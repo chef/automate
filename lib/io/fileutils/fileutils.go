@@ -95,7 +95,7 @@ func GetHabRootPath() string {
 	}
 	pkgPath := string(out)
 	habIndex := strings.Index(string(pkgPath), "hab")
-	rootHab := pkgPath[0 : habIndex+4]
+	rootHab := pkgPath[0 : habIndex+3]
 	if rootHab == "" {
 		rootHab = HAB_DIR
 	}

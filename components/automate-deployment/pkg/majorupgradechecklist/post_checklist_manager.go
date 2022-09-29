@@ -5,8 +5,7 @@ import (
 )
 
 const (
-	FILE_NAME        = "upgrade_metadata.json"
-	UPGRADE_METADATA = "/hab/svc/deployment-service/var/" + FILE_NAME
+	FILE_NAME = "upgrade_metadata.json"
 )
 
 type PostChecklistManager struct {

@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"syscall"
 
 	"github.com/chef/automate/api/config/deployment"
@@ -23,18 +22,16 @@ import (
 
 const (
 	SPACES_BEFORE_STEPS = "       "
-	UPGRADE_METADATA    = "/hab/svc/deployment-service/var/upgrade_metadata.json"
 )
 
 type MigratorV4Utils interface {
-	GetEsTotalShardSettings() (int32, error)
+	GetEsTotalShardSettings(path string) (int32, error)
 	PatchOpensearchConfig(es *ESSettings) (string, string, error)
 	IsExternalElasticSearch(timeout int64) bool
 	StopAutomate() error
 	StartAutomate() error
-	GetHabRootPath(habrootcmd string) string
-	ReadV4Checklist(id string) (bool, error)
-	UpdatePostChecklistFile(id string) error
+	ReadV4Checklist(id, path string) (bool, error)
+	UpdatePostChecklistFile(id, path string) error
 	ExecuteCommand(command string, args []string, workingDir string) error
 	GetServicesStatus() (bool, error)
 	GetAutomateFQDN(timeout int64) string
@@ -84,9 +81,9 @@ func (m *MigratorV4UtilsImpl) PatchOpensearchConfig(osConfig *ESSettings) (strin
 	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
 }
 
-func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
+func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings(path string) (int32, error) {
 	esSetting := &ESSettings{}
-	jsonData, err := ioutil.ReadFile(majorupgrade_utils.V3_ES_SETTING_FILE) // nosemgrep
+	jsonData, err := ioutil.ReadFile(path) // nosemgrep
 	if err != nil {
 		return esSetting.TotalShardSettings, err
 	}
@@ -164,34 +161,20 @@ func (m *MigratorV4UtilsImpl) StartAutomate() error {
 	return nil
 }
 
-func (m *MigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
-	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
-	if err != nil {
-		return "/hab/"
-	}
-	pkgPath := string(out)
-	habIndex := strings.Index(string(pkgPath), "hab")
-	rootHab := pkgPath[0 : habIndex+4]
-	if rootHab == "" {
-		rootHab = "/hab/"
-	}
-	return rootHab
-}
-
-func (m *MigratorV4UtilsImpl) ReadV4Checklist(id string) (bool, error) {
+func (m *MigratorV4UtilsImpl) ReadV4Checklist(id, path string) (bool, error) {
 	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 	if err != nil {
 		return false, err
 	}
-	return ci.ReadPostChecklistById(id, UPGRADE_METADATA)
+	return ci.ReadPostChecklistById(id, path)
 }
 
-func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id string) error {
+func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id, path string) error {
 	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 	if err != nil {
 		return err
 	}
-	return ci.UpdatePostChecklistFile(id, UPGRADE_METADATA)
+	return ci.UpdatePostChecklistFile(id, path)
 }
 
 func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {

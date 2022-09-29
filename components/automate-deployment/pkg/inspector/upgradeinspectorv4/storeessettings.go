@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
@@ -17,6 +18,7 @@ type StoreESSettingsInspection struct {
 	timeout         int64
 	exitError       error
 	exitedWithError bool
+	fileutils       fileutils.FileUtils
 }
 
 func (ses *StoreESSettingsInspection) ShowInfo(index *int) error {
@@ -30,11 +32,12 @@ func (ses *StoreESSettingsInspection) GetShortInfo() []string {
 	return nil
 }
 
-func NewStoreESSettingsInspection(w *cli.Writer, utls UpgradeV4Utils, timeout int64) *StoreESSettingsInspection {
+func NewStoreESSettingsInspection(w *cli.Writer, utls UpgradeV4Utils, fileutils fileutils.FileUtils, timeout int64) *StoreESSettingsInspection {
 	return &StoreESSettingsInspection{
 		writer:       w,
 		upgradeUtils: utls,
 		timeout:      timeout,
+		fileutils:    fileutils,
 	}
 }
 
@@ -111,7 +114,9 @@ func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) er
 	if err != nil {
 		return errors.Wrap(err, "Failed to map elasticsearch settings to json")
 	}
-	err = ses.upgradeUtils.WriteToFile(majorupgrade_utils.V3_ES_SETTING_FILE, esSettingsJson)
+	habRoot := ses.fileutils.GetHabRootPath()
+	esSettingFilePath := habRoot + majorupgrade_utils.V3_ES_SETTING_FILE
+	err = ses.upgradeUtils.WriteToFile(esSettingFilePath, esSettingsJson)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write elasticsearch settings to file")
 	}

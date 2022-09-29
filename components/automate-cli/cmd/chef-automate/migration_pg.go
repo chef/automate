@@ -17,6 +17,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -109,7 +110,8 @@ func newMigrateDataCmd() *cobra.Command {
 func runCleanup(cmd *cobra.Command, args []string) error {
 	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
 		mu := migratorv4.NewMigratorV4Utils()
-		cleanUp := migratorv4.NewCleanUp(writer, mu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept)
+		mfu := &fileutils.FileSystemUtils{}
+		cleanUp := migratorv4.NewCleanUp(writer, mu, mfu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept)
 		cleanUp.Clean()
 	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
 		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
@@ -130,7 +132,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+			isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 			if err != nil {
 				return err
 			}
@@ -184,7 +186,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		isExecuted, err := ci.ReadPostChecklistById(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
+		isExecuted, err := ci.ReadPostChecklistById(MIGRATE_PG_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
@@ -382,7 +384,7 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot stri
 		writer.Fail(err.Error())
 		return err
 	}
-	err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+	err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
 		writer.Fail("UpdatePostChecklistFile : " + err.Error())
 	}
@@ -480,7 +482,7 @@ func cleanUp() error {
 		if err != nil {
 			return err
 		}
-		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		err = ci.UpdatePostChecklistFile(CLEANUP_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
@@ -524,7 +526,7 @@ func cleanUpes() error {
 			writer.Fail(err.Error())
 			return err
 		}
-		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		err = ci.UpdatePostChecklistFile(CLEANUP_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			writer.Fail(err.Error())
 			return err
@@ -701,7 +703,7 @@ func checkUpdateMigration(check bool) error {
 			if err != nil {
 				return err
 			}
-			err = ci.UpdatePostChecklistFile(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
+			err = ci.UpdatePostChecklistFile(MIGRATE_PG_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 			if err != nil {
 			}
 		}

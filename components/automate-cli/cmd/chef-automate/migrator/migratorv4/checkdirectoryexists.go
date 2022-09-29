@@ -30,31 +30,34 @@ func (cde *CheckDirExists) setError(err error) error {
 }
 
 func (cde *CheckDirExists) Run() error {
+	habroot := cde.fileutils.GetHabRootPath()
+	esDatadir := habroot + ELASTICSEARCH_DATA_DIR
+	esvardir := habroot + ELASTICSEARCH_VAR_DIR
 
-	existDirData, err := cde.fileutils.PathExists(ELASTICSEARCH_DATA_DIR)
+	existDirData, err := cde.fileutils.PathExists(esDatadir)
 	if err != nil {
-		err = errors.Wrap(err, "Failed to check directory "+ELASTICSEARCH_DATA_DIR)
+		err = errors.Wrap(err, "Failed to check directory "+esDatadir)
 		cde.setError(err)
 		return err
 	}
-	existDirVar, err := cde.fileutils.PathExists(ELASTICSEARCH_VAR_DIR)
+	existDirVar, err := cde.fileutils.PathExists(esvardir)
 	if err != nil {
-		err = errors.Wrap(err, "Failed to check directory "+ELASTICSEARCH_VAR_DIR)
+		err = errors.Wrap(err, "Failed to check directory "+esvardir)
 		cde.setError(err)
 		return err
 	}
 	if !existDirVar && !existDirData {
-		err = errors.New(fmt.Sprintf("Directories not found :\n%s\n%s", ELASTICSEARCH_DATA_DIR, ELASTICSEARCH_VAR_DIR))
+		err = errors.New(fmt.Sprintf("Directories not found :\n%s\n%s", esDatadir, esvardir))
 		cde.setError(err)
 		return err
 	}
 	if !existDirData {
-		err = errors.New("Directory not found : " + ELASTICSEARCH_DATA_DIR)
+		err = errors.New("Directory not found : " + esDatadir)
 		cde.setError(err)
 		return err
 	}
 	if !existDirVar {
-		err = errors.New("Directory not found : " + ELASTICSEARCH_VAR_DIR)
+		err = errors.New("Directory not found : " + esvardir)
 		cde.setError(err)
 		return err
 	}

@@ -6,13 +6,13 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
 )
 
 const (
-	HABROOT_CMD = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
-	FSCRIPT     = `
+	FSCRIPT = `
 mv %[1]vsvc/automate-opensearch/data %[1]vsvc/automate-opensearch/data.os; 
 mv %[1]vsvc/automate-opensearch/var %[1]vsvc/automate-opensearch/var.os; 
 cp -r %[1]vsvc/automate-elasticsearch/data %[1]vsvc/automate-opensearch/; 
@@ -24,16 +24,18 @@ chown -RL hab:hab %[1]vsvc/automate-opensearch/var;`
 type MigrationScript struct {
 	writer     *cli.Writer
 	utils      MigratorV4Utils
+	fileutils  fileutils.FileUtils
 	spinner    *spinner.Spinner
 	runError   error
 	hasError   bool
 	isExecuted bool
 }
 
-func NewMigrationScript(w *cli.Writer, utils MigratorV4Utils) *MigrationScript {
+func NewMigrationScript(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils) *MigrationScript {
 	return &MigrationScript{
-		writer: w,
-		utils:  utils,
+		writer:    w,
+		utils:     utils,
+		fileutils: fileutils,
 	}
 }
 
@@ -64,7 +66,7 @@ func (ms *MigrationScript) showCopying() {
 
 func (ms *MigrationScript) Run() error {
 	ms.showCopying()
-	habRoot := ms.utils.GetHabRootPath(HABROOT_CMD)
+	habRoot := ms.fileutils.GetHabRootPath()
 	script := fmt.Sprintf(FSCRIPT, habRoot)
 	args := []string{
 		"-c",

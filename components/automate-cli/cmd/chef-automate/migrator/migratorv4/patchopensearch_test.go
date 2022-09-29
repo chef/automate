@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -11,10 +12,12 @@ import (
 func TestPatchOsSuccess(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 	}
-	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu)
+	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu, &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
+	})
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
@@ -26,10 +29,12 @@ func TestPatchOsSuccess(t *testing.T) {
 func TestPatchOsErrorGetShardSettings(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return -1, errors.New("unexpected") },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return -1, errors.New("unexpected") },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 	}
-	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu)
+	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu, &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
+	})
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
@@ -41,10 +46,12 @@ func TestPatchOsErrorGetShardSettings(t *testing.T) {
 func TestPatchOsErrorPatchingShardSettings(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", errors.New("unexpected error") },
 	}
-	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu)
+	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu, &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
+	})
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
@@ -57,7 +64,9 @@ func TestPatchOsErrorPatchingShardSettings(t *testing.T) {
 
 func TestCalculateMaxTotalShardsLessThan1500(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
-	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{})
+	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{}, &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
+	})
 	var shardsUsed int32 = 1200
 	var minShardVal int32 = MINIMUM_SHARD_VALUE
 	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT
@@ -68,7 +77,9 @@ func TestCalculateMaxTotalShardsLessThan1500(t *testing.T) {
 
 func TestCalculateMaxTotalShardsMoreThan1500(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
-	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{})
+	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{}, &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
+	})
 	var shardsUsed int32 = 1800
 	var minShardVal int32 = MINIMUM_SHARD_VALUE
 	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT

@@ -1,22 +1,21 @@
 package migratorv4
 
 type MockMigratorV4UtilsImpl struct {
-	GetEsTotalShardSettingsFunc func() (int32, error)
+	GetEsTotalShardSettingsFunc func(path string) (int32, error)
 	PatchOpensearchConfigFunc   func(es *ESSettings) (string, string, error)
 	IsExternalElasticSearchFunc func(timeout int64) bool
 	StopAutomateFunc            func() error
 	StartAutomateFunc           func() error
-	GetHabRootPathFunc          func(habrootcmd string) string
-	ReadV4ChecklistFunc         func(id string) (bool, error)
-	UpdatePostChecklistFileFunc func(id string) error
+	ReadV4ChecklistFunc         func(id, path string) (bool, error)
+	UpdatePostChecklistFileFunc func(id, path string) error
 	ExecuteCommandFunc          func(command string, args []string, workingDir string) error
 	GetServicesStatusFunc       func() (bool, error)
 	CreateMigrateJsonFunc       func() error
 	GetAutomateFQDNFunc         func(timeout int64) string
 }
 
-func (mui *MockMigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
-	return mui.GetEsTotalShardSettingsFunc()
+func (mui *MockMigratorV4UtilsImpl) GetEsTotalShardSettings(path string) (int32, error) {
+	return mui.GetEsTotalShardSettingsFunc(path)
 }
 func (mui *MockMigratorV4UtilsImpl) PatchOpensearchConfig(es *ESSettings) (string, string, error) {
 	return mui.PatchOpensearchConfigFunc(es)
@@ -30,14 +29,11 @@ func (mui *MockMigratorV4UtilsImpl) StopAutomate() error {
 func (mui *MockMigratorV4UtilsImpl) StartAutomate() error {
 	return mui.StartAutomateFunc()
 }
-func (mui *MockMigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
-	return mui.GetHabRootPathFunc(habrootcmd)
+func (mui *MockMigratorV4UtilsImpl) ReadV4Checklist(id, path string) (bool, error) {
+	return mui.ReadV4ChecklistFunc(id, path)
 }
-func (mui *MockMigratorV4UtilsImpl) ReadV4Checklist(id string) (bool, error) {
-	return mui.ReadV4ChecklistFunc(id)
-}
-func (mui *MockMigratorV4UtilsImpl) UpdatePostChecklistFile(id string) error {
-	return mui.UpdatePostChecklistFileFunc(id)
+func (mui *MockMigratorV4UtilsImpl) UpdatePostChecklistFile(id, path string) error {
+	return mui.UpdatePostChecklistFileFunc(id, path)
 }
 func (mui *MockMigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {
 	return mui.ExecuteCommandFunc(command, args, workingDir)

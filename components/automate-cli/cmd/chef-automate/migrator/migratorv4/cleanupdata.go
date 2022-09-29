@@ -6,6 +6,8 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
 )
@@ -17,22 +19,23 @@ const (
 	rm -rf %[1]vsvc/automate-elasticsearch/data;
 	rm -rf %[1]vsvc/automate-elasticsearch/var;
 	`
-	habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
 	CLEANUP_ID = "clean_up"
 )
 
 type Cleanup struct {
 	writer       *cli.Writer
 	utils        MigratorV4Utils
+	fileutils    fileutils.FileUtils
 	spinner      *spinner.Spinner
 	autoAccept   bool
 	forceExecute bool
 }
 
-func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, autoAccept, forceExecute bool) *Cleanup {
+func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils, autoAccept, forceExecute bool) *Cleanup {
 	return &Cleanup{
 		writer:       w,
 		utils:        utils,
+		fileutils:    fileutils,
 		autoAccept:   autoAccept,
 		forceExecute: forceExecute,
 	}
@@ -49,8 +52,8 @@ func (cu *Cleanup) Clean() error {
 }
 
 func (cu *Cleanup) startCleanup(forceExecute, autoAccept bool) error {
-
-	isExecuted, err := cu.utils.ReadV4Checklist(CLEANUP_ID)
+	habRoot := cu.fileutils.GetHabRootPath()
+	isExecuted, err := cu.utils.ReadV4Checklist(CLEANUP_ID, habRoot+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
 		return err
 	}
@@ -86,7 +89,7 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 		}
 	}
 	cu.showDeletingMessage()
-	habRoot := cu.utils.GetHabRootPath(habrootcmd)
+	habRoot := cu.fileutils.GetHabRootPath()
 	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
 	args := []string{
 		"-c",
@@ -96,7 +99,8 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 	if err != nil {
 		return err
 	} else {
-		err = cu.utils.UpdatePostChecklistFile(CLEANUP_ID)
+		habRoot := cu.fileutils.GetHabRootPath()
+		err = cu.utils.UpdatePostChecklistFile(CLEANUP_ID, habRoot+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}

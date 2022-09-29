@@ -32,19 +32,20 @@ func (cs *CheckStorage) setError(err error) error {
 }
 
 func (cs *CheckStorage) Run() error {
-	esDirSize, err := cs.fileutils.CalDirSizeInGB(ELASTICSEARCH_DATA_DIR)
+	habRoot := cs.fileutils.GetHabRootPath()
+	esDirSize, err := cs.fileutils.CalDirSizeInGB(habRoot + ELASTICSEARCH_DATA_DIR)
 	if err != nil {
 		cs.setError(err)
 		return err
 	}
 	minimumRequiredSpace := esDirSize * 110 / 100
-	osDirSize, err := cs.fileutils.GetFreeSpaceinGB(OPENSEARCH_DATA_DIR)
+	osDirSize, err := cs.fileutils.GetFreeSpaceinGB(habRoot + OPENSEARCH_DATA_DIR)
 	if err != nil {
 		cs.setError(err)
 		return err
 	}
 	if osDirSize < minimumRequiredSpace {
-		err = errors.New(fmt.Sprintf("Insufficient space. Directory %s should have minimum %.2fGB space available.", OPENSEARCH_DATA_DIR, minimumRequiredSpace))
+		err = errors.New(fmt.Sprintf("Insufficient space. Directory %s should have minimum %.2fGB space available.", habRoot+OPENSEARCH_DATA_DIR, minimumRequiredSpace))
 		cs.setError(err)
 		return err
 	}

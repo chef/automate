@@ -153,7 +153,7 @@ func (ui *UpgradeInspectorV4) AddDefaultInspections() {
 	esBasePath := ui.upgradeUtils.GetESBasePath(ui.timeout)
 	ui.AddInspection(NewESIndexInspection(ui.writer, ui.upgradeUtils, esBasePath))
 	ui.AddInspection(NewReplaceS3UrlInspection(ui.writer, ui.upgradeUtils, ui.timeout))
-	ui.AddInspection(NewStoreESSettingsInspection(ui.writer, ui.upgradeUtils, ui.timeout))
+	ui.AddInspection(NewStoreESSettingsInspection(ui.writer, ui.upgradeUtils, ui.fileUtils, ui.timeout))
 	ui.AddInspection(NewDisableShardingInspection(ui.writer, ui.upgradeUtils))
 	ui.AddInspection(NewEnableMaintenanceInspection(ui.writer, ui.upgradeUtils, ui.timeout))
 }

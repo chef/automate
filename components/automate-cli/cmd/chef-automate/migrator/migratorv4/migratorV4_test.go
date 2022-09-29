@@ -39,9 +39,8 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	mmu := &MockMigratorV4UtilsImpl{
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 	}
@@ -49,6 +48,7 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation(false)
@@ -74,14 +74,13 @@ func TestRunSuccessfulMigrationsWithForceFlag(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
 	}
 	forceExecuteFlag := true
@@ -89,6 +88,7 @@ func TestRunSuccessfulMigrationsWithForceFlag(t *testing.T) {
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.RunMigrationFlow(false)
@@ -120,14 +120,13 @@ func TestRunSuccessfulMigrationsWithAutoAccept(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return false, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return false, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
 	}
 	forceExecuteFlag := true
@@ -135,6 +134,7 @@ func TestRunSuccessfulMigrationsWithAutoAccept(t *testing.T) {
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.RunMigrationFlow(false)
@@ -164,12 +164,13 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	mmu := &MockMigratorV4UtilsImpl{
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
-	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
+	}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	err := migratorv4.ExecuteMigrationSteps()
 	expected := "Can't process without user consent."
@@ -181,20 +182,20 @@ func TestRunMigrationFlowAllSuccess(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := "Failed"
@@ -206,16 +207,16 @@ func TestRunMigrationFlowIsExecutedErrors(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, errors.New("unexpected") },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, errors.New("unexpected") },
 		StartAutomateFunc:           func() error { return errors.New("unexpected") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `[Error] unexpected
@@ -230,16 +231,16 @@ func TestRunMigrationFlowIsExecutedReplyNo(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return errors.New("unexpected") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `Migration Terminated.`
@@ -251,19 +252,19 @@ func TestRunMigrationFlowDefferedErrors(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return errors.New("unexpected error while starting automate") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `[Error] unexpected error while starting automate
@@ -278,10 +279,9 @@ func TestRunMigrationFlowDefferedErrorsAndExecuteMigrationError(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return errors.New("unexpected error while starting automate") },
 		ExecuteCommandFunc: func(command string, args []string, workingDir string) error {
 			if args[0] == "-c" {
@@ -290,12 +290,13 @@ func TestRunMigrationFlowDefferedErrorsAndExecuteMigrationError(t *testing.T) {
 			return nil
 		},
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `✖  Failed to start Chef Automate
@@ -313,20 +314,20 @@ func TestRunMigrationFlowCleanupDecline(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	t.Log(w.Output())
@@ -341,20 +342,20 @@ func TestRunMigrationFlowCleanup(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	t.Log(w.Output())
@@ -368,19 +369,19 @@ func TestPathNotExist(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
 	mmu := &MockMigratorV4UtilsImpl{
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
+		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, errors.New("path error") },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := "[Error] Failed to check directory /hab/svc/automate-elasticsearch/data: path error\nMigration Terminated.\n"
@@ -394,18 +395,18 @@ func TestExternalDetected(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
 	mmu := &MockMigratorV4UtilsImpl{
 		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		GetEsTotalShardSettingsFunc: func(string) (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return true },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, errors.New("path error") },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}, 10)
 	migratorv4.RunMigrationFlow(false)
 	expected := "[Error] Detected External OpenSearch\nPlease resolve this and try again.\nPlease contact support if you are not sure how to resolve this.\nMigration Terminated.\n"

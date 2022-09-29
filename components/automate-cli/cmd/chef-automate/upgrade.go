@@ -691,7 +691,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 		if err != nil {
 			return err
 		}
-		err = ci.UpdatePostChecklistFile(EXTERNAL_PATCH_ID, majorupgradechecklist.UPGRADE_METADATA)
+		err = ci.UpdatePostChecklistFile(EXTERNAL_PATCH_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 		}
 		_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, true)
@@ -893,7 +893,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil

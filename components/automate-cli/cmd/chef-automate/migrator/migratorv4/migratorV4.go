@@ -6,6 +6,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/fatih/color"
 )
 
@@ -83,10 +84,10 @@ func (m *MigratorV4) AskForConfirmation(skipConfirmation bool) error {
 func (m *MigratorV4) AddDefaultMigrationSteps() {
 	m.AddMigrationSteps(NewEnsureStatus(m.writer, m.migratorUtils))
 	m.AddMigrationSteps(NewCheckStorage(m.writer, m.migratorUtils, m.fileutils))
-	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils, m.fileutils))
 	m.AddMigrationSteps(NewCheckDirExists(m.writer, m.fileutils))
 	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils, &m.runHealthStatus))
-	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils, m.fileutils))
 	m.AddMigrationSteps(NewWaitForHealthy(m.writer, m.migratorUtils, &m.runHealthStatus))
 }
 
@@ -111,14 +112,16 @@ func (m *MigratorV4) PrintMigrationErrors() {
 }
 
 func (m *MigratorV4) SaveExecutedStatus() error {
-	return m.migratorUtils.UpdatePostChecklistFile(MIGRATE_ES_ID)
+	habroot := m.fileutils.GetHabRootPath()
+	return m.migratorUtils.UpdatePostChecklistFile(MIGRATE_ES_ID, habroot+majorupgrade_utils.UPGRADE_METADATA)
 }
 
 func (m *MigratorV4) IsExecutedCheck() error {
 	if m.ForceExecute {
 		return nil
 	}
-	isExecuted, err := m.migratorUtils.ReadV4Checklist(MIGRATE_ES_ID)
+	habroot := m.fileutils.GetHabRootPath()
+	isExecuted, err := m.migratorUtils.ReadV4Checklist(MIGRATE_ES_ID, habroot+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
 		return err
 	}
@@ -191,7 +194,7 @@ func (m *MigratorV4) RunMigrationFlow(skipConfirmation bool) {
 }
 
 func (m *MigratorV4) ClearData() error {
-	clearData := NewCleanUp(m.writer, m.migratorUtils, false, false)
+	clearData := NewCleanUp(m.writer, m.migratorUtils, m.fileutils, false, false)
 	clearData.Clean()
 	return nil
 }

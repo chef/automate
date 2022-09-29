@@ -24,11 +24,6 @@ func TestExecCommand(t *testing.T) {
 }
 func TestUpdatePostCheclist(t *testing.T) {
 	impl := NewMigratorV4Utils()
-	err := impl.UpdatePostChecklistFile("dsdsd")
+	err := impl.UpdatePostChecklistFile("dsdsd", "/hab/fd")
 	assert.Error(t, err)
-}
-func TestHabRoot(t *testing.T) {
-	impl := NewMigratorV4Utils()
-	str := impl.GetHabRootPath("dsdsd")
-	assert.Equal(t, "/hab/", str)
 }

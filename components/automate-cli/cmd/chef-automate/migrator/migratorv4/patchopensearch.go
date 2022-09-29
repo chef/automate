@@ -7,6 +7,7 @@ import (
 	"github.com/briandowns/spinner"
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/fatih/color"
@@ -21,33 +22,35 @@ const (
 	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95%"
 	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
 	MAX_POSSIBLE_HEAP_SIZE                = 32
-	ELASTICSEARCH_DATA_DIR                = "/hab/svc/automate-elasticsearch/data"
-	ELASTICSEARCH_VAR_DIR                 = "/hab/svc/automate-elasticsearch/var"
-	OPENSEARCH_DATA_DIR                   = "/hab/svc/automate-opensearch/data"
+	ELASTICSEARCH_DATA_DIR                = "/svc/automate-elasticsearch/data"
+	ELASTICSEARCH_VAR_DIR                 = "/svc/automate-elasticsearch/var"
+	OPENSEARCH_DATA_DIR                   = "/svc/automate-opensearch/data"
 	MIGRATE_ES_ID                         = "migrate_es"
 )
 
 type PatchOpensearchConfig struct {
 	writer     *cli.Writer
 	utils      MigratorV4Utils
+	fileutils  fileutils.FileUtils
 	spinner    *spinner.Spinner
 	runError   error
 	hasError   bool
 	isExecuted bool
 }
 
-func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils) *PatchOpensearchConfig {
+func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils) *PatchOpensearchConfig {
 	return &PatchOpensearchConfig{
-		writer: w,
-		utils:  utils,
+		writer:    w,
+		utils:     utils,
+		fileutils: fileutils,
 	}
 }
 
 func (poc *PatchOpensearchConfig) Run() error {
 	poc.showUpdating()
 	opensearchSettings := poc.GetDefaultOpensearchSettings()
-
-	esTotalShards, _ := poc.utils.GetEsTotalShardSettings()
+	habroot := poc.fileutils.GetHabRootPath()
+	esTotalShards, _ := poc.utils.GetEsTotalShardSettings(habroot + majorupgrade_utils.V3_ES_SETTING_FILE)
 	opensearchSettings.TotalShardSettings = poc.calculateMaxTotalShards(esTotalShards, MINIMUM_SHARD_VALUE, INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
 	_, _, err := poc.utils.PatchOpensearchConfig(opensearchSettings)
 	if err != nil {
