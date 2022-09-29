@@ -3,7 +3,6 @@ package migratorv4
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -184,12 +183,9 @@ func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id, path string) error {
 
 func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {
 	c := exec.Command(command, args...)
-	c.Stdin = os.Stdin
 	if len(workingDir) > 0 {
 		c.Dir = workingDir
 	}
-	c.Stdout = io.MultiWriter(os.Stdout)
-	c.Stderr = io.MultiWriter(os.Stderr)
 	err := c.Run()
 	return err
 }

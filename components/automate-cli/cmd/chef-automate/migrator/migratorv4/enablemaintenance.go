@@ -103,9 +103,6 @@ func (em *EnableMaintenance) setExecuted() {
 }
 
 func (em *EnableMaintenance) OnSuccess() (err error) {
-	if !em.isExecuted {
-		return nil
-	}
 	em.showTurningOff()
 	isMaintenanceOn, err := em.utils.GetMaintenanceStatus(em.timeout)
 	if err != nil {
