@@ -65,7 +65,7 @@ func (m *MigratorV4) AddMigrationSteps(migrationSteps migrator.MigrationSteps) {
 }
 
 func (m *MigratorV4) AskForConfirmation(skipConfirmation bool) error {
-	if skipConfirmation {
+	if skipConfirmation || m.AutoAcceptFlag || m.ForceExecute {
 		m.migrationConsent = true
 		return nil
 	}
@@ -115,6 +115,9 @@ func (m *MigratorV4) SaveExecutedStatus() error {
 }
 
 func (m *MigratorV4) IsExecutedCheck() error {
+	if m.ForceExecute {
+		return nil
+	}
 	isExecuted, err := m.migratorUtils.ReadV4Checklist(MIGRATE_ES_ID)
 	if err != nil {
 		return err
