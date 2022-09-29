@@ -17,6 +17,13 @@ import (
 const (
 	INDEX_BATCH_SIZE int    = 10
 	MSG_ES_CHECKING  string = "Elasticsearch indices are in version 6"
+	BIG_SPACE               = "                "
+	INDEX_ACTION            = `%[1]vPlease choose from options below:
+%[1]v1. Delete these indices and proceed with upgrade.
+%[1]v2. Exit the upgrade process, manually re-index the indices and upgrade Chef Automate later on.
+
+%[1]vFor more information on reindexing, visit: https://www. elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html
+`
 )
 
 // remove .saved-searches
@@ -85,12 +92,7 @@ func (es *ESIndexInspection) showSuccess() {
 }
 
 func (es *ESIndexInspection) promptForDeletion() bool {
-	msg := `                Please choose from options below:
-                1. Delete these indices and proceed with upgrade.
-                2. Exit the upgrade process, manually re-index the indices and upgrade Chef Automate later on.
-
-                For more information on reindexing, visit: https://www. elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html
-`
+	msg := fmt.Sprintf(INDEX_ACTION, BIG_SPACE)
 	es.writer.Println(msg)
 	return es.shouldDelete()
 }
@@ -123,13 +125,13 @@ func (es *ESIndexInspection) batchDeleteOldIndices(indexList []string, basePath 
 }
 
 func (es *ESIndexInspection) deletedSuccessfully() {
-	es.writer.Println("                " + color.New(color.FgGreen).Sprint("✔") + " Old Elasticsearch indices deleted successfully\n")
+	es.writer.Println(BIG_SPACE + color.New(color.FgGreen).Sprint("✔") + " Old Elasticsearch indices deleted successfully\n")
 	es.writer.Println(" " + color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
 		"]\t" + MSG_ES_CHECKING)
 }
 
 func (es *ESIndexInspection) shouldDelete() bool {
-	choice, err := es.writer.Prompt("                Enter your choice (1/2)")
+	choice, err := es.writer.Prompt(BIG_SPACE + "Enter your choice (1/2)")
 	if err != nil {
 		es.writer.Println(err.Error())
 	}
@@ -139,7 +141,7 @@ func (es *ESIndexInspection) shouldDelete() bool {
 	case "2":
 		return false
 	default:
-		es.writer.Printf("                I don't understand '%s'. Please type '1' or '2'\n", choice)
+		es.writer.Printf(BIG_SPACE+"I don't understand '%s'. Please type '1' or '2'\n", choice)
 		return es.shouldDelete()
 	}
 }
@@ -169,17 +171,17 @@ func (es *ESIndexInspection) showErrorList() {
 }
 
 func (es *ESIndexInspection) showErrorListOldAutomateIndices() {
-	es.writer.Println("                [" + color.New(color.FgRed).Sprint("Error") + "] Below indices are from an older version of Elasticsearch from Chef Automate 1")
+	es.writer.Println(BIG_SPACE + "[" + color.New(color.FgRed).Sprint("Error") + "] Below indices are from an older version of Elasticsearch from Chef Automate 1")
 	for _, a1 := range es.automateOldIndices {
-		es.writer.Println("                " + "        " + a1)
+		es.writer.Println(BIG_SPACE + "        " + a1)
 	}
 	es.writer.Println("")
 }
 
 func (es *ESIndexInspection) showErrorListOldOtherIndices() {
-	es.writer.Println("                [" + color.New(color.FgRed).Sprint("Error") + "] Below indices are from an older version of Elasticsearch")
+	es.writer.Println(BIG_SPACE + "[" + color.New(color.FgRed).Sprint("Error") + "] Below indices are from an older version of Elasticsearch")
 	for _, oi := range es.otherOldIndices {
-		es.writer.Println("                " + "        " + oi)
+		es.writer.Println(BIG_SPACE + "        " + oi)
 	}
 	es.writer.Println("")
 }
