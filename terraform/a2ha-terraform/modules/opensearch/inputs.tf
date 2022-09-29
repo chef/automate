@@ -58,11 +58,11 @@ variable "opensearch_svc_load_args" {
 }
 
 variable "opensearch_user_password" {
-  default = ""
+  default = "admin"
 }
 
 variable "opensearch_username" {
-  default = ""
+  default = "admin"
 }
 
 variable "opensearchsidecar_pkg_ident" {
