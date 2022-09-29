@@ -107,6 +107,7 @@ func LoadServiceMetadata(ctx context.Context, bucket Bucket, svcName string, obj
 	mdStorageKey := path.Join(svcName, metadataFileBaseName)
 
 	reader, err := bucket.NewReader(ctx, mdStorageKey, objectVerifier)
+	logrus.Debug(" LoadServiceMetadata : ", err)
 	if err != nil {
 		// Return an IsNotExist error unwrapped so caller can also check for IsNotExist
 		if IsNotExist(err) {
@@ -141,6 +142,7 @@ func LoadAllSpecsFromBackup(ctx context.Context, bucket Bucket, verifier ObjectV
 	specless := []string{}
 	for _, service := range services {
 		metadata, err := LoadServiceMetadata(ctx, bucket, string(service), verifier)
+		logrus.Debug("Missing metadata for ", service, err)
 		if err != nil {
 			if IsNotExist(errors.Cause(err)) {
 				logrus.Warnf("Missing metadata for %s", service)
