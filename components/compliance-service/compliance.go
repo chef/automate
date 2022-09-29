@@ -12,8 +12,6 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
-	"github.com/chef/automate/components/compliance-service/migrations"
-
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/external/secrets"
@@ -207,14 +205,14 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
-	upgradeDB := pgdb.NewDB(db)
+	/*upgradeDB := pgdb.NewDB(db)
 	upgradeService := migrations.NewService(upgradeDB, cerealManager)
 
 	// Initiating cereal Manager for upgrade jobs
 	err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
 	if err != nil {
 		logrus.Fatalf("Failed to initiate cereal manager for upgrading jobs %v", err)
-	}
+	}*/
 
 	err = processor.InitCerealManager(cerealManager, conf.CerealConfig.Workers, ingesticESClient)
 	if err != nil {
@@ -273,7 +271,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	}
 
 	// Running upgrade scenarios for DayLatest flag
-	go upgradeService.PollForUpgradeFlagDayLatest()
+	//go upgradeService.PollForUpgradeFlagDayLatest()
 
 	errc := make(chan error)
 	defer close(errc)

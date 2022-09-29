@@ -309,7 +309,8 @@ func (a *Reporting) getAllNodes(ctx context.Context, jobId string, end_time stri
 	}
 	return nodesList, nil
 }
-func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary, error) {
+
+/* func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary, error) {
 	inDomain := &reportingService.ListFilters{}
 	out := &reporting.AssetSummary{}
 
@@ -373,3 +374,4 @@ func (a *Reporting) ListControlItemsRange(ctx context.Context, in *reporting.Con
 	}
 	return out, nil
 }
+*/
