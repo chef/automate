@@ -615,8 +615,8 @@ func printUpgradeStatusMsg(resp *api.UpgradeStatusResponse) {
 	} else {
 		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to version (%s) successfully.", resp.CurrentVersion))
 	}
-	writer.Println(fmt.Sprintf("To know whats new in version (%s),", resp.CurrentVersion))
-	writer.Println("visit" + color.New(color.FgBlue).Sprint(fmt.Sprintf(" https://docs.chef.io/release_notes_automate/#%s ", resp.CurrentVersion)))
+	writer.Println(fmt.Sprintf("  To know whats new in version (%s),", resp.CurrentVersion))
+	writer.Println("  visit" + color.New(color.FgBlue).Sprint(fmt.Sprintf(" https://docs.chef.io/release_notes_automate/#%s ", resp.CurrentVersion)))
 	writer.Println(color.New(color.FgGreen).Sprint("------------------------------------------------------------------------------------"))
 	writer.Println("")
 }
