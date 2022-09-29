@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -202,43 +201,44 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					)
 				}
 			case "4":
-				muv4ui := &upgradeinspectorv4.MockUpgradeV4UtilsImp{
-					IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
-					ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
-						if strings.Contains(url, "index.version") {
-							return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
-						} else if strings.Contains(url, "_cluster/stats") {
-							return []byte(`{"indices":{"shards":{"total":51}}}`), nil
-						} else if strings.Contains(url, "indices") {
-							return []byte(`comp-2-run-info
-node-attribute
-node-state-7
-node-1-run-info
-comp-3-profiles
-eventfeed-2-feeds`), nil
-						} else if strings.Contains(url, "_cluster/settings") {
-							return []byte{}, nil
-						} else {
-							return []byte{}, nil
-						}
-					},
-					GetESBasePathFunc:        func(timeout int64) string { return "http://localhost" },
-					GetBackupS3URLFunc:       func(timeout int64) (string, error) { return "https://s3.us-east-1.amazonaws.com", nil },
-					PatchS3backupURLFunc:     func(timeout int64) (stdOut, stdErr string, err error) { return "", "", nil },
-					GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return false, nil },
-					SetMaintenanceModeFunc:   func(timeout int64, status bool) (stdOut, stdErr string, err error) { return "", "", nil },
-					GetServicesStatusFunc:    func() (bool, error) { return true, nil },
-				}
+				// 				muv4ui := &upgradeinspectorv4.MockUpgradeV4UtilsImp{
+				// 					IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+				// 					ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+				// 						if strings.Contains(url, "index.version") {
+				// 							return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+				// 						} else if strings.Contains(url, "_cluster/stats") {
+				// 							return []byte(`{"indices":{"shards":{"total":51}}}`), nil
+				// 						} else if strings.Contains(url, "indices") {
+				// 							return []byte(`comp-2-run-info
+				// node-attribute
+				// node-state-7
+				// node-1-run-info
+				// comp-3-profiles
+				// eventfeed-2-feeds`), nil
+				// 						} else if strings.Contains(url, "_cluster/settings") {
+				// 							return []byte{}, nil
+				// 						} else {
+				// 							return []byte{}, nil
+				// 						}
+				// 					},
+				// 					GetESBasePathFunc:        func(timeout int64) string { return "http://localhost" },
+				// 					GetBackupS3URLFunc:       func(timeout int64) (string, error) { return "https://s3.us-east-1.amazonaws.com", nil },
+				// 					PatchS3backupURLFunc:     func(timeout int64) (stdOut, stdErr string, err error) { return "", "", nil },
+				// 					GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return false, nil },
+				// 					SetMaintenanceModeFunc:   func(timeout int64, status bool) (stdOut, stdErr string, err error) { return "", "", nil },
+				// 					GetServicesStatusFunc:    func() (bool, error) { return true, nil },
+				// 				}
 
-				mfu := &fileutils.MockFileSystemUtils{
-					CalDirSizeInGBFunc:         func(path string) (float64, error) { return 2, nil },
-					CheckSpaceAvailabilityFunc: func(dir string, minSpace float64) (bool, error) { return true, nil },
-					GetFreeSpaceinGBFunc:       func(dir string) (float64, error) { return 8, nil },
-					GetHabRootPathFunc:         func() string { return "/hab" },
-					PathExistsFunc:             func(path string) (bool, error) { return true, nil },
-					WriteToFileFunc:            func(filepath string, data []byte) error { return nil },
-				}
-				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, muv4ui, mfu, configCmdFlags.timeout)
+				// 				mfu := &fileutils.MockFileSystemUtils{
+				// 					CalDirSizeInGBFunc:         func(path string) (float64, error) { return 2, nil },
+				// 					CheckSpaceAvailabilityFunc: func(dir string, minSpace float64) (bool, error) { return true, nil },
+				// 					GetFreeSpaceinGBFunc:       func(dir string) (float64, error) { return 8, nil },
+				// 					GetHabRootPathFunc:         func() string { return "/hab" },
+				// 					PathExistsFunc:             func(path string) (bool, error) { return true, nil },
+				// 					WriteToFileFunc:            func(filepath string, data []byte) error { return nil },
+				// 				}
+				// upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, muv4ui, mfu, configCmdFlags.timeout)
+				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, upgradeinspectorv4.NewUpgradeV4Utils(), &fileutils.FileSystemUtils{}, configCmdFlags.timeout)
 				isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
 				if isError {
 					return nil
