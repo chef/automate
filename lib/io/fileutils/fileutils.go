@@ -2,6 +2,7 @@ package fileutils
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -80,7 +81,7 @@ func GetFreeSpaceinGB(dir string) (float64, error) {
 }
 
 func WriteToFile(filepath string, data []byte) error {
-	return os.WriteFile(filepath, data, 775)
+	return ioutil.WriteFile(filepath, data, 775) // nosemgrep
 }
 
 type FileUtils interface {
