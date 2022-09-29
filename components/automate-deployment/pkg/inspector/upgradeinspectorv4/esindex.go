@@ -85,7 +85,7 @@ func (es *ESIndexInspection) setExitError(err error) {
 }
 
 func (es *ESIndexInspection) showSuccess() {
-	es.spinner.FinalMSG = fmt.Sprintf(" " + color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
+	es.spinner.FinalMSG = fmt.Sprintf(color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
 		"]\t" + MSG_ES_CHECKING)
 	es.spinner.Stop()
 	es.writer.Println("")
@@ -154,7 +154,7 @@ func (es *ESIndexInspection) hasOldIndices() bool {
 }
 
 func (es *ESIndexInspection) showError() {
-	es.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  [" + color.New(color.FgRed).Sprint("Failed") + "]\t" + MSG_ES_CHECKING
+	es.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  [" + color.New(color.FgRed).Sprint("Failed") + "]\t" + MSG_ES_CHECKING
 	es.spinner.Stop()
 	es.writer.Println("")
 }
