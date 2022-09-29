@@ -17,6 +17,7 @@ func TestCheckStorage(t *testing.T) {
 	mfu := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 5.0, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckStorage(cw.CliWriter, mmu, mfu)
 	err := ms.Run()
@@ -31,6 +32,7 @@ func TestCheckStorageLowSpace(t *testing.T) {
 	mfu := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 2.0, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckStorage(cw.CliWriter, mmu, mfu)
 	err := ms.Run()
@@ -45,6 +47,7 @@ func TestCheckStorageErrorInCalDirFunc(t *testing.T) {
 	mfu := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return -1, errors.New("unexpected") },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 2.0, nil },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckStorage(cw.CliWriter, mmu, mfu)
 	err := ms.Run()
@@ -59,6 +62,7 @@ func TestCheckStorageErrorInGetFreeSpaceFunc(t *testing.T) {
 	mfu := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return -1, errors.New("unexpected") },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckStorage(cw.CliWriter, mmu, mfu)
 	err := ms.Run()

@@ -662,7 +662,7 @@ func startMigration() error {
 	// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 	// }
 	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
-	migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10)
+	migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
 	migrator.RunMigrationFlow(true)
 	return nil
 }
@@ -671,6 +671,13 @@ func startMigration() error {
 func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	printUpgradeStatusMsg(resp)
 
+	isHealthy, err := majorupgrade_utils.EnsureStatus()
+	if err != nil {
+		return err
+	}
+	if isHealthy {
+		return nil
+	}
 	isUserConsent, err := promptUser("Have you updated your " + color.New(color.Bold).Sprint(openSearchConfigFile) + " with actual external OpenSearch connection configurations?")
 	writer.Println("")
 	if err != nil {
@@ -726,7 +733,6 @@ func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 
 	//Handle the case where user wish to migrate the Elasticsearch data to OpenSearch i.e. `y`
 	if isMigrationConsent {
-		//TODO: Need to add the command to migrate the Elasticsearch data to OpenSearch
 		return startMigration()
 	}
 
@@ -752,7 +758,6 @@ func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 		return nil
 	}
 	// Handle the case where user does not wish to skip migration i.e. `n` case
-	// TODO: Need to add the command to migrate the Elasticsearch data to OpenSearch
 	return startMigration()
 }
 

@@ -15,6 +15,7 @@ func TestDirectoryAvailability(t *testing.T) {
 		PathExistsFunc: func(path string) (bool, error) {
 			return true, nil
 		},
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckDirExists(cw.CliWriter, mfu)
 	err := ms.Run()
@@ -29,6 +30,7 @@ func TestDirectoryAvailabilityError(t *testing.T) {
 		PathExistsFunc: func(path string) (bool, error) {
 			return false, errors.New("permission error")
 		},
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckDirExists(cw.CliWriter, mfu)
 	err := ms.Run()
@@ -48,6 +50,7 @@ func TestDirectoryAvailabilityOneNotFound(t *testing.T) {
 			}
 			return false, nil
 		},
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckDirExists(cw.CliWriter, mfu)
 	err := ms.Run()
@@ -63,6 +66,7 @@ func TestDirectoryAvailabilityNotExistsBoth(t *testing.T) {
 		PathExistsFunc: func(path string) (bool, error) {
 			return false, nil
 		},
+		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
 	}
 	ms := NewCheckDirExists(cw.CliWriter, mfu)
 	err := ms.Run()

@@ -2,6 +2,7 @@ package migratorv4
 
 import (
 	"errors"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -15,8 +16,9 @@ const (
 	MIGRATION_TERMINATED  = "Migration Terminated."
 )
 
+var SPINNER_TIMEOUT = 100 * time.Millisecond
+
 type MigratorV4 struct {
-	*MigrateV4Flags
 	timeout          int64
 	migratorUtils    MigratorV4Utils
 	fileutils        fileutils.FileUtils
@@ -27,18 +29,10 @@ type MigratorV4 struct {
 	runHealthStatus  bool
 }
 
-type MigrateV4Flags struct {
-	AutoAcceptFlag bool
-	ForceExecute   bool
-}
-
-func NewMigratorV4(writer *cli.Writer, autoAccept, forceExecute bool, migratorUtils MigratorV4Utils, fileutils fileutils.FileUtils, timeout int64) migrator.Migrator {
+func NewMigratorV4(writer *cli.Writer, migratorUtils MigratorV4Utils, fileutils fileutils.FileUtils, timeout int64, spinnerTimeout time.Duration) migrator.Migrator {
+	SPINNER_TIMEOUT = spinnerTimeout
 	return &MigratorV4{
-		writer: writer,
-		MigrateV4Flags: &MigrateV4Flags{
-			AutoAcceptFlag: autoAccept,
-			ForceExecute:   forceExecute,
-		},
+		writer:        writer,
 		migratorUtils: migratorUtils,
 		fileutils:     fileutils,
 		timeout:       timeout,
@@ -66,7 +60,7 @@ func (m *MigratorV4) AddMigrationSteps(migrationSteps migrator.MigrationSteps) {
 }
 
 func (m *MigratorV4) AskForConfirmation(skipConfirmation bool) error {
-	if skipConfirmation || m.AutoAcceptFlag || m.ForceExecute {
+	if skipConfirmation {
 		m.migrationConsent = true
 		return nil
 	}
@@ -117,9 +111,6 @@ func (m *MigratorV4) SaveExecutedStatus() error {
 }
 
 func (m *MigratorV4) IsExecutedCheck() error {
-	if m.ForceExecute {
-		return nil
-	}
 	habroot := m.fileutils.GetHabRootPath()
 	isExecuted, err := m.migratorUtils.ReadV4Checklist(MIGRATE_ES_ID, habroot+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {

@@ -254,7 +254,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		// }
 		// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
-		migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10)
+		migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
 		migrator.RunMigrationFlow(false)
 		return nil
 	} else {
