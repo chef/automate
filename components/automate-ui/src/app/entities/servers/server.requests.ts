@@ -21,10 +21,7 @@ export class ServerRequests {
   constructor(private http: HttpClient) { }
 
   public getServers(): Observable<ServersResponse> {
-    const abc =  this.http.get<ServersResponse>(`${env.infra_proxy_url}/servers`);
-    console.log(abc);
-    debugger
-    return abc;
+    return this.http.get<ServersResponse>(`${env.infra_proxy_url}/servers`);
   }
 
   public getServer(id: string): Observable<ServerResponse> {
