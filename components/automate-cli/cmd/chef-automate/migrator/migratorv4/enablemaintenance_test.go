@@ -29,7 +29,7 @@ func TestMaintenanceOFF(t *testing.T) {
 	}
 	ms := NewEnableMaintenance(cw.CliWriter, mmu, 10, SPINNER_TEST_DURATION)
 	ms.isExecuted = true
-	err := ms.onSuccess()
+	err := ms.OnSuccess()
 	assert.NoError(t, err)
 	ms.ErrorHandler()
 	assert.Contains(t, cw.Output(), "Maintenance mode turned OFF successfully")

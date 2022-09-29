@@ -80,7 +80,7 @@ func (em *EnableMaintenance) showError() {
 }
 
 func (em *EnableMaintenance) showTurningOff() {
-	em.spinner = em.writer.NewSpinner()
+	em.spinner = em.writer.NewSpinnerWithTab()
 	em.spinner.Suffix = fmt.Sprintf("  Turning OFF maintenance mode")
 	em.spinner.Start()
 	time.Sleep(em.spinnerTimeout)
@@ -102,7 +102,7 @@ func (em *EnableMaintenance) setExecuted() {
 	em.isExecuted = true
 }
 
-func (em *EnableMaintenance) onSuccess() (err error) {
+func (em *EnableMaintenance) OnSuccess() (err error) {
 	if !em.isExecuted {
 		return nil
 	}
