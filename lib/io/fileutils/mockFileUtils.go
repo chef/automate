@@ -7,6 +7,7 @@ type MockFileSystemUtils struct {
 	CheckSpaceAvailabilityFunc func(dir string, minSpace float64) (bool, error)
 	GetFreeSpaceinGBFunc       func(dir string) (float64, error)
 	GetHabRootPathFunc         func() string
+	WriteToFileFunc            func(filepath string, data []byte) error
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -26,4 +27,7 @@ func (fsu *MockFileSystemUtils) GetFreeSpaceinGB(dir string) (float64, error) {
 }
 func (fsu *MockFileSystemUtils) GetHabRootPath() string {
 	return fsu.GetHabRootPathFunc()
+}
+func (fsu *MockFileSystemUtils) WriteToFile(filepath string, data []byte) error {
+	return fsu.WriteToFileFunc(filepath, data)
 }

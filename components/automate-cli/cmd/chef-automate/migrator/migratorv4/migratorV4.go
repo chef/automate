@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	NEXT_AUTOMATE_VERSION = "4"
 	MIGRATION_TERMINATED  = "Migration Terminated."
 )
 

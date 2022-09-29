@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/api/config/load_balancer"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -62,4 +63,20 @@ func EnsureStatus() (bool, error) {
 		)
 	}
 	return res.ServiceStatus.AllHealthy(), nil
+}
+
+func UpdatePostChecklistFile(id, path, version string) error {
+	ci, err := majorupgradechecklist.NewPostChecklistManager(version)
+	if err != nil {
+		return err
+	}
+	return ci.UpdatePostChecklistFile(id, path)
+}
+
+func ReadV4Checklist(id, path, version string) (bool, error) {
+	ci, err := majorupgradechecklist.NewPostChecklistManager(version)
+	if err != nil {
+		return false, err
+	}
+	return ci.ReadPostChecklistById(id, path)
 }

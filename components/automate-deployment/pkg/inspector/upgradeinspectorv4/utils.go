@@ -23,7 +23,6 @@ type UpgradeV4Utils interface {
 	PatchS3backupURL(timeout int64) (stdOut, stdErr string, err error)
 	GetMaintenanceStatus(timeout int64) (bool, error)
 	SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error)
-	WriteToFile(filepath string, data []byte) error
 	GetServicesStatus() (bool, error)
 }
 
@@ -129,10 +128,6 @@ func (cu *UpgradeV4UtilsImp) ExecRequest(url, methodType string, requestBody io.
 		return nil, errors.Errorf("Request failed with status %d\n%s\n", res.StatusCode, string(body))
 	}
 	return body, nil
-}
-
-func (cu *UpgradeV4UtilsImp) WriteToFile(filepath string, data []byte) error {
-	return ioutil.WriteFile(filepath, data, 775)
 }
 
 func (cu *UpgradeV4UtilsImp) GetServicesStatus() (bool, error) {

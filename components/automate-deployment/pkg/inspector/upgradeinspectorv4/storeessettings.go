@@ -116,7 +116,7 @@ func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) er
 	}
 	habRoot := ses.fileutils.GetHabRootPath()
 	esSettingFilePath := habRoot + majorupgrade_utils.V3_ES_SETTING_FILE
-	err = ses.upgradeUtils.WriteToFile(esSettingFilePath, esSettingsJson)
+	err = ses.fileutils.WriteToFile(esSettingFilePath, esSettingsJson)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write elasticsearch settings to file")
 	}

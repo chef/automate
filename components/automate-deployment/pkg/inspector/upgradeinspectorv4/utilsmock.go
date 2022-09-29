@@ -12,7 +12,6 @@ type MockUpgradeV4UtilsImp struct {
 	PatchS3backupURLFunc        func(timeout int64) (stdOut, stdErr string, err error)
 	GetMaintenanceStatusFunc    func(timeout int64) (bool, error)
 	SetMaintenanceModeFunc      func(timeout int64, status bool) (stdOut, stdErr string, err error)
-	WriteToFileFunc             func(filepath string, data []byte) error
 	GetServicesStatusFunc       func() (bool, error)
 }
 
@@ -36,9 +35,6 @@ func (utl *MockUpgradeV4UtilsImp) GetMaintenanceStatus(timeout int64) (bool, err
 }
 func (utl *MockUpgradeV4UtilsImp) SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
 	return utl.SetMaintenanceModeFunc(timeout, status)
-}
-func (utl *MockUpgradeV4UtilsImp) WriteToFile(filepath string, data []byte) error {
-	return utl.WriteToFileFunc(filepath, data)
 }
 func (utl *MockUpgradeV4UtilsImp) GetServicesStatus() (bool, error) {
 	return utl.GetServicesStatusFunc()

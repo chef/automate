@@ -13,7 +13,6 @@ import (
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
-	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
@@ -21,7 +20,8 @@ import (
 )
 
 const (
-	SPACES_BEFORE_STEPS = "       "
+	SPACES_BEFORE_STEPS   = "       "
+	NEXT_AUTOMATE_VERSION = "4"
 )
 
 type MigratorV4Utils interface {
@@ -162,19 +162,11 @@ func (m *MigratorV4UtilsImpl) StartAutomate() error {
 }
 
 func (m *MigratorV4UtilsImpl) ReadV4Checklist(id, path string) (bool, error) {
-	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-	if err != nil {
-		return false, err
-	}
-	return ci.ReadPostChecklistById(id, path)
+	return majorupgrade_utils.ReadV4Checklist(id, path, NEXT_AUTOMATE_VERSION)
 }
 
 func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id, path string) error {
-	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-	if err != nil {
-		return err
-	}
-	return ci.UpdatePostChecklistFile(id, path)
+	return majorupgrade_utils.UpdatePostChecklistFile(id, path, NEXT_AUTOMATE_VERSION)
 }
 
 func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {

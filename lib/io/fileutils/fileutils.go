@@ -2,6 +2,7 @@ package fileutils
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -79,6 +80,10 @@ func GetFreeSpaceinGB(dir string) (float64, error) {
 	return float64(v) / (1024 * 1024), nil
 }
 
+func WriteToFile(filepath string, data []byte) error {
+	return ioutil.WriteFile(filepath, data, 775)
+}
+
 type FileUtils interface {
 	PathExists(path string) (bool, error)
 	IsSymlink(path string) (bool, error)
@@ -86,6 +91,7 @@ type FileUtils interface {
 	CheckSpaceAvailability(dir string, minSpace float64) (bool, error)
 	GetFreeSpaceinGB(dir string) (float64, error)
 	GetHabRootPath() string
+	WriteToFile(filepath string, data []byte) error
 }
 
 func GetHabRootPath() string {
@@ -121,4 +127,7 @@ func (fsu *FileSystemUtils) GetFreeSpaceinGB(dir string) (float64, error) {
 }
 func (fsu *FileSystemUtils) GetHabRootPath() string {
 	return GetHabRootPath()
+}
+func (fsu *FileSystemUtils) WriteToFile(filepath string, data []byte) error {
+	return WriteToFile(filepath, data)
 }

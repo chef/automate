@@ -443,6 +443,7 @@ func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
+		WriteToFileFunc:      func(filepath string, data []byte) error { return nil },
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
@@ -463,7 +464,6 @@ func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
 			return true, nil
 		},
 		ExecRequestFunc: ExecRequestNonAutomate,
-		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
 	}, mfs, 10)
 
 	expected := HAB_SPACE_ERR
@@ -479,6 +479,7 @@ func TestUpgradeInspectorV4ExitMessageFailedMaintenance(t *testing.T) {
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
 		GetHabRootPathFunc:   GetHabRootPath,
+		WriteToFileFunc:      func(filepath string, data []byte) error { return nil },
 	}
 	shardingCalledCount := 0
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
@@ -513,7 +514,6 @@ func TestUpgradeInspectorV4ExitMessageFailedMaintenance(t *testing.T) {
 				return []byte{}, nil
 			}
 		},
-		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
 	}, mfs, 10)
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
@@ -539,6 +539,7 @@ func TestUpgradeInspectorV4SkipAllEnsureStatusFailure(t *testing.T) {
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
 		GetHabRootPathFunc:   GetHabRootPath,
+		WriteToFileFunc:      func(filepath string, data []byte) error { return nil },
 	}
 	shardingCalledCount := 0
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
@@ -573,7 +574,6 @@ func TestUpgradeInspectorV4SkipAllEnsureStatusFailure(t *testing.T) {
 				return []byte{}, nil
 			}
 		},
-		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
 	}, mfs, 10)
 
 	expected := ALL_SKIPPED_OS

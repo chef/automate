@@ -227,7 +227,6 @@ eventfeed-2-feeds`), nil
 					PatchS3backupURLFunc:     func(timeout int64) (stdOut, stdErr string, err error) { return "", "", nil },
 					GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return false, nil },
 					SetMaintenanceModeFunc:   func(timeout int64, status bool) (stdOut, stdErr string, err error) { return "", "", nil },
-					WriteToFileFunc:          func(filepath string, data []byte) error { return nil },
 					GetServicesStatusFunc:    func() (bool, error) { return true, nil },
 				}
 
@@ -237,6 +236,7 @@ eventfeed-2-feeds`), nil
 					GetFreeSpaceinGBFunc:       func(dir string) (float64, error) { return 8, nil },
 					GetHabRootPathFunc:         func() string { return "/hab" },
 					PathExistsFunc:             func(path string) (bool, error) { return true, nil },
+					WriteToFileFunc:            func(filepath string, data []byte) error { return nil },
 				}
 				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, muv4ui, mfu, configCmdFlags.timeout)
 				isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
