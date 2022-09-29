@@ -160,7 +160,7 @@ func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist() error {
+func (ci *V3ChecklistManager) RunChecklist(timeout int64) error {
 
 	var dbType string
 	checklists := []Checklist{}
@@ -327,4 +327,9 @@ func promptUpgradeContinue() Checklist {
 			return nil
 		},
 	}
+}
+
+func (ci *V3ChecklistManager) StoreSearchEngineSettings() error {
+	fmt.Printf("Not needed for now")
+	return nil
 }
