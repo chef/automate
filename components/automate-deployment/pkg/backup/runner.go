@@ -566,6 +566,7 @@ func (r *Runner) RestoreBackup(
 }
 
 // stateFullServicesMap : List of Service need to restore
+/*
 var stateFullServicesMap = map[string]struct{}{
 	"backup-gateway":          {},
 	"applications-service":    {},
@@ -588,7 +589,7 @@ var stateFullServicesMap = map[string]struct{}{
 	"secrets-service":         {},
 	"session-service":         {},
 	"teams-service":           {},
-}
+}*/
 
 // startRestoreOperations starts unloads services, loads the backed up package
 // manifest and builds a slice of topologically sorted services that are to be
@@ -746,6 +747,16 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		r.failf(err, "Failed to load service metadata checksum information")
 		return err
 	}
+	stateFullServicesMap := make(map[string]struct{})
+	stateFullServicesMap["backup-gateway"] = struct{}{}
+	for _, service := range r.specs {
+		logrus.Info("Service Name : ", service.Name, "  Backup status : ", service.WriteMetadata)
+		if service.WriteMetadata {
+			stateFullServicesMap[service.Name] = struct{}{}
+		}
+	}
+	logrus.Debug("list of stateFullServicesMap services : ", stateFullServicesMap)
+	logrus.Info(" Length of stateFullServicesMap ", len(stateFullServicesMap))
 
 	// Restore the services in topological order.
 	for _, svc := range desiredServices {
@@ -800,7 +811,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		)
 
 		// stateFullServicesMap : contain the list of services which need to be restored
-		//
+
 		_, isStateFullService := stateFullServicesMap[svc.Name()]
 		r.infof(" Need to Look for metadata : %s it is Present : %t", svc.Name(), isStateFullService)
 
