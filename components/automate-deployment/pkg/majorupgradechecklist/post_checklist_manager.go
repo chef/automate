@@ -5,8 +5,7 @@ import (
 )
 
 const (
-	FILE_NAME        = "upgrade_metadata.json"
-	UPGRADE_METADATA = "/hab/svc/deployment-service/var/" + FILE_NAME
+	FILE_NAME = "upgrade_metadata.json"
 )
 
 type PostChecklistManager struct {
@@ -101,20 +100,23 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 		}
 
 		if showPostChecklist {
-			for i := 0; i < len(res.PostChecklist); i++ {
-				if !res.PostChecklist[i].IsExecuted {
-					postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+			if pcm.isExternalDB {
+				postCmdList = []string{"External OpenSearch Patch"}
+			} else {
+				for i := 0; i < len(res.PostChecklist); i++ {
+					if !res.PostChecklist[i].IsExecuted {
+						postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+					}
 				}
 			}
 		}
-
-		if pcm.isExternalDB {
-			res.Seen = true
-			err = CreateJsonFile(res, path)
-			if err != nil {
-				return postCmdList, err
-			}
-		}
+		// if pcm.isExternalDB {
+		// 	res.Seen = true
+		// 	err = CreateJsonFile(res, path)
+		// 	if err != nil {
+		// 		return postCmdList, err
+		// 	}
+		// }
 	} else {
 		return postCmdList, status.Errorf(status.UpgradeError, "Failed to read checklist since version didn't match")
 	}

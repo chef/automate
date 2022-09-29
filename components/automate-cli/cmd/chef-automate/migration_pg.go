@@ -13,8 +13,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorv4"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -105,42 +108,10 @@ func newMigrateDataCmd() *cobra.Command {
 
 func runCleanup(cmd *cobra.Command, args []string) error {
 	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
-		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-		if err != nil {
-			writer.Error("NewPostChecklistManager Failed")
-			return err
-		}
-
-		isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
-		if err != nil {
-			writer.Error("ReadPostChecklistById Failed")
-			return err
-		}
-
-		if isExecuted {
-			if ClearDataCmdFlags.forceExecute {
-				isExecuted = false
-			} else {
-				err := promptCheckList(
-					"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
-				)
-				if err != nil {
-					writer.Error("promptCheckList Failed")
-					return err
-				} else {
-					isExecuted = false
-				}
-			}
-		}
-
-		if !isExecuted {
-			writer.Title("Deleting file created by es_upgrade")
-			err := cleanUpes()
-			if err != nil {
-				writer.Error(err.Error())
-				return err
-			}
-		}
+		mu := migratorv4.NewMigratorV4Utils()
+		mfu := &fileutils.FileSystemUtils{}
+		cleanUp := migratorv4.NewCleanUp(writer, mu, mfu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept, time.Second)
+		cleanUp.Clean(false)
 	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
 		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
 		if err != nil {
@@ -160,7 +131,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+			isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 			if err != nil {
 				return err
 			}
@@ -214,7 +185,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		isExecuted, err := ci.ReadPostChecklistById(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
+		isExecuted, err := ci.ReadPostChecklistById(MIGRATE_PG_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
@@ -263,82 +234,30 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
-		var isAvailableSpace bool
-		var err error
-
-		//Disabling  of the maintenance mode when starting for migration post-upgrade
-		writer.Println("Disabling the Maintenance mode")
-		out, err := exec.Command("/bin/sh", "-c", "chef-automate maintenance off").Output()
-		if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
-			writer.Error("Failed to disable the maintenance mode : " + err.Error() +
-				"/n/n Please disable it manually post migration using chef-automate maintenance off")
-		}
-
-		if migrateDataCmdFlags.check {
-			writer.Title("--check flag is not required for es-migation. \nPlease run the command without --check flag")
-			return nil
-		}
-		if migrateDataCmdFlags.skipStorageCheck {
-			isAvailableSpace = true
-			err = nil
-		} else {
-			isAvailableSpace, err = checkSpaceAvailable(ELASTICSEARCH_DIR)
-			if err != nil {
-				return err
-			}
-		}
-
-		if isAvailableSpace {
-			ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-			if err != nil {
-				writer.Error("NewPostChecklistManager Failed : " + err.Error())
-				return err
-			}
-
-			isExecuted, err := ci.ReadPostChecklistById(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
-			if err != nil {
-				writer.Error("ReadPostChecklistById Failed : " + err.Error())
-				return err
-			}
-
-			if isExecuted {
-				if migrateDataCmdFlags.forceExecute {
-					isExecuted = false
-				} else {
-					err := promptCheckList(
-						"migrate_es is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]")
-					if err != nil {
-						return err
-					} else {
-						isExecuted = false
-					}
-				}
-			}
-
-			if !isExecuted {
-				if !migrateDataCmdFlags.autoAccept {
-					err := promptCheckList(
-						"It will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
-					)
-					if err != nil {
-						return err
-					}
-					isEmbeded := !majorupgradechecklist.IsExternalElasticSearch()
-					patchError := majorupgradechecklist.PatchBestOpenSearchSettings(writer, isEmbeded)
-					if patchError != nil {
-						writer.Errorf("Error in patching default settings for opensearch\n %s \n", err.Error())
-					}
-					err = esMigrateExecutor(ci)
-					if err != nil {
-						writer.Error("esMigrateExecutor : " + err.Error())
-						return err
-					}
-				}
-			} else {
-				writer.Title("Insufficient Space for ES data Migration ")
-			} // isAvailableSpace
-		}
-		// end for the es migration
+		// mv4U := &migratorv4.MockMigratorV4UtilsImpl{
+		// 	IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		// 	StopAutomateFunc:            func() error { return nil },
+		// 	GetEsTotalShardSettingsFunc: func(path string) (int32, error) { return 2000, nil },
+		// 	PatchOpensearchConfigFunc:   func(es *migratorv4.ESSettings) (string, string, error) { return "", "", nil },
+		// 	ReadV4ChecklistFunc:         func(id string, path string) (bool, error) { return true, nil },
+		// 	StartAutomateFunc:           func() error { return nil },
+		// 	ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+		// 	GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+		// 	UpdatePostChecklistFileFunc: func(id string, path string) error { return nil },
+		// 	GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
+		// 	GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		// 	SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
+		// }
+		// mfu := &fileutils.MockFileSystemUtils{
+		// 	CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
+		// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+		// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+		// 	GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
+		// }
+		// migrator := migratorv4.NewMigratorV4(writer, mv4U, mfu, 10, time.Second)
+		migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
+		migrator.RunMigrationFlow(false)
+		return nil
 	} else {
 		return errors.New("please provide valid input for data flag")
 	}
@@ -466,7 +385,7 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot stri
 		writer.Fail(err.Error())
 		return err
 	}
-	err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+	err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
 		writer.Fail("UpdatePostChecklistFile : " + err.Error())
 	}
@@ -564,7 +483,7 @@ func cleanUp() error {
 		if err != nil {
 			return err
 		}
-		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		err = ci.UpdatePostChecklistFile(CLEANUP_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
@@ -608,7 +527,7 @@ func cleanUpes() error {
 			writer.Fail(err.Error())
 			return err
 		}
-		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		err = ci.UpdatePostChecklistFile(CLEANUP_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			writer.Fail(err.Error())
 			return err
@@ -785,7 +704,7 @@ func checkUpdateMigration(check bool) error {
 			if err != nil {
 				return err
 			}
-			err = ci.UpdatePostChecklistFile(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
+			err = ci.UpdatePostChecklistFile(MIGRATE_PG_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 			if err != nil {
 			}
 		}

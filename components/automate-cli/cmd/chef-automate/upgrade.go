@@ -5,21 +5,26 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/chef/automate/api/config/deployment"
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorv4"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv4"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -66,6 +71,7 @@ var upgradeStatusCmd = &cobra.Command{
 }
 
 const disableMaintenanceModeCmd = `chef-automate maintenance off`
+const patchConfigCommand = `chef-automate config patch`
 const disableMaintenanceModeMsg = `Please disable the maintenance mode to allow ingestion by using ` + disableMaintenanceModeCmd
 const a1RunningMsg = "You have a running Chef Automate v1 installation. Did you mean to type `chef-automate upgrade-from-v1` (alias for: `chef-automate migrate-from-v1`)?"
 const convergeDisabledWarning = `Converge is disabled. This will prevent Automate from upgrading.
@@ -73,8 +79,10 @@ const convergeDisabledWarning = `Converge is disabled. This will prevent Automat
 To fix this, delete the file "/hab/svc/deployment-service/data/converge_disable".
 Otherwise, you may need to run "chef-automate dev start-converge".
 `
+const openSearchConfigFile = "opensearch_config.toml"
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
+
 	a1IsRunning, err := isA1Running()
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)
@@ -134,7 +142,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-
+	var major string
 	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
@@ -151,7 +159,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 	} else {
-		fmt.Println(validatedResp)
+		PrintVersions(writer, validatedResp.CurrentVersion, validatedResp.TargetVersion)
 		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
 			writer.Println("Chef Automate up-to-date")
 			return nil
@@ -167,27 +175,76 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				writer.Println("Failed to read and store search settings")
 			} */
-			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
-			if err != nil {
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"Request to start upgrade failed",
-				)
-			}
+			major, _ = majorupgradechecklist.GetMajorVersion(validatedResp.TargetVersion)
+			switch major {
+			case "3":
+				ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+				if err != nil {
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
 
-			flags := majorupgradechecklist.ChecklistUpgradeFlags{
-				SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
-				OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
-			}
-			err = ci.RunChecklist(configCmdFlags.timeout, flags)
-			if err != nil {
-				exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"Request to start upgrade failed",
-				)
+				flags := majorupgradechecklist.ChecklistUpgradeFlags{
+					SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
+					OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
+				}
+				err = ci.RunChecklist(configCmdFlags.timeout, flags)
+				if err != nil {
+					exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
+			case "4":
+				// 				muv4ui := &upgradeinspectorv4.MockUpgradeV4UtilsImp{
+				// 					IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+				// 					ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+				// 						if strings.Contains(url, "index.version") {
+				// 							return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+				// 						} else if strings.Contains(url, "_cluster/stats") {
+				// 							return []byte(`{"indices":{"shards":{"total":51}}}`), nil
+				// 						} else if strings.Contains(url, "indices") {
+				// 							return []byte(`comp-2-run-info
+				// node-attribute
+				// node-state-7
+				// node-1-run-info
+				// comp-3-profiles
+				// eventfeed-2-feeds`), nil
+				// 						} else if strings.Contains(url, "_cluster/settings") {
+				// 							return []byte{}, nil
+				// 						} else {
+				// 							return []byte{}, nil
+				// 						}
+				// 					},
+				// 					GetESBasePathFunc:        func(timeout int64) string { return "http://localhost" },
+				// 					GetBackupS3URLFunc:       func(timeout int64) (string, error) { return "https://s3.us-east-1.amazonaws.com", nil },
+				// 					PatchS3backupURLFunc:     func(timeout int64) (stdOut, stdErr string, err error) { return "", "", nil },
+				// 					GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return false, nil },
+				// 					SetMaintenanceModeFunc:   func(timeout int64, status bool) (stdOut, stdErr string, err error) { return "", "", nil },
+				// 					GetServicesStatusFunc:    func() (bool, error) { return true, nil },
+				// 				}
+
+				// 				mfu := &fileutils.MockFileSystemUtils{
+				// 					CalDirSizeInGBFunc:         func(path string) (float64, error) { return 2, nil },
+				// 					CheckSpaceAvailabilityFunc: func(dir string, minSpace float64) (bool, error) { return true, nil },
+				// 					GetFreeSpaceinGBFunc:       func(dir string) (float64, error) { return 8, nil },
+				// 					GetHabRootPathFunc:         func() string { return "/hab" },
+				// 					PathExistsFunc:             func(path string) (bool, error) { return true, nil },
+				// 					WriteToFileFunc:            func(filepath string, data []byte) error { return nil },
+				// 				}
+				// upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, muv4ui, mfu, configCmdFlags.timeout)
+				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, upgradeinspectorv4.NewUpgradeV4Utils(), &fileutils.FileSystemUtils{}, configCmdFlags.timeout)
+				isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
+				if isError {
+					return nil
+				}
+			default:
+				return status.Errorf(status.UpgradeError, "invalid major version")
 			}
 		}
 	}
@@ -205,7 +262,25 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 	if resp.NextVersion != resp.PreviousVersion {
-		writer.Println("Upgrading Chef Automate")
+		if upgradeRunCmdFlags.isMajorUpgrade {
+			switch major {
+			case "4":
+				isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
+				if isExternalOpenSearch {
+					err := postUpgradingExternal(resp)
+					if err != nil {
+						return err
+					}
+				} else {
+					err := postUpgradingEmbedded(resp)
+					if err != nil {
+						return err
+					}
+				}
+			default:
+				writer.Println("Upgrading Chef Automate")
+			}
+		}
 	} else {
 		//TODO(jaym): This is a bit of a lie. We don't factor hartifact overrides
 		//            into this calculation
@@ -217,6 +292,81 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// stuff breaks when deployment-service is restarted. Until that's fixed,
 	// it would be pointless to try to stream the events.
 	return nil
+}
+
+func postUpgradingEmbedded(resp *api.UpgradeResponse) error {
+	writer.Println(fmt.Sprintf("Upgrading Chef Automate from version %s to %s", resp.PreviousVersion, resp.NextVersion))
+	writer.Println("This might take around 15 to 20 min")
+	writer.Println("")
+	writer.Println("Once upgrade is complete, You will get an option to migrate data from Elasticsearch to OpenSearch.")
+	writer.Println("Maintenance mode will be turned off after migration is complete.")
+	writer.Println("")
+	writer.Println("To check the upgrade status use " + color.New(color.Bold).Sprint("$ chef-automate upgrade status"))
+	return nil
+}
+
+func postUpgradingExternal(resp *api.UpgradeResponse) error {
+	writer.Println(fmt.Sprintf("\nUpgrading Chef Automate from version %s to version %s.", resp.PreviousVersion, resp.NextVersion))
+	writer.Println("")
+	msg := fmt.Sprintf(`----------------------------------------------------------------------
+IMPORTANT
+
+To establish connection between automate and OpenSearch database,
+it is required to patch the configuration file with correct values.
+
+We have created a sample config file for configuring external OpenSearch:
+%s
+
+Once upgrade is complete, you must update this file with actual external OpenSearch connection configurations
+and then run the below patch command to update the configurations:
+%s
+----------------------------------------------------------------------
+`, color.New(color.Bold).Sprint(openSearchConfigFile), color.New(color.Bold).Sprint(fmt.Sprintf("$ %s %s", patchConfigCommand, openSearchConfigFile)))
+	writer.Println(msg)
+
+	file, err := os.Create(openSearchConfigFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	const openSearchConfig = `[global.v1.external.opensearch]
+  enable = true
+  nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
+
+# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+[global.v1.external.opensearch.auth]
+  scheme = "basic_auth"
+[global.v1.external.opensearch.auth.basic_auth]
+## Create this opensearch user before starting the Chef Automate deployment;
+## Chef Automate assumes it exists.
+  username = "<admin username>"
+  password = "<admin password>"
+# Use below configuration only if using HTTPS connection
+[global.v1.external.opensearch.ssl]
+# Specify either a root_cert or a root_cert_file
+  root_cert = """$(cat </path/to/cert_file.crt>)"""
+# server_name = "<opensearch server name>"
+  
+# Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
+# [esgateway.v1.sys.ngx.http]
+#  proxy_set_header_host = "<your external es hostname>:1234"
+
+# Uncomment and add to change the ssl_verify_depth for the root cert bundle
+#   ssl_verify_depth = "2"
+`
+	_, err = file.WriteString(openSearchConfig)
+	if err != nil {
+		return err
+	}
+	writer.Println("To check the upgrade status use " + color.New(color.Bold).Sprint("$ chef-automate upgrade status"))
+	return nil
+}
+
+func PrintVersions(writer *cli.Writer, currentVersion, targetVersion string) {
+	writer.Println("Current version: " + currentVersion)
+	writer.Println("Target version: " + targetVersion)
+	writer.Println("")
 }
 
 // restartDeploymentService will kill the Pid of Deployment Service and then Hab will restart this service
@@ -371,35 +521,29 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		//Todo(milestone) - update the comparison logic of current version and latest available version
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
-				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
-			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
-				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
-					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
-				if !resp.IsConvergeCompatable {
-					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
+				err := postUpgradeStatus(resp)
+				if err != nil {
+					return err
 				}
+			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
+				isMajor := !resp.IsConvergeCompatable
+				PrintAutomateOutOfDate(writer, resp.CurrentVersion, resp.LatestAvailableVersion, isMajor)
+				// writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
+				// 	resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				// if !resp.IsConvergeCompatable {
+				// 	writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
+				// }
 			} else {
-				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
+				err := postUpgradeStatus(resp)
+				if err != nil {
+					return err
+				}
 			}
 		default:
-			if resp.IsAirgapped {
-				writer.Printf("Automate is up-to-date with airgap bundle %s\n", resp.LatestAvailableVersion)
-			} else {
-				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
+			err := postUpgradeStatus(resp)
+			if err != nil {
+				return err
 			}
-		}
-
-		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
-		if err != nil {
-			return err
-		}
-		if len(pendingPostChecklist) > 0 {
-			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
-			for index, msg := range pendingPostChecklist {
-				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
-			}
-			writer.Body("\n")
-			GetopenSearchConfig()
 		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
@@ -438,6 +582,188 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
+	major, _ := majorupgradechecklist.GetMajorVersion(resp.CurrentVersion)
+	switch major {
+	case "4":
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
+			if isExternalOpenSearch {
+				return postUpgradeStatusExternal(resp)
+			}
+			return postUpgardeStatusEmbedded(resp)
+		} else {
+			printUpgradeStatusMsg(resp)
+		}
+	default:
+		printUpgradeStatusMsg(resp)
+	}
+	return nil
+}
+
+// Print the automate upgrade status when automate is up to date
+func printUpgradeStatusMsg(resp *api.UpgradeStatusResponse) {
+	writer.Println(color.New(color.FgGreen).Sprint("------------------------------------------------------------------------------------"))
+	if resp.IsAirgapped {
+		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to airgap bundle version (%s) successfully.", resp.CurrentVersion))
+	} else {
+		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to version (%s) successfully.", resp.CurrentVersion))
+	}
+	writer.Println(fmt.Sprintf("  To know whats new in version (%s),", resp.CurrentVersion))
+	writer.Println("  visit" + color.New(color.FgBlue).Sprint(fmt.Sprintf(" https://docs.chef.io/release_notes_automate/#%s ", resp.CurrentVersion)))
+	writer.Println(color.New(color.FgGreen).Sprint("------------------------------------------------------------------------------------"))
+	writer.Println("")
+}
+
+func startSpinner(msg string) *spinner.Spinner {
+	spinner := writer.NewSpinner()
+	spinner.Suffix = fmt.Sprintf("  %s", msg)
+	spinner.Start()
+	time.Sleep(time.Second)
+	return spinner
+}
+
+func stopSpinner(spinner *spinner.Spinner, msg string) {
+	spinner.FinalMSG = fmt.Sprintf("%s  %s", color.New(color.FgGreen).Sprint("✔"), msg)
+	spinner.Stop()
+	writer.Println("")
+}
+
+// prompt user for confirmation
+func promptUser(message string) (bool, error) {
+	return writer.Confirm(message)
+}
+
+func startMigration() error {
+	// mv4U := &migratorv4.MockMigratorV4UtilsImpl{
+	// 	IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+	// 	StopAutomateFunc:            func() error { return nil },
+	// 	GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+	// 	PatchOpensearchConfigFunc: func(es *migratorv4.ESSettings) (string, string, error) {
+	// 		return "", "", nil
+	// 	},
+	// 	GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+	// 	ReadV4ChecklistFunc:         func(id string) (bool, error) { return false, nil },
+	// 	StartAutomateFunc:           func() error { return nil },
+	// 	ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+	// 	GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+	// 	GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
+	// 	UpdatePostChecklistFileFunc: func(id string) error { return nil },
+	// }
+	// mfu := &fileutils.MockFileSystemUtils{
+	// 	CalDirSizeInGBFunc:   func(path string) (float64, error) { return 5, nil },
+	// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 8, nil },
+	// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+	// }
+	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
+	migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
+	migrator.RunMigrationFlow(true)
+	return nil
+}
+
+// postUpgradeStatusExternal - Handle case for external opensearch after upgrade status
+func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
+	printUpgradeStatusMsg(resp)
+
+	isHealthy, err := majorupgrade_utils.EnsureStatus()
+	if err != nil {
+		return err
+	}
+	if isHealthy {
+		return nil
+	}
+	isUserConsent, err := promptUser("Have you updated your " + color.New(color.Bold).Sprint(openSearchConfigFile) + " with actual external OpenSearch connection configurations?")
+	writer.Println("")
+	if err != nil {
+		return err
+	}
+
+	//Handle the case where user has updated the opensearch_config.toml i.e. `y` case
+	if isUserConsent {
+		spinner := startSpinner("Updating external OpenSearch configurations")
+		//TODO: Need to add opensearch_config.toml path
+		_, err := exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, openSearchConfigFile)).Output()
+		if err != nil {
+			return err
+		}
+		stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
+
+		path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
+		res, err := majorupgradechecklist.ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
+		if err != nil {
+			return err
+		}
+
+		res.Seen = true
+		err = majorupgradechecklist.CreateJsonFile(res, path)
+		if err != nil {
+			return err
+		}
+
+		_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
+		if err != nil {
+			return err
+		}
+		writer.Println(fmt.Sprintf("%s  Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
+		return nil
+	}
+
+	// Handle the case where user has not updated the opensearch_config.toml i.e. `n` case
+	writer.Println("After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations and then run the below patch command to update the configurations:")
+	writer.Println(color.New(color.Bold).Sprint("$ chef-automate config patch opensearch.toml"))
+	writer.Println("")
+	_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
+	if err != nil {
+		return err
+	}
+	writer.Println(fmt.Sprintf("%s  Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
+	return nil
+}
+
+// postUpgardeStatusEmbedded - Handle case for embedded opensearch after upgrade status
+func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
+	printUpgradeStatusMsg(resp)
+
+	isMigrationConsent, err := promptUser("Do you wish to migrate the Elasticsearch data to OpenSearch now?")
+	writer.Println("")
+	if err != nil {
+		return err
+	}
+
+	//Handle the case where user wish to migrate the Elasticsearch data to OpenSearch i.e. `y`
+	if isMigrationConsent {
+		return startMigration()
+	}
+
+	//Handle the case where user does not wish to migrate the Elasticsearch data to OpenSearch i.e. `n` case
+	writer.Println(color.New(color.FgYellow).Sprint("!") + " [" + color.New(color.FgYellow).Sprint("Warning") + "] " + "  Any data collected until the migration will be lost.")
+	writer.Println("")
+	isSkipConsent, err := promptUser("Are you sure to skip migration?")
+	if err != nil {
+		return err
+	}
+	//Handle the case where user wishes to skip migration i.e. `y` case
+	if isSkipConsent {
+		writer.Println("Data migration skipped")
+		writer.Println("")
+		writer.Println("To migrate data later on, use this command")
+		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate -data=es"))
+		writer.Println("")
+		_, _, err := majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
+		if err != nil {
+			return err
+		}
+		writer.Println(fmt.Sprintf("%s Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
+		return nil
+	}
+	// Handle the case where user does not wish to skip migration i.e. `n` case
+	return startMigration()
 }
 
 func isA1Running() (bool, error) {
@@ -577,7 +903,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
@@ -603,8 +929,6 @@ func GetopenSearchConfig() {
 		writer.Println(string(t))
 
 	}
-
-	return
 }
 
 type OpenSearchModel struct {
@@ -613,4 +937,22 @@ type OpenSearchModel struct {
 
 type OpenSearch_v1 struct {
 	V1 *opensearch.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
+}
+
+const (
+	msgAutomateOutOfDate = `Automate is out-of-date !!`
+	msgInfoMajor         = `
+Please ensure you are using latest CLI version and then run the command:
+  $ chef-automate upgrade run --major command to upgrade to latest version
+
+Visit https://docs.chef.io/automate/major_upgrade_4.x for more information`
+)
+
+func PrintAutomateOutOfDate(writer *cli.Writer, currentVersion, latestVersion string, isMajor bool) {
+	writer.Println(msgAutomateOutOfDate)
+	writer.Println("Current version: " + currentVersion)
+	writer.Println("Latest upgradable version: " + latestVersion)
+	if isMajor {
+		writer.Println(msgInfoMajor)
+	}
 }
