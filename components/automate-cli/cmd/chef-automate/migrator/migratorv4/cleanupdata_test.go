@@ -22,7 +22,7 @@ func TestRunCleanCmdForFirstTimeWithSuccess(t *testing.T) {
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 	}
 
-	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false, SPINNER_TEST_DURATION)
 	cu.Clean()
 	expected1 := "Clean up in progres"
 	expected2 := `Would you like to clean up the old Elasticsearch data now? (y/n)`
@@ -44,7 +44,7 @@ func TestRunCleanCmdIfUserAlreadyExecutedWithFailed(t *testing.T) {
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return errors.New("failed to update") },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 	}
-	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false, SPINNER_TEST_DURATION)
 	cu.Clean()
 	expected1 := `Your have already deleted your old Elasticsearch data.
 Do you want to perform clean up again? (y/n)
@@ -68,7 +68,7 @@ func TestRunCleanCmdFailureReadV4ChecklistError(t *testing.T) {
 		GetHabRootPathFunc: func() string { return "/hab" },
 	}
 
-	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false, SPINNER_TEST_DURATION)
 	err := cu.Clean()
 	assert.Error(t, err, "unexpected")
 }
@@ -85,7 +85,7 @@ func TestRunCleanCmdFailureAskForConfirmationFirstPromt(t *testing.T) {
 		GetHabRootPathFunc: func() string { return "/hab" },
 	}
 
-	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false, SPINNER_TEST_DURATION)
 	cu.Clean()
 	assert.Contains(t, cw.Output(), "I don't understand 'x'. Please type 'y' or 'n'.")
 }
@@ -102,7 +102,7 @@ func TestRunCleanCmdFailureAskForConfirmationSecoundPromt(t *testing.T) {
 		GetHabRootPathFunc: func() string { return "/hab" },
 	}
 
-	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false, SPINNER_TEST_DURATION)
 	cu.Clean()
 	assert.Contains(t, cw.Output(), "I don't understand 'x'. Please type 'y' or 'n'.")
 }
@@ -119,7 +119,7 @@ func TestRunCleanCmdFailureAskForConfirmationUserTerminated(t *testing.T) {
 		GetHabRootPathFunc: func() string { return "/hab" },
 	}
 
-	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false, SPINNER_TEST_DURATION)
 	err := cu.Clean()
 	assert.Error(t, err, "Cleanup Process Terminated.")
 }

@@ -17,7 +17,7 @@ func TestPatchOsSuccess(t *testing.T) {
 	}
 	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
-	})
+	}, SPINNER_TEST_DURATION)
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
@@ -34,7 +34,7 @@ func TestPatchOsErrorGetShardSettings(t *testing.T) {
 	}
 	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
-	})
+	}, SPINNER_TEST_DURATION)
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
@@ -51,7 +51,7 @@ func TestPatchOsErrorPatchingShardSettings(t *testing.T) {
 	}
 	poc := NewPatchOpensearchConfig(cw.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
-	})
+	}, SPINNER_TEST_DURATION)
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
@@ -66,7 +66,7 @@ func TestCalculateMaxTotalShardsLessThan1500(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{}, &fileutils.MockFileSystemUtils{
 		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
-	})
+	}, SPINNER_TEST_DURATION)
 	var shardsUsed int32 = 1200
 	var minShardVal int32 = MINIMUM_SHARD_VALUE
 	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT
@@ -79,7 +79,7 @@ func TestCalculateMaxTotalShardsMoreThan1500(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{}, &fileutils.MockFileSystemUtils{
 		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
-	})
+	}, SPINNER_TEST_DURATION)
 	var shardsUsed int32 = 1800
 	var minShardVal int32 = MINIMUM_SHARD_VALUE
 	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT

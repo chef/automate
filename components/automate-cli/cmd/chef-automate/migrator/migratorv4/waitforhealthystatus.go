@@ -10,17 +10,19 @@ import (
 )
 
 type WaitForHealthy struct {
-	writer       *cli.Writer
-	utils        MigratorV4Utils
-	spinner      *spinner.Spinner
-	healthStatus *bool
+	writer         *cli.Writer
+	utils          MigratorV4Utils
+	spinner        *spinner.Spinner
+	healthStatus   *bool
+	spinnerTimeout time.Duration
 }
 
-func NewWaitForHealthy(writer *cli.Writer, utils MigratorV4Utils, healthStatus *bool) *WaitForHealthy {
+func NewWaitForHealthy(writer *cli.Writer, utils MigratorV4Utils, healthStatus *bool, spinnerTimeout time.Duration) *WaitForHealthy {
 	return &WaitForHealthy{
-		writer:       writer,
-		utils:        utils,
-		healthStatus: healthStatus,
+		writer:         writer,
+		utils:          utils,
+		healthStatus:   healthStatus,
+		spinnerTimeout: spinnerTimeout,
 	}
 }
 
@@ -48,7 +50,7 @@ func (wfh *WaitForHealthy) showStartStatus() {
 	wfh.spinner = wfh.writer.NewSpinnerWithTab()
 	wfh.spinner.Suffix = fmt.Sprintf("  Checking Chef automate status")
 	wfh.spinner.Start()
-	time.Sleep(time.Second)
+	time.Sleep(wfh.spinnerTimeout)
 }
 
 func (wfh *WaitForHealthy) DefferedHandler() error {

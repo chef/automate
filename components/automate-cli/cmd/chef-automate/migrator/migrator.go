@@ -10,6 +10,7 @@ type Migrator interface {
 	PrintMigrationErrors()
 	RunMigrationFlow(skipConfirmation bool)
 	ClearData() error
+	RunSuccess() error
 }
 
 type MigrationSteps interface {
@@ -20,4 +21,9 @@ type MigrationSteps interface {
 type PostMigrationSteps interface {
 	MigrationSteps
 	DefferedHandler() error
+}
+
+type SuccessfulMigrationSteps interface {
+	MigrationSteps
+	OnSuccess() error
 }

@@ -16,7 +16,7 @@ func TestWaitForHealthyDeffered(t *testing.T) {
 		},
 	}
 	var st = true
-	wfh := NewWaitForHealthy(cw.CliWriter, mmu, &st)
+	wfh := NewWaitForHealthy(cw.CliWriter, mmu, &st, SPINNER_TEST_DURATION)
 	err := wfh.DefferedHandler()
 	assert.NoError(t, err)
 	expected1 := "  Checking Chef automate status"
@@ -33,7 +33,7 @@ func TestWaitForHealthyDefferedError(t *testing.T) {
 		},
 	}
 	var st = true
-	wfh := NewWaitForHealthy(cw.CliWriter, mmu, &st)
+	wfh := NewWaitForHealthy(cw.CliWriter, mmu, &st, SPINNER_TEST_DURATION)
 	err := wfh.DefferedHandler()
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "terminated due to error")

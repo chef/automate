@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	MIGRATION_TERMINATED  = "Migration Terminated."
+	MIGRATION_TERMINATED = "Migration Terminated."
 )
 
 var SPINNER_TIMEOUT = 100 * time.Millisecond
@@ -26,15 +26,16 @@ type MigratorV4 struct {
 	migrationConsent bool
 	isExecuted       bool
 	runHealthStatus  bool
+	spinnerTimeout   time.Duration
 }
 
 func NewMigratorV4(writer *cli.Writer, migratorUtils MigratorV4Utils, fileutils fileutils.FileUtils, timeout int64, spinnerTimeout time.Duration) migrator.Migrator {
-	SPINNER_TIMEOUT = spinnerTimeout
 	return &MigratorV4{
-		writer:        writer,
-		migratorUtils: migratorUtils,
-		fileutils:     fileutils,
-		timeout:       timeout,
+		writer:         writer,
+		migratorUtils:  migratorUtils,
+		fileutils:      fileutils,
+		timeout:        timeout,
+		spinnerTimeout: spinnerTimeout,
 	}
 }
 
@@ -77,11 +78,12 @@ func (m *MigratorV4) AskForConfirmation(skipConfirmation bool) error {
 func (m *MigratorV4) AddDefaultMigrationSteps() {
 	m.AddMigrationSteps(NewEnsureStatus(m.writer, m.migratorUtils))
 	m.AddMigrationSteps(NewCheckStorage(m.writer, m.migratorUtils, m.fileutils))
-	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils, m.fileutils))
+	m.AddMigrationSteps(NewEnableMaintenance(m.writer, m.migratorUtils, m.timeout, m.spinnerTimeout))
+	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils, m.fileutils, m.spinnerTimeout))
 	m.AddMigrationSteps(NewCheckDirExists(m.writer, m.fileutils))
-	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils, &m.runHealthStatus))
-	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils, m.fileutils))
-	m.AddMigrationSteps(NewWaitForHealthy(m.writer, m.migratorUtils, &m.runHealthStatus))
+	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils, &m.runHealthStatus, m.spinnerTimeout))
+	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils, m.fileutils, m.spinnerTimeout))
+	m.AddMigrationSteps(NewWaitForHealthy(m.writer, m.migratorUtils, &m.runHealthStatus, m.spinnerTimeout))
 }
 
 func (m *MigratorV4) ExecuteDeferredSteps() error {
@@ -163,6 +165,8 @@ func (m *MigratorV4) RunMigrationFlow(skipConfirmation bool) {
 	errDeffered := m.ExecuteDeferredSteps()
 	if err != nil {
 		m.PrintMigrationErrors()
+		m.RunSuccess()
+
 	} else {
 		m.SaveExecutedStatus()
 	}
@@ -184,7 +188,7 @@ func (m *MigratorV4) RunMigrationFlow(skipConfirmation bool) {
 }
 
 func (m *MigratorV4) ClearData() error {
-	clearData := NewCleanUp(m.writer, m.migratorUtils, m.fileutils, false, false)
+	clearData := NewCleanUp(m.writer, m.migratorUtils, m.fileutils, false, false, m.spinnerTimeout)
 	clearData.Clean()
 	return nil
 }
@@ -198,4 +202,18 @@ Verify Chef Automate to see that everything is running and that all your data is
 Once verified, you can remove old Elasticsearch data.
 
 `, fqdn)
+}
+
+func (m *MigratorV4) RunSuccess() error {
+	for _, steps := range m.migrationSteps {
+		var i interface{} = steps
+		_, ok := i.(migrator.SuccessfulMigrationSteps)
+		if ok {
+			err := steps.(migrator.SuccessfulMigrationSteps).OnSuccess()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

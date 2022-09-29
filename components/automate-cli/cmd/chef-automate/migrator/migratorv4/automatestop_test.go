@@ -14,7 +14,7 @@ func TestAutomateStop(t *testing.T) {
 		StopAutomateFunc: func() error { return nil },
 	}
 	var st bool
-	as := NewAutomateStop(cw.CliWriter, mmu, &st)
+	as := NewAutomateStop(cw.CliWriter, mmu, &st, SPINNER_TEST_DURATION)
 	as.Run()
 	expected1 := "Stopping Chef Automate"
 	expected2 := "✔  Chef Automate Stopped"
@@ -28,7 +28,7 @@ func TestAutomateStopError(t *testing.T) {
 		StopAutomateFunc: func() error { return errors.New("unexpected") },
 	}
 	var st bool
-	as := NewAutomateStop(cw.CliWriter, mmu, &st)
+	as := NewAutomateStop(cw.CliWriter, mmu, &st, SPINNER_TEST_DURATION)
 	as.Run()
 	as.ErrorHandler()
 	expected1 := "✖  Failed to stop Chef Automate"
@@ -44,7 +44,7 @@ func TestAutomateStopDefferedHandlerWithoutError(t *testing.T) {
 		StartAutomateFunc: func() error { return nil },
 	}
 	var st bool
-	as := NewAutomateStop(cw.CliWriter, mmu, &st)
+	as := NewAutomateStop(cw.CliWriter, mmu, &st, SPINNER_TEST_DURATION)
 	as.Run()
 	err := as.DefferedHandler()
 	assert.NoError(t, err)
@@ -58,7 +58,7 @@ func TestAutomateStopDefferedHandlerWithError(t *testing.T) {
 		StartAutomateFunc: func() error { return errors.New("unexpected") },
 	}
 	var st bool
-	as := NewAutomateStop(cw.CliWriter, mmu, &st)
+	as := NewAutomateStop(cw.CliWriter, mmu, &st, SPINNER_TEST_DURATION)
 	as.Run()
 	as.DefferedHandler()
 	assert.Contains(t, cw.Output(), "✖  Failed to start Chef Automate")

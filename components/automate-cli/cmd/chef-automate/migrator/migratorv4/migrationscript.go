@@ -22,20 +22,22 @@ chown -RL hab:hab %[1]vsvc/automate-opensearch/var;`
 )
 
 type MigrationScript struct {
-	writer     *cli.Writer
-	utils      MigratorV4Utils
-	fileutils  fileutils.FileUtils
-	spinner    *spinner.Spinner
-	runError   error
-	hasError   bool
-	isExecuted bool
+	writer         *cli.Writer
+	utils          MigratorV4Utils
+	fileutils      fileutils.FileUtils
+	spinner        *spinner.Spinner
+	runError       error
+	hasError       bool
+	isExecuted     bool
+	spinnerTimeout time.Duration
 }
 
-func NewMigrationScript(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils) *MigrationScript {
+func NewMigrationScript(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils, spinnerTimeout time.Duration) *MigrationScript {
 	return &MigrationScript{
-		writer:    w,
-		utils:     utils,
-		fileutils: fileutils,
+		writer:         w,
+		utils:          utils,
+		fileutils:      fileutils,
+		spinnerTimeout: spinnerTimeout,
 	}
 }
 
@@ -61,7 +63,7 @@ func (ms *MigrationScript) showCopying() {
 	ms.spinner = ms.writer.NewSpinnerWithTab()
 	ms.spinner.Suffix = fmt.Sprintf("  Copying Data")
 	ms.spinner.Start()
-	time.Sleep(time.Second)
+	time.Sleep(ms.spinnerTimeout)
 }
 
 func (ms *MigrationScript) Run() error {

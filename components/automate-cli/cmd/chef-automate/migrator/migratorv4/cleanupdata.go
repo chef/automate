@@ -23,21 +23,23 @@ const (
 )
 
 type Cleanup struct {
-	writer       *cli.Writer
-	utils        MigratorV4Utils
-	fileutils    fileutils.FileUtils
-	spinner      *spinner.Spinner
-	autoAccept   bool
-	forceExecute bool
+	writer         *cli.Writer
+	utils          MigratorV4Utils
+	fileutils      fileutils.FileUtils
+	spinner        *spinner.Spinner
+	autoAccept     bool
+	forceExecute   bool
+	spinnerTimeout time.Duration
 }
 
-func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils, autoAccept, forceExecute bool) *Cleanup {
+func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils, autoAccept, forceExecute bool, spinnerTimeout time.Duration) *Cleanup {
 	return &Cleanup{
-		writer:       w,
-		utils:        utils,
-		fileutils:    fileutils,
-		autoAccept:   autoAccept,
-		forceExecute: forceExecute,
+		writer:         w,
+		utils:          utils,
+		fileutils:      fileutils,
+		autoAccept:     autoAccept,
+		forceExecute:   forceExecute,
+		spinnerTimeout: spinnerTimeout,
 	}
 }
 
@@ -112,7 +114,7 @@ func (cu *Cleanup) showDeletingMessage() {
 	cu.spinner = cu.writer.NewSpinner()
 	cu.spinner.Suffix = "  Clean up in progress"
 	cu.spinner.Start()
-	time.Sleep(time.Second)
+	time.Sleep(cu.spinnerTimeout)
 }
 
 func (cu *Cleanup) showClearDataSuccessMessage() {

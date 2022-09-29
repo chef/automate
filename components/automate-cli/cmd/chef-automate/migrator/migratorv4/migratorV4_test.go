@@ -3,7 +3,6 @@ package migratorv4
 import (
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
@@ -15,7 +14,7 @@ const WISH_TO_MIGRATE = "Do you wish to migrate the Elasticsearch data to OpenSe
 func TestRunMigrations(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	mmu := &MockMigratorV4UtilsImpl{}
-	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{}, 10, 100*time.Millisecond)
+	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{}, 10, SPINNER_TEST_DURATION)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation(false)
 	t.Log(w.Output())
@@ -25,7 +24,7 @@ func TestRunMigrations(t *testing.T) {
 func TestRunMigrationsWronginput(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	mmu := &MockMigratorV4UtilsImpl{}
-	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{}, 10, 100*time.Millisecond)
+	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{}, 10, SPINNER_TEST_DURATION)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation(false)
 	t.Log(w.Output())
@@ -44,13 +43,15 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation(false)
 	migratorv4.ExecuteMigrationSteps()
@@ -80,7 +81,7 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		GetHabRootPathFunc: func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	err := migratorv4.ExecuteMigrationSteps()
 	expected := "Can't process without user consent."
@@ -100,13 +101,15 @@ func TestRunMigrationFlowAllSuccess(t *testing.T) {
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := "Failed"
 	assert.NotContains(t, w.Output(), expected1)
@@ -127,7 +130,7 @@ func TestRunMigrationFlowIsExecutedErrors(t *testing.T) {
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `[Error] unexpected
 Please resolve this and try again.
@@ -151,7 +154,7 @@ func TestRunMigrationFlowIsExecutedReplyNo(t *testing.T) {
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `Migration Terminated.`
 	assert.Contains(t, w.Output(), expected1)
@@ -169,13 +172,15 @@ func TestRunMigrationFlowDefferedErrors(t *testing.T) {
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `[Error] unexpected error while starting automate
 Please resolve this and try again.
@@ -201,13 +206,15 @@ func TestRunMigrationFlowDefferedErrorsAndExecuteMigrationError(t *testing.T) {
 		},
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := `✖  Failed to start Chef Automate
 [Error] Failed to copy data while migration: unexpected error while running scripts
@@ -232,13 +239,15 @@ func TestRunMigrationFlowCleanupDecline(t *testing.T) {
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	t.Log(w.Output())
 	expected1 := "Failed"
@@ -260,13 +269,15 @@ func TestRunMigrationFlowCleanup(t *testing.T) {
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	t.Log(w.Output())
 	expected1 := "Failed"
@@ -286,13 +297,15 @@ func TestPathNotExist(t *testing.T) {
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		ReadV4ChecklistFunc:         func(id, path string) (bool, error) { return true, nil },
 		UpdatePostChecklistFileFunc: func(id, path string) error { return nil },
+		GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
+		SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, errors.New("path error") },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected1 := "[Error] Failed to check directory /hab/svc/automate-elasticsearch/data: path error\nMigration Terminated.\n"
 
@@ -317,7 +330,7 @@ func TestExternalDetected(t *testing.T) {
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
 		PathExistsFunc:       func(path string) (bool, error) { return true, errors.New("path error") },
 		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-	}, 10, 100*time.Millisecond)
+	}, 10, SPINNER_TEST_DURATION)
 	migratorv4.RunMigrationFlow(false)
 	expected := "[Error] Detected External OpenSearch\nPlease resolve this and try again.\nPlease contact support if you are not sure how to resolve this.\nMigration Terminated.\n"
 	assert.Contains(t, w.Output(), expected)

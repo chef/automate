@@ -29,20 +29,22 @@ const (
 )
 
 type PatchOpensearchConfig struct {
-	writer     *cli.Writer
-	utils      MigratorV4Utils
-	fileutils  fileutils.FileUtils
-	spinner    *spinner.Spinner
-	runError   error
-	hasError   bool
-	isExecuted bool
+	writer         *cli.Writer
+	utils          MigratorV4Utils
+	fileutils      fileutils.FileUtils
+	spinner        *spinner.Spinner
+	runError       error
+	hasError       bool
+	isExecuted     bool
+	spinnerTimeout time.Duration
 }
 
-func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils) *PatchOpensearchConfig {
+func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils, spinnerTimeout time.Duration) *PatchOpensearchConfig {
 	return &PatchOpensearchConfig{
-		writer:    w,
-		utils:     utils,
-		fileutils: fileutils,
+		writer:         w,
+		utils:          utils,
+		fileutils:      fileutils,
+		spinnerTimeout: spinnerTimeout,
 	}
 }
 
@@ -117,5 +119,5 @@ func (poc *PatchOpensearchConfig) showUpdating() {
 	poc.spinner = poc.writer.NewSpinnerWithTab()
 	poc.spinner.Suffix = fmt.Sprintf("  Updating OpenSearch configurations")
 	poc.spinner.Start()
-	time.Sleep(time.Second)
+	time.Sleep(poc.spinnerTimeout)
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+	"time"
 
 	"github.com/chef/automate/api/config/deployment"
 	opensearch "github.com/chef/automate/api/config/opensearch"
@@ -22,6 +23,7 @@ import (
 const (
 	SPACES_BEFORE_STEPS   = "       "
 	NEXT_AUTOMATE_VERSION = "4"
+	SPINNER_TEST_DURATION = 100 * time.Millisecond
 )
 
 type MigratorV4Utils interface {
@@ -35,6 +37,8 @@ type MigratorV4Utils interface {
 	ExecuteCommand(command string, args []string, workingDir string) error
 	GetServicesStatus() (bool, error)
 	GetAutomateFQDN(timeout int64) string
+	GetMaintenanceStatus(timeout int64) (bool, error)
+	SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error)
 }
 
 type ESSettings struct {
@@ -191,4 +195,12 @@ func (m *MigratorV4UtilsImpl) GetAutomateFQDN(timeout int64) string {
 		return "http://path.local.automate.instance.io"
 	}
 	return res.Config.GetGlobal().GetV1().GetFqdn().Value
+}
+
+func (m *MigratorV4UtilsImpl) GetMaintenanceStatus(timeout int64) (bool, error) {
+	return majorupgrade_utils.GetMaintenanceStatus(timeout)
+}
+
+func (m *MigratorV4UtilsImpl) SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
+	return majorupgrade_utils.SetMaintenanceMode(timeout, status)
 }

@@ -80,3 +80,11 @@ func ReadV4Checklist(id, path, version string) (bool, error) {
 	}
 	return ci.ReadPostChecklistById(id, path)
 }
+
+func GetMaintenanceStatus(timeout int64) (bool, error) {
+	config, err := client.GetAutomateConfig(timeout)
+	if err != nil {
+		return false, errors.Wrap(err, "Failed to get maintenance status")
+	}
+	return config.GetConfig().GetLoadBalancer().GetV1().GetSys().GetService().GetMaintenanceMode().GetValue(), nil
+}

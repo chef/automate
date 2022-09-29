@@ -10,20 +10,22 @@ import (
 )
 
 type AutomateStop struct {
-	writer       *cli.Writer
-	utils        MigratorV4Utils
-	spinner      *spinner.Spinner
-	runError     error
-	hasError     bool
-	isExecuted   bool
-	healthStatus *bool
+	writer         *cli.Writer
+	utils          MigratorV4Utils
+	spinner        *spinner.Spinner
+	runError       error
+	hasError       bool
+	isExecuted     bool
+	healthStatus   *bool
+	spinnerTimeout time.Duration
 }
 
-func NewAutomateStop(w *cli.Writer, utils MigratorV4Utils, healthStatus *bool) *AutomateStop {
+func NewAutomateStop(w *cli.Writer, utils MigratorV4Utils, healthStatus *bool, spinnerTimeout time.Duration) *AutomateStop {
 	return &AutomateStop{
-		writer:       w,
-		utils:        utils,
-		healthStatus: healthStatus,
+		writer:         w,
+		utils:          utils,
+		healthStatus:   healthStatus,
+		spinnerTimeout: spinnerTimeout,
 	}
 }
 
@@ -61,7 +63,7 @@ func (as *AutomateStop) showStopping() {
 	as.spinner = as.writer.NewSpinnerWithTab()
 	as.spinner.Suffix = fmt.Sprintf("  Stopping Chef Automate")
 	as.spinner.Start()
-	time.Sleep(time.Second)
+	time.Sleep(as.spinnerTimeout)
 }
 
 func (as *AutomateStop) showStartError() {
@@ -80,7 +82,7 @@ func (as *AutomateStop) showStarting() {
 	as.spinner = as.writer.NewSpinnerWithTab()
 	as.spinner.Suffix = fmt.Sprintf("  Restarting Chef Automate")
 	as.spinner.Start()
-	time.Sleep(time.Second)
+	time.Sleep(as.spinnerTimeout)
 }
 
 func (as *AutomateStop) DefferedHandler() error {

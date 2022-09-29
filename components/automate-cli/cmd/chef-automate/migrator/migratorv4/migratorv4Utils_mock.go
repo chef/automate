@@ -12,6 +12,8 @@ type MockMigratorV4UtilsImpl struct {
 	GetServicesStatusFunc       func() (bool, error)
 	CreateMigrateJsonFunc       func() error
 	GetAutomateFQDNFunc         func(timeout int64) string
+	GetMaintenanceStatusFunc    func(timeout int64) (bool, error)
+	SetMaintenanceModeFunc      func(timeout int64, status bool) (stdOut, stdErr string, err error)
 }
 
 func (mui *MockMigratorV4UtilsImpl) GetEsTotalShardSettings(path string) (int32, error) {
@@ -46,4 +48,10 @@ func (mui *MockMigratorV4UtilsImpl) CreateMigrateJson() error {
 }
 func (mui *MockMigratorV4UtilsImpl) GetAutomateFQDN(timeout int64) string {
 	return mui.GetAutomateFQDNFunc(timeout)
+}
+func (mui *MockMigratorV4UtilsImpl) GetMaintenanceStatus(timeout int64) (bool, error) {
+	return mui.GetMaintenanceStatusFunc(timeout)
+}
+func (mui *MockMigratorV4UtilsImpl) SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
+	return mui.SetMaintenanceModeFunc(timeout, status)
 }

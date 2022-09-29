@@ -41,11 +41,7 @@ func (cu *UpgradeV4UtilsImp) GetBackupS3URL(timeout int64) (string, error) {
 }
 
 func (cu *UpgradeV4UtilsImp) GetMaintenanceStatus(timeout int64) (bool, error) {
-	config, err := client.GetAutomateConfig(timeout)
-	if err != nil {
-		return false, errors.Wrap(err, "Failed to get maintenance status")
-	}
-	return config.GetConfig().GetLoadBalancer().GetV1().GetSys().GetService().GetMaintenanceMode().GetValue(), nil
+	return majorupgrade_utils.GetMaintenanceStatus(timeout)
 }
 
 func (cu *UpgradeV4UtilsImp) PatchS3backupURL(timeout int64) (stdOut, stdErr string, err error) {

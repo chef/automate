@@ -17,7 +17,7 @@ func TestRunMigrationScript(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		ExecuteCommandFunc: func(command string, args []string, workingDir string) error { return nil },
 	}
-	ms := NewMigrationScript(cw.CliWriter, mmu, mfu)
+	ms := NewMigrationScript(cw.CliWriter, mmu, mfu, SPINNER_TEST_DURATION)
 	ms.Run()
 	expected1 := "Copying Data"
 	expected2 := "✔  Data Copied Successfully"
@@ -33,7 +33,7 @@ func TestRunMigrationScriptExecError(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		ExecuteCommandFunc: func(command string, args []string, workingDir string) error { return errors.New("unexpected") },
 	}
-	ms := NewMigrationScript(cw.CliWriter, mmu, mfu)
+	ms := NewMigrationScript(cw.CliWriter, mmu, mfu, SPINNER_TEST_DURATION)
 	ms.Run()
 	ms.ErrorHandler()
 	expected1 := "✖  Failed to copy data"
