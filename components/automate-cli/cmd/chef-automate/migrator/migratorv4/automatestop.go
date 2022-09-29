@@ -78,7 +78,7 @@ func (as *AutomateStop) showStarted() {
 
 func (as *AutomateStop) showStarting() {
 	as.spinner = as.writer.NewSpinnerWithTab()
-	as.spinner.Suffix = fmt.Sprintf("  Starting Chef Automate")
+	as.spinner.Suffix = fmt.Sprintf("  Restarting Chef Automate")
 	as.spinner.Start()
 	time.Sleep(time.Second)
 }
