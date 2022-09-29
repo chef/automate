@@ -170,8 +170,9 @@ func (m *MigratorV4) RunMigrationFlow(skipConfirmation bool) {
 	errDeffered := m.ExecuteDeferredSteps()
 	if err != nil {
 		m.PrintMigrationErrors()
+	} else {
+		m.SaveExecutedStatus()
 	}
-	m.SaveExecutedStatus()
 	if errDeffered != nil {
 		m.handleError(errDeffered)
 	} else {
