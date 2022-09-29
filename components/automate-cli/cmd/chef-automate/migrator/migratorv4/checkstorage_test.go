@@ -70,3 +70,19 @@ func TestCheckStorageErrorInGetFreeSpaceFunc(t *testing.T) {
 	ms.ErrorHandler()
 	assert.Equal(t, cw.Output(), "[Error] unexpected\n")
 }
+
+func TestCheckStorageErrorInGetFreeSpaceFuncWithPathDoesntExist(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriter()
+	mmu := &MockMigratorV4UtilsImpl{}
+	mfu := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3.0, nil },
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return -1, errors.New("unexpected") },
+		PathExistsFunc:       func(path string) (bool, error) { return false, errors.New("unexpected") },
+		GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
+	}
+	ms := NewCheckStorage(cw.CliWriter, mmu, mfu)
+	err := ms.Run()
+	assert.Contains(t, err.Error(), "unexpected")
+	ms.ErrorHandler()
+	assert.Equal(t, cw.Output(), "[Error] unexpected\n")
+}

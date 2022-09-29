@@ -55,3 +55,71 @@ Do you want to perform clean up again? (y/n)
 	assert.Contains(t, cw.Output(), expected2)
 	assert.Contains(t, cw.Output(), expected3)
 }
+
+func TestRunCleanCmdFailureReadV4ChecklistError(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
+	mmu := &MockMigratorV4UtilsImpl{
+		ReadV4ChecklistFunc:         func(id string, path string) (bool, error) { return false, errors.New("unexpected") },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return errors.New("failed to update") },
+		UpdatePostChecklistFileFunc: func(id string, path string) error { return nil },
+	}
+	mfu := &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return "/hab" },
+	}
+
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	err := cu.Clean()
+	assert.Error(t, err, "unexpected")
+}
+
+func TestRunCleanCmdFailureAskForConfirmationFirstPromt(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	mmu := &MockMigratorV4UtilsImpl{
+		ReadV4ChecklistFunc:         func(id string, path string) (bool, error) { return false, nil },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id string, path string) error { return nil },
+	}
+	mfu := &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return "/hab" },
+	}
+
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu.Clean()
+	assert.Contains(t, cw.Output(), "I don't understand 'x'. Please type 'y' or 'n'.")
+}
+
+func TestRunCleanCmdFailureAskForConfirmationSecoundPromt(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriterWithInputs("y", "x")
+	mmu := &MockMigratorV4UtilsImpl{
+		ReadV4ChecklistFunc:         func(id string, path string) (bool, error) { return true, nil },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id string, path string) error { return nil },
+	}
+	mfu := &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return "/hab" },
+	}
+
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	cu.Clean()
+	assert.Contains(t, cw.Output(), "I don't understand 'x'. Please type 'y' or 'n'.")
+}
+
+func TestRunCleanCmdFailureAskForConfirmationUserTerminated(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriterWithInputs("n")
+	mmu := &MockMigratorV4UtilsImpl{
+		ReadV4ChecklistFunc:         func(id string, path string) (bool, error) { return false, nil },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+		UpdatePostChecklistFileFunc: func(id string, path string) error { return nil },
+	}
+	mfu := &fileutils.MockFileSystemUtils{
+		GetHabRootPathFunc: func() string { return "/hab" },
+	}
+
+	cu := NewCleanUp(cw.CliWriter, mmu, mfu, false, false)
+	err := cu.Clean()
+	assert.Error(t, err, "Cleanup Process Terminated.")
+}
