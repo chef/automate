@@ -1,59 +1,44 @@
-import { EntityState, EntityAdapter, createEntityAdapter } from "@ngrx/entity";
+import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
+import { set, pipe } from 'lodash/fp';
 
-import { SsoConfig } from "./sso-config.model";
-import { set } from "lodash/fp";
-import { SsoActionTypes, SsoActions } from "./sso-config.actions";
-import { EntityStatus } from "../entities";
+import { EntityStatus } from 'app/entities/entities';
+import { SsoConfigActionTypes, SsoConfigActions } from './sso-config.actions';
+import { SsoConfig } from './sso-config.model';
 
-export interface SsoEntityState extends EntityState<SsoConfig> {
-  getAllStatus: EntityStatus;
+export interface SsoConfigEntityState extends EntityState<SsoConfig> {
+  getStatus: EntityStatus;
   ssoConfig: SsoConfig;
 }
 
-const GET_ALL_STATUS = "getAllStatus";
-const GET_STATUS = "getstatus"
+const GET_STATUS = 'getStatus';
 
-export const ssoEntityAdapter: EntityAdapter<SsoConfig> = createEntityAdapter<SsoConfig>();
+export const ssoConfigEntityAdapter:
+  EntityAdapter<SsoConfig> = createEntityAdapter<SsoConfig>();
 
-export const SsoEntityInitialState: SsoEntityState =
-  ssoEntityAdapter.getInitialState({
-    getAllStatus: EntityStatus.notLoaded,
+export const SsoConfigEntityInitialState: SsoConfigEntityState =
+  ssoConfigEntityAdapter.getInitialState(<SsoConfigEntityState>{
+    getStatus: EntityStatus.notLoaded,
     ssoConfig: null
-  });
+});
 
-export function SsoEntityReducer(
-  state: SsoEntityState = SsoEntityInitialState,
-  action: SsoActions
-): SsoEntityState {
+export function ssoConfigEntityReducer(
+  state: SsoConfigEntityState = SsoConfigEntityInitialState,
+  action: SsoConfigActions): SsoConfigEntityState {
+
   switch (action.type) {
-    
-    case SsoActionTypes.GET_ALL: {
-      return set(GET_ALL_STATUS, EntityStatus.loading, state);
-    }
+    case SsoConfigActionTypes.GET:
+      return set(GET_STATUS, EntityStatus.loading, ssoConfigEntityAdapter.removeAll(state));
 
-    case SsoActionTypes.GET_ALL_SUCCESS: {
-      const ssoConfigstatusState = set(
-        GET_ALL_STATUS,
-        EntityStatus.loadingSuccess,
-        state
-      );
-      return set (
-        GET_STATUS,
-        action.payload,
-        ssoConfigstatusState
-      ) as SsoEntityState;
-    }
+    case SsoConfigActionTypes.GET_SUCCESS:
+      return pipe(
+        set('getStatus', EntityStatus.loadingSuccess),
+        set('ssoConfig', action.payload)
+      )(state) as SsoConfigEntityState;
 
-    case SsoActionTypes.GET_ALL_FAILURE: {
-      return set(
-        GET_ALL_STATUS,
-        EntityStatus.loadingFailure,
-        state
-      ) as SsoEntityState;
-    }
+    case SsoConfigActionTypes.GET_FAILURE:
+      return set(GET_STATUS, EntityStatus.loadingFailure, state);
+
     default:
       return state;
   }
 }
-
-

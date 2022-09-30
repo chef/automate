@@ -2,31 +2,27 @@ import { Action } from '@ngrx/store'
 import { HttpErrorResponse } from '@angular/common/http'
 import { SsoConfig } from './sso-config.model'
 
-export enum SsoActionTypes {
-    GET_ALL         = 'SSO::GET_ALL',
-    GET_ALL_SUCCESS = 'SSO::GET_ALL::SUCCESS',
-    GET_ALL_FAILURE = 'SSO::GET_ALL::FAILURE'
+export enum SsoConfigActionTypes {
+  GET = 'SSO_CONFIG::GET_ALL',
+  GET_SUCCESS = 'SSO_CONFIG::GET::SUCCESS',
+  GET_FAILURE = 'SSO_CONFIG::GET::FAILURE'
 }
 
-export class GetAllSsoConfig implements Action { 
-    readonly type = SsoActionTypes.GET_ALL;
+export class GetSsoConfig implements Action {
+  readonly type = SsoConfigActionTypes.GET;
 }
 
-export interface GetAllConfigResponse {
-    SsoConfigs: SsoConfig;
+export class GetSsoConfigSuccess implements Action {
+  readonly type = SsoConfigActionTypes.GET_SUCCESS;
+  constructor(public payload: SsoConfig) { }
 }
 
-export class GetAllSsoConfigSuccess implements Action {
-    readonly type = SsoActionTypes.GET_ALL_SUCCESS;
-    constructor(public payload: GetAllConfigResponse) {}
+export class GetSsoConfigFailure implements Action {
+  readonly type = SsoConfigActionTypes.GET_FAILURE;
+  constructor(public payload: HttpErrorResponse) { };
 }
 
-export class GetAllSsoConfigFailure implements Action {
-    readonly type = SsoActionTypes.GET_ALL_FAILURE;
-    constructor(public payload: HttpErrorResponse) {};
-}
-
-export type SsoActions = 
-  | GetAllSsoConfig
-  | GetAllSsoConfigSuccess
-  | GetAllSsoConfigFailure
+export type SsoConfigActions =
+  | GetSsoConfig
+  | GetSsoConfigSuccess
+  | GetSsoConfigFailure

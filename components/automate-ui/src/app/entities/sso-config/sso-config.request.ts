@@ -5,10 +5,9 @@ import { Observable } from "rxjs";
 import { environment as env } from "environments/environment";
 import { SsoConfig } from "./sso-config.model";
 import { InterceptorSkipHeader } from "app/services/http/http-client-auth.interceptor";
-import { GetAllConfigResponse } from "./sso-config.actions";
 
-export interface SsoPayloadResponse {
-  sso: SsoConfig;
+export interface SsoConfigResponse {
+  ssoConfig: SsoConfig;
 }
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
@@ -16,12 +15,9 @@ const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 export class SsoConfigRequests {
   constructor(private http: HttpClient) {}
 
-  public getAllConfig(): Observable<GetAllConfigResponse> {
-    const abc =  this.http.get<GetAllConfigResponse>(
-      `${env.gateway_url}/sso/config`,
-      { headers }
+  public getSsoConfig(): Observable<SsoConfig> {
+    return this.http.get<SsoConfig>(
+      `${env.gateway_url}/sso/config`, { headers }
     );
-    console.log(abc);
-    return abc;
   }
 }

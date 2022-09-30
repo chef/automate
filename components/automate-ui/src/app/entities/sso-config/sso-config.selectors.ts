@@ -1,19 +1,20 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { ssoEntityAdapter, SsoEntityState } from "./sso-config.reducer";
-import { routeParams } from "app/route.selectors";
-import { find } from "lodash/fp";
+import { ssoConfigEntityAdapter, SsoConfigEntityState } from "./sso-config.reducer";
+
 export const ssoConfigState =
-  createFeatureSelector<SsoEntityState>('ssoConfigs');
+  createFeatureSelector<SsoConfigEntityState>('ssoConfig');
 
-export const { selectAll: allSsoConfigs, selectEntities: ssoConfigEntities } =
-  ssoEntityAdapter.getSelectors(ssoConfigState);
+export const { 
+  selectAll: allSsoConfigs, 
+  selectEntities: ssoConfigEntities
+} = ssoConfigEntityAdapter.getSelectors(ssoConfigState);
 
-export const getAllStatus = createSelector(
+export const getStatus = createSelector(
   ssoConfigState,
-  (state) => state.getAllStatus 
+  (state) => state.getStatus
 );
-export const ssoConfigFromRoute = createSelector(
-  ssoConfigEntities,
-  routeParams,
-  (state, { sso_url }) => find({ sso_url }, state)
+
+export const ssoConfig = createSelector(
+  ssoConfigState,
+  (state) => state.ssoConfig
 );

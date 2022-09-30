@@ -104,7 +104,7 @@ const routes: Routes = [
           component: ApiTokenDetailsComponent
         },
         {
-          path: 'sso',
+          path: 'sso-config',
           component: SsoConfigComponent
         },
         {
