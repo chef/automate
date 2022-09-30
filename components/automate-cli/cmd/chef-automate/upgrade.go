@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -586,6 +587,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 	major, _ := majorupgradechecklist.GetMajorVersion(resp.CurrentVersion)
+	isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
 	switch major {
 	case "4":
 		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
@@ -593,13 +595,28 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 			return err
 		}
 		if len(pendingPostChecklist) > 0 {
-			isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
 			if isExternalOpenSearch {
 				return postUpgradeStatusExternal(resp)
 			}
 			return postUpgardeStatusEmbedded(resp)
 		} else {
 			printUpgradeStatusMsg(resp)
+		}
+	case "3":
+		printUpgradeStatusMsg(resp)
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
+			for index, msg := range pendingPostChecklist {
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+			}
+		}
+		err = SetSeenTrueForExternal()
+		if err != nil {
+			return err
 		}
 	default:
 		printUpgradeStatusMsg(resp)
@@ -694,14 +711,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 		}
 		stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
 
-		path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
-		res, err := majorupgradechecklist.ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
-		if err != nil {
-			return err
-		}
-
-		res.Seen = true
-		err = majorupgradechecklist.CreateJsonFile(res, path)
+		err = SetSeenTrueForExternal()
 		if err != nil {
 			return err
 		}
@@ -955,4 +965,19 @@ func PrintAutomateOutOfDate(writer *cli.Writer, currentVersion, latestVersion st
 	if isMajor {
 		writer.Println(msgInfoMajor)
 	}
+}
+
+func SetSeenTrueForExternal() error {
+	path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
+	res, err := majorupgradechecklist.ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
+	if err != nil {
+		return err
+	}
+
+	res.Seen = true
+	err = majorupgradechecklist.CreateJsonFile(res, path)
+	if err != nil {
+		return err
+	}
+	return nil
 }
