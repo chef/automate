@@ -60,25 +60,18 @@ func (cu *Cleanup) startCleanup(forceExecute, autoAccept, skipConfirmation bool)
 		return err
 	}
 
-	if isExecuted {
-		if forceExecute {
-			isExecuted = false
-		} else {
-			err := cu.askForConfirmation(`Your have already deleted your old Elasticsearch data.
+	if isExecuted && !forceExecute {
+		err := cu.askForConfirmation(`Your have already deleted your old Elasticsearch data.
 Do you want to perform clean up again?`)
-			if err != nil {
-				return err
-			} else {
-				isExecuted = false
-			}
-		}
-	}
-
-	if !isExecuted {
-		err := cu.runcleanUpes(autoAccept, skipConfirmation)
 		if err != nil {
 			return err
 		}
+		skipConfirmation = true
+	}
+
+	err = cu.runcleanUpes(autoAccept, skipConfirmation)
+	if err != nil {
+		return err
 	}
 	return nil
 }
