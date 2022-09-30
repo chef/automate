@@ -38,8 +38,7 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
  
 ## Upgrade and migration flow
 
-![Upgrade flow](/images/automate/major-v4-upgrade-flow.png)
-![Migration flow](/images/automate/major-v4-migrate-flow.png)
+![Upgrade flow](/images/automate/migration-and-upgrade-v4-flow.png)
 
 ## Prerequisites
 
