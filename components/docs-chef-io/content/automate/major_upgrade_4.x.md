@@ -280,8 +280,7 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
     $ chef-automate config patch opensearch_config.toml
     ----------------------------------------------------------------------
 
-    To check the upgrade status use
-    $ chef-automate upgrade status
+    To check the upgrade status use $ chef-automate upgrade status
     ```
 
 2. Check upgrade status is up-to-date
@@ -569,8 +568,7 @@ To upgrade to 4.x, follow the steps below:
     $ chef-automate config patch opensearch_config.toml
     ----------------------------------------------------------------------
 
-    To check the upgrade status use
-    $ chef-automate upgrade status
+    To check the upgrade status use $ chef-automate upgrade status
     ```
 
 2. Check upgrade status is up-to-date
