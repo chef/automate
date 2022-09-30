@@ -28,7 +28,7 @@ export class SidebarComponent {
   }
 
   public checkDeploymentType(menuItem: any , menuGroup: any) {
-    if (menuItem.route === '/settings/sso' &&
+    if (menuItem.route === '/settings/sso-config' &&
     this.telemetryService.getDeploymenType() !== 'SAAS') {
       menuGroup.visible$ = false;
       menuItem.visible$ = false;
