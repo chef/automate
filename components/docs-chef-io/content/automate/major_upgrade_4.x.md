@@ -28,13 +28,13 @@ Please choose the following upgrade journey based on your current version of Che
 | -------------------- | ---------- |
 | Any version before 20220329091442| 20220329091442|
 | 20220329091442| 3.0.49|
-| 3.0.49| 4.0.x
+| 3.0.49| 4.x
 
 For example, if today you are on version *2021201164433*, your upgrade journey should be:
 
 1. Manual upgrade to *20220329091442*
 1. Manual upgrade to *3.0.49*
-1. Manual upgrade to *4.0.x*
+1. Manual upgrade to *4.x*
 
 ## Prerequisites
 
@@ -60,9 +60,9 @@ sudo chef-automate version
 
 To upgrade to automate 3.0.49 follow the link: [upgrading to 3.0.49]({{< relref "major_upgrade.md" >}})
 
-## Upgrade Path from 3.0.49 to 4.0.x
+## Upgrade Path from 3.0.49 to 4.x
 
-There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
+There are four possible scenarios to upgrade from 3.0.49 to 4.x version.
 
 - [Chef Automate with Embedded Elasticsearch]({{< relref "#chef-automate-with-embedded-elasticsearch" >}})
 
@@ -84,7 +84,7 @@ So, accept the checklist item asking permission to disable sharding. {{< /warnin
 
 To upgrade Chef Automate with embedded Elasticsearch, follow the steps given below:
 
-**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.x**
 
 1. Start a major version upgrade:
 
@@ -97,7 +97,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     #Output
 
     Current version: 3.0.49
-    Target version: 4.2.59
+    Target version: 4.x.y
     
     This is a major upgrade!
     In this release, Elasticsearch will be migrated to OpenSearch.
@@ -145,9 +145,9 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     #Output
 
     ------------------------------------------------------------------------------------
-    ✔ Chef Automate upgraded to version (4.2.59) successfully.
-      To know whats new in version (4.2.59),
-      visit https://docs.chef.io/release_notes_automate/#4.2.59 
+    ✔ Chef Automate upgraded to version (4.x.y) successfully.
+      To know whats new in version (4.x.y),
+      visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
     Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
@@ -173,8 +173,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
      ✔  Clean up successful  
     
     ```
-5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
-if you haven't done in above step
+3. **[If not done in previous steps]** Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 
     ```sh
     sudo chef-automate post-major-upgrade migrate --data=es
@@ -205,28 +204,22 @@ if you haven't done in above step
     ```
 
 
-6. Verify whether all services are running:
+4. Verify whether all services are running:
 
     ```sh
     sudo chef-automate status
     ```
 
-7. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+5. **[If not done in step 2]** Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
 
     ```sh
     sudo chef-automate post-major-upgrade clear-data --data=es
     ```
+
     ```shell
     #Output
 
     Would you like to clean up the old Elasticsearch data now? (y/n)
-    y
-     ✔  Clean up successful 
-    
-    #or
-    
-    Your have already deleted your old Elasticsearch data.
-    Do you want to perform clean up again? (y/n)
     y
      ✔  Clean up successful 
     ```
@@ -235,20 +228,90 @@ if you haven't done in above step
 
 To upgrade Chef Automate with external Elasticsearch, follow the steps given below:
 
-**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.x**
 
 1. Start major version upgrade:
 
-```sh
-sudo chef-automate upgrade run --major
-```
+    ```sh
+    sudo chef-automate upgrade run --major
+    ```
+
+    ```sh
+    #Output
+
+    Current version: 3.0.49
+    Target version: 4.x.y
+    
+    This is a major upgrade!
+    In this release, Elasticsearch will be migrated to OpenSearch.
+    
+    Please make sure following things are taken care of
+    1. You have scheduled downtime for the duration of the upgrade
+    2. You have taken a backup by running the command: chef automate backup create
+    3. /hab directory should have at least 5.9GB of free space. (Currently available space : 39.6GB)
+    
+    You can always change the OpenSearch destination directory by using the flag:
+      $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
+    
+    For more information, visit 
+    https://docs.chef.io/automate/major_upgrade 4.x/
+    
+    Would you like to proceed with the upgrade? (y/n)
+    y
+    
+    Following Pre-flight checks will be conducted
+    1. /hab directory should have at least 5.9GB of free space
+    2. Elasticsearch indices are in version 6
+    
+    Pre flight checks
+     ✔  [Passed]    /hab directory should have at least 5.9GB of free space 
+     ✔  Maintenance mode turned ON successfully
+    Upgrading Chef Automate from version 3.0.49 to 4.x
+    ----------------------------------------------------------------------
+    IMPORTANT 
+    
+    To establish connection between automate and OpenSearch database, 
+    it is required to patch the configuration file with correct values.
+    
+    We have created a sample config file for configuring external OpenSearch:
+    opensearch_config.toml
+    
+    Once upgrade is complete, you must update this file with actual external OpenSearch connection configurations 
+    and then run the below patch command to update the configurations:
+    $ chef-automate config patch opensearch_config.toml
+    ----------------------------------------------------------------------
+
+    To check the upgrade status use
+    $ chef-automate upgrade status
+    ```
 
 2. Check upgrade status is up-to-date
 
-```sh
-sudo chef-automate status
-```
+    ```sh
+    sudo chef-automate status
+    ```
 
+    
+    ```shell
+    #Output
+
+    ------------------------------------------------------------------------------------
+    ✔ Chef Automate upgraded to version (4.x.y) successfully.
+      To know whats new in version (4.x.y),
+      visit https://docs.chef.io/release_notes_automate/#4.x.y 
+    ------------------------------------------------------------------------------------
+    
+    Have you updated your opensearch_config.toml with actual external OpenSearch connection configurations? (y/n)
+    y
+     ✔  External OpenSearch configurations updated successfully.
+     ✔  Maintenance mode turned ON successfully
+
+    After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations 
+    and then run the below patch command to update the configurations:
+    $ chef-automate config patch opensearch.toml
+
+    ✔  Maintenance mode turned ON successfully
+    ```
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
 4. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
@@ -256,17 +319,11 @@ sudo chef-automate status
     Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
     Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
 
-5. Turn off maintenance mode:
-
-```sh
-sudo chef-automate maintenance off
-```
-
 ### Chef Automate in Air-Gapped Environment With Embedded ElasticSearch
 
-**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.x**
 
-To upgrade to 4.0.x, follow the steps below:
+To upgrade to 4.x, follow the steps below:
 
 #### On Internet connected machine
 
@@ -432,9 +489,9 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 ### Chef Automate in Air-Gapped Environment With External ElasticSearch
 
-**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.x**
 
-To upgrade to 4.0.x, follow the steps below:
+To upgrade to 4.x, follow the steps below:
 
 #### On Internet connected machine
 
@@ -553,7 +610,7 @@ Waiting for Deployment Service to be healthy
 Waiting for Deployment Service to be healthy
 Waiting for Deployment Service to be healthy
 Deployment Service is healty now
-current_version:"4.2.10" target_version:"4.2.59" target_major:"4"
+current_version:"4.x" target_version:"4.x.y" target_major:"4"
 Upgrading Chef Automate
 ```
 
