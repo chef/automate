@@ -6,7 +6,7 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Disaster Recovery Setup"
+    title = "Disaster Recovery On Prem"
     parent = "automate/deploy_high_availability/disaster_recovery"
     identifier = "automate/deploy_high_availability/ha_disaster_recovery_setup.md Disaster Recovery"
     weight = 200
