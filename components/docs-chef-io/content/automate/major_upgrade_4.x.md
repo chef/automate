@@ -88,141 +88,148 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
 1. Start a major version upgrade:
 
-```sh
-sudo chef-automate upgrade run --major
-```
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure accept the prompt by marking yes, otherwise it will prompt you the error.The output will be show somthing similar as below:
+    ```sh
+    sudo chef-automate upgrade run --major
+    ```
 
-```shell
-Current version: 3.0.49
-Target version: 4.2.59
 
-This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
+    ```shell
+    #Output
 
-Please make sure following things are taken care of
-1. You have scheduled downtime for the duration of the upgrade
-2. You have taken a backup by running the command: chef automate backup create
-3. /hab directory should have at least 5.9GB of free space. (Currently available space : 39.6GB)
-
-You can always change the OpenSearch destination directory by using the flag:
-  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
-
-For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-
-Would you like to proceed with the upgrade? (y/n)
-y
-
-Following Pre-flight checks will be conducted
-1. /hab directory should have at least 5.9GB of free space
-2. Elasticsearch indices are in version 6
-
-Pre flight checks
- ✔  [Passed]    /hab directory should have at least 5.9GB of free space 
- ✔  [Passed]    Elasticsearch indices are in version 6 
- ✔  Maintenance mode turned ON successfully
-Upgrading Chef Automate from version 3.0.49 to 4.x
-This might take around 15 to 20 min
-
-Once upgrade is complete, You will get an option to migrate data from Elasticsearch to OpenSearch.
-Maintenance mode will be turned off after migration is complete.
-
-To check the upgrade status use $ chef-automate upgrade status
-```
-It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+    Current version: 3.0.49
+    Target version: 4.2.59
+    
+    This is a major upgrade!
+    In this release, Elasticsearch will be migrated to OpenSearch.
+    
+    Please make sure following things are taken care of
+    1. You have scheduled downtime for the duration of the upgrade
+    2. You have taken a backup by running the command: chef automate backup create
+    3. /hab directory should have at least 5.9GB of free space. (Currently available space : 39.6GB)
+    
+    You can always change the OpenSearch destination directory by using the flag:
+      $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
+    
+    For more information, visit 
+    https://docs.chef.io/automate/major_upgrade 4.x/
+    
+    Would you like to proceed with the upgrade? (y/n)
+    y
+    
+    Following Pre-flight checks will be conducted
+    1. /hab directory should have at least 5.9GB of free space
+    2. Elasticsearch indices are in version 6
+    
+    Pre flight checks
+     ✔  [Passed]    /hab directory should have at least 5.9GB of free space 
+     ✔  [Passed]    Elasticsearch indices are in version 6 
+     ✔  Maintenance mode turned ON successfully
+    Upgrading Chef Automate from version 3.0.49 to 4.x
+    This might take around 15 to 20 min
+    
+    Once upgrade is complete, You will get an option to migrate data from Elasticsearch to OpenSearch.
+    Maintenance mode will be turned off after migration is complete.
+    
+    To check the upgrade status use $ chef-automate upgrade status
+    ```
 
 2. Check the upgrade status of Chef Automate:
 
-```sh
-sudo chef-automate upgrade status
-```
-This should return: Automate is up-to-date with airgap bundle `4.x.y` version
+    Make sure all your services are up by running `chef-automate status`
+    ```sh
+    sudo chef-automate upgrade status
+    ```
+    
 
-```shell
-------------------------------------------------------------------------------------
-✔ Chef Automate upgraded to version (4.2.59) successfully.
-  To know whats new in version (4.2.59),
-  visit https://docs.chef.io/release_notes_automate/#4.2.59 
-------------------------------------------------------------------------------------
+    ```shell
+    #Output
 
-Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
-y
-
-Migration in progress
-        ✔  Maintenance mode turned ON successfully
-        ✔  OpenSearch configurations updated successfully
-        ✔  Chef Automate Stopped  
-        ✔  Data Copied Successfully
-        ✔  Chef Automate Started    
-        ✔  Chef Automate status is healthy
-        ✔  Maintenance mode turned OFF successfully
- ✔  Migration complete
-
-Verify Chef Automate to see that everything is running and that all your data is available.
-ip-172-31-26-40.ap-south-1.compute.internal
-
-Once verified, you can remove old Elasticsearch data.
-
-Would you like to clean up the old Elasticsearch data now? (y/n)
-y
- ✔  Clean up successful  
-
-```
+    ------------------------------------------------------------------------------------
+    ✔ Chef Automate upgraded to version (4.2.59) successfully.
+      To know whats new in version (4.2.59),
+      visit https://docs.chef.io/release_notes_automate/#4.2.59 
+    ------------------------------------------------------------------------------------
+    
+    Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
+    y
+    
+    Migration in progress
+            ✔  Maintenance mode turned ON successfully
+            ✔  OpenSearch configurations updated successfully
+            ✔  Chef Automate Stopped  
+            ✔  Data Copied Successfully
+            ✔  Chef Automate Started    
+            ✔  Chef Automate status is healthy
+            ✔  Maintenance mode turned OFF successfully
+     ✔  Migration complete
+    
+    Verify Chef Automate to see that everything is running and that all your data is available.
+    ip-172-31-26-40.ap-south-1.compute.internal
+    
+    Once verified, you can remove old Elasticsearch data.
+    
+    Would you like to clean up the old Elasticsearch data now? (y/n)
+    y
+     ✔  Clean up successful  
+    
+    ```
 5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
-if you haven't done in **chef-automate upgrade status** command
+if you haven't done in above step
 
-```sh
-sudo chef-automate post-major-upgrade migrate --data=es
-```
+    ```sh
+    sudo chef-automate post-major-upgrade migrate --data=es
+    ```
 
-```shell
-Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
-y
+    ```shell
+    #Output
 
-Migration in progress
-        ✔  Maintenance mode turned ON successfully
-        ✔  OpenSearch configurations updated successfully
-        ✔  Chef Automate Stopped  
-        ✔  Data Copied Successfully
-        ✔  Chef Automate Started    
-        ✔  Chef Automate status is healthy
-        ✔  Maintenance mode turned OFF successfully
- ✔  Migration complete
-
-Verify Chef Automate to see that everything is running and that all your data is available.
-ip-172-31-26-40.ap-south-1.compute.internal
-
-Once verified, you can remove old Elasticsearch data.
-
-
-```
+    Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
+    y
+    
+    Migration in progress
+            ✔  Maintenance mode turned ON successfully
+            ✔  OpenSearch configurations updated successfully
+            ✔  Chef Automate Stopped  
+            ✔  Data Copied Successfully
+            ✔  Chef Automate Started    
+            ✔  Chef Automate status is healthy
+            ✔  Maintenance mode turned OFF successfully
+     ✔  Migration complete
+    
+    Verify Chef Automate to see that everything is running and that all your data is available.
+    ip-172-31-26-40.ap-south-1.compute.internal
+    
+    Once verified, you can remove old Elasticsearch data.
+    
+    
+    ```
 
 
 6. Verify whether all services are running:
 
-```sh
-sudo chef-automate status
-```
+    ```sh
+    sudo chef-automate status
+    ```
 
 7. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
 
-```sh
-sudo chef-automate post-major-upgrade clear-data --data=es
-```
-```shell
-Would you like to clean up the old Elasticsearch data now? (y/n)
-y
- ✔  Clean up successful 
+    ```sh
+    sudo chef-automate post-major-upgrade clear-data --data=es
+    ```
+    ```shell
+    #Output
 
-or
-
-Your have already deleted your old Elasticsearch data.
-Do you want to perform clean up again? (y/n)
-y
- ✔  Clean up successful 
-```
+    Would you like to clean up the old Elasticsearch data now? (y/n)
+    y
+     ✔  Clean up successful 
+    
+    #or
+    
+    Your have already deleted your old Elasticsearch data.
+    Do you want to perform clean up again? (y/n)
+    y
+     ✔  Clean up successful 
+    ```
 
 ### Chef Automate with External ElasticSearch
 
