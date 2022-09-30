@@ -91,21 +91,44 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 ```sh
 sudo chef-automate upgrade run --major
 ```
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure accept the prompt by marking yes, otherwise it will prompt you the error.The output will be show somthing similar as below:
 
 ```shell
-You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+Current version: 3.0.49
+Target version: 4.2.59
+
+This is a major upgrade!
+In this release, Elasticsearch will be migrated to OpenSearch.
+
+Please make sure following things are taken care of
+1. You have scheduled downtime for the duration of the upgrade
+2. You have taken a backup by running the command: chef automate backup create
+3. /hab directory should have at least 5.9GB of free space. (Currently available space : 39.6GB)
+
+You can always change the OpenSearch destination directory by using the flag:
+  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
+
+For more information, visit 
+https://docs.chef.io/automate/major_upgrade 4.x/
+
+Would you like to proceed with the upgrade? (y/n)
 y
-You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
-y
-Ensure you have more than 60 percent free disk space (y/n)
-y
-This will disable Sharding on your elastic search (y/n)
-y
-{"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
-{"_shards":{"total":60,"successful":30,"failed":0}}
-After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
-y
+
+Following Pre-flight checks will be conducted
+1. /hab directory should have at least 5.9GB of free space
+2. Elasticsearch indices are in version 6
+
+Pre flight checks
+ ✔  [Passed]    /hab directory should have at least 5.9GB of free space 
+ ✔  [Passed]    Elasticsearch indices are in version 6 
+ ✔  Maintenance mode turned ON successfully
+Upgrading Chef Automate from version 3.0.49 to 4.x
+This might take around 15 to 20 min
+
+Once upgrade is complete, You will get an option to migrate data from Elasticsearch to OpenSearch.
+Maintenance mode will be turned off after migration is complete.
+
+To check the upgrade status use $ chef-automate upgrade status
 ```
 It starts upgrading 
 Once you are done with the upgrade, follow the steps post upgrade which are:
