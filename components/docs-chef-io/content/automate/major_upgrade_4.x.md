@@ -35,6 +35,11 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
 1. Manual upgrade to *20220329091442*
 1. Manual upgrade to *3.0.49*
 1. Manual upgrade to *4.x*
+ 
+## Upgrade and migration flow
+
+![Upgrade flow](/images/automate/major-v4-upgrade-flow.png)
+![Migration flow](/images/automate/major-v4-migrate-flow.png)
 
 ## Prerequisites
 
