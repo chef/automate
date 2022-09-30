@@ -46,11 +46,13 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 
 	// Validating s3 url
 	if config.Global != nil && config.Global.String() != "" {
-		if config.Global.V1.Backups.Location.Value == "s3" {
-			isValid := validateS3Url(config)
-			if !isValid {
-				errMessage := "The endpoint value of s3 backup in provided patch configuration is having invalid pattern " + config.Global.V1.Backups.S3.Bucket.Endpoint.Value + ". Please ensure to replace it with https://s3.amazonaws.com"
-				return status.Wrap(nil, status.DeploymentServiceCallError, errMessage)
+		if config.Global.V1 != nil && config.Global.V1.Backups != nil && config.Global.V1.Backups.Location != nil {
+			if config.Global.V1.Backups.Location.Value == "s3" {
+				isValid := validateS3Url(config)
+				if !isValid {
+					errMessage := "The endpoint value of s3 backup in provided patch configuration is having invalid pattern " + config.Global.V1.Backups.S3.Bucket.Endpoint.Value + ". Please ensure to replace it with https://s3.amazonaws.com"
+					return status.Wrap(nil, status.DeploymentServiceCallError, errMessage)
+				}
 			}
 		}
 	}

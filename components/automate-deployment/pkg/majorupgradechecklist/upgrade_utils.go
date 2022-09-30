@@ -11,7 +11,9 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
+	"github.com/chef/automate/lib/io/fileutils"
 	cm "github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -135,4 +137,19 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, version string, sk
 		return false, status.Errorf(status.InsufficientSpaceError, message)
 	}
 	return true, nil
+}
+
+func SetSeenTrueForExternal() error {
+	path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
+	res, err := ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
+	if err != nil {
+		return err
+	}
+
+	res.Seen = true
+	err = CreateJsonFile(res, path)
+	if err != nil {
+		return err
+	}
+	return nil
 }

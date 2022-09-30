@@ -333,7 +333,7 @@ and then run the below patch command to update the configurations:
 
 	const openSearchConfig = `[global.v1.external.opensearch]
   enable = true
-  nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
+  nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200"]
 
 # Uncomment and fill out if using external opensearch with SSL and/or basic auth
 [global.v1.external.opensearch.auth]
@@ -351,10 +351,10 @@ and then run the below patch command to update the configurations:
   
 # Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
-#  proxy_set_header_host = "<your external es hostname>:1234"
+#  proxy_set_header_host = "<Your External OpenSearch Hostname>:<Port-No>"
 
 # Uncomment and add to change the ssl_verify_depth for the root cert bundle
-#   ssl_verify_depth = "2"
+#   ssl_verify_depth = "5"
 `
 	_, err = file.WriteString(openSearchConfig)
 	if err != nil {
@@ -522,10 +522,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		//Todo(milestone) - update the comparison logic of current version and latest available version
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
-				err := postUpgradeStatus(resp)
-				if err != nil {
-					return err
-				}
+				printUpgradeStatusMsg(resp)
 			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
 				isMajor := !resp.IsConvergeCompatable
 				PrintAutomateOutOfDate(writer, resp.CurrentVersion, resp.LatestAvailableVersion, isMajor)
@@ -535,16 +532,15 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				// 	writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
 				// }
 			} else {
-				err := postUpgradeStatus(resp)
-				if err != nil {
-					return err
-				}
+				printUpgradeStatusMsg(resp)
 			}
 		default:
-			err := postUpgradeStatus(resp)
-			if err != nil {
-				return err
-			}
+			printUpgradeStatusMsg(resp)
+		}
+
+		err := postUpgradeStatus(resp)
+		if err != nil {
+			return err
 		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
@@ -598,12 +594,9 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 			if isExternalOpenSearch {
 				return postUpgradeStatusExternal(resp)
 			}
-			return postUpgardeStatusEmbedded(resp)
-		} else {
-			printUpgradeStatusMsg(resp)
+			return postUpgradeStatusEmbedded(resp)
 		}
 	case "3":
-		printUpgradeStatusMsg(resp)
 		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
 		if err != nil {
 			return err
@@ -614,12 +607,10 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
 		}
-		err = SetSeenTrueForExternal()
+		err = majorupgradechecklist.SetSeenTrueForExternal()
 		if err != nil {
 			return err
 		}
-	default:
-		printUpgradeStatusMsg(resp)
 	}
 	return nil
 }
@@ -684,17 +675,26 @@ func startMigration() error {
 	return nil
 }
 
+func contains(s []*api.ServiceState, e string) bool {
+	for _, a := range s {
+		if a.Name == e {
+			return true
+		}
+	}
+	return false
+}
+
 // postUpgradeStatusExternal - Handle case for external opensearch after upgrade status
 func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
-	printUpgradeStatusMsg(resp)
 
-	isHealthy, err := majorupgrade_utils.EnsureStatus()
+	svcList, err := majorupgrade_utils.GetAutomateSvcList()
 	if err != nil {
 		return err
 	}
-	if isHealthy {
+	if !contains(svcList, "automate-opensearch") {
 		return nil
 	}
+
 	isUserConsent, err := promptUser("Have you updated your " + color.New(color.Bold).Sprint(openSearchConfigFile) + " with actual external OpenSearch connection configurations?")
 	writer.Println("")
 	if err != nil {
@@ -711,7 +711,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 		}
 		stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
 
-		err = SetSeenTrueForExternal()
+		err = majorupgradechecklist.SetSeenTrueForExternal()
 		if err != nil {
 			return err
 		}
@@ -725,8 +725,8 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	}
 
 	// Handle the case where user has not updated the opensearch_config.toml i.e. `n` case
-	writer.Println("After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations and then run the below patch command to update the configurations:")
-	writer.Println(color.New(color.Bold).Sprint("$ chef-automate config patch opensearch.toml"))
+	writer.Println("After the upgrade, you must update opensearch_config.toml with actual external OpenSearch connection configurations and then run the below patch command to update the configurations:")
+	writer.Println(color.New(color.Bold).Sprint("$ chef-automate config patch opensearch_config.toml"))
 	writer.Println("")
 	_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
 	if err != nil {
@@ -737,8 +737,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 }
 
 // postUpgardeStatusEmbedded - Handle case for embedded opensearch after upgrade status
-func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
-	printUpgradeStatusMsg(resp)
+func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 
 	isMigrationConsent, err := promptUser("Do you wish to migrate the Elasticsearch data to OpenSearch now?")
 	writer.Println("")
@@ -965,19 +964,5 @@ func PrintAutomateOutOfDate(writer *cli.Writer, currentVersion, latestVersion st
 	if isMajor {
 		writer.Println(msgInfoMajor)
 	}
-}
-
-func SetSeenTrueForExternal() error {
-	path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
-	res, err := majorupgradechecklist.ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
-	if err != nil {
-		return err
-	}
-
-	res.Seen = true
-	err = majorupgradechecklist.CreateJsonFile(res, path)
-	if err != nil {
-		return err
-	}
-	return nil
+	writer.Println("")
 }

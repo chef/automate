@@ -71,6 +71,22 @@ func EnsureStatus() (bool, error) {
 	return res.ServiceStatus.AllHealthy(), nil
 }
 
+func GetAutomateSvcList() ([]*api.ServiceState, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error connecting while trying to get Chef Automate status")
+	}
+
+	res, err := connection.Status(context.Background(), &api.StatusRequest{})
+	if err != nil {
+		return nil, errors.Wrap(
+			err,
+			"Request to obtain Chef Automate status information failed",
+		)
+	}
+	return res.ServiceStatus.GetServices(), nil
+}
+
 func GetMaintenanceStatus(timeout int64) (bool, error) {
 	config, err := client.GetAutomateConfig(timeout)
 	if err != nil {
