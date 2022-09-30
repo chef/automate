@@ -100,7 +100,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 		}
 
 		if showPostChecklist {
-			if pcm.isExternalDB {
+			if pcm.isExternalDB && pcm.version != "3" {
 				postCmdList = []string{"External OpenSearch Patch"}
 			} else {
 				for i := 0; i < len(res.PostChecklist); i++ {
