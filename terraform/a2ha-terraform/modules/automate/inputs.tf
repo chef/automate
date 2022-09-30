@@ -1,3 +1,7 @@
+variable "access_key" {
+  default = ""
+}
+
 variable "airgap_info" {
 }
 
@@ -37,7 +41,7 @@ variable "aws_os_snapshot_role_arn" {
 }
 
 variable "aws_region" {
-  default     = "us-west-2"
+  default     = ""
   description = "The name of the selected AWS region / datacenter."
 }
 
@@ -73,6 +77,10 @@ variable "hab_sup_http_gateway_auth_token" {
 }
 
 variable "habitat_info" {
+}
+
+variable "infra" {
+  default = ""
 }
 
 variable "managed_opensearch_certificate" {
@@ -115,6 +123,10 @@ variable "managed_rds_superuser_username" {
   default = ""
 }
 
+variable "nfs_mount_path" {
+  default = "/mnt/automate_backups"
+}
+
 variable "opensearch_listen_port" {
   default = 9200
 }
@@ -151,6 +163,10 @@ variable "public_ips" {
 
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
+}
+
+variable "secret_key" {
+  default = ""
 }
 
 variable "setup_managed_services" {

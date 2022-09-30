@@ -5,8 +5,13 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
 
+type ChecklistUpgradeFlags struct {
+	SkipStorageCheck bool
+	OsDestDataDir    string
+}
+
 type ChecklistManager interface {
-	RunChecklist() error
+	RunChecklist(int64, ChecklistUpgradeFlags) error
 	GetPostChecklist() []PostCheckListItem
 }
 

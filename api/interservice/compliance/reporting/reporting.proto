@@ -23,10 +23,10 @@ service ReportingService {
 	rpc GetReportContent(ReportContentRequest) returns (ReportContentResponse) {};
 	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
-	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
+	/*rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
 	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {};
  	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {};
-	rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {};
+	rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {};*/
 }
 
 message ReportContentRequest {

@@ -18,6 +18,9 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
+
+backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
+
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
@@ -63,6 +66,17 @@ existing_nodes do
   chef_server_private_ips [{{ range $index, $element := .ExistingInfra.Config.ChefServerPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   opensearch_private_ips [{{ range $index, $element := .ExistingInfra.Config.OpensearchPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   postgresql_private_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+end
+
+###################################################################################
+### Only applies when using an existing node architecture with object storage   ###
+###################################################################################
+object_storage do
+  bucket_name "{{ .ObjectStorage.Config.BucketName }}"
+  access_key "{{ .ObjectStorage.Config.AccessKey }}"
+  secret_key "{{ .ObjectStorage.Config.SecretKey }}"
+  endpoint "{{ .ObjectStorage.Config.Endpoint }}"
+  region "{{ .ObjectStorage.Config.Region }}"
 end
 `
 

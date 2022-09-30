@@ -2,8 +2,10 @@ package usagegenerator
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -32,34 +34,40 @@ type ConvergeInfo struct {
 
 type ComplianceInfo interface{}
 
-var url = "http://%s:%s"
+var url = "https://%s:%s"
 var errorcsv = "Error while writing csv: "
 var timeFormat = "2006-01-02"
-var dateFormat = "yyyy-MM-dd"
-var datetimeFormat = "yyyy-MM-dd-HH:mm:ss"
-var datetimesecFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
 var errorQuery = "Error in query: "
 
-func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client {
+func elasticSearchConnection(url string, esHostName string, esPort string, esUserName string, esPassword string) *elastic.Client {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
-	client, err := elastic.NewClient(
+	esclient, err := elastic.NewClient(
+		elastic.SetHttpClient(client),
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
+		elastic.SetBasicAuth(esUserName, esPassword),
 	)
 	if err != nil {
 		fmt.Println("Elastic error : ", err)
 		os.Exit(1)
 	}
-	return client
+	return esclient
 }
 
-func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateNodeCount(esHostName string, esPort string, esUserName string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUserName, esPassword)
 	queryElasticSearchNodeCount(client, startTime, endTime)
 }
 
-func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateNodeRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
 	queryElasticSearchNodeReport(client, startTime, endTime)
 }
 
@@ -142,10 +150,9 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 }
 
 func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
-	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-	rangeQuery.Gte(startTime)
-	rangeQuery.Lte(endTime)
+	rangeQuery := elastic.NewRangeQuery("end_time")
+	rangeQuery.Gte(startTime.Format(time.RFC3339))
+	rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 	aggr := elastic.NewCardinalityAggregation().Field("entity_uuid")
 	searchService := client.Search().
@@ -203,10 +210,9 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	}
 
 	for {
-		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-		rangeQuery.Gte(t)
-		rangeQuery.Lte(endTime)
+		rangeQuery := elastic.NewRangeQuery("end_time")
+		rangeQuery.Gte(t.Format(time.RFC3339))
+		rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 		fetchSource := elastic.NewFetchSourceContext(true).Include(sourceFields...)
 		searchService := client.Search().
@@ -260,13 +266,13 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	fmt.Println("The details of the runs can be found in : ", filename)
 }
 
-func GenerateComplianceResourceRunCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateComplianceResourceRunCount(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
 	queryElasticSearchComplianceResourceCount(client, startTime, endTime)
 }
 
-func GenerateComplianceResourceRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateComplianceResourceRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
 	queryElasticSearchComplianceResourceRunReport(client, startTime, endTime)
 }
 
@@ -327,10 +333,9 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 }
 
 func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
-	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-	rangeQuery.Gte(startTime)
-	rangeQuery.Lte(endTime)
+	rangeQuery := elastic.NewRangeQuery("end_time")
+	rangeQuery.Gte(startTime.Format(time.RFC3339))
+	rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 	aggr := elastic.NewCardinalityAggregation().Field("node_uuid")
 	searchService := client.Search().
@@ -377,10 +382,9 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 	}
 	header := true
 	for {
-		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-		rangeQuery.Gte(t)
-		rangeQuery.Lte(endTime)
+		rangeQuery := elastic.NewRangeQuery("end_time")
+		rangeQuery.Gte(t.Format(time.RFC3339))
+		rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 		fetchSource := elastic.NewFetchSourceContext(true).Include(sourceField...)
 

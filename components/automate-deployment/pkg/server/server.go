@@ -54,6 +54,8 @@ import (
 	usermgmt_client "github.com/chef/automate/components/automate-deployment/pkg/usermgmt/client"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/platform/pg"
 	"github.com/chef/automate/lib/secrets"
@@ -1418,11 +1420,16 @@ func (s *server) doConverge(
 			if err != nil {
 				errHandler(err)
 			}
-			err = ci.CreatePostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
+			err = ci.CreatePostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 			if err != nil {
 				errHandler(err)
 			}
 		}
+
+		if os.Getenv(isUpgradeMajorEnv) == "true" {
+
+		}
+
 		// TODO: We need some way to know that the hab supervisor has called
 		// the right hooks on each service before we check the status. Otherwise,
 		// we can run into cases where we check the status of the services
@@ -1996,7 +2003,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			return nil, status.Errorf(codes.InvalidArgument, "Failed to get post checklist manager: %s", err)
 		}
 
-		ReadPendingPostChecklist, _ = pcm.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
+		ReadPendingPostChecklist, _ = pcm.ReadPendingPostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 	}
 
 	if len(ReadPendingPostChecklist) == 0 {

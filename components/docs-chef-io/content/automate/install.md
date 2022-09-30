@@ -33,25 +33,17 @@ Create a `config.toml` file with default values for your Chef Automate installat
 sudo ./chef-automate init-config
 ```
 
-You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor.
-
-add elasticsearch heapsize setting at end of config as shown below, 
-recomended heap size is 50% of total memory, but cannot exceed more than 32 gb.
+You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor. Add ElasticSearch heap size setting at the end of `config` as shown below. The recommended heap size is 50% of total memory but should not exceed more than 32 GB.
 
 ```toml
 [elasticsearch.v1.sys.runtime]
-  heapsize = "...g" # ... must be replaced with number in gb example 4g mean (4 gb)
+heapsize = "...g" # ... must be replaced with a number in GB example, 4g mean (4 GB)
 ```
 
-If you have requirements around data size and/or redundancy, see [Configuring External
-Data Stores]({{< relref "#configuring-external-data-stores" >}}) for information on
-configuring Chef Automate to use an externally-deployed PostgreSQL database cluster
-and/or OpenSearch cluster. If you have requirements around a highly-available
-deployment of Chef Automate, please reach out to a Customer Success or Professional
-Services representative for assistance.
+If you have requirements around data size and/or redundancy, see [Configuring External Data Stores]({{< relref "#configuring-external-data-stores" >}}) for information on configuring Chef Automate to use an externally-deployed PostgreSQL database cluster and/or OpenSearch cluster. If you have requirements around a highly-available
+deployment of Chef Automate, please reach out to a Customer Success or Professional Services representative for assistance.
 
-See [Configuring Chef Automate]({{< relref "configuration.md" >}}) for more information
-on configuration settings.
+See [Configuring Chef Automate]({{< relref "configuration.md" >}}) for more information on configuration settings.
 
 ## Deploy Chef Automate
 
@@ -61,9 +53,9 @@ sudo ./chef-automate deploy config.toml
 
 Deployment takes a few minutes. The first step is accepting the terms of service in the command line, after which the installer performs a series of pre-flight checks;
 any unsuccessful checks have information for resolving issues or skipping the check.
-Run the deploy command again, after resolving any pre-flight issues.
+Run the deploy command again after resolving any pre-flight issues.
 
-At the end of the deployment process you will see:
+At the end of the deployment process, you will see:
 
 ```shell
 Deploy complete
@@ -73,11 +65,7 @@ The deployment process writes login credentials to the `automate-credentials.tom
 
 ## Open Chef Automate
 
-Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with
-the credentials provided in `automate-credentials.toml`.  Once you log in, Chef Automate
-prompts you for a license.
-
-When your Chef Automate instance is equipped with internet connectivity, you can get a 60-day trial license from there.
+Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with the credentials provided in `automate-credentials.toml`. Once you log in, Chef Automate prompts you for a license. When your Chef Automate instance is equipped with internet connectivity, you can get a 60-day trial license from there.
 Alternatively, a license obtained by other means can be applied.
 
 ### Configure Data Collection
@@ -107,7 +95,7 @@ You can disable automatic upgrades by modifying the `upgrade_strategy` setting i
 upgrade_strategy = "none"
 ```
 
-To manually initiate an upgrade, run
+To manually initiate an upgrade, run the following command:
 
 ```shell
 chef-automate upgrade run
@@ -117,32 +105,29 @@ This command upgrades Chef Automate to the latest version available from your re
 
 ### Common Problems
 
-If you are unable to open Chef Automate, check that the `config.toml` contains the public DNS as the FQDN.
+If you cannot open Chef Automate, check that the `config.toml` contains the public DNS as the FQDN.
 
 ```shell
 # This is a default Chef Automate configuration file. You can run
-# 'chef-automate deploy' with this config file and it should
+# 'chef-automate deploy' with this config file should
 # successfully create a new Chef Automate instance with default settings.
 
 [global.v1]
 # The external fully qualified domain name.
-# When the application is deployed you should be able to access 'https://<fqdn>/'
-# to login.
+# When the application is deployed, you should be able to access 'https://<fqdn>/'
+# to log in.
 fqdn = "<_Public DNS_name>"
 ```
 
-Once you correct and save the FQDN, run
+Once you correct and save the FQDN, run the following command and retry opening the Chef Automate in your browser.
 
 ```shell
 sudo chef-automate config patch config.toml
 ```
 
-and retry opening Chef Automate in your browser.
-
 ### Configuring External Data Stores
 
-You can configure Chef Automate to use PostgreSQL and OpenSearch clusters that are not deployed via Chef Automate itself.
-The directions provided below are intended for use only during initial deployment of Chef Automate.
+You can configure Chef Automate to use PostgreSQL and OpenSearch clusters that are not deployed via Chef Automate. The directions below are intended for use only during the initial deployment of Chef Automate.
 
 #### Configuring External OpenSearch
 
@@ -153,6 +138,11 @@ Chef Automate supports the official OpenSearch Service by Amazon Web Services. C
 **Automate supports OpenSearch connection over HTTPS or HTTP**
 
 Add the following to your `config.toml` for HTTPS connection:
+
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
 
 ```toml
 [global.v1.external.opensearch]
@@ -181,6 +171,12 @@ Add the following to your `config.toml` for HTTPS connection:
 ```
 
 Add the following to your `config.toml` for HTTP connection:
+
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
+
 ```toml
 [global.v1.external.opensearch]
   enable = true
@@ -310,6 +306,10 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 1. Configure each OpenSearch node with a GCS client configuration that contains the proper GCS settings as described in the OpenSearch documentation.
 1. Enable GCS backups by adding the following settings to your `config.toml`:
 
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
     ```toml
     [global.v1.external.opensearch]
       enable = true
@@ -343,6 +343,10 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 #### Configuring an External PostgreSQL Database
 
 Add the following settings to your `config.toml`:
+
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
 
 ```toml
 [global.v1.external.postgresql]

@@ -76,7 +76,7 @@ func (gws GatewayLocationSpecification) ToBucket(key string) Bucket {
 		logrus.WithError(err).Warn("could not initialize backup gateway bucket")
 		return errBucket{err: err}
 	}
-
+	logrus.Debug("GatewayLocationSpecification : ToBucket", bucket)
 	return bucket
 }
 
@@ -159,7 +159,7 @@ func (s3spec S3LocationSpecification) ToBucket(baseKey string) Bucket {
 		logrus.WithError(err).Warn("could not initialize bucket")
 		return errBucket{err: err}
 	}
-
+	logrus.Debug("S3LocationSpecification : ToBucket", bucket)
 	return bucket
 }
 
@@ -183,6 +183,7 @@ func (s3spec S3LocationSpecification) String() string {
 // it into a corresponding LocationSpecification type depending on the backup location.
 func NewRemoteLocationSpecificationFromRestoreTask(restoreTask *api.BackupRestoreTask) LocationSpecification {
 	if restoreTask.GetS3BackupLocation().GetBucketName() != "" {
+		logrus.Debugf("NewRemoteLocationSpecificationFromRestoreTask S3 %s", restoreTask.GetS3BackupLocation().GetBucketName())
 		return S3LocationSpecification{
 			BucketName:   restoreTask.GetS3BackupLocation().GetBucketName(),
 			BasePath:     restoreTask.GetS3BackupLocation().GetBasePath(),
@@ -192,19 +193,21 @@ func NewRemoteLocationSpecificationFromRestoreTask(restoreTask *api.BackupRestor
 			SessionToken: restoreTask.GetS3BackupLocation().GetSessionToken(),
 		}
 	} else if restoreTask.GetGcsBackupLocation().GetBucketName() != "" {
+		logrus.Debugf("NewRemoteLocationSpecificationFromRestoreTask GCS %s", restoreTask.GetGcsBackupLocation().GetBucketName())
 		return GCSLocationSpecification{
 			BucketName:                   restoreTask.GetGcsBackupLocation().GetBucketName(),
 			BasePath:                     restoreTask.GetGcsBackupLocation().GetBasePath(),
 			GoogleApplicationCredentials: restoreTask.GetGcsBackupLocation().GetGoogleApplicationCredentials(),
 		}
 	}
-
+	logrus.Debugf("FilesystemLocationSpecification %s", restoreTask.GetBackupDir())
 	return FilesystemLocationSpecification{Path: restoreTask.GetBackupDir()}
 }
 
 // NewRemoteLocationSpecificationFromGlobalConfig takes the GlobalConfig and converts
 // it into a corresponding LocationSpecification type depending on the backup location.
 func NewRemoteLocationSpecificationFromGlobalConfig(globalConfig *config.GlobalConfig) LocationSpecification {
+	logrus.Debugf("NewRemoteLocationSpecificationFromGlobalConfig %s", globalConfig.GetV1().GetBackups().GetLocation().GetValue())
 	switch globalConfig.GetV1().GetBackups().GetLocation().GetValue() {
 	case "s3":
 		return S3LocationSpecification{
@@ -246,7 +249,7 @@ func NewMinioLocationSpec(endpoint,
 	groupName string,
 	rootCert []byte,
 	secretStore secrets.SecretsReader) (LocationSpecification, error) {
-
+	logrus.Debugf("NewMinioLocationSpec : : basePath = %s : bucketName = %s", basePath, bucketName)
 	certPool := x509.NewCertPool()
 	if !certPool.AppendCertsFromPEM(rootCert) {
 		return nil, errors.New("building root ca cert pool")

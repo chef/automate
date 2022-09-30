@@ -26,7 +26,7 @@ const (
 
 	backupError = "Please take a backup and restart the upgrade process."
 
-	diskSpaceError = `Please ensure to have 60% free disk space`
+	diskSpaceError = `Please ensure to have %.2f GB free disk space`
 
 	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
 
@@ -130,17 +130,6 @@ func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3Checklist
 	}
 }
 
-type checkFunc func() Checklist
-
-func preChecklist(check checkFunc) []Checklist {
-	return []Checklist{
-		downTimeCheck(),
-		backupCheck(),
-		check(),
-		postChecklistIntimationCheck(),
-	}
-}
-
 func IsExternalPG() bool {
 	config, err := platform_config.ConfigFromParams("pg-sidecar-service", "/hab/svc/pg-sidecar-service", "")
 	if err != nil {
@@ -160,7 +149,7 @@ func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist() error {
+func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgradeFlags) error {
 
 	var dbType string
 	checklists := []Checklist{}
@@ -169,11 +158,11 @@ func (ci *V3ChecklistManager) RunChecklist() error {
 	if ci.isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
-		checklists = append(checklists, preChecklist(externalPGUpgradeCheck)...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), externalPGUpgradeCheck(), postChecklistIntimationCheck()}...)
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
-		checklists = append(checklists, preChecklist(diskSpaceCheck)...)
+		checklists = append(checklists, []Checklist{diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir), downTimeCheck(), backupCheck(), replaceS3Url(), postChecklistIntimationCheck()}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
@@ -253,21 +242,13 @@ func backupCheck() Checklist {
 	}
 }
 
-func diskSpaceCheck() Checklist {
+func diskSpaceCheck(version string, skipStorageCheck bool, osDestDataDir string) Checklist {
 	return Checklist{
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Ensure you have more than 60 percent free disk space")
-			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
-			}
-			if !resp {
-				h.Writer.Error(diskSpaceError)
-				return status.New(status.InvalidCommandArgsError, diskSpaceError)
-			}
-			return nil
+			_, err := CheckSpaceAvailable(false, "", version, skipStorageCheck, osDestDataDir)
+			return err
 		},
 	}
 }

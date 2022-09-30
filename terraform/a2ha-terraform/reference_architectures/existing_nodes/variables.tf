@@ -1,3 +1,19 @@
+variable "access_key" {
+  default = ""
+}
+
+variable "backup_config_efs" {
+  default = "false"
+}
+
+variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "bucket_name" {
+  default = ""
+}
+
 variable "existing_automate_ips" {
   default = []
 }
@@ -28,6 +44,22 @@ variable "existing_postgresql_ips" {
 
 variable "existing_postgresql_private_ips" {
   default = []
+}
+
+variable "infra" {
+  default = "existing_infra"
+}
+
+variable "region" {
+  default = ""
+}
+
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
+}
+
+variable "secret_key" {
+  default = ""
 }
 
 variable "ssh_key_file" {

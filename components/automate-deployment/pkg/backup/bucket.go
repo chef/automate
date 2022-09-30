@@ -155,6 +155,7 @@ func (r *checksummingReader) BlobSHA256() string {
 func (bkt fsBucket) NewReader(ctx context.Context, relPath string, verifier ObjectVerifier) (io.ReadCloser, error) {
 	validatePath(relPath)
 	r, err := os.Open(path.Join(bkt.basePath, relPath))
+	logrus.Debugf("fsBucket NewReader %s ", relPath)
 	if err != nil {
 		return nil, err
 	}
@@ -349,6 +350,7 @@ type s3Bucket struct {
 }
 
 func NewS3Bucket(name string, basePath string, c *aws.Config) (Bucket, error) {
+	logrus.Debugf("NewS3Bucket : basePath = %s : name = %s", basePath, name)
 	s, err := session.NewSession(c)
 	if err != nil {
 		return nil, err
@@ -372,6 +374,7 @@ func NewS3Bucket(name string, basePath string, c *aws.Config) (Bucket, error) {
 func (bkt *s3Bucket) NewReader(ctx context.Context, name string, verifier ObjectVerifier) (io.ReadCloser, error) {
 	relPath := path.Join(bkt.basePath, name)
 	validatePath(relPath)
+	logrus.Debugf("s3Bucket : NewReader : relPath = %s : name = %s", bkt.basePath, name)
 	r, err := bkt.bucket.NewReader(ctx, relPath, nil)
 	if err != nil {
 		return nil, err
@@ -489,6 +492,7 @@ type errBucket struct {
 }
 
 func (bkt errBucket) NewReader(ctx context.Context, path string, verifier ObjectVerifier) (io.ReadCloser, error) {
+	logrus.Debugf("errBucket : NewReader : path = %s", path)
 	return nil, bkt.err
 }
 
@@ -524,7 +528,7 @@ type GCSConfig struct {
 
 func NewGCSBucket(name string, basePath string, c *GCSConfig) (Bucket, error) {
 	ctx := context.Background()
-
+	logrus.Debugf("NewGCSBucket : NewReader : basePath = %s : name = %s", basePath, name)
 	var creds *google.Credentials
 	var err error
 
@@ -563,6 +567,7 @@ func NewGCSBucket(name string, basePath string, c *GCSConfig) (Bucket, error) {
 func (bkt *gcsBucket) NewReader(ctx context.Context, name string, verifier ObjectVerifier) (io.ReadCloser, error) {
 	relPath := path.Join(bkt.basePath, name)
 	validatePath(relPath)
+	logrus.Debugf("gcsBucket : NewReader : relPath = %s : name = %s", relPath, name)
 	r, err := bkt.bucket.NewReader(ctx, relPath, nil)
 	if err != nil {
 		return nil, err

@@ -7,6 +7,10 @@ variable "backend_aib_dest_file" {
 variable "backend_aib_local_file" {
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
 variable "habitat_info" {
 }
 
@@ -14,6 +18,10 @@ variable "journalbeat_pkg_ident" {
 }
 
 variable "metricbeat_pkg_ident" {
+}
+
+variable "nfs_mount_path" {
+  default = "/mnt/automate_backups"
 }
 
 variable "opensearch_listen_port" {

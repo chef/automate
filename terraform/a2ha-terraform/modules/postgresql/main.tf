@@ -28,6 +28,9 @@ locals {
     proxy_svc_load_args       = var.proxy_svc_load_args,
     tmp_path                  = var.tmp_path
   })
+  premount = templatefile("${path.module}/templates/pre_mount.tpl", {
+    nfs_mount_path  = var.nfs_mount_path
+  })
 }
 
 resource "null_resource" "postgresql" {
@@ -70,7 +73,7 @@ resource "null_resource" "postgresql" {
 
   provisioner "file" {
     destination = "${var.tmp_path}/pre_mount.sh"
-    source      = "${path.module}/templates/pre_mount.tpl"
+    content     = local.premount
   }
 
   provisioner "remote-exec" {

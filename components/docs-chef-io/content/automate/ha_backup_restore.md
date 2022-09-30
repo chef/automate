@@ -112,7 +112,7 @@ This section explains how to take backup for External Elastic Search (ES) and Po
 
     ## documentation. See the following links:
 
-    ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
+    ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
 
     ## Backup repo settings
 

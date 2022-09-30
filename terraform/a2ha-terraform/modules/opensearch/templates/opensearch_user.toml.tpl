@@ -8,3 +8,16 @@
 
 [transport]
   port = 9300
+
+${ "${backup_config}" == "s3" ? <<EOT
+[s3]
+  [s3.client.default]
+    endpoint = "${endpoint}"
+
+EOT 
+: "${backup_config}" == "efs" ? <<EOT
+[path]      
+  repo = "${nfs_mount_path}/opensearch"
+EOT 
+: "" }
+

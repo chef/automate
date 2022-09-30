@@ -14,6 +14,10 @@ failure() {
   exit 1
 }
 
+# Creating mount path for elasticsearch backup 
+sudo mkdir -p ${nfs_mount_path}
+sudo chown hab:hab -RL ${nfs_mount_path}/
+
 # When we truncate the file we need to preserve the file permisssions
 truncate_with_timestamp() {
   local TMPFILE=$(mktemp)

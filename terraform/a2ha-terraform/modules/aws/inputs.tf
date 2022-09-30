@@ -53,7 +53,7 @@ variable "aws_os_snapshot_role_arn" {
 }
 
 variable "aws_region" {
-  default     = "us-west-2"
+  default     = ""
   description = "The name of the selected AWS region / datacenter."
 }
 
@@ -63,7 +63,7 @@ variable "aws_ssh_key_file" {
 variable "aws_ssh_key_pair_name" {
 }
 
-variable  "aws_ssh_port" {
+variable "aws_ssh_port" {
   default = 22
 }
 

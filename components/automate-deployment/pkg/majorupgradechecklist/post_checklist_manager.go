@@ -2,12 +2,10 @@ package majorupgradechecklist
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
 
 const (
-	FILE_NAME        = "upgrade_metadata.json"
-	UPGRADE_METADATA = "/hab/svc/deployment-service/var/" + FILE_NAME
+	FILE_NAME = "upgrade_metadata.json"
 )
 
 type PostChecklistManager struct {
@@ -31,7 +29,6 @@ type PostChecklist struct {
 }
 
 func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
-	var writer cli.FormatWriter
 	externalDB := false
 
 	majorVersion, _ := GetMajorVersion(version)
@@ -39,7 +36,7 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	case "3":
 		externalDB = IsExternalPG()
 	case "4":
-		externalDB = IsExternalElasticSearch(writer)
+		externalDB = IsExternalElasticSearch()
 	}
 
 	ci, err := NewChecklistManager(nil, version)
@@ -103,20 +100,23 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 		}
 
 		if showPostChecklist {
-			for i := 0; i < len(res.PostChecklist); i++ {
-				if !res.PostChecklist[i].IsExecuted {
-					postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+			if pcm.isExternalDB && pcm.version != "3" {
+				postCmdList = []string{"External OpenSearch Patch"}
+			} else {
+				for i := 0; i < len(res.PostChecklist); i++ {
+					if !res.PostChecklist[i].IsExecuted {
+						postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+					}
 				}
 			}
 		}
-
-		if pcm.isExternalDB {
-			res.Seen = true
-			err = CreateJsonFile(res, path)
-			if err != nil {
-				return postCmdList, err
-			}
-		}
+		// if pcm.isExternalDB {
+		// 	res.Seen = true
+		// 	err = CreateJsonFile(res, path)
+		// 	if err != nil {
+		// 		return postCmdList, err
+		// 	}
+		// }
 	} else {
 		return postCmdList, status.Errorf(status.UpgradeError, "Failed to read checklist since version didn't match")
 	}

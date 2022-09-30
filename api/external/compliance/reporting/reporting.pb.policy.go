@@ -191,41 +191,4 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/LicenseUsageNodes", "compliance:reporting:licenseusage", "compliance:reportingLicenseUsage:list", "", "", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/AssetCount", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/assets/count", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListAsset", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/assets/search", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*AssetListRequest); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "sort":
-					return m.Sort
-				case "assets_type":
-					return m.AssetsType
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/SetAssetConfig", "compliance:reporting:config", "compliance:reports:update", "PUT", "/api/v0/compliance/reporting/assets/config", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/GetAssetConfig", "compliance:reporting:config", "compliance:reports:get", "GET", "/api/v0/compliance/reporting/assets/config/search", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlItemsRange", "compliance:reporting:control", "compliance:controlItems:list", "POST", "/api/v0/compliance/reporting/controls/search", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*ControlItemRequest); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "text":
-					return m.Text
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
 }

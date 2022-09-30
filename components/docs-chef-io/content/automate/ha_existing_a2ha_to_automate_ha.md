@@ -61,13 +61,23 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     20180508201952    completed  4 minutes old
     ```
 
-2. Detach the File system from the old A2HA cluster.
+1. Detach the File system from the old A2HA cluster.
 
-3. Configure the backup at Automate HA cluster, in case if you have not configured, please refer this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup)
+1. Detach the File system from the old A2HA cluster.
 
-4. From the Step 3, you will get the backup mount path.
+1. Configure the backup at Automate HA cluster, in case if you have not configured, please refer this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup)
 
-5. Stop all the services at frontend nodes in Automate HA Cluster.
+1. From the Step 3, you will get the backup mount path.
+
+1. Stop all the services at frontend nodes in Automate HA Cluster.
+
+1. Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`.
+
+1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config:
+
+    ```bash
+    sudo chef-automate config show > current_config.toml 
+    ```
 
 6. Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`.
 
@@ -83,16 +93,27 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     sudo chef-automate stop
     ```
 
+<<<<<<< HEAD
 8. To run the restore command we need the airgap bundle. Get the Automate HA airgap bundle from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`.
     - In case of airgap bundle is not present at `/var/tmp`, in that case we can copy the bundle from the bastion node to the Automate node.
 
 9. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
+=======
+1. To run the restore command we need the airgap bundle. Get the Automate HA airgap bundle from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`.
+    - In case of airgap bundle is not present at `/var/tmp`, in that case we can copy the bundle from the bastion node to the Automate node.
+
+1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
+>>>>>>> main
 
     ```bash
     sudo chef-automate config show > current_config.toml 
     ```
 
+<<<<<<< HEAD
 10. Add the OpenSearch credentials to the applied config.
+=======
+1. Add the OpenSearch credentials to the applied config.
+>>>>>>> main
 
     - If using Chef Managed Opensearch, then add the below config into `current_config.toml` (without any changes).  
 
@@ -104,6 +125,14 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
     - If using AWS Managed services, then add the below config into `current_config.toml` (change this with your actual credentials)
 
+<<<<<<< HEAD
+=======
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
+
+>>>>>>> main
         ```bash
         [global.v1.external.opensearch.auth]
             scheme = "aws_os"
@@ -114,37 +143,63 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
             secret_key = "<YOUR AWS SECRET KEY>"
         ```
 
+<<<<<<< HEAD
 11. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
+=======
+1. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
+>>>>>>> main
 
     ```cmd
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
+<<<<<<< HEAD
 12. After the restore is successfully executed, you will see the below message:
+=======
+1. After the restore is successfully executed, you will see the below message:
+>>>>>>> main
   
     ```bash
     Success: Restored backup 20210622065515
     ```
 
+<<<<<<< HEAD
 13. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
+=======
+1. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
+>>>>>>> main
 
     ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
+<<<<<<< HEAD
 14. Start the Service in all the frontend nodes with the below command.
+=======
+1. Start the Service in all the frontend nodes with the below command.
+>>>>>>> main
 
     ``` bash
     sudo chef-automate start
     ```
+<<<<<<< HEAD
 
 {{< warning >}}
+=======
+>>>>>>> main
 
-- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. After restoring Automate HA talk to OpenSearch.
+    {{< warning >}}
 
+    - After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. After restoring Automate HA talk to OpenSearch.
+
+    - Remove the elaticsearch config from all Frontend nodes, to do that, redirect the applied config to the file and set the config again. For example:
+
+<<<<<<< HEAD
 -  We should remove the elaticsearch config from all Frontend nodes, to do that, redirect the applied config to the file and set the config again.
    For example:
 
+=======
+>>>>>>> main
     ```bash
     chef-automate config show > applied_config.toml
     ```
@@ -152,7 +207,11 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     Remove the below field from the `applied_config.toml`.
 
     ```bash
+<<<<<<< HEAD
    [global.v1.external]
+=======
+    [global.v1.external]
+>>>>>>> main
      [global.v1.external.elasticsearch]
        enable = true
        nodes = [""]
@@ -174,12 +233,18 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
     These steps should be executed on all the Frontend nodes.  
 
-{{< /warning >}}
+    {{< /warning >}}
 
 ## Equivalent Commands
+<<<<<<< HEAD
 
 In Automate HA there are equivalent command which had been used in A2HA
 
+=======
+
+In Automate HA there are equivalent command which had been used in A2HA:
+
+>>>>>>> main
 | Commands                   | A2HA                                                      | Automate HA                                                   |
 |----------------------------|-----------------------------------------------------------|---------------------------------------------------------------|
 | init config existing infra | `bash automate-cluster-ctl config init -a existing_nodes` | `bash chef-automate init-config-ha existing_infra `           |
