@@ -118,131 +118,64 @@ sudo chef-automate upgrade status
 This should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 ```shell
-Post Upgrade Steps:
-===================
+------------------------------------------------------------------------------------
+✔ Chef Automate upgraded to version (4.2.59) successfully.
+  To know whats new in version (4.2.59),
+  visit https://docs.chef.io/release_notes_automate/#4.2.59 
+------------------------------------------------------------------------------------
 
-  
-1) Check the status of your upgrade using:  
-     $ chef-automate upgrade status
-   This should return: Automate is up-to-date
-  
-2) Disable the maintenance mode if you enabled previously using:
-	$ chef-automate maintenance off
-  
-3) Migrate Data from Elastic Search to Open Search using this command:
-     $ chef-automate post-major-upgrade migrate --data=es
-  
-4) Check Automate UI everything is running and all data is visible
-  
-5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
-     $ chef-automate post-major-upgrade clear-data --data=es
-```
-{{< note >}} If your backup location is S3 and endpoint is configured as regional then change your settings as below:
-```shell
-[global.v1.backups]
-  location = "s3"
-[global.v1.backups.s3.bucket]
-  # name (required): The name of the bucket
-  name = "<bucket name>"
+Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
+y
 
-  # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
-  # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
-  endpoint = "https://s3.amazonaws.com"
-```
- {{< /note >}}
+Migration in progress
+        ✔  Maintenance mode turned ON successfully
+        ✔  OpenSearch configurations updated successfully
+        ✔  Chef Automate Stopped  
+        ✔  Data Copied Successfully
+        ✔  Chef Automate Started    
+        ✔  Chef Automate status is healthy
+        ✔  Maintenance mode turned OFF successfully
+ ✔  Migration complete
 
-3. Turn off maintenance mode:
+Verify Chef Automate to see that everything is running and that all your data is available.
+ip-172-31-26-40.ap-south-1.compute.internal
 
-```sh
-sudo chef-automate maintenance off
-```
-This should return:
-`Updating deployment configuration`
-`Applying deployment configuration`
+Once verified, you can remove old Elasticsearch data.
 
-4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
-
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch]
-  [elasticsearch.v1]
-    [elasticsearch.v1.sys]
-      [elasticsearch.v1.sys.cluster]
-        max_shards_per_node = 6000
-      [elasticsearch.v1.sys.indices]
-        [elasticsearch.v1.sys.indices.breaker]
-          total_limit = "95%"
-      [elasticsearch.v1.sys.runtime]
-        max_open_files = "65536"
-        max_locked_memory = "unlimited"
-        heapsize = "8g" # This should be the 50% of RAM```
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch]
-  [opensearch.v1]
-    [opensearch.v1.sys]
-      [opensearch.v1.sys.cluster]
-        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
-      [opensearch.v1.sys.indices]
-        [opensearch.v1.sys.indices.breaker]
-          total_limit = "95%"
-      [opensearch.v1.sys.runtime]
-        max_open_files = "65536"
-        max_locked_memory = "unlimited"
-        heapsize = "8g" # This should be the 50% of RAM
+Would you like to clean up the old Elasticsearch data now? (y/n)
+y
+ ✔  Clean up successful  
 
 ```
-
-{{< warning >}} 
-Configure the OpenSearch Heap size to **50%** of RAM, but not more than 32GB.
-{{< /warning >}}
-
-
-Apply this using the `config patch` command.
-
 5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+if you haven't done in **chef-automate upgrade status** command
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
+
 ```shell
-It will start the migration immediately after check.
-Press y to agree, n to disagree? [y/n]: y
+Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)
+y
 
-HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+Migration in progress
+        ✔  Maintenance mode turned ON successfully
+        ✔  OpenSearch configurations updated successfully
+        ✔  Chef Automate Stopped  
+        ✔  Data Copied Successfully
+        ✔  Chef Automate Started    
+        ✔  Chef Automate status is healthy
+        ✔  Maintenance mode turned OFF successfully
+ ✔  Migration complete
+
+Verify Chef Automate to see that everything is running and that all your data is available.
+ip-172-31-26-40.ap-south-1.compute.internal
+
+Once verified, you can remove old Elasticsearch data.
 
 
-----------------------------------------------
-Chef-automate stop 
-----------------------------------------------
-
-Chef Automate Stopped
-
-----------------------------------------------
-migration from es to os 
-----------------------------------------------
-
-Checking for es_upgrade
-
-Done with Migration 
- Please wait for some time to reindex the data
-
-----------------------------------------------
-Chef-automate start 
-----------------------------------------------
-
-Starting Chef Automate
-
-----------------------------------------------
-Chef-automate status 
-----------------------------------------------
 ```
+
 
 6. Verify whether all services are running:
 
@@ -254,6 +187,18 @@ sudo chef-automate status
 
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
+```
+```shell
+Would you like to clean up the old Elasticsearch data now? (y/n)
+y
+ ✔  Clean up successful 
+
+or
+
+Your have already deleted your old Elasticsearch data.
+Do you want to perform clean up again? (y/n)
+y
+ ✔  Clean up successful 
 ```
 
 ### Chef Automate with External ElasticSearch
