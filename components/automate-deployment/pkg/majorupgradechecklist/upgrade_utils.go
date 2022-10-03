@@ -143,7 +143,7 @@ func SetSeenTrueForExternal() error {
 	path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
 	res, err := ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	res.Seen = true

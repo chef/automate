@@ -49,7 +49,7 @@ In this release, Elasticsearch will be migrated to OpenSearch.
 		ui.showOSDestDirFlagMsg()
 	}
 	ui.writer.Println("For more information, visit")
-	ui.writer.Println(color.New(color.FgBlue).Sprint("https://docs.chef.io/automate/major_upgrade_4.x/"))
+	ui.writer.Println(color.New(color.FgBlue).Sprint("https://docs.chef.io/automate/major_upgrade_4.x/\n"))
 	return ui.promptToContinue()
 }
 
