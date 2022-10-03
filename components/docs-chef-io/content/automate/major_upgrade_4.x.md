@@ -56,9 +56,9 @@ Check your current version:
 sudo chef-automate version
 ```
 
-{{< note >}} If your server Version is less than *20220329091442*, refer to [Upgrade to 3.0.49]({{< relref "major_upgrade.md" >}}) page. {{< /note >}}
+{{< note >}} If your server version is less than *20220329091442*, refer to [Upgrade to 3.0.49]({{< relref "major_upgrade.md" >}}) page. {{< /note >}}
 
-{{< note >}} If your server sersion is less than *3.0.49*, upgrade to latest minor version in 3 series. {{< /note >}}
+{{< note >}} If your server version is less than *3.0.49*, upgrade to latest minor version in 3 series. {{< /note >}}
 
 ### Normal and airgapped upgrade to 3.0.49
 
@@ -680,7 +680,7 @@ Deployment service is stopped
 Waiting for Deployment Service to be healthy
 Waiting for Deployment Service to be healthy
 Waiting for Deployment Service to be healthy
-Deployment Service is healty now
+Deployment Service is healthy now
 current_version:"4.x" target_version:"4.x.y" target_major:"4"
 Upgrading Chef Automate
 ```
