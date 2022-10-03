@@ -1426,10 +1426,6 @@ func (s *server) doConverge(
 			}
 		}
 
-		if os.Getenv(isUpgradeMajorEnv) == "true" {
-
-		}
-
 		// TODO: We need some way to know that the hab supervisor has called
 		// the right hooks on each service before we check the status. Otherwise,
 		// we can run into cases where we check the status of the services

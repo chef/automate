@@ -623,9 +623,9 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 func printUpgradeStatusMsg(resp *api.UpgradeStatusResponse) {
 	writer.Println(color.New(color.FgGreen).Sprint("------------------------------------------------------------------------------------"))
 	if resp.IsAirgapped {
-		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to airgap bundle version: (%s).", resp.CurrentVersion))
+		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to airgap bundle version: %s", resp.CurrentVersion))
 	} else {
-		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to version (%s) successfully.", resp.CurrentVersion))
+		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to version: %s", resp.CurrentVersion))
 	}
 	writer.Println(fmt.Sprintf("  Find out what's new in version (%s) by visiting ", resp.CurrentVersion))
 	writer.Println("  visit" + color.New(color.FgBlue).Sprint(fmt.Sprintf(" https://docs.chef.io/release_notes_automate/#%s ", resp.CurrentVersion)))
@@ -653,27 +653,6 @@ func promptUser(message string) (bool, error) {
 }
 
 func startMigration() error {
-	// mv4U := &migratorv4.MockMigratorV4UtilsImpl{
-	// 	IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
-	// 	StopAutomateFunc:            func() error { return nil },
-	// 	GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
-	// 	PatchOpensearchConfigFunc: func(es *migratorv4.ESSettings) (string, string, error) {
-	// 		return "", "", nil
-	// 	},
-	// 	GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-	// 	ReadV4ChecklistFunc:         func(id string) (bool, error) { return false, nil },
-	// 	StartAutomateFunc:           func() error { return nil },
-	// 	ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
-	// 	GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-	// 	GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
-	// 	UpdatePostChecklistFileFunc: func(id string) error { return nil },
-	// }
-	// mfu := &fileutils.MockFileSystemUtils{
-	// 	CalDirSizeInGBFunc:   func(path string) (float64, error) { return 5, nil },
-	// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 8, nil },
-	// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
-	// }
-	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
 	migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
 	migrator.RunMigrationFlow(true)
 	return nil
@@ -759,6 +738,7 @@ func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 	writer.Println("")
 	writer.Println("To migrate data later on, use this command")
 	writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es"))
+	writer.Println("")
 	writer.Println("To skip data migration permanently, use this command")
 	writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es --skip-migration"))
 	writer.Println("")

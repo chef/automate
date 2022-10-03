@@ -44,6 +44,7 @@ Please ensure you are using latest CLI version and then run the command:
   $ chef-automate upgrade run --major command to upgrade to latest version
 
 Visit https://docs.chef.io/automate/major_upgrade_4.x for more information
+
 `
 	assert.Equal(t, expected, tw.Output())
 }
@@ -54,6 +55,7 @@ func TestPrintAutomateOutOfDateWithoutMajor(t *testing.T) {
 	expected := `Automate is out-of-date !!
 Current version: 3.0.49
 Latest upgradable version: 3.0.59
+
 `
 	assert.Equal(t, expected, tw.Output())
 }

@@ -236,27 +236,6 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
-		// mv4U := &migratorv4.MockMigratorV4UtilsImpl{
-		// 	IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
-		// 	StopAutomateFunc:            func() error { return nil },
-		// 	GetEsTotalShardSettingsFunc: func(path string) (int32, error) { return 2000, nil },
-		// 	PatchOpensearchConfigFunc:   func(es *migratorv4.ESSettings) (string, string, error) { return "", "", nil },
-		// 	ReadV4ChecklistFunc:         func(id string, path string) (bool, error) { return true, nil },
-		// 	StartAutomateFunc:           func() error { return nil },
-		// 	ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
-		// 	GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		// 	UpdatePostChecklistFileFunc: func(id string, path string) error { return nil },
-		// 	GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
-		// 	GetMaintenanceStatusFunc:    func(timeout int64) (bool, error) { return false, nil },
-		// 	SetMaintenanceModeFunc:      func(timeout int64, status bool) (string, string, error) { return "", "", nil },
-		// }
-		// mfu := &fileutils.MockFileSystemUtils{
-		// 	CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
-		// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
-		// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
-		// 	GetHabRootPathFunc:   func() string { return majorupgrade_utils.HAB_DIR },
-		// }
-		// migrator := migratorv4.NewMigratorV4(writer, mv4U, mfu, 10, time.Second)
 		migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
 		if migrateDataCmdFlags.skipMigrationPermanently {
 			migrator.SkipMigrationPermanently()
