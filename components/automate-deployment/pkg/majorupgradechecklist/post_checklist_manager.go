@@ -88,7 +88,8 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 	var showPostChecklist = false
 	res, err := ReadJsonFile(path)
 	if err != nil {
-		return postCmdList, err
+		// overriding error to nil, in the case of file not found
+		return postCmdList, nil
 	}
 
 	if res.Version == pcm.version {

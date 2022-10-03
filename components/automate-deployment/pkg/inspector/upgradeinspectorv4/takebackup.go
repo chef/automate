@@ -11,7 +11,7 @@ type TakeBackupInspection struct {
 
 func (tb *TakeBackupInspection) ShowInfo(index *int) error {
 	tb.writer.Printf("%d. You have taken a backup by running the command: "+
-		color.New(color.Bold).Sprint("chef automate backup create")+"\n", *index)
+		color.New(color.Bold).Sprint("chef automate backup create")+".\n", *index)
 	*index++
 	return nil
 }

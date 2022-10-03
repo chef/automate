@@ -32,7 +32,7 @@ func (ui *UpgradeInspectorV4) ShowInfo() error {
 In this release, Elasticsearch will be migrated to OpenSearch.
 `)
 	if len(ui.inspections) > 0 {
-		ui.writer.Println("Please make sure following things are taken care of")
+		ui.writer.Println("Before proceeding, please ensure:")
 	}
 	index := 1
 	for _, inspection := range ui.inspections {
