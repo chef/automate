@@ -18,15 +18,15 @@ const (
 var SPINNER_TIMEOUT = 100 * time.Millisecond
 
 type MigratorV4 struct {
-	timeout                  int64
-	migratorUtils            MigratorV4Utils
-	fileutils                fileutils.FileUtils
-	writer                   *cli.Writer
-	migrationSteps           []migrator.MigrationSteps
-	migrationConsent         bool
-	isExecuted               bool
-	runHealthStatus          bool
-	spinnerTimeout           time.Duration
+	timeout          int64
+	migratorUtils    MigratorV4Utils
+	fileutils        fileutils.FileUtils
+	writer           *cli.Writer
+	migrationSteps   []migrator.MigrationSteps
+	migrationConsent bool
+	isExecuted       bool
+	runHealthStatus  bool
+	spinnerTimeout   time.Duration
 }
 
 func NewMigratorV4(writer *cli.Writer, migratorUtils MigratorV4Utils, fileutils fileutils.FileUtils, timeout int64, spinnerTimeout time.Duration) migrator.Migrator {
@@ -236,16 +236,16 @@ func (m *MigratorV4) RunSuccess() error {
 	return nil
 }
 
-func (m *MigratorV4) UpdateSkipMigration(isSkip bool) error {
+func (m *MigratorV4) SkipMigrationPermanently() error {
 	habroot := m.fileutils.GetHabRootPath()
-	return m.migratorUtils.UpdatePostChecklistFile(SKIP_MIGRATION_ID, habroot+majorupgrade_utils.UPGRADE_METADATA)
+	return m.migratorUtils.UpdatePostChecklistFile(SKIP_MIGRATION_PERMANENTLY_ID, habroot+majorupgrade_utils.UPGRADE_METADATA)
 }
 
-func (m *MigratorV4) ReadSkipMigration() (bool, error) {
+func (m *MigratorV4) IsMigrationPermanentlySkipped() (bool, error) {
 	habRoot := m.fileutils.GetHabRootPath()
-	isExecuted, err := m.migratorUtils.ReadV4Checklist(SKIP_MIGRATION_ID, habRoot+majorupgrade_utils.UPGRADE_METADATA)
+	isExecuted, err := m.migratorUtils.ReadV4Checklist(SKIP_MIGRATION_PERMANENTLY_ID, habRoot+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
-		return isExecuted, err
+		return true, nil
 	}
 	return isExecuted, nil
 }

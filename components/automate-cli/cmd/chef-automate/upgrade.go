@@ -671,8 +671,8 @@ func startMigration() error {
 	// }
 	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
 	migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
-	isSkip, _ := migrator.ReadSkipMigration()
-	if !isSkip {
+	isSkipped, _ := migrator.IsMigrationPermanentlySkipped()
+	if !isSkipped {
 		migrator.RunMigrationFlow(true)
 	}
 	return nil
