@@ -125,10 +125,10 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     2. Elasticsearch indices are in version 6
     
     Pre flight checks
-     ✔  [Passed]    The /hab/ directory should have at least 5.9GB of free space 
-     ✔  [Passed]    Elasticsearch indices are in version 6 
+       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    Elasticsearch indices are in version 6 
 
-     ✔  Maintenance mode turned ON successfully
+       Maintenance mode turned ON successfully
 
     Upgrading Chef Automate from version 3.0.49 to 4.x
     This might take around 15 to 20 min
@@ -150,7 +150,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     #Output
 
     ------------------------------------------------------------------------------------
-    ✔ Chef Automate upgraded to version: 4.x.y.
+      Chef Automate upgraded to version: 4.x.y.
       Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
@@ -159,14 +159,14 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     y
     
     Data Migration is in progress
-            ✔  Maintenance mode turned ON successfully
-            ✔  OpenSearch configurations updated successfully
-            ✔  Chef Automate Stopped  
-            ✔  Data Copied Successfully
-            ✔  Chef Automate Started    
-            ✔  Chef Automate status is healthy
-            ✔  Maintenance mode turned OFF successfully
-     ✔  Migration complete
+              Maintenance mode turned ON successfully
+              OpenSearch configurations updated successfully
+              Chef Automate Stopped  
+              Data Copied Successfully
+              Chef Automate Started    
+              Chef Automate status is healthy
+              Maintenance mode turned OFF successfully
+       Migration complete
     
     Verify Chef Automate to see that everything is running and that all your data is available.
     a2-dev.test #fqdn
@@ -175,7 +175,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     
     Would you like to clean up the old Elasticsearch data now? (y/n)
     y
-     ✔  Clean up successful  
+       Clean up successful  
     
     ```
 3. **[If not done in previous steps]** Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
@@ -191,14 +191,14 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     y
     
     Data Migration is in progress
-            ✔  Maintenance mode turned ON successfully
-            ✔  OpenSearch configurations updated successfully
-            ✔  Chef Automate Stopped  
-            ✔  Data Copied Successfully
-            ✔  Chef Automate Started    
-            ✔  Chef Automate status is healthy
-            ✔  Maintenance mode turned OFF successfully
-     ✔  Migration complete
+              Maintenance mode turned ON successfully
+              OpenSearch configurations updated successfully
+              Chef Automate Stopped  
+              Data Copied Successfully
+              Chef Automate Started    
+              Chef Automate status is healthy
+              Maintenance mode turned OFF successfully
+       Migration complete
     
     Verify Chef Automate to see that everything is running and that all your data is available.
     ip-172-31-26-40.ap-south-1.compute.internal
@@ -226,7 +226,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
     Would you like to clean up the old Elasticsearch data now? (y/n)
     y
-     ✔  Clean up successful 
+       Clean up successful 
     ```
 
 ### Chef Automate with External ElasticSearch
@@ -268,9 +268,9 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
     1. The /hab/ directory should have at least 5.9GB of free space
     
     Pre flight checks
-     ✔  [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
 
-     ✔  Maintenance mode turned ON successfully
+       Maintenance mode turned ON successfully
 
     Upgrading Chef Automate from version 3.0.49 to 4.x
     ----------------------------------------------------------------------
@@ -301,22 +301,22 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
     #Output
 
     ------------------------------------------------------------------------------------
-    ✔ Chef Automate upgraded to version: 4.x.y.
+      Chef Automate upgraded to version: 4.x.y.
       Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
     Have you updated your opensearch_config.toml with actual external OpenSearch connection configurations? (y/n)
     y
-     ✔  External OpenSearch configurations updated successfully.
+       External OpenSearch configurations updated successfully.
 
-     ✔  Maintenance mode turned ON successfully
+       Maintenance mode turned ON successfully
 
     After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations 
     and then run the below patch command to update the configurations:
     $ chef-automate config patch opensearch.toml
 
-    ✔  Maintenance mode turned ON successfully
+      Maintenance mode turned ON successfully
     ```
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
@@ -394,10 +394,10 @@ To upgrade to 4.x, follow the steps below:
     2. Elasticsearch indices are in version 6
     
     Pre flight checks
-     ✔  [Passed]    The /hab/ directory should have at least 5.9GB of free space 
-     ✔  [Passed]    Elasticsearch indices are in version 6 
+       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    Elasticsearch indices are in version 6 
 
-     ✔  Maintenance mode turned ON successfully
+       Maintenance mode turned ON successfully
 
     Upgrading Chef Automate from version 3.0.49 to 4.x
     This might take around 15 to 20 min
@@ -419,7 +419,7 @@ To upgrade to 4.x, follow the steps below:
     #Output
 
     ------------------------------------------------------------------------------------
-    ✔ Chef Automate upgraded to airgap bundle version: 4.x.y.
+     Chef Automate upgraded to airgap bundle version: 4.x.y.
       Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
@@ -428,14 +428,14 @@ To upgrade to 4.x, follow the steps below:
     y
     
     Data Migration is in progress
-            ✔  Maintenance mode turned ON successfully
-            ✔  OpenSearch configurations updated successfully
-            ✔  Chef Automate Stopped  
-            ✔  Data Copied Successfully
-            ✔  Chef Automate Started    
-            ✔  Chef Automate status is healthy
-            ✔  Maintenance mode turned OFF successfully
-     ✔  Migration complete
+              Maintenance mode turned ON successfully
+              OpenSearch configurations updated successfully
+              Chef Automate Stopped  
+              Data Copied Successfully
+              Chef Automate Started    
+              Chef Automate status is healthy
+              Maintenance mode turned OFF successfully
+       Migration complete
     
     Verify Chef Automate to see that everything is running and that all your data is available.
     a2-dev.test #fqdn
@@ -444,7 +444,7 @@ To upgrade to 4.x, follow the steps below:
     
     Would you like to clean up the old Elasticsearch data now? (y/n)
     y
-     ✔  Clean up successful  
+       Clean up successful  
     
     ```
 3. **[If not done in previous steps]** Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
@@ -460,14 +460,14 @@ To upgrade to 4.x, follow the steps below:
     y
     
     Data Migration is in progress
-            ✔  Maintenance mode turned ON successfully
-            ✔  OpenSearch configurations updated successfully
-            ✔  Chef Automate Stopped  
-            ✔  Data Copied Successfully
-            ✔  Chef Automate Started    
-            ✔  Chef Automate status is healthy
-            ✔  Maintenance mode turned OFF successfully
-     ✔  Migration complete
+              Maintenance mode turned ON successfully
+              OpenSearch configurations updated successfully
+              Chef Automate Stopped  
+              Data Copied Successfully
+              Chef Automate Started    
+              Chef Automate status is healthy
+              Maintenance mode turned OFF successfully
+       Migration complete
     
     Verify Chef Automate to see that everything is running and that all your data is available.
     ip-172-31-26-40.ap-south-1.compute.internal
@@ -495,7 +495,7 @@ To upgrade to 4.x, follow the steps below:
 
     Would you like to clean up the old Elasticsearch data now? (y/n)
     y
-     ✔  Clean up successful 
+       Clean up successful 
     ```
 
 ### Chef Automate in Air-Gapped Environment With External ElasticSearch
@@ -560,9 +560,9 @@ To upgrade to 4.x, follow the steps below:
     1. The /hab/ directory should have at least 5.9GB of free space
     
     Pre flight checks
-     ✔  [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
 
-     ✔  Maintenance mode turned ON successfully
+       Maintenance mode turned ON successfully
 
     Upgrading Chef Automate from version 3.0.49 to 4.x
     ----------------------------------------------------------------------
@@ -593,22 +593,22 @@ To upgrade to 4.x, follow the steps below:
     #Output
 
     ------------------------------------------------------------------------------------
-    ✔ Chef Automate upgraded to airgap bundle version: 4.x.y.
+     Chef Automate upgraded to airgap bundle version: 4.x.y.
       Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
     Have you updated your opensearch_config.toml with actual external OpenSearch connection configurations? (y/n)
     y
-     ✔  External OpenSearch configurations updated successfully.
+       External OpenSearch configurations updated successfully.
 
-     ✔  Maintenance mode turned ON successfully
+       Maintenance mode turned ON successfully
 
     After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations 
     and then run the below patch command to update the configurations:
     $ chef-automate config patch opensearch.toml
 
-    ✔  Maintenance mode turned ON successfully
+      Maintenance mode turned ON successfully
     ```
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
