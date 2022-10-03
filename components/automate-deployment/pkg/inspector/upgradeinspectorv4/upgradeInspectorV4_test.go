@@ -25,7 +25,7 @@ Would you like to proceed with the upgrade? (y/n)`
 	INFO_MSG = `Please make sure following things are taken care of
 1. You have scheduled downtime for the duration of the upgrade
 2. You have taken a backup by running the command: chef automate backup create
-3. /hab directory should have at least 8.8GB of free space. (Currently available space : 2.5GB)`
+3. /hab directory should have at least 8.8GB of free space. (You have current available space : 2.5GB)`
 	INSPECTION_LIST = `Following Pre-flight checks will be conducted
 1. /hab directory should have at least 5.5GB of free space
 2. /home/ubuntu directory should have at least 3.3GB of free space

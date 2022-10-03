@@ -48,9 +48,8 @@ In this release, Elasticsearch will be migrated to OpenSearch.
 	if !ui.upgradeUtils.IsExternalElasticSearch(ui.timeout) && (len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR) {
 		ui.showOSDestDirFlagMsg()
 	}
-	ui.writer.Println(`For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-`)
+	ui.writer.Println("For more information, visit")
+	ui.writer.Println(color.New(color.FgBlue).Sprint("https://docs.chef.io/automate/major_upgrade_4.x/"))
 	return ui.promptToContinue()
 }
 
