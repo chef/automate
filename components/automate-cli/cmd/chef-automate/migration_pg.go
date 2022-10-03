@@ -23,11 +23,12 @@ import (
 )
 
 var migrateDataCmdFlags = struct {
-	check            bool
-	data             string
-	autoAccept       bool
-	forceExecute     bool
-	skipStorageCheck bool
+	check                    bool
+	data                     string
+	autoAccept               bool
+	forceExecute             bool
+	skipStorageCheck         bool
+	skipMigrationPermanently bool
 }{}
 
 var ClearDataCmdFlags = struct {
@@ -103,6 +104,7 @@ func newMigrateDataCmd() *cobra.Command {
 	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
 	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.skipStorageCheck, "skip-storage-check", "s", false, "skip storage check")
 	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "force-execute")
+	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.skipMigrationPermanently, "skip-migration", "", false, "skip-migration")
 	return migrateDataCmd
 }
 
@@ -256,6 +258,10 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		// }
 		// migrator := migratorv4.NewMigratorV4(writer, mv4U, mfu, 10, time.Second)
 		migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
+		if migrateDataCmdFlags.skipMigrationPermanently {
+			migrator.UpdateSkipMigration(migrateDataCmdFlags.skipMigrationPermanently)
+			return nil
+		}
 		migrator.RunMigrationFlow(false)
 		return nil
 	} else {

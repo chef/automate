@@ -671,7 +671,10 @@ func startMigration() error {
 	// }
 	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
 	migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
-	migrator.RunMigrationFlow(true)
+	isSkip, _ := migrator.ReadSkipMigration()
+	if !isSkip {
+		migrator.RunMigrationFlow(true)
+	}
 	return nil
 }
 
@@ -764,7 +767,7 @@ func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 		writer.Println("To migrate data later on, use this command")
 		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es"))
 		writer.Println("To skip data migration permanently, use this command")
-		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data --data=es --skip-migration"))
+		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es --skip-migration"))
 		writer.Println("")
 		_, _, err := majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
 		if err != nil {
