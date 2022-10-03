@@ -43,7 +43,7 @@ func (m *MigratorV4) ExecuteMigrationSteps() (err error) {
 	if !m.migrationConsent {
 		return errors.New("Can't process without user consent.")
 	}
-	m.writer.Println("Migration in progress")
+	m.writer.Println("Data Migration is in progress")
 	for _, step := range m.migrationSteps {
 		err = step.Run()
 		if err != nil {

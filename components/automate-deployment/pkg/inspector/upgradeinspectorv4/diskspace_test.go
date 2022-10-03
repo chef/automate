@@ -53,7 +53,7 @@ func TestDiskSpaceInspection(t *testing.T) {
 	tb := NewDiskSpaceInspection(tw.CliWriter, false, "", mfs)
 	index := 3
 	tb.ShowInfo(&index)
-	expected := `3. /hab directory should have at least 8.8GB of free space. (Currently available space : 2.5GB)
+	expected := `3. /hab directory should have at least 8.8GB of free space. (You have current available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
 	assert.Equal(t, 4, index)
@@ -69,7 +69,7 @@ func TestDiskSpaceInspectionWithExternal(t *testing.T) {
 	tb := NewDiskSpaceInspection(tw.CliWriter, true, "", mfs)
 	index := 3
 	tb.ShowInfo(&index)
-	expected := `3. /hab directory should have at least 5.5GB of free space. (Currently available space : 2.5GB)
+	expected := `3. /hab directory should have at least 5.5GB of free space. (You have current available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
 	assert.Equal(t, 4, index)
@@ -85,8 +85,8 @@ func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
 	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
 	index := 3
 	tb.ShowInfo(&index)
-	expected := `3. /hab directory should have at least 5.5GB of free space. (Currently available space : 2.5GB)
-4. /home/ubuntu directory should have at least 3.3GB of free space. (Currently available space : 2.5GB)
+	expected := `3. /hab directory should have at least 5.5GB of free space. (You have current available space : 2.5GB)
+4. /home/ubuntu directory should have at least 3.3GB of free space. (You have current available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
 	assert.Equal(t, 5, index)
@@ -156,7 +156,7 @@ func TestDiskSpaceInspectionWithOSDataDirFilesystemError(t *testing.T) {
 	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
 	index := 3
 	tb.ShowInfo(&index)
-	expected := `3. /hab directory should have at least 5.5GB of free space. (Currently available space : 2.5GB)
+	expected := `3. /hab directory should have at least 5.5GB of free space. (You have current available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
 	assert.Equal(t, 4, index)

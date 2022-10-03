@@ -48,7 +48,7 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 	if err != nil {
 		return err
 	}
-	ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (Available space : %.1fGB)\n",
+	ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)\n",
 		*index, ds.habDir, ds.requiredHabSpace, ds.currentHabSpace)
 	*index++
 	if !ds.isExternal && ds.hasOSDestDir() {
@@ -57,7 +57,7 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 		if err != nil {
 			return err
 		}
-		ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (Available space : %.1fGB)\n",
+		ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)\n",
 			*index, ds.osDestDir, ds.requiredOSDestSpace, ds.currentSpaceInOSDir)
 		*index++
 	}

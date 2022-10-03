@@ -757,6 +757,11 @@ func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 	//Handle the case where user does not wish to migrate the Elasticsearch data to OpenSearch i.e. `n` case
 	writer.Println(color.New(color.FgYellow).Sprint("!") + " [" + color.New(color.FgYellow).Sprint("Warning") + "] " + "  If the data migration is performed at a later point any data collected since the upgrade will be lost.")
 	writer.Println("")
+	writer.Println("To migrate data later on, use this command")
+	writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es"))
+	writer.Println("To skip data migration permanently, use this command")
+	writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es --skip-migration"))
+	writer.Println("")
 	isSkipConsent, err := promptUser("Are you sure you want to skip the data migration?")
 	if err != nil {
 		return err
@@ -764,11 +769,6 @@ func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 	//Handle the case where user wishes to skip migration i.e. `y` case
 	if isSkipConsent {
 		writer.Println("Data migration skipped")
-		writer.Println("")
-		writer.Println("To migrate data later on, use this command")
-		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es"))
-		writer.Println("To skip data migration permanently, use this command")
-		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es --skip-migration"))
 		writer.Println("")
 		_, _, err := majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
 		if err != nil {
