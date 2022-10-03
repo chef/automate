@@ -55,9 +55,8 @@ func TestReadPendingPostChecklistFile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, []string{}, res)
 	res, err = pcm.ReadPendingPostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, len(res))
-	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
 
 	// if version is invalid and we have right path for the file
 	// then return error

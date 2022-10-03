@@ -18,25 +18,25 @@ const (
 In this release, Elasticsearch will be migrated to OpenSearch.`
 	RUN_WITH_OS_FLAG = `You can always change the OpenSearch destination directory by using the flag:
   $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>`
-	PROCEED_CONF = `For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
+	PROCEED_CONF = `For more information, visit
+https://docs.chef.io/automate/major_upgrade_4.x/
 
 Would you like to proceed with the upgrade? (y/n)`
-	INFO_MSG = `Please make sure following things are taken care of
-1. You have scheduled downtime for the duration of the upgrade
-2. You have taken a backup by running the command: chef automate backup create
-3. /hab directory should have at least 8.8GB of free space. (Currently available space : 2.5GB)`
+	INFO_MSG = `Before proceeding, please ensure:
+1. You have scheduled downtime for the duration of the upgrade.
+2. You have taken a backup by running the command: chef automate backup create.
+3. The /hab/ directory should have at least 8.8GB of free space. (You have current available space : 2.5GB)`
 	INSPECTION_LIST = `Following Pre-flight checks will be conducted
-1. /hab directory should have at least 5.5GB of free space
-2. /home/ubuntu directory should have at least 3.3GB of free space
+1. The /hab/ directory should have at least 5.5GB of free space
+2. The /home/ubuntu/ directory should have at least 3.3GB of free space
 `
 	ALL_SKIPPED_OS = `Pre flight checks
- ⊖  [Skipped]	/hab directory should have at least 5.5GB of free space
- ⊖  [Skipped]	/home/ubuntu directory should have at least 3.3GB of free space
+ ⊖  [Skipped]	The /hab/ directory should have at least 5.5GB of free space
+ ⊖  [Skipped]	The /home/ubuntu/ directory should have at least 3.3GB of free space
  ⊖  [Skipped]	Elasticsearch indices are in version 6
 
 [Error] Please make sure all services are healthy by running chef-automate status`
-	HAB_SPACE_ERR = `✖  [Failed]	/hab directory should have at least 8.8GB of free space
+	HAB_SPACE_ERR = `✖  [Failed]	The /hab/ directory should have at least 8.8GB of free space
  ⊖  [Skipped]	Elasticsearch indices are in version 6
 
 [Error] Required Space : 8.8GB
@@ -59,6 +59,8 @@ func TestUpgradeInspectorV4ShowInfoWithNoInspections(t *testing.T) {
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	err := ui.ShowInfo()
+	t.Log(tw.Output())
+	t.Log(expected)
 	assert.Equal(t, expected, tw.Output())
 	assert.NoError(t, err)
 }
@@ -140,9 +142,9 @@ func TestUpgradeInspectorV4ShowInfoWithInspectionsWithFilesystemError(t *testing
 	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	expected := fmt.Sprintf(`%s
 
-Please make sure following things are taken care of
-1. You have scheduled downtime for the duration of the upgrade
-2. You have taken a backup by running the command: chef automate backup create
+Before proceeding, please ensure:
+1. You have scheduled downtime for the duration of the upgrade.
+2. You have taken a backup by running the command: chef automate backup create.
 `, TITLE_MSG)
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGBError,
@@ -209,10 +211,10 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 	diskSpaceInspection.checkDelay = 100 * time.Millisecond
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have at least 5.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have at least 3.3GB of free space"
-	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have at least 5.5GB of free space"
-	expectedPassOSDestChecking := "✔  [Passed]\t/home/ubuntu directory should have at least 3.3GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\tThe /hab/ directory should have at least 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\tThe /home/ubuntu/ directory should have at least 3.3GB of free space"
+	expectedPassHabChecking := "✔  [Passed]\tThe /hab/ directory should have at least 5.5GB of free space"
+	expectedPassOSDestChecking := "✔  [Passed]\tThe /home/ubuntu/ directory should have at least 3.3GB of free space"
 
 	err := ui.Inspect()
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -246,9 +248,9 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	diskSpaceInspection.checkDelay = 100 * time.Millisecond
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have at least 10.5GB of free space"
-	expectedPassHabChecking := "✖  [Failed]\t/hab directory should have at least 10.5GB of free space"
-	expectedPassOSDestChecking := "⊖  [Skipped]\t/home/ubuntu directory should have at least 3.3GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\tThe /hab/ directory should have at least 10.5GB of free space"
+	expectedPassHabChecking := "✖  [Failed]\tThe /hab/ directory should have at least 10.5GB of free space"
+	expectedPassOSDestChecking := "⊖  [Skipped]\tThe /home/ubuntu/ directory should have at least 3.3GB of free space"
 	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
@@ -285,10 +287,10 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	diskSpaceInspection.checkDelay = 100 * time.Millisecond
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have at least 5.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have at least 10.5GB of free space"
-	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have at least 5.5GB of free space"
-	expectedPassOSDestChecking := "✖  [Failed]\t/home/ubuntu directory should have at least 10.5GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\tThe /hab/ directory should have at least 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\tThe /home/ubuntu/ directory should have at least 10.5GB of free space"
+	expectedPassHabChecking := "✔  [Passed]\tThe /hab/ directory should have at least 5.5GB of free space"
+	expectedPassOSDestChecking := "✖  [Failed]\tThe /home/ubuntu/ directory should have at least 10.5GB of free space"
 	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
@@ -356,7 +358,7 @@ func TestUpgradeInspectorV4ShowInspectionListForExternal(t *testing.T) {
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have at least 5.5GB of free space"
+	expected := "Following Pre-flight checks will be conducted\n1. The /hab/ directory should have at least 5.5GB of free space"
 
 	ui.ShowInfo()
 	ui.ShowInspectionList()
@@ -389,7 +391,7 @@ func TestUpgradeInspectorV4ShowInspectionListForEmbedded(t *testing.T) {
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have at least 8.8GB of free space"
+	expected := "Following Pre-flight checks will be conducted\n1. The /hab/ directory should have at least 8.8GB of free space"
 
 	ui.ShowInfo()
 	ui.ShowInspectionList()
@@ -427,7 +429,7 @@ func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected1 := "[Skipped]\t/home/ubuntu directory should have at least 3.3GB of free space"
+	expected1 := "[Skipped]\tThe /home/ubuntu/ directory should have at least 3.3GB of free space"
 	expected2 := "[Skipped]\tElasticsearch indices are in version 6\n"
 
 	ui.ShowInfo()

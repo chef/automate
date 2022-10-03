@@ -20,6 +20,7 @@ rm -rf %[1]v/svc/automate-elasticsearch/data;
 rm -rf %[1]v/svc/automate-elasticsearch/var;
 `
 	CLEANUP_ID = "clean_up"
+	SKIP_MIGRATION_PERMANENTLY_ID = "skip_migration"
 )
 
 type Cleanup struct {

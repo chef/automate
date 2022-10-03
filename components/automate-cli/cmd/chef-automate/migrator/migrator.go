@@ -11,6 +11,8 @@ type Migrator interface {
 	RunMigrationFlow(skipConfirmation bool)
 	ClearData() error
 	RunSuccess() error
+	SkipMigrationPermanently() error
+	IsMigrationPermanentlySkipped() (bool, error)
 }
 
 type MigrationSteps interface {

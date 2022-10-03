@@ -14,7 +14,7 @@ import (
 
 const (
 	MIN_HAB_FREE_SPACE float64 = 5.5
-	MIN_REQ_SPACE_STR          = "%s directory should have at least %.1fGB of free space"
+	MIN_REQ_SPACE_STR          = "The %s/ directory should have at least %.1fGB of free space"
 	ENSURE_SPACE               = "\nPlease ensure the available free space is %.1fGB\nand run "
 	UPGRADE_CMD                = "chef-automate upgrade run --major"
 	ES_DATA                    = "/svc/automate-elasticsearch/data"
@@ -48,7 +48,7 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 	if err != nil {
 		return err
 	}
-	ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (Currently available space : %.1fGB)\n",
+	ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)\n",
 		*index, ds.habDir, ds.requiredHabSpace, ds.currentHabSpace)
 	*index++
 	if !ds.isExternal && ds.hasOSDestDir() {
@@ -57,7 +57,7 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 		if err != nil {
 			return err
 		}
-		ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (Currently available space : %.1fGB)\n",
+		ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (You have current available space : %.1fGB)\n",
 			*index, ds.osDestDir, ds.requiredOSDestSpace, ds.currentSpaceInOSDir)
 		*index++
 	}

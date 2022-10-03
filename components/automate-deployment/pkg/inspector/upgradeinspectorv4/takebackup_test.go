@@ -12,6 +12,6 @@ func TestTakeBackup(t *testing.T) {
 	tb := NewTakeBackupInspection(tw.CliWriter)
 	index := 2
 	tb.ShowInfo(&index)
-	expected := "2. You have taken a backup by running the command: chef automate backup create\n"
+	expected := "2. You have taken a backup by running the command: chef automate backup create.\n"
 	assert.Equal(t, expected, tw.Output())
 }

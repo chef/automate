@@ -73,11 +73,29 @@ func (pcm *PostChecklistManager) ReadPostChecklistById(id string, path string) (
 		return checklistIDIsExecuted, nil
 	}
 
+	idNotFound := true
 	for i := 0; i < len(res.PostChecklist); i++ {
 		if res.PostChecklist[i].Id == id {
 			checklistIDIsExecuted = res.PostChecklist[i].IsExecuted
+			idNotFound = false
 			break
 		}
+	}
+
+	if id == "skip_migration" && idNotFound {
+		skipMigration := PostCheckListItem{
+			Id:         "skip_migration",
+			Msg:        run_skip_migration,
+			Cmd:        run_skip_migration_cmd,
+			Optional:   true,
+			IsExecuted: false,
+		}
+		res.PostChecklist = append(res.PostChecklist, skipMigration)
+		err := CreateJsonFile(res, path)
+		if err != nil {
+			return false, err
+		}
+		return false, nil
 	}
 
 	return checklistIDIsExecuted, nil
@@ -88,7 +106,8 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 	var showPostChecklist = false
 	res, err := ReadJsonFile(path)
 	if err != nil {
-		return postCmdList, err
+		// overriding error to nil, in the case of file not found
+		return postCmdList, nil
 	}
 
 	if res.Version == pcm.version {

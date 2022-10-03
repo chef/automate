@@ -43,7 +43,7 @@ func (m *MigratorV4) ExecuteMigrationSteps() (err error) {
 	if !m.migrationConsent {
 		return errors.New("Can't process without user consent.")
 	}
-	m.writer.Println("Migration in progress")
+	m.writer.Println("Data Migration is in progress")
 	for _, step := range m.migrationSteps {
 		err = step.Run()
 		if err != nil {
@@ -195,8 +195,8 @@ func (m *MigratorV4) doDelete() error {
 	if !doDelete {
 		m.writer.Println("Cleanup skipped")
 		m.writer.Println("")
-		m.writer.Println("To clean up Elasticsearch data later on, you can use command:")
-		m.writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data -data-es"))
+		m.writer.Println("To clean up Elasticsearch data later, use command:")
+		m.writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data --data=es"))
 	}
 	err = m.ClearData()
 	if err != nil {
@@ -234,4 +234,18 @@ func (m *MigratorV4) RunSuccess() error {
 		}
 	}
 	return nil
+}
+
+func (m *MigratorV4) SkipMigrationPermanently() error {
+	habroot := m.fileutils.GetHabRootPath()
+	return m.migratorUtils.UpdatePostChecklistFile(SKIP_MIGRATION_PERMANENTLY_ID, habroot+majorupgrade_utils.UPGRADE_METADATA)
+}
+
+func (m *MigratorV4) IsMigrationPermanentlySkipped() (bool, error) {
+	habRoot := m.fileutils.GetHabRootPath()
+	isExecuted, err := m.migratorUtils.ReadV4Checklist(SKIP_MIGRATION_PERMANENTLY_ID, habRoot+majorupgrade_utils.UPGRADE_METADATA)
+	if err != nil {
+		return true, nil
+	}
+	return isExecuted, nil
 }
