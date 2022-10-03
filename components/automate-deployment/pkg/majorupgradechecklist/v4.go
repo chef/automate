@@ -179,6 +179,13 @@ var postChecklistV4External = []PostCheckListItem{
 		Optional:   true,
 		IsExecuted: false,
 	},
+	{
+		Id:         "skip_migration",
+		Msg:        run_skip_migration,
+		Cmd:        run_skip_migration_cmd,
+		Optional:   true,
+		IsExecuted: false,
+	},
 }
 
 func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4ChecklistManager {

@@ -586,15 +586,19 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 	isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
 	switch major {
 	case "4":
-		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
-		if err != nil {
-			return err
-		}
-		if len(pendingPostChecklist) > 0 {
-			if isExternalOpenSearch {
-				return postUpgradeStatusExternal(resp)
+		migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
+		isSkipped, _ := migrator.IsMigrationPermanentlySkipped()
+		if !isSkipped {
+			pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+			if err != nil {
+				return err
 			}
-			return postUpgradeStatusEmbedded(resp)
+			if len(pendingPostChecklist) > 0 {
+				if isExternalOpenSearch {
+					return postUpgradeStatusExternal(resp)
+				}
+				return postUpgradeStatusEmbedded(resp)
+			}
 		}
 	case "3":
 		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
@@ -671,10 +675,7 @@ func startMigration() error {
 	// }
 	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
 	migrator := migratorv4.NewMigratorV4(writer, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10, time.Second)
-	isSkipped, _ := migrator.IsMigrationPermanentlySkipped()
-	if !isSkipped {
-		migrator.RunMigrationFlow(true)
-	}
+	migrator.RunMigrationFlow(true)
 	return nil
 }
 
