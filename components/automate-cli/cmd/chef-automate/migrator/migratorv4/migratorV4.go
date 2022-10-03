@@ -195,8 +195,8 @@ func (m *MigratorV4) doDelete() error {
 	if !doDelete {
 		m.writer.Println("Cleanup skipped")
 		m.writer.Println("")
-		m.writer.Println("To clean up Elasticsearch data later on, you can use command:")
-		m.writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data -data-es"))
+		m.writer.Println("To clean up Elasticsearch data later, use command:")
+		m.writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data --data=es"))
 	}
 	err = m.ClearData()
 	if err != nil {

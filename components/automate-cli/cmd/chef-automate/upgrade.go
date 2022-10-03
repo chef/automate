@@ -619,11 +619,11 @@ func postUpgradeStatus(resp *api.UpgradeStatusResponse) error {
 func printUpgradeStatusMsg(resp *api.UpgradeStatusResponse) {
 	writer.Println(color.New(color.FgGreen).Sprint("------------------------------------------------------------------------------------"))
 	if resp.IsAirgapped {
-		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to airgap bundle version (%s) successfully.", resp.CurrentVersion))
+		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to airgap bundle version: (%s).", resp.CurrentVersion))
 	} else {
 		writer.Println(color.New(color.FgGreen).Sprintf("✔ Chef Automate upgraded to version (%s) successfully.", resp.CurrentVersion))
 	}
-	writer.Println(fmt.Sprintf("  To know whats new in version (%s),", resp.CurrentVersion))
+	writer.Println(fmt.Sprintf("  Find out what's new in version (%s) by visiting ", resp.CurrentVersion))
 	writer.Println("  visit" + color.New(color.FgBlue).Sprint(fmt.Sprintf(" https://docs.chef.io/release_notes_automate/#%s ", resp.CurrentVersion)))
 	writer.Println(color.New(color.FgGreen).Sprint("------------------------------------------------------------------------------------"))
 	writer.Println("")
@@ -751,9 +751,9 @@ func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 	}
 
 	//Handle the case where user does not wish to migrate the Elasticsearch data to OpenSearch i.e. `n` case
-	writer.Println(color.New(color.FgYellow).Sprint("!") + " [" + color.New(color.FgYellow).Sprint("Warning") + "] " + "  Any data collected until the migration will be lost.")
+	writer.Println(color.New(color.FgYellow).Sprint("!") + " [" + color.New(color.FgYellow).Sprint("Warning") + "] " + "  If the data migration is performed at a later point any data collected since the upgrade will be lost.")
 	writer.Println("")
-	isSkipConsent, err := promptUser("Are you sure to skip migration?")
+	isSkipConsent, err := promptUser("Are you sure you want to skip the data migration?")
 	if err != nil {
 		return err
 	}
@@ -762,7 +762,9 @@ func postUpgradeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 		writer.Println("Data migration skipped")
 		writer.Println("")
 		writer.Println("To migrate data later on, use this command")
-		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate -data=es"))
+		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade migrate --data=es"))
+		writer.Println("To skip data migration permanently, use this command")
+		writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data --data=es --skip-migration"))
 		writer.Println("")
 		_, _, err := majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
 		if err != nil {
