@@ -151,7 +151,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
     ------------------------------------------------------------------------------------
     ✔ Chef Automate upgraded to version: 4.x.y.
-      Find out what\'s new in version (4.x.y) by visiting
+      Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
@@ -302,7 +302,7 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
 
     ------------------------------------------------------------------------------------
     ✔ Chef Automate upgraded to version: 4.x.y.
-      Find out what\'s new in version (4.x.y) by visiting
+      Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
@@ -420,7 +420,7 @@ To upgrade to 4.x, follow the steps below:
 
     ------------------------------------------------------------------------------------
     ✔ Chef Automate upgraded to airgap bundle version: 4.x.y.
-      Find out what\'s new in version (4.x.y) by visiting
+      Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
@@ -594,7 +594,7 @@ To upgrade to 4.x, follow the steps below:
 
     ------------------------------------------------------------------------------------
     ✔ Chef Automate upgraded to airgap bundle version: 4.x.y.
-      Find out what\'s new in version (4.x.y) by visiting
+      Find out what's new in version (4.x.y) by visiting
       visit https://docs.chef.io/release_notes_automate/#4.x.y 
     ------------------------------------------------------------------------------------
     
