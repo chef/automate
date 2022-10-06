@@ -26,10 +26,11 @@ weight = 210
 
 ### Overview
 
-To communicate with Amazon S3 we need a IAM Role is required with [poicy](/automate/backup/#aws-s3-permissions)
+To Communicate with Amazon S3 we need a IAM Role with required [policy](/automate/backup/#aws-s3-permissions).
 
-In case of if you are using the Managed Service the you need to create a [snapshot-role](/automate/managed_services/#opensearch-setup) for opensearch.
+Attach the IAM Role to the All the Opensearch Node and Frontend Node.
 
+<!--
 **Permissions Required**
 
 Check if the IAM user has all the required permissions. The permission policies are listed below:
@@ -43,15 +44,22 @@ Create an IAM role to give access of **S3** to **OpenSearch** instances. The rol
 The permissions can either be directly added to the user or added via **IAM Group**.
 
 Once done with the above steps, `.toml` file and patch the `.config`. In the file, modify the values listed below:
+-->
+
+{{< note >}}
+
+In case of if you are using the Managed AWS Service the you need to create a [snapshot-role](/automate/managed_services/#opensearch-setup) for opensearch.
+
+{{< /note >}}
+
+#### Configuration in Provision host
 
 1. bucket name -
 
     - `bucket = "bucket-name"`
     - `name = "bucket-name"`
 
-2. `mkdir configs`
-
-3. `vi configs/automate.toml`
+1. Create a toml say, `automate.toml`.
 
 Refer to the content for the `automate.toml` file below:
 
@@ -120,10 +128,8 @@ Refer to the content for the `automate.toml` file below:
 Execute the command given below to trigger the deployment.
 
 ```sh
-./chef-automate config patch configs/automate.toml
+./chef-automate config patch automate.toml
 ```
-
-Take a [back-up](/automate/ha_restore/) of the configurations once the cluster has been deployed.
 
 {{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 
@@ -143,7 +149,8 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
-- Shutdown Chef Automate service on all front-end nodes
+- Shutdown Chef Automate service on all front-end nodes.
+
  - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
  - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
 
