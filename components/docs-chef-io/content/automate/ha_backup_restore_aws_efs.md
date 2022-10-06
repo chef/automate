@@ -1,5 +1,5 @@
 +++
-title = "AWS deployment using EFS"
+title = "AWS Deployment using EFS"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
 [menu.automate]
-title = "AWS deployment using EFS"
-identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Prerequisites"
+title = "AWS Deployment using EFS"
+identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore AWS Deployment - EFS"
 parent = "automate/deploy_high_availability/backup_and_restore"
-weight = 210
+weight = 230
 +++
 
 {{< warning >}}

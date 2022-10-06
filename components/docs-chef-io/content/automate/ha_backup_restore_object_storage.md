@@ -10,7 +10,7 @@ gh_repo = "automate"
 title = "On-Permise Deployment using Object Storage"
 identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Object Storage - On-Premise"
 parent = "automate/deploy_high_availability/backup_and_restore"
-weight = 210
+weight = 220
 +++
 
 {{< warning >}}
