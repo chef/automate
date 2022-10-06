@@ -1,5 +1,5 @@
 +++
-title = "Backup and restore using Object Storage | On-Permise Deployment"
+title = "On-Permise Deployment using Object Storage"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
 [menu.automate]
-title = "Prerequisites"
+title = "On-Permise Deployment using Object Storage"
 identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Object Storage - On-Premise"
 parent = "automate/deploy_high_availability/backup_and_restore"
 weight = 210
@@ -19,8 +19,8 @@ weight = 210
 
 {{< note >}}
 
--   This page explains the configuration for backup with **object storage** and Restore with On-Premise deployment procedure.
--   If user choose `backup_config` as `object_storage` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required and can be skipped**. i.e., **`backup_config = "object_storage"`** . If `backup_config` left blank, then configuration needs to be done for backup and restore.
+- This page explains the configuration for backup and restore with object storage for On-Premise deployment.
+- If user choose `backup_config` as `object_storage` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` left blank, then configuration needs to be configure manually.
 
 {{< /note >}}
 
@@ -28,19 +28,19 @@ weight = 210
 
 This section provides the pre-backup configuration required to backup the data on Object Storage System (Other than AWS S3) like Minio, Non-AWS S3. The steps to set a secret key using commands are given below:
 
-#### Configuration in Opensearch Node
+### Configuration in Opensearch Node
 
 This section provides the pre-backup configuration required to backup the data on Object Storage System (Similar to but not AWS S3) like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
 1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
 
--   Export `OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
--   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
--   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
--   `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
--   `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+- `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
+- `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
+- `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
+- `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+- `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
-The final output after running the command 1.5 on the third node is given below:
+The final output after running the curl command on the all node is given below:
 
 ```json
 {
@@ -64,16 +64,16 @@ The final output after running the command 1.5 on the third node is given below:
 }
 ```
 
-2. To override the existing default endpoint:
+1. To override the existing default endpoint:
 
--   Login to one of the open search instances and run the following command (You need root access to run the command):
+- Login to one of the open search instances and run the following command (You need root access to run the command):
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
 automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
 ```
 
--   Edit the created `es_config.toml` file and add the following settings at the end of the file. (_The file will be empty if the credentials have not been rotated_)
+- Edit the created `es_config.toml` file and add the following settings at the end of the file. (_The file will be empty if the credentials have not been rotated_)
 
 ```sh
 [s3]
@@ -86,13 +86,13 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
     endpoint = ""
 ```
 
--   Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (_This will trigger a restart of the OpenSearch services on each server_)
+- Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (_This will trigger a restart of the OpenSearch services on each server_)
 
 ```sh
 hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
 ```
 
--   Once done with the above steps, run the following command:
+- Once done with the above steps, run the following command:
 
 ```sh
 journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
@@ -176,15 +176,15 @@ Refer to the content for the `automate.toml` file below:
 
     # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
     # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
-    endpoint = "https://s3.amazonaws.com"
+    endpoint = "<Your Object Storage URL>"
 
     # base_path (optional):  The path within the bucket where backups should be stored
     # If base_path is not set, backups will be stored at the root of the bucket.
     base_path = "automate"
 
   [global.v1.backups.s3.credentials]
-    access_key = "AKIAO"
-    secret_key = "s3kQ"
+    access_key = "<Your Access Key>"
+    secret_key = "<Your Secret Key>"
 ```
 
 Execute the command given below to trigger the deployment.
@@ -193,7 +193,7 @@ Execute the command given below to trigger the deployment.
 ./chef-automate config patch /path/to/automate.toml
 ```
 
-## Backup and Restore
+## Backup and Restore Commands
 
 ### Backup
 
@@ -218,19 +218,23 @@ Restore operation restores all the data while the backup is going on. The restor
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
 
--   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
--   Shutdown Chef Automate service on all front-end nodes
+- Shutdown Chef Automate service on all front-end nodes
 
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
 
--   Log in to the same instance of Chef Automate front-end node from which backup is taken.
+- Log in to the one of Chef Automate front-end node.
 
--   Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint <>`.
 
-{{< figure src="/images/automate/ha_restore.png" alt="Restore">}}
+{{< note >}}
 
--   Ideally all Chef Automate and Chef Infra Server front-end nodes should start by end of restoring. If not, start them by executing the `sudo systemctl start chef-automate` command.
+After restore command successfully executed, we need to start the service's on other frontend node. use the below command to start all the service's
+  
+  ```sh
+  sudo systemctl start chef-automate
+  ```
 
-{{< figure src="/images/automate/ha_restore_success.png" alt="Restore Success">}}
+{{< /note >}}
