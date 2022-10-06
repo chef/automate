@@ -30,9 +30,10 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 ### Setting up backup configuration
 
+- Create a EFS file system, plese refer sample steps [here](https://docs.aws.amazon.com/efs/latest/ug/gs-step-two-create-efs-resources.html)
 #### Configuration in Opensearch Node
 
-- Mount the shared file system on all OpenSearch servers:
+- Mount the shared file system on all OpenSearch and Frontend servers:
 
 ```sh
 mount /mnt/automate_backups

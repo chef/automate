@@ -29,7 +29,7 @@ This section provides the pre-backup configuration required to backup the data o
 
 ### Configuration in Opensearch Node
 
-This section provides the pre-backup configuration required to backup the data on Object Storage System (Similar to but not AWS S3) like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
+This section provides the pre-backup configuration required to backup the data on Object Storage System like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
 1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
 

@@ -31,7 +31,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 #### Configuration in Opensearch Node
 
-- Mount the shared file system on **all** OpenSearch servers :
+- Mount the shared file system on **all** OpenSearch and Frontend servers :
 
     ```sh
     mount /mnt/automate_backups
