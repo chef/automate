@@ -6,11 +6,11 @@ draft = false
 gh_repo = "automate"
 
 [menu]
-[menu.automate]
-title = "AWS Deployment using EFS"
-identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore AWS Deployment - EFS"
-parent = "automate/deploy_high_availability/backup_and_restore"
-weight = 230
+  [menu.automate]
+    title = "AWS Deployment using EFS"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore AWS Deployment - EFS"
+    parent = "automate/deploy_high_availability/backup_and_restore"
+    weight = 230
 +++
 
 {{< warning >}}
