@@ -109,7 +109,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     Before proceeding, please ensure:
     1. You have scheduled downtime for the duration of the upgrade.
     2. You have taken a backup by running the command: chef automate backup create.
-    3. The /hab/ directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
+    3. The /hab directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
     
     You can always change the OpenSearch destination directory by using the flag:
       $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
@@ -121,11 +121,11 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
     y
     
     Following Pre-flight checks will be conducted
-    1. The /hab/ directory should have at least 5.9GB of free space
+    1. The /hab directory should have at least 5.9GB of free space
     2. Elasticsearch indices are in version 6
     
     Pre flight checks
-       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    The /hab directory should have at least 5.9GB of free space 
        [Passed]    Elasticsearch indices are in version 6 
 
        Maintenance mode turned ON successfully
@@ -253,7 +253,7 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
     Before proceeding, please ensure:
     1. You have scheduled downtime for the duration of the upgrade.
     2. You have taken a backup by running the command: chef automate backup create.
-    3. The /hab/ directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
+    3. The /hab directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
     
     You can always change the OpenSearch destination directory by using the flag:
       $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
@@ -265,10 +265,10 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
     y
     
     Following Pre-flight checks will be conducted
-    1. The /hab/ directory should have at least 5.9GB of free space
+    1. The /hab directory should have at least 5.9GB of free space
     
     Pre flight checks
-       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    The /hab directory should have at least 5.9GB of free space 
 
        Maintenance mode turned ON successfully
 
@@ -378,7 +378,7 @@ To upgrade to 4.x, follow the steps below:
     Before proceeding, please ensure:
     1. You have scheduled downtime for the duration of the upgrade.
     2. You have taken a backup by running the command: chef automate backup create.
-    3. The /hab/ directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
+    3. The /hab directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
     
     You can always change the OpenSearch destination directory by using the flag:
       $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
@@ -390,11 +390,11 @@ To upgrade to 4.x, follow the steps below:
     y
     
     Following Pre-flight checks will be conducted
-    1. The /hab/ directory should have at least 5.9GB of free space
+    1. The /hab directory should have at least 5.9GB of free space
     2. Elasticsearch indices are in version 6
     
     Pre flight checks
-       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    The /hab directory should have at least 5.9GB of free space 
        [Passed]    Elasticsearch indices are in version 6 
 
        Maintenance mode turned ON successfully
@@ -545,7 +545,7 @@ To upgrade to 4.x, follow the steps below:
     Before proceeding, please ensure:
     1. You have scheduled downtime for the duration of the upgrade.
     2. You have taken a backup by running the command: chef automate backup create.
-    3. The /hab/ directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
+    3. The /hab directory should have at least 5.9GB of free space. (You have current available space : 39.6GB)
     
     You can always change the OpenSearch destination directory by using the flag:
       $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
@@ -557,10 +557,10 @@ To upgrade to 4.x, follow the steps below:
     y
     
     Following Pre-flight checks will be conducted
-    1. The /hab/ directory should have at least 5.9GB of free space
+    1. The /hab directory should have at least 5.9GB of free space
     
     Pre flight checks
-       [Passed]    The /hab/ directory should have at least 5.9GB of free space 
+       [Passed]    The /hab directory should have at least 5.9GB of free space 
 
        Maintenance mode turned ON successfully
 
