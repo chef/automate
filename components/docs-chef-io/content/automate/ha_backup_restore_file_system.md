@@ -20,7 +20,7 @@ weight = 210
 {{< note >}}
 
 - This page explains the configuration for backup and restore with file system for On-Premise deployment procedure.
-- If user choose `backup_config` as `file_system` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required **. i.e., **`backup_config = "file_system"`** . If `backup_config` left blank, then configuration needs to be configure for backup and restore.
+- If user choose `backup_config` as `file_system` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` left blank, then configuration needs to be configure for backup and restore.
 
 {{< /note >}}
 
