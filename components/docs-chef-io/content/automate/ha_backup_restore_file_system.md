@@ -124,7 +124,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 ### Backup
 
-Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
 ```cmd
 chef-automate backup create
@@ -145,7 +145,7 @@ Restore operation restores all the data while the backup is going on. The restor
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
-- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+- Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
 
 - Shutdown Chef Automate service on all front-end nodes
 

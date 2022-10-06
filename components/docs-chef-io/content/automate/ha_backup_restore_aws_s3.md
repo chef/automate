@@ -133,7 +133,7 @@ Take a [back-up](/automate/ha_restore/) of the configurations once the cluster h
 
 ### Backup
 
-Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node (chef-server or automate node). The backup command is as shown below:
+To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
 ```cmd
 chef-automate backup create

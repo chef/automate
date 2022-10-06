@@ -66,7 +66,7 @@ The final output after running the curl command on the all node is given below:
 
 1. To override the existing default endpoint:
 
-- Login to one of the open search instances and run the following command (You need root access to run the command):
+- Login to one of the open search instances and run the following command :
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
@@ -102,13 +102,20 @@ The screen will display a message of OpenSearch going from **RED/YELLOW** to **G
 
 #### Healthcheck commands
 
-To be filled
+    ```sh
+    hab svc status (check whether OpenSearch service is up or not)
+
+    curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices are green or not)
+
+    # Watch for a message about OpenSearch going from RED to GREEN
+    `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
+    ```
 
 #### Configuration in Provision host
 
 {{< note >}}
 
-Make sure all the frontend nodes and opensearch have access to the object storage. (IAM role)
+Make sure all the frontend nodes and opensearch have access to the object storage.
 
 {{< /note >}}
 
@@ -197,7 +204,7 @@ Execute the command given below to trigger the deployment.
 
 ### Backup
 
-Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node (chef-server or automate node). The backup command is as shown below:
+To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
 ```cmd
 chef-automate backup create
@@ -218,7 +225,7 @@ Restore operation restores all the data while the backup is going on. The restor
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
 
-- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+- Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
 
 - Shutdown Chef Automate service on all front-end nodes
 

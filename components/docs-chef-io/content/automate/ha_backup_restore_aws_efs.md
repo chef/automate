@@ -45,7 +45,7 @@ sudo chown hab:hab /mnt/automate_backups/opensearch/
 
 Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch server by following the steps given below:
 
-- Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
+- Export the current OpenSearch config from the Habitat supervisor :
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
@@ -58,7 +58,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 
 ```sh
 [path]
-# Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
+# Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in config.toml
 repo = "/mnt/automate_backups/opensearch"
 ```
 
@@ -98,7 +98,7 @@ path = "/mnt/automate_backups/opensearch"
 path = "/mnt/automate_backups/backups"
 ```
 
-- Patch the `.config` to trigger the deployment.
+- Patch the `.config` to apply the above config.
 
 ```sh
 ./chef-automate config patch automate.toml
@@ -108,7 +108,7 @@ path = "/mnt/automate_backups/backups"
 
 ### Backup
 
-Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
 ```cmd
 chef-automate backup create
