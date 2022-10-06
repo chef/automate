@@ -120,7 +120,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
     ./chef-automate config patch automate.toml
     ```
 
-## Backup and Restore
+## Backup and Restore commands
 
 ### Backup
 
@@ -141,7 +141,7 @@ Restore operation restores all the data while the backup is going on. The restor
 -   Create a new user _UserB_ and a respective API token named _Token2_.
 -   Now, suppose you want to restore data in the same automate cluster. In that case, the data will only be stored for _UserA_ with its token as the backup bundle only contains the _UserA_, and the _UserB_ is not available in the backup bundle. -->
 
-#### Restoring the Backed-up Data From file system
+### Restoring the Backed-up Data From file system
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
@@ -152,12 +152,8 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
   - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
   - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
 
-- Log in to the same instance of Chef Automate front-end node from which backup is taken.
+- ssh to the one  of Chef Automate front-end node.
 
 - Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
 
-{{< figure src="/images/automate/ha_restore.png" alt="Restore">}}
-
 - Start all Chef Automate and Chef Infra Server front-end nodes by executing the `sudo systemctl start chef-automate` command.
-
-{{< figure src="/images/automate/ha_restore_success.png" alt="Restore Success">}}
