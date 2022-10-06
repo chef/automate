@@ -54,11 +54,6 @@ In case of if you are using the Managed AWS Service the you need to create a [sn
 
 #### Configuration in Provision host
 
-1. bucket name -
-
-    - `bucket = "bucket-name"`
-    - `name = "bucket-name"`
-
 1. Create a toml say, `automate.toml`.
 
 Refer to the content for the `automate.toml` file below:
