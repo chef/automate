@@ -19,7 +19,6 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- This page explains the prerequisites of the backup with AWS deployment procedure.
 - If user choose `backup_config` as `efs` in `config.toml,` backup is already configured during deployment, **the below steps are not required and can be skipped**. i.e., **`backup_config = "efs"`** . If we have kept the `backup_config` blank, then configuration needs to be configure manually.
 
 {{< /note >}}

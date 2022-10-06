@@ -19,7 +19,6 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- This page explains the configuration for backup and restore with object storage for On-Premise deployment.
 - If user choose `backup_config` as `object_storage` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` left blank, then configuration needs to be configure manually.
 
 {{< /note >}}
