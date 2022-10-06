@@ -224,3 +224,78 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
     # type = nearline
     # access control = uniform
     ```
+
+## Configure Embedded OpenSearch
+
+Default configuration applied for OpenSearch:
+  
+```toml
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.proxy]
+      [opensearch.v1.sys.cluster]
+        name = "chef-insights"
+        max_shards_per_node = 1000
+        [opensearch.v1.sys.cluster.routing]
+          [opensearch.v1.sys.cluster.routing.allocation]
+            node_concurrent_recoveries = 2
+            node_initial_primaries_recoveries = 4
+            same_shard_host = false
+      [opensearch.v1.sys.node]
+        max_local_storage_nodes = 1
+        master = true
+        data = true
+      [opensearch.v1.sys.path]
+        logs = "logs"
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.recovery]
+          max_bytes_per_sec = "20mb"
+        [opensearch.v1.sys.indices.fielddata]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+          fielddata_limit = "60%"
+          fielddata_overhead = "1.03"
+          request_limit = "40%"
+          request_overhead = "1"
+      [opensearch.v1.sys.bootstrap]
+        memory_lock = false
+      [opensearch.v1.sys.network]
+        host = ""
+        port = 10168
+      [opensearch.v1.sys.transport]
+        port = "10169"
+      [opensearch.v1.sys.discovery]
+        ping_unicast_hosts = "[]"
+        minimum_master_nodes = 1
+        zen_fd_ping_timeout = "30s"
+      [opensearch.v1.sys.gateway]
+        expected_nodes = 0
+        expected_master_nodes = 0
+        expected_data_nodes = 0
+      [opensearch.v1.sys.action]
+        destructive_requires_name = true
+      [opensearch.v1.sys.logger]
+        level = "info"
+      [opensearch.v1.sys.plugins]
+      [opensearch.v1.sys.runtime]
+        max_locked_memory = "unlimited"
+        os_java_opts = ""
+        heapsize = "8g"
+      [opensearch.v1.sys.s3]
+        [opensearch.v1.sys.s3.client]
+          name = "default"
+          read_timeout = "50s"
+          max_retries = 3
+          use_throttle_retries = true
+      [opensearch.v1.sys.index]
+        number_of_replicas = 0
+        refresh_interval = "1s"
+```
+
+You can choose to override the default configuration by modifying any of the above settings in your `config.toml` file.
+Then patch this configuration into your Chef Automate installation by running:
+
+```bash
+chef-automate config patch </path/to/config.toml>
+```

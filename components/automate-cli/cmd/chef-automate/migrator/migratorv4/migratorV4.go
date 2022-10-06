@@ -197,11 +197,13 @@ func (m *MigratorV4) doDelete() error {
 		m.writer.Println("")
 		m.writer.Println("To clean up Elasticsearch data later, use command:")
 		m.writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data --data=es"))
+	} else {
+		err = m.ClearData()
+		if err != nil {
+			return err
+		}
 	}
-	err = m.ClearData()
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 
