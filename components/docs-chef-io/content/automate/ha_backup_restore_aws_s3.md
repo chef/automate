@@ -19,7 +19,6 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- This page explains the prerequisites of the backup with AWS deployment procedure.
 - If user choose `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then configuration needs to be configure manually.
 
 {{< /note >}}
