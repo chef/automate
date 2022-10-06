@@ -1,5 +1,5 @@
 +++
-title = "Prerequisites"
+title = "AWS deployment With AWS S3"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
 [menu.automate]
-title = "Prerequisites"
+title = "AWS deployment With AWS S3"
 identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Prerequisites"
 parent = "automate/deploy_high_availability/backup_and_restore"
 weight = 210
@@ -19,8 +19,8 @@ weight = 210
 
 {{< note >}}
 
--   This page explains the prerequisites of the backup with AWS deployment procedure.
--   If user choose `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required and can be skipped**. i.e., **`backup_config = "s3"`** . If we have kept the `backup_config` blank, we need to perform the below steps.
+- This page explains the prerequisites of the backup with AWS deployment procedure.
+- If user choose `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then configuration needs to be configure manually.
 
 {{< /note >}}
 
@@ -143,19 +143,22 @@ chef-automate backup create
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External AWS S3, follow the steps given below:
 
--   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
--   Shutdown Chef Automate service on all front-end nodes
+- Shutdown Chef Automate service on all front-end nodes
+ - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
+ - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
 
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
+- Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
--   Log in to the same instance of Chef Automate front-end node from which backup is taken.
+- Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
--   Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+{{< note >}}
 
-{{< figure src="/images/automate/ha_restore.png" alt="Restore">}}
+After restore command successfully executed, we need to start the service's on other frontend node. use the below command to start all the service's
+  
+  ```sh
+  sudo systemctl start chef-automate
+  ```
 
--   Ideally all Chef Automate and Chef Infra Server front-end nodes should start by end of restoring. If not, start them by executing the `sudo systemctl start chef-automate` command.
-
-{{< figure src="/images/automate/ha_restore_success.png" alt="Restore Success">}}
+{{< /note >}}

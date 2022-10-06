@@ -1,5 +1,5 @@
 +++
-title = "Prerequisites"
+title = "AWS deployment With EFS"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
 [menu.automate]
-title = "Prerequisites"
+title = "AWS deployment With EFS"
 identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Prerequisites"
 parent = "automate/deploy_high_availability/backup_and_restore"
 weight = 210
@@ -19,24 +19,24 @@ weight = 210
 
 {{< note >}}
 
--   This page explains the prerequisites of the backup with AWS deployment procedure.
--   If user choose `backup_config` as `efs` in `config.toml,` backup is already configured during deployment, **the below steps are not required and can be skipped**. i.e., **`backup_config = "efs"`** . If we have kept the `backup_config` blank, we need to perform the below steps.
+- This page explains the prerequisites of the backup with AWS deployment procedure.
+- If user choose `backup_config` as `efs` in `config.toml,` backup is already configured during deployment, **the below steps are not required and can be skipped**. i.e., **`backup_config = "efs"`** . If we have kept the `backup_config` blank, then configuration needs to be configure manually.
 
 {{< /note >}}
 
-### Overview
+## Overview
 
 A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
 
 Once the shared filesystem is mounted to `/mnt/automate_backups`, configure Automate to register the snapshot locations with OpenSearch.
 
--   Mount the shared file system on all OpenSearch servers:
+- Mount the shared file system on all OpenSearch servers:
 
 ```sh
 mount /mnt/automate_backups
 ```
 
--   Create an OpenSearch sub-directory and set permissions to one of the OpenSearch server (only if the network mount is correctly mounted).
+- Create an OpenSearch sub-directory and set permissions to one of the OpenSearch server (only if the network mount is correctly mounted).
 
 ```sh
 sudo mkdir /mnt/automate_backups/opensearch
@@ -45,14 +45,14 @@ sudo chown hab:hab /mnt/automate_backups/opensearch/
 
 Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch server by following the steps given below:
 
--   Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
+- Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
 automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
 ```
 
--   Edit `es_config.toml` and add the following settings to the end of the file.
+- Edit `es_config.toml` and add the following settings to the end of the file.
 
 {{< note >}} If the credentials have never been rotated, the above file may be empty. {{< /note >}}
 
@@ -75,9 +75,9 @@ curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -
 `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
 ```
 
--   Configure Automate to handle _External OpenSearch Backups_.
+- Configure Automate to handle _External OpenSearch Backups_.
 
--   Create an `automate.toml` file on the provisioning server using the following command:
+- Create an `automate.toml` file on the provisioning server using the following command:
 
 ```bash
 touch automate.toml
@@ -98,13 +98,13 @@ path = "/mnt/automate_backups/opensearch"
 path = "/mnt/automate_backups/backups"
 ```
 
--   Patch the `.config` to trigger the deployment.
+- Patch the `.config` to trigger the deployment.
 
 ```sh
 ./chef-automate config patch automate.toml
 ```
 
-## Backup and Restore
+## Backup and Restore commands
 
 ### Backup
 
@@ -114,23 +114,27 @@ Chef Automate let's you create a new backup. You can create it by running the ba
 chef-automate backup create
 ```
 
-#### Restoring the EFS Backed-up Data
+### Restoring the EFS Backed-up Data
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
--   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
--   Shutdown Chef Automate service on all front-end nodes
+- Shutdown Chef Automate service on all front-end nodes
 
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
 
--   Log in to the same instance of Chef Automate front-end node from which backup is taken.
+- Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
--   Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
+- Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
 
-{{< figure src="/images/automate/ha_restore.png" alt="Restore">}}
+{{< note >}}
 
--   Start all Chef Automate and Chef Infra Server front-end nodes by executing the `sudo systemctl start chef-automate` command.
+After restore command successfully executed, we need to start the service's on other frontend node. use the below command to start all the service's
+  
+  ```sh
+  sudo systemctl start chef-automate
+  ```
 
-{{< figure src="/images/automate/ha_restore_success.png" alt="Restore Success">}}
+{{< /note >}}
