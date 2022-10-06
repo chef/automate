@@ -73,7 +73,7 @@ source /hab/sup/default/SystemdEnvironmentFile.sh
 automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
 ```
 
-- Edit the created `es_config.toml` file and add the following settings at the end of the file. (_The file will be empty if the credentials have not been rotated_)
+- Edit the created `es_config.toml` file and add the following settings at the end of the file. (_The file will be empty if the certificates have not been rotated_)
 
 ```sh
 [s3]
@@ -121,14 +121,7 @@ Make sure all the frontend nodes and opensearch have access to the object storag
 
 Once done with the opensearch setup, add the following `automate.toml` file and patch the `config`. In the file, modify the values listed below:
 
-1. bucket name -
-
-    - `bucket = "bucket-name"`
-    - `name = "bucket-name"`
-
-2. `mkdir configs`
-
-3. `vi configs/automate.toml`
+1. `vi automate.toml`
 
 Refer to the content for the `automate.toml` file below:
 
