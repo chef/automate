@@ -1,5 +1,5 @@
 +++
-title = "Backup and Restore using Filesystem | On-Permise Deployment"
+title = "On-Permise Deployment using Filesystem"
 
 draft = false
 
