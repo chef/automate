@@ -224,7 +224,6 @@ For example : Add new Automate node to the existing deployed cluster.
     chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
 
-- If you have done certification rotation, in that case you have to run the certificate rotation command again to rotate the certificate for the newly added node.
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
@@ -329,8 +328,6 @@ For example : Remove Automate node to the existing deployed cluster.
   ```sh
     chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
-
-- If you have done certification rotation, in that case you have to run the certificate rotation command again to rotate the certificate for the newly added node.
 
 ### Troubleshooting
 
