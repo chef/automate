@@ -36,8 +36,6 @@ Check if the IAM user has all the required permissions. The permission policies 
 
 1. AdministratorAccess
 
-1. APIGatewayAdministrator (For aws AmazonAPIGatewayAdministrator)
-
 1. S3FullAccess (for aws AmazonS3FullAccess)
 
 Create an IAM role to give access of **S3** to **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate S3.
@@ -115,8 +113,8 @@ Refer to the content for the `automate.toml` file below:
     base_path = "automate"
 
   [global.v1.backups.s3.credentials]
-    access_key = "AKIAO"
-    secret_key = "s3kQ"
+    access_key = "<Your Access Key>"
+    secret_key = "<Your Seecret Key>"
 ```
 
 Execute the command given below to trigger the deployment.
@@ -129,7 +127,7 @@ Take a [back-up](/automate/ha_restore/) of the configurations once the cluster h
 
 {{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 
-## Backup and Restore
+## Backup and Restore Commands
 
 ### Backup
 

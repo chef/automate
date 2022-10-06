@@ -26,9 +26,12 @@ weight = 230
 
 ## Overview
 
-A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
+A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the `path.repo` setting on all master and data nodes.
 
-Once the shared filesystem is mounted to `/mnt/automate_backups`, configure Automate to register the snapshot locations with OpenSearch.
+
+### Setting up backup configuration
+
+#### Configuration in Opensearch Node
 
 - Mount the shared file system on all OpenSearch servers:
 
@@ -54,7 +57,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 
 - Edit `es_config.toml` and add the following settings to the end of the file.
 
-{{< note >}} If the credentials have never been rotated, the above file may be empty. {{< /note >}}
+{{< note >}} If the certificates have never been rotated, the above file may be empty. {{< /note >}}
 
 ```sh
 [path]
@@ -75,7 +78,13 @@ curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -
 `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
 ```
 
-- Configure Automate to handle _External OpenSearch Backups_.
+#### Healthcheck commands
+
+```sh
+    hab svc status (check whether OpenSearch service is up or not)
+```
+
+#### Configuration in Provision host
 
 - Create an `automate.toml` file on the provisioning server using the following command:
 
@@ -98,7 +107,7 @@ path = "/mnt/automate_backups/opensearch"
 path = "/mnt/automate_backups/backups"
 ```
 
-- Patch the `.config` to apply the above config.
+- Patch the `config` using below command.
 
 ```sh
 ./chef-automate config patch automate.toml
