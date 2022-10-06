@@ -44,7 +44,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 {{< /note >}}
 
-Apply following steps on any **one of the OpenSearch server** node
+Apply following steps on **all of the OpenSearch server** node
 
 - Create an OpenSearch sub-directory and set permissions (only if the network mount is correctly mounted).
 
@@ -72,7 +72,8 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
       repo = "/mnt/automate_backups/opensearch"
     ```
 
-- The following command will apply the updated `es_config.toml` config to OpenSearch once and will trigger restart of opensearch in all nodes.
+- The following command will apply the updated `es_config.toml` config to all the OpenSearch nodes and will trigger restart of opensearch in all nodes.
+  Execution of the below command is any one of the opensearch node.
 
     ```sh
     hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
