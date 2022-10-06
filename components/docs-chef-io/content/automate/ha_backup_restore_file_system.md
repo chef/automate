@@ -1,5 +1,5 @@
 +++
-title = "Backup and restore using Filesystem | On-Permise Deployment"
+title = "Backup and Restore using Filesystem | On-Permise Deployment"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
 [menu.automate]
-title = "Prerequisites"
+title = "Backup and Restore using Filesystem | On-Permise Deployment"
 identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore File System - On-Premise"
 parent = "automate/deploy_high_availability/backup_and_restore"
 weight = 210
@@ -19,8 +19,8 @@ weight = 210
 
 {{< note >}}
 
--   This page explains the configuration for backup with file system and Restore with On-Premise deployment procedure.
--   If user choose `backup_config` as `file_system` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required and can be skipped**. i.e., **`backup_config = "file_system"`** . If `backup_config` left blank, then configuration needs to be done for backup and restore.
+- This page explains the configuration for backup and restore with file system for On-Premise deployment procedure.
+- If user choose `backup_config` as `file_system` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required **. i.e., **`backup_config = "file_system"`** . If `backup_config` left blank, then configuration needs to be configure for backup and restore.
 
 {{< /note >}}
 
@@ -32,7 +32,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 #### Configuration in Opensearch Node
 
--   Mount the shared file system on **all** OpenSearch servers:
+- Mount the shared file system on **all** OpenSearch servers:
 
     ```sh
     mount /mnt/automate_backups
@@ -40,13 +40,13 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 {{< note >}}
 
--   For the sake of this walk through let us assume `/mnt/automate_backups` as a backup path (which is also a default path for AWS deployment)
+- For the sake of this walk through let us assume `/mnt/automate_backups` as a backup path (which is also a default path for AWS deployment)
 
 {{< /note >}}
 
 Apply following steps on any **one of the OpenSearch server** node
 
--   Create an OpenSearch sub-directory and set permissions (only if the network mount is correctly mounted).
+- Create an OpenSearch sub-directory and set permissions (only if the network mount is correctly mounted).
 
     ```sh
     sudo mkdir /mnt/automate_backups/opensearch
@@ -55,14 +55,14 @@ Apply following steps on any **one of the OpenSearch server** node
 
 Configure the OpenSearch `path.repo` setting by following the steps given below:
 
--   Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
+- Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
 
     ```sh
     source /hab/sup/default/SystemdEnvironmentFile.sh
     automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
     ```
 
--   Edit `es_config.toml` and add the following settings to the end of the file.
+- Edit `es_config.toml` and add the following settings to the end of the file.
 
     {{< note >}} If the credentials have never been rotated, the above file may be empty. {{< /note >}}
 
@@ -72,7 +72,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
       repo = "/mnt/automate_backups/opensearch"
     ```
 
--   The following command will apply the updated `es_config.toml` config to OpenSearch once and will trigger restart of opensearch in all nodes.
+- The following command will apply the updated `es_config.toml` config to OpenSearch once and will trigger restart of opensearch in all nodes.
 
     ```sh
     hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
