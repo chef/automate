@@ -1,5 +1,5 @@
 +++
-title = "AWS Deployment using S3"
+title = "AWS Deployment using AWS S3"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
 [menu.automate]
-title = "AWS Deployment using S3"
-identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore AWS Deployment - S3"
+title = "AWS Deployment using AWS S3"
+identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Prerequisites"
 parent = "automate/deploy_high_availability/backup_and_restore"
-weight = 240
+weight = 210
 +++
 
 {{< warning >}}
@@ -26,9 +26,9 @@ weight = 240
 
 ### Overview
 
-### Pre Backup Configuration for S3 Backup
+To communicate with Amazon S3 we need a IAM Role is required with [poicy](/automate/backup/#aws-s3-permissions)
 
-To run the terraform scripts, the IAM users should have proper permissions. Going forward, we will also discuss the required permissions. You should have your `secret access key` and `key id`, or else you can regenerate a new access key.
+In case of if you are using the Managed Service the you need to create a [snapshot-role](/automate/managed_services/#opensearch-setup) for opensearch.
 
 **Permissions Required**
 
