@@ -156,4 +156,12 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
 
-- Start all Chef Automate and Chef Infra Server front-end nodes by executing the `sudo systemctl start chef-automate` command.
+{{< note >}}
+
+After restore command successfully executed, we need to start the service's on other frontend node. use the below command to start all the service's
+  
+  ```sh
+  sudo systemctl start chef-automate
+  ```
+
+{{< /note >}}
