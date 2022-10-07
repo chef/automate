@@ -112,6 +112,6 @@ do_test_upgrade() {
 
     # Make sure the release is correct
     chef-automate upgrade status --versions-file "$versionsFile"
-    chef-automate upgrade status --versions-file "$versionsFile" | grep "Chef Automate upgraded to version: ($release)"
+    chef-automate upgrade status --versions-file "$versionsFile" | grep "Chef Automate upgraded to version: $release"
     do_test_upgrade_default
 }
