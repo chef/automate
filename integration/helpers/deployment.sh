@@ -108,7 +108,7 @@ wait_for_upgrade() {
         local errcode
         errcode="0"
         #shellcheck disable=SC2154
-        upgrade_status_output="$(echo "y
+        upgrade_status_output="$(echo "n
 n" | chef-automate upgrade status --versions-file "$versionsFile" -d 2>&1)" || errcode="$?"
         echo "${upgrade_status_output}"
         echo "status exit code=$errcode"

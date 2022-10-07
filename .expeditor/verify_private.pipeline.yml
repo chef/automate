@@ -513,18 +513,18 @@ steps:
 #         linux:
 #           privileged: true
 
-#   - label: "v2 to v3 upgrade"
-#     command:
-#       - integration/run_test integration/tests/v2_to_v3_upgrade.sh
-#     timeout_in_minutes: 25
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "v2 to v3 upgrade"
+    command:
+      - integration/run_test integration/tests/v2_to_v3_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
   
   - label: "v3 to v4 upgrade"
     command:
@@ -539,70 +539,70 @@ steps:
         linux:
           privileged: true
 
-#   - label: "iam v1 to v2 force-upgrade"
-#     command:
-#       - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
-#     timeout_in_minutes: 25
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "iam v1 to v2 force-upgrade"
+    command:
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-#   - label: "iam v1 to v2 force-upgrade (diagnostics only)"
-#     command:
-#       - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
-#     timeout_in_minutes: 25
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "iam v1 to v2 force-upgrade (diagnostics only)"
+    command:
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-#   - label: "iam v2 with no legacy policies force-upgrade to v2"
-#     command:
-#       - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-#     timeout_in_minutes: 25
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "iam v2 with no legacy policies force-upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-#   - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
-#     command:
-#       - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
-#     timeout_in_minutes: 25
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-#   - label: "iam v2 with legacy policies force upgrade to v2"
-#     command:
-#       - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
-#     timeout_in_minutes: 25
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "iam v2 with legacy policies force upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
 # #  - label: "a1migration"
 # #    command:
