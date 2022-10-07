@@ -65,8 +65,8 @@ run_upgrade() {
 
             #shellcheck disable=SC2154
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
-            echo 'y
-n' | chef-automate upgrade status
+#             echo 'y
+# n' | chef-automate upgrade status
         else
             echo "regular normal upgrade"
             sleep 45
