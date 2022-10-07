@@ -84,16 +84,14 @@ do_upgrade() {
     echo "$ERROR"
     if echo "${ERROR}" | grep 'This is a Major upgrade'; then
         echo "major normal upgrade"
-        echo "y
-y
-y
-y
-y
-y" | chef-automate upgrade run --major  --version "$release"
+        echo "n
+n" | chef-automate upgrade run --major  --version "$release"
         sleep 45
         #shellcheck disable=SC2154
         wait_for_upgrade "false"
-        echo "y" | chef-automate post-major-upgrade migrate --data=ES
+        wait_for_healthy
+        echo 'y
+y' | chef-automate upgrade status --versions-file "$versionsFile"
     else
         echo "regular normal upgrade"
         sleep 45
@@ -114,6 +112,6 @@ do_test_upgrade() {
 
     # Make sure the release is correct
     chef-automate upgrade status --versions-file "$versionsFile"
-    chef-automate upgrade status --versions-file "$versionsFile" | grep "Automate is up-to-date ($release)"
+    chef-automate upgrade status --versions-file "$versionsFile" | grep "Chef Automate upgraded to version: ($release)"
     do_test_upgrade_default
 }
