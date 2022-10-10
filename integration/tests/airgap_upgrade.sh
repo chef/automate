@@ -18,14 +18,14 @@ do_build() {
 
     set_version_file
     #shellcheck disable=SC2154
-    newversion=$(jq -r -c ".build"  "$test_manifest_dir/dev.json")
+    newversion=$(jq -r -c ".build"  "$test_manifest_dir/3.0.49.json")
     #shellcheck disable=SC2154
     jq --arg val "$newversion" '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
 
     log_info "Creating initial airgap bundle"
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
-        --manifest "$test_manifest_dir/dev.json" \
+        --manifest "$test_manifest_dir/3.0.49.json" \
         --workspace workspace \
         --versions-file "$versionsFile" \
         bundle.aib
