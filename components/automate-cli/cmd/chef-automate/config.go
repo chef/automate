@@ -215,7 +215,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteType string) {
 
-	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	pemBytes, err := os.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
 	}
