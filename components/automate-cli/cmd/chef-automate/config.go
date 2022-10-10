@@ -197,13 +197,13 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 
 		if configCmdFlags.postgresql {
-			for i := 0; i < len(infra.Outputs.PostgresqlPrivateIps.Value); i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], "be")
+			for i := 0; i < 1; i++ {
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], "pg")
 			}
 		}
 
 		if configCmdFlags.opensearch {
-			for i := 0; i < len(infra.Outputs.OpensearchPrivateIps.Value); i++ {
+			for i := 0; i < 1; i++ {
 				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], "os")
 			}
 		}
@@ -215,6 +215,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteType string) {
 
+	writer.Bodyf(sshUser, sshPort, sshKeyFile, ip, path)
 	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
@@ -239,6 +240,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	}
 	var stdoutBuf bytes.Buffer
 	session.Stdout = &stdoutBuf
+	// err = session.Run("sudo rm -rf /tmp/" + path + "")
 	cmd := "scp"
 	exec_args := []string{"-i", sshKeyFile, "-r", path, sshUser + "@" + ip + ":/tmp/"}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
@@ -247,7 +249,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	}
 	writer.Printf("Executing patch command on IP: " + ip)
 	if remoteType == "fe" {
-		err = session.Run("sudo chef-automate config patch  /tmp/" + path + ";")
+		err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
 	} else if remoteType == "pg" {
 		// err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
 		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "")
