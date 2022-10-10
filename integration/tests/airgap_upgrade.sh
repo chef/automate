@@ -52,10 +52,7 @@ do_deploy() {
 }
 
 do_upgrade() {
-
-    log_info "Airgap upgrading..."
-
-    echo "y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
+    echo "y" | chef-automate upgrade run --major --airgap-bundle update.aib --versions-file "$versionsFile"
     # NOTE: This is a hack
     # The hack above was no longer good enough because we have a thing that needs
     # to be updated that isn't a service
