@@ -1,14 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -19,6 +23,12 @@ var configCmdFlags = struct {
 	overwriteFile bool
 	timeout       int64
 	acceptMLSA    bool
+
+	// automate    bool
+	// chef_server bool
+	frontend   bool
+	opensearch bool
+	postgresql bool
 }{}
 
 func init() {
@@ -27,6 +37,13 @@ func init() {
 	configCmd.AddCommand(setConfigCmd)
 
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "o", false, "Overwrite existing config.toml")
+
+	// patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Patch toml configuration to the automate node")
+	// patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Patch toml configuration to the chef_server node")
+	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "frontend", false, "Patch toml configuration to the chef_server node")
+	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the chef_server node")
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 
@@ -119,45 +136,132 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func runPatchCommand(cmd *cobra.Command, args []string) error {
-	cfg, err := dc.LoadUserOverrideConfigFile(args[0])
+
+	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
-		return status.Annotate(err, status.ConfigError)
+		return err
 	}
+
+	sshUser := infra.Outputs.SSHUser.Value
+	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshPort := infra.Outputs.SSHPort.Value
+
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
 		then automate cluster ctl deploy will patch the config to automate
 	*/
+	/*
+		// if isA2HARBFileExist() {
+		// 	if !configCmdFlags.acceptMLSA {
+		// 		response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it,
+		// 		this command will deploy that new airgap bundle with patching of configuration.
+		// 		Press y to agree, n to to disagree? [y/n]`)
+		// 		if err != nil {
+		// 			return err
+		// 		}
+
+		// 		if !strings.Contains(response, "y") {
+		// 			return errors.New("canceled Patching")
+		// 		}
+		// 	}
+		// 	input, err := ioutil.ReadFile(args[0])
+		// 	if err != nil {
+		// 		return nil
+		// 	}
+		// 	err = ioutil.WriteFile(AUTOMATE_HA_AUTOMATE_CONFIG_FILE, input, 0644)
+		// 	if err != nil {
+		// 		writer.Printf("error in patching automate config to automate HA")
+		// 		return err
+		// 	}
+		// 	return executeDeployment(args)
+		// }
+	*/
+
 	if isA2HARBFileExist() {
-		if !configCmdFlags.acceptMLSA {
-			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
-			this command will deploy that new airgap bundle with patching of configuration. 
-			Press y to agree, n to to disagree? [y/n]`)
+		if configCmdFlags.frontend {
+			cfg, err := dc.LoadUserOverrideConfigFile(args[0])
 			if err != nil {
+				return status.Annotate(err, status.ConfigError)
+			}
+			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
+			// writer.Bodyf(strings.Join(frontendIps, ""))
+			// writer.Bodyf(strconv.Itoa(len(frontendIps)))
+			// writer.Bodyf(infra.Outputs.SSHUser.Value)
+			writer.Bodyf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
+			for i := 0; i < len(frontendIps); i++ {
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], "fe")
+			}
+			if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
 				return err
 			}
+		}
 
-			if !strings.Contains(response, "y") {
-				return errors.New("canceled Patching")
+		if configCmdFlags.postgresql {
+			for i := 0; i < len(infra.Outputs.PostgresqlPrivateIps.Value); i++ {
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], "be")
 			}
 		}
-		input, err := ioutil.ReadFile(args[0])
-		if err != nil {
-			return nil
-		}
-		err = ioutil.WriteFile(AUTOMATE_HA_AUTOMATE_CONFIG_FILE, input, 0644)
-		if err != nil {
-			writer.Printf("error in patching automate config to automate HA")
-			return err
-		}
-		return executeDeployment(args)
-	}
 
-	if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
-		return err
+		if configCmdFlags.opensearch {
+			for i := 0; i < len(infra.Outputs.OpensearchPrivateIps.Value); i++ {
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], "os")
+			}
+		}
 	}
 
 	writer.Success("Configuration patched")
 	return nil
+}
+
+func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteType string) {
+
+	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	if err != nil {
+		writer.Errorf("Unable to read private key: %v", err)
+	}
+	signer, err := ssh.ParsePrivateKey(pemBytes)
+	if err != nil {
+		writer.Errorf("Parsing key failed: %v", err)
+	}
+	config := &ssh.ClientConfig{
+		User:            sshUser,
+		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+	conn, err := ssh.Dial("tcp", net.JoinHostPort(ip, sshPort), config)
+	if err != nil {
+		writer.Errorf("dial failed:%v", err)
+	}
+	defer conn.Close()
+	session, err := conn.NewSession()
+	if err != nil {
+		writer.Errorf("session failed:%v", err)
+	}
+	var stdoutBuf bytes.Buffer
+	session.Stdout = &stdoutBuf
+	cmd := "scp"
+	exec_args := []string{"-i", sshKeyFile, "-r", path, sshUser + "@" + ip + ":/tmp/"}
+	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	writer.Printf("Executing patch command on IP: " + ip)
+	if remoteType == "fe" {
+		err = session.Run("sudo chef-automate config patch  /tmp/" + path + ";")
+	} else if remoteType == "pg" {
+		// err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
+		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "")
+		// writer.Bodyf("PG")
+	} else {
+		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "")
+	}
+	if err != nil {
+		writer.Errorf("Run failed:%v", err)
+	} else {
+		writer.Success("SCP successful...\n")
+	}
+	defer session.Close()
+	writer.Printf(">%s", stdoutBuf)
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) error {

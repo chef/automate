@@ -101,6 +101,14 @@ type AutomteHAInfraDetails struct {
 			Value string `json:"value"`
 			Type  string `json:"type"`
 		} `json:"ssh_key_file"`
+		SSHUser struct {
+			Value string `json:"value"`
+			Type  string `json:"type"`
+		} `json:"ssh_user"`
+		SSHPort struct {
+			Value string `json:"value"`
+			Type  string `json:"type"`
+		} `json:"ssh_port"`
 	} `json:"outputs"`
 	Resources []struct {
 		Module    string `json:"module,omitempty"`
@@ -172,9 +180,10 @@ type AutomteHAInfraDetails struct {
 }
 
 func init() {
-	sshCommand.PersistentFlags().StringVar(
+	sshCommand.PersistentFlags().StringVarP(
 		&sshFlags.hostname,
 		"hostname",
+		"H",
 		"",
 		"Automate ha server name to ssh")
 	RootCmd.AddCommand(sshCommand)
