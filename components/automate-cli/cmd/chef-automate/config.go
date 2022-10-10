@@ -246,9 +246,11 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	writer.Printf("Executing patch command on IP: " + ip)
+	// writer.Printf("Executing patch command on IP: " + ip)
+	writer.StartSpinner()
 	if remoteType == "fe" {
-		err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
+		err = session.Run("sudo chef-automate config patch  /tmp/" + path +
+			"; timestamp=$(date +\"%Y%m%d%H%M%S\"); export timestamp; [ -e \"/etc/chef-automate/config.toml\" ] && mv -f /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$timestamp;  chef-automate config show >  /etc/chef-automate/config.toml")
 	} else if remoteType == "pg" {
 		// err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
 		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "")
@@ -256,6 +258,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	} else {
 		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "")
 	}
+	writer.StopSpinner()
 	if err != nil {
 		writer.Errorf("Run failed:%v", err)
 	} else {
