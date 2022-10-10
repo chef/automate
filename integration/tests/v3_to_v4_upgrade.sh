@@ -57,12 +57,7 @@ run_upgrade() {
         echo "$ERROR"
         if echo "${ERROR}" | grep 'This is a Major upgrade'; then
             echo "major normal upgrade"
-            echo "y
-y
-y
-y
-y
-y" | chef-automate upgrade run --major --versions-file "$versionsFile"
+            echo "y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             # NOTE: This is a hack
             # The hack above was no longer good enough because we have a thing that needs
             # to be updated that isn't a service
@@ -70,7 +65,9 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
 
             #shellcheck disable=SC2154
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
-            echo 'y' | chef-automate post-major-upgrade migrate --data=es 
+            wait_for_healthy
+            echo 'y
+y' | chef-automate upgrade status --versions-file "$versionsFile"
         else
             echo "regular normal upgrade"
             sleep 45
