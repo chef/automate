@@ -14,6 +14,38 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/sso/authenticate": {
+      "post": {
+        "operationId": "SsoConfigService_Authenticate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.sso.AuthenticateTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "SsoConfigService"
+        ]
+      }
+    },
     "/api/v0/sso/config": {
       "get": {
         "operationId": "SsoConfigService_GetSsoConfig",
@@ -38,6 +70,14 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.sso.AuthenticateTokenResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.sso.GetSsoConfigResponse": {
       "type": "object",
       "properties": {

@@ -9,4 +9,7 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.sso.SsoConfigService/GetSsoConfig", "sso:config", "sso:config:get", "GET", "/api/v0/sso/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.sso.SsoConfigService/Authenticate", "sso:config", "sso:config:post", "POST", "/api/v0/sso/authenticate", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
