@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/4x-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 ## What are Certificates?

@@ -13,7 +13,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/4x-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) functionality and the steps to resolve them.

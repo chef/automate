@@ -13,7 +13,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/4x-warn %}}s
+{{% automate/ha-warn %}}s
 {{< /warning >}}
 
 This page includes commands that can be executed for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. It is highly recommended to run these commands on a test cluster before using them in a production environment.

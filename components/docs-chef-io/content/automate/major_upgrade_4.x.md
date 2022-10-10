@@ -12,10 +12,6 @@ gh_repo = "automate"
     weight = 30
 +++
 
-{{< warning >}}
-{{% automate/4x-warn %}}
-{{< /warning >}}
-
 {{< warning >}} *Elasticsearch support has been removed from this version (4.0.27) of Chef Automate.* {{< /warning >}}
 
 Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate *4.x*.

@@ -10,11 +10,6 @@ draft = false
     parent = "automate/configuring_automate/elasticsearch"
 +++
 
-{{< warning >}}
-{{% automate/4x-warn %}}
-{{< /warning >}}
-
-
 This guide covers upgrading services used by Chef Automate.
 
 ## Upgrade Elasticsearch to OpenSearch

@@ -12,10 +12,6 @@ gh_repo = "automate"
     weight = 80
 +++
 
-{{< warning >}}
-{{% automate/4x-warn %}}
-{{< /warning >}}
-
 ## Prerequisites
 
 ### PostgreSQL Setup

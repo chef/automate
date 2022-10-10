@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/4x-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.

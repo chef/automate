@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/4x-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 This guide details how to set up the load balancer configuration for Chef Automate and Chef Infra Server.

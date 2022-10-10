@@ -13,10 +13,6 @@ gh_repo = "automate"
     weight = 10
 +++
 
-{{< warning >}}
-{{% automate/4x-warn %}}
-{{< /warning >}}
-
 The _Reports_ page provides a comprehensive insight into all scanned infrastructure compliance status. Scan results for audit cookbook configurations also appear in this view.
 
 {{< note >}} If the size of a report goes over 4MB, enable the **Large Compliance Report** feature to make the **Reports Page** and **Download Report** work as expected. {{< /note >}}

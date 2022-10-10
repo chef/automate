@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/4x-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 This page explains the Amazon VPC and CIDR notations concepts. You need to provide these values in `config.toml` values to deploy Chef Automate High Availability (HA) using AWS.

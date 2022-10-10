@@ -1,0 +1,1 @@
+We are currently working on making the setup and upgrade process to Automate HA a seamless experience. If you are already using Chef Automate HA, or are planning to use it, please contact your customer success manager or account manager for more information.
