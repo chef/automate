@@ -131,7 +131,7 @@ y" | chef-automate upgrade status --versions-file "$versionsFile" -d 2>&1)" || e
                 fi
         esac
 
-        if echo "${upgrade_status_output}" | grep 'Chef Automate upgraded to version'; then
+        if echo "${upgrade_status_output}" | grep 'Chef Automate upgraded to'; then
             upgrade_complete="true"
             break
         else
