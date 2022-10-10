@@ -29,7 +29,7 @@ Chef lets you choose your **upgrade journey** based on your current version of C
 | 20220329091442| 3.0.x|
 | 3.0.49| 4.x|
 
-Click [here](https://docs.chef.io/automate/major_upgrade_4.x/) to know more.
+See the [Chef Automate 4.x upgrade documentation](https://docs.chef.io/automate/major_upgrade_4.x/) for more information. 
 
 ## New Features
 -
