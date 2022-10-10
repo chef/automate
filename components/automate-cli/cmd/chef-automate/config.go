@@ -207,7 +207,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			const remoteService string = "postgresql"
 			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService)
 			if err != nil {
-				return err
+				return status.Annotate(err, status.ConfigError)
 			}
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 			writer.Body(scriptCommands)
