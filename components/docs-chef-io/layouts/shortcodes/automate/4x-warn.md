@@ -1,1 +1,1 @@
-Chef Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Chef Automate 3.0.49. Please get in touch with support for more information.
+We are currently working on making the setup and upgrade process to Automate HA a seamless experience. If you are already using Automate HA or planning to use it, please get in touch with Customer Success or your Account Manager for more information

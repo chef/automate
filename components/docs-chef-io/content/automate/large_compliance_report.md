@@ -12,10 +12,6 @@ gh_repo = "automate"
     weight = 70
 +++
 
-{{< warning >}}
-{{% automate/4x-warn %}}
-{{< /warning >}}
-
 {{< note >}} 
 
 - The Large Compliance Report is supported from Chef Automate Version **4.2.x** and above.
