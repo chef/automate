@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/HA-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 {{< note >}}

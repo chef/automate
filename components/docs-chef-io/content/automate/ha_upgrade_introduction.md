@@ -13,7 +13,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/HA-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 Steps to upgrade the Chef Automate HA are as shown below:

@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/HA-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 In this section, we'll discuss the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:

@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/HA-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate for your domain.

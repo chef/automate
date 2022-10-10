@@ -13,7 +13,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{% automate/HA-warn %}}
+{{% automate/ha-warn %}}
 {{< /warning >}}
 
 ## Setup Disaster Recovery Cluster For OnPrem Deployment
