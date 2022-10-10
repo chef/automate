@@ -51,7 +51,7 @@ do_deploy() {
         --accept-terms-and-mlsa
 }
 
-do_upgrade() {
+run_upgrade() {
 
     echo "y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
     # NOTE: This is a hack
