@@ -52,5 +52,16 @@ do_deploy() {
 }
 
 do_upgrade() {
-    run_upgrade update.aib
+
+    echo "y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
+    # NOTE: This is a hack
+    # The hack above was no longer good enough because we have a thing that needs
+    # to be updated that isn't a service
+    sleep 45
+
+    #shellcheck disable=SC2154
+    wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+    wait_for_healthy
+    echo 'y
+y' | chef-automate upgrade status --versions-file "$versionsFile"
 }
