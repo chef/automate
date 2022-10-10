@@ -54,7 +54,8 @@ export class TopNavLandingComponent {
         ['/apis/iam/v2/tokens', 'get'],
         ['/apis/iam/v2/policies', 'get'],
         ['/apis/iam/v2/roles', 'get'],
-        ['/apis/iam/v2/projects', 'get']
+        ['/apis/iam/v2/projects', 'get'],
+        ['/api/v0/sso/config' , 'get']
       ], route: '/settings'
     }
   ];

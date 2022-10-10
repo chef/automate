@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
 
@@ -13,7 +14,8 @@ export class SidebarComponent {
   menuGroups$: Observable<MenuItemGroup[]>;
 
   constructor(
-    @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService
+    @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.menuGroups$ = layoutFacade.sidebar$;
     this.updateMenuGroupVisibility();
@@ -21,7 +23,16 @@ export class SidebarComponent {
 
   public isAuthorized($event, menuItem, menuGroup) {
     menuItem.authorized.isAuthorized = $event;
+    this.checkDeploymentType(menuItem , menuGroup);
     this.setGroupVisibility(menuGroup);
+  }
+
+  public checkDeploymentType(menuItem: any , menuGroup: any) {
+    if (menuItem.route === '/settings/sso-config' &&
+    this.telemetryService.getDeploymenType() !== 'SAAS') {
+      menuGroup.visible$ = false;
+      menuItem.visible$ = false;
+    }
   }
 
   public hasMenuItemsNotRequiringAuthorization(menuItemGroup: any): boolean {
