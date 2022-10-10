@@ -220,6 +220,19 @@ export class LayoutSidebarService {
                 }
               }
             ]
+          },
+          {
+            name: 'Single Sign-On',
+            items: [
+              {
+                name: 'Configure',
+                icon: 'security',
+                route: '/settings/sso-config',
+                authorized: {
+                  allOf: ['/api/v0/sso/config', 'get']
+                }
+              }
+            ]
           }
         ],
         profile: [{

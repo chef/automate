@@ -53,6 +53,7 @@ import { RoleDetailsComponent } from './modules/roles/details/role-details.compo
 import { UIComponent } from 'app/ui.component';
 import { UserDetailsComponent } from './modules/user/user-details/user-details.component';
 import { UserDetailsNonAdminResolve } from './modules/user/user-details/user-details.resolver';
+import { SsoConfigComponent } from './modules/sso-config/sso-config.component';
 
 // Services
 import { ChefSessionService } from './services/chef-session/chef-session.service';
@@ -101,6 +102,10 @@ const routes: Routes = [
         {
           path: 'tokens/:id',
           component: ApiTokenDetailsComponent
+        },
+        {
+          path: 'sso-config',
+          component: SsoConfigComponent
         },
         {
           path: 'users',
