@@ -2,14 +2,13 @@ package handler
 
 import (
 	"context"
-
+	"github.com/chef/automate/api/external/sso"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	license_control "github.com/chef/automate/api/interservice/license_control"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc/status"
-
-	"github.com/chef/automate/api/external/sso"
 	"github.com/golang/protobuf/ptypes/empty"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // SsoConfig - the ssoconfig service data structure
@@ -27,21 +26,13 @@ func NewSsoConfigHandler(license_client license_control.LicenseControlServiceCli
 }
 
 func (a *SsoConfig) GetSsoConfig(ctx context.Context, in *empty.Empty) (*sso.GetSsoConfigResponse, error) {
-
-	deploymentType, err := a.getDeploymentDetails(ctx)
+	err := a.validateDeploymentType(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if deploymentType != "SAAS" {
-		msg := "Unauthorized: Deployment type is not SAAS"
-		return nil, status.Error(7, msg)
-	}
-
-	req := &deployment.GetAutomateConfigRequest{}
-
-	res, err := a.client.GetAutomateConfig(ctx, req)
-	if err != nil {
+	res, err := a.getConfigData(ctx)
+	if err !=nil {
 		return nil, err
 	}
 
@@ -72,6 +63,43 @@ func (a *SsoConfig) GetSsoConfig(ctx context.Context, in *empty.Empty) (*sso.Get
 	}, nil
 }
 
+func (a *SsoConfig) DeleteSsoConfig(ctx context.Context, in *empty.Empty) (*sso.DeleteSsoConfigResponse, error) {
+	err := a.validateDeploymentType(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("Received request to delete sso config")
+	res, err := a.getConfigData(ctx)
+
+	if err !=nil {
+		return nil, err
+	}
+	
+	if res.Config.Dex != nil {
+		return &sso.DeleteSsoConfigResponse{
+			Message: "SSO Configuration disabled successfully",
+		}, nil
+	}
+
+	return &sso.DeleteSsoConfigResponse{
+		Message: "SSO Configuration not disabled successfully",
+	}, nil
+}
+
+func(a *SsoConfig) validateDeploymentType(ctx context.Context) error {
+	deploymentType, err := a.getDeploymentDetails(ctx)
+	if err != nil {
+		return err
+	}
+
+	if deploymentType != "SAAS" {
+		msg := "Unauthorized: Deployment type is not SAAS"
+		return status.Error(codes.PermissionDenied, msg)
+	}
+	return nil
+}
+
 func (a *SsoConfig) getDeploymentDetails(ctx context.Context) (string, error) {
 	deployIDResponse, err := a.license_client.GetDeploymentID(ctx, &license_control.GetDeploymentIDRequest{})
 	if err != nil {
@@ -88,4 +116,11 @@ func (a *SsoConfig) getDeploymentDetails(ctx context.Context) (string, error) {
 	log.Debugf("deployIDResponse.DeploymentType: %s ", deployIDResponse.DeploymentType)
 
 	return deployIDResponse.DeploymentType, nil
+}
+
+
+func (a *SsoConfig) getConfigData(ctx context.Context) (*deployment.GetAutomateConfigResponse, error) {
+	req := &deployment.GetAutomateConfigRequest{}
+
+	return a.client.GetAutomateConfig(ctx, req)
 }
