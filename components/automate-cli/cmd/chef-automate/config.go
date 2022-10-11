@@ -136,7 +136,6 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func runPatchCommand(cmd *cobra.Command, args []string) error {
-
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return err
@@ -179,10 +178,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 	if isA2HARBFileExist() {
 		if configCmdFlags.frontend {
-			cfg, err := dc.LoadUserOverrideConfigFile(args[0])
-			if err != nil {
-				return status.Annotate(err, status.ConfigError)
-			}
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
 			// writer.Bodyf(strings.Join(frontendIps, ""))
 			// writer.Bodyf(strconv.Itoa(len(frontendIps)))
@@ -190,9 +185,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			writer.Bodyf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
 			for i := 0; i < len(frontendIps); i++ {
 				executePatchOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], "fe")
-			}
-			if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
-				return err
 			}
 		}
 
@@ -207,6 +199,15 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], "os")
 			}
 		}
+	} else {
+		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+
+		if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
+			return err
+		}
 	}
 
 	writer.Success("Configuration patched")
@@ -215,7 +216,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteType string) {
 
-	pemBytes, err := os.ReadFile(sshKeyFile)
+	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
 	}
@@ -249,8 +250,8 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	// writer.Printf("Executing patch command on IP: " + ip)
 	writer.StartSpinner()
 	if remoteType == "fe" {
-		err = session.Run("sudo chef-automate config patch  /tmp/" + path +
-			"; timestamp=$(date +\"%Y%m%d%H%M%S\"); export timestamp; [ -e \"/etc/chef-automate/config.toml\" ] && mv -f /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$timestamp;  chef-automate config show >  /etc/chef-automate/config.toml")
+		err = session.Run("sudo chef-automate config patch /tmp/" + path +
+			"")
 	} else if remoteType == "pg" {
 		// err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
 		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "")
@@ -262,7 +263,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	if err != nil {
 		writer.Errorf("Run failed:%v", err)
 	} else {
-		writer.Success("SCP successful...\n")
+		writer.Success("\nSCP successful...\n")
 	}
 	defer session.Close()
 	writer.Printf(">%s", stdoutBuf)
