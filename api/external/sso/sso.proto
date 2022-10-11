@@ -31,8 +31,19 @@ service SsoConfigService {
 		};
 	};
 
+	rpc SetSsoConfig (SetSsoConfigRequest) returns (SetSsoConfigResponse) {
+		option (google.api.http) = {
+			post: "/api/v0/sso/config"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "sso:config"
+			action: "sso:config:post"
+		};
+	};
+
 	/*
-	Delete Sso Config 
+	Delete Sso Config
 
 	Delete the sso config if present
 
@@ -53,7 +64,6 @@ service SsoConfigService {
 	};
 }
 
-
 message GetSsoConfigResponse {
     string ca_contents = 1;
     string sso_url = 2;
@@ -68,4 +78,18 @@ message GetSsoConfigResponse {
 message DeleteSsoConfigResponse {
     string message = 1;
 }
-  
+
+message SetSsoConfigRequest {
+	string ca_contents = 1;
+    string sso_url = 2;
+    string email_attr = 3;
+    string username_attr = 4;
+    string groups_attr = 5;
+    repeated string allowed_groups = 6;
+    string entity_issuer = 7;
+    string name_id_policy_format = 8;
+}
+
+message SetSsoConfigResponse {
+	string response = 1;
+}

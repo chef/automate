@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -22,6 +23,16 @@ type SsoConfig struct {
 	client         deployment.DeploymentClient
 }
 
+type PostConfig struct {
+    CaContents         string  	`json:"CaContents"`
+	SsoUrl             string	`json:"SsoUrl"`
+	EmailAttr          string	`json:"EmailAttr"`
+	UsernameAttr       string	`json:"UsernameAttr"`
+	GroupsAttr         string	`json:"GroupAttr"`
+	AllowedGroups      []string	`json:"AllowedGroup"`
+	EntityIssuer       string	`json:"EntityIssuer"`
+	NameIdPolicyFormat string	`json:"NameIdPolicyFormat"`
+}
 // NewSsoConfigHandler - create a new ssoconfig service handler
 func NewSsoConfigHandler(license_client license_control.LicenseControlServiceClient, client deployment.DeploymentClient) *SsoConfig {
 	return &SsoConfig{
@@ -80,7 +91,7 @@ func (a *SsoConfig) DeleteSsoConfig(ctx context.Context, in *empty.Empty) (*sso.
 	if err !=nil {
 		return nil, err
 	}
-	
+
 	if res.Config.Dex != nil {
 		url, err := getBastionUrl()
 		if err != nil {
@@ -145,7 +156,7 @@ func makeRequest(requestType string, url string, jsonData []byte, fileName strin
 	if err != nil {
         log.Fatal("Error occurred", err)
     }
-	
+
     req.Header.Set("Content-Type", "application/json")
     client := &http.Client{}
     resp, err := client.Do(req)
@@ -159,6 +170,57 @@ func makeRequest(requestType string, url string, jsonData []byte, fileName strin
 		return
 	}
 	ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Failure"), 0777)
+}
+
+func(a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigRequest) (*sso.SetSsoConfigResponse , error) {
+	err := a.validateDeploymentType(ctx)
+	if err != nil {
+		return nil , err
+	}
+
+	req := &sso.SetSsoConfigRequest{
+		CaContents: in.CaContents,
+		SsoUrl: in.SsoUrl,
+		EmailAttr: in.EmailAttr,
+		UsernameAttr: in.UsernameAttr,
+		GroupsAttr: in.GroupsAttr,
+		AllowedGroups: in.AllowedGroups,
+		EntityIssuer: in.EntityIssuer,
+		NameIdPolicyFormat: in.NameIdPolicyFormat,
+	}
+	body_params:= &PostConfig{
+		CaContents:         req.CaContents,
+		SsoUrl:             req.SsoUrl,
+		EmailAttr:          req.EmailAttr,
+		UsernameAttr:       req.UsernameAttr,
+		GroupsAttr:         req.GroupsAttr,
+		AllowedGroups:      req.AllowedGroups,
+		EntityIssuer:       req.EntityIssuer,
+		NameIdPolicyFormat: req.NameIdPolicyFormat,
+	}
+	// jsonValue, _ :=  json.Marshal(body_params)
+	buf := new(bytes.Buffer)
+	ip := getBastionIp()
+	url := "http://" + string(ip)
+	json.NewEncoder(buf).Encode(body_params)
+
+	request, _ := http.NewRequest("POST",url,buf)
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+	fmt.Println("response Body:", string(body))
+	return &sso.SetSsoConfigResponse{
+		Response: "Config patch was successfull",
+	}, nil
 }
 
 func getBastionUrl() (*string, error) {
