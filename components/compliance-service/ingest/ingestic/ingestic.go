@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -20,10 +21,12 @@ import (
 type ESClient struct {
 	client      *elastic.Client
 	initialized bool
+	Conf        config.Compliance
 }
 
-func NewESClient(client *elastic.Client) *ESClient {
-	return &ESClient{client: client, initialized: false}
+// NewESClient returns new search client.
+func NewESClient(client *elastic.Client, conf config.Compliance) *ESClient {
+	return &ESClient{client: client, initialized: false, Conf: conf}
 }
 
 // This method will support adding a document with a specified ID
@@ -65,6 +68,9 @@ func (backend *ESClient) InitializeStore(ctx context.Context) {
 	logrus.Info("Initialize elastic with mappings")
 	if !backend.initialized {
 		for _, esMap := range mappings.AllMappings {
+			if esMap == mappings.ComplianceControlRepData && !backend.Conf.Service.EnableEnhancedReporting {
+				continue
+			}
 			backend.CreateTemplate(ctx, esMap.Index, esMap.Mapping)
 			if !esMap.Timeseries {
 				backend.createStoreIfNotExists(ctx, esMap.Index, esMap.Mapping)

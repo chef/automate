@@ -109,6 +109,7 @@ func init() {
 	runCmd.Flags().IntVar(&conf.Service.MessageBufferSize, "message-buffer-size", 100, "Number of ingest messages allowed to buffer")
 	runCmd.Flags().BoolVar(&conf.Service.EnableLargeReporting, "enable-large-reporting", false, "upgrade to support large reporting")
 	runCmd.Flags().IntVar(&conf.Service.LcrOpenSearchRequests, "lcr-open-search-requests", conf.Service.LcrOpenSearchRequests, "number of concurrent requests to communicate with open search for large compliance reporting")
+	runCmd.Flags().BoolVar(&conf.Service.EnableEnhancedReporting, "enable-enhanced-reporting", false, "upgrade to support enhanced compliance reporting")
 
 	// Postgres Config Flags
 	runCmd.Flags().StringVar(&conf.Postgres.ConnectionString, "postgres-uri", conf.Postgres.ConnectionString, "PostgreSQL connection string to use")

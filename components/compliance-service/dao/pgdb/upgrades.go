@@ -2,9 +2,11 @@ package pgdb
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"strings"
 )
 
 type UpgradesDB struct {
@@ -25,8 +27,8 @@ func (u *UpgradesDB) UpdateControlFlagToFalse() error {
 }
 
 //GetUpgradeFlags Gets the all the upgrade flags and status from the pg database
-func (u *UpgradesDB) GetUpgradeFlags() (map[string]bool, error) {
-	flagMap := make(map[string]bool)
+func (u *UpgradesDB) GetUpgradeFlags() (map[string]Flag, error) {
+	flagMap := make(map[string]Flag)
 
 	logrus.Info("Inside the comp run info flag")
 	flags := []string{ControlIndexFlag}
@@ -42,11 +44,11 @@ func (u *UpgradesDB) GetUpgradeFlags() (map[string]bool, error) {
 
 	for rows.Next() {
 		flag := Flag{}
-		if err := rows.Scan(&flag.flag, &flag.status); err != nil {
+		if err := rows.Scan(&flag.FlagName, &flag.Status, &flag.UpgradedTime); err != nil {
 			logrus.Errorf("Unable to get the flags with error %v", err)
 			return nil, err
 		}
-		flagMap[flag.flag] = flag.status
+		flagMap[flag.FlagName] = flag
 	}
 	if err := rows.Err(); err != nil {
 		return nil, errors.Wrap(err, "error retrieving result rows")
@@ -54,13 +56,26 @@ func (u *UpgradesDB) GetUpgradeFlags() (map[string]bool, error) {
 	return flagMap, err
 }
 
+// UpdateControlFlagTimeStamp updates the upgrade_time for the control index flag
+func (u *UpgradesDB) UpdateControlFlagTimeStamp() error {
+	_, err := u.DB.Exec(getUpdateQueryForTime(ControlIndexFlag), time.Now(), ControlIndexFlag)
+	if err != nil {
+		err = errors.Wrapf(err, "Unable to update the upgrade_time of upgrade_flags for control_index flag")
+	}
+	return err
+}
+
 //getQueryForFlag gets the query for flag
 func getQueryForFlag(flag []string) string {
 	flags := `'` + strings.Join(flag, `','`) + `'`
-	return fmt.Sprintf("Select upgrade_flag,upgrade_value from upgrade_flags where upgrade_flag in (%s)", flags)
+	return fmt.Sprintf("Select upgrade_flag,upgrade_value, upgrade_time from upgrade_flags where upgrade_flag in (%s)", flags)
 }
 
 //getUpdateQuery gets the update query for flag
 func getUpdateQuery(flag string) string {
 	return fmt.Sprintf("Update upgrade_flags set upgrade_value=false where upgrade_flag='%s'", flag)
+}
+
+func getUpdateQueryForTime(flag string) string {
+	return fmt.Sprintf("Update upgrade_flags set upgrade_time= $1 where upgrade_flag= $2")
 }
