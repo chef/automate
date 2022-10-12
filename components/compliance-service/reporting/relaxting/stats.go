@@ -20,12 +20,11 @@ import (
 func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.ReportSummary, error) {
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
-
-	/*filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	//filters["start_time"] = []string{}
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
-	}*/
+	}
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
@@ -71,12 +70,10 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
-	// Only end_time matters for this call
-	filters["start_time"] = []string{}
-	/*filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
-	}*/
+	}
 	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -124,50 +121,7 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
-	// Only end_time matters for this call
-	filters["start_time"] = []string{}
-	latestOnly := FetchLatestDataOrNot(filters)
-
-	depth, err := backend.NewDepth(filters, latestOnly)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
-	}
-
-	queryInfo := depth.getQueryInfo()
-
-	searchSource := elastic.NewSearchSource().
-		Query(queryInfo.filtQuery).
-		Size(0)
-
-	for aggName, agg := range depth.getStatsSummaryControlsAggs() {
-		searchSource.Aggregation(aggName, agg)
-	}
-
-	source, err := searchSource.Source()
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get Source", myName))
-	}
-
-	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-	b, _ := json.Marshal(source)
-	logrus.Info(string(b))
-	searchResult, err := queryInfo.client.Search().
-		SearchSource(searchSource).
-		Index(queryInfo.esIndex).
-		Size(0).
-		Do(context.Background())
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	logrus.Info(searchResult)
-
-	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
-
-	return depth.getStatsSummaryControlsResult(searchResult), nil
-
-	//Getting data over the range
-	/*filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +165,7 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 
 	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
-	return backend.getStatsSummaryControlsResult(searchResult), nil*/
+	return backend.getStatsSummaryControlsResult(searchResult), nil
 }
 
 //GetStatsFailures - Gets top failures, aggregate data for the given set of filters
