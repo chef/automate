@@ -209,9 +209,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
-	upgradeDB := pgdb.NewDB(db)
-	upgradeService := migrations.NewService(upgradeDB, cerealManager)
+	var upgradeService *migrations.Upgrade
 	if conf.Service.EnableEnhancedReporting {
+		upgradeDB := pgdb.NewDB(db)
+		upgradeService = migrations.NewService(upgradeDB, cerealManager)
+
 		// Initiating cereal Manager for upgrade jobs
 		err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
 		if err != nil {
