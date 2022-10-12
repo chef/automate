@@ -113,6 +113,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, statusserver.MigrationFailedMsg)
 		return db, connFactory, esr, statusSrv, errors.Wrap(err, "createPGBackend failed")
 	}
+	statusSrv.SetPGBackend(db)
 	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, statusserver.MigrationCompletedMsg)
 
 	// create esconfig info backend

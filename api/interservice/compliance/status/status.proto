@@ -22,6 +22,15 @@ message MigrationStatus {
 	Status status = 4;
 }
 
+message ControlIndexMigrationStatus {
+	enum Status {
+		NOTSTARTED = 0;
+		INPROGRESS = 1;
+		COMPLETED = 2;
+	}
+
+	Status status = 1;
+}
 
 // label is used to differentiate between multiple migrations done by one service
 message LogEntry {
@@ -32,4 +41,5 @@ message LogEntry {
 
 service ComplianceStatusService {
 	rpc GetMigrationStatus (google.protobuf.Empty) returns (MigrationStatus) {};
+	rpc GetControlIndexMigrationStatus(google.protobuf.Empty) returns (ControlIndexMigrationStatus) {};
 }

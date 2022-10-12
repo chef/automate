@@ -2,6 +2,7 @@ package status
 
 import (
 	"context"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -37,6 +38,7 @@ const MigrationCompletedMsg = "COMPLETED"
 type Server struct {
 	MigrationStatus  *status.MigrationStatus
 	MigrationChannel chan status.LogEntry
+	DB               pgdb.Storage
 }
 
 // New creates a new instance of Server
@@ -53,6 +55,10 @@ func New() *Server {
 	}
 	go listenForMigrationUpdates(migrationChannel, thisServer)
 	return thisServer
+}
+
+func (srv *Server) SetPGBackend(db *pgdb.DB) {
+	srv.DB = &pgdb.UpgradesDB{DB: db}
 }
 
 // GetMigrationStatus returns the migration status of the service
@@ -130,5 +136,24 @@ func AddMigrationUpdate(migServer *Server, logLabel string, logText string) {
 		Label:     logLabel,
 		Text:      logText,
 		Timestamp: timeNow,
+	}
+}
+
+//GetEnhancedReportingMigrationStatus is the service endpoint to get the status of Control Index migration status
+func (srv *Server) GetControlIndexMigrationStatus(ctx context.Context, empty *pb.Empty) (*status.ControlIndexMigrationStatus, error) {
+	flagMap, err := srv.DB.GetUpgradeFlagsTimestamp()
+	if err != nil {
+		return nil, err
+	}
+
+	flg := flagMap[pgdb.ControlIndexFlag]
+	if flg.Status {
+		if flg.UpgradeTimestamp == nil {
+			return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTSTARTED}, nil
+		}
+	}
+
+	if !flg.Status {
+		return &status.ControlIndexMigrationStatus{IsCompleted: true}, nil
 	}
 }

@@ -39,7 +39,7 @@ SELECT
   j.id,
   j.name,
   j.type,
-  j.status,
+  j.Status,
   j.start_time,
   j.end_time,
   j.timeout,
@@ -87,7 +87,7 @@ FROM jobs j
                          FROM (SELECT
                                  r.node_id,
                                  r.report_id,
-                                 r.status,
+                                 r.Status,
                                  r.result,
                                  r.start_time,
                                  r.end_time) x)) AS results_agg,
@@ -103,7 +103,7 @@ SELECT
   j.id,
   j.name,
   j.type,
-  j.status,
+  j.Status,
   j.start_time,
 	j.end_time,
 	j.parent_id,
@@ -154,7 +154,7 @@ WHERE job_id = $1
 `
 
 const selectResultByJobAndNodeIds = `
-SELECT job_id, status, result, start_time, end_time, report_id
+SELECT job_id, Status, result, start_time, end_time, report_id
 FROM results
 WHERE job_id=$1 AND node_id=$2
 ORDER BY start_time DESC
@@ -166,7 +166,7 @@ LIMIT 1;
 const sqlGetOWCAScans = `
 SELECT j.id, j.end_time
 FROM jobs j
-WHERE recurrence = '' AND type = 'exec' AND (end_time >= $1 OR status = 'running');
+WHERE recurrence = '' AND type = 'exec' AND (end_time >= $1 OR Status = 'running');
 `
 
 const selectProfileIdsFromJobsProfilesByJobId = `
@@ -218,7 +218,7 @@ const postgresTimeFormat = "2006-01-02T15:04:05"
 var jobsSortFields = map[string]string{
 	"name":       "LOWER(j.name)",
 	"type":       "LOWER(j.type)",
-	"status":     "LOWER(j.status)",
+	"Status":     "LOWER(j.Status)",
 	"start_time": "j.start_time",
 	"end_time":   "j.end_time",
 }
@@ -229,7 +229,7 @@ var jobFilterField = map[string]string{
 	"name":       "name",
 	"parent_job": "parent_id",
 	"profile":    "profile",
-	"status":     "status",
+	"Status":     "Status",
 }
 
 // job used to insert to db
@@ -243,7 +243,7 @@ type job struct {
 	Timeout       int32           `db:"timeout"`
 	Retries       int32           `db:"retries"`
 	RetriesLeft   int32           `db:"retries_left"`
-	Status        string          `db:"status"`
+	Status        string          `db:"Status"`
 	Startime      time.Time       `db:"start_time"`
 	Endtime       time.Time       `db:"end_time"`
 	NodeSelectors json.RawMessage `db:"node_selectors"`
@@ -298,7 +298,7 @@ type ResultsRow struct {
 	JobID     string    `db:"job_id" json:"job_id,omitempty"`
 	NodeID    string    `db:"node_id" json:"node_id"`
 	ReportID  string    `db:"report_id" json:"report_id"`
-	Status    string    `db:"status" json:"status"`
+	Status    string    `db:"Status" json:"Status"`
 	Result    string    `db:"result" json:"result"`
 	StartTime time.Time `db:"start_time" json:"start_time"`
 	EndTime   time.Time `db:"end_time" json:"end_time"`
@@ -423,7 +423,7 @@ func fromDBSelectJob(inSelectJob *jobSelectDetail) (jobs.Job, error) {
 		resultsNew[i] = &jobs.ResultsRow{
 			NodeId:   item["node_id"],
 			ReportId: item["report_id"],
-			Status:   item["status"],
+			Status:   item["Status"],
 			Result:   item["result"],
 		}
 
@@ -648,11 +648,11 @@ func validateJobFilters(filters []*common.Filter) error {
 					}
 				}
 			}
-		case "status":
+		case "Status":
 			for _, item := range filter.Values {
 				if item != "" {
 					if !isValidJobStatus(item) {
-						return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid status filter: %s. status must be one of the following: 'completed', 'failed', 'new', 'running', 'scheduled'", item)}
+						return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid Status filter: %s. Status must be one of the following: 'completed', 'failed', 'new', 'running', 'scheduled'", item)}
 					}
 				}
 			}
