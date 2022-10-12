@@ -229,6 +229,10 @@ service ReportingService {
 	Supports pagination, filtering, and sorting.
 	Valid sort fields: name, title
 
+	The API supports date range filters when `end_time` is the current time
+	and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	date other than the current date, the API would return data only for the `end_time`.
+
 	Example:
 	```
 	{"filters":
@@ -308,7 +312,7 @@ service ReportingService {
 
 	List all nodes, with optional filtering, pagination, and sorting.
 	Max return payload size is 4MB, use pagination to fetch remaining data.
-  | Sort parameter | Sort value |
+	| Sort parameter | Sort value |
 	| --- | --- |
 	| environment | environment.lower |
 	| latest_report.controls.failed.critical | controls_sums.failed.critical |
@@ -318,6 +322,11 @@ service ReportingService {
 	| name | node_name.lower |
 	| platform | platform.full |
 	| status | status |
+
+	The API supports date range filters when `end_time` is the current time
+	and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	date other than the current date, the API would return data only for the `end_time`.
+
 	Example:
 	```
 	{
@@ -329,7 +338,7 @@ service ReportingService {
 		"page":1,"per_page":100,
 		"sort":"environment","order":"ASC"
 	}
-  ```
+	```
 
 	Authorization Action:
 	```
@@ -367,6 +376,143 @@ service ReportingService {
 		};
 		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			tags: "hidden";
+		};
+	};
+
+	/*
+	Assets Count
+
+	Count the compliance assets based on different filter options.
+	The API returns the response based on reported and unreported assets
+
+	Authorization Action:
+	```
+	compliance:reports:list
+	```
+	*/
+	rpc AssetCount(ListFilters) returns (AssetSummary) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/assets/count"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reports"
+			action: "compliance:reports:list"
+		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
+	}
+
+	/*
+	List Assets
+
+	Lists the compliance assets based on different filter options.
+	The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
+
+	Authorization Action:
+	```
+	compliance:reports:list
+	```
+	*/
+	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/assets/search"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reports"
+			action: "compliance:reports:list"
+		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
+	}
+
+	/*
+	Set Unreachable Assets Config
+
+	SetAssetConfig sets the compliance config with the parameters of no of days
+	And API returns the policy name and no of the days which will set in the compliance data base
+
+	Authorization Action:
+	```
+	compliance:reports:update
+	```
+	*/ 
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {
+ 		option (google.api.http) = {
+ 			put: "/api/v0/compliance/reporting/assets/config"
+ 			body: "*"
+ 		};
+ 		option (chef.automate.api.iam.policy) = {
+ 			resource: "compliance:reporting:config"
+ 			action: "compliance:reports:update"
+ 		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
+ 	}
+
+	/*
+	Get Assets Config
+
+	GetAssetConfig gets the config details from the compliance data base 
+	and API return the policy name and no of days
+	Authorization Action:
+	```
+	compliance:reports:get
+	```
+	*/ 
+ 	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {
+ 		option (google.api.http) = {
+ 			get: "/api/v0/compliance/reporting/assets/config/search"
+ 		};
+ 		option (chef.automate.api.iam.policy) = {
+ 			resource: "compliance:reporting:config"
+ 			action: "compliance:reports:get"
+ 		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
+ 	}
+
+	/*
+	List Controls Search
+
+	Lists controls from the last run, with optional filtering.
+	Supports filtering,pagination but not sorting.
+	Limited to 100 results by default.
+	Gets the summary of each control.
+
+  The API supports date range filters when `end_time` is the current time
+	and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	date other than the current date, the API would return data only for the `end_time`.
+
+	Example:
+	```
+	{"filters":
+		[
+			{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+			{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+		],
+		"page_number":1, "size": 3,
+	}
+	```
+
+	Authorization Action:
+	```
+	compliance:controlItems:list
+	```
+	*/
+	rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/controls/search"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:control"
+			action: "compliance:controlItems:list"
 		};
 	};
 

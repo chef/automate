@@ -246,7 +246,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	/*// Migrates A2 version 2 for comp-run-info indices to the current version
+	// Migrates A2 version 2 for comp-run-info indices to the current version
 	a2V2CompRunIndices := A2V2CompRunIndices{backend: &backend}
 	err = backend.migrate(a2V2CompRunIndices, statusSrv, statusserver.MigrationLabelCompRun)
 	if err != nil {
@@ -254,7 +254,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelCompRun, errMsg.Error())
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelCompRun, statusserver.MigrationFailedMsg)
 		return errMsg
-	}*/
+	}
 
 	return nil
 }
@@ -286,12 +286,12 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 	}
 
 	//migrating the comp run info index
-	/*	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the comp run info index...")
-		err = migratable.migrateCompRunInfo()
-		if err != nil {
-			logrus.Error(err)
-			return err
-		}*/
+	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the comp run info index...")
+	err = migratable.migrateCompRunInfo()
+	if err != nil {
+		logrus.Error(err)
+		return err
+	}
 
 	//migrate the compliance time-series indices
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Calculating TimeSeries migration range...")

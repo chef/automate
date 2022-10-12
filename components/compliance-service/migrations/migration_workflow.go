@@ -2,8 +2,6 @@ package migrations
 
 import (
 	"context"
-	"time"
-
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -11,6 +9,7 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 var (
@@ -179,7 +178,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 			if _, found := latestReportsMap[report]; found {
 
 				//Updating the comp run info Flag
-				err := esClient.InsertComplianceRunInfo(ctx, inspecReport.NodeID, inspecReport.EndTime)
+				err := esClient.InsertComplianceRunInfo(ctx, inspecReport, inspecReport.EndTime)
 				if err != nil {
 					logrus.Errorf("Unable to perform action compliance run info for node %s and report %s with error %v", inspecReport.NodeID, report, err)
 				}
