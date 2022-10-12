@@ -24,14 +24,14 @@ type SsoConfig struct {
 }
 
 type PostConfig struct {
-    CaContents         string  	`json:"CaContents"`
-	SsoUrl             string	`json:"SsoUrl"`
-	EmailAttr          string	`json:"EmailAttr"`
-	UsernameAttr       string	`json:"UsernameAttr"`
-	GroupsAttr         string	`json:"GroupAttr"`
-	AllowedGroups      []string	`json:"AllowedGroup"`
-	EntityIssuer       string	`json:"EntityIssuer"`
-	NameIdPolicyFormat string	`json:"NameIdPolicyFormat"`
+    Ca_contents           string  		`json:"ca_contents"`
+	Sso_url               string		`json:"sso_url"`
+	Email_attr            string		`json:"email_attr"`
+	Username_attr         string		`json:"username_attr"`
+	Groups_attr           string		`json:"groups_attr"`
+	Allowed_groups        []string	    `json:"allowed_groups"`
+	Entity_issuer         string		`json:"entity_issuer"`
+	Name_id_policy_format string	    `json:"name_id_policy_format"`
 }
 // NewSsoConfigHandler - create a new ssoconfig service handler
 func NewSsoConfigHandler(license_client license_control.LicenseControlServiceClient, client deployment.DeploymentClient) *SsoConfig {
@@ -189,29 +189,31 @@ func(a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigRequest
 		NameIdPolicyFormat: in.NameIdPolicyFormat,
 	}
 	body_params:= &PostConfig{
-		CaContents:         req.CaContents,
-		SsoUrl:             req.SsoUrl,
-		EmailAttr:          req.EmailAttr,
-		UsernameAttr:       req.UsernameAttr,
-		GroupsAttr:         req.GroupsAttr,
-		AllowedGroups:      req.AllowedGroups,
-		EntityIssuer:       req.EntityIssuer,
-		NameIdPolicyFormat: req.NameIdPolicyFormat,
+		Ca_contents:         req.CaContents,
+		Sso_url:             req.SsoUrl,
+		Email_attr:          req.EmailAttr,
+		Username_attr:       req.UsernameAttr,
+		Groups_attr:         req.GroupsAttr,
+		Allowed_groups:      req.AllowedGroups,
+		Entity_issuer:       req.EntityIssuer,
+		Name_id_policy_format: req.NameIdPolicyFormat,
 	}
-	// jsonValue, _ :=  json.Marshal(body_params)
-	buf := new(bytes.Buffer)
+	jsonValue, _ :=  json.Marshal(body_params)
 	ip := getBastionIp()
 	url := "http://" + string(ip)
-	json.NewEncoder(buf).Encode(body_params)
-
-	request, _ := http.NewRequest("POST",url,buf)
-	client := &http.Client{}
-	res, err := client.Do(request)
+	request, err := http.NewRequest("POST",url, bytes.NewBuffer(jsonValue))
 	if err != nil {
 		log.Fatalln(err)
 		return nil, err
 	}
-	defer res.Body.Close()
+    request.Header.Set("Content-Type", "application/json")
+    client := &http.Client{}
+    resp, err := client.Do(request)
+    if err != nil {
+		log.Fatalln(err)
+		return nil, err
+    }
+    defer resp.Body.Close()
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		log.Fatalln(err)
