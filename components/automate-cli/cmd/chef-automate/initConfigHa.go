@@ -49,21 +49,33 @@ type AwsConfigToml struct {
 			InstanceCount     string `toml:"instance_count"`
 			TeamsPort         string `toml:"teams_port"`
 			ConfigFile        string `toml:"config_file"`
+			RootCA            string `toml:"root_ca"`
+			PrivateKey        string `toml:"private_key"`
+			PublicKey         string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Opensearch struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"postgresql"`
 	Aws struct {
@@ -162,21 +174,33 @@ type ExistingInfraConfigToml struct {
 			InstanceCount string `toml:"instance_count"`
 			TeamsPort     string `toml:"teams_port"`
 			ConfigFile    string `toml:"config_file"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Opensearch struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			RootCA        string `toml:"root_ca"`
+			PrivateKey    string `toml:"private_key"`
+			PublicKey     string `toml:"public_key"`
 		} `toml:"config"`
 	} `toml:"postgresql"`
 	ExistingInfra struct {

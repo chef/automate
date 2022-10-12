@@ -163,6 +163,22 @@ automate_fqdn = "<%= config.automate.fqdn %>" # leave commented out for AWS, oth
 automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
 opensearch_instance_count = <%= config.opensearch.instance_count %>
+
+automate_root_ca = <%= config.automate.root_ca %>
+chef_server_root_ca = <%= config.chef_server.root_ca %>
+opensearch_root_ca = <%= config.opensearch.root_ca %>
+postgresql_root_ca = <%= config.postgresql.root_ca %>
+
+automate_private_key = <%= config.automate.private_key %>
+chef_server_private_key = <%= config.chef_server.private_key %>
+opensearch_private_key = <%= config.opensearch.private_key %>
+postgresql_private_key = <%= config.postgresql.private_key %>
+
+automate_public_key = <%= config.automate.public_key %>
+chef_server_public_key = <%= config.chef_server.public_key %>
+opensearch_public_key = <%= config.opensearch.public_key %>
+postgresql_public_key = <%= config.postgresql.public_key %>
+
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"

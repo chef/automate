@@ -39,6 +39,9 @@ locals {
     access_key                         = var.access_key
     secret_key                         = var.secret_key
     infra                              = var.infra
+    automate_root_ca                   = var.automate_root_ca
+    automate_private_key               = var.automate_private_key
+    automate_public_key                = var.automate_public_key
   })
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {
@@ -52,6 +55,9 @@ locals {
     ssh_port                        = var.ssh_port,
     tmp_path                        = var.tmp_path
     nfs_mount_path                  = var.nfs_mount_path
+    automate_root_ca                = var.automate_root_ca
+    automate_private_key            = var.automate_private_key
+    automate_public_key             = var.automate_public_key
   })
 }
 

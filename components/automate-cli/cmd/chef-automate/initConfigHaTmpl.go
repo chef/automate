@@ -59,6 +59,10 @@ instance_count = ""
 # teams_port = ""
 config_file = "configs/automate.toml"
 
+# Add Automate load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 
 
 [chef_server.config]
@@ -66,6 +70,11 @@ config_file = "configs/automate.toml"
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
+
+# Add Chef Server load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 
 ## === ===
 
@@ -76,6 +85,11 @@ instance_count = ""
 # No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
 
+# Add OpenSearch load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
+
 ## === ===
 
 [postgresql.config]
@@ -83,6 +97,11 @@ instance_count = ""
 
 # No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
+
+# Add Postgresql load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 
 ## === ===
 
@@ -332,11 +351,21 @@ instance_count = ""
 # teams_port = ""
 config_file = "configs/automate.toml"
 
+# Add Automate load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
+
 [chef_server.config]
 ## === INPUT NEEDED ===
 
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
+
+# Add Chef Server load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 
 ## === ===
 
@@ -346,6 +375,11 @@ instance_count = ""
 # No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
 
+# Add OpenSearch load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
+
 ## === ===
 
 [postgresql.config]
@@ -353,6 +387,11 @@ instance_count = ""
 
 # No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
+
+# Add postgresql load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 
 ## === ===
 

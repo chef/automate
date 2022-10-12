@@ -68,18 +68,31 @@ module AutomateCluster
       default :teams_port
 
       default(:config_file, 'configs/automate.toml').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
+
+      default :root_ca
+      default :public_key
+      default :private_key
     end
 
     config_context :chef_server do
       default :instance_count, 1
+      default :root_ca
+      default :public_key
+      default :private_key
     end
 
     config_context :opensearch do
       default :instance_count, 3
+      default :root_ca
+      default :public_key
+      default :private_key
     end
 
     config_context :postgresql do
       default :instance_count, 3
+      default :root_ca
+      default :public_key
+      default :private_key
     end
 
     # Only applies to existing node architecture
