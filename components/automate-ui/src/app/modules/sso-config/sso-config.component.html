@@ -1,10 +1,99 @@
 <div class="content-container">
   <div class="cantainer sso-container">
     <main>
+      <chef-loading-spinner *ngIf="loading" size='50' fixed></chef-loading-spinner>
       <chef-page-header>
-        <chef-heading>SSO Config</chef-heading>
-        <chef-subheading> Sign-On configuration from the chef SAAS users.</chef-subheading>
+        <chef-heading>SAML Setup</chef-heading>
+        <chef-subheading>The table below displays the user directories currently configured for Chef Automate.
+        </chef-subheading>
+        <div slot="header-buttons">
+          <chef-button primary caution class="remove-button" label="Remove SSO config" (click)="removeSsoConfig()">
+            Remove Configuration
+          </chef-button>
+        </div>
       </chef-page-header>
+      <section class="page-body">
+        <form [formGroup]="ssoConfigForm">
+          <chef-form-field>
+            <label>Service Providers <span aria-hidden="true">*</span></label>
+            <chef-radio ngDefaultControl formControlName="serviceProvider">
+              <chef-option value="azureAd">Azure AD</chef-option>
+              <chef-option value="office365">Office365</chef-option>
+              <chef-option value="okta">OKTA</chef-option>
+              <chef-option value="oneLogin">OneLogin</chef-option>
+              <chef-option value="ping">Ping</chef-option>
+              <chef-option value="tivoli">Tivoli Federated Identity Manager</chef-option>
+            </chef-radio>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="ssoUrl">SSO URL<span aria-hidden="true">*</span></label>
+            <input id="ssoUrl" chefInput formControlName="ssoUrl" type="text" />
+            <chef-error *ngIf="hasRequiredError('ssoUrl')">
+              SSO URL is required.
+            </chef-error>
+            <chef-error *ngIf="ssoConfigForm.get('ssoUrl').hasError('pattern') ">
+              SSO URL is invalid.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="emailAttribute">Email Attribute<span aria-hidden="true">*</span></label>
+            <input id="emailAttribute" chefInput formControlName="emailAttribute" type="text" />
+            <chef-error *ngIf="hasRequiredError('emailAttribute')">
+              Email Attribute is required.
+            </chef-error>
+            <chef-error
+              *ngIf="ssoConfigForm.get('emailAttribute').hasError('minlength') && hasAttemptedInput('emailAttribute')">
+              Email Attribute must be at least 5 characters.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="usernameAttribute">Username Attribute<span aria-hidden="true">*</span></label>
+            <input id="usernameAttribute" chefInput formControlName="usernameAttribute" type="text" />
+            <chef-error *ngIf="hasRequiredError('usernameAttribute')">
+              Username Attribute is required.
+            </chef-error>
+            <chef-error
+              *ngIf="ssoConfigForm.get('usernameAttribute').hasError('minlength') && hasAttemptedInput('usernameAttribute')">
+              Username Attribute must be at least 5 characters.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="groupAttribute">Group Attribute</label>
+            <input id="groupAttribute" chefInput formControlName="groupAttribute" type="text" />
+          </chef-form-field>
+          <chef-form-field>
+            <label for="allowedGroups">Allowed Groups</label>
+            <textarea id="allowedGroups" chefInput formControlName="allowedGroups"></textarea>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="entityIssuer">Entity Issuer<span aria-hidden="true">*</span></label>
+            <input id="entityIssuer" chefInput formControlName="entityIssuer" type="text" />
+            <chef-error *ngIf="hasRequiredError('entityIssuer')">
+              Entity Issuer is required.
+            </chef-error>
+            <chef-error *ngIf="ssoConfigForm.get('entityIssuer').hasError('pattern') ">
+              Entity Issuer is invalid.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="caInfo">CA information<span aria-hidden="true">*</span></label>
+            <textarea id="caInfo" chefInput name="caInfo" formControlName="caInfo"></textarea>
+            <chef-error *ngIf="hasRequiredError('caInfo')">
+              CA information is required.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="nameIdPolicyFormat">Name Id policy format</label>
+            <input id="nameIdPolicyFormat" chefInput formControlName="nameIdPolicyFormat" type="text" />
+          </chef-form-field>
+          <div id="button-bar">
+            <chef-button id="cancel" tertiary>Cancel</chef-button>
+            <chef-button primary data-cy="submit" id="submit" [disabled]="!ssoConfigForm.valid" (click)="saveSsoConfig()">
+              <span>Submit</span>
+            </chef-button>
+          </div>
+        </form>
+      </section>
     </main>
   </div>
 </div>
