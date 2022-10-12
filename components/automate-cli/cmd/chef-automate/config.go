@@ -259,11 +259,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
+
 		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
 		if err != nil {
 			return status.Annotate(err, status.ConfigError)
 		}
-
 		if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
 			return err
 		}
