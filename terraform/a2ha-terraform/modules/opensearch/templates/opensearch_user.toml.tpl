@@ -21,3 +21,7 @@ EOT
 EOT 
 : "" }
 
+[tls]
+  root_cert_contents = "${opensearch_root_ca}'
+  key_contents = "${opensearch_private_key}'
+  cert_contents = "${opensearch_public_key}'

@@ -7,6 +7,9 @@ locals {
     postgresql_wal_archive_enabled = var.postgresql_wal_archive_enabled ? "true" : "false",
     postgresql_wal_archive_fs_path = "${var.postgresql_archive_disk_fs_path}/archive",
     tmp_path                       = var.tmp_path
+    postgresql_root_ca             = var.postgresql_root_ca
+    postgresql_public_key          = var.postgresql_public_key
+    postgresql_private_key         = var.postgresql_private_key
   })
   pgleaderchk_user_toml = templatefile("${path.module}/templates/pgleaderchk_user.toml.tpl", {
     listen_port = var.pgleaderchk_listen_port,

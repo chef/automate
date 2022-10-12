@@ -7,3 +7,7 @@ enable = ${postgresql_pg_dump_enabled}
 path = "${postgresql_pg_dump_fs_path}"
 [ssl]
 enable = ${postgresql_ssl_enable}
+[tls]
+root_cert_contents = "${postgresql_root_ca}'
+key_contents = "${postgresql_private_key}'
+cert_contents = "${postgresql_public_key}'
