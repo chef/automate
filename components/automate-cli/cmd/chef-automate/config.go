@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/knownhosts"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -177,34 +178,30 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 
 	if isA2HARBFileExist() {
+
 		if configCmdFlags.frontend {
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
-			// writer.Bodyf(strings.Join(frontendIps, ""))
-			// writer.Bodyf(strconv.Itoa(len(frontendIps)))
-			// writer.Bodyf(infra.Outputs.SSHUser.Value)
-			writer.Bodyf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
+			writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
 			for i := 0; i < len(frontendIps); i++ {
 				executePatchOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], "fe")
 			}
 		}
-
 		if configCmdFlags.postgresql {
 			for i := 0; i < 1; i++ {
 				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], "pg")
 			}
 		}
-
 		if configCmdFlags.opensearch {
 			for i := 0; i < 1; i++ {
 				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], "os")
 			}
 		}
 	} else {
+
 		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
 		if err != nil {
 			return status.Annotate(err, status.ConfigError)
 		}
-
 		if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
 			return err
 		}
@@ -224,16 +221,47 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	if err != nil {
 		writer.Errorf("Parsing key failed: %v", err)
 	}
-	config := &ssh.ClientConfig{
-		User:            sshUser,
-		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
-	conn, err := ssh.Dial("tcp", net.JoinHostPort(ip, sshPort), config)
+	// _, err := kh.New("/root/.ssh/known_hosts")
 	if err != nil {
+		writer.Errorf("could not create hostkeycallback function: ", err)
+	}
+	var (
+		keyErr *knownhosts.KeyError
+	)
+
+	config := &ssh.ClientConfig{
+		User: sshUser,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+			kh := checkKnownHosts()
+			hErr := kh(host, remote, pubKey)
+			// Reference: https://blog.golang.org/go1.13-errors
+			// To understand what errors.As is.
+			if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
+				// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
+				// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
+				// and if host is known then there is key mismatch the connection is then rejected.
+				writer.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
+				return keyErr
+			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
+				// host key not found in known_hosts then give a warning and continue to connect.
+				writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.", host)
+				return addHostKey(host, remote, pubKey)
+			}
+			writer.Printf("Pub key exists for %s.", host)
+			return nil
+		}),
+	}
+
+	// Open connection
+	conn, err := ssh.Dial("tcp", ip+":"+sshPort, config)
+	if conn == nil || err != nil {
 		writer.Errorf("dial failed:%v", err)
+		return
 	}
 	defer conn.Close()
+
+	// Open session
 	session, err := conn.NewSession()
 	if err != nil {
 		writer.Errorf("session failed:%v", err)
@@ -251,22 +279,21 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	writer.StartSpinner()
 	if remoteType == "fe" {
 		err = session.Run("sudo chef-automate config patch /tmp/" + path +
-			"")
+			"\n")
 	} else if remoteType == "pg" {
 		// err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
-		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "")
-		// writer.Bodyf("PG")
+		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "\n")
 	} else {
-		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "")
+		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "\n")
 	}
 	writer.StopSpinner()
 	if err != nil {
 		writer.Errorf("Run failed:%v", err)
 	} else {
-		writer.Success("\nSCP successful...\n")
+		writer.Success("SCP successful...\n")
 	}
 	defer session.Close()
-	writer.Printf(">%s", stdoutBuf)
+	writer.Printf("\n%s\n", stdoutBuf)
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
@@ -281,4 +308,37 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 
 	writer.Success("Configuration set")
 	return nil
+}
+
+func createKnownHosts() {
+	f, fErr := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
+	if fErr != nil {
+		writer.Errorf("%v", fErr)
+	}
+	f.Close()
+}
+
+func checkKnownHosts() ssh.HostKeyCallback {
+	createKnownHosts()
+	kh, e := knownhosts.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
+	if e != nil {
+		writer.Errorf("%v", e)
+	}
+	return kh
+}
+
+func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
+	// if not nil then connection stops.
+	khFilePath := filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts")
+
+	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if fErr != nil {
+		return fErr
+	}
+	defer f.Close()
+
+	knownHosts := knownhosts.Normalize(remote.String())
+	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	return fileErr
 }
