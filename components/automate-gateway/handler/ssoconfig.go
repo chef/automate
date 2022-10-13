@@ -2,6 +2,11 @@ package handler
 
 import (
 	"context"
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"strings"
+    "net/http"
 	"github.com/chef/automate/api/external/sso"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	license_control "github.com/chef/automate/api/interservice/license_control"
@@ -77,10 +82,19 @@ func (a *SsoConfig) DeleteSsoConfig(ctx context.Context, in *empty.Empty) (*sso.
 	}
 	
 	if res.Config.Dex != nil {
+		url, err := getBastionUrl()
+		if err != nil {
+			return nil, err
+		}
+		err = ioutil.WriteFile("/var/automate-ha/revert-status.txt", []byte("Pending"), 0777)
+		if err != nil {
+			fmt.Printf("Unable to write file: %v", err)
+		}
+		go makeRequest("DELETE", *url, nil)
 		return &sso.DeleteSsoConfigResponse{
-			Message: "SSO Configuration disabled successfully",
-		}, nil
-	}
+            Message: "Started Disabling SSO Configuration",
+        }, nil
+    }
 
 	return &sso.DeleteSsoConfigResponse{
 		Message: "SSO Configuration not disabled successfully",
@@ -123,4 +137,35 @@ func (a *SsoConfig) getConfigData(ctx context.Context) (*deployment.GetAutomateC
 	req := &deployment.GetAutomateConfigRequest{}
 
 	return a.client.GetAutomateConfig(ctx, req)
+}
+
+func makeRequest(requestType string, url string, jsonData []byte) {
+    req, err := http.NewRequest(requestType, url, bytes.NewBuffer(jsonData))
+	if err != nil {
+        log.Fatal("Error occurred", err)
+    }
+	
+    req.Header.Set("Content-Type", "application/json")
+    client := &http.Client{}
+    resp, err := client.Do(req)
+
+    if err != nil {
+        log.Fatal("Error occurred", err)
+    }
+    defer resp.Body.Close()
+	if resp.StatusCode == http.StatusOK {
+		ioutil.WriteFile("/var/automate-ha/revert-status.txt", []byte("Success"), 0777)
+		return
+	}
+	ioutil.WriteFile("/var/automate-ha/revert-status.txt", []byte("Failure"), 0777)
+}
+
+func getBastionUrl() (*string, error) {
+	content, err := ioutil.ReadFile("/var/automate-ha/bastion_info.txt")
+	if err != nil {
+		log.Fatal("Error occurred while reading file: ", err)
+		return nil, err
+	}
+	url := "http://" + strings.TrimSpace(string(content))
+	return &url, nil
 }
