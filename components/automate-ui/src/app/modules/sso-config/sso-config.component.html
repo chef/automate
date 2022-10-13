@@ -1,13 +1,14 @@
 <div class="content-container">
   <div class="cantainer sso-container">
     <main>
-      <chef-loading-spinner *ngIf="loading" size='50' fixed></chef-loading-spinner>
+      <chef-loading-spinner *ngIf="ssoConfigLoading" size='50' fixed></chef-loading-spinner>
       <chef-page-header>
         <chef-heading>SAML Setup</chef-heading>
         <chef-subheading>The table below displays the user directories currently configured for Chef Automate.
         </chef-subheading>
         <div slot="header-buttons">
-          <chef-button primary caution class="remove-button" label="Remove SSO config" (click)="removeSsoConfig()">
+          <chef-button primary caution class="remove-button" label="Remove SSO config"
+            [disabled]="!isSsoConfigAvailable()" (click)="removeSsoConfig()">
             Remove Configuration
           </chef-button>
         </div>
@@ -26,7 +27,7 @@
             </chef-radio>
           </chef-form-field>
           <chef-form-field>
-            <label for="ssoUrl">SSO URL<span aria-hidden="true">*</span></label>
+            <label for="ssoUrl">SSO URL <span aria-hidden="true">*</span></label>
             <input id="ssoUrl" chefInput formControlName="ssoUrl" type="text" />
             <chef-error *ngIf="hasRequiredError('ssoUrl')">
               SSO URL is required.
@@ -36,7 +37,7 @@
             </chef-error>
           </chef-form-field>
           <chef-form-field>
-            <label for="emailAttribute">Email Attribute<span aria-hidden="true">*</span></label>
+            <label for="emailAttribute">Email Attribute <span aria-hidden="true">*</span></label>
             <input id="emailAttribute" chefInput formControlName="emailAttribute" type="text" />
             <chef-error *ngIf="hasRequiredError('emailAttribute')">
               Email Attribute is required.
@@ -47,7 +48,7 @@
             </chef-error>
           </chef-form-field>
           <chef-form-field>
-            <label for="usernameAttribute">Username Attribute<span aria-hidden="true">*</span></label>
+            <label for="usernameAttribute">Username Attribute <span aria-hidden="true">*</span></label>
             <input id="usernameAttribute" chefInput formControlName="usernameAttribute" type="text" />
             <chef-error *ngIf="hasRequiredError('usernameAttribute')">
               Username Attribute is required.
@@ -63,10 +64,10 @@
           </chef-form-field>
           <chef-form-field>
             <label for="allowedGroups">Allowed Groups</label>
-            <textarea id="allowedGroups" chefInput formControlName="allowedGroups"></textarea>
+            <textarea id="allowedGroups" chefInput formControlName="allowedGroups" spellcheck="false"></textarea>
           </chef-form-field>
           <chef-form-field>
-            <label for="entityIssuer">Entity Issuer<span aria-hidden="true">*</span></label>
+            <label for="entityIssuer">Entity Issuer <span aria-hidden="true">*</span></label>
             <input id="entityIssuer" chefInput formControlName="entityIssuer" type="text" />
             <chef-error *ngIf="hasRequiredError('entityIssuer')">
               Entity Issuer is required.
@@ -76,7 +77,7 @@
             </chef-error>
           </chef-form-field>
           <chef-form-field>
-            <label for="caInfo">CA information<span aria-hidden="true">*</span></label>
+            <label for="caInfo">CA information <span aria-hidden="true">*</span></label>
             <textarea id="caInfo" chefInput name="caInfo" formControlName="caInfo"></textarea>
             <chef-error *ngIf="hasRequiredError('caInfo')">
               CA information is required.
@@ -87,8 +88,9 @@
             <input id="nameIdPolicyFormat" chefInput formControlName="nameIdPolicyFormat" type="text" />
           </chef-form-field>
           <div id="button-bar">
-            <chef-button id="cancel" tertiary>Cancel</chef-button>
-            <chef-button primary data-cy="submit" id="submit" [disabled]="!ssoConfigForm.valid" (click)="saveSsoConfig()">
+            <chef-button id="cancel" tertiary (click)="cancelSsoConfig()">Cancel</chef-button>
+            <chef-button primary data-cy="submit" id="submit" [disabled]="!ssoConfigForm.valid"
+              (click)="saveSsoConfig()">
               <span>Submit</span>
             </chef-button>
           </div>

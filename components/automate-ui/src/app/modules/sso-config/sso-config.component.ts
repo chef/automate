@@ -6,13 +6,15 @@ import {
 } from "app/entities/layout/layout.facade";
 import { Store } from "@ngrx/store";
 import { NgrxStateAtom } from "app/ngrx.reducers";
-import { GetSsoConfig } from "app/entities/sso-config/sso-config.actions";
+import { CreateSsoConfig, DeleteSsoConfig, GetSsoConfig } from "app/entities/sso-config/sso-config.actions";
 import { takeUntil } from "rxjs/operators";
 import { combineLatest, Subject } from "rxjs";
 import { EntityStatus } from "app/entities/entities";
 import { isNil } from "lodash/fp";
 import {
+  deleteStatus,
   getStatus,
+  saveStatus,
   ssoConfig
 } from "app/entities/sso-config/sso-config.selectors";
 import { SsoConfig } from "app/entities/sso-config/sso-config.model";
@@ -27,13 +29,14 @@ export class SsoConfigComponent implements OnInit {
   private isDestroyed = new Subject<boolean>();
   public ssoConfig: SsoConfig;
   public ssoConfigForm: FormGroup;
-  public loading: boolean = false;
+  public ssoConfigLoading: boolean = true;
 
   constructor(
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder,
     private store: Store<NgrxStateAtom>
   ) {
+    this.ssoConfigLoading = true;
     this.ssoConfigForm = fb.group({
       serviceProvider: ["azureAd"],
       ssoUrl: [
@@ -42,14 +45,14 @@ export class SsoConfigComponent implements OnInit {
       ],
       emailAttribute: ["", [Validators.required, Validators.minLength(5)]],
       usernameAttribute: ["", [Validators.required, Validators.minLength(5)]],
-      groupAttribute: [],
-      allowedGroups: [],
+      groupAttribute: [""],
+      allowedGroups: [""],
       entityIssuer: [
         "",
         [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)],
       ],
       caInfo: ["", [Validators.required]],
-      nameIdPolicyFormat: [],
+      nameIdPolicyFormat: [""]
     });
   }
 
@@ -69,32 +72,64 @@ export class SsoConfigComponent implements OnInit {
           !isNil(ssoConfigState)
         ) {
           this.ssoConfig = ssoConfigState;
-          console.log(this.ssoConfig);
-          this.ssoConfigForm.patchValue({
-            ssoUrl: this.ssoConfig.sso_url,
-            emailAttribute: this.ssoConfig.email_attr,
-            usernameAttribute: this.ssoConfig.username_attr,
-            groupAttribute: this.ssoConfig.groups_attr,
-            entityIssuer: this.ssoConfig.entity_issuer,
-            caInfo: this.ssoConfig.ca_contents,
-            nameIdPolicyFormat: this.ssoConfig.name_id_policy_format
-          });
+          this.populateForm(this.ssoConfig);
+          this.ssoConfigLoading = false;
         }
       });
   }
 
-  removeSsoConfig() {
-    console.log("remove sso config");
-    this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
-    }, 5000);
+  saveSsoConfig() {
+    this.ssoConfigLoading = true;
+    const ssoConfig: SsoConfig = {
+      ca_contents: this.ssoConfigForm.value.caInfo,
+      sso_url: this.ssoConfigForm.value.ssoUrl,
+      email_attr: this.ssoConfigForm.value.emailAttribute,
+      username_attr: this.ssoConfigForm.value.usernameAttribute,
+      groups_attr: this.ssoConfigForm.value.groupAttribute,
+      allowed_groups: this.convertToArray(this.ssoConfigForm.value.allowedGroups),
+      entity_issuer: this.ssoConfigForm.value.entityIssuer,
+      name_id_policy_format: this.ssoConfigForm.value.nameIdPolicyFormat
+    };
+
+    this.store.dispatch(new CreateSsoConfig(ssoConfig));
+    this.store.select(saveStatus).subscribe(state => {
+      console.log("saveStatus from store", state);
+      if (state === EntityStatus.loadingSuccess || state === EntityStatus.loadingFailure) {
+        this.ssoConfigLoading = false;
+      }
+    })
   }
 
-  saveSsoConfig() {
-    console.log("save sso config");
-    // console.log(this.ssoConfigForm);
-    console.log(this.ssoConfigForm.value);
+  cancelSsoConfig() {
+    this.populateForm(this.ssoConfig);
+  }
+
+  removeSsoConfig() {
+    this.ssoConfigLoading = true;
+    this.store.dispatch(new DeleteSsoConfig());
+    this.store.select(deleteStatus).subscribe(state => {
+      console.log("deleteStatus from store", state);
+      if (state === EntityStatus.loadingSuccess || state === EntityStatus.loadingFailure) {
+        this.ssoConfigLoading = false;
+      }
+    })
+  }
+
+  populateForm(ssoConfig: SsoConfig) {
+    this.ssoConfigForm.patchValue({
+      ssoUrl: ssoConfig.sso_url,
+      emailAttribute: ssoConfig.email_attr,
+      usernameAttribute: ssoConfig.username_attr,
+      groupAttribute: ssoConfig.groups_attr,
+      allowedGroups: ssoConfig.allowed_groups.toString(),
+      entityIssuer: ssoConfig.entity_issuer,
+      caInfo: ssoConfig.ca_contents,
+      nameIdPolicyFormat: ssoConfig.name_id_policy_format
+    });
+  }
+
+  isSsoConfigAvailable() {
+    return this.ssoConfig && this.ssoConfig.sso_url;
   }
 
   hasRequiredError(field: string): boolean {
@@ -109,5 +144,9 @@ export class SsoConfigComponent implements OnInit {
       this.ssoConfigForm.get(field).touched &&
       this.ssoConfigForm.get(field).dirty
     );
+  }
+
+  convertToArray(value: string) {
+    return value.split(",").map(item => item.trim()).filter(item => item !== "");
   }
 }

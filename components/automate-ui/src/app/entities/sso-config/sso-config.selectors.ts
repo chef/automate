@@ -18,3 +18,18 @@ export const ssoConfig = createSelector(
   ssoConfigState,
   (state) => state.ssoConfig
 );
+
+export const saveStatus = createSelector(
+  ssoConfigState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  ssoConfigState,
+  (state) => state.saveError
+);
+
+export const deleteStatus = createSelector(
+  ssoConfigState,
+  (state) => state.deleteStatus
+);
