@@ -22,6 +22,8 @@ EOT
 : "" }
 
 [tls]
-  root_cert_contents = "${opensearch_root_ca}'
-  key_contents = "${opensearch_private_key}'
-  cert_contents = "${opensearch_public_key}'
+  rootCA = "${opensearch_root_ca}"
+  admin_cert = "${opensearch_public_key}"
+  admin_key = "${opensearch_private_key}"
+  ssl_cert = "${opensearch_public_key}"
+  ssl_key = "${opensearch_private_key}"
