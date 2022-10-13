@@ -108,3 +108,13 @@ variable "sudo_cmd" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+
+
+variable opensearch_root_ca {
+}
+
+variable opensearch_private_key {
+}
+
+variable opensearch_public_key {
+}

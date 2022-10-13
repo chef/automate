@@ -42,6 +42,9 @@ locals {
     automate_root_ca                   = var.automate_root_ca
     automate_private_key               = var.automate_private_key
     automate_public_key                = var.automate_public_key
+    chef_server_root_ca                = var.chef_server_root_ca
+    chef_server_private_key            = var.chef_server_private_key
+    chef_server_public_key             = var.chef_server_public_key
   })
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {

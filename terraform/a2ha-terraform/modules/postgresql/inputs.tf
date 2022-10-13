@@ -107,3 +107,12 @@ variable "sudo_cmd" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+
+variable postgresql_root_ca {
+}
+
+variable postgresql_private_key {
+}
+
+variable postgresql_public_key {
+}

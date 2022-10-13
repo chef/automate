@@ -197,3 +197,22 @@ variable "teams_port" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+
+
+variable automate_root_ca {
+}
+
+variable automate_private_key {
+}
+
+variable automate_public_key {
+}
+
+variable chef_server_root_ca {
+}
+
+variable chef_server_private_key {
+}
+
+variable chef_server_public_key {
+}

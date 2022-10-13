@@ -212,3 +212,39 @@ variable "ssh_user" {
 variable "sudo_cmd" {
   default = "sudo"
 }
+
+variable automate_root_ca {
+}
+
+variable automate_private_key {
+}
+
+variable automate_public_key {
+}
+
+variable chef_server_root_ca {
+}
+
+variable chef_server_private_key {
+}
+
+variable chef_server_public_key {
+}
+
+variable postgresql_root_ca {
+}
+
+variable postgresql_private_key {
+}
+
+variable postgresql_public_key {
+}
+
+variable opensearch_root_ca {
+}
+
+variable opensearch_private_key {
+}
+
+variable opensearch_public_key {
+}
