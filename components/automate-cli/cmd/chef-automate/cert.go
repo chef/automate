@@ -53,9 +53,20 @@ func certCmd() *cobra.Command {
 		Args:  cobra.MaximumNArgs(2),
 	}
 
+	certDisplay := &cobra.Command{
+		Use:   "display",
+		Short: "Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.",
+		RunE:  runCertDisplayCmd,
+		Args:  cobra.MaximumNArgs(2),
+	}
 	cmd.AddCommand(certShow)
-
+	cmd.AddCommand(certDisplay)
 	return cmd
+}
+
+func runCertDisplayCmd(*cobra.Command, []string) error {
+	fmt.Println("hello world!")
+	return nil
 }
 
 func runCertShowCmd(*cobra.Command, []string) error {
