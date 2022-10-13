@@ -164,20 +164,44 @@ automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
 opensearch_instance_count = <%= config.opensearch.instance_count %>
 
-automate_root_ca = <%= config.automate.root_ca %>
-chef_server_root_ca = <%= config.chef_server.root_ca %>
-opensearch_root_ca = <%= config.opensearch.root_ca %>
-postgresql_root_ca = <%= config.postgresql.root_ca %>
+automate_root_ca = <<-EOT
+<%= config.automate.root_ca %>
+EOT
+chef_server_root_ca = <<-EOT
+<%= config.chef_server.root_ca %>
+EOT
+opensearch_root_ca = <<-EOT
+<%= config.opensearch.root_ca %>
+EOT
+postgresql_root_ca = <<-EOT
+<%= config.postgresql.root_ca %>
+EOT
 
-automate_private_key = <%= config.automate.private_key %>
-chef_server_private_key = <%= config.chef_server.private_key %>
-opensearch_private_key = <%= config.opensearch.private_key %>
-postgresql_private_key = <%= config.postgresql.private_key %>
+automate_private_key = <<-EOT
+<%= config.automate.private_key %>
+EOT
+chef_server_private_key = <<-EOT
+<%= config.chef_server.private_key %>
+EOT
+opensearch_private_key = <<-EOT
+<%= config.opensearch.private_key %>
+EOT
+postgresql_private_key = <<-EOT
+<%= config.postgresql.private_key %>
+EOT
 
-automate_public_key = <%= config.automate.public_key %>
-chef_server_public_key = <%= config.chef_server.public_key %>
-opensearch_public_key = <%= config.opensearch.public_key %>
-postgresql_public_key = <%= config.postgresql.public_key %>
+automate_public_key = <<-EOT
+<%= config.automate.public_key %>
+EOT
+chef_server_public_key = <<-EOT
+<%= config.chef_server.public_key %>
+EOT
+opensearch_public_key = <<-EOT
+<%= config.opensearch.public_key %>
+EOT
+postgresql_public_key = <<-EOT
+<%= config.postgresql.public_key %>
+EOT
 
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
