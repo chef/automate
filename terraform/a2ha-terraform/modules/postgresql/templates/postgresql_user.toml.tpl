@@ -8,6 +8,6 @@ path = "${postgresql_pg_dump_fs_path}"
 [ssl]
 enable = ${postgresql_ssl_enable}
 [tls]
-ssl_cert = "${postgresql_public_key}"
-ssl_key = "${postgresql_private_key}"
-issuer_cert = "${postgresql_root_ca}"
+ssl_cert = """${postgresql_public_key}"""
+ssl_key = """${postgresql_private_key}"""
+issuer_cert = """${postgresql_root_ca}"""

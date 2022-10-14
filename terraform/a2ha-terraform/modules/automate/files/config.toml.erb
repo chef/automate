@@ -101,6 +101,12 @@
     a1_data_collector_token = "<%= overrides[:automate_dc_token] %>"
 <% end %>
 
+  [cs_nginx.v1.sys.ngx.http]
+    ssl_verify_depth = 6
+  [global.v1.external.automate.ssl]
+    server_name = "<%= overrides[:automate_fqdn] %>"
+    root_cert = """<%= overrides[:automate_root_ca] %>"""
+
 # Deployment service configuration.
 [deployment.v1]
   [deployment.v1.svc]
@@ -126,19 +132,37 @@
     # visit Chef Automate in your web browser. We recommend using a
     # certificate signed by a certificate authority you trust.
     [[load_balancer.v1.sys.frontend_tls]]
+
+    <% if overrides[:automate_role] == "chef_api" -%>
       # The TLS certificate for the load balancer frontend.
-    <% if overrides[:automate_root_ca] != "" -%>
-      cert = """<%= overrides[:automate_root_ca] %>"""
+      <% if overrides[:chef_server_public_key] != "" -%>
+        cert = """<%= overrides[:chef_server_public_key] %>"""
+      <% else %>
+        cert = """<%= tls_cert %>"""
+      <% end %>
+
+      # The TLS private key for the load balancer frontend.
+      <% if overrides[:chef_server_private_key] != "" -%>
+        key = """<%= overrides[:chef_server_private_key] %>"""
+      <% else %>
+        key = """<%= tls_key %>"""
+      <% end %>
     <% else %>
-      cert = """<%= tls_cert %>"""
+      # The TLS certificate for the load balancer frontend.
+      <% if overrides[:automate_public_key] != "" -%>
+        cert = """<%= overrides[:automate_public_key] %>"""
+      <% else %>
+        cert = """<%= tls_cert %>"""
+      <% end %>
+
+      # The TLS private key for the load balancer frontend.
+      <% if overrides[:automate_private_key] != "" -%>
+        key = """<%= overrides[:automate_private_key] %>"""
+      <% else %>
+        key = """<%= tls_key %>"""
+      <% end %>
     <% end %>
 
-     # The TLS private key for the load balancer frontend.
-    <% if overrides[:automate_private_key] != "" -%>
-      key = """<%= overrides[:automate_private_key] %>"""
-    <% else %>
-      key = """<%= tls_key %>"""
-    <% end %>
 
 <% end %>
 
