@@ -19,14 +19,14 @@
   access_key = "${access_key}"
   secret_key = "${secret_key}"
   infra = "${infra}"
-  automate_root_ca = "${automate_root_ca}"
-  automate_private_key               = "${automate_private_key}"
-  automate_public_key                = "${automate_public_key}"
-  chef_server_root_ca                = "${chef_server_root_ca}"
-  chef_server_private_key            = "${chef_server_private_key}"
-  chef_server_public_key             = "${chef_server_public_key}"
-  opensearch_root_ca                 = "${opensearch_root_ca}"
-  postgresql_root_ca                 = "${postgresql_root_ca}"
+  automate_root_ca = """${automate_root_ca}"""
+  automate_private_key = """${automate_private_key}"""
+  automate_public_key = """${automate_public_key}"""
+  chef_server_root_ca = """${chef_server_root_ca}"""
+  chef_server_private_key = """${chef_server_private_key}"""
+  chef_server_public_key = """${chef_server_public_key}"""
+  opensearch_root_ca = """${opensearch_root_ca}"""
+  postgresql_root_ca = """${postgresql_root_ca}"""
 
   
 [services]
