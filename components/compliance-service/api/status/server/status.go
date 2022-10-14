@@ -148,12 +148,10 @@ func (srv *Server) GetControlIndexMigrationStatus(ctx context.Context, empty *pb
 
 	flg := flagMap[pgdb.ControlIndexFlag]
 	if flg.Status {
-		if flg.UpgradeTimestamp == nil {
-			return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTSTARTED}, nil
-		}
+		//if flg.UpgradeTimestamp == nil {
+		return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTSTARTED}, nil
+		//}
 	}
 
-	if !flg.Status {
-		return &status.ControlIndexMigrationStatus{IsCompleted: true}, nil
-	}
+	return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_COMPLETED}, nil
 }

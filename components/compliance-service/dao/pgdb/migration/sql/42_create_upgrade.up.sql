@@ -2,10 +2,9 @@
 CREATE TABLE IF NOT EXISTS upgrade_flags (
     id                         text PRIMARY KEY,
     upgrade_flag               text NOT NULL UNIQUE,
-    upgrade_value              boolean NOT NULL,
-    upgrade_timestamp          timestamp without time zone
+    upgrade_value              boolean NOT NULL
 );
 
-INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (1,'day_latest',true, NULL);
+INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (1,'day_latest',true);
 
-INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (2,'control_index',true, NULL);
+INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (2,'control_index',true);
