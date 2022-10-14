@@ -45,6 +45,9 @@ locals {
     chef_server_root_ca                = var.chef_server_root_ca
     chef_server_private_key            = var.chef_server_private_key
     chef_server_public_key             = var.chef_server_public_key
+    opensearch_root_ca                 = var.opensearch_root_ca
+    postgresql_root_ca                 = var.postgresql_root_ca
+ 
   })
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {

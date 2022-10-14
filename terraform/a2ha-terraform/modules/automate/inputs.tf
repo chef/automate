@@ -216,3 +216,11 @@ variable chef_server_private_key {
 
 variable chef_server_public_key {
 }
+
+variable opensearch_root_ca {
+  
+}
+
+variable postgresql_root_ca {
+  
+}
