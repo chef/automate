@@ -86,11 +86,12 @@ func (a *SsoConfig) DeleteSsoConfig(ctx context.Context, in *empty.Empty) (*sso.
 		if err != nil {
 			return nil, err
 		}
-		err = ioutil.WriteFile("/var/automate-ha/revert-status.txt", []byte("Pending"), 0777)
+		fileName := "revert-status.txt"
+		err = ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Pending"), 0777)
 		if err != nil {
 			fmt.Printf("Unable to write file: %v", err)
 		}
-		go makeRequest("DELETE", *url, nil)
+		go makeRequest("DELETE", *url, nil, fileName)
 		return &sso.DeleteSsoConfigResponse{
             Message: "Started Disabling SSO Configuration",
         }, nil
@@ -139,7 +140,7 @@ func (a *SsoConfig) getConfigData(ctx context.Context) (*deployment.GetAutomateC
 	return a.client.GetAutomateConfig(ctx, req)
 }
 
-func makeRequest(requestType string, url string, jsonData []byte) {
+func makeRequest(requestType string, url string, jsonData []byte, fileName string) {
     req, err := http.NewRequest(requestType, url, bytes.NewBuffer(jsonData))
 	if err != nil {
         log.Fatal("Error occurred", err)
@@ -154,10 +155,10 @@ func makeRequest(requestType string, url string, jsonData []byte) {
     }
     defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
-		ioutil.WriteFile("/var/automate-ha/revert-status.txt", []byte("Success"), 0777)
+		ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Success"), 0777)
 		return
 	}
-	ioutil.WriteFile("/var/automate-ha/revert-status.txt", []byte("Failure"), 0777)
+	ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Failure"), 0777)
 }
 
 func getBastionUrl() (*string, error) {
