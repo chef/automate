@@ -103,7 +103,7 @@ func createPGBackend(conf *config.Postgres) (*pgdb.DB, error) {
 // here we execute migrations, create the es and pg backends, read certs, set up the needed env vars,
 // and modify config info
 func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFactory *secureconn.Factory, esr relaxting.ES2Backend, statusSrv *statusserver.Server, err error) {
-	statusSrv = statusserver.New()
+	statusSrv = statusserver.New(conf.Service.EnableEnhancedReporting)
 
 	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, "Initializing DB connection and schema migration...")
 	// start pg backend

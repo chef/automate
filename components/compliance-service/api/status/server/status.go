@@ -36,13 +36,14 @@ const MigrationCompletedMsg = "COMPLETED"
 
 // Server struct
 type Server struct {
-	MigrationStatus  *status.MigrationStatus
-	MigrationChannel chan status.LogEntry
-	DB               pgdb.Storage
+	MigrationStatus         *status.MigrationStatus
+	MigrationChannel        chan status.LogEntry
+	DB                      pgdb.Storage
+	EnableEnhancedReporting bool
 }
 
 // New creates a new instance of Server
-func New() *Server {
+func New(enabledEnhancedReporting bool) *Server {
 	migrationChannel := make(chan status.LogEntry)
 	migrationStatus := &status.MigrationStatus{
 		Completed: 0,
@@ -50,8 +51,9 @@ func New() *Server {
 		Status:    status.MigrationStatus_RUNNING,
 	}
 	thisServer := &Server{
-		MigrationStatus:  migrationStatus,
-		MigrationChannel: migrationChannel,
+		MigrationStatus:         migrationStatus,
+		MigrationChannel:        migrationChannel,
+		EnableEnhancedReporting: enabledEnhancedReporting,
 	}
 	go listenForMigrationUpdates(migrationChannel, thisServer)
 	return thisServer
@@ -141,16 +143,22 @@ func AddMigrationUpdate(migServer *Server, logLabel string, logText string) {
 
 //GetEnhancedReportingMigrationStatus is the service endpoint to get the status of Control Index migration status
 func (srv *Server) GetControlIndexMigrationStatus(ctx context.Context, empty *pb.Empty) (*status.ControlIndexMigrationStatus, error) {
-	flagMap, err := srv.DB.GetUpgradeFlagsTimestamp()
+	if !srv.EnableEnhancedReporting {
+		return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTCONFIGURED}, nil
+	}
+
+	flagMap, err := srv.DB.GetUpgradeFlags()
 	if err != nil {
 		return nil, err
 	}
 
 	flg := flagMap[pgdb.ControlIndexFlag]
 	if flg.Status {
-		//if flg.UpgradeTimestamp == nil {
-		return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTSTARTED}, nil
-		//}
+		if flg.UpgradedTime.IsZero() {
+			return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTSTARTED}, nil
+		} else {
+			return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_INPROGRESS}, nil
+		}
 	}
 
 	return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_COMPLETED}, nil
