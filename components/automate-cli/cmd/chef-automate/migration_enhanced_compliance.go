@@ -8,12 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	enhanceMigrateComplianceCmd.AddCommand(newMigrateStatusCmd())
-	enhanceComplianceCmd.AddCommand(migrateCmd)
-	RootCmd.AddCommand(enhanceComplianceCmd)
-}
-
 var enhanceComplianceCmd = &cobra.Command{
 	Use:    "enhance-compliance",
 	Short:  "Utilities for enhance-compliance reporting",
@@ -52,4 +46,10 @@ func runEnhancedComplianceMigrateStatusCmd(cmd *cobra.Command, args []string) er
 
 	writer.Println(response.Status)
 	return nil
+}
+
+func init() {
+	RootCmd.AddCommand(enhanceComplianceCmd)
+	enhanceComplianceCmd.AddCommand(enhanceMigrateComplianceCmd)
+	enhanceMigrateComplianceCmd.AddCommand(newMigrateStatusCmd())
 }
