@@ -5,9 +5,9 @@ package main
 import (
 	"bytes"
 	"container/list"
-	"html/template"
 	"io/ioutil"
 	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 )
