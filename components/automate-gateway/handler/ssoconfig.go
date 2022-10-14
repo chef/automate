@@ -199,27 +199,17 @@ func(a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigRequest
 		Name_id_policy_format: req.NameIdPolicyFormat,
 	}
 	jsonValue, _ :=  json.Marshal(body_params)
-	ip := getBastionIp()
-	url := "http://" + string(ip)
-	request, err := http.NewRequest("POST",url, bytes.NewBuffer(jsonValue))
+	url, err := getBastionUrl()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Errror while creating bastion url = ", err)
 		return nil, err
 	}
-    request.Header.Set("Content-Type", "application/json")
-    client := &http.Client{}
-    resp, err := client.Do(request)
-    if err != nil {
-		log.Fatalln(err)
-		return nil, err
-    }
-    defer resp.Body.Close()
-	body, err := ioutil.ReadAll(request.Body)
+	fileName := "post-status.txt"
+	err = ioutil.WriteFile("/var/automate-ha/"+fileName , []byte("Pending"), 0777)
 	if err != nil {
-		log.Fatalln(err)
-		return nil, err
+		fmt.Printf("Unable to write the file: %v" , err)
 	}
-	fmt.Println("response Body:", string(body))
+	go makeRequest("POST", *url, jsonValue , fileName)
 	return &sso.SetSsoConfigResponse{
 		Response: "Config patch was successfull",
 	}, nil
