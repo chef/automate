@@ -35,7 +35,6 @@ export class CreateSsoConfig implements Action {
 
 export class CreateSsoConfigSuccess implements Action {
   readonly type = SsoConfigActionTypes.CREATE_SUCCESS;
-  constructor(public payload) { }
 }
 
 export class CreateSsoConfigFailure implements Action {
@@ -49,7 +48,6 @@ export class DeleteSsoConfig implements Action {
 
 export class DeleteSsoConfigSuccess implements Action {
   readonly type = SsoConfigActionTypes.DELETE_SUCCESS;
-  constructor(public payload) { }
 }
 
 export class DeleteSsoConfigFailure implements Action {

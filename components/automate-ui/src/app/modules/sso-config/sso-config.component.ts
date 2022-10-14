@@ -12,9 +12,7 @@ import { combineLatest, Subject } from "rxjs";
 import { EntityStatus } from "app/entities/entities";
 import { isNil } from "lodash/fp";
 import {
-  deleteStatus,
   getStatus,
-  saveStatus,
   ssoConfig
 } from "app/entities/sso-config/sso-config.selectors";
 import { SsoConfig } from "app/entities/sso-config/sso-config.model";
@@ -29,14 +27,13 @@ export class SsoConfigComponent implements OnInit {
   private isDestroyed = new Subject<boolean>();
   public ssoConfig: SsoConfig;
   public ssoConfigForm: FormGroup;
-  public ssoConfigLoading: boolean = true;
+  public ssoConfigLoading: boolean = false;
 
   constructor(
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder,
     private store: Store<NgrxStateAtom>
   ) {
-    this.ssoConfigLoading = true;
     this.ssoConfigForm = fb.group({
       serviceProvider: ["azureAd"],
       ssoUrl: [
@@ -63,6 +60,7 @@ export class SsoConfigComponent implements OnInit {
 
   // get sso config
   private getSsoConfig(): void {
+    this.ssoConfigLoading = true;
     this.store.dispatch(new GetSsoConfig());
     combineLatest([this.store.select(getStatus), this.store.select(ssoConfig)])
       .pipe(takeUntil(this.isDestroyed))
@@ -79,7 +77,6 @@ export class SsoConfigComponent implements OnInit {
   }
 
   saveSsoConfig() {
-    this.ssoConfigLoading = true;
     const ssoConfig: SsoConfig = {
       ca_contents: this.ssoConfigForm.value.caInfo,
       sso_url: this.ssoConfigForm.value.ssoUrl,
@@ -92,31 +89,25 @@ export class SsoConfigComponent implements OnInit {
     };
 
     this.store.dispatch(new CreateSsoConfig(ssoConfig));
-    this.store.select(saveStatus).subscribe(state => {
-      console.log("saveStatus from store", state);
-      if (state === EntityStatus.loadingSuccess || state === EntityStatus.loadingFailure) {
-        this.ssoConfigLoading = false;
-      }
-    })
+    // TODO: save sso config api status polling
+    // this.store.dispatch(new CreateSsoConfigSuccess()); 
   }
 
   cancelSsoConfig() {
-    this.populateForm(this.ssoConfig);
+    this.getSsoConfig();
+    this.ssoConfigForm.markAsPristine();
   }
 
   removeSsoConfig() {
-    this.ssoConfigLoading = true;
     this.store.dispatch(new DeleteSsoConfig());
-    this.store.select(deleteStatus).subscribe(state => {
-      console.log("deleteStatus from store", state);
-      if (state === EntityStatus.loadingSuccess || state === EntityStatus.loadingFailure) {
-        this.ssoConfigLoading = false;
-      }
-    })
+    // TODO: remove sso config api status polling
+    // this.ssoConfigForm.reset({serviceProvider: 'azureAd'});
+    // this.store.dispatch(new DeleteSsoConfigSuccess());
   }
 
-  populateForm(ssoConfig: SsoConfig) {
+  populateForm(ssoConfig) {
     this.ssoConfigForm.patchValue({
+      serviceProvider: 'azureAd',
       ssoUrl: ssoConfig.sso_url,
       emailAttribute: ssoConfig.email_attr,
       usernameAttribute: ssoConfig.username_attr,

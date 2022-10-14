@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ConfigService } from 'app/services/config/config.service';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
 
@@ -12,24 +12,28 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
 })
 export class SidebarComponent {
   menuGroups$: Observable<MenuItemGroup[]>;
+  deploymentType: string;
 
   constructor(
     @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private configService: ConfigService
   ) {
-    this.menuGroups$ = layoutFacade.sidebar$;
-    this.updateMenuGroupVisibility();
+    this.configService.getConfig().subscribe((config) => {
+      this.deploymentType = config.deploymentType;
+      this.menuGroups$ = layoutFacade.sidebar$;
+      this.updateMenuGroupVisibility();
+    })
   }
 
   public isAuthorized($event, menuItem, menuGroup) {
     menuItem.authorized.isAuthorized = $event;
-    this.checkDeploymentType(menuItem , menuGroup);
+    this.checkDeploymentType(menuItem, menuGroup);
     this.setGroupVisibility(menuGroup);
   }
 
-  public checkDeploymentType(menuItem: any , menuGroup: any) {
+  public checkDeploymentType(menuItem: any, menuGroup: any) {
     if (menuItem.route === '/settings/sso-config' &&
-    this.telemetryService.getDeploymenType() !== 'SAAS') {
+      this.deploymentType !== 'SAAS') {
       menuGroup.visible$ = false;
       menuItem.visible$ = false;
     }
@@ -55,7 +59,7 @@ export class SidebarComponent {
   }
 
   private hasAuthorizedMenuItems(menuItemGroup: any): boolean {
-    return  menuItemGroup.items.some(menuItem =>
-          menuItem.authorized && menuItem.authorized.isAuthorized);
+    return menuItemGroup.items.some(menuItem =>
+      menuItem.authorized && menuItem.authorized.isAuthorized);
   }
 }

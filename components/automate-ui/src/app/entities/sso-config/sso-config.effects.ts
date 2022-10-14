@@ -57,7 +57,7 @@ export class SsoConfigEffects {
       ofType(SsoConfigActionTypes.CREATE),
       mergeMap(({ payload }: CreateSsoConfig) =>
         this.requests.createSsoConfig(payload).pipe(
-          map((resp) => new CreateSsoConfigSuccess(resp)),
+          map(() => new CreateSsoConfigSuccess()),
           catchError((error: HttpErrorResponse) =>
             observableof(new CreateSsoConfigFailure(error))
           )
@@ -97,7 +97,7 @@ export class SsoConfigEffects {
       ofType(SsoConfigActionTypes.DELETE),
       mergeMap(() =>
         this.requests.deleteSsoConfig().pipe(
-          map(resp => new DeleteSsoConfigSuccess(resp)),
+          map(() => new DeleteSsoConfigSuccess()),
           catchError((error: HttpErrorResponse) =>
             observableof(new DeleteSsoConfigFailure(error))
           )
