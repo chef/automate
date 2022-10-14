@@ -12,6 +12,8 @@ overview() {
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
 	--data-raw '{"filters":[]}'
+
+	wait
 }
 
 list_nodes() {
@@ -23,6 +25,7 @@ list_nodes() {
 	--header 'Content-Type: text/plain' \
   	--data-raw '{"filters":[],"page":1,"per_page":100,"sort":"latest_report.end_time","order":"DESC"}' \
 
+	wait
 }
 
 get_report() {
@@ -35,6 +38,8 @@ get_report() {
 	--data-raw '{"filters":[{"type":"node_id","values":["9b9f4e51-b049-4b10-9555-10578916e666"]}],"page":1,"per_page":10,"sort":"latest_report.end_time","order":"DESC"}' \
 	--compressed \
 	--insecure
+
+	wait
 }
 
 suggestions() {
@@ -47,6 +52,8 @@ suggestions() {
 	--data-raw '{"type":"control_tag_value","text":"","type_key":"control_tag:gtitle","filters":[{"type":"start_time","values":["2022-10-02T00:00:00Z"]},{"type":"end_time","values":["2022-10-12T23:59:59Z"]}]}' \
 	--compressed \
 	--insecure
+
+	wait
 }
 
 profiles() {
@@ -59,6 +66,8 @@ profiles() {
   	--data-raw '{"filters":[],"page":1,"per_page":100}' \
   	--compressed \
  	--insecure
+
+	wait
 }
 
 get_profile() {
@@ -71,6 +80,8 @@ get_profile() {
 	--data-raw '{"type":"summary","id":"b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015","filters":[]}' \
 	--compressed \
 	--insecure
+
+	wait
 }
 
 list_control_report() {
@@ -83,6 +94,8 @@ list_control_report() {
 	--data-raw '{"filters":[{"type":"from","values":["0"]},{"type":"size","values":["100"]},{"type":"status","values":[""]}]}' \
 	--compressed \
 	--insecure
+
+	wait
 }
 
 list_control() {
@@ -95,6 +108,8 @@ list_control() {
 	--data-raw '{"filters":[]}' \
 	--compressed \
 	--insecure
+
+	wait
 }
 
 for i in {1..1000} ; do
@@ -106,6 +121,8 @@ for i in {1..1000} ; do
 	get_profile &
 	list_control_report &
 	list_control &
+
+	sleep 10
 done
 
 echo "${newline}Done executions!"
