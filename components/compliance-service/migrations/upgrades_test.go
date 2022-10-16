@@ -1,11 +1,10 @@
 package migrations
 
 import (
-	"testing"
-	"time"
-
+	"github.com/chef/automate/components/compliance-service/dao/testDB"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestPollDataForFlags(t *testing.T) {
@@ -24,7 +23,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test False status from db",
 			args: args{upgrade: Upgrade{
-				storage:         UpgradeDBTest{},
+				storage:         testDB.UpgradeDBTest{},
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: false,
@@ -32,7 +31,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test error for day latest flag from db",
 			args: args{upgrade: Upgrade{
-				storage:         &UpgradeDBTest{Error: true},
+				storage:         &testDB.UpgradeDBTest{Error: true},
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: true,
@@ -41,7 +40,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test true status from database",
 			args: args{upgrade: Upgrade{
-				storage:         &UpgradeDBTest{NeedStatus: true},
+				storage:         &testDB.UpgradeDBTest{NeedStatus: true},
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: false,
@@ -49,7 +48,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test error from cereal manager for daily latest flag",
 			args: args{upgrade: Upgrade{
-				storage:         &UpgradeDBTest{NeedStatus: true},
+				storage:         &testDB.UpgradeDBTest{NeedNotStartedStatus: true},
 				cerealInterface: &CerealInterfaceTest{NeedError: true},
 			}},
 			wantError: true,
@@ -59,7 +58,7 @@ func TestPollDataForFlags(t *testing.T) {
 
 	for _, test := range tests {
 
-		got := test.args.upgrade.PollForUpgradeFlagDayLatest(time.Time{})
+		got := test.args.upgrade.PollForUpgradeFlagDayLatest()
 
 		if test.wantError {
 			assert.Equal(t, got.Error(), test.error.Error())

@@ -141,7 +141,7 @@ func AddMigrationUpdate(migServer *Server, logLabel string, logText string) {
 	}
 }
 
-//GetEnhancedReportingMigrationStatus is the service endpoint to get the status of Control Index migration status
+//GetControlIndexMigrationStatus is the service endpoint to get the status of Control Index migration status
 func (srv *Server) GetControlIndexMigrationStatus(ctx context.Context, empty *pb.Empty) (*status.ControlIndexMigrationStatus, error) {
 	if !srv.EnableEnhancedReporting {
 		return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTCONFIGURED}, nil
