@@ -221,6 +221,11 @@ func makeUpgradingService(actual *habapi.ServiceInfo, target habpkg.VersionedPac
 	return ret
 }
 
+const MigrationCompletedStatus = "The Migration of compliance controls and assets have completed."
+const MigrationNotStartedStatus = "The Migration of compliance controls and assets is yet to start."
+const MigrationInProgressStatus = "The Migration of compliance controls and assets is in progress."
+const MigrationNotConfiguredStatus = "Automate is not configured to support enhance compliance reporting."
+
 func (s *server) ControlIndexUpgradeStatus(ctx context.Context, empty *pb.Empty) (*api.ControlIndexUpgradeStatusResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -247,13 +252,13 @@ func (s *server) ControlIndexUpgradeStatus(ctx context.Context, empty *pb.Empty)
 	stResponse := &api.ControlIndexUpgradeStatusResponse{}
 	switch response.Status {
 	case csc.ControlIndexMigrationStatus_COMPLETED:
-		stResponse.Status = "The Migration of compliance controls and assets have completed."
+		stResponse.Status = MigrationCompletedStatus
 	case csc.ControlIndexMigrationStatus_NOTSTARTED:
-		stResponse.Status = "The Migration of compliance controls and assets is yet to start."
+		stResponse.Status = MigrationNotStartedStatus
 	case csc.ControlIndexMigrationStatus_INPROGRESS:
-		stResponse.Status = "The Migration of compliance controls and assets is in progress."
+		stResponse.Status = MigrationInProgressStatus
 	case csc.ControlIndexMigrationStatus_NOTCONFIGURED:
-		stResponse.Status = "Automate is not configured to support enhance compliance reporting."
+		stResponse.Status = MigrationNotConfiguredStatus
 	}
 
 	return stResponse, nil
