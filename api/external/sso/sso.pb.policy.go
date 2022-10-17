@@ -9,4 +9,29 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.sso.SsoConfigService/GetSsoConfig", "sso:config", "sso:config:get", "GET", "/api/v0/sso/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.sso.SsoConfigService/SetSsoConfig", "sso:config", "sso:config:post", "POST", "/api/v0/sso/config", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*SetSsoConfigRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "ca_contents":
+					return m.CaContents
+				case "sso_url":
+					return m.SsoUrl
+				case "email_attr":
+					return m.EmailAttr
+				case "username_attr":
+					return m.UsernameAttr
+				case "groups_attr":
+					return m.GroupsAttr
+				case "entity_issuer":
+					return m.EntityIssuer
+				case "name_id_policy_format":
+					return m.NameIdPolicyFormat
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }
