@@ -34,6 +34,36 @@ func init() {
         "tags": [
           "SsoConfigService"
         ]
+      },
+      "post": {
+        "operationId": "SsoConfigService_SetSsoConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.sso.SetSsoConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.sso.SetSsoConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SsoConfigService"
+        ]
       }
     }
   },
@@ -66,6 +96,46 @@ func init() {
           "type": "string"
         },
         "name_id_policy_format": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.sso.SetSsoConfigRequest": {
+      "type": "object",
+      "properties": {
+        "ca_contents": {
+          "type": "string"
+        },
+        "sso_url": {
+          "type": "string"
+        },
+        "email_attr": {
+          "type": "string"
+        },
+        "username_attr": {
+          "type": "string"
+        },
+        "groups_attr": {
+          "type": "string"
+        },
+        "allowed_groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entity_issuer": {
+          "type": "string"
+        },
+        "name_id_policy_format": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.sso.SetSsoConfigResponse": {
+      "type": "object",
+      "properties": {
+        "response": {
           "type": "string"
         }
       }
