@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -31,6 +30,25 @@ var configCmdFlags = struct {
 	opensearch bool
 	postgresql bool
 }{}
+
+const (
+	FRONTEND_COMMANDS = `
+	sudo chef-automate config patch /tmp/%s;
+	export TIMESTAMP=$(date +'%s');
+	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
+	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
+
+	BACKEND_COMMAND = `
+	export HAB_LICENSE=accept-no-persist;
+	export TIMESTAMP=$(date +"%s");
+	source /hab/sup/default/SystemdEnvironmentFile.sh;
+	automate-backend-ctl applied --svc=automate-ha-%s | tail -n +2 > /tmp/pg_config.toml; 
+	cat /tmp/pg_config.toml >> /tmp/%s ;
+	sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/pg_config.toml;   
+	`
+
+	dateFormat = "%Y%m%d%H%M%S"
+)
 
 func init() {
 	configCmd.AddCommand(showConfigCmd)
@@ -181,19 +199,25 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 		if configCmdFlags.frontend {
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
-			writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
+			// writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
+			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], "fe")
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], scriptCommands)
 			}
 		}
 		if configCmdFlags.postgresql {
+			const remoteService string = "postgresql"
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], "%s")
 			for i := 0; i < 1; i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], "pg")
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], scriptCommands)
 			}
 		}
 		if configCmdFlags.opensearch {
+			const remoteService string = "opensearch"
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], "%s")
+			// scriptCommands := "export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/os_config.toml; cat /tmp/os_config.toml >> /tmp/" + args[0] + " ;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/os_config.toml; \n"
 			for i := 0; i < 1; i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], "os")
+				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], scriptCommands)
 			}
 		}
 	} else {
@@ -211,7 +235,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteType string) {
+func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteCommands string) {
 
 	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
@@ -273,18 +297,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	}
 
 	writer.StartSpinner()
-	switch remoteType {
-	case "fe":
-		err = session.Run("sudo chef-automate config patch /tmp/" + path + ";export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP; sudo chef-automate config show > sudo /etc/chef-automate/config.toml;\n")
-
-	case "pg":
-		const remoteService string = "postgresql"
-		err = session.Run("export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/pg_config.toml; cat /tmp/pg_config.toml >> /tmp/" + path + " ;sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/pg_config.toml; \n")
-
-	case "os":
-		const remoteService string = "opensearch"
-		err = session.Run("export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/os_config.toml; cat /tmp/os_config.toml >> /tmp/" + path + " ;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/os_config.toml; \n")
-	}
+	err = session.Run(remoteCommands)
 
 	writer.StopSpinner()
 	if err != nil {
