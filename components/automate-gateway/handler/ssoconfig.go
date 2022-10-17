@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"strings"
     "net/http"
@@ -21,6 +20,8 @@ type SsoConfig struct {
 	license_client license_control.LicenseControlServiceClient
 	client         deployment.DeploymentClient
 }
+
+const ssoFilesPath = "/var/automate-ha/"
 
 // NewSsoConfigHandler - create a new ssoconfig service handler
 func NewSsoConfigHandler(license_client license_control.LicenseControlServiceClient, client deployment.DeploymentClient) *SsoConfig {
@@ -87,9 +88,10 @@ func (a *SsoConfig) DeleteSsoConfig(ctx context.Context, in *empty.Empty) (*sso.
 			return nil, err
 		}
 		fileName := "revert-status.txt"
-		err = ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Pending"), 0777)
+		err = ioutil.WriteFile(ssoFilesPath+fileName, []byte("Pending"), 0777)
 		if err != nil {
-			fmt.Printf("Unable to write file: %v", err)
+			log.Printf("Unable to write file:", err)
+			return nil, err
 		}
 		go makeRequest("DELETE", *url, nil, fileName)
 		return &sso.DeleteSsoConfigResponse{
@@ -155,14 +157,14 @@ func makeRequest(requestType string, url string, jsonData []byte, fileName strin
     }
     defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
-		ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Success"), 0777)
+		ioutil.WriteFile(ssoFilesPath+fileName, []byte("Success"), 0777)
 		return
 	}
-	ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Failure"), 0777)
+	ioutil.WriteFile(ssoFilesPath+fileName, []byte("Failure"), 0777)
 }
 
 func getBastionUrl() (*string, error) {
-	content, err := ioutil.ReadFile("/var/automate-ha/bastion_info.txt")
+	content, err := ioutil.ReadFile(ssoFilesPath+"bastion_info.txt")
 	if err != nil {
 		log.Fatal("Error occurred while reading file: ", err)
 		return nil, err
