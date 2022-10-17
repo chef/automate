@@ -221,10 +221,6 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	if err != nil {
 		writer.Errorf("Parsing key failed: %v", err)
 	}
-	// _, err := kh.New("/root/.ssh/known_hosts")
-	if err != nil {
-		writer.Errorf("could not create hostkeycallback function: ", err)
-	}
 	var (
 		keyErr *knownhosts.KeyError
 	)
@@ -278,10 +274,11 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	// writer.Printf("Executing patch command on IP: " + ip)
 	writer.StartSpinner()
 	if remoteType == "fe" {
-		err = session.Run("sudo chef-automate config patch /tmp/" + path +
-			"\n")
+		// creating helper to update config toml
+
+		err = session.Run("sudo chef-automate config patch /tmp/" + path + ";echo \"Arvinth: \";export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");echo \"$TIMESTAMP\";sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP; sudo chef-automate config show > sudo /etc/chef-automate/config.toml;\n")
 	} else if remoteType == "pg" {
-		// err = session.Run("sudo chef-automate config patch  /tmp/" + path + "")
+
 		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "\n")
 	} else {
 		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "\n")
