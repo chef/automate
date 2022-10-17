@@ -86,6 +86,8 @@ module AutomateCluster
       default :root_ca
       default :public_key
       default :private_key
+      default :admin_dn
+      default :nodes_dn
     end
 
     config_context :postgresql do

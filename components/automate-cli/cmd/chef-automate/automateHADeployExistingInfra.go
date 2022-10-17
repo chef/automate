@@ -3,7 +3,6 @@ package main
 import (
 	"container/list"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -64,17 +63,17 @@ func (e *existingInfra) generateConfig() error {
 	return nil
 }
 
-func (e *existingInfra) getDistinguishedNameFromKey() (*pkix.Name, error) {
-	dn_value := e.config.Opensearch.Config.PublicKey
-	block, _ := pem.Decode([]byte(dn_value))
+func (e *existingInfra) getDistinguishedNameFromKey() (string, error) {
+	public_key := e.config.Opensearch.Config.PublicKey
+	block, _ := pem.Decode([]byte(public_key))
 	if block == nil {
-		return nil, status.New(status.ConfigError, "failed to decode certificate PEM")
+		return "", status.New(status.ConfigError, "failed to decode certificate PEM")
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
-	if err == nil {
-		return nil, status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
+	if err != nil {
+		return "", status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
 	}
-	return &cert.Subject, nil
+	return fmt.Sprintf("%v", cert.Subject), nil
 }
 
 func (e *existingInfra) getConfigPath() string {

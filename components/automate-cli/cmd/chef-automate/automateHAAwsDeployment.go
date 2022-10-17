@@ -3,7 +3,6 @@ package main
 import (
 	"container/list"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -72,24 +71,24 @@ func (a *awsDeployment) generateConfig() error {
 	if err != nil {
 		return err
 	}
-	a.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", dn)
-	a.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", dn)
+	a.config.Opensearch.Config.AdminDn = dn
+	a.config.Opensearch.Config.NodesDn = dn
 	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, a.config)
 	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
 	return nil
 }
 
-func (a *awsDeployment) getDistinguishedNameFromKey() (*pkix.Name, error) {
-	dn_value := a.config.Opensearch.Config.PublicKey
-	block, _ := pem.Decode([]byte(dn_value))
+func (a *awsDeployment) getDistinguishedNameFromKey() (string, error) {
+	public_key := a.config.Opensearch.Config.PublicKey
+	block, _ := pem.Decode([]byte(public_key))
 	if block == nil {
-		return nil, status.New(status.ConfigError, "failed to decode certificate PEM")
+		return "", status.New(status.ConfigError, "failed to decode certificate PEM")
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err == nil {
-		return nil, status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
+		return "", status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
 	}
-	return &cert.Subject, nil
+	return fmt.Sprintf("%v", cert.Subject), nil
 }
 
 func (a *awsDeployment) getConfigPath() string {
