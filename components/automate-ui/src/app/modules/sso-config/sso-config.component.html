@@ -59,14 +59,6 @@
             </chef-error>
           </chef-form-field>
           <chef-form-field>
-            <label for="groupAttribute">Group Attribute</label>
-            <input id="groupAttribute" chefInput formControlName="groupAttribute" type="text" />
-          </chef-form-field>
-          <chef-form-field>
-            <label for="allowedGroups">Allowed Groups</label>
-            <textarea id="allowedGroups" chefInput formControlName="allowedGroups" spellcheck="false"></textarea>
-          </chef-form-field>
-          <chef-form-field>
             <label for="entityIssuer">Entity Issuer <span aria-hidden="true">*</span></label>
             <input id="entityIssuer" chefInput formControlName="entityIssuer" type="text" />
             <chef-error *ngIf="hasRequiredError('entityIssuer')">
@@ -77,14 +69,22 @@
             </chef-error>
           </chef-form-field>
           <chef-form-field>
-            <label for="caInfo">CA information <span aria-hidden="true">*</span></label>
-            <textarea id="caInfo" chefInput name="caInfo" formControlName="caInfo"></textarea>
+            <label for="caInfo">CA Information <span aria-hidden="true">*</span></label>
+            <textarea id="caInfo" chefInput name="caInfo" formControlName="caInfo" placeholder="-----BEGIN CERTIFICATE-----"></textarea>
             <chef-error *ngIf="hasRequiredError('caInfo')">
               CA information is required.
             </chef-error>
           </chef-form-field>
           <chef-form-field>
-            <label for="nameIdPolicyFormat">Name Id policy format</label>
+            <label for="groupAttribute">Group Attribute</label>
+            <input id="groupAttribute" chefInput formControlName="groupAttribute" type="text" />
+          </chef-form-field>
+          <chef-form-field>
+            <label for="allowedGroups">Allowed Groups</label>
+            <textarea id="allowedGroups" chefInput formControlName="allowedGroups" spellcheck="false"></textarea>
+          </chef-form-field>
+          <chef-form-field>
+            <label for="nameIdPolicyFormat">Name Id Policy Format</label>
             <input id="nameIdPolicyFormat" chefInput formControlName="nameIdPolicyFormat" type="text" />
           </chef-form-field>
           <div id="button-bar">
