@@ -159,6 +159,8 @@ module "opensearch" {
   opensearch_root_ca              = var.opensearch_root_ca
   opensearch_private_key          = var.opensearch_private_key
   opensearch_public_key           = var.opensearch_public_key
+  opensearch_admin_dn             = var.opensearch_admin_dn
+  opensearch_nodes_dn             = var.opensearch_nodes_dn
 }
 
 module "postgresql" {

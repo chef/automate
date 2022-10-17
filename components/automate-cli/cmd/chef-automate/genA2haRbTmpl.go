@@ -58,6 +58,8 @@ opensearch do
   {{ if .Opensearch.Config.RootCA }} root_ca "{{ .Opensearch.Config.RootCA }}" {{ else }} # root_ca "{{ .Opensearch.Config.RootCA }}" {{ end }}
   {{ if .Opensearch.Config.PrivateKey }} private_key "{{ .Opensearch.Config.PrivateKey }}" {{ else }} # private_key "{{ .Opensearch.Config.PrivateKey }}" {{ end }}
   {{ if .Opensearch.Config.PublicKey }} public_key "{{ .Opensearch.Config.PublicKey }}" {{ else }} # public_key "{{ .Opensearch.Config.PublicKey }}" {{ end }}
+  {{ if .Opensearch.Config.AdminDn }} admin_dn "{{ .Opensearch.Config.AdminDn }}" {{ else }} # admin_dn "{{ .Opensearch.Config.AdminDn }}" {{ end }}
+  {{ if .Opensearch.Config.NodesDn }} nodes_dn "{{ .Opensearch.Config.NodesDn }}" {{ else }} # nodes_dn "{{ .Opensearch.Config.NodesDn }}" {{ end }}
 end
 
 ###############################################################
@@ -150,6 +152,8 @@ opensearch do
   {{ if .Opensearch.Config.RootCA }} root_ca "{{ .Opensearch.Config.RootCA }}" {{ else }} # root_ca "{{ .Opensearch.Config.RootCA }}" {{ end }}
   {{ if .Opensearch.Config.PrivateKey }} private_key "{{ .Opensearch.Config.PrivateKey }}" {{ else }} # private_key "{{ .Opensearch.Config.PrivateKey }}" {{ end }}
   {{ if .Opensearch.Config.PublicKey }} public_key "{{ .Opensearch.Config.PublicKey }}" {{ else }} # public_key "{{ .Opensearch.Config.PublicKey }}" {{ end }}
+  {{ if .Opensearch.Config.AdminDn }} admin_dn "{{ .Opensearch.Config.AdminDn }}" {{ else }} # admin_dn "{{ .Opensearch.Config.AdminDn }}" {{ end }}
+  {{ if .Opensearch.Config.NodesDn }} nodes_dn "{{ .Opensearch.Config.NodesDn }}" {{ else }} # nodes_dn "{{ .Opensearch.Config.NodesDn }}" {{ end }}
 end
 
 ###############################################################

@@ -118,3 +118,8 @@ variable opensearch_private_key {
 
 variable opensearch_public_key {
 }
+variable opensearch_admin_dn {
+}
+variable opensearch_nodes_dn {
+}
+

@@ -68,6 +68,8 @@ type AwsConfigToml struct {
 			RootCA        string `toml:"root_ca"`
 			PrivateKey    string `toml:"private_key"`
 			PublicKey     string `toml:"public_key"`
+			AdminDn       string `toml:"admin_dn"`
+			NodesDn       string `toml:"nodes_dn"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
@@ -193,6 +195,8 @@ type ExistingInfraConfigToml struct {
 			RootCA        string `toml:"root_ca"`
 			PrivateKey    string `toml:"private_key"`
 			PublicKey     string `toml:"public_key"`
+			AdminDn       string `toml:"admin_dn"`
+			NodesDn       string `toml:"nodes_dn"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {

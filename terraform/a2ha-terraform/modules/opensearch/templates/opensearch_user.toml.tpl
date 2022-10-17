@@ -27,3 +27,11 @@ EOT
   admin_key = """${opensearch_private_key}"""
   ssl_cert = """${opensearch_public_key}"""
   ssl_key = """${opensearch_private_key}"""
+
+[plugins.security.authcz]
+admin_dn = "${opensearch_admin_dn}"
+[plugins.security.ssl.transport]
+enforce_hostname_verification = false
+resolve_hostname = false
+[plugins.security]
+nodes_dn = "${opensearch_nodes_dn}"

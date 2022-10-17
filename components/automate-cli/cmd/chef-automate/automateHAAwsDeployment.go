@@ -2,6 +2,10 @@ package main
 
 import (
 	"container/list"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -64,9 +68,28 @@ func (a *awsDeployment) generateConfig() error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
 	}
+	dn, err := a.getDistinguishedNameFromKey()
+	if err != nil {
+		return err
+	}
+	a.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", dn)
+	a.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", dn)
 	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, a.config)
 	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
 	return nil
+}
+
+func (a *awsDeployment) getDistinguishedNameFromKey() (*pkix.Name, error) {
+	dn_value := a.config.Opensearch.Config.PublicKey
+	block, _ := pem.Decode([]byte(dn_value))
+	if block == nil {
+		return nil, status.New(status.ConfigError, "failed to decode certificate PEM")
+	}
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err == nil {
+		return nil, status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
+	}
+	return &cert.Subject, nil
 }
 
 func (a *awsDeployment) getConfigPath() string {

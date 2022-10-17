@@ -224,6 +224,9 @@ postgresql_public_key = <<-EOT
 
 EOT
 
+admin_dn = "<%= config.opensearch.admin_dn %>"
+nodes_dn = "<%= config.opensearch.nodes_dn %>"
+
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
