@@ -276,12 +276,12 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	if remoteType == "fe" {
 		// creating helper to update config toml
 
-		err = session.Run("sudo chef-automate config patch /tmp/" + path + ";echo \"Arvinth: \";export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");echo \"$TIMESTAMP\";sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP; sudo chef-automate config show > sudo /etc/chef-automate/config.toml;\n")
+		err = session.Run("sudo chef-automate config patch /tmp/" + path + ";export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP; sudo chef-automate config show > sudo /etc/chef-automate/config.toml;\n")
 	} else if remoteType == "pg" {
 
-		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "\n")
+		err = session.Run("export HAB_LICENSE=accept-no-persist;sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "\n")
 	} else {
-		err = session.Run("export HAB_LICENSE=accept-no-persist; echo \"yes\" | sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "\n")
+		err = session.Run("export HAB_LICENSE=accept-no-persist;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "\n")
 	}
 	writer.StopSpinner()
 	if err != nil {
