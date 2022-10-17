@@ -66,6 +66,8 @@ type AwsConfigToml struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
 			RootCA        string `toml:"root_ca"`
+			AdminCert     string `toml:"admin_cert"`
+			AdminKey      string `toml:"admin_key"`
 			PrivateKey    string `toml:"private_key"`
 			PublicKey     string `toml:"public_key"`
 			AdminDn       string `toml:"admin_dn"`
@@ -193,6 +195,8 @@ type ExistingInfraConfigToml struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
 			RootCA        string `toml:"root_ca"`
+			AdminCert     string `toml:"admin_cert"`
+			AdminKey      string `toml:"admin_key"`
 			PrivateKey    string `toml:"private_key"`
 			PublicKey     string `toml:"public_key"`
 			AdminDn       string `toml:"admin_dn"`

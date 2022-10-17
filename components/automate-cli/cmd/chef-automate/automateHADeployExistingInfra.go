@@ -52,19 +52,22 @@ func (e *existingInfra) generateConfig() error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
 	}
-	dn, err := e.getDistinguishedNameFromKey()
+	admin_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
 	if err != nil {
 		return err
 	}
-	e.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", dn)
-	e.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", dn)
+	e.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", admin_dn)
+	nodes_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.PublicKey)
+	if err != nil {
+		return err
+	}
+	e.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 	finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, e.config)
 	writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 	return nil
 }
 
-func (e *existingInfra) getDistinguishedNameFromKey() (string, error) {
-	public_key := e.config.Opensearch.Config.PublicKey
+func (e *existingInfra) getDistinguishedNameFromKey(public_key string) (string, error) {
 	block, _ := pem.Decode([]byte(public_key))
 	if block == nil {
 		return "", status.New(status.ConfigError, "failed to decode certificate PEM")

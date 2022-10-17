@@ -56,6 +56,8 @@ end
 opensearch do
   instance_count {{ .Opensearch.Config.InstanceCount }}
   {{ if .Opensearch.Config.RootCA }} root_ca "{{ .Opensearch.Config.RootCA }}" {{ else }} # root_ca "{{ .Opensearch.Config.RootCA }}" {{ end }}
+  {{ if .Opensearch.Config.AdminKey }} admin_key "{{ .Opensearch.Config.AdminKey }}" {{ else }} # admin_key "{{ .Opensearch.Config.AdminKey }}" {{ end }}
+  {{ if .Opensearch.Config.AdminCert }} admin_cert "{{ .Opensearch.Config.AdminCert }}" {{ else }} # admin_cert "{{ .Opensearch.Config.AdminCert }}" {{ end }}
   {{ if .Opensearch.Config.PrivateKey }} private_key "{{ .Opensearch.Config.PrivateKey }}" {{ else }} # private_key "{{ .Opensearch.Config.PrivateKey }}" {{ end }}
   {{ if .Opensearch.Config.PublicKey }} public_key "{{ .Opensearch.Config.PublicKey }}" {{ else }} # public_key "{{ .Opensearch.Config.PublicKey }}" {{ end }}
   admin_dn "{{ .Opensearch.Config.AdminDn }}"
