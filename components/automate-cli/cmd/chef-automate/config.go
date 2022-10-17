@@ -202,14 +202,14 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			// writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], scriptCommands)
+				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], scriptCommands)
 			}
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], "%s")
 			for i := 0; i < 1; i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], scriptCommands)
+				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], scriptCommands)
 			}
 		}
 		if configCmdFlags.opensearch {
@@ -217,7 +217,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], "%s")
 			// scriptCommands := "export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/os_config.toml; cat /tmp/os_config.toml >> /tmp/" + args[0] + " ;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/os_config.toml; \n"
 			for i := 0; i < 1; i++ {
-				executePatchOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], scriptCommands)
+				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], scriptCommands)
 			}
 		}
 	} else {
@@ -235,7 +235,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip string, path string, remoteCommands string) {
+func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
 
 	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
@@ -274,7 +274,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	}
 
 	// Open connection
-	conn, err := ssh.Dial("tcp", ip+":"+sshPort, config)
+	conn, err := ssh.Dial("tcp", hostIP+":"+sshPort, config)
 	if conn == nil || err != nil {
 		writer.Errorf("dial failed:%v", err)
 		return
@@ -290,7 +290,7 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 	session.Stdout = &stdoutBuf
 	// err = session.Run("sudo rm -rf /tmp/" + path + "")
 	cmd := "scp"
-	exec_args := []string{"-i", sshKeyFile, "-r", path, sshUser + "@" + ip + ":/tmp/"}
+	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/"}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
