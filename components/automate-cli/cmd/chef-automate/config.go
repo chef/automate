@@ -271,18 +271,21 @@ func executePatchOnRemote(sshUser string, sshPort string, sshKeyFile string, ip 
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	// writer.Printf("Executing patch command on IP: " + ip)
+
 	writer.StartSpinner()
-	if remoteType == "fe" {
-		// creating helper to update config toml
-
+	switch remoteType {
+	case "fe":
 		err = session.Run("sudo chef-automate config patch /tmp/" + path + ";export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP; sudo chef-automate config show > sudo /etc/chef-automate/config.toml;\n")
-	} else if remoteType == "pg" {
 
-		err = session.Run("export HAB_LICENSE=accept-no-persist;sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/" + path + "\n")
-	} else {
-		err = session.Run("export HAB_LICENSE=accept-no-persist;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/" + path + "\n")
+	case "pg":
+		const remoteService string = "postgresql"
+		err = session.Run("export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/pg_config.toml; cat /tmp/pg_config.toml >> /tmp/" + path + " ;sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/pg_config.toml; \n")
+
+	case "os":
+		const remoteService string = "opensearch"
+		err = session.Run("export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/os_config.toml; cat /tmp/os_config.toml >> /tmp/" + path + " ;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/os_config.toml; \n")
 	}
+
 	writer.StopSpinner()
 	if err != nil {
 		writer.Errorf("Run failed:%v", err)
