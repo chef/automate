@@ -188,7 +188,7 @@ func(a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigRequest
 		EntityIssuer: in.EntityIssuer,
 		NameIdPolicyFormat: in.NameIdPolicyFormat,
 	}
-	body_params:= &PostConfig{
+	bodyParams:= &PostConfig{
 		Ca_contents:         req.CaContents,
 		Sso_url:             req.SsoUrl,
 		Email_attr:          req.EmailAttr,
@@ -198,7 +198,7 @@ func(a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigRequest
 		Entity_issuer:       req.EntityIssuer,
 		Name_id_policy_format: req.NameIdPolicyFormat,
 	}
-	jsonValue, _ :=  json.Marshal(body_params)
+	jsonValue, _ :=  json.Marshal(bodyParams)
 	url, err := getBastionUrl()
 	if err != nil {
 		log.Fatalln("Errror while creating bastion url = ", err)
