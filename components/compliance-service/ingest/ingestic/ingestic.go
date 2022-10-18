@@ -1222,9 +1222,6 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, upgradeT
 	boolQuery := elastic.NewBoolQuery().
 		Must(elastic.NewTermQuery("daily_latest", true)).Must(rangeQuery)
 
-	src, _ := boolQuery.Source()
-	logrus.Infof("Test Query For upgrade is noow : %v", src)
-
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"report_uuid",
 		"node_uuid",

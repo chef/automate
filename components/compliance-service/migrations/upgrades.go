@@ -21,7 +21,6 @@ func NewService(pg *pgdb.UpgradesDB, cerealManger *cereal.Manager) *Upgrade {
 }
 
 //PollForUpgradeFlagDayLatest checks for the day latest flag value in upgrade flags
-//TODO:: run the upgrade from current date to upgradeDate
 func (u *Upgrade) PollForUpgradeFlagDayLatest(upgradeDate time.Time) error {
 	logrus.Infof("upgrade will run from %s to till now", upgradeDate.String())
 	controlFlag, err := u.getUpgradeFlag(pgdb.ControlIndexFlag)

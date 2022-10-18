@@ -128,9 +128,9 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 		return nil, err
 	}
 
-	logrus.Info("Inside the upgrades flag flow")
 	logrus.Infof("Upgrade started at time %v", time.Now())
 	if job.ControlFlag {
+
 		logrus.Info("Inside the control flag")
 		if err := performActionForUpgrade(ctx, t.ESClient, job.UpgradeDate); err != nil {
 			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
@@ -159,7 +159,7 @@ type ControlIndexUpgradeTask struct {
 
 func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient, upgradeTime time.Time) error {
 	mapping := mappings.ComplianceRepDate
-	if time.Now().Sub(upgradeTime)/24 > 90 {
+	if time.Now().Sub(upgradeTime).Hours()/24 > 90 {
 		upgradeTime = time.Now().Add(-24 * time.Hour * 90)
 	}
 	reportsMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, upgradeTime)
