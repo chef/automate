@@ -2254,7 +2254,7 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 	return nil
 }
 
-func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
+func getStartDateFromEndDate(endTime string, startTime string, isEnhancedReportingEnabled bool) ([]string, error) {
 	if len(endTime) == 0 {
 		return nil, nil
 	}
@@ -2264,13 +2264,14 @@ func getStartDateFromEndDate(endTime string, startTime string) ([]string, error)
 		return []string{}, err
 	}
 
-	if checkTodayIsEndTime(parsedEndTime) {
+	if checkTodayIsEndTime(parsedEndTime) && isEnhancedReportingEnabled {
 		if startTime == "" {
 			return []string{}, nil
 		}
 		return []string{startTime}, nil
 	}
-	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
+	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(),
+		parsedEndTime.Hour(), parsedEndTime.Minute(), parsedEndTime.Second(), 0, parsedEndTime.Location())
 
 	return []string{newStartTime.Format(time.RFC3339)}, nil
 
@@ -2306,7 +2307,8 @@ func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters
 		return nil, err
 	}
 
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)

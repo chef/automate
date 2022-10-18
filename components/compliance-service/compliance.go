@@ -85,11 +85,12 @@ func createESBackend(servConf *config.Compliance, db *pgdb.DB) relaxting.ES2Back
 
 	// define the ElasticSearch backend config with legacy automate auth
 	esr := relaxting.ES2Backend{
-		ESUrl:             servConf.ElasticSearch.Url,
-		Enterprise:        servConf.Delivery.Enterprise,
-		ChefDeliveryUser:  servConf.Delivery.User,
-		ChefDeliveryToken: servConf.Delivery.Token,
-		PGdb:              db,
+		ESUrl:                      servConf.ElasticSearch.Url,
+		Enterprise:                 servConf.Delivery.Enterprise,
+		ChefDeliveryUser:           servConf.Delivery.User,
+		ChefDeliveryToken:          servConf.Delivery.Token,
+		PGdb:                       db,
+		IsEnhancedReportingEnabled: servConf.Service.EnableEnhancedReporting,
 	}
 	return esr
 }

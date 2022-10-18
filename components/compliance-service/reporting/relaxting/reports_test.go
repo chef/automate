@@ -3,14 +3,15 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/golang/protobuf/ptypes"
+	"github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -840,5 +841,105 @@ func TestGetMultiControlString(t *testing.T) {
 	for _, tc := range tests {
 		resp := getMultiControlString(tc.input)
 		assert.Equal(t, tc.expectedResp, resp)
+	}
+}
+
+func TestGetStartDateFromEndDate(t *testing.T) {
+	type test struct {
+		name                       string
+		startTime                  string
+		endTime                    string
+		isEnhancedReportingEnabled bool
+		expectedStartTime          string
+	}
+	tests := []test{
+		{
+			name:                       "config_enabled_end_date_as_previous_date",
+			startTime:                  time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+			endTime:                    time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+			isEnhancedReportingEnabled: true,
+			expectedStartTime:          time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+		},
+		{
+			name:                       "config_enabled_end_date_as_current_date",
+			startTime:                  time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+			endTime:                    time.Now().Format(time.RFC3339),
+			isEnhancedReportingEnabled: true,
+			expectedStartTime:          time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+		},
+		{
+			name:                       "config_disabled_end_date_as_previous_date",
+			startTime:                  time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+			endTime:                    time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+			isEnhancedReportingEnabled: false,
+			expectedStartTime:          time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+		},
+		{
+			name:                       "config_disabled_end_date_as_current_date",
+			startTime:                  time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+			endTime:                    time.Now().Format(time.RFC3339),
+			isEnhancedReportingEnabled: false,
+			expectedStartTime:          time.Now().Format(time.RFC3339),
+		},
+		{
+			name:                       "config_disabled_end_date_as_empty",
+			startTime:                  time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+			endTime:                    "",
+			isEnhancedReportingEnabled: false,
+			expectedStartTime:          "",
+		},
+		{
+			name:                       "config_enabled_end_date_as_empty",
+			startTime:                  time.Now().Add(time.Hour * 48 * -1).Format(time.RFC3339),
+			endTime:                    "",
+			isEnhancedReportingEnabled: true,
+			expectedStartTime:          "",
+		},
+		{
+			name:                       "config_enabled_end_date_as_previous_date_start_date_as_empty",
+			startTime:                  "",
+			endTime:                    time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+			isEnhancedReportingEnabled: true,
+			expectedStartTime:          time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+		},
+		{
+			name:                       "config_enabled_end_date_as_current_date_start_date_as_empty",
+			startTime:                  "",
+			endTime:                    time.Now().Format(time.RFC3339),
+			isEnhancedReportingEnabled: true,
+			expectedStartTime:          "",
+		},
+		{
+			name:                       "config_disabled_end_date_as_previous_date_start_date_as_empty",
+			startTime:                  "",
+			endTime:                    time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+			isEnhancedReportingEnabled: false,
+			expectedStartTime:          time.Now().Add(time.Hour * 24 * -1).Format(time.RFC3339),
+		},
+		{
+			name:                       "config_disabled_end_date_as_current_date_start_date_as_empty",
+			startTime:                  "",
+			endTime:                    time.Now().Format(time.RFC3339),
+			isEnhancedReportingEnabled: false,
+			expectedStartTime:          time.Now().Format(time.RFC3339),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			resp, err := getStartDateFromEndDate(tc.endTime, tc.startTime, tc.isEnhancedReportingEnabled)
+			assert.NoError(t, err)
+			if tc.startTime != "" && tc.endTime != "" {
+				assert.Equal(t, tc.expectedStartTime, resp[0])
+			} else if tc.endTime == "" {
+				assert.Equal(t, 0, len(resp))
+			} else if tc.startTime == "" {
+				if tc.expectedStartTime != "" {
+					assert.Equal(t, tc.expectedStartTime, resp[0])
+				} else {
+					assert.Equal(t, 0, len(resp))
+				}
+			}
+		})
 	}
 }

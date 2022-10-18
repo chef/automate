@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"time"
+
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
@@ -21,7 +22,8 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
 	//filters["start_time"] = []string{}
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +72,8 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +124,8 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 	if err != nil {
 		return nil, err
 	}
