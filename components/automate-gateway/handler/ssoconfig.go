@@ -44,6 +44,8 @@ func NewSsoConfigHandler(license_client license_control.LicenseControlServiceCli
 	}
 }
 
+const ssoFilesPath = "/var/automate-ha/"
+
 func (a *SsoConfig) GetSsoConfig(ctx context.Context, in *empty.Empty) (*sso.GetSsoConfigResponse, error) {
 
 	deploymentType, err := a.getDeploymentDetails(ctx)
@@ -136,10 +138,10 @@ func makeRequest(requestType string, url string, jsonData []byte, fileName strin
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
-		ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Success"), 0777)
+		ioutil.WriteFile(ssoFilesPath+fileName, []byte("Success"), 0777)
 		return
 	}
-	ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Failure"), 0777)
+	ioutil.WriteFile(ssoFilesPath+fileName, []byte("Failure"), 0777)
 }
 
 func (a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigRequest) (*sso.SetSsoConfigResponse, error) {
@@ -175,7 +177,7 @@ func (a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigReques
 		return nil, err
 	}
 	fileName := "post-status.txt"
-	err = ioutil.WriteFile("/var/automate-ha/"+fileName, []byte("Pending"), 0777)
+	err = ioutil.WriteFile(ssoFilesPath+fileName, []byte("Pending"), 0777)
 	if err != nil {
 		fmt.Printf("Unable to write the file: %v", err)
 	}
@@ -186,7 +188,7 @@ func (a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigReques
 }
 
 func getBastionUrl() (*string, error) {
-	content, err := ioutil.ReadFile("/var/automate-ha/bastion_info.txt")
+	content, err := ioutil.ReadFile(ssoFilesPath+"bastion_info.txt")
 	if err != nil {
 		log.Fatal("Error occurred while reading file: ", err)
 		return nil, err
