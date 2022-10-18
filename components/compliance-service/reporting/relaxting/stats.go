@@ -4,9 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
-
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"time"
 
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
@@ -119,6 +118,7 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 
 	return depth.getStatsSummaryNodesResult(searchResult), nil
 }
+
 
 //GetStatsSummaryControlsRange - Gets summary stats, control centric, aggregate data for the given set of filters with date range
 func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]string) (*stats.ControlsSummary, error) {
