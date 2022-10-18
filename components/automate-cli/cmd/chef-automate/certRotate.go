@@ -1,12 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/knownhosts"
 )
 
-var rootCaFlags = struct {
+var certFlags = struct {
 	rootCa      string
 	privateCert string
 	publicCert  string
@@ -17,13 +27,22 @@ var sshFlag = struct {
 	pg       bool
 }{}
 
-// certRotateCmd represents the certRotate command
 var certRotateCmd = &cobra.Command{
-	Use:   "certRotate",
+	Use:   "cert-rotate",
 	Short: "Chef Automate rotate cert",
 	Long:  "Chef Automate CLI command to rotate certificates",
 	RunE:  certRotate,
 }
+
+const (
+	FRONTEND_COMMANDS = `
+	sudo chef-automate config patch /tmp/%s;
+	export TIMESTAMP=$(date +'%s');
+	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
+	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
+
+	dateFormat = "%Y%m%d%H%M%S"
+)
 
 func init() {
 	RootCmd.AddCommand(certRotateCmd)
@@ -31,17 +50,173 @@ func init() {
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.automate, "automate", false, "Automate ha server name to ssh")
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.pg, "pg", false, "Automate ha server name to ssh")
 
-	certRotateCmd.PersistentFlags().StringVar(&rootCaFlags.rootCa, "root-ca", "", "Automate Root CA value")
-	certRotateCmd.PersistentFlags().StringVar(&rootCaFlags.privateCert, "private-cert", "", "Automate ha private certificate")
-	certRotateCmd.PersistentFlags().StringVar(&rootCaFlags.publicCert, "public-cert", "", "Automate ha public certificate")
+	certRotateCmd.PersistentFlags().StringVar(&certFlags.rootCa, "root-ca", "", "Automate Root CA value")
+	certRotateCmd.PersistentFlags().StringVar(&certFlags.privateCert, "private-cert", "", "Automate ha private certificate")
+	certRotateCmd.PersistentFlags().StringVar(&certFlags.publicCert, "public-cert", "", "Automate ha public certificate")
+}
+
+func errorCheck(err error) {
+	if err != nil {
+		log.Panicf("failed reading data from file: %s", err)
+	}
 }
 
 func certRotate(cmd *cobra.Command, args []string) error {
-	fmt.Println(rootCaFlags.rootCa)
-	if sshFlag.automate {
-		fmt.Println("automate")
-	} else {
-		fmt.Println("pg")
+
+	rootCaPath := certFlags.rootCa
+	privateCertPath := certFlags.privateCert
+	publicCertPath := certFlags.publicCert
+	fileName := "cert.toml"
+
+	rootCA, err := ioutil.ReadFile(rootCaPath)
+	errorCheck(err)
+
+	privateCert, err := ioutil.ReadFile(privateCertPath)
+	errorCheck(err)
+
+	publicCert, err := ioutil.ReadFile(publicCertPath)
+	errorCheck(err)
+
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	config := fmt.Sprintf(`
+		[[load_balancer.v1.sys.frontend_tls]]
+			cert = """%v"""
+			key = """%v"""
+		[global.v1.external.automate.ssl]
+			root_cert = """%v"""
+		`, string(publicCert), string(privateCert), string(rootCA))
+
+	_, err = f.Write([]byte(config))
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	sshUser := "ec2-user"
+	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshPort := "22"
+
+	if isA2HARBFileExist() {
+		if sshFlag.automate {
+			automateIps := infra.Outputs.AutomatePrivateIps.Value
+			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, fileName, dateFormat)
+			for i := 0; i < len(automateIps); i++ {
+				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[i], fileName, scriptCommands)
+			}
+		}
 	}
 	return nil
+}
+
+func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
+
+	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	if err != nil {
+		writer.Errorf("Unable to read private key: %v", err)
+	}
+	signer, err := ssh.ParsePrivateKey(pemBytes)
+	if err != nil {
+		writer.Errorf("Parsing key failed: %v", err)
+	}
+	var (
+		keyErr *knownhosts.KeyError
+	)
+
+	config := &ssh.ClientConfig{
+		User: sshUser,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+			kh := checkKnownHosts()
+			hErr := kh(host, remote, pubKey)
+			// Reference: https://blog.golang.org/go1.13-errors
+			// To understand what errors.As is.
+			if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
+				// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
+				// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
+				// and if host is known then there is key mismatch the connection is then rejected.
+				writer.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
+				return keyErr
+			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
+				// host key not found in known_hosts then give a warning and continue to connect.
+				writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.", host)
+				return addHostKey(host, remote, pubKey)
+			}
+			writer.Printf("Pub key exists for %s.", host)
+			return nil
+		}),
+	}
+
+	// Open connection
+	conn, err := ssh.Dial("tcp", hostIP+":"+sshPort, config)
+	if conn == nil || err != nil {
+		writer.Errorf("dial failed:%v", err)
+		return
+	}
+	defer conn.Close()
+
+	// Open session
+	session, err := conn.NewSession()
+	if err != nil {
+		writer.Errorf("session failed:%v", err)
+	}
+	var stdoutBuf bytes.Buffer
+	session.Stdout = &stdoutBuf
+
+	cmd := "scp"
+	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/"}
+	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	writer.StartSpinner()
+	err = session.Run(remoteCommands)
+
+	writer.StopSpinner()
+	if err != nil {
+		writer.Errorf("Run failed:%v", err)
+	} else {
+		writer.Success("SCP successful...\n")
+	}
+	defer session.Close()
+}
+
+func createKnownHosts() {
+	f, fErr := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
+	if fErr != nil {
+		writer.Errorf("%v", fErr)
+	}
+	f.Close()
+}
+
+func checkKnownHosts() ssh.HostKeyCallback {
+	createKnownHosts()
+	kh, e := knownhosts.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
+	if e != nil {
+		writer.Errorf("%v", e)
+	}
+	return kh
+}
+
+func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
+	// if not nil then connection stops.
+	khFilePath := filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts")
+
+	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if fErr != nil {
+		return fErr
+	}
+	defer f.Close()
+
+	knownHosts := knownhosts.Normalize(remote.String())
+	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	return fileErr
 }
