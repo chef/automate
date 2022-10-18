@@ -207,11 +207,9 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
-	var upgradeService *migrations.Upgrade
+	upgradeDB := pgdb.NewDB(db)
+	upgradeService := migrations.NewService(upgradeDB, cerealManager)
 	if conf.Service.EnableEnhancedReporting {
-		upgradeDB := pgdb.NewDB(db)
-		upgradeService = migrations.NewService(upgradeDB, cerealManager)
-
 		// Initiating cereal Manager for upgrade jobs
 		err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
 		if err != nil {
@@ -275,9 +273,13 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		logrus.Fatalf("serveGrpc aborting, unable to run migrations: %v", err)
 	}
 
+	date, err := upgradeService.UpdateFlags(conf.Service.EnableEnhancedReporting)
+	if err != nil {
+		logrus.Fatalf("serveGrpc aborting, unable to find the date to run the upgrades: %v", err)
+	}
 	if conf.Service.EnableEnhancedReporting {
 		// Running upgrade scenarios for DayLatest flag
-		go upgradeService.PollForUpgradeFlagDayLatest()
+		go upgradeService.PollForUpgradeFlagDayLatest(date)
 	}
 
 	errc := make(chan error)

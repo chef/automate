@@ -1,9 +1,11 @@
 package migrations
 
 import (
+	"testing"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestPollDataForFlags(t *testing.T) {
@@ -57,7 +59,7 @@ func TestPollDataForFlags(t *testing.T) {
 
 	for _, test := range tests {
 
-		got := test.args.upgrade.PollForUpgradeFlagDayLatest()
+		got := test.args.upgrade.PollForUpgradeFlagDayLatest(time.Time{})
 
 		if test.wantError {
 			assert.Equal(t, got.Error(), test.error.Error())

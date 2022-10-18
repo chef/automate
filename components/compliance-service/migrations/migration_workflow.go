@@ -2,6 +2,8 @@ package migrations
 
 import (
 	"context"
+	"time"
+
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -9,7 +11,6 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 var (
@@ -132,10 +133,15 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
 		}
 
-		err := t.UpgradesDB.UpdateControlFlagToFalse()
+		err := t.UpgradesDB.UpdateControlFlagValue(false)
 		if err != nil {
 			logrus.Warnf("Unable to set upgrades flag in database")
 		}
+	}
+
+	err := t.UpgradesDB.RemoveEnhancedReportingFlag()
+	if err != nil {
+		logrus.Warn(errors.Wrapf(err, "Unable to delete the enhanced_reporting flag entry").Error())
 	}
 
 	logrus.Infof("Upgrade completed at time %v", time.Now())
