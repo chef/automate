@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 70
 +++
 
-{{< note >}} 
+{{< note >}}
 
 - The Large Compliance Report is supported from Chef Automate Version **4.2.x** and above.
 - The Large Compliance Report feature is not available for Chef Automate High Availability (HA) as of now.
@@ -26,8 +26,8 @@ The following change in architecture enables Automate to ingest reports larger t
 ![LCR Architecture](/images/automate/lcr_architecture.jpg)
 
 Automate with the configuration to allow ingestion of an extensive compliance report and allow the data to be sent to the OpenSearch data and in an externally deployed Minio Service. Automate in the configuration expects that a Minio Server is running externally to Automate ecosystem, which Automate can connect and transact to.
-  
-Automate with the configuration will enable Automate to:  
+
+Automate with the configuration will enable Automate to:
 
 - Allow ingestion of compliance reports larger than 4MB,
 - Exporting or downloading complete reports larger than 4MB in size.
@@ -42,7 +42,7 @@ Here is a benchmark test summary report run on
 
 - Instance Type: **16 vCPU, 30 GB memory**
 - Number of Compliance Targets: **20K**
-- **OpenSearch** and **Postgres** are deployed internally  
+- **OpenSearch** and **Postgres** are deployed internally
 
 | Report Size | Supported Concurrency |
 | --- | --- |
@@ -59,7 +59,7 @@ Here is a benchmark test summary report run on
 
 ### MinIO
 
-MinIO is a High-Performance Object Storage released under GNU Affero General Public License v3.0. It is API compatible with the Amazon S3 cloud storage service. MinIO is the only object storage suite available on public cloud, every Kubernetes distribution, the private cloud, and the edge.  
+MinIO is a High-Performance Object Storage released under GNU Affero General Public License v3.0. It is API compatible with the Amazon S3 cloud storage service. MinIO is the only object storage suite available on public cloud, every Kubernetes distribution, the private cloud, and the edge.
 
 Click [here](https://min.io) to learn more about MinIO and [set up](https://docs.min.io/minio/baremetal/) the MinIO on a baremetal server.
 
@@ -73,11 +73,11 @@ To enable Automate to ingest Large Compliance reports:
 
 ```toml
 [global.v1.external.minio]
-    ##Do not add the protocol(http or https) for minio server end point. ex. mydomain.com:1234 
-    endpoint = "<minio server end point>:<port>" 
+    ##Do not add the protocol(http or https) for minio server end point. ex. mydomain.com:1234
+    endpoint = "<minio server end point>:<port>"
     root_user = "<username>"
     root_password = "<password>"
-    
+
     ## Uncomment and fill out if want to modify the number of workers to run in parallel to communicate with OpenSearch for preparing the doc for export, default value is 50
     #concurrent_open_search_requests = 50
     ## Uncomment and fill out if want to modify the number of workers to run in parallel to communicate with MINIO server for preparing the doc for export, default value is 10
@@ -86,10 +86,9 @@ To enable Automate to ingest Large Compliance reports:
     #enable_ssl = true
     #cert = """$(cat </path/to/cert_file.crt>)"""
 
-   
-[global.v1.large_reporting]                                
+[global.v1.large_reporting]
     enable_large_reporting = true
-    
+
 ## Uncomment and fill out if you want to modify the bucket name used to store data in the MinIO server; the default name is 'default'.
 ## If MINIO is configured to use any public cloud platforms like S3, Azure blob storage, or Google Cloud Storage, It is mandatory to modify the bucket name other than `default`
 #[report_manager.v1.sys.objstore]
