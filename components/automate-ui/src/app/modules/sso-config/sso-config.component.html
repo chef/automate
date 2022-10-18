@@ -16,17 +16,6 @@
       <section class="page-body">
         <form [formGroup]="ssoConfigForm">
           <chef-form-field>
-            <label>Service Providers <span aria-hidden="true">*</span></label>
-            <chef-radio ngDefaultControl formControlName="serviceProvider">
-              <chef-option value="azureAd">Azure AD</chef-option>
-              <chef-option value="office365">Office365</chef-option>
-              <chef-option value="okta">OKTA</chef-option>
-              <chef-option value="oneLogin">OneLogin</chef-option>
-              <chef-option value="ping">Ping</chef-option>
-              <chef-option value="tivoli">Tivoli Federated Identity Manager</chef-option>
-            </chef-radio>
-          </chef-form-field>
-          <chef-form-field>
             <label for="ssoUrl">SSO URL <span aria-hidden="true">*</span></label>
             <input id="ssoUrl" chefInput formControlName="ssoUrl" type="text" />
             <chef-error *ngIf="hasRequiredError('ssoUrl')">
