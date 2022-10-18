@@ -1,5 +1,5 @@
 +++
-title = "On-Permise Deployment using Filesystem"
+title = "On-Premise Deployment using Filesystem"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
     [menu.automate]
-        title = "On-Permise Deployment using Filesystem"
+        title = "On-Premise Deployment using Filesystem"
         identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore File System"
         parent = "automate/deploy_high_availability/backup_and_restore"
         weight = 210
