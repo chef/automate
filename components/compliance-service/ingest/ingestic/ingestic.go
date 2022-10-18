@@ -327,19 +327,12 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 }
 
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
-	t := time.Now()
+
 	var runInfo relaxting.ESComplianceRunInfo
 	var err error
 	mapping := mappings.ComplianceRunInfo
-	t1 := time.Now()
 	runInfo = MapReportToRunInfo(report, runDateTime)
-	logrus.Info("Completed mapping report to runinfo in ", time.Since(t1).Seconds())
-
-	t1 = time.Now()
 	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
-	logrus.Info("Completed upsert report to runinfo in ", time.Since(t1).Seconds())
-
-	logrus.Info("Completed InsertComplianceRunInfo in ", time.Since(t).Seconds())
 	return err
 }
 
@@ -1009,7 +1002,6 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId []string, indexTod
 					}
 					statusMap[hit.Id] = status.Status
 				}
-				//logrus.Debugf("Found the document with for control with doc Id %s", docId)
 
 			}
 		}
@@ -1030,6 +1022,8 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkBatch := 25
 	bulkRequest := backend.client.Bulk()
 	for ind, control := range controls {
+		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		status, found := statusMap[docId]
 		if ind > 0 && ind%bulkBatch == 0 {
 			if bulkRequest.NumberOfActions() > 0 {
 				e := backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
@@ -1038,14 +1032,13 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 				}
 			}
 		}
-		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+
+		scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 		}
 		//Updating the day latest in bulk update
 		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
-		status, found := statusMap[docId]
 		if found {
 			//Adding the request for daily latest in bulk update only
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
@@ -1092,7 +1085,7 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 
 // Sets the 'day_latest' field to 'false' for all control index
 // This way, the last 90 days is covered
-func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) (*elastic.Script, string, error) {
+func (backend *ESClient) SetDayLatestToFalseForControlIndex(nodeId string) (*elastic.Script, string, error) {
 
 	script := elastic.NewScript(`
 	def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
@@ -1113,7 +1106,6 @@ func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context,
 		logrus.Errorf("Cannot get indexes: %+v", err)
 		return nil, "", err
 	}
-	// Updating in all the Indices
 
 	return script, esIndexes, nil
 
@@ -1167,7 +1159,7 @@ func (backend *ESClient) SetNodesDayLatestFalseForUpgrade(ctx context.Context, n
 		Query(boolQuery).
 		Script(script).
 		Refresh("false").
-		Do(ctx)
+		Do(context.TODO())
 
 	if err != nil {
 		logrus.Errorf("Unable to update node uuid %s with error %v", nodeUuid, err)
@@ -1255,14 +1247,14 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, upgradeT
 	return reportsMap, latestReportMap, nil
 }
 
-func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string, firstRun chan string, errorCh chan error) {
+func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string) (string, error) {
 	logrus.Debug("Fetching document  by  nodeUUID")
 	var item relaxting.FirstRunInfo
 	boolQuery := elastic.NewBoolQuery()
 	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(nodeUuid)
 	boolQuery = boolQuery.Must(idsQuery)
-	fsc := elastic.NewFetchSourceContext(true)
+	fsc := elastic.NewFetchSourceContext(true).Include("last_run")
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
 		Query(boolQuery).
@@ -1280,11 +1272,10 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 			"hits.hits._id",
 			"hits.hits._source",
 			"hits.hits.inner_hits").
-		Do(ctx)
+		Do(context.TODO())
 
 	if err != nil {
-		errorCh <- err
-		return
+		return "", err
 	}
 
 	if searchResult.TotalHits() > 0 {
@@ -1296,15 +1287,14 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 				err := json.Unmarshal(hit.Source, &item)
 				if err != nil {
 					logrus.Errorf("Received error while unmarshling from getting first run info %+v", err)
-					errorCh <- err
-					return
+					return "", err
 				}
 
 			}
 
 		}
 	}
-	firstRun <- item.FirstRun
+	return item.LastRun, nil
 }
 
 func getReportsDailyLatestTrueResult(searchResult *elastic.SearchResult, reportsMap map[string]string, nodesMap map[string]relaxting.ReportId, latestReports map[string]bool) {
@@ -1326,4 +1316,146 @@ func getReportsDailyLatestTrueResult(searchResult *elastic.SearchResult, reports
 			}
 		}
 	}
+}
+
+func (backend *ESClient) InsertComplianceRunInfoUpgrade(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
+	var runInfo relaxting.ESComplianceRunInfo
+	var lastRun string
+	var err error
+	mapping := mappings.ComplianceRunInfo
+	lastRun, err = backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index)
+	if err != nil {
+		logrus.Errorf("Unable to fetch document with node id in comp run info %s", report.NodeID)
+		return err
+	}
+	lastRunDateTime, err := time.Parse(time.RFC3339, lastRun)
+	if err != nil {
+		logrus.Errorf("Unable to parse time for node id %s", report.NodeID)
+	}
+
+	if !runDateTime.After(lastRunDateTime) {
+		runInfo = MapReportToRunInfo(report, runDateTime)
+		err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
+	}
+
+	return err
+}
+
+//CheckIfControlIdExistsForControlIndex gets a control document from comp-1-control-* for upgrade process
+func (backend *ESClient) CheckIfControlIdANdNodeIdExistsForControlIndex(docId []string, indexWithDateAndTime string) (map[string]*relaxting.ControlNodesInfo, error) {
+	logrus.Debugf("Checking the control document exists for today with doc Id :%s", docId)
+	statusMap := make(map[string]*relaxting.ControlNodesInfo)
+	fsc := elastic.NewFetchSourceContext(true).Include("_id", "nodes.node_uuid", "nodes.node_end_time", "status")
+	boolQuery := elastic.NewBoolQuery()
+	idsQuery := elastic.NewIdsQuery().Ids(docId...)
+	boolQuery = boolQuery.Must(idsQuery)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(len(docId))
+
+	source, _ := searchSource.Source()
+	relaxting.LogQueryPartMin(indexWithDateAndTime, source, "Query for getting nodes for control")
+
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(indexWithDateAndTime).
+		Do(context.Background())
+	if err != nil {
+		switch {
+		case elastic.IsTimeout(err):
+			logrus.Errorf("Timeout retrieving document: %v", err)
+			return nil, err
+		default:
+			logrus.Errorf("Received error: %v", err)
+			return nil, err
+		}
+	}
+
+	relaxting.LogQueryPartMin(indexWithDateAndTime, searchResult, "Query for search result")
+	controlNodesInfo := &relaxting.ControlNodesInfo{}
+	if searchResult.TotalHits() > 0 {
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the id of the index
+			if len(hit.Id) > 0 {
+				if hit.Source != nil {
+					err := json.Unmarshal(hit.Source, controlNodesInfo)
+					if err != nil {
+						return nil, err
+					}
+					statusMap[hit.Id] = controlNodesInfo
+				}
+
+			}
+		}
+	}
+
+	return statusMap, nil
+
+}
+
+//UploadDataToControlIndexForUpgrade Uploades the data to new control index with comp-1-control-* in the upgrade process
+// Different from UploadDataToControlIndex as it pre-checks if the node exists already or not
+func (backend *ESClient) UploadDataToControlIndexForUpgrade(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time, statusMap map[string]*relaxting.ControlNodesInfo) error {
+	var err error
+	var IsNodePresent bool
+	mapping := mappings.ComplianceControlRepData
+	index := mapping.IndexTimeseriesFmt(endTime)
+	bulkBatch := 25
+	bulkRequest := backend.client.Bulk()
+	for ind, control := range controls {
+
+		if ind > 0 && ind%bulkBatch == 0 {
+			if bulkRequest.NumberOfActions() > 0 {
+				e := backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
+				if e != nil {
+					return e
+				}
+			}
+		}
+		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		nodesControls, found := statusMap[docId]
+		//If the same node is already present for a control check the time.
+		IsNodePresent = checkIfNodeIdExistsForControl(statusMap, docId, control)
+		if IsNodePresent {
+			continue
+		}
+
+		scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)
+		if err != nil {
+			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
+		}
+		//Updating the day latest in bulk update
+		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
+
+		if found {
+			//Adding the request for daily latest in bulk update only
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(nodesControls.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
+			continue
+		}
+		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
+	}
+	if bulkRequest.NumberOfActions() > 0 {
+		err = backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
+
+	}
+	return err
+
+}
+
+func checkIfNodeIdExistsForControl(statusMap map[string]*relaxting.ControlNodesInfo, docId string, control relaxting.Control) bool {
+	nodesControls, found := statusMap[docId]
+	if found {
+		for _, nodes := range nodesControls.Nodes {
+			if nodes.NodeUUID == control.Nodes[0].NodeUUID && nodes.NodeEndTime.After(control.Nodes[0].NodeEndTime) {
+				return true
+			}
+		}
+	}
+
+	return false
+
 }
