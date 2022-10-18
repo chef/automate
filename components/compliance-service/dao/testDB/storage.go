@@ -27,8 +27,6 @@ func (u UpgradeDBTest) GetUpgradeFlags() (map[string]pgdb.Flag, error) {
 	}
 	if u.NeedStatus {
 		flagsMap[pgdb.ControlIndexFlag] = pgdb.Flag{Status: true, UpgradedTime: time.Now()}
-		flagsMap[pgdb.CompRunInfoFlag] = pgdb.Flag{Status: true, UpgradedTime: time.Now()}
-		flagsMap[pgdb.DayLatestFlag] = pgdb.Flag{Status: true, UpgradedTime: time.Now()}
 	}
 	if u.NeedNotStartedStatus {
 		flagsMap[pgdb.ControlIndexFlag] = pgdb.Flag{Status: true, UpgradedTime: time.Time{}}
@@ -48,5 +46,17 @@ func (u UpgradeDBTest) UpdateControlFlagToFalse() error {
 }
 
 func (u UpgradeDBTest) UpdateControlFlagTimeStamp() error {
+	return nil
+}
+
+func (u UpgradeDBTest) UpdateControlFlagValue(bool) error {
+	return nil
+}
+
+func (u UpgradeDBTest) AddEnhancedReportingFlag() error {
+	return nil
+}
+
+func (u UpgradeDBTest) RemoveEnhancedReportingFlag() error {
 	return nil
 }
