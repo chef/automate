@@ -20,13 +20,27 @@ gh_repo = "automate"
 
 
 
-## Enable Enhanced Compliance Reporting
+## Enable Enhanced and Assets Compliance Report
 
+To enable the enhanced and asset compliance report:
 
+1. Create a `patch.toml` if one does not already exist for your Chef Automate installation.
 
-## Enable Assets Compliance Reporting
+1. Add the following configuration to the `patch.toml` file:
 
+    ```toml
+    [compliance.v1.sys.service]
 
+    enable_enhanced_compliance_reporting = true
+    ```
+
+    Here `enable_enhanced_compliance_reporting` attribute is set to **true**, which enables the enhanced and asset compliance report. To disable it, set the value of `enable_enhanced_compliance_reporting` to **false**.
+
+1. Patch the config by running the following command:
+
+    ```toml
+    chef-automate config patch patch.toml
+    ```
 
 ## Upgrade Status Command
 
