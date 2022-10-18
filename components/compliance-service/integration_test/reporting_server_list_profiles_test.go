@@ -19,7 +19,7 @@ func TestListProfiles(t *testing.T) {
 	suite.DeleteAllDocuments()
 
 	es2Backend := relaxting.ES2Backend{ESUrl: opensearchUrl}
-	server := reportingServer.New(&es2Backend, nil, 5, nil)
+	server := reportingServer.New(&es2Backend, nil, 5, nil, false)
 
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
