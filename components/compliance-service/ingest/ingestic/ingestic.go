@@ -1022,8 +1022,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkBatch := 25
 	bulkRequest := backend.client.Bulk()
 	for ind, control := range controls {
-		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		status, found := statusMap[docId]
 		if ind > 0 && ind%bulkBatch == 0 {
 			if bulkRequest.NumberOfActions() > 0 {
 				e := backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
@@ -1032,6 +1030,8 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 				}
 			}
 		}
+		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		status, found := statusMap[docId]
 
 		scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)
 		if err != nil {
