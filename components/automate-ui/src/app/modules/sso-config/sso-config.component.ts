@@ -89,8 +89,6 @@ export class SsoConfigComponent implements OnInit {
     };
 
     this.store.dispatch(new CreateSsoConfig(ssoConfig));
-    // TODO: save sso config api status polling
-    // this.store.dispatch(new CreateSsoConfigSuccess()); 
   }
 
   cancelSsoConfig() {
@@ -100,9 +98,6 @@ export class SsoConfigComponent implements OnInit {
 
   removeSsoConfig() {
     this.store.dispatch(new DeleteSsoConfig());
-    // TODO: remove sso config api status polling
-    // this.ssoConfigForm.reset({serviceProvider: 'azureAd'});
-    // this.store.dispatch(new DeleteSsoConfigSuccess());
   }
 
   populateForm(ssoConfig) {

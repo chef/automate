@@ -10,7 +10,7 @@ export interface SsoConfigResponse {
   ssoConfig: SsoConfig;
 }
 
-export interface apiResponse {
+export interface ApiResponse {
   message: string;
 }
 
@@ -25,12 +25,12 @@ export class SsoConfigRequests {
     );
   }
 
-  public createSsoConfig(ssoConfig: SsoConfig): Observable<apiResponse> {
-    return this.http.post<apiResponse>(
+  public createSsoConfig(ssoConfig: SsoConfig): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(
       `${env.gateway_url}/sso/config`, ssoConfig);
   }
 
-  public deleteSsoConfig(): Observable<apiResponse> {
-    return this.http.delete<apiResponse>(`${env.gateway_url}/sso/config`);
+  public deleteSsoConfig(): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${env.gateway_url}/sso/config`);
   }
 }
