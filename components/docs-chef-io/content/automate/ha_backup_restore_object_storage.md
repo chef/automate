@@ -1,5 +1,5 @@
 +++
-title = "On-Permise Deployment using Object Storage"
+title = "On-Premise Deployment using Object Storage"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-Permise Deployment using Object Storage"
+    title = "On-Premise Deployment using Object Storage"
     identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Object Storage"
     parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 220
