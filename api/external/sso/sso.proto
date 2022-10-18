@@ -30,7 +30,16 @@ service SsoConfigService {
 			action: "sso:config:get"
 		};
 	};
+	/*
+	Post Sso Config 
 
+	Set the SSO config on the instances
+
+	Authorization Action:
+	```
+	sso:config:post
+	```
+	*/
 	rpc SetSsoConfig (SetSsoConfigRequest) returns (SetSsoConfigResponse) {
         option (google.api.http) = {
             post: "/api/v0/sso/config"
