@@ -1,22 +1,22 @@
 +++
-title = "Enhanced Compliance Report"
+title = "Enhanced Compliance Report Ingestion"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Enhanced Compliance Report"
+    title = "Enhanced Compliance Report Ingestion"
     parent = "automate/configure"
     identifier = "automate/configure/enhanced_compliance_report.md Enhanced Compliance Report"
     weight = 80
 +++
 
-## What is Enhanced Compliance Reporting
+**Enhanced Compliance Reporting** has been introduced in the Chef Automate which comes with new compliance APIs. The existing APIs can be used to work on a specific date. The new introduced compliance APIs have been introduced to work on the Date Range.
 
+While specifing the date range, the end date will always be the current date whereas the start date can be any date before 90 days.
 
-
-## What is Assets Compliance Reporting
+## Asset Compliance Reporting
 
 
 
