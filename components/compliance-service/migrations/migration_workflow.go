@@ -41,6 +41,7 @@ type MigrationWorkflow struct {
 
 type MigrationWorkflowParameters struct {
 	ControlIndexFlag bool
+	UpgradeDate      time.Time
 }
 
 type MigrationWorkflowPayload struct {
@@ -68,6 +69,7 @@ func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 
 	err = w.EnqueueTask(UpgradeTaskName, UpgradeParameters{
 		ControlFlag: workflowParams.ControlIndexFlag,
+		UpgradeDate: workflowParams.UpgradeDate,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "failed to enqueue the migration-task")
@@ -115,6 +117,7 @@ type UpgradeParameters struct {
 	DayLatestFlag   bool
 	ControlFlag     bool
 	CompRunInfoFlag bool
+	UpgradeDate     time.Time
 }
 
 func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -129,7 +132,7 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 	logrus.Infof("Upgrade started at time %v", time.Now())
 	if job.ControlFlag {
 		logrus.Info("Inside the control flag")
-		if err := performActionForUpgrade(ctx, t.ESClient); err != nil {
+		if err := performActionForUpgrade(ctx, t.ESClient, job.UpgradeDate); err != nil {
 			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
 		}
 
@@ -154,10 +157,12 @@ type ControlIndexUpgradeTask struct {
 	UpgradesDB *pgdb.UpgradesDB
 }
 
-func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) error {
+func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient, upgradeTime time.Time) error {
 	mapping := mappings.ComplianceRepDate
-	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	reportsMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, time90DaysAgo)
+	if time.Now().Sub(upgradeTime)/24 > 90 {
+		upgradeTime = time.Now().Add(-24 * time.Hour * 90)
+	}
+	reportsMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, upgradeTime)
 	if err != nil {
 		logrus.Errorf("Unable to Get Report IDs where daily latest true with err %v", err)
 		return err

@@ -29,12 +29,13 @@ func (u *Upgrade) PollForUpgradeFlagDayLatest(upgradeDate time.Time) error {
 		return err
 	}
 	if controlFlag.Status {
-		err = u.cerealInterface.EnqueueWorkflowUpgrade()
+		err = u.cerealInterface.EnqueueWorkflowUpgrade(upgradeDate)
 		if err != nil {
 			return errors.Wrapf(err, "Unable to enqueue the message in the flow for daily latest flag")
 		}
 		u.storage.UpdateControlFlagTimeStamp()
 	}
+
 	return nil
 }
 

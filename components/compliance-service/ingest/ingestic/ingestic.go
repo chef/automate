@@ -1206,19 +1206,24 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 }
 
 //GetReportsDailyLatestTrue Get the Nodes where daily latest flag is true from past 90 days from current date for upgrading
-func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]string, map[string]bool, error) {
+func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, upgradeTime time.Time) (map[string]string, map[string]bool, error) {
 	reportsMap := make(map[string]string)
 	nodesMap := make(map[string]relaxting.ReportId)
 	latestReportMap := make(map[string]bool)
-	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, upgradeTime.Format(time.RFC3339), time.Now().Format(time.RFC3339))
 	if err != nil {
 		return nil, nil, err
 	}
 
 	indicesSlice := strings.Split(indices, ",")
 
+	rangeQuery := elastic.NewRangeQuery("end_time").Gte(upgradeTime.Format(time.RFC3339))
+
 	boolQuery := elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("daily_latest", true))
+		Must(elastic.NewTermQuery("daily_latest", true)).Must(rangeQuery)
+
+	src, _ := boolQuery.Source()
+	logrus.Infof("Test Query For upgrade is noow : %v", src)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"report_uuid",
