@@ -34,10 +34,38 @@ func init() {
         "tags": [
           "SsoConfigService"
         ]
+      },
+      "delete": {
+        "operationId": "SsoConfigService_DeleteSsoConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.sso.DeleteSsoConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "SsoConfigService"
+        ]
       }
     }
   },
   "definitions": {
+    "chef.automate.api.sso.DeleteSsoConfigResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.sso.GetSsoConfigResponse": {
       "type": "object",
       "properties": {
