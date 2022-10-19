@@ -76,9 +76,11 @@ To check the status of the migration, run the following command:
 COMMAND
 ```
 
-## Benchmark numbers on the time of upgrade based on the worker count
+## Performance Benchmark
 
+To check the performance benchmark, firstly set the value of `enable_enhanced_compliance_reporting` to `true`. This will enable the enhanced compliance reporting in your system. Enabling the enhanced compliance reporting will migrate your data from the current indexes to the new indexes. This migration takes place asynchronously at the back ground which does not disturbs the upgrade process and will not overload the data ingestion.
 
+Once the enhanced compliance report is enabled and the ingestion has been started, let's take and example of a system with 2.3 GB data. Here the upgradation and the ingestion process is going on in parallel. Once the ingestion is done, the **Current CPU utilization** shows as **84%** whereas the **Current Memory Utilization** shows as **86.5%**. In the end, you Disk Usage can go up to **8.2GB**.
 
-## Benchmark numbers on the ingestion process based on the worker count
+TABLE FOR PERFORMANCE BENCHMARKING
 
