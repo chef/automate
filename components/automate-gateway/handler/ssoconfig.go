@@ -151,7 +151,7 @@ func validateCaContents(ca_contents string) error {
 	if strings.Contains(ca_contents, "-----BEGIN CERTIFICATE-----") && strings.Contains(ca_contents, "-----END CERTIFICATE-----") {
 		return nil
 	} else {
-		return errors.New("The Ca contents provided are not correct")
+		return errors.New("the ca_contents provided are not correct")
 	}
 }
 
@@ -175,7 +175,7 @@ func (a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigReques
 	if err := validateCaContents(req.CaContents); err != nil {
 		return nil, err
 	}
-
+	
 	bodyParams := &PostConfig{
 		Ca_contents:           req.CaContents,
 		Sso_url:               req.SsoUrl,
@@ -185,6 +185,11 @@ func (a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigReques
 		Allowed_groups:        req.AllowedGroups,
 		Entity_issuer:         req.EntityIssuer,
 		Name_id_policy_format: req.NameIdPolicyFormat,
+	}
+	err = validate.Struct(bodyParams)
+	if err != nil {
+		fmt.Print("Unable to fetch the required fields")
+		return nil, err
 	}
 	jsonValue, _ := json.Marshal(bodyParams)
 	url, err := getBastionUrl()
