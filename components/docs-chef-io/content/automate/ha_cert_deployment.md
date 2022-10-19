@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Add Certificate During Deployment"
     parent = "automate/deploy_high_availability/certificates"
     identifier = "automate/deploy_high_availability/certificates/ha_cert_deployment.md Add Certificate During Deployment"
-    weight = 230
+    weight = 210
 +++
 
 {{< warning >}}
