@@ -255,6 +255,7 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
+		return
 	}
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
