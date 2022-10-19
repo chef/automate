@@ -120,19 +120,16 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	return depth.getStatsSummaryNodesResult(searchResult), nil
 }
 
-//GetStatsSummaryControls - Gets summary stats, control centric, aggregate data for the given set of filters
-func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
-	myName := "GetStatsSummaryControls"
-
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
-		backend.IsEnhancedReportingEnabled)
-	if err != nil {
-		return nil, err
-	}
+//GetStatsSummaryControlsRange - Gets summary stats, control centric, aggregate data for the given set of filters with date range
+func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]string) (*stats.ControlsSummary, error) {
+	myName := "GetStatsSummaryControlsRange"
 
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	client, err := backend.ES2Client()
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to connect to es-client")
+	}
 
 	esIndex, err := getControlIndex(filters)
 	if err != nil {
@@ -170,6 +167,69 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
 	return backend.getStatsSummaryControlsResult(searchResult), nil
+}
+
+//GetStatsSummaryControls - Gets summary stats, control centric, aggregate data for the given set of filters
+func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
+	myName := "GetStatsSummaryControls"
+
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
+	if err != nil {
+		return nil, err
+	}
+
+	if backend.IsEnhancedReportingEnabled {
+		// Check for range and if enhanced_control_reporting is enabled?
+		isValidDateRange, err := isDateRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("%s ", myName))
+		}
+
+		if isValidDateRange {
+			return backend.GetStatsSummaryControlsRange(filters)
+		}
+	}
+
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
+	}
+
+	queryInfo := depth.getQueryInfo()
+
+	searchSource := elastic.NewSearchSource().
+		Query(queryInfo.filtQuery).
+		Size(0)
+
+	for aggName, agg := range depth.getStatsSummaryControlsAggs() {
+		searchSource.Aggregation(aggName, agg)
+	}
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get Source", myName))
+	}
+
+	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
+	b, _ := json.Marshal(source)
+	logrus.Info(string(b))
+	searchResult, err := queryInfo.client.Search().
+		SearchSource(searchSource).
+		Index(queryInfo.esIndex).
+		Size(0).
+		Do(context.Background())
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	logrus.Info(searchResult)
+
+	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
+
+	return depth.getStatsSummaryControlsResult(searchResult), nil
 }
 
 //GetStatsFailures - Gets top failures, aggregate data for the given set of filters
