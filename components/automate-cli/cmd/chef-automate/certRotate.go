@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -61,7 +60,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 	if privateCertPath == "" || publicCertPath == "" {
 		return errors.New("Please provide public and private cert paths")
 	}
-	privateCert, err := ioutil.ReadFile(privateCertPath)
+	privateCert, err := os.ReadFile(privateCertPath)
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -70,7 +69,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	publicCert, err := ioutil.ReadFile(publicCertPath)
+	publicCert, err := os.ReadFile(publicCertPath)
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -119,7 +118,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 
 func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
 
-	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	pemBytes, err := os.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
 		return
