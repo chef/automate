@@ -2260,11 +2260,11 @@ func isDateRange(endTime string, startTime string) (bool, error) {
 	}
 	eTime, err := time.Parse(layout, endTime)
 	if err != nil {
-		return false, errors.Errorf("cannot parse the time")
+		return false, errors.Errorf("cannot parse the end time")
 	}
 	sTime, err := time.Parse(layout, startTime)
 	if err != nil {
-		return false, errors.Errorf("cannot parse the time")
+		return false, errors.Errorf("cannot parse the start time")
 	}
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 
