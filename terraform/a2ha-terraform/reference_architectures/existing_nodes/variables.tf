@@ -127,10 +127,14 @@ variable opensearch_admin_cert {
 variable opensearch_admin_key {
 }
 variable automate_custom_certs_enabled {
+  default = false
 }
 variable chef_server_custom_certs_enabled {
+  default = false
 }
 variable postgresql_custom_certs_enabled {
+  default = false
 }
 variable opensearch_custom_certs_enabled {
+  default = false
 }

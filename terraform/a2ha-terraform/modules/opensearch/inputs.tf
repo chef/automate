@@ -127,5 +127,6 @@ variable opensearch_admin_cert {
 variable opensearch_admin_key {
 }
 variable opensearch_custom_certs_enabled {
+  default = false
 }
 

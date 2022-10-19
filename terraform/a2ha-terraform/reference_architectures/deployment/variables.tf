@@ -257,10 +257,14 @@ variable opensearch_admin_dn {
 variable opensearch_nodes_dn {
 }
 variable automate_custom_certs_enabled {
+  default = false
 }
 variable chef_server_custom_certs_enabled {
+  default = false
 }
 variable postgresql_custom_certs_enabled {
+  default = false
 }
 variable opensearch_custom_certs_enabled {
+  default = false
 }
