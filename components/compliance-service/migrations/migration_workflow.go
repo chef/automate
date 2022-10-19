@@ -130,7 +130,8 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 
 	logrus.Infof("Upgrade started at time %v", time.Now())
 	if job.ControlFlag {
-
+		logrus.Info("Updating Control Flag Timestamp")
+		t.UpgradesDB.UpdateControlFlagTimeStamp()
 		logrus.Info("Inside the control flag")
 		if err := performActionForUpgrade(ctx, t.ESClient, job.UpgradeDate); err != nil {
 			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")

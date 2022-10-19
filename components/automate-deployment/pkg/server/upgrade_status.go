@@ -2,11 +2,16 @@ package server
 
 import (
 	"context"
+	pb "github.com/golang/protobuf/ptypes/empty"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
 
+	csc "github.com/chef/automate/api/interservice/compliance/status"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
@@ -214,4 +219,47 @@ func makeUpgradingService(actual *habapi.ServiceInfo, target habpkg.VersionedPac
 		ret.Actual.Release = actual.Pkg.Release
 	}
 	return ret
+}
+
+const MigrationCompletedStatus = "The Migration of compliance controls and assets have completed."
+const MigrationNotStartedStatus = "The Migration of compliance controls and assets is yet to start."
+const MigrationInProgressStatus = "The Migration of compliance controls and assets is in progress."
+const MigrationNotConfiguredStatus = "Automate is not configured to support enhance compliance reporting."
+
+func (s *server) ControlIndexUpgradeStatus(ctx context.Context, empty *pb.Empty) (*api.ControlIndexUpgradeStatusResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	connection, err := s.connFactory.DialContext(
+		ctx,
+		"compliance-service",
+		s.AddressForService("compliance-service"),
+		grpc.WithBlock(),
+	)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to connect to compliance-service")
+	}
+
+	c := csc.NewComplianceStatusServiceClient(connection)
+	response, err := c.GetControlIndexMigrationStatus(ctx, &pb.Empty{})
+	if err != nil {
+		logrus.WithError(err).Error("Could not get Control Index Migration Status")
+
+		return nil, err
+	}
+
+	stResponse := &api.ControlIndexUpgradeStatusResponse{}
+	switch response.Status {
+	case csc.ControlIndexMigrationStatus_COMPLETED:
+		stResponse.Status = MigrationCompletedStatus
+	case csc.ControlIndexMigrationStatus_NOTSTARTED:
+		stResponse.Status = MigrationNotStartedStatus
+	case csc.ControlIndexMigrationStatus_INPROGRESS:
+		stResponse.Status = MigrationInProgressStatus
+	case csc.ControlIndexMigrationStatus_NOTCONFIGURED:
+		stResponse.Status = MigrationNotConfiguredStatus
+	}
+
+	return stResponse, nil
 }
