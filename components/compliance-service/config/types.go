@@ -18,6 +18,7 @@ type Service struct {
 	EnableLargeReporting    bool
 	LcrOpenSearchRequests   int
 	EnableEnhancedReporting bool
+	ControlsPopulatorsCount int
 }
 
 // Compliance service specific config options
