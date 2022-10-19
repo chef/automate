@@ -27,7 +27,7 @@
         username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
         password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
     [global.v1.external.opensearch.ssl]
-    <% if overrides[:opensearch_custom_certs_enabled] != "" -%>
+    <% if overrides[:opensearch_custom_certs_enabled] == true -%>
       server_name = ""
       root_cert = """<%= overrides[:opensearch_root_ca] -%>"""
     <% else %>
@@ -66,7 +66,7 @@
 
   [global.v1.external.postgresql.ssl]
     enable = <%= services[:postgresql][:ssl] %>
-  <% if overrides[:postgresql_custom_certs_enabled] != "" -%>
+  <% if overrides[:postgresql_custom_certs_enabled] == true -%>
     root_cert = """<%= overrides[:postgresql_root_ca] -%>"""
   <% else %>
     root_cert = """<%= svc_configs[:postgresql]['ssl']['issuer_cert'] -%>"""
@@ -129,7 +129,7 @@
 
     <% if overrides[:automate_role] == "chef_api" -%>
       # The TLS private key for the load balancer frontend.
-      <% if overrides[:chef_server_custom_certs_enabled] != "" -%>
+      <% if overrides[:chef_server_custom_certs_enabled] == true -%>
         key = """<%= overrides[:chef_server_private_key] %>"""
         cert = """<%= overrides[:chef_server_public_key] %>"""
       <% else %>
@@ -138,7 +138,7 @@
       <% end %>
     <% else %>
       # The TLS certificate for the load balancer frontend.
-      <% if overrides[:automate_custom_certs_enabled] != "" -%>
+      <% if overrides[:automate_custom_certs_enabled] == true -%>
         cert = """<%= overrides[:automate_public_key] %>"""
         key = """<%= overrides[:automate_private_key] %>"""
       <% else %>
