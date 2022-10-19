@@ -2254,6 +2254,28 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 	return nil
 }
 
+func isDateRange(endTime string, startTime string) (bool, error) {
+	if len(endTime) == 0 || len(startTime) == 0 {
+		return false, nil
+	}
+	eTime, err := time.Parse(layout, endTime)
+	if err != nil {
+		return false, errors.Errorf("cannot parse the time")
+	}
+	sTime, err := time.Parse(layout, startTime)
+	if err != nil {
+		return false, errors.Errorf("cannot parse the time")
+	}
+	diff := int(eTime.Sub(sTime).Hours() / 24)
+
+	if diff > 1 {
+		return true, nil
+	} else if diff < 0 {
+		return false, errors.Errorf("Start time should not be greater than end time")
+	}
+	return false, nil
+}
+
 func getStartDateFromEndDate(endTime string, startTime string, isEnhancedReportingEnabled bool) ([]string, error) {
 	if len(endTime) == 0 {
 		return nil, nil

@@ -124,12 +124,6 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControlsRange"
 
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
-		backend.IsEnhancedReportingEnabled)
-	if err != nil {
-		return nil, err
-	}
-
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	client, err := backend.ES2Client()
@@ -179,17 +173,23 @@ func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]stri
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
-	// Check for range and if enhanced_control_reporting is enabled?
-	isValidDateRange, err := isDateRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s ", myName))
-	}
-	if isValidDateRange {
-		return backend.GetStatsSummaryControlsRange(filters)
+		return nil, err
 	}
 
-	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	if backend.IsEnhancedReportingEnabled {
+		// Check for range and if enhanced_control_reporting is enabled?
+		isValidDateRange, err := isDateRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("%s ", myName))
+		}
+
+		if isValidDateRange {
+			return backend.GetStatsSummaryControlsRange(filters)
+		}
+	}
 
 	latestOnly := FetchLatestDataOrNot(filters)
 
