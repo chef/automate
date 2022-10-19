@@ -82,5 +82,6 @@ To check the performance benchmark, firstly set the value of `enable_enhanced_co
 
 Once the enhanced compliance report is enabled and the ingestion has been started, let's take and example of a system with 2.3 GB data. Here the upgradation and the ingestion process is going on in parallel. Once the ingestion is done, the **Current CPU utilization** shows as **84%** whereas the **Current Memory Utilization** shows as **86.5%**. In the end, you Disk Usage can go up to **8.2GB**.
 
-TABLE FOR PERFORMANCE BENCHMARKING
+The performance benchmarking tests based on the assumptions are listed below:
 
+TABLE FOR PERFORMANCE BENCHMARKING
