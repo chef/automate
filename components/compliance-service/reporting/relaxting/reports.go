@@ -1435,19 +1435,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if latestOnly {
-
 		// only if there is no job_id filter set, do we want the daily latest
-		if len(filters["end_time"]) > 0 {
-			// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
-			termQuery := elastic.NewTermsQuery("daily_latest", true)
-			boolQuery = boolQuery.Must(termQuery)
-		} else {
-			// If we don't have an end_time filter, we use the day_latest filter
-			termQuery := elastic.NewTermsQuery("day_latest", true)
-			boolQuery = boolQuery.Must(termQuery)
-		}
-
-		/*// only if there is no job_id filter set, do we want the daily latest
 		setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 		if err != nil {
 			errors.Errorf("cannot parse the time %v", err)
@@ -1456,7 +1444,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		for _, flag := range setFlags {
 			termQuery := elastic.NewTermsQuery(flag, true)
 			boolQuery = boolQuery.Must(termQuery)
-		}*/
+		}
 
 	}
 
@@ -2264,6 +2252,28 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 		return errors.Errorf("Start time should not be greater than end time")
 	}
 	return nil
+}
+
+func isDateRange(endTime string, startTime string) (bool, error) {
+	if len(endTime) == 0 || len(startTime) == 0 {
+		return false, nil
+	}
+	eTime, err := time.Parse(layout, endTime)
+	if err != nil {
+		return false, errors.Errorf("cannot parse the time")
+	}
+	sTime, err := time.Parse(layout, startTime)
+	if err != nil {
+		return false, errors.Errorf("cannot parse the time")
+	}
+	diff := int(eTime.Sub(sTime).Hours() / 24)
+
+	if diff > 1 {
+		return true, nil
+	} else if diff < 0 {
+		return false, errors.Errorf("Start time should not be greater than end time")
+	}
+	return false, nil
 }
 
 func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {

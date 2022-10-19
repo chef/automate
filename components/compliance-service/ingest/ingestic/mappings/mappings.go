@@ -19,7 +19,7 @@ var AllMappings = []Mapping{
 	ComplianceSumDate,
 	ComplianceProfiles,
 	ComplianceRunInfo,
-	// ComplianceControlRepData,
+	ComplianceControlRepData,
 }
 
 const (
@@ -31,7 +31,7 @@ const (
 	ComplianceCurrentTimeSeriesIndicesVersion = "7"
 	//ComplianceCurrentProfilesIndicesVersion allows us to know, for any version of compliance, what level we are at with our profiles and profiles-mappings indices
 	ComplianceCurrentProfilesIndicesVersion = "3"
-	ComplianceCurrentRunInfoVersion         = "2"
+	ComplianceCurrentRunInfoVersion         = "3"
 	ComplianceCurrentControlInfoVersion     = "1"
 
 	compAndVersionTimeSeries = "comp-" + ComplianceCurrentTimeSeriesIndicesVersion

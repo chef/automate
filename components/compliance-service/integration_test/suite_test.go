@@ -4,13 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"testing"
-	"time"
-
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
+	"os"
+	"testing"
+	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -47,7 +46,8 @@ type Suite struct {
 	NotifierMock            *NotifierMock
 	EventServiceClientMock  *event.MockEventServiceClient
 	ReportServiceClientMock *report_manager.MockReportManagerServiceClient
-	CerealManagerMock       *cereal.Manager
+	CerealManagerMock *cereal.Manager
+
 }
 
 // Initialize the test suite
@@ -90,7 +90,7 @@ func NewGlobalSuite() *Suite {
 	s.CerealManagerMock = cereal
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, nil, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, false, s.CerealManagerMock)
+		s.ProjectsClientMock, 100, false,s.CerealManagerMock)
 
 	return s
 }
@@ -127,7 +127,7 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.CerealManagerMock = cereal
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, s.ReportServiceClientMock, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, false, s.CerealManagerMock)
+		s.ProjectsClientMock, 100, false,s.CerealManagerMock)
 
 	return s
 }
@@ -303,7 +303,7 @@ func (s *Suite) InsertComplianceRunInfos(reports []*relaxting.ESInSpecReport) ([
 		ids[i] = report.NodeID
 
 		for tries := 0; tries < 3; tries++ {
-			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report.NodeID, report.EndTime)
+			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report, report.EndTime)
 			if err == nil {
 				break
 			}
