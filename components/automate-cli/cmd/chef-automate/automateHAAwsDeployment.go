@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/local-user-service/password"
@@ -144,6 +145,7 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 		errorList.PushBack("Invalid or empty postgres-sql instance_count")
 	}
 	errorList.PushBackList(a.validateEnvFields())
+	errorList.PushBackList(a.validateCerts())
 	return errorList
 }
 
@@ -214,6 +216,41 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	}
 	if len(a.config.Aws.Config.PostgresqlEbsVolumeType) < 1 {
 		errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_type")
+	}
+	return errorList
+}
+
+func (a *awsDeployment) validateCerts() *list.List {
+	errorList := list.New()
+	if a.config.Automate.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(a.config.Automate.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(a.config.Automate.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(a.config.Automate.Config.PublicKey)) < 1 {
+			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
+	if a.config.ChefServer.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(a.config.ChefServer.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(a.config.ChefServer.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(a.config.ChefServer.Config.PublicKey)) < 1 {
+			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
+	if a.config.Postgresql.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(a.config.Postgresql.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(a.config.Postgresql.Config.PublicKey)) < 1 {
+			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
+	if a.config.Opensearch.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(a.config.Opensearch.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(a.config.Opensearch.Config.AdminKey)) < 1 ||
+			len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) < 1 ||
+			len(strings.TrimSpace(a.config.Opensearch.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) < 1 {
+			errorList.PushBack("Opensearch RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
 	}
 	return errorList
 }

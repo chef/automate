@@ -248,7 +248,19 @@ variable opensearch_private_key {
 
 variable opensearch_public_key {
 }
+variable opensearch_admin_cert {
+}
+variable opensearch_admin_key {
+}
 variable opensearch_admin_dn {
 }
 variable opensearch_nodes_dn {
+}
+variable automate_custom_certs_enabled {
+}
+variable chef_server_custom_certs_enabled {
+}
+variable postgresql_custom_certs_enabled {
+}
+variable opensearch_custom_certs_enabled {
 }

@@ -69,6 +69,7 @@ module AutomateCluster
 
       default(:config_file, 'configs/automate.toml').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
 
+      default :custom_certs_enabled
       default :root_ca
       default :public_key
       default :private_key
@@ -76,6 +77,7 @@ module AutomateCluster
 
     config_context :chef_server do
       default :instance_count, 1
+      default :custom_certs_enabled
       default :root_ca
       default :public_key
       default :private_key
@@ -83,7 +85,10 @@ module AutomateCluster
 
     config_context :opensearch do
       default :instance_count, 3
+      default :custom_certs_enabled
       default :root_ca
+      default :admin_key
+      default :admin_cert
       default :public_key
       default :private_key
       default :admin_dn
@@ -92,6 +97,7 @@ module AutomateCluster
 
     config_context :postgresql do
       default :instance_count, 3
+      default :custom_certs_enabled
       default :root_ca
       default :public_key
       default :private_key

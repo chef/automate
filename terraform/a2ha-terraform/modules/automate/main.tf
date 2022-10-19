@@ -47,6 +47,10 @@ locals {
     chef_server_public_key             = var.chef_server_public_key
     opensearch_root_ca                 = var.opensearch_root_ca
     postgresql_root_ca                 = var.postgresql_root_ca
+    automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+    chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+    postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+    opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
  
   })
 

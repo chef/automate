@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
@@ -159,6 +160,42 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	}
 
 	errorList.PushBackList(e.validateIPs())
+	errorList.PushBackList(e.validateCerts())
+	return errorList
+}
+
+func (e *existingInfra) validateCerts() *list.List {
+	errorList := list.New()
+	if e.config.Automate.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(e.config.Automate.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(e.config.Automate.Config.PublicKey)) < 1 {
+			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
+	if e.config.ChefServer.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(e.config.ChefServer.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(e.config.ChefServer.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(e.config.ChefServer.Config.PublicKey)) < 1 {
+			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
+	if e.config.Postgresql.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(e.config.Postgresql.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(e.config.Postgresql.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(e.config.Postgresql.Config.PublicKey)) < 1 {
+			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
+	if e.config.Opensearch.Config.CustomCertsEnabled {
+		if len(strings.TrimSpace(e.config.Opensearch.Config.RootCA)) < 1 ||
+			len(strings.TrimSpace(e.config.Opensearch.Config.AdminKey)) < 1 ||
+			len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) < 1 ||
+			len(strings.TrimSpace(e.config.Opensearch.Config.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) < 1 {
+			errorList.PushBack("Opensearch RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+		}
+	}
 	return errorList
 }
 

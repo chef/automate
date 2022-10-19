@@ -27,7 +27,7 @@
         username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
         password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
     [global.v1.external.opensearch.ssl]
-    <% if overrides[:opensearch_root_ca] != "" -%>
+    <% if overrides[:opensearch_custom_certs_enabled] != "" -%>
       server_name = ""
       root_cert = """<%= overrides[:opensearch_root_ca] -%>"""
     <% else %>
@@ -66,7 +66,7 @@
 
   [global.v1.external.postgresql.ssl]
     enable = <%= services[:postgresql][:ssl] %>
-  <% if overrides[:postgresql_root_ca] != "" -%>
+  <% if overrides[:postgresql_custom_certs_enabled] != "" -%>
     root_cert = """<%= overrides[:postgresql_root_ca] -%>"""
   <% else %>
     root_cert = """<%= svc_configs[:postgresql]['ssl']['issuer_cert'] -%>"""
@@ -128,31 +128,21 @@
     [[load_balancer.v1.sys.frontend_tls]]
 
     <% if overrides[:automate_role] == "chef_api" -%>
-      # The TLS certificate for the load balancer frontend.
-      <% if overrides[:chef_server_public_key] != "" -%>
+      # The TLS private key for the load balancer frontend.
+      <% if overrides[:chef_server_custom_certs_enabled] != "" -%>
+        key = """<%= overrides[:chef_server_private_key] %>"""
         cert = """<%= overrides[:chef_server_public_key] %>"""
       <% else %>
-        cert = """<%= tls_cert %>"""
-      <% end %>
-
-      # The TLS private key for the load balancer frontend.
-      <% if overrides[:chef_server_private_key] != "" -%>
-        key = """<%= overrides[:chef_server_private_key] %>"""
-      <% else %>
         key = """<%= tls_key %>"""
+        cert = """<%= tls_cert %>"""
       <% end %>
     <% else %>
       # The TLS certificate for the load balancer frontend.
-      <% if overrides[:automate_public_key] != "" -%>
+      <% if overrides[:automate_custom_certs_enabled] != "" -%>
         cert = """<%= overrides[:automate_public_key] %>"""
-      <% else %>
-        cert = """<%= tls_cert %>"""
-      <% end %>
-
-      # The TLS private key for the load balancer frontend.
-      <% if overrides[:automate_private_key] != "" -%>
         key = """<%= overrides[:automate_private_key] %>"""
       <% else %>
+        cert = """<%= tls_cert %>"""
         key = """<%= tls_key %>"""
       <% end %>
     <% end %>

@@ -35,6 +35,7 @@ automate do
   ### port (default: 10128) conflicts with another service.
   {{ if .Automate.Config.TeamsPort }} teams_port "{{ .Automate.Config.TeamsPort }}" {{ else }} # teams_port "{{ .Automate.Config.TeamsPort }}" {{ end }}
   config_file "{{ .Automate.Config.ConfigFile }}"
+  custom_certs_enabled "{{ .Automate.Config.CustomCertsEnabled }}"
   {{ if .Automate.Config.RootCA }} root_ca "{{ .Automate.Config.RootCA }}" {{ else }} # root_ca "{{ .Automate.Config.RootCA }}" {{ end }}
   {{ if .Automate.Config.PrivateKey }} private_key "{{ .Automate.Config.PrivateKey }}" {{ else }} # private_key "{{ .Automate.Config.PrivateKey }}" {{ end }}
   {{ if .Automate.Config.PublicKey }} public_key "{{ .Automate.Config.PublicKey }}" {{ else }} # public_key "{{ .Automate.Config.PublicKey }}" {{ end }}
@@ -45,6 +46,7 @@ end
 ###############################################################
 chef_server do
   instance_count {{ .ChefServer.Config.InstanceCount }}
+  custom_certs_enabled "{{ .ChefServer.Config.CustomCertsEnabled }}"
   {{ if .ChefServer.Config.RootCA }} root_ca "{{ .ChefServer.Config.RootCA }}" {{ else }} # root_ca "{{ .ChefServer.Config.RootCA }}" {{ end }}
   {{ if .ChefServer.Config.PrivateKey }} private_key "{{ .ChefServer.Config.PrivateKey }}" {{ else }} # private_key "{{ .ChefServer.Config.PrivateKey }}" {{ end }}
   {{ if .ChefServer.Config.PublicKey }} public_key "{{ .ChefServer.Config.PublicKey }}" {{ else }} # public_key "{{ .ChefServer.Config.PublicKey }}" {{ end }}
@@ -55,6 +57,7 @@ end
 ###############################################################
 opensearch do
   instance_count {{ .Opensearch.Config.InstanceCount }}
+  custom_certs_enabled "{{ .Opensearch.Config.CustomCertsEnabled }}"
   {{ if .Opensearch.Config.RootCA }} root_ca "{{ .Opensearch.Config.RootCA }}" {{ else }} # root_ca "{{ .Opensearch.Config.RootCA }}" {{ end }}
   {{ if .Opensearch.Config.AdminKey }} admin_key "{{ .Opensearch.Config.AdminKey }}" {{ else }} # admin_key "{{ .Opensearch.Config.AdminKey }}" {{ end }}
   {{ if .Opensearch.Config.AdminCert }} admin_cert "{{ .Opensearch.Config.AdminCert }}" {{ else }} # admin_cert "{{ .Opensearch.Config.AdminCert }}" {{ end }}
@@ -69,6 +72,7 @@ end
 ###############################################################
 postgresql do
   instance_count {{ .Postgresql.Config.InstanceCount }}
+  custom_certs_enabled "{{ .Postgresql.Config.CustomCertsEnabled }}"
   {{ if .Postgresql.Config.RootCA }} root_ca "{{ .Postgresql.Config.RootCA }}" {{ else }} # root_ca "{{ .Postgresql.Config.RootCA }}" {{ end }}
   {{ if .Postgresql.Config.PrivateKey }} private_key "{{ .Postgresql.Config.PrivateKey }}" {{ else }} # private_key "{{ .Postgresql.Config.PrivateKey }}" {{ end }}
   {{ if .Postgresql.Config.PublicKey }} public_key "{{ .Postgresql.Config.PublicKey }}" {{ else }} # public_key "{{ .Postgresql.Config.PublicKey }}" {{ end }}
@@ -131,6 +135,7 @@ automate do
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
   {{ if .Automate.Config.TeamsPort }} teams_port "{{ .Automate.Config.TeamsPort }}" {{ else }} # teams_port "{{ .Automate.Config.TeamsPort }}" {{ end }}
+  custom_certs_enabled "{{ .Automate.Config.CustomCertsEnabled }}"
   {{ if .Automate.Config.RootCA }} root_ca "{{ .Automate.Config.RootCA }}" {{ else }} # root_ca "{{ .Automate.Config.RootCA }}" {{ end }}
   {{ if .Automate.Config.PrivateKey }} private_key "{{ .Automate.Config.PrivateKey }}" {{ else }} # private_key "{{ .Automate.Config.PrivateKey }}" {{ end }}
   {{ if .Automate.Config.PublicKey }} public_key "{{ .Automate.Config.PublicKey }}" {{ else }} # public_key "{{ .Automate.Config.PublicKey }}" {{ end }}
@@ -141,6 +146,7 @@ end
 ###############################################################
 chef_server do
   instance_count {{ .ChefServer.Config.InstanceCount }}
+  custom_certs_enabled "{{ .ChefServer.Config.CustomCertsEnabled }}"
   {{ if .ChefServer.Config.RootCA }} root_ca "{{ .ChefServer.Config.RootCA }}" {{ else }} # root_ca "{{ .ChefServer.Config.RootCA }}" {{ end }}
   {{ if .ChefServer.Config.PrivateKey }} private_key "{{ .ChefServer.Config.PrivateKey }}" {{ else }} # private_key "{{ .ChefServer.Config.PrivateKey }}" {{ end }}
   {{ if .ChefServer.Config.PublicKey }} public_key "{{ .ChefServer.Config.PublicKey }}" {{ else }} # public_key "{{ .ChefServer.Config.PublicKey }}" {{ end }}
@@ -151,7 +157,10 @@ end
 ###############################################################
 opensearch do
   instance_count {{ .Opensearch.Config.InstanceCount }}
+  custom_certs_enabled "{{ .Opensearch.Config.CustomCertsEnabled }}"
   {{ if .Opensearch.Config.RootCA }} root_ca "{{ .Opensearch.Config.RootCA }}" {{ else }} # root_ca "{{ .Opensearch.Config.RootCA }}" {{ end }}
+  {{ if .Opensearch.Config.AdminKey }} admin_key "{{ .Opensearch.Config.AdminKey }}" {{ else }} # admin_key "{{ .Opensearch.Config.AdminKey }}" {{ end }}
+  {{ if .Opensearch.Config.AdminCert }} admin_cert "{{ .Opensearch.Config.AdminCert }}" {{ else }} # admin_cert "{{ .Opensearch.Config.AdminCert }}" {{ end }}
   {{ if .Opensearch.Config.PrivateKey }} private_key "{{ .Opensearch.Config.PrivateKey }}" {{ else }} # private_key "{{ .Opensearch.Config.PrivateKey }}" {{ end }}
   {{ if .Opensearch.Config.PublicKey }} public_key "{{ .Opensearch.Config.PublicKey }}" {{ else }} # public_key "{{ .Opensearch.Config.PublicKey }}" {{ end }}
   admin_dn "{{ .Opensearch.Config.AdminDn }}"
@@ -163,6 +172,7 @@ end
 ###############################################################
 postgresql do
   instance_count {{ .Postgresql.Config.InstanceCount }}
+  custom_certs_enabled "{{ .Postgresql.Config.CustomCertsEnabled }}"
   {{ if .Postgresql.Config.RootCA }} root_ca "{{ .Postgresql.Config.RootCA }}" {{ else }} # root_ca "{{ .Postgresql.Config.RootCA }}" {{ end }}
   {{ if .Postgresql.Config.PrivateKey }} private_key "{{ .Postgresql.Config.PrivateKey }}" {{ else }} # private_key "{{ .Postgresql.Config.PrivateKey }}" {{ end }}
   {{ if .Postgresql.Config.PublicKey }} public_key "{{ .Postgresql.Config.PublicKey }}" {{ else }} # public_key "{{ .Postgresql.Config.PublicKey }}" {{ end }}

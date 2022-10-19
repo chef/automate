@@ -194,6 +194,11 @@ chef_server_private_key = <<-EOT
 
 EOT
 
+opensearch_admin_key = <<-EOT
+<%= config.opensearch.admin_key %>
+
+EOT
+
 opensearch_private_key = <<-EOT
 <%= config.opensearch.private_key %>
 
@@ -219,10 +224,20 @@ opensearch_public_key = <<-EOT
 
 EOT
 
+opensearch_admin_cert = <<-EOT
+<%= config.opensearch.admin_cert %>
+
+EOT
+
 postgresql_public_key = <<-EOT
 <%= config.postgresql.public_key %>
 
 EOT
+
+automate_custom_certs_enabled = <%= config.automate.custom_certs_enabled %>
+chef_server_custom_certs_enabled = <%= config.chef_server.custom_certs_enabled %>
+postgresql_custom_certs_enabled = <%= config.postgresql.custom_certs_enabled %>
+opensearch_custom_certs_enabled = <%= config.opensearch.custom_certs_enabled %>
 
 opensearch_admin_dn = "<%= config.opensearch.admin_dn %>"
 opensearch_nodes_dn = "<%= config.opensearch.nodes_dn %>"

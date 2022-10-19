@@ -116,3 +116,5 @@ variable postgresql_private_key {
 
 variable postgresql_public_key {
 }
+variable postgresql_custom_certs_enabled {
+}

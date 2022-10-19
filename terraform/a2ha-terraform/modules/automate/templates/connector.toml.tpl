@@ -27,6 +27,10 @@
   chef_server_public_key = """${chef_server_public_key}"""
   opensearch_root_ca = """${opensearch_root_ca}"""
   postgresql_root_ca = """${postgresql_root_ca}"""
+  automate_custom_certs_enabled = ${automate_custom_certs_enabled}
+  chef_server_custom_certs_enabled = ${chef_server_custom_certs_enabled}
+  postgresql_custom_certs_enabled = ${postgresql_custom_certs_enabled}
+  opensearch_custom_certs_enabled = ${opensearch_custom_certs_enabled}
 
   
 [services]

@@ -224,3 +224,12 @@ variable opensearch_root_ca {
 variable postgresql_root_ca {
   
 }
+
+variable automate_custom_certs_enabled {
+}
+variable chef_server_custom_certs_enabled {
+}
+variable postgresql_custom_certs_enabled {
+}
+variable opensearch_custom_certs_enabled {
+}

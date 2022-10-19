@@ -10,6 +10,7 @@ locals {
     postgresql_root_ca             = var.postgresql_root_ca
     postgresql_public_key          = var.postgresql_public_key
     postgresql_private_key         = var.postgresql_private_key
+    postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
   })
   pgleaderchk_user_toml = templatefile("${path.module}/templates/pgleaderchk_user.toml.tpl", {
     listen_port = var.pgleaderchk_listen_port,
