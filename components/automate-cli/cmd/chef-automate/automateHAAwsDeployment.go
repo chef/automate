@@ -68,16 +68,18 @@ func (a *awsDeployment) generateConfig() error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
 	}
-	admin_dn, err := a.getDistinguishedNameFromKey(a.config.Opensearch.Config.AdminCert)
-	if err != nil {
-		return err
+	if a.config.Opensearch.Config.CustomCertsEnabled {
+		admin_dn, err := a.getDistinguishedNameFromKey(a.config.Opensearch.Config.AdminCert)
+		if err != nil {
+			return err
+		}
+		a.config.Opensearch.Config.AdminDn = admin_dn
+		nodes_dn, err := a.getDistinguishedNameFromKey(a.config.Opensearch.Config.PublicKey)
+		if err != nil {
+			return err
+		}
+		a.config.Opensearch.Config.NodesDn = nodes_dn
 	}
-	a.config.Opensearch.Config.AdminDn = admin_dn
-	nodes_dn, err := a.getDistinguishedNameFromKey(a.config.Opensearch.Config.PublicKey)
-	if err != nil {
-		return err
-	}
-	a.config.Opensearch.Config.NodesDn = nodes_dn
 	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, a.config)
 	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
 	return nil
