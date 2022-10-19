@@ -2293,7 +2293,7 @@ func getStartDateFromEndDate(endTime string, startTime string, isEnhancedReporti
 		return []string{startTime}, nil
 	}
 	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(),
-		parsedEndTime.Hour(), parsedEndTime.Minute(), parsedEndTime.Second(), 0, parsedEndTime.Location())
+		0, 0, 0, 0, parsedEndTime.Location())
 
 	return []string{newStartTime.Format(time.RFC3339)}, nil
 
