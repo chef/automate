@@ -17,6 +17,7 @@ import {
 } from "app/entities/sso-config/sso-config.selectors";
 import { SsoConfig } from "app/entities/sso-config/sso-config.model";
 import { Regex } from "app/helpers/auth/regex";
+import { ConfigService } from 'app/services/config/config.service';
 
 @Component({
   selector: "app-sso-config",
@@ -28,14 +29,15 @@ export class SsoConfigComponent implements OnInit {
   public ssoConfig: SsoConfig;
   public ssoConfigForm: FormGroup;
   public ssoConfigLoading: boolean = false;
+  public deploymentType: string;
 
   constructor(
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private configService: ConfigService
   ) {
     this.ssoConfigForm = fb.group({
-      serviceProvider: ["azureAd"],
       ssoUrl: [
         "",
         [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)],
@@ -55,6 +57,9 @@ export class SsoConfigComponent implements OnInit {
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
+    this.configService.getConfig().subscribe((config) => {
+      this.deploymentType = config.deploymentType;
+    });
     this.getSsoConfig();
   }
 
@@ -71,6 +76,10 @@ export class SsoConfigComponent implements OnInit {
         ) {
           this.ssoConfig = ssoConfigState;
           this.populateForm(this.ssoConfig);
+        }
+
+        if (getSsoConfigStatus === EntityStatus.loadingSuccess ||
+          getSsoConfigStatus === EntityStatus.loadingFailure) {
           this.ssoConfigLoading = false;
         }
       });
@@ -102,7 +111,6 @@ export class SsoConfigComponent implements OnInit {
 
   populateForm(ssoConfig) {
     this.ssoConfigForm.patchValue({
-      serviceProvider: 'azureAd',
       ssoUrl: ssoConfig.sso_url,
       emailAttribute: ssoConfig.email_attr,
       usernameAttribute: ssoConfig.username_attr,
