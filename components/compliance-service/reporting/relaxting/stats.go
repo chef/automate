@@ -119,7 +119,6 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	return depth.getStatsSummaryNodesResult(searchResult), nil
 }
 
-
 //GetStatsSummaryControlsRange - Gets summary stats, control centric, aggregate data for the given set of filters with date range
 func (backend ES2Backend) GetStatsSummaryControlsRange(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControlsRange"
