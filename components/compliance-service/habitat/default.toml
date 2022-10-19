@@ -11,6 +11,7 @@ port = 10121
 external_fqdn = "localhost"
 enable_large_reporting = false
 lcr_open_search_requests = 50
+enable_enhanced_compliance_reporting = false
 
 [storage]
 database = "chef_compliance_service"

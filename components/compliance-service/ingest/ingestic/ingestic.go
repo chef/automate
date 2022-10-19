@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -20,10 +21,12 @@ import (
 type ESClient struct {
 	client      *elastic.Client
 	initialized bool
+	Conf        config.Compliance
 }
 
-func NewESClient(client *elastic.Client) *ESClient {
-	return &ESClient{client: client, initialized: false}
+// NewESClient returns new search client.
+func NewESClient(client *elastic.Client, conf config.Compliance) *ESClient {
+	return &ESClient{client: client, initialized: false, Conf: conf}
 }
 
 // This method will support adding a document with a specified ID
@@ -65,6 +68,9 @@ func (backend *ESClient) InitializeStore(ctx context.Context) {
 	logrus.Info("Initialize elastic with mappings")
 	if !backend.initialized {
 		for _, esMap := range mappings.AllMappings {
+			if esMap == mappings.ComplianceControlRepData && !backend.Conf.Service.EnableEnhancedReporting {
+				continue
+			}
 			backend.CreateTemplate(ctx, esMap.Index, esMap.Mapping)
 			if !esMap.Timeseries {
 				backend.createStoreIfNotExists(ctx, esMap.Index, esMap.Mapping)
@@ -1200,19 +1206,21 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 }
 
 //GetReportsDailyLatestTrue Get the Nodes where daily latest flag is true from past 90 days from current date for upgrading
-func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]string, map[string]bool, error) {
+func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, upgradeTime time.Time) (map[string]string, map[string]bool, error) {
 	reportsMap := make(map[string]string)
 	nodesMap := make(map[string]relaxting.ReportId)
 	latestReportMap := make(map[string]bool)
-	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, upgradeTime.Format(time.RFC3339), time.Now().Format(time.RFC3339))
 	if err != nil {
 		return nil, nil, err
 	}
 
 	indicesSlice := strings.Split(indices, ",")
 
+	rangeQuery := elastic.NewRangeQuery("end_time").Gte(upgradeTime.Format(time.RFC3339))
+
 	boolQuery := elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("daily_latest", true))
+		Must(elastic.NewTermQuery("daily_latest", true)).Must(rangeQuery)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"report_uuid",

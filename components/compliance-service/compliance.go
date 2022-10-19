@@ -85,11 +85,12 @@ func createESBackend(servConf *config.Compliance, db *pgdb.DB) relaxting.ES2Back
 
 	// define the ElasticSearch backend config with legacy automate auth
 	esr := relaxting.ES2Backend{
-		ESUrl:             servConf.ElasticSearch.Url,
-		Enterprise:        servConf.Delivery.Enterprise,
-		ChefDeliveryUser:  servConf.Delivery.User,
-		ChefDeliveryToken: servConf.Delivery.Token,
-		PGdb:              db,
+		ESUrl:                      servConf.ElasticSearch.Url,
+		Enterprise:                 servConf.Delivery.Enterprise,
+		ChefDeliveryUser:           servConf.Delivery.User,
+		ChefDeliveryToken:          servConf.Delivery.Token,
+		PGdb:                       db,
+		IsEnhancedReportingEnabled: servConf.Service.EnableEnhancedReporting,
 	}
 	return esr
 }
@@ -176,7 +177,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		logrus.Infof("not getting authz client; env var RUN_MODE found. value is 'test' ")
 	}
 	nodeManagerServiceClient := getManagerConnection(connFactory, conf.Manager.Endpoint)
-	ingesticESClient := ingestic.NewESClient(esClient)
+	ingesticESClient := ingestic.NewESClient(esClient, conf)
 	ingesticESClient.InitializeStore(context.Background())
 	runner.ESClient = ingesticESClient
 	var reportmanagerClient reportmanager.ReportManagerServiceClient
@@ -209,11 +210,12 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	upgradeDB := pgdb.NewDB(db)
 	upgradeService := migrations.NewService(upgradeDB, cerealManager)
-
-	// Initiating cereal Manager for upgrade jobs
-	err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
-	if err != nil {
-		logrus.Fatalf("Failed to initiate cereal manager for upgrading jobs %v", err)
+	if conf.Service.EnableEnhancedReporting {
+		// Initiating cereal Manager for upgrade jobs
+		err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
+		if err != nil {
+			logrus.Fatalf("Failed to initiate cereal manager for upgrading jobs %v", err)
+		}
 	}
 
 	err = processor.InitCerealManager(cerealManager, conf.CerealConfig.Workers, ingesticESClient)
@@ -230,7 +232,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient,
-		conf.Service.LcrOpenSearchRequests, db))
+		conf.Service.LcrOpenSearchRequests, db, conf.Service.EnableEnhancedReporting))
 
 	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
 	profiles.RegisterProfilesServiceServer(s, ps)
@@ -272,8 +274,14 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		logrus.Fatalf("serveGrpc aborting, unable to run migrations: %v", err)
 	}
 
-	// Running upgrade scenarios for DayLatest flag
-	go upgradeService.PollForUpgradeFlagDayLatest()
+	date, err := upgradeService.UpdateFlags(conf.Service.EnableEnhancedReporting)
+	if err != nil {
+		logrus.Fatalf("serveGrpc aborting, unable to find the date to run the upgrades: %v", err)
+	}
+	if conf.Service.EnableEnhancedReporting {
+		// Running upgrade scenarios for DayLatest flag
+		go upgradeService.PollForUpgradeFlagDayLatest(date)
+	}
 
 	errc := make(chan error)
 	defer close(errc)

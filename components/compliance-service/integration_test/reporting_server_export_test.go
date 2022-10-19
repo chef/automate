@@ -32,7 +32,7 @@ func TestReportingServerExport(t *testing.T) {
 			AcknowledgementId: "testAck",
 		}, nil)
 
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, reportServiceClientMock, 5, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, reportServiceClientMock, 5, nil, false)
 
 	/*
 	   Create a struct suitable for setting up a streaming server connection in a test environment.

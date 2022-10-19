@@ -10,22 +10,34 @@ type UpgradeDBTest struct {
 	NeedStatus bool
 }
 
-func (u UpgradeDBTest) GetUpgradeFlags() (map[string]bool, error) {
+func (u UpgradeDBTest) GetUpgradeFlags() (map[string]pgdb.Flag, error) {
 	if u.Error {
 		return nil, errors.New("Unable to fetch status from database")
 	}
 
-	flagsMap := make(map[string]bool)
+	flagsMap := make(map[string]pgdb.Flag)
 
 	if u.NeedStatus {
-		flagsMap[pgdb.ControlIndexFlag] = true
-		flagsMap[pgdb.CompRunInfoFlag] = true
-		flagsMap[pgdb.DayLatestFlag] = true
+		flagsMap[pgdb.ControlIndexFlag] = pgdb.Flag{FlagName: pgdb.ControlIndexFlag, Status: true}
+		flagsMap[pgdb.CompRunInfoFlag] = pgdb.Flag{FlagName: pgdb.CompRunInfoFlag, Status: true}
+		flagsMap[pgdb.DayLatestFlag] = pgdb.Flag{FlagName: pgdb.DayLatestFlag, Status: true}
 		return flagsMap, nil
 	}
 	return flagsMap, nil
 }
 
-func (u UpgradeDBTest) UpdateControlFlagToFalse() error {
+func (u UpgradeDBTest) UpdateControlFlagValue(b bool) error {
+	return nil
+}
+
+func (u UpgradeDBTest) RemoveEnhancedReportingFlag() error {
+	return nil
+}
+
+func (u UpgradeDBTest) UpdateControlFlagTimeStamp() error {
+	return nil
+}
+
+func (u UpgradeDBTest) AddEnhancedReportingFlag() error {
 	return nil
 }

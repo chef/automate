@@ -45,6 +45,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value message_buffer_size = 8;
 				google.protobuf.BoolValue enable_large_reporting = 9;
 				google.protobuf.Int32Value lcr_open_search_requests = 10;
+				google.protobuf.BoolValue enable_enhanced_compliance_reporting = 11;
 			}
 
 			message Proxy {

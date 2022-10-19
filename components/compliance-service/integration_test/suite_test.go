@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
-	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/postgres"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/chef/automate/components/compliance-service/config"
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -46,8 +48,7 @@ type Suite struct {
 	NotifierMock            *NotifierMock
 	EventServiceClientMock  *event.MockEventServiceClient
 	ReportServiceClientMock *report_manager.MockReportManagerServiceClient
-	CerealManagerMock *cereal.Manager
-
+	CerealManagerMock       *cereal.Manager
 }
 
 // Initialize the test suite
@@ -68,7 +69,7 @@ func NewGlobalSuite() *Suite {
 	}
 
 	s.elasticClient = esclient
-	s.ingesticESClient = ingestic.NewESClient(esclient)
+	s.ingesticESClient = ingestic.NewESClient(esclient, config.Compliance{})
 	s.ingesticESClient.InitializeStore(context.Background())
 
 	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(nil))
@@ -90,7 +91,7 @@ func NewGlobalSuite() *Suite {
 	s.CerealManagerMock = cereal
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, nil, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, false,s.CerealManagerMock)
+		s.ProjectsClientMock, 100, false, s.CerealManagerMock)
 
 	return s
 }
@@ -109,7 +110,7 @@ func NewLocalSuite(t *testing.T) *Suite {
 	}
 
 	s.elasticClient = esclient
-	s.ingesticESClient = ingestic.NewESClient(esclient)
+	s.ingesticESClient = ingestic.NewESClient(esclient, config.Compliance{})
 	s.ingesticESClient.InitializeStore(context.Background())
 
 	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(t))
@@ -127,7 +128,7 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.CerealManagerMock = cereal
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, s.ReportServiceClientMock, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, false,s.CerealManagerMock)
+		s.ProjectsClientMock, 100, false, s.CerealManagerMock)
 
 	return s
 }

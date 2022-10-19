@@ -320,7 +320,8 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 		logrus.Debugf("filter: name=>%s value=>%s\n", filterName, filterValue)
 	}
 
-	filters["start_time"], _ = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], _ = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 
 	/*err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
@@ -664,7 +665,8 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	filters["status"] = make([]string, 0)
 
 	// Only end_time matters for this call
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]),
+		backend.IsEnhancedReportingEnabled)
 	if err != nil {
 		return nil, nil, err
 	}

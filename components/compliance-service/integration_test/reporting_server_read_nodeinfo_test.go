@@ -14,7 +14,7 @@ import (
 )
 
 func TestReadNodeInfo(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5, nil, false)
 	reports := []*relaxting.ESInSpecReport{
 		{
 			Projects: []string{},
