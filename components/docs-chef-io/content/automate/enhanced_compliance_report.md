@@ -70,7 +70,7 @@ Once you have enabled the enhanced compliance reporting (`enable_enhanced_compli
 
 {{< note >}} The migration process of the data from the existing indexes to the new indexes happens asynchronously. {{< /note >}}
 
-To status the status of the migration, run the following command:
+To check the status of the migration, run the following command:
 
 ```sh
 COMMAND
