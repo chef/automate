@@ -1,7 +1,7 @@
 #!/bin/bash
 
-domain="ec2-3-137-206-93.us-east-2.compute.amazonaws.com"
-token="8Vve_boBz4qfRhugMU3slm6fvbo="
+domain="ec2-18-116-164-107.us-east-2.compute.amazonaws.com"
+token="Y59ukGax4oVBlkkcVlS6sgkAafA="
 newline=$'\n'
 
 overview() {
@@ -11,7 +11,7 @@ overview() {
 	--header 'accept: application/json, text/plain, */*' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
-	--data-raw '{"filters":[]}'
+	--data-raw '{"filters":[{"type":"start_time","values":["2022-10-11T00:00:00Z"]},{"type":"end_time","values":["2022-10-19T23:59:59Z"]}]}' 
 
 	wait
 }
@@ -23,7 +23,8 @@ list_nodes() {
 	--header 'accept: application/json, text/plain, */*' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
-  	--data-raw '{"filters":[],"page":1,"per_page":100,"sort":"latest_report.end_time","order":"DESC"}' 
+  	--data-raw '{"filters":[{"type":"start_time","values":["2022-10-11T00:00:00Z"]},{"type":"end_time","values":["2022-10-19T23:59:59Z"]}],"page":1,"per_page":100,"sort":"latest_report.end_time","order":"DESC"}' 
+
 
 	wait
 }
@@ -35,7 +36,7 @@ get_report() {
   	--header 'accept: application/json, text/plain, */*' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
-	--data-raw '{"filters":[{"type":"node_id","values":["660d0ba0-92bb-43fc-a62b-747e28ba2390"]}],"page":1,"per_page":10,"sort":"latest_report.end_time","order":"DESC"}' \
+	--data-raw '{"filters":[{"type":"node_id","values":["524c135f-973b-41f2-9214-7cd24a90f88a"]}],"page":1,"per_page":10,"sort":"latest_report.end_time","order":"DESC"}' \
 	--compressed 
 
 	wait
@@ -61,20 +62,20 @@ profiles() {
   	--header 'accept: application/json, text/plain, */*' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
-  	--data-raw '{"filters":[],"page":1,"per_page":100}' \
+  --data-raw '{"filters":[{"type":"start_time","values":["2022-10-11T00:00:00Z"]},{"type":"end_time","values":["2022-10-19T23:59:59Z"]}],"page":1,"per_page":100}' \
   	--compressed 
 
 	wait
 }
 
 get_profile() {
-	echo  "${newline}****************** Get profile API ******************"
+	echo -k "${newline}****************** Get profile API ******************"
 
 	curl -k 'https://'$domain'/api/v0/compliance/reporting/stats/profiles' \
    	--header 'accept: application/json, text/plain, */*' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
-	--data-raw '{"type":"summary","id":"b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015","filters":[]}' \
+	--data-raw '{"type":"summary","id":"416342174df2ecfef3b0c648ca6bd5f830f0166947f01e6f43e4c8HHURK","filters":[]}' \
 	--compressed 
 
 	wait
@@ -83,7 +84,7 @@ get_profile() {
 list_control_report() {
 	echo "${newline}****************** List Control Report API ******************"
 
-	curl -k 'https://'$domain'/api/v0/compliance/reporting/reportcontrols/id/a4a396f1-a0b3-42ba-be92-74a081f7b421' \
+	curl -k 'https://'$domain'/api/v0/compliance/reporting/reportcontrols/id/48327ef1-6860-4385-95c6-cbbd26969c29' \
 	--header 'accept: application/json, text/plain, */*' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: text/plain' \
@@ -122,7 +123,7 @@ asets_count() {
 
 search_assets() {
 	echo "${newline}****************** Assets search API ******************"
-	
+
 	curl -k --location --request POST 'https://'$domain'/api/v0/compliance/reporting/assets/search' \
 	--header 'api-token: '$token'' \
 	--header 'Content-Type: application/json' \
@@ -154,7 +155,12 @@ for i in {1..100} ; do
 	asets_count &
 	search_assets &
 	asset_config &
+
 	sleep 10
 done
 
 echo "${newline}Done executions!"
+
+
+
+
