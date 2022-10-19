@@ -60,6 +60,7 @@ instance_count = ""
 config_file = "configs/automate.toml"
 
 # Add Automate load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
@@ -72,6 +73,7 @@ config_file = "configs/automate.toml"
 instance_count = ""
 
 # Add Chef Server load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
@@ -86,7 +88,10 @@ instance_count = ""
 instance_count = ""
 
 # Add OpenSearch load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
+# admin_key = ""
+# admin_cert = ""
 # private_key = ""
 # public_key = ""
 
@@ -99,6 +104,7 @@ instance_count = ""
 instance_count = ""
 
 # Add Postgresql load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
@@ -352,6 +358,7 @@ instance_count = ""
 config_file = "configs/automate.toml"
 
 # Add Automate load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
@@ -363,6 +370,7 @@ config_file = "configs/automate.toml"
 instance_count = ""
 
 # Add Chef Server load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
@@ -376,7 +384,10 @@ instance_count = ""
 instance_count = ""
 
 # Add OpenSearch load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
+# admin_key = ""
+# admin_cert = ""
 # private_key = ""
 # public_key = ""
 
@@ -389,6 +400,7 @@ instance_count = ""
 instance_count = ""
 
 # Add postgresql load balancer root-ca and keys
+custom_certs_enabled = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
