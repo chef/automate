@@ -61,7 +61,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 	if privateCertPath == "" || publicCertPath == "" {
 		return errors.New("Please provide public and private cert paths")
 	}
-	privateCert, err := ioutil.ReadFile(privateCertPath)
+	privateCert, err := ioutil.ReadFile(privateCertPath) // nosemgrep
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -70,7 +70,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	publicCert, err := ioutil.ReadFile(publicCertPath)
+	publicCert, err := ioutil.ReadFile(publicCertPath) // nosemgrep
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -119,7 +119,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 
 func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
 
-	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	pemBytes, err := ioutil.ReadFile(sshKeyFile) // nosemgrep
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
 		return
