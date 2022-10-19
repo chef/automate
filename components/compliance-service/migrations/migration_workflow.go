@@ -189,7 +189,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient, u
 			if _, found := latestReportsMap[report]; found {
 
 				//Updating the comp run info Flag
-				err := esClient.InsertComplianceRunInfo(ctx, inspecReport, inspecReport.EndTime)
+				err := esClient.InsertComplianceRunInfoUpgrade(ctx, inspecReport, inspecReport.EndTime)
 				if err != nil {
 					logrus.Errorf("Unable to perform action compliance run info for node %s and report %s with error %v", inspecReport.NodeID, report, err)
 				}
@@ -201,6 +201,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient, u
 				}
 
 			}
+
 			//Updating controls Index structure
 			controls, docIds, err := processor.MapStructsESInSpecReportToControls(inspecReport)
 			if err != nil {
@@ -208,11 +209,18 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient, u
 				continue
 			}
 
-			logrus.Debugf("Parsed results got results")
-			err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime, docIds)
+			//checking if the document exists node for particular node and control id
+			controlMapping := mappings.ComplianceControlRepData
+			index = controlMapping.IndexTimeseriesFmt(parsedEndTime)
+			nodesControlsMap, err := esClient.CheckIfControlIdANdNodeIdExistsForControlIndex(docIds, index)
+
+			logrus.Infof("Parsed results for control index and got the documents withe report id %s", report)
+			err = esClient.UploadDataToControlIndexForUpgrade(ctx, report, controls, parsedEndTime, nodesControlsMap)
 			if err != nil {
 				logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
 			}
+
+			logrus.Infof("Completed process for ugrading the report for report id %s and count %d", report, count)
 
 			count++
 

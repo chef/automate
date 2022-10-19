@@ -402,5 +402,15 @@ type ControlRunInfo struct {
 }
 
 type FirstRunInfo struct {
-	FirstRun string `json:"first_run""`
+	LastRun string `json:"last_run""`
+}
+
+type ControlNodesInfo struct {
+	Status string             `json:"status"`
+	Nodes  []NodesControlInfo `json:"nodes"`
+}
+
+type NodesControlInfo struct {
+	NodeUUID    string    `json:"node_uuid"`
+	NodeEndTime time.Time `json:"node_end_time"`
 }
