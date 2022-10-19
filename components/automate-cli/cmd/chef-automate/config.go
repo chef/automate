@@ -39,12 +39,13 @@ const (
 	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
 
 	BACKEND_COMMAND = `
-	export HAB_LICENSE=accept-no-persist;
 	export TIMESTAMP=$(date +"%s");
 	source /hab/sup/default/SystemdEnvironmentFile.sh;
 	automate-backend-ctl applied --svc=automate-ha-%s | tail -n +2 > /tmp/pg_config.toml; 
-	cat /tmp/pg_config.toml >> /tmp/%s ;
-	sudo hab config apply automate-ha-postgresql.default  $(date '+%s') /tmp/pg_config.toml;   
+	cat /tmp/%s >> /tmp/pg_config.toml ;
+	echo "yes" | hab config apply automate-ha-%s.default  $(date '+%s') /tmp/pg_config.toml;  
+	rm -rf /tmp/%s; 
+	mv /tmp/pg_config.toml /tmp/pg_config.toml.$TIMESTAMP;
 	`
 
 	dateFormat = "%Y%m%d%H%M%S"
@@ -59,7 +60,7 @@ func init() {
 
 	// patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Patch toml configuration to the automate node")
 	// patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Patch toml configuration to the chef_server node")
-	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "frontend", false, "Patch toml configuration to the all frontend nodes")
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Patch toml configuration to the all frontend nodes")
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
@@ -197,27 +198,41 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 	if isA2HARBFileExist() {
 
+		// scriptCommands1 := "source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);automate-backend-ctl show --svc=automate-ha-opensearch"
+		// output, err := getConfigFromRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[0], args[0], scriptCommands1)
+
+		// if err != nil {
+		// 	writer.Printf("\n%v\n", err)
+		// } else {
+		// 	data := &OpensearchConfig{}
+		// 	json.Unmarshal([]byte(output), &data)
+		// 	fmt.Printf("Operation: %v", data)
+
+		// }
 		if configCmdFlags.frontend {
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
+			if len(frontendIps) == 0 {
+				writer.Error("No frontend IPs are found")
+				os.Exit(1)
+			}
 			// writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], scriptCommands)
+				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], args[0], scriptCommands)
 			}
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], "%s")
-			for i := 0; i < 1; i++ {
-				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[i], args[0], scriptCommands)
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], remoteService, "%s", args[0])
+			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
+				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[0], args[0], scriptCommands)
 			}
 		}
 		if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], "%s")
-			// scriptCommands := "export HAB_LICENSE=accept-no-persist;export TIMESTAMP=$(date +\"%Y%m%d%H%M%S\");source /hab/sup/default/SystemdEnvironmentFile.sh; automate-backend-ctl applied --svc=automate-ha-" + remoteService + " | tail -n +2 > /tmp/os_config.toml; cat /tmp/os_config.toml >> /tmp/" + args[0] + " ;sudo hab config apply automate-ha-opensearch.default $(date '+%s') /tmp/os_config.toml; \n"
-			for i := 0; i < 1; i++ {
-				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[i], args[0], scriptCommands)
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], remoteService, "%s", args[0])
+			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
+				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[0], args[0], scriptCommands)
 			}
 		}
 	} else {
@@ -235,7 +250,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
+func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
 
 	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
@@ -244,6 +259,7 @@ func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
 		writer.Errorf("Parsing key failed: %v", err)
+		return
 	}
 	var (
 		keyErr *knownhosts.KeyError
@@ -265,7 +281,8 @@ func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 				return keyErr
 			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
 				// host key not found in known_hosts then give a warning and continue to connect.
-				writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.", host)
+				writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
+				// time.Sleep(2 * time.Second)
 				return addHostKey(host, remote, pubKey)
 			}
 			writer.Printf("Pub key exists for %s.", host)
@@ -285,16 +302,12 @@ func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	session, err := conn.NewSession()
 	if err != nil {
 		writer.Errorf("session failed:%v", err)
+		return
 	}
 	var stdoutBuf bytes.Buffer
 	session.Stdout = &stdoutBuf
 	// err = session.Run("sudo rm -rf /tmp/" + path + "")
-	cmd := "scp"
-	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/"}
-	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+	copyFileToRemote(sshKeyFile, tomlFilePath, sshUser, hostIP)
 
 	writer.StartSpinner()
 	err = session.Run(remoteCommands)
@@ -302,8 +315,7 @@ func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	writer.StopSpinner()
 	if err != nil {
 		writer.Errorf("Run failed:%v", err)
-	} else {
-		writer.Success("SCP successful...\n")
+		return
 	}
 	defer session.Close()
 	writer.Printf("\n%s\n", stdoutBuf)
@@ -323,10 +335,20 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string) {
+	cmd := "scp"
+	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/"}
+	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
 func createKnownHosts() {
 	f, fErr := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
 	if fErr != nil {
 		writer.Errorf("%v", fErr)
+		return
 	}
 	f.Close()
 }
@@ -336,6 +358,7 @@ func checkKnownHosts() ssh.HostKeyCallback {
 	kh, e := knownhosts.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
 	if e != nil {
 		writer.Errorf("%v", e)
+		return nil
 	}
 	return kh
 }
@@ -352,6 +375,6 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	defer f.Close()
 
 	knownHosts := knownhosts.Normalize(remote.String())
-	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	_, fileErr := f.WriteString(knownhosts.Line([]string{"\n", knownHosts}, pubKey))
 	return fileErr
 }
