@@ -108,7 +108,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
-  {{< note >}} To add custom certificates for services during deployment please refer [this](/automate/ha_cert_deployment).{{< /note >}}
+   {{< note >}}
+   To add custom certificates for services during deployment please refer [this](/automate/ha_cert_deployment).
+   {{< /note >}}
 
 3. Continue with the deployment after updating config:
 
