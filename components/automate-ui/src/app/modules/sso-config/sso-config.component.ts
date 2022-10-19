@@ -134,10 +134,7 @@ export class SsoConfigComponent implements OnInit {
   }
 
   hasAttemptedInput(field: string): boolean {
-    return (
-      this.ssoConfigForm.get(field).touched &&
-      this.ssoConfigForm.get(field).dirty
-    );
+    return this.ssoConfigForm.get(field).dirty;
   }
 
   convertToArray(value: string) {
