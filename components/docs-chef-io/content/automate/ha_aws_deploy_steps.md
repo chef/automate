@@ -107,6 +107,8 @@ Run the following steps on Bastion Host Machine:
      - Set `postgresql_ebs_volume_iops`, `postgresql_ebs_volume_size` based on your load needs.
      - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`, `opensearch_ebs_volume_type`, `postgresql_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
+{{< note >}} To add custom certificates for services during deployment please refer [this](/automate/ha_cert_deployment){{< /note >}}
+
 3. Continue with the deployment after updating config:
 
    ```bash
