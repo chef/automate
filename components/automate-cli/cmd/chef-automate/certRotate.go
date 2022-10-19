@@ -191,7 +191,7 @@ func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	writer.Success("SCP successful...\n")
 
 	defer session.Close()
-	writer.Printf("\n%s\n", stdoutBuf)
+	writer.Printf("\n%s\n", stdoutBuf.String())
 }
 
 func createKnownHosts() {
