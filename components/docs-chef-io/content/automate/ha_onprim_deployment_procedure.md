@@ -71,9 +71,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    "
    ```
 
-   {{< note >}} 
-   Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
-   {{< /note >}}
+  {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
    Note: If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
    After transfering, in Airgapped Bastion, run below commands:
@@ -96,7 +94,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    ```
 
    - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
-   - Add IP address of each machine in relevant service section, multiple IP's shoud be in double quotes (`"`) and separated with comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
+   - Add IP address of each machine in relevant service section, multiple IP's should be in double quotes (`"`) and separated with comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
       - If we want to use same machine for OpenSearch and Postgresql then provide same IP for both the config fields. Which means overall there will 3 machines or VM's running both OpenSearch and Postgresql. A reduced performance should be expected with this. Minimum 3 VM's or Machines will be used for Both OpenSearch and Postgresql running together on all 3 machines.
       - Also, you can use same machines for Chef Automate and Chef Infra Server. Which means overall there will be 2 machines or VM's running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VM's or Machines will be used by both Chef Automate and Chef Infra Server running together on both 2 machines.
       - Thus, overall minimum machines needed will be 5.
@@ -108,9 +106,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
-   {{< note >}}
-   To add custom certificates for services during deployment please refer [this](/automate/ha_cert_deployment).
-   {{< /note >}}
+   {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
 
 3. Continue with the deployment after updating config:
 
@@ -243,13 +239,13 @@ For example : Add new Automate node to the existing deployed cluster.
   - To download the airgap bundle, please run the command from the machine where we have internet access.
 
     ```sh
-    chef-automate create airgap bundle --version 4.X.Y  
+    chef-automate create airgap bundle --version 4.X.Y
     ```
 
-  - Copy the airgap bundle to the bastion host.  
+  - Copy the airgap bundle to the bastion host.
 
-- Run the `deploy` command to add the new node.  
-  
+- Run the `deploy` command to add the new node.
+
   ```sh
     chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
@@ -274,7 +270,7 @@ For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
   | [automate.config] <br/> instance_count = "3" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
-  
+
 - Trigger the deployment command again from the bastion node.
 - To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
   - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
@@ -294,10 +290,10 @@ For example : Remove Automate node to the existing deployed cluster.
   - To download the airgap bundle, please run the command from the machine where we have internet access.
 
     ```sh
-    chef-automate create airgap bundle --version 4.X.Y  
+    chef-automate create airgap bundle --version 4.X.Y
     ```
 
-  - Copy the airgap bundle to the bastion host.  
+  - Copy the airgap bundle to the bastion host.
 
 - Run the `deploy` command to remove the node.
 
@@ -321,7 +317,7 @@ For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
   | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
-  
+
 - Run the below command from the bastion node.
 
   ```sh
@@ -348,10 +344,10 @@ For example : Remove Automate node to the existing deployed cluster.
   - To download the airgap bundle, please run the command from the machine where we have internet access.
 
     ```sh
-    chef-automate create airgap bundle --version 4.X.Y  
+    chef-automate create airgap bundle --version 4.X.Y
     ```
 
-  - Copy the airgap bundle to the bastion host.  
+  - Copy the airgap bundle to the bastion host.
 
 - Run the `deploy` command to replace a node.
 
@@ -368,7 +364,7 @@ For example : Remove Automate node to the existing deployed cluster.
   ```
 
 - **Resolution** : Execute the below command.
-  
+
   ```sh
   cd /hab/a2_deploy_workspace/terraform
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
