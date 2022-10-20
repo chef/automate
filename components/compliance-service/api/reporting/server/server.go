@@ -34,18 +34,21 @@ const streamBufferSize = 2097152
 
 // Server implementation for reporting
 type Server struct {
-	es                       *relaxting.ES2Backend
-	reportMgr                reportmanager.ReportManagerServiceClient
-	lcr_open_search_requests int
-	db                       *pgdb.DB
+	es                         *relaxting.ES2Backend
+	reportMgr                  reportmanager.ReportManagerServiceClient
+	lcr_open_search_requests   int
+	db                         *pgdb.DB
+	isEnhancedReportingEnabled bool
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcrOpenSearchRequest int, db *pgdb.DB) *Server {
+func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcrOpenSearchRequest int, db *pgdb.DB,
+	isEnhancedReportingEnabled bool) *Server {
 	server := Server{
-		es:                       es,
-		lcr_open_search_requests: lcrOpenSearchRequest,
-		db:                       db,
+		es:                         es,
+		lcr_open_search_requests:   lcrOpenSearchRequest,
+		db:                         db,
+		isEnhancedReportingEnabled: isEnhancedReportingEnabled,
 	}
 	if rm != nil {
 		server.reportMgr = rm
@@ -917,7 +920,11 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 	}
 	return nil*/
 }
+
 func (srv *Server) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary, error) {
+	if !srv.isEnhancedReportingEnabled {
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for enhanced compliance reporting")
+	}
 	var assets *reporting.AssetSummary
 
 	formattedFilters := formatFilters(in.Filters)
@@ -938,6 +945,9 @@ func (srv *Server) AssetCount(ctx context.Context, in *reporting.ListFilters) (*
 }
 
 func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
+	if !srv.isEnhancedReportingEnabled {
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for enhanced compliance reporting")
+	}
 	formattedFilters := formatFilters(in.Filters)
 	var asset []*reporting.Assets
 
@@ -955,6 +965,9 @@ func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest
 }
 
 func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	if !srv.isEnhancedReportingEnabled {
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for enhanced compliance reporting")
+	}
 	result, err := srv.db.GetConfigs(ctx)
 	if err != nil {
 		logrus.Errorf("error while getting the conf: %+v", err)
@@ -965,6 +978,9 @@ func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetCon
 }
 
 func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	if !srv.isEnhancedReportingEnabled {
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for enhanced compliance reporting")
+	}
 	err := srv.db.SetConfigs(ctx, in)
 	if err != nil {
 		logrus.Errorf("error while updating the conf: %+v", err)
@@ -982,6 +998,9 @@ func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceC
 
 // ListControlItemsRange returns a list of controlListItems based on query
 func (srv *Server) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	if !srv.isEnhancedReportingEnabled {
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for enhanced compliance reporting")
+	}
 	var controlListItems *reporting.ControlItems
 	if in.Size == 0 {
 		in.Size = 100

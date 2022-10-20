@@ -41,6 +41,7 @@ type MigrationWorkflow struct {
 
 type MigrationWorkflowParameters struct {
 	ControlIndexFlag bool
+	UpgradeDate      time.Time
 }
 
 type MigrationWorkflowPayload struct {
@@ -68,6 +69,7 @@ func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 
 	err = w.EnqueueTask(UpgradeTaskName, UpgradeParameters{
 		ControlFlag: workflowParams.ControlIndexFlag,
+		UpgradeDate: workflowParams.UpgradeDate,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "failed to enqueue the migration-task")
@@ -115,6 +117,7 @@ type UpgradeParameters struct {
 	DayLatestFlag   bool
 	ControlFlag     bool
 	CompRunInfoFlag bool
+	UpgradeDate     time.Time
 }
 
 func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -125,18 +128,24 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 		return nil, err
 	}
 
-	logrus.Info("Inside the upgrades flag flow")
 	logrus.Infof("Upgrade started at time %v", time.Now())
 	if job.ControlFlag {
+		logrus.Info("Updating Control Flag Timestamp")
+		t.UpgradesDB.UpdateControlFlagTimeStamp()
 		logrus.Info("Inside the control flag")
-		if err := performActionForUpgrade(ctx, t.ESClient); err != nil {
+		if err := performActionForUpgrade(ctx, t.ESClient, job.UpgradeDate); err != nil {
 			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
 		}
 
-		err := t.UpgradesDB.UpdateControlFlagToFalse()
+		err := t.UpgradesDB.UpdateControlFlagValue(false)
 		if err != nil {
 			logrus.Warnf("Unable to set upgrades flag in database")
 		}
+	}
+
+	err := t.UpgradesDB.RemoveEnhancedReportingFlag()
+	if err != nil {
+		logrus.Warn(errors.Wrapf(err, "Unable to delete the enhanced_reporting flag entry").Error())
 	}
 
 	logrus.Infof("Upgrade completed at time %v", time.Now())
@@ -149,10 +158,12 @@ type ControlIndexUpgradeTask struct {
 	UpgradesDB *pgdb.UpgradesDB
 }
 
-func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) error {
+func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient, upgradeTime time.Time) error {
 	mapping := mappings.ComplianceRepDate
-	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	reportsMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, time90DaysAgo)
+	if time.Now().Sub(upgradeTime).Hours()/24 > 90 {
+		upgradeTime = time.Now().Add(-24 * time.Hour * 90)
+	}
+	reportsMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, upgradeTime)
 	if err != nil {
 		logrus.Errorf("Unable to Get Report IDs where daily latest true with err %v", err)
 		return err
@@ -179,7 +190,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 			if _, found := latestReportsMap[report]; found {
 
 				//Updating the comp run info Flag
-				err := esClient.InsertComplianceRunInfo(ctx, inspecReport.NodeID, inspecReport.EndTime)
+				err := esClient.InsertComplianceRunInfoUpgrade(ctx, inspecReport, inspecReport.EndTime)
 				if err != nil {
 					logrus.Errorf("Unable to perform action compliance run info for node %s and report %s with error %v", inspecReport.NodeID, report, err)
 				}
@@ -191,6 +202,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 				}
 
 			}
+
 			//Updating controls Index structure
 			controls, docIds, err := processor.MapStructsESInSpecReportToControls(inspecReport)
 			if err != nil {
@@ -198,11 +210,18 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 				continue
 			}
 
-			logrus.Debugf("Parsed results got results")
-			err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime, docIds)
+			//checking if the document exists node for particular node and control id
+			controlMapping := mappings.ComplianceControlRepData
+			index = controlMapping.IndexTimeseriesFmt(parsedEndTime)
+			nodesControlsMap, err := esClient.CheckIfControlIdANdNodeIdExistsForControlIndex(docIds, index)
+
+			logrus.Infof("Parsed results for control index and got the documents withe report id %s", report)
+			err = esClient.UploadDataToControlIndexForUpgrade(ctx, report, controls, parsedEndTime, nodesControlsMap)
 			if err != nil {
 				logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
 			}
+
+			logrus.Infof("Completed process for ugrading the report for report id %s and count %d", report, count)
 
 			count++
 

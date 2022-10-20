@@ -1,0 +1,2 @@
+[compliance.v1.sys.service]
+enable_enhanced_compliance_reporting = true

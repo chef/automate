@@ -2,6 +2,7 @@ package status
 
 import (
 	"context"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -26,8 +27,8 @@ const (
 	//MigrationLabelFEEDS = "ElasticSearch_Feeds_1"
 )
 
-const maxMigrations = 9        // Total migrations should match the number of constants above
-const totalMigrationSteps = 41 // Max number of migration LogEntry items we can have across all migrations
+const maxMigrations = 10       // Total migrations should match the number of constants above
+const totalMigrationSteps = 53 // Max number of migration LogEntry items we can have across all migrations
 
 // Special message sent by the services to flag the end of a migration either failed or successful
 const MigrationFailedMsg = "FAILED"
@@ -35,12 +36,14 @@ const MigrationCompletedMsg = "COMPLETED"
 
 // Server struct
 type Server struct {
-	MigrationStatus  *status.MigrationStatus
-	MigrationChannel chan status.LogEntry
+	MigrationStatus         *status.MigrationStatus
+	MigrationChannel        chan status.LogEntry
+	DB                      pgdb.Storage
+	EnableEnhancedReporting bool
 }
 
 // New creates a new instance of Server
-func New() *Server {
+func New(enabledEnhancedReporting bool) *Server {
 	migrationChannel := make(chan status.LogEntry)
 	migrationStatus := &status.MigrationStatus{
 		Completed: 0,
@@ -48,11 +51,16 @@ func New() *Server {
 		Status:    status.MigrationStatus_RUNNING,
 	}
 	thisServer := &Server{
-		MigrationStatus:  migrationStatus,
-		MigrationChannel: migrationChannel,
+		MigrationStatus:         migrationStatus,
+		MigrationChannel:        migrationChannel,
+		EnableEnhancedReporting: enabledEnhancedReporting,
 	}
 	go listenForMigrationUpdates(migrationChannel, thisServer)
 	return thisServer
+}
+
+func (srv *Server) SetPGBackend(db *pgdb.DB) {
+	srv.DB = &pgdb.UpgradesDB{DB: db}
 }
 
 // GetMigrationStatus returns the migration status of the service
@@ -131,4 +139,27 @@ func AddMigrationUpdate(migServer *Server, logLabel string, logText string) {
 		Text:      logText,
 		Timestamp: timeNow,
 	}
+}
+
+//GetControlIndexMigrationStatus is the service endpoint to get the status of Control Index migration status
+func (srv *Server) GetControlIndexMigrationStatus(ctx context.Context, empty *pb.Empty) (*status.ControlIndexMigrationStatus, error) {
+	if !srv.EnableEnhancedReporting {
+		return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTCONFIGURED}, nil
+	}
+
+	flagMap, err := srv.DB.GetUpgradeFlags()
+	if err != nil {
+		return nil, err
+	}
+
+	flg := flagMap[pgdb.ControlIndexFlag]
+	if flg.Status {
+		if flg.UpgradedTime.IsZero() {
+			return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_NOTSTARTED}, nil
+		} else {
+			return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_INPROGRESS}, nil
+		}
+	}
+
+	return &status.ControlIndexMigrationStatus{Status: status.ControlIndexMigrationStatus_COMPLETED}, nil
 }

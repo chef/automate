@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/lib/cereal"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
@@ -110,8 +111,8 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient, cerea
 			out <- nil
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
-		logrus.Infof("Enqueue workflow started at %v", time.Now())
-		/*
+		if client.Conf.Service.EnableEnhancedReporting {
+			logrus.Infof("Enqueue workflow started at %v", time.Now())
 			errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
 				fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
 				processor.ControlWorkflowParameters{
@@ -125,18 +126,19 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient, cerea
 			if errWorkflow != nil {
 				fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)
 			}
-		*/
+		}
 		close(out)
 	}()
 	return out
 }
+
 func insertInspecReportRunInfo(msg message.Compliance, client *ingestic.ESClient) <-chan error {
 	out := make(chan error)
 	go func() {
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
 		start := time.Now()
 
-		err := client.InsertComplianceRunInfo(msg.Ctx, msg.InspecReport.NodeID, msg.Shared.EndTime)
+		err := client.InsertComplianceRunInfo(msg.Ctx, msg.InspecReport, msg.Shared.EndTime)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_report object")
 			out <- err

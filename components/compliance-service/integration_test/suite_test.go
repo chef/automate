@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
@@ -68,7 +69,7 @@ func NewGlobalSuite() *Suite {
 	}
 
 	s.elasticClient = esclient
-	s.ingesticESClient = ingestic.NewESClient(esclient)
+	s.ingesticESClient = ingestic.NewESClient(esclient, config.Compliance{})
 	s.ingesticESClient.InitializeStore(context.Background())
 
 	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(nil))
@@ -109,7 +110,7 @@ func NewLocalSuite(t *testing.T) *Suite {
 	}
 
 	s.elasticClient = esclient
-	s.ingesticESClient = ingestic.NewESClient(esclient)
+	s.ingesticESClient = ingestic.NewESClient(esclient, config.Compliance{})
 	s.ingesticESClient.InitializeStore(context.Background())
 
 	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(t))
@@ -303,7 +304,7 @@ func (s *Suite) InsertComplianceRunInfos(reports []*relaxting.ESInSpecReport) ([
 		ids[i] = report.NodeID
 
 		for tries := 0; tries < 3; tries++ {
-			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report.NodeID, report.EndTime)
+			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report, report.EndTime)
 			if err == nil {
 				break
 			}

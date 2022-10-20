@@ -23,11 +23,12 @@ import (
 )
 
 type ES2Backend struct {
-	ESUrl             string
-	Enterprise        string
-	ChefDeliveryUser  string
-	ChefDeliveryToken string
-	PGdb              *pgdb.DB
+	ESUrl                      string
+	Enterprise                 string
+	ChefDeliveryUser           string
+	ChefDeliveryToken          string
+	PGdb                       *pgdb.DB
+	IsEnhancedReportingEnabled bool
 }
 
 // ReportingTransport structure for Automate login
