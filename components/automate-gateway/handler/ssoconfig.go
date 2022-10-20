@@ -194,7 +194,7 @@ func (a *SsoConfig) SetSsoConfig(ctx context.Context, in *sso.SetSsoConfigReques
 	jsonValue, _ := json.Marshal(bodyParams)
 	url, err := getBastionUrl()
 	if err != nil {
-		log.Fatalln("Errror while creating bastion url = ", err)
+		log.Fatal("Error while creating bastion url = ", err)
 		return nil, err
 	}
 	fileName := "post-status.txt"
