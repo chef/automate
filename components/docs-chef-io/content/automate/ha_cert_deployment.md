@@ -19,7 +19,7 @@ gh_repo = "automate"
 
 Custom certificates can be added during deployment for different services.
 
-## Common certificate for all the nodes of a service
+## Setting common certificate for all the nodes of a service
 
 The following services support custom certificates:
 

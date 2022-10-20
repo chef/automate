@@ -159,12 +159,38 @@ backup_mount = "/mnt/automate_backups"
 fqdn = ""
 instance_count = "2"
 config_file = "configs/automate.toml"
+# Set custom_certs_enabled = true to provide custom certificates during deployment
+custom_certs_enabled = false
+# Add Automate load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 [chef_server.config]
 instance_count = "2"
+# Set custom_certs_enabled = true to provide custom certificates during deployment
+custom_certs_enabled = false
+# Add Chef Server load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 [opensearch.config]
 instance_count = "3"
+# Set custom_certs_enabled = true to provide custom certificates during deployment
+custom_certs_enabled = false
+# Add OpenSearch load balancer root-ca and keys
+# root_ca = ""
+# admin_key = ""
+# admin_cert = ""
+# private_key = ""
+# public_key = ""
 [postgresql.config]
 instance_count = "3"
+# Set custom_certs_enabled = true to provide custom certificates during deployment
+custom_certs_enabled = false
+# Add Postgresql load balancer root-ca and keys
+# root_ca = ""
+# private_key = ""
+# public_key = ""
 [existing_infra.config]
 ## === INPUT NEEDED ===
 # provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
