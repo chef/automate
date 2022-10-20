@@ -469,8 +469,5 @@ export class TelemetryService {
     });
     return promise;
   }
-  getDeploymenType() {
-    return this.deploymentType;
-  }
 
 }

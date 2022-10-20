@@ -10,14 +10,27 @@ export interface SsoConfigResponse {
   ssoConfig: SsoConfig;
 }
 
+export interface ApiResponse {
+  message: string;
+}
+
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 @Injectable()
 export class SsoConfigRequests {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   public getSsoConfig(): Observable<SsoConfig> {
     return this.http.get<SsoConfig>(
       `${env.gateway_url}/sso/config`, { headers }
     );
+  }
+
+  public createSsoConfig(ssoConfig: SsoConfig): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(
+      `${env.gateway_url}/sso/config`, ssoConfig);
+  }
+
+  public deleteSsoConfig(): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${env.gateway_url}/sso/config`);
   }
 }
