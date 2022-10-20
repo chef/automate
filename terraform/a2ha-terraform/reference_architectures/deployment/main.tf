@@ -284,6 +284,7 @@ module "opensearch" {
   opensearch_admin_cert           = var.opensearch_admin_cert
   opensearch_admin_dn             = var.opensearch_admin_dn
   opensearch_nodes_dn             = var.opensearch_nodes_dn
+  opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
   depends_on = [
     module.habitat-opensearch
   ]
@@ -324,6 +325,7 @@ module "postgresql" {
   postgresql_root_ca              = var.postgresql_root_ca
   postgresql_private_key          = var.postgresql_private_key
   postgresql_public_key           = var.postgresql_public_key
+  postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
   depends_on = [
     module.habitat-postgresql
   ]
@@ -345,6 +347,10 @@ module "bootstrap_automate" {
   chef_server_root_ca                = var.chef_server_root_ca
   chef_server_private_key            = var.chef_server_private_key
   chef_server_public_key             = var.chef_server_public_key
+  automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+  chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+  postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+  opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = 1
@@ -409,6 +415,10 @@ module "automate" {
   chef_server_root_ca                = var.chef_server_root_ca
   chef_server_private_key            = var.chef_server_private_key
   chef_server_public_key             = var.chef_server_public_key
+  automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+  chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+  postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+  opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.automate_instance_count - 1
@@ -477,6 +487,10 @@ module "chef_server" {
   chef_server_root_ca                = var.chef_server_root_ca
   chef_server_private_key            = var.chef_server_private_key
   chef_server_public_key             = var.chef_server_public_key
+  automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+  chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+  postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+  opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.chef_server_instance_count
