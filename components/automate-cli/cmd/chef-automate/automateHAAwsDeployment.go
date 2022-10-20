@@ -91,7 +91,7 @@ func (a *awsDeployment) getDistinguishedNameFromKey(public_key string) (string, 
 		return "", status.New(status.ConfigError, "failed to decode certificate PEM")
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
-	if err == nil {
+	if err != nil {
 		return "", status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
 	}
 	return fmt.Sprintf("%v", cert.Subject), nil
