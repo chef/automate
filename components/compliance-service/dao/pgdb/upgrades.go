@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"strings"
+	"time"
 )
 
 type UpgradesDB struct {
