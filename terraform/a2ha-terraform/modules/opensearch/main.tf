@@ -1,23 +1,23 @@
 locals {
   opensearch_user_toml = [
     for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/opensearch_user.toml.tpl", {
-      listen_port        = var.opensearch_listen_port,
-      minimum_masters    = floor(var.opensearch_instance_count / 2 + 1),
-      node_name          = var.private_ips[n],
-      private_ip         = var.private_ips[n],
-      private_ips        = join(", ", formatlist("\"%s\"", var.private_ips)),
-      nodes_list         = join(", ", formatlist("\"%s\"", var.private_ips))
-      tmp_path           = var.tmp_path
-      backup_config      = var.backup_config_s3 == "true" ? "s3" : var.backup_config_efs == "true" ? "efs" : ""
-      endpoint           = var.s3_endpoint
-      nfs_mount_path     = var.nfs_mount_path
-      opensearch_root_ca = var.opensearch_root_ca
-      opensearch_public_key = var.opensearch_public_key
-      opensearch_private_key = var.opensearch_private_key
-      opensearch_admin_key = var.opensearch_admin_key
-      opensearch_admin_cert = var.opensearch_admin_cert
-      opensearch_admin_dn = var.opensearch_admin_dn
-      opensearch_nodes_dn = var.opensearch_nodes_dn
+      listen_port                     = var.opensearch_listen_port,
+      minimum_masters                 = floor(var.opensearch_instance_count / 2 + 1),
+      node_name                       = var.private_ips[n],
+      private_ip                      = var.private_ips[n],
+      private_ips                     = join(", ", formatlist("\"%s\"", var.private_ips)),
+      nodes_list                      = join(", ", formatlist("\"%s\"", var.private_ips))
+      tmp_path                        = var.tmp_path
+      backup_config                   = var.backup_config_s3 == "true" ? "s3" : var.backup_config_efs == "true" ? "efs" : ""
+      endpoint                        = var.s3_endpoint
+      nfs_mount_path                  = var.nfs_mount_path
+      opensearch_root_ca              = var.opensearch_root_ca
+      opensearch_public_key           = var.opensearch_public_key
+      opensearch_private_key          = var.opensearch_private_key
+      opensearch_admin_key            = var.opensearch_admin_key
+      opensearch_admin_cert           = var.opensearch_admin_cert
+      opensearch_admin_dn             = var.opensearch_admin_dn
+      opensearch_nodes_dn             = var.opensearch_nodes_dn
       opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
     })
   ]

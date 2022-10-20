@@ -280,7 +280,7 @@ module "opensearch" {
   opensearch_root_ca              = var.opensearch_root_ca
   opensearch_private_key          = var.opensearch_private_key
   opensearch_public_key           = var.opensearch_public_key
-  opensearch_admin_key           = var.opensearch_admin_key
+  opensearch_admin_key            = var.opensearch_admin_key
   opensearch_admin_cert           = var.opensearch_admin_cert
   opensearch_admin_dn             = var.opensearch_admin_dn
   opensearch_nodes_dn             = var.opensearch_nodes_dn
@@ -338,8 +338,8 @@ module "bootstrap_automate" {
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
   automate_root_ca                   = var.automate_root_ca
-  opensearch_root_ca              = var.opensearch_root_ca
-  postgresql_root_ca              = var.postgresql_root_ca
+  opensearch_root_ca                 = var.opensearch_root_ca
+  postgresql_root_ca                 = var.postgresql_root_ca
   automate_private_key               = var.automate_private_key
   automate_public_key                = var.automate_public_key
   chef_server_root_ca                = var.chef_server_root_ca
@@ -402,8 +402,8 @@ module "automate" {
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
   automate_root_ca                   = var.automate_root_ca
-  opensearch_root_ca              = var.opensearch_root_ca
-  postgresql_root_ca              = var.postgresql_root_ca
+  opensearch_root_ca                 = var.opensearch_root_ca
+  postgresql_root_ca                 = var.postgresql_root_ca
   automate_private_key               = var.automate_private_key
   automate_public_key                = var.automate_public_key  
   chef_server_root_ca                = var.chef_server_root_ca
@@ -470,8 +470,8 @@ module "chef_server" {
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
   automate_root_ca                   = var.automate_root_ca
-  opensearch_root_ca              = var.opensearch_root_ca
-  postgresql_root_ca              = var.postgresql_root_ca
+  opensearch_root_ca                 = var.opensearch_root_ca
+  postgresql_root_ca                 = var.postgresql_root_ca
   automate_private_key               = var.automate_private_key
   automate_public_key                = var.automate_public_key  
   chef_server_root_ca                = var.chef_server_root_ca
