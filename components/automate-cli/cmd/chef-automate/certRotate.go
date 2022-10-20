@@ -18,12 +18,14 @@ import (
 )
 
 var certFlags = struct {
+	rootCa      string
 	privateCert string
 	publicCert  string
 }{}
 
 var sshFlag = struct {
 	automate bool
+	postgres bool
 }{}
 
 var certRotateCmd = &cobra.Command{
@@ -40,6 +42,9 @@ const (
 	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
 	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
 
+	BACKEND_COMMAND = `
+    sudo HAB_LICENSE=accept-no-persist hab config apply automate-ha-%s.default  $(date +"%s") /tmp/%s;`
+
 	dateFormat = "%Y%m%d%H%M%S"
 )
 
@@ -48,12 +53,16 @@ func init() {
 
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.automate, "automate", false, "Automate ha server name to ssh")
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.automate, "a2", false, "Automate ha server name to ssh")
+	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.postgres, "postgres", false, "Postgres server name to ssh")
+	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.postgres, "pg", false, "Postgres server name to ssh")
 
+	certRotateCmd.PersistentFlags().StringVar(&certFlags.rootCa, "root-ca", "", "Root CA value")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.privateCert, "private-cert", "", "Ha private certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.publicCert, "public-cert", "", "Ha public certificate")
 }
 
 func certRotate(cmd *cobra.Command, args []string) error {
+	rootCaPath := certFlags.rootCa
 	privateCertPath := certFlags.privateCert
 	publicCertPath := certFlags.publicCert
 	fileName := "cert.toml"
@@ -61,6 +70,23 @@ func certRotate(cmd *cobra.Command, args []string) error {
 	if privateCertPath == "" || publicCertPath == "" {
 		return errors.New("Please provide public and private cert paths")
 	}
+
+	var rootCA []byte
+	var err error
+	if sshFlag.postgres {
+		if rootCaPath == "" {
+			return errors.New("Please provide rootCA path")
+		}
+		rootCA, err = ioutil.ReadFile(rootCaPath) // nosemgrep
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.FileAccessError,
+				fmt.Sprintf("failed reading data from file: %s", err),
+			)
+		}
+	}
+
 	privateCert, err := ioutil.ReadFile(privateCertPath) // nosemgrep
 	if err != nil {
 		return status.Wrap(
@@ -112,6 +138,24 @@ func certRotate(cmd *cobra.Command, args []string) error {
 			for i := 0; i < len(automateIps); i++ {
 				connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[i], fileName, scriptCommands)
 			}
+
+		} else if sshFlag.postgres {
+			config := fmt.Sprintf(`
+			 [ssl]
+			 enable = true
+			 ssl_key = """%v"""
+			 ssl_cert = """%v"""
+			 issuer_cert = """%v"""
+			`, string(privateCert), string(publicCert), string(rootCA))
+
+			_, err = f.Write([]byte(config))
+			if err != nil {
+				log.Fatal(err)
+			}
+			f.Close()
+			const remoteService string = "postgresql"
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, remoteService, dateFormat, fileName)
+			connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[0], fileName, scriptCommands)
 		}
 	}
 	return nil
