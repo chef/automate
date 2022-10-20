@@ -79,7 +79,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.Create(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/"}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return
 	}
 
 	writer.StartSpinner()
@@ -226,5 +226,6 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 
 	knownHosts := knownhosts.Normalize(remote.String())
 	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	f.WriteString("/n")
 	return fileErr
 }
