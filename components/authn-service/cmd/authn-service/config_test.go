@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/ghodss/yaml"
@@ -20,7 +19,6 @@ var _ = yaml.YAMLToJSON
 
 func TestUnmarshalConfig(t *testing.T) {
 	tokenID := uuid.Must(uuid.NewV4()).String()
-	fmt.Println(tokenID)
 	tests := map[string]struct {
 		rawConfig      []byte
 		expectedConfig Config
