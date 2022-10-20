@@ -243,7 +243,7 @@ type job struct {
 	Timeout       int32           `db:"timeout"`
 	Retries       int32           `db:"retries"`
 	RetriesLeft   int32           `db:"retries_left"`
-	status        string          `db:"status"`
+	Status        string          `db:"status"`
 	Startime      time.Time       `db:"start_time"`
 	Endtime       time.Time       `db:"end_time"`
 	NodeSelectors json.RawMessage `db:"node_selectors"`
@@ -323,7 +323,7 @@ func toDBJob(inJob *jobs.Job) (job, error) {
 	newJob.Timeout = inJob.Timeout
 	newJob.Retries = inJob.Retries
 	newJob.RetriesLeft = inJob.RetriesLeft
-	newJob.status = inJob.Status
+	newJob.Status = inJob.Status
 	newJobStarttime, err := ptypes.Timestamp(inJob.StartTime)
 	if err != nil {
 		if inJob.StartTime != nil {
@@ -386,7 +386,7 @@ func fromDBSelectJob(inSelectJob *jobSelectDetail) (jobs.Job, error) {
 		newProfiles = append(newProfiles, item["url"])
 	}
 	jobSelect.Profiles = newProfiles
-	jobSelect.Status = inSelectJob.status
+	jobSelect.Status = inSelectJob.Status
 	jobStartTime, err := ptypes.TimestampProto(inSelectJob.Startime)
 	if err != nil {
 		return jobSelect, errors.Wrap(err, "fromDBSelectJob unable to translate start_time to timestamp")
@@ -423,7 +423,7 @@ func fromDBSelectJob(inSelectJob *jobSelectDetail) (jobs.Job, error) {
 		resultsNew[i] = &jobs.ResultsRow{
 			NodeId:   item["node_id"],
 			ReportId: item["report_id"],
-			Status:   item["Status"],
+			Status:   item["status"],
 			Result:   item["result"],
 		}
 
@@ -478,7 +478,7 @@ func fromDBSelectAllJobs(inSelectJob *jobSelectSummary) (*jobs.Job, error) {
 	}
 	jobSelect.Tags = tags
 	jobSelect.Type = inSelectJob.Type
-	jobSelect.Status = inSelectJob.status
+	jobSelect.Status = inSelectJob.Status
 	jobStartTime, err := ptypes.TimestampProto(inSelectJob.Startime)
 	if err != nil {
 		return nil, errors.Wrap(err, "fromDBSelectAllJobs unable to translate start_time to timestamp")
@@ -648,11 +648,11 @@ func validateJobFilters(filters []*common.Filter) error {
 					}
 				}
 			}
-		case "Status":
+		case "status":
 			for _, item := range filter.Values {
 				if item != "" {
 					if !isValidJobStatus(item) {
-						return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid Status filter: %s. Status must be one of the following: 'completed', 'failed', 'new', 'running', 'scheduled'", item)}
+						return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid status filter: %s. status must be one of the following: 'completed', 'failed', 'new', 'running', 'scheduled'", item)}
 					}
 				}
 			}
