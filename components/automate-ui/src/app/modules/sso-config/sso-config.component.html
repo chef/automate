@@ -6,14 +6,16 @@
         <chef-heading>SAML Setup</chef-heading>
         <chef-subheading>Sign-On configuration from the chef SAAS users.
         </chef-subheading>
-        <app-authorized [allOf]="['/api/v0/sso/config', 'get']">
-          <div *ngIf="deploymentType === 'SAAS'"  slot="header-buttons">
-            <chef-button primary caution class="remove-button" label="Remove SSO config"
-              [disabled]="!isSsoConfigAvailable()" (click)="removeSsoConfig()">
-              Remove Configuration
-            </chef-button>
-          </div>
-        </app-authorized>
+        <div slot="header-buttons">
+          <app-authorized [allOf]="['/api/v0/sso/config', 'get']">
+            <div *ngIf="deploymentType === 'SAAS'">
+              <chef-button primary caution class="remove-button" label="Remove SSO config"
+                [disabled]="!isSsoConfigAvailable()" (click)="removeSsoConfig()">
+                Remove Configuration
+              </chef-button>
+            </div>
+          </app-authorized>
+        </div>
       </chef-page-header>
       <section class="page-body">
         <app-authorized [allOf]="['/api/v0/sso/config', 'get']">
