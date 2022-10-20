@@ -2,11 +2,10 @@ package pgdb
 
 import (
 	"fmt"
-	"strings"
-	"time"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strings"
+	"time"
 )
 
 type UpgradesDB struct {

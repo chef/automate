@@ -219,7 +219,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
-	err = processor.InitCerealManager(cerealManager, conf.CerealConfig.Workers, ingesticESClient)
+	err = processor.InitCerealManager(cerealManager, conf.Service.ControlsPopulatorsCount, ingesticESClient)
 	if err != nil {
 		logrus.Fatalf("failed to initiate cereal manager: %v", err)
 	}
