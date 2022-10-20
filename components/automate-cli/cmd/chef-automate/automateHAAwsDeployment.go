@@ -85,8 +85,8 @@ func (a *awsDeployment) generateConfig() error {
 	return nil
 }
 
-func (a *awsDeployment) getDistinguishedNameFromKey(public_key string) (string, error) {
-	block, _ := pem.Decode([]byte(public_key))
+func (a *awsDeployment) getDistinguishedNameFromKey(publicKey string) (string, error) {
+	block, _ := pem.Decode([]byte(publicKey))
 	if block == nil {
 		return "", status.New(status.ConfigError, "failed to decode certificate PEM")
 	}

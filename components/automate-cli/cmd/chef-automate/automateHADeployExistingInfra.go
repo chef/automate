@@ -70,8 +70,8 @@ func (e *existingInfra) generateConfig() error {
 	return nil
 }
 
-func (e *existingInfra) getDistinguishedNameFromKey(public_key string) (string, error) {
-	block, _ := pem.Decode([]byte(public_key))
+func (e *existingInfra) getDistinguishedNameFromKey(publicKey string) (string, error) {
+	block, _ := pem.Decode([]byte(publicKey))
 	if block == nil {
 		return "", status.New(status.ConfigError, "failed to decode certificate PEM")
 	}
