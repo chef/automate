@@ -1,5 +1,5 @@
 +++
-title = "Add Certificate During Deployment"
+title = "Add Custom Certificate During Deployment"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Add Certificate During Deployment"
+    title = "Add Custom Certificate During Deployment"
     parent = "automate/deploy_high_availability/certificates"
-    identifier = "automate/deploy_high_availability/certificates/ha_cert_deployment.md Add Certificate During Deployment"
+    identifier = "automate/deploy_high_availability/certificates/ha_cert_deployment.md Add Custom Certificate During Deployment"
     weight = 210
 +++
 
