@@ -12,9 +12,9 @@ locals {
 module "system-tuning-frontend" {
   source                          = "./modules/system"
   automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
-  opensearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
   instance_count                  = local.frontend_count
-  postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
   private_ips                     = local.frontend_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
@@ -25,10 +25,11 @@ module "system-tuning-frontend" {
 
 module "system-tuning-backend" {
   source                          = "./modules/system"
+  count                           = var.setup_managed_services ? 0 : 1
   automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
-  opensearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
   instance_count                  = local.backend_count
-  postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
   private_ips                     = local.backend_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
@@ -39,7 +40,8 @@ module "system-tuning-backend" {
 
 module "airgap_bundle-backend" {
   source            = "./modules/airgap_bundle"
-  archive_disk_info = module.system-tuning-backend.archive_disk_info
+  count             = var.setup_managed_services ? 0 : 1
+  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-backend[0].archive_disk_info
   instance_count    = local.backend_count
   private_ips       = local.backend_private_ips
   bundle_files = [{
@@ -76,7 +78,8 @@ module "airgap_bundle-frontend" {
 
 module "habitat-backend" {
   source                          = "./modules/habitat"
-  airgap_info                     = module.airgap_bundle-backend.airgap_info
+  count                           = var.setup_managed_services ? 0 : 1
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -127,7 +130,8 @@ module "habitat-frontend" {
 
 module "opensearch" {
   source                          = "./modules/opensearch"
-  airgap_info                     = module.airgap_bundle-backend.airgap_info
+  count                           = var.setup_managed_services ? 0 : 1
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   curator_pkg_ident               = var.curator_pkg_ident
@@ -137,7 +141,7 @@ module "opensearch" {
   opensearch_svc_load_args        = var.elasticsearch_svc_load_args
   opensearchsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
   opensearchsidecar_svc_load_args = var.elasticsidecar_svc_load_args
-  habitat_info                    = module.habitat-backend.habitat_info
+  habitat_info                    = var.setup_managed_services ? "" : module.habitat-backend[0].habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   kibana_pkg_ident                = var.kibana_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
@@ -160,18 +164,19 @@ module "opensearch" {
 
 module "postgresql" {
   source                          = "./modules/postgresql"
-  airgap_info                     = module.airgap_bundle-backend.airgap_info
+  count                           = var.setup_managed_services ? 0 : 1
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips          = var.existing_opensearch_private_ips
-  habitat_info                    = module.habitat-backend.habitat_info
+  opensearch_private_ips          = var.setup_managed_services ? [] : var.existing_opensearch_private_ips
+  habitat_info                    = var.setup_managed_services ? "" : module.habitat-backend[0].habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   pgleaderchk_pkg_ident           = var.pgleaderchk_pkg_ident
   pgleaderchk_svc_load_args       = var.pgleaderchk_svc_load_args
-  postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
   postgresql_instance_count       = var.postgresql_instance_count
   postgresql_listen_port          = var.postgresql_listen_port
   postgresql_pkg_ident            = var.postgresql_pkg_ident
@@ -212,9 +217,23 @@ module "bootstrap_automate" {
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips          = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.setup_managed_services ? [] : var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
-  postgresql_private_ips          = var.existing_postgresql_private_ips
+  managed_opensearch_certificate     = var.managed_opensearch_certificate
+  managed_opensearch_domain_url      = var.managed_opensearch_domain_url
+  managed_opensearch_user_password   = var.managed_opensearch_user_password
+  managed_opensearch_username        = var.managed_opensearch_username
+  aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret
+  managed_rds_instance_url           = var.managed_rds_instance_url
+  managed_rds_superuser_username     = var.managed_rds_superuser_username
+  managed_rds_superuser_password     = var.managed_rds_superuser_password
+  managed_rds_dbuser_username        = var.managed_rds_dbuser_username
+  managed_rds_dbuser_password        = var.managed_rds_dbuser_password
+  managed_rds_certificate            = var.managed_rds_certificate
+  setup_managed_services          = var.setup_managed_services
+  postgresql_private_ips          = var.setup_managed_services ? [] : var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = slice(var.existing_automate_private_ips, 0, 1)
   ssh_key_file                    = var.ssh_key_file
@@ -254,9 +273,23 @@ module "automate" {
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips          = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.setup_managed_services ? [] : var.existing_opensearch_private_ips
+  managed_opensearch_certificate     = var.managed_opensearch_certificate
+  managed_opensearch_domain_url      = var.managed_opensearch_domain_url
+  managed_opensearch_user_password   = var.managed_opensearch_user_password
+  managed_opensearch_username        = var.managed_opensearch_username
+  aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret
+  managed_rds_instance_url           = var.managed_rds_instance_url
+  managed_rds_superuser_username     = var.managed_rds_superuser_username
+  managed_rds_superuser_password     = var.managed_rds_superuser_password
+  managed_rds_dbuser_username        = var.managed_rds_dbuser_username
+  managed_rds_dbuser_password        = var.managed_rds_dbuser_password
+  managed_rds_certificate            = var.managed_rds_certificate
   proxy_listen_port               = var.proxy_listen_port
-  postgresql_private_ips          = var.existing_postgresql_private_ips
+  setup_managed_services          = var.setup_managed_services
+  postgresql_private_ips          = var.setup_managed_services ? [] : var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips = slice(
     var.existing_automate_private_ips,
@@ -300,10 +333,24 @@ module "chef_server" {
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips          = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.setup_managed_services ? [] : var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
-  postgresql_private_ips          = var.existing_postgresql_private_ips
+  postgresql_private_ips          = var.setup_managed_services ? [] : var.existing_postgresql_private_ips
+  managed_opensearch_certificate     = var.managed_opensearch_certificate
+  managed_opensearch_domain_url      = var.managed_opensearch_domain_url
+  managed_opensearch_user_password   = var.managed_opensearch_user_password
+  managed_opensearch_username        = var.managed_opensearch_username
+  aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret
+  managed_rds_instance_url           = var.managed_rds_instance_url
+  managed_rds_superuser_username     = var.managed_rds_superuser_username
+  managed_rds_superuser_password     = var.managed_rds_superuser_password
+  managed_rds_dbuser_username        = var.managed_rds_dbuser_username
+  managed_rds_dbuser_password        = var.managed_rds_dbuser_password
+  managed_rds_certificate            = var.managed_rds_certificate
   postgresql_ssl_enable           = var.postgresql_ssl_enable
+  setup_managed_services          = var.setup_managed_services
   private_ips                     = var.existing_chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
