@@ -96,6 +96,13 @@
 
   [global.v1.external.automate.auth]
     token = "<%= overrides[:automate_dc_token] %>"
+
+  <% if overrides[:automate_custom_certs_enabled] == true && overrides[:automate_root_ca] -%>
+    [cs_nginx.v1.sys.ngx.http]
+      ssl_verify_depth = 6
+    [global.v1.external.automate.ssl]
+      server_name = "https://<%= overrides[:automate_fqdn] %>"
+      root_cert = """<%= overrides[:automate_root_ca] %>"""
 <% else %>
   [auth_n.v1.sys.service]
     a1_data_collector_token = "<%= overrides[:automate_dc_token] %>"
@@ -116,38 +123,24 @@
     upgrade_strategy = "<%= overrides[:upgrade_strategy] -%>"
     deployment_type = "local"
 
-<% if tls_cert -%>
-# Load Balancer service configuration.
+<% if overrides[:automate_role] == "chef_api" && overrides[:chef_server_custom_certs_enabled] == true -%>
 [load_balancer]
   [load_balancer.v1.sys]
-    # The following TLS certificate and RSA public key were
-    # automatically generated. The certificate is a self-signed
-    # certificate and will likely produce security warnings when you
-    # visit Chef Automate in your web browser. We recommend using a
-    # certificate signed by a certificate authority you trust.
     [[load_balancer.v1.sys.frontend_tls]]
-
-    <% if overrides[:automate_role] == "chef_api" -%>
-      # The TLS private key for the load balancer frontend.
-      <% if overrides[:chef_server_custom_certs_enabled] == true -%>
-        key = """<%= overrides[:chef_server_private_key] %>"""
-        cert = """<%= overrides[:chef_server_public_key] %>"""
-      <% else %>
-        key = """<%= tls_key %>"""
-        cert = """<%= tls_cert %>"""
-      <% end %>
-    <% else %>
-      # The TLS certificate for the load balancer frontend.
-      <% if overrides[:automate_custom_certs_enabled] == true -%>
-        cert = """<%= overrides[:automate_public_key] %>"""
-        key = """<%= overrides[:automate_private_key] %>"""
-      <% else %>
-        cert = """<%= tls_cert %>"""
-        key = """<%= tls_key %>"""
-      <% end %>
-    <% end %>
-
-
+    key = """<%= overrides[:chef_server_private_key] %>"""
+    cert = """<%= overrides[:chef_server_public_key] %>"""
+<% elsif overrides[:automate_role] != "chef_api" && overrides[:automate_custom_certs_enabled] == true %>
+[load_balancer]
+  [load_balancer.v1.sys]
+    [[load_balancer.v1.sys.frontend_tls]]
+    cert = """<%= overrides[:automate_public_key] %>"""
+    key = """<%= overrides[:automate_private_key] %>"""
+<% elsif tls_cert -%>
+[load_balancer]
+  [load_balancer.v1.sys]
+    [[load_balancer.v1.sys.frontend_tls]]
+    cert = """<%= tls_cert %>"""
+    key = """<%= tls_key %>"""
 <% end %>
 
 <% if overrides[:teams_port] != 10128 %>
