@@ -73,6 +73,7 @@ func init() {
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.getAppliedConfig, "get-config", "G", false, "Get applied config from Opensearch or Postgresql nodes")
+	patchConfigCmd.PersistentFlags().StringVarP(&configCmdFlags.file, "file", "F", "output_config.toml", "File path to write the config (default \"output_config.toml\")")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -264,7 +265,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	writer.Success("Configuration patched")
+	// writer.Success("Configuration patched")
 	return nil
 }
 
@@ -467,4 +468,20 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	}
 
 	return tomlFile, nil
+}
+
+func createTomlFile(file string, tomlOutput string) error {
+	writer.Print(file)
+	initConfigHAPath := file
+	if _, err := os.Stat(initConfigHAPath); err == nil {
+		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigHAPath)
+		return nil
+	}
+
+	err := ioutil.WriteFile(initConfigHAPath, []byte(tomlOutput), 0600)
+	if err != nil {
+		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
+	}
+	writer.Printf("\nconfig initializatized in a generated file : %s", initConfigHAPath)
+	return nil
 }
