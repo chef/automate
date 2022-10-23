@@ -174,9 +174,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 
-	// cfg, _ := dc.LoadUserOverrideConfigFile(args[0])
-	// fmt.Printf("\n\nCFG: %v\n", cfg)
-
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
 		then automate cluster ctl deploy will patch the config to automate
@@ -265,7 +262,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// writer.Success("Configuration patched")
+	writer.Success("Configuration patched")
 	return nil
 }
 
@@ -482,6 +479,6 @@ func createTomlFile(file string, tomlOutput string) error {
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
 	}
-	writer.Printf("\nconfig initializatized in a generated file : %s", initConfigHAPath)
+	writer.Printf("\nconfig initializatized in a generated file : %s\n", initConfigHAPath)
 	return nil
 }
