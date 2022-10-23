@@ -45,12 +45,9 @@ const (
 	BACKEND_COMMAND = `
 	export TIMESTAMP=$(date +"%s");
 	mv /tmp/pg_config.toml /tmp/pg_config.toml.$TIMESTAMP;
-	source /hab/sup/default/SystemdEnvironmentFile.sh;
-	automate-backend-ctl applied --svc=automate-ha-%s | tail -n +2 > /tmp/pg_config.toml; 
-	cat /tmp/%s >> /tmp/pg_config.toml ;
-	echo "yes" | hab config apply automate-ha-%s.default  $(date '+%s') /tmp/pg_config.toml;  
+	cat /tmp/%s >> /tmp/pg_config.toml;
+	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /tmp/pg_config.toml;  
 	rm -rf /tmp/%s; 
-	mv /tmp/pg_config.toml /tmp/pg_config.toml.$TIMESTAMP;
 	`
 
 	GET_CONFIG = `
@@ -177,13 +174,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 
-	// cfg, _ := dc.LoadUserOverrideConfigFile(args[0])
-	// fmt.Printf("\n\nCFG: %v\n", cfg)
-
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
 		then automate cluster ctl deploy will patch the config to automate
 	*/
+
 	/*
 		// if isA2HARBFileExist() {
 		// 	if !configCmdFlags.acceptMLSA {
@@ -223,6 +218,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				}
 				createTomlFile(configCmdFlags.file, output)
 			}
+			return nil
 		}
 
 		if configCmdFlags.frontend {
@@ -235,27 +231,30 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
 				copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i])
-				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
+				_, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
+				writer.Printf(output)
 			}
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], remoteService, "%s", args[0])
-			writer.Body(scriptCommands)
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, args[0], remoteService, "%s", args[0])
+			// writer.Body(scriptCommands)
 			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
 				copyFileToRemote(sskKeyFile, args[0], sshUser, remoteIp)
-				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+				_, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+				writer.Printf(output)
 			}
 		}
 		if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], remoteService, "%s", args[0])
-			writer.Body(scriptCommands)
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, args[0], remoteService, "%s", args[0])
+			// writer.Body(scriptCommands)
 			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
 				copyFileToRemote(sskKeyFile, args[0], sshUser, remoteIp)
-				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+				_, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+				writer.Printf(output)
 			}
 		}
 	} else {
@@ -269,7 +268,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// writer.Success("Configuration patched")
+	writer.Success("Configuration patched")
 	return nil
 }
 
@@ -434,6 +433,6 @@ func createTomlFile(file string, tomlOutput string) error {
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
 	}
-	writer.Printf("\nconfig initializatized in a generated file : %s", initConfigHAPath)
+	writer.Printf("\nconfig initializatized in a generated file : %s\n", initConfigHAPath)
 	return nil
 }
