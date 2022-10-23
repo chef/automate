@@ -72,6 +72,7 @@ func init() {
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.getAppliedConfig, "get-config", "G", false, "Get applied config from Opensearch or Postgresql nodes")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -171,6 +172,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
+
+	// cfg, _ := dc.LoadUserOverrideConfigFile(args[0])
+	// fmt.Printf("\n\nCFG: %v\n", cfg)
 
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
