@@ -103,6 +103,7 @@
     [global.v1.external.automate.ssl]
       server_name = "https://<%= overrides[:automate_fqdn] %>"
       root_cert = """<%= overrides[:automate_root_ca] %>"""
+  <% end %>
 <% else %>
   [auth_n.v1.sys.service]
     a1_data_collector_token = "<%= overrides[:automate_dc_token] %>"
@@ -129,7 +130,7 @@
     [[load_balancer.v1.sys.frontend_tls]]
     key = """<%= overrides[:chef_server_private_key] %>"""
     cert = """<%= overrides[:chef_server_public_key] %>"""
-<% elsif overrides[:automate_role] != "chef_api" && overrides[:automate_custom_certs_enabled] == true %>
+<% elsif overrides[:automate_role] != "chef_api" && overrides[:automate_custom_certs_enabled] == true -%>
 [load_balancer]
   [load_balancer.v1.sys]
     [[load_balancer.v1.sys.frontend_tls]]
