@@ -2,12 +2,16 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"strings"
+
 	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -17,6 +21,9 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/toml"
+	"github.com/imdario/mergo"
+	// toml2 "github.com/pelletier/go-toml/v2"
 )
 
 var configCmdFlags = struct {
@@ -26,9 +33,10 @@ var configCmdFlags = struct {
 
 	// automate    bool
 	// chef_server bool
-	frontend   bool
-	opensearch bool
-	postgresql bool
+	frontend         bool
+	opensearch       bool
+	postgresql       bool
+	getAppliedConfig bool
 }{}
 
 const (
@@ -40,12 +48,18 @@ const (
 
 	BACKEND_COMMAND = `
 	export TIMESTAMP=$(date +"%s");
+	mv /tmp/pg_config.toml /tmp/pg_config.toml.$TIMESTAMP;
 	source /hab/sup/default/SystemdEnvironmentFile.sh;
 	automate-backend-ctl applied --svc=automate-ha-%s | tail -n +2 > /tmp/pg_config.toml; 
 	cat /tmp/%s >> /tmp/pg_config.toml ;
 	echo "yes" | hab config apply automate-ha-%s.default  $(date '+%s') /tmp/pg_config.toml;  
 	rm -rf /tmp/%s; 
 	mv /tmp/pg_config.toml /tmp/pg_config.toml.$TIMESTAMP;
+	`
+
+	GET_CONFIG = `
+	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
+	sudo automate-backend-ctl applied --svc=automate-ha-%s
 	`
 
 	dateFormat = "%Y%m%d%H%M%S"
@@ -64,6 +78,7 @@ func init() {
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.getAppliedConfig, "get-config", "G", false, "Get applied config from Opensearch or Postgresql nodes")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 
@@ -165,6 +180,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 
+	// cfg, _ := dc.LoadUserOverrideConfigFile(args[0])
+	// fmt.Printf("\n\nCFG: %v\n", cfg)
+
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
 		then automate cluster ctl deploy will patch the config to automate
@@ -198,17 +216,72 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 	if isA2HARBFileExist() {
 
-		// scriptCommands1 := "source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);automate-backend-ctl show --svc=automate-ha-opensearch"
-		// output, err := getConfigFromRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[0], args[0], scriptCommands1)
+		scriptCommands1 := "source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);automate-backend-ctl applied --svc=automate-ha-opensearch"
+		rawOutput, err := getConfigFromRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[0], args[0], scriptCommands1)
+		if err != nil {
+			writer.Printf("\n%v\n", err)
+		}
 
-		// if err != nil {
-		// 	writer.Printf("\n%v\n", err)
-		// } else {
-		// 	data := &OpensearchConfig{}
-		// 	json.Unmarshal([]byte(output), &data)
-		// 	fmt.Printf("Operation: %v", data)
+		output := tomlToJson(rawOutput, OpensearchConfig{})
+		fmt.Printf("output : %v", output)
 
-		// }
+		//  start from here
+		pemBytes, err := ioutil.ReadFile(args[0])
+		if err != nil {
+			writer.Printf("\n%v\n", err)
+		}
+		fmt.Printf("Input: " + string(pemBytes))
+		input := tomlToJson(string(pemBytes), OpensearchConfig{})
+		fmt.Printf("Useroutput : %v", input)
+
+		//inputByte, _ := json.Marshal(input)
+		outputByte, _ := json.Marshal(output)
+
+		erro := json.Unmarshal(pemBytes, &outputByte)
+		if erro != nil {
+			writer.Printf("\n%v\n", erro)
+		}
+
+		if err != nil {
+			writer.Printf("\n%v\n", err)
+		}
+
+		// mergedValue := merge(input, output)
+		mergo.Merge(&input, output)
+		fmt.Printf("mergedValue : %v", &input)
+		fmt.Println(input)
+
+		if err != nil {
+			writer.Printf("\n%v\n", err)
+		} else {
+			// var data OpensearchConfig
+			// toml.Decode(output, &data)
+			// fmt.Printf("\nFull :")
+			// j, _ := json.Marshal(data)
+			// fmt.Print(string(j))
+			// // toml.Unmarshal(j, &data)
+			// // fmt.Printf("+%v", data)
+			// doc := `[s3]
+			// [s3.client.default]
+			// 	read_timeout = "60s"`
+			// var cfg OpensearchConfig
+			// toml.Unmarshal([]byte(doc), &cfg)
+			// fmt.Printf("%v", cfg.S3.Client.Default.ReadTimeout)
+			// var tm2 OpensearchConfig
+			// toml2.Unmarshal([]byte(doc), &tm2)
+			// fmt.Printf("TM2: %v\n", tm2.S3.Client.Default.ReadTimeout)
+			// b, _ := toml2.Marshal(tm2)
+			// fmt.Println(string(b))
+		}
+
+		if configCmdFlags.getAppliedConfig {
+			remoteIP, remoteService := getRemoteType(args[0], infra)
+			scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
+			// writer.Body(scriptCommands)
+			if len(remoteIP) > 0 {
+				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, args[0], scriptCommands)
+			}
+		}
 		if configCmdFlags.frontend {
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
 			if len(frontendIps) == 0 {
@@ -224,6 +297,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], remoteService, "%s", args[0])
+			writer.Body(scriptCommands)
 			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value[0], args[0], scriptCommands)
 			}
@@ -231,6 +305,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, args[0], remoteService, "%s", args[0])
+			writer.Body(scriptCommands)
 			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 				ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value[0], args[0], scriptCommands)
 			}
@@ -250,17 +325,33 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) {
+func pointy() {
+	firstName := "John"
+	midName := "MiddleName"
+	lastName := "Doe"
+	a := A{&firstName, &midName, &lastName} // fetched from db
+	data := []byte(`{"mid_name":"M", "last_name":"Smith"}`)
+	err := json.Unmarshal(data, &a)
+
+	dataByt, _ := json.Marshal(a)
+	fmt.Println(string(dataByt))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%v %v %v\n", *a.FirstName, *a.MiddleName, *a.LastName)
+}
+
+func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) (error, string) {
 
 	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
-		return
+		return err, ""
 	}
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
 		writer.Errorf("Parsing key failed: %v", err)
-		return
+		return err, ""
 	}
 	var (
 		keyErr *knownhosts.KeyError
@@ -295,7 +386,7 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	conn, err := ssh.Dial("tcp", hostIP+":"+sshPort, config)
 	if conn == nil || err != nil {
 		writer.Errorf("dial failed:%v", err)
-		return
+		return err, ""
 	}
 	defer conn.Close()
 
@@ -303,7 +394,7 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	session, err := conn.NewSession()
 	if err != nil {
 		writer.Errorf("session failed:%v", err)
-		return
+		return err, ""
 	}
 	var stdoutBuf bytes.Buffer
 	session.Stdout = &stdoutBuf
@@ -316,10 +407,83 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	writer.StopSpinner()
 	if err != nil {
 		writer.Errorf("Run failed:%v", err)
-		return
+		return err, ""
 	}
 	defer session.Close()
 	writer.Printf("\n%s\n", stdoutBuf)
+	return nil, fmt.Sprintf("%v", stdoutBuf)
+}
+
+func getConfigFromRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, tomlFilePath string, remoteCommands string) (string, error) {
+
+	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	if err != nil {
+		writer.Errorf("Unable to read private key: %v", err)
+	}
+	signer, err := ssh.ParsePrivateKey(pemBytes)
+	if err != nil {
+		writer.Errorf("Parsing key failed: %v", err)
+	}
+	var (
+		keyErr *knownhosts.KeyError
+	)
+
+	config := &ssh.ClientConfig{
+		User: sshUser,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+			kh := checkKnownHosts()
+			hErr := kh(host, remote, pubKey)
+			// Reference: https://blog.golang.org/go1.13-errors
+			// To understand what errors.As is.
+			if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
+				// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
+				// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
+				// and if host is known then there is key mismatch the connection is then rejected.
+				writer.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
+				return keyErr
+			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
+				// host key not found in known_hosts then give a warning and continue to connect.
+				writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
+				// time.Sleep(2 * time.Second)
+				return addHostKey(host, remote, pubKey)
+			}
+			writer.Printf("Pub key exists for %s.", host)
+			return nil
+		}),
+	}
+
+	// Open connection
+	conn, err := ssh.Dial("tcp", hostIP+":"+sshPort, config)
+	if conn == nil || err != nil {
+		writer.Errorf("dial failed:%v", err)
+		return "", err
+	}
+	defer conn.Close()
+
+	// Open session
+	session, err := conn.NewSession()
+	if err != nil {
+		writer.Errorf("session failed:%v", err)
+		return "", err
+	}
+	var stdoutBuf bytes.Buffer
+	session.Stdout = &stdoutBuf
+	// err = session.Run("sudo rm -rf /tmp/" + path + "")
+	copyFileToRemote(sshKeyFile, tomlFilePath, sshUser, hostIP)
+
+	writer.StartSpinner()
+	err = session.Run(remoteCommands)
+
+	writer.StopSpinner()
+	if err != nil {
+		writer.Errorf("Run failed:%v", err)
+	} else {
+		writer.Success("SCP successful...\n")
+	}
+	defer session.Close()
+	writer.Printf("\n%s\n", stdoutBuf)
+	return stdoutBuf.String(), nil
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
@@ -378,4 +542,39 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	knownHosts := knownhosts.Normalize(remote.String())
 	_, fileErr := f.WriteString(knownhosts.Line([]string{"\n", knownHosts}, pubKey))
 	return fileErr
+}
+
+func tomlToJson(rawData string, Open interface{}) interface{} {
+
+	re := regexp.MustCompile("(?im).*info:.*$")
+	tomlOutput := re.ReplaceAllString(rawData, "")
+	open := Open
+	toml.Decode(tomlOutput, &open)
+	//dataByt, _ := json.Marshal(open)
+	//fmt.Println(string(dataByt))
+	return open
+}
+
+func merge(dest, src interface{}) *interface{} {
+	mergo.Merge(&dest, src)
+	fmt.Println("Dest: ", dest)
+	return &dest
+}
+
+type A struct {
+	FirstName  *string `json:"first_name"`
+	MiddleName *string `json:"mid_name"`
+	LastName   *string `json:"last_name"`
+}
+
+func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
+	switch strings.ToLower(flag) {
+	case "opensearch", "os":
+		return infra.Outputs.PostgresqlPrivateIps.Value[0], "opensearch"
+
+	case "postgresql", "pg":
+		return infra.Outputs.OpensearchPrivateIps.Value[0], "postgresql"
+	default:
+		return "", ""
+	}
 }
