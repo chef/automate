@@ -260,48 +260,47 @@ locals {
   be_sudo_password = var.be_sudo_password != null ? var.be_sudo_password : var.sudo_password
 }
 
-
-variable "automate_root_ca" {
+variable automate_root_ca {
 }
-variable "automate_private_key" {
+variable automate_private_key {
 }
-variable "automate_public_key" {
+variable automate_public_key {
 }
-variable "chef_server_private_key" {
+variable chef_server_private_key {
 }
-variable "chef_server_public_key" {
-}
-
-variable "postgresql_root_ca" {
-}
-variable "postgresql_private_key" {
-}
-variable "postgresql_public_key" {
+variable chef_server_public_key {
 }
 
-variable "opensearch_root_ca" {
+variable postgresql_root_ca {
 }
-variable "opensearch_private_key" {
+variable postgresql_private_key {
 }
-variable "opensearch_public_key" {
+variable postgresql_public_key {
 }
-variable "opensearch_admin_dn" {
+
+variable opensearch_root_ca {
 }
-variable "opensearch_nodes_dn" {
+variable opensearch_private_key {
 }
-variable "opensearch_admin_cert" {
+variable opensearch_public_key {
 }
-variable "opensearch_admin_key" {
+variable opensearch_admin_dn {
 }
-variable "automate_custom_certs_enabled" {
+variable opensearch_nodes_dn {
+}
+variable opensearch_admin_cert {
+}
+variable opensearch_admin_key {
+}
+variable automate_custom_certs_enabled {
   default = false
 }
-variable "chef_server_custom_certs_enabled" {
+variable chef_server_custom_certs_enabled {
   default = false
 }
-variable "postgresql_custom_certs_enabled" {
+variable postgresql_custom_certs_enabled {
   default = false
 }
-variable "opensearch_custom_certs_enabled" {
+variable opensearch_custom_certs_enabled {
   default = false
 }
