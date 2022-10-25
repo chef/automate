@@ -495,23 +495,23 @@ func tomlToJson(rawData string) string {
 	return tomlOutput
 }
 
-func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string) (error, string) {
+func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string) (error, string) {
 	tomlFile := args[0] + timestamp
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 
-	remoteIP, remoteService := getRemoteType(args[0], infra)
+	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
-	writer.Body(scriptCommands + "\n")
+	// writer.Body(scriptCommands + "\n")
 	err, rawOutput := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
-	writer.Body("Output" + rawOutput + "\n")
+	// writer.Body("Output" + rawOutput + "\n")
 	if err != nil {
 		// writer.Errorf("%s", err)
 		return err, ""
 	}
 
-	writer.Body(rawOutput)
+	// writer.Body(rawOutput)
 
 	var src OpensearchConfig
 	if _, err := toml.Decode(tomlToJson(rawOutput), &src); err != nil {
@@ -531,8 +531,8 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	destString := string(pemBytes)
 	var dest OpensearchConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		// writer.Printf("%v", err)
-		return err, ""
+		// writer.Printf("Config file must be a valid %s config", remoteService)
+		return errors.Errorf("Config file must be a valid %s config", remoteService), ""
 	}
 
 	// writer.Printf("Dest/User Input: ", dest)
