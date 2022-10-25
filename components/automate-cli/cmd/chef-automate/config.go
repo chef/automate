@@ -482,3 +482,80 @@ func createTomlFile(file string, tomlOutput string) error {
 	writer.Printf("\nconfig initializatized in a generated file : %s\n", initConfigHAPath)
 	return nil
 }
+
+func tomlToJson(rawData string) string {
+
+	re := regexp.MustCompile("(?im).*info:.*$")
+	tomlOutput := re.ReplaceAllString(rawData, "")
+	// open := Open
+	// toml.Decode(tomlOutput, &open)
+	// dataByt, _ := json.Marshal(open)
+	// fmt.Println(string(dataByt))
+	// return string(dataByt)
+	return tomlOutput
+}
+
+func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string) (error, string) {
+	tomlFile := args[0] + timestamp
+	sshUser := infra.Outputs.SSHUser.Value
+	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshPort := infra.Outputs.SSHPort.Value
+
+	remoteIP, remoteService := getRemoteType(args[0], infra)
+	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
+	writer.Body(scriptCommands + "\n")
+	err, rawOutput := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
+	writer.Body("Output" + rawOutput + "\n")
+	if err != nil {
+		// writer.Errorf("%s", err)
+		return err, ""
+	}
+
+	writer.Body(rawOutput)
+
+	var src OpensearchConfig
+	if _, err := toml.Decode(tomlToJson(rawOutput), &src); err != nil {
+		// writer.Printf("%v", err)
+		return err, ""
+	}
+
+	// fmt.Println("Src/Server Output: ", src)
+
+	//  start from here
+	pemBytes, err := ioutil.ReadFile(args[0])
+	if err != nil {
+		// writer.Printf("\n%v\n", err)
+		return err, ""
+	}
+
+	destString := string(pemBytes)
+	var dest OpensearchConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		// writer.Printf("%v", err)
+		return err, ""
+	}
+
+	// writer.Printf("Dest/User Input: ", dest)
+	mergo.Merge(&dest, src) //, mergo.WithOverride
+	// writer.Printf("%v", dest)
+
+	f, err := os.Create(tomlFile)
+
+	if err != nil {
+		// failed to create/open the file    log.Fatal(err)
+		writer.Bodyf("Failed to create/open the file, \n%v", err)
+		return err, ""
+	}
+	if err := toml.NewEncoder(f).Encode(dest); err != nil {
+		// failed to encode    log.Fatal(err)
+		writer.Bodyf("Failed to encode\n%v", err)
+		return err, ""
+	}
+	if err := f.Close(); err != nil {
+		// failed to close the file
+		writer.Bodyf("Failed to close the file\n%v", err)
+		return err, ""
+	}
+
+	return nil, tomlFile
+}
