@@ -475,7 +475,7 @@ func createTomlFile(file string, tomlOutput string) error {
 		return nil
 	}
 
-	err := ioutil.WriteFile(initConfigHAPath, []byte(tomlOutput), 0600)
+	err := os.WriteFile(initConfigHAPath, []byte(tomlOutput), 0600)
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
 	}
@@ -495,7 +495,7 @@ func tomlToJson(rawData string) string {
 	return tomlOutput
 }
 
-func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string) (error, string) {
+func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string) (string, error) {
 	tomlFile := args[0] + timestamp
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
@@ -504,11 +504,11 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
 	// writer.Body(scriptCommands + "\n")
-	err, rawOutput := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
+	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
 	// writer.Body("Output" + rawOutput + "\n")
 	if err != nil {
 		// writer.Errorf("%s", err)
-		return err, ""
+		return "", err
 	}
 
 	// writer.Body(rawOutput)
@@ -516,23 +516,23 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	var src OpensearchConfig
 	if _, err := toml.Decode(tomlToJson(rawOutput), &src); err != nil {
 		// writer.Printf("%v", err)
-		return err, ""
+		return "", err
 	}
 
 	// fmt.Println("Src/Server Output: ", src)
 
 	//  start from here
-	pemBytes, err := ioutil.ReadFile(args[0])
+	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
 		// writer.Printf("\n%v\n", err)
-		return err, ""
+		return "", err
 	}
 
 	destString := string(pemBytes)
 	var dest OpensearchConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
 		// writer.Printf("Config file must be a valid %s config", remoteService)
-		return errors.Errorf("Config file must be a valid %s config", remoteService), ""
+		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
 	}
 
 	// writer.Printf("Dest/User Input: ", dest)
@@ -544,18 +544,18 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	if err != nil {
 		// failed to create/open the file    log.Fatal(err)
 		writer.Bodyf("Failed to create/open the file, \n%v", err)
-		return err, ""
+		return "", err
 	}
 	if err := toml.NewEncoder(f).Encode(dest); err != nil {
 		// failed to encode    log.Fatal(err)
 		writer.Bodyf("Failed to encode\n%v", err)
-		return err, ""
+		return "", err
 	}
 	if err := f.Close(); err != nil {
 		// failed to close the file
 		writer.Bodyf("Failed to close the file\n%v", err)
-		return err, ""
+		return "", err
 	}
 
-	return nil, tomlFile
+	return tomlFile, nil
 }
