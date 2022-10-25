@@ -48,10 +48,7 @@ const (
 
 	BACKEND_COMMAND = `
 	export TIMESTAMP=$(date +"%s");
-	mv /tmp/pg_config.toml /tmp/pg_config.toml.$TIMESTAMP;
-	cat /tmp/%s >> /tmp/pg_config.toml;
-	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /tmp/pg_config.toml;  
-	rm -rf /tmp/%s; 
+	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /tmp/%s;
 	`
 
 	GET_CONFIG = `
@@ -237,7 +234,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			// writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i])
+				const remoteService string = "frontend"
+				copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp)
 				_, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
 				writer.Printf(output)
 			}
@@ -248,11 +246,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, args[0], remoteService, "%s", args[0])
-			// writer.Body(scriptCommands)
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+			writer.Body(scriptCommands)
 			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
-				copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp)
+				copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
 				_, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
 				writer.Printf(output)
 			}
@@ -263,11 +261,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, args[0], remoteService, "%s", args[0])
-			// writer.Body(scriptCommands)
+			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+			writer.Body(scriptCommands)
 			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
-				copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp)
+				copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
 				_, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
 				writer.Printf(output)
 			}
@@ -374,9 +372,9 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string) {
+func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string) {
 	cmd := "scp"
-	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/"}
+	exec_args := []string{"-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
