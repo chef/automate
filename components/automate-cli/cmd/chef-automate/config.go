@@ -217,7 +217,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			if len(remoteIP) > 0 {
 				err, output := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
 				if err != nil {
-					writer.Errorf("%s", err)
+					writer.Errorf("%v", err)
 					return err
 				}
 				createTomlFile(configCmdFlags.file, output)
