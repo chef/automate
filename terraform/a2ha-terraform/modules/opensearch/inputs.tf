@@ -110,23 +110,23 @@ variable "tmp_path" {
 }
 
 
-variable opensearch_root_ca {
+variable "opensearch_root_ca" {
 }
 
-variable opensearch_private_key {
+variable "opensearch_private_key" {
 }
 
-variable opensearch_public_key {
+variable "opensearch_public_key" {
 }
-variable opensearch_admin_dn {
+variable "opensearch_admin_dn" {
 }
-variable opensearch_nodes_dn {
+variable "opensearch_nodes_dn" {
 }
-variable opensearch_admin_cert {
+variable "opensearch_admin_cert" {
 }
-variable opensearch_admin_key {
+variable "opensearch_admin_key" {
 }
-variable opensearch_custom_certs_enabled {
+variable "opensearch_custom_certs_enabled" {
   default = false
 }
 

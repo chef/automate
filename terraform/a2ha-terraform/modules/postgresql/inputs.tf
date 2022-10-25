@@ -108,14 +108,14 @@ variable "tmp_path" {
   default = "/var/automate-ha"
 }
 
-variable postgresql_root_ca {
+variable "postgresql_root_ca" {
 }
 
-variable postgresql_private_key {
+variable "postgresql_private_key" {
 }
 
-variable postgresql_public_key {
+variable "postgresql_public_key" {
 }
-variable postgresql_custom_certs_enabled {
+variable "postgresql_custom_certs_enabled" {
   default = false
 }

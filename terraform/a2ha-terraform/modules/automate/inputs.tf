@@ -199,37 +199,37 @@ variable "tmp_path" {
 }
 
 
-variable automate_root_ca {
+variable "automate_root_ca" {
 }
 
-variable automate_private_key {
+variable "automate_private_key" {
 }
 
-variable automate_public_key {
+variable "automate_public_key" {
 }
-variable chef_server_private_key {
-}
-
-variable chef_server_public_key {
+variable "chef_server_private_key" {
 }
 
-variable opensearch_root_ca {
+variable "chef_server_public_key" {
+}
+
+variable "opensearch_root_ca" {
   
 }
 
-variable postgresql_root_ca {
+variable "postgresql_root_ca" {
   
 }
 
-variable automate_custom_certs_enabled {
+variable "automate_custom_certs_enabled" {
   default = false
 }
-variable chef_server_custom_certs_enabled {
+variable "chef_server_custom_certs_enabled" {
   default = false
 }
-variable postgresql_custom_certs_enabled {
+variable "postgresql_custom_certs_enabled" {
   default = false
 }
-variable opensearch_custom_certs_enabled {
+variable "opensearch_custom_certs_enabled" {
   default = false
 }
