@@ -43,8 +43,6 @@ describe AutomateCluster::Helpers do
       shellout = instance_double("Mixlib::ShellOut")
       expect(shellout).to receive(:stdout).and_return('Test Output')
 
-      AutomateCluster.logger.error "::::::", shellout
-
       expect(instance).to receive(:shellout!).with('make test', cwd: '/test/config_workspace').and_return(shellout)
 
       instance.run_make_cmd('test')
