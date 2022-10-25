@@ -45,6 +45,10 @@ variable "pgleaderchk_svc_load_args" {
 variable "postgresql_archive_disk_fs_path" {
 }
 
+variable "postgresql_custom_certs_enabled" {
+  default = false
+}
+
 variable "postgresql_instance_count" {
   default = 3
 }
@@ -57,6 +61,15 @@ variable "postgresql_pg_dump_enabled" {
 }
 
 variable "postgresql_pkg_ident" {
+}
+
+variable "postgresql_private_key" {
+}
+
+variable "postgresql_public_key" {
+}
+
+variable "postgresql_root_ca" {
 }
 
 variable "postgresql_ssl_enable" {
@@ -106,16 +119,4 @@ variable "sudo_cmd" {
 
 variable "tmp_path" {
   default = "/var/automate-ha"
-}
-
-variable "postgresql_root_ca" {
-}
-
-variable "postgresql_private_key" {
-}
-
-variable "postgresql_public_key" {
-}
-variable "postgresql_custom_certs_enabled" {
-  default = false
 }
