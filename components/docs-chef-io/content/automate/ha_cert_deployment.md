@@ -42,7 +42,6 @@ To add a common custom certificate for all the nodes of Chef Server service, add
 ```toml
 [chef_server.config]
 custom_certs_enabled = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
 private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
 public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
 ```
