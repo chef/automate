@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Self Sign Certificates"
     parent = "automate/deploy_high_availability/certificates"
     identifier = "automate/deploy_high_availability/certificates/ha_cert_selfsign.md Self Sign Certificates"
-    weight = 210
+    weight = 220
 +++
 
 {{< warning >}}
