@@ -59,7 +59,6 @@ type AwsConfigToml struct {
 		Config struct {
 			InstanceCount      string `toml:"instance_count"`
 			CustomCertsEnabled bool   `toml:"custom_certs_enabled"`
-			RootCA             string `toml:"root_ca"`
 			PrivateKey         string `toml:"private_key"`
 			PublicKey          string `toml:"public_key"`
 		} `toml:"config"`
@@ -192,7 +191,6 @@ type ExistingInfraConfigToml struct {
 		Config struct {
 			InstanceCount      string `toml:"instance_count"`
 			CustomCertsEnabled bool   `toml:"custom_certs_enabled"`
-			RootCA             string `toml:"root_ca"`
 			PrivateKey         string `toml:"private_key"`
 			PublicKey          string `toml:"public_key"`
 		} `toml:"config"`

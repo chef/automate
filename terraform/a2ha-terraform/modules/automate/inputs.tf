@@ -207,10 +207,6 @@ variable automate_private_key {
 
 variable automate_public_key {
 }
-
-variable chef_server_root_ca {
-}
-
 variable chef_server_private_key {
 }
 

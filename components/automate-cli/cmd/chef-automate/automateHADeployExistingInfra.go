@@ -176,8 +176,7 @@ func (e *existingInfra) validateCerts() *list.List {
 		}
 	}
 	if e.config.ChefServer.Config.CustomCertsEnabled {
-		if len(strings.TrimSpace(e.config.ChefServer.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(e.config.ChefServer.Config.PrivateKey)) < 1 ||
+		if len(strings.TrimSpace(e.config.ChefServer.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.ChefServer.Config.PublicKey)) < 1 {
 			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 		}

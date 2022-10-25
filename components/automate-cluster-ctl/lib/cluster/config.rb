@@ -78,7 +78,6 @@ module AutomateCluster
     config_context :chef_server do
       default :instance_count, 1
       default :custom_certs_enabled, false
-      default :root_ca
       default :public_key
       default :private_key
     end

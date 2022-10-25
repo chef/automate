@@ -76,7 +76,6 @@ instance_count = ""
 # Set custom_certs_enabled = true to provide custom certificates during deployment
 custom_certs_enabled = false
 # Add Chef Server load balancer root-ca and keys
-# root_ca = ""
 # private_key = ""
 # public_key = ""
 
@@ -377,7 +376,6 @@ instance_count = ""
 # Set custom_certs_enabled = true to provide custom certificates during deployment
 custom_certs_enabled = false
 # Add Chef Server load balancer root-ca and keys
-# root_ca = ""
 # private_key = ""
 # public_key = ""
 

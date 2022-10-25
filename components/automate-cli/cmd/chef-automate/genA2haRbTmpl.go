@@ -47,7 +47,6 @@ end
 chef_server do
   instance_count {{ .ChefServer.Config.InstanceCount }}
   custom_certs_enabled "{{ .ChefServer.Config.CustomCertsEnabled }}"
-  {{ if .ChefServer.Config.RootCA }} root_ca "{{ .ChefServer.Config.RootCA }}" {{ else }} # root_ca "{{ .ChefServer.Config.RootCA }}" {{ end }}
   {{ if .ChefServer.Config.PrivateKey }} private_key "{{ .ChefServer.Config.PrivateKey }}" {{ else }} # private_key "{{ .ChefServer.Config.PrivateKey }}" {{ end }}
   {{ if .ChefServer.Config.PublicKey }} public_key "{{ .ChefServer.Config.PublicKey }}" {{ else }} # public_key "{{ .ChefServer.Config.PublicKey }}" {{ end }}
 end
@@ -147,7 +146,6 @@ end
 chef_server do
   instance_count {{ .ChefServer.Config.InstanceCount }}
   custom_certs_enabled "{{ .ChefServer.Config.CustomCertsEnabled }}"
-  {{ if .ChefServer.Config.RootCA }} root_ca "{{ .ChefServer.Config.RootCA }}" {{ else }} # root_ca "{{ .ChefServer.Config.RootCA }}" {{ end }}
   {{ if .ChefServer.Config.PrivateKey }} private_key "{{ .ChefServer.Config.PrivateKey }}" {{ else }} # private_key "{{ .ChefServer.Config.PrivateKey }}" {{ end }}
   {{ if .ChefServer.Config.PublicKey }} public_key "{{ .ChefServer.Config.PublicKey }}" {{ else }} # public_key "{{ .ChefServer.Config.PublicKey }}" {{ end }}
 end
