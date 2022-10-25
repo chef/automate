@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -128,6 +129,45 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 	if isA2HARBFileExist() {
+
+	   //scp -i <> fileNAmepassedInArgs username@A.B.C.D:/home/<USER-DIR>/config.345r34r.toml
+	   //ssh -o StrictHostKeyChecking=no  -i $SSH_KEY $SSH_USER@$ip
+
+	   var sshKey AutomteHAInfraDetails
+	   sshKeyFile := sshKey.Outputs.SSHKeyFile.Value
+
+	   var sshUser AutomteHAInfraDetails
+	   sshUsername := sshUser.Outputs.SSHUser.Value
+
+	   var automateIp AutomteHAInfraDetails
+	   automateIps := automateIp.Outputs.AutomatePrivateIps.Value
+
+	   var chefserverIp AutomteHAInfraDetails
+	   chefserverIps := chefserverIp.Outputs.ChefServerPrivateIps
+
+    script := fmt.Sprintf(`
+	ssh -o StrictHostKeyChecking=no  -i %[1]s %[2]s@%[3]s;
+    for ip: automate do;
+	scp -i %[1]s %[4]s %[2]s @%[3]s/etc;
+    sudo chef-automate config patch %[4]s;
+    done
+	ssh -o StrictHostKeyChecking=no  -i %[1]s %[2]s@%[5]s;
+    for ip: chef-server do
+	scp -i %[1]s %[4]s %[2]s @%[5]s/etc;
+    sudo chef-automate config patch %[4]s;
+    done`,sshKeyFile,sshUsername,automateIps,args[0],chefserverIps)
+ 
+    command := exec.Command("/bin/sh", "-c", script)
+
+    err = command.Run()
+
+    if err != nil {
+
+        writer.Fail(err.Error())
+
+        return err
+
+    }
 		if !configCmdFlags.acceptMLSA {
 			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
 			this command will deploy that new airgap bundle with patching of configuration. 
