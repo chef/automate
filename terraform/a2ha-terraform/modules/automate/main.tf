@@ -39,6 +39,18 @@ locals {
     access_key                         = var.access_key
     secret_key                         = var.secret_key
     infra                              = var.infra
+    automate_root_ca                   = var.automate_root_ca
+    automate_private_key               = var.automate_private_key
+    automate_public_key                = var.automate_public_key
+    chef_server_private_key            = var.chef_server_private_key
+    chef_server_public_key             = var.chef_server_public_key
+    opensearch_root_ca                 = var.opensearch_root_ca
+    postgresql_root_ca                 = var.postgresql_root_ca
+    automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+    chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+    postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+    opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+ 
   })
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {
@@ -52,6 +64,9 @@ locals {
     ssh_port                        = var.ssh_port,
     tmp_path                        = var.tmp_path
     nfs_mount_path                  = var.nfs_mount_path
+    automate_root_ca                = var.automate_root_ca
+    automate_private_key            = var.automate_private_key
+    automate_public_key             = var.automate_public_key
   })
 }
 

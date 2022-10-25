@@ -277,6 +277,14 @@ module "opensearch" {
   sudo_cmd                        = var.sudo_cmd
   backup_config_efs               = var.backup_config_efs
   nfs_mount_path                  = var.nfs_mount_path
+  opensearch_root_ca              = var.opensearch_root_ca
+  opensearch_private_key          = var.opensearch_private_key
+  opensearch_public_key           = var.opensearch_public_key
+  opensearch_admin_key            = var.opensearch_admin_key
+  opensearch_admin_cert           = var.opensearch_admin_cert
+  opensearch_admin_dn             = var.opensearch_admin_dn
+  opensearch_nodes_dn             = var.opensearch_nodes_dn
+  opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
   depends_on = [
     module.habitat-opensearch
   ]
@@ -314,6 +322,10 @@ module "postgresql" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   nfs_mount_path                  = var.nfs_mount_path
+  postgresql_root_ca              = var.postgresql_root_ca
+  postgresql_private_key          = var.postgresql_private_key
+  postgresql_public_key           = var.postgresql_public_key
+  postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
   depends_on = [
     module.habitat-postgresql
   ]
@@ -327,6 +339,17 @@ module "bootstrap_automate" {
   automate_admin_username            = var.automate_admin_username
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
+  automate_root_ca                   = var.automate_root_ca
+  opensearch_root_ca                 = var.opensearch_root_ca
+  postgresql_root_ca                 = var.postgresql_root_ca
+  automate_private_key               = var.automate_private_key
+  automate_public_key                = var.automate_public_key
+  chef_server_private_key            = var.chef_server_private_key
+  chef_server_public_key             = var.chef_server_public_key
+  automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+  chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+  postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+  opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = 1
@@ -383,6 +406,17 @@ module "automate" {
   automate_admin_username            = var.automate_admin_username
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
+  automate_root_ca                   = var.automate_root_ca
+  opensearch_root_ca                 = var.opensearch_root_ca
+  postgresql_root_ca                 = var.postgresql_root_ca
+  automate_private_key               = var.automate_private_key
+  automate_public_key                = var.automate_public_key
+  chef_server_private_key            = var.chef_server_private_key
+  chef_server_public_key             = var.chef_server_public_key
+  automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+  chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+  postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+  opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.automate_instance_count - 1
@@ -443,6 +477,17 @@ module "chef_server" {
   automate_admin_username            = var.automate_admin_username
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
+  automate_root_ca                   = var.automate_root_ca
+  opensearch_root_ca                 = var.opensearch_root_ca
+  postgresql_root_ca                 = var.postgresql_root_ca
+  automate_private_key               = var.automate_private_key
+  automate_public_key                = var.automate_public_key
+  chef_server_private_key            = var.chef_server_private_key
+  chef_server_public_key             = var.chef_server_public_key
+  automate_custom_certs_enabled      = var.automate_custom_certs_enabled
+  chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
+  postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
+  opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.chef_server_instance_count

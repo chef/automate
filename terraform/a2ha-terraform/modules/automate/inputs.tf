@@ -18,6 +18,10 @@ variable "automate_config" {
   default = ""
 }
 
+variable "automate_custom_certs_enabled" {
+  default = false
+}
+
 variable "automate_dc_token" {
 }
 
@@ -32,8 +36,17 @@ variable "automate_license" {
   default = "Contact Chef Sales at sales@chef.io to request a license."
 }
 
+variable "automate_private_key" {
+}
+
+variable "automate_public_key" {
+}
+
 variable "automate_role" {
   description = "Set the type of server role. can be one of: bootstrap_automate, automate or chef_api"
+}
+
+variable "automate_root_ca" {
 }
 
 variable "aws_os_snapshot_role_arn" {
@@ -61,6 +74,16 @@ variable "backup_config_s3" {
 
 variable "bucket_name" {
   default = "chef-automate-ha"
+}
+
+variable "chef_server_custom_certs_enabled" {
+  default = false
+}
+
+variable "chef_server_private_key" {
+}
+
+variable "chef_server_public_key" {
 }
 
 variable "cluster_id" {
@@ -127,12 +150,19 @@ variable "nfs_mount_path" {
   default = "/mnt/automate_backups"
 }
 
+variable "opensearch_custom_certs_enabled" {
+  default = false
+}
+
 variable "opensearch_listen_port" {
   default = 9200
 }
 
 variable "opensearch_private_ips" {
   default = []
+}
+
+variable "opensearch_root_ca" {
 }
 
 variable "os_snapshot_user_access_key_id" {
@@ -143,8 +173,15 @@ variable "os_snapshot_user_access_key_secret" {
   default = ""
 }
 
+variable "postgresql_custom_certs_enabled" {
+  default = false
+}
+
 variable "postgresql_private_ips" {
   default = []
+}
+
+variable "postgresql_root_ca" {
 }
 
 variable "postgresql_ssl_enable" {

@@ -163,6 +163,80 @@ automate_fqdn = "<%= config.automate.fqdn %>" # leave commented out for AWS, oth
 automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
 opensearch_instance_count = <%= config.opensearch.instance_count %>
+
+automate_root_ca = <<-EOT
+<%= config.automate.root_ca %>
+
+EOT
+
+opensearch_root_ca = <<-EOT
+<%= config.opensearch.root_ca %>
+
+EOT
+
+postgresql_root_ca = <<-EOT
+<%= config.postgresql.root_ca %>
+
+EOT
+
+automate_private_key = <<-EOT
+<%= config.automate.private_key %>
+
+EOT
+
+chef_server_private_key = <<-EOT
+<%= config.chef_server.private_key %>
+
+EOT
+
+opensearch_admin_key = <<-EOT
+<%= config.opensearch.admin_key %>
+
+EOT
+
+opensearch_private_key = <<-EOT
+<%= config.opensearch.private_key %>
+
+EOT
+
+postgresql_private_key = <<-EOT
+<%= config.postgresql.private_key %>
+
+EOT
+
+automate_public_key = <<-EOT
+<%= config.automate.public_key %>
+
+EOT
+
+chef_server_public_key = <<-EOT
+<%= config.chef_server.public_key %>
+
+EOT
+
+opensearch_public_key = <<-EOT
+<%= config.opensearch.public_key %>
+
+EOT
+
+opensearch_admin_cert = <<-EOT
+<%= config.opensearch.admin_cert %>
+
+EOT
+
+postgresql_public_key = <<-EOT
+<%= config.postgresql.public_key %>
+
+EOT
+
+automate_custom_certs_enabled = <%= config.automate.custom_certs_enabled %>
+chef_server_custom_certs_enabled = <%= config.chef_server.custom_certs_enabled %>
+postgresql_custom_certs_enabled = <%= config.postgresql.custom_certs_enabled %>
+opensearch_custom_certs_enabled = <%= config.opensearch.custom_certs_enabled %>
+
+opensearch_admin_dn = "<%= config.opensearch.admin_dn %>"
+opensearch_nodes_dn = "<%= config.opensearch.nodes_dn %>"
+
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
