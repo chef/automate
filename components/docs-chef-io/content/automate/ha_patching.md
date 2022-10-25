@@ -19,11 +19,6 @@ gh_repo = "automate"
 
 Patching new configuration in all nodes can be done from bastion server. This page explains all the argument and flags available with `config patch` command
 
-{{< warning >}}
-
--   For Opensearch and Postgresql make sure to run `get-config` command to get the applied configuration and add the config to be patched on top of it.  
-    {{< /warning >}}
-
 Flags available
 
 -   --frontend - "Patch toml configuration to the all frontend nodes"
