@@ -93,6 +93,9 @@ module AutomateCluster
       opts[:cwd] ||= workspace_path
 
       so = shellout!("make #{cmd}", opts)
+      puts "::::inside"
+      puts "make #{cmd}"
+      puts opts
       AutomateCluster.logger.debug so.stdout, cmd: "make #{cmd}"
       so
     end

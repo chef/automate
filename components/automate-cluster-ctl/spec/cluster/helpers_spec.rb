@@ -47,6 +47,9 @@ describe AutomateCluster::Helpers do
 
       expect(instance).to receive(:shellout!).with('make test', cwd: '/test/config_workspace').and_return(shellout)
 
+      puts shellout
+      puts ":::::::came here"
+
       instance.run_make_cmd('test')
     end
 
