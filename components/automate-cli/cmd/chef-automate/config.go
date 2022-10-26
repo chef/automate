@@ -207,7 +207,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			const remoteService string = "postgresql"
 			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService)
 			if err != nil {
-				return status.Annotate(err, status.ConfigError)
+				return err
 			}
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 			writer.Body(scriptCommands)
@@ -432,82 +432,6 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 
 	//  start from here
 	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
-	if err != nil {
-		return "", err
-	}
-
-	destString := string(pemBytes)
-	var dest OpensearchConfig
-	if _, err := toml.Decode(destString, &dest); err != nil {
-		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
-	}
-
-	mergo.Merge(&dest, src) //, mergo.WithOverride
-
-	f, err := os.Create(tomlFile)
-
-	if err != nil {
-		// failed to create/open the file
-		writer.Bodyf("Failed to create/open the file, \n%v", err)
-		return "", err
-	}
-	if err := toml.NewEncoder(f).Encode(dest); err != nil {
-		// failed to encode
-		writer.Bodyf("Failed to encode\n%v", err)
-		return "", err
-	}
-	if err := f.Close(); err != nil {
-		// failed to close the file
-		writer.Bodyf("Failed to close the file\n%v", err)
-		return "", err
-	}
-
-	return tomlFile, nil
-}
-
-func createTomlFile(file string, tomlOutput string) error {
-	writer.Print(file)
-	initConfigHAPath := file
-	if _, err := os.Stat(initConfigHAPath); err == nil {
-		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigHAPath)
-		return nil
-	}
-
-	err := os.WriteFile(initConfigHAPath, []byte(tomlOutput), 0600)
-	if err != nil {
-		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
-	}
-	writer.Printf("\nconfig initializatized in a generated file : %s\n", initConfigHAPath)
-	return nil
-}
-
-func tomlToJson(rawData string) string {
-
-	re := regexp.MustCompile("(?im).*info:.*$")
-	tomlOutput := re.ReplaceAllString(rawData, "")
-	return tomlOutput
-}
-
-func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string) (string, error) {
-	tomlFile := args[0] + timestamp
-	sshUser := infra.Outputs.SSHUser.Value
-	sskKeyFile := infra.Outputs.SSHKeyFile.Value
-	sshPort := infra.Outputs.SSHPort.Value
-
-	remoteIP, remoteService := getRemoteType(remoteType, infra)
-	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
-	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
-	if err != nil {
-		return "", err
-	}
-
-	var src OpensearchConfig
-	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
-		return "", err
-	}
-
-	//  start from here
-	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
 		return "", err
 	}
