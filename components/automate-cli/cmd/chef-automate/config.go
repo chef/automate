@@ -163,21 +163,21 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func runPatchCommand(cmd *cobra.Command, args []string) error {
-	infra, err := getAutomateHAInfraDetails()
-	if err != nil {
-		return err
-	}
-
-	sshUser := infra.Outputs.SSHUser.Value
-	sskKeyFile := infra.Outputs.SSHKeyFile.Value
-	sshPort := infra.Outputs.SSHPort.Value
-
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 
 	if isA2HARBFileExist() {
+
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+
+		sshUser := infra.Outputs.SSHUser.Value
+		sskKeyFile := infra.Outputs.SSHKeyFile.Value
+		sshPort := infra.Outputs.SSHPort.Value
 
 		timestamp := time.Now().Format("20060102150405")
 
@@ -348,7 +348,7 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 
 func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string) error {
 	cmd := "scp"
-	exec_args := []string{"-o StrictHostKeyChecking=no", "-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
+	exec_args := []string{"-o StrictHostKeyChecking=off", "-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		writer.Print("Failed to copy TOML file to remote\n")
 		return err
