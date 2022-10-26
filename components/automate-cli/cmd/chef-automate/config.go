@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
@@ -293,7 +294,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
 
-	pemBytes, err := os.ReadFile(sshKeyFile)
+	pemBytes, err := ioutil.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
 		return "", err
@@ -460,7 +461,7 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	}
 
 	//  start from here
-	pemBytes, err := os.ReadFile(args[0])
+	pemBytes, err := ioutil.ReadFile(args[0])
 	if err != nil {
 		return "", err
 	}
