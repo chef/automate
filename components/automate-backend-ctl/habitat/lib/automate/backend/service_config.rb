@@ -56,7 +56,7 @@ module Automate
 
       def get(uri)
         sleep_length = 5
-        Log.info "GET #{self.class.base_uri}#{uri}"
+        Log.debug "GET #{self.class.base_uri}#{uri}"
         while true
           begin
             resp = self.class.get(
