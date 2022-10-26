@@ -392,6 +392,52 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	return fileErr
 }
 
+func getMergedOpensearchInterface(rawOutput string, pemFilePath string, remoteService string) (interface{}, error) {
+
+	var src OpensearchConfig
+	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
+		return "", err
+	}
+
+	pemBytes, err := ioutil.ReadFile(pemFilePath) // nosemgrep
+	if err != nil {
+		return "", err
+	}
+
+	destString := string(pemBytes)
+	var dest OpensearchConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
+	}
+
+	mergo.Merge(&dest, src) //, mergo.WithOverride
+
+	return dest, nil
+}
+
+func getMergedPostgresqlInterface(rawOutput string, pemFilePath string, remoteService string) (interface{}, error) {
+
+	var src PostgresqlConfig
+	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
+		return "", err
+	}
+
+	pemBytes, err := ioutil.ReadFile(pemFilePath) // nosemgrep
+	if err != nil {
+		return "", err
+	}
+
+	destString := string(pemBytes)
+	var dest PostgresqlConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
+	}
+
+	mergo.Merge(&dest, src) //, mergo.WithOverride
+
+	return dest, nil
+}
+
 func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
 	switch strings.ToLower(flag) {
 	case "opensearch", "os", "o":
@@ -399,7 +445,7 @@ func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
 	case "postgresql", "pg", "p":
 		return infra.Outputs.PostgresqlPrivateIps.Value[0], "postgresql"
 	default:
-		return infra.Outputs.OpensearchPrivateIps.Value[0], "opensearch"
+		return "", ""
 	}
 }
 
@@ -423,24 +469,18 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 		return "", err
 	}
 
-	var src OpensearchConfig
-	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
-		return "", err
+	var (
+		dest interface{}
+		err1 error
+	)
+	if remoteService == "opensearch" {
+		dest, err1 = getMergedOpensearchInterface(rawOutput, args[0], remoteService)
+	} else {
+		dest, err1 = getMergedPostgresqlInterface(rawOutput, args[0], remoteService)
 	}
-
-	//  start from here
-	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
-	if err != nil {
-		return "", err
+	if err1 != nil {
+		return "", err1
 	}
-
-	destString := string(pemBytes)
-	var dest OpensearchConfig
-	if _, err := toml.Decode(destString, &dest); err != nil {
-		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
-	}
-
-	mergo.Merge(&dest, src) //, mergo.WithOverride
 
 	f, err := os.Create(tomlFile)
 
