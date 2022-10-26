@@ -8,6 +8,7 @@ options:
   default_value: "false"
   usage: help for ssh
 - name: hostname
+  shorthand: H
   usage: Automate ha server name to ssh
 inherited_options:
 - name: debug
