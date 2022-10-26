@@ -71,11 +71,8 @@ func init() {
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
-	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.getAppliedConfig, "get-config", "G", false, "Get applied config from Opensearch or Postgresql nodes")
-	patchConfigCmd.PersistentFlags().StringVarP(&configCmdFlags.file, "file", "F", "output_config.toml", "File path to write the config (default \"output_config.toml\")")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
-
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
 
 	RootCmd.AddCommand(configCmd)
@@ -210,20 +207,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 		timestamp := time.Now().Format("20060102150405")
 
-		if configCmdFlags.getAppliedConfig {
-			remoteIP, remoteService := getRemoteType(args[0], infra)
-			scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
-			if len(remoteIP) > 0 {
-				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
-				}
-				createTomlFile(configCmdFlags.file, output)
-			}
-			return nil
-		}
-
 		if configCmdFlags.frontend {
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
 			if len(frontendIps) == 0 {
@@ -234,7 +217,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
 				const remoteService string = "frontend"
-				copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp)
+				if err != nil {
+					writer.Errorf("%v", err)
+					return err
+				}
 				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
 				if err != nil {
 					writer.Errorf("%v", err)
@@ -253,7 +240,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			writer.Body(scriptCommands)
 			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
-				copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
+				if err != nil {
+					writer.Errorf("%v", err)
+					return err
+				}
 				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
 				if err != nil {
 					writer.Errorf("%v", err)
@@ -272,7 +263,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			writer.Body(scriptCommands)
 			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
-				copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
+				if err != nil {
+					writer.Errorf("%v", err)
+					return err
+				}
 				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
 				if err != nil {
 					writer.Errorf("%v", err)
@@ -329,11 +324,10 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 				return keyErr
 			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
 				// host key not found in known_hosts then give a warning and continue to connect.
-				writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
-				// time.Sleep(2 * time.Second)
+				// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
 				return addHostKey(host, remote, pubKey)
 			}
-			writer.Printf("Pub key exists for %s.\n", host)
+			// writer.Printf("Pub key exists for %s.\n", host)
 			return nil
 		}),
 	}
@@ -383,15 +377,15 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string) {
+func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string) error {
 	cmd := "scp"
 	exec_args := []string{"-o StrictHostKeyChecking=no", "-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
-	// fmt.Print("Copying file")
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		writer.Print("Failed to copy TOML file to remote\n")
+		return err
 	}
-	fmt.Print("Copied TOML file\n")
+	writer.Print("Copied TOML file to remote\n")
+	return nil
 }
 
 func createKnownHosts() {
@@ -429,12 +423,6 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	return fileErr
 }
 
-type A struct {
-	FirstName  *string `json:"first_name"`
-	MiddleName *string `json:"mid_name"`
-	LastName   *string `json:"last_name"`
-}
-
 func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
 	switch strings.ToLower(flag) {
 	case "opensearch", "os", "o":
@@ -446,31 +434,10 @@ func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
 	}
 }
 
-func createTomlFile(file string, tomlOutput string) error {
-	writer.Print(file)
-	initConfigHAPath := file
-	if _, err := os.Stat(initConfigHAPath); err == nil {
-		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigHAPath)
-		return nil
-	}
-
-	err := os.WriteFile(initConfigHAPath, []byte(tomlOutput), 0600)
-	if err != nil {
-		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
-	}
-	writer.Printf("\nconfig initializatized in a generated file : %s\n", initConfigHAPath)
-	return nil
-}
-
-func tomlToJson(rawData string) string {
+func cleanToml(rawData string) string {
 
 	re := regexp.MustCompile("(?im).*info:.*$")
 	tomlOutput := re.ReplaceAllString(rawData, "")
-	// open := Open
-	// toml.Decode(tomlOutput, &open)
-	// dataByt, _ := json.Marshal(open)
-	// fmt.Println(string(dataByt))
-	// return string(dataByt)
 	return tomlOutput
 }
 
@@ -482,51 +449,39 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
-	// writer.Body(scriptCommands + "\n")
 	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
-	// writer.Body("Output" + rawOutput + "\n")
 	if err != nil {
-		// writer.Errorf("%s", err)
 		return "", err
 	}
-
-	// writer.Body(rawOutput)
 
 	var src OpensearchConfig
-	if _, err := toml.Decode(tomlToJson(rawOutput), &src); err != nil {
-		// writer.Printf("%v", err)
+	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
 		return "", err
 	}
-
-	// fmt.Println("Src/Server Output: ", src)
 
 	//  start from here
 	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
-		// writer.Printf("\n%v\n", err)
 		return "", err
 	}
 
 	destString := string(pemBytes)
 	var dest OpensearchConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		// writer.Printf("Config file must be a valid %s config", remoteService)
 		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
 	}
 
-	// writer.Printf("Dest/User Input: ", dest)
 	mergo.Merge(&dest, src) //, mergo.WithOverride
-	// writer.Printf("%v", dest)
 
 	f, err := os.Create(tomlFile)
 
 	if err != nil {
-		// failed to create/open the file    log.Fatal(err)
+		// failed to create/open the file
 		writer.Bodyf("Failed to create/open the file, \n%v", err)
 		return "", err
 	}
 	if err := toml.NewEncoder(f).Encode(dest); err != nil {
-		// failed to encode    log.Fatal(err)
+		// failed to encode
 		writer.Bodyf("Failed to encode\n%v", err)
 		return "", err
 	}
