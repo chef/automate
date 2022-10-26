@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
@@ -177,33 +176,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 
-	/*
-		// if isA2HARBFileExist() {
-		// 	if !configCmdFlags.acceptMLSA {
-		// 		response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it,
-		// 		this command will deploy that new airgap bundle with patching of configuration.
-		// 		Press y to agree, n to to disagree? [y/n]`)
-		// 		if err != nil {
-		// 			return err
-		// 		}
-
-		// 		if !strings.Contains(response, "y") {
-		// 			return errors.New("canceled Patching")
-		// 		}
-		// 	}
-		// 	input, err := ioutil.ReadFile(args[0])
-		// 	if err != nil {
-		// 		return nil
-		// 	}
-		// 	err = ioutil.WriteFile(AUTOMATE_HA_AUTOMATE_CONFIG_FILE, input, 0644)
-		// 	if err != nil {
-		// 		writer.Printf("error in patching automate config to automate HA")
-		// 		return err
-		// 	}
-		// 	return executeDeployment(args)
-		// }
-	*/
-
 	if isA2HARBFileExist() {
 
 		timestamp := time.Now().Format("20060102150405")
@@ -214,10 +186,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				writer.Error("No frontend IPs are found")
 				os.Exit(1)
 			}
-			// writer.Printf("IPs: " + strings.Join(frontendIps, "") + "Path :" + args[0])
-			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, args[0], dateFormat)
+			const remoteService string = "frontend"
+			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				const remoteService string = "frontend"
 				err := copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp)
 				if err != nil {
 					writer.Errorf("%v", err)
@@ -294,7 +265,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
 
-	pemBytes, err := ioutil.ReadFile(sshKeyFile)
+	pemBytes, err := os.ReadFile(sshKeyFile)
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
 		return "", err
@@ -349,7 +320,6 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	}
 	var stdoutBuf bytes.Buffer
 	session.Stdout = &stdoutBuf
-	// err = session.Run("sudo rm -rf /tmp/" + path + "")
 
 	writer.StartSpinner()
 	err = session.Run(remoteCommands)
@@ -360,7 +330,6 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 		return "", err
 	}
 	defer session.Close()
-	// writer.Printf("\n%s\n", stdoutBuf)
 	return stdoutBuf.String(), nil
 }
 
@@ -461,7 +430,7 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	}
 
 	//  start from here
-	pemBytes, err := ioutil.ReadFile(args[0])
+	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
 		return "", err
 	}
