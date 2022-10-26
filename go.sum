@@ -601,8 +601,6 @@ github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaR
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
 github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181zc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
-github.com/pelletier/go-toml/v2 v2.0.5 h1:ipoSadvV8oGUjnUbMub59IDPPwfxF694nG/jwbMiyQg=
-github.com/pelletier/go-toml/v2 v2.0.5/go.mod h1:OMHamSCAODeSsVrwwvcJOaoN0LIUIaFVNZzmWyNfXas=
 github.com/peterbourgon/mergemap v0.0.0-20130613134717-e21c03b7a721 h1:ArxMo6jAOO2KuRsepZ0hTaH4hZCi2CCW4P9PV59HHH0=
 github.com/peterbourgon/mergemap v0.0.0-20130613134717-e21c03b7a721/go.mod h1:jQyRpOpE/KbvPc0VKXjAqctYglwUO5W6zAcGcFfbvlo=
 github.com/peterh/liner v0.0.0-20170211195444-bf27d3ba8e1d/go.mod h1:xIteQHvHuaLYG9IFj6mSxM0fCKrs34IrEQUhOYuGPHc=
