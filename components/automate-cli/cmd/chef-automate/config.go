@@ -210,7 +210,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				return err
 			}
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-			writer.Body(scriptCommands)
 			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
 				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
@@ -233,7 +232,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				return err
 			}
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-			writer.Body(scriptCommands)
 			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
 				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
