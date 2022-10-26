@@ -72,8 +72,6 @@ func init() {
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
-	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.getAppliedConfig, "get-config", "G", false, "Get applied config from Opensearch or Postgresql nodes")
-	patchConfigCmd.PersistentFlags().StringVarP(&configCmdFlags.file, "file", "F", "output_config.toml", "File path to write the config (default \"output_config.toml\")")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -487,11 +485,6 @@ func tomlToJson(rawData string) string {
 
 	re := regexp.MustCompile("(?im).*info:.*$")
 	tomlOutput := re.ReplaceAllString(rawData, "")
-	// open := Open
-	// toml.Decode(tomlOutput, &open)
-	// dataByt, _ := json.Marshal(open)
-	// fmt.Println(string(dataByt))
-	// return string(dataByt)
 	return tomlOutput
 }
 
@@ -503,51 +496,39 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
-	// writer.Body(scriptCommands + "\n")
 	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
-	// writer.Body("Output" + rawOutput + "\n")
 	if err != nil {
-		// writer.Errorf("%s", err)
 		return "", err
 	}
-
-	// writer.Body(rawOutput)
 
 	var src OpensearchConfig
-	if _, err := toml.Decode(tomlToJson(rawOutput), &src); err != nil {
-		// writer.Printf("%v", err)
+	if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
 		return "", err
 	}
-
-	// fmt.Println("Src/Server Output: ", src)
 
 	//  start from here
 	pemBytes, err := os.ReadFile(args[0])
 	if err != nil {
-		// writer.Printf("\n%v\n", err)
 		return "", err
 	}
 
 	destString := string(pemBytes)
 	var dest OpensearchConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		// writer.Printf("Config file must be a valid %s config", remoteService)
 		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
 	}
 
-	// writer.Printf("Dest/User Input: ", dest)
 	mergo.Merge(&dest, src) //, mergo.WithOverride
-	// writer.Printf("%v", dest)
 
 	f, err := os.Create(tomlFile)
 
 	if err != nil {
-		// failed to create/open the file    log.Fatal(err)
+		// failed to create/open the file
 		writer.Bodyf("Failed to create/open the file, \n%v", err)
 		return "", err
 	}
 	if err := toml.NewEncoder(f).Encode(dest); err != nil {
-		// failed to encode    log.Fatal(err)
+		// failed to encode
 		writer.Bodyf("Failed to encode\n%v", err)
 		return "", err
 	}
