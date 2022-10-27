@@ -39,6 +39,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.ListenAddress = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10160)
 	c.V1.Sys.Log.Level = w.String("info")
+	c.V1.Sys.Log.RedirectSysLog = w.Bool(false)
 
 	c.V1.Svc.DeploymentType = w.String("local")
 	c.V1.Svc.Channel = w.String("current")
@@ -175,10 +176,12 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	c.V1.Sys.Proxy.ConnectionString = g.ProxyString()
 	c.V1.Sys.Proxy.NoProxyString = g.NoProxyString()
 	c.V1.Sys.Backup.Filesystem.Path = g.GetV1().GetBackups().GetFilesystem().GetPath()
+	//c.V1.Sys.Log.RedirectSysLog.Value = g.GetV1().GetLog().GetRedirectSysLog().GetValue()
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = logLevel
 	}
+
 }
 
 // SystemdProxyConfig returns the proxy configuration in a format that

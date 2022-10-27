@@ -1,6 +1,8 @@
 listen_address = "127.0.0.1"
 port = {{cfg.service.port}}
 log_level = "{{cfg.log.level}}"
+redirectSysLog = {{cfg.log.redirectSysLog}}
+
 
 {{#if cfg.gather_logs.staging_dir ~}}
 staging_dir = "{{cfg.gather_logs.staging_dir}}"
