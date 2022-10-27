@@ -3,7 +3,7 @@ title = "Patch Configuration"
 
 draft = false
 
-gh_repo = "automate" 
+gh_repo = "automate"
 
 [menu]
   [menu.automate]
