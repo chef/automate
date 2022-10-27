@@ -100,3 +100,9 @@ output "aws_cluster_id" {
   value = random_id.random.hex
 }
 
+output "ssh_user" {
+  value = var.aws_ssh_user
+}
+output "ssh_port" {
+  value = var.aws_ssh_port
+}
