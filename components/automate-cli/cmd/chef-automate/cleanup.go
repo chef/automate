@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net"
-	"os"
-	"path/filepath"
 	"strings"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -14,12 +12,12 @@ import (
 )
 
 var cleanupFlags = struct {
-	onprem        bool
+	onprem bool
 }{}
 
 type SshClient struct {
-	sshUser string
-	sshPort string
+	sshUser    string
+	sshPort    string
 	sshKeyFile string
 }
 
@@ -29,26 +27,25 @@ func init() {
 
 }
 
-var cleanupCmd = &cobra.Command {
-		Use:  "cleanup",
-	    Short: "cleanup the Automate HA instances",
-	    Long:  "cleaning up the instance of all the Automate HA related Applications.",
-		Annotations: map[string]string{
-			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
-		},
-		RunE: runCleanupCmd,
-		Hidden: true,
-		
+var cleanupCmd = &cobra.Command{
+	Use:   "cleanup",
+	Short: "cleanup the Automate HA instances",
+	Long:  "cleaning up the instance of all the Automate HA related Applications.",
+	Annotations: map[string]string{
+		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+	},
+	RunE:   runCleanupCmd,
+	Hidden: true,
 }
 
 const (
-		FRONTENDCLEANUP_COMMANDS = `
+	FRONTENDCLEANUP_COMMANDS = `
 		sudo systemctl stop chef-automate;
 		sudo rm -rf /hab;
 		sudo rm -rf /var/automate-ha;
 		`
-	
-		BACKENDCLEANUP_COMMANDS = `
+
+	BACKENDCLEANUP_COMMANDS = `
 		sudo systemctl stop hab-sup;
 		sudo rm -rf /hab; 
 		sudo rm -rf /var/automate-ha;
@@ -61,13 +58,13 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if infra != nil {
-		sshInfo :=SshClient{
-			sshUser: infra.Outputs.SSHUser.Value,
-			sshPort: infra.Outputs.SSHPort.Value,
+		sshInfo := SshClient{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
 			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 		}
 
-			writer.Printf(strings.Join(args, ""))
+		writer.Printf(strings.Join(args, ""))
 		if isA2HARBFileExist() {
 			if cleanupFlags.onprem {
 				automateIps := infra.Outputs.AutomatePrivateIps.Value
@@ -101,7 +98,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 				for i := 0; i < len(opensearchIps); i++ {
 					servername := "opensearch"
 					err := executeCleanupOnRemote(sshInfo, opensearchIps[i], servername, BACKENDCLEANUP_COMMANDS)
-					if err !=nil {
+					if err != nil {
 						writer.Error(err.Error())
 						return err
 					}
@@ -128,9 +125,9 @@ func executeCleanupOnRemote(sshDetails SshClient, ip string, servername string, 
 	pemBytes, err := ioutil.ReadFile(sshDetails.sshKeyFile) // nosemgrep
 	if err != nil {
 		writer.Errorf("Unable to read private key file for ssh connection: %s", err.Error())
-		return err 
-		}
-		// create signer
+		return err
+	}
+	// create signer
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
 		writer.Errorf("Unable to parse private key for ssh connection: %s", err.Error())
@@ -165,7 +162,7 @@ func executeCleanupOnRemote(sshDetails SshClient, ip string, servername string, 
 		return err
 	}
 	defer conn.Close()
-		// open session
+	// open session
 	session, err := conn.NewSession()
 	if err != nil {
 		writer.Errorf("session failed:%s", err.Error())
@@ -173,7 +170,7 @@ func executeCleanupOnRemote(sshDetails SshClient, ip string, servername string, 
 	}
 	var stdoutBuf bytes.Buffer
 	session.Stdout = &stdoutBuf
-	writer.Println("cleaning up the " +servername +" node on IP: "+ip+"\n")
+	writer.Println("cleaning up the " + servername + " node on IP: " + ip + "\n")
 	err = session.Run(commands)
 	if err != nil {
 		writer.Errorf("\nRun failed:%v", err)
@@ -183,40 +180,4 @@ func executeCleanupOnRemote(sshDetails SshClient, ip string, servername string, 
 	}
 	defer session.Close()
 	return err
-}
-
-func createKnownHosts() {
-	f, err := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
-	if err != nil {
-		writer.Errorf("%v", err)
-		return 
-	}
-	f.Close()
-}
-
-func checkKnownHosts() ssh.HostKeyCallback {
-	createKnownHosts()
-	kh, e := knownhosts.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
-	if e != nil {
-		writer.Errorf("%v", e)
-		return nil
-	}
-	return kh
-}
-
-func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
-	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
-	// if not nil then connection stops.
-	khFilePath := filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts")
-
-	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
-	if fErr != nil {
-		writer.Errorf(fErr.Error())
-		return fErr
-	}
-	defer f.Close()
-
-	knownHosts := knownhosts.Normalize(remote.String())
-	_, fileErr := f.WriteString(knownhosts.Line([]string{"\n", knownHosts}, pubKey))
-	return fileErr
 }
