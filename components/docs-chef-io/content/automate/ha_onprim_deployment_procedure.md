@@ -355,6 +355,20 @@ For example : Remove Automate node to the existing deployed cluster.
     chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
 
+### Uninstall chef automate HA
+
+{{< danger >}}
+Below section will uninstall the chef automate HA
+{{< /danger >}}
+
+#### To uninstall On-Premise 
+
+To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+
+```bash
+    chef-automate cleanup --onprem
+```
+
 ### Troubleshooting
 
 #### Failure in adding nodes
