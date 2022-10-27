@@ -363,6 +363,7 @@ message Opensearch {
 message Log {
   google.protobuf.StringValue level = 1;
   google.protobuf.StringValue format = 2;
+  google.protobuf.BoolValue redirectSysLog = 3;
 }
 
 message Disclosure {

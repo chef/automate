@@ -2,16 +2,19 @@ package server
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
-
+	"fmt"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
+	"github.com/pkg/errors"
+	"os"
+	"os/exec"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var rsyslogConfigFile = "/etc/rsyslog.d/automate.conf"
 
 // GetAutomateConfig returns a copy of the userOverrideConfig of the existing
 // deployment.
@@ -59,6 +62,7 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 	operation := func(s *server) error {
 		// Use a copy to make sure none of our operations modifies the
 		// userOverrideConfig until we're sure it should change.
+
 		existingCopy, err := s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
 		if err != nil {
 			return status.Error(codes.FailedPrecondition, "Unable to acquire existing configuration")
@@ -67,6 +71,14 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 		existingHash, err := existingCopy.Sum64()
 		if err != nil {
 			return status.Error(codes.FailedPrecondition, "Unable to determine existing configuration hash")
+		}
+
+		fmt.Println("Got value ", req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
+
+		fmt.Println("Existing value ", existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+			fmt.Println("Got value inside if", req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
+
 		}
 
 		// Compare our existing configurations hash with the hash of the configuration
@@ -231,6 +243,43 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 
 	if err = s.persistDeployment(); err != nil {
 		return status.Error(codes.Internal, err.Error())
+	}
+
+	return nil
+}
+
+func restartSyslogService() error {
+	_, err := exec.Command("systemctl restart rsyslog.service").Output()
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart rsyslog").Error())
+	}
+
+	return nil
+}
+
+func createConfigFileForAutomateSysLog() error {
+	f, err := os.Create(rsyslogConfigFile)
+
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to create rsyslog configuration file for automate").Error())
+	}
+
+	defer f.Close()
+
+	_, err2 := f.WriteString("if $programname == 'hab' then /var/log/automate.log\n& stop")
+
+	if err2 != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
+	}
+
+	return nil
+
+}
+
+func removeConfigFileForAutomateSyslog() error {
+	err := os.Remove(rsyslogConfigFile)
+	if err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to delete the  rsyslog configuration file for automate").Error())
 	}
 
 	return nil

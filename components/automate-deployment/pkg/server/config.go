@@ -11,6 +11,7 @@ type Config struct {
 	ListenAddress            string `mapstructure:"listen_address"`
 	Port                     uint32 `mapstructure:"port"`
 	LogLevel                 string `mapstructure:"log_level"`
+	RedirectSysLog           bool   `mapstructure:"redirectSyslog"`
 	LogFormat                string `mapstructure:"log_format"`
 	StagingDir               string `mapstructure:"staging_dir"`
 	ConvergeIntervalSecs     uint32 `mapstructure:"converge_interval_secs"`
