@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Patch Configuration"
     identifier = "automate/deploy_high_availability/deployment/ha_patching.md Patch Configuration"
     parent = "automate/deploy_high_availability/deployment"
-    weight = 7230
+    weight = 75
 +++
 
 Patching new configuration in all nodes can be done from bastion server. This page explains all the argument and flags available using `config patch` command.
