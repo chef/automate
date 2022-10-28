@@ -13,10 +13,10 @@ import (
 
 const (
 	FSCRIPT = `
-mv %[1]v/svc/automate-opensearch/data %[1]vsvc/automate-opensearch/data.os; 
-mv %[1]v/svc/automate-opensearch/var %[1]vsvc/automate-opensearch/var.os; 
-cp -r %[1]v/svc/automate-elasticsearch/data %[1]vsvc/automate-opensearch/; 
-cp -r %[1]v/svc/automate-elasticsearch/var %[1]vsvc/automate-opensearch/; 
+mv %[1]v/svc/automate-opensearch/data %[1]v/svc/automate-opensearch/data.os; 
+mv %[1]v/svc/automate-opensearch/var %[1]v/svc/automate-opensearch/var.os; 
+cp -r %[1]v/svc/automate-elasticsearch/data %[1]v/svc/automate-opensearch/; 
+cp -r %[1]v/svc/automate-elasticsearch/var %[1]v/svc/automate-opensearch/; 
 chown -RL hab:hab %[1]v/svc/automate-opensearch/data; 
 chown -RL hab:hab %[1]v/svc/automate-opensearch/var;`
 )
