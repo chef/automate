@@ -1,18 +1,31 @@
 package server
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/pkg/errors"
-	"os"
-	"os/exec"
+	"github.com/sirupsen/logrus"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+)
+
+const (
+	logFilePath   = "/var/log/automate.log"
+	configFile    = "/etc/logrotate.conf"
+	logRotateConf = "components/automate-deployment/logrotate.conf"
 )
 
 var rsyslogConfigFile = "/etc/rsyslog.d/automate.conf"
@@ -312,6 +325,119 @@ func removeConfigFileForAutomateSyslog() error {
 	err := os.Remove(rsyslogConfigFile)
 	if err != nil {
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to delete the  rsyslog configuration file for automate").Error())
+	}
+
+	return nil
+}
+
+// runLogrotateConfig() to initiate logrotate setup
+func runLogrotateConfig() error {
+	if err := logrotateConfChecks(); err != nil {
+		logrus.Error("Logrotate isn't setup!")
+		log.Println(`
+		*********************** To Install logrotate Run ********************************
+		Ubuntu: sudo apt install logrotate
+		RHEL: sudo rpm install logrotate	
+		`)
+		return err
+	}
+
+	if err := configLogrotate(); err != nil {
+		logrus.Errorf("Error while configuring logrotate: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func logrotateConfChecks() error {
+	_, err := exec.Command("logrotate").Output()
+	if strings.Contains(err.Error(), "executable file not found") {
+		logrus.Errorf("The system doesn't have logrotate installed, %v", err)
+		return err
+	}
+
+	// Check for the logrotate.conf and rsyslog.conf existance
+	if _, err := os.Stat("/etc/logrotate.conf"); errors.Is(err, os.ErrNotExist) {
+		logrus.Errorf("The system doesn't seem to have logrotate installed or configured: %v", err)
+		return err
+	}
+
+	if _, err := os.Stat("/etc/rsyslog.conf"); errors.Is(err, os.ErrNotExist) {
+		logrus.Errorf("The system doesn't seem to have rsyslog  configured: %v", err)
+		return err
+	}
+
+	// Check for the logrotate.d and rsyslog.conf existance
+	if _, err := os.Stat("/etc/logrotate.d"); errors.Is(err, os.ErrNotExist) {
+		logrus.Errorf("The system doesn't seem to have logrotate.d dir: %v", err)
+		return err
+	}
+
+	// Check for the rsyslog.conf and rsyslog.conf existance
+	if _, err := os.Stat("/etc/rsyslog.d"); errors.Is(err, os.ErrNotExist) {
+		logrus.Errorf("The system doesn't seem to have rsyslog.d dir: %v", err)
+		return err
+	}
+	return nil
+}
+
+func configLogrotate() error {
+
+	f, err := os.Open(configFile)
+	if err != nil {
+		logrus.Errorf("cannot open the file: %v", err)
+		return err
+	}
+	defer f.Close()
+
+	flag := false
+	var bs []byte
+	buf := bytes.NewBuffer(bs)
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), "/var/log/automate.log") {
+			flag = true
+		}
+		if !flag {
+			_, err := buf.Write(scanner.Bytes())
+			if err != nil {
+				logrus.Errorf("Error occured in buf write: %v", err)
+			}
+			_, err = buf.WriteString("\n")
+			if err != nil {
+				logrus.Errorf("Error occured while writing string: %v", err)
+			}
+		}
+
+		if strings.Contains(scanner.Text(), "}") && flag {
+			flag = false
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		logrus.Errorf("Error occured: %v", err)
+	}
+
+	err = os.WriteFile(configFile, buf.Bytes(), 0666)
+	if err != nil {
+		logrus.Errorf("Error occured while writing to a file: %v", err)
+	}
+
+	// Append a new conf to the end of a file
+	byteSlice, err := ioutil.ReadFile(logRotateConf)
+	if err != nil {
+		logrus.Errorf("cannot read the file: %v", err)
+	}
+	file, err := os.OpenFile(configFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		logrus.Errorf("cannot open the file", err)
+	}
+
+	defer file.Close()
+
+	if _, err = file.WriteString("\n" + string(byteSlice)); err != nil {
+		logrus.Errorf("cannot append to a file: %v", err)
 	}
 
 	return nil
