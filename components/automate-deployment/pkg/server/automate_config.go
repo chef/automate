@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
@@ -73,13 +74,7 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 			return status.Error(codes.FailedPrecondition, "Unable to determine existing configuration hash")
 		}
 
-		fmt.Println("Got value ", req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
-
 		fmt.Println("Existing value ", existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
-		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
-			fmt.Println("Got value inside if", req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
-
-		}
 
 		// Compare our existing configurations hash with the hash of the configuration
 		// that was returned to the client when the request was initiated. If
@@ -87,6 +82,10 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 		// the configuration update.
 		if existingHash != req.Hash {
 			return status.Error(codes.DeadlineExceeded, "The configuration has changed since you initiated the update request. Please try again.")
+		}
+
+		if err = setConfigForRedirectLogs(req, existingCopy); err != nil {
+			return status.Error(codes.Internal, "Failed to set configuration for redirecting logs for automate")
 		}
 
 		if err = existingCopy.OverrideConfigValues(req.Config); err != nil {
@@ -248,9 +247,41 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 	return nil
 }
 
+func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) error {
+	//Set the config if already not set
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
+		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false {
+		err := createConfigFileForAutomateSysLog()
+		if err != nil {
+			return status.Error(codes.Internal, "Failed to create configuration into syslog")
+		}
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, "Failed to restart syslog service")
+		}
+	}
+
+	//Rollback the config if requested
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
+		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+		err := removeConfigFileForAutomateSyslog()
+		if err != nil {
+			return status.Error(codes.Internal, "Failed to remove configuration into syslog")
+		}
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, "Failed to restart syslog service while removing config file for syslog")
+		}
+
+	}
+
+	return nil
+}
+
 func restartSyslogService() error {
-	_, err := exec.Command("systemctl restart rsyslog.service").Output()
+	_, err := exec.Command("bash", "-c", "systemctl restart rsyslog.service").Output()
 	if err != nil {
+		fmt.Println("Unable to restart syslog service with error ", err)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart rsyslog").Error())
 	}
 
@@ -266,9 +297,10 @@ func createConfigFileForAutomateSysLog() error {
 
 	defer f.Close()
 
-	_, err2 := f.WriteString("if $programname == 'hab' then /var/log/automate.log\n& stop")
+	_, err2 := f.WriteString("if $programname == 'hab' then /var/log/automate.log\n& stop\n")
 
 	if err2 != nil {
+		fmt.Println("Unable to create config with error ", err2)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
 	}
 
