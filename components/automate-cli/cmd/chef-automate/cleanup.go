@@ -113,7 +113,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else {
-		writer.Println("\nCleanup not executed.")
+		writer.Println("\nCleanup cannot be done")
 	}
 	return nil
 }
