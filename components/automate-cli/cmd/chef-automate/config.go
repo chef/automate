@@ -190,7 +190,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			const remoteService string = "frontend"
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				err := copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp, false)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err
@@ -212,7 +212,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
-				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err
@@ -234,7 +234,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 				remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
-				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err
@@ -346,12 +346,20 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string) error {
+func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string, removeFileFromLocal bool) error {
 	cmd := "scp"
 	exec_args := []string{"-o StrictHostKeyChecking=off", "-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		writer.Print("Failed to copy TOML file to remote\n")
 		return err
+	}
+	if removeFileFromLocal {
+		cmd := "rm"
+		exec_args := []string{"-rf", tomlFilePath}
+		if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+			writer.Print("Failed to copy TOML file to remote\n")
+			return err
+		}
 	}
 	writer.Print("Copied TOML file to remote\n")
 	return nil
