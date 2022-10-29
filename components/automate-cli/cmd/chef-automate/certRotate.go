@@ -41,6 +41,16 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.publicCert, "public-cert", "", "Public certificate")
 }
 
+const (
+	FRONTEND_CONFIG = `
+	[[load_balancer.v1.sys.frontend_tls]]
+		cert = """%v"""
+		key = """%v"""
+	[[global.v1.frontend_tls]]
+		cert = """%v"""
+		key = """%v"""`
+)
+
 func certRotate(cmd *cobra.Command, args []string) error {
 	privateCertPath := certFlags.privateCert
 	publicCertPath := certFlags.publicCert
@@ -83,35 +93,35 @@ func certRotate(cmd *cobra.Command, args []string) error {
 		sskKeyFile := infra.Outputs.SSHKeyFile.Value
 		sshPort := infra.Outputs.SSHPort.Value
 
-		if sshFlag.automate {
-			config := fmt.Sprintf(`
-			[[load_balancer.v1.sys.frontend_tls]]
-				cert = """%v"""
-				key = """%v"""
-			[[global.v1.frontend_tls]]
-				cert = """%v"""
-				key = """%v"""
-		`, string(publicCert), string(privateCert), string(publicCert), string(privateCert))
-
+		if sshFlag.automate || sshFlag.chefserver {
+			config := fmt.Sprintf(FRONTEND_CONFIG, string(publicCert), string(privateCert), string(publicCert), string(privateCert))
 			_, err = f.Write([]byte(config))
 			if err != nil {
 				log.Fatal(err)
 			}
 			f.Close()
-			automateIps := infra.Outputs.AutomatePrivateIps.Value
-			if len(automateIps) == 0 {
-				return errors.New("No Automate Ips found")
+
+			var frontendIps []string
+			var remoteService string
+			if sshFlag.automate {
+				frontendIps = infra.Outputs.AutomatePrivateIps.Value
+				remoteService = "automate"
+			} else if sshFlag.chefserver {
+				frontendIps = infra.Outputs.ChefServerPrivateIps.Value
+				remoteService = "chefserver"
+			}
+			if len(frontendIps) == 0 {
+				return errors.New(fmt.Sprintf("No %s Ips found", remoteService))
 			}
 
-			const remoteService string = "automate"
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-			for i := 0; i < len(automateIps); i++ {
-				err := copyFileToRemote(sskKeyFile, fileName, sshUser, automateIps[i], remoteService+timestamp)
+			for i := 0; i < len(frontendIps); i++ {
+				err := copyFileToRemote(sskKeyFile, fileName, sshUser, frontendIps[i], remoteService+timestamp)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err
 				}
-				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[i], scriptCommands)
+				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err
@@ -119,41 +129,6 @@ func certRotate(cmd *cobra.Command, args []string) error {
 				writer.Printf(output)
 			}
 
-		} else if sshFlag.chefserver {
-			config := fmt.Sprintf(`
-			[[load_balancer.v1.sys.frontend_tls]]
-				cert = """%v"""
-				key = """%v"""
-			[[global.v1.frontend_tls]]
-				cert = """%v"""
-				key = """%v"""
-		`, string(publicCert), string(privateCert), string(publicCert), string(privateCert))
-
-			_, err = f.Write([]byte(config))
-			if err != nil {
-				log.Fatal(err)
-			}
-			f.Close()
-			chefserverIps := infra.Outputs.ChefServerPrivateIps.Value
-			if len(chefserverIps) == 0 {
-				return errors.New("No Chef Server Ips found")
-			}
-
-			const remoteService string = "chefserver"
-			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-			for i := 0; i < len(chefserverIps); i++ {
-				err := copyFileToRemote(sskKeyFile, fileName, sshUser, chefserverIps[i], remoteService+timestamp)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
-				}
-				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, chefserverIps[i], scriptCommands)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
-				}
-				writer.Printf(output)
-			}
 		}
 	}
 	return nil
