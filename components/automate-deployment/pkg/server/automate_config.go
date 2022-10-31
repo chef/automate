@@ -421,7 +421,7 @@ func configLogrotate() error {
 		logrus.Errorf("Error occured: %v", err)
 	}
 
-	err = os.WriteFile(configFile, buf.Bytes(), 0666)
+	err = ioutil.WriteFile(configFile, buf.Bytes(), 0666)
 	if err != nil {
 		logrus.Errorf("Error occured while writing to a file: %v", err)
 	}
