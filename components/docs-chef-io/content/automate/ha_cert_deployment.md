@@ -29,7 +29,7 @@ To add a common custom certificate for all the nodes of Chef Automate service, a
 
 ```toml
 [automate.config]
-custom_certs_enabled = true
+enable_custom_certs = true
 root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
 private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
 public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
@@ -41,7 +41,7 @@ To add a common custom certificate for all the nodes of Chef Server service, add
 
 ```toml
 [chef_server.config]
-custom_certs_enabled = true
+enable_custom_certs = true
 private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
 public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
 ```
@@ -52,7 +52,7 @@ To add a common custom certificate for all the nodes of OpenSearch service, add 
 
 ```toml
 [opensearch.config]
-custom_certs_enabled = true
+enable_custom_certs = true
 root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
 private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
 public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
@@ -66,7 +66,7 @@ To add a common custom certificate for all the nodes of PostgreSQL service, add 
 
 ```toml
 [postgresql.config]
-custom_certs_enabled = true
+enable_custom_certs = true
 root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
 private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
 public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
