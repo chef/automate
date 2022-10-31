@@ -116,7 +116,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				err := copyFileToRemote(sskKeyFile, fileName, sshUser, frontendIps[i], remoteService+timestamp)
+				err := copyFileToRemote(sskKeyFile, fileName, sshUser, frontendIps[i], remoteService+timestamp, false)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err
