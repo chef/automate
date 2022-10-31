@@ -287,7 +287,9 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 
 	}
-
+	if err := runLogrotateConfig(); err != nil {
+		return status.Error(codes.Internal, "cannot configure logrotate")
+	}
 	return nil
 }
 
