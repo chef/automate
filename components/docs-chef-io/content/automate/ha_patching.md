@@ -8,14 +8,10 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Patch Configuration"
-    identifier = "automate/deploy_high_availability/ha_patching.md Patch Configuration"
-    parent = "automate/deploy_high_availability"
+    identifier = "automate/deploy_high_availability/deployment/ha_patching.md Patch Configuration"
+    parent = "automate/deploy_high_availability/deployment"
     weight = 75
 +++
-
-{{< warning >}}
-{{% automate/4x-warn %}}
-{{< /warning >}}
 
 Patching new configuration in all nodes can be done from bastion server. This page explains all the argument and flags available using `config patch` command.
 
@@ -34,4 +30,5 @@ chef-automate config patch --< FLAG > < PATH_TO_TOML_FILE >
 
 For Example: `chef-automate config patch --frontend /home/frontend.toml`
 
-{{< note >}} Frontend patch will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node of the cluser.{{< /note >}}
+{{< note >}} Frontend patch will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node 
+of the cluser.{{< /note >}}

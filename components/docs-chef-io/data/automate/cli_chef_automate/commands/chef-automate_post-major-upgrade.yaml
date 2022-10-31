@@ -1,0 +1,22 @@
+name: chef-automate post-major-upgrade
+synopsis: Utilities for post-major-upgrade
+usage: chef-automate post-major-upgrade COMMAND [flags]
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for post-major-upgrade
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI
+- clear-data - Chef Automate post-major-upgrade clear-data
+- migrate - Chef Automate post-major-upgrade migrate

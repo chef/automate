@@ -66,12 +66,14 @@ const (
 	[global.v1.external.postgresql.ssl]
 		enable = true
 		root_cert = """%v"""`
+
 )
 
 func certRotate(cmd *cobra.Command, args []string) error {
 	privateCertPath := certFlags.privateCert
 	publicCertPath := certFlags.publicCert
 	rootCaPath := certFlags.rootCA
+
 	fileName := "cert-rotate.toml"
 	timestamp := time.Now().Format("20060102150405")
 
@@ -151,7 +153,8 @@ func certRotate(cmd *cobra.Command, args []string) error {
 
 			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
 			for i := 0; i < len(frontendIps); i++ {
-				err := copyFileToRemote(sskKeyFile, fileName, sshUser, frontendIps[i], remoteService+timestamp)
+
+				err := copyFileToRemote(sskKeyFile, fileName, sshUser, frontendIps[i], remoteService+timestamp, false)
 				if err != nil {
 					writer.Errorf("%v", err)
 					return err

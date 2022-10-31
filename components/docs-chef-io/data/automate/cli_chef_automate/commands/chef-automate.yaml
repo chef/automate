@@ -24,6 +24,7 @@ see_also:
 - 'airgap - '
 - applications - Manage applications observability features
 - backup - Chef Automate backup
+- cert-rotate - Chef Automate rotate cert
 - config - Chef Automate configuration
 - deploy - Deploy Chef Automate
 - external-cert - Manage Chef Automate's external certificate
@@ -38,6 +39,7 @@ see_also:
 - maintenance - Put Chef Automate into or out of maintenance mode
 - migrate-from-v1 - Migrate from Chef Automate v1
 - migrate-from-v1-status - Watch the status of the migration to Chef Automate 2
+- post-major-upgrade - Utilities for post-major-upgrade
 - preflight-check - Perform preflight check
 - provision-infra - Provision Automate HA infra.
 - restart-services - restart deployment services

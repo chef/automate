@@ -76,7 +76,7 @@ func init() {
 var migrateCmd = &cobra.Command{
 	Use:    "post-major-upgrade COMMAND",
 	Short:  "Utilities for post-major-upgrade",
-	Hidden: true,
+	Hidden: false,
 }
 
 func newClearDataCmd() *cobra.Command {
