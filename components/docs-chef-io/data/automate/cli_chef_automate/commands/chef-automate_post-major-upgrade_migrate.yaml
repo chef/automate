@@ -1,0 +1,42 @@
+name: chef-automate post-major-upgrade migrate
+synopsis: Chef Automate post-major-upgrade migrate
+usage: chef-automate post-major-upgrade migrate [flags]
+description: |
+  Chef Automate migrate. migrate can be used to migrate pg or migrate es
+options:
+- name: ""
+  shorthand: "y"
+  default_value: "false"
+  usage: auto-accept
+- name: check
+  default_value: "false"
+  usage: check
+- name: data
+  usage: data
+- name: force
+  shorthand: f
+  default_value: "false"
+  usage: force-execute
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for migrate
+- name: skip-migration
+  default_value: "false"
+  usage: permanently skiping migration
+- name: skip-storage-check
+  shorthand: s
+  default_value: "false"
+  usage: skip storage check
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate post-major-upgrade - Utilities for post-major-upgrade

@@ -1,0 +1,31 @@
+name: chef-automate post-major-upgrade clear-data
+synopsis: Chef Automate post-major-upgrade clear-data
+usage: chef-automate post-major-upgrade clear-data [flags]
+description: Chef Automate post-major-upgrade to clear old pg data
+options:
+- name: ""
+  shorthand: "y"
+  default_value: "false"
+  usage: auto-accept
+- name: data
+  usage: data
+- name: force
+  shorthand: f
+  default_value: "false"
+  usage: fore-execute
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for clear-data
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate post-major-upgrade - Utilities for post-major-upgrade
