@@ -208,6 +208,91 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 - `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
+## On Premise Setup with AWS Managed Services.
+
+### Prerequisites
+
+- Follow the Prerequisites for On Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
+- You can exclude the creation of instances for OpenSearch and Postgresql as you will be using AWS OpenSearch and AWS RDS Postgresql.
+- Setup AWS RDS Postgresql 13.5. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more. Make sure to open the required port in Security Groups while creating AWS RDS Postgresql.
+- Setup AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
+- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
+- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to know more about VPC and CIDR creation.
+- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
+
+See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine)to run on Bastion to download latest Automate CLI and Airgapped Bundle.
+
+Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) for sample config
+
+- Set AWS Config Details:
+      - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the opensearch_private_ips and postgresql_private_ips empty.
+      - Set `type` as `aws`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+      - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
+      - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
+      - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
+      - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
+      - Leave postgresql_root_cert and opensearch_root_cert as blank in case of On Premise with AWS Managed Services.
+      - For backup and restore configuration set `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#prerequisites) to know more.
+
+Continue with the deployment after updating config:
+```bash
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Verify the data in the config
+   cat config.toml
+
+   #Run deploy command to deploy `automate.aib` with set `config.toml`
+   chef-automate deploy config.toml --airgap-bundle automate.aib
+
+   #After Deployment is done successfully. Check status of Chef Automate HA services
+   chef-automate status
+   ```
+### Sample config to setup On Premise with AWS Managed Services
+
+```config
+# ============== External Datbase Services ======================
+## === INPUT NEEDED ===
+# In case you are trying to deploy with AWS Managed Services set type as "aws"
+# If you are trying external managed database set type as "self-managed"
+[external.database]
+# eg type = "aws" or "self-managed"
+type = "aws"
+[external.database.postgre_sql]
+# eg: instance_url = "managed-rds-db.cww4poze5gkx.ap-northeast-1.rds.amazonaws.com:5432"
+instance_url = ""
+# eg: username = "postgres"
+superuser_username = ""
+# eg: password = "Progress123"
+superuser_password = ""
+# eg: dbuser_username = "postgres"
+dbuser_username = ""
+# eg: dbuser_password = "Progress123"
+dbuser_password = ""
+# eg: postgresql_certificate =
+postgresql_certificate = "<cert content>"
+# In case of AWS managed RDS leave it blank
+postgresql_root_cert = ""
+[external.database.open_search]
+# eg: managed_opensearch_domain_name = "managed-services-os"
+opensearch_domain_name = ""
+# eg: opensearch_domain_url = "search-managed-services-os-eckom3msrwqlmjlgbdu.us-east-1.es.amazonaws.com"
+opensearch_domain_url = ""
+# eg: opensearch_username = "admin"
+opensearch_username = ""
+# eg: opensearch_user_password = "Progress@123"
+opensearch_user_password = ""
+# eg: managed_opensearch_certificate = "<cert content>"
+opensearch_certificate = "<cert content>"
+# In case of AWS managed opensearch leave it blank
+opensearch_root_cert = ""
+[external.database.open_search.aws]
+# eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
+aws_os_snapshot_role_arn = ""
+# eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
+os_snapshot_user_access_key_id = ""
+# eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
+os_snapshot_user_access_key_secret = ""
+```
 ### How To Add More Nodes to the On-Prem Deployment
 
 - Open the `config.toml` at bastion node
