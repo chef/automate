@@ -348,7 +348,7 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 
 func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, hostIP string, destFileName string) error {
 	cmd := "scp"
-	exec_args := []string{"-o StrictHostKeyChecking=off", "-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
+	exec_args := []string{"-o StrictHostKeyChecking=no", "-i", sshKeyFile, "-r", tomlFilePath, sshUser + "@" + hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
 		writer.Print("Failed to copy TOML file to remote\n")
 		return err
