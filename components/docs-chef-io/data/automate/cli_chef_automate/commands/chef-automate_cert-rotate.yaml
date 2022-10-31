@@ -1,0 +1,37 @@
+name: chef-automate cert-rotate
+synopsis: Chef Automate rotate cert
+usage: chef-automate cert-rotate [flags]
+description: Chef Automate CLI command to rotate certificates
+options:
+- name: a2
+  default_value: "false"
+  usage: Automate Certificate Rotation
+- name: automate
+  default_value: "false"
+  usage: Automate Certificate Rotation
+- name: chefserver
+  default_value: "false"
+  usage: Chef Infra Server Certificate Rotation
+- name: cs
+  default_value: "false"
+  usage: Chef Infra Server Certificate Rotation
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for cert-rotate
+- name: private-cert
+  usage: Private certificate
+- name: public-cert
+  usage: Public certificate
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI
