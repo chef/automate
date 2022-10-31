@@ -59,8 +59,8 @@ instance_count = ""
 # teams_port = ""
 config_file = "configs/automate.toml"
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add Automate load balancer root-ca and keys
 # root_ca = ""
 # private_key = ""
@@ -73,8 +73,8 @@ custom_certs_enabled = false
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add Chef Server load balancer root-ca and keys
 # private_key = ""
 # public_key = ""
@@ -88,8 +88,8 @@ custom_certs_enabled = false
 # No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add OpenSearch load balancer root-ca and keys
 # root_ca = ""
 # admin_key = ""
@@ -105,8 +105,8 @@ custom_certs_enabled = false
 # No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add Postgresql load balancer root-ca and keys
 # root_ca = ""
 # private_key = ""
@@ -360,8 +360,8 @@ instance_count = ""
 # teams_port = ""
 config_file = "configs/automate.toml"
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add Automate load balancer root-ca and keys
 # root_ca = ""
 # private_key = ""
@@ -373,8 +373,8 @@ custom_certs_enabled = false
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
 instance_count = ""
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add Chef Server load balancer root-ca and keys
 # private_key = ""
 # public_key = ""
@@ -387,8 +387,8 @@ custom_certs_enabled = false
 # No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add OpenSearch load balancer root-ca and keys
 # root_ca = ""
 # admin_key = ""
@@ -404,8 +404,8 @@ custom_certs_enabled = false
 # No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
 instance_count = ""
 
-# Set custom_certs_enabled = true to provide custom certificates during deployment
-custom_certs_enabled = false
+# Set enable_custom_certs = true to provide custom certificates during deployment
+enable_custom_certs = false
 # Add postgresql load balancer root-ca and keys
 # root_ca = ""
 # private_key = ""

@@ -53,7 +53,7 @@ func (e *existingInfra) generateConfig() error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
 	}
-	if e.config.Opensearch.Config.CustomCertsEnabled {
+	if e.config.Opensearch.Config.EnableCustomCerts {
 		admin_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
 		if err != nil {
 			return err
@@ -168,33 +168,33 @@ func (e *existingInfra) validateConfigFields() *list.List {
 
 func (e *existingInfra) validateCerts() *list.List {
 	errorList := list.New()
-	if e.config.Automate.Config.CustomCertsEnabled {
+	if e.config.Automate.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(e.config.Automate.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Set enable_custom_certs to false to continue without custom certificates.")
 		}
 	}
-	if e.config.ChefServer.Config.CustomCertsEnabled {
+	if e.config.ChefServer.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(e.config.ChefServer.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.ChefServer.Config.PublicKey)) < 1 {
-			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Set enable_custom_certs to false to continue without custom certificates.")
 		}
 	}
-	if e.config.Postgresql.Config.CustomCertsEnabled {
+	if e.config.Postgresql.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(e.config.Postgresql.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(e.config.Postgresql.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Postgresql.Config.PublicKey)) < 1 {
-			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Set enable_custom_certs to false to continue without custom certificates.")
 		}
 	}
-	if e.config.Opensearch.Config.CustomCertsEnabled {
+	if e.config.Opensearch.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(e.config.Opensearch.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.AdminKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) < 1 {
-			errorList.PushBack("Opensearch RootCA and/or Public Key and/or Private Key are missing. Otherwise set custom_certs_enabled to false.")
+			errorList.PushBack("Opensearch RootCA and/or Public Key and/or Private Key are missing. Otherwise set enable_custom_certs to false.")
 		}
 	}
 	return errorList
