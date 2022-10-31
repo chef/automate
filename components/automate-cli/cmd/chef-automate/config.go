@@ -388,7 +388,8 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	defer f.Close()
 
 	knownHosts := knownhosts.Normalize(remote.String())
-	_, fileErr := f.WriteString(knownhosts.Line([]string{"\n", knownHosts}, pubKey))
+	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	f.WriteString("\n")
 	return fileErr
 }
 
