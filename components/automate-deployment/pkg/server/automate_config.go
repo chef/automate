@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -399,15 +398,8 @@ func configLogrotate() error {
 	}
 	defer file.Close()
 
-	// Read the configure file and paste it in /etc/logrotate.d/automate
-	byteSlice, err := ioutil.ReadFile("components/automate-deployment/logrotate.conf")
-	if err != nil {
-		logrus.Errorf("cannot read the file: %v", err)
-		return err
-	}
-
 	// Write the byteSlice to file
-	noOfBytes, err := file.Write(byteSlice)
+	noOfBytes, err := file.WriteString(logRotate)
 	if err != nil {
 		logrus.Errorf("cannot write the byte slice to the file: %v", err)
 		return err
