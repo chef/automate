@@ -20,6 +20,7 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_password ""
 
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
+### type "{{ .ExternalDB.Database.Type}}"
 
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
@@ -97,6 +98,27 @@ object_storage do
   endpoint "{{ .ObjectStorage.Config.Endpoint }}"
   region "{{ .ObjectStorage.Config.Region }}"
 end
+
+managed_aws do
+  {{ if  or (eq .ExternalDB.Database.Type "aws") (eq .ExternalDB.Database.Type "self-managed") }}setup_managed_services true {{ else}} setup_managed_services false {{ end}}
+  {{ if (eq .ExternalDB.Database.Type "self-managed")}}setup_self_managed_services true {{ else}}setup_self_managed_services false {{ end}}
+  opensearch_domain_name "{{ .ExternalDB.Database.Opensearch.OpensearchDomainName}}" 
+  opensearch_domain_url "{{ .ExternalDB.Database.Opensearch.OpensearchInstanceURL}}"
+  opensearch_username "{{ .ExternalDB.Database.Opensearch.OpensearchSuperUserName}}"
+  opensearch_user_password "{{ .ExternalDB.Database.Opensearch.OpensearchSuperUserPassword}}"
+  {{ if (eq .ExternalDB.Database.Type "aws") }}opensearch_certificate "{{ .ExternalDB.Database.Opensearch.OpensearchCertificate}}" {{else}}#opensearch_certificate "{{ .ExternalDB.Database.Opensearch.OpensearchCertificate}}" {{end}}
+  {{ if (eq .ExternalDB.Database.Type "aws") }}aws_os_snapshot_role_arn "{{ .ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn}}" {{ else }}#aws_os_snapshot_role_arn "{{ .ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn}}" {{ end }}
+  {{ if (eq .ExternalDB.Database.Type "aws") }}os_snapshot_user_access_key_id "{{ .ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId}}" {{ else }}#os_snapshot_user_access_key_id "{{ .ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId}}" {{ end }}
+  {{ if (eq .ExternalDB.Database.Type "aws") }}os_snapshot_user_access_key_secret "{{ .ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret}}" {{ else }}#os_snapshot_user_access_key_secret "{{ .ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret}}" {{ end }}
+  instance_url "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL }}"
+  superuser_username "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName}}"
+  superuser_password "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword}}"
+  dbuser_username "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName}}"
+  dbuser_password "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword}}"
+  {{ if (eq .ExternalDB.Database.Type "aws") }}postgresql_certificate "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLCertificate}}" {{ else }}#postgresql_certificate "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLCertificate}}" {{ end }}
+  {{ if (eq .ExternalDB.Database.Type "self-managed") }}postgresql_root_cert "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLRootCert}}" {{ else }}#postgresql_root_cert "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLRootCert}}" {{ end }}
+  {{ if (eq .ExternalDB.Database.Type "self-managed") }}opensearch_root_cert "{{ .ExternalDB.Database.Opensearch.OpensearchRootCert}}" {{ else}}#opensearch_root_cert "{{ .ExternalDB.Database.Opensearch.OpensearchRootCert}}" {{ end}}
+end  
 `
 
 const awsA2harbTemplate = `

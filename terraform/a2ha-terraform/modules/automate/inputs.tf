@@ -110,6 +110,10 @@ variable "managed_opensearch_certificate" {
   default = ""
 }
 
+variable "managed_opensearch_domain_name" {
+  default = ""
+}
+
 variable "managed_opensearch_domain_url" {
   default = ""
 }
@@ -165,6 +169,9 @@ variable "opensearch_private_ips" {
 variable "opensearch_root_ca" {
 }
 
+variable "opensearch_root_cert" {
+}
+
 variable "os_snapshot_user_access_key_id" {
   default = ""
 }
@@ -182,6 +189,9 @@ variable "postgresql_private_ips" {
 }
 
 variable "postgresql_root_ca" {
+}
+
+variable "postgresql_root_cert" {
 }
 
 variable "postgresql_ssl_enable" {
@@ -207,6 +217,10 @@ variable "secret_key" {
 }
 
 variable "setup_managed_services" {
+  default = false
+}
+
+variable "setup_self_managed_services" {
   default = false
 }
 

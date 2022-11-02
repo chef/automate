@@ -158,6 +158,10 @@ variable "opensearch_public_ips" {
   default = []
 }
 
+variable "opensearch_root_cert" {
+    default = ""
+}
+
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
@@ -186,6 +190,10 @@ variable "postgresql_private_ips" {
   default = []
 }
 
+variable "postgresql_root_cert" {
+  default = ""
+}
+
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
@@ -195,6 +203,10 @@ variable "s3_endpoint" {
 }
 
 variable "setup_managed_services" {
+  default = false
+}
+
+variable "setup_self_managed_services" {
   default = false
 }
 
