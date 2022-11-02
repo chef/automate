@@ -284,6 +284,11 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			return status.Error(codes.Internal, "Failed to restart syslog service while removing config file for syslog")
 		}
 
+		if err = rollbackLogrotate(); err != nil {
+			logrus.Errorf("cannot rollback logrotate: %v", err)
+			return err
+		}
+
 	}
 
 	return nil
@@ -313,6 +318,11 @@ func createConfigFileForAutomateSysLog() error {
 	if err2 != nil {
 		fmt.Println("Unable to create config with error ", err2)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
+	}
+
+	if err = runLogrotateConfig(); err != nil {
+		logrus.Error("****************** ERROR: ", err)
+		return err
 	}
 
 	return nil
@@ -404,4 +414,8 @@ func configLogrotate() error {
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 	return nil
+}
+
+func rollbackLogrotate() error {
+	return os.Remove("/etc/logrotate.d/automate")
 }
