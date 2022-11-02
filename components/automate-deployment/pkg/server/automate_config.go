@@ -2,6 +2,11 @@ package server
 
 import (
 	"context"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
@@ -10,10 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
-	"os"
-	"os/exec"
-	"strings"
 )
 
 const (
@@ -23,8 +24,11 @@ const (
 	logRotate     = `
 /var/log/automate.log {
     daily
+	dateext
     rotate 5
-    size 10M
+    size 5k
+	copytruncate
+    missingok
 }
 `
 )
@@ -406,9 +410,10 @@ func configLogrotate() error {
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 
-	_, err = exec.Command("bash", "-c", "logrotate -vf /etc/logrotate.conf").CombinedOutput()
+	_, err = exec.Command("bash", "-c", "logrotate /etc/logrotate.conf").CombinedOutput()
 	if err != nil {
 		logrus.Errorf("Unable to run logrotate: %v", err)
+		// return err
 	}
 
 	return nil
