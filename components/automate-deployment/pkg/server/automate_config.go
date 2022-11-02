@@ -400,7 +400,7 @@ func configLogrotate() error {
 	defer file.Close()
 
 	// Read the configure file and paste it in /etc/logrotate.d/automate
-	byteSlice, err := ioutil.ReadFile("logconf.conf")
+	byteSlice, err := ioutil.ReadFile("components/automate-deployment/logrotate.conf")
 	if err != nil {
 		logrus.Errorf("cannot read the file: %v", err)
 		return err
@@ -413,6 +413,13 @@ func configLogrotate() error {
 		return err
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
+
+	_, err = exec.Command("bash", "-c", "logrotate -f /etc/logrotate.conf").Output()
+	if err != nil {
+		fmt.Println("Unable to run logrotate with error ", err)
+		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart rsyslog").Error())
+	}
+
 	return nil
 }
 
