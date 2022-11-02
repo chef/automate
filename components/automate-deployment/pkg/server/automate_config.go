@@ -23,6 +23,13 @@ const (
 	logFilePath   = "/var/log/automate.log"
 	configFile    = "/etc/logrotate.conf"
 	logRotateConf = "components/automate-deployment/logrotate.conf"
+	logRotate     = `
+/var/log/automate.log {
+    daily
+    rotate 5
+    size 10M
+}
+`
 )
 
 var rsyslogConfigFile = "/etc/rsyslog.d/automate.conf"
