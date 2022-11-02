@@ -222,7 +222,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) for sample config
+Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-with-aws-managed-services) for sample config of AWS Managed Services.
 
 - Set AWS Config Details:
     - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
@@ -268,9 +268,8 @@ superuser_password = ""
 dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
-# eg: postgresql_certificate =
-postgresql_certificate = "<cert content>"
 # In case of AWS managed RDS leave it blank
+# eg: postgresql_root_cert = "cert_content>"
 postgresql_root_cert = ""
 [external.database.open_search]
 # eg: managed_opensearch_domain_name = "managed-services-os"
@@ -281,9 +280,8 @@ opensearch_domain_url = ""
 opensearch_username = ""
 # eg: opensearch_user_password = "Progress@123"
 opensearch_user_password = ""
-# eg: managed_opensearch_certificate = "<cert content>"
-opensearch_certificate = "<cert content>"
 # In case of AWS managed opensearch leave it blank
+# eg: opensearch_root_cert = "<cert_content>"
 opensearch_root_cert = ""
 [external.database.open_search.aws]
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
@@ -303,7 +301,7 @@ os_snapshot_user_access_key_secret = ""
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) for sample config
+Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-with-self-managed-services) for sample config for Self Managed Services.
 
 - Set Self Managed Config Details:
     - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
@@ -350,12 +348,11 @@ superuser_password = ""
 dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
-# eg: postgresql_certificate =
-postgresql_certificate = "<cert content>"
 # In case of AWS managed RDS leave it blank
+# eg: postgresql_root_cert = "cert_content>"
 postgresql_root_cert = ""
 [external.database.open_search]
-# eg: managed_opensearch_domain_name = "managed-services-os"
+# eg: managed_opensearch_domain_name = "chefnode"
 opensearch_domain_name = ""
 # eg: opensearch_domain_url = "A.B.C.D:9200"
 opensearch_domain_url = ""
@@ -363,9 +360,8 @@ opensearch_domain_url = ""
 opensearch_username = ""
 # eg: opensearch_user_password = "Progress@123"
 opensearch_user_password = ""
-# eg: managed_opensearch_certificate = "<cert content>"
-opensearch_certificate = "<cert content>"
 # In case of AWS managed opensearch leave it blank
+# eg: opensearch_root_cert = "<cert_content>"
 opensearch_root_cert = ""
 [external.database.open_search.aws]
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
