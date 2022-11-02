@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"io/ioutil"
 	"reflect"
 	"regexp"
@@ -224,7 +223,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-//setConfigForFrontEndNodes patches the configuration for front end nodes in Automate HA
+// setConfigForFrontEndNodes patches the configuration for front end nodes in Automate HA
 func setConfigForFrontEndNodes(args []string, sshUser string, sskKeyFile string, sshPort string, frontendIps []string, remoteService string, timestamp string) error {
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
 	for i := 0; i < len(frontendIps); i++ {
@@ -244,7 +243,7 @@ func setConfigForFrontEndNodes(args []string, sshUser string, sskKeyFile string,
 	return nil
 }
 
-//setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
+// setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
 func setConfigForPostgresqlNodes(args []string, remoteService string, sshUser string, sshPort string, sskKeyFile string, infra *AutomteHAInfraDetails, timestamp string) error {
 	//checking for log configuration
 	err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value)
@@ -287,7 +286,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUser st
 	return nil
 }
 
-//setConfigForOpensearch patches the config for open-search nodes in Automate HA
+// setConfigForOpensearch patches the config for open-search nodes in Automate HA
 func setConfigForOpensearch(args []string, remoteService string, sshUser string, sshPort string, sskKeyFile string, infra *AutomteHAInfraDetails, timestamp string) error {
 	//checking for log configuration
 	err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value)
@@ -329,76 +328,6 @@ func setConfigForOpensearch(args []string, remoteService string, sshUser string,
 		writer.Println("There is no change in the configuration")
 	}
 	return nil
-}
-
-func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
-
-	pemBytes, err := ioutil.ReadFile(sshKeyFile) // nosemgrep
-	if err != nil {
-		writer.Errorf("Unable to read private key: %v", err)
-		return "", err
-	}
-	signer, err := ssh.ParsePrivateKey(pemBytes)
-	if err != nil {
-		writer.Errorf("Parsing key failed: %v", err)
-		return "", err
-	}
-	var (
-		keyErr *knownhosts.KeyError
-	)
-
-	// Client config
-	config := &ssh.ClientConfig{
-		User: sshUser,
-		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
-			kh := checkKnownHosts()
-			hErr := kh(host, remote, pubKey)
-			// Reference: https://blog.golang.org/go1.13-errors
-			// To understand what errors.As is.
-			if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
-				// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
-				// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
-				// and if host is known then there is key mismatch the connection is then rejected.
-				writer.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
-				return keyErr
-			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
-				// host key not found in known_hosts then give a warning and continue to connect.
-				// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
-				return addHostKey(host, remote, pubKey)
-			}
-			// writer.Printf("Pub key exists for %s.\n", host)
-			return nil
-		}),
-	}
-
-	// Open connection
-	conn, err := ssh.Dial("tcp", hostIP+":"+sshPort, config)
-	if conn == nil || err != nil {
-		writer.Errorf("dial failed:%v", err)
-		return "", err
-	}
-	defer conn.Close()
-
-	// Open session
-	session, err := conn.NewSession()
-	if err != nil {
-		writer.Errorf("session failed:%v", err)
-		return "", err
-	}
-	var stdoutBuf bytes.Buffer
-	session.Stdout = &stdoutBuf
-
-	writer.StartSpinner()
-	err = session.Run(remoteCommands)
-
-	writer.StopSpinner()
-	if err != nil {
-		writer.Errorf("Run failed:%v", err)
-		return "", err
-	}
-	defer session.Close()
-	return stdoutBuf.String(), nil
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
@@ -579,7 +508,7 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	return tomlFile, nil
 }
 
-//getConfigFromRemoteServer gets the config for remote server using the commands
+// getConfigFromRemoteServer gets the config for remote server using the commands
 func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, config string) (string, error) {
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
@@ -594,7 +523,7 @@ func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, 
 	return rawOutput, nil
 }
 
-//getDecodedConfig gets the decoded config from the input
+// getDecodedConfig gets the decoded config from the input
 func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 	if remoteService == postgresql {
 		var src PostgresqlConfig
@@ -614,7 +543,7 @@ func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 	return nil, nil
 }
 
-//getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
+// getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
 func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
 	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
 	if err != nil {
@@ -639,7 +568,7 @@ func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string)
 
 }
 
-//isConfigChanged checks if configuration is changed
+// isConfigChanged checks if configuration is changed
 func isConfigChanged(src interface{}, dest interface{}) bool {
 	if reflect.DeepEqual(src, dest) {
 		return false
@@ -647,7 +576,7 @@ func isConfigChanged(src interface{}, dest interface{}) bool {
 	return true
 }
 
-//getExistingAndRequestedConfigForPostgres get requested and existing config for postgresql
+// getExistingAndRequestedConfigForPostgres get requested and existing config for postgresql
 func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInfraDetails, config string) (PostgresqlConfig, PostgresqlConfig, error) {
 	//Getting Existing config from server
 	var existingConfig PostgresqlConfig
@@ -672,7 +601,7 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInf
 	return existingConfig, reqConfig, nil
 }
 
-//getExistingAndRequestedConfigForOpenSearch gets existed and requested config for opensearch
+// getExistingAndRequestedConfigForOpenSearch gets existed and requested config for opensearch
 func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAInfraDetails, config string) (OpensearchConfig, OpensearchConfig, error) {
 	//Getting Existing config from server
 	var existingConfig OpensearchConfig
@@ -698,7 +627,7 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAI
 	return existingConfig, reqConfig, nil
 }
 
-//createTomlFileFromConfig created a toml file where path and struct interface is provided
+// createTomlFileFromConfig created a toml file where path and struct interface is provided
 func createTomlFileFromConfig(config interface{}, tomlFile string) (string, error) {
 	f, err := os.Create(tomlFile)
 

@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
+	flag "github.com/spf13/pflag"
 )
 
 const restoreRecovery = `Check the logs (journalctl -u chef-automate) for errors related
@@ -37,6 +38,15 @@ Under normal circumstances, restoring over an existing Chef Automate installatio
 some services are down will work correctly. If such a restore does not work correctly, ensure that
 either all services are up (chef-automate restart-services)
 or all services are down (chef-automate stop) before retrying the restore.`
+
+var allPassedFlags string = ""
+
+type BackupFromBashtion interface {
+	isBastionHost() bool
+	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails) error
+}
+
+type BackupFromBashtionImp struct{}
 
 var backupCmdFlags = struct {
 	noProgress     bool
@@ -136,8 +146,9 @@ func init() {
 }
 
 var backupCmd = &cobra.Command{
-	Use:   "backup COMMAND",
-	Short: "Chef Automate backup",
+	Use:               "backup COMMAND",
+	Short:             "Chef Automate backup",
+	PersistentPreRunE: preBackupCmd,
 }
 
 var createBackupCmd = &cobra.Command{
@@ -230,6 +241,41 @@ var integrityBackupValidateCmd = &cobra.Command{
 	Short: "validate the shared object integrity",
 	Long:  "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
 	RunE:  runValidateBackupIntegrity,
+}
+
+func preBackupCmd(cmd *cobra.Command, args []string) error {
+	if NewBackupFromBashtion().isBastionHost() {
+		//TODO need to handle airgap bundle path from bastion host
+		//TODO need to handle parallel execution
+		//TODO how to pass missing opensearch credentials
+		//TODO handle --no-progress for status, show, cancel commands etc.
+		//TODO 
+		allPassedFlags = ""
+		cmd.Flags().Visit(checkFlags)
+		commandString := cmd.CommandPath() + " "
+		if len(args) > 0 {
+			for _, ar := range args {
+				commandString = commandString + ar + " "
+			}
+		}
+		commandString = commandString + "--no-progress "
+		commandString = commandString + allPassedFlags
+		fmt.Println(commandString)
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
+			return err
+			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
+		}
+		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra)
+		if err != nil {
+			return err
+			//return status.Errorf(status.BackupRestoreError, "error in executing on remote machines", err)
+		}
+		// used os.exit as need to stop next lifecycle method to execute
+		os.Exit(1)
+	}
+	return nil
 }
 
 func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
@@ -730,6 +776,10 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 	return parsedBackups[0].task, nil
 }
 
+func checkFlags(f *flag.Flag) {
+	allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
+}
+
 // nolint: gocyclo
 func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
@@ -970,4 +1020,47 @@ func idsToBackupTasks(args []string) ([]*api.BackupTask, error) {
 	}
 
 	return ids, nil
+}
+
+func NewBackupFromBashtion() BackupFromBashtion {
+	return &BackupFromBashtionImp{}
+}
+
+func (ins *BackupFromBashtionImp) isBastionHost() bool {
+	if isA2HARBFileExist() {
+		return true
+	}
+	return false
+}
+
+func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails) error {
+	//res, err := ConnectAndExecuteCommandOnRemote()
+	sshUser := infra.Outputs.SSHUser.Value
+	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshPort := infra.Outputs.SSHPort.Value
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	if automateIps == nil || len(automateIps) < 1 {
+		return status.Errorf(status.ConfigError, "Invalid deployment config")
+	}
+	res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
+	if err != nil {
+		writer.Errorf("error in executing backup commands in Automate remote from bashtion %s \n", err.Error())
+		return err
+	}
+	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", res)
+	// pooling job
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	for {
+		res, err = ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "chef-automate backup status")
+		if err != nil || ctx.Err() != nil {
+			writer.Errorf("error in polling backup status %s \n", err.Error())
+			return err
+		}
+		writer.Println(res)
+		if res == "ideal" {
+			break
+		}
+	}
+	return nil
 }
