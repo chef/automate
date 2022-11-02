@@ -2,17 +2,35 @@ package server
 
 import (
 	"context"
-	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/pkg/errors"
-	"os"
-	"os/exec"
-
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+)
+
+const (
+	logFilePath   = "/var/log/automate.log"
+	configFile    = "/etc/logrotate.conf"
+	logRotateConf = "components/automate-deployment/logrotate.conf"
+	logRotate     = `
+/var/log/automate.log {
+    daily
+	dateext
+    rotate 5
+    size 5k
+	copytruncate
+    missingok
+}
+`
 )
 
 var rsyslogConfigFile = "/etc/rsyslog.d/automate.conf"
@@ -73,8 +91,6 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 		if err != nil {
 			return status.Error(codes.FailedPrecondition, "Unable to determine existing configuration hash")
 		}
-
-		fmt.Println("Existing value ", existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
 
 		// Compare our existing configurations hash with the hash of the configuration
 		// that was returned to the client when the request was initiated. If
@@ -259,6 +275,11 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		if err != nil {
 			return status.Error(codes.Internal, "Failed to restart syslog service")
 		}
+
+		if err = runLogrotateConfig(); err != nil {
+			logrus.Errorf("cannot configure log rotate: %v", err)
+			return err
+		}
 	}
 
 	//Rollback the config if requested
@@ -273,6 +294,11 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			return status.Error(codes.Internal, "Failed to restart syslog service while removing config file for syslog")
 		}
 
+		if err = rollbackLogrotate(); err != nil {
+			logrus.Errorf("cannot rollback logrotate: %v", err)
+			return err
+		}
+
 	}
 
 	return nil
@@ -281,7 +307,6 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 func restartSyslogService() error {
 	_, err := exec.Command("bash", "-c", "systemctl restart rsyslog.service").Output()
 	if err != nil {
-		fmt.Println("Unable to restart syslog service with error ", err)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart rsyslog").Error())
 	}
 
@@ -300,7 +325,6 @@ func createConfigFileForAutomateSysLog() error {
 	_, err2 := f.WriteString("if $programname == 'hab' then /var/log/automate.log\n& stop\n")
 
 	if err2 != nil {
-		fmt.Println("Unable to create config with error ", err2)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
 	}
 
@@ -315,4 +339,86 @@ func removeConfigFileForAutomateSyslog() error {
 	}
 
 	return nil
+}
+
+// runLogrotateConfig() to initiate logrotate setup
+func runLogrotateConfig() error {
+	if err := logrotateConfChecks(); err != nil {
+		logrus.Error("Logrotate isn't setup!")
+		log.Println(`
+		*********************** To Install logrotate Run ***********************
+		Ubuntu: sudo apt install logrotate
+		RHEL: sudo rpm install logrotate	
+		`)
+		// return err
+	}
+
+	if err := configLogrotate(); err != nil {
+		logrus.Errorf("Error while configuring logrotate: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func logrotateConfChecks() error {
+	_, err := exec.Command("logrotate").Output()
+	if strings.Contains(err.Error(), "executable file not found") {
+		log.Printf("The system doesn't have logrotate installed, %v", err)
+		return err
+	}
+
+	// Check for the logrotate.conf and rsyslog.conf existance
+	if _, err := os.Stat("/etc/logrotate.conf"); errors.Is(err, os.ErrNotExist) {
+		log.Printf("The system doesn't seem to have logrotate installed or configured: %v", err)
+		return err
+	}
+
+	if _, err := os.Stat("/etc/rsyslog.conf"); errors.Is(err, os.ErrNotExist) {
+		log.Printf("The system doesn't seem to have rsyslog  configured: %v", err)
+		return err
+	}
+
+	// Check for the logrotate.d and rsyslog.conf existance
+	if _, err := os.Stat("/etc/logrotate.d"); errors.Is(err, os.ErrNotExist) {
+		log.Printf("The system doesn't seem to have logrotate.d dir: %v", err)
+		return err
+	}
+
+	// Check for the rsyslog.conf and rsyslog.conf existance
+	if _, err := os.Stat("/etc/rsyslog.d"); errors.Is(err, os.ErrNotExist) {
+		log.Printf("The system doesn't seem to have rsyslog.d dir: %v", err)
+		return err
+	}
+	return nil
+}
+
+func configLogrotate() error {
+	// Create a file in /etc/logrotate.d/automate
+	file, err := os.Create("/etc/logrotate.d/automate")
+	if err != nil {
+		logrus.Errorf("cannot create a file: %v", err)
+		return err
+	}
+	defer file.Close()
+
+	// Write the byteSlice to file
+	noOfBytes, err := file.WriteString(logRotate)
+	if err != nil {
+		logrus.Errorf("cannot write the byte slice to the file: %v", err)
+		return err
+	}
+	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
+
+	_, err = exec.Command("bash", "-c", "logrotate /etc/logrotate.conf").CombinedOutput()
+	if err != nil {
+		logrus.Errorf("Unable to run logrotate: %v", err)
+		// return err
+	}
+
+	return nil
+}
+
+func rollbackLogrotate() error {
+	return os.Remove("/etc/logrotate.d/automate")
 }
