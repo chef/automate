@@ -205,7 +205,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService)
+			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService, GET_CONFIG)
 			if err != nil {
 				return err
 			}
@@ -227,7 +227,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 		if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
-			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService)
+			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService, GET_CONFIG)
 			if err != nil {
 				return err
 			}
@@ -396,7 +396,8 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	defer f.Close()
 
 	knownHosts := knownhosts.Normalize(remote.String())
-	_, fileErr := f.WriteString(knownhosts.Line([]string{"\n", knownHosts}, pubKey))
+	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	f.WriteString("\n")
 	return fileErr
 }
 
@@ -464,14 +465,14 @@ func cleanToml(rawData string) string {
 	return tomlOutput
 }
 
-func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string) (string, error) {
+func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string, config string) (string, error) {
 	tomlFile := args[0] + timestamp
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
-	scriptCommands := fmt.Sprintf(GET_CONFIG, remoteService)
+	scriptCommands := fmt.Sprintf(config, remoteService)
 	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
 	if err != nil {
 		return "", err

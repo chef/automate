@@ -145,48 +145,48 @@ type OpensearchConfig struct {
 }
 
 type PostgresqlConfig struct {
-	CheckpointCompletionTarget float64 `protobuf:"bytes,,opt,name=checkpoint_completion_target,proto3" toml:"checkpoint_completion_target,omitempty" json:"checkpoint_completion_target,omitempty" mapstructure:"checkpoint_completion_target,omitempty"`
+	CheckpointCompletionTarget float64 `protobuf:"bytes,,opt,name=checkpoint_completion_target,proto3" toml:"checkpoint_completion_target,omitzero" json:"checkpoint_completion_target,omitzero" mapstructure:"checkpoint_completion_target,omitzero"`
 	CheckpointTimeout          string  `protobuf:"bytes,,opt,name=checkpoint_timeout,proto3" toml:"checkpoint_timeout,omitempty" json:"checkpoint_timeout,omitempty" mapstructure:"checkpoint_timeout,omitempty"`
 	Host                       string  `protobuf:"bytes,,opt,name=host,proto3" toml:"host,omitempty" json:"host,omitempty" mapstructure:"host,omitempty"`
 	LogLevel                   string  `protobuf:"bytes,,opt,name=log_level,proto3" toml:"log_level,omitempty" json:"log_level,omitempty" mapstructure:"log_level,omitempty"`
 	LogLinePrefix              string  `protobuf:"bytes,,opt,name=log_line_prefix,proto3" toml:"log_line_prefix,omitempty" json:"log_line_prefix,omitempty" mapstructure:"log_line_prefix,omitempty"`
 	LoggingCollector           string  `protobuf:"bytes,,opt,name=logging_collector,proto3" toml:"logging_collector,omitempty" json:"logging_collector,omitempty" mapstructure:"logging_collector,omitempty"`
-	MaxConnections             int     `protobuf:"bytes,,opt,name=max_connections,proto3" toml:"max_connections,omitempty" json:"max_connections,omitempty" mapstructure:"max_connections,omitempty"`
-	MaxLocksPerTransaction     int     `protobuf:"bytes,,opt,name=max_locks_per_transaction,proto3" toml:"max_locks_per_transaction,omitempty" json:"max_locks_per_transaction,omitempty" mapstructure:"max_locks_per_transaction,omitempty"`
+	MaxConnections             int     `protobuf:"bytes,,opt,name=max_connections,proto3" toml:"max_connections,omitzero" json:"max_connections,omitzero" mapstructure:"max_connections,omitzero"`
+	MaxLocksPerTransaction     int     `protobuf:"bytes,,opt,name=max_locks_per_transaction,proto3" toml:"max_locks_per_transaction,omitzero" json:"max_locks_per_transaction,omitzero" mapstructure:"max_locks_per_transaction,omitzero"`
 	MaxWalSize                 string  `protobuf:"bytes,,opt,name=max_wal_size,proto3" toml:"max_wal_size,omitempty" json:"max_wal_size,omitempty" mapstructure:"max_wal_size,omitempty"`
 	MinWalSize                 string  `protobuf:"bytes,,opt,name=min_wal_size,proto3" toml:"min_wal_size,omitempty" json:"min_wal_size,omitempty" mapstructure:"min_wal_size,omitempty"`
-	Port                       int     `protobuf:"bytes,,opt,name=port,proto3" toml:"port,omitempty" json:"port,omitempty" mapstructure:"port,omitempty"`
+	Port                       int     `protobuf:"bytes,,opt,name=port,proto3" toml:"port,omitzero" json:"port,omitzero" mapstructure:"port,omitzero"`
 	PrintDbStatistics          bool    `protobuf:"bytes,,opt,name=print_db_statistics,proto3" toml:"print_db_statistics,omitempty" json:"print_db_statistics,omitempty" mapstructure:"print_db_statistics,omitempty"`
-	WalKeepSize                int     `protobuf:"bytes,,opt,name=wal_keep_size,proto3" toml:"wal_keep_size,omitempty" json:"wal_keep_size,omitempty" mapstructure:"wal_keep_size,omitempty"`
-	PgDump                     struct {
+	WalKeepSize                int     `protobuf:"bytes,,opt,name=wal_keep_size,proto3" toml:"wal_keep_size,omitzero" json:"wal_keep_size,omitzero" mapstructure:"wal_keep_size,omitzero"`
+	PgDump                     *struct {
 		Enable bool   `protobuf:"bytes,,opt,name=enable,proto3" toml:"enable,omitempty" json:"enable,omitempty" mapstructure:"enable,omitempty"`
 		Path   string `protobuf:"bytes,,opt,name=path,proto3" toml:"path,omitempty" json:"path,omitempty" mapstructure:"path,omitempty"`
 	} `protobuf:"bytes,,opt,name=pg_dump,proto3" toml:"pg_dump,omitempty" json:"pg_dump,omitempty" mapstructure:"pg_dump,omitempty"`
-	Replication struct {
-		LagHealthThreshold         int    `protobuf:"bytes,,opt,name=lag_health_threshold,proto3" toml:"lag_health_threshold,omitempty" json:"lag_health_threshold,omitempty" mapstructure:"lag_health_threshold,omitempty"`
-		MaxReplayLagBeforeRestartS int    `protobuf:"bytes,,opt,name=max_replay_lag_before_restart_s,proto3" toml:"max_replay_lag_before_restart_s,omitempty" json:"max_replay_lag_before_restart_s,omitempty" mapstructure:"max_replay_lag_before_restart_s,omitempty"`
+	Replication *struct {
+		LagHealthThreshold         int    `protobuf:"bytes,,opt,name=lag_health_threshold,proto3" toml:"lag_health_threshold,omitzero" json:"lag_health_threshold,omitzero" mapstructure:"lag_health_threshold,omitzero"`
+		MaxReplayLagBeforeRestartS int    `protobuf:"bytes,,opt,name=max_replay_lag_before_restart_s,proto3" toml:"max_replay_lag_before_restart_s,omitzero" json:"max_replay_lag_before_restart_s,omitzero" mapstructure:"max_replay_lag_before_restart_s,omitzero"`
 		Name                       string `protobuf:"bytes,,opt,name=name,proto3" toml:"name,omitempty" json:"name,omitempty" mapstructure:"name,omitempty"`
 		Password                   string `protobuf:"bytes,,opt,name=password,proto3" toml:"password,omitempty" json:"password,omitempty" mapstructure:"password,omitempty"`
 	} `protobuf:"bytes,,opt,name=replication,proto3" toml:"replication,omitempty" json:"replication,omitempty" mapstructure:"replication,omitempty"`
-	S3 struct {
+	S3 *struct {
 		Client struct {
 			Default struct {
 				ReadTimeout string `protobuf:"bytes,,opt,name=read_timeout,proto3" toml:"read_timeout,omitempty" json:"read_timeout,omitempty" mapstructure:"read_timeout,omitempty"`
 			} `protobuf:"bytes,,opt,name=default,proto3" toml:"default,omitempty" json:"default,omitempty" mapstructure:"default,omitempty"`
 		} `protobuf:"bytes,,opt,name=client,proto3" toml:"client,omitempty" json:"client,omitempty" mapstructure:"client,omitempty"`
 	} `protobuf:"bytes,,opt,name=s3,proto3" toml:"s3,omitempty" json:"s3,omitempty" mapstructure:"s3,omitempty"`
-	Ssl struct {
+	Ssl *struct {
 		Enable     bool   `protobuf:"bytes,,opt,name=enable,proto3" toml:"enable,omitempty" json:"enable,omitempty" mapstructure:"enable,omitempty"`
 		IssuerCert string `protobuf:"bytes,,opt,name=issuer_cert,proto3" toml:"issuer_cert,omitempty" json:"issuer_cert,omitempty" mapstructure:"issuer_cert,omitempty"`
 		SslCert    string `protobuf:"bytes,,opt,name=ssl_cert,proto3" toml:"ssl_cert,omitempty" json:"ssl_cert,omitempty" mapstructure:"ssl_cert,omitempty"`
 		SslKey     string `protobuf:"bytes,,opt,name=ssl_key,proto3" toml:"ssl_key,omitempty" json:"ssl_key,omitempty" mapstructure:"ssl_key,omitempty"`
 		TLSCiphers string `protobuf:"bytes,,opt,name=tls_ciphers,proto3" toml:"tls_ciphers,omitempty" json:"tls_ciphers,omitempty" mapstructure:"tls_ciphers,omitempty"`
 	} `protobuf:"bytes,,opt,name=ssl,proto3" toml:"ssl,omitempty" json:"ssl,omitempty" mapstructure:"ssl,omitempty"`
-	Superuser struct {
+	Superuser *struct {
 		Name     string `protobuf:"bytes,,opt,name=name,proto3" toml:"name,omitempty" json:"name,omitempty" mapstructure:"name,omitempty"`
 		Password string `protobuf:"bytes,,opt,name=password,proto3" toml:"password,omitempty" json:"password,omitempty" mapstructure:"password,omitempty"`
 	} `protobuf:"bytes,,opt,name=superuser,proto3" toml:"superuser,omitempty" json:"superuser,omitempty" mapstructure:"superuser,omitempty"`
-	WalArchive struct {
+	WalArchive *struct {
 		Enable bool   `protobuf:"bytes,,opt,name=enable,proto3" toml:"enable,omitempty" json:"enable,omitempty" mapstructure:"enable,omitempty"`
 		Path   string `protobuf:"bytes,,opt,name=path,proto3" toml:"path,omitempty" json:"path,omitempty" mapstructure:"path,omitempty"`
 	} `protobuf:"bytes,,opt,name=wal_archive,proto3" toml:"wal_archive,omitempty" json:"wal_archive,omitempty" mapstructure:"wal_archive,omitempty"`
