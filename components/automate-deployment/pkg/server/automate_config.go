@@ -320,7 +320,7 @@ func createConfigFileForAutomateSysLog() error {
 	}
 
 	if err = runLogrotateConfig(); err != nil {
-		logrus.Error("****************** ERROR: ", err)
+		logrus.Errorf("cannot configure log rotate: %v", err)
 		return err
 	}
 
@@ -406,10 +406,10 @@ func configLogrotate() error {
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 
-	_, err = exec.Command("bash", "-c", "logrotate -f /etc/logrotate.conf").Output()
+	_, err = exec.Command("/bin/bash", "-c", "logrotate -f /etc/logrotate.conf").Output()
 	if err != nil {
-		fmt.Println("Unable to run logrotate with error ", err)
-		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart rsyslog").Error())
+		logrus.Errorf("Unable to run logrotate: %v", err)
+		return err
 	}
 
 	return nil
