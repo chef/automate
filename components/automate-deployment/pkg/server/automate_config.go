@@ -1,8 +1,6 @@
 package server
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -335,11 +333,11 @@ func runLogrotateConfig() error {
 	if err := logrotateConfChecks(); err != nil {
 		logrus.Error("Logrotate isn't setup!")
 		log.Println(`
-		*********************** To Install logrotate Run ********************************
+		*********************** To Install logrotate Run ***********************
 		Ubuntu: sudo apt install logrotate
 		RHEL: sudo rpm install logrotate	
 		`)
-		return err
+		// return err
 	}
 
 	if err := configLogrotate(); err != nil {
@@ -353,92 +351,57 @@ func runLogrotateConfig() error {
 func logrotateConfChecks() error {
 	_, err := exec.Command("logrotate").Output()
 	if strings.Contains(err.Error(), "executable file not found") {
-		logrus.Errorf("The system doesn't have logrotate installed, %v", err)
+		log.Printf("The system doesn't have logrotate installed, %v", err)
 		return err
 	}
 
 	// Check for the logrotate.conf and rsyslog.conf existance
 	if _, err := os.Stat("/etc/logrotate.conf"); errors.Is(err, os.ErrNotExist) {
-		logrus.Errorf("The system doesn't seem to have logrotate installed or configured: %v", err)
+		log.Printf("The system doesn't seem to have logrotate installed or configured: %v", err)
 		return err
 	}
 
 	if _, err := os.Stat("/etc/rsyslog.conf"); errors.Is(err, os.ErrNotExist) {
-		logrus.Errorf("The system doesn't seem to have rsyslog  configured: %v", err)
+		log.Printf("The system doesn't seem to have rsyslog  configured: %v", err)
 		return err
 	}
 
 	// Check for the logrotate.d and rsyslog.conf existance
 	if _, err := os.Stat("/etc/logrotate.d"); errors.Is(err, os.ErrNotExist) {
-		logrus.Errorf("The system doesn't seem to have logrotate.d dir: %v", err)
+		log.Printf("The system doesn't seem to have logrotate.d dir: %v", err)
 		return err
 	}
 
 	// Check for the rsyslog.conf and rsyslog.conf existance
 	if _, err := os.Stat("/etc/rsyslog.d"); errors.Is(err, os.ErrNotExist) {
-		logrus.Errorf("The system doesn't seem to have rsyslog.d dir: %v", err)
+		log.Printf("The system doesn't seem to have rsyslog.d dir: %v", err)
 		return err
 	}
 	return nil
 }
 
 func configLogrotate() error {
-
-	f, err := os.Open(configFile)
+	// Create a file in /etc/logrotate.d/automate
+	file, err := os.Create("/etc/logrotate.d/automate")
 	if err != nil {
-		logrus.Errorf("cannot open the file: %v", err)
+		logrus.Errorf("cannot create a file: %v", err)
 		return err
 	}
-	defer f.Close()
-
-	flag := false
-	var bs []byte
-	buf := bytes.NewBuffer(bs)
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "/var/log/automate.log") {
-			flag = true
-		}
-		if !flag {
-			_, err := buf.Write(scanner.Bytes())
-			if err != nil {
-				logrus.Errorf("Error occured in buf write: %v", err)
-			}
-			_, err = buf.WriteString("\n")
-			if err != nil {
-				logrus.Errorf("Error occured while writing string: %v", err)
-			}
-		}
-
-		if strings.Contains(scanner.Text(), "}") && flag {
-			flag = false
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		logrus.Errorf("Error occured: %v", err)
-	}
-
-	err = os.WriteFile(configFile, buf.Bytes(), 0666)
-	if err != nil {
-		logrus.Errorf("Error occured while writing to a file: %v", err)
-	}
-
-	// Append a new conf to the end of a file
-	byteSlice, err := ioutil.ReadFile(logRotateConf)
-	if err != nil {
-		logrus.Errorf("cannot read the file: %v", err)
-	}
-	file, err := os.OpenFile(configFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		logrus.Errorf("cannot open the file", err)
-	}
-
 	defer file.Close()
 
-	if _, err = file.WriteString("\n" + string(byteSlice)); err != nil {
-		logrus.Errorf("cannot append to a file: %v", err)
+	// Read the configure file and paste it in /etc/logrotate.d/automate
+	byteSlice, err := ioutil.ReadFile("logconf.conf")
+	if err != nil {
+		logrus.Errorf("cannot read the file: %v", err)
+		return err
 	}
 
+	// Write the byteSlice to file
+	noOfBytes, err := file.Write(byteSlice)
+	if err != nil {
+		logrus.Errorf("cannot write the byte slice to the file: %v", err)
+		return err
+	}
+	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 	return nil
 }
