@@ -406,7 +406,7 @@ func configLogrotate() error {
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 
-	_, err = exec.Command("/bin/bash", "-c", "logrotate -f /etc/logrotate.conf").Output()
+	_, err = exec.Command("/bin/bash", "-d", "logrotate -f /etc/logrotate.conf").Output()
 	if err != nil {
 		logrus.Errorf("Unable to run logrotate: %v", err)
 		return err
