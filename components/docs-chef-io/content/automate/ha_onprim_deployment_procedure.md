@@ -218,7 +218,7 @@ opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
 postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ```
 
-### Minimum changes to be made
+### Minimum changes to be made for On Premise Deployment
 
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 - Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
@@ -267,7 +267,7 @@ Continue with the deployment after updating config:
    #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
    ```
-### Sample config to setup On Premise with AWS Managed Services
+### Sample config to setup On Premise Deployment with AWS Managed Services
 
 ```config
 # ============== External Datbase Services ======================
@@ -289,7 +289,7 @@ dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
 # In case of AWS managed RDS leave it blank
-# eg: postgresql_root_cert = "cert_content>"
+# eg: postgresql_root_cert = "<cert_content>"
 postgresql_root_cert = ""
 [external.database.open_search]
 # eg: managed_opensearch_domain_name = "managed-services-os"
@@ -347,7 +347,7 @@ Continue with the deployment after updating config:
    #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
    ```
-### Sample config to setup On Premise with Self Managed Services
+### Sample config to setup On Premise Deployment with Self Managed Services
 
 ```config
 # ============== External Datbase Services ======================
@@ -369,7 +369,7 @@ dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
 # In case of AWS managed RDS leave it blank
-# eg: postgresql_root_cert = "cert_content>"
+# eg: postgresql_root_cert = "<cert_content>"
 postgresql_root_cert = ""
 [external.database.open_search]
 # eg: managed_opensearch_domain_name = "chefnode"
@@ -394,7 +394,7 @@ os_snapshot_user_access_key_secret = ""
 ### How To Add More Nodes to the On-Prem Deployment
 
 - Open the `config.toml` at bastion node
-- change the `instance_count` value, as explained in below example.
+- Change the `instance_count` value, as explained in below example.
 - Add the `Ip address` for the respetive node at the end, as explained in the example.
 - Make sure that all the necesssary port and fire wall setting are align in the new node.
 
