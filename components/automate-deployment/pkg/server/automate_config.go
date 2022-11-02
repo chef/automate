@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -90,8 +89,6 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 		if err != nil {
 			return status.Error(codes.FailedPrecondition, "Unable to determine existing configuration hash")
 		}
-
-		fmt.Println("Existing value ", existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue())
 
 		// Compare our existing configurations hash with the hash of the configuration
 		// that was returned to the client when the request was initiated. If
@@ -303,7 +300,6 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 func restartSyslogService() error {
 	_, err := exec.Command("bash", "-c", "systemctl restart rsyslog.service").Output()
 	if err != nil {
-		fmt.Println("Unable to restart syslog service with error ", err)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to restart rsyslog").Error())
 	}
 
@@ -322,7 +318,6 @@ func createConfigFileForAutomateSysLog() error {
 	_, err2 := f.WriteString("if $programname == 'hab' then /var/log/automate.log\n& stop\n")
 
 	if err2 != nil {
-		fmt.Println("Unable to create config with error ", err2)
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
 	}
 
