@@ -2,20 +2,18 @@ package server
 
 import (
 	"context"
-	"log"
-	"os"
-	"os/exec"
-	"strings"
-
 	"github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
 )
 
 const (
@@ -273,6 +271,11 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		if err != nil {
 			return status.Error(codes.Internal, "Failed to restart syslog service")
 		}
+
+		if err = runLogrotateConfig(); err != nil {
+			logrus.Errorf("cannot configure log rotate: %v", err)
+			return err
+		}
 	}
 
 	//Rollback the config if requested
@@ -319,11 +322,6 @@ func createConfigFileForAutomateSysLog() error {
 
 	if err2 != nil {
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
-	}
-
-	if err = runLogrotateConfig(); err != nil {
-		logrus.Errorf("cannot configure log rotate: %v", err)
-		return err
 	}
 
 	return nil
@@ -408,10 +406,9 @@ func configLogrotate() error {
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 
-	_, err = exec.Command("/bin/bash", "-d", "logrotate -f /etc/logrotate.conf").Output()
+	_, err = exec.Command("bash", "-c", "logrotate -vf /etc/logrotate.conf").CombinedOutput()
 	if err != nil {
 		logrus.Errorf("Unable to run logrotate: %v", err)
-		return err
 	}
 
 	return nil
