@@ -129,6 +129,13 @@ Run the following steps on Bastion Host Machine:
    chef-automate info
       "
    ```
+{{< note >}}
+-  Below command can be used from the bastion host to patch configuration to all the frontend nodes of Automate HA.
+
+  ```sh
+    chef-automate config patch path/to/config.toml
+  ```
+{{< /note >}}
 
 Note: DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
 

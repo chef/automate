@@ -252,6 +252,12 @@ For example : Add new Automate node to the existing deployed cluster.
 
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+- Below command can be used from the bastion host to patch configuration to all the frontend nodes of Automate HA.
+
+  ```sh
+    chef-automate config patch path/to/config.toml
+  ```
+
 
 ### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
 
