@@ -2,6 +2,10 @@ variable "access_key" {
   default = ""
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
 variable "backup_config_efs" {
   default = "false"
 }
@@ -50,6 +54,64 @@ variable "infra" {
   default = "existing_infra"
 }
 
+variable "managed_opensearch_certificate" {
+  default = ""
+}
+
+variable "managed_opensearch_domain_name" {
+  default = ""
+}
+
+variable "managed_opensearch_domain_url" {
+  default = ""
+}
+
+variable "managed_opensearch_user_password" {
+  default = ""
+}
+
+variable "managed_opensearch_username" {
+  default = ""
+}
+
+variable "managed_rds_certificate" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_password" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_username" {
+  default = ""
+}
+
+variable "managed_rds_instance_url" {
+  default = ""
+}
+
+variable "managed_rds_superuser_password" {
+  default = ""
+}
+
+variable "managed_rds_superuser_username" {
+  default = ""
+}
+
+variable "opensearch_root_cert" {
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
+}
+
+variable "postgresql_root_cert" {
+}
+
 variable "region" {
   default = ""
 }
@@ -60,6 +122,14 @@ variable "s3_endpoint" {
 
 variable "secret_key" {
   default = ""
+}
+
+variable "setup_managed_services" {
+  default = false
+}
+
+variable "setup_self_managed_services" {
+  default = false
 }
 
 variable "ssh_key_file" {

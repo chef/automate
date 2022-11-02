@@ -425,6 +425,65 @@ opensearch_private_ips = []
 postgresql_private_ips = []
 ## === ===
 
+# ============== External Datbase Services ======================
+
+## === INPUT NEEDED ===
+# In case you are trying to deploy with AWS Managed Services set type as "aws"
+# If you are trying external managed database set type as "self-managed"
+
+[external.database]
+
+# eg type = "aws" or "self-managed"
+type = ""
+
+[external.database.postgre_sql]
+
+# eg: instance_url = "managed-rds-db.c5gkx.ap-northeast-1.rds.amazonaws.com:5432"
+instance_url = ""
+
+# eg: username = "postgres"
+superuser_username = ""
+
+# eg: password = "Progress123"
+superuser_password = ""
+
+# eg: dbuser_username = "postgres"
+dbuser_username = ""
+
+# eg: dbuser_password = "Progress123"
+dbuser_password = ""
+
+# In case of AWS managed RDS leave it blank
+postgresql_root_cert = "<cert_content>"
+
+[external.database.open_search]
+
+# eg: managed_opensearch_domain_name = "managed-services-os"
+opensearch_domain_name = ""
+
+# eg: opensearch_domain_url = "search-managed-services-os.us-east-1.es.amazonaws.com"
+opensearch_domain_url = ""
+
+# eg: opensearch_username = "admin"
+opensearch_username = ""
+
+# eg: opensearch_user_password = "Progress@123"
+opensearch_user_password = ""
+
+# In case of AWS managed opensearch leave it blank
+opensearch_root_cert = "<cert_content>"
+
+[external.database.open_search.aws]
+
+# eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
+aws_os_snapshot_role_arn = ""
+
+# eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
+os_snapshot_user_access_key_id = ""
+
+# eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
+os_snapshot_user_access_key_secret = ""
+
 `
 
 var UsageTemplate string = `

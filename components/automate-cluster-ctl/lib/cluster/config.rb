@@ -119,6 +119,27 @@ module AutomateCluster
       default :region, ""
     end
 
+    #Only applies to External Database Configuration
+    config_context :managed_aws do
+      default :setup_managed_services, false
+      default :setup_self_managed_services, false
+      default :opensearch_domain_name, ' '
+      default :opensearch_domain_url, ' '
+      default :opensearch_username, ' '
+      default :opensearch_user_password, ' '
+      default :opensearch_certificate, ' '
+      default :aws_os_snapshot_role_arn, ' '
+      default :os_snapshot_user_access_key_id, ' '
+      default :os_snapshot_user_access_key_secret, ' '
+      default :instance_url, ' '
+      default :superuser_username, ' '
+      default :superuser_password, ' '
+      default :dbuser_username, ' '
+      default :dbuser_password, ' '
+      default :postgresql_certificate, ' '
+      default :postgresql_root_cert
+      default :opensearch_root_cert
+    end
     # AWS Related
     config_context :aws do
       default :profile, 'default'

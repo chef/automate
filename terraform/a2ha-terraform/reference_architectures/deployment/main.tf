@@ -376,6 +376,8 @@ module "bootstrap_automate" {
   managed_rds_dbuser_username        = var.managed_rds_dbuser_username
   managed_rds_dbuser_password        = var.managed_rds_dbuser_password
   managed_rds_certificate            = var.managed_rds_certificate
+  opensearch_root_cert               = var.opensearch_root_cert
+  postgresql_root_cert               = var.postgresql_root_cert
   postgresql_private_ips             = var.postgresql_private_ips
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips                        = slice(var.automate_private_ips, 0, 1)
@@ -443,6 +445,8 @@ module "automate" {
   managed_rds_dbuser_username        = var.managed_rds_dbuser_username
   managed_rds_dbuser_password        = var.managed_rds_dbuser_password
   managed_rds_certificate            = var.managed_rds_certificate
+  opensearch_root_cert               = var.opensearch_root_cert
+  postgresql_root_cert               = var.postgresql_root_cert
   postgresql_private_ips             = var.postgresql_private_ips
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips = slice(
@@ -514,6 +518,8 @@ module "chef_server" {
   managed_rds_dbuser_username        = var.managed_rds_dbuser_username
   managed_rds_dbuser_password        = var.managed_rds_dbuser_password
   managed_rds_certificate            = var.managed_rds_certificate
+  opensearch_root_cert               = var.opensearch_root_cert
+  postgresql_root_cert               = var.postgresql_root_cert
   postgresql_private_ips             = var.postgresql_private_ips
   postgresql_ssl_enable              = var.postgresql_ssl_enable
   private_ips                        = var.chef_server_private_ips

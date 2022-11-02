@@ -9,6 +9,7 @@
   automate_role = "${automate_role}"
   channel = "current"
   setup_managed_services = ${setup_managed_services}
+  setup_self_managed_services = ${setup_self_managed_services}
   upgrade_strategy = "none"
   teams_port = ${teams_port}
   backup_config_s3 = "${backup_config_s3}"
@@ -39,6 +40,7 @@
   svc_group = "default"
   svc_name = "automate-ha-opensearch"
   svc_port = ${opensearch_listen_port}
+  managed_opensearch_domain_name = "${managed_opensearch_domain_name}"
   managed_opensearch_certificate = "${managed_opensearch_certificate}"
   managed_opensearch_domain_url = "${managed_opensearch_domain_url}"
   managed_opensearch_user_password = "${managed_opensearch_user_password}"
@@ -46,6 +48,7 @@
   aws_os_snapshot_role_arn = "${aws_os_snapshot_role_arn}"
   os_snapshot_user_access_key_id = "${os_snapshot_user_access_key_id}"
   os_snapshot_user_access_key_secret = "${os_snapshot_user_access_key_secret}"
+  opensearch_root_cert = """${opensearch_root_cert}"""
 
   [services.postgresql]
   ips = ${postgresql_ips}
@@ -55,6 +58,7 @@
   managed_rds_instance_url       = "${managed_rds_instance_url}"
   managed_rds_superuser_password = "${managed_rds_superuser_password}"
   managed_rds_superuser_username = "${managed_rds_superuser_username}"
+  postgresql_root_cert           = """${postgresql_root_cert}"""
   sup_port = 9631
   svc_group = "default"
   svc_name = "automate-ha-postgresql"

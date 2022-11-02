@@ -149,6 +149,34 @@ existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %
 existing_chef_server_private_ips = <%= config.existing_nodes.chef_server_private_ips %>
 existing_opensearch_private_ips = <%= config.existing_nodes.opensearch_private_ips %>
 existing_postgresql_private_ips = <%= config.existing_nodes.postgresql_private_ips %>
+
+setup_managed_services = "<%= config.managed_aws.setup_managed_services %>"
+setup_self_managed_services = "<%= config.managed_aws.setup_self_managed_services %>"
+managed_opensearch_domain_name = "<%= config.managed_aws.opensearch_domain_name %>"
+managed_opensearch_domain_url = "<%= config.managed_aws.opensearch_domain_url %>"
+managed_opensearch_username = "<%= config.managed_aws.opensearch_username %>"
+managed_opensearch_user_password = "<%= config.managed_aws.opensearch_user_password %>"
+managed_opensearch_certificate = "<%= config.managed_aws.opensearch_certificate %>"
+aws_os_snapshot_role_arn = "<%= config.managed_aws.aws_os_snapshot_role_arn %>"
+os_snapshot_user_access_key_id = "<%= config.managed_aws.os_snapshot_user_access_key_id %>"
+os_snapshot_user_access_key_secret = "<%= config.managed_aws.os_snapshot_user_access_key_secret %>"
+managed_rds_instance_url = "<%= config.managed_aws.instance_url %>"
+managed_rds_superuser_username = "<%= config.managed_aws.superuser_username %>"
+managed_rds_superuser_password = "<%= config.managed_aws.superuser_password %>"
+managed_rds_dbuser_username = "<%= config.managed_aws.dbuser_username %>"
+managed_rds_dbuser_password = "<%= config.managed_aws.dbuser_password %>"
+managed_rds_postgresql_certificate = "<%= config.managed_aws.postgresql_certificate %>"
+
+postgresql_root_cert = <<-EOT
+<%= config.managed_aws.postgresql_root_cert %>
+
+EOT
+
+opensearch_root_cert = <<-EOT
+<%= config.managed_aws.opensearch_root_cert %>
+
+EOT
+
 <% end %>
 
 # Common
