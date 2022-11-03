@@ -97,6 +97,7 @@ func init() {
 	backupCmd.AddCommand(statusBackupCmd)
 	backupCmd.AddCommand(cancelBackupCmd)
 	backupCmd.AddCommand(integrityBackupCmd)
+	backupCmd.AddCommand(streamStatusBackupCmd)
 
 	backupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.noProgress, "no-progress", "", false, "Don't follow operation progress")
 	backupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.requestTimeout, "request-timeout", "r", 20, "API request timeout for deployment-service in seconds")
@@ -215,6 +216,14 @@ var statusBackupCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(0),
 }
 
+var streamStatusBackupCmd = &cobra.Command{
+	Use:   "stream-status",
+	Short: "Stream the Chef Automate backup runner status",
+	Long:  "Stream the Chef Automate backup runner status",
+	RunE:  runStreamBackupStatus,
+	Args:  cobra.ExactArgs(1),
+}
+
 var cancelBackupCmd = &cobra.Command{
 	Use:   "cancel",
 	Short: "cancel the running backup operation",
@@ -246,13 +255,13 @@ var integrityBackupValidateCmd = &cobra.Command{
 func preBackupCmd(cmd *cobra.Command, args []string) error {
 	if NewBackupFromBashtion().isBastionHost() {
 		//TODO need to handle airgap bundle path from bastion host
-		//TODO need to handle parallel execution
 		//TODO how to pass missing opensearch credentials
-		//TODO handle --no-progress for status, show, cancel commands etc.
-		//TODO 
 		allPassedFlags = ""
 		cmd.Flags().Visit(checkFlags)
 		commandString := cmd.CommandPath() + " "
+		if !strings.Contains(commandString, "sudo") {
+			commandString = "sudo " + commandString
+		}
 		if len(args) > 0 {
 			for _, ar := range args {
 				commandString = commandString + ar + " "
@@ -314,6 +323,32 @@ func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	writer.Successf("Created backup %s", res.Backup.TaskID())
+	return nil
+}
+
+func runStreamBackupStatus(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return errors.New("*Required args Backup Id, to Stream backup status backup id is required")
+	}
+	backupTaskId := args[0]
+	lastEvent, err := client.StreamBackupStatus(
+		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+		time.Duration(backupCmdFlags.createWaitTimeout)*time.Second,
+		backupTaskId,
+		writer,
+	)
+	if err != nil {
+		return status.Wrap(err, status.BackupError, "Streaming backup events failed")
+	}
+
+	if lastEvent != nil && lastEvent.GetBackup() != nil {
+		status.GlobalResult = createBackupResult{
+			BackupId: backupTaskId,
+			SHA256:   lastEvent.GetBackup().Description.Sha256,
+		}
+	}
+
+	writer.Successf("Created backup %s", backupTaskId)
 	return nil
 }
 
@@ -777,7 +812,9 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 }
 
 func checkFlags(f *flag.Flag) {
-	allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
+	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") {
+		allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
+	}
 }
 
 // nolint: gocyclo
@@ -1034,33 +1071,37 @@ func (ins *BackupFromBashtionImp) isBastionHost() bool {
 }
 
 func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails) error {
-	//res, err := ConnectAndExecuteCommandOnRemote()
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	fmt.Println(sshUser)
+	fmt.Println(sskKeyFile)
+	fmt.Println(sshPort)
+	fmt.Println(automateIps)
 	if automateIps == nil || len(automateIps) < 1 {
 		return status.Errorf(status.ConfigError, "Invalid deployment config")
 	}
 	res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
 	if err != nil {
 		writer.Errorf("error in executing backup commands in Automate remote from bashtion %s \n", err.Error())
+		fmt.Println(err)
+		fmt.Println(res)
 		return err
 	}
 	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", res)
 	// pooling job
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 	for {
-		res, err = ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "chef-automate backup status")
-		if err != nil || ctx.Err() != nil {
+		res, err = ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup status")
+		if err != nil {
 			writer.Errorf("error in polling backup status %s \n", err.Error())
 			return err
 		}
-		writer.Println(res)
-		if res == "ideal" {
+		//writer.Println(res)
+		if strings.EqualFold(strings.ToLower(strings.TrimSpace(res)), "Idle") {
 			break
 		}
+		time.Sleep(2 * time.Second)
 	}
 	return nil
 }

@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"net"
+	"os"
 
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
@@ -66,14 +68,15 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 		return "", err
 	}
 	var stdoutBuf bytes.Buffer
-	session.Stdout = &stdoutBuf
+	//session.Stdout = &stdoutBuf
+	session.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
 
 	writer.StartSpinner()
 	err = session.Run(remoteCommands)
 
 	writer.StopSpinner()
 	if err != nil {
-		writer.Errorf("Run failed:%v", err)
+		writer.Errorf("Run failed: %v", err)
 		return "", err
 	}
 	defer session.Close()
