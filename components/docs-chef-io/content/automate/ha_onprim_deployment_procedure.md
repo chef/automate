@@ -218,7 +218,7 @@ opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
 postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ```
 
-### Minimum changes to be made for On Premise Deployment
+### Minimum changes to be made for On-Premise Deployment
 
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 - Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
@@ -228,11 +228,11 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 - `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
-## On Premise Setup with AWS Managed Services.
+## On-Premise Setup with AWS Managed Services.
 
 ### Prerequisites
 
-- Follow the Prerequisites for On Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
+- Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
 - You can exclude the creation of instances for OpenSearch and Postgresql as you will be using AWS OpenSearch and AWS RDS Postgresql.
 - Setup AWS RDS Postgresql 13.5. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more. Make sure to open the required port in Security Groups while creating AWS RDS Postgresql.
 - Setup AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
@@ -251,7 +251,7 @@ Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_pr
     - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
     - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
     - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
-    - Leave postgresql_root_cert and opensearch_root_cert as blank in case of On Premise with AWS Managed Services.
+    - Leave postgresql_root_cert and opensearch_root_cert as blank in case of On-Premise with AWS Managed Services.
     - For backup and restore configuration set `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#prerequisites) to know more.
 
 Continue with the deployment after updating config:
@@ -267,7 +267,7 @@ Continue with the deployment after updating config:
    #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
    ```
-### Sample config to setup On Premise Deployment with AWS Managed Services
+### Sample config to setup On-Premise Deployment with AWS Managed Services
 
 ```config
 # ============== External Datbase Services ======================
@@ -312,11 +312,11 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-## On Premise Setup with Self Managed Services
+## On-Premise Setup with Self Managed Services
 
 ### Prerequisites
 
-- Follow the Prerequisites for On Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
+- Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
 - You can exclude the creation of instances for OpenSearch and Postgresql as you will be using Self Managed OpenSearch and RDS Postgresql.
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
@@ -347,7 +347,7 @@ Continue with the deployment after updating config:
    #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
    ```
-### Sample config to setup On Premise Deployment with Self Managed Services
+### Sample config to setup On-Premise Deployment with Self Managed Services
 
 ```config
 # ============== External Datbase Services ======================
