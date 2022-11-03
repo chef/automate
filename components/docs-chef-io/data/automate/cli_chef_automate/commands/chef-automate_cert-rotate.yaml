@@ -19,10 +19,18 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for cert-rotate
+- name: pg
+  default_value: "false"
+  usage: Postgres Certificate Rotation
+- name: postgres
+  default_value: "false"
+  usage: Postgres Certificate Rotation
 - name: private-cert
   usage: Private certificate
 - name: public-cert
   usage: Public certificate
+- name: root-ca
+  usage: RootCA certificate
 inherited_options:
 - name: debug
   shorthand: d
