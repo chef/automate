@@ -222,7 +222,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-with-aws-managed-services) for sample config of AWS Managed Services.
+Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for sample config of AWS Managed Services.
 
 - Set AWS Config Details:
     - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
@@ -301,7 +301,7 @@ os_snapshot_user_access_key_secret = ""
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-with-self-managed-services) for sample config for Self Managed Services.
+Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
 
 - Set Self Managed Config Details:
     - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
