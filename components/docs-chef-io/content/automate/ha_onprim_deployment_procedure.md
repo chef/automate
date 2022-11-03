@@ -233,12 +233,12 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ### Prerequisites
 
 - Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
-- You can exclude the creation of instances for OpenSearch and Postgresql as you will be using AWS OpenSearch and AWS RDS Postgresql.
+- This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed services.
 - Setup AWS RDS Postgresql 13.5. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more. Make sure to open the required port in Security Groups while creating AWS RDS Postgresql.
 - Setup AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to know more about VPC and CIDR creation.
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
+- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
@@ -317,7 +317,7 @@ os_snapshot_user_access_key_secret = ""
 ### Prerequisites
 
 - Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
-- You can exclude the creation of instances for OpenSearch and Postgresql as you will be using Self Managed OpenSearch and RDS Postgresql.
+- This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
