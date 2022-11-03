@@ -23,13 +23,13 @@ const (
 	logRotateConf = "components/automate-deployment/logrotate.conf"
 	logRotate     = `
 /var/log/automate.log {
-    daily
+	maxsize 50M
 	dateext
-    rotate 5
-    size 5k
+	rotate 10
+	missingok
+	compress
 	copytruncate
-    missingok
-}
+}	
 `
 )
 
