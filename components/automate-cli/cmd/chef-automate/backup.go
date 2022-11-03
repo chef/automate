@@ -269,7 +269,6 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 		}
 		commandString = commandString + "--no-progress "
 		commandString = commandString + allPassedFlags
-		fmt.Println(commandString)
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
@@ -281,7 +280,7 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 			return err
 			//return status.Errorf(status.BackupRestoreError, "error in executing on remote machines", err)
 		}
-		// used os.exit as need to stop next lifecycle method to execute
+		// NOTE: used os.exit as need to stop next lifecycle method to execute
 		os.Exit(1)
 	}
 	return nil
@@ -1075,18 +1074,12 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 	automateIps := infra.Outputs.AutomatePrivateIps.Value
-	fmt.Println(sshUser)
-	fmt.Println(sskKeyFile)
-	fmt.Println(sshPort)
-	fmt.Println(automateIps)
 	if automateIps == nil || len(automateIps) < 1 {
 		return status.Errorf(status.ConfigError, "Invalid deployment config")
 	}
 	res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
 	if err != nil {
 		writer.Errorf("error in executing backup commands in Automate remote from bashtion %s \n", err.Error())
-		fmt.Println(err)
-		fmt.Println(res)
 		return err
 	}
 	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", res)
