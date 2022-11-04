@@ -39,7 +39,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.ListenAddress = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10160)
 	c.V1.Sys.Log.Level = w.String("info")
-	c.V1.Sys.Log.RedirectSysLog = w.Bool(false)
 
 	c.V1.Svc.DeploymentType = w.String("local")
 	c.V1.Svc.Channel = w.String("current")
