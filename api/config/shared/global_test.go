@@ -448,3 +448,44 @@ func loadFromToml(s string) *GlobalConfig {
 	}
 	return c
 }
+
+func TestValidateReDirectSysLogConfig(t *testing.T) {
+	t.Run("withRedirectSyslog True and no syslog path", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Log: &Log{
+					RedirectSysLog: w.Bool(true),
+				},
+			},
+		}
+		err := c.ValidateReDirectSysLogConfig()
+		require.Error(t, err)
+	})
+	t.Run("withRedirectSyslog True and taking the default value for max size", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Log: &Log{
+					RedirectSysLog:      w.Bool(true),
+					RedirectLogFilePath: w.String("/var/"),
+				},
+			},
+		}
+		err := c.ValidateReDirectSysLogConfig()
+		assert.Equal(t, "100M", c.GetV1().GetLog().GetMaxSizeRotateLogs().GetValue())
+		require.NoError(t, err)
+	})
+	t.Run("withRedirectSyslog True and taking the default value for rotaion number for logs", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Log: &Log{
+					RedirectSysLog:      w.Bool(true),
+					RedirectLogFilePath: w.String("/var/"),
+				},
+			},
+		}
+		err := c.ValidateReDirectSysLogConfig()
+		assert.Equal(t, int32(10), c.GetV1().GetLog().GetMaxNumberRotatedLogs().GetValue())
+		require.NoError(t, err)
+	})
+
+}

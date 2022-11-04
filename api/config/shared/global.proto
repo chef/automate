@@ -364,6 +364,11 @@ message Log {
   google.protobuf.StringValue level = 1;
   google.protobuf.StringValue format = 2;
   google.protobuf.BoolValue redirect_sys_log = 3;
+  google.protobuf.StringValue redirect_log_file_path = 4;
+  google.protobuf.BoolValue compress_rotated_logs = 5;
+  google.protobuf.StringValue max_size_rotate_logs = 6;
+  google.protobuf.Int32Value max_number_rotated_logs = 7;
+
 }
 
 message Disclosure {

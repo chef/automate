@@ -2,12 +2,14 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/chef/automate/api/config/deployment"
+	config "github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
@@ -18,22 +20,9 @@ import (
 )
 
 const (
-	logFilePath   = "/var/log/automate.log"
-	configFile    = "/etc/logrotate.conf"
-	logRotateConf = "components/automate-deployment/logrotate.conf"
-	logRotate     = `
-/var/log/automate.log {
-	maxsize 50M
-	dateext
-	rotate 10
-	missingok
-	compress
-	copytruncate
-}	
-`
+	rsyslogConfigFile   = "/etc/rsyslog.d/automate.conf"
+	logRotateConfigFile = "/etc/logrotate.d/automate"
 )
-
-var rsyslogConfigFile = "/etc/rsyslog.d/automate.conf"
 
 // GetAutomateConfig returns a copy of the userOverrideConfig of the existing
 // deployment.
@@ -100,6 +89,9 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 			return status.Error(codes.DeadlineExceeded, "The configuration has changed since you initiated the update request. Please try again.")
 		}
 
+		if err = req.GetConfig().GetGlobal().ValidateReDirectSysLogConfig(); err != nil {
+			return status.Error(codes.InvalidArgument, err.Error())
+		}
 		if err = setConfigForRedirectLogs(req, existingCopy); err != nil {
 			return status.Error(codes.Internal, "Failed to set configuration for redirecting logs for automate")
 		}
@@ -264,10 +256,12 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 }
 
 func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) error {
+
 	//Set the config if already not set
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false {
-		err := createConfigFileForAutomateSysLog()
+
+		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 		if err != nil {
 			return status.Error(codes.Internal, "Failed to create configuration into syslog")
 		}
@@ -276,7 +270,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			return status.Error(codes.Internal, "Failed to restart syslog service")
 		}
 
-		if err = runLogrotateConfig(); err != nil {
+		if err = runLogrotateConfig(req); err != nil {
 			logrus.Errorf("cannot configure log rotate: %v", err)
 			return err
 		}
@@ -313,7 +307,8 @@ func restartSyslogService() error {
 	return nil
 }
 
-func createConfigFileForAutomateSysLog() error {
+func createConfigFileForAutomateSysLog(pathForLog string) error {
+
 	f, err := os.Create(rsyslogConfigFile)
 
 	if err != nil {
@@ -322,7 +317,7 @@ func createConfigFileForAutomateSysLog() error {
 
 	defer f.Close()
 
-	_, err2 := f.WriteString("if $programname == 'hab' then /var/log/automate.log\n& stop\n")
+	_, err2 := f.WriteString(fmt.Sprintf("if $programname == 'hab' then %s\n& stop\n", getLogFileName(pathForLog)))
 
 	if err2 != nil {
 		return status.Error(codes.Internal, errors.Wrap(err, "Unable to write in  rsyslog configuration file for automate").Error())
@@ -342,18 +337,12 @@ func removeConfigFileForAutomateSyslog() error {
 }
 
 // runLogrotateConfig() to initiate logrotate setup
-func runLogrotateConfig() error {
+func runLogrotateConfig(req *api.PatchAutomateConfigRequest) error {
 	if err := logrotateConfChecks(); err != nil {
 		logrus.Error("Logrotate isn't setup!")
-		log.Println(`
-		*********************** To Install logrotate Run ***********************
-		Ubuntu: sudo apt install logrotate
-		RHEL: sudo rpm install logrotate	
-		`)
-		// return err
 	}
 
-	if err := configLogrotate(); err != nil {
+	if err := configLogrotate(req.GetConfig().GetGlobal().GetV1().GetLog()); err != nil {
 		logrus.Errorf("Error while configuring logrotate: %v", err)
 		return err
 	}
@@ -373,52 +362,31 @@ func logrotateConfChecks() error {
 		log.Printf("The system doesn't seem to have logrotate installed or configured: %v", err)
 		return err
 	}
-
-	if _, err := os.Stat("/etc/rsyslog.conf"); errors.Is(err, os.ErrNotExist) {
-		log.Printf("The system doesn't seem to have rsyslog  configured: %v", err)
-		return err
-	}
-
-	// Check for the logrotate.d and rsyslog.conf existance
-	if _, err := os.Stat("/etc/logrotate.d"); errors.Is(err, os.ErrNotExist) {
-		log.Printf("The system doesn't seem to have logrotate.d dir: %v", err)
-		return err
-	}
-
-	// Check for the rsyslog.conf and rsyslog.conf existance
-	if _, err := os.Stat("/etc/rsyslog.d"); errors.Is(err, os.ErrNotExist) {
-		log.Printf("The system doesn't seem to have rsyslog.d dir: %v", err)
-		return err
-	}
 	return nil
 }
 
-func configLogrotate() error {
+func configLogrotate(req *config.Log) error {
 	// Create a file in /etc/logrotate.d/automate
-	file, err := os.Create("/etc/logrotate.d/automate")
+	file, err := os.Create(logRotateConfigFile)
 	if err != nil {
 		logrus.Errorf("cannot create a file: %v", err)
 		return err
 	}
 	defer file.Close()
 
+	logRotateConfigContent := LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
+		getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress")
 	// Write the byteSlice to file
-	noOfBytes, err := file.WriteString(logRotate)
+	noOfBytes, err := file.WriteString(logRotateConfigContent)
 	if err != nil {
 		logrus.Errorf("cannot write the byte slice to the file: %v", err)
 		return err
 	}
 	logrus.Infof("%v no of bytes are written to the file", noOfBytes)
 
-	_, err = exec.Command("bash", "-c", "logrotate /etc/logrotate.conf").CombinedOutput()
-	if err != nil {
-		logrus.Errorf("Unable to run logrotate: %v", err)
-		// return err
-	}
-
 	return nil
 }
 
 func rollbackLogrotate() error {
-	return os.Remove("/etc/logrotate.d/automate")
+	return os.Remove(logRotateConfigFile)
 }
