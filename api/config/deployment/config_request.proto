@@ -33,7 +33,6 @@ message ConfigRequest {
 
 			message Log {
 				google.protobuf.StringValue level = 1;
-				google.protobuf.BoolValue redirect_sys_log = 2;
 			}
 
 			message GatherLogs {

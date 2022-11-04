@@ -8,7 +8,6 @@ port           = 10160
 [log]
 level = "info"
 format = "text"
-redirectSysLog = false
 
 [gather_logs]
 staging_dir = ""
