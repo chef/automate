@@ -42,7 +42,7 @@ or all services are down (chef-automate stop) before retrying the restore.`
 var allPassedFlags string = ""
 
 type BackupFromBashtion interface {
-	isBastionHost() bool
+	isBashtionHost() bool
 	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool) error
 }
 
@@ -253,7 +253,7 @@ var integrityBackupValidateCmd = &cobra.Command{
 }
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {
-	if NewBackupFromBashtion().isBastionHost() {
+	if NewBackupFromBashtion().isBashtionHost() {
 		//TODO need to handle airgap bundle path from bastion host
 		//TODO how to pass missing opensearch credentials
 		allPassedFlags = ""
@@ -1075,7 +1075,7 @@ func NewBackupFromBashtion() BackupFromBashtion {
 	return &BackupFromBashtionImp{}
 }
 
-func (ins *BackupFromBashtionImp) isBastionHost() bool {
+func (ins *BackupFromBashtionImp) isBashtionHost() bool {
 	if isA2HARBFileExist() {
 		return true
 	}
@@ -1093,20 +1093,22 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	}
 	if stopFrontends {
 		for _, automateIp := range automateIps {
+			writer.Printf("stopping automate nodes %s \n", automateIp)
 			stopA2Res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIp, "sudo chef-automate stop")
 			if err != nil {
 				writer.Errorf("error in stopping chef-automate on automate nodes %s \n", err.Error())
 				return err
 			}
-			writer.Printf("stopped chef-automate from automate node \n %s \n", stopA2Res)
+			writer.Printf("stopped chef-automate from automate node \n %s : %s \n", stopA2Res, automateIp)
 		}
 		for _, chefServerIp := range chefServerIps {
+			writer.Printf("stopping chef server nodes %s \n", chefServerIp)
 			stopCSRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, chefServerIp, "sudo chef-automate stop")
 			if err != nil {
 				writer.Errorf("error in stopping chef-automate on chef server nodes %s \n", err.Error())
 				return err
 			}
-			writer.Printf("stopped chef-automate from chef server node \n %s \n", stopCSRes)
+			writer.Printf("stopped chef-automate from chef server node \n %s : %s \n", stopCSRes, chefServerIp)
 		}
 	}
 	cmdRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
