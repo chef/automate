@@ -43,7 +43,7 @@ var allPassedFlags string = ""
 
 type BackupFromBashtion interface {
 	isBastionHost() bool
-	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails) error
+	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool) error
 }
 
 type BackupFromBashtionImp struct{}
@@ -275,10 +275,23 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 			return err
 			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
 		}
-		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra)
+		if strings.Contains(cmd.CommandPath(), "create") {
+			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false)
+			if err != nil {
+				return err
+			}
+			os.Exit(1)
+		}
+		if strings.Contains(cmd.CommandPath(), "restore") {
+			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true)
+			if err != nil {
+				return err
+			}
+			os.Exit(1)
+		}
+		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false)
 		if err != nil {
 			return err
-			//return status.Errorf(status.BackupRestoreError, "error in executing on remote machines", err)
 		}
 		// NOTE: used os.exit as need to stop next lifecycle method to execute
 		os.Exit(1)
@@ -1069,32 +1082,58 @@ func (ins *BackupFromBashtionImp) isBastionHost() bool {
 	return false
 }
 
-func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails) error {
+func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool) error {
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	chefServerIps := infra.Outputs.ChefServerPrivateIps.Value
 	if automateIps == nil || len(automateIps) < 1 {
 		return status.Errorf(status.ConfigError, "Invalid deployment config")
 	}
-	res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
+	if stopFrontends {
+		for _, automateIp := range automateIps {
+			stopA2Res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIp, "sudo chef-automate stop")
+			if err != nil {
+				writer.Errorf("error in stopping chef-automate on automate nodes %s \n", err.Error())
+				return err
+			}
+			writer.Printf("stopped chef-automate from automate node \n %s \n", stopA2Res)
+		}
+		for _, chefServerIp := range chefServerIps {
+			stopCSRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, chefServerIp, "sudo chef-automate stop")
+			if err != nil {
+				writer.Errorf("error in stopping chef-automate on chef server nodes %s \n", err.Error())
+				return err
+			}
+			writer.Printf("stopped chef-automate from chef server node \n %s \n", stopCSRes)
+		}
+	}
+	cmdRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
 	if err != nil {
 		writer.Errorf("error in executing backup commands in Automate remote from bashtion %s \n", err.Error())
 		return err
 	}
-	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", res)
+	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", cmdRes)
 	// pooling job
-	for {
-		res, err = ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup status")
-		if err != nil {
-			writer.Errorf("error in polling backup status %s \n", err.Error())
-			return err
+	if pooling {
+		for {
+			statusResponse, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup status")
+			if err != nil {
+				writer.Errorf("error in polling backup status %s \n", err.Error())
+				return err
+			}
+			writer.Println(statusResponse)
+			if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
+				/* _, err = ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup stream-status "+cmdRes)
+				if err != nil {
+					writer.Errorf("error in polling backup status stream %s \n", err.Error())
+					return err
+				} */
+				break
+			}
+			time.Sleep(2 * time.Second)
 		}
-		//writer.Println(res)
-		if strings.EqualFold(strings.ToLower(strings.TrimSpace(res)), "Idle") {
-			break
-		}
-		time.Sleep(2 * time.Second)
 	}
 	return nil
 }
