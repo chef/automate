@@ -3,7 +3,7 @@
 hab pkg binlink chef/inspec -f
 hab pkg binlink core/terraform -f
 hab pkg binlink core/jq-static -f
-hab pkg binlink chef/automate-ha-cluster-ctl -f
+hab pkg binlink vivekshankar1/automate-ha-cluster-ctl -f
 
 NEW_WORKSPACE="{{pkg.path}}/workspace"
 

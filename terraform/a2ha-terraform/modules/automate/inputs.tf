@@ -248,3 +248,11 @@ variable "teams_port" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+variable automate_certs_by_ip {
+  type = map(map(string))
+  default = {}
+}
+variable chef_server_certs_by_ip {
+  type = map(map(string))
+  default = {}
+}

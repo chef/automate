@@ -120,3 +120,8 @@ variable "sudo_cmd" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+
+variable postgresql_certs_by_ip {
+  type = map(map(string))
+  default = {}
+}

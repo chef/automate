@@ -133,3 +133,8 @@ variable "sudo_cmd" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+
+variable opensearch_certs_by_ip {
+  type = map(map(string))
+  default = {}
+}

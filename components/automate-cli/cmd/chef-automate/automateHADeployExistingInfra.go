@@ -53,18 +53,40 @@ func (e *existingInfra) generateConfig() error {
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
 	}
+
+	//If CustomCertsEnabled for OpenSearch is enabled, then get admin_dn and nodes_dn from the certs
 	if e.config.Opensearch.Config.EnableCustomCerts {
-		admin_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
-		if err != nil {
-			return err
+		//If AdminCert is given then get the admin_dn from the cert
+		if len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) > 0 {
+			admin_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
+			if err != nil {
+				return err
+			}
+			e.config.Opensearch.Config.AdminDn = admin_dn
 		}
-		e.config.Opensearch.Config.AdminDn = admin_dn
-		nodes_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.PublicKey)
-		if err != nil {
-			return err
+		//If PublicKey is given then get the nodes_dn from the cert
+		if len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) > 0 {
+			nodes_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.PublicKey)
+			if err != nil {
+				return err
+			}
+			e.config.Opensearch.Config.NodesDn = nodes_dn
 		}
-		e.config.Opensearch.Config.NodesDn = nodes_dn
+
+		//Set the admin_dn and nodes_dn in the config for all IP addresses
+		for i := 0; i < len(e.config.Opensearch.Config.CertsByIP); i++ {
+			//If PublicKey is given then get the nodes_dn from the cert
+			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
+			if len(strings.TrimSpace(publicKey)) > 0 {
+				nodes_dn, err := e.getDistinguishedNameFromKey(publicKey)
+				if err != nil {
+					return err
+				}
+				e.config.Opensearch.Config.CertsByIP[i].NodesDn = nodes_dn
+			}
+		}
 	}
+
 	finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, e.config)
 	writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 	return nil
@@ -209,34 +231,79 @@ func (e *existingInfra) validateExternalDbFields() *list.List {
 }
 
 func (e *existingInfra) validateCerts() *list.List {
+
 	errorList := list.New()
+
+	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if e.config.Automate.Config.EnableCustomCerts {
+		// check if all the default certs are given
 		if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(e.config.Automate.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Set enable_custom_certs to false to continue without custom certificates.")
+			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+		}
+		// check if all the certs are valid for given IPs
+		for _, node := range e.config.Automate.Config.CertsByIP {
+			if len(strings.TrimSpace(node.IP)) < 1 ||
+				len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(node.PublicKey)) < 1 {
+				errorList.PushBack("Field certs_by_ip for automate requires ip, private_key and public_key. Some of them are missing.")
+			}
 		}
 	}
+
+	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if e.config.ChefServer.Config.EnableCustomCerts {
+		// check if all the default certs are given
 		if len(strings.TrimSpace(e.config.ChefServer.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.ChefServer.Config.PublicKey)) < 1 {
-			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Set enable_custom_certs to false to continue without custom certificates.")
+			errorList.PushBack("ChefServer Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+		}
+		// check if all the certs are valid for given IPs
+		for _, node := range e.config.ChefServer.Config.CertsByIP {
+			if len(strings.TrimSpace(node.IP)) < 1 ||
+				len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(node.PublicKey)) < 1 {
+				errorList.PushBack("Field certs_by_ip for chef_server requires ip, private_key and public_key. Some of them are missing.")
+			}
 		}
 	}
+
+	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if e.config.Postgresql.Config.EnableCustomCerts {
+		// check if all the default certs are given
 		if len(strings.TrimSpace(e.config.Postgresql.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(e.config.Postgresql.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Postgresql.Config.PublicKey)) < 1 {
-			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Set enable_custom_certs to false to continue without custom certificates.")
+			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+		}
+		// check if all the certs are valid for given IPs
+		for _, node := range e.config.Postgresql.Config.CertsByIP {
+			if len(strings.TrimSpace(node.IP)) < 1 ||
+				len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(node.PublicKey)) < 1 {
+				errorList.PushBack("Field certs_by_ip for postgresql requires ip, private_key and public_key. Some of them are missing.")
+			}
 		}
 	}
+
+	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if e.config.Opensearch.Config.EnableCustomCerts {
+		// check if all the default certs are given
 		if len(strings.TrimSpace(e.config.Opensearch.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.AdminKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) < 1 {
-			errorList.PushBack("Opensearch RootCA and/or Public Key and/or Private Key are missing. Otherwise set enable_custom_certs to false.")
+			errorList.PushBack("Opensearch RootCA and/or Admin Key and/or Admin Cert and/or Public Key and/or Private Key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+		}
+		// check if all the certs are valid for given IPs
+		for _, node := range e.config.Opensearch.Config.CertsByIP {
+			if len(strings.TrimSpace(node.IP)) < 1 ||
+				len(strings.TrimSpace(node.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(node.PublicKey)) < 1 {
+				errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
+			}
 		}
 	}
 	return errorList
@@ -271,5 +338,37 @@ func (e *existingInfra) validateIPs() *list.List {
 			}
 		}
 	}
+
+	if e.config.Automate.Config.EnableCustomCerts {
+		for _, element := range e.config.Automate.Config.CertsByIP {
+			if checkIPAddress(element.IP) != nil {
+				errorList.PushBack("Automate IP " + element.IP + " for certs " + notValidErrorString)
+			}
+		}
+	}
+	if e.config.ChefServer.Config.EnableCustomCerts {
+		for _, element := range e.config.ChefServer.Config.CertsByIP {
+			if checkIPAddress(element.IP) != nil {
+				errorList.PushBack("ChefServer IP " + element.IP + " for certs " + notValidErrorString)
+			}
+		}
+	}
+
+	if e.config.Opensearch.Config.EnableCustomCerts {
+		for _, element := range e.config.Opensearch.Config.CertsByIP {
+			if checkIPAddress(element.IP) != nil {
+				errorList.PushBack("Opensearch IP " + element.IP + " for certs " + notValidErrorString)
+			}
+		}
+	}
+
+	if e.config.Postgresql.Config.EnableCustomCerts {
+		for _, element := range e.config.Postgresql.Config.CertsByIP {
+			if checkIPAddress(element.IP) != nil {
+				errorList.PushBack("Postgresql IP " + element.IP + " for certs " + notValidErrorString)
+			}
+		}
+	}
+
 	return errorList
 }

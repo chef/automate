@@ -160,3 +160,52 @@ variable "tag_name" {
 variable "tag_project" {
   default = ""
 }
+
+# variable automate_certs_by_ip {
+#   description = "Certificates for automate nodes by IP."
+#   type = map(object({
+#     root_ca  = string
+#     private_key = string
+#     public_key  = string
+#   }))
+# }
+# variable chef_server_certs_by_ip {
+#   description = "Certificates for automate nodes by IP."
+#   type = map(object({
+#     private_key = string
+#     public_key  = string
+#   }))
+# }
+# variable postgresql_certs_by_ip {
+#   description = "Certificates for automate nodes by IP."
+#   type = map(object({
+#     root_ca  = string
+#     private_key = string
+#     public_key  = string
+#   }))
+# }
+# variable opensearch_certs_by_ip {
+#   description = "Certificates for automate nodes by IP."
+#   type = map(object({
+#     root_ca  = string
+#     private_key = string
+#     public_key  = string
+#     admin_cert  = string
+#     admin_key  = string
+#     admin_dn  = string
+#     nodes_dn  = string
+#   }))
+# }
+
+variable automate_certs_by_ip {
+  default = "{}"
+}
+variable chef_server_certs_by_ip {
+  default = "{}"
+}
+variable postgresql_certs_by_ip {
+  default = "{}"
+}
+variable opensearch_certs_by_ip {
+  default = "{}"
+}
