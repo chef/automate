@@ -289,6 +289,22 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 			}
 			os.Exit(1)
 		}
+		if strings.Contains(cmd.CommandPath(), "delete") {
+			if !backupDeleteCmdFlags.yes {
+				yes, err := writer.Confirm(
+					fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+						strings.Join(args, "\n"),
+					),
+				)
+				if err != nil {
+					return status.Annotate(err, status.BackupError)
+				}
+				if !yes {
+					return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
+				}
+				commandString = commandString + " --yes"
+			}
+		}
 		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false)
 		if err != nil {
 			return err
