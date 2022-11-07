@@ -227,9 +227,9 @@ Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_pr
 - Set AWS Config Details:
     - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
     - Set `type` as `aws`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
-    - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
+    - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
     - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
-    - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
+    - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
     - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
     - Leave postgresql_root_cert and opensearch_root_cert as blank in case of On-Premise with AWS Managed Services.
     - For backup and restore configuration set `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#prerequisites) to know more.
@@ -306,10 +306,10 @@ Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_pr
 - Set Self Managed Config Details:
     - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
     - Set `type` as `self-managed`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
-    - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` of your Self Managed RDS.
+    - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for your Self Managed RDS.
     - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
     - Provide the Root ca value of Postgresql `postgresql_root_cert`.
-    - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` of your Self Managed OpenSearch.
+    - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for your Self Managed OpenSearch.
     - Set `opensearch_domain_url` as the URL with Port No. For example: `"10.1.2.234:9200"`.
     - Provide the Root ca value of OpenSearch `opensearch_root_cert`.
     - Leave the [external.database.open_search.aws] config as blank as it is specific for AWS Managed Services.
