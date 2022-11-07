@@ -237,21 +237,21 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - Setup AWS RDS Postgresql 13.5. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more. Make sure to open the required port in Security Groups while creating AWS RDS Postgresql.
 - Setup AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
-- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to know more about VPC and CIDR creation.
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
+- Create the Virtual Private Cloud (VPC) in AWS before starting or use the default one. Click [here](/automate/ha_vpc_setup/) to know more about VPC and CIDR creation.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges that includes: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more about how to create IAM Users.
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
 Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for sample config of AWS Managed Services.
 
 - Set AWS Config Details:
-    - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
-    - Set `type` as `aws`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+    - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
+    - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank (`""`).
     - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
     - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
     - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
     - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
-    - Leave postgresql_root_cert and opensearch_root_cert as blank in case of On-Premise with AWS Managed Services.
+    - Leave `postgresql_root_cert` and `opensearch_root_cert` as blank in case of On-Premise with AWS Managed Services.
     - For backup and restore configuration set `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#prerequisites) to know more.
 
 Continue with the deployment after updating config:
@@ -314,24 +314,24 @@ os_snapshot_user_access_key_secret = ""
 
 ## On-Premise Setup with Self Managed Services
 
+{{< note >}} This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services. {{< /note >}}
 ### Prerequisites
 
 - Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
-- This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download latest Automate CLI and Airgapped Bundle.
 
 Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
 
 - Set Self Managed Config Details:
-    - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as empty.
-    - Set `type` as `self-managed`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+    - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
+    - Set `type` as `self-managed`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank (`""`).
     - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for your Self Managed RDS.
     - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
-    - Provide the Root ca value of Postgresql `postgresql_root_cert`.
+    - Provide the Root Certificate(root_ca) value of Postgresql under `postgresql_root_cert`.
     - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for your Self Managed OpenSearch.
     - Set `opensearch_domain_url` as the URL with Port No. For example: `"10.1.2.234:9200"`.
-    - Provide the Root ca value of OpenSearch `opensearch_root_cert`.
+    - Provide the Root Certificate(root_ca) value of OpenSearch under `opensearch_root_cert`.
     - Leave the [external.database.open_search.aws] config as blank as it is specific for AWS Managed Services.
 
 Continue with the deployment after updating config:
@@ -395,8 +395,8 @@ os_snapshot_user_access_key_secret = ""
 
 - Open the `config.toml` at bastion node
 - Change the `instance_count` value, as explained in below example.
-- Add the `Ip address` for the respetive node at the end, as explained in the example.
-- Make sure that all the necesssary port and fire wall setting are align in the new node.
+- Add the `IP address` for the respective node(s) at the end, as explained in the example.
+- Make sure that all the necessary port and firewall settings are aligned in the new node.
 
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
@@ -404,7 +404,7 @@ For example : Add new Automate node to the existing deployed cluster.
   | [automate.config] <br/> instance_count = "1" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
 
 - Trigger the deployment command again from the bastion node.
-- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+- To trigger the deploy command, we require the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or deleted from the bastion, then we need to download the airgap bundle again.
   - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
 
     ```sh
