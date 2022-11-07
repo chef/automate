@@ -366,6 +366,7 @@ func logrotateConfChecks() error {
 }
 
 func configLogrotate(req *config.Log) error {
+	var logRotateConfigContent string
 	// Create a file in /etc/logrotate.d/automate
 	file, err := os.Create(logRotateConfigFile)
 	if err != nil {
@@ -374,8 +375,14 @@ func configLogrotate(req *config.Log) error {
 	}
 	defer file.Close()
 
-	logRotateConfigContent := LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-		getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress")
+	if req.GetCompressRotatedLogs().GetValue() == true {
+		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress")
+	} else {
+		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate")
+	}
+
 	// Write the byteSlice to file
 	noOfBytes, err := file.WriteString(logRotateConfigContent)
 	if err != nil {
