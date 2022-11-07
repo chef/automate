@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"net/url"
 	"os/exec"
 	"strings"
@@ -419,6 +420,24 @@ func (c *GlobalConfig) PrepareSystemConfig(certificate *TLSCredentials) (Prepare
 	sys := c.V1.Sys
 	sys.Tls = certificate
 	return c.V1.Sys, nil
+}
+
+func (c *GlobalConfig) ValidateReDirectSysLogConfig() error {
+	if c.GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+		if c.GetV1().GetLog().GetRedirectLogFilePath().GetValue() == "" {
+			return errors.New("Please specify a log path location using redirect_log_file_path")
+		}
+
+		if c.GetV1().GetLog().GetMaxSizeRotateLogs().GetValue() == "" {
+			c.V1.Log.MaxSizeRotateLogs = w.String("100M")
+		}
+
+		if c.GetV1().GetLog().GetMaxNumberRotatedLogs().GetValue() == 0 {
+			c.V1.Log.MaxNumberRotatedLogs = w.Int32(10)
+		}
+	}
+
+	return nil
 }
 
 func getLatestPlatformToolsPath() string {
