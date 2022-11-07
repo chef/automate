@@ -175,12 +175,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	c.V1.Sys.Proxy.ConnectionString = g.ProxyString()
 	c.V1.Sys.Proxy.NoProxyString = g.NoProxyString()
 	c.V1.Sys.Backup.Filesystem.Path = g.GetV1().GetBackups().GetFilesystem().GetPath()
-	//c.V1.Sys.Log.RedirectSysLog.Value = g.GetV1().GetLog().GetRedirectSysLog().GetValue()
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = logLevel
 	}
-
 }
 
 // SystemdProxyConfig returns the proxy configuration in a format that

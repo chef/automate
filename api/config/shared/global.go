@@ -424,11 +424,11 @@ func (c *GlobalConfig) PrepareSystemConfig(certificate *TLSCredentials) (Prepare
 
 func (c *GlobalConfig) ValidateReDirectSysLogConfig() error {
 	if c.GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
-		if len(c.GetV1().GetLog().GetRedirectLogFilePath().GetValue()) == 0 {
+		if c.GetV1().GetLog().GetRedirectLogFilePath().GetValue() == "" {
 			return errors.New("Please specify a log path location using redirect_log_file_path")
 		}
 
-		if len(c.GetV1().GetLog().GetMaxSizeRotateLogs().GetValue()) == 0 {
+		if c.GetV1().GetLog().GetMaxSizeRotateLogs().GetValue() == "" {
 			c.V1.Log.MaxSizeRotateLogs = w.String("100M")
 		}
 

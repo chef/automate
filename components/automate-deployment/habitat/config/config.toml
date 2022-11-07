@@ -2,7 +2,6 @@ listen_address = "127.0.0.1"
 port = {{cfg.service.port}}
 log_level = "{{cfg.log.level}}"
 
-
 {{#if cfg.gather_logs.staging_dir ~}}
 staging_dir = "{{cfg.gather_logs.staging_dir}}"
 {{/if ~}}

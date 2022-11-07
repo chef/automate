@@ -93,6 +93,7 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
 		if err = setConfigForRedirectLogs(req, existingCopy); err != nil {
+			logrus.Errorf("Unable to set config for redirect logs with error %v", err)
 			return status.Error(codes.Internal, "Failed to set configuration for redirecting logs for automate")
 		}
 
@@ -255,6 +256,9 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 	return nil
 }
 
+//setConfigForRedirectLogs Add the config for rsyslog and logrotate
+//if the req has redirect_sys_log as true and existing has redirect_sys_log as false it will add the configurations
+//if the req has redirect_sys_log as false and existing has redirect_sys_log as true it will remove the configurations
 func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) error {
 
 	//Set the config if already not set
@@ -263,11 +267,11 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 
 		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 		if err != nil {
-			return status.Error(codes.Internal, "Failed to create configuration into syslog")
+			return status.Error(codes.Internal, err.Error())
 		}
 		err = restartSyslogService()
 		if err != nil {
-			return status.Error(codes.Internal, "Failed to restart syslog service")
+			return status.Error(codes.Internal, err.Error())
 		}
 
 		if err = runLogrotateConfig(req); err != nil {
@@ -285,7 +289,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 		err = restartSyslogService()
 		if err != nil {
-			return status.Error(codes.Internal, "Failed to restart syslog service while removing config file for syslog")
+			return status.Error(codes.Internal, err.Error())
 		}
 
 		if err = rollbackLogrotate(); err != nil {
@@ -298,6 +302,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	return nil
 }
 
+//restartSyslogService restarts the rsyslog service for the supported platforms
 func restartSyslogService() error {
 	_, err := exec.Command("bash", "-c", "systemctl restart rsyslog.service").Output()
 	if err != nil {
@@ -307,6 +312,8 @@ func restartSyslogService() error {
 	return nil
 }
 
+//createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
+// which redirects the logs to the specified location
 func createConfigFileForAutomateSysLog(pathForLog string) error {
 
 	f, err := os.Create(rsyslogConfigFile)
@@ -327,6 +334,7 @@ func createConfigFileForAutomateSysLog(pathForLog string) error {
 
 }
 
+//removeConfigFileForAutomateSyslog Deletes the file /etc/rsyslog.d/automate.conf, to disable redirecting logs
 func removeConfigFileForAutomateSyslog() error {
 	err := os.Remove(rsyslogConfigFile)
 	if err != nil {
@@ -350,6 +358,8 @@ func runLogrotateConfig(req *api.PatchAutomateConfigRequest) error {
 	return nil
 }
 
+//logrotateConfChecks Checks if the supported platform has logrotate pre-installed or not
+//if not, it returns and error which depicts to install the logrotate
 func logrotateConfChecks() error {
 	_, err := exec.Command("logrotate").Output()
 	if strings.Contains(err.Error(), "executable file not found") {
@@ -365,6 +375,8 @@ func logrotateConfChecks() error {
 	return nil
 }
 
+// configLogrotate Adds a config file for logrotate as /etc/logrotate.d/automate
+// it handles all the config for rotating logs.
 func configLogrotate(req *config.Log) error {
 	var logRotateConfigContent string
 	// Create a file in /etc/logrotate.d/automate

@@ -6,13 +6,18 @@ import (
 )
 
 func TestGetLogFileName(t *testing.T) {
-	pathForFile := "/var/log/"
-
-	expectedString := "/var/log/automate.log"
-
-	actualString := getLogFileName(pathForFile)
-
-	assert.Equal(t, expectedString, actualString)
+	t.Run("when the path has / in the end", func(t *testing.T) {
+		pathForFile := "/var/log/"
+		expectedString := "/var/log/automate.log"
+		actualString := getLogFileName(pathForFile)
+		assert.Equal(t, expectedString, actualString)
+	})
+	t.Run("when the path doesn't have / in the end", func(t *testing.T) {
+		pathForFile := "/var/log"
+		expectedString := "/var/log/automate.log"
+		actualString := getLogFileName(pathForFile)
+		assert.Equal(t, expectedString, actualString)
+	})
 }
 
 func TestGetConcatStringFromConfig(t *testing.T) {

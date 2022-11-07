@@ -472,19 +472,8 @@ func TestValidateReDirectSysLogConfig(t *testing.T) {
 		}
 		err := c.ValidateReDirectSysLogConfig()
 		assert.Equal(t, "100M", c.GetV1().GetLog().GetMaxSizeRotateLogs().GetValue())
-		require.NoError(t, err)
-	})
-	t.Run("withRedirectSyslog True and taking the default value for rotaion number for logs", func(t *testing.T) {
-		c := &GlobalConfig{
-			V1: &V1{
-				Log: &Log{
-					RedirectSysLog:      w.Bool(true),
-					RedirectLogFilePath: w.String("/var/"),
-				},
-			},
-		}
-		err := c.ValidateReDirectSysLogConfig()
 		assert.Equal(t, int32(10), c.GetV1().GetLog().GetMaxNumberRotatedLogs().GetValue())
+		assert.Equal(t, false, c.GetV1().GetLog().GetCompressRotatedLogs().GetValue())
 		require.NoError(t, err)
 	})
 

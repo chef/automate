@@ -19,7 +19,11 @@ func LogRotateConf(path string, params ...string) string {
 }
 
 func getLogFileName(path string) string {
-	return fmt.Sprintf("%sautomate.log", path)
+	if string(path[len(path)-1]) == "/" {
+		return fmt.Sprintf("%sautomate.log", path)
+	} else {
+		return fmt.Sprintf("%s/automate.log", path)
+	}
 }
 
 func getConcatStringFromConfig(constant string, variable interface{}) string {
