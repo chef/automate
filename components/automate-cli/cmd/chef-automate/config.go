@@ -201,6 +201,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 					return err
 				}
 				writer.Printf(output)
+
+				writer.Success("Cleanup is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
 			}
 		}
 		if configCmdFlags.postgresql {
@@ -223,6 +225,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 					return err
 				}
 				writer.Printf(output)
+				writer.Success("Cleanup is completed on " + remoteService + " node : " + remoteIp + "\n")
 			}
 		}
 		if configCmdFlags.opensearch {
@@ -245,6 +248,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 					return err
 				}
 				writer.Printf(output)
+				writer.Success("Cleanup is completed on " + remoteService + " node : " + remoteIp + "\n")
 			}
 		}
 	} else {
@@ -258,7 +262,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	writer.Success("Configuration patched")
+	// writer.Success("Configuration patched")
 	return nil
 }
 
