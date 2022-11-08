@@ -244,8 +244,8 @@ Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_pr
 
 - Set AWS Config Details:
 
-  - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips empty.
-  - Set `type` as `aws`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+  - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
+  - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
   - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
   - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
   - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
@@ -325,8 +325,8 @@ See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedur
 Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
 
 - Set Self-Managed Config Details:
-  - Provide instance count as `0` for [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips empty.
-  - Set `type` as `self-managed`, As these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+  - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
+  - Set `type` as `self-managed`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
   - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for your Self Managed RDS.
   - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
   - Provide the Root ca value of Postgresql `postgresql_root_cert`.
