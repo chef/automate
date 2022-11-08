@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
 	"io/ioutil"
 	"net"
 
@@ -65,18 +65,8 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 		writer.Errorf("session failed:%v", err)
 		return "", err
 	}
-	//var stdoutBuf bytes.Buffer
-	//session.Stdout = &stdoutBuf
-
-	o, err := session.StdoutPipe()
-	for {
-		tmp := make([]byte, 1024)
-		_, err := o.Read(tmp)
-		fmt.Print(string(tmp))
-		if err != nil {
-			break
-		}
-	}
+	var stdoutBuf bytes.Buffer
+	session.Stdout = &stdoutBuf
 
 	writer.StartSpinner()
 	err = session.Run(remoteCommands)
@@ -87,5 +77,6 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 		return "", err
 	}
 	defer session.Close()
-	//return stdoutBuf.String(), nil
+	return stdoutBuf.String(), nil
+
 }
