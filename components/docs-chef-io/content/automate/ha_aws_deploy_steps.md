@@ -304,3 +304,19 @@ X-Project = "Test_Project"
 - Provide `ami_filter_owner` Eg: `112758395563`
 - Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
+
+### Uninstall chef automate HA
+
+{{< danger >}}
+- Running clean up command will remove all AWS resources created by `provision-infra` command
+- Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
+{{< /danger >}}
+
+To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+```bash
+    chef-automate cleanup --aws-deployment --force
+```
+or
+```bash
+    chef-automate cleanup --aws-deployment
+```
