@@ -139,7 +139,7 @@ func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 		return runGatherLogsLocalCmd(overridePath, gatherLogsCmdFlags.logLines)
 	}
 
-	return gatherLogsFromServer(overridePath, gatherLogsCmdFlags.logLines)
+	return gatherLogsRunning(overridePath, gatherLogsCmdFlags.logLines)
 }
 
 const recoveryMsg = `
@@ -633,4 +633,20 @@ func tryRevertingAnyNginxConfChanges() {
 
 func init() {
 	RootCmd.AddCommand(newGatherLogsCmd())
+}
+
+func gatherLogsRunning(outfileOverride string, logLines uint64) error {
+	_, err := client.Connection(client.DefaultClientTimeout)
+
+	if err != nil {
+		return runGatherLogsLocalCmd(outfileOverride, logLines)
+
+	}
+	cmd := exec.Command("hab", "svc", "status")
+	stdoutStderr, err := cmd.CombinedOutput()
+	if err != nil {
+		return status.WithRecovery(errors.Wrap(err, string(stdoutStderr)), "hab-sup is not working")
+	}
+
+	return gatherLogsFromServer(outfileOverride, logLines)
 }
