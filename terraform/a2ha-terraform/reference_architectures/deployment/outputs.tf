@@ -73,3 +73,11 @@ output "opensearch_ssh" {
     var.opensearch_private_ips,
   )
 }
+
+output "backup_config_efs" {
+  value = var.backup_config_efs
+}
+
+output "backup_config_s3" {
+  value = var.backup_config_s3
+}
