@@ -42,7 +42,7 @@ or all services are down (chef-automate stop) before retrying the restore.`
 var allPassedFlags string = ""
 
 type BackupFromBashtion interface {
-	isBashtionHost() bool
+	isBastionHost() bool
 	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error
 }
 
@@ -253,7 +253,7 @@ var integrityBackupValidateCmd = &cobra.Command{
 }
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {
-	if NewBackupFromBashtion().isBashtionHost() {
+	if NewBackupFromBashtion().isBastionHost() {
 		//TODO need to handle airgap bundle path from bastion host
 		//TODO how to pass missing opensearch credentials
 		allPassedFlags = ""
@@ -1091,7 +1091,7 @@ func NewBackupFromBashtion() BackupFromBashtion {
 	return &BackupFromBashtionImp{}
 }
 
-func (ins *BackupFromBashtionImp) isBashtionHost() bool {
+func (ins *BackupFromBashtionImp) isBastionHost() bool {
 	if isA2HARBFileExist() {
 		return true
 	}
@@ -1132,7 +1132,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		writer.Errorf("error in executing backup commands in Automate remote from bashtion %s \n", err.Error())
 		return err
 	}
-	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", cmdRes)
+	writer.Printf("triggered backup commands in Automate remote machine %s from bashtion host response \n %s \n", automateIps[0], cmdRes)
 	// pooling job
 	if pooling {
 		writer.StartSpinner()
