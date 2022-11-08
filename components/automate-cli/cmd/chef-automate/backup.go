@@ -254,63 +254,76 @@ var integrityBackupValidateCmd = &cobra.Command{
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {
 	if NewBackupFromBashtion().isBastionHost() {
-		//TODO need to handle airgap bundle path from bastion host
-		//TODO how to pass missing opensearch credentials
+		//Enhancments:  need to handle airgap bundle path from bastion host
+		//Enhancments: how to pass missing opensearch credentials
 		allPassedFlags = ""
 		cmd.Flags().Visit(checkFlags)
-		commandString := cmd.CommandPath() + " "
-		if !strings.Contains(commandString, "sudo") {
-			commandString = "sudo " + commandString
-		}
-		if len(args) > 0 {
-			for _, ar := range args {
-				commandString = commandString + ar + " "
-			}
-		}
-		commandString = commandString + "--no-progress "
-		commandString = commandString + allPassedFlags
+		commandString := prepareCommandString(cmd, args, allPassedFlags)
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
 			return err
 			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
 		}
-		if strings.Contains(cmd.CommandPath(), "create") {
-			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
-			if err != nil {
-				return err
-			}
-			os.Exit(1)
-		}
-		if strings.Contains(cmd.CommandPath(), "restore") {
-			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
-			if err != nil {
-				return err
-			}
-			os.Exit(1)
-		}
-		if strings.Contains(cmd.CommandPath(), "delete") {
-			if !backupDeleteCmdFlags.yes {
-				yes, err := writer.Confirm(
-					fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
-						strings.Join(args, "\n"),
-					),
-				)
-				if err != nil {
-					return status.Annotate(err, status.BackupError)
-				}
-				if !yes {
-					return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
-				}
-				commandString = commandString + " --yes"
-			}
-		}
-		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
+		err = handleBackupCommandsOnBastion(cmd, args, commandString, infra)
 		if err != nil {
 			return err
 		}
 		// NOTE: used os.exit as need to stop next lifecycle method to execute
 		os.Exit(1)
+	}
+	return nil
+}
+
+func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) string {
+	commandString := cmd.CommandPath() + " "
+	if !strings.Contains(commandString, "sudo") {
+		commandString = "sudo " + commandString
+	}
+	if len(args) > 0 {
+		for _, ar := range args {
+			commandString = commandString + ar + " "
+		}
+	}
+	commandString = commandString + "--no-progress "
+	commandString = commandString + allPassedFlags
+	return commandString
+}
+
+func handleBackupCommandsOnBastion(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
+	if strings.Contains(cmd.CommandPath(), "create") {
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
+		if err != nil {
+			return err
+		}
+		os.Exit(1)
+	}
+	if strings.Contains(cmd.CommandPath(), "restore") {
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
+		if err != nil {
+			return err
+		}
+		os.Exit(1)
+	}
+	if strings.Contains(cmd.CommandPath(), "delete") {
+		if !backupDeleteCmdFlags.yes {
+			yes, err := writer.Confirm(
+				fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+					strings.Join(args, "\n"),
+				),
+			)
+			if err != nil {
+				return status.Annotate(err, status.BackupError)
+			}
+			if !yes {
+				return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
+			}
+			commandString = commandString + " --yes"
+		}
+	}
+	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
+	if err != nil {
+		return err
 	}
 	return nil
 }
