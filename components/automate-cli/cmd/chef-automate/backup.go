@@ -1113,7 +1113,7 @@ func (ins *BackupFromBashtionImp) isBastionHost() bool {
 
 func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error {
 	sshUser := infra.Outputs.SSHUser.Value
-	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
 	automateIps := infra.Outputs.AutomatePrivateIps.Value
 	chefServerIps := infra.Outputs.ChefServerPrivateIps.Value
@@ -1121,56 +1121,72 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		return status.Errorf(status.ConfigError, "Invalid deployment config")
 	}
 	if stopFrontends {
-		for _, automateIp := range automateIps {
-			writer.Printf("stopping automate nodes %s \n", automateIp)
-			stopA2Res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIp, "sudo chef-automate stop")
-			if err != nil {
-				writer.Errorf("error in stopping chef-automate on automate nodes %s \n", err.Error())
-				return err
-			}
-			writer.Printf("stopped chef-automate from automate node \n %s : %s \n", stopA2Res, automateIp)
-		}
-		for _, chefServerIp := range chefServerIps {
-			writer.Printf("stopping chef server nodes %s \n", chefServerIp)
-			stopCSRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, chefServerIp, "sudo chef-automate stop")
-			if err != nil {
-				writer.Errorf("error in stopping chef-automate on chef server nodes %s \n", err.Error())
-				return err
-			}
-			writer.Printf("stopped chef-automate from chef server node \n %s : %s \n", stopCSRes, chefServerIp)
+		err := stopFrontendNodes(sshUser, sshKeyFile, sshPort, automateIps, chefServerIps)
+		if err != nil {
+			return err
 		}
 	}
-	cmdRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], commandString)
+	cmdRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, automateIps[0], commandString)
 	if err != nil {
-		writer.Errorf("error in executing backup commands in Automate remote from bashtion %s \n", err.Error())
+		writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
 		return err
 	}
-	writer.Printf("triggered backup commands in Automate remote machine %s from bashtion host response \n %s \n", automateIps[0], cmdRes)
-	// pooling job
+	writer.Printf("triggered backup commands on Automate node %s \n %s \n", automateIps[0], cmdRes)
+
 	if pooling {
-		writer.StartSpinner()
-		for {
-			statusResponse, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup status")
-			if err != nil {
-				writer.Errorf("error in polling backup status %s \n", err.Error())
-				return err
-			}
-			//writer.Println(statusResponse)
-			if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
-				if backupState {
-					backupList, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup list")
-					if err != nil {
-						writer.Errorf("error in getting backup list %s \n", err.Error())
-						break
-					}
-					backupState := getBackupStateFromList(backupList, cmdRes)
-					writer.Println(backupState)
-				}
-				writer.StopSpinner()
-				break
-			}
-			time.Sleep(2 * time.Second)
+		err := poolStatus(sshUser, sshKeyFile, sshPort, automateIps, cmdRes, backupState)
+		if err != nil {
+			return err
 		}
+	}
+	return nil
+}
+
+func poolStatus(sshUser string, sshKeyFile string, sshPort string, automateIps []string, cmdRes string, backupState bool) error {
+	writer.StartSpinner()
+	for {
+		statusResponse, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, automateIps[0], "sudo chef-automate backup status")
+		if err != nil {
+			writer.Errorf("error in polling backup status %s \n", err.Error())
+			return err
+		}
+		//writer.Println(statusResponse)
+		if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
+			if backupState {
+				backupList, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, automateIps[0], "sudo chef-automate backup list")
+				if err != nil {
+					writer.Errorf("error in getting backup list %s \n", err.Error())
+					break
+				}
+				backupState := getBackupStateFromList(backupList, cmdRes)
+				writer.Println(backupState)
+			}
+			writer.StopSpinner()
+			break
+		}
+		time.Sleep(2 * time.Second)
+	}
+	return nil
+}
+
+func stopFrontendNodes(sshUser string, sshKeyFile string, sshPort string, automateIps []string, chefServerIps []string) error {
+	for _, automateIp := range automateIps {
+		writer.Printf("stopping automate nodes %s \n", automateIp)
+		stopA2Res, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, automateIp, "sudo chef-automate stop")
+		if err != nil {
+			writer.Errorf("error in stopping chef-automate on automate nodes %s \n", err.Error())
+			return err
+		}
+		writer.Printf("stopped chef-automate from automate node \n %s : %s \n", stopA2Res, automateIp)
+	}
+	for _, chefServerIp := range chefServerIps {
+		writer.Printf("stopping chef server nodes %s \n", chefServerIp)
+		stopCSRes, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, chefServerIp, "sudo chef-automate stop")
+		if err != nil {
+			writer.Errorf("error in stopping chef-automate on chef server nodes %s \n", err.Error())
+			return err
+		}
+		writer.Printf("stopped chef-automate from chef server node \n %s : %s \n", stopCSRes, chefServerIp)
 	}
 	return nil
 }
