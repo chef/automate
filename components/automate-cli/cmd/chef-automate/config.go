@@ -200,9 +200,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 					writer.Errorf("%v", err)
 					return err
 				}
-				writer.Printf(output)
-
-				writer.Success("Cleanup is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
+				writer.Printf(output + "\n")
+				writer.Success("Patching is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
 			}
 		}
 		if configCmdFlags.postgresql {
@@ -224,8 +223,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 					writer.Errorf("%v", err)
 					return err
 				}
-				writer.Printf(output)
-				writer.Success("Cleanup is completed on " + remoteService + " node : " + remoteIp + "\n")
+				writer.Printf(output + "\n")
+				writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
 			}
 		}
 		if configCmdFlags.opensearch {
@@ -247,8 +246,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 					writer.Errorf("%v", err)
 					return err
 				}
-				writer.Printf(output)
-				writer.Success("Cleanup is completed on " + remoteService + " node : " + remoteIp + "\n")
+				writer.Printf(output + "\n")
+				writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
 			}
 		}
 	} else {
