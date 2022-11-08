@@ -70,6 +70,7 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 			sshKeyFile := infra.Outputs.SSHKeyFile.Value
 			sshPort := infra.Outputs.SSHPort.Value
 			if cleanupFlags.onprem {
+
 				res, err := writer.Prompt("Cleanup will remove all the Automate HA resources created by deploy command. Do you want to continue?\nPress y to agree, n to disagree? [y/n]")
 				if err != nil {
 					return err
