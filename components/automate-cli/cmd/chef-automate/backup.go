@@ -43,7 +43,7 @@ var allPassedFlags string = ""
 
 type BackupFromBashtion interface {
 	isBashtionHost() bool
-	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool) error
+	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error
 }
 
 type BackupFromBashtionImp struct{}
@@ -276,14 +276,14 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
 		}
 		if strings.Contains(cmd.CommandPath(), "create") {
-			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false)
+			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
 			if err != nil {
 				return err
 			}
 			os.Exit(1)
 		}
 		if strings.Contains(cmd.CommandPath(), "restore") {
-			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true)
+			err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
 			if err != nil {
 				return err
 			}
@@ -305,7 +305,7 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 				commandString = commandString + " --yes"
 			}
 		}
-		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false)
+		err = NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
 		if err != nil {
 			return err
 		}
@@ -1098,7 +1098,7 @@ func (ins *BackupFromBashtionImp) isBashtionHost() bool {
 	return false
 }
 
-func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool) error {
+func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error {
 	sshUser := infra.Outputs.SSHUser.Value
 	sskKeyFile := infra.Outputs.SSHKeyFile.Value
 	sshPort := infra.Outputs.SSHPort.Value
@@ -1135,23 +1135,36 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	writer.Printf("triggered backup commands in Automate remote machine from bashtion host response \n %s \n", cmdRes)
 	// pooling job
 	if pooling {
+		writer.StartSpinner()
 		for {
 			statusResponse, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup status")
 			if err != nil {
 				writer.Errorf("error in polling backup status %s \n", err.Error())
 				return err
 			}
-			writer.Println(statusResponse)
+			//writer.Println(statusResponse)
 			if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
-				/* _, err = ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup stream-status "+cmdRes)
-				if err != nil {
-					writer.Errorf("error in polling backup status stream %s \n", err.Error())
-					return err
-				} */
+				if backupState {
+					backupList, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, automateIps[0], "sudo chef-automate backup list")
+					if err != nil {
+						writer.Errorf("error in getting backup list %s \n", err.Error())
+						break
+					}
+					backupState := getBackupStateFromList(backupList, cmdRes)
+					writer.Println(backupState)
+				}
+				writer.StopSpinner()
 				break
 			}
 			time.Sleep(2 * time.Second)
 		}
 	}
 	return nil
+}
+
+func getBackupStateFromList(output string, backupId string) string {
+	idxFind := strings.Index(output, strings.TrimSpace(backupId))
+	left := strings.LastIndex(output[:idxFind], "\n")
+	right := strings.Index(output[idxFind:], "\n")
+	return output[left : idxFind+right]
 }

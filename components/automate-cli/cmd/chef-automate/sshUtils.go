@@ -67,7 +67,6 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	}
 	var stdoutBuf bytes.Buffer
 	session.Stdout = &stdoutBuf
-	//session.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
 
 	writer.StartSpinner()
 	err = session.Run(remoteCommands)
