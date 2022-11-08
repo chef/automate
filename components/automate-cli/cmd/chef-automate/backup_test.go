@@ -9,7 +9,7 @@ import (
 func TestIsBastionHost(t *testing.T) {
 	impl := NewBackupFromBashtion()
 	bastionHost := impl.isBastionHost()
-	assert.True(t, bastionHost)
+	assert.False(t, bastionHost)
 }
 
 func TestExecuteAndPoolStatusWithInvalidConfig(t *testing.T) {
