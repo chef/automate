@@ -8,13 +8,13 @@ import (
 
 func TestIsBastionHost(t *testing.T) {
 	impl := NewBackupFromBashtion()
-	bastionHost := impl.isBashtionHost()
+	bastionHost := impl.isBastionHost()
 	assert.True(t, bastionHost)
 }
 
 func TestExecuteAndPoolStatusWithInvalidConfig(t *testing.T) {
 	impl := NewBackupFromBashtion()
-	err := impl.executeOnRemoteAndPoolStatus("chef-automate backup create", &AutomteHAInfraDetails{}, false, false)
+	err := impl.executeOnRemoteAndPoolStatus("chef-automate backup create", &AutomteHAInfraDetails{}, false, false, false)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Invalid deployment config")
 }
