@@ -185,6 +185,11 @@ type ExistingInfraConfigToml struct {
 			RootCA            string `toml:"root_ca"`
 			PrivateKey        string `toml:"private_key"`
 			PublicKey         string `toml:"public_key"`
+			CertsByIP         []struct {
+				IP         string `toml:"ip"`
+				PrivateKey string `toml:"private_key"`
+				PublicKey  string `toml:"public_key"`
+			} `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
@@ -193,6 +198,11 @@ type ExistingInfraConfigToml struct {
 			EnableCustomCerts bool   `toml:"enable_custom_certs"`
 			PrivateKey        string `toml:"private_key"`
 			PublicKey         string `toml:"public_key"`
+			CertsByIP         []struct {
+				IP         string `toml:"ip"`
+				PrivateKey string `toml:"private_key"`
+				PublicKey  string `toml:"public_key"`
+			} `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Opensearch struct {
@@ -206,6 +216,12 @@ type ExistingInfraConfigToml struct {
 			PublicKey         string `toml:"public_key"`
 			AdminDn           string `toml:"admin_dn"`
 			NodesDn           string `toml:"nodes_dn"`
+			CertsByIP         []struct {
+				IP         string `toml:"ip"`
+				PrivateKey string `toml:"private_key"`
+				PublicKey  string `toml:"public_key"`
+				NodesDn    string `toml:"nodes_dn"`
+			} `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
@@ -215,6 +231,11 @@ type ExistingInfraConfigToml struct {
 			RootCA            string `toml:"root_ca"`
 			PrivateKey        string `toml:"private_key"`
 			PublicKey         string `toml:"public_key"`
+			CertsByIP         []struct {
+				IP         string `toml:"ip"`
+				PrivateKey string `toml:"private_key"`
+				PublicKey  string `toml:"public_key"`
+			} `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"postgresql"`
 	ExistingInfra struct {
