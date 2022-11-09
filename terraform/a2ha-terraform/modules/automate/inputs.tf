@@ -14,6 +14,11 @@ variable "automate_admin_password" {
 variable "automate_admin_username" {
 }
 
+variable "automate_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "automate_config" {
   default = ""
 }
@@ -74,6 +79,11 @@ variable "backup_config_s3" {
 
 variable "bucket_name" {
   default = "chef-automate-ha"
+}
+
+variable "chef_server_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "chef_server_custom_certs_enabled" {
@@ -247,12 +257,4 @@ variable "teams_port" {
 
 variable "tmp_path" {
   default = "/var/automate-ha"
-}
-variable automate_certs_by_ip {
-  type = map(map(string))
-  default = {}
-}
-variable chef_server_certs_by_ip {
-  type = map(map(string))
-  default = {}
 }

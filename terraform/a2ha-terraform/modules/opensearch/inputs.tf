@@ -50,6 +50,11 @@ variable "opensearch_admin_dn" {
 variable "opensearch_admin_key" {
 }
 
+variable "opensearch_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "opensearch_custom_certs_enabled" {
   default = false
 }
@@ -132,9 +137,4 @@ variable "sudo_cmd" {
 
 variable "tmp_path" {
   default = "/var/automate-ha"
-}
-
-variable opensearch_certs_by_ip {
-  type = map(map(string))
-  default = {}
 }

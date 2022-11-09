@@ -6,7 +6,7 @@ import re
 
 # this regex matches terraform variable definitions
 # we capture the variable name so we can sort on it
-pattern = r'(variable\s+")([^"]+)("\s+{[^{]*})'
+pattern = r'(variable ")([\w\d]+)(" {\n[\w\W]+?\n})'
 
 
 def process(content):

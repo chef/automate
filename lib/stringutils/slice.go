@@ -7,6 +7,18 @@ import (
 
 var ErrNotFound = errors.New("Not found")
 
+func SubSlice(s1 []string, s2 []string) bool {
+	if len(s1) > len(s2) {
+		return false
+	}
+	for _, e := range s1 {
+		if !SliceContains(s2, e) {
+			return false
+		}
+	}
+	return true
+}
+
 func SliceContains(haystack []string, needle string) bool {
 	for _, s := range haystack {
 		if s == needle {

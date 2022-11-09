@@ -45,6 +45,11 @@ variable "pgleaderchk_svc_load_args" {
 variable "postgresql_archive_disk_fs_path" {
 }
 
+variable "postgresql_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "postgresql_custom_certs_enabled" {
   default = false
 }
@@ -119,9 +124,4 @@ variable "sudo_cmd" {
 
 variable "tmp_path" {
   default = "/var/automate-ha"
-}
-
-variable postgresql_certs_by_ip {
-  type = map(map(string))
-  default = {}
 }
