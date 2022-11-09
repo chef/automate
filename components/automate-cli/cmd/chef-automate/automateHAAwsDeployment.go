@@ -228,20 +228,20 @@ func (a *awsDeployment) validateCerts() *list.List {
 		if len(strings.TrimSpace(a.config.Automate.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(a.config.Automate.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(a.config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate RootCA and/or Public Key and/or Private Key are missing. Otherwise set enable_custom_certs to false.")
+			errorList.PushBack("Automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
 	}
 	if a.config.ChefServer.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(a.config.ChefServer.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(a.config.ChefServer.Config.PublicKey)) < 1 {
-			errorList.PushBack("ChefServer RootCA and/or Public Key and/or Private Key are missing. Otherwise set enable_custom_certs to false.")
+			errorList.PushBack("ChefServer root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
 	}
 	if a.config.Postgresql.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 ||
 			len(strings.TrimSpace(a.config.Postgresql.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(a.config.Postgresql.Config.PublicKey)) < 1 {
-			errorList.PushBack("Postgresql RootCA and/or Public Key and/or Private Key are missing. Otherwise set enable_custom_certs to false.")
+			errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
 	}
 	if a.config.Opensearch.Config.EnableCustomCerts {
@@ -250,7 +250,7 @@ func (a *awsDeployment) validateCerts() *list.List {
 			len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) < 1 ||
 			len(strings.TrimSpace(a.config.Opensearch.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) < 1 {
-			errorList.PushBack("Opensearch RootCA and/or Public Key and/or Private Key are missing. Otherwise set enable_custom_certs to false.")
+			errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
 	}
 	return errorList

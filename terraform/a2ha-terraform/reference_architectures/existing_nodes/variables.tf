@@ -2,6 +2,11 @@ variable "access_key" {
   default = ""
 }
 
+variable "automate_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "aws_os_snapshot_role_arn" {
   default = ""
 }
@@ -16,6 +21,11 @@ variable "backup_config_s3" {
 
 variable "bucket_name" {
   default = ""
+}
+
+variable "chef_server_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "existing_automate_ips" {
@@ -98,6 +108,11 @@ variable "managed_rds_superuser_username" {
   default = ""
 }
 
+variable "opensearch_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "opensearch_root_cert" {
 }
 
@@ -107,6 +122,11 @@ variable "os_snapshot_user_access_key_id" {
 
 variable "os_snapshot_user_access_key_secret" {
   default = ""
+}
+
+variable "postgresql_certs_by_ip" {
+  type = map(map(string))
+  default = {}
 }
 
 variable "postgresql_root_cert" {

@@ -160,14 +160,15 @@ module "opensearch" {
   opensearch_username             = var.opensearch_username
   opensearch_user_password        = var.opensearch_user_password
   depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
-  opensearch_root_ca              = var.opensearch_root_ca
-  opensearch_private_key          = var.opensearch_private_key
-  opensearch_public_key           = var.opensearch_public_key
-  opensearch_admin_key            = var.opensearch_admin_key
-  opensearch_admin_cert           = var.opensearch_admin_cert
+  opensearch_root_ca              = trimspace(var.opensearch_root_ca)
+  opensearch_private_key          = trimspace(var.opensearch_private_key)
+  opensearch_public_key           = trimspace(var.opensearch_public_key)
+  opensearch_admin_key            = trimspace(var.opensearch_admin_key)
+  opensearch_admin_cert           = trimspace(var.opensearch_admin_cert)
   opensearch_admin_dn             = var.opensearch_admin_dn
   opensearch_nodes_dn             = var.opensearch_nodes_dn
   opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
+  opensearch_certs_by_ip          = var.opensearch_certs_by_ip
 }
 
 module "postgresql" {
@@ -204,10 +205,11 @@ module "postgresql" {
   backup_config_efs               = var.backup_config_efs
   nfs_mount_path                  = var.nfs_mount_path
   depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
-  postgresql_root_ca              = var.postgresql_root_ca
-  postgresql_private_key          = var.postgresql_private_key
-  postgresql_public_key           = var.postgresql_public_key
+  postgresql_root_ca              = trimspace(var.postgresql_root_ca)
+  postgresql_private_key          = trimspace(var.postgresql_private_key)
+  postgresql_public_key           = trimspace(var.postgresql_public_key)
   postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
+  postgresql_certs_by_ip          = var.postgresql_certs_by_ip
 }
 
 module "bootstrap_automate" {
@@ -217,17 +219,18 @@ module "bootstrap_automate" {
   automate_admin_username            = var.automate_admin_username
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
-  automate_root_ca                   = var.automate_root_ca
-  opensearch_root_ca                 = var.opensearch_root_ca
-  postgresql_root_ca                 = var.postgresql_root_ca
-  automate_private_key               = var.automate_private_key
-  automate_public_key                = var.automate_public_key
-  chef_server_private_key            = var.chef_server_private_key
-  chef_server_public_key             = var.chef_server_public_key
+  automate_root_ca                   = trimspace(var.automate_root_ca)
+  opensearch_root_ca                 = trimspace(var.opensearch_root_ca)
+  postgresql_root_ca                 = trimspace(var.postgresql_root_ca)
+  automate_private_key               = trimspace(var.automate_private_key)
+  automate_public_key                = trimspace(var.automate_public_key)
+  chef_server_private_key            = trimspace(var.chef_server_private_key)
+  chef_server_public_key             = trimspace(var.chef_server_public_key)
   automate_custom_certs_enabled      = var.automate_custom_certs_enabled
   chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
   postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+  automate_certs_by_ip               = var.automate_certs_by_ip
   opensearch_root_cert               = var.opensearch_root_cert
   postgresql_root_cert               = var.postgresql_root_cert
   managed_opensearch_domain_name     = var.managed_opensearch_domain_name
@@ -254,7 +257,7 @@ module "bootstrap_automate" {
   backend_aib_dest_file              = var.backend_aib_dest_file
   backend_aib_local_file             = var.backend_aib_local_file
   frontend_aib_dest_file             = var.frontend_aib_dest_file
-  frontend_aib_local_file            = var.frontend_aib_local_file
+  frontend_aib_local_file            = var.frontend_aib_local_file  
   habitat_info                       = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token    = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port             = var.opensearch_listen_port
@@ -288,17 +291,18 @@ module "automate" {
   automate_admin_username            = var.automate_admin_username
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
-  automate_root_ca                   = var.automate_root_ca
-  opensearch_root_ca                 = var.opensearch_root_ca
-  postgresql_root_ca                 = var.postgresql_root_ca
-  automate_private_key               = var.automate_private_key
-  automate_public_key                = var.automate_public_key
-  chef_server_private_key            = var.chef_server_private_key
-  chef_server_public_key             = var.chef_server_public_key
+  automate_root_ca                   = trimspace(var.automate_root_ca)
+  opensearch_root_ca                 = trimspace(var.opensearch_root_ca)
+  postgresql_root_ca                 = trimspace(var.postgresql_root_ca)
+  automate_private_key               = trimspace(var.automate_private_key)
+  automate_public_key                = trimspace(var.automate_public_key)
+  chef_server_private_key            = trimspace(var.chef_server_private_key)
+  chef_server_public_key             = trimspace(var.chef_server_public_key)
   automate_custom_certs_enabled      = var.automate_custom_certs_enabled
   chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
   postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+  automate_certs_by_ip               = var.automate_certs_by_ip
   managed_opensearch_domain_name     = var.managed_opensearch_domain_name
   managed_opensearch_certificate     = var.managed_opensearch_certificate
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url
@@ -320,7 +324,7 @@ module "automate" {
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.automate_instance_count - 1
-  automate_role                      = "automate"
+  automate_role                      = "automate"            
   cluster_id                         = random_id.cluster_id.hex
   backend_aib_dest_file              = var.backend_aib_dest_file
   frontend_aib_dest_file             = var.frontend_aib_dest_file
@@ -338,22 +342,22 @@ module "automate" {
     1,
     length(var.existing_automate_private_ips),
   )
-  ssh_key_file           = var.ssh_key_file
-  ssh_user               = var.ssh_user
-  ssh_port               = var.ssh_port
-  ssh_user_sudo_password = local.fe_sudo_password
-  sudo_cmd               = var.sudo_cmd
-  teams_port             = var.teams_port
-  backup_config_s3       = var.backup_config_s3
-  backup_config_efs      = var.backup_config_efs
-  s3_endpoint            = var.s3_endpoint
-  bucket_name            = var.bucket_name
-  access_key             = var.access_key
-  secret_key             = var.secret_key
-  aws_region             = var.region
-  infra                  = var.infra
-  nfs_mount_path         = var.nfs_mount_path
-  depends_on             = [module.bootstrap_automate]
+  ssh_key_file                       = var.ssh_key_file
+  ssh_user                           = var.ssh_user
+  ssh_port                           = var.ssh_port
+  ssh_user_sudo_password             = local.fe_sudo_password
+  sudo_cmd                           = var.sudo_cmd
+  teams_port                         = var.teams_port
+  backup_config_s3                   = var.backup_config_s3
+  backup_config_efs                  = var.backup_config_efs
+  s3_endpoint                        = var.s3_endpoint
+  bucket_name                        = var.bucket_name
+  access_key                         = var.access_key
+  secret_key                         = var.secret_key
+  aws_region                         = var.region
+  infra                              = var.infra
+  nfs_mount_path                     = var.nfs_mount_path
+  depends_on                         = [module.bootstrap_automate]
 }
 
 module "chef_server" {
@@ -363,17 +367,18 @@ module "chef_server" {
   automate_admin_username            = var.automate_admin_username
   automate_admin_password            = var.automate_admin_password
   automate_config                    = file(var.automate_config_file)
-  automate_root_ca                   = var.automate_root_ca
-  opensearch_root_ca                 = var.opensearch_root_ca
-  postgresql_root_ca                 = var.postgresql_root_ca
-  automate_private_key               = var.automate_private_key
-  automate_public_key                = var.automate_public_key
-  chef_server_private_key            = var.chef_server_private_key
-  chef_server_public_key             = var.chef_server_public_key
+  automate_root_ca                   = trimspace(var.automate_root_ca)
+  opensearch_root_ca                 = trimspace(var.opensearch_root_ca)
+  postgresql_root_ca                 = trimspace(var.postgresql_root_ca)
+  automate_private_key               = trimspace(var.automate_private_key)
+  automate_public_key                = trimspace(var.automate_public_key)
+  chef_server_private_key            = trimspace(var.chef_server_private_key)
+  chef_server_public_key             = trimspace(var.chef_server_public_key)
   automate_custom_certs_enabled      = var.automate_custom_certs_enabled
   chef_server_custom_certs_enabled   = var.chef_server_custom_certs_enabled
   postgresql_custom_certs_enabled    = var.postgresql_custom_certs_enabled
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
+  chef_server_certs_by_ip            = var.chef_server_certs_by_ip
   managed_opensearch_domain_name     = var.managed_opensearch_domain_name
   managed_opensearch_certificate     = var.managed_opensearch_certificate
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url

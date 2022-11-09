@@ -161,12 +161,22 @@ enable_custom_certs = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
+# Or you can provide certificates at node level using below fields
+# [[automate.config.certs_by_ip]]
+# ip = "A.B.C.D"
+# private_key = ""
+# public_key = ""
 [chef_server.config]
 instance_count = "2"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 # Add Chef Server load balancer root-ca and keys
 # root_ca = ""
+# private_key = ""
+# public_key = ""
+# Or you can provide certificates at node level using below fields
+# [[chef_server.config.certs_by_ip]]
+# ip = "I.J.K.L"
 # private_key = ""
 # public_key = ""
 [opensearch.config]
@@ -179,12 +189,22 @@ enable_custom_certs = false
 # admin_cert = ""
 # private_key = ""
 # public_key = ""
+# Or you can provide certificates at node level using below fields
+# [[opensearch.config.certs_by_ip]]
+# ip = "A1.A2.A3.A4"
+# private_key = ""
+# public_key = ""
 [postgresql.config]
 instance_count = "3"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 # Add Postgresql load balancer root-ca and keys
 # root_ca = ""
+# private_key = ""
+# public_key = ""
+# Or you can provide certificates at node level using below fields
+# [[postgresql.config.certs_by_ip]]
+# ip = "D1.D2.D3.D4"
 # private_key = ""
 # public_key = ""
 [existing_infra.config]

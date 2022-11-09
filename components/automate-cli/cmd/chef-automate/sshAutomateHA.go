@@ -109,6 +109,14 @@ type AutomteHAInfraDetails struct {
 			Value string `json:"value"`
 			Type  string `json:"type"`
 		} `json:"ssh_port"`
+		BackupConfigEFS struct {
+			Value string `json:"value"`
+			Type  string `json:"type"`
+		} `json:"backup_config_efs"`
+		BackupConfigS3 struct {
+			Value string `json:"value"`
+			Type  string `json:"type"`
+		} `json:"backup_config_s3"`
 	} `json:"outputs"`
 	Resources []struct {
 		Module    string `json:"module,omitempty"`

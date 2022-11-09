@@ -1,17 +1,21 @@
 locals {
-  postgresql_user_toml = templatefile("${path.module}/templates/postgresql_user.toml.tpl", {
-    listen_port                     = var.postgresql_listen_port,
-    postgresql_pg_dump_enabled      = var.postgresql_pg_dump_enabled ? "true" : "false",
-    postgresql_pg_dump_fs_path      = "${var.postgresql_archive_disk_fs_path}/pg_dump",
-    postgresql_ssl_enable           = var.postgresql_ssl_enable ? "true" : "false",
-    postgresql_wal_archive_enabled  = var.postgresql_wal_archive_enabled ? "true" : "false",
-    postgresql_wal_archive_fs_path  = "${var.postgresql_archive_disk_fs_path}/archive",
-    tmp_path                        = var.tmp_path
-    postgresql_root_ca              = var.postgresql_root_ca
-    postgresql_public_key           = var.postgresql_public_key
-    postgresql_private_key          = var.postgresql_private_key
-    postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
-  })
+  postgresql_user_toml = [
+    for n in range(var.postgresql_instance_count) : templatefile("${path.module}/templates/postgresql_user.toml.tpl", {
+      listen_port                     = var.postgresql_listen_port,
+      postgresql_pg_dump_enabled      = var.postgresql_pg_dump_enabled ? "true" : "false",
+      postgresql_pg_dump_fs_path      = "${var.postgresql_archive_disk_fs_path}/pg_dump",
+      postgresql_ssl_enable           = var.postgresql_ssl_enable ? "true" : "false",
+      postgresql_wal_archive_enabled  = var.postgresql_wal_archive_enabled ? "true" : "false",
+      postgresql_wal_archive_fs_path  = "${var.postgresql_archive_disk_fs_path}/archive",
+      tmp_path                        = var.tmp_path
+      postgresql_root_ca              = var.postgresql_root_ca
+      postgresql_public_key           = var.postgresql_public_key
+      postgresql_private_key          = var.postgresql_private_key
+      postgresql_custom_certs_enabled = var.postgresql_custom_certs_enabled
+      postgresql_public_key           = contains(keys(var.postgresql_certs_by_ip), var.private_ips[n]) ? var.postgresql_certs_by_ip[element(var.private_ips, n)].public_key : var.postgresql_public_key
+      postgresql_private_key          = contains(keys(var.postgresql_certs_by_ip), var.private_ips[n]) ? var.postgresql_certs_by_ip[element(var.private_ips, n)].private_key : var.postgresql_private_key
+    })
+  ]
   pgleaderchk_user_toml = templatefile("${path.module}/templates/pgleaderchk_user.toml.tpl", {
     listen_port = var.pgleaderchk_listen_port,
     tmp_path    = var.tmp_path
@@ -41,7 +45,7 @@ resource "null_resource" "postgresql" {
   count = var.postgresql_instance_count
 
   triggers = {
-    template       = local.postgresql_user_toml
+    template       = local.postgresql_user_toml[count.index]
     template_pgl   = local.pgleaderchk_user_toml
     template_puser = local.proxy_user_toml
     template_prov  = local.provision
@@ -57,7 +61,7 @@ resource "null_resource" "postgresql" {
 
   provisioner "file" {
     destination = "${var.tmp_path}/postgresql-user.toml"
-    content     = local.postgresql_user_toml
+    content     = local.postgresql_user_toml[count.index]
   }
 
   provisioner "file" {

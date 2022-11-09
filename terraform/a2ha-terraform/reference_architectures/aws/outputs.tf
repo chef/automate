@@ -41,3 +41,11 @@ output "os_snapshot_user_access_key_secret" {
 output "postgresql_private_ips" {
   value = formatlist("%s", module.aws.postgresql_private_ips)
 }
+
+output "backup_config_efs" {
+  value = var.backup_config_efs
+}
+
+output "backup_config_s3" {
+  value = var.backup_config_s3
+}

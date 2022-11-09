@@ -73,6 +73,7 @@ module AutomateCluster
       default :root_ca
       default :public_key
       default :private_key
+      default :certs_by_ip, "{}"
     end
 
     config_context :chef_server do
@@ -80,6 +81,7 @@ module AutomateCluster
       default :enable_custom_certs, false
       default :public_key
       default :private_key
+      default :certs_by_ip, "{}"
     end
 
     config_context :opensearch do
@@ -92,6 +94,7 @@ module AutomateCluster
       default :private_key
       default :admin_dn
       default :nodes_dn
+      default :certs_by_ip, "{}"
     end
 
     config_context :postgresql do
@@ -100,6 +103,7 @@ module AutomateCluster
       default :root_ca
       default :public_key
       default :private_key
+      default :certs_by_ip, "{}"
     end
 
     # Only applies to existing node architecture

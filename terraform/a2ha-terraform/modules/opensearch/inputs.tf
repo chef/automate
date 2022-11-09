@@ -50,6 +50,11 @@ variable "opensearch_admin_dn" {
 variable "opensearch_admin_key" {
 }
 
+variable "opensearch_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
 variable "opensearch_custom_certs_enabled" {
   default = false
 }
