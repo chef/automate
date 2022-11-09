@@ -265,7 +265,7 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 			return err
 			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
 		}
-		err = handleBackupCommandsOnBastion(cmd, args, commandString, infra)
+		err = handleBackupCommands(cmd, args, commandString, infra)
 		if err != nil {
 			return err
 		}
@@ -290,7 +290,7 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 	return commandString
 }
 
-func handleBackupCommandsOnBastion(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
+func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
 		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
 		if err != nil {
@@ -306,18 +306,11 @@ func handleBackupCommandsOnBastion(cmd *cobra.Command, args []string, commandStr
 		os.Exit(1)
 	}
 	if strings.Contains(cmd.CommandPath(), "delete") {
-		if !backupDeleteCmdFlags.yes {
-			yes, err := writer.Confirm(
-				fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
-					strings.Join(args, "\n"),
-				),
-			)
-			if err != nil {
-				return status.Annotate(err, status.BackupError)
-			}
-			if !yes {
-				return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
-			}
+		affirmation, err := takeDeleteAffirmation(args)
+		if err != nil {
+			return err
+		}
+		if affirmation {
 			commandString = commandString + " --yes"
 		}
 	}
@@ -326,6 +319,24 @@ func handleBackupCommandsOnBastion(cmd *cobra.Command, args []string, commandStr
 		return err
 	}
 	return nil
+}
+
+func takeDeleteAffirmation(args []string) (bool, error) {
+	if !backupDeleteCmdFlags.yes {
+		yes, err := writer.Confirm(
+			fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+				strings.Join(args, "\n"),
+			),
+		)
+		if err != nil {
+			return false, status.Annotate(err, status.BackupError)
+		}
+		if !yes {
+			return false, status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
+		}
+		return true, nil
+	}
+	return false, nil
 }
 
 func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
