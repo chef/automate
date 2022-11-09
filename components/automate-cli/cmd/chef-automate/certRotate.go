@@ -107,167 +107,200 @@ const (
 
 // This function will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func certRotate(cmd *cobra.Command, args []string) error {
-	fileName := "cert-rotate.toml"
-	timestamp := time.Now().Format("20060102150405")
-
 	rootCA, publicCert, privateCert, adminCert, adminKey, err := getCerts()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	f, err := os.Create(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	if isA2HARBFileExist() {
-
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
-		sshUser := infra.Outputs.SSHUser.Value
-		sskKeyFile := infra.Outputs.SSHKeyFile.Value
-		sshPort := infra.Outputs.SSHPort.Value
 
 		if sshFlag.automate || sshFlag.chefserver {
-			// Writing the required configurations in the toml file
-			config := fmt.Sprintf(FRONTEND_CONFIG, string(publicCert), string(privateCert), string(publicCert), string(privateCert))
-			_, err = f.Write([]byte(config))
+			err := certRotateFrontend(publicCert, privateCert, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
-			f.Close()
-
-			var frontendIps []string
-			var remoteService string
-			if sshFlag.automate {
-				frontendIps = infra.Outputs.AutomatePrivateIps.Value
-				remoteService = "automate"
-			} else if sshFlag.chefserver {
-				frontendIps = infra.Outputs.ChefServerPrivateIps.Value
-				remoteService = "chefserver"
-			}
-			if len(frontendIps) == 0 {
-				return errors.New(fmt.Sprintf("No %s Ips found", remoteService))
-			}
-
-			// Defining set of commands which run on frontend nodes
-			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-			err := copyAndExecute(frontendIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
-			if err != nil {
-				log.Fatal(err)
-			}
-
 		} else if sshFlag.postgres {
-			// Writing the required configurations in the toml file
-			config := fmt.Sprintf(POSTGRES_CONFIG, string(privateCert), string(publicCert), string(rootCA))
-			_, err = f.Write([]byte(config))
+			err := certRotatePG(publicCert, privateCert, rootCA, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
-			f.Close()
-
-			postgresIps := infra.Outputs.PostgresqlPrivateIps.Value
-			if len(postgresIps) == 0 {
-				return errors.New("No Postgres IPs are found")
-			}
-			remoteService := "postgresql"
-
-			// Defining set of commands which run on postgres nodes
-			scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
-			err = copyAndExecute(postgresIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// Patching root-ca to frontend-nodes
-			filename_fe := "pg_fe.toml"
-			// Creating and Writing the required configurations in the toml file
-			config_fe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, string(rootCA))
-			fe, err := os.Create(filename_fe)
-			if err != nil {
-				log.Fatal(err)
-			}
-			_, err = fe.Write([]byte(config_fe))
-			if err != nil {
-				log.Fatal(err)
-			}
-			fe.Close()
-
-			frontendIps := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
-			if len(frontendIps) == 0 {
-				return errors.New("No frontend IPs are found")
-			}
-			remoteService = "frontend"
-
-			// Defining set of commands which run on frontend nodes
-			scriptCommands = fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-			err = copyAndExecute(frontendIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, filename_fe, scriptCommands)
-			if err != nil {
-				log.Fatal(err)
-			}
-
 		} else if sshFlag.opensearch {
-			e := existingInfra{}
-			admin_dn, err := e.getDistinguishedNameFromKey(string(adminCert))
-			if err != nil {
-				return err
-			}
-			nodes_dn, err := e.getDistinguishedNameFromKey(string(publicCert))
-			if err != nil {
-				return err
-			}
-
-			// Writing the required configurations in the toml file
-			config := fmt.Sprintf(OPENSEARCH_CONFIG, string(rootCA), string(adminCert), string(adminKey), string(publicCert), string(privateCert), fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
-			_, err = f.Write([]byte(config))
-			if err != nil {
-				log.Fatal(err)
-			}
-			f.Close()
-
-			opensearchIps := infra.Outputs.OpensearchPrivateIps.Value
-			if len(opensearchIps) == 0 {
-				return errors.New("No Opensearch IPs are found")
-			}
-			remoteService := "opensearch"
-
-			// Defining set of commands which run on opensearch nodes
-			scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
-			err = copyAndExecute(opensearchIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// Patching root-ca to frontend-nodes
-			cn := nodes_dn.CommonName
-			filename_fe := "os_fe.toml"
-			// Creating and Writing the required configurations in the toml file
-			config_fe := fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, string(rootCA), cn)
-			fe, err := os.Create(filename_fe)
-			if err != nil {
-				log.Fatal(err)
-			}
-			_, err = fe.Write([]byte(config_fe))
-			if err != nil {
-				log.Fatal(err)
-			}
-			fe.Close()
-
-			frontendIps := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
-			if len(frontendIps) == 0 {
-				return errors.New("No frontend IPs are found")
-			}
-			remoteService = "frontend"
-
-			// Defining set of commands which run on frontend nodes
-			scriptCommands = fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-			err = copyAndExecute(frontendIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, filename_fe, scriptCommands)
+			err := certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
+	}
+	return nil
+}
+
+func getSshDetails(infra *AutomteHAInfraDetails) (string, string, string) {
+	return infra.Outputs.SSHUser.Value, infra.Outputs.SSHKeyFile.Value, infra.Outputs.SSHPort.Value
+}
+
+// This function will rotate the certificates of Automate and Chef Infra Server,
+func certRotateFrontend(publicCert, privateCert string, infra *AutomteHAInfraDetails) error {
+	fileName := "cert-rotate-fe.toml"
+	timestamp := time.Now().Format("20060102150405")
+	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Writing the required configurations in the toml file
+	config := fmt.Sprintf(FRONTEND_CONFIG, publicCert, privateCert, publicCert, privateCert)
+	_, err = f.Write([]byte(config))
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+
+	var frontendIps []string
+	var remoteService string
+	if sshFlag.automate {
+		frontendIps = infra.Outputs.AutomatePrivateIps.Value
+		remoteService = "automate"
+	} else if sshFlag.chefserver {
+		frontendIps = infra.Outputs.ChefServerPrivateIps.Value
+		remoteService = "chefserver"
+	}
+	if len(frontendIps) == 0 {
+		return errors.New(fmt.Sprintf("No %s Ips found", remoteService))
+	}
+
+	// Defining set of commands which run on frontend nodes
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
+	err = copyAndExecute(frontendIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+// This function will rotate the certificates of Postgres
+func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
+	fileName := "cert-rotate-pg.toml"
+	timestamp := time.Now().Format("20060102150405")
+	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Writing the required configurations in the toml file
+	config := fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
+	_, err = f.Write([]byte(config))
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+
+	postgresIps := infra.Outputs.PostgresqlPrivateIps.Value
+	if len(postgresIps) == 0 {
+		return errors.New("No Postgres IPs are found")
+	}
+	remoteService := "postgresql"
+
+	// Defining set of commands which run on postgres nodes
+	scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
+	err = copyAndExecute(postgresIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Patching root-ca to frontend-nodes
+	filename_fe := "pg_fe.toml"
+	// Creating and Writing the required configurations in the toml file
+	config_fe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, rootCA)
+	err = patchRootCaToFrontend(config_fe, filename_fe, timestamp, infra)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+// This function will rotate the certificates of OpenSearch
+func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, infra *AutomteHAInfraDetails) error {
+	fileName := "cert-rotate-os.toml"
+	timestamp := time.Now().Format("20060102150405")
+	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	e := existingInfra{}
+	admin_dn, err := e.getDistinguishedNameFromKey(adminCert)
+	if err != nil {
+		return err
+	}
+	nodes_dn, err := e.getDistinguishedNameFromKey(publicCert)
+	if err != nil {
+		return err
+	}
+
+	// Writing the required configurations in the toml file
+	config := fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
+	_, err = f.Write([]byte(config))
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+
+	opensearchIps := infra.Outputs.OpensearchPrivateIps.Value
+	if len(opensearchIps) == 0 {
+		return errors.New("No Opensearch IPs are found")
+	}
+	remoteService := "opensearch"
+
+	// Defining set of commands which run on opensearch nodes
+	scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
+	err = copyAndExecute(opensearchIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Patching root-ca to frontend-nodes
+	cn := nodes_dn.CommonName
+	filename_fe := "os_fe.toml"
+	// Creating and Writing the required configurations in the toml file
+	config_fe := fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
+	err = patchRootCaToFrontend(config_fe, filename_fe, timestamp, infra)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+// This function will patch the root-ca to frontend nodes to maintain the connection with backend nodes.
+func patchRootCaToFrontend(config_fe, filename_fe, timestamp string, infra *AutomteHAInfraDetails) error {
+	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+	remoteService := "frontend"
+	fe, err := os.Create(filename_fe)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = fe.Write([]byte(config_fe))
+	if err != nil {
+		log.Fatal(err)
+	}
+	fe.Close()
+
+	frontendIps := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
+	if len(frontendIps) == 0 {
+		return errors.New("No frontend IPs are found")
+	}
+
+	// Defining set of commands which run on frontend nodes
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
+	err = copyAndExecute(frontendIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, filename_fe, scriptCommands)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return nil
 }
