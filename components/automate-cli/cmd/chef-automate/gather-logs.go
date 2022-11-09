@@ -139,7 +139,7 @@ func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 		return runGatherLogsLocalCmd(overridePath, gatherLogsCmdFlags.logLines)
 	}
 
-	return gatherLogsRunning(overridePath, gatherLogsCmdFlags.logLines)
+	return gatherLogsForFaultyNodes(overridePath, gatherLogsCmdFlags.logLines)
 }
 
 const recoveryMsg = `
@@ -635,10 +635,10 @@ func init() {
 	RootCmd.AddCommand(newGatherLogsCmd())
 }
 
-func gatherLogsRunning(outfileOverride string, logLines uint64) error {
+func gatherLogsForFaultyNodes(outfileOverride string, logLines uint64) error {
 	_, err := client.Connection(client.DefaultClientTimeout)
 
-	if err != nil {
+	if status.ErrorType(err) == "DeploymentServiceCallError" || status.ErrorType(err) == "DeploymentServiceUnreachableError" {
 		return runGatherLogsLocalCmd(outfileOverride, logLines)
 
 	}
