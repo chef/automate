@@ -1,5 +1,4 @@
 FROM ubuntu:bionic-20190612
-LABEL maintainer="vshankar@progress.com"
 
 ENV SQUID_VERSION=3.5.27 \
     SQUID_CACHE_DIR=/var/spool/squid \
