@@ -642,11 +642,18 @@ func gatherLogsForFaultyNodes(outfileOverride string, logLines uint64) error {
 		return runGatherLogsLocalCmd(outfileOverride, logLines)
 
 	}
-	cmd := exec.Command("hab", "svc", "status")
-	stdoutStderr, err := cmd.CombinedOutput()
+	cmd, err := exec.Command("hab", "svc", "status").CombinedOutput()
 	if err != nil {
-		return status.WithRecovery(errors.Wrap(err, string(stdoutStderr)), "hab-sup is not working")
+		return status.WithRecovery(errors.Wrapf(err, string(cmd)), "hab-sup is not working")
 	}
 
 	return gatherLogsFromServer(outfileOverride, logLines)
+}
+
+func gatherLogsForFaultyBackendNodes(outfileOverride string, logLines uint64) error {
+	cmd, err := exec.Command("hab", "svc", "status").CombinedOutput()
+	if err != nil {
+		return status.WithRecovery(errors.Wrapf(err, string(cmd)), "hab-sup is not working")
+	}
+	return runGatherLogsLocalCmd(outfileOverride, logLines)
 }
