@@ -167,7 +167,7 @@ if [[ "${test_proxy}" = "true" ]]; then
         --network "${test_proxy_internal_network_name}" \
         --volume "$PWD/logs:/var/log/squid" \
         --volume "$PWD/integration/squid.conf:/etc/squid/squid.conf" \
-        datadog/squid
+        $(docker build -q $PWD/integration/squid-docker)
 
     # Connect the proxy container to the default bridge network
     # which has access to the internet
