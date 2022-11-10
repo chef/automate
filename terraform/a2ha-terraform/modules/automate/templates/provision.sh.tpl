@@ -139,7 +139,7 @@ wait_for_upgrade() {
             return 1
     esac
 
-    if echo "$upgrade_status_output" | grep 'up-to-date'; then
+    if echo "$upgrade_status_output" | grep 'upgraded to airgap bundle'; then
         upgrade_complete="true"
         break
     else
