@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-func Test_editConfig(t *testing.T) {
+func TestUpdateOfLogroateConfig(t *testing.T) {
 	type args struct {
 		req          *api.PatchAutomateConfigRequest
 		existingCopy *deployment.AutomateConfig
@@ -166,7 +166,7 @@ func Test_editConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := EditConfig(tt.args.req, tt.args.existingCopy)
+			got, err := UpdateOfLogroateConfig(tt.args.req, tt.args.existingCopy)
 			logrus.Printf("Final: %+v", got)
 
 			if (err != nil) != tt.wantErr {
@@ -185,11 +185,6 @@ func Test_editConfig(t *testing.T) {
 			if got.Config.Global.V1.Log.MaxNumberRotatedLogs.Value != tt.want.Config.Global.V1.Log.MaxNumberRotatedLogs.Value {
 				t.Errorf("Values aren't the same")
 			}
-			// b := reflect.DeepEqual(got, tt.want)
-			// logrus.Println("DeepEqual: ", b)
-			// if !b {
-			// 	t.Errorf("editConfig() = %v, want %v", got, tt.want)
-			// }
 		})
 	}
 }

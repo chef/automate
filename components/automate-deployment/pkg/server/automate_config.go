@@ -285,13 +285,24 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 
-		req, err := EditConfig(req, existingCopy)
+		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 		if err != nil {
-			logrus.Errorf("cannot edit the config: %v", err)
-			return status.Error(codes.Internal, "Failed to edit configuration into syslog")
+			return status.Error(codes.Internal, err.Error())
 		}
 
-		if err = configLogrotate(req.GetConfig().GetGlobal().GetV1().GetLog()); err != nil {
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() != existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
+			err = restartSyslogService()
+			if err != nil {
+				return status.Error(codes.Internal, err.Error())
+			}
+		}
+
+		res, err := UpdateOfLogroateConfig(req, existingCopy)
+		if err != nil {
+			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: ", err)
+		}
+
+		if err = runLogrotateConfig(res); err != nil {
 			logrus.Errorf("cannot configure log rotate: %v", err)
 			return err
 		}
@@ -332,7 +343,7 @@ func restartSyslogService() error {
 //createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
 // which redirects the logs to the specified location
 func createConfigFileForAutomateSysLog(pathForLog string) error {
-
+	os.Remove(rsyslogConfigFile)
 	f, err := os.Create(rsyslogConfigFile)
 
 	if err != nil {
@@ -397,6 +408,7 @@ func logrotateConfChecks() error {
 func configLogrotate(req *config.Log) error {
 	var logRotateConfigContent string
 	// Create a file in /etc/logrotate.d/automate
+	os.Remove(logRotateConfigFile)
 	file, err := os.Create(logRotateConfigFile)
 	if err != nil {
 		logrus.Errorf("cannot create a file: %v", err)
@@ -427,7 +439,7 @@ func rollbackLogrotate() error {
 	return os.Remove(logRotateConfigFile)
 }
 
-func EditConfig(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
+func UpdateOfLogroateConfig(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true && existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 		if err := mergo.Merge(req.Config, existingCopy); err != nil {
 			logrus.Errorf("cannot merge the requested and existing structs: %v", err)
