@@ -13,6 +13,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
+	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -280,6 +281,22 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 	}
 
+	//Set the config if already not set
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
+		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+
+		req, err := EditConfig(req, existingCopy)
+		if err != nil {
+			logrus.Errorf("cannot edit the config: %v", err)
+			return status.Error(codes.Internal, "Failed to edit configuration into syslog")
+		}
+
+		if err = configLogrotate(req.GetConfig().GetGlobal().GetV1().GetLog()); err != nil {
+			logrus.Errorf("cannot configure log rotate: %v", err)
+			return err
+		}
+	}
+
 	//Rollback the config if requested
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
@@ -408,4 +425,15 @@ func configLogrotate(req *config.Log) error {
 
 func rollbackLogrotate() error {
 	return os.Remove(logRotateConfigFile)
+}
+
+func EditConfig(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true && existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+		if err := mergo.Merge(req.Config, existingCopy); err != nil {
+			logrus.Errorf("cannot merge the requested and existing structs: %v", err)
+			return nil, err
+		}
+	}
+
+	return req, nil
 }
