@@ -136,7 +136,7 @@ func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if gatherLogsCmdFlags.localFallback {
-		return runGatherLogsLocalCmd(overridePath, gatherLogsCmdFlags.logLines)
+		return gatherLogsForFaultyBackendNodes(overridePath, gatherLogsCmdFlags.logLines)
 	}
 
 	return gatherLogsForFaultyNodes(overridePath, gatherLogsCmdFlags.logLines)
