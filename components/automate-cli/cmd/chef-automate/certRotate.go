@@ -28,6 +28,10 @@ var sshFlag = struct {
 	opensearch bool
 }{}
 
+var ipFlag = struct {
+	postgresIp string
+}{}
+
 var certRotateCmd = &cobra.Command{
 	Use:   "cert-rotate",
 	Short: "Chef Automate rotate cert",
@@ -52,6 +56,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.rootCA, "root-ca", "", "RootCA certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.adminCert, "admin-cert", "", "Admin certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.adminKey, "admin-key", "", "Admin Private certificate")
+	certRotateCmd.PersistentFlags().StringVar(&ipFlag.postgresIp, "ip", "", "Postgres Node IP")
 }
 
 const (
