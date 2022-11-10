@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -16,6 +17,10 @@ var certFlags = struct {
 	privateCert string
 	publicCert  string
 	rootCA      string
+}{}
+
+var ipFlag = struct {
+	postgresIp string
 }{}
 
 var sshFlag = struct {
@@ -44,6 +49,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.privateCert, "private-cert", "", "Private certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.publicCert, "public-cert", "", "Public certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.rootCA, "root-ca", "", "RootCA certificate")
+	certRotateCmd.PersistentFlags().StringVar(&ipFlag.postgresIp, "ip", "", "Postgres Node IP")
 }
 
 const (
@@ -184,7 +190,36 @@ func certRotate(cmd *cobra.Command, args []string) error {
 				return err
 			}
 			scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
-			postgresIps := infra.Outputs.PostgresqlPrivateIps.Value
+
+			var postgresIps []string
+			if ipFlag.postgresIp != "" {
+				postgresIps = append(postgresIps, ipFlag.postgresIp)
+
+				//check for issuer_cert (root-ca)
+				getPgConfigCmd := fmt.Sprintf(GET_CONFIG, remoteService)
+				pgConfigRawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ipFlag.postgresIp, getPgConfigCmd)
+				if err != nil {
+					return err
+				}
+				var pgConfig PostgresqlConfig
+				if _, err := toml.Decode(cleanToml(pgConfigRawOutput), &pgConfig); err != nil {
+					return err
+				}
+
+				if string(rootCA) != pgConfig.Ssl.IssuerCert {
+					ok, err := writer.Confirm("apply root-ca to all nodes?")
+					if err != nil || !ok {
+						if !ok {
+							err = errors.New("failed to update root-ca")
+						}
+						return err
+					}
+					postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
+				}
+			} else {
+				postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
+			}
+
 			for i := 0; i < len(postgresIps); i++ {
 				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, postgresIps[i], remoteService+timestamp, false)
 				if err != nil {
