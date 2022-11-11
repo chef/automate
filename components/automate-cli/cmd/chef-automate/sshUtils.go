@@ -1,34 +1,73 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
 
-func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
+type SSHConfig struct {
+	sshUser    string
+	sshPort    string
+	sshKeyFile string
+	hostIP     string
+}
+type SSHUtil interface {
+	getSSHConfig() *SSHConfig
+	setSSHConfig(sshConfig *SSHConfig)
+	getClientConfig() (*ssh.ClientConfig, error)
+	getConnection() (*ssh.Client, error)
+	connectAndExecuteCommandOnRemote(remoteCommands string) (string, error)
+	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
+}
 
-	pemBytes, err := ioutil.ReadFile(sshKeyFile) // nosemgrep
+type SSHUtilImpl struct {
+	SshConfig *SSHConfig
+}
+
+func NewSSHUtil(sshconfig *SSHConfig) SSHUtil {
+	return &SSHUtilImpl{
+		SshConfig: sshconfig,
+	}
+}
+
+func (s *SSHUtilImpl) getSSHConfig() *SSHConfig {
+	return s.SshConfig
+}
+
+func (s *SSHUtilImpl) setSSHConfig(sshConfig *SSHConfig) {
+	s.SshConfig = sshConfig
+}
+
+func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
+	pemBytes, err := ioutil.ReadFile(s.SshConfig.sshKeyFile) // nosemgrep
 	if err != nil {
 		writer.Errorf("Unable to read private key: %v", err)
-		return "", err
+		return nil, err
 	}
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
 		writer.Errorf("Parsing key failed: %v", err)
-		return "", err
+		return nil, err
 	}
 	var (
 		keyErr *knownhosts.KeyError
 	)
-
 	// Client config
-	config := &ssh.ClientConfig{
-		User: sshUser,
+	return &ssh.ClientConfig{
+		User: s.SshConfig.sshUser,
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 			kh := checkKnownHosts()
@@ -49,12 +88,62 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 			// writer.Printf("Pub key exists for %s.\n", host)
 			return nil
 		}),
-	}
+	}, nil
+}
 
+func (s *SSHUtilImpl) getConnection() (*ssh.Client, error) {
+	config, err := s.getClientConfig()
+	if err != nil {
+		return nil, err
+	}
 	// Open connection
-	conn, err := ssh.Dial("tcp", hostIP+":"+sshPort, config)
+	conn, err := ssh.Dial("tcp", s.SshConfig.hostIP+":"+s.SshConfig.sshPort, config)
 	if conn == nil || err != nil {
 		writer.Errorf("dial failed:%v", err)
+		return nil, err
+	}
+	return conn, err
+}
+
+func createKnownHosts() {
+	f, fErr := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
+	if fErr != nil {
+		writer.Errorf("%v", fErr)
+		return
+	}
+	f.Close()
+}
+
+func checkKnownHosts() ssh.HostKeyCallback {
+	createKnownHosts()
+	kh, e := knownhosts.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
+	if e != nil {
+		writer.Errorf("%v", e)
+		return nil
+	}
+	return kh
+}
+
+func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
+	// add host key if host is not found in known_hosts, error object is return, if nil then connection proceeds,
+	// if not nil then connection stops.
+	khFilePath := filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts")
+
+	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if fErr != nil {
+		return fErr
+	}
+	defer f.Close()
+
+	knownHosts := knownhosts.Normalize(remote.String())
+	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
+	f.WriteString("\n")
+	return fileErr
+}
+
+func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string) (string, error) {
+	conn, err := s.getConnection()
+	if err != nil {
 		return "", err
 	}
 	defer conn.Close()
@@ -78,5 +167,145 @@ func ConnectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile
 	}
 	defer session.Close()
 	return stdoutBuf.String(), nil
+}
 
+func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error) {
+	conn, err := s.getConnection()
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+
+	// Open session
+	session, err := conn.NewSession()
+	if err != nil {
+		writer.Errorf("session failed:%v", err)
+		return "", err
+	}
+	defer session.Close()
+	/////////////////////
+	cmdWriter, err := session.StdinPipe()
+	if err != nil {
+		writer.Println(err.Error())
+	}
+	cmdReader, err := session.StdoutPipe()
+	if err != nil {
+		writer.Printf("Error creating StdoutPipe for Cmd %s \n", err.Error())
+		os.Exit(1)
+	}
+	cmdError, err := session.StderrPipe()
+	if err != nil {
+		writer.Println(err.Error())
+	}
+
+	spinnerChannel := make(chan string)
+	go showSpinner(spinnerChannel)
+	spinnerChannel <- "start"
+	wr := make(chan []byte, 10)
+	go stdInRoutine(wr, cmdWriter)
+	outchan := make(chan string)
+	go stdOutRoutine(outchan, cmdReader)
+	go stdErrRoutine(spinnerChannel, cmdError)
+
+	err = session.Start(remoteCommands)
+	if err != nil {
+		writer.Printf("Error starting Cmd %s \n", err.Error())
+		os.Exit(1)
+	}
+
+	err = session.Wait()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
+		os.Exit(1)
+	}
+	spinnerChannel <- "stop"
+	output := <-outchan
+	close(spinnerChannel)
+	close(wr)
+	close(outchan)
+	return output, nil
+}
+
+func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
+	cmd := "scp"
+	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
+	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+		writer.Print("Failed to copy TOML file to remote\n")
+		return err
+	}
+	if removeFile {
+		cmd := "rm"
+		exec_args := []string{"-rf", srcFilePath}
+		if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+			writer.Print("Failed to copy TOML file to remote\n")
+			return err
+		}
+	}
+	writer.Print("Copied TOML file to remote\n")
+	return nil
+}
+
+func stdInRoutine(wr chan []byte, cmdWriter io.WriteCloser) {
+	for {
+		select {
+		case d := <-wr:
+			_, err := cmdWriter.Write(d)
+			if err != nil {
+				fmt.Println("ERR IN " + err.Error())
+			}
+		}
+	}
+}
+
+func stdOutRoutine(out chan string, cmdReader io.Reader) {
+	scanner := bufio.NewScanner(cmdReader)
+	var sb strings.Builder
+	var isStringAlphabetic = regexp.MustCompile(`^[a-zA-Z0-9_:]*$`).MatchString
+	for {
+		if tkn := scanner.Scan(); tkn {
+			rcv := scanner.Bytes()
+
+			raw := make([]byte, len(rcv))
+			copy(raw, rcv)
+			t := strings.TrimSpace(string(raw))
+			strings.Contains(t, `^[a-zA-Z0-9_:]*$`)
+			if isStringAlphabetic(t) {
+				sb.WriteString("OUT : " + t)
+				sb.WriteString("\n")
+			}
+
+			//fmt.Println(t)
+		} else {
+			if scanner.Err() != nil {
+				fmt.Println("SERR OUT " + scanner.Err().Error())
+			}
+			out <- sb.String()
+			return
+		}
+	}
+}
+
+func stdErrRoutine(sr chan string, cmdError io.Reader) {
+	scanner := bufio.NewScanner(cmdError)
+
+	for scanner.Scan() {
+		t := scanner.Text()
+		if len(strings.TrimSpace("ERR OUT "+t)) > 0 {
+			sr <- "stop"
+		}
+		fmt.Println(t)
+	}
+}
+
+func showSpinner(ch chan string) {
+	for {
+		state := <-ch
+		fmt.Println(state)
+		if strings.EqualFold(strings.TrimSpace(state), "start") {
+			writer.StartSpinner()
+		}
+		if strings.EqualFold(strings.TrimSpace(state), "stop") {
+			writer.StopSpinner()
+		}
+	}
 }

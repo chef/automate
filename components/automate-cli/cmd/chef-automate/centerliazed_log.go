@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	config "github.com/chef/automate/api/config/shared"
@@ -21,8 +22,8 @@ const (
 	restartSyslogService = "sudo systemctl restart rsyslog.service"
 )
 
-//enableCentralizedLogConfigForHA checks for requested and existing configuration for logging
-func enableCentralizedLogConfigForHA(args []string, remoteType string, sshUser string, sshPort string, sskKeyFile string, remoteIp []string) error {
+// enableCentralizedLogConfigForHA checks for requested and existing configuration for logging
+func enableCentralizedLogConfigForHA(args []string, remoteType string, sshUtil SSHUtil, remoteIp []string) error {
 	reqConfig, err := getConfigForArgsLogs(args, remoteType)
 	if err != nil {
 		return err
@@ -37,7 +38,7 @@ func enableCentralizedLogConfigForHA(args []string, remoteType string, sshUser s
 		return err
 	}
 
-	err = enableCentralizedLogging(reqConfig, existConfig, sshUser, sshPort, sskKeyFile, remoteIp, remoteType)
+	err = enableCentralizedLogging(reqConfig, existConfig, sshUtil, remoteIp, remoteType)
 	if err != nil {
 		return err
 	}
@@ -45,8 +46,8 @@ func enableCentralizedLogConfigForHA(args []string, remoteType string, sshUser s
 	return nil
 }
 
-//enableCentralizedLogging gets commands for rsyslog ang logrotate
-func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfig, sshUser string, sshPort string, sskKeyFile string, remoteIp []string, remoteType string) error {
+// enableCentralizedLogging gets commands for rsyslog ang logrotate
+func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfig, sshUtil SSHUtil, remoteIp []string, remoteType string) error {
 
 	scriptCommands := getScriptCommandsForLogging(reqConfig, existConfig)
 	if scriptCommands == "" {
@@ -54,7 +55,7 @@ func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.Auto
 		return nil
 	}
 
-	err := createRsyslogAndLogRotateConfig(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands, remoteType)
+	err := createRsyslogAndLogRotateConfig(sshUtil, remoteIp, scriptCommands, remoteType)
 	if err != nil {
 		return err
 	}
@@ -74,7 +75,7 @@ func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.Auto
 
 }
 
-//getScriptCommandsForLogging gets the commands to be executed for  logging
+// getScriptCommandsForLogging gets the commands to be executed for  logging
 func getScriptCommandsForLogging(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfig) string {
 	var scriptCommands string
 
@@ -99,7 +100,7 @@ func getScriptCommandsForLogging(reqConfig *dc.AutomateConfig, existConfig *dc.A
 
 }
 
-//getScriptCommandsForConfigChangedLogging gets the script commands where only some values are changed
+// getScriptCommandsForConfigChangedLogging gets the script commands where only some values are changed
 func getScriptCommandsForConfigChangedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfig) string {
 	var scriptCommands string
 	//Disable the centralized logging if requested
@@ -136,7 +137,7 @@ func configLogrotate(req *shared.Log) string {
 	return logRotateConfigContent
 }
 
-//createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
+// createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
 // which redirects the logs to the specified location
 func createConfigFileForAutomateSysLog(pathForLog string) string {
 	return fmt.Sprintf(`if \$programname == \"bash\" then %s
@@ -144,7 +145,7 @@ func createConfigFileForAutomateSysLog(pathForLog string) string {
 
 }
 
-//LogRotateConf gets the log rotate configuration using the values  from config
+// LogRotateConf gets the log rotate configuration using the values  from config
 func LogRotateConf(path string, params ...string) string {
 	if len(params) < 1 {
 		return ""
@@ -158,7 +159,7 @@ func LogRotateConf(path string, params ...string) string {
 	return buffer.String()
 }
 
-//getLogFileName gets the log file name based on the path provided
+// getLogFileName gets the log file name based on the path provided
 func getLogFileName(path string) string {
 	if string(path[len(path)-1]) == "/" {
 		return fmt.Sprintf("%sautomate.log", path)
@@ -171,7 +172,7 @@ func getConcatStringFromConfig(constant string, variable interface{}) string {
 	return fmt.Sprintf("%s %v", constant, variable)
 }
 
-//decodeLogConfig decodes the log config from the log string from file
+// decodeLogConfig decodes the log config from the log string from file
 func decodeLogConfig(logConfig string) (*dc.AutomateConfig, error) {
 	var src dc.AutomateConfig
 	if _, err := toml.Decode(logConfig, &src); err != nil {
@@ -181,7 +182,7 @@ func decodeLogConfig(logConfig string) (*dc.AutomateConfig, error) {
 	return &src, nil
 }
 
-//getConfigForArgsLogs get the requested config from the patched file
+// getConfigForArgsLogs get the requested config from the patched file
 func getConfigForArgsLogs(args []string, remoteService string) (*dc.AutomateConfig, error) {
 
 	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
@@ -199,7 +200,7 @@ func getConfigForArgsLogs(args []string, remoteService string) (*dc.AutomateConf
 
 }
 
-////rollBackCentralized removed the logrotate file and rsyslog file
+// //rollBackCentralized removed the logrotate file and rsyslog file
 func rollBackCentralized() string {
 	rsyslogFileRemove := fmt.Sprintf("sudo rm %s", rsyslogConfigFile)
 
@@ -208,7 +209,7 @@ func rollBackCentralized() string {
 	return fmt.Sprintf(" %s; %s; %s", rsyslogFileRemove, logRotateFileRemove, restartSyslogService)
 }
 
-//setConfigForCentralizedLog sets config for rsyslog and logrotate
+// setConfigForCentralizedLog sets config for rsyslog and logrotate
 func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string {
 	contentForRsyslogConfig := createConfigFileForAutomateSysLog(reqConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 
@@ -222,10 +223,11 @@ func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string 
 
 }
 
-//createRsyslogAndLogRotateConfig patching the config into the remote database servers
-func createRsyslogAndLogRotateConfig(sshUser string, sshPort string, sskKeyFile string, remoteIp []string, scriptCommands string, remoteService string) error {
+// createRsyslogAndLogRotateConfig patching the config into the remote database servers
+func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string) error {
 	for i := 0; i < len(remoteIp); i++ {
-		output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp[i], scriptCommands)
+		sshUtil.getSSHConfig().hostIP = remoteIp[i]
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
 		if err != nil {
 			writer.Errorf("%v", err)
 			return err

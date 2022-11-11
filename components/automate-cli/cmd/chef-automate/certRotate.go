@@ -156,18 +156,20 @@ func certRotate(cmd *cobra.Command, args []string) error {
 			writer.Warn("admin-cert and admin-key flag will be ignored when node flag is provided")
 		}
 
+		sshConfig := getSshDetails(infra)
+		sshUtil := NewSSHUtil(sshConfig)
 		if sshFlag.automate || sshFlag.chefserver {
-			err := certRotateFrontend(publicCert, privateCert, rootCA, infra)
+			err := certRotateFrontend(sshUtil, publicCert, privateCert, rootCA, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
 		} else if sshFlag.postgres {
-			err := certRotatePG(publicCert, privateCert, rootCA, infra)
+			err := certRotatePG(sshUtil, publicCert, privateCert, rootCA, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
 		} else if sshFlag.opensearch {
-			err := certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey, infra)
+			err := certRotateOS(sshUtil, publicCert, privateCert, rootCA, adminCert, adminKey, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -177,7 +179,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 }
 
 // This function will rotate the certificates of Automate and Chef Infra Server,
-func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
+func certRotateFrontend(sshUtil SSHUtil, publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
 	fileName := "cert-rotate-fe.toml"
 	timestamp := time.Now().Format("20060102150405")
 	var remoteService string
@@ -189,7 +191,7 @@ func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHA
 	}
 	// Creating and patching the required configurations.
 	config := fmt.Sprintf(FRONTEND_CONFIG, publicCert, privateCert, publicCert, privateCert)
-	err := patchConfig(config, fileName, timestamp, remoteService, infra)
+	err := patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -198,10 +200,31 @@ func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHA
 	if nodeFlag.node != "" {
 		return nil
 	}
+<<<<<<< HEAD
 
 	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
 	if sshFlag.automate {
 		err = patchRootCAinCS(rootCA, timestamp, infra)
+=======
+
+	// If we pass root-ca in automate then we also need to update root-ca in the ChefServer to maintain the connection
+	if sshFlag.automate {
+		fileName = "rotate-root_CA.toml"
+		remoteService = "chefserver"
+		cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
+		ips := getIps(remoteService, infra)
+		if len(ips) == 0 {
+			return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
+		}
+		sshUtil.getSSHConfig().hostIP = ips[0]
+		fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		config = fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
+		err = patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
+>>>>>>> 92398fc1d (handle restore respose)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -210,7 +233,7 @@ func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHA
 }
 
 // This function will rotate the certificates of Postgres
-func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
+func certRotatePG(sshUtil SSHUtil, publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
 	if isManagedServicesOn() {
 		return errors.New("You can not rotate certs for AWS managed services")
 	}
@@ -226,7 +249,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 		config = fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
 	}
 
-	err := patchConfig(config, fileName, timestamp, remoteService, infra)
+	err := patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -240,7 +263,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 	remoteService = "frontend"
 	// Creating and patching the required configurations.
 	config_fe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, rootCA)
-	err = patchConfig(config_fe, filename_fe, timestamp, remoteService, infra)
+	err = patchConfig(sshUtil, config_fe, filename_fe, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -248,7 +271,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 }
 
 // This function will rotate the certificates of OpenSearch
-func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, infra *AutomteHAInfraDetails) error {
+func certRotateOS(sshUtil SSHUtil, publicCert, privateCert, rootCA, adminCert, adminKey string, infra *AutomteHAInfraDetails) error {
 	if isManagedServicesOn() {
 		return errors.New("You can not rotate certs for AWS managed services")
 	}
@@ -271,6 +294,7 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 	}
 
 	// Creating and patching the required configurations.
+<<<<<<< HEAD
 	var config string
 	if nodeFlag.node != "" {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, publicCert, privateCert, fmt.Sprintf("%v", nodes_dn))
@@ -278,6 +302,10 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
 	}
 	err = patchConfig(config, fileName, timestamp, remoteService, infra)
+=======
+	config := fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
+	err = patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
+>>>>>>> 92398fc1d (handle restore respose)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -288,6 +316,7 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 	remoteService = "frontend"
 
 	// Creating and patching the required configurations.
+<<<<<<< HEAD
 	var config_fe string
 	if nodeFlag.node != "" {
 		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
@@ -295,6 +324,10 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
 	}
 	err = patchConfig(config_fe, filename_fe, timestamp, remoteService, infra)
+=======
+	config_fe := fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
+	err = patchConfig(sshUtil, config_fe, filename_fe, timestamp, remoteService, infra)
+>>>>>>> 92398fc1d (handle restore respose)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -302,8 +335,7 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 }
 
 // This function will patch the configurations to required nodes.
-func patchConfig(config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails) error {
-	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+func patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -335,7 +367,7 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 	} else if remoteService == "postgresql" || remoteService == "opensearch" {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
 	}
-	err = copyAndExecute(ips, sshUser, sshPort, sskKeyFile, timestamp, remoteService, filename, scriptCommands)
+	err = copyAndExecute(ips, sshUtil, timestamp, remoteService, filename, scriptCommands)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -367,21 +399,22 @@ func patchRootCAinCS(rootCA, timestamp string, infra *AutomteHAInfraDetails) err
 }
 
 // This function will copy the toml file to each required node and then execute the set of commands.
-func copyAndExecute(ips []string, sshUser string, sshPort string, sskKeyFile string, timestamp string, remoteService string, fileName string, scriptCommands string) error {
+func copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string) error {
 
 	var err error
 	var tomlFilePath string
 	for i := 0; i < len(ips); i++ {
+		sshUtil.getSSHConfig().hostIP = ips[i]
 		if (sshFlag.postgres || sshFlag.opensearch) && remoteService != "frontend" {
-			tomlFilePath, err = getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUser, sshPort, sskKeyFile, ips[i])
+			tomlFilePath, err = getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUtil)
 			if err != nil {
 				return err
 			}
 			// Copying the new toml file which includes both old and new configurations (for backend nodes).
-			err = copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, ips[i], remoteService+timestamp, false)
+			err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
 		} else {
 			// Copying the new toml file which includes new configurations (for frontend nodes).
-			err = copyFileToRemote(sskKeyFile, fileName, sshUser, ips[i], remoteService+timestamp, false)
+			err = sshUtil.copyFileToRemote(fileName, remoteService+timestamp, false)
 		}
 		if err != nil {
 			writer.Errorf("%v", err)
@@ -389,7 +422,7 @@ func copyAndExecute(ips []string, sshUser string, sshPort string, sskKeyFile str
 		}
 
 		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
-		output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ips[i], scriptCommands)
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
 		if err != nil {
 			writer.Errorf("%v", err)
 			return err
@@ -410,8 +443,13 @@ func validateEachIp(remoteService string, infra *AutomteHAInfraDetails) bool {
 }
 
 // This function will return the SSH details.
-func getSshDetails(infra *AutomteHAInfraDetails) (string, string, string) {
-	return infra.Outputs.SSHUser.Value, infra.Outputs.SSHKeyFile.Value, infra.Outputs.SSHPort.Value
+func getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
+	sshConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	}
+	return sshConfig
 }
 
 // This function will return the Ips based on the given remote service.
@@ -508,16 +546,19 @@ func getCerts() (string, string, string, string, string, error) {
 	return string(rootCA), string(publicCert), string(privateCert), string(adminCert), string(adminKey), nil
 }
 
-/* If we are working on backend service, then first we have to get the applied configurations
+/*
+	If we are working on backend service, then first we have to get the applied configurations
+
 and then merge it with new configurations, then apply that configuration.
 Because if we directly apply the new configurations, then the old applied configurations will be gone.
 So, we have to retain the old configurations also.
 
-This function will create the new toml file which includes old and new configurations.*/
-func getMerger(fileName string, timestamp string, remoteType string, config string, sshUser string, sshPort string, sskKeyFile string, remoteIP string) (string, error) {
+This function will create the new toml file which includes old and new configurations.
+*/
+func getMerger(fileName string, timestamp string, remoteType string, config string, sshUtil SSHUtil) (string, error) {
 	tomlFile := fileName + timestamp
 	scriptCommands := fmt.Sprintf(config, remoteType)
-	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
+	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
 	if err != nil {
 		return "", err
 	}
