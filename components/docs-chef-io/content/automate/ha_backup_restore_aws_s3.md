@@ -19,7 +19,7 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- If the user chooses `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
+-   If the user chooses `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
@@ -57,67 +57,67 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 Refer to the content for the `automate.toml` file below:
 
-```sh
-[global.v1]
-  [global.v1.external.opensearch.backup]
-    enable = true
-    location = "s3"
+    ```sh
+    [global.v1]
+      [global.v1.external.opensearch.backup]
+        enable = true
+        location = "s3"
 
-  [global.v1.external.opensearch.backup.s3]
+      [global.v1.external.opensearch.backup.s3]
 
-    # bucket (required): The name of the bucket
-    bucket = "bucket-name"
+        # bucket (required): The name of the bucket
+        bucket = "bucket-name"
 
-    # base_path (optional):  The path within the bucket where backups should be stored
-    # If base_path is not set, backups will be stored at the root of the bucket.
-    base_path = "opensearch"
+        # base_path (optional):  The path within the bucket where backups should be stored
+        # If base_path is not set, backups will be stored at the root of the bucket.
+        base_path = "opensearch"
 
-    # name of an s3 client configuration you create in your opensearch.yml
-    # see https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-client.html
-    # for full documentation on how to configure client settings on your
-    # OpenSearch nodes
-    client = "default"
+        # name of an s3 client configuration you create in your opensearch.yml
+        # see https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-client.html
+        # for full documentation on how to configure client settings on your
+        # OpenSearch nodes
+        client = "default"
 
-  [global.v1.external.opensearch.backup.s3.settings]
-    ## The meaning of these settings is documented in the S3 Repository Plugin
-    ## documentation. See the following links:
-    ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
+      [global.v1.external.opensearch.backup.s3.settings]
+        ## The meaning of these settings is documented in the S3 Repository Plugin
+        ## documentation. See the following links:
+        ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
 
-    ## Backup repo settings
-    # compress = false
-    # server_side_encryption = false
-    # buffer_size = "100mb"
-    # canned_acl = "private"
-    # storage_class = "standard"
-    ## Snapshot settings
-    # max_snapshot_bytes_per_sec = "40mb"
-    # max_restore_bytes_per_sec = "40mb"
-    # chunk_size = "null"
-    ## S3 client settings
-    # read_timeout = "50s"
-    # max_retries = 3
-    # use_throttle_retries = true
-    # protocol = "https"
+        ## Backup repo settings
+        # compress = false
+        # server_side_encryption = false
+        # buffer_size = "100mb"
+        # canned_acl = "private"
+        # storage_class = "standard"
+        ## Snapshot settings
+        # max_snapshot_bytes_per_sec = "40mb"
+        # max_restore_bytes_per_sec = "40mb"
+        # chunk_size = "null"
+        ## S3 client settings
+        # read_timeout = "50s"
+        # max_retries = 3
+        # use_throttle_retries = true
+        # protocol = "https"
 
-  [global.v1.backups]
-    location = "s3"
+      [global.v1.backups]
+        location = "s3"
 
-  [global.v1.backups.s3.bucket]
-    # name (required): The name of the bucket
-    name = "bucket-name"
+      [global.v1.backups.s3.bucket]
+        # name (required): The name of the bucket
+        name = "bucket-name"
 
-    # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
-    # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
-    endpoint = "https://s3.amazonaws.com"
+        # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
+        # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
+        endpoint = "https://s3.amazonaws.com"
 
-    # base_path (optional):  The path within the bucket where backups should be stored
-    # If base_path is not set, backups will be stored at the root of the bucket.
-    base_path = "automate"
+        # base_path (optional):  The path within the bucket where backups should be stored
+        # If base_path is not set, backups will be stored at the root of the bucket.
+        base_path = "automate"
 
-  [global.v1.backups.s3.credentials]
-    access_key = "<Your Access Key>"
-    secret_key = "<Your Seecret Key>"
-```
+      [global.v1.backups.s3.credentials]
+        access_key = "<Your Access Key>"
+        secret_key = "<Your Seecret Key>"
+    ```
 
 Execute the command given below to trigger the deployment.
 
@@ -133,31 +133,31 @@ Execute the command given below to trigger the deployment.
 
 To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
-```cmd
-chef-automate backup create
-```
+    ```cmd
+    chef-automate backup create
+    ```
 
 #### Restoring the Backed-up Data from Object Storage
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External AWS S3, follow the steps given below:
 
-- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+-   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
-- Shutdown Chef Automate service on all front-end nodes.
+-   Shutdown Chef Automate service on all front-end nodes.
 
- - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
- - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
+-   Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
+-   Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
 
-- Log in to the same instance of Chef Automate front-end node from which backup is taken.
+-   Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
-- Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+-   Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
 {{< note >}}
 
 After the restore command is successfully executed, we need to start the services on the other frontend nodes. use the below command to start all the services
-  
-  ```sh
-  sudo systemctl start chef-automate
-  ```
+
+    ```sh
+    sudo systemctl start chef-automate
+    ```
 
 {{< /note >}}
