@@ -19,15 +19,15 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- If user choose `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then configuration needs to be configure manually.
+- If the user chooses `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
 ### Overview
 
-To Communicate with Amazon S3 we need a IAM Role with required [policy](/automate/backup/#aws-s3-permissions).
+To Communicate with Amazon S3 we need an IAM Role with the required [policy](/automate/backup/#aws-s3-permissions).
 
-Attach the IAM Role to the All the Opensearch Node and Frontend Node.
+Attach the IAM Role to the All the OpenSearch Node and Frontend Node.
 
 <!--
 **Permissions Required**
@@ -38,7 +38,7 @@ Check if the IAM user has all the required permissions. The permission policies 
 
 1. S3FullAccess (for aws AmazonS3FullAccess)
 
-Create an IAM role to give access of **S3** to **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate S3.
+Create an IAM role to give access to **S3** in **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate S3.
 
 The permissions can either be directly added to the user or added via **IAM Group**.
 
@@ -47,13 +47,13 @@ Once done with the above steps, `.toml` file and patch the `.config`. In the fil
 
 {{< note >}}
 
-In case of if you are using the Managed AWS Service the you need to create a [snapshot-role](/automate/managed_services/#opensearch-setup) for opensearch.
+In case of if you are using the Managed AWS Service you need to create a [snapshot-role](/automate/managed_services/#opensearch-setup) for OpenSearch.
 
 {{< /note >}}
 
 #### Configuration in Provision host
 
-1. Create a toml say, `automate.toml`.
+1. Create a .toml say, `automate.toml`.
 
 Refer to the content for the `automate.toml` file below:
 
@@ -121,9 +121,9 @@ Refer to the content for the `automate.toml` file below:
 
 Execute the command given below to trigger the deployment.
 
-```sh
-./chef-automate config patch automate.toml
-```
+    ```sh
+    chef-automate config patch --frontend automate.toml
+    ```
 
 {{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 
@@ -154,7 +154,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 {{< note >}}
 
-After restore command successfully executed, we need to start the service's on other frontend node. use the below command to start all the service's
+After the restore command is successfully executed, we need to start the services on the other frontend nodes. use the below command to start all the services
   
   ```sh
   sudo systemctl start chef-automate
