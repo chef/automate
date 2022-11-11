@@ -30,6 +30,7 @@ type SSHUtil interface {
 	getClientConfig() (*ssh.ClientConfig, error)
 	getConnection() (*ssh.Client, error)
 	connectAndExecuteCommandOnRemote(remoteCommands string) (string, error)
+	connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error)
 	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
 }
 

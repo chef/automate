@@ -1153,7 +1153,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		}
 	}
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
-	cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString)
+	cmdRes, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
 	if err != nil {
 		writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
 		return err
