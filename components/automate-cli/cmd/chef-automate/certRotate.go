@@ -273,7 +273,7 @@ func copyAndExecute(ips []string, sshUser string, sshPort string, sskKeyFile str
 			return err
 		}
 
-		fmt.Printf("Started Applying the Configurations in %s node", remoteService)
+		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
 		output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ips[i], scriptCommands)
 		if err != nil {
 			writer.Errorf("%v", err)

@@ -364,7 +364,6 @@ func copyFileToRemote(sshKeyFile string, tomlFilePath string, sshUser string, ho
 			return err
 		}
 	}
-	writer.Print("Copied TOML file to remote\n")
 	return nil
 }
 
