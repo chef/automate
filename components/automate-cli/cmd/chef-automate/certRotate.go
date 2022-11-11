@@ -113,10 +113,6 @@ func certRotate(cmd *cobra.Command, args []string) error {
 	}
 
 	if isA2HARBFileExist() {
-		if isManagedServicesOn() {
-			return errors.New("You can not rotate certs for managed services")
-		}
-
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -165,6 +161,9 @@ func certRotateFrontend(publicCert, privateCert string, infra *AutomteHAInfraDet
 
 // This function will rotate the certificates of Postgres
 func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
+	if isManagedServicesOn() {
+		return errors.New("You can not rotate certs for AWS managed services")
+	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
 	remoteService := "postgresql"
@@ -190,6 +189,9 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 
 // This function will rotate the certificates of OpenSearch
 func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, infra *AutomteHAInfraDetails) error {
+	if isManagedServicesOn() {
+		return errors.New("You can not rotate certs for AWS managed services")
+	}
 	fileName := "cert-rotate-os.toml"
 	timestamp := time.Now().Format("20060102150405")
 	remoteService := "opensearch"
