@@ -28,8 +28,8 @@ var sshFlag = struct {
 	opensearch bool
 }{}
 
-var ipFlag = struct {
-	postgresIp string
+var nodeFlag = struct {
+	node string
 }{}
 
 var certRotateCmd = &cobra.Command{
@@ -56,7 +56,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.rootCA, "root-ca", "", "RootCA certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.adminCert, "admin-cert", "", "Admin certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.adminKey, "admin-key", "", "Admin Private certificate")
-	certRotateCmd.PersistentFlags().StringVar(&ipFlag.postgresIp, "ip", "", "Postgres Node IP")
+	certRotateCmd.PersistentFlags().StringVar(&nodeFlag.node, "node", "", "Node Ip address")
 }
 
 const (
@@ -74,6 +74,12 @@ const (
 		ssl_key = """%v"""
 		ssl_cert = """%v"""
 		issuer_cert = """%v"""`
+
+	POSTGRES_CONFIG_IGNORE_ISSUER_CERT = `
+	[ssl]
+		enable = true
+		ssl_key = """%v"""
+		ssl_cert = """%v"""`
 
 	POSTGRES_FRONTEND_CONFIG = `
 	[global.v1.external.postgresql.ssl]
@@ -171,16 +177,76 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := "postgresql"
+	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
 
-	// Creating and patching the required configurations.
-	config := fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
-	err := patchConfig(config, fileName, timestamp, remoteService, infra)
+	f, err := os.Create(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Patching root-ca to frontend-nodes for maintaining the connection.
+	var config string
+	if nodeFlag.node != "" {
+		writer.Warn("root-ca flag will be ignored when node flag is provided")
+		config = fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, privateCert, publicCert)
+	} else {
+		config = fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
+	}
+
+	// Writing the required configurations in the toml file
+	_, err = f.Write([]byte(config))
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.Close()
+
+	remoteService := "postgresql"
+
+	var postgresIps []string
+	if nodeFlag.node != "" {
+		postgresIps = append(postgresIps, nodeFlag.node)
+
+		// //check for issuer_cert (root-ca)
+		// getPgConfigCmd := fmt.Sprintf(GET_CONFIG, remoteService)
+		// pgConfigRawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ipFlag.postgresIp, getPgConfigCmd)
+		// if err != nil {
+		// 	return err
+		// }
+		// var pgConfig PostgresqlConfig
+		// if _, err := toml.Decode(cleanToml(pgConfigRawOutput), &pgConfig); err != nil {
+		// 	return err
+		// }
+
+		// if string(rootCA) != pgConfig.Ssl.IssuerCert {
+		// 	ok, err := writer.Confirm("apply root-ca to all nodes?")
+		// 	if err != nil || !ok {
+		// 		if !ok {
+		// 			err = errors.New("failed to update root-ca")
+		// 		}
+		// 		return err
+		// 	}
+		// 	postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
+		// }
+	} else {
+		postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
+	}
+
+	if len(postgresIps) == 0 {
+		return errors.New("No Postgres IPs are found")
+	}
+
+	// Defining set of commands which run on postgres nodes
+	scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
+	err = copyAndExecute(postgresIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// ignore patching of root-ca when node flag is provided
+	if nodeFlag.node != "" {
+		return nil
+	}
+
+	// Patching root-ca to frontend-nodes
 	filename_fe := "pg_fe.toml"
 	remoteService = "frontend"
 	// Creating and patching the required configurations.
