@@ -58,7 +58,7 @@ Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch serve
     repo = "/mnt/automate_backups/opensearch"
     ```
 
-To trigger the restart of the OpenSearch on each server, apply the updated `es_config.toml` config to OpenSearch once.
+-   To trigger the restart of the OpenSearch on each server, apply the updated `es_config.toml` config to OpenSearch once.
 
     ```sh
     chef-automate config patch --opensearch os_config.toml
@@ -91,7 +91,7 @@ To trigger the restart of the OpenSearch on each server, apply the updated `es_c
     touch automate.toml
     ```
 
-Add the following configuration to `automate.toml` on the provisioning host:
+-   Add the following configuration to `automate.toml` on the provisioning host:
 
     ```sh
     [global.v1.external.opensearch.backup]
@@ -116,7 +116,7 @@ Add the following configuration to `automate.toml` on the provisioning host:
 
 ### Backup
 
-To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create

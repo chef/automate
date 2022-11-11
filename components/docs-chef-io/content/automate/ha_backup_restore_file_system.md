@@ -121,7 +121,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 ### Backup
 
-To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -146,8 +146,8 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 After the restore command is successfully executed, we need to start the services on other frontend nodes. use the below command to start all the services
 
-        ```sh
-        sudo systemctl start chef-automate
-        ```
+```sh
+sudo systemctl start chef-automate
+```
 
 {{< /note >}}

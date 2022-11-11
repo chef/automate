@@ -41,27 +41,27 @@ This section provides the pre-backup configuration required to back up the data 
 
 The final output after running the curl command on all nodes is given below:
 
-    ```json
-    {
-      "_nodes": {
-        "total": 3,
-        "successful": 3,
-        "failed": 0
-      },
-      "cluster_name": "chef-insights",
-      "nodes": {
-        "lenRTrZ1QS2uv_vJIwL-kQ": {
-          "name": "lenRTrZ"
-        },
-        "Us5iBo4_RoaeojySjWpr9A": {
-          "name": "Us5iBo4"
-        },
-        "qtz7KseqSlGm2lEm0BiUEg": {
-          "name": "qtz7Kse"
-        }
-      }
-    }
-    ```
+```json
+{
+	"_nodes": {
+		"total": 3,
+		"successful": 3,
+		"failed": 0
+	},
+	"cluster_name": "chef-insights",
+	"nodes": {
+		"lenRTrZ1QS2uv_vJIwL-kQ": {
+			"name": "lenRTrZ"
+		},
+		"Us5iBo4_RoaeojySjWpr9A": {
+			"name": "Us5iBo4"
+		},
+		"qtz7KseqSlGm2lEm0BiUEg": {
+			"name": "qtz7Kse"
+		}
+	}
+}
+```
 
 #### Configuration for Automate Node from Provision Host
 
@@ -121,11 +121,11 @@ Make sure all the frontend nodes and OpenSearch have access to the object storag
 
 {{< /note >}}
 
-Once done with the OpenSearch setup, add the following `automate.toml` file and patch the `config`. In the file, modify the values listed below:
+Once done with the OpenSearch setup, add the following `automate.toml` file and patch the updated config to all frontend nodes. In the file, modify the values listed below:
 
-1. `vi automate.toml`
+1. Create .toml file by `vi automate.toml`
 
-Refer to the content for the `automate.toml` file below:
+2. Refer to the content for the `automate.toml` file below:
 
     ```sh
     [global.v1]
@@ -189,7 +189,7 @@ Refer to the content for the `automate.toml` file below:
         secret_key = "<Your Secret Key>"
     ```
 
-Execute the command given below to trigger the deployment.
+3. Execute the command given below to trigger the deployment.
 
     ```sh
     ./chef-automate config patch --frontend /path/to/automate.toml
@@ -199,7 +199,7 @@ Execute the command given below to trigger the deployment.
 
 ### Backup
 
-To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -233,7 +233,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 {{< note >}}
 
-After the restore command is executed successfully, we need to start the services on other frontend nodes. use the below command to start all the services
+-   After the restore command is executed successfully, we need to start the services on other frontend nodes. use the below command to start all the services
 
     ```sh
     sudo systemctl start chef-automate

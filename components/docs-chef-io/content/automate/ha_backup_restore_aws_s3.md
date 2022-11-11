@@ -55,7 +55,7 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 1. Create a .toml say, `automate.toml`.
 
-Refer to the content for the `automate.toml` file below:
+-   Refer to the content for the `automate.toml` file below:
 
     ```sh
     [global.v1]
@@ -119,7 +119,7 @@ Refer to the content for the `automate.toml` file below:
         secret_key = "<Your Seecret Key>"
     ```
 
-Execute the command given below to trigger the deployment.
+-   Execute the command given below to trigger the deployment.
 
     ```sh
     chef-automate config patch --frontend automate.toml
@@ -131,7 +131,7 @@ Execute the command given below to trigger the deployment.
 
 ### Backup
 
-To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -154,7 +154,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 {{< note >}}
 
-After the restore command is successfully executed, we need to start the services on the other frontend nodes. use the below command to start all the services
+-   After the restore command is successfully executed, we need to start the services on the other frontend nodes. use the below command to start all the services
 
     ```sh
     sudo systemctl start chef-automate
