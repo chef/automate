@@ -113,6 +113,10 @@ func certRotate(cmd *cobra.Command, args []string) error {
 	}
 
 	if isA2HARBFileExist() {
+		if isManagedServicesOn() {
+			return errors.New("You can not rotate certs for managed services")
+		}
+
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
