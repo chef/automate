@@ -638,13 +638,14 @@ func init() {
 func gatherLogsForFaultyNodes(outfileOverride string, logLines uint64) error {
 	_, err := client.Connection(client.DefaultClientTimeout)
 
-	if status.ErrorType(err) == "DeploymentServiceCallError" || status.ErrorType(err) == "DeploymentServiceUnreachableError" {
-		return runGatherLogsLocalCmd(outfileOverride, logLines)
-
-	}
 	cmd, err := exec.Command("hab", "svc", "status").CombinedOutput()
 	if err != nil {
 		return status.WithRecovery(errors.Wrapf(err, string(cmd)), "hab-sup is not working")
+	}
+
+	if status.ErrorType(err) == "DeploymentServiceCallError" || status.ErrorType(err) == "DeploymentServiceUnreachableError" {
+		return runGatherLogsLocalCmd(outfileOverride, logLines)
+
 	}
 
 	return gatherLogsFromServer(outfileOverride, logLines)
