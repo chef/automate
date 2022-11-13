@@ -10,8 +10,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
@@ -228,21 +228,22 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands
 }
 
 func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
+	writer.Printf("doing scp file transfer to remote node %s \n", s.SshConfig.hostIP)
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		writer.Print("Failed to copy TOML file to remote\n")
+		writer.Printf("Failed to copy TOML file to remote %s\n", err.Error())
 		return err
 	}
 	if removeFile {
 		cmd := "rm"
 		exec_args := []string{"-rf", srcFilePath}
 		if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-			writer.Print("Failed to copy TOML file to remote\n")
+			writer.Printf("Failed to copy file to remote %s\n", err.Error())
 			return err
 		}
 	}
-	writer.Print("Copied TOML file to remote\n")
+	writer.Print("Copied file to remote\n")
 	return nil
 }
 
@@ -252,7 +253,7 @@ func stdInRoutine(wr chan []byte, cmdWriter io.WriteCloser) {
 		case d := <-wr:
 			_, err := cmdWriter.Write(d)
 			if err != nil {
-				fmt.Println("ERR IN " + err.Error())
+				fmt.Println(err.Error())
 			}
 		}
 	}
@@ -261,24 +262,22 @@ func stdInRoutine(wr chan []byte, cmdWriter io.WriteCloser) {
 func stdOutRoutine(out chan string, cmdReader io.Reader) {
 	scanner := bufio.NewScanner(cmdReader)
 	var sb strings.Builder
-	var isStringAlphabetic = regexp.MustCompile(`^[a-zA-Z0-9_:]*$`).MatchString
+	//var isStringAlphabetic = regexp.MustCompile(`*[a-zA-Z0-9_:]*`).MatchString
 	for {
 		if tkn := scanner.Scan(); tkn {
 			rcv := scanner.Bytes()
 
 			raw := make([]byte, len(rcv))
 			copy(raw, rcv)
-			t := strings.TrimSpace(string(raw))
-			strings.Contains(t, `^[a-zA-Z0-9_:]*$`)
-			if isStringAlphabetic(t) {
-				sb.WriteString("OUT : " + t)
-				sb.WriteString("\n")
-			}
-
-			//fmt.Println(t)
+			t := strings.TrimFunc(string(raw), func(r rune) bool {
+				return !unicode.IsGraphic(r)
+			})
+			writer.Println(t)
+			sb.WriteString(t)
+			sb.WriteString("\n")
 		} else {
 			if scanner.Err() != nil {
-				fmt.Println("SERR OUT " + scanner.Err().Error())
+				fmt.Println(scanner.Err().Error())
 			}
 			out <- sb.String()
 			return
@@ -291,7 +290,7 @@ func stdErrRoutine(sr chan string, cmdError io.Reader) {
 
 	for scanner.Scan() {
 		t := scanner.Text()
-		if len(strings.TrimSpace("ERR OUT "+t)) > 0 {
+		if len(strings.TrimSpace(t)) > 0 {
 			sr <- "stop"
 		}
 		fmt.Println(t)
@@ -301,7 +300,6 @@ func stdErrRoutine(sr chan string, cmdError io.Reader) {
 func showSpinner(ch chan string) {
 	for {
 		state := <-ch
-		fmt.Println(state)
 		if strings.EqualFold(strings.TrimSpace(state), "start") {
 			writer.StartSpinner()
 		}

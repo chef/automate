@@ -285,14 +285,13 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 			commandString = commandString + ar + " "
 		}
 	}
-	commandString = commandString + "--no-progress "
 	commandString = commandString + allPassedFlags
 	return commandString
 }
 
 func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, true)
 		if err != nil {
 			return err
 		}
@@ -307,8 +306,9 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			if !yes {
 				return status.New(status.InvalidCommandArgsError, "A2 is currently deployed")
 			}
+			commandString = commandString + " --yes"
 		}
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, true, false)
 		if err != nil {
 			return err
 		}
@@ -323,6 +323,7 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			commandString = commandString + " --yes"
 		}
 	}
+	commandString = commandString + "--no-progress "
 	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
 	if err != nil {
 		return err
@@ -873,7 +874,7 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 }
 
 func checkFlags(f *flag.Flag) {
-	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") {
+	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") {
 		allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
 	}
 }
@@ -1145,7 +1146,8 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	if stopFrontends {
 		if len(backupCmdFlags.airgap) > 0 {
 			sshUtil.getSSHConfig().hostIP = automateIps[0]
-			sshUtil.copyFileToRemote(backupCmdFlags.airgap, filepath.Base(backupCmdFlags.airgap), false)
+			sshUtil.copyFileToRemote(backupCmdFlags.airgap, "automate-ha/"+filepath.Base(backupCmdFlags.airgap), false)
+			commandString = commandString + " --airgap-bundle " + "/tmp/automate-ha/" + filepath.Base(backupCmdFlags.airgap)
 		}
 		err := stopFrontendNodes(sshUtil, automateIps, chefServerIps)
 		if err != nil {
@@ -1153,20 +1155,26 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		}
 	}
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
-	cmdRes, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
-	if err != nil {
-		writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
-		return err
-	}
-	writer.Printf("triggered backup commands on Automate node %s \n %s \n", automateIps[0], cmdRes)
-
 	if pooling {
-		err := poolStatus(sshUtil, cmdRes, backupState)
+		cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString)
+		if err != nil {
+			writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
+			return err
+		}
+		writer.Printf("triggered backup commands on Automate node %s \n %s \n", automateIps[0], cmdRes)
+		err = poolStatus(sshUtil, cmdRes, backupState)
 		if err != nil {
 			return err
 		}
+		return nil
+	} else {
+		_, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
+		if err != nil {
+			writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
+			return err
+		}
+		return nil
 	}
-	return nil
 }
 
 func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
