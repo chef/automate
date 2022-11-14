@@ -170,7 +170,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 
 	if isA2HARBFileExist() {
-		fmt.Println("inside the a2ha condition")
 
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
@@ -208,13 +207,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			fmt.Println("Going to see centerliased Config")
 			//checking for log configuration
 			err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value)
 			if err != nil {
 				return err
 			}
-			fmt.Println("Going to see port Config", infra.Outputs.SSHPort)
 			//checking database configuration
 			existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, remoteService, GET_CONFIG)
 			if err != nil {
