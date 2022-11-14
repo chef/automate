@@ -65,7 +65,7 @@ func (e *existingInfra) generateConfig() error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600)
+	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600) // nosemgrep
 	if err != nil {
 		return err
 	}
