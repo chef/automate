@@ -292,7 +292,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			}
 
 			if err = runLogrotateConfig(res); err != nil {
-				logrus.Errorf("cannot configure log rotate: %v", err)
+				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
 				return err
 			}
 			return nil
@@ -314,7 +314,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 
 		if err = runLogrotateConfig(res); err != nil {
-			logrus.Errorf("cannot configure log rotate: %v", err)
+			logrus.Errorf("cannot configure log rotate qith new file path: %v", err)
 			return err
 		}
 

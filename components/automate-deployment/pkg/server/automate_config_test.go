@@ -11,6 +11,11 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+const (
+	filePath1 = "/var/log/automate.log"
+	filePath2 = "/var/tmp/automate.log"
+)
+
 func TestUpdateOfLogroateConfig(t *testing.T) {
 	type args struct {
 		req          *api.PatchAutomateConfigRequest
@@ -32,7 +37,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 							V1: &shared.V1{
 								Log: &shared.Log{
 									RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-									RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/tmp/automate.log"},
+									RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath2},
 									CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 									MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "10"},
 									MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 3},
@@ -57,7 +62,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/tmp/automate.log"},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath2},
 								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "10"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 3},
@@ -77,7 +82,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 							V1: &shared.V1{
 								Log: &shared.Log{
 									RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-									RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/log/automate.log"},
+									RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath1},
 									CompressRotatedLogs:  &wrapperspb.BoolValue{Value: false},
 									MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 									MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
@@ -91,7 +96,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath: &wrapperspb.StringValue{Value: "/var/tmp/automate.log"},
+								RedirectLogFilePath: &wrapperspb.StringValue{Value: filePath2},
 								CompressRotatedLogs: &wrapperspb.BoolValue{Value: true},
 
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 10},
@@ -106,7 +111,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/log/automate.log"},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath1},
 								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
@@ -126,7 +131,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 							V1: &shared.V1{
 								Log: &shared.Log{
 									RedirectSysLog:      &wrapperspb.BoolValue{Value: true},
-									RedirectLogFilePath: &wrapperspb.StringValue{Value: "/var/tmp/automate.log"},
+									RedirectLogFilePath: &wrapperspb.StringValue{Value: filePath2},
 									MaxSizeRotateLogs:   &wrapperspb.StringValue{Value: "30M"},
 								},
 							},
@@ -138,7 +143,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/log/automate.log"},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath1},
 								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
@@ -153,7 +158,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/tmp/automate.log"},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: filePath2},
 								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
