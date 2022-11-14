@@ -177,13 +177,9 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
-	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+	remoteService := "postgresql"
 
-	f, err := os.Create(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	// Creating and patching the required configurations.
 	var config string
 	if nodeFlag.node != "" {
 		writer.Warn("root-ca flag will be ignored when node flag is provided")
@@ -192,51 +188,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 		config = fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
 	}
 
-	// Writing the required configurations in the toml file
-	_, err = f.Write([]byte(config))
-	if err != nil {
-		log.Fatal(err)
-	}
-	f.Close()
-
-	remoteService := "postgresql"
-
-	var postgresIps []string
-	if nodeFlag.node != "" {
-		postgresIps = append(postgresIps, nodeFlag.node)
-
-		// //check for issuer_cert (root-ca)
-		// getPgConfigCmd := fmt.Sprintf(GET_CONFIG, remoteService)
-		// pgConfigRawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ipFlag.postgresIp, getPgConfigCmd)
-		// if err != nil {
-		// 	return err
-		// }
-		// var pgConfig PostgresqlConfig
-		// if _, err := toml.Decode(cleanToml(pgConfigRawOutput), &pgConfig); err != nil {
-		// 	return err
-		// }
-
-		// if string(rootCA) != pgConfig.Ssl.IssuerCert {
-		// 	ok, err := writer.Confirm("apply root-ca to all nodes?")
-		// 	if err != nil || !ok {
-		// 		if !ok {
-		// 			err = errors.New("failed to update root-ca")
-		// 		}
-		// 		return err
-		// 	}
-		// 	postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
-		// }
-	} else {
-		postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
-	}
-
-	if len(postgresIps) == 0 {
-		return errors.New("No Postgres IPs are found")
-	}
-
-	// Defining set of commands which run on postgres nodes
-	scriptCommands := fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
-	err = copyAndExecute(postgresIps, sshUser, sshPort, sskKeyFile, timestamp, remoteService, fileName, scriptCommands)
+	err := patchConfig(config, fileName, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -310,7 +262,15 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 	}
 	f.Close()
 
-	ips := getIps(remoteService, infra)
+	// condition for individual node patch
+	var ips []string
+	if nodeFlag.node != "" {
+		ips = append(ips, nodeFlag.node)
+		// checkRootCA(ips, remoteService)
+	} else {
+		ips = getIps(remoteService, infra)
+	}
+
 	if len(ips) == 0 {
 		return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
 	}
@@ -328,6 +288,45 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 	}
 	return nil
 }
+
+// func checkRootCA(ips []string, remoteService string, infra *AutomteHAInfraDetails) error {
+// 	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+// 	var ip = ips[len(ips)-1]
+// 	// //check for issuer_cert (root-ca)
+// 	getConfigCmd := fmt.Sprintf(GET_CONFIG, remoteService)
+// 	configRawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ip, getConfigCmd)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	type config struct {
+// 		pg PostgresqlConfig
+// 		os OpensearchConfig
+// 	}
+// 	var cf struct{}
+// 	if remoteService == "postgres" {
+// 		cf = config.pg
+// 	} else {
+// 		cf = config.os
+// 	}
+// 	if _, err := toml.Decode(cleanToml(configRawOutput), &cf); err != nil {
+// 		return err
+// 	}
+
+// 	if string(rootCA) != pgConfig.Ssl.IssuerCert {
+// 		ok, err := writer.Confirm("apply root-ca to all nodes?")
+// 		if err != nil || !ok {
+// 			if !ok {
+// 				err = errors.New("failed to update root-ca")
+// 			}
+// 			return err
+// 		}
+// 		postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
+// 	}
+// 	} else {
+// 		postgresIps = infra.Outputs.PostgresqlPrivateIps.Value
+// 	}
+// }
 
 // This function will copy the toml file to each required node and then execute the set of commands.
 func copyAndExecute(ips []string, sshUser string, sshPort string, sskKeyFile string, timestamp string, remoteService string, fileName string, scriptCommands string) error {
