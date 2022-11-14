@@ -223,7 +223,6 @@ func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string 
 //createRsyslogAndLogRotateConfig patching the config into the remote database servers
 func createRsyslogAndLogRotateConfig(sshUser string, sshPort string, sskKeyFile string, remoteIp []string, scriptCommands string) error {
 	for i := 0; i < len(remoteIp); i++ {
-		fmt.Println("Script commands got for this config", scriptCommands)
 		output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp[i], scriptCommands)
 		if err != nil {
 			writer.Errorf("%v", err)
