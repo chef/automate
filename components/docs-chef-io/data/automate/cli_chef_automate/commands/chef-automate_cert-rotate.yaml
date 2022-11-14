@@ -23,6 +23,8 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for cert-rotate
+- name: ip
+  usage: IP of a particular node
 - name: opensearch
   default_value: "false"
   usage: OS Certificate Rotation
