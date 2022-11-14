@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -173,18 +174,10 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 				t.Errorf("editConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got.Config.Global.V1.Log.RedirectLogFilePath.Value != tt.want.Config.Global.V1.Log.RedirectLogFilePath.Value {
-				t.Errorf("RedirectLogFilePath Values aren't the same: %v", err)
-			}
-			if got.Config.Global.V1.Log.CompressRotatedLogs.Value != tt.want.Config.Global.V1.Log.CompressRotatedLogs.Value {
-				t.Errorf("CompressRotatedLogs Values aren't the same: %v", err)
-			}
-			if got.Config.Global.V1.Log.MaxSizeRotateLogs.Value != tt.want.Config.Global.V1.Log.MaxSizeRotateLogs.Value {
-				t.Errorf("MaxSizeRotateLogs Values aren't the same: %v", err)
-			}
-			if got.Config.Global.V1.Log.MaxNumberRotatedLogs.Value != tt.want.Config.Global.V1.Log.MaxNumberRotatedLogs.Value {
-				t.Errorf("MaxNumberRotatedLogs Values aren't the same: %v", err)
-			}
+			require.Equal(t, got.Config.Global.V1.Log.RedirectLogFilePath.Value, tt.want.Config.Global.V1.Log.RedirectLogFilePath.Value)
+			require.Equal(t, got.Config.Global.V1.Log.CompressRotatedLogs.Value, tt.want.Config.Global.V1.Log.CompressRotatedLogs.Value)
+			require.Equal(t, got.Config.Global.V1.Log.MaxSizeRotateLogs.Value, tt.want.Config.Global.V1.Log.MaxSizeRotateLogs.Value)
+			require.Equal(t, got.Config.Global.V1.Log.MaxNumberRotatedLogs.Value, tt.want.Config.Global.V1.Log.MaxNumberRotatedLogs.Value)
 		})
 	}
 }
