@@ -15,7 +15,7 @@ create_cache_dir() {
 create_log_dir
 create_cache_dir
 
-# allow arguments to be passed to squid
+# Allow arguments to be passed to squid
 if [[ ${1:0:1} = '-' ]]; then
   EXTRA_ARGS="$@"
   set --
@@ -24,7 +24,7 @@ elif [[ ${1} == squid || ${1} == $(which squid) ]]; then
   set --
 fi
 
-# default behaviour is to launch squid
+# Default behaviour is to launch squid
 if [[ -z ${1} ]]; then
   if [[ ! -d ${SQUID_CACHE_DIR}/00 ]]; then
     echo "Initializing cache..."
