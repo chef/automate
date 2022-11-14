@@ -285,16 +285,27 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
+			res, err := UpdateOfLogroateConfig(req, existingCopy)
+			if err != nil {
+				logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
+			}
+
+			if err = runLogrotateConfig(res); err != nil {
+				logrus.Errorf("cannot configure log rotate: %v", err)
+				return err
+			}
+			return nil
+		}
+
 		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() != existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
-			err = restartSyslogService()
-			if err != nil {
-				return status.Error(codes.Internal, err.Error())
-			}
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
 		}
 
 		res, err := UpdateOfLogroateConfig(req, existingCopy)
@@ -306,6 +317,8 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			logrus.Errorf("cannot configure log rotate: %v", err)
 			return err
 		}
+
+		return nil
 	}
 
 	//Rollback the config if requested

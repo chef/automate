@@ -76,7 +76,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 							V1: &shared.V1{
 								Log: &shared.Log{
 									RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-									RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/var/automate.log"},
+									RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/log/automate.log"},
 									CompressRotatedLogs:  &wrapperspb.BoolValue{Value: false},
 									MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 									MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
@@ -105,7 +105,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/var/automate.log"},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/log/automate.log"},
 								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
@@ -137,7 +137,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 						V1: &shared.V1{
 							Log: &shared.Log{
 								RedirectSysLog:       &wrapperspb.BoolValue{Value: true},
-								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/var/automate.log"},
+								RedirectLogFilePath:  &wrapperspb.StringValue{Value: "/var/log/automate.log"},
 								CompressRotatedLogs:  &wrapperspb.BoolValue{Value: true},
 								MaxSizeRotateLogs:    &wrapperspb.StringValue{Value: "30M"},
 								MaxNumberRotatedLogs: &wrapperspb.Int32Value{Value: 11},
