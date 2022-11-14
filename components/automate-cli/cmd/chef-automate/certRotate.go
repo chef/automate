@@ -419,9 +419,8 @@ func getCerts() (string, string, string, string, string, error) {
 		)
 	}
 
-	// Root CA is mandatory for PG and OS nodes. But root CA is ignored when node flag
-	// is provided
-	if sshFlag.postgres || sshFlag.opensearch {
+	// Root CA is mandatory for A2, PG and OS nodes. But root CA is ignored when node flag is provided
+	if sshFlag.automate || sshFlag.postgres || sshFlag.opensearch {
 		if rootCaPath == "" && nodeFlag.node == "" {
 			return "", "", "", "", "", errors.New("Please provide rootCA path")
 		}
