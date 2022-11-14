@@ -136,10 +136,10 @@ func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if gatherLogsCmdFlags.localFallback {
-		return gatherLogsForFaultyBackendNodes(overridePath, gatherLogsCmdFlags.logLines)
+		return gatherLogsForBackendNodes(overridePath, gatherLogsCmdFlags.logLines)
 	}
 
-	return gatherLogsForFaultyNodes(overridePath, gatherLogsCmdFlags.logLines)
+	return gatherLogsFromServerForFrontendNodes(overridePath, gatherLogsCmdFlags.logLines)
 }
 
 const recoveryMsg = `
@@ -635,25 +635,40 @@ func init() {
 	RootCmd.AddCommand(newGatherLogsCmd())
 }
 
-func gatherLogsForFaultyNodes(outfileOverride string, logLines uint64) error {
-	cmd, err := exec.Command("hab", "svc", "status").CombinedOutput()
-	if err != nil {
-		return status.WithRecovery(errors.Wrapf(err, string(cmd)), "hab-sup is not working")
-	}
-	_, err = client.Connection(client.DefaultClientTimeout)
+//gatherLogsFromServerForFrontendNodes checks for hab svc status and for deployment service error
+//Gather the logs for all frontend nodes
+func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint64) error {
+	str := `
+	* * * chef-automate node services are down
+	* * * No gather-logs collected
+	`
+	//check for hab svc status
+	_, habSupError := exec.Command("hab", "svc", "status").CombinedOutput()
 
+	if habSupError != nil {
+		return status.WithRecovery(habSupError, str)
+	}
+	_, err := client.Connection(client.DefaultClientTimeout)
+	//check for deployment service error and if err return local gather-logs
 	if status.ErrorType(err) == "DeploymentServiceCallError" || status.ErrorType(err) == "DeploymentServiceUnreachableError" {
 		return runGatherLogsLocalCmd(outfileOverride, logLines)
-
 	}
 
 	return gatherLogsFromServer(outfileOverride, logLines)
 }
 
-func gatherLogsForFaultyBackendNodes(outfileOverride string, logLines uint64) error {
-	cmd, err := exec.Command("hab", "svc", "status").CombinedOutput()
-	if err != nil {
-		return status.WithRecovery(errors.Wrapf(err, string(cmd)), "hab-sup is not working")
+//gatherLogsForBackendNodes checks for hab svc status
+// Gather the logs for all backend nodes
+func gatherLogsForBackendNodes(outfileOverride string, logLines uint64) error {
+	str := `
+	* * * Backend node services are down
+	* * * No gather-logs collected
+	`
+	//check for hab svc status
+	_, habSupError := exec.Command("hab", "svc", "status").CombinedOutput()
+
+	if habSupError != nil {
+		return status.WithRecovery(habSupError, str)
 	}
 	return runGatherLogsLocalCmd(outfileOverride, logLines)
 }
