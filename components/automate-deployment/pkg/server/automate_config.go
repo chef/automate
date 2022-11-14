@@ -299,7 +299,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 
 		res, err := UpdateOfLogroateConfig(req, existingCopy)
 		if err != nil {
-			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: ", err)
+			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
 		}
 
 		if err = runLogrotateConfig(res); err != nil {
@@ -418,10 +418,10 @@ func configLogrotate(req *config.Log) error {
 
 	if req.GetCompressRotatedLogs().GetValue() == true {
 		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress")
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress", "dateext")
 	} else {
 		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate")
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "dateext")
 	}
 
 	// Write the byteSlice to file

@@ -174,16 +174,16 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 				return
 			}
 			if got.Config.Global.V1.Log.RedirectLogFilePath.Value != tt.want.Config.Global.V1.Log.RedirectLogFilePath.Value {
-				t.Errorf("Values aren't the same")
+				t.Errorf("RedirectLogFilePath Values aren't the same: %v", err)
 			}
 			if got.Config.Global.V1.Log.CompressRotatedLogs.Value != tt.want.Config.Global.V1.Log.CompressRotatedLogs.Value {
-				t.Errorf("Values aren't the same")
+				t.Errorf("CompressRotatedLogs Values aren't the same: %v", err)
 			}
 			if got.Config.Global.V1.Log.MaxSizeRotateLogs.Value != tt.want.Config.Global.V1.Log.MaxSizeRotateLogs.Value {
-				t.Errorf("Values aren't the same")
+				t.Errorf("MaxSizeRotateLogs Values aren't the same: %v", err)
 			}
 			if got.Config.Global.V1.Log.MaxNumberRotatedLogs.Value != tt.want.Config.Global.V1.Log.MaxNumberRotatedLogs.Value {
-				t.Errorf("Values aren't the same")
+				t.Errorf("MaxNumberRotatedLogs Values aren't the same: %v", err)
 			}
 		})
 	}
