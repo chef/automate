@@ -186,7 +186,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 
 	// Creating and patching the required configurations.
 	var config string
-	if rootCA == "" {
+	if nodeFlag.node != "" {
 		config = fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, privateCert, publicCert)
 	} else {
 		config = fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
