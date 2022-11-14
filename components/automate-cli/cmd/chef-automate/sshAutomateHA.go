@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	dc "github.com/chef/automate/api/config/deployment"
 	"io/ioutil"
 	"strconv"
@@ -289,7 +288,6 @@ func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]str
 }
 
 func getPostgresOrOpenSearchExistingLogConfig(remoteType string) (*dc.AutomateConfig, error) {
-	fmt.Println("Inside the function getPostgresOrOpenSearchExistingLogConfig")
 	var log dc.AutomateConfig
 	var fileName string
 	if remoteType == "postgresql" {
@@ -298,7 +296,6 @@ func getPostgresOrOpenSearchExistingLogConfig(remoteType string) (*dc.AutomateCo
 		fileName = opensearchConfig
 	}
 	if checkIfFileExist(fileName) {
-		fmt.Println("Got file name as fileName with inside loginc for file exist", fileName)
 		contents, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			return &log, err
