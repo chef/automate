@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/local-user-service/password"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
@@ -82,6 +83,14 @@ func (a *awsDeployment) generateConfig() error {
 	}
 	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, a.config)
 	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
+	config, err := toml.Marshal(a.config)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

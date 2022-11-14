@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 )
@@ -60,6 +61,14 @@ func (e *existingInfra) generateConfig() error {
 	}
 	finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, e.config)
 	writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+	config, err := toml.Marshal(e.config)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
