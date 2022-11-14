@@ -28,6 +28,10 @@ var sshFlag = struct {
 	opensearch bool
 }{}
 
+var nodeFlag = struct {
+	node string
+}{}
+
 var certRotateCmd = &cobra.Command{
 	Use:   "cert-rotate",
 	Short: "Chef Automate rotate cert",
@@ -52,6 +56,8 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.rootCA, "root-ca", "", "RootCA certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.adminCert, "admin-cert", "", "Admin certificate")
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.adminKey, "admin-key", "", "Admin Private certificate")
+
+	certRotateCmd.PersistentFlags().StringVar(&nodeFlag.node, "ip", "", "IP of a particular node")
 }
 
 const (
@@ -239,7 +245,16 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 	}
 	f.Close()
 
-	ips := getIps(remoteService, infra)
+	var ips []string
+	if nodeFlag.node != "" {
+		isValid := validateEachIp(remoteService, infra)
+		if !isValid {
+			return errors.New(fmt.Sprintf("Please Enter Valid %s IP", remoteService))
+		}
+		ips = append(ips, nodeFlag.node)
+	} else {
+		ips = getIps(remoteService, infra)
+	}
 	if len(ips) == 0 {
 		return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
 	}
@@ -288,6 +303,16 @@ func copyAndExecute(ips []string, sshUser string, sshPort string, sskKeyFile str
 		writer.Printf(output + "\n")
 	}
 	return nil
+}
+
+func validateEachIp(remoteService string, infra *AutomteHAInfraDetails) bool {
+	ips := getIps(remoteService, infra)
+	for i := 0; i < len(ips); i++ {
+		if ips[i] == nodeFlag.node {
+			return true
+		}
+	}
+	return false
 }
 
 // This function will return the SSH details.
