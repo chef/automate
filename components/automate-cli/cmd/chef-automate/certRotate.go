@@ -179,6 +179,12 @@ func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHA
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// ignore root-ca when node flag is provided
+	if nodeFlag.node != "" {
+		return nil
+	}
+
 	// If we pass root-ca in automate then we also need to update root-ca in the ChefServer to maintain the connection
 	if sshFlag.automate {
 		fileName = "rotate-root_CA.toml"
