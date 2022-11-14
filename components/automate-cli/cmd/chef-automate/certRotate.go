@@ -198,7 +198,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 	}
 
 	// ignore patching of root-ca when node flag is provided
-	if rootCA == "" {
+	if nodeFlag.node != "" {
 		return nil
 	}
 	// Patching root-ca to frontend-nodes for maintaining the connection.
@@ -392,7 +392,7 @@ func getCerts() (string, string, string, string, string, error) {
 	// Root CA is mandatory for PG and OS nodes. But root CA is ignored when node flag
 	// is provided
 	if sshFlag.postgres || sshFlag.opensearch {
-		if rootCaPath == "" && (nodeFlag.node == "") {
+		if rootCaPath == "" && nodeFlag.node == "" {
 			return "", "", "", "", "", errors.New("Please provide rootCA path")
 		}
 		if rootCaPath != "" {
