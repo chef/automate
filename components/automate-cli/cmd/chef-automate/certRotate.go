@@ -130,6 +130,10 @@ func certRotate(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
+		if rootCA != "" && nodeFlag.node != "" {
+			writer.Warn("root-ca flag will be ignored when node flag is provided")
+		}
+
 		if sshFlag.automate || sshFlag.chefserver {
 			err := certRotateFrontend(publicCert, privateCert, infra)
 			if err != nil {
@@ -182,10 +186,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 
 	// Creating and patching the required configurations.
 	var config string
-	if nodeFlag.node != "" {
-		if rootCA != "" {
-			writer.Warn("root-ca flag will be ignored when node flag is provided")
-		}
+	if rootCA == "" {
 		config = fmt.Sprintf(POSTGRES_CONFIG_IGNORE_ISSUER_CERT, privateCert, publicCert)
 	} else {
 		config = fmt.Sprintf(POSTGRES_CONFIG, privateCert, publicCert, rootCA)
@@ -197,7 +198,7 @@ func certRotatePG(publicCert, privateCert, rootCA string, infra *AutomteHAInfraD
 	}
 
 	// ignore patching of root-ca when node flag is provided
-	if nodeFlag.node != "" {
+	if rootCA == "" {
 		return nil
 	}
 	// Patching root-ca to frontend-nodes for maintaining the connection.
@@ -362,7 +363,8 @@ func getCerts() (string, string, string, string, string, error) {
 	rootCaPath := certFlags.rootCA
 	adminCertPath := certFlags.adminCert
 	adminKeyPath := certFlags.adminKey
-	var rootCA, adminCert, adminKey []byte
+	var rootCABytes, adminCert, adminKey []byte
+	var rootCA string
 	var err error
 
 	if privateCertPath == "" || publicCertPath == "" {
@@ -387,18 +389,22 @@ func getCerts() (string, string, string, string, string, error) {
 		)
 	}
 
-	// Root CA is mandatory for PG and OS nodes.
+	// Root CA is mandatory for PG and OS nodes. But root CA is ignored when node flag
+	// is provided
 	if sshFlag.postgres || sshFlag.opensearch {
-		if rootCaPath == "" {
+		if rootCaPath == "" && (nodeFlag.node == "") {
 			return "", "", "", "", "", errors.New("Please provide rootCA path")
 		}
-		rootCA, err = ioutil.ReadFile(rootCaPath) // nosemgrep
-		if err != nil {
-			return "", "", "", "", "", status.Wrap(
-				err,
-				status.FileAccessError,
-				fmt.Sprintf("failed reading data from file: %s", err.Error()),
-			)
+		if rootCaPath != "" {
+			rootCABytes, err = ioutil.ReadFile(rootCaPath) // nosemgrep
+			rootCA = string(rootCABytes)
+			if err != nil {
+				return "", "", "", "", "", status.Wrap(
+					err,
+					status.FileAccessError,
+					fmt.Sprintf("failed reading data from file: %s", err.Error()),
+				)
+			}
 		}
 	}
 
@@ -425,7 +431,8 @@ func getCerts() (string, string, string, string, string, error) {
 			)
 		}
 	}
-	return string(rootCA), string(publicCert), string(privateCert), string(adminCert), string(adminKey), nil
+
+	return rootCA, string(publicCert), string(privateCert), string(adminCert), string(adminKey), nil
 }
 
 /* If we are working on backend service, then first we have to get the applied configurations
