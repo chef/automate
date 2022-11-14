@@ -50,7 +50,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch server by following the steps given below:
 
--   Create a .tomll file (`os_config.toml`) and add the following settings to the end of the file.
+-   Create a .toml file (`os_config.toml`) and add the following settings to the end of the file.
 
     ```sh
     [path]

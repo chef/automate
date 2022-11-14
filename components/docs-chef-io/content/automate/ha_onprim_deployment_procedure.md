@@ -147,6 +147,18 @@ architecture = "existing_nodes"
 workspace_path = "/hab/a2_deploy_workspace"
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
+
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = ""
+# If backup_config = "object_storage" fill out [object_storage.config] as well 
+[object_storage.config]
+bucket_name = ""
+access_key = ""
+secret_key = ""
+endpoint = ""
+# [Optional] Mention object_storage region if applicable
+# Eg: region = "us-west-1"
+region = ""
 # ============== EC2 Nodes Config ======================
 [automate.config]
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
@@ -225,6 +237,9 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - `chef_server_private_ips` Eg: ["192.0.1.1"]
 - `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 - `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
+- *Optional - In case of adding backup configuration make sure to fill the following configuration in the sample. 
+    - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`. 
+    - For **File System** - `backup_config = "file_system"`.
 
 ## On-Premise Setup with AWS Managed Services
 
