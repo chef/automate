@@ -6,6 +6,10 @@ options:
 - name: a2
   default_value: "false"
   usage: Automate Certificate Rotation
+- name: admin-cert
+  usage: Admin certificate
+- name: admin-key
+  usage: Admin Private certificate
 - name: automate
   default_value: "false"
   usage: Automate Certificate Rotation
@@ -19,6 +23,12 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for cert-rotate
+- name: opensearch
+  default_value: "false"
+  usage: OS Certificate Rotation
+- name: os
+  default_value: "false"
+  usage: OS Certificate Rotation
 - name: pg
   default_value: "false"
   usage: Postgres Certificate Rotation
