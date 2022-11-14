@@ -27,7 +27,6 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 		want    *api.PatchAutomateConfigRequest
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "If exsting value isn't set",
 			args: args{
