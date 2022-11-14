@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -169,6 +170,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 
 	if isA2HARBFileExist() {
+		fmt.Println("inside the a2ha condition")
 
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
@@ -206,50 +208,83 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService, GET_CONFIG)
+			fmt.Println("Going to see centerliased Config")
+			//checking for log configuration
+			err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value)
 			if err != nil {
 				return err
 			}
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-			if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
-				remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
-				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
+			fmt.Println("Going to see port Config", infra.Outputs.SSHPort)
+			//checking database configuration
+			existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, remoteService, GET_CONFIG)
+			if err != nil {
+				return err
+			}
+			isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
+			//Implementing the config if there is some change in the database configuration
+			if isConfigChangedDatabase {
+				tomlFile := args[0] + timestamp
+				tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
 				if err != nil {
-					writer.Errorf("%v", err)
 					return err
 				}
-				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
+				scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+				if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
+					remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
+					err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
+					if err != nil {
+						writer.Errorf("%v", err)
+						return err
+					}
+					output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+					if err != nil {
+						writer.Errorf("%v", err)
+						return err
+					}
+					writer.Printf(output + "\n")
+					writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
 				}
-				writer.Printf(output + "\n")
-				writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
+
 			}
 		}
 		if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
-			tomlFilePath, err := getMergerTOMLPath(args, infra, timestamp, remoteService, GET_CONFIG)
+			//checking for log configuration
+			enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value)
+			//checking database configuration
+			existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, remoteService, GET_CONFIG)
 			if err != nil {
 				return err
 			}
-			scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-			if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
-				remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
-				err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
+			isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
+			//Implementing the config if there is some change in the database configuration
+			if isConfigChangedDatabase {
+				tomlFile := args[0] + timestamp
+				tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
+
 				if err != nil {
-					writer.Errorf("%v", err)
 					return err
 				}
-				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
+				scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+				if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
+					remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
+					err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
+					if err != nil {
+						writer.Errorf("%v", err)
+						return err
+					}
+					output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+					if err != nil {
+						writer.Errorf("%v", err)
+						return err
+					}
+					writer.Printf(output + "\n")
+					writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
 				}
-				writer.Printf(output + "\n")
-				writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
+
 			}
 		}
+
 	} else {
 
 		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
@@ -461,7 +496,6 @@ func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
 }
 
 func cleanToml(rawData string) string {
-
 	re := regexp.MustCompile("(?im).*info:.*$")
 	tomlOutput := re.ReplaceAllString(rawData, "")
 	return tomlOutput
@@ -512,4 +546,155 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	}
 
 	return tomlFile, nil
+}
+
+//getConfigFromRemoteServer gets the config for remote server using the commands
+func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, config string) (string, error) {
+	sshUser := infra.Outputs.SSHUser.Value
+	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshPort := infra.Outputs.SSHPort.Value
+
+	remoteIP, remoteService := getRemoteType(remoteType, infra)
+	scriptCommands := fmt.Sprintf(config, remoteService)
+	rawOutput, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIP, scriptCommands)
+	if err != nil {
+		return "", err
+	}
+	return rawOutput, nil
+}
+
+//getDecodedConfig gets the decoded config from the input
+func getDecodedConfig(input string, remoteService string) (interface{}, error) {
+	if remoteService == "postgresql" {
+		var src PostgresqlConfig
+		if _, err := toml.Decode(cleanToml(input), &src); err != nil {
+			return nil, err
+		}
+		return src, nil
+	}
+	if remoteService == "opensearch" {
+		var src OpensearchConfig
+		if _, err := toml.Decode(cleanToml(input), &src); err != nil {
+			return nil, err
+		}
+		return src, nil
+	}
+
+	return nil, nil
+}
+
+//getConfigForArgsOpenSearch gets the requested config from the args provided for opensearch
+func getConfigForArgsOpenSearch(args []string, remoteService string) (OpensearchConfig, error) {
+	var dest OpensearchConfig
+	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
+	if err != nil {
+		return dest, err
+	}
+
+	destString := string(pemBytes)
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		return dest, errors.Errorf("Config file must be a valid %s config", remoteService)
+	}
+
+	return dest, nil
+
+}
+
+//getConfigForArgsPostgresql gets the requested config from the args provided for postgress
+func getConfigForArgsPostgresql(args []string, remoteService string) (PostgresqlConfig, error) {
+	var dest PostgresqlConfig
+	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
+	if err != nil {
+		return dest, err
+	}
+
+	destString := string(pemBytes)
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		return dest, errors.Errorf("Config file must be a valid %s config", remoteService)
+	}
+
+	return dest, nil
+
+}
+
+//isConfigChanged checks if configuration is changed
+func isConfigChanged(src interface{}, dest interface{}) bool {
+	if reflect.DeepEqual(src, dest) {
+		return false
+	}
+	return true
+}
+
+//getExistingAndRequestedConfigForPostgres get requested and existing config for postgress
+func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInfraDetails, remoteType string, config string) (PostgresqlConfig, PostgresqlConfig, error) {
+	//Getting Existing config from server
+	var existingConfig PostgresqlConfig
+	var reqConfig PostgresqlConfig
+	srcInputString, err := getConfigFromRemoteServer(infra, remoteType, config)
+	if err != nil {
+		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
+	}
+	existingConfigInterface, err := getDecodedConfig(srcInputString, remoteType)
+	if err != nil {
+		return existingConfig, reqConfig, err
+	}
+	existingConfig = existingConfigInterface.(PostgresqlConfig)
+
+	//Getting Requested Config
+	reqConfig, err = getConfigForArgsPostgresql(args, remoteType)
+	if err != nil {
+		return existingConfig, reqConfig, err
+	}
+
+	mergo.Merge(&reqConfig, existingConfig)
+	return existingConfig, reqConfig, nil
+}
+
+//getExistingAndRequestedConfigForOpenSearch gets existed and requested config for opensearch
+func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAInfraDetails, remoteType string, config string) (OpensearchConfig, OpensearchConfig, error) {
+	//Getting Existing config from server
+	var existingConfig OpensearchConfig
+	var reqConfig OpensearchConfig
+	srcInputString, err := getConfigFromRemoteServer(infra, remoteType, config)
+	if err != nil {
+		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
+	}
+	existingConfigInterface, err := getDecodedConfig(srcInputString, remoteType)
+	if err != nil {
+		return existingConfig, reqConfig, err
+	}
+	existingConfig = existingConfigInterface.(OpensearchConfig)
+
+	//Getting Requested Config
+	reqConfig, err = getConfigForArgsOpenSearch(args, remoteType)
+	if err != nil {
+		return existingConfig, reqConfig, err
+	}
+
+	mergo.Merge(&reqConfig, existingConfig)
+	return existingConfig, reqConfig, nil
+}
+
+//createTomlFileFromConfig created a toml file where path and struct interface is provided
+func createTomlFileFromConfig(config interface{}, tomlFile string) (string, error) {
+	f, err := os.Create(tomlFile)
+
+	if err != nil {
+		// failed to create/open the file
+		writer.Bodyf("Failed to create/open the file, \n%v", err)
+		return "", err
+	}
+	if err := toml.NewEncoder(f).Encode(config); err != nil {
+		// failed to encode
+		writer.Bodyf("Failed to encode\n%v", err)
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		// failed to close the file
+		writer.Bodyf("Failed to close the file\n%v", err)
+		return "", err
+	}
+
+	return tomlFile, nil
+
 }
