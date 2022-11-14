@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -67,6 +68,13 @@ const (
 	[[global.v1.frontend_tls]]
 		cert = """%v"""
 		key = """%v"""`
+
+	CHEFSERVER_ROOTCA_CONFIG = `
+	[cs_nginx.v1.sys.ngx.http]
+		ssl_verify_depth = 6
+	[global.v1.external.automate.ssl]
+		server_name = "https://%v"
+		root_cert = """%v"""`
 
 	POSTGRES_CONFIG = `
 	[ssl]
@@ -135,7 +143,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 		}
 
 		if sshFlag.automate || sshFlag.chefserver {
-			err := certRotateFrontend(publicCert, privateCert, infra)
+			err := certRotateFrontend(publicCert, privateCert, rootCA, infra)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -155,7 +163,7 @@ func certRotate(cmd *cobra.Command, args []string) error {
 }
 
 // This function will rotate the certificates of Automate and Chef Infra Server,
-func certRotateFrontend(publicCert, privateCert string, infra *AutomteHAInfraDetails) error {
+func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHAInfraDetails) error {
 	fileName := "cert-rotate-fe.toml"
 	timestamp := time.Now().Format("20060102150405")
 	var remoteService string
@@ -171,7 +179,28 @@ func certRotateFrontend(publicCert, privateCert string, infra *AutomteHAInfraDet
 	if err != nil {
 		log.Fatal(err)
 	}
+	// If we pass root-ca in automate then we also need to update root-ca in the ChefServer to maintain the connection
+	if sshFlag.automate {
+		fileName = "rotate-root_CA.toml"
+		remoteService = "chefserver"
+		sshUser, sskKeyFile, sshPort := getSshDetails(infra)
 
+		cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
+		ips := getIps(remoteService, infra)
+		if len(ips) == 0 {
+			return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
+		}
+		fqdn, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ips[0], cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		config = fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
+		err = patchConfig(config, fileName, timestamp, remoteService, infra)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return nil
 }
 
@@ -297,9 +326,10 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 func copyAndExecute(ips []string, sshUser string, sshPort string, sskKeyFile string, timestamp string, remoteService string, fileName string, scriptCommands string) error {
 
 	var err error
+	var tomlFilePath string
 	for i := 0; i < len(ips); i++ {
 		if (sshFlag.postgres || sshFlag.opensearch) && remoteService != "frontend" {
-			tomlFilePath, err := getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUser, sshPort, sskKeyFile, ips[i])
+			tomlFilePath, err = getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUser, sshPort, sskKeyFile, ips[i])
 			if err != nil {
 				return err
 			}
