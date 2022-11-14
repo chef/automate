@@ -14,7 +14,6 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 )
-
 type existingInfra struct {
 	config     ExistingInfraConfigToml
 	configPath string

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
@@ -394,7 +395,36 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return errors.New("canceled upgrade")
 		}
 	}
+	data , err := ioutil.ReadFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE)
+	if err != nil{
+		return err
+	}
+	mode , err := getModeFromConfig(AUTOMATE_HA_WORKSPACE_CONFIG_FILE)
+	if err != nil{
+		return err 
+	}
 
+	if mode == EXISTING_INFRA_MODE {
+		config := ExistingInfraConfigToml{}
+		err := toml.Unmarshal(data,&config)
+		if err != nil {
+			return err
+		}
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
+		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writer.Println("a2ha.rb has regenerated...")
+
+	} else if mode == AWS_MODE {
+		config := AwsConfigToml{}
+		err := toml.Unmarshal(data,config)
+		if err != nil {
+			return err
+		}
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
+		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+
+	}
+	
 	if offlineMode {
 		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap, upgradeRunCmdFlags.saas)
 		if uperr != nil {
