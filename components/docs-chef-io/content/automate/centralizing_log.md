@@ -13,6 +13,8 @@ gh_repo = "automate"
     weight = 42
 +++
 
+Centralizing the log is a method to redirect your log to a separate file and save it. Centralizing the log in a file is always helpful if you want to transmit it to a third-party application like **Splunk** or **Logstack**.
+
 To check the status of the Chef Automate from deployment with channel and type, run the following command:
 
 ```bash
@@ -24,28 +26,33 @@ chef-automate status
 To view the logs, run the following command:
 
 ```shell
-journalctl -u chef-automate
+journalctl -u chef-automate -f
 ```
 
 Click [here](/automate/configuring_automate/log_management) to learn more about Log Management.
 
+## Prerequisites
+
+The Operating system has two modules that should be present in your environment:
+
+1. Rsyslog
+1. Log Rotate
+
+The above modules come by default with all the operating systems we support.
+
 ## Centralize the Log in a Document
 
-Centralizing the log is a method where you redirect your log to a file and save it in a document format. Centralizing the log in a document format is always helpful if you want to transmit it to a third-party application like **Splunk** or **Logstack**. You don't have to run the above command repeatedly to check the log.
-
-The configuration to centralize the log in a document format is shown below:
+Once you centralize the log, you can run the above command sparingly to check the log. The configuration to centralize the log in a file is shown below:
 
 ```toml
 redirect_sys_log = true //centralize the log
-redirect_log_file_path = "/var/tmp/" //set the location of the log file
+redirect_log_file_path = "PATH OF THE LOG FILE" //set the location of the log file. syntax: /var/tmp/
 ```
 
 In the above specifications:
 
 - Setting the property `redirect_sys_log` to **true** will centralize the log in a document format.
 - The default location of the log file is `/var/tmp/` as shown above. You can save the log file in your desired locations and mention the location in the above `redirect_log_file_path` property.
-
-Patching the above configurations to chef automate will start transmitting the `automate.log` file wherever the location is mentioned in the above file.
 
 {{< note >}}
 
@@ -54,7 +61,15 @@ Patching the above configurations to chef automate will start transmitting the `
 
 {{< /note >}}
 
-## Log Rotation
+### Patch the Log Configuration
+
+Once you have created the **automate.log** file, patch the above configurations to chef automate. Patching the configuration will start transmitting the `automate.log` file wherever the location is specified in `redirect_log_file_path`.
+
+```bash
+sudo chef-automate config patch config.toml
+```
+
+### Configuring Log Rotation and Retention
 
 The centralizing log also comes with log rotation with the following specifications:
 
@@ -64,14 +79,23 @@ redirect_log_file_path = "/var/tmp/" //set the location of the log file
 
 //log rotation configurations
 compress_rotated_logs = true //compress the log file
-max_size_rotate = "10M" //set the max size of the file
+max_size_rotate = "10M" //set the max size of the file. syntax: 10M, 90k
 max_number_rotated_logs = 10 //number of backup files to be stored
 ```
 
 In the above specifications:
 
 - To compress the logs, set the value of `compress_rotated_logs` to **true**. The default value of `compress_rotated_logs` is **false**.
-- The `max_size_rotate` property sets the limit after which you want to rotate the log. The default value of `max_size_rotate` is **10M**, i.e., the logs will rotate once the file size reaches the limit of 10Mb.
-- The `max_number_rotated_logs` property sets the number of file logs you want to save in your backup. As soon as the file size reaches 10Mb, it creates a new backup file each time. Using this property, you can limit the number of backup files in your storage.
+- The `max_size_rotate` property sets the limit after which you want to rotate the log. The default value of `max_size_rotate` is **10M**, i.e., the logs will rotate once the file size reaches the limit of 10Mb. You can also set the value of `max_size_rotate` in **KB**.
+- The `max_number_rotated_logs` property sets the number of file logs you want to save in your backup. Using this property, you can limit the number of backup files in your storage. The maximum number of log files you can store is **10** per day.
 
 {{< note >}} The default value of `max_number_rotated_logs` is **10M**. If you don't want to keep more than one log file in your storage, set the value of `max_number_rotated_logs` to **1**. {{< /note >}}
+
+### Configure Logs for OpenSearch in Chef Automate HA
+
+To configure the centralizing log feature for OpenSearch in Chef Automate HA, run the following command:
+
+```toml
+chef-automate config patch --opensearch <file/path/to/toml>
+chef-automate config patch --postgresql <file/path/to/toml>
+```
