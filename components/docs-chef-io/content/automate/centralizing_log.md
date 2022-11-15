@@ -40,7 +40,7 @@ The Operating system has two modules that should be present in your environment:
 
 The above modules come by default with all the operating systems we support.
 
-## Centralize the Log in a Document
+## Centralize the Log in a File
 
 Once you centralize the log, you can run the above command sparingly to check the log. The configuration to centralize the log in a file is shown below:
 
@@ -69,7 +69,7 @@ Once you have created the **automate.log** file, patch the above configurations 
 sudo chef-automate config patch config.toml
 ```
 
-### Configuring Log Rotation and Retention
+## Configuring Log Rotation and Retention
 
 The centralizing log also comes with log rotation with the following specifications:
 
@@ -91,7 +91,7 @@ In the above specifications:
 
 {{< note >}} The default value of `max_number_rotated_logs` is **10M**. If you don't want to keep more than one log file in your storage, set the value of `max_number_rotated_logs` to **1**. {{< /note >}}
 
-### Configure Logs for OpenSearch in Chef Automate HA
+## Configure Logs for OpenSearch in Chef Automate HA
 
 To configure the centralizing log feature for OpenSearch in Chef Automate HA, run the following command:
 
