@@ -5,6 +5,7 @@ import (
 	"errors"
 	dc "github.com/chef/automate/api/config/deployment"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -296,10 +297,11 @@ func getPostgresOrOpenSearchExistingLogConfig(remoteType string) (*dc.AutomateCo
 		fileName = opensearchConfig
 	}
 	if checkIfFileExist(fileName) {
-		contents, err := ioutil.ReadFile(fileName)
+		file, err := os.Open(fileName)
 		if err != nil {
 			return &log, err
 		}
+		contents, err := ioutil.ReadAll(file)
 		destString := string(contents)
 		log1, err := decodeLogConfig(destString)
 		log = *log1
