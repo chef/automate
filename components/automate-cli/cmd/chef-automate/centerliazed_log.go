@@ -82,7 +82,7 @@ func getScriptCommandsForLogging(reqConfig *dc.AutomateConfig, existConfig *dc.A
 		config.Merge(existConfig, reqConfig, merged)
 		*reqConfig = *merged
 		//If config changed reapplying the config accordingly
-		if isConfigChanged(reqConfig, existConfig) {
+		if isConfigChanged(reqConfig.GetGlobal().GetV1().GetLog(), existConfig.GetGlobal().GetV1().GetLog()) {
 			scriptCommands = getScriptCommandsForConfigChangedLogging(reqConfig, existConfig)
 		} else {
 			//if config in unchanged do nothing and returns
