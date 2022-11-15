@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -40,6 +41,11 @@ either all services are up (chef-automate restart-services)
 or all services are down (chef-automate stop) before retrying the restore.`
 
 var allPassedFlags string = ""
+
+const (
+	AUTOMATE_CMD_STOP  = "sudo chef-automate stop"
+	AUTOMATE_CMD_START = "sudo chef-automate start"
+)
 
 type BackupFromBashtion interface {
 	isBastionHost() bool
@@ -286,12 +292,13 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 		}
 	}
 	commandString = commandString + allPassedFlags
+	commandString = commandString + "--no-progress "
 	return commandString
 }
 
 func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, true)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
 		if err != nil {
 			return err
 		}
@@ -308,7 +315,7 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			}
 			commandString = commandString + " --yes"
 		}
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, true, false)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
 		if err != nil {
 			return err
 		}
@@ -323,7 +330,6 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			commandString = commandString + " --yes"
 		}
 	}
-	commandString = commandString + "--no-progress "
 	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
 	if err != nil {
 		return err
@@ -1149,10 +1155,17 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 			sshUtil.copyFileToRemote(backupCmdFlags.airgap, "automate-ha/"+filepath.Base(backupCmdFlags.airgap), false)
 			commandString = commandString + " --airgap-bundle " + "/tmp/automate-ha/" + filepath.Base(backupCmdFlags.airgap)
 		}
-		err := stopFrontendNodes(sshUtil, automateIps, chefServerIps)
+		err := executeOnFrontendNodes(sshUtil, automateIps[1:], chefServerIps, AUTOMATE_CMD_STOP)
 		if err != nil {
 			return err
 		}
+		defer func() {
+			err := executeOnFrontendNodes(sshUtil, automateIps[1:], chefServerIps, AUTOMATE_CMD_START)
+			if err != nil {
+				writer.Println(err.Error())
+				return
+			}
+		}()
 	}
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
 	if pooling {
@@ -1162,7 +1175,15 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 			return err
 		}
 		writer.Printf("triggered backup commands on Automate node %s \n %s \n", automateIps[0], cmdRes)
-		err = poolStatus(sshUtil, cmdRes, backupState)
+		writer.StartSpinner()
+		var wg sync.WaitGroup
+		wg.Add(1)
+		errChan := make(chan error)
+		go poolStatus(sshUtil, errChan, &wg, cmdRes, backupState)
+		wg.Wait()
+		writer.StopSpinner()
+		err = <-errChan
+		close(errChan)
 		if err != nil {
 			return err
 		}
@@ -1177,13 +1198,12 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	}
 }
 
-func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
-	writer.StartSpinner()
+func poolStatus(sshUtil SSHUtil, errChan chan error, wg *sync.WaitGroup, cmdRes string, backupState bool) {
 	for {
 		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status")
 		if err != nil {
 			writer.Errorf("error in polling backup status %s \n", err.Error())
-			return err
+			errChan <- err
 		}
 		//writer.Println(statusResponse)
 		if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
@@ -1196,19 +1216,19 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
 				backupState := getBackupStateFromList(backupList, cmdRes)
 				writer.Println(backupState)
 			}
-			writer.StopSpinner()
+			writer.Println("backup operation completed")
+			wg.Done()
 			break
 		}
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
-	return nil
 }
 
-func stopFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
+func executeOnFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string, cmd string) error {
 	for _, automateIp := range automateIps {
 		writer.Printf("stopping automate nodes %s \n", automateIp)
 		sshUtil.getSSHConfig().hostIP = automateIp
-		stopA2Res, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate stop")
+		stopA2Res, err := sshUtil.connectAndExecuteCommandOnRemote(cmd)
 		if err != nil {
 			writer.Errorf("error in stopping chef-automate on automate nodes %s \n", err.Error())
 			return err
@@ -1218,7 +1238,7 @@ func stopFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []st
 	for _, chefServerIp := range chefServerIps {
 		writer.Printf("stopping chef server nodes %s \n", chefServerIp)
 		sshUtil.getSSHConfig().hostIP = chefServerIp
-		stopCSRes, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate stop")
+		stopCSRes, err := sshUtil.connectAndExecuteCommandOnRemote(cmd)
 		if err != nil {
 			writer.Errorf("error in stopping chef-automate on chef server nodes %s \n", err.Error())
 			return err
