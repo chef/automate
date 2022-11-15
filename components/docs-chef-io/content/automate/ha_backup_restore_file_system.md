@@ -19,7 +19,7 @@ gh_repo = "automate"
 
 {{< note >}}
 
--   If the user chooses `backup_config` as `file_system` in `config.toml,` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
+-   If the user chooses `backup_config` as `file_system` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
@@ -62,7 +62,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
       # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
       repo = "/mnt/automate_backups/opensearch"
     ```
--   Following command will add the configuration to the OpenSearch node.
+-   Following command will add the configuration to the OpenSearch node.
     ```sh
       chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>
     ```
@@ -83,7 +83,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
     curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices are green or not)
 
     # Watch for a message about OpenSearch going from RED to GREEN
-    `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
+    journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
     ```
 
 #### Configuration for Automate Node from Provision Host

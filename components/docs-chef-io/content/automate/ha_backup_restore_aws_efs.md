@@ -19,7 +19,7 @@ gh_repo = "automate"
 
 {{< note >}}
 
--   If the user chooses `backup_config` as `efs` in `config.toml,` backup is already configured during deployment, **the below steps are not required and can be skipped**. i.e., **`backup_config = "efs"`** . If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
+-   If the user chooses `backup_config` as `efs` in `config.toml` backup is already configured during deployment, **the below steps are not required and can be skipped**. i.e., **`backup_config = "efs"`** . If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
