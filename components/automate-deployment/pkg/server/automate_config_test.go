@@ -6,7 +6,6 @@ import (
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -172,12 +171,9 @@ func TestUpdateByMergingStructs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := UpdateByMergingStructs(tt.args.req, tt.args.existingCopy)
-			logrus.Printf("Final: %+v", got)
+			require.NoError(t, err)
+			require.False(t, tt.wantErr)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("editConfig() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
 			require.Equal(t, got.Config.Global.V1.Log.RedirectLogFilePath.Value, tt.want.Config.Global.V1.Log.RedirectLogFilePath.Value)
 			require.Equal(t, got.Config.Global.V1.Log.CompressRotatedLogs.Value, tt.want.Config.Global.V1.Log.CompressRotatedLogs.Value)
 			require.Equal(t, got.Config.Global.V1.Log.MaxSizeRotateLogs.Value, tt.want.Config.Global.V1.Log.MaxSizeRotateLogs.Value)

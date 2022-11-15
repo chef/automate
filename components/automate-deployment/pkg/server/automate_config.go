@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"reflect"
 	"strings"
 
 	"github.com/chef/automate/api/config/deployment"
@@ -291,8 +290,8 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
 		}
 
-		if reflect.DeepEqual(res.Config.Global.V1.Log, existingCopy.Global.V1.Log) {
-			return errors.New("structs are equal, there is nothing to update")
+		if IfEqual(res, existingCopy) {
+			return nil
 		}
 
 		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
@@ -463,4 +462,15 @@ func UpdateByMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *d
 	}
 
 	return req, nil
+}
+
+func IfEqual(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) bool {
+	if req.Config.Global.V1.Log.MaxNumberRotatedLogs == existingCopy.Global.V1.Log.MaxNumberRotatedLogs &&
+		req.Config.Global.V1.Log.RedirectLogFilePath == existingCopy.Global.V1.Log.RedirectLogFilePath &&
+		req.Config.Global.V1.Log.CompressRotatedLogs == existingCopy.Global.V1.Log.CompressRotatedLogs &&
+		req.Config.Global.V1.Log.MaxSizeRotateLogs == existingCopy.Global.V1.Log.MaxSizeRotateLogs {
+		return true
+	}
+
+	return false
 }
