@@ -8,18 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	AWS        string = "aws"
-	DEPLOYMENT string = "deployment"
-
-	AWS_PROVISION = `
-	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done
-	%s
-	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy  -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve;cd $i;done
-`
-	DEPLOYMENT_CLEANUP = `hab pkg uninstall chef/automate-ha-deployment`
-)
-
 var cleanupFlags = struct {
 	onprem bool
 	aws    bool
@@ -46,17 +34,24 @@ var cleanupCmd = &cobra.Command{
 }
 
 const (
-	FRONTENDCLEANUP_COMMANDS = `
-		sudo systemctl stop chef-automate;
-		sudo rm -rf /hab;
-		sudo rm -rf /var/automate-ha;
-		`
-
-	BACKENDCLEANUP_COMMANDS = `
-		sudo systemctl stop hab-sup;
-		sudo rm -rf /hab; 
-		sudo rm -rf /var/automate-ha;
-		`
+	AWS                string = "aws"
+	DEPLOYMENT         string = "deployment"
+	DEPLOYMENT_CLEANUP string = `hab pkg uninstall chef/automate-ha-deployment`
+	AWS_PROVISION      string = `
+	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done
+	%s
+	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy  -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve;cd $i;done
+  `
+	FRONTENDCLEANUP_COMMANDS string = `
+	sudo systemctl stop chef-automate;
+	sudo rm -rf /hab;
+	sudo rm -rf /var/automate-ha;
+	`
+	BACKENDCLEANUP_COMMANDS string = `
+	sudo systemctl stop hab-sup;
+	sudo rm -rf /hab; 
+	sudo rm -rf /var/automate-ha;
+	`
 )
 
 func runCleanupCmd(cmd *cobra.Command, args []string) error {
