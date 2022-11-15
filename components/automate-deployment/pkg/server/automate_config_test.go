@@ -16,7 +16,7 @@ const (
 	filePath2 = "/var/tmp/automate.log"
 )
 
-func TestUpdateOfLogroateConfig(t *testing.T) {
+func TestUpdateOfLogroateConfigMergingStructs(t *testing.T) {
 	type args struct {
 		req          *api.PatchAutomateConfigRequest
 		existingCopy *deployment.AutomateConfig
@@ -171,7 +171,7 @@ func TestUpdateOfLogroateConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := UpdateOfLogroateConfig(tt.args.req, tt.args.existingCopy)
+			got, err := UpdateOfLogroateConfigMergingStructs(tt.args.req, tt.args.existingCopy)
 			logrus.Printf("Final: %+v", got)
 
 			if (err != nil) != tt.wantErr {

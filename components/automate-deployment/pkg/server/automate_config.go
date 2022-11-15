@@ -286,7 +286,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 
 		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
-			res, err := UpdateOfLogroateConfig(req, existingCopy)
+			res, err := UpdateOfLogroateConfigMergingStructs(req, existingCopy)
 			if err != nil {
 				logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
 			}
@@ -308,13 +308,13 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		res, err := UpdateOfLogroateConfig(req, existingCopy)
+		res, err := UpdateOfLogroateConfigMergingStructs(req, existingCopy)
 		if err != nil {
 			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
 		}
 
 		if err = runLogrotateConfig(res); err != nil {
-			logrus.Errorf("cannot configure log rotate qith new file path: %v", err)
+			logrus.Errorf("cannot configure log rotate with new file path: %v", err)
 			return err
 		}
 
@@ -452,7 +452,8 @@ func rollbackLogrotate() error {
 	return os.Remove(logRotateConfigFile)
 }
 
-func UpdateOfLogroateConfig(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
+// UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
+func UpdateOfLogroateConfigMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true && existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 		if err := mergo.Merge(req.Config, existingCopy); err != nil {
 			logrus.Errorf("cannot merge the requested and existing structs: %v", err)
