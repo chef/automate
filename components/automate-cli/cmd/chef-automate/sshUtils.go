@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/pkg/errors"
@@ -31,6 +32,7 @@ type SSHUtil interface {
 	connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error)
 	connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error)
 	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
+	copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error)
 }
 
 type SSHUtilImpl struct {
@@ -249,6 +251,19 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 	}
 	writer.Print("Copied file to remote\n")
 	return nil
+}
+
+// This function will copy file from remote to local and return new local file path
+func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
+	cmd := "scp"
+	ts := time.Now().Format("20060102150405")
+	destFileName := "/tmp/" + ts + "_" + outputFileName
+	execArgs := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":" + remoteFilePath, destFileName}
+	if err := exec.Command(cmd, execArgs...).Run(); err != nil {
+		writer.Print("Failed to copy file from remote\n")
+		return "", err
+	}
+	return destFileName, nil
 }
 
 func stdInRoutine(wr chan []byte, cmdWriter io.WriteCloser) {

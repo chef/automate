@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -133,19 +136,21 @@ const (
 	sudo systemctl stop hab-sup.service
 	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
 	sudo systemctl start hab-sup.service`
+
+	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 )
 
 // This function will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func certRotate(cmd *cobra.Command, args []string) error {
-	rootCA, publicCert, privateCert, adminCert, adminKey, err := getCerts()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	if isA2HARBFileExist() {
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
+		}
+
+		rootCA, publicCert, privateCert, adminCert, adminKey, err := getCerts(infra)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		// we need to ignore root-ca, adminCert and adminKey in the case of each node
@@ -438,7 +443,7 @@ func getIps(remoteService string, infra *AutomteHAInfraDetails) []string {
 }
 
 // This function will read the certificate paths, and then return the required certificates.
-func getCerts() (string, string, string, string, string, error) {
+func getCerts(infra *AutomteHAInfraDetails) (string, string, string, string, string, error) {
 	privateCertPath := certFlags.privateCert
 	publicCertPath := certFlags.publicCert
 	rootCaPath := certFlags.rootCA
@@ -447,25 +452,27 @@ func getCerts() (string, string, string, string, string, error) {
 	var rootCA, adminCert, adminKey []byte
 	var err error
 
+	const fileAccessErrorMsg string = "failed reading data from the given source, %s"
+
 	if privateCertPath == "" || publicCertPath == "" {
 		return "", "", "", "", "", errors.New("Please provide public and private cert paths")
 	}
 
-	privateCert, err := ioutil.ReadFile(privateCertPath) // nosemgrep
+	privateCert, err := getCertFromFile(privateCertPath, infra)
 	if err != nil {
 		return "", "", "", "", "", status.Wrap(
 			err,
 			status.FileAccessError,
-			fmt.Sprintf("failed reading data from file: %s", err.Error()),
+			fmt.Sprintf(fileAccessErrorMsg, err.Error()),
 		)
 	}
 
-	publicCert, err := ioutil.ReadFile(publicCertPath) // nosemgrep
+	publicCert, err := getCertFromFile(publicCertPath, infra)
 	if err != nil {
 		return "", "", "", "", "", status.Wrap(
 			err,
 			status.FileAccessError,
-			fmt.Sprintf("failed reading data from file: %s", err.Error()),
+			fmt.Sprintf(fileAccessErrorMsg, err.Error()),
 		)
 	}
 
@@ -475,12 +482,12 @@ func getCerts() (string, string, string, string, string, error) {
 			return "", "", "", "", "", errors.New("Please provide rootCA path")
 		}
 		if rootCaPath != "" {
-			rootCA, err = ioutil.ReadFile(rootCaPath) // nosemgrep
+			rootCA, err = getCertFromFile(rootCaPath, infra)
 			if err != nil {
 				return "", "", "", "", "", status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf("failed reading data from file: %s", err.Error()),
+					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
 				)
 			}
 		}
@@ -492,21 +499,21 @@ func getCerts() (string, string, string, string, string, error) {
 			return "", "", "", "", "", errors.New("Please provide Admin cert and Admin key paths")
 		}
 		if adminCertPath != "" && adminKeyPath != "" {
-			adminCert, err = ioutil.ReadFile(adminCertPath) // nosemgrep
+			adminCert, err = getCertFromFile(adminCertPath, infra)
 			if err != nil {
 				return "", "", "", "", "", status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf("failed reading data from file: %s", err.Error()),
+					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
 				)
 			}
 
-			adminKey, err = ioutil.ReadFile(adminKeyPath) // nosemgrep
+			adminKey, err = getCertFromFile(adminCertPath, infra)
 			if err != nil {
 				return "", "", "", "", "", status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf("failed reading data from file: %s", err.Error()),
+					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
 				)
 			}
 		}
@@ -515,13 +522,56 @@ func getCerts() (string, string, string, string, string, error) {
 	return string(rootCA), string(publicCert), string(privateCert), string(adminCert), string(adminKey), nil
 }
 
+// This function will read the certificate from the given path (local or remote).
+func getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, error) {
+	// Checking if the given path is remote or local.
+	if isRemotePath(certPath) {
+		// Get Host IP from the given path and validate it.
+		hostIP := getIPV4(certPath)
+		if net.ParseIP(hostIP).To4() == nil {
+			return nil, errors.New(fmt.Sprintf("%v is not a valid IPv4 address", hostIP))
+		}
+
+		// Get the file path from the given remote address.
+		certPaths := strings.Split(certPath, ":")
+		if len(certPaths) != 2 {
+			return nil, errors.New(fmt.Sprintf("Invalid remote path: %v", certPath))
+		}
+		remoteFilePath := strings.TrimSpace(certPaths[1])
+		fileName := filepath.Base(remoteFilePath)
+		if remoteFilePath == "" || fileName == "" {
+			return nil, errors.New(fmt.Sprintf("Invalid remote path: %v", certPath))
+		}
+
+		// Download certificate from remote host.
+		sshConfig := getSshDetails(infra)
+		sshUtil := NewSSHUtil(sshConfig)
+		sshUtil.getSSHConfig().hostIP = hostIP
+		filePath, err := sshUtil.copyFileFromRemote(remoteFilePath, fileName)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Unable to copy file from remote path: %v", certPath))
+		}
+		return ioutil.ReadFile(filePath) // nosemgrep
+	}
+	return ioutil.ReadFile(certPath) // nosemgrep
+}
+
+func isRemotePath(path string) bool {
+	pattern := regexp.MustCompile(IP_V4_REGEX)
+	return pattern.MatchString(path)
+}
+
+func getIPV4(path string) string {
+	pattern := regexp.MustCompile(IP_V4_REGEX)
+	return pattern.FindString(path)
+}
+
 /*
 	If we are working on backend service, then first we have to get the applied configurations
 
 and then merge it with new configurations, then apply that configuration.
 Because if we directly apply the new configurations, then the old applied configurations will be gone.
 So, we have to retain the old configurations also.
-
 This function will create the new toml file which includes old and new configurations.
 */
 func getMerger(fileName string, timestamp string, remoteType string, config string, sshUtil SSHUtil) (string, error) {
