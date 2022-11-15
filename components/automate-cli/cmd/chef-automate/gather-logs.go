@@ -638,7 +638,7 @@ func init() {
 //gatherLogsFromServerForFrontendNodes checks for hab svc status and for deployment service error
 //Gather the logs for all frontend nodes
 func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint64) error {
-	str := `
+	habSupErrorMsg := `
 	* * * chef-automate node services are down
 	* * * No gather-logs collected
 	`
@@ -646,7 +646,7 @@ func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint6
 	_, habSupError := exec.Command("hab", "svc", "status").CombinedOutput()
 
 	if habSupError != nil {
-		return status.WithRecovery(habSupError, str)
+		return status.WithRecovery(habSupError, habSupErrorMsg)
 	}
 	_, err := client.Connection(client.DefaultClientTimeout)
 	//check for deployment service error and if err return local gather-logs
@@ -660,7 +660,7 @@ func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint6
 //gatherLogsForBackendNodes checks for hab svc status
 // Gather the logs for all backend nodes
 func gatherLogsForBackendNodes(outfileOverride string, logLines uint64) error {
-	str := `
+	habSupErrorMsg := `
 	* * * Backend node services are down
 	* * * No gather-logs collected
 	`
@@ -668,7 +668,7 @@ func gatherLogsForBackendNodes(outfileOverride string, logLines uint64) error {
 	_, habSupError := exec.Command("hab", "svc", "status").CombinedOutput()
 
 	if habSupError != nil {
-		return status.WithRecovery(habSupError, str)
+		return status.WithRecovery(habSupError, habSupErrorMsg)
 	}
 	return runGatherLogsLocalCmd(outfileOverride, logLines)
 }
