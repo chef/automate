@@ -1,5 +1,0 @@
-[global]
-  [global.v1]
-    [global.v1.log]
-      redirect_sys_log = true
-      redirect_log_file_path = "/var/tmp/"

@@ -5,6 +5,7 @@ import (
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
@@ -83,6 +84,7 @@ password = "replication"`
 }
 
 func TestTomlFileCreateFromReqConfigLog(t *testing.T) {
+	fileName := "logtoml.toml"
 	req := dc.AutomateConfig{
 		Global: &shared.GlobalConfig{
 			V1: &shared.V1{
@@ -94,6 +96,7 @@ func TestTomlFileCreateFromReqConfigLog(t *testing.T) {
 		},
 	}
 
-	createTomlFileFromConfig(req, "logtoml.toml")
-	assert.FileExists(t, "logtoml.toml")
+	createTomlFileFromConfig(req, fileName)
+	assert.FileExists(t, fileName)
+	os.Remove(fileName)
 }
