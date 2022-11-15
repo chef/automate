@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
 
 	"github.com/chef/automate/api/config/deployment"
@@ -285,11 +286,16 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 
+		res, err := UpdateByMergingStructs(req, existingCopy)
+		if err != nil {
+			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
+		}
+
+		if reflect.DeepEqual(res.Config.Global.V1.Log, existingCopy.Global.V1.Log) {
+			return errors.New("structs are equal, there is nothing to update")
+		}
+
 		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
-			res, err := UpdateOfLogroateConfigMergingStructs(req, existingCopy)
-			if err != nil {
-				logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
-			}
 
 			if err = runLogrotateConfig(res); err != nil {
 				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
@@ -298,7 +304,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 			return nil
 		}
 
-		err := createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
+		err = createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
@@ -306,11 +312,6 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		err = restartSyslogService()
 		if err != nil {
 			return status.Error(codes.Internal, err.Error())
-		}
-
-		res, err := UpdateOfLogroateConfigMergingStructs(req, existingCopy)
-		if err != nil {
-			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
 		}
 
 		if err = runLogrotateConfig(res); err != nil {
@@ -453,7 +454,7 @@ func rollbackLogrotate() error {
 }
 
 // UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
-func UpdateOfLogroateConfigMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
+func UpdateByMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true && existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 		if err := mergo.Merge(req.Config, existingCopy); err != nil {
 			logrus.Errorf("cannot merge the requested and existing structs: %v", err)
