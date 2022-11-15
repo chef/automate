@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/x509/pkix"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -43,13 +44,13 @@ var certRotateCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(certRotateCmd)
 
-	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.automate, "automate", false, "Automate Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&sshFlag.automate, "automate", "a", false, "Automate Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.automate, "a2", false, "Automate Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.chefserver, "chefserver", false, "Chef Infra Server Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&sshFlag.chefserver, "chef_server", "c", false, "Chef Infra Server Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.chefserver, "cs", false, "Chef Infra Server Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.postgres, "postgres", false, "Postgres Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&sshFlag.postgres, "postgresql", "p", false, "Postgres Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.postgres, "pg", false, "Postgres Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.opensearch, "opensearch", false, "OS Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&sshFlag.opensearch, "opensearch", "o", false, "OS Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&sshFlag.opensearch, "os", false, "OS Certificate Rotation")
 
 	certRotateCmd.PersistentFlags().StringVar(&certFlags.privateCert, "private-cert", "", "Private certificate")
@@ -87,8 +88,7 @@ const (
 	[ssl]
 		enable = true
 		ssl_key = """%v"""
-		ssl_cert = """%v"""
-		`
+		ssl_cert = """%v"""`
 
 	POSTGRES_FRONTEND_CONFIG = `
 	[global.v1.external.postgresql.ssl]
@@ -102,7 +102,6 @@ const (
 		admin_key = """%v"""
 		ssl_cert = """%v"""
 		ssl_key = """%v"""
-
 	[plugins.security.authcz]
 		admin_dn = '- %v'
 	[plugins.security.ssl.transport]
@@ -111,9 +110,20 @@ const (
 	[plugins.security]
 		nodes_dn = '- %v'`
 
+	OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA = `
+	[tls]
+		ssl_cert = """%v"""
+		ssl_key = """%v"""
+	[plugins.security]
+		nodes_dn = '- %v'`
+
 	OPENSEARCH_FRONTEND_CONFIG = `
 	[global.v1.external.opensearch.ssl]
 		root_cert = """%v"""
+		server_name = "%v"`
+
+	OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT = `
+	[global.v1.external.opensearch.ssl]
 		server_name = "%v"`
 
 	GET_USER_CONFIG = `
@@ -138,8 +148,12 @@ func certRotate(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
+		// we need to ignore root-ca, adminCert and adminKey in the case of each node
 		if rootCA != "" && nodeFlag.node != "" {
 			writer.Warn("root-ca flag will be ignored when node flag is provided")
+		}
+		if (adminCert != "" || adminKey != "") && nodeFlag.node != "" {
+			writer.Warn("admin-cert and admin-key flag will be ignored when node flag is provided")
 		}
 
 		if sshFlag.automate || sshFlag.chefserver {
@@ -185,24 +199,9 @@ func certRotateFrontend(publicCert, privateCert, rootCA string, infra *AutomteHA
 		return nil
 	}
 
-	// If we pass root-ca in automate then we also need to update root-ca in the ChefServer to maintain the connection
+	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
 	if sshFlag.automate {
-		fileName = "rotate-root_CA.toml"
-		remoteService = "chefserver"
-		sshUser, sskKeyFile, sshPort := getSshDetails(infra)
-
-		cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
-		ips := getIps(remoteService, infra)
-		if len(ips) == 0 {
-			return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
-		}
-		fqdn, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ips[0], cmd)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		config = fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
-		err = patchConfig(config, fileName, timestamp, remoteService, infra)
+		err = patchRootCAinCS(rootCA, timestamp, infra)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -258,9 +257,13 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 	remoteService := "opensearch"
 
 	e := existingInfra{}
-	admin_dn, err := e.getDistinguishedNameFromKey(adminCert)
-	if err != nil {
-		return err
+	var admin_dn pkix.Name
+	var err error
+	if nodeFlag.node == "" {
+		admin_dn, err = e.getDistinguishedNameFromKey(adminCert)
+		if err != nil {
+			return err
+		}
 	}
 	nodes_dn, err := e.getDistinguishedNameFromKey(publicCert)
 	if err != nil {
@@ -268,7 +271,12 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 	}
 
 	// Creating and patching the required configurations.
-	config := fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
+	var config string
+	if nodeFlag.node != "" {
+		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, publicCert, privateCert, fmt.Sprintf("%v", nodes_dn))
+	} else {
+		config = fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
+	}
 	err = patchConfig(config, fileName, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
@@ -278,8 +286,14 @@ func certRotateOS(publicCert, privateCert, rootCA, adminCert, adminKey string, i
 	cn := nodes_dn.CommonName
 	filename_fe := "os_fe.toml"
 	remoteService = "frontend"
+
 	// Creating and patching the required configurations.
-	config_fe := fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
+	var config_fe string
+	if nodeFlag.node != "" {
+		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
+	} else {
+		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
+	}
 	err = patchConfig(config_fe, filename_fe, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
@@ -301,7 +315,7 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 	f.Close()
 
 	var ips []string
-	if nodeFlag.node != "" {
+	if nodeFlag.node != "" && remoteService != "frontend" {
 		isValid := validateEachIp(remoteService, infra)
 		if !isValid {
 			return errors.New(fmt.Sprintf("Please Enter Valid %s IP", remoteService))
@@ -322,6 +336,30 @@ func patchConfig(config, filename, timestamp, remoteService string, infra *Autom
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
 	}
 	err = copyAndExecute(ips, sshUser, sshPort, sskKeyFile, timestamp, remoteService, filename, scriptCommands)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+// This function will rotate the root-ca in the ChefServer to maintain the connection
+func patchRootCAinCS(rootCA, timestamp string, infra *AutomteHAInfraDetails) error {
+	fileName := "rotate-root_CA.toml"
+	remoteService := "chefserver"
+	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
+
+	cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
+	ips := getIps(remoteService, infra)
+	if len(ips) == 0 {
+		return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
+	}
+	fqdn, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ips[0], cmd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	config := fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
+	err = patchConfig(config, fileName, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -399,8 +437,7 @@ func getCerts() (string, string, string, string, string, error) {
 	rootCaPath := certFlags.rootCA
 	adminCertPath := certFlags.adminCert
 	adminKeyPath := certFlags.adminKey
-	var rootCABytes, adminCert, adminKey []byte
-	var rootCA string
+	var rootCA, adminCert, adminKey []byte
 	var err error
 
 	if privateCertPath == "" || publicCertPath == "" {
@@ -431,8 +468,7 @@ func getCerts() (string, string, string, string, string, error) {
 			return "", "", "", "", "", errors.New("Please provide rootCA path")
 		}
 		if rootCaPath != "" {
-			rootCABytes, err = ioutil.ReadFile(rootCaPath) // nosemgrep
-			rootCA = string(rootCABytes)
+			rootCA, err = ioutil.ReadFile(rootCaPath) // nosemgrep
 			if err != nil {
 				return "", "", "", "", "", status.Wrap(
 					err,
@@ -445,29 +481,31 @@ func getCerts() (string, string, string, string, string, error) {
 
 	// Admin Cert and Admin Key is mandatory for OS nodes.
 	if sshFlag.opensearch {
-		if adminCertPath == "" || adminKeyPath == "" {
+		if (adminCertPath == "" || adminKeyPath == "") && nodeFlag.node == "" {
 			return "", "", "", "", "", errors.New("Please provide Admin cert and Admin key paths")
 		}
-		adminCert, err = ioutil.ReadFile(adminCertPath) // nosemgrep
-		if err != nil {
-			return "", "", "", "", "", status.Wrap(
-				err,
-				status.FileAccessError,
-				fmt.Sprintf("failed reading data from file: %s", err.Error()),
-			)
-		}
+		if adminCertPath != "" && adminKeyPath != "" {
+			adminCert, err = ioutil.ReadFile(adminCertPath) // nosemgrep
+			if err != nil {
+				return "", "", "", "", "", status.Wrap(
+					err,
+					status.FileAccessError,
+					fmt.Sprintf("failed reading data from file: %s", err.Error()),
+				)
+			}
 
-		adminKey, err = ioutil.ReadFile(adminKeyPath) // nosemgrep
-		if err != nil {
-			return "", "", "", "", "", status.Wrap(
-				err,
-				status.FileAccessError,
-				fmt.Sprintf("failed reading data from file: %s", err.Error()),
-			)
+			adminKey, err = ioutil.ReadFile(adminKeyPath) // nosemgrep
+			if err != nil {
+				return "", "", "", "", "", status.Wrap(
+					err,
+					status.FileAccessError,
+					fmt.Sprintf("failed reading data from file: %s", err.Error()),
+				)
+			}
 		}
 	}
 
-	return rootCA, string(publicCert), string(privateCert), string(adminCert), string(adminKey), nil
+	return string(rootCA), string(publicCert), string(privateCert), string(adminCert), string(adminKey), nil
 }
 
 /* If we are working on backend service, then first we have to get the applied configurations
