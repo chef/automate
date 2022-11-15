@@ -8,11 +8,13 @@ import (
 	"testing"
 )
 
+var fqdn = "a2.test.com"
+
 func TestIsConfigChanged(t *testing.T) {
 
 	t.Run("check if the values are changed For Postgresql", func(t *testing.T) {
 		reqConfig := PostgresqlConfig{
-			Host: "a2.test.com",
+			Host: fqdn,
 			Port: 80,
 		}
 
@@ -27,7 +29,7 @@ func TestIsConfigChanged(t *testing.T) {
 	})
 	t.Run("check if the some values are added For Postgresql", func(t *testing.T) {
 		reqConfig := PostgresqlConfig{
-			Host:              "a2.test.com",
+			Host:              fqdn,
 			Port:              80,
 			CheckpointTimeout: "10c",
 		}
@@ -42,13 +44,13 @@ func TestIsConfigChanged(t *testing.T) {
 	})
 	t.Run("check if the no values are added or changed", func(t *testing.T) {
 		reqConfig := PostgresqlConfig{
-			Host:              "a2.test.com",
+			Host:              fqdn,
 			Port:              80,
 			CheckpointTimeout: "10c",
 		}
 
 		existingConfig := PostgresqlConfig{
-			Host:              "a2.test.com",
+			Host:              fqdn,
 			Port:              80,
 			CheckpointTimeout: "10c",
 		}

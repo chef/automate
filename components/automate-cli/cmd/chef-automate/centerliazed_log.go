@@ -54,7 +54,7 @@ func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.Auto
 		return nil
 	}
 
-	err := createRsyslogAndLogRotateConfig(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+	err := createRsyslogAndLogRotateConfig(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands, remoteType)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string 
 }
 
 //createRsyslogAndLogRotateConfig patching the config into the remote database servers
-func createRsyslogAndLogRotateConfig(sshUser string, sshPort string, sskKeyFile string, remoteIp []string, scriptCommands string) error {
+func createRsyslogAndLogRotateConfig(sshUser string, sshPort string, sskKeyFile string, remoteIp []string, scriptCommands string, remoteService string) error {
 	for i := 0; i < len(remoteIp); i++ {
 		output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp[i], scriptCommands)
 		if err != nil {
@@ -229,6 +229,7 @@ func createRsyslogAndLogRotateConfig(sshUser string, sshPort string, sskKeyFile 
 			return err
 		}
 		writer.Printf(output)
+		writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp[i] + "\n")
 
 	}
 	return nil

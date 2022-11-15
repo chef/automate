@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func Test_getScriptCommandsForConfigChangedLogging(t *testing.T) {
+func TestGetScriptCommandsForConfigChangedLogging(t *testing.T) {
 	type args struct {
 		reqConfig   *dc.AutomateConfig
 		existConfig *dc.AutomateConfig
@@ -133,7 +133,7 @@ func Test_getScriptCommandsForConfigChangedLogging(t *testing.T) {
 	}
 }
 
-func Test_getScriptCommandsForLogging(t *testing.T) {
+func TestGetScriptCommandsForLogging(t *testing.T) {
 	type args struct {
 		reqConfig   *dc.AutomateConfig
 		existConfig *dc.AutomateConfig

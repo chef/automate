@@ -60,6 +60,8 @@ const (
 	dateFormat = "%Y%m%d%H%M%S"
 )
 
+var configValid = "Config file must be a valid %s config"
+
 func init() {
 	configCmd.AddCommand(showConfigCmd)
 	configCmd.AddCommand(patchConfigCmd)
@@ -204,6 +206,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				writer.Printf(output + "\n")
 				writer.Success("Patching is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
 			}
+
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
@@ -450,7 +453,7 @@ func getMergedOpensearchInterface(rawOutput string, pemFilePath string, remoteSe
 	destString := string(pemBytes)
 	var dest OpensearchConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
+		return "", errors.Errorf(configValid, remoteService)
 	}
 
 	mergo.Merge(&dest, src) //, mergo.WithOverride
@@ -473,7 +476,7 @@ func getMergedPostgresqlInterface(rawOutput string, pemFilePath string, remoteSe
 	destString := string(pemBytes)
 	var dest PostgresqlConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		return "", errors.Errorf("Config file must be a valid %s config", remoteService)
+		return "", errors.Errorf(configValid, remoteService)
 	}
 
 	mergo.Merge(&dest, src) //, mergo.WithOverride
@@ -590,7 +593,7 @@ func getConfigForArgsOpenSearch(args []string, remoteService string) (Opensearch
 
 	destString := string(pemBytes)
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		return dest, errors.Errorf("Config file must be a valid %s config", remoteService)
+		return dest, errors.Errorf(configValid, remoteService)
 	}
 
 	return dest, nil
@@ -607,7 +610,7 @@ func getConfigForArgsPostgresql(args []string, remoteService string) (Postgresql
 
 	destString := string(pemBytes)
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		return dest, errors.Errorf("Config file must be a valid %s config", remoteService)
+		return dest, errors.Errorf(configValid, remoteService)
 	}
 
 	return dest, nil
