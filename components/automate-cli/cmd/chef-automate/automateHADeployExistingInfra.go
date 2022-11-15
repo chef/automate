@@ -440,3 +440,16 @@ func (e *existingInfra) validateIPs() *list.List {
 
 	return errorList
 }
+
+func readConfig(path string) (ExistingInfraConfigToml, error) {
+	templateBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return ExistingInfraConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	config := ExistingInfraConfigToml{}
+	err = ptoml.Unmarshal(templateBytes, &config)
+	if err != nil {
+		return ExistingInfraConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return config, nil
+}
