@@ -59,8 +59,8 @@ const (
 
 	dateFormat = "%Y%m%d%H%M%S"
 
-	postgresql = "postgresql"
-	opensearch = "opensearch"
+	postgresql       = "postgresql"
+	opensearch_const = "opensearch"
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -603,7 +603,7 @@ func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 		}
 		return src, nil
 	}
-	if remoteService == opensearch {
+	if remoteService == opensearch_const {
 		var src OpensearchConfig
 		if _, err := toml.Decode(cleanToml(input), &src); err != nil {
 			return nil, err
@@ -677,18 +677,18 @@ func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAI
 	//Getting Existing config from server
 	var existingConfig OpensearchConfig
 	var reqConfig OpensearchConfig
-	srcInputString, err := getConfigFromRemoteServer(infra, opensearch, config)
+	srcInputString, err := getConfigFromRemoteServer(infra, opensearch_const, config)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
 	}
-	existingConfigInterface, err := getDecodedConfig(srcInputString, opensearch)
+	existingConfigInterface, err := getDecodedConfig(srcInputString, opensearch_const)
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
 	existingConfig = existingConfigInterface.(OpensearchConfig)
 
 	//Getting Requested Config
-	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, opensearch)
+	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, opensearch_const)
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
