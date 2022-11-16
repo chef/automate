@@ -99,3 +99,48 @@ To configure the centralizing log feature for OpenSearch in Chef Automate HA, ru
 chef-automate config patch --opensearch <file/path/to/toml>
 chef-automate config patch --postgresql <file/path/to/toml>
 ```
+
+## 3rd Party Integration using Splunk
+
+Splunk is used to generate data and visualize it in real-time. Here, the Splunk forwarder will be used to view the data outside the local environment. Assuming that you already have your splunk forwarder installed, run the following command to start Splunk Universal forwarder:
+
+```bash
+[system@ABC]# cd splunkforwarder/bin
+[system@ABC]# ./splunk start --accept-license
+```
+
+The above command will start your spunk forwarder.
+
+Now, edit the `inputs.conf` file on your Splunk Forwarder as shown below:
+
+```bash
+[system@ABC]# ./splunk add monitor /var/tmp/automate.log
+```
+
+In the above command, **/var/tmp/** is the location of the `automate.log` which you can change accordingly. Running the above command will show:
+
+```bash
+Added monitor of '/var/tmp/automate.log'
+```
+
+The above statement confirms that the value of the monitor in `input.conf` has been updated to `var/tmp/automate.log`. Open the `input.conf` file just to confirm whether the content in the file is as expected. The expected content is:
+
+```bash
+[monitor:///var/tmp/automate.log]
+disabled = false
+```
+
+Restart your splunk forwarder using the following command:
+
+```bash
+[system@ABC]# ./splunk restart
+```
+
+Verify if the data is flowing as expected in splunk using the following command:
+
+```bash
+
+```
+
+The output from the above command is as shown below:
+
