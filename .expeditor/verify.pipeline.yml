@@ -139,7 +139,7 @@ steps:
     command:
       - rm -rf /bin/catchsegv
       - rm -rf /bin/gencat
-      - rm -rf /bin/genconf
+      - rm -rf /bin/getconf
       - rm -rf /bin/xtrace
       - rm -rf /bin/iconv
       - rm -rf /bin/makedb
