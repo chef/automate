@@ -173,6 +173,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 	if isA2HARBFileExist() {
 
+		var err error
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -191,30 +192,18 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				os.Exit(1)
 			}
 			const remoteService string = "frontend"
-			err := setConfigForFrontEndNodes(args, sshUser, sskKeyFile, sshPort, frontendIps, remoteService, timestamp)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
-
-		}
-		if configCmdFlags.postgresql {
+			err = setConfigForFrontEndNodes(args, sshUser, sskKeyFile, sshPort, frontendIps, remoteService, timestamp)
+		} else if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			err := setConfigForPostgresqlNodes(args, remoteService, sshUser, sshPort, sskKeyFile, infra, timestamp)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
-		}
-		if configCmdFlags.opensearch {
+			err = setConfigForPostgresqlNodes(args, remoteService, sshUser, sshPort, sskKeyFile, infra, timestamp)
+		} else if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
-			//checking for log configuration
-			err := setConfigForOpensearch(args, remoteService, sshUser, sshPort, sskKeyFile, infra, timestamp)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
+			err = setConfigForOpensearch(args, remoteService, sshUser, sshPort, sskKeyFile, infra, timestamp)
 
+		}
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
 		}
 
 	} else {
@@ -260,7 +249,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUser st
 		return err
 	}
 	//checking database configuration
-	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, remoteService, GET_CONFIG)
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, GET_CONFIG)
 	if err != nil {
 		return err
 	}
@@ -303,7 +292,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUser string,
 		return err
 	}
 	//checking database configuration
-	existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, remoteService, GET_CONFIG)
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, GET_CONFIG)
 	if err != nil {
 		return err
 	}
@@ -334,7 +323,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUser string,
 		}
 
 	} else {
-		writer.Print("There is no change in the configuration")
+		writer.Println("There is no change in the configuration")
 	}
 	return nil
 }
@@ -622,31 +611,12 @@ func getDecodedConfig(input string, remoteService string) (interface{}, error) {
 	return nil, nil
 }
 
-//getConfigForArgsOpenSearch gets the requested config from the args provided for opensearch
-func getConfigForArgsOpenSearch(args []string, remoteService string) (OpensearchConfig, error) {
-	var dest OpensearchConfig
-	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
-	if err != nil {
-		return dest, err
-	}
-
-	destString := string(pemBytes)
-	if _, err := toml.Decode(destString, &dest); err != nil {
-		return dest, errors.Errorf(configValid, remoteService)
-	}
-
-	return dest, nil
-
-}
-
 //getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
 func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
-
 	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
 	if err != nil {
 		return nil, err
 	}
-
 	destString := string(pemBytes)
 	if remoteService == "postgresql" {
 		var dest PostgresqlConfig
@@ -675,22 +645,22 @@ func isConfigChanged(src interface{}, dest interface{}) bool {
 }
 
 //getExistingAndRequestedConfigForPostgres get requested and existing config for postgresql
-func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInfraDetails, remoteType string, config string) (PostgresqlConfig, PostgresqlConfig, error) {
+func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInfraDetails, config string) (PostgresqlConfig, PostgresqlConfig, error) {
 	//Getting Existing config from server
 	var existingConfig PostgresqlConfig
 	var reqConfig PostgresqlConfig
-	srcInputString, err := getConfigFromRemoteServer(infra, remoteType, config)
+	srcInputString, err := getConfigFromRemoteServer(infra, "postgresql", config)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
 	}
-	existingConfigInterface, err := getDecodedConfig(srcInputString, remoteType)
+	existingConfigInterface, err := getDecodedConfig(srcInputString, "postgresql")
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
 	existingConfig = existingConfigInterface.(PostgresqlConfig)
 
 	//Getting Requested Config
-	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, remoteType)
+	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, "postgresql")
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
@@ -700,25 +670,26 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInf
 }
 
 //getExistingAndRequestedConfigForOpenSearch gets existed and requested config for opensearch
-func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAInfraDetails, remoteType string, config string) (OpensearchConfig, OpensearchConfig, error) {
+func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAInfraDetails, config string) (OpensearchConfig, OpensearchConfig, error) {
 	//Getting Existing config from server
 	var existingConfig OpensearchConfig
 	var reqConfig OpensearchConfig
-	srcInputString, err := getConfigFromRemoteServer(infra, remoteType, config)
+	srcInputString, err := getConfigFromRemoteServer(infra, "opensearch", config)
 	if err != nil {
 		return existingConfig, reqConfig, errors.Wrapf(err, "Unable to get config from the server with error")
 	}
-	existingConfigInterface, err := getDecodedConfig(srcInputString, remoteType)
+	existingConfigInterface, err := getDecodedConfig(srcInputString, "opensearch")
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
 	existingConfig = existingConfigInterface.(OpensearchConfig)
 
 	//Getting Requested Config
-	reqConfig, err = getConfigForArgsOpenSearch(args, remoteType)
+	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, "opensearch")
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
+	reqConfig = reqConfigInterface.(OpensearchConfig)
 
 	mergo.Merge(&reqConfig, existingConfig)
 	return existingConfig, reqConfig, nil
