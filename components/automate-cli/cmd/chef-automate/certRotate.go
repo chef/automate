@@ -200,31 +200,10 @@ func certRotateFrontend(sshUtil SSHUtil, publicCert, privateCert, rootCA string,
 	if nodeFlag.node != "" {
 		return nil
 	}
-<<<<<<< HEAD
 
 	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
 	if sshFlag.automate {
-		err = patchRootCAinCS(rootCA, timestamp, infra)
-=======
-
-	// If we pass root-ca in automate then we also need to update root-ca in the ChefServer to maintain the connection
-	if sshFlag.automate {
-		fileName = "rotate-root_CA.toml"
-		remoteService = "chefserver"
-		cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
-		ips := getIps(remoteService, infra)
-		if len(ips) == 0 {
-			return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
-		}
-		sshUtil.getSSHConfig().hostIP = ips[0]
-		fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		config = fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
-		err = patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
->>>>>>> 92398fc1d (handle restore respose)
+		err = patchRootCAinCS(sshUtil, rootCA, timestamp, infra)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -294,18 +273,13 @@ func certRotateOS(sshUtil SSHUtil, publicCert, privateCert, rootCA, adminCert, a
 	}
 
 	// Creating and patching the required configurations.
-<<<<<<< HEAD
 	var config string
 	if nodeFlag.node != "" {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, publicCert, privateCert, fmt.Sprintf("%v", nodes_dn))
 	} else {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
 	}
-	err = patchConfig(config, fileName, timestamp, remoteService, infra)
-=======
-	config := fmt.Sprintf(OPENSEARCH_CONFIG, rootCA, adminCert, adminKey, publicCert, privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
 	err = patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
->>>>>>> 92398fc1d (handle restore respose)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -316,18 +290,13 @@ func certRotateOS(sshUtil SSHUtil, publicCert, privateCert, rootCA, adminCert, a
 	remoteService = "frontend"
 
 	// Creating and patching the required configurations.
-<<<<<<< HEAD
 	var config_fe string
 	if nodeFlag.node != "" {
 		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
 	} else {
 		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
 	}
-	err = patchConfig(config_fe, filename_fe, timestamp, remoteService, infra)
-=======
-	config_fe := fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, rootCA, cn)
 	err = patchConfig(sshUtil, config_fe, filename_fe, timestamp, remoteService, infra)
->>>>>>> 92398fc1d (handle restore respose)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -375,23 +344,23 @@ func patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService str
 }
 
 // This function will rotate the root-ca in the ChefServer to maintain the connection
-func patchRootCAinCS(rootCA, timestamp string, infra *AutomteHAInfraDetails) error {
+func patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomteHAInfraDetails) error {
+
 	fileName := "rotate-root_CA.toml"
 	remoteService := "chefserver"
-	sshUser, sskKeyFile, sshPort := getSshDetails(infra)
-
 	cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
 	ips := getIps(remoteService, infra)
 	if len(ips) == 0 {
 		return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
 	}
-	fqdn, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ips[0], cmd)
+	sshUtil.getSSHConfig().hostIP = ips[0]
+	fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	config := fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
-	err = patchConfig(config, fileName, timestamp, remoteService, infra)
+	err = patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra)
 	if err != nil {
 		log.Fatal(err)
 	}
