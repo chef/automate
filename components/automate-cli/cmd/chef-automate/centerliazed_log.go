@@ -65,8 +65,10 @@ func enableCentralizedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.Auto
 			writer.Errorf("Unable to created toml file for postgresql toml %v", err)
 		}
 	} else {
-		createTomlFileFromConfig(&reqConfig, opensearchConfig)
-		writer.Errorf("Unable to created toml file for open-search toml %v", err)
+		_, err := createTomlFileFromConfig(&reqConfig, opensearchConfig)
+		if err != nil {
+			writer.Errorf("Unable to created toml file for postgresql toml %v", err)
+		}
 	}
 	return nil
 
@@ -101,7 +103,7 @@ func getScriptCommandsForLogging(reqConfig *dc.AutomateConfig, existConfig *dc.A
 func getScriptCommandsForConfigChangedLogging(reqConfig *dc.AutomateConfig, existConfig *dc.AutomateConfig) string {
 	var scriptCommands string
 	//Disable the centralized logging if requested
-	// if only logrorate policies are requested and there is no change in the file path created
+	// if only logrotate policies are requested and there is no change in the file path created
 	// if file path changes are requested
 	if reqConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existConfig.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
@@ -201,12 +203,12 @@ func getConfigForArgsLogs(args []string, remoteService string) (*dc.AutomateConf
 func rollBackCentralized() string {
 	rsyslogFileRemove := fmt.Sprintf("sudo rm %s", rsyslogConfigFile)
 
-	logrorateFileRemove := fmt.Sprintf("sudo rm %s", logRotateConfigFile)
+	logRotateFileRemove := fmt.Sprintf("sudo rm %s", logRotateConfigFile)
 
-	return fmt.Sprintf(" %s; %s; %s", rsyslogFileRemove, logrorateFileRemove, restartSyslogService)
+	return fmt.Sprintf(" %s; %s; %s", rsyslogFileRemove, logRotateFileRemove, restartSyslogService)
 }
 
-//setConfigForCentralizedLog sets config for rsyslog and logrorate
+//setConfigForCentralizedLog sets config for rsyslog and logrotate
 func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string {
 	contentForRsyslogConfig := createConfigFileForAutomateSysLog(reqConfig.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
 

@@ -296,7 +296,7 @@ func getPostgresOrOpenSearchExistingLogConfig(remoteType string) (*dc.AutomateCo
 		fileName = opensearchConfig
 	}
 	if checkIfFileExist(fileName) {
-		contents, err := ioutil.ReadFile(fileName) // nosemgrep //
+		contents, err := ioutil.ReadFile(fileName) // nosemgrep
 		if err != nil {
 			return nil, err
 		}

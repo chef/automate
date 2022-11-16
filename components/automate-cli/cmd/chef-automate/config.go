@@ -191,98 +191,30 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				os.Exit(1)
 			}
 			const remoteService string = "frontend"
-			scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-			for i := 0; i < len(frontendIps); i++ {
-				err := copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp, false)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
-				}
-				output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
-				if err != nil {
-					writer.Errorf("%v", err)
-					return err
-				}
-				writer.Printf(output + "\n")
-				writer.Success("Patching is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
+			err := setConfigForFrontEndNodes(args, sshUser, sskKeyFile, sshPort, frontendIps, remoteService, timestamp)
+			if err != nil {
+				writer.Errorf("%v", err)
+				return err
 			}
 
 		}
 		if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			//checking for log configuration
-			err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value)
+			err := setConfigForPostgresqlNodes(args, remoteService, sshUser, sshPort, sskKeyFile, infra, timestamp)
 			if err != nil {
+				writer.Errorf("%v", err)
 				return err
-			}
-			//checking database configuration
-			existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, remoteService, GET_CONFIG)
-			if err != nil {
-				return err
-			}
-			isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
-			//Implementing the config if there is some change in the database configuration
-			if isConfigChangedDatabase {
-				tomlFile := args[0] + timestamp
-				tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
-				if err != nil {
-					return err
-				}
-				scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-				if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
-					remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
-					err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
-					if err != nil {
-						writer.Errorf("%v", err)
-						return err
-					}
-					output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
-					if err != nil {
-						writer.Errorf("%v", err)
-						return err
-					}
-					writer.Printf(output + "\n")
-					writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
-				}
-
 			}
 		}
 		if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
 			//checking for log configuration
-			enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value)
-			//checking database configuration
-			existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, remoteService, GET_CONFIG)
+			err := setConfigForOpensearch(args, remoteService, sshUser, sshPort, sskKeyFile, infra, timestamp)
 			if err != nil {
+				writer.Errorf("%v", err)
 				return err
 			}
-			isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
-			//Implementing the config if there is some change in the database configuration
-			if isConfigChangedDatabase {
-				tomlFile := args[0] + timestamp
-				tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
 
-				if err != nil {
-					return err
-				}
-				scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-				if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
-					remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
-					err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
-					if err != nil {
-						writer.Errorf("%v", err)
-						return err
-					}
-					output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
-					if err != nil {
-						writer.Errorf("%v", err)
-						return err
-					}
-					writer.Printf(output + "\n")
-					writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
-				}
-
-			}
 		}
 
 	} else {
@@ -297,6 +229,113 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	// writer.Success("Configuration patched")
+	return nil
+}
+
+//setConfigForFrontEndNodes patches the configuration for front end nodes in Automate HA
+func setConfigForFrontEndNodes(args []string, sshUser string, sskKeyFile string, sshPort string, frontendIps []string, remoteService string, timestamp string) error {
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
+	for i := 0; i < len(frontendIps); i++ {
+		err := copyFileToRemote(sskKeyFile, args[0], sshUser, frontendIps[i], remoteService+timestamp, false)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, frontendIps[i], scriptCommands)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		writer.Printf(output + "\n")
+		writer.Success("Patching is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
+	}
+	return nil
+}
+
+//setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
+func setConfigForPostgresqlNodes(args []string, remoteService string, sshUser string, sshPort string, sskKeyFile string, infra *AutomteHAInfraDetails, timestamp string) error {
+	//checking for log configuration
+	err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.PostgresqlPrivateIps.Value)
+	if err != nil {
+		return err
+	}
+	//checking database configuration
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, remoteService, GET_CONFIG)
+	if err != nil {
+		return err
+	}
+	isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
+	//Implementing the config if there is some change in the database configuration
+	if isConfigChangedDatabase {
+		tomlFile := args[0] + timestamp
+		tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
+		if err != nil {
+			return err
+		}
+		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+		if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
+			remoteIp := infra.Outputs.PostgresqlPrivateIps.Value[0]
+			err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
+			if err != nil {
+				writer.Errorf("%v", err)
+				return err
+			}
+			output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+			if err != nil {
+				writer.Errorf("%v", err)
+				return err
+			}
+			writer.Printf(output + "\n")
+			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
+		}
+
+	} else {
+		writer.Println("There is no change in the configuration")
+	}
+	return nil
+}
+
+//setConfigForOpensearch patches the config for open-search nodes in Automate HA
+func setConfigForOpensearch(args []string, remoteService string, sshUser string, sshPort string, sskKeyFile string, infra *AutomteHAInfraDetails, timestamp string) error {
+	//checking for log configuration
+	err := enableCentralizedLogConfigForHA(args, remoteService, sshUser, sshPort, sskKeyFile, infra.Outputs.OpensearchPrivateIps.Value)
+	if err != nil {
+		return err
+	}
+	//checking database configuration
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, remoteService, GET_CONFIG)
+	if err != nil {
+		return err
+	}
+	isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
+	//Implementing the config if there is some change in the database configuration
+	if isConfigChangedDatabase {
+		tomlFile := args[0] + timestamp
+		tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
+
+		if err != nil {
+			return err
+		}
+		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+		if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
+			remoteIp := infra.Outputs.OpensearchPrivateIps.Value[0]
+			err := copyFileToRemote(sskKeyFile, tomlFilePath, sshUser, remoteIp, remoteService+timestamp, true)
+			if err != nil {
+				writer.Errorf("%v", err)
+				return err
+			}
+			output, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, remoteIp, scriptCommands)
+			if err != nil {
+				writer.Errorf("%v", err)
+				return err
+			}
+			writer.Printf(output + "\n")
+			writer.Success("Patching is completed on " + remoteService + " node : " + remoteIp + "\n")
+		}
+
+	} else {
+		writer.Print("There is no change in the configuration")
+	}
 	return nil
 }
 
@@ -600,20 +639,30 @@ func getConfigForArgsOpenSearch(args []string, remoteService string) (Opensearch
 
 }
 
-//getConfigForArgsPostgresql gets the requested config from the args provided for postgress
-func getConfigForArgsPostgresql(args []string, remoteService string) (PostgresqlConfig, error) {
-	var dest PostgresqlConfig
+//getConfigForArgsPostgresqlAndOpenSearch gets the requested config from the args provided for postgresql or opensearch
+func getConfigForArgsPostgresqlOrOpenSearch(args []string, remoteService string) (interface{}, error) {
+
 	pemBytes, err := ioutil.ReadFile(args[0]) // nosemgrep
 	if err != nil {
-		return dest, err
+		return nil, err
 	}
 
 	destString := string(pemBytes)
-	if _, err := toml.Decode(destString, &dest); err != nil {
-		return dest, errors.Errorf(configValid, remoteService)
+	if remoteService == "postgresql" {
+		var dest PostgresqlConfig
+		if _, err := toml.Decode(destString, &dest); err != nil {
+			return dest, errors.Errorf(configValid, remoteService)
+		}
+		return dest, nil
+	} else {
+		var dest OpensearchConfig
+		if _, err := toml.Decode(destString, &dest); err != nil {
+			return dest, errors.Errorf(configValid, remoteService)
+		}
+		return dest, nil
 	}
 
-	return dest, nil
+	return nil, nil
 
 }
 
@@ -625,7 +674,7 @@ func isConfigChanged(src interface{}, dest interface{}) bool {
 	return true
 }
 
-//getExistingAndRequestedConfigForPostgres get requested and existing config for postgress
+//getExistingAndRequestedConfigForPostgres get requested and existing config for postgresql
 func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInfraDetails, remoteType string, config string) (PostgresqlConfig, PostgresqlConfig, error) {
 	//Getting Existing config from server
 	var existingConfig PostgresqlConfig
@@ -641,11 +690,11 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInf
 	existingConfig = existingConfigInterface.(PostgresqlConfig)
 
 	//Getting Requested Config
-	reqConfig, err = getConfigForArgsPostgresql(args, remoteType)
+	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, remoteType)
 	if err != nil {
 		return existingConfig, reqConfig, err
 	}
-
+	reqConfig = reqConfigInterface.(PostgresqlConfig)
 	mergo.Merge(&reqConfig, existingConfig)
 	return existingConfig, reqConfig, nil
 }
