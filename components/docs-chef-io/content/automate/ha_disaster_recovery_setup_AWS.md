@@ -95,7 +95,7 @@ Configure backups for both clusters using only [object storage](/automate/ha_bac
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-    - We don't recommend creating backups from the Disaster Recovery cluster unless it has become the active cluster and recieving traffic from the clients/nodes.
+    - We don't recommend creating backups from the Disaster Recovery cluster unless it has become the active cluster and receiving traffic from the clients/nodes.
 
     - Stop all the services on all Automate and Chef Infra frontend nodes using the following command:
 
