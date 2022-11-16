@@ -227,7 +227,7 @@ func createScriptCommandsForCentralizedLog(reqConfig *dc.AutomateConfig) string 
 func createRsyslogAndLogRotateConfig(sshUtil SSHUtil, remoteIp []string, scriptCommands string, remoteService string) error {
 	for i := 0; i < len(remoteIp); i++ {
 		sshUtil.getSSHConfig().hostIP = remoteIp[i]
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
 			writer.Errorf("%v", err)
 			return err

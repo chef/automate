@@ -217,7 +217,7 @@ func certRotateFrontend(sshUtil SSHUtil, publicCert, privateCert, rootCA string,
 			return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
 		}
 		sshUtil.getSSHConfig().hostIP = ips[0]
-		fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd)
+		fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -422,7 +422,7 @@ func copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteServi
 		}
 
 		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
 			writer.Errorf("%v", err)
 			return err
@@ -558,7 +558,7 @@ This function will create the new toml file which includes old and new configura
 func getMerger(fileName string, timestamp string, remoteType string, config string, sshUtil SSHUtil) (string, error) {
 	tomlFile := fileName + timestamp
 	scriptCommands := fmt.Sprintf(config, remoteType)
-	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 	if err != nil {
 		return "", err
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -29,7 +28,7 @@ type SSHUtil interface {
 	setSSHConfig(sshConfig *SSHConfig)
 	getClientConfig() (*ssh.ClientConfig, error)
 	getConnection() (*ssh.Client, error)
-	connectAndExecuteCommandOnRemote(remoteCommands string) (string, error)
+	connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error)
 	connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error)
 	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
 }
@@ -142,7 +141,7 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	return fileErr
 }
 
-func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string) (string, error) {
+func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error) {
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -155,19 +154,24 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string) (s
 		writer.Errorf("session failed:%v", err)
 		return "", err
 	}
-	var stdoutBuf bytes.Buffer
-	session.Stdout = &stdoutBuf
 
-	writer.StartSpinner()
-	err = session.Run(remoteCommands)
+	if spinner {
+		writer.StartSpinner()
+	}
+	output, err := session.CombinedOutput(remoteCommands)
+	if err != nil {
+		return "", err
+	}
 
-	writer.StopSpinner()
+	if spinner {
+		writer.StopSpinner()
+	}
 	if err != nil {
 		writer.Errorf("Run failed: %v", err)
 		return "", err
 	}
 	defer session.Close()
-	return stdoutBuf.String(), nil
+	return string(output), nil
 }
 
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error) {

@@ -234,7 +234,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			writer.Errorf("%v", err)
 			return err
 		}
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
 			writer.Errorf("%v", err)
 			return err
@@ -273,7 +273,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 				writer.Errorf("%v", err)
 				return err
 			}
-			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				writer.Errorf("%v", err)
 				return err
@@ -317,7 +317,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 				writer.Errorf("%v", err)
 				return err
 			}
-			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				writer.Errorf("%v", err)
 				return err
@@ -420,7 +420,7 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 	sshconfig.hostIP = remoteIP
 	sshUtil := NewSSHUtil(sshconfig)
 	scriptCommands := fmt.Sprintf(config, remoteService)
-	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 	if err != nil {
 		return "", err
 	}
@@ -464,7 +464,7 @@ func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, 
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	sshUtil.getSSHConfig().hostIP = remoteIP
 	scriptCommands := fmt.Sprintf(config, remoteService)
-	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands)
+	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 	if err != nil {
 		return "", err
 	}

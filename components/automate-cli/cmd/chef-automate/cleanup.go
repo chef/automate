@@ -169,7 +169,7 @@ func executeCommandForArrayofIPs(sshUtil SSHUtil, remoteIps []string, script str
 	for i := 0; i < len(remoteIps); i++ {
 		sshUtil.getSSHConfig().hostIP = remoteIps[i]
 		writer.Println("Cleanup has started on " + servername + " node : " + remoteIps[i] + "\n")
-		_, err := sshUtil.connectAndExecuteCommandOnRemote(script)
+		_, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 		if err != nil {
 			writer.Error(err.Error())
 			return err
