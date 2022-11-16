@@ -13,6 +13,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
+	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -280,6 +281,46 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 		}
 	}
 
+	//Set the config if already not set
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true &&
+		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+
+		res, err := UpdateByMergingStructs(req, existingCopy)
+		if err != nil {
+			logrus.Errorf("cannot merge requested and existing structs through mergo.Merge: %v", err)
+		}
+
+		if IfEqual(res, existingCopy) {
+			return nil
+		}
+
+		if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() == existingCopy.GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue() {
+
+			if err = runLogrotateConfig(res); err != nil {
+				logrus.Errorf("cannot configure log rotate with existing file path: %v", err)
+				return err
+			}
+			return nil
+		}
+
+		err = createConfigFileForAutomateSysLog(req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectLogFilePath().GetValue())
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		err = restartSyslogService()
+		if err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+
+		if err = runLogrotateConfig(res); err != nil {
+			logrus.Errorf("cannot configure log rotate with new file path: %v", err)
+			return err
+		}
+
+		return nil
+	}
+
 	//Rollback the config if requested
 	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
@@ -315,7 +356,7 @@ func restartSyslogService() error {
 //createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
 // which redirects the logs to the specified location
 func createConfigFileForAutomateSysLog(pathForLog string) error {
-
+	os.Remove(rsyslogConfigFile)
 	f, err := os.Create(rsyslogConfigFile)
 
 	if err != nil {
@@ -380,6 +421,7 @@ func logrotateConfChecks() error {
 func configLogrotate(req *config.Log) error {
 	var logRotateConfigContent string
 	// Create a file in /etc/logrotate.d/automate
+	os.Remove(logRotateConfigFile)
 	file, err := os.Create(logRotateConfigFile)
 	if err != nil {
 		logrus.Errorf("cannot create a file: %v", err)
@@ -389,10 +431,10 @@ func configLogrotate(req *config.Log) error {
 
 	if req.GetCompressRotatedLogs().GetValue() == true {
 		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress")
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "compress", "dateext")
 	} else {
 		logRotateConfigContent = LogRotateConf(getLogFileName(req.GetRedirectLogFilePath().GetValue()),
-			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate")
+			getConcatStringFromConfig("size", req.GetMaxSizeRotateLogs().GetValue()), getConcatStringFromConfig("rotate", req.GetMaxNumberRotatedLogs().GetValue()), "missingok", "copytruncate", "dateext")
 	}
 
 	// Write the byteSlice to file
@@ -408,4 +450,27 @@ func configLogrotate(req *config.Log) error {
 
 func rollbackLogrotate() error {
 	return os.Remove(logRotateConfigFile)
+}
+
+// UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
+func UpdateByMergingStructs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) (*api.PatchAutomateConfigRequest, error) {
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true && existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
+		if err := mergo.Merge(req.Config, existingCopy); err != nil {
+			logrus.Errorf("cannot merge the requested and existing structs: %v", err)
+			return nil, err
+		}
+	}
+
+	return req, nil
+}
+
+func IfEqual(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) bool {
+	if req.Config.Global.V1.Log.MaxNumberRotatedLogs == existingCopy.Global.V1.Log.MaxNumberRotatedLogs &&
+		req.Config.Global.V1.Log.RedirectLogFilePath == existingCopy.Global.V1.Log.RedirectLogFilePath &&
+		req.Config.Global.V1.Log.CompressRotatedLogs == existingCopy.Global.V1.Log.CompressRotatedLogs &&
+		req.Config.Global.V1.Log.MaxSizeRotateLogs == existingCopy.Global.V1.Log.MaxSizeRotateLogs {
+		return true
+	}
+
+	return false
 }

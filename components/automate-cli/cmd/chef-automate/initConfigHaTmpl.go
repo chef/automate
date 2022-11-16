@@ -432,8 +432,8 @@ enable_custom_certs = false
 [existing_infra.config]
 ## === INPUT NEEDED ===
 
-# provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
-# No of ip address should be same as No of instance_count count mentioned above in 
+# provide comma-seperated IP addresses of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No. of IP address should be the same as the No. of instance_count count mentioned above in
 # automate.config, chef_server.config, opensearch.config and postgresql.config
 automate_private_ips = []
 chef_server_private_ips = []

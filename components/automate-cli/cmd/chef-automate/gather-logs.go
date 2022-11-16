@@ -136,10 +136,10 @@ func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if gatherLogsCmdFlags.localFallback {
-		return runGatherLogsLocalCmd(overridePath, gatherLogsCmdFlags.logLines)
+		return gatherLogsForBackendNodes(overridePath, gatherLogsCmdFlags.logLines)
 	}
 
-	return gatherLogsFromServer(overridePath, gatherLogsCmdFlags.logLines)
+	return gatherLogsFromServerForFrontendNodes(overridePath, gatherLogsCmdFlags.logLines)
 }
 
 const recoveryMsg = `
@@ -633,4 +633,42 @@ func tryRevertingAnyNginxConfChanges() {
 
 func init() {
 	RootCmd.AddCommand(newGatherLogsCmd())
+}
+
+//gatherLogsFromServerForFrontendNodes checks for hab svc status and for deployment service error
+//Gather the logs for all frontend nodes
+func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint64) error {
+	habSupErrorMsg := `
+	* * * chef-automate node services are down
+	* * * No gather-logs collected
+	`
+	//check for hab svc status
+	_, habSupError := exec.Command("hab", "svc", "status").CombinedOutput()
+
+	if habSupError != nil {
+		return status.WithRecovery(habSupError, habSupErrorMsg)
+	}
+	_, err := client.Connection(client.DefaultClientTimeout)
+	//check for deployment service error and if err return local gather-logs
+	if status.ErrorType(err) == "DeploymentServiceCallError" || status.ErrorType(err) == "DeploymentServiceUnreachableError" {
+		return runGatherLogsLocalCmd(outfileOverride, logLines)
+	}
+
+	return gatherLogsFromServer(outfileOverride, logLines)
+}
+
+//gatherLogsForBackendNodes checks for hab svc status
+// Gather the logs for all backend nodes
+func gatherLogsForBackendNodes(outfileOverride string, logLines uint64) error {
+	habSupErrorMsg := `
+	* * * Backend node services are down
+	* * * No gather-logs collected
+	`
+	//check for hab svc status
+	_, habSupError := exec.Command("hab", "svc", "status").CombinedOutput()
+
+	if habSupError != nil {
+		return status.WithRecovery(habSupError, habSupErrorMsg)
+	}
+	return runGatherLogsLocalCmd(outfileOverride, logLines)
 }

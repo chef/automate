@@ -3,12 +3,14 @@ package main
 import (
 	"container/list"
 	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 )
@@ -60,6 +62,14 @@ func (e *existingInfra) generateConfig() error {
 	}
 	finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, e.config)
 	writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+	config, err := toml.Marshal(e.config)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600) // nosemgrep
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -72,7 +82,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 			if err != nil {
 				return err
 			}
-			e.config.Opensearch.Config.AdminDn = admin_dn
+			e.config.Opensearch.Config.AdminDn = fmt.Sprintf("%v", admin_dn)
 		}
 		//If PublicKey is given then get the nodes_dn from the cert
 		if len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) > 0 {
@@ -80,7 +90,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 			if err != nil {
 				return err
 			}
-			e.config.Opensearch.Config.NodesDn = nodes_dn
+			e.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 		}
 
 		//Set the admin_dn and nodes_dn in the config for all IP addresses
@@ -92,23 +102,23 @@ func (e *existingInfra) addDNTocertConfig() error {
 				if err != nil {
 					return err
 				}
-				e.config.Opensearch.Config.CertsByIP[i].NodesDn = nodes_dn
+				e.config.Opensearch.Config.CertsByIP[i].NodesDn = fmt.Sprintf("%v", nodes_dn)
 			}
 		}
 	}
 	return nil
 }
 
-func (e *existingInfra) getDistinguishedNameFromKey(publicKey string) (string, error) {
+func (e *existingInfra) getDistinguishedNameFromKey(publicKey string) (pkix.Name, error) {
 	block, _ := pem.Decode([]byte(publicKey))
 	if block == nil {
-		return "", status.New(status.ConfigError, "failed to decode certificate PEM")
+		return pkix.Name{}, status.New(status.ConfigError, "failed to decode certificate PEM")
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
-		return "", status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
+		return pkix.Name{}, status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
 	}
-	return fmt.Sprintf("%v", cert.Subject), nil
+	return cert.Subject, nil
 }
 
 func (e *existingInfra) getConfigPath() string {

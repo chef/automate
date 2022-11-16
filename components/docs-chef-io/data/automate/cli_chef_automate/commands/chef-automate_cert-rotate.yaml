@@ -6,10 +6,16 @@ options:
 - name: a2
   default_value: "false"
   usage: Automate Certificate Rotation
+- name: admin-cert
+  usage: Admin certificate
+- name: admin-key
+  usage: Admin Private certificate
 - name: automate
+  shorthand: a
   default_value: "false"
   usage: Automate Certificate Rotation
-- name: chefserver
+- name: chef_server
+  shorthand: c
   default_value: "false"
   usage: Chef Infra Server Certificate Rotation
 - name: cs
@@ -19,10 +25,20 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for cert-rotate
+- name: node
+  usage: Node Ip address
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: OS Certificate Rotation
+- name: os
+  default_value: "false"
+  usage: OS Certificate Rotation
 - name: pg
   default_value: "false"
   usage: Postgres Certificate Rotation
-- name: postgres
+- name: postgresql
+  shorthand: p
   default_value: "false"
   usage: Postgres Certificate Rotation
 - name: private-cert
