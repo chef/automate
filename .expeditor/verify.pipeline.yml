@@ -139,6 +139,15 @@ steps:
     command:
       - rm -rf /bin/catchsegv
       - rm -rf /bin/gencat
+      - rm -rf /bin/genconf
+      - rm -rf /bin/xtrace
+      - rm -rf /bin/iconv
+      - rm -rf /bin/makedb
+      - rm -rf /bin/sotruss
+      - rm -rf /bin/nscd
+      - rm -rf /bin/localedef
+      - rm -rf /bin/zdump
+      - rm -rf /bin/sprof
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
       - scripts/install_hab_pkg.sh core/opa
       - cd components/authz-service/engine/opa/policy
