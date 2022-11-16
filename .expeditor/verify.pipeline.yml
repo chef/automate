@@ -140,6 +140,16 @@ steps:
       - rm -rf /bin/catchsegv
       - rm -rf /bin/gencat
       - rm -rf /bin/getconf
+      - rm -rf /bin/getent
+      - rm -rf /bin/iconvconfig
+      - rm -rf /bin/ldconfig
+      - rm -rf /bin/ldd
+      - rm -rf /bin/locale
+      - rm -rf /bin/mtrace
+      - rm -rf /bin/pcprofiledump
+      - rm -rf /bin/pldd
+      - rm -rf /bin/tzselect
+      - rm -rf /bin/zic
       - rm -rf /bin/xtrace
       - rm -rf /bin/iconv
       - rm -rf /bin/makedb
