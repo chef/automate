@@ -527,6 +527,7 @@ func getCerts(infra *AutomteHAInfraDetails) (string, string, string, string, str
 
 // This function will read the certificate from the given path (local or remote).
 func getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, error) {
+	certPath = strings.TrimSpace(certPath)
 	// Checking if the given path is remote or local.
 	if IsRemotePath(certPath) {
 		remoteFilePath, fileName, hostIP, err := GetRemoteFileDetails(certPath)
@@ -567,8 +568,10 @@ func GetRemoteFileDetails(remotePath string) (string, string, string, error) {
 	return remoteFilePath, fileName, hostIP, nil
 }
 
+// Path should be in this format <IPv4>:<PathToFile>
+// Example, 10.1.0.234:/home/ec2-user/certs/public.pem
 func IsRemotePath(path string) bool {
-	pattern := regexp.MustCompile(IP_V4_REGEX)
+	pattern := regexp.MustCompile(`^` + IP_V4_REGEX + `:`)
 	return pattern.MatchString(path)
 }
 
