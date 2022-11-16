@@ -564,6 +564,7 @@ func GetRemoteFileDetails(remotePath string) (string, string, string, error) {
 	if !IsValidFilePath(remoteFilePath) {
 		return "", "", "", errors.New(fmt.Sprintf("Invalid remote file path: %v", remoteFilePath))
 	}
+	remoteFilePath = filepath.Clean(remoteFilePath)
 
 	// Get the filename from the file path.
 	fileName := filepath.Base(remoteFilePath)
