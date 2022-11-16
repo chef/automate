@@ -118,7 +118,7 @@ You can also use `--chef_server`or `-c` instead of cs flag
 
 You can also use `--postgresql` or `-p` instead of pg flag
 
-- The following command will rotate certificates of opensearch cluster:
+- To rotate certificates of opensearch cluster:
 
 `chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os`
 
