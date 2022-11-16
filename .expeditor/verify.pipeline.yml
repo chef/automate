@@ -159,6 +159,7 @@ steps:
       - rm -rf /bin/zdump
       - rm -rf /bin/sprof
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
+      - ls -ltrh /bin/
       - scripts/install_hab_pkg.sh core/opa
       - cd components/authz-service/engine/opa/policy
       - make static unit
