@@ -137,7 +137,8 @@ const (
 	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
 	sudo systemctl start hab-sup.service`
 
-	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
+	IP_V4_REGEX     = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
+	FILE_PATH_REGEX = `^[A-Za-z0-9\/\-_]+(\.([a-zA-Z]+))$`
 )
 
 // This function will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
@@ -552,16 +553,24 @@ func GetRemoteFileDetails(remotePath string) (string, string, string, error) {
 		return "", "", "", errors.New(fmt.Sprintf("%v is not a valid IPv4 address", hostIP))
 	}
 
-	// Get the file path from the given remote address.
+	// Get the file path and filename from the given remote address.
 	certPaths := strings.Split(remotePath, ":")
 	if len(certPaths) != 2 {
 		return "", "", "", errors.New(fmt.Sprintf("Invalid remote path: %v", remotePath))
 	}
+
+	// Get the file path and validate it.
 	remoteFilePath := strings.TrimSpace(certPaths[1])
+	if !IsValidFilePath(remoteFilePath) {
+		return "", "", "", errors.New(fmt.Sprintf("Invalid remote file path: %v", remoteFilePath))
+	}
+
+	// Get the filename from the file path.
 	fileName := filepath.Base(remoteFilePath)
 	if remoteFilePath == "" || fileName == string(os.PathSeparator) {
 		return "", "", "", errors.New(fmt.Sprintf("Invalid remote path: %v", remotePath))
 	}
+
 	return remoteFilePath, fileName, hostIP, nil
 }
 
@@ -575,6 +584,12 @@ func IsRemotePath(path string) bool {
 func GetIPV4(path string) string {
 	pattern := regexp.MustCompile(IP_V4_REGEX)
 	return pattern.FindString(path)
+}
+
+// File path should be absolute.
+func IsValidFilePath(path string) bool {
+	pattern := regexp.MustCompile(FILE_PATH_REGEX)
+	return pattern.MatchString(path)
 }
 
 /*
