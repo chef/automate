@@ -137,6 +137,7 @@ steps:
 
   - label: "[unit] OPA"
     command:
+      - rm -rf /bin/catchsegv
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
       - scripts/install_hab_pkg.sh core/opa
       - cd components/authz-service/engine/opa/policy
