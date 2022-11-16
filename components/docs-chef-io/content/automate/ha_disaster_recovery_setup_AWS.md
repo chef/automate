@@ -32,7 +32,7 @@ In the above approach, there will be 2 identical clusters
 - Primary Cluster (or Production Cluster)
 - Disaster Recovery Cluster
 
-![Disaster Recovery Setup with 2 Identical Clusters](/images/automate/DR_AWS_Deployment.png)
+![Disaster Recovery Setup with 2 Identical Clusters](/images/automate/DR_AWS _Deployment.png)
 
 The primary cluster will be active and regular backups will be performed using `chef-automate backup create`. At the same time, the disaster recovery cluster will be restoring the latest backup data using `chef-automate backup restore`.
 
