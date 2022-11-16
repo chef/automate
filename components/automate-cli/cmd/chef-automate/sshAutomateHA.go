@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	dc "github.com/chef/automate/api/config/deployment"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -284,4 +285,28 @@ func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]str
 	default:
 		return nil, errors.New("invalid hostname possible values should be any one of automate/a2, chef_server/cs, postgresql/pg or opensearch/os")
 	}
+}
+
+func getPostgresOrOpenSearchExistingLogConfig(remoteType string) (*dc.AutomateConfig, error) {
+	var log dc.AutomateConfig
+	var fileName string
+	if remoteType == "postgresql" {
+		fileName = postgresLogConfig
+	} else {
+		fileName = opensearchConfig
+	}
+	if checkIfFileExist(fileName) {
+		contents, err := ioutil.ReadFile(fileName) // nosemgrep
+		if err != nil {
+			return nil, err
+		}
+		destString := string(contents)
+		log1, err := decodeLogConfig(destString)
+		log = *log1
+		if err != nil {
+			return &log, err
+		}
+	}
+	return &log, nil
+
 }
