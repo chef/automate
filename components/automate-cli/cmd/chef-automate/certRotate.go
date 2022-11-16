@@ -528,24 +528,11 @@ func getCerts(infra *AutomteHAInfraDetails) (string, string, string, string, str
 // This function will read the certificate from the given path (local or remote).
 func getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, error) {
 	// Checking if the given path is remote or local.
-	if isRemotePath(certPath) {
-		// Get Host IP from the given path and validate it.
-		hostIP := getIPV4(certPath)
-		if net.ParseIP(hostIP).To4() == nil {
-			return nil, errors.New(fmt.Sprintf("%v is not a valid IPv4 address", hostIP))
+	if IsRemotePath(certPath) {
+		remoteFilePath, fileName, hostIP, err := GetRemoteFileDetails(certPath)
+		if err != nil {
+			return nil, err
 		}
-
-		// Get the file path from the given remote address.
-		certPaths := strings.Split(certPath, ":")
-		if len(certPaths) != 2 {
-			return nil, errors.New(fmt.Sprintf("Invalid remote path: %v", certPath))
-		}
-		remoteFilePath := strings.TrimSpace(certPaths[1])
-		fileName := filepath.Base(remoteFilePath)
-		if remoteFilePath == "" || fileName == "" {
-			return nil, errors.New(fmt.Sprintf("Invalid remote path: %v", certPath))
-		}
-
 		// Download certificate from remote host.
 		sshConfig := getSshDetails(infra)
 		sshUtil := NewSSHUtil(sshConfig)
@@ -559,12 +546,33 @@ func getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, err
 	return ioutil.ReadFile(certPath) // nosemgrep
 }
 
-func isRemotePath(path string) bool {
+// Get the remote file details from path.
+func GetRemoteFileDetails(remotePath string) (string, string, string, error) {
+	// Get Host IP from the given path and validate it.
+	hostIP := GetIPV4(remotePath)
+	if net.ParseIP(hostIP).To4() == nil {
+		return "", "", "", errors.New(fmt.Sprintf("%v is not a valid IPv4 address", hostIP))
+	}
+
+	// Get the file path from the given remote address.
+	certPaths := strings.Split(remotePath, ":")
+	if len(certPaths) != 2 {
+		return "", "", "", errors.New(fmt.Sprintf("Invalid remote path: %v", remotePath))
+	}
+	remoteFilePath := strings.TrimSpace(certPaths[1])
+	fileName := filepath.Base(remoteFilePath)
+	if remoteFilePath == "" || fileName == string(os.PathSeparator) {
+		return "", "", "", errors.New(fmt.Sprintf("Invalid remote path: %v", remotePath))
+	}
+	return remoteFilePath, fileName, hostIP, nil
+}
+
+func IsRemotePath(path string) bool {
 	pattern := regexp.MustCompile(IP_V4_REGEX)
 	return pattern.MatchString(path)
 }
 
-func getIPV4(path string) string {
+func GetIPV4(path string) string {
 	pattern := regexp.MustCompile(IP_V4_REGEX)
 	return pattern.FindString(path)
 }
