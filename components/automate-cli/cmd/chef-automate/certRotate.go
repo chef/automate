@@ -511,7 +511,7 @@ func getCerts(infra *AutomteHAInfraDetails) (string, string, string, string, str
 				)
 			}
 
-			adminKey, err = getCertFromFile(adminCertPath, infra)
+			adminKey, err = getCertFromFile(adminKeyPath, infra)
 			if err != nil {
 				return "", "", "", "", "", status.Wrap(
 					err,
