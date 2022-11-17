@@ -37,50 +37,37 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
 
 ### Creating a Certificate
 
-1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
+1. Navigate to your bastion host, make a new directory. For example, `mkdir rotate-certs` (directory name can be anything).
 
-2. Execute the `./scripts/credentials set ssl --rotate-all` command. This command creates a skeleton of certificates.
-
-3. Copy the below bash script to a new file
+2. `cd rotate-certs` then execute below script.
 
 ```bash
 # !/bin/bash
 
 echo extendedKeyUsage = clientAuth, serverAuth > server_cert_ext.cnf
 echo extendedKeyUsage = clientAuth, serverAuth > client_cert_ext.cnf
-openssl genrsa -out ca_root.key 2048
-openssl req -x509 -new -key ca_root.key -sha256 -out ca_root.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca'
-openssl genrsa -out admin-pkcs12.key 2048
-openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "admin-pkcs12.key" -topk8 -out "oser_admin_ssl_private.key" -nocrypt
-openssl req -new -key oser_admin_ssl_private.key -out admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
-openssl x509 -req -in admin.csr -CA ca_root.pem -CAkey ca_root.key -CAcreateserial -out oser_admin_ssl_public.pem -sha256 -extfile server_cert_ext.cnf
-openssl genrsa -out ssl-pkcs12.key 2048
-openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "ssl-pkcs12.key" -topk8 -out  oser_ssl_private.key -nocrypt
-openssl req -new -key oser_ssl_private.key -out ssl.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode'
-openssl x509 -req -in ssl.csr -CA ca_root.pem -CAkey ca_root.key -CAcreateserial -out oser_ssl_public.pem -sha256 -extfile client_cert_ext.cnf
-
-cp ca_root.pem /hab/a2_deploy_workspace/certs/ca_root.pem
-cp oser_admin_ssl_public.pem /hab/a2_deploy_workspace/certs/oser_admin_ssl_public.pem
-cp oser_admin_ssl_private.key /hab/a2_deploy_workspace/certs/oser_admin_ssl_private.key
-cp oser_ssl_public.pem /hab/a2_deploy_workspace/certs/oser_ssl_public.pem
-cp oser_ssl_private.key /hab/a2_deploy_workspace/certs/oser_ssl_private.key
-cp oser_admin_ssl_private.key /hab/a2_deploy_workspace/certs/kibana_ssl_private.key
-cp oser_admin_ssl_public.pem /hab/a2_deploy_workspace/certs/kibana_ssl_public.pem
-cp oser_ssl_private.key /hab/a2_deploy_workspace/certs/pg_ssl_private.key
-cp oser_ssl_public.pem /hab/a2_deploy_workspace/certs/pg_ssl_public.pem
+  openssl genrsa -out root-ca-key.pem 2048
+  openssl req -new -x509 -sha256 -key root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=progress" -out root-ca.pem -days 1095
+  # Admin cert
+  openssl genrsa -out admin-key-temp.pem 2048
+  openssl pkcs8 -inform PEM -outform PEM -in admin-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out admin-key.pem
+  openssl req -new -key admin-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin" -out admin.csr
+  openssl x509 -req -in admin.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out admin.pem -days 1095 -extfile server_cert_ext.cnf
+  # Node cert 1
+  openssl genrsa -out node1-key-temp.pem 2048
+  openssl pkcs8 -inform PEM -outform PEM -in node1-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out node1-key.pem
+  openssl req -new -key node1-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out node1.csr
+  openssl x509 -req -in node1.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node1.pem -days 1095 -extfile client_cert_ext.cnf
+  # Node cert 2
+  openssl genrsa -out node2-key-temp.pem 2048
+  openssl pkcs8 -inform PEM -outform PEM -in node2-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out node2-key.pem
+  openssl req -new -key node2-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out node2.csr
+  openssl x509 -req -in node2.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node2.pem -days 1095 -extfile client_cert_ext.cnf
+  # Client cert
+  openssl genrsa -out client-key-temp.pem 2048
+  openssl pkcs8 -inform PEM -outform PEM -in client-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out client-key.pem
+  openssl req -new -key client-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefclient" -out client.csr
+  openssl x509 -req -in client.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out client.pem -days 1095 -extfile client_cert_ext.cnf
 ```
 
-4. Navigate to your bastion host and execute the new file containing the copied bash script. The script generates the certificates at `/hab/a2_deploy_workspace/certs` directory. For example, `bash cert.sh`, where _cert.sh_ is the name of the newly created bash script file.
-
-5. Again, navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
-
-6. To apply the generated certificates, execute the following command:
-
--   `./scripts/credentials set ssl --oser-ssl`
--   `./scripts/credentials set ssl --pg-ssl`
-
-A confirmation message appears once the certificates are applied successfully, as shown below:
-
-{{< figure src="/images/automate/ha_self_sign_certificate.png" alt="Certification Creation using openssl utility">}}
-
-7. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, wait for three to four minutes for the instances to be up.
+3. The script generates the certificates at newly created directory, `rotate-certs` in this case.
