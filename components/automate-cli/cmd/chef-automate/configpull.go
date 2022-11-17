@@ -27,7 +27,6 @@ func getOpensearchConfig(sshUtil SSHUtil, remoteIps []string) (string, error) {
 		return "", err
 	}
 		maparray := filteringRequiredFieldsFromOpensearchConfig(infra, &src)
-		writer.Println(maparray["ip"],maparray["public_key"])
 		array= append(array, maparray)
 		
 		}
