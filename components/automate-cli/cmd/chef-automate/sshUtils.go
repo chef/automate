@@ -255,7 +255,7 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 
 // This function will copy file from remote to local and return new local file path
 func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
-	writer.Printf("doing scp file transfer from remote node %s \n", s.SshConfig.hostIP)
+	writer.Printf("Doing scp file transfer of file %s from remote node %s \n", remoteFilePath, s.SshConfig.hostIP)
 	cmd := "scp"
 	ts := time.Now().Format("20060102150405")
 	destFileName := "/tmp/" + ts + "_" + outputFileName
@@ -264,7 +264,7 @@ func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName s
 		writer.Printf("Failed to copy file from remote %s\n", err.Error())
 		return "", err
 	}
-	writer.Print("Copied file from remote\n")
+	writer.Printf("Copied file from remote to %s \n", destFileName)
 	return destFileName, nil
 }
 
