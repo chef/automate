@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 42
 +++
 
-Centralizing the log is a method to redirect your log to a separate file and save it. Centralizing the log in a file is always helpful if you want to transmit it to a third-party application like **Splunk** or **Logstack**.
+Centralizing the log is a method to redirect your log to a separate file and save it. Centralizing the log in a file is always helpful if you want to transmit it to a third-party application like **Splunk** or **Logstash**.
 
 To check the status of the Chef Automate from deployment with channel and type, run the following command:
 
@@ -100,9 +100,9 @@ chef-automate config patch --opensearch <file/path/to/toml>
 chef-automate config patch --postgresql <file/path/to/toml>
 ```
 
-## 3rd Party Integration using Splunk
+## Log Consolidation using Splunk
 
-Splunk is used to generate data and visualize it in real-time. Here, the Splunk forwarder will be used to view the data outside the local environment. Assuming that you already have your splunk forwarder installed, run the following command to start Splunk Universal forwarder:
+**Splunk** can consolodates all the log data and pushesd it to a central, accessible and easy to use interface. Here, the **Splunk forwarder** will be used to view the data outside the local environment. Assuming that you already have your splunk forwarder installed, run the following command to start **Splunk Universal forwarder**:
 
 ```bash
 [system@ABC]# cd splunkforwarder/bin
