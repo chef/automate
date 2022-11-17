@@ -136,11 +136,4 @@ Restart your splunk forwarder using the following command:
 [system@ABC]# ./splunk restart
 ```
 
-Verify if the data is flowing as expected in splunk using the following command:
-
-```bash
-
-```
-
-The output from the above command is as shown below:
-
+The above step will let you view the `automate.log` file in your splunk forwarder. Click [here](https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html) to know about the Splunk Forwarder.
