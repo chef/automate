@@ -102,7 +102,7 @@ chef-automate config patch --postgresql <file/path/to/toml>
 
 ## Log Consolidation using Splunk
 
-**Splunk** can consolodates all the log data and pushesd it to a central, accessible and easy to use interface. Here, the **Splunk forwarder** will be used to view the data outside the local environment. Assuming that you already have your splunk forwarder installed, run the following command to start **Splunk Universal forwarder**:
+**Splunk** consolidates all the log data and pushes it to a central, accessible, easy-to-use interface. Here, the **Splunk forwarder** here will view the data outside the local environment. Assuming that you already have your Splunk forwarder installed, run the following command to start **Splunk Universal forwarder**:
 
 ```bash
 [system@ABC]# cd splunkforwarder/bin
@@ -117,7 +117,7 @@ Now, edit the `inputs.conf` file on your Splunk Forwarder as shown below:
 [system@ABC]# ./splunk add monitor /var/tmp/automate.log
 ```
 
-In the above command, **/var/tmp/** is the location of the `automate.log` which you can change accordingly. Running the above command will show:
+In the above command, **/var/tmp/** is the location of the `automate.log`, which you can change accordingly. Running the above command will show the following:
 
 ```bash
 Added monitor of '/var/tmp/automate.log'
