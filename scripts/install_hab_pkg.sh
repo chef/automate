@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-export RUST_LOG=debug
+
 export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
