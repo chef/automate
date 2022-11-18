@@ -4,7 +4,7 @@
 #
 
 module "single_local_all_inplace_upgrade" {
-  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
+  source = "github.com/vivekshankar1/es-terraform-vivek//modules/cd_instance_v2"
 
   # DNS components ( a2-all-local-inplace-upgrade-{{channel}}.cd.chef.co )
   subdomain        = "a2-all-local-inplace-upgrade"

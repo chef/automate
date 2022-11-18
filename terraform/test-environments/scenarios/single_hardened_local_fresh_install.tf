@@ -4,7 +4,7 @@
 #
 
 module "single_hardened_local_fresh_install" {
-  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
+  source = "github.com/vivekshankar1/es-terraform-vivek//modules/cd_instance_v2"
 
   # DNS components ( a2-hardened-local-fresh-install-{{channel}}.cd.chef.co )
   subdomain        = "a2-hardened-local-fresh-install"
