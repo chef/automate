@@ -28,7 +28,7 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 {{< note >}} Below `cert-rotate` commands can only be executed from `bastion host` {{< /note >}}
 
-### Rotate Certificates of Cluster
+### Rotate Certificates of each service
 
 If you want to rotate certificates of entire cluster, then you can follow the below commands:
 

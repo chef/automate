@@ -37,7 +37,7 @@ var sshFlag = struct {
 var certRotateCmd = &cobra.Command{
 	Use:   "cert-rotate",
 	Short: "Chef Automate rotate cert",
-	Long:  "Chef Automate CLI command to rotate certificates",
+	Long:  "Chef Automate CLI command to rotate certificates, this command should always be executed from AutomateHA Bastion Node",
 	RunE:  certRotate,
 }
 
@@ -174,7 +174,10 @@ func certRotate(cmd *cobra.Command, args []string) error {
 				log.Fatal(err)
 			}
 		}
+	} else {
+		log.Fatal(fmt.Errorf("cert-rotate command should be executed from Automate HA Bastion Node"))
 	}
+
 	return nil
 }
 
