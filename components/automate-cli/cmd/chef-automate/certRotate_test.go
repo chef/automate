@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	RemoteFilePath = "10.1.0.234:/home/ec2-user/certs/public.pem"
+	RemoteFilePath = "198.51.100.0:/home/ec2-user/certs/public.pem"
 	LocalFilePath  = "/home/ec2-user/certs/public.pem"
+	ValidIP        = "198.51.100.0"
 )
 
 func TestIsRemotePath(t *testing.T) {
@@ -25,7 +26,7 @@ func TestIsRemotePath(t *testing.T) {
 	})
 
 	t.Run("Invalid remote path 1", func(t *testing.T) {
-		input := "/home/ec2-user/certs/public.pem10.1.0.234"
+		input := "/home/ec2-user/certs/public.pem198.51.100.0"
 		res := IsRemotePath(input)
 		assert.False(t, res)
 	})
@@ -35,7 +36,7 @@ func TestIsRemotePath(t *testing.T) {
 		assert.False(t, res)
 	})
 	t.Run("Invalid remote path 3", func(t *testing.T) {
-		input := "\n   10.1.0.234:/home/ec2-user/certs/public.pem"
+		input := "\n   198.51.100.0:/home/ec2-user/certs/public.pem"
 		res := IsRemotePath(input)
 		assert.False(t, res)
 	})
@@ -43,9 +44,9 @@ func TestIsRemotePath(t *testing.T) {
 
 func TestGetIPV4(t *testing.T) {
 	t.Run("Valid IP V4", func(t *testing.T) {
-		input := "198.51.100.0:/home/ec2-user/certs/public.pem"
+		input := RemoteFilePath
 		res := GetIPV4(input)
-		expected := "198.51.100.0"
+		expected := ValidIP
 		assert.Equal(t, expected, res)
 	})
 
@@ -80,14 +81,14 @@ func TestGetIPV4(t *testing.T) {
 
 func TestGetRemoteFileDetails(t *testing.T) {
 	t.Run("Valid Remote Path", func(t *testing.T) {
-		input := "198.51.100.0:/home/ec2-user/certs/public.pem"
+		input := RemoteFilePath
 		remoteFilePathRes, fileNameRes, hostIPRes, err := GetRemoteFileDetails(input)
 		assert.NoError(t, err)
 		remoteFilePathExp := LocalFilePath
 		assert.Equal(t, remoteFilePathExp, remoteFilePathRes)
 		fileNameExp := "public.pem"
 		assert.Equal(t, fileNameExp, fileNameRes)
-		hostIPExp := "198.51.100.0"
+		hostIPExp := ValidIP
 		assert.Equal(t, hostIPExp, hostIPRes)
 	})
 
@@ -118,26 +119,26 @@ func TestGetRemoteFileDetails(t *testing.T) {
 	})
 
 	t.Run("Invalid Remote Path - No filename", func(t *testing.T) {
-		input := "10.1.0.234:/home/ec2-user/certs/public/"
+		input := "198.51.100.0:/home/ec2-user/certs/public/"
 		remoteFilePathRes, fileNameRes, hostIPRes, err := GetRemoteFileDetails(input)
 		assert.NoError(t, err)
 		remoteFilePathExp := "/home/ec2-user/certs/public"
 		assert.Equal(t, remoteFilePathExp, remoteFilePathRes)
 		fileNameExp := "public"
 		assert.Equal(t, fileNameExp, fileNameRes)
-		hostIPExp := "10.1.0.234"
+		hostIPExp := ValidIP
 		assert.Equal(t, hostIPExp, hostIPRes)
 	})
 
 	t.Run("Invalid Remote Path - Reverse", func(t *testing.T) {
-		input := "/home/ec2-user/certs/public/:10.1.0.234"
+		input := "/home/ec2-user/certs/public/:198.51.100.0"
 		remoteFilePathRes, fileNameRes, hostIPRes, err := GetRemoteFileDetails(input)
 		assert.NoError(t, err)
-		remoteFilePathExp := "10.1.0.234"
+		remoteFilePathExp := ValidIP
 		assert.Equal(t, remoteFilePathExp, remoteFilePathRes)
-		fileNameExp := "10.1.0.234"
+		fileNameExp := ValidIP
 		assert.Equal(t, fileNameExp, fileNameRes)
-		hostIPExp := "10.1.0.234"
+		hostIPExp := ValidIP
 		assert.Equal(t, hostIPExp, hostIPRes)
 	})
 
