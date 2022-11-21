@@ -36,3 +36,23 @@ const AUTOMATE_HA_ES_CAR = "automate-ha-elasticsidecar"
 const ORIGIN_PATTERN = `[a-zA-z0-9]*`
 const PACKAGE_NAME_PATTERN = `-[a-zA-Z0-9]*-.*-\d+\.`
 const RELEASE_AND_VERSION_PATTERN = `.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`
+
+const (
+	FRONTEND_COMMANDS = `
+	sudo chef-automate config patch /tmp/%s;
+	export TIMESTAMP=$(date +'%s');
+	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
+	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
+
+	BACKEND_COMMAND = `
+	export TIMESTAMP=$(date +"%s");
+	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /tmp/%s;
+	`
+
+	GET_CONFIG = `
+	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
+	automate-backend-ctl show --svc=automate-ha-%s | tail -n +2
+	`
+
+	GET_FRONTEND_CONFIG = `sudo chef-automate config show`
+)
