@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 )
