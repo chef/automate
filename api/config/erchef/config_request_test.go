@@ -42,3 +42,12 @@ func TestDataCollector(t *testing.T) {
 		require.False(t, c.V1.Sys.GetDataCollector().GetEnabled().GetValue())
 	})
 }
+
+func TestDefaultValues(t *testing.T) {
+	defaultValues := DefaultConfigRequest()
+	assert.Equal(t, int32(70), defaultValues.GetV1().GetSys().GetDataCollector().GetPoolMaxAge().GetValue())
+	assert.Equal(t, int32(1), defaultValues.GetV1().GetSys().GetDataCollector().GetPoolCullInterval().GetValue())
+	assert.Equal(t, int32(70), defaultValues.GetV1().GetSys().GetDataCollector().GetMaxConnectionDuration().GetValue())
+	assert.Equal(t, int32(10000), defaultValues.GetV1().GetSys().GetDataCollector().GetIbrowseTimeout().GetValue())
+
+}

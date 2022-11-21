@@ -106,6 +106,12 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_max_size = 3;
 				google.protobuf.Int32Value pool_queue_max = 4;
 				google.protobuf.BoolValue enabled = 5;
+				google.protobuf.Int32Value pool_max_age = 6;
+				google.protobuf.Int32Value pool_cull_interval = 7;
+				google.protobuf.Int32Value max_connection_duration = 8;
+				google.protobuf.Int32Value ibrowse_timeout= 9;
+
+
 			}
 
 			message Depsolver {
