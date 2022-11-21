@@ -18,7 +18,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_erchef/14.15.10/20220516074924"
+  "${vendor_origin}/oc_erchef/15.3.2/20221108221436 "
 )
 
 pkg_build_deps=(
