@@ -17,7 +17,7 @@ message ConfigRequest {
 		System sys = 1;
 		Service svc = 2;
 
-		message System {
+		message System { 
 			chef.automate.infra.config.Mlsa mlsa = 1;
 			Log log = 2;
 			Network network = 3;
@@ -46,9 +46,10 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_max_size = 3;
 				google.protobuf.Int32Value pool_queue_max = 4;
 				google.protobuf.Int32Value pool_queue_timeout = 5;
+				google.protobuf.Int32Value db_pool_size = 6;
+				google.protobuf.StringValue sql_connection_user = 7;
 			}
 		}
-
 
 
 		message Service {}
