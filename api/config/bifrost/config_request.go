@@ -36,6 +36,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Sql.PoolMaxSize = w.Int32(20)
 	c.V1.Sys.Sql.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Sql.PoolQueueTimeout = w.Int32(2000)
+	// c.V1.Sys.Sql.DBPoolSize =
 
 	return c
 }
@@ -69,3 +70,6 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 
 	return c.V1.Sys, nil
 }
+
+
+absolute
