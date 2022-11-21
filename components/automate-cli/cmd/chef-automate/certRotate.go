@@ -536,6 +536,7 @@ func getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, err
 		sshUtil := NewSSHUtil(sshConfig)
 		sshUtil.getSSHConfig().hostIP = hostIP
 		filePath, err := sshUtil.copyFileFromRemote(remoteFilePath, fileName)
+		defer os.Remove(filePath)
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Unable to copy file from remote path: %v", certPath))
 		}
