@@ -49,7 +49,12 @@ const (
 
 	GET_CONFIG = `
 	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
-	automate-backend-ctl show --svc=automate-ha-%s | tail -n +2
+	automate-backend-ctl show --svc=automate-ha-%s
+	`
+
+	GET_APPLIED_CONFIG = `
+	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
+	automate-backend-ctl applied --svc=automate-ha-%s
 	`
 
 	dateFormat = "%Y%m%d%H%M%S"
@@ -253,7 +258,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 		return err
 	}
 	//checking database configuration
-	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, GET_CONFIG, sshUtil)
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForPostgres(args, infra, GET_APPLIED_CONFIG, sshUtil)
 	if err != nil {
 		return err
 	}
@@ -296,7 +301,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 		return err
 	}
 	//checking database configuration
-	existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, GET_CONFIG, sshUtil)
+	existConfig, reqConfig, err := getExistingAndRequestedConfigForOpenSearch(args, infra, GET_APPLIED_CONFIG, sshUtil)
 	if err != nil {
 		return err
 	}
@@ -304,6 +309,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 	//Implementing the config if there is some change in the database configuration
 	if isConfigChangedDatabase {
 		tomlFile := args[0] + timestamp
+		// reqConfig.TLS = nil
 		tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
 
 		if err != nil {
@@ -464,6 +470,7 @@ func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, 
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	sshUtil.getSSHConfig().hostIP = remoteIP
 	scriptCommands := fmt.Sprintf(config, remoteService)
+	// writer.Println("GET CONFIG SCRIPT: \n" + scriptCommands + "\n")
 	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 	if err != nil {
 		return "", err
