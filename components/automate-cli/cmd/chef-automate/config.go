@@ -211,7 +211,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				writer.Error("No automate IPs are found")
 				os.Exit(1)
 			}
-			const remoteService string = "frontend"
+			const remoteService string = "automate"
 			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
 		} else if configCmdFlags.chef_server {
 			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
@@ -219,7 +219,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				writer.Error("No chef-server IPs are found")
 				os.Exit(1)
 			}
-			const remoteService string = "frontend"
+			const remoteService string = "chef-server"
 			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
 		} else if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
