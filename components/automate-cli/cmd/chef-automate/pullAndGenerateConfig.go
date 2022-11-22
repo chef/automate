@@ -2,8 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/toml"
 )
 
@@ -112,24 +116,106 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 	return ipConfigMap, nil
 }
 
-func (p *PullConfigsImpl) generateConfig() {
+func (p *PullConfigsImpl) generateConfig() error {
 	osConfigMap, err := p.pullOpensearchConfigs()
+	if err != nil {
+		return err
+	}
 	pgConfigMap, err := p.pullPGConfigs()
+	if err != nil {
+		return err
+	}
 	a2ConfigMap, err := p.pullAutomateConfigs()
+	if err != nil {
+		return err
+	}
 	csConfigMap, err := p.pullChefServerConfigs()
+	if err != nil {
+		return err
+	}
 
+	var sharedConfigToml *ExistingInfraConfigToml
+	if checkSharedConfigFile() {
+		sharedConfigToml, err = getExistingInfraConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
+		if err != nil {
+			return err
+		}
+	}
+	var osCerts []CertByIP
+	for key, ele := range osConfigMap {
+		certByIP := CertByIP{
+			IP:         key,
+			PrivateKey: ele.privateKey,
+			PublicKey:  ele.publicKey,
+		}
+		osCerts = append(osCerts, certByIP)
+	}
+
+	sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
+
+	var pgCerts []CertByIP
+	for key, ele := range pgConfigMap {
+		certByIP := CertByIP{
+			IP:         key,
+			PrivateKey: ele.privateKey,
+			PublicKey:  ele.publicKey,
+		}
+		pgCerts = append(pgCerts, certByIP)
+	}
+
+	sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
+
+	var a2Certs []CertByIP
+	for key, ele := range a2ConfigMap {
+		certByIP := CertByIP{
+			IP:         key,
+			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
+			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
+		}
+		pgCerts = append(a2Certs, certByIP)
+	}
+
+	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
+
+	var csCerts []CertByIP
+	for key, ele := range csConfigMap {
+		certByIP := CertByIP{
+			IP:         key,
+			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
+			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
+		}
+		pgCerts = append(csCerts, certByIP)
+	}
+
+	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
+
+	shardConfig, err := mtoml.Marshal(sharedConfigToml)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("config_1.toml", shardConfig, 600)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func getOSRootCA(config map[string]*OpensearchConfig) {
-
+func getOSORPGRootCA(config map[string]*ConfigKeys) string {
+	for _, ele := range config {
+		if len(strings.TrimSpace(ele.rootCA)) > 0 {
+			return strings.TrimSpace(ele.rootCA)
+		}
+	}
+	return ""
 }
 
-func getPGRootCA(config map[string]*PostgresqlConfig) {
-
-}
-
-func getA2RootCA(config map[string]*dc.AutomateConfig) {
-
+func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if len(strings.TrimSpace(ele.Global.V1.Sys.Tls.RootCertContents)) > 0 {
+			return ele.Global.V1.Sys.Tls.RootCertContents
+		}
+	}
+	return ""
 }
 
 func getCSRootCA(config map[string]*dc.AutomateConfig) {

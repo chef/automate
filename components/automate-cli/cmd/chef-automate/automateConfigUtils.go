@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io/ioutil"
 	"net"
 	"path/filepath"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
@@ -39,4 +41,37 @@ func checkIPAddress(ip string) error {
 	} else {
 		return nil
 	}
+}
+
+func getExistingInfraConfig(configPath string) (*ExistingInfraConfigToml, error) {
+	templateBytes, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	config := ExistingInfraConfigToml{}
+	err = ptoml.Unmarshal(templateBytes, &config)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return &config, nil
+}
+
+func getAwsConfig(configPath string) (*AwsConfigToml, error) {
+	templateBytes, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	config := AwsConfigToml{}
+	err = ptoml.Unmarshal(templateBytes, &config)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return &config, nil
+}
+
+func checkSharedConfigFile() bool {
+	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")) {
+		return true
+	}
+	return false
 }

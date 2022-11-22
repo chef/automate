@@ -247,11 +247,7 @@ func (e *existingInfra) validateExternalDbFields() *list.List {
 	return errorList
 }
 
-func extractIPsFromCertsByIP(certsByIp []struct {
-	IP         string `toml:"ip"`
-	PrivateKey string `toml:"private_key"`
-	PublicKey  string `toml:"public_key"`
-}) []string {
+func extractIPsFromCertsByIP(certsByIp []CertByIP) []string {
 	ips := []string{}
 	for _, el := range certsByIp {
 		ips = append(ips, el.IP)
@@ -259,12 +255,7 @@ func extractIPsFromCertsByIP(certsByIp []struct {
 	return ips
 }
 
-func extractIPsFromCertsByIPOpensearch(certsByIp []struct {
-	IP         string `toml:"ip"`
-	PrivateKey string `toml:"private_key"`
-	PublicKey  string `toml:"public_key"`
-	NodesDn    string `toml:"nodes_dn"`
-}) []string {
+func extractIPsFromCertsByIPOpensearch(certsByIp []CertByIP) []string {
 	ips := []string{}
 	for _, el := range certsByIp {
 		ips = append(ips, el.IP)
