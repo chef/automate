@@ -1,7 +1,8 @@
 name: chef-automate cert-rotate
 synopsis: Chef Automate rotate cert
 usage: chef-automate cert-rotate [flags]
-description: Chef Automate CLI command to rotate certificates
+description: |
+  Chef Automate CLI command to rotate certificates, this command should always be executed from AutomateHA Bastion Node
 options:
 - name: a2
   default_value: "false"
