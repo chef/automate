@@ -92,8 +92,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	// TODO(ssd) 2018-07-24: We should auto-calculate this based
 	// on CPU on the target.
 	c.V1.Sys.Depsolver.Timeout = w.Int32(20000)
-	c.V1.Sys.Depsolver.PoolInitSize = w.Int32(25)
-	c.V1.Sys.Depsolver.PoolMaxSize = w.Int32(100)
+	c.V1.Sys.Depsolver.PoolInitSize = w.Int32(5)
+	c.V1.Sys.Depsolver.PoolMaxSize = w.Int32(5)
 	c.V1.Sys.Depsolver.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Depsolver.PoolQueueTimeout = w.Int32(0)
 
