@@ -259,3 +259,6 @@
 <% if overrides[:automate_config_file] %>
 <%= File.read(overrides[:automate_config_file]) %>
 <% end %>
+
+[bifrost.v1.sys.sql]
+  pool_queue_max=20
