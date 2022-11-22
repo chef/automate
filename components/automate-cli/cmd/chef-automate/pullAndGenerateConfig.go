@@ -184,7 +184,7 @@ func (p *PullConfigsImpl) generateConfig() error {
 			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
 			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
 		}
-		pgCerts = append(csCerts, certByIP)
+		csCerts = append(csCerts, certByIP)
 	}
 
 	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
@@ -193,7 +193,7 @@ func (p *PullConfigsImpl) generateConfig() error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("config_1.toml", shardConfig, 600)
+	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config_1.toml"), shardConfig, 600)
 	if err != nil {
 		return err
 	}
