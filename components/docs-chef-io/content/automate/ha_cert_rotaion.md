@@ -17,76 +17,72 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Certificate rotation is the replacement of existing certificates with new ones when any certificate expires or is based on your organization's policy. A new CA authority is substituted for the old, requiring a replacement of the root certificate for the cluster.
+Certificate rotation replaces existing certificates with new ones when any certificate expires or is based on your organization's policy. A new CA authority is substituted for the old, requiring a replacement of the root certificate for the cluster.
 
 The certificate rotation is also required when the key for a node, client, or CA is compromised. If compromised, you need to change the contents of a certificate. For example, to add another DNS name or the IP address of a load balancer to reach a node, you have to rotate only the node certificates.
 
-## Rotate using OpenSSL
+## Prerequisites
 
-You can generate the required certificates or use your organization's existing certificates. To rotate your certificates(from `cd /hab/a2_deploy_workspace` path), that are used in Chef Automate High Availability (HA), follow the steps below:
+- Either existing certificates can be used or to generate new ones, click [here](https://docs.chef.io/automate/ha_cert_selfsign/)
 
--   Navigate to your workspace folder(example: `cd /hab/a2_deploy_workspace`) and execute the `./scripts/credentials set ssl --rotate all` command. The command rotates all the certificates of your organization.
+## Rotate using Cert-Rotate Command
 
-    {{< note >}} When you run the above command for the first time, a series of certificates are created and saved in `/hab/a2_deploy_workspace/certs` location. Identify the appropriate certificate. For example, to rotate certificates for **PostgreSQL**, use certificate values into _pg_ssl_private.key_, _pg_ssl_public.pem_, and _ca_root.pem_. Similarly, to rotate certificates for **OpenSearch**, use certificate values into _ca_root.pem_, _oser_admin_ssl_private.key_, _oser_admin_ssl_public.pem_, _oser_ssl_private.key_, _oser_ssl_public.pem_, _kibana_ssl_private.key_, and _kibana_ssl_public.pem_. {{< /note >}}
+{{< note >}} Below `cert-rotate` commands can only be executed from `bastion host` {{< /note >}}
 
--   To rotate the PostgreSQL certificates, execute the `./scripts/credentials set ssl --pg-ssl` command.
+### Rotate Certificates of each service
 
--   To rotate the OpenSearch certificates, execute the `./scripts/credentials set ssl --oser-ssl` command.
+If you want to rotate certificates of the entire cluster, then you can follow the below commands:
 
-<!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
+- To rotate certificates of automate cluster:
 
-<!-- - Place your root certificate into `ca_root.pem file`. -->
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --a2`
 
-<!-- - Place your intermediate CA into the `pem` file. -->
+You can also use `--automate` or `-a` instead of a2 flag
 
--   If your organization issues a certificate from an intermediate CA, place the respective certificate after the server certificate as per the order listed. In the `certs/pg_ssl_public.pem`, place the following ordered list:
+- To rotate certificates of chef server cluster:
 
-    -   Server Certificate
-    -   Intermediate CA Certificate 1
-    -   Intermediate CA Certificate n
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs`
 
--   Execute the `./scripts/credentials set ssl` command (with the appropriate options). This command deploys the nodes.
+You can also use `--chef_server`or `-c` instead of the cs flag.
 
--   Execute the `./scripts/credentials set ssl --help` command. The command will provide an information and a list of commands related to certificate rotation.
+- To rotate certificates of the PostgreSQL cluster:
 
--   For rotating the PostgreSQL credentials, execute the `./scripts/credentials set postgresql --auto` command.
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --pg`
 
--   For rotating the OpenSearch credentials, execute the `./scripts/credentials set opensearch --auto` command.
+You can also use `--postgresql` or `-p` instead of the pg flag.
 
-{{< figure src="/images/automate/ha_cert_rotation.png" alt="Certificate Rotation">}}
+- To rotate certificates of OpenSearch cluster:
 
-## Rotate using Own Organization Certificates
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --root-ca <path of root certificate> --admin-cert <path of admin certificate> --admin-key <path of admin key> --os`
 
-To use existing certificates of your organization, follow the steps given below:
+You can also use `--opensearch` or `-o` instead of the os flag.
 
-{{< note >}} All the commands will run from `/hab/a2_deploy_workspace`. {{< /note >}}
+### Rotate Certificates of Particular Node
 
--   Run `./scripts/credentials set ssl --rotate-all`
+{{< note >}} If you want to apply the unique certificates which are generated from different root certificate (which is not applied on the cluster), then you have to first run the above cluster command. After that, you can run the commands below so the connection will not break. But if it is not the case, i.e., you want to apply the certificates generated from the same root certificate, then you can directly run the below commands. {{< /note >}}
 
-    -   Run this command (for the first time) to create a skeleton of certificates. The certificate can be located in `/hab/a2_deploy_workspace/certs` directory. For example: to rotate the certificates for **PostgreSQL**, save the content of the certificate in `pg_ssl_private.key`, `pg_ssl_public.pem`, and `ca_root.pem`. Similarly, tto rotate the PostgreSQL certificate, run the command. The `ca_root` will remain the same for all the certificates if the `ca_root` is same for all the other certificates like opensearch, kibana, or frontend. The only thing which changes is the content of the appropriate certificate.
+If you want to rotate certificates of a particular node, then you can follow the below commands:
 
-    -   To rotate OpenSearch certificates, insert the content of the certificate of CA to `ca_root.pem`, `oser_admin_ssl_private.key`, `oser_admin_ssl_public.pem`, `oser_ssl_private.key`, `oser_ssl_public.pem`, `kibana_ssl_private.key`, and `kibana_ssl_public.pem`.
+- To rotate the certificates of particular automate node:
 
-    -   To rotate a specific certificate, run the following commands:
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --a2 --node <IP of a particular automate node>`
 
-    `./scripts/credentials set ssl --pg-ssl` (This will rotate PostgreSQL Certificates)
+You can also use `--automate` or `-a` instead of a2 flag
 
-    `./scripts/credentials set ssl --es-ssl`
+- To rotate the certificates of particular chef server node:
 
-    -   To change all the certificates, add contents to the appropriate file and run the following command:
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --cs --node <IP of a particular chef server node>`
 
-    `./scripts/credentials set ssl --rotate-all`
+You can also use `--chef_server` or `-c` instead of the cs flag.
 
-    -   The following command will give you all the information about certificate rotation:
+- To rotate the certificates of a particular PostgreSQL node:
 
-    `./scripts/credentials set ssl --help`
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --pg --node <IP of a particular postgresql node>`
 
-If your organization issues a certificate from an Intermediate CA, add the certificate in the sequence as shown below:
+You can also use `--postgresql` or `-p` instead of the pg flag.
 
-```sh
-Server Certificate
-Intermediate CA Certificate 1
-Intermediate CA Certificate n
-```
+- To rotate the certificates of a particular OpenSearch node:
 
-Copy the above content to `certs/pg_ssl_public.pem`.
+`chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular opensearch node>`
+
+You can also use `--opensearch` or `-o` instead of the os flag
