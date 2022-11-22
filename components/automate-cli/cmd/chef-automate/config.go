@@ -26,8 +26,8 @@ var configCmdFlags = struct {
 	timeout       int64
 	acceptMLSA    bool
 
-	// automate    bool
-	// chef_server bool
+	automate         bool
+	chef_server      bool
 	frontend         bool
 	opensearch       bool
 	postgresql       bool
@@ -71,13 +71,17 @@ func init() {
 	configCmd.AddCommand(setConfigCmd)
 
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "o", false, "Overwrite existing config.toml")
-
-	// patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Patch toml configuration to the automate node")
-	// patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Patch toml configuration to the chef_server node")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Patch toml configuration to the all frontend nodes")
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
+
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Patch toml configuration to the automate node")
+	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Patch toml configuration to the automate node[DUPLICATE]")
+	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Patch toml configuration to the chef_server node")
+	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.chef_server, "cs", false, "Patch toml configuration to the chef_server node[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Patch toml configuration to the opensearch node")
+	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.opensearch, "os", false, "Patch toml configuration to the opensearch node[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Patch toml configuration to the postgresql node")
+	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Patch toml configuration to the postgresql node[DUPLICATE]")
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -197,6 +201,22 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
 			if len(frontendIps) == 0 {
 				writer.Error("No frontend IPs are found")
+				os.Exit(1)
+			}
+			const remoteService string = "frontend"
+			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+		} else if configCmdFlags.automate {
+			frontendIps := infra.Outputs.AutomatePrivateIps.Value
+			if len(frontendIps) == 0 {
+				writer.Error("No automate IPs are found")
+				os.Exit(1)
+			}
+			const remoteService string = "frontend"
+			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+		} else if configCmdFlags.chef_server {
+			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
+			if len(frontendIps) == 0 {
+				writer.Error("No chef-server IPs are found")
 				os.Exit(1)
 			}
 			const remoteService string = "frontend"
@@ -470,7 +490,6 @@ func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, 
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	sshUtil.getSSHConfig().hostIP = remoteIP
 	scriptCommands := fmt.Sprintf(config, remoteService)
-	// writer.Println("GET CONFIG SCRIPT: \n" + scriptCommands + "\n")
 	rawOutput, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 	if err != nil {
 		return "", err
