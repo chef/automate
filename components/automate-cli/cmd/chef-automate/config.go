@@ -253,6 +253,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
 	for i := 0; i < len(frontendIps); i++ {
+		writer.Print("Connecting to the " + remoteService + " node : " + frontendIps[i])
 		sshUtil.getSSHConfig().hostIP = frontendIps[i]
 		err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
 		if err != nil {
@@ -293,6 +294,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 		if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
 			sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
+			writer.Print("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
 			err := sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
 			if err != nil {
 				writer.Errorf("%v", err)
@@ -338,6 +340,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 		if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
 			sshUtil.getSSHConfig().hostIP = infra.Outputs.OpensearchPrivateIps.Value[0]
+			writer.Print("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
 			err := sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
 			if err != nil {
 				writer.Errorf("%v", err)
