@@ -129,7 +129,7 @@ tar xf ${aib_file} -C ${tmp_path}/aib_workspace || failure "Failed to extract ${
 rsync -a --keep-dirlinks ${tmp_path}/aib_workspace/hab /
 
 # Copy the hab bin if it doesn't exist
-[ ! -f /usr/bin/hab ] && rsync -a ${tmp_path}/aib_workspace/bin/hab /usr/bin
+rsync -a ${tmp_path}/aib_workspace/bin/hab /usr/bin
 
 # TODO: remove this workaround once the following issue is resolved
 # https://github.com/habitat-sh/habitat/issues/6260
