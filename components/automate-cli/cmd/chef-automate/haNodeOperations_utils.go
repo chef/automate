@@ -89,7 +89,7 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (string, string, string, error) {
 }
 
 func writeFile(tomlbytes []byte, filepath string) error {
-	err := ioutil.WriteFile(filepath, tomlbytes, 0600)
+	err := ioutil.WriteFile(filepath, tomlbytes, 0600) // nosemgrep
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
 	}

@@ -428,7 +428,7 @@ func (e *existingInfra) validateIPs() *list.List {
 }
 
 func readConfig(path string) (ExistingInfraConfigToml, error) {
-	templateBytes, err := ioutil.ReadFile(path)
+	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
 	if err != nil {
 		return ExistingInfraConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
