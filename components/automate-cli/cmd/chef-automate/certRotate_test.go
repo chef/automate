@@ -13,6 +13,7 @@ const (
 	LocalFilePath  = "/home/ec2-user/certs/public.pem"
 	ValidIP        = "198.51.100.0"
 	FileContent    = "File exist and readed successfully"
+	ValidCertPath  = "./certRotate.go"
 )
 
 func TestIsRemotePath(t *testing.T) {
@@ -204,9 +205,9 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("All paths given and flag is automate service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
-			rootCA:      "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
+			rootCA:      ValidCertPath,
 		}
 		sshFlag = sshFlagStruct{
 			automate: true,
@@ -223,9 +224,9 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("some invalid paths given and flag is automate service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
+			privateCert: ValidCertPath,
 			publicCert:  "./xyx-cert.go",
-			rootCA:      "./certRotate.go",
+			rootCA:      ValidCertPath,
 		}
 		sshFlag = sshFlagStruct{
 			automate: true,
@@ -261,8 +262,8 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("All paths given except root-ca and flag is automate service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
 		}
 		sshFlag = sshFlagStruct{
 			automate: true,
@@ -277,8 +278,8 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("All paths given but root-ca path is invalid(file not exist) flag is automate service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
 			rootCA:      "./xyx-cert.go",
 		}
 		sshFlag = sshFlagStruct{
@@ -294,8 +295,8 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("All paths given except root-ca flag is automate service and node flag given", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
 		}
 		sshFlag = sshFlagStruct{
 			automate: true,
@@ -313,11 +314,11 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("All paths given and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
-			rootCA:      "./certRotate.go",
-			adminCert:   "./certRotate.go",
-			adminKey:    "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
+			rootCA:      ValidCertPath,
+			adminCert:   ValidCertPath,
+			adminKey:    ValidCertPath,
 		}
 		sshFlag = sshFlagStruct{
 			opensearch: true,
@@ -333,10 +334,10 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("Some mandatory path not and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
-			rootCA:      "./certRotate.go",
-			adminCert:   "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
+			rootCA:      ValidCertPath,
+			adminCert:   ValidCertPath,
 			adminKey:    "",
 		}
 		sshFlag = sshFlagStruct{
@@ -355,11 +356,11 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("invalid adminCert path and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
-			rootCA:      "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
+			rootCA:      ValidCertPath,
 			adminCert:   "./xyz-cert.go",
-			adminKey:    "./certRotate.go",
+			adminKey:    ValidCertPath,
 		}
 		sshFlag = sshFlagStruct{
 			//services
@@ -377,10 +378,10 @@ func TestGetCerts(t *testing.T) {
 
 	t.Run("invalid adminKey path and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
-			privateCert: "./certRotate.go",
-			publicCert:  "./certRotate.go",
-			rootCA:      "./certRotate.go",
-			adminCert:   "./certRotate.go",
+			privateCert: ValidCertPath,
+			publicCert:  ValidCertPath,
+			rootCA:      ValidCertPath,
+			adminCert:   ValidCertPath,
 			adminKey:    "./xyz-cert.go",
 		}
 		sshFlag = sshFlagStruct{
