@@ -62,7 +62,14 @@ func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, a
 	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs)
 }
 func (nu *NodeUtilsImpl) connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
-	return ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, hostIP, remoteCommands)
+	sshconfig := &SSHConfig{
+		sshUser:    sshUser,
+		sshPort:    sshPort,
+		sshKeyFile: sshKeyFile,
+		hostIP:     hostIP,
+	}
+	sshUtil := NewSSHUtil(sshconfig)
+	return sshUtil.connectAndExecuteCommandOnRemote(remoteCommands, true)
 }
 
 func (nu *NodeUtilsImpl) genConfig(path string) error {
