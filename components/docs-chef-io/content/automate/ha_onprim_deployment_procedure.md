@@ -50,6 +50,9 @@ sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<P
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ```
 
+{{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+{{< /warning >}}
+
 ### Run these steps on Bastion Host Machine
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
@@ -144,8 +147,8 @@ ssh_port = "22"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
+# DON'T MODIFY THE BELOW LINE (workspace_path)
 workspace_path = "/hab/a2_deploy_workspace"
-# DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
 
 # Eg.: backup_config = "object_storage" or "file_system"

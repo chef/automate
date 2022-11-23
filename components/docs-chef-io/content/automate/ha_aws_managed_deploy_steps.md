@@ -47,6 +47,9 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrase for Private Key authentication.
 
+{{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+{{< /warning >}}
+
 ### Run these steps on Bastion Host Machine
 
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
