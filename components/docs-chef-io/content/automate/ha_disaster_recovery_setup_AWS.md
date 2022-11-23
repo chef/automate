@@ -36,7 +36,7 @@ In the above approach, there will be 2 identical clusters
 
 The primary cluster will be active and regular backups will be performed using `chef-automate backup create`. At the same time, the disaster recovery cluster will be restoring the latest backup data using `chef-automate backup restore`.
 
-When a failure of the primary cluster occurs, failover can be accomplished through updating DNS records to the DR cluster, alternatively, many commercial load balancers can be configured to handle routing traffic to a DR cluster in the event of a failure.
+When a failure of the primary cluster occurs, failover can be accomplished through updating DNS records to the DR cluster Load balancer.
 
 ### Caveat with the above approach
 
@@ -155,37 +155,3 @@ Steps to switch to the disaster recovery cluster are as follows:
 - Update the Automate FQDN DNS entry to resolve to the Disaster Recovery load balancer.
 - The Disaster Recovery cluster will be the primary cluster, it may take some time for DNS changes to fully propagate.
 - Setup backup cron to start taking backups of the now active cluster.
-
-
-## Setup Disaster Recovery Cluster For AWS Deployment With AWS Managed Services
-
-### Requirements
-
-1. Two identical clusters located in different cloud provider regions.
-1. Amazon S3 access in both the region for Application backup.
-1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
-
-In this approach, there will be 2 identical clusters
-
-- Primary Cluster (or Production Cluster)
-- Disaster Recovery Cluster
-
-
-### Steps to setup the Production and Disaster Recovery Cluster
-
-- Choose 2 Region for the Deployment, one for Production cluster and other for DR cluster.
-- Setup the Primary Cluster with steps mention [here](https://docs.chef.io/automate/ha_aws_managed_deploy_steps/) in one of the region.
-- To Setup the DR cluster first we setup the Database
-  - Setup AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) for detailed steps.
-  - Do the Opensearch configuration mention in the [docs](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/replication.html)
-  
-### Prerequisites
-
-
-- Setup AWS Another OpenSearch cluster 1.2 in other than Primary region [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)
-
-- Do the Opensearch configuration mention in the [docs](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/replication.html)
-
-- Setup the AWS RDS Replica cluster https://aws.amazon.com/blogs/database/best-practices-for-amazon-rds-for-postgresql-cross-region-read-replicas/  
-
-- Setup AWS RDS Postgresql 13.5 in another region. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
