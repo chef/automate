@@ -90,6 +90,10 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_max_size = 4;
 				google.protobuf.Int32Value pool_queue_max = 5;
 				google.protobuf.Int32Value pool_queue_timeout = 6;
+				google.protobuf.Int32Value authz_fanout = 7;
+				google.protobuf.Int32Value authz_timeout = 8;
+				google.protobuf.Int32Value cleanup_batch_size = 9;
+				
 			}
 
 			message Sql {
@@ -126,6 +130,10 @@ message ConfigRequest {
 				google.protobuf.Int64Value max_bytes = 1;
 			}
 
+			message IBrowse {
+				google.protobuf.Int64Value ibrowse_max_pipeline_size = 1;
+				google.protobuf.Int32Value ibrowse_max_sessions = 2;
+			}
 		}
 		message Service {}
 	}
