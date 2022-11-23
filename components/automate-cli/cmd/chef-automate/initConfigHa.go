@@ -21,7 +21,7 @@ type CertByIP struct {
 	IP         string `toml:"ip"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
-	NodesDn    string `toml:"nodes_dn"`
+	NodesDn    string `toml:"nodes_dn,omitempty"`
 }
 
 type AwsConfigToml struct {

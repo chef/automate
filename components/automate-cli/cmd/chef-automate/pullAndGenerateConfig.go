@@ -15,6 +15,8 @@ type ConfigKeys struct {
 	rootCA     string
 	privateKey string
 	publicKey  string
+	adminCert  string
+	adminKey   string
 }
 
 type PullConfigs interface {
@@ -54,6 +56,8 @@ func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error
 			rootCA:     src.TLS.RootCA,
 			privateKey: src.TLS.SslKey,
 			publicKey:  src.TLS.SslCert,
+			adminCert:  src.TLS.AdminCert,
+			adminKey:   src.TLS.AdminKey,
 		}
 	}
 	return ipConfigMap, nil
@@ -153,6 +157,10 @@ func (p *PullConfigsImpl) generateConfig() error {
 
 	sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
 
+	sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
+
+	sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+
 	var pgCerts []CertByIP
 	for key, ele := range pgConfigMap {
 		certByIP := CertByIP{
@@ -165,8 +173,12 @@ func (p *PullConfigsImpl) generateConfig() error {
 
 	sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
 
+	sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
+
 	var a2Certs []CertByIP
 	for key, ele := range a2ConfigMap {
+		fmt.Printf("Automate Config........%s\n", key)
+		fmt.Println(ele.Global.V1.FrontendTls)
 		certByIP := CertByIP{
 			IP:         key,
 			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
@@ -177,8 +189,12 @@ func (p *PullConfigsImpl) generateConfig() error {
 
 	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
 
+	sharedConfigToml.Automate.Config.RootCA = getA2ORCSRootCA(a2ConfigMap)
+
 	var csCerts []CertByIP
 	for key, ele := range csConfigMap {
+		fmt.Printf("Chef-Server Config........ %s\n", key)
+		fmt.Println(ele.Global.V1.FrontendTls)
 		certByIP := CertByIP{
 			IP:         key,
 			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
@@ -209,6 +225,15 @@ func getOSORPGRootCA(config map[string]*ConfigKeys) string {
 	return ""
 }
 
+func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
+	for _, ele := range config {
+		if len(strings.TrimSpace(ele.rootCA)) > 0 {
+			return strings.TrimSpace(ele.adminCert), strings.TrimSpace(ele.adminKey)
+		}
+	}
+	return "", ""
+}
+
 func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
 		if len(strings.TrimSpace(ele.Global.V1.Sys.Tls.RootCertContents)) > 0 {
@@ -216,8 +241,4 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 		}
 	}
 	return ""
-}
-
-func getCSRootCA(config map[string]*dc.AutomateConfig) {
-
 }
