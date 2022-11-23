@@ -422,37 +422,36 @@ os_snapshot_user_access_key_secret = ""
 
 The commands requires some arguments so that it can determine which types of nodes you want to add into your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to add as comma seperated values with no spaces in between.
 For example, 
-- if we want to add nodes with ip 10.1.2.23 to automate we have to run:
-  ```
-  chef-automate node add --automate 10.1.2.23
-  ```
-- If we want to add nodes with ip 10.1.2.23 and 10.0.1.42 to chef-server we have to run:
-  ```
-  chef-automate node add --automate 10.1.2.23,10.0.1.42
-  ```
-- If we want to add nodes with ip 10.1.2.23 and 10.0.1.42 to opensearch we have to run:
-  ```
-  chef-automate node add --automate 10.1.2.23,10.0.1.42
-  ```
-- If we want to add nodes with ip 10.1.2.23, 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
-  ```
-  chef-automate node add --automate 10.1.2.23,10.0.1.42,10.0.1.54
-  ```
+  - if you want to add nodes with ip 10.1.2.23 to automate you have to run:
+    ```sh
+    chef-automate node add --automate 10.1.2.23
+    ```
+  - If you want to add nodes with ip 10.1.2.23 and 10.0.1.42 to chef-server you have to run:
+    ```sh
+    chef-automate node add --chef-server 10.1.2.23,10.0.1.42
+    ```
+  - If you want to add nodes with ip 10.1.2.23 and 10.0.1.42 to opensearch you have to run:
+    ```sh
+    chef-automate node add --opensearch 10.1.2.23,10.0.1.42
+    ```
+  - If you want to add nodes with ip 10.1.2.23, 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
+    ```sh
+    chef-automate node add --postgresql 10.1.2.23,10.0.1.42,10.0.1.54
+    ```
 
-We can mix and match different services together if we want to add nodes across various services
-
-- If we want to add nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
-  ```
-  chef-automate node add --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
-  ```
-- If we want to add nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
-  ```
-  chef-automate node add --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
-  ```
+You can mix and match different services together if you want to add nodes across various services
+  - If you want to add nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
+    ```sh
+    chef-automate node add --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+    ```
+  - If you want to add nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
+    ```sh
+    chef-automate node add --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+    ```
 Once the command will execute it will add the supplied nodes to your automate setup. The changes might take a while.
 
 {{< note >}} 
-- If you have applies some patches to any of the existing nodes make sure you apply the same on your current node as well.
+- If you have applied patches to any of the existing services make sure you apply the same on your current node as well.
 - The new node will be configured with the certificates which were already configured in your HA setup. 
 - If you had applied unique certificates per node then the certificates of one of the nodes has been applied by default. 
 - If you want to change the certificates then you can do so by running the `chef-automate cert-rotate [options]` command.
@@ -474,33 +473,32 @@ If you encounter any problems executing the above steps please refer the trouble
 {{< /warning >}}
 
 
-
 The commands requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to remove as comma seperated values with no spaces in between.
 For example, 
-- if we want to remove nodes with ip 10.1.2.23 to automate we have to run:
-  ```
-  chef-automate node remove --automate 10.1.2.23
-  ```
-- If we want to remove nodes with ip 10.1.2.23 and 10.0.1.42 to chef-server we have to run:
-  ```
-  chef-automate node remove --automate 10.1.2.23,10.0.1.42
-  ```
-- If we want to remove nodes with ip 10.1.2.23 and 10.0.1.42 to opensearch we have to run:
-  ```
-  chef-automate node remove --automate 10.1.2.23,10.0.1.42
-  ```
-- If we want to remove nodes with ip 10.1.2.23, 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
-  ```
-  chef-automate node remove --automate 10.1.2.23,10.0.1.42,10.0.1.54
-  ```
+  - if you want to remove nodes with ip 10.1.2.23 to automate you have to run:
+    ```sh
+    chef-automate node remove --automate 10.1.2.23
+    ```
+  - If you want to remove nodes with ip 10.1.2.23 and 10.0.1.42 to chef-server you have to run:
+    ```sh
+    chef-automate node remove --chef-server 10.1.2.23,10.0.1.42
+    ```
+  - If you want to remove nodes with ip 10.1.2.23 and 10.0.1.42 to opensearch you have to run:
+    ```sh
+    chef-automate node remove --opensearch 10.1.2.23,10.0.1.42
+    ```
+  - If you want to remove nodes with ip 10.1.2.23, 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
+    ```sh
+    chef-automate node remove --postgresql 10.1.2.23,10.0.1.42,10.0.1.54
+    ```
 
-We can mix and match different services together if we want to remove nodes across various services
+You can mix and match different services together if you want to remove nodes across various services
 
-- If we want to remove nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+- If you want to remove nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
   ```
   chef-automate node remove --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
   ```
-- If we want to remove nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+- If you want to remove nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
   ```
   chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
   ```
