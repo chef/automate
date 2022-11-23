@@ -276,46 +276,7 @@ func (ani *AddNodeImpl) splitIPCSV() (automateIpList, chefServerIpList, opensear
 	return
 }
 
-// func runDeleteNodeHACmd(c *cobra.Command, args []string) error {
-// 	var configPath = ""
-// 	if len(args) > 0 {
-// 		configPath = args[0]
-// 	}
-// 	var deployer, derr = getDeployer(configPath)
-// 	if derr != nil {
-// 		return status.Wrap(derr, status.ConfigError, invalidConfig)
-// 	}
-// 	if deployer != nil {
-// 		// check deployment type AWS or ExistingInfra
-// 		deployerType, err := getModeFromConfig(configPath)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if deployerType == EXISTING_INFRA_MODE {
-// 		}
-// 	}
-// 	return nil
-// }
-
-// func deleteNodeHACmd() *cobra.Command {
-// 	var deleteNodeHACmd = &cobra.Command{
-// 		Use:   "delete",
-// 		Short: "Delete existing node in HA",
-// 		Long:  `Delete existing node in HA`,
-// 		RunE:  runDeleteNodeHACmd,
-// 	}
-// 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "a2")
-// 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "cs")
-// 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "", "os")
-// 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "", "pg")
-// 	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "", "y", false, "auto-accept")
-// 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.filepath, "filepath", "/hab/a2_deploy_workspace/config.toml", "file-path")
-
-// 	return deleteNodeHACmd
-// }
-
 func init() {
 	nodeCmd.AddCommand(addNodeHACmd())
-	// nodeCmd.AddCommand(deleteNodeHACmd())
 	RootCmd.AddCommand(nodeCmd)
 }
