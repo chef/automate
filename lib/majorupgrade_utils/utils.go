@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	INDICES_TOTAL_SHARD_DEFAULT = 2000
+	INDICES_TOTAL_SHARD_DEFAULT = 2500
 	V3_ES_SETTING_FILE          = "/svc/deployment-service/old_es_v3_settings.json"
 	HAB_DIR                     = "/hab"
 	UPGRADE_METADATA            = "/svc/deployment-service/var/upgrade_metadata.json"
