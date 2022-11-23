@@ -96,13 +96,6 @@ func runAddNodeHACmd(c *cobra.Command, args []string) error {
 	return nil
 }
 
-type AddNode interface {
-	validate() error
-	modifyConfig() error
-	promptUserConfirmation() (bool, error)
-	runDeploy() error
-}
-
 type AddNodeImpl struct {
 	config                  ExistingInfraConfigToml
 	copyConfigForUserPrompt ExistingInfraConfigToml
@@ -116,7 +109,7 @@ type AddNodeImpl struct {
 	writer                  *cli.Writer
 }
 
-func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeUtils, filepath string) AddNode {
+func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeUtils, filepath string) HAModifyAndDeploy {
 	return &AddNodeImpl{
 		flags:      flags,
 		writer:     writer,
@@ -132,7 +125,12 @@ func (ani *AddNodeImpl) validate() error {
 		return err
 	}
 	ani.copyConfigForUserPrompt = ani.config
-	ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = ani.splitIPCSV()
+	ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = splitIPCSV(
+		ani.flags.automateIp,
+		ani.flags.chefServerIp,
+		ani.flags.opensearchIp,
+		ani.flags.postgresqlIp,
+	)
 	errorList := ani.validateCmdArgs(ani.automateIpList, ani.chefServerIpList, ani.postgresqlIp, ani.opensearchIpList, ani.config)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
@@ -141,19 +139,19 @@ func (ani *AddNodeImpl) validate() error {
 }
 
 func (ani *AddNodeImpl) modifyConfig() error {
-	err := modifyConfigForNewNode(&ani.config.Automate.Config.InstanceCount, &ani.config.ExistingInfra.Config.AutomatePrivateIps, ani.automateIpList, &ani.config.Automate.Config.CertsByIP)
+	err := modifyConfigForAddNewNode(&ani.config.Automate.Config.InstanceCount, &ani.config.ExistingInfra.Config.AutomatePrivateIps, ani.automateIpList, &ani.config.Automate.Config.CertsByIP)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
 	}
-	err = modifyConfigForNewNode(&ani.config.ChefServer.Config.InstanceCount, &ani.config.ExistingInfra.Config.ChefServerPrivateIps, ani.chefServerIpList, &ani.config.ChefServer.Config.CertsByIP)
+	err = modifyConfigForAddNewNode(&ani.config.ChefServer.Config.InstanceCount, &ani.config.ExistingInfra.Config.ChefServerPrivateIps, ani.chefServerIpList, &ani.config.ChefServer.Config.CertsByIP)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
 	}
-	err = modifyConfigForNewNode(&ani.config.Opensearch.Config.InstanceCount, &ani.config.ExistingInfra.Config.OpensearchPrivateIps, ani.opensearchIpList, &ani.config.Opensearch.Config.CertsByIP)
+	err = modifyConfigForAddNewNode(&ani.config.Opensearch.Config.InstanceCount, &ani.config.ExistingInfra.Config.OpensearchPrivateIps, ani.opensearchIpList, &ani.config.Opensearch.Config.CertsByIP)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
 	}
-	err = modifyConfigForNewNode(&ani.config.Postgresql.Config.InstanceCount, &ani.config.ExistingInfra.Config.PostgresqlPrivateIps, ani.postgresqlIp, &ani.config.Postgresql.Config.CertsByIP)
+	err = modifyConfigForAddNewNode(&ani.config.Postgresql.Config.InstanceCount, &ani.config.ExistingInfra.Config.PostgresqlPrivateIps, ani.postgresqlIp, &ani.config.Postgresql.Config.CertsByIP)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")
 	}
@@ -182,7 +180,7 @@ func (ani *AddNodeImpl) promptUserConfirmation() (bool, error) {
 	if len(ani.postgresqlIp) > 0 {
 		ani.writer.Println("Postgresql => " + strings.Join(ani.postgresqlIp, ", "))
 	}
-	return ani.writer.Confirm("This will add the new nodes to your existing setup. The process may thae a while. Are you sure you want to continue?")
+	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
 func (ani *AddNodeImpl) runDeploy() error {
@@ -256,27 +254,8 @@ func (ani *AddNodeImpl) validateConnection(ip string) error {
 	return nil
 }
 
-func (ani *AddNodeImpl) splitIPCSV() (automateIpList, chefServerIpList, opensearchIpList, postgresqlIp []string) {
-	if ani.flags.automateIp != "" {
-		automateIpList = strings.Split(ani.flags.automateIp, ",")
-		automateIpList = trimSliceSpace(automateIpList)
-	}
-	if ani.flags.chefServerIp != "" {
-		chefServerIpList = strings.Split(ani.flags.chefServerIp, ",")
-		chefServerIpList = trimSliceSpace(chefServerIpList)
-	}
-	if ani.flags.opensearchIp != "" {
-		opensearchIpList = strings.Split(ani.flags.opensearchIp, ",")
-		opensearchIpList = trimSliceSpace(opensearchIpList)
-	}
-	if ani.flags.postgresqlIp != "" {
-		postgresqlIp = strings.Split(ani.flags.postgresqlIp, ",")
-		postgresqlIp = trimSliceSpace(postgresqlIp)
-	}
-	return
-}
-
 func init() {
 	nodeCmd.AddCommand(addNodeHACmd())
+	nodeCmd.AddCommand(deleteNodeHACmd())
 	RootCmd.AddCommand(nodeCmd)
 }

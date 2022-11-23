@@ -9,6 +9,13 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
+type HAModifyAndDeploy interface {
+	validate() error
+	modifyConfig() error
+	promptUserConfirmation() (bool, error)
+	runDeploy() error
+}
+
 type MockNodeUtilsImpl struct {
 	readConfigfunc                            func(path string) (ExistingInfraConfigToml, error)
 	writeFilefunc                             func(tomlbytes []byte, filepath string) error
@@ -103,12 +110,12 @@ func trimSliceSpace(slc []string) []string {
 	return slc
 }
 
-func modifyConfigForNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
 	if len(newIps) == 0 {
 		return nil
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
-	inc, err := addInstanceCount(*instanceCount, len(newIps))
+	inc, err := modifyInstanceCount(*instanceCount, len(newIps))
 	*instanceCount = inc
 	if err != nil {
 		return err
@@ -124,10 +131,73 @@ func modifyConfigForNewNode(instanceCount *string, existingPrivateIPs *[]string,
 	return nil
 }
 
-func addInstanceCount(instanceCount string, additive int) (string, error) {
+func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+	if len(newIps) == 0 {
+		return nil
+	}
+	*existingPrivateIPs = difference(*existingPrivateIPs, newIps)
+	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	*instanceCount = inc
+	if err != nil {
+		return err
+	}
+	if len(*certsIp) > 0 {
+		for _, ip := range newIps {
+			*certsIp = findAndDelete(*certsIp, ip)
+		}
+	}
+	return nil
+}
+
+func difference(a, b []string) []string {
+	mb := make(map[string]struct{}, len(b))
+	for _, x := range b {
+		mb[x] = struct{}{}
+	}
+	var diff []string
+	for _, x := range a {
+		if _, found := mb[x]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
+}
+
+func findAndDelete(s []CertByIP, item string) []CertByIP {
+	index := 0
+	for _, i := range s {
+		if i.IP != item {
+			s[index] = i
+			index++
+		}
+	}
+	return s[:index]
+}
+
+func modifyInstanceCount(instanceCount string, additive int) (string, error) {
 	i, err := strconv.Atoi(instanceCount)
 	if err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("%v", i+additive), nil
+}
+
+func splitIPCSV(automateIp, chefserverIp, opensearchIp, postgresIp string) (automateIpList, chefServerIpList, opensearchIpList, postgresqlIp []string) {
+	if automateIp != "" {
+		automateIpList = strings.Split(automateIp, ",")
+		automateIpList = trimSliceSpace(automateIpList)
+	}
+	if chefserverIp != "" {
+		chefServerIpList = strings.Split(chefserverIp, ",")
+		chefServerIpList = trimSliceSpace(chefServerIpList)
+	}
+	if opensearchIp != "" {
+		opensearchIpList = strings.Split(opensearchIp, ",")
+		opensearchIpList = trimSliceSpace(opensearchIpList)
+	}
+	if postgresIp != "" {
+		postgresqlIp = strings.Split(postgresIp, ",")
+		postgresqlIp = trimSliceSpace(postgresqlIp)
+	}
+	return
 }
