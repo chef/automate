@@ -25,11 +25,13 @@ type certFlagsStruct struct {
 	adminCert   string
 	adminKey    string
 }
+
 var certFlags = certFlagsStruct{}
 
 type nodeFlagStruct struct {
 	node string
 }
+
 var nodeFlag = nodeFlagStruct{}
 
 type sshFlagStruct = struct {
@@ -38,6 +40,7 @@ type sshFlagStruct = struct {
 	postgres   bool
 	opensearch bool
 }
+
 var sshFlag = sshFlagStruct{}
 
 var certRotateCmd = &cobra.Command{
@@ -142,6 +145,7 @@ const (
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 )
+
 var readFileFromOs = ioutil.ReadFile // nosemgrep
 // This function will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func certRotate(cmd *cobra.Command, args []string) error {
@@ -561,7 +565,7 @@ func GetRemoteFileDetails(remotePath string) (string, string, string, error) {
 
 	// Get the file path and filename from the given remote address.
 	certPaths := strings.Split(remotePath, ":")
-	if len(certPaths) != 2 {
+	if len(certPaths) != 2 || certPaths[1] == "" {
 		return "", "", "", errors.New(fmt.Sprintf("Invalid remote path: %v", remotePath))
 	}
 
@@ -570,7 +574,7 @@ func GetRemoteFileDetails(remotePath string) (string, string, string, error) {
 
 	// Get the filename from the file path.
 	fileName := filepath.Base(remoteFilePath)
-	if remoteFilePath == "" || fileName == string(os.PathSeparator) {
+	if fileName == "." || fileName == string(os.PathSeparator) {
 		return "", "", "", errors.New(fmt.Sprintf("Invalid remote path: %v", remotePath))
 	}
 

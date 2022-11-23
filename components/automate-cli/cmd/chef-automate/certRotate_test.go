@@ -144,11 +144,12 @@ func TestGetRemoteFileDetails(t *testing.T) {
 		hostIPExp := ValidIP
 		assert.Equal(t, hostIPExp, hostIPRes)
 	})
-/*
+
 	t.Run("Invalid Remote Path (empty path)", func(t *testing.T) {
 		input := ValidIP + ":"
 		remoteFilePathRes, fileNameRes, hostIPRes, err := GetRemoteFileDetails(input)
 		assert.Error(t, err)
+		assert.Equal(t, "Invalid remote path: 198.51.100.0:", err.Error())
 		remoteFilePathExp := ""
 		assert.Equal(t, remoteFilePathExp, remoteFilePathRes)
 		fileNameExp := ""
@@ -156,7 +157,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 		hostIPExp := ValidIP
 		assert.NotEqual(t, hostIPExp, hostIPRes)
 	})
-*/
+
 }
 
 func TestGetCerts(t *testing.T) {
@@ -171,7 +172,6 @@ func TestGetCerts(t *testing.T) {
 		sshFlag = oldSshFlag
 		nodeFlag = oldNodeFlag
 	}()
-
 
 	readFileFromOs = func(filename string) ([]byte, error) {
 		if _, err := os.Stat(filename); err == nil {
@@ -274,12 +274,12 @@ func TestGetCerts(t *testing.T) {
 		assert.Equal(t, "", publicCertRes)
 		assert.Equal(t, "", privateCertRes)
 	})
-    
+
 	t.Run("All paths given but root-ca path is invalid(file not exist) flag is automate service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
 			privateCert: "./certRotate.go",
 			publicCert:  "./certRotate.go",
-			rootCA: "./xyx-cert.go",
+			rootCA:      "./xyx-cert.go",
 		}
 		sshFlag = sshFlagStruct{
 			automate: true,
@@ -330,7 +330,7 @@ func TestGetCerts(t *testing.T) {
 		assert.Equal(t, FileContent, adminCertRes)
 		assert.Equal(t, FileContent, adminKeyRes)
 	})
-     
+
 	t.Run("Some mandatory path not and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
 			privateCert: "./certRotate.go",
@@ -352,8 +352,8 @@ func TestGetCerts(t *testing.T) {
 		assert.Equal(t, "", adminCertRes)
 		assert.Equal(t, "", adminKeyRes)
 	})
-  
-    t.Run("invalid adminCert path and flag is opensearch service", func(t *testing.T) {
+
+	t.Run("invalid adminCert path and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
 			privateCert: "./certRotate.go",
 			publicCert:  "./certRotate.go",
@@ -374,8 +374,8 @@ func TestGetCerts(t *testing.T) {
 		assert.Equal(t, "", adminCertRes)
 		assert.Equal(t, "", adminKeyRes)
 	})
-    
-    t.Run("invalid adminKey path and flag is opensearch service", func(t *testing.T) {
+
+	t.Run("invalid adminKey path and flag is opensearch service", func(t *testing.T) {
 		certFlags = certFlagsStruct{
 			privateCert: "./certRotate.go",
 			publicCert:  "./certRotate.go",
