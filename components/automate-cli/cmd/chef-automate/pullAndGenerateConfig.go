@@ -238,7 +238,7 @@ func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
 
 func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
-		if ele.Global.V1.Sys.Tls != nil && len(strings.TrimSpace(ele.Global.V1.Sys.Tls.RootCertContents)) > 0 {
+		if ele.Global.V1.Sys != nil && ele.Global.V1.Sys.Tls != nil && len(strings.TrimSpace(ele.Global.V1.Sys.Tls.RootCertContents)) > 0 {
 			return ele.Global.V1.Sys.Tls.RootCertContents
 		}
 	}
