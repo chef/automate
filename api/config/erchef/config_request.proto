@@ -64,6 +64,7 @@ message ConfigRequest {
 				google.protobuf.StringValue actions_fqdn = 6;
 				google.protobuf.BoolValue cbv_cache_enabled = 7;
 				google.protobuf.Int32Value cbv_cache_item_ttl = 8;
+				google.protobuf.Int32Value s3_url_ttl = 9;
 			}
 
 			message Indexing {
@@ -90,9 +91,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_max_size = 4;
 				google.protobuf.Int32Value pool_queue_max = 5;
 				google.protobuf.Int32Value pool_queue_timeout = 6;
-				google.protobuf.Int32Value authz_fanout = 7;
-				google.protobuf.Int32Value authz_timeout = 8;
-				google.protobuf.Int32Value cleanup_batch_size = 9;
+				google.protobuf.Int32Value cleanup_batch_size = 7;
 				
 			}
 
