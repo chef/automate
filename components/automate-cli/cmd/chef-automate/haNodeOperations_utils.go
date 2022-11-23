@@ -106,15 +106,13 @@ func modifyConfigForNewNode(instanceCount *string, existingPrivateIPs *[]string,
 	if err != nil {
 		return err
 	}
-	if len(*certsIp) > 0 {
-		for _, ip := range newIps {
-			c := CertByIP{
-				IP:         ip,
-				PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
-				PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
-			}
-			*certsIp = append(*certsIp, c)
+	for _, ip := range newIps {
+		c := CertByIP{
+			IP:         ip,
+			PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
+			PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
 		}
+		*certsIp = append(*certsIp, c)
 	}
 	return nil
 }
