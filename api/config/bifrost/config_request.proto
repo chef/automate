@@ -17,7 +17,7 @@ message ConfigRequest {
 		System sys = 1;
 		Service svc = 2;
 
-		message System { 
+		message System {
 			chef.automate.infra.config.Mlsa mlsa = 1;
 			Log log = 2;
 			Network network = 3;
