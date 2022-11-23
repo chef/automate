@@ -184,7 +184,7 @@ func (p *PullConfigsImpl) generateConfig() error {
 			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
 			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
 		}
-		pgCerts = append(a2Certs, certByIP)
+		a2Certs = append(a2Certs, certByIP)
 	}
 
 	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
@@ -195,12 +195,14 @@ func (p *PullConfigsImpl) generateConfig() error {
 	for key, ele := range csConfigMap {
 		fmt.Printf("Chef-Server Config........ %s\n", key)
 		fmt.Println(ele.Global.V1.FrontendTls)
-		certByIP := CertByIP{
-			IP:         key,
-			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
-			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
+		if len(ele.Global.V1.FrontendTls) > 0 {
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.Global.V1.FrontendTls[0].Key,
+				PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
+			}
+			csCerts = append(csCerts, certByIP)
 		}
-		csCerts = append(csCerts, certByIP)
 	}
 
 	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
@@ -236,7 +238,7 @@ func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
 
 func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
-		if len(strings.TrimSpace(ele.Global.V1.Sys.Tls.RootCertContents)) > 0 {
+		if ele.Global.V1.Sys.Tls != nil && len(strings.TrimSpace(ele.Global.V1.Sys.Tls.RootCertContents)) > 0 {
 			return ele.Global.V1.Sys.Tls.RootCertContents
 		}
 	}
