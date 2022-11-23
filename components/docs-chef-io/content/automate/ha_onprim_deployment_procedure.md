@@ -420,49 +420,49 @@ os_snapshot_user_access_key_secret = ""
 
 ### How To Add More Nodes to the On-Prem Deployment
 
-- Open the `config.toml` at the bastion node
-- Change the `instance_count` value, as explained in the below example.
-- Add the `Ip address` for the respective node at the end, as explained in the example.
-- Make sure that all the necessary ports and firewall settings are aligned in the new node.
-
-For example: Add a new Automate node to the existing deployed cluster.
-
-  | Old Config | => | New Config |
-  | :--- | :--- | :--- |
-  | [automate.config] <br/> instance_count = "1" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
-
-- Trigger the deployment command again from the bastion node.
-- To trigger the deploy command, we required the chef-automate airgap bundle; use the airgap bundle running on the current cluster. In case of the bundle is missing or deleted from the bastion, then we need to download the airgap bundle again.
-  - In case you do not know which Chef-Automate version is running, then ssh to one of the frontend nodes and run the below command.
-
-    ```sh
-    sudo chef-automate version
-    ```
-
-  - Output
-
-    ```sh
-    Version: 2
-    CLI Build: 20220920122615
-    Server Build: 4.X.Y
-    ```
-
-  - To download the airgap bundle, please run the command from the machine where we have internet access.
-
-    ```sh
-    chef-automate create airgap bundle --version 4.X.Y
-    ```
-
-  - Copy the airgap bundle to the bastion host.
-
-- Run the `deploy` command to add the new node.
-
-  ```sh
-    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
+The commands requires some arguments so that it can determine which types of nodes you want to add into your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to add, as comma seperated values with no spaces in between.
+For example, 
+- if we want to add nodes with ip 10.1.2.23 to automate we have to run:
+  ```
+  chef-automate node add --automate 10.1.2.23
+  ```
+- If we want to add nodes with ip 10.1.2.23 and 10.0.1.42 to chef-server we have to run:
+  ```
+  chef-automate node add --automate 10.1.2.23,10.0.1.42
+  ```
+- If we want to add nodes with ip 10.1.2.23 and 10.0.1.42 to opensearch we have to run:
+  ```
+  chef-automate node add --automate 10.1.2.23,10.0.1.42
+  ```
+- If we want to add nodes with ip 10.1.2.23, 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+  ```
+  chef-automate node add --automate 10.1.2.23,10.0.1.42,10.0.1.54
   ```
 
-- Above process can be done for `chef-server`, `postgresql` and `opensearch` clusters as well
-- In case of Deployment fails, refer to the troubleshooting document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+We can mix and match different services together if we want to add nodes across various services
+
+- If we want to add nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+  ```
+  chef-automate node add --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+  ```
+- If we want to add nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+  ```
+  chef-automate node add --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+  ```
+Once the command will execute it will add the supplied nodes to your automate setup. The changes might take a while.
+
+{{< note >}} 
+- If you have applies some patches to any of the existing nodes make sure you apply the same on your current node as well.
+- The new node will be configured with the certificates which were already configured in your HA setup. 
+- If you had applied unique certificates per node then the certificates of one of the nodes has been applied by default. 
+- If you want to change the certificates then you can do so by running the `chef-automate cert-rotate [options]` command.
+{{< /note >}}
+
+{{< warning >}}
+Its important to make sure that the ip address of the nodes you are trying to add have sufficient resources and are reachable from the bastion host.
+{{< /warning >}}
+
+If you encounter any problems executing the above steps please refer the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
 
@@ -473,47 +473,44 @@ For example: Add a new Automate node to the existing deployed cluster.
 
 {{< /warning >}}
 
-- Open the `config.toml` at the bastion node.
-- change the `instance_count` value, as explained in the below example.
-- Remove the `Ip address` for the respective node, as explained in the example.
 
-For example: Remove Automate node to the existing deployed cluster.
-  | Old Config | => | New Config |
-  | :--- | :--- | :--- |
-  | [automate.config] <br/> instance_count = "3" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
 
-- Trigger the deployment command again from the bastion node.
-- To trigger the deploy command, we required the chef-automate airgap bundle, use the airgap bundle running on the current cluster. In case of the bundle is missing or deleted from the bastion, then we need to download the airgap bundle again.
-  - In case you do not know which Chef-Automate version is running, then ssh to one of the frontend nodes and run the below command.
-
-    ```sh
-    sudo chef-automate version
-    ```
-
-  - Output
-
-    ```sh
-    Version: 2
-    CLI Build: 20220920122615
-    Server Build: 4.X.Y
-    ```
-
-  - To download the airgap bundle, please run the command from the machine where we have internet access.
-
-    ```sh
-    chef-automate create airgap bundle --version 4.X.Y
-    ```
-
-  - Copy the airgap bundle to the bastion host.
-
-- Run the `deploy` command to remove the node.
-
-  ```sh
-    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
+The commands requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to remove, as comma seperated values with no spaces in between.
+For example, 
+- if we want to remove nodes with ip 10.1.2.23 to automate we have to run:
+  ```
+  chef-automate node remove --automate 10.1.2.23
+  ```
+- If we want to remove nodes with ip 10.1.2.23 and 10.0.1.42 to chef-server we have to run:
+  ```
+  chef-automate node remove --automate 10.1.2.23,10.0.1.42
+  ```
+- If we want to remove nodes with ip 10.1.2.23 and 10.0.1.42 to opensearch we have to run:
+  ```
+  chef-automate node remove --automate 10.1.2.23,10.0.1.42
+  ```
+- If we want to remove nodes with ip 10.1.2.23, 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+  ```
+  chef-automate node remove --automate 10.1.2.23,10.0.1.42,10.0.1.54
   ```
 
-- Above process can be done for `chef-server` and `automate`.
-- In case of Deployment fails, refer to the troubleshooting document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+We can mix and match different services together if we want to remove nodes across various services
+
+- If we want to remove nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+  ```
+  chef-automate node remove --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+  ```
+- If we want to remove nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql we have to run:
+  ```
+  chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+  ```
+Once the command will execute it will remove the supplied nodes from your automate setup. The changes might take a while.
+
+{{< note >}} 
+- The ip's which are provided needs to be associated with a node in your HA setup.
+{{< /note >}}
+
+If you encounter any problems executing the above steps please refer the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How to Replace Node in Automate HA Cluster
 
