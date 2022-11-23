@@ -448,7 +448,7 @@ You can mix and match different services together if you want to add nodes acros
     ```sh
     chef-automate node add --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
     ```
-Once the command will execute it will add the supplied nodes to your automate setup. The changes might take a while.
+Once the command will execute, it will add the supplied nodes to your automate setup. The changes might take a while.
 
 {{< note >}} 
 - If you have applied patches to any of the existing services make sure you apply the same on your current node as well.
@@ -502,7 +502,7 @@ You can mix and match different services together if you want to remove nodes ac
     ```sh
     chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
     ```
-Once the command will execute it will remove the supplied nodes from your automate setup. The changes might take a while.
+Once the command will execute, it will remove the supplied nodes from your automate setup. The changes might take a while.
 
 {{< note >}} 
 - The ip's which are provided needs to be associated with a node in your HA setup.
