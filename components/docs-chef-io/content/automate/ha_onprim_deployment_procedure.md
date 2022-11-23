@@ -420,7 +420,7 @@ os_snapshot_user_access_key_secret = ""
 
 ### How To Add More Nodes to the On-Prem Deployment
 
-The commands requires some arguments so that it can determine which types of nodes you want to add into your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to add, as comma seperated values with no spaces in between.
+The commands requires some arguments so that it can determine which types of nodes you want to add into your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to add as comma seperated values with no spaces in between.
 For example, 
 - if we want to add nodes with ip 10.1.2.23 to automate we have to run:
   ```
@@ -475,7 +475,7 @@ If you encounter any problems executing the above steps please refer the trouble
 
 
 
-The commands requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to remove, as comma seperated values with no spaces in between.
+The commands requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes that you want to remove as comma seperated values with no spaces in between.
 For example, 
 - if we want to remove nodes with ip 10.1.2.23 to automate we have to run:
   ```
