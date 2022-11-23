@@ -16,15 +16,15 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-## Setup Disaster Recovery Cluster For AWS Deployment
+## Setup Disaster Recovery Cluster For AWS Deployment with Chef Managed Database (Opensearch and PostgreSql) 
 
 Recovery Point Objective (RPO) is the maximum acceptable amount of time since the last data recovery point, if an RPO of 1 to 24 hours is acceptable then using a typical backup and restore strategy for your disaster recovery plan is recommended.
 Typically these two clusters should be located in different data centers or cloud provider regions.
 
 ### Requirements
 
-1. Two identical clusters located in different data centers or cloud provider regions.
-1. Network accessible storage (NAS), object store (S3), available in both data centers/regions.
+1. Two identical clusters located in different cloud provider regions.
+1. Amazon S3 access in both the region for Application backup.
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
 In the above approach, there will be 2 identical clusters
@@ -153,3 +153,37 @@ Steps to switch to the disaster recovery cluster are as follows:
 - Update the Automate FQDN DNS entry to resolve to the Disaster Recovery load balancer.
 - The Disaster Recovery cluster will be the primary cluster, it may take some time for DNS changes to fully propagate.
 - Setup backup cron to start taking backups of the now active cluster.
+
+
+## Setup Disaster Recovery Cluster For AWS Deployment With AWS Managed Services
+
+### Requirements
+
+1. Two identical clusters located in different cloud provider regions.
+1. Amazon S3 access in both the region for Application backup.
+1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
+
+In this approach, there will be 2 identical clusters
+
+- Primary Cluster (or Production Cluster)
+- Disaster Recovery Cluster
+
+
+### Steps to setup the Production and Disaster Recovery Cluster
+
+- Choose 2 Region for the Deployment, one for Production cluster and other for DR cluster.
+- Setup the Primary Cluster with steps mention [here](https://docs.chef.io/automate/ha_aws_managed_deploy_steps/) in one of the region.
+- To Setup the DR cluster first we setup the Database
+  - Setup AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) for detailed steps.
+  - Do the Opensearch configuration mention in the [docs](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/replication.html)
+  
+### Prerequisites
+
+
+- Setup AWS Another OpenSearch cluster 1.2 in other than Primary region [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)
+
+- Do the Opensearch configuration mention in the [docs](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/replication.html)
+
+- Setup the AWS RDS Replica cluster https://aws.amazon.com/blogs/database/best-practices-for-amazon-rds-for-postgresql-cross-region-read-replicas/  
+
+- Setup AWS RDS Postgresql 13.5 in another region. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
