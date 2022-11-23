@@ -92,6 +92,7 @@ type FileUtils interface {
 	GetFreeSpaceinGB(dir string) (float64, error)
 	GetHabRootPath() string
 	WriteToFile(filepath string, data []byte) error
+	ReadFile(filename string) ([]byte, error)
 }
 
 func GetHabRootPath() string {
@@ -130,4 +131,7 @@ func (fsu *FileSystemUtils) GetHabRootPath() string {
 }
 func (fsu *FileSystemUtils) WriteToFile(filepath string, data []byte) error {
 	return WriteToFile(filepath, data)
+}
+func (fsu *FileSystemUtils) ReadFile(filename string) ([]byte, error) {
+	return ioutil.ReadFile(filename) // nosemgrep
 }
