@@ -18,24 +18,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var certFlags = struct {
+type certFlagsStruct struct {
 	privateCert string
 	publicCert  string
 	rootCA      string
 	adminCert   string
 	adminKey    string
-}{}
+}
+var certFlags = certFlagsStruct{}
 
-var nodeFlag = struct {
+type nodeFlagStruct struct {
 	node string
-}{}
+}
+var nodeFlag = nodeFlagStruct{}
 
-var sshFlag = struct {
+type sshFlagStruct = struct {
 	automate   bool
 	chefserver bool
 	postgres   bool
 	opensearch bool
-}{}
+}
+var sshFlag = sshFlagStruct{}
 
 var certRotateCmd = &cobra.Command{
 	Use:   "cert-rotate",
@@ -139,7 +142,7 @@ const (
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 )
-
+var readFileFromOs = ioutil.ReadFile // nosemgrep
 // This function will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func certRotate(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
@@ -540,9 +543,9 @@ func getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, err
 			return nil, errors.New(fmt.Sprintf("Unable to copy file from remote path: %v", certPath))
 		}
 		defer os.Remove(filePath)
-		return ioutil.ReadFile(filePath) // nosemgrep
+		return readFileFromOs(filePath) // nosemgrep
 	}
-	return ioutil.ReadFile(certPath) // nosemgrep
+	return readFileFromOs(certPath) // nosemgrep
 }
 
 // Get the remote file details from path.
