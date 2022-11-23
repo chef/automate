@@ -16,7 +16,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-## Setup Disaster Recovery Cluster For AWS Deployment with Chef Managed Database (Opensearch and PostgreSql) 
+## Setup Disaster Recovery Cluster For AWS Deployment
 
 Recovery Point Objective (RPO) is the maximum acceptable amount of time since the last data recovery point, if an RPO of 1 to 24 hours is acceptable then using a typical backup and restore strategy for your disaster recovery plan is recommended.
 Typically these two clusters should be located in different data centers or cloud provider regions.
@@ -53,7 +53,9 @@ When a failure of the primary cluster occurs, failover can be accomplished throu
 1. Do the backup configuration as explained in backup section for [object storage](/automate/ha_backup_restore_aws_s3/).
 
 {{< note >}}
-Configure backups for both clusters using only [object storage](/automate/ha_backup_restore_aws_s3/).
+
+- During the deployment for Primary and DR cluster use the same S3 bucket name.
+- Configure backups for both clusters using only [object storage](/automate/ha_backup_restore_aws_s3/).
 {{< /note >}}
 
 1. On Primary Cluster
