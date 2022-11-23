@@ -494,14 +494,14 @@ For example,
 
 You can mix and match different services together if you want to remove nodes across various services
 
-- If you want to remove nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
-  ```
-  chef-automate node remove --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
-  ```
-- If you want to remove nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
-  ```
-  chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
-  ```
+  - If you want to remove nodes with ip 10.1.2.23 to automate and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
+    ```sh
+    chef-automate node remove --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+    ```
+  - If you want to remove nodes with ip 10.1.2.23 to automate, nodes with ip 10.1.0.36 and 10.0.1.233 to chef-server and nodes with ip 10.0.1.54 and 10.0.1.42 to postgresql you have to run:
+    ```sh
+    chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+    ```
 Once the command will execute it will remove the supplied nodes from your automate setup. The changes might take a while.
 
 {{< note >}} 
