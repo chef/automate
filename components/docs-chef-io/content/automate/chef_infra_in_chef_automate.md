@@ -19,9 +19,9 @@ When operated in a standalone mode, the list contains specific parameters which 
 
 The list of parameters are as follows:
 
-| Parameters | Default Values In Standalone Infra Server | Default Values In Backend Server | Automate Configuration |
-| ---------- | ----------------------------------------- | -------------------------------- | ---------------------- |
-|
+| Parameters                     | Default Values In Standalone Infra Server | Default Values In Backend Server | Automate Configuration |
+| ------------------------------ | ----------------------------------------- | -------------------------------- | ---------------------- |
+| opscode_erchef['db_pool_size'] | 20                                        | 20                               | cfg.sql.pool_max_size  |
 |
 |
 |
