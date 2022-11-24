@@ -134,8 +134,6 @@ func init() {
 		RunE:  certRotateCmdFunc(&flagsObj),
 	}
 
-	RootCmd.AddCommand(certRotateCmd)
-
 	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, "automate", "a", false, "Automate Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Automate Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, "chef_server", "c", false, "Chef Infra Server Certificate Rotation")
@@ -152,6 +150,8 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminKeyPath, "admin-key", "", "Admin Private certificate")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.node, "node", "", "Node Ip address")
+
+	RootCmd.AddCommand(certRotateCmd)
 }
 
 func certRotateCmdFunc(flagsObj *flags) func(cmd *cobra.Command, args []string) error {
