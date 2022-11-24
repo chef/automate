@@ -55,6 +55,7 @@ const (
 	BACKENDCLEANUP_COMMANDS = `
 		sudo systemctl stop hab-sup;
 		sudo rm -rf /hab; 
+		sudo rm -rf /bin/hab;
 		sudo rm -rf /var/automate-ha;
 		`
 )
