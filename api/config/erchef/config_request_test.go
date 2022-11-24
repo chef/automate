@@ -50,4 +50,11 @@ func TestDefaultValues(t *testing.T) {
 	assert.Equal(t, int32(70), defaultValues.GetV1().GetSys().GetDataCollector().GetMaxConnectionDuration().GetValue())
 	assert.Equal(t, int32(10000), defaultValues.GetV1().GetSys().GetDataCollector().GetIbrowseTimeout().GetValue())
 
+	require.Equal(t, int32(0), defaultValues.GetV1().GetSys().GetAuthz().GetCleanupBatchSize().GetValue())
+
+	require.Equal(t, int32(900), defaultValues.GetV1().GetSys().GetApi().GetS3UrlTtl().GetValue())
+
+	require.Equal(t, int32(1), defaultValues.GetV1().GetSys().GetIBrowse().GetIbrowseMaxPipelineSize().GetValue())
+	require.Equal(t, int32(256), defaultValues.GetV1().GetSys().GetIBrowse().GetIbrowseMaxSessions().GetValue())
+
 }
