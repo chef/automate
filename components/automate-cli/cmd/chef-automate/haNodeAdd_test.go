@@ -170,9 +170,9 @@ func Test_addnode_Prompt(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247
+Automate => 10.1.0.247, 10.1.0.248
 Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114
+OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
 Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
 
 New nodes to be added:
@@ -221,9 +221,9 @@ func Test_addnode_Deploy_with_newOS_node(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247
+Automate => 10.1.0.247, 10.1.0.248
 Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114
+OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
 Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
 
 New nodes to be added:
@@ -273,9 +273,9 @@ func Test_addnode_Deploy_with_newOS_node_genconfig_error(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247
+Automate => 10.1.0.247, 10.1.0.248
 Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114
+OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
 Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
 
 New nodes to be added:
