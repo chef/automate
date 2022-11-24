@@ -36,6 +36,6 @@ The list of parameters are as follows:
 |
 |
 |
-
+|
 
 Click [here](https://docs.chef.io/server/ctl_chef_server/) for the detailed description of the above parameters.
