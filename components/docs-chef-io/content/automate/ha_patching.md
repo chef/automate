@@ -43,6 +43,6 @@ For Example: `chef-automate config patch --frontend /home/frontend.toml`
 
 {{< warning >}}
 
--   For certificate rotation, don't use config patch. Instead `cert-rotate` command can be used. To know more about certificate rotation click [here](/automate/ha_cert_rotaion)
+-   For certificate rotation, don't use `config patch`. Instead `cert-rotate` command can be used. To know more about certificate rotation click [here](/automate/ha_cert_rotaion)
 
 {{< /warning >}}
