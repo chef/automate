@@ -9,7 +9,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -240,20 +239,6 @@ func (dni *DeleteNodeImpl) validateCmdArgs(automateIpList, chefServerIpList, pos
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. Postgresql instance count cannot be less than %d. Final count %d not allowed.", POSTGRESQL_MIN_INSTANCE_COUNT, finalCount))
 		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(config.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlIp, "Postgresql"))
-	}
-	return errorList
-}
-
-func checkIfPresentInPrivateIPList(existingIPArray []string, ips []string, errorPrefix string) *list.List {
-	errorList := list.New()
-	prefixAdder := ""
-	if errorPrefix != "" {
-		prefixAdder = " "
-	}
-	for _, ip := range ips {
-		if !stringutils.SliceContains(existingIPArray, ip) {
-			errorList.PushBack(fmt.Sprintf("%s%sIp %s is not present in existing list of ip addresses. Please use a different private ip.", errorPrefix, prefixAdder, ip))
-		}
 	}
 	return errorList
 }

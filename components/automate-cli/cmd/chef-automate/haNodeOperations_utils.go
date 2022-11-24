@@ -1,10 +1,13 @@
 package main
 
 import (
+	"container/list"
 	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/chef/automate/lib/stringutils"
 )
 
 const TAINT_TERRAFORM = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
@@ -193,4 +196,18 @@ func isFinalInstanceCountAllowed(current string, additive int, minAllowed int) (
 		return false, final, nil
 	}
 	return true, final, nil
+}
+
+func checkIfPresentInPrivateIPList(existingIPArray []string, ips []string, errorPrefix string) *list.List {
+	errorList := list.New()
+	prefixAdder := ""
+	if errorPrefix != "" {
+		prefixAdder = " "
+	}
+	for _, ip := range ips {
+		if !stringutils.SliceContains(existingIPArray, ip) {
+			errorList.PushBack(fmt.Sprintf("%s%sIp %s is not present in existing list of ip addresses. Please use a different private ip.", errorPrefix, prefixAdder, ip))
+		}
+	}
+	return errorList
 }
