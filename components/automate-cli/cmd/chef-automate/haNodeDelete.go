@@ -14,62 +14,64 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func runDeleteNodeHACmd(c *cobra.Command, args []string) error {
-
-	if !isA2HARBFileExist() {
-		return errors.New(AUTOMATE_HA_INVALID_BASTION)
-	}
-	if addDeleteNodeHACmdFlags.automateIp == "" &&
-		addDeleteNodeHACmdFlags.chefServerIp == "" &&
-		addDeleteNodeHACmdFlags.opensearchIp == "" &&
-		addDeleteNodeHACmdFlags.postgresqlIp == "" {
-		c.Help()
-		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
-	}
-	configFilePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
-	if !checkIfFileExist(configFilePath) {
-		return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
-	}
-	// check deployment type AWS or ExistingInfra
-	deployerType, err := getModeFromConfig(configFilePath)
-	if err != nil {
-		return err
-	}
-	if deployerType == EXISTING_INFRA_MODE {
-		nodedeleter := NewDeleteNode(writer, addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath)
-		err := nodedeleter.validate()
+func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
+	return func(c *cobra.Command, args []string) error {
+		if !isA2HARBFileExist() {
+			return errors.New(AUTOMATE_HA_INVALID_BASTION)
+		}
+		if addDeleteNodeHACmdFlags.automateIp == "" &&
+			addDeleteNodeHACmdFlags.chefServerIp == "" &&
+			addDeleteNodeHACmdFlags.opensearchIp == "" &&
+			addDeleteNodeHACmdFlags.postgresqlIp == "" {
+			c.Help()
+			return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
+		}
+		configFilePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
+		if !checkIfFileExist(configFilePath) {
+			return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
+		}
+		// check deployment type AWS or ExistingInfra
+		deployerType, err := getModeFromConfig(configFilePath)
 		if err != nil {
 			return err
 		}
-		err = nodedeleter.modifyConfig()
-		if err != nil {
-			return err
-		}
-		if !addDeleteNodeHACmdFlags.autoAccept {
-			res, err := nodedeleter.promptUserConfirmation()
+		if deployerType == EXISTING_INFRA_MODE {
+			nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath)
+			err := nodedeleter.validate()
 			if err != nil {
 				return err
 			}
-			if !res {
-				return nil
+			err = nodedeleter.modifyConfig()
+			if err != nil {
+				return err
 			}
+			if !addDeleteNodeHACmdFlags.autoAccept {
+				res, err := nodedeleter.promptUserConfirmation()
+				if err != nil {
+					return err
+				}
+				if !res {
+					return nil
+				}
+			}
+			err = nodedeleter.runDeploy()
+			if err != nil {
+				return err
+			}
+		} else {
+			return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
 		}
-		err = nodedeleter.runDeploy()
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
+		return nil
 	}
-	return nil
 }
 
 func deleteNodeHACmd() *cobra.Command {
+	var addDeleteNodeHACmdFlags = AddDeleteNodeHACmdFlags{}
 	var deleteNodeHACmd = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete existing node in HA",
 		Long:  `Delete existing node in HA`,
-		RunE:  runDeleteNodeHACmd,
+		RunE:  runDeleteNodeHACmd(&addDeleteNodeHACmdFlags),
 	}
 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "new chef-server ip addresses")

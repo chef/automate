@@ -23,8 +23,6 @@ type AddDeleteNodeHACmdFlags struct {
 	autoAccept   bool
 }
 
-var addDeleteNodeHACmdFlags = AddDeleteNodeHACmdFlags{}
-
 var nodeCmd = &cobra.Command{
 	Use:    "node COMMAND",
 	Short:  "This command is used to add or delete HA nodes",
@@ -32,11 +30,12 @@ var nodeCmd = &cobra.Command{
 }
 
 func addNodeHACmd() *cobra.Command {
+	var addDeleteNodeHACmdFlags = AddDeleteNodeHACmdFlags{}
 	var addNodeHACmd = &cobra.Command{
 		Use:   "add",
 		Short: "Add new node in HA",
 		Long:  `Add new node in HA`,
-		RunE:  runAddNodeHACmd,
+		RunE:  runAddNodeHACmd(&addDeleteNodeHACmdFlags),
 	}
 	addNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
 	addNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "new chef-server ip addresses")
@@ -47,53 +46,55 @@ func addNodeHACmd() *cobra.Command {
 	return addNodeHACmd
 }
 
-func runAddNodeHACmd(c *cobra.Command, args []string) error {
-	if !isA2HARBFileExist() {
-		return errors.New(AUTOMATE_HA_INVALID_BASTION)
-	}
-	if addDeleteNodeHACmdFlags.automateIp == "" &&
-		addDeleteNodeHACmdFlags.chefServerIp == "" &&
-		addDeleteNodeHACmdFlags.opensearchIp == "" &&
-		addDeleteNodeHACmdFlags.postgresqlIp == "" {
-		c.Help()
-		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
-	}
-	configFilePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
-	if !checkIfFileExist(configFilePath) {
-		return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
-	}
-	// check deployment type AWS or ExistingInfra
-	deployerType, err := getModeFromConfig(configFilePath)
-	if err != nil {
-		return err
-	}
-	if deployerType == EXISTING_INFRA_MODE {
-		nodeAdder := NewAddNode(writer, addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath)
-		err := nodeAdder.validate()
+func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
+	return func(c *cobra.Command, args []string) error {
+		if !isA2HARBFileExist() {
+			return errors.New(AUTOMATE_HA_INVALID_BASTION)
+		}
+		if addDeleteNodeHACmdFlags.automateIp == "" &&
+			addDeleteNodeHACmdFlags.chefServerIp == "" &&
+			addDeleteNodeHACmdFlags.opensearchIp == "" &&
+			addDeleteNodeHACmdFlags.postgresqlIp == "" {
+			c.Help()
+			return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
+		}
+		configFilePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
+		if !checkIfFileExist(configFilePath) {
+			return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
+		}
+		// check deployment type AWS or ExistingInfra
+		deployerType, err := getModeFromConfig(configFilePath)
 		if err != nil {
 			return err
 		}
-		err = nodeAdder.modifyConfig()
-		if err != nil {
-			return err
-		}
-		if !addDeleteNodeHACmdFlags.autoAccept {
-			res, err := nodeAdder.promptUserConfirmation()
+		if deployerType == EXISTING_INFRA_MODE {
+			nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath)
+			err := nodeAdder.validate()
 			if err != nil {
 				return err
 			}
-			if !res {
-				return nil
+			err = nodeAdder.modifyConfig()
+			if err != nil {
+				return err
 			}
+			if !addDeleteNodeHACmdFlags.autoAccept {
+				res, err := nodeAdder.promptUserConfirmation()
+				if err != nil {
+					return err
+				}
+				if !res {
+					return nil
+				}
+			}
+			err = nodeAdder.runDeploy()
+			if err != nil {
+				return err
+			}
+		} else {
+			return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
 		}
-		err = nodeAdder.runDeploy()
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
+		return nil
 	}
-	return nil
 }
 
 type AddNodeImpl struct {
