@@ -21,6 +21,23 @@ const (
 	OPENSEARCH_MIN_INSTANCE_COUNT  = 3
 )
 
+func deleteNodeHACmd() *cobra.Command {
+	var addDeleteNodeHACmdFlags = AddDeleteNodeHACmdFlags{}
+	var deleteNodeHACmd = &cobra.Command{
+		Use:   "remove",
+		Short: "remove existing node in HA",
+		Long:  `remove existing node in HA`,
+		RunE:  runDeleteNodeHACmd(&addDeleteNodeHACmdFlags),
+	}
+	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "new chef-server ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "", "new opensearch ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "", "new postgresql ip addresses")
+	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
+
+	return deleteNodeHACmd
+}
+
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
 		if !isA2HARBFileExist() {
@@ -71,23 +88,6 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 		}
 		return nil
 	}
-}
-
-func deleteNodeHACmd() *cobra.Command {
-	var addDeleteNodeHACmdFlags = AddDeleteNodeHACmdFlags{}
-	var deleteNodeHACmd = &cobra.Command{
-		Use:   "remove",
-		Short: "remove existing node in HA",
-		Long:  `remove existing node in HA`,
-		RunE:  runDeleteNodeHACmd(&addDeleteNodeHACmdFlags),
-	}
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "new chef-server ip addresses")
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "", "new opensearch ip addresses")
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "", "new postgresql ip addresses")
-	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
-
-	return deleteNodeHACmd
 }
 
 type DeleteNodeImpl struct {
