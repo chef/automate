@@ -18,23 +18,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type flags struct {
-	automate    bool
-	chefserver  bool
-	postgres    bool
-	opensearch  bool
-	privateCert string
-	publicCert  string
-	rootCA      string
-	adminCert   string
-	adminKey    string
-	node        string
-}
-
-type certRotateFlow struct {
-	FileUtils fileutils.FileUtils
-}
-
 const (
 	FRONTEND_CONFIG = `
 	[[load_balancer.v1.sys.frontend_tls]]
@@ -111,6 +94,28 @@ const (
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 )
 
+type flags struct {
+	//SSH
+	automate   bool
+	chefserver bool
+	postgres   bool
+	opensearch bool
+
+	// Certificates
+	privateCert string
+	publicCert  string
+	rootCA      string
+	adminCert   string
+	adminKey    string
+
+	// Node
+	node string
+}
+
+type certRotateFlow struct {
+	FileUtils fileutils.FileUtils
+}
+
 func init() {
 	flagsObj := flags{}
 
@@ -137,6 +142,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.rootCA, "root-ca", "", "RootCA certificate")
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminCert, "admin-cert", "", "Admin certificate")
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminKey, "admin-key", "", "Admin Private certificate")
+
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.node, "node", "", "Node Ip address")
 }
 
