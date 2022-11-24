@@ -2,11 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"strings"
-
-	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
 type HAModifyAndDeploy interface {
@@ -18,65 +15,42 @@ type HAModifyAndDeploy interface {
 
 type MockNodeUtilsImpl struct {
 	readConfigfunc                            func(path string) (ExistingInfraConfigToml, error)
-	writeFilefunc                             func(tomlbytes []byte, filepath string) error
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
-	getHaInfraDetailsfunc                     func() (string, string, string, error)
-	connectAndExecuteCommandOnRemotefunc      func(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error)
+	getHaInfraDetailsfunc                     func() (*SSHConfig, error)
 	genConfigfunc                             func(path string) error
 }
 
 func (mnu *MockNodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
 	return mnu.readConfigfunc(path)
 }
-func (mnu *MockNodeUtilsImpl) writeFile(tomlbytes []byte, filepath string) error {
-	return mnu.writeFilefunc(tomlbytes, filepath)
-}
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	return mnu.executeAutomateClusterCtlCommandAsyncfunc(command, args, helpDocs)
 }
-func (mnu *MockNodeUtilsImpl) connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
-	return mnu.connectAndExecuteCommandOnRemotefunc(sshUser, sshPort, sshKeyFile, hostIP, remoteCommands)
-}
-func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (string, string, string, error) {
+func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()
 }
 func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
 	return mnu.genConfigfunc(path)
 }
 
-type NodeUtils interface {
+type NodeOpUtils interface {
 	readConfig(path string) (ExistingInfraConfigToml, error)
-	writeFile(tomlbytes []byte, filepath string) error
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
-	connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error)
-	getHaInfraDetails() (string, string, string, error)
+	getHaInfraDetails() (*SSHConfig, error)
 	genConfig(path string) error
 }
 
 type NodeUtilsImpl struct{}
 
-func NewNodeUtils() NodeUtils {
+func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
 }
 
 func (nu *NodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
 	return readConfig(path)
 }
-func (nu *NodeUtilsImpl) writeFile(tomlbytes []byte, filepath string) error {
-	return writeFile(tomlbytes, filepath)
-}
 func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs)
-}
-func (nu *NodeUtilsImpl) connectAndExecuteCommandOnRemote(sshUser string, sshPort string, sshKeyFile string, hostIP string, remoteCommands string) (string, error) {
-	sshconfig := &SSHConfig{
-		sshUser:    sshUser,
-		sshPort:    sshPort,
-		sshKeyFile: sshKeyFile,
-		hostIP:     hostIP,
-	}
-	sshUtil := NewSSHUtil(sshconfig)
-	return sshUtil.connectAndExecuteCommandOnRemote(remoteCommands, true)
 }
 
 func (nu *NodeUtilsImpl) genConfig(path string) error {
@@ -84,23 +58,17 @@ func (nu *NodeUtilsImpl) genConfig(path string) error {
 	return e.generateConfig()
 }
 
-func (nu *NodeUtilsImpl) getHaInfraDetails() (string, string, string, error) {
+func (nu *NodeUtilsImpl) getHaInfraDetails() (*SSHConfig, error) {
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
-		return "", "", "", err
+		return &SSHConfig{}, err
 	}
-	sshUser := infra.Outputs.SSHUser.Value
-	sskKeyFile := infra.Outputs.SSHKeyFile.Value
-	sshPort := infra.Outputs.SSHPort.Value
-	return sshUser, sskKeyFile, sshPort, nil
-}
-
-func writeFile(tomlbytes []byte, filepath string) error {
-	err := ioutil.WriteFile(filepath, tomlbytes, 0600) // nosemgrep
-	if err != nil {
-		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
+	sshconfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 	}
-	return nil
+	return sshconfig, nil
 }
 
 func trimSliceSpace(slc []string) []string {

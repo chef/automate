@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
@@ -36,7 +37,7 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 			return err
 		}
 		if deployerType == EXISTING_INFRA_MODE {
-			nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath)
+			nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath, &fileutils.FileSystemUtils{})
 			err := nodedeleter.validate()
 			if err != nil {
 				return err
@@ -89,18 +90,20 @@ type DeleteNodeImpl struct {
 	chefServerIpList        []string
 	opensearchIpList        []string
 	postgresqlIp            []string
-	nodeUtils               NodeUtils
+	nodeUtils               NodeOpUtils
 	flags                   AddDeleteNodeHACmdFlags
 	configpath              string
 	writer                  *cli.Writer
+	fileUtils               fileutils.FileUtils
 }
 
-func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeUtils, filepath string) HAModifyAndDeploy {
+func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, filepath string, fileutils fileutils.FileUtils) HAModifyAndDeploy {
 	return &DeleteNodeImpl{
 		flags:      flags,
 		writer:     writer,
 		nodeUtils:  nodeUtils,
 		configpath: filepath,
+		fileUtils:  fileutils,
 	}
 }
 
@@ -172,7 +175,7 @@ func (dni *DeleteNodeImpl) runDeploy() error {
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
 	}
-	err = dni.nodeUtils.writeFile(tomlbytes, dni.configpath)
+	err = dni.fileUtils.WriteToFile(dni.configpath, tomlbytes)
 	if err != nil {
 		return err
 	}

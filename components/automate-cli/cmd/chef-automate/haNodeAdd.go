@@ -10,6 +10,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	cli "github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/spf13/cobra"
@@ -68,8 +69,9 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 			return err
 		}
 		if deployerType == EXISTING_INFRA_MODE {
-			nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath)
-			err := nodeAdder.validate()
+			sshconfig := &SSHConfig{}
+			nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath, &fileutils.FileSystemUtils{}, NewSSHUtil(sshconfig))
+			err = nodeAdder.validate()
 			if err != nil {
 				return err
 			}
@@ -104,18 +106,22 @@ type AddNodeImpl struct {
 	chefServerIpList        []string
 	opensearchIpList        []string
 	postgresqlIp            []string
-	nodeUtils               NodeUtils
+	nodeUtils               NodeOpUtils
 	flags                   AddDeleteNodeHACmdFlags
 	configpath              string
 	writer                  *cli.Writer
+	fileutils               fileutils.FileUtils
+	sshUtil                 SSHUtil
 }
 
-func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeUtils, filepath string) HAModifyAndDeploy {
+func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, filepath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
 	return &AddNodeImpl{
 		flags:      flags,
 		writer:     writer,
 		nodeUtils:  nodeUtils,
 		configpath: filepath,
+		fileutils:  fileUtils,
+		sshUtil:    sshUtil,
 	}
 }
 
@@ -189,7 +195,7 @@ func (ani *AddNodeImpl) runDeploy() error {
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
 	}
-	err = ani.nodeUtils.writeFile(tomlbytes, ani.configpath)
+	err = ani.fileutils.WriteToFile(ani.configpath, tomlbytes)
 	if err != nil {
 		return err
 	}
@@ -244,11 +250,13 @@ func (ani *AddNodeImpl) validateIPAddresses(config ExistingInfraConfigToml, ips 
 }
 
 func (ani *AddNodeImpl) validateConnection(ip string) error {
-	sshUser, sskKeyFile, sshPort, err := ani.nodeUtils.getHaInfraDetails()
+	sshConfig, err := ani.nodeUtils.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
-	_, err = ani.nodeUtils.connectAndExecuteCommandOnRemote(sshUser, sshPort, sskKeyFile, ip, "sudo echo 1")
+	sshConfig.hostIP = ip
+	ani.sshUtil.setSSHConfig(sshConfig)
+	_, err = ani.sshUtil.connectAndExecuteCommandOnRemote("sudo echo 1", true)
 	if err != nil {
 		return err
 	}
