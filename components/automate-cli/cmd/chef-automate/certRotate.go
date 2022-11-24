@@ -267,11 +267,11 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 		return nil
 	}
 	// Patching root-ca to frontend-nodes for maintaining the connection.
-	filename_fe := "pg_fe.toml"
+	filenameFe := "pg_fe.toml"
 	remoteService = "frontend"
 	// Creating and patching the required configurations.
-	config_fe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, certs.rootCA)
-	err = c.patchConfig(sshUtil, config_fe, filename_fe, timestamp, remoteService, infra, flagsObj)
+	configFe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, certs.rootCA)
+	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -288,15 +288,15 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	remoteService := "opensearch"
 
 	e := existingInfra{}
-	var admin_dn pkix.Name
+	var adminDn pkix.Name
 	var err error
 	if flagsObj.node == "" {
-		admin_dn, err = e.getDistinguishedNameFromKey(certs.adminCert)
+		adminDn, err = e.getDistinguishedNameFromKey(certs.adminCert)
 		if err != nil {
 			return err
 		}
 	}
-	nodes_dn, err := e.getDistinguishedNameFromKey(certs.publicCert)
+	nodesDn, err := e.getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
 		return err
 	}
@@ -304,9 +304,9 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	// Creating and patching the required configurations.
 	var config string
 	if flagsObj.node != "" {
-		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", nodes_dn))
+		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", nodesDn))
 	} else {
-		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", admin_dn), fmt.Sprintf("%v", nodes_dn))
+		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
 	}
 	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
@@ -314,18 +314,18 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	}
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
-	cn := nodes_dn.CommonName
-	filename_fe := "os_fe.toml"
+	cn := nodesDn.CommonName
+	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
 	// Creating and patching the required configurations.
-	var config_fe string
+	var configFe string
 	if flagsObj.node != "" {
-		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
+		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
 	} else {
-		config_fe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
+		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
 	}
-	err = c.patchConfig(sshUtil, config_fe, filename_fe, timestamp, remoteService, infra, flagsObj)
+	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
 		log.Fatal(err)
 	}
