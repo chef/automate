@@ -23,7 +23,7 @@ Typically these two clusters should be located in different data centers or clou
 
 ### Requirements
 
-1. The location of the two identical clusters is in different cloud provider regions.
+1. Two identical clusters located in different AWS regions.
 1. Amazon S3 access in both regions for Application backup.
 1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
@@ -50,7 +50,7 @@ When the primary cluster fails, accomplish the failover by updating DNS records 
 
 1. Deploy the Disaster Recovery cluster into a different data center/region using the same steps as the Primary cluster
 
-1. Do the backup configuration as explained in the backup section for [object storage](/automate/ha_backup_restore_aws_s3/).
+1. Do the backup configuration only when you have not provided the (backup information) configuration at the time of deployment. Refer backup section for [object storage](/automate/ha_backup_restore_aws_s3/).
 
     {{< note >}}
     - During the deployment for the Primary and DR clusters, use the same S3 bucket name.
