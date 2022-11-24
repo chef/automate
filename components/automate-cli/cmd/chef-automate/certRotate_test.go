@@ -213,10 +213,10 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "All paths given and flag is automate service",
 			flagsObj: flags{
-				automate:    true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				rootCA:      ValidCertPath,
+				automate:        true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				rootCAPath:      ValidCertPath,
 			},
 			rootCaWant:      FileContent,
 			publicCertWant:  FileContent,
@@ -228,10 +228,10 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "All paths given except root-ca flag is automate service and node flag given",
 			flagsObj: flags{
-				automate:    true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				node:        "ip-given",
+				automate:        true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				node:            "ip-given",
 			},
 			rootCaWant:      "",
 			publicCertWant:  FileContent,
@@ -243,12 +243,12 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "All paths given and flag is opensearch service",
 			flagsObj: flags{
-				opensearch:  true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				rootCA:      ValidCertPath,
-				adminCert:   ValidCertPath,
-				adminKey:    ValidCertPath,
+				opensearch:      true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				rootCAPath:      ValidCertPath,
+				adminCertPath:   ValidCertPath,
+				adminKeyPath:    ValidCertPath,
 			},
 			rootCaWant:      FileContent,
 			publicCertWant:  FileContent,
@@ -270,10 +270,10 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "some invalid paths given and flag is automate service",
 			flagsObj: flags{
-				automate:    true,
-				privateCert: ValidCertPath,
-				publicCert:  "./xyx-cert.go",
-				rootCA:      ValidCertPath,
+				automate:        true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  "./xyx-cert.go",
+				rootCAPath:      ValidCertPath,
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -285,10 +285,10 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "All paths given but invalid (file not exist in (f.s)and flag is automate service",
 			flagsObj: flags{
-				automate:    true,
-				privateCert: "./xyz.go",
-				publicCert:  "./xyz.go",
-				rootCA:      "./xyx.go",
+				automate:        true,
+				privateCertPath: "./xyz.go",
+				publicCertPath:  "./xyz.go",
+				rootCAPath:      "./xyx.go",
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -300,9 +300,9 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "All paths given except root-ca and flag is automate service",
 			flagsObj: flags{
-				automate:    true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
+				automate:        true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -314,10 +314,10 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "All paths given but root-ca path is invalid(file not exist) flag is automate service",
 			flagsObj: flags{
-				automate:    true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				rootCA:      "./xyx-cert.go",
+				automate:        true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				rootCAPath:      "./xyx-cert.go",
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -329,12 +329,12 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "Some mandatory path not given and flag is opensearch service",
 			flagsObj: flags{
-				opensearch:  true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				rootCA:      ValidCertPath,
-				adminCert:   ValidCertPath,
-				adminKey:    "",
+				opensearch:      true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				rootCAPath:      ValidCertPath,
+				adminCertPath:   ValidCertPath,
+				adminKeyPath:    "",
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -346,12 +346,12 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "Invalid adminCert path and flag is opensearch service",
 			flagsObj: flags{
-				opensearch:  true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				rootCA:      ValidCertPath,
-				adminCert:   "./xyz-cert.go",
-				adminKey:    ValidCertPath,
+				opensearch:      true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				rootCAPath:      ValidCertPath,
+				adminCertPath:   "./xyz-cert.go",
+				adminKeyPath:    ValidCertPath,
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -363,12 +363,12 @@ func TestGetCerts(t *testing.T) {
 		{
 			testCaseDescription: "Invalid adminKey path and flag is opensearch service",
 			flagsObj: flags{
-				opensearch:  true,
-				privateCert: ValidCertPath,
-				publicCert:  ValidCertPath,
-				rootCA:      ValidCertPath,
-				adminCert:   ValidCertPath,
-				adminKey:    "./xyz-cert.go",
+				opensearch:      true,
+				privateCertPath: ValidCertPath,
+				publicCertPath:  ValidCertPath,
+				rootCAPath:      ValidCertPath,
+				adminCertPath:   ValidCertPath,
+				adminKeyPath:    "./xyz-cert.go",
 			},
 			rootCaWant:      "",
 			publicCertWant:  "",
@@ -381,17 +381,21 @@ func TestGetCerts(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			rootCaGot, publicCertGot, privateCertGot, adminCertGot, adminKeyGot, err := c.getCerts(infra, &tc.flagsObj)
+			certsGot, err := c.getCerts(infra, &tc.flagsObj)
 			if tc.isError {
 				assert.Error(t, err)
+				assert.Nil(t, certsGot)
 			} else {
 				assert.NoError(t, err)
+				assert.NotNil(t, certsGot)
 			}
-			assert.Equal(t, tc.rootCaWant, rootCaGot)
-			assert.Equal(t, tc.publicCertWant, publicCertGot)
-			assert.Equal(t, tc.privateCertWant, privateCertGot)
-			assert.Equal(t, tc.adminCertWant, adminCertGot)
-			assert.Equal(t, tc.adminKeyWant, adminKeyGot)
+			if certsGot != nil {
+				assert.Equal(t, tc.rootCaWant, certsGot.rootCA)
+				assert.Equal(t, tc.publicCertWant, certsGot.publicCert)
+				assert.Equal(t, tc.privateCertWant, certsGot.privateCert)
+				assert.Equal(t, tc.adminCertWant, certsGot.adminCert)
+				assert.Equal(t, tc.adminKeyWant, certsGot.adminKey)
+			}
 		})
 	}
 }
