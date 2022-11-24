@@ -50,7 +50,7 @@ admin_password = "chefautomate"
 fqdn = "A2-3d694a9d-automate-lb-304279661.ap-south-1.elb.amazonaws.com"
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
-instance_count = "1"
+instance_count = "2"
 
 ## === ===
 
@@ -66,6 +66,11 @@ private_key = """test_private_key"""
 
 [[automate.config.certs_by_ip]]
 ip = "10.1.0.247"
+public_key = """test_pub_key"""
+private_key = """test_private_key"""
+
+[[automate.config.certs_by_ip]]
+ip = "10.1.0.248"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
@@ -91,7 +96,7 @@ private_key = """test_private_key"""
 ## === INPUT NEEDED ===
 
 # No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
-instance_count = "3"
+instance_count = "4"
 
 # Add OpenSearch load balancer root-ca and keys
 enable_custom_certs = true
@@ -116,6 +121,11 @@ private_key = """test_private_key"""
 
 [[opensearch.config.certs_by_ip]]
 ip = "10.1.2.114"
+public_key = """test_pub_key"""
+private_key = """test_private_key"""
+
+[[opensearch.config.certs_by_ip]]
+ip = "10.1.2.115"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
@@ -156,7 +166,7 @@ private_key = """test_private_key"""
 # provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
 # No of ip address should be same as No of instance_count count mentioned above in
 # automate.config, chef_server.config, opensearch.config and postgresql.config
-automate_private_ips = ["10.1.0.247"]
+automate_private_ips = ["10.1.0.247","10.1.0.248"]
 chef_server_private_ips = ["10.1.0.80"]
-opensearch_private_ips = ["10.1.0.6","10.1.1.253","10.1.2.114"]
+opensearch_private_ips = ["10.1.0.6","10.1.1.253","10.1.2.114","10.1.2.115"]
 postgresql_private_ips = ["10.1.0.134","10.1.1.196","10.1.2.163"]

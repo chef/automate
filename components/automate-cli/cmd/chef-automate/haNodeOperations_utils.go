@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
 
+const TAINT_TERRAFORM = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
+
 type HAModifyAndDeploy interface {
+	prepare() error
 	validate() error
 	modifyConfig() error
 	promptUserConfirmation() (bool, error)
@@ -18,6 +22,7 @@ type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
 	getHaInfraDetailsfunc                     func() (*SSHConfig, error)
 	genConfigfunc                             func(path string) error
+	taintTerraformFunc                        func() error
 }
 
 func (mnu *MockNodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
@@ -32,18 +37,26 @@ func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*SSHConfig, error) {
 func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
 	return mnu.genConfigfunc(path)
 }
+func (mnu *MockNodeUtilsImpl) taintTerraform() error {
+	return mnu.taintTerraformFunc()
+}
 
 type NodeOpUtils interface {
 	readConfig(path string) (ExistingInfraConfigToml, error)
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*SSHConfig, error)
 	genConfig(path string) error
+	taintTerraform() error
 }
 
 type NodeUtilsImpl struct{}
 
 func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
+}
+
+func (nu *NodeUtilsImpl) taintTerraform() error {
+	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform"))
 }
 
 func (nu *NodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
@@ -168,4 +181,16 @@ func splitIPCSV(automateIp, chefserverIp, opensearchIp, postgresIp string) (auto
 		postgresqlIp = trimSliceSpace(postgresqlIp)
 	}
 	return
+}
+
+func isFinalInstanceCountAllowed(current string, additive int, minAllowed int) (bool, int, error) {
+	i, err := strconv.Atoi(current)
+	if err != nil {
+		return false, -1, err
+	}
+	final := i + additive
+	if final < minAllowed {
+		return false, final, nil
+	}
+	return true, final, nil
 }

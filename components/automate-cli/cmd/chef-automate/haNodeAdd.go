@@ -88,6 +88,7 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 					return nil
 				}
 			}
+			nodeAdder.prepare()
 			err = nodeAdder.runDeploy()
 			if err != nil {
 				return err
@@ -123,6 +124,10 @@ func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils Nod
 		fileutils:  fileUtils,
 		sshUtil:    sshUtil,
 	}
+}
+
+func (ani *AddNodeImpl) prepare() error {
+	return ani.nodeUtils.taintTerraform()
 }
 
 func (ani *AddNodeImpl) validate() error {

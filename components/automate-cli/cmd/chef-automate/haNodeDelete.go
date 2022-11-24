@@ -15,6 +15,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	AUTOMATE_MIN_INSTANCE_COUNT    = 1
+	CHEF_SERVER_MIN_INSTANCE_COUNT = 1
+	POSTGRESQL_MIN_INSTANCE_COUNT  = 3
+	OPENSEARCH_MIN_INSTANCE_COUNT  = 3
+)
+
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
 		if !isA2HARBFileExist() {
@@ -55,6 +62,7 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 					return nil
 				}
 			}
+			nodedeleter.prepare()
 			err = nodedeleter.runDeploy()
 			if err != nil {
 				return err
@@ -105,6 +113,10 @@ func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils 
 		configpath: filepath,
 		fileUtils:  fileutils,
 	}
+}
+
+func (dni *DeleteNodeImpl) prepare() error {
+	return dni.nodeUtils.taintTerraform()
 }
 
 func (dni *DeleteNodeImpl) validate() error {
@@ -190,15 +202,43 @@ func (dni *DeleteNodeImpl) runDeploy() error {
 func (dni *DeleteNodeImpl) validateCmdArgs(automateIpList, chefServerIpList, postgresqlIp, opensearchIpList []string, config ExistingInfraConfigToml) *list.List {
 	errorList := list.New()
 	if len(automateIpList) > 0 {
+		allowed, finalCount, err := isFinalInstanceCountAllowed(dni.config.Automate.Config.InstanceCount, -len(automateIpList), AUTOMATE_MIN_INSTANCE_COUNT)
+		if err != nil {
+			errorList.PushBack("Error occurred in calculating automate final instance count")
+		}
+		if !allowed {
+			errorList.PushBack(fmt.Sprintf("Unable to remove node. Automate instance count cannot be less than %d. Final count %d not allowed.", AUTOMATE_MIN_INSTANCE_COUNT, finalCount))
+		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(config.ExistingInfra.Config.AutomatePrivateIps, automateIpList, "Automate"))
 	}
 	if len(chefServerIpList) > 0 {
+		allowed, finalCount, err := isFinalInstanceCountAllowed(dni.config.ChefServer.Config.InstanceCount, -len(chefServerIpList), CHEF_SERVER_MIN_INSTANCE_COUNT)
+		if err != nil {
+			errorList.PushBack("Error occurred in calculating chef server final instance count")
+		}
+		if !allowed {
+			errorList.PushBack(fmt.Sprintf("Unable to remove node. Chef Server instance count cannot be less than %d. Final count %d not allowed.", CHEF_SERVER_MIN_INSTANCE_COUNT, finalCount))
+		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(config.ExistingInfra.Config.ChefServerPrivateIps, chefServerIpList, "Chef-Server"))
 	}
 	if len(opensearchIpList) > 0 {
+		allowed, finalCount, err := isFinalInstanceCountAllowed(dni.config.Opensearch.Config.InstanceCount, -len(opensearchIpList), OPENSEARCH_MIN_INSTANCE_COUNT)
+		if err != nil {
+			errorList.PushBack("Error occurred in calculating opensearch final instance count")
+		}
+		if !allowed {
+			errorList.PushBack(fmt.Sprintf("Unable to remove node. OpenSearch instance count cannot be less than %d. Final count %d not allowed.", OPENSEARCH_MIN_INSTANCE_COUNT, finalCount))
+		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(config.ExistingInfra.Config.OpensearchPrivateIps, opensearchIpList, "OpenSearch"))
 	}
 	if len(postgresqlIp) > 0 {
+		allowed, finalCount, err := isFinalInstanceCountAllowed(dni.config.Postgresql.Config.InstanceCount, -len(postgresqlIp), POSTGRESQL_MIN_INSTANCE_COUNT)
+		if err != nil {
+			errorList.PushBack("Error occurred in calculating postgresql final instance count")
+		}
+		if !allowed {
+			errorList.PushBack(fmt.Sprintf("Unable to remove node. Postgresql instance count cannot be less than %d. Final count %d not allowed.", POSTGRESQL_MIN_INSTANCE_COUNT, finalCount))
+		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(config.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlIp, "Postgresql"))
 	}
 	return errorList

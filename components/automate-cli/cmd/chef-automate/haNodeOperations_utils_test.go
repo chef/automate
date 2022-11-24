@@ -118,3 +118,15 @@ func Test_splitIPCSV(t *testing.T) {
 	assert.Equal(t, []string{"10.2.43.4", "10.4.31.2"}, opensearchIpList)
 	assert.Equal(t, []string{"10.2.3.99", "10.4.3.200"}, postgresqlIp)
 }
+
+func Test_isFinalInstanceCountAllowed(t *testing.T) {
+	allowed, finalcount, err := isFinalInstanceCountAllowed("3", -1, 3)
+	assert.NoError(t, err)
+	assert.False(t, allowed)
+	assert.Equal(t, 2, finalcount)
+
+	allowed, finalcount, err = isFinalInstanceCountAllowed("5", -2, 3)
+	assert.NoError(t, err)
+	assert.True(t, allowed)
+	assert.Equal(t, 3, finalcount)
+}

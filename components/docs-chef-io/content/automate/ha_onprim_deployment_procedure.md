@@ -507,6 +507,10 @@ Once the command will execute, it will remove the supplied nodes from your autom
 
 {{< note >}} 
 - The ip's which are provided needs to be associated with a node in your HA setup.
+- Automate instance count cannot be less than 1.
+- Chef Server instance count cannot be less than 1.
+- Opensearch instance count cannot be less than 3.
+- Postgresql instance count cannot be less than 3.
 {{< /note >}}
 
 If you encounter any problems executing the above steps please refer the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
