@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -10,6 +11,78 @@ import (
 	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/toml"
 )
+
+var tfVarRbTemp = `
+require 'json'
+
+%s
+
+puts({
+    :region => region,
+    :endpoint => endpoint,
+    :secret_key => secret_key,
+    :access_key => access_key,
+    :bucket_name => bucket_name,
+    :ssh_key_file => ssh_key_file,
+    :ssh_port => ssh_port,
+    :ssh_user => ssh_user,
+    :habitat_uid_gid => habitat_uid_gid,
+    :postgresql_archive_disk_fs_path => postgresql_archive_disk_fs_path,
+    :postgresql_instance_count => postgresql_instance_count,
+    :nfs_mount_path => nfs_mount_path,
+    :opensearch_certs_by_ip => opensearch_certs_by_ip,
+    :postgresql_certs_by_ip => postgresql_certs_by_ip,
+    :chef_server_certs_by_ip => chef_server_certs_by_ip,
+    :automate_certs_by_ip => automate_certs_by_ip,
+    :opensearch_nodes_dn => opensearch_nodes_dn,
+    :opensearch_admin_dn => opensearch_admin_dn,
+    :opensearch_custom_certs_enabled => opensearch_custom_certs_enabled,
+    :postgresql_custom_certs_enabled => postgresql_custom_certs_enabled,
+    :chef_server_custom_certs_enabled => chef_server_custom_certs_enabled,
+    :automate_custom_certs_enabled => automate_custom_certs_enabled,
+    :postgresql_public_key => postgresql_public_key,
+    :opensearch_admin_cert => opensearch_admin_cert,
+    :opensearch_public_key => opensearch_public_key,
+    :chef_server_public_key => chef_server_public_key,
+    :automate_public_key => automate_public_key,
+    :postgresql_private_key => postgresql_private_key,
+    :opensearch_private_key => opensearch_private_key,
+    :opensearch_admin_key => opensearch_admin_key,
+    :chef_server_private_key => chef_server_private_key,
+    :automate_private_key => automate_private_key,
+    :postgresql_root_ca => postgresql_root_ca,
+    :opensearch_root_ca => opensearch_root_ca,
+    :automate_root_ca => automate_root_ca,
+    :opensearch_instance_count => opensearch_instance_count,
+    :chef_server_instance_count => chef_server_instance_count,
+    :automate_instance_count => automate_instance_count,
+    :automate_fqdn => automate_fqdn,
+    :automate_config_file => automate_config_file,
+    :opensearch_root_cert => opensearch_root_cert,
+    :postgresql_root_cert => postgresql_root_cert,
+    :managed_rds_postgresql_certificate => managed_rds_postgresql_certificate,
+    :managed_rds_dbuser_password => managed_rds_dbuser_password,
+    :managed_rds_dbuser_username => managed_rds_dbuser_username,
+    :managed_rds_superuser_password => managed_rds_superuser_password,
+    :managed_rds_superuser_username => managed_rds_superuser_username,
+    :managed_rds_instance_url => managed_rds_instance_url,
+    :os_snapshot_user_access_key_secret => os_snapshot_user_access_key_secret,
+    :os_snapshot_user_access_key_id => os_snapshot_user_access_key_id,
+    :aws_os_snapshot_role_arn => aws_os_snapshot_role_arn,
+    :managed_opensearch_certificate => managed_opensearch_certificate,
+    :managed_opensearch_user_password => managed_opensearch_user_password,
+    :managed_opensearch_username => managed_opensearch_username,
+    :managed_opensearch_domain_url => managed_opensearch_domain_url,
+    :managed_opensearch_domain_name => managed_opensearch_domain_name,
+    :setup_self_managed_services => setup_self_managed_services,
+    :setup_managed_services => setup_managed_services,
+    :existing_postgresql_private_ips => existing_postgresql_private_ips,
+    :existing_opensearch_private_ips => existing_opensearch_private_ips,
+    :existing_chef_server_private_ips => existing_chef_server_private_ips,
+    :existing_automate_private_ips => existing_automate_private_ips,
+    :backup_config_s3 => backup_config_s3,
+}.to_json)
+`
 
 type ConfigKeys struct {
 	rootCA     string
@@ -243,4 +316,30 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 		}
 	}
 	return ""
+}
+
+func readTerraformTfVarsFile() {
+	contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars"))
+	if err != nil {
+		writer.Println(err.Error())
+	}
+	rbScript := fmt.Sprintf(tfVarRbTemp, string(contentByte))
+	filenamePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "tfvar_json_script.rb")
+	err = ioutil.WriteFile(filenamePath, []byte(rbScript), 777)
+	if err != nil {
+		writer.Println(err.Error())
+	}
+
+	pkgcmd := "HAB_LICENSE=accept-no-persist hab pkg path core/ruby30"
+	out, err := exec.Command("/bin/sh", "-c", pkgcmd).Output()
+	if err != nil {
+		writer.Fail(err.Error())
+	}
+	rubuyBin := string(out)
+	rubuyBin = rubuyBin + "/hab/pkgs/core/ruby30/3.0.3/20220312100602/bin/ruby"
+	err = executeCommand("/hab/pkgs/core/ruby30/3.0.3/20220312100602/bin/ruby", []string{filenamePath}, "")
+	if err != nil {
+		writer.Println(err.Error())
+	}
+
 }
