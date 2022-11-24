@@ -161,7 +161,7 @@ func certRotateCmdFunc(flagsObj *flags) func(cmd *cobra.Command, args []string) 
 	}
 }
 
-// This function will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
+// certRotate will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj *flags) error {
 	if isA2HARBFileExist() {
 		infra, err := getAutomateHAInfraDetails()
@@ -207,7 +207,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 	return nil
 }
 
-// This function will rotate the certificates of Automate and Chef Infra Server,
+// certRotateFrontend will rotate the certificates of Automate and Chef Infra Server.
 func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *flags) error {
 	fileName := "cert-rotate-fe.toml"
 	timestamp := time.Now().Format("20060102150405")
@@ -240,7 +240,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	return nil
 }
 
-// This function will rotate the certificates of Postgres
+// certRotatePG will rotate the certificates of Postgres.
 func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *flags) error {
 	if isManagedServicesOn() {
 		return errors.New("You can not rotate certs for AWS managed services")
@@ -278,7 +278,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	return nil
 }
 
-// This function will rotate the certificates of OpenSearch
+// certRotateOS will rotate the certificates of OpenSearch.
 func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *flags) error {
 	if isManagedServicesOn() {
 		return errors.New("You can not rotate certs for AWS managed services")
@@ -332,7 +332,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	return nil
 }
 
-// This function will patch the configurations to required nodes.
+// patchConfig will patch the configurations to required nodes.
 func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails, flagsObj *flags) error {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -372,7 +372,7 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 	return nil
 }
 
-// This function will rotate the root-ca in the ChefServer to maintain the connection
+// patchRootCAinCS will rotate the root-ca in the ChefServer to maintain the connection.
 func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomteHAInfraDetails, flagsObj *flags) error {
 
 	fileName := "rotate-root_CA.toml"
@@ -396,7 +396,7 @@ func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp stri
 	return nil
 }
 
-// This function will copy the toml file to each required node and then execute the set of commands.
+// copyAndExecute will copy the toml file to each required node and then execute the set of commands.
 func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *flags) error {
 
 	var err error
@@ -430,6 +430,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 	return nil
 }
 
+// validateEachIp validate given ip with the remoteService cluster.
 func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomteHAInfraDetails, flagsObj *flags) bool {
 	ips := c.getIps(remoteService, infra)
 	for i := 0; i < len(ips); i++ {
@@ -440,7 +441,7 @@ func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomteHAIn
 	return false
 }
 
-// This function will return the SSH details.
+// getSshDetails will return the SSH details.
 func (c *certRotateFlow) getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
@@ -450,7 +451,7 @@ func (c *certRotateFlow) getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig 
 	return sshConfig
 }
 
-// This function will return the Ips based on the given remote service.
+// getIps will return the Ips based on the given remote service.
 func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetails) []string {
 	if remoteService == "automate" {
 		return infra.Outputs.AutomatePrivateIps.Value
@@ -466,7 +467,7 @@ func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetai
 	return []string{}
 }
 
-// This function will read the certificate paths, and then return the required certificates.
+// getCerts will read the certificate paths, and then return the required certificates.
 func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags) (*certificates, error) {
 	privateCertPath := flagsObj.privateCertPath
 	publicCertPath := flagsObj.publicCertPath
@@ -554,7 +555,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 	return certs, nil
 }
 
-// This function will read the certificate from the given path (local or remote).
+// getCertFromFile will read the certificate from the given path (local or remote).
 func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, error) {
 	certPath = strings.TrimSpace(certPath)
 	// Checking if the given path is remote or local.
@@ -578,7 +579,7 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 	return c.FileUtils.ReadFile(certPath)
 }
 
-// Get the remote file details from path.
+// GetRemoteFileDetails returns the remote file details from the remotePath.
 func (c *certRotateFlow) GetRemoteFileDetails(remotePath string) (string, string, string, error) {
 	// Get Host IP from the given path and validate it.
 	hostIP := c.GetIPV4(remotePath)
@@ -604,25 +605,30 @@ func (c *certRotateFlow) GetRemoteFileDetails(remotePath string) (string, string
 	return remoteFilePath, fileName, hostIP, nil
 }
 
-// Path should be in this format <IPv4>:<PathToFile>
-// Example, 10.1.0.234:/home/ec2-user/certs/public.pem
+/*
+IsRemotePath checks whether given path is valid remote path.
+Path should be in this format <IPv4>:<PathToFile>.
+
+Example: 10.1.0.234:/home/ec2-user/certs/public.pem
+*/
 func (c *certRotateFlow) IsRemotePath(path string) bool {
 	pattern := regexp.MustCompile(`^` + IP_V4_REGEX + `:`)
 	return pattern.MatchString(path)
 }
 
+// GetIPV4 returns ip from given path.
 func (c *certRotateFlow) GetIPV4(path string) string {
 	pattern := regexp.MustCompile(IP_V4_REGEX)
 	return pattern.FindString(path)
 }
 
 /*
-	If we are working on backend service, then first we have to get the applied configurations
+getMerger will create the new toml file which includes old and new configurations.
 
+If we are working on backend service, then first we have to get the applied configurations
 and then merge it with new configurations, then apply that configuration.
 Because if we directly apply the new configurations, then the old applied configurations will be gone.
 So, we have to retain the old configurations also.
-This function will create the new toml file which includes old and new configurations.
 */
 func (c *certRotateFlow) getMerger(fileName string, timestamp string, remoteType string, config string, sshUtil SSHUtil) (string, error) {
 	tomlFile := fileName + timestamp
