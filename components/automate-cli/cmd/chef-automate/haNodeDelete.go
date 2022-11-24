@@ -69,9 +69,9 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 func deleteNodeHACmd() *cobra.Command {
 	var addDeleteNodeHACmdFlags = AddDeleteNodeHACmdFlags{}
 	var deleteNodeHACmd = &cobra.Command{
-		Use:   "delete",
-		Short: "Delete existing node in HA",
-		Long:  `Delete existing node in HA`,
+		Use:   "remove",
+		Short: "remove existing node in HA",
+		Long:  `remove existing node in HA`,
 		RunE:  runDeleteNodeHACmd(&addDeleteNodeHACmdFlags),
 	}
 	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
