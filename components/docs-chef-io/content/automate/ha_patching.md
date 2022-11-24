@@ -17,13 +17,13 @@ Patching new configuration in all nodes can be done from bastion server. This pa
 
 The available flags are listed below:
 
-| Flag          | Duplicate | Shorthand | Usage                                                                              |
-| ------------- | --------- | --------- | ---------------------------------------------------------------------------------- |
-| --automate    | --a2      | -a        | Patch configuration to all the Automate nodes.                                     |
-| --chef_server | --cs      | -c        | Patch configuration to all the Chef Server nodes.                                  |
-| --frontend    | --fe      | -f        | Patch configuration to all the Frontend nodes. (Includes Automate and Chef Server) |
-| --postgresql  | --pg      | -p        | Patch configuration to the PostgresQL cluser.                                      |
-| --opensearch  | --os      | -o        | Patch configuration to the OpenSearch cluser.                                      |
+| Flag           | Duplicate | Shorthand | Usage                                                                              |
+| -------------- | --------- | --------- | ---------------------------------------------------------------------------------- |
+| - -automate    | - -a2     | -a        | Patch configuration to all the Automate nodes.                                     |
+| - -chef_server | - -cs     | -c        | Patch configuration to all the Chef Server nodes.                                  |
+| - -frontend    | - -fe     | -f        | Patch configuration to all the Frontend nodes. (Includes Automate and Chef Server) |
+| - -postgresql  | - -pg     | -p        | Patch configuration to the PostgresQL cluser.                                      |
+| - -opensearch  | - -os     | -o        | Patch configuration to the OpenSearch cluser.                                      |
 
 You can use the above patches using the following format:
 
