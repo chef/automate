@@ -42,7 +42,7 @@ When the primary cluster fails, accomplish the failover by updating DNS records 
 
 - Running two parallel clusters can be expensive.
 - The amount of data loss will depend on how frequently backups are performed in the Primary cluster.
-- Changing DNS records from the Primary loadbalancer to the Disaster Recovery loadbalancer can take time to propagate through the network.
+- Changing DNS records from the Primary load-balancer to the Disaster Recovery load-balancer can take time to propagate through the network.
 
 ### Steps to set up the Production and Disaster Recovery Cluster
 
