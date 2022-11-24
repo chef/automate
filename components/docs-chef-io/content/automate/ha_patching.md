@@ -40,3 +40,9 @@ For Example: `chef-automate config patch --frontend /home/frontend.toml`
 -   After patching some services will go restart. So the health status will take upto 2 minutes to show healthy.
 
 {{< /note >}}
+
+{{< warning >}}
+
+-   For certificate rotation, don't use config patch. Instead `cert-rotate` command can be used. To know more about certificate rotation click [here](/automate/ha_cert_rotaion)
+
+{{< /warning >}}
