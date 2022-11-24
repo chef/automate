@@ -25,6 +25,7 @@ func NewConfigRequest() *ConfigRequest {
 				DataCollector: &ConfigRequest_V1_System_DataCollector{},
 				Depsolver:     &ConfigRequest_V1_System_Depsolver{},
 				Memory:        &ConfigRequest_V1_System_Memory{},
+				IBrowse:       &ConfigRequest_V1_System_IBrowse{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
