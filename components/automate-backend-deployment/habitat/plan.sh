@@ -27,7 +27,7 @@ pkg_deps=(
 )
 
 pkg_build_deps=(
-  core/gcc
+  core/gcc 
 )
 
 # workaround for https://github.com/habitat-sh/habitat/issues/6341
