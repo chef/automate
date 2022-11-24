@@ -451,10 +451,11 @@ You can mix and match different services together if you want to add nodes acros
 Once the command will execute, it will add the supplied nodes to your automate setup. The changes might take a while.
 
 {{< note >}} 
-- If you have applied patches to any of the existing services make sure you apply the same on your current node as well.
+- If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well. 
+For example, if you have patched any external configurations like SAML or LDAP or any other which was done manually post deployment in automate nodes, make sure to patch those configurations on the new automate nodes as well. The same has to be followed for other services like Chef-Server, Postgresql and OpenSearch.
 - The new node will be configured with the certificates which were already configured in your HA setup. 
-- If you had applied unique certificates per node then the certificates of one of the nodes has been applied by default. 
-- If you want to change the certificates then you can do so by running the `chef-automate cert-rotate [options]` command.
+- If you had applied unique certificates per node then the certificates of one of the nodes has been applied by default on the new nodes. 
+- If you want to change the certificates for the new nodes then you can do so by manually running the `chef-automate cert-rotate [options]` command.
 {{< /note >}}
 
 {{< warning >}}
