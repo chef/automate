@@ -200,9 +200,7 @@ func TestGetCerts(t *testing.T) {
 
 	type testCaseInfo struct {
 		testCaseDescription string
-		certFlagObjInput    certFlags
-		sshFlagObjInput     sshFlag
-		nodeFlagObjInput    nodeFlag
+		flagsObj            flags
 		rootCaWant          string
 		publicCertWant      string
 		privateCertWant     string
@@ -214,33 +212,26 @@ func TestGetCerts(t *testing.T) {
 	testCases := []testCaseInfo{
 		{
 			testCaseDescription: "All paths given and flag is automate service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				automate:    true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 				rootCA:      ValidCertPath,
 			},
-			sshFlagObjInput: sshFlag{
-				automate: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       FileContent,
-			publicCertWant:   FileContent,
-			privateCertWant:  FileContent,
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          false,
+			rootCaWant:      FileContent,
+			publicCertWant:  FileContent,
+			privateCertWant: FileContent,
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         false,
 		},
 		{
 			testCaseDescription: "All paths given except root-ca flag is automate service and node flag given",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				automate:    true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
-			},
-			sshFlagObjInput: sshFlag{
-				automate: true,
-			},
-			nodeFlagObjInput: nodeFlag{
-				node: "ip-given",
+				node:        "ip-given",
 			},
 			rootCaWant:      "",
 			publicCertWant:  FileContent,
@@ -251,29 +242,24 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths given and flag is opensearch service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				opensearch:  true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 				rootCA:      ValidCertPath,
 				adminCert:   ValidCertPath,
 				adminKey:    ValidCertPath,
 			},
-			sshFlagObjInput: sshFlag{
-				opensearch: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       FileContent,
-			publicCertWant:   FileContent,
-			privateCertWant:  FileContent,
-			adminCertWant:    FileContent,
-			adminKeyWant:     FileContent,
-			isError:          false,
+			rootCaWant:      FileContent,
+			publicCertWant:  FileContent,
+			privateCertWant: FileContent,
+			adminCertWant:   FileContent,
+			adminKeyWant:    FileContent,
+			isError:         false,
 		},
 		{
 			testCaseDescription: "All paths empty and flag for automate service",
-			certFlagObjInput:    certFlags{},
-			sshFlagObjInput:     sshFlag{},
-			nodeFlagObjInput:    nodeFlag{},
+			flagsObj:            flags{},
 			rootCaWant:          "",
 			publicCertWant:      "",
 			privateCertWant:     "",
@@ -283,140 +269,119 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "some invalid paths given and flag is automate service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				automate:    true,
 				privateCert: ValidCertPath,
 				publicCert:  "./xyx-cert.go",
 				rootCA:      ValidCertPath,
 			},
-			sshFlagObjInput: sshFlag{
-				automate: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 		{
 			testCaseDescription: "All paths given but invalid (file not exist in (f.s)and flag is automate service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				automate:    true,
 				privateCert: "./xyz.go",
 				publicCert:  "./xyz.go",
 				rootCA:      "./xyx.go",
 			},
-			sshFlagObjInput: sshFlag{
-				automate: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 		{
 			testCaseDescription: "All paths given except root-ca and flag is automate service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				automate:    true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 			},
-			sshFlagObjInput: sshFlag{
-				automate: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 		{
 			testCaseDescription: "All paths given but root-ca path is invalid(file not exist) flag is automate service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				automate:    true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 				rootCA:      "./xyx-cert.go",
 			},
-			sshFlagObjInput: sshFlag{
-				automate: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 		{
 			testCaseDescription: "Some mandatory path not given and flag is opensearch service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				opensearch:  true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 				rootCA:      ValidCertPath,
 				adminCert:   ValidCertPath,
 				adminKey:    "",
 			},
-			sshFlagObjInput: sshFlag{
-				opensearch: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 		{
 			testCaseDescription: "Invalid adminCert path and flag is opensearch service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				opensearch:  true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 				rootCA:      ValidCertPath,
 				adminCert:   "./xyz-cert.go",
 				adminKey:    ValidCertPath,
 			},
-			sshFlagObjInput: sshFlag{
-				opensearch: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 		{
 			testCaseDescription: "Invalid adminKey path and flag is opensearch service",
-			certFlagObjInput: certFlags{
+			flagsObj: flags{
+				opensearch:  true,
 				privateCert: ValidCertPath,
 				publicCert:  ValidCertPath,
 				rootCA:      ValidCertPath,
 				adminCert:   ValidCertPath,
 				adminKey:    "./xyz-cert.go",
 			},
-			sshFlagObjInput: sshFlag{
-				opensearch: true,
-			},
-			nodeFlagObjInput: nodeFlag{},
-			rootCaWant:       "",
-			publicCertWant:   "",
-			privateCertWant:  "",
-			adminCertWant:    "",
-			adminKeyWant:     "",
-			isError:          true,
+			rootCaWant:      "",
+			publicCertWant:  "",
+			privateCertWant: "",
+			adminCertWant:   "",
+			adminKeyWant:    "",
+			isError:         true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			rootCaGot, publicCertGot, privateCertGot, adminCertGot, adminKeyGot, err := c.getCerts(infra, &tc.sshFlagObjInput, &tc.certFlagObjInput, &tc.nodeFlagObjInput)
+			rootCaGot, publicCertGot, privateCertGot, adminCertGot, adminKeyGot, err := c.getCerts(infra, &tc.flagsObj)
 			if tc.isError {
 				assert.Error(t, err)
 			} else {
