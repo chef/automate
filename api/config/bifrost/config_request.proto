@@ -38,6 +38,7 @@ message ConfigRequest {
 				// rotation configurables require
 				// different units.
 				google.protobuf.Int32Value rotation_max_megabytes = 5;
+				google.protobuf.BoolValue extended_perf_log = 6;
 			}
 
 			message Sql {
@@ -48,7 +49,6 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_timeout = 5;
 			}
 		}
-
 
 
 		message Service {}

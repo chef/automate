@@ -30,6 +30,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.RotationMaxBytes = w.Int64(104857600)
 	c.V1.Sys.Log.RotationMaxFiles = w.Int32(10)
 	c.V1.Sys.Log.MaxErrorLogsPerSecond = w.Int32(1000)
+	c.V1.Sys.Log.ExtendedPerfLog = w.Bool(true)
 
 	c.V1.Sys.Sql.Timeout = w.Int32(5000)
 	c.V1.Sys.Sql.PoolInitSize = w.Int32(10)
