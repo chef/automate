@@ -77,6 +77,13 @@ func Test_difference_1(t *testing.T) {
 	assert.Equal(t, []string{"10.2.3.23"}, strArr)
 }
 
+func Test_difference_if_no_match(t *testing.T) {
+	a := []string{"10.2.3.23", "10.0.1.192", "10.2.3.4"}
+	b := []string{"10.0.1.129", "10.2.3.32"}
+	strArr := difference(a, b)
+	assert.Equal(t, []string{"10.2.3.23", "10.0.1.192", "10.2.3.4"}, strArr)
+}
+
 func Test_findAndDelete(t *testing.T) {
 	certs := []CertByIP{
 		{
@@ -95,6 +102,41 @@ func Test_findAndDelete(t *testing.T) {
 	assert.Equal(t, []CertByIP{
 		{
 			IP:         "10.2.3.23",
+			PrivateKey: "private",
+			PublicKey:  "public",
+		},
+	}, arr)
+}
+
+func Test_findAndDelete_if_no_match(t *testing.T) {
+	certs := []CertByIP{
+		{
+			IP:         "10.2.3.23",
+			PrivateKey: "private",
+			PublicKey:  "public",
+		}, {
+			IP:         "10.0.1.192",
+			PrivateKey: "private",
+			PublicKey:  "public",
+		}, {
+			IP:         "10.2.3.96",
+			PrivateKey: "private",
+			PublicKey:  "public",
+		},
+	}
+	b := "10.0.1.11"
+	arr := findAndDelete(certs, b)
+	assert.Equal(t, []CertByIP{
+		{
+			IP:         "10.2.3.23",
+			PrivateKey: "private",
+			PublicKey:  "public",
+		}, {
+			IP:         "10.0.1.192",
+			PrivateKey: "private",
+			PublicKey:  "public",
+		}, {
+			IP:         "10.2.3.96",
 			PrivateKey: "private",
 			PublicKey:  "public",
 		},

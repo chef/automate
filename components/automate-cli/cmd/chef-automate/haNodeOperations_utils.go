@@ -3,11 +3,14 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"io/ioutil"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
+	ptoml "github.com/pelletier/go-toml"
 )
 
 const TAINT_TERRAFORM = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
@@ -210,4 +213,17 @@ func checkIfPresentInPrivateIPList(existingIPArray []string, ips []string, error
 		}
 	}
 	return errorList
+}
+
+func readConfig(path string) (ExistingInfraConfigToml, error) {
+	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	if err != nil {
+		return ExistingInfraConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	config := ExistingInfraConfigToml{}
+	err = ptoml.Unmarshal(templateBytes, &config)
+	if err != nil {
+		return ExistingInfraConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return config, nil
 }

@@ -29,10 +29,10 @@ func deleteNodeHACmd() *cobra.Command {
 		Long:  `remove existing node in HA`,
 		RunE:  runDeleteNodeHACmd(&addDeleteNodeHACmdFlags),
 	}
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "new chef-server ip addresses")
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "", "new opensearch ip addresses")
-	deleteNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "", "new postgresql ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.automateIp, "automate", "a", "", "new automate ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "c", "", "new chef-server ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "o", "", "new opensearch ip addresses")
+	deleteNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "p", "", "new postgresql ip addresses")
 	deleteNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
 
 	return deleteNodeHACmd
@@ -138,19 +138,39 @@ func (dni *DeleteNodeImpl) validate() error {
 	return nil
 }
 func (dni *DeleteNodeImpl) modifyConfig() error {
-	err := modifyConfigForDeleteNode(&dni.config.Automate.Config.InstanceCount, &dni.config.ExistingInfra.Config.AutomatePrivateIps, dni.automateIpList, &dni.config.Automate.Config.CertsByIP)
+	err := modifyConfigForDeleteNode(
+		&dni.config.Automate.Config.InstanceCount,
+		&dni.config.ExistingInfra.Config.AutomatePrivateIps,
+		dni.automateIpList,
+		&dni.config.Automate.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
 	}
-	err = modifyConfigForDeleteNode(&dni.config.ChefServer.Config.InstanceCount, &dni.config.ExistingInfra.Config.ChefServerPrivateIps, dni.chefServerIpList, &dni.config.ChefServer.Config.CertsByIP)
+	err = modifyConfigForDeleteNode(
+		&dni.config.ChefServer.Config.InstanceCount,
+		&dni.config.ExistingInfra.Config.ChefServerPrivateIps,
+		dni.chefServerIpList,
+		&dni.config.ChefServer.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
 	}
-	err = modifyConfigForDeleteNode(&dni.config.Opensearch.Config.InstanceCount, &dni.config.ExistingInfra.Config.OpensearchPrivateIps, dni.opensearchIpList, &dni.config.Opensearch.Config.CertsByIP)
+	err = modifyConfigForDeleteNode(
+		&dni.config.Opensearch.Config.InstanceCount,
+		&dni.config.ExistingInfra.Config.OpensearchPrivateIps,
+		dni.opensearchIpList,
+		&dni.config.Opensearch.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
 	}
-	err = modifyConfigForDeleteNode(&dni.config.Postgresql.Config.InstanceCount, &dni.config.ExistingInfra.Config.PostgresqlPrivateIps, dni.postgresqlIp, &dni.config.Postgresql.Config.CertsByIP)
+	err = modifyConfigForDeleteNode(
+		&dni.config.Postgresql.Config.InstanceCount,
+		&dni.config.ExistingInfra.Config.PostgresqlPrivateIps,
+		dni.postgresqlIp,
+		&dni.config.Postgresql.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")
 	}

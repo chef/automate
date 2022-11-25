@@ -119,7 +119,7 @@ func Test_addnode_readfile_error(t *testing.T) {
 	assert.Contains(t, err.Error(), "random")
 }
 
-func Test_addnode_Modify(t *testing.T) {
+func Test_addnode_Modify_automate(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "10.2.1.67",
@@ -141,6 +141,90 @@ func Test_addnode_Modify(t *testing.T) {
 	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeImpl).automateIpList[0])
+	assert.Equal(t, "3", nodeAdd.(*AddNodeImpl).config.Automate.Config.InstanceCount)
+	assert.Equal(t, 3, len(nodeAdd.(*AddNodeImpl).config.Automate.Config.CertsByIP))
+	assert.Equal(t, 3, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.AutomatePrivateIps))
+}
+
+func Test_addnode_Modify_infra(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		chefServerIp: "10.2.1.67",
+	}
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			return readConfig(path)
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.validate()
+	assert.NoError(t, err)
+	err = nodeAdd.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, flags.chefServerIp, nodeAdd.(*AddNodeImpl).chefServerIpList[0])
+	assert.Equal(t, "2", nodeAdd.(*AddNodeImpl).config.ChefServer.Config.InstanceCount)
+	assert.Equal(t, 2, len(nodeAdd.(*AddNodeImpl).config.ChefServer.Config.CertsByIP))
+	assert.Equal(t, 2, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.ChefServerPrivateIps))
+}
+
+func Test_addnode_Modify_postgresql(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		postgresqlIp: "10.2.1.67",
+	}
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			return readConfig(path)
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.validate()
+	assert.NoError(t, err)
+	err = nodeAdd.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, flags.postgresqlIp, nodeAdd.(*AddNodeImpl).postgresqlIp[0])
+	assert.Equal(t, "4", nodeAdd.(*AddNodeImpl).config.Postgresql.Config.InstanceCount)
+	assert.Equal(t, 4, len(nodeAdd.(*AddNodeImpl).config.Postgresql.Config.CertsByIP))
+	assert.Equal(t, 4, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))
+}
+
+func Test_addnode_Modify_opensearch(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: "10.2.1.67",
+	}
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			return readConfig(path)
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.validate()
+	assert.NoError(t, err)
+	err = nodeAdd.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeImpl).opensearchIpList[0])
+	assert.Equal(t, "5", nodeAdd.(*AddNodeImpl).config.Opensearch.Config.InstanceCount)
+	assert.Equal(t, 5, len(nodeAdd.(*AddNodeImpl).config.Opensearch.Config.CertsByIP))
+	assert.Equal(t, 5, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.OpensearchPrivateIps))
 }
 
 func Test_addnode_Prompt(t *testing.T) {

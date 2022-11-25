@@ -38,10 +38,10 @@ func addNodeHACmd() *cobra.Command {
 		Long:  `Add new node in HA`,
 		RunE:  runAddNodeHACmd(&addDeleteNodeHACmdFlags),
 	}
-	addNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.automateIp, "automate", "", "new automate ip addresses")
-	addNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "", "new chef-server ip addresses")
-	addNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "", "new opensearch ip addresses")
-	addNodeHACmd.PersistentFlags().StringVar(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "", "new postgres ip addresses")
+	addNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.automateIp, "automate", "a", "", "new automate ip addresses")
+	addNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "c", "", "new chef-server ip addresses")
+	addNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.opensearchIp, "opensearch", "o", "", "new opensearch ip addresses")
+	addNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.postgresqlIp, "postgresql", "p", "", "new postgres ip addresses")
 	addNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
 
 	return addNodeHACmd
@@ -151,19 +151,39 @@ func (ani *AddNodeImpl) validate() error {
 }
 
 func (ani *AddNodeImpl) modifyConfig() error {
-	err := modifyConfigForAddNewNode(&ani.config.Automate.Config.InstanceCount, &ani.config.ExistingInfra.Config.AutomatePrivateIps, ani.automateIpList, &ani.config.Automate.Config.CertsByIP)
+	err := modifyConfigForAddNewNode(
+		&ani.config.Automate.Config.InstanceCount,
+		&ani.config.ExistingInfra.Config.AutomatePrivateIps,
+		ani.automateIpList,
+		&ani.config.Automate.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
 	}
-	err = modifyConfigForAddNewNode(&ani.config.ChefServer.Config.InstanceCount, &ani.config.ExistingInfra.Config.ChefServerPrivateIps, ani.chefServerIpList, &ani.config.ChefServer.Config.CertsByIP)
+	err = modifyConfigForAddNewNode(
+		&ani.config.ChefServer.Config.InstanceCount,
+		&ani.config.ExistingInfra.Config.ChefServerPrivateIps,
+		ani.chefServerIpList,
+		&ani.config.ChefServer.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
 	}
-	err = modifyConfigForAddNewNode(&ani.config.Opensearch.Config.InstanceCount, &ani.config.ExistingInfra.Config.OpensearchPrivateIps, ani.opensearchIpList, &ani.config.Opensearch.Config.CertsByIP)
+	err = modifyConfigForAddNewNode(
+		&ani.config.Opensearch.Config.InstanceCount,
+		&ani.config.ExistingInfra.Config.OpensearchPrivateIps,
+		ani.opensearchIpList,
+		&ani.config.Opensearch.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
 	}
-	err = modifyConfigForAddNewNode(&ani.config.Postgresql.Config.InstanceCount, &ani.config.ExistingInfra.Config.PostgresqlPrivateIps, ani.postgresqlIp, &ani.config.Postgresql.Config.CertsByIP)
+	err = modifyConfigForAddNewNode(
+		&ani.config.Postgresql.Config.InstanceCount,
+		&ani.config.ExistingInfra.Config.PostgresqlPrivateIps,
+		ani.postgresqlIp,
+		&ani.config.Postgresql.Config.CertsByIP,
+	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")
 	}
