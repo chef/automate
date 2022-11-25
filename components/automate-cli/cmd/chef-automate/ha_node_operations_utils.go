@@ -16,7 +16,7 @@ import (
 const TAINT_TERRAFORM = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
 
 type HAModifyAndDeploy interface {
-	execute(c *cobra.Command, args []string) error
+	Execute(c *cobra.Command, args []string) error
 	prepare() error
 	validate() error
 	modifyConfig() error

@@ -41,7 +41,7 @@ func deleteNodeHACmd() *cobra.Command {
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
 		nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{})
-		return nodedeleter.execute(c, args)
+		return nodedeleter.Execute(c, args)
 	}
 }
 
@@ -71,7 +71,7 @@ func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils 
 	}
 }
 
-func (dni *DeleteNodeImpl) execute(c *cobra.Command, args []string) error {
+func (dni *DeleteNodeImpl) Execute(c *cobra.Command, args []string) error {
 	if !dni.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}

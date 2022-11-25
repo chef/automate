@@ -58,7 +58,7 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 	return func(c *cobra.Command, args []string) error {
 		sshconfig := &SSHConfig{}
 		nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(sshconfig))
-		return nodeAdder.execute(c, args)
+		return nodeAdder.Execute(c, args)
 	}
 }
 
@@ -90,7 +90,7 @@ func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils Nod
 	}
 }
 
-func (ani *AddNodeImpl) execute(c *cobra.Command, args []string) error {
+func (ani *AddNodeImpl) Execute(c *cobra.Command, args []string) error {
 	if !ani.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
