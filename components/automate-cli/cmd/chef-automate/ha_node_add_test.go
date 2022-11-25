@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-const CONFIG_TOML_PATH = "../../pkg/testfiles/config.toml"
+const CONFIG_TOML_PATH = "../../pkg/testfiles"
 const TEST_IP_1 = "192.0.2.11"
 
 type MockSSHUtilsImpl struct {

@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -28,7 +27,7 @@ type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
 	getHaInfraDetailsfunc                     func() (*SSHConfig, error)
 	genConfigfunc                             func(path string) error
-	taintTerraformFunc                        func() error
+	taintTerraformFunc                        func(path string) error
 }
 
 func (mnu *MockNodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
@@ -43,8 +42,8 @@ func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*SSHConfig, error) {
 func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
 	return mnu.genConfigfunc(path)
 }
-func (mnu *MockNodeUtilsImpl) taintTerraform() error {
-	return mnu.taintTerraformFunc()
+func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
+	return mnu.taintTerraformFunc(path)
 }
 
 type NodeOpUtils interface {
@@ -52,7 +51,7 @@ type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*SSHConfig, error)
 	genConfig(path string) error
-	taintTerraform() error
+	taintTerraform(path string) error
 }
 
 type NodeUtilsImpl struct{}
@@ -61,8 +60,8 @@ func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
 }
 
-func (nu *NodeUtilsImpl) taintTerraform() error {
-	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform"))
+func (nu *NodeUtilsImpl) taintTerraform(path string) error {
+	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, path)
 }
 
 func (nu *NodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {

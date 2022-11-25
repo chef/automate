@@ -70,7 +70,7 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 		}
 		if deployerType == EXISTING_INFRA_MODE {
 			sshconfig := &SSHConfig{}
-			nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath, &fileutils.FileSystemUtils{}, NewSSHUtil(sshconfig))
+			nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(sshconfig))
 			err = nodeAdder.validate()
 			if err != nil {
 				return err
@@ -110,24 +110,26 @@ type AddNodeImpl struct {
 	nodeUtils               NodeOpUtils
 	flags                   AddDeleteNodeHACmdFlags
 	configpath              string
+	terraformPath           string
 	writer                  *cli.Writer
 	fileutils               fileutils.FileUtils
 	sshUtil                 SSHUtil
 }
 
-func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, filepath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
+func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileUtils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
 	return &AddNodeImpl{
-		flags:      flags,
-		writer:     writer,
-		nodeUtils:  nodeUtils,
-		configpath: filepath,
-		fileutils:  fileUtils,
-		sshUtil:    sshUtil,
+		flags:         flags,
+		writer:        writer,
+		nodeUtils:     nodeUtils,
+		configpath:    filepath.Join(haDirPath, "config.toml"),
+		terraformPath: filepath.Join(haDirPath, "terraform"),
+		fileutils:     fileUtils,
+		sshUtil:       sshUtil,
 	}
 }
 
 func (ani *AddNodeImpl) prepare() error {
-	return ani.nodeUtils.taintTerraform()
+	return ani.nodeUtils.taintTerraform(ani.terraformPath)
 }
 
 func (ani *AddNodeImpl) validate() error {

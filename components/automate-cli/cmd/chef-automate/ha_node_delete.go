@@ -60,7 +60,7 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 			return err
 		}
 		if deployerType == EXISTING_INFRA_MODE {
-			nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), configFilePath, &fileutils.FileSystemUtils{})
+			nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{})
 			err := nodedeleter.validate()
 			if err != nil {
 				return err
@@ -100,22 +100,24 @@ type DeleteNodeImpl struct {
 	nodeUtils               NodeOpUtils
 	flags                   AddDeleteNodeHACmdFlags
 	configpath              string
+	terraformPath           string
 	writer                  *cli.Writer
 	fileUtils               fileutils.FileUtils
 }
 
-func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, filepath string, fileutils fileutils.FileUtils) HAModifyAndDeploy {
+func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils) HAModifyAndDeploy {
 	return &DeleteNodeImpl{
-		flags:      flags,
-		writer:     writer,
-		nodeUtils:  nodeUtils,
-		configpath: filepath,
-		fileUtils:  fileutils,
+		flags:         flags,
+		writer:        writer,
+		nodeUtils:     nodeUtils,
+		configpath:    filepath.Join(haDirPath, "config.toml"),
+		terraformPath: filepath.Join(haDirPath, "terraform"),
+		fileUtils:     fileutils,
 	}
 }
 
 func (dni *DeleteNodeImpl) prepare() error {
-	return dni.nodeUtils.taintTerraform()
+	return dni.nodeUtils.taintTerraform(dni.terraformPath)
 }
 
 func (dni *DeleteNodeImpl) validate() error {
