@@ -12,6 +12,7 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/toml"
+	"github.com/sirupsen/logrus"
 )
 
 var tfVarRbTemp = `
@@ -214,45 +215,48 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	osConfigMap, err := p.pullOpensearchConfigs()
-	if err != nil {
-		return nil, err
-	}
-	pgConfigMap, err := p.pullPGConfigs()
-	if err != nil {
-		return nil, err
-	}
-
-	var osCerts []CertByIP
-	for key, ele := range osConfigMap {
-		certByIP := CertByIP{
-			IP:         key,
-			PrivateKey: ele.privateKey,
-			PublicKey:  ele.publicKey,
+	// checking onprem with managed or self managed services
+	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
+	if len(strings.TrimSpace(sharedConfigToml.ExternalDB.Database.Type)) < 1 {
+		osConfigMap, err := p.pullOpensearchConfigs()
+		if err != nil {
+			return nil, err
 		}
-		osCerts = append(osCerts, certByIP)
-	}
-
-	sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
-
-	sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
-
-	sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
-
-	var pgCerts []CertByIP
-	for key, ele := range pgConfigMap {
-		certByIP := CertByIP{
-			IP:         key,
-			PrivateKey: ele.privateKey,
-			PublicKey:  ele.publicKey,
+		pgConfigMap, err := p.pullPGConfigs()
+		if err != nil {
+			return nil, err
 		}
-		pgCerts = append(pgCerts, certByIP)
+
+		var osCerts []CertByIP
+		for key, ele := range osConfigMap {
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.privateKey,
+				PublicKey:  ele.publicKey,
+			}
+			osCerts = append(osCerts, certByIP)
+		}
+
+		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
+
+		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
+
+		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+
+		var pgCerts []CertByIP
+		for key, ele := range pgConfigMap {
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.privateKey,
+				PublicKey:  ele.publicKey,
+			}
+			pgCerts = append(pgCerts, certByIP)
+		}
+
+		sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
+
+		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
 	}
-
-	sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
-
-	sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
 
 	var a2Certs []CertByIP
 	for key, ele := range a2ConfigMap {
