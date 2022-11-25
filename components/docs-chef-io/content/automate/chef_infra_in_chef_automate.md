@@ -19,14 +19,14 @@ When operated in a standalone mode, the list contains specific parameters which 
 
 The list of parameters are as follows:
 
-| Parameters                     | Default Values In Standalone Infra Server | Default Values In Backend Server | Automate Configuration       |
-| ------------------------------ | ----------------------------------------- | -------------------------------- | ---------------------------- |
-| opscode_erchef['db_pool_size'] | 20                                        | 20                               | ```cfg.sql.pool_max_size```  |
-|
-|
-|
-|
-|
+| Parameters                                  | Default Values In Standalone Infra Server | Default Values In Backend Server | Automate Configuration                         |
+| ------------------------------------------- | ----------------------------------------- | -------------------------------- | ---------------------------------------------- |
+| opscode_erchef['db_pool_size']              | 20                                        | 20                               | ```cfg.sql.pool_max_size```                    |
+| opscode_erchef['s3_url_ttl']	              | 900                                       | 28800		                         | ```erchef.v1.sys.api.s3_url_ttl```             |
+| opscode_erchef['cleanup_batch_size']        |	0                                         | 0		                             | ```erchef.v1.sys.authz.cleanup_batch_size```   |
+| opscode_erchef['ibrowse_max_pipeline_size'] |	1	                                        | 1	                               | ```erchef.v1.sys.ibrowse.max_pipeline_size``` |
+| opscode_erchef['ibrowse_max_sessions']      | 256	                                      | 256	                             | ```erchef.v1.sys.ibrowse.max_sessions```      |
+| oc_bifrost['extended_perf_log']             | true                                      | true                             | ```bifrost.v1.sys.log.extended_perf_log```     |
 |
 |
 |
