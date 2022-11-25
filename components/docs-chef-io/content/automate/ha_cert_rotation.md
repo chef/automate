@@ -30,7 +30,7 @@ The certificate rotation is also required when the key for a node, client, or CA
 {{< note >}}
 
 - Below `cert-rotate` commands can only be executed from `bastion host`.
-- If you want to use certificates stored in another node of the HA cluster, then you can provide the remote path to the certificates using `<IP_ADDRESS_OF_NODE>:<ABSOLUTE_PATH_TO_THE_CERT_FILE` format instead of local path.
+- If you want to use certificates stored in another node of the HA cluster, you can provide the remote path to the certificates using the `<IP_ADDRESS_OF_NODE>:<ABSOLUTE_PATH_TO_THE_CERT_FILE>` format instead of the local path.
 
 {{< /note >}}
 
