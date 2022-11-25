@@ -290,7 +290,7 @@ func (p *PullConfigsImpl) generateConfig() error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config_1.toml"), shardConfig, 600)
+	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 600)
 	if err != nil {
 		return err
 	}
