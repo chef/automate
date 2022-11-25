@@ -2,9 +2,6 @@ package main
 
 import (
 	"container/list"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -78,7 +75,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 	if e.config.Opensearch.Config.EnableCustomCerts {
 		//If AdminCert is given then get the admin_dn from the cert
 		if len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) > 0 {
-			admin_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
+			admin_dn, err := getDistinguishedNameFromKey(e.config.Opensearch.Config.AdminCert)
 			if err != nil {
 				return err
 			}
@@ -86,7 +83,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 		}
 		//If PublicKey is given then get the nodes_dn from the cert
 		if len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) > 0 {
-			nodes_dn, err := e.getDistinguishedNameFromKey(e.config.Opensearch.Config.PublicKey)
+			nodes_dn, err := getDistinguishedNameFromKey(e.config.Opensearch.Config.PublicKey)
 			if err != nil {
 				return err
 			}
@@ -98,7 +95,7 @@ func (e *existingInfra) addDNTocertConfig() error {
 			//If PublicKey is given then get the nodes_dn from the cert
 			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
 			if len(strings.TrimSpace(publicKey)) > 0 {
-				nodes_dn, err := e.getDistinguishedNameFromKey(publicKey)
+				nodes_dn, err := getDistinguishedNameFromKey(publicKey)
 				if err != nil {
 					return err
 				}
@@ -107,18 +104,6 @@ func (e *existingInfra) addDNTocertConfig() error {
 		}
 	}
 	return nil
-}
-
-func (e *existingInfra) getDistinguishedNameFromKey(publicKey string) (pkix.Name, error) {
-	block, _ := pem.Decode([]byte(publicKey))
-	if block == nil {
-		return pkix.Name{}, status.New(status.ConfigError, "failed to decode certificate PEM")
-	}
-	cert, err := x509.ParseCertificate(block.Bytes)
-	if err != nil {
-		return pkix.Name{}, status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
-	}
-	return cert.Subject, nil
 }
 
 func (e *existingInfra) getConfigPath() string {

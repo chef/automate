@@ -242,13 +242,23 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
 
 		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
+		if err != nil {
+			writer.Fail(err.Error())
+		}
+		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
 
 		var pgCerts []CertByIP
 		for key, ele := range pgConfigMap {
+			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
+			if err != nil {
+				writer.Fail(err.Error())
+			}
 			certByIP := CertByIP{
 				IP:         key,
 				PrivateKey: ele.privateKey,
 				PublicKey:  ele.publicKey,
+				NodesDn:    fmt.Sprintf("%v", nodeDn),
 			}
 			pgCerts = append(pgCerts, certByIP)
 		}

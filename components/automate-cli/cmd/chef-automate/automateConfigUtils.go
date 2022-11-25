@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
 	"io/ioutil"
 	"net"
 	"path/filepath"
@@ -74,4 +77,16 @@ func checkSharedConfigFile() bool {
 		return true
 	}
 	return false
+}
+
+func getDistinguishedNameFromKey(publicKey string) (pkix.Name, error) {
+	block, _ := pem.Decode([]byte(publicKey))
+	if block == nil {
+		return pkix.Name{}, status.New(status.ConfigError, "failed to decode certificate PEM")
+	}
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return pkix.Name{}, status.Wrap(err, status.ConfigError, "failed to parse certificate PEM")
+	}
+	return cert.Subject, nil
 }
