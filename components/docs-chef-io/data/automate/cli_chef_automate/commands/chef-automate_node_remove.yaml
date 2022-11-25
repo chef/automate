@@ -1,0 +1,37 @@
+name: chef-automate node remove
+synopsis: remove existing node in HA
+usage: chef-automate node remove [flags]
+description: remove existing node in HA
+options:
+- name: auto-accept
+  shorthand: "y"
+  default_value: "false"
+  usage: auto-accept
+- name: automate
+  shorthand: a
+  usage: new automate ip addresses
+- name: chef-server
+  shorthand: c
+  usage: new chef-server ip addresses
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for remove
+- name: opensearch
+  shorthand: o
+  usage: new opensearch ip addresses
+- name: postgresql
+  shorthand: p
+  usage: new postgresql ip addresses
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate node - This command is used to add or delete HA nodes

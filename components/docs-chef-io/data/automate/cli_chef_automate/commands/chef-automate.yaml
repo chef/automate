@@ -39,6 +39,7 @@ see_also:
 - maintenance - Put Chef Automate into or out of maintenance mode
 - migrate-from-v1 - Migrate from Chef Automate v1
 - migrate-from-v1-status - Watch the status of the migration to Chef Automate 2
+- node - This command is used to add or delete HA nodes
 - post-major-upgrade - Utilities for post-major-upgrade
 - preflight-check - Perform preflight check
 - provision-infra - Provision Automate HA infra.
