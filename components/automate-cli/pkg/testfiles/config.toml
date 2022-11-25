@@ -8,8 +8,8 @@
 ssh_user = "ec2-user"
 
 # private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/xxxx.pem"
-ssh_key_file = "/home/ec2-user/xxxx.pem"
+# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+ssh_key_file = "/home/ec2-user/A2HA.pem"
 
 # custome ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"
@@ -32,7 +32,7 @@ backup_config = "object_storage"
 # If backup_config = "object_storage" fill out [object_storage.config] as well
 ## Object storage similar to AWS S3 Bucket
 [object_storage.config]
-bucket_name = "a2ha-xxxxxx"
+bucket_name = "a2ha-bloomberg"
 access_key = "xxxxxxxx"
 secret_key = "x+xxxxxxxxxxxxxxxxxxxxxxxxx"
 endpoint = "s3.amazonaws.com"
@@ -65,12 +65,12 @@ public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[automate.config.certs_by_ip]]
-ip = "10.1.0.247"
+ip = "192.0.2.0"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[automate.config.certs_by_ip]]
-ip = "10.1.0.248"
+ip = "192.0.2.1"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
@@ -86,7 +86,7 @@ public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[chef_server.config.certs_by_ip]]
-ip = "10.1.0.80"
+ip = "192.0.2.2"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
@@ -110,22 +110,22 @@ private_key = """test_private_key"""
 # public_key = ""
 
 [[opensearch.config.certs_by_ip]]
-ip = "10.1.0.6"
+ip = "192.0.2.3"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[opensearch.config.certs_by_ip]]
-ip = "10.1.1.253"
+ip = "192.0.2.4"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[opensearch.config.certs_by_ip]]
-ip = "10.1.2.114"
+ip = "192.0.2.5"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[opensearch.config.certs_by_ip]]
-ip = "10.1.2.115"
+ip = "192.0.2.6"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
@@ -145,17 +145,17 @@ public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[postgresql.config.certs_by_ip]]
-ip = "10.1.0.134"
+ip = "192.0.2.7"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[postgresql.config.certs_by_ip]]
-ip = "10.1.1.196"
+ip = "192.0.2.8"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 
 [[postgresql.config.certs_by_ip]]
-ip = "10.1.2.163"
+ip = "192.0.2.9"
 public_key = """test_pub_key"""
 private_key = """test_private_key"""
 ## === ===
@@ -166,7 +166,7 @@ private_key = """test_private_key"""
 # provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
 # No of ip address should be same as No of instance_count count mentioned above in
 # automate.config, chef_server.config, opensearch.config and postgresql.config
-automate_private_ips = ["10.1.0.247","10.1.0.248"]
-chef_server_private_ips = ["10.1.0.80"]
-opensearch_private_ips = ["10.1.0.6","10.1.1.253","10.1.2.114","10.1.2.115"]
-postgresql_private_ips = ["10.1.0.134","10.1.1.196","10.1.2.163"]
+automate_private_ips = ["192.0.2.0","192.0.2.1"]
+chef_server_private_ips = ["192.0.2.2"]
+opensearch_private_ips = ["192.0.2.3","192.0.2.4","192.0.2.5","192.0.2.6"]
+postgresql_private_ips = ["192.0.2.7","192.0.2.8","192.0.2.9"]

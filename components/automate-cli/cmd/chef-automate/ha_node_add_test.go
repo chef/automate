@@ -10,7 +10,8 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-const configtomlpath = "./testfiles/config.toml"
+const CONFIG_TOML_PATH = "../../pkg/testfiles/config.toml"
+const TEST_IP_1 = "192.0.2.11"
 
 type MockSSHUtilsImpl struct {
 	getSSHConfigFunc                                func() *SSHConfig
@@ -44,7 +45,7 @@ func (msu *MockSSHUtilsImpl) copyFileToRemote(srcFilePath string, destFileName s
 	return msu.copyFileToRemoteFunc(srcFilePath, destFileName, removeFile)
 }
 
-func Test_addnode_validate_error(t *testing.T) {
+func TestAddnodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "10.2.1.67,ewewedw",
@@ -56,7 +57,7 @@ func Test_addnode_validate_error(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -66,7 +67,7 @@ func Test_addnode_validate_error(t *testing.T) {
 	assert.Contains(t, err.Error(), "IP address validation failed: \nIncorrect Automate IP address format for ip ewewedw")
 }
 
-func Test_addnode_validate_error_multiple(t *testing.T) {
+func TestAddnodeValidateErrorMultiple(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp:   "10.2.1.67,ewewedw",
@@ -81,7 +82,7 @@ func Test_addnode_validate_error_multiple(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -97,10 +98,10 @@ Incorrect Postgresql IP address format for ip 10.2.1.657
 Incorrect Postgresql IP address format for ip ewewedw`)
 }
 
-func Test_addnode_readfile_error(t *testing.T) {
+func TestMddnodeReadfileError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67",
+		automateIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -109,7 +110,7 @@ func Test_addnode_readfile_error(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -119,10 +120,10 @@ func Test_addnode_readfile_error(t *testing.T) {
 	assert.Contains(t, err.Error(), "random")
 }
 
-func Test_addnode_Modify_automate(t *testing.T) {
+func TestAddnodeModifyAutomate(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67",
+		automateIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -131,7 +132,7 @@ func Test_addnode_Modify_automate(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -146,10 +147,10 @@ func Test_addnode_Modify_automate(t *testing.T) {
 	assert.Equal(t, 3, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.AutomatePrivateIps))
 }
 
-func Test_addnode_Modify_infra(t *testing.T) {
+func TestAddnodeModifyInfra(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		chefServerIp: "10.2.1.67",
+		chefServerIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -158,7 +159,7 @@ func Test_addnode_Modify_infra(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -173,10 +174,10 @@ func Test_addnode_Modify_infra(t *testing.T) {
 	assert.Equal(t, 2, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.ChefServerPrivateIps))
 }
 
-func Test_addnode_Modify_postgresql(t *testing.T) {
+func TestAddnodeModifyPostgresql(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		postgresqlIp: "10.2.1.67",
+		postgresqlIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -185,7 +186,7 @@ func Test_addnode_Modify_postgresql(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -200,10 +201,10 @@ func Test_addnode_Modify_postgresql(t *testing.T) {
 	assert.Equal(t, 4, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))
 }
 
-func Test_addnode_Modify_opensearch(t *testing.T) {
+func TestAddnodeModifyOpensearch(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.2.1.67",
+		opensearchIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -212,7 +213,7 @@ func Test_addnode_Modify_opensearch(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -227,10 +228,10 @@ func Test_addnode_Modify_opensearch(t *testing.T) {
 	assert.Equal(t, 5, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.OpensearchPrivateIps))
 }
 
-func Test_addnode_Prompt(t *testing.T) {
+func TestAddnodePrompt(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67",
+		automateIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -239,7 +240,7 @@ func Test_addnode_Prompt(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -254,21 +255,21 @@ func Test_addnode_Prompt(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247, 10.1.0.248
-Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
-Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
 New nodes to be added:
 ================================================
-Automate => 10.2.1.67
+Automate => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
-func Test_addnode_Deploy_with_newOS_node(t *testing.T) {
+func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.2.1.67",
+		opensearchIp: TEST_IP_1,
 	}
 	var filewritten, deployed bool
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
@@ -285,7 +286,7 @@ func Test_addnode_Deploy_with_newOS_node(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			filewritten = true
 			return nil
@@ -305,14 +306,14 @@ func Test_addnode_Deploy_with_newOS_node(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247, 10.1.0.248
-Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
-Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
 New nodes to be added:
 ================================================
-OpenSearch => 10.2.1.67
+OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodeAdd.runDeploy()
 	assert.NoError(t, err)
@@ -320,10 +321,10 @@ This will add the new nodes to your existing setup. It might take a while. Are y
 	assert.Equal(t, true, deployed)
 }
 
-func Test_addnode_Deploy_with_newOS_node_genconfig_error(t *testing.T) {
+func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.2.1.67",
+		opensearchIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -338,7 +339,7 @@ func Test_addnode_Deploy_with_newOS_node_genconfig_error(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return errors.New("random")
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			return nil
 		},
@@ -357,14 +358,14 @@ func Test_addnode_Deploy_with_newOS_node_genconfig_error(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247, 10.1.0.248
-Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
-Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
 New nodes to be added:
 ================================================
-OpenSearch => 10.2.1.67
+OpenSearch => 192.0.2.11
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodeAdd.runDeploy()
 	assert.Error(t, err)

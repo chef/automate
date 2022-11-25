@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_deletenode_validate_error(t *testing.T) {
+func TestDeleteNodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "10.2.1.67,ewewedw",
@@ -21,7 +21,7 @@ func Test_deletenode_validate_error(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
@@ -30,7 +30,7 @@ Automate Ip 10.2.1.67 is not present in existing list of ip addresses. Please us
 Automate Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.`)
 }
 
-func Test_deletenode_validate_error_multiple(t *testing.T) {
+func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp:   "10.2.1.67,ewewedw",
@@ -45,7 +45,7 @@ func Test_deletenode_validate_error_multiple(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
@@ -63,10 +63,10 @@ Postgresql Ip 10.2.1.657 is not present in existing list of ip addresses. Please
 Postgresql Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.`)
 }
 
-func Test_deletenode_Modify_automate(t *testing.T) {
+func TestDeleteNodeModifyAutomate(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.1.0.247",
+		automateIp: "192.0.2.0",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -75,7 +75,7 @@ func Test_deletenode_Modify_automate(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -86,10 +86,10 @@ func Test_deletenode_Modify_automate(t *testing.T) {
 	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeImpl).config.ExistingInfra.Config.AutomatePrivateIps))
 }
 
-func Test_deletenode_Modify_infra(t *testing.T) {
+func TestDeleteNodeModifyInfra(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		chefServerIp: "10.1.0.80",
+		chefServerIp: "192.0.2.2",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -98,7 +98,7 @@ func Test_deletenode_Modify_infra(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Chef Server instance count cannot be less than 1. Final count 0 not allowed.")
@@ -111,10 +111,10 @@ func Test_deletenode_Modify_infra(t *testing.T) {
 	assert.Equal(t, 0, len(nodedelete.(*DeleteNodeImpl).config.ExistingInfra.Config.ChefServerPrivateIps))
 }
 
-func Test_deletenode_Modify_opensearch(t *testing.T) {
+func TestDeletenodeModifyOpensearch(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.1.2.115",
+		opensearchIp: "192.0.2.6",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -123,7 +123,7 @@ func Test_deletenode_Modify_opensearch(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -134,10 +134,10 @@ func Test_deletenode_Modify_opensearch(t *testing.T) {
 	assert.Equal(t, 3, len(nodedelete.(*DeleteNodeImpl).config.ExistingInfra.Config.OpensearchPrivateIps))
 }
 
-func Test_deletenode_Modify_postgresql(t *testing.T) {
+func TestDeletenodeModifyPostgresql(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		postgresqlIp: "10.1.2.163",
+		postgresqlIp: "192.0.2.9",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -146,7 +146,7 @@ func Test_deletenode_Modify_postgresql(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
@@ -159,10 +159,10 @@ func Test_deletenode_Modify_postgresql(t *testing.T) {
 	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))
 }
 
-func Test_deletenode_Prompt(t *testing.T) {
+func TestDeleteNodePrompt(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.1.0.247",
+		automateIp: "192.0.2.0",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -171,7 +171,7 @@ func Test_deletenode_Prompt(t *testing.T) {
 		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
 			return &SSHConfig{}, nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{})
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -182,21 +182,21 @@ func Test_deletenode_Prompt(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247, 10.1.0.248
-Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
-Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
 Nodes to be deleted:
 ================================================
-Automate => 10.1.0.247
+Automate => 192.0.2.0
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
-func Test_deletenode_Deploy_with_newOS_node(t *testing.T) {
+func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.1.0.6",
+		opensearchIp: "192.0.2.3",
 	}
 	var filewritten, deployed bool
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
@@ -213,7 +213,7 @@ func Test_deletenode_Deploy_with_newOS_node(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			filewritten = true
 			return nil
@@ -229,14 +229,14 @@ func Test_deletenode_Deploy_with_newOS_node(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247, 10.1.0.248
-Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
-Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
 Nodes to be deleted:
 ================================================
-OpenSearch => 10.1.0.6
+OpenSearch => 192.0.2.3
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodedelete.runDeploy()
 	assert.NoError(t, err)
@@ -244,10 +244,10 @@ This will delete the above nodes from your existing setup. It might take a while
 	assert.Equal(t, true, deployed)
 }
 
-func Test_deletenode_Deploy_with_newOS_mincount_error(t *testing.T) {
+func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.1.0.6,10.1.2.114",
+		opensearchIp: "192.0.2.3,192.0.2.5",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -262,7 +262,7 @@ func Test_deletenode_Deploy_with_newOS_mincount_error(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			return errors.New("random")
 		},
@@ -273,10 +273,10 @@ func Test_deletenode_Deploy_with_newOS_mincount_error(t *testing.T) {
 Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.`)
 }
 
-func Test_deletenode_Deploy_with_newOS_node_error(t *testing.T) {
+func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: "10.1.0.6",
+		opensearchIp: "192.0.2.3",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
 		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
@@ -291,7 +291,7 @@ func Test_deletenode_Deploy_with_newOS_node_error(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
-	}, configtomlpath, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			return errors.New("random")
 		},
@@ -306,14 +306,14 @@ func Test_deletenode_Deploy_with_newOS_node_error(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================
-Automate => 10.1.0.247, 10.1.0.248
-Chef-Server => 10.1.0.80
-OpenSearch => 10.1.0.6, 10.1.1.253, 10.1.2.114, 10.1.2.115
-Postgresql => 10.1.0.134, 10.1.1.196, 10.1.2.163
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
 Nodes to be deleted:
 ================================================
-OpenSearch => 10.1.0.6
+OpenSearch => 192.0.2.3
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodedelete.runDeploy()
 	assert.Error(t, err)
