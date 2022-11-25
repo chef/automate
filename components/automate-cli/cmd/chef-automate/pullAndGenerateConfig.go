@@ -333,20 +333,15 @@ func getHAConfig() (*ExistingInfraConfigToml, error) {
 func getHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, error) {
 	sharedConfigToml := &ExistingInfraConfigToml{}
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = "existing_nodes"
-
 	if len(strings.TrimSpace(tfvarConfig.SecretsKeyFile)) < 1 {
-		writer.Println("taking default")
 		sharedConfigToml.Architecture.ConfigInitials.SecretsKeyFile = filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "secrets.key")
 	} else {
-		writer.Println("taking tfvars")
 		sharedConfigToml.Architecture.ConfigInitials.SecretsKeyFile = tfvarConfig.SecretsKeyFile
 	}
 
 	if len(strings.TrimSpace(tfvarConfig.SecretsStoreFile)) < 1 {
-		writer.Println("taking default")
 		sharedConfigToml.Architecture.ConfigInitials.SecretsStoreFile = filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "secrets.json")
 	} else {
-		writer.Println("taking tfvars")
 		sharedConfigToml.Architecture.ConfigInitials.SecretsStoreFile = tfvarConfig.SecretsStoreFile
 	}
 
