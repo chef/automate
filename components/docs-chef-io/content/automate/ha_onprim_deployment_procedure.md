@@ -27,16 +27,18 @@ This section will discuss the steps to deploy Chef Automate HA on-premise machin
 - OS Root Volume (/) must be at least 40 GB
 - TMP space (/var/tmp) must be at least 5GB
 - Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
-- A Common user has access to all machines.
-- This common user should have sudo privileges.
-- This common user uses the same SSH Private Key file to access all machines.
-- Key-based SSH for the provisioning user for all the machines for HA-Deployment.
-- We do not support passphrases for Private Key authentication.
-- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+- A common user has been created on all machines involved in the cluster
+- This common user has SSH access to all machines
+- This common user has the same UID on all machines
+- This common user should have sudo privileges on all machines
+- This common user uses the same SSH Private Key file to access all machines
+- Key-based SSH for the provisioning user for all the machines for HA-Deployment
+- We do not support passphrases for Private Key authentication
+- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
-- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
-- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
-- Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
+- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer
+- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer
+- Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers
 - If DNS is not used, then these records should be added to `/etc/hosts` in all the machines, including Bastion:
 
 ```bash
