@@ -8,8 +8,8 @@
 ssh_user = "ec2-user"
 
 # private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/A2HA.pem"
-ssh_key_file = "/home/ec2-user/A2HA.pem"
+# Eg.: ssh_user = "~/.ssh/xxxx.pem"
+ssh_key_file = "/home/ec2-user/xxxx.pem"
 
 # custome ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"
@@ -32,7 +32,7 @@ backup_config = "object_storage"
 # If backup_config = "object_storage" fill out [object_storage.config] as well
 ## Object storage similar to AWS S3 Bucket
 [object_storage.config]
-bucket_name = "a2ha-bloomberg"
+bucket_name = "a2ha-xxxxxx"
 access_key = "xxxxxxxx"
 secret_key = "x+xxxxxxxxxxxxxxxxxxxxxxxxx"
 endpoint = "s3.amazonaws.com"
