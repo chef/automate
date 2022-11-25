@@ -256,8 +256,6 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 
 	var a2Certs []CertByIP
 	for key, ele := range a2ConfigMap {
-		fmt.Printf("Automate Config........%s\n", key)
-		fmt.Println(ele.Global.V1.FrontendTls)
 		certByIP := CertByIP{
 			IP:         key,
 			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
@@ -272,8 +270,6 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 
 	var csCerts []CertByIP
 	for key, ele := range csConfigMap {
-		fmt.Printf("Chef-Server Config........ %s\n", key)
-		fmt.Println(ele.Global.V1.FrontendTls)
 		if len(ele.Global.V1.FrontendTls) > 0 {
 			certByIP := CertByIP{
 				IP:         key,
