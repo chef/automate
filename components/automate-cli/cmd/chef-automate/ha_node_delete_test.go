@@ -406,7 +406,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 			return nil
 		},
 	})
-	err := nodeAdd.execute(nil, nil, &flags)
+	err := nodeAdd.execute(nil, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
 ================================================

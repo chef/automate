@@ -58,7 +58,7 @@ func runAddNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *c
 	return func(c *cobra.Command, args []string) error {
 		sshconfig := &SSHConfig{}
 		nodeAdder := NewAddNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(sshconfig))
-		return nodeAdder.execute(c, args, addDeleteNodeHACmdFlags)
+		return nodeAdder.execute(c, args)
 	}
 }
 
@@ -90,14 +90,14 @@ func NewAddNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils Nod
 	}
 }
 
-func (ani *AddNodeImpl) execute(c *cobra.Command, args []string, addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) error {
+func (ani *AddNodeImpl) execute(c *cobra.Command, args []string) error {
 	if !ani.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	if addDeleteNodeHACmdFlags.automateIp == "" &&
-		addDeleteNodeHACmdFlags.chefServerIp == "" &&
-		addDeleteNodeHACmdFlags.opensearchIp == "" &&
-		addDeleteNodeHACmdFlags.postgresqlIp == "" {
+	if ani.flags.automateIp == "" &&
+		ani.flags.chefServerIp == "" &&
+		ani.flags.opensearchIp == "" &&
+		ani.flags.postgresqlIp == "" {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
 	}
@@ -119,7 +119,7 @@ func (ani *AddNodeImpl) execute(c *cobra.Command, args []string, addDeleteNodeHA
 		if err != nil {
 			return err
 		}
-		if !addDeleteNodeHACmdFlags.autoAccept {
+		if !ani.flags.autoAccept {
 			res, err := ani.promptUserConfirmation()
 			if err != nil {
 				return err

@@ -41,7 +41,7 @@ func deleteNodeHACmd() *cobra.Command {
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
 		nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{})
-		return nodedeleter.execute(c, args, addDeleteNodeHACmdFlags)
+		return nodedeleter.execute(c, args)
 	}
 }
 
@@ -71,14 +71,14 @@ func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils 
 	}
 }
 
-func (dni *DeleteNodeImpl) execute(c *cobra.Command, args []string, addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) error {
+func (dni *DeleteNodeImpl) execute(c *cobra.Command, args []string) error {
 	if !dni.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	if addDeleteNodeHACmdFlags.automateIp == "" &&
-		addDeleteNodeHACmdFlags.chefServerIp == "" &&
-		addDeleteNodeHACmdFlags.opensearchIp == "" &&
-		addDeleteNodeHACmdFlags.postgresqlIp == "" {
+	if dni.flags.automateIp == "" &&
+		dni.flags.chefServerIp == "" &&
+		dni.flags.opensearchIp == "" &&
+		dni.flags.postgresqlIp == "" {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
@@ -100,7 +100,7 @@ func (dni *DeleteNodeImpl) execute(c *cobra.Command, args []string, addDeleteNod
 		if err != nil {
 			return err
 		}
-		if !addDeleteNodeHACmdFlags.autoAccept {
+		if !dni.flags.autoAccept {
 			res, err := dni.promptUserConfirmation()
 			if err != nil {
 				return err
