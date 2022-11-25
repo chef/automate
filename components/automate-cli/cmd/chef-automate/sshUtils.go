@@ -234,7 +234,6 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands
 }
 
 func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
-	writer.Printf("doing scp file transfer to remote node %s \n", s.SshConfig.hostIP)
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
@@ -249,7 +248,6 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 			return err
 		}
 	}
-	writer.Print("Copied file to remote\n")
 	return nil
 }
 

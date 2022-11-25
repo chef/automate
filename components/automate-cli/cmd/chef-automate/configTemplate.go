@@ -132,16 +132,18 @@ type OpensearchConfig struct {
 			} `protobuf:"bytes,,opt,name=default,proto3" toml:"default,omitempty" json:"default,omitempty" mapstructure:"default,omitempty"`
 		} `protobuf:"bytes,,opt,name=client,proto3" toml:"client,omitempty" json:"client,omitempty" mapstructure:"client,omitempty"`
 	} `protobuf:"bytes,,opt,name=s3,proto3" toml:"s3,omitempty" json:"s3,omitempty" mapstructure:"s3,omitempty"`
-	TLS *struct {
-		AdminCert string `protobuf:"bytes,,opt,name=admin_cert,proto3" toml:"admin_cert,omitempty" json:"admin_cert,omitempty" mapstructure:"admin_cert,omitempty"`
-		AdminKey  string `protobuf:"bytes,,opt,name=admin_key,proto3" toml:"admin_key,omitempty" json:"admin_key,omitempty" mapstructure:"admin_key,omitempty"`
-		RootCA    string `protobuf:"bytes,,opt,name=rootCA,proto3" toml:"rootCA,omitempty" json:"rootCA,omitempty" mapstructure:"rootCA,omitempty"`
-		SslCert   string `protobuf:"bytes,,opt,name=ssl_cert,proto3" toml:"ssl_cert,omitempty" json:"ssl_cert,omitempty" mapstructure:"ssl_cert,omitempty"`
-		SslKey    string `protobuf:"bytes,,opt,name=ssl_key,proto3" toml:"ssl_key,omitempty" json:"ssl_key,omitempty" mapstructure:"ssl_key,omitempty"`
-	} `protobuf:"bytes,,opt,name=tls,proto3" toml:"tls,omitempty" json:"tls,omitempty" mapstructure:"tls,omitempty"`
+	*TLS      `protobuf:"bytes,,opt,name=tls,proto3" toml:"tls,omitempty" json:"tls,omitempty" mapstructure:"tls,omitempty"`
 	Transport *struct {
 		Port int `protobuf:"bytes,,opt,name=port,proto3" toml:"port,omitzero" json:"port,omitzero" mapstructure:"port,omitzero"`
 	} `protobuf:"bytes,,opt,name=transport,proto3" toml:"transport,omitempty" json:"transport,omitempty" mapstructure:"transport,omitempty"`
+}
+
+type TLS struct {
+	AdminCert string `protobuf:"bytes,,opt,name=admin_cert,proto3" toml:"admin_cert,omitempty" json:"admin_cert,omitempty" mapstructure:"admin_cert,omitempty"`
+	AdminKey  string `protobuf:"bytes,,opt,name=admin_key,proto3" toml:"admin_key,omitempty" json:"admin_key,omitempty" mapstructure:"admin_key,omitempty"`
+	RootCA    string `protobuf:"bytes,,opt,name=rootCA,proto3" toml:"rootCA,omitempty" json:"rootCA,omitempty" mapstructure:"rootCA,omitempty"`
+	SslCert   string `protobuf:"bytes,,opt,name=ssl_cert,proto3" toml:"ssl_cert,omitempty" json:"ssl_cert,omitempty" mapstructure:"ssl_cert,omitempty"`
+	SslKey    string `protobuf:"bytes,,opt,name=ssl_key,proto3" toml:"ssl_key,omitempty" json:"ssl_key,omitempty" mapstructure:"ssl_key,omitempty"`
 }
 
 type PostgresqlConfig struct {
