@@ -240,14 +240,6 @@ func extractIPsFromCertsByIP(certsByIp []CertByIP) []string {
 	return ips
 }
 
-func extractIPsFromCertsByIPOpensearch(certsByIp []CertByIP) []string {
-	ips := []string{}
-	for _, el := range certsByIp {
-		ips = append(ips, el.IP)
-	}
-	return ips
-}
-
 func (e *existingInfra) validateCerts() *list.List {
 
 	errorList := list.New()
@@ -338,7 +330,7 @@ func (e *existingInfra) validateCerts() *list.List {
 				len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) < 1 {
 				errorList.PushBack("Opensearch root_ca, admin_key or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
-			if !stringutils.SubSlice(e.config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIPOpensearch(e.config.Opensearch.Config.CertsByIP)) {
+			if !stringutils.SubSlice(e.config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(e.config.Opensearch.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(e.config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
