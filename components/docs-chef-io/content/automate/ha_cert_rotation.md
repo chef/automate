@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "Certificate Rotation"
     parent = "automate/deploy_high_availability/certificates"
-    identifier = "automate/deploy_high_availability/certificates/ha_cert_rotaion.md Certificate Rotation"
+    identifier = "automate/deploy_high_availability/certificates/ha_cert_rotation.md Certificate Rotation"
     weight = 230
 +++
 
@@ -27,7 +27,12 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 ## Rotate using Cert-Rotate Command
 
-{{< note >}} Below `cert-rotate` commands can only be executed from `bastion host` {{< /note >}}
+{{< note >}}
+
+- Below `cert-rotate` commands can only be executed from `bastion host`.
+- If you want to use certificates stored in another node of the HA cluster, you can provide the remote path to the certificates using the `<IP_ADDRESS_OF_NODE>:<ABSOLUTE_PATH_TO_THE_CERT_FILE>` format instead of the local path.
+
+{{< /note >}}
 
 ### Rotate Certificates of each service
 
