@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -21,6 +22,7 @@ type MockSSHUtilsImpl struct {
 	connectAndExecuteCommandOnRemoteFunc            func(remoteCommands string, spinner bool) (string, error)
 	connectAndExecuteCommandOnRemoteSteamOutputFunc func(remoteCommands string) (string, error)
 	copyFileToRemoteFunc                            func(srcFilePath string, destFileName string, removeFile bool) error
+	copyFileFromRemoteFunc                          func(remoteFilePath string, outputFileName string) (string, error)
 }
 
 func (msu *MockSSHUtilsImpl) getSSHConfig() *SSHConfig {
@@ -43,6 +45,9 @@ func (msu *MockSSHUtilsImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteC
 }
 func (msu *MockSSHUtilsImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
 	return msu.copyFileToRemoteFunc(srcFilePath, destFileName, removeFile)
+}
+func (msu *MockSSHUtilsImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
+	return msu.copyFileFromRemoteFunc(remoteFilePath, outputFileName)
 }
 
 func TestAddnodeValidateError(t *testing.T) {
@@ -118,6 +123,61 @@ func TestMddnodeReadfileError(t *testing.T) {
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
+}
+
+func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		postgresqlIp: TEST_IP_1,
+	}
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(path)
+			if err != nil {
+				return ExistingInfraConfigToml{}, err
+			}
+			cfg.ExternalDB.Database.Type = TYPE_AWS
+			return cfg, nil
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
+}
+
+func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: TEST_IP_1,
+		automateIp:   TEST_IP_2,
+	}
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(path)
+			if err != nil {
+				return ExistingInfraConfigToml{}, err
+			}
+			cfg.ExternalDB.Database.Type = TYPE_AWS
+			return cfg, nil
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
 }
 
 func TestAddnodeModifyAutomate(t *testing.T) {

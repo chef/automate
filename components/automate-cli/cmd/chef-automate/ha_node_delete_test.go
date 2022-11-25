@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -84,6 +85,53 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 	assert.Equal(t, "1", nodedelete.(*DeleteNodeImpl).config.Automate.Config.InstanceCount)
 	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeImpl).config.Automate.Config.CertsByIP))
 	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeImpl).config.ExistingInfra.Config.AutomatePrivateIps))
+}
+
+func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		postgresqlIp: TEST_IP_1,
+	}
+	nodeAdd := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(path)
+			if err != nil {
+				return ExistingInfraConfigToml{}, err
+			}
+			cfg.ExternalDB.Database.Type = TYPE_AWS
+			return cfg, nil
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+	err := nodeAdd.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
+}
+
+func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: TEST_IP_1,
+		automateIp:   TEST_IP_2,
+	}
+	nodeAdd := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(path)
+			if err != nil {
+				return ExistingInfraConfigToml{}, err
+			}
+			cfg.ExternalDB.Database.Type = TYPE_AWS
+			return cfg, nil
+		},
+		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
+			return &SSHConfig{}, nil
+		},
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+	err := nodeAdd.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
 }
 
 func TestDeleteNodeModifyInfra(t *testing.T) {

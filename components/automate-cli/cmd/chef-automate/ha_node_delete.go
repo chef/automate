@@ -133,6 +133,11 @@ func (dni *DeleteNodeImpl) validate() error {
 		dni.flags.opensearchIp,
 		dni.flags.postgresqlIp,
 	)
+	if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
+		if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIp) > 0 {
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+		}
+	}
 	errorList := dni.validateCmdArgs(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIp, dni.opensearchIpList, dni.config)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")

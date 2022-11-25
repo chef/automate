@@ -16,6 +16,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	TYPE_ERROR = `Cannot %s OpenSearch or Postgresql nodes if external.database.type is either aws or self-managed.
+Please set external.database.type to empty if you want to add OpenSearch or Postgresql nodes`
+	TYPE_AWS          = "aws"
+	TYPE_SELF_MANAGED = "self-managed"
+)
+
 type AddDeleteNodeHACmdFlags struct {
 	automateIp   string
 	chefServerIp string
@@ -145,6 +152,11 @@ func (ani *AddNodeImpl) validate() error {
 		ani.flags.opensearchIp,
 		ani.flags.postgresqlIp,
 	)
+	if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
+		if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+		}
+	}
 	errorList := ani.validateCmdArgs(ani.automateIpList, ani.chefServerIpList, ani.postgresqlIp, ani.opensearchIpList, ani.config)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
