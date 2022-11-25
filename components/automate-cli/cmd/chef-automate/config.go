@@ -148,10 +148,8 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 
-		writer.Bodyf("%v", configCmdFlags)
 		if configCmdFlags.overwriteFile {
-			writer.Error("Overwrite flag is not supported in HA")
-			// return errors.New("Node not mentioned")
+			writer.Errorln("Overwrite flag is not supported in HA")
 		}
 
 		var scriptCommand string
@@ -170,7 +168,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			hostIpArray = infra.Outputs.OpensearchPrivateIps.Value
 			scriptCommand = fmt.Sprintf(GET_CONFIG, "opensearch")
 		default:
-			return errors.New("Unsupported flag")
+			return errors.New("Missing or Unsupported flag\n Please run the following command to see all available flags \n\n`chef-automate config show --help`\n")
 		}
 		for i := 0; i < len(hostIpArray); i++ {
 			sshUtil.getSSHConfig().hostIP = hostIpArray[i]
@@ -178,7 +176,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			writer.Success("Config on node IP: " + hostIpArray[i] + "\n")
+			writer.Success("Configuration from " + hostIpArray[i] + "node:\n")
 			writer.Println(output)
 		}
 
