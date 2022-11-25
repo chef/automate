@@ -302,7 +302,7 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644)
+	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +317,7 @@ func getHAConfig() (*ExistingInfraConfigToml, error) {
 		}
 		return sharedConfigToml, nil
 	} else {
-		contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars"))
+		contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars")) // nosemgrep
 		if err != nil {
 			writer.Println(err.Error())
 			return nil, err
@@ -440,7 +440,7 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 func getJsonFromTerraformTfVarsFile(tfvarsContent string) (*HATfvars, error) {
 	rbScript := fmt.Sprintf(tfVarRbTemp, tfvarsContent, getKeysFromTfvars(tfvarsContent))
 	filenamePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "tfvar_json_script.rb")
-	err := ioutil.WriteFile(filenamePath, []byte(rbScript), 777)
+	err := ioutil.WriteFile(filenamePath, []byte(rbScript), 777) // nosemgrep
 	if err != nil {
 		writer.Println(err.Error())
 	}
@@ -482,7 +482,7 @@ func getKeysFromTfvars(text string) string {
 }
 
 func getModeOfDeployment() string {
-	contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch"))
+	contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 	if err != nil {
 		writer.Println(err.Error())
 		return ""

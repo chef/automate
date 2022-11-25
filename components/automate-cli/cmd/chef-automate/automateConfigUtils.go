@@ -47,7 +47,7 @@ func checkIPAddress(ip string) error {
 }
 
 func getExistingInfraConfig(configPath string) (*ExistingInfraConfigToml, error) {
-	templateBytes, err := ioutil.ReadFile(configPath)
+	templateBytes, err := ioutil.ReadFile(configPath) // nosemgrep
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
@@ -60,7 +60,7 @@ func getExistingInfraConfig(configPath string) (*ExistingInfraConfigToml, error)
 }
 
 func getAwsConfig(configPath string) (*AwsConfigToml, error) {
-	templateBytes, err := ioutil.ReadFile(configPath)
+	templateBytes, err := ioutil.ReadFile(configPath) // nosemgrep
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
