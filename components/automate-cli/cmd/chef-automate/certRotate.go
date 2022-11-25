@@ -287,15 +287,15 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	timestamp := time.Now().Format("20060102150405")
 	remoteService := "opensearch"
 
-	var admin_dn pkix.Name
+	var adminDn pkix.Name
 	var err error
-	if nodeFlag.node == "" {
-		admin_dn, err = getDistinguishedNameFromKey(adminCert)
+	if flagsObj.node == "" {
+		adminDn, err = getDistinguishedNameFromKey(certs.adminCert)
 		if err != nil {
 			return err
 		}
 	}
-	nodes_dn, err := getDistinguishedNameFromKey(publicCert)
+	nodesDn, err := getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
 		return err
 	}
