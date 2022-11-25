@@ -407,13 +407,13 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		err = configPuller.generateConfig()
+		config, err := configPuller.generateConfig()
 		if err != nil {
 			return err
 		}
-		writer.Println("Config_1 has generated...")
-	} else {
-		//TODO as of now we are supporting update of config at the time of existing infra deployment
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
+		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writer.Println("a2ha.rb has regenerated...")
 	}
 
 	if offlineMode {

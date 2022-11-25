@@ -105,7 +105,7 @@ type PullConfigs interface {
 	pullPGConfigs() (map[string]*ConfigKeys, error)
 	pullAutomateConfigs() (map[string]*dc.AutomateConfig, error)
 	pullChefServerConfigs() (map[string]*dc.AutomateConfig, error)
-	generateConfig() error
+	generateConfig() (*ExistingInfraConfigToml, error)
 }
 
 type PullConfigsImpl struct {
@@ -201,27 +201,27 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 	return ipConfigMap, nil
 }
 
-func (p *PullConfigsImpl) generateConfig() error {
+func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := getHAConfig()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	a2ConfigMap, err := p.pullAutomateConfigs()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	csConfigMap, err := p.pullChefServerConfigs()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	osConfigMap, err := p.pullOpensearchConfigs()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	pgConfigMap, err := p.pullPGConfigs()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var osCerts []CertByIP
@@ -288,13 +288,13 @@ func (p *PullConfigsImpl) generateConfig() error {
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return sharedConfigToml, nil
 }
 
 func getHAConfig() (*ExistingInfraConfigToml, error) {
