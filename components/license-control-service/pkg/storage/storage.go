@@ -20,7 +20,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
-const HATEMPPATH = "/var/automate-ha"
+const HATEMPPATH = "/hab/var/automate-ha"
 
 // NoLicenseError is the error returned by a backend when it does not
 // have a configured License.

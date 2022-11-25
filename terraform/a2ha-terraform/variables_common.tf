@@ -240,7 +240,7 @@ variable "teams_port" {
 }
 
 variable "tmp_path" {
-  default = "/var/automate-ha"
+  default = "/hab/var/automate-ha"
 }
 
 variable "sudo_password" {
