@@ -57,7 +57,7 @@ const (
 	automate-backend-ctl applied --svc=automate-ha-%s
 	`
 
-	GET_FRONTEND_CONFIGS = `sudo chef-automate config show`
+	GET_FRONTEND_CONFIG = `sudo chef-automate config show`
 
 	dateFormat = "%Y%m%d%H%M%S"
 
@@ -77,6 +77,10 @@ func init() {
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Shows configurations from Chef-server node(HA)")
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Shows configurations from PostgresQL node")
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Shows configurations from OpenSearch node")
+	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Shows configurations from Automate node(HA)[DUPLICATE]")
+	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.chef_server, "cs", false, "Shows configurations from Chef-server node(HA)[DUPLICATE]")
+	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Shows configurations from PostgresQL node[DUPLICATE]")
+	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.opensearch, "os", false, "Shows configurations from OpenSearch node[DUPLICATE]")
 
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Patch toml configuration to the all frontend nodes")
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
@@ -155,10 +159,10 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		switch true {
 		case configCmdFlags.automate:
 			hostIpArray = append(hostIpArray, infra.Outputs.AutomatePrivateIps.Value[0])
-			scriptCommand = GET_FRONTEND_CONFIGS
+			scriptCommand = GET_FRONTEND_CONFIG
 		case configCmdFlags.chef_server:
 			hostIpArray = append(hostIpArray, infra.Outputs.ChefServerPrivateIps.Value[0])
-			scriptCommand = GET_FRONTEND_CONFIGS
+			scriptCommand = GET_FRONTEND_CONFIG
 		case configCmdFlags.postgresql:
 			hostIpArray = infra.Outputs.PostgresqlPrivateIps.Value
 			scriptCommand = fmt.Sprintf(GET_CONFIG, "postgresql")
