@@ -36,31 +36,7 @@ var configCmdFlags = struct {
 }{}
 
 const (
-	FRONTEND_COMMANDS = `
-	sudo chef-automate config patch /tmp/%s;
-	export TIMESTAMP=$(date +'%s');
-	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
-	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`
-
-	BACKEND_COMMAND = `
-	export TIMESTAMP=$(date +"%s");
-	echo "yes" | sudo hab config apply automate-ha-%s.default  $(date '+%s') /tmp/%s;
-	`
-
-	GET_CONFIG = `
-	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
-	automate-backend-ctl show --svc=automate-ha-%s
-	`
-
-	GET_APPLIED_CONFIG = `
-	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
-	automate-backend-ctl applied --svc=automate-ha-%s
-	`
-
-	GET_FRONTEND_CONFIG = `sudo chef-automate config show`
-
-	dateFormat = "%Y%m%d%H%M%S"
-
+	dateFormat       = "%Y%m%d%H%M%S"
 	postgresql       = "postgresql"
 	opensearch_const = "opensearch"
 )
