@@ -43,6 +43,15 @@ var haTfvarsJsonString = `
 {"backup_config_efs":"true","existing_automate_private_ips":["10.1.0.150"],"existing_chef_server_private_ips":["10.1.0.151"],"existing_opensearch_private_ips":["10.1.0.202","10.1.1.201","10.1.2.200"],"existing_postgresql_private_ips":["10.1.0.100","10.1.1.101","10.1.2.102"],"automate_config_file":"/hab/a2_deploy_workspace/configs/automate.toml","automate_fqdn":"A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com","automate_instance_count":1,"chef_server_instance_count":1,"opensearch_instance_count":3,"nfs_mount_path":"/mnt/automate_backups","postgresql_instance_count":3,"postgresql_archive_disk_fs_path":"/mnt/automate_backups/postgresql","habitat_uid_gid":"","ssh_user":"test-user","ssh_port":"22","ssh_key_file":"/home/test-user/keys.pem"}
 `
 
+const (
+	ip1        = "127.0.0.1"
+	ip2        = "127.0.0.2"
+	ip3        = "127.0.0.3"
+	adminCert  = "it is a admin cert"
+	adminKey   = "it is a admin key"
+	rootCACert = "It is a root ca certificates"
+)
+
 var parsedJsonFromTfVarsStubb = &HATfvars{
 	SshUser:    "ec2-user",
 	SshPort:    "22",
@@ -72,17 +81,17 @@ func TestGetJsonFromTerraformTfVarsFile(t *testing.T) {
 }
 
 func TestGetA2ORCSRootCATLSEmpty(t *testing.T) {
-	output := getA2ORCSRootCA(map[string]*dc.AutomateConfig{"127.0.0.1": automateEmptySysConfigStubb})
+	output := getA2ORCSRootCA(map[string]*dc.AutomateConfig{ip1: automateEmptySysConfigStubb})
 	assert.Equal(t, "", output)
 }
 
 func TestGetA2ORCSRootCARootCertEmpty(t *testing.T) {
-	output := getA2ORCSRootCA(map[string]*dc.AutomateConfig{"127.0.0.1": automateConfigStubb})
+	output := getA2ORCSRootCA(map[string]*dc.AutomateConfig{ip1: automateConfigStubb})
 	assert.Equal(t, "", output)
 }
 func TestGetA2ORCSRootCA(t *testing.T) {
 	automateConfigStubb.Global.V1.Sys.Tls.RootCertContents = rootCertContents
-	output := getA2ORCSRootCA(map[string]*dc.AutomateConfig{"127.0.0.1": automateConfigStubb})
+	output := getA2ORCSRootCA(map[string]*dc.AutomateConfig{ip1: automateConfigStubb})
 	assert.Equal(t, rootCertContents, output)
 }
 
@@ -92,9 +101,9 @@ func TestGetA2ORCSRootCAEmptyMap(t *testing.T) {
 }
 
 func TestGetOSAdminCertAndAdminKeyAdminKey(t *testing.T) {
-	certOut, keyOut := getOSAdminCertAndAdminKey(map[string]*ConfigKeys{"127.0.0.1": {}, "127.0.0.2": {adminCert: "it is a admin cert", adminKey: "it is a admin key"}})
-	assert.Equal(t, "it is a admin cert", certOut)
-	assert.Equal(t, "it is a admin key", keyOut)
+	certOut, keyOut := getOSAdminCertAndAdminKey(map[string]*ConfigKeys{ip1: {}, ip2: {adminCert: adminCert, adminKey: adminKey}})
+	assert.Equal(t, adminCert, certOut)
+	assert.Equal(t, adminKey, keyOut)
 }
 
 func TestGetOSAdminCertAndAdminKeyEmptyMap(t *testing.T) {
@@ -104,24 +113,24 @@ func TestGetOSAdminCertAndAdminKeyEmptyMap(t *testing.T) {
 }
 
 func TestGetOSAdminCertAndAdminKeyAdminKeyEmpty(t *testing.T) {
-	certOut, keyOut := getOSAdminCertAndAdminKey(map[string]*ConfigKeys{"127.0.0.1": {}, "127.0.0.2": {adminCert: "it is a admin cert"}})
-	assert.Equal(t, "it is a admin cert", certOut)
+	certOut, keyOut := getOSAdminCertAndAdminKey(map[string]*ConfigKeys{ip1: {}, ip2: {adminCert: adminCert}})
+	assert.Equal(t, adminCert, certOut)
 	assert.Equal(t, "", keyOut)
 }
 
 func TestGetOSAdminCertAndAdminKeyAdminCertEmpty(t *testing.T) {
-	certOut, keyOut := getOSAdminCertAndAdminKey(map[string]*ConfigKeys{"127.0.0.1": {}, "127.0.0.2": {adminKey: "it is a admin key"}})
+	certOut, keyOut := getOSAdminCertAndAdminKey(map[string]*ConfigKeys{ip1: {}, ip2: {adminKey: adminKey}})
 	assert.Equal(t, "", certOut)
-	assert.Equal(t, "it is a admin key", keyOut)
+	assert.Equal(t, adminKey, keyOut)
 }
 
 func TestGetOSORPGRootCA(t *testing.T) {
-	out := getOSORPGRootCA(map[string]*ConfigKeys{"127.0.0.1": {}, "127.0.0.2": {}, "127.0.0.3": {rootCA: "It is a root ca certificates"}})
-	assert.Equal(t, "It is a root ca certificates", out)
+	out := getOSORPGRootCA(map[string]*ConfigKeys{ip1: {}, ip2: {}, ip3: {rootCA: rootCACert}})
+	assert.Equal(t, rootCACert, out)
 }
 
 func TestGetOSORPGRootCAEmpty(t *testing.T) {
-	out := getOSORPGRootCA(map[string]*ConfigKeys{"127.0.0.1": {}, "127.0.0.2": {}, "127.0.0.3": {rootCA: ""}})
+	out := getOSORPGRootCA(map[string]*ConfigKeys{ip1: {}, ip2: {}, ip3: {rootCA: ""}})
 	assert.Equal(t, "", out)
 }
 
