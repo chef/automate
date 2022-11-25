@@ -10,11 +10,13 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
+	"github.com/spf13/cobra"
 )
 
 const TAINT_TERRAFORM = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
 
 type HAModifyAndDeploy interface {
+	execute(c *cobra.Command, args []string, addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) error
 	prepare() error
 	validate() error
 	modifyConfig() error
@@ -28,6 +30,9 @@ type MockNodeUtilsImpl struct {
 	getHaInfraDetailsfunc                     func() (*SSHConfig, error)
 	genConfigfunc                             func(path string) error
 	taintTerraformFunc                        func(path string) error
+	isA2HARBFileExistFunc                     func() bool
+	getModeFromConfigFunc                     func(path string) (string, error)
+	checkIfFileExistFunc                      func(path string) bool
 }
 
 func (mnu *MockNodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
@@ -45,6 +50,15 @@ func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
 func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
 	return mnu.taintTerraformFunc(path)
 }
+func (mnu *MockNodeUtilsImpl) isA2HARBFileExist() bool {
+	return mnu.isA2HARBFileExistFunc()
+}
+func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
+	return mnu.getModeFromConfigFunc(path)
+}
+func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
+	return mnu.checkIfFileExistFunc(path)
+}
 
 type NodeOpUtils interface {
 	readConfig(path string) (ExistingInfraConfigToml, error)
@@ -52,12 +66,27 @@ type NodeOpUtils interface {
 	getHaInfraDetails() (*SSHConfig, error)
 	genConfig(path string) error
 	taintTerraform(path string) error
+	isA2HARBFileExist() bool
+	getModeFromConfig(path string) (string, error)
+	checkIfFileExist(path string) bool
 }
 
 type NodeUtilsImpl struct{}
 
 func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
+}
+
+func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
+	return checkIfFileExist(path)
+}
+
+func (nu *NodeUtilsImpl) getModeFromConfig(path string) (string, error) {
+	return getModeFromConfig(path)
+}
+
+func (nu *NodeUtilsImpl) isA2HARBFileExist() bool {
+	return isA2HARBFileExist()
 }
 
 func (nu *NodeUtilsImpl) taintTerraform(path string) error {

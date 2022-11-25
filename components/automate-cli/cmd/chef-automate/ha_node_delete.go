@@ -40,53 +40,8 @@ func deleteNodeHACmd() *cobra.Command {
 
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
-		if !isA2HARBFileExist() {
-			return errors.New(AUTOMATE_HA_INVALID_BASTION)
-		}
-		if addDeleteNodeHACmdFlags.automateIp == "" &&
-			addDeleteNodeHACmdFlags.chefServerIp == "" &&
-			addDeleteNodeHACmdFlags.opensearchIp == "" &&
-			addDeleteNodeHACmdFlags.postgresqlIp == "" {
-			c.Help()
-			return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
-		}
-		configFilePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
-		if !checkIfFileExist(configFilePath) {
-			return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
-		}
-		// check deployment type AWS or ExistingInfra
-		deployerType, err := getModeFromConfig(configFilePath)
-		if err != nil {
-			return err
-		}
-		if deployerType == EXISTING_INFRA_MODE {
-			nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{})
-			err := nodedeleter.validate()
-			if err != nil {
-				return err
-			}
-			err = nodedeleter.modifyConfig()
-			if err != nil {
-				return err
-			}
-			if !addDeleteNodeHACmdFlags.autoAccept {
-				res, err := nodedeleter.promptUserConfirmation()
-				if err != nil {
-					return err
-				}
-				if !res {
-					return nil
-				}
-			}
-			nodedeleter.prepare()
-			err = nodedeleter.runDeploy()
-			if err != nil {
-				return err
-			}
-		} else {
-			return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
-		}
-		return nil
+		nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{})
+		return nodedeleter.execute(c, args, addDeleteNodeHACmdFlags)
 	}
 }
 
@@ -114,6 +69,55 @@ func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils 
 		terraformPath: filepath.Join(haDirPath, "terraform"),
 		fileUtils:     fileutils,
 	}
+}
+
+func (dni *DeleteNodeImpl) execute(c *cobra.Command, args []string, addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) error {
+	if !dni.nodeUtils.isA2HARBFileExist() {
+		return errors.New(AUTOMATE_HA_INVALID_BASTION)
+	}
+	if addDeleteNodeHACmdFlags.automateIp == "" &&
+		addDeleteNodeHACmdFlags.chefServerIp == "" &&
+		addDeleteNodeHACmdFlags.opensearchIp == "" &&
+		addDeleteNodeHACmdFlags.postgresqlIp == "" {
+		c.Help()
+		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
+	}
+	configFilePath := filepath.Join(dni.configpath)
+	if !dni.nodeUtils.checkIfFileExist(configFilePath) {
+		return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
+	}
+	// check deployment type AWS or ExistingInfra
+	deployerType, err := dni.nodeUtils.getModeFromConfig(configFilePath)
+	if err != nil {
+		return err
+	}
+	if deployerType == EXISTING_INFRA_MODE {
+		err := dni.validate()
+		if err != nil {
+			return err
+		}
+		err = dni.modifyConfig()
+		if err != nil {
+			return err
+		}
+		if !addDeleteNodeHACmdFlags.autoAccept {
+			res, err := dni.promptUserConfirmation()
+			if err != nil {
+				return err
+			}
+			if !res {
+				return nil
+			}
+		}
+		dni.prepare()
+		err = dni.runDeploy()
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
+	}
+	return nil
 }
 
 func (dni *DeleteNodeImpl) prepare() error {
