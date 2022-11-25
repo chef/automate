@@ -202,11 +202,7 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 }
 
 func (p *PullConfigsImpl) generateConfig() error {
-	osConfigMap, err := p.pullOpensearchConfigs()
-	if err != nil {
-		return err
-	}
-	pgConfigMap, err := p.pullPGConfigs()
+	sharedConfigToml, err := getHAConfig()
 	if err != nil {
 		return err
 	}
@@ -219,6 +215,15 @@ func (p *PullConfigsImpl) generateConfig() error {
 		return err
 	}
 
+	osConfigMap, err := p.pullOpensearchConfigs()
+	if err != nil {
+		return err
+	}
+	pgConfigMap, err := p.pullPGConfigs()
+	if err != nil {
+		return err
+	}
+
 	var osCerts []CertByIP
 	for key, ele := range osConfigMap {
 		certByIP := CertByIP{
@@ -227,11 +232,6 @@ func (p *PullConfigsImpl) generateConfig() error {
 			PublicKey:  ele.publicKey,
 		}
 		osCerts = append(osCerts, certByIP)
-	}
-
-	sharedConfigToml, err := getHAConfig()
-	if err != nil {
-		return err
 	}
 
 	sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
@@ -290,7 +290,7 @@ func (p *PullConfigsImpl) generateConfig() error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 600)
+	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644)
 	if err != nil {
 		return err
 	}
@@ -456,4 +456,18 @@ func getKeysFromTfvars(text string) string {
 		}
 	}
 	return keys
+}
+
+func getModeOfDeployment() string {
+	contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch"))
+	if err != nil {
+		writer.Println(err.Error())
+		return ""
+	}
+	deploymentMode := strings.TrimSpace(string(contentByte))
+
+	if strings.EqualFold(deploymentMode, "existing_nodes") {
+		return EXISTING_INFRA_MODE
+	}
+	return AWS_MODE
 }

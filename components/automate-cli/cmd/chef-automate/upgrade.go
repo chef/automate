@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
@@ -395,49 +394,27 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return errors.New("canceled upgrade")
 		}
 	}
-
-	data, err := ioutil.ReadFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE)
-    if err != nil {
-        return err
-    }
-    mode, err := getModeFromConfig(AUTOMATE_HA_WORKSPACE_CONFIG_FILE)
-    if err != nil {
-        return err
-    }
-    if mode == EXISTING_INFRA_MODE {
-        config := ExistingInfraConfigToml{}
-        err := toml.Unmarshal(data, &config)
-        if err != nil {
-            return err
-        }
-        finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
-        writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
-        writer.Println("a2ha.rb has regenerated...")
-        infra, err := getAutomateHAInfraDetails()
-        if err != nil {
-            return err
-        }
-        sshConfig := &SSHConfig{
-            sshUser:    infra.Outputs.SSHUser.Value,
-            sshKeyFile: infra.Outputs.SSHKeyFile.Value,
-            sshPort:    infra.Outputs.SSHPort.Value,
-        }
-        sshUtil := NewSSHUtil(sshConfig)
-        configPuller := NewPullConfigs(infra, sshUtil)
-        err = configPuller.generateConfig()
-        if err != nil {
-            return err
-        }
-        writer.Println("Config_1 has generated...")
-    } else if mode == AWS_MODE {
-        config := AwsConfigToml{}
-        err := toml.Unmarshal(data, config)
-        if err != nil {
-            return err
-        }
-        finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
-        writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
-    }
+	modeOfDeployment := getModeOfDeployment()
+	if modeOfDeployment == EXISTING_INFRA_MODE {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
+		err = configPuller.generateConfig()
+		if err != nil {
+			return err
+		}
+		writer.Println("Config_1 has generated...")
+	} else {
+		//TODO as of now we are supporting update of config at the time of existing infra deployment
+	}
 
 	if offlineMode {
 		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap, upgradeRunCmdFlags.saas)
