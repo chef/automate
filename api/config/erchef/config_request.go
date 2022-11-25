@@ -25,7 +25,7 @@ func NewConfigRequest() *ConfigRequest {
 				DataCollector: &ConfigRequest_V1_System_DataCollector{},
 				Depsolver:     &ConfigRequest_V1_System_Depsolver{},
 				Memory:        &ConfigRequest_V1_System_Memory{},
-				IBrowse:       &ConfigRequest_V1_System_IBrowse{},
+				Ibrowse:       &ConfigRequest_V1_System_IBrowse{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -100,8 +100,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Depsolver.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Depsolver.PoolQueueTimeout = w.Int32(0)
 
-	c.V1.Sys.IBrowse.IbrowseMaxPipelineSize = w.Int32(1)
-	c.V1.Sys.IBrowse.IbrowseMaxSessions = w.Int32(256)
+	c.V1.Sys.Ibrowse.IbrowseMaxPipelineSize = w.Int32(1)
+	c.V1.Sys.Ibrowse.IbrowseMaxSessions = w.Int32(256)
 
 	return c
 }

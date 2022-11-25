@@ -54,7 +54,7 @@ func TestDefaultValues(t *testing.T) {
 
 	require.Equal(t, int32(900), defaultValues.GetV1().GetSys().GetApi().GetS3UrlTtl().GetValue())
 
-	require.Equal(t, int32(1), defaultValues.GetV1().GetSys().GetIBrowse().GetIbrowseMaxPipelineSize().GetValue())
-	require.Equal(t, int32(256), defaultValues.GetV1().GetSys().GetIBrowse().GetIbrowseMaxSessions().GetValue())
+	require.Equal(t, int32(1), defaultValues.GetV1().GetSys().GetIbrowse().GetIbrowseMaxPipelineSize().GetValue())
+	require.Equal(t, int32(256), defaultValues.GetV1().GetSys().GetIbrowse().GetIbrowseMaxSessions().GetValue())
 
 }

@@ -31,7 +31,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 11;
 			Memory memory = 12;
 			chef.automate.infra.config.External.Automate external_automate = 13;
-			IBrowse iBrowse = 14;
+			IBrowse ibrowse = 14;
 
 			message Network {
 				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10203, protocol: "https" } ];
