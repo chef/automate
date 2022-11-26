@@ -477,8 +477,6 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-If you encounter any problems executing the above steps, please refer to the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
-
 ### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
 
 {{< warning >}}
@@ -540,8 +538,6 @@ Once the command executes, it will remove the supplied nodes from your automate 
 - Postgresql instance count cannot be less than 3.
 
 {{< /note >}}
-
-If you encounter any problems executing the above steps, please refer to the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How to Replace Node in Automate HA Cluster
 
@@ -611,7 +607,7 @@ To uninstall chef automate HA instances after unsuccessful deployment, run the b
 
 ### Troubleshooting
 
-#### Failure in adding nodes
+#### Failure to replacing nodes
 
   ```bash
   Error: Upload failed: scp: /var/automate-ha: Permission denied
