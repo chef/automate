@@ -25,9 +25,9 @@ pkg_deps=(
   core/busybox-static
   chef/automate-ha-cluster-ctl
 )
-
+ 
 pkg_build_deps=(
-  core/gcc 
+  core/gcc
 )
 
 # workaround for https://github.com/habitat-sh/habitat/issues/6341
