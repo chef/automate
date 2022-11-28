@@ -42,7 +42,7 @@ locals {
     opensearch_user_password        = var.opensearch_user_password
   })
 
-  keystore = templatefile("${path.module}/templates/provision1.sh.tpl", {
+  keystore = templatefile("${path.module}/templates/opensearch.keystore.sh.tpl", {
     opensearch_pkg_ident            = var.opensearch_pkg_ident,
     backup_config_s3                = var.backup_config_s3
     access_key                      = var.access_key
@@ -141,14 +141,14 @@ resource "null_resource" "opensearch_keystore" {
   }
 
   provisioner "file" {
-    destination = "${var.tmp_path}/provision1.sh"
-    content     = local.provision
+    destination = "${var.tmp_path}/opensearch.keystore.sh"
+    content     = local.keystore
   }
 
   provisioner "remote-exec" {
     inline = [
-      "chmod 0700 ${var.tmp_path}/provision1.sh",
-      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/provision1.sh",
+      "chmod 0700 ${var.tmp_path}/opensearch.keystore.sh",
+      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/opensearch.keystore.sh",
     ]
   }
   depends_on = [ null_resource.opensearch ]
