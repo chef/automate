@@ -148,6 +148,7 @@ resource "null_resource" "opensearch_keystore" {
   provisioner "remote-exec" {
     inline = [
       "chmod 0700 ${var.tmp_path}/opensearch.keystore.sh",
+      "sleep ${count.index*2}",
       "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/opensearch.keystore.sh",
     ]
   }
