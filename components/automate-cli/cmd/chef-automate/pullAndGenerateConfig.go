@@ -345,22 +345,22 @@ func getHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, err
 		sharedConfigToml.Architecture.ConfigInitials.SecretsStoreFile = tfvarConfig.SecretsStoreFile
 	}
 
-	if strings.EqualFold(tfvarConfig.BackupConfigS3, "true") {
+	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigS3), "true") {
 		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "object_storage"
 	}
-	if strings.EqualFold(tfvarConfig.BackupConfigEFS, "true") {
+	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigEFS), "true") {
 		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "file_system"
 	}
-	sharedConfigToml.Architecture.ConfigInitials.BackupMount = tfvarConfig.NfsMountPath
-	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = tfvarConfig.HabitatUidGid
-	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = tfvarConfig.SshKeyFile
-	sharedConfigToml.Architecture.ConfigInitials.SSHPort = tfvarConfig.SshPort
-	sharedConfigToml.Architecture.ConfigInitials.SSHUser = tfvarConfig.SshUser
-	sharedConfigToml.Automate.Config.Fqdn = tfvarConfig.AutomateFqdn
+	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(tfvarConfig.NfsMountPath)
+	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(tfvarConfig.HabitatUidGid)
+	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
+	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
+	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
+	sharedConfigToml.Automate.Config.Fqdn = strings.TrimSpace(tfvarConfig.AutomateFqdn)
 	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
-	sharedConfigToml.Automate.Config.ConfigFile = tfvarConfig.AutomateConfigFile
+	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
 	sharedConfigToml.Automate.Config.EnableCustomCerts = tfvarConfig.AutomateCustomCertsEnabled
-	sharedConfigToml.Automate.Config.AdminPassword = tfvarConfig.AutomateAdminPassword
+	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(tfvarConfig.AutomateAdminPassword)
 	sharedConfigToml.Automate.Config.TeamsPort = strconv.Itoa(tfvarConfig.TeamsPort)
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = tfvarConfig.ChefServerCustomCertsEnabled
 	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(tfvarConfig.ChefServerInstanceCount)
@@ -368,33 +368,33 @@ func getHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, err
 	sharedConfigToml.Postgresql.Config.InstanceCount = strconv.Itoa(tfvarConfig.PostgresqlInstanceCount)
 	sharedConfigToml.Opensearch.Config.EnableCustomCerts = tfvarConfig.OpensearchCustomCertsEnabled
 	sharedConfigToml.Opensearch.Config.InstanceCount = strconv.Itoa(tfvarConfig.OpensearchInstanceCount)
-	sharedConfigToml.Opensearch.Config.AdminDn = tfvarConfig.OpensearchAdminDn
-	sharedConfigToml.Opensearch.Config.NodesDn = tfvarConfig.OpensearchNodesDn
+	sharedConfigToml.Opensearch.Config.AdminDn = strings.TrimSpace(tfvarConfig.OpensearchAdminDn)
+	sharedConfigToml.Opensearch.Config.NodesDn = strings.TrimSpace(tfvarConfig.OpensearchNodesDn)
 	sharedConfigToml.ExistingInfra.Config.AutomatePrivateIps = tfvarConfig.ExistingAutomatePrivateIps
 	sharedConfigToml.ExistingInfra.Config.ChefServerPrivateIps = tfvarConfig.ExistingChefServerPrivateIps
 	sharedConfigToml.ExistingInfra.Config.PostgresqlPrivateIps = tfvarConfig.ExistingPostgresqlPrivateIps
 	sharedConfigToml.ExistingInfra.Config.OpensearchPrivateIps = tfvarConfig.ExistingOpensearchPrivateIps
-	sharedConfigToml.ObjectStorage.Config.AccessKey = tfvarConfig.AccessKey
-	sharedConfigToml.ObjectStorage.Config.SecretKey = tfvarConfig.SecretKey
-	sharedConfigToml.ObjectStorage.Config.BucketName = tfvarConfig.BucketName
-	sharedConfigToml.ObjectStorage.Config.Endpoint = tfvarConfig.Endpoint
-	sharedConfigToml.ObjectStorage.Config.Region = tfvarConfig.Region
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = tfvarConfig.ManagedOpensearchDomainUrl
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = tfvarConfig.ManagedOpensearchDomainName
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchCertificate = tfvarConfig.ManagedOpensearchCertificate
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = tfvarConfig.OpensearchRootCert
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = tfvarConfig.ManagedOpensearchUsername
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = tfvarConfig.ManagedOpensearchUserPassword
-	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = tfvarConfig.AwsOsSnapshotRoleArn
-	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = tfvarConfig.OsSnapshotUserAccessKeyId
-	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = tfvarConfig.OsSnapshotUserAccessKeySecret
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLCertificate = tfvarConfig.ManagedRdsPostgresqlCertificate
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = tfvarConfig.ManagedRdsDbuserUsername
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = tfvarConfig.ManagedRdsDbuserPassword
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = tfvarConfig.ManagedRdsInstanceUrl
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert = tfvarConfig.PostgresqlRootCert
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName = tfvarConfig.ManagedRdsSuperuserUsername
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = tfvarConfig.ManagedRdsSuperuserPassword
+	sharedConfigToml.ObjectStorage.Config.AccessKey = strings.TrimSpace(tfvarConfig.AccessKey)
+	sharedConfigToml.ObjectStorage.Config.SecretKey = strings.TrimSpace(tfvarConfig.SecretKey)
+	sharedConfigToml.ObjectStorage.Config.BucketName = strings.TrimSpace(tfvarConfig.BucketName)
+	sharedConfigToml.ObjectStorage.Config.Endpoint = strings.TrimSpace(tfvarConfig.Endpoint)
+	sharedConfigToml.ObjectStorage.Config.Region = strings.TrimSpace(tfvarConfig.Region)
+	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainUrl)
+	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainName)
+	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchCertificate = strings.TrimSpace(tfvarConfig.ManagedOpensearchCertificate)
+	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = strings.TrimSpace(tfvarConfig.OpensearchRootCert)
+	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = strings.TrimSpace(tfvarConfig.ManagedOpensearchUsername)
+	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = strings.TrimSpace(tfvarConfig.ManagedOpensearchUserPassword)
+	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = strings.TrimSpace(tfvarConfig.AwsOsSnapshotRoleArn)
+	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeyId)
+	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeySecret)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLCertificate = strings.TrimSpace(tfvarConfig.ManagedRdsPostgresqlCertificate)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserUsername)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserPassword)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = strings.TrimSpace(tfvarConfig.ManagedRdsInstanceUrl)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert = strings.TrimSpace(tfvarConfig.PostgresqlRootCert)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserUsername)
+	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserPassword)
 	setupManagedServices := strings.TrimSpace(tfvarConfig.SetupManagedServices)
 	setupSelfManagedServices := strings.TrimSpace(tfvarConfig.SetupSelfManagedServices)
 	if strings.EqualFold(setupManagedServices, "true") && strings.EqualFold(setupSelfManagedServices, "true") {

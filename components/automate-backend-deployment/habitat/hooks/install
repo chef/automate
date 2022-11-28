@@ -113,6 +113,12 @@ EOF
     # fi
 
   # copy over the automate-cluster-ctl configs
+
+  if [[ -f $OLD_WORKSPACE/config.toml ]]; then
+    echo "Copying previous 'automate-cluster-ctl' config to new workspace"
+    cp $OLD_WORKSPACE/config.toml $NEW_WORKSPACE/config.toml
+  fi
+
   if [[ -f $OLD_WORKSPACE/a2ha.rb ]]; then
     echo "Copying previous 'automate-cluster-ctl' config and secrets to new workspace"
     cp $OLD_WORKSPACE/a2ha.rb $NEW_WORKSPACE/a2ha.rb
