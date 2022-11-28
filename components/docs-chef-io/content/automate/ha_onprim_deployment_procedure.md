@@ -418,7 +418,7 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-### How To Add More Nodes to the On-Prem Deployment
+### How To Add More Nodes to the OnPrem Deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
 For example,
@@ -477,9 +477,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-If you encounter any problems executing the above steps, please refer to the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
-
-### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
+### How To Remove Any Nodes From Frontend Cluster OnPrem Deployment
 
 {{< warning >}}
 
@@ -541,59 +539,10 @@ Once the command executes, it will remove the supplied nodes from your automate 
 
 {{< /note >}}
 
-If you encounter any problems executing the above steps, please refer to the troubleshooting section [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
-
 ### How to Replace Node in Automate HA Cluster
 
-- Open the `config.toml` at the bastion node.
-- Remove the `Ip Address` of the unhealthy node as explained below.
-- Add the new `Ip address` value, as explained in the below example.
-- Make sure all the necessary port and firewall settings are aligned in the new node.
-
- For example: Remove node to the existing deployed Postgres cluster.
- In the example, we are replacing the node `10.0.7.0` with `10.0.9.0`.
-
-  | Old Config | => | New Config |
-  | :--- | :--- | :--- |
-  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
-
-- Run the below command from the bastion node.
-
-  ```sh
-  cd /hab/a2_deploy_workspace/terraform
-  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
-  cd -
-  ```
-
-- To trigger the deploy command, we required the chef-automate airgap bundle to use the airgap bundle running on the current cluster. Download the airbapped bundle if it is missing or deleted.
-
-  - In case you need to know which Chef-Automate version is running, then ssh to one of the frontend nodes and run the below command.
-
-    ```sh
-    sudo chef-automate version
-    ```
-
-  - Output
-
-    ```sh
-    Version: 2
-    CLI Build: 20220920122615
-    Server Build: 4.X.Y
-    ```
-
-  - To download the airgap bundle, please run the command from the machine where we have internet access.
-
-    ```sh
-    chef-automate create airgap bundle --version 4.X.Y
-    ```
-
-  - Copy the airgap bundle to the bastion host.
-
-- Run the `deploy` command to replace a node.
-
-  ```sh
-    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
-  ```
+- First Add a New Node follow [this](#How-To-Add-More-Nodes-to-the-OnPrem-Deployment).
+- Delete a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster-OnPrem-Deployment).
 
 ### Uninstall chef automate HA
 
@@ -611,7 +560,7 @@ To uninstall chef automate HA instances after unsuccessful deployment, run the b
 
 ### Troubleshooting
 
-#### Failure in adding nodes
+#### Failure to replacing nodes
 
   ```bash
   Error: Upload failed: scp: /var/automate-ha: Permission denied
