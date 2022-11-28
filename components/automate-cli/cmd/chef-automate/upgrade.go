@@ -394,6 +394,27 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return errors.New("canceled upgrade")
 		}
 	}
+	modeOfDeployment := getModeOfDeployment()
+	if modeOfDeployment == EXISTING_INFRA_MODE {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
+		config, err := configPuller.generateConfig()
+		if err != nil {
+			return err
+		}
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
+		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writer.Println("a2ha.rb has regenerated...")
+	}
 
 	if offlineMode {
 		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap, upgradeRunCmdFlags.saas)

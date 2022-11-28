@@ -5,14 +5,42 @@ usage: |
 description: |
   Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT
 options:
+- name: a2
+  default_value: "false"
+  usage: Shows configurations from Automate node(HA)[DUPLICATE]
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Shows configurations from Automate node(HA)
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Shows configurations from Chef-server node(HA)
+- name: cs
+  default_value: "false"
+  usage: Shows configurations from Chef-server node(HA)[DUPLICATE]
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for show
-- name: overwrite
+- name: opensearch
   shorthand: o
   default_value: "false"
-  usage: Overwrite existing config.toml
+  usage: Shows configurations from OpenSearch node
+- name: os
+  default_value: "false"
+  usage: Shows configurations from OpenSearch node[DUPLICATE]
+- name: overwrite
+  shorthand: O
+  default_value: "false"
+  usage: Overwrite existing config.toml [Standalone]
+- name: pg
+  default_value: "false"
+  usage: Shows configurations from PostgresQL node[DUPLICATE]
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: Shows configurations from PostgresQL node
 inherited_options:
 - name: auto-approve
   shorthand: "y"

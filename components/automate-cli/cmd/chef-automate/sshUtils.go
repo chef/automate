@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/pkg/errors"
@@ -23,6 +24,7 @@ type SSHConfig struct {
 	sshKeyFile string
 	hostIP     string
 }
+
 type SSHUtil interface {
 	getSSHConfig() *SSHConfig
 	setSSHConfig(sshConfig *SSHConfig)
@@ -31,6 +33,7 @@ type SSHUtil interface {
 	connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error)
 	connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error)
 	copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error
+	copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error)
 }
 
 type SSHUtilImpl struct {
@@ -99,7 +102,7 @@ func (s *SSHUtilImpl) getConnection() (*ssh.Client, error) {
 	// Open connection
 	conn, err := ssh.Dial("tcp", s.SshConfig.hostIP+":"+s.SshConfig.sshPort, config)
 	if conn == nil || err != nil {
-		writer.Errorf("dial failed:%v", err)
+		writer.Errorf("dial failed:%v\n", err)
 		return nil, err
 	}
 	return conn, err
@@ -151,7 +154,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	// Open session
 	session, err := conn.NewSession()
 	if err != nil {
-		writer.Errorf("session failed:%v", err)
+		writer.Errorf("session failed:%v\n", err)
 		return "", err
 	}
 
@@ -167,7 +170,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 		writer.StopSpinner()
 	}
 	if err != nil {
-		writer.Errorf("Run failed: %v", err)
+		writer.Errorf("Run failed: %v\n", err)
 		return "", err
 	}
 	defer session.Close()
@@ -232,7 +235,6 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands
 }
 
 func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
-	writer.Printf("doing scp file transfer to remote node %s \n", s.SshConfig.hostIP)
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
@@ -247,8 +249,22 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 			return err
 		}
 	}
-	writer.Print("Copied file to remote\n")
 	return nil
+}
+
+// This function will copy file from remote to local and return new local file path
+func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
+	writer.Printf("Downloading file %s from remote node %s \n", remoteFilePath, s.SshConfig.hostIP)
+	cmd := "scp"
+	ts := time.Now().Format("20060102150405")
+	destFileName := "/tmp/" + ts + "_" + outputFileName
+	execArgs := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":" + remoteFilePath, destFileName}
+	if err := exec.Command(cmd, execArgs...).Run(); err != nil {
+		writer.Printf("Failed to copy file from remote %s\n", err.Error())
+		return "", err
+	}
+	writer.Printf("File downloaded %s \n", destFileName)
+	return destFileName, nil
 }
 
 func stdInRoutine(wr chan []byte, cmdWriter io.WriteCloser) {

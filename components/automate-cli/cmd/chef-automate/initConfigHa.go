@@ -17,6 +17,13 @@ var initConfigHabA2HAPathFlag = struct {
 	a2haDirPath string
 }{}
 
+type CertByIP struct {
+	IP         string `toml:"ip"`
+	PrivateKey string `toml:"private_key"`
+	PublicKey  string `toml:"public_key"`
+	NodesDn    string `toml:"nodes_dn,omitempty"`
+}
+
 type AwsConfigToml struct {
 	Architecture struct {
 		ConfigInitials struct {
@@ -176,66 +183,49 @@ type ExistingInfraConfigToml struct {
 	} `toml:"architecture"`
 	Automate struct {
 		Config struct {
-			AdminPassword     string `toml:"admin_password"`
-			Fqdn              string `toml:"fqdn"`
-			InstanceCount     string `toml:"instance_count"`
-			TeamsPort         string `toml:"teams_port"`
-			ConfigFile        string `toml:"config_file"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			RootCA            string `toml:"root_ca"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
-			CertsByIP         []struct {
-				IP         string `toml:"ip"`
-				PrivateKey string `toml:"private_key"`
-				PublicKey  string `toml:"public_key"`
-			} `toml:"certs_by_ip"`
+			AdminPassword     string     `toml:"admin_password"`
+			Fqdn              string     `toml:"fqdn"`
+			InstanceCount     string     `toml:"instance_count"`
+			TeamsPort         string     `toml:"teams_port"`
+			ConfigFile        string     `toml:"config_file"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			RootCA            string     `toml:"root_ca"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
 		Config struct {
-			InstanceCount     string `toml:"instance_count"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
-			CertsByIP         []struct {
-				IP         string `toml:"ip"`
-				PrivateKey string `toml:"private_key"`
-				PublicKey  string `toml:"public_key"`
-			} `toml:"certs_by_ip"`
+			InstanceCount     string     `toml:"instance_count"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Opensearch struct {
 		Config struct {
-			InstanceCount     string `toml:"instance_count"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			RootCA            string `toml:"root_ca"`
-			AdminCert         string `toml:"admin_cert"`
-			AdminKey          string `toml:"admin_key"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
-			AdminDn           string `toml:"admin_dn"`
-			NodesDn           string `toml:"nodes_dn"`
-			CertsByIP         []struct {
-				IP         string `toml:"ip"`
-				PrivateKey string `toml:"private_key"`
-				PublicKey  string `toml:"public_key"`
-				NodesDn    string `toml:"nodes_dn"`
-			} `toml:"certs_by_ip"`
+			InstanceCount     string     `toml:"instance_count"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			RootCA            string     `toml:"root_ca"`
+			AdminCert         string     `toml:"admin_cert"`
+			AdminKey          string     `toml:"admin_key"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			AdminDn           string     `toml:"admin_dn"`
+			NodesDn           string     `toml:"nodes_dn"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
 		Config struct {
-			InstanceCount     string `toml:"instance_count"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			RootCA            string `toml:"root_ca"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
-			CertsByIP         []struct {
-				IP         string `toml:"ip"`
-				PrivateKey string `toml:"private_key"`
-				PublicKey  string `toml:"public_key"`
-			} `toml:"certs_by_ip"`
+			InstanceCount     string     `toml:"instance_count"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			RootCA            string     `toml:"root_ca"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"postgresql"`
 	ExistingInfra struct {

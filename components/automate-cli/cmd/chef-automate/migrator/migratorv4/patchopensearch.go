@@ -20,7 +20,7 @@ const (
 	MAX_OPEN_FILE_KEY                     = "Max open files"
 	MAX_LOCKED_MEM_KEY                    = "Max locked memory"
 	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95%"
-	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
+	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 1000
 	MAX_POSSIBLE_HEAP_SIZE                = 32
 	ELASTICSEARCH_DATA_DIR                = "/svc/automate-elasticsearch/data"
 	ELASTICSEARCH_VAR_DIR                 = "/svc/automate-elasticsearch/var"
