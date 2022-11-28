@@ -418,7 +418,7 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-### How To Add More Nodes to the On-Prem Deployment
+### How To Add More Nodes to the OnPrem Deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
 For example,
@@ -477,7 +477,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
+### How To Remove Any Nodes From Frontend Cluster OnPrem Deployment
 
 {{< warning >}}
 
@@ -541,8 +541,8 @@ Once the command executes, it will remove the supplied nodes from your automate 
 
 ### How to Replace Node in Automate HA Cluster
 
-- First Add a New Node follow [this](#How-To-Add-More-Nodes-to-the-On-Prem-Deployment).
-- Delete a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster)
+- First Add a New Node follow [this](#How-To-Add-More-Nodes-to-the-OnPrem-Deployment).
+- Delete a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster-OnPrem-Deployment).
 
 ### Uninstall chef automate HA
 
