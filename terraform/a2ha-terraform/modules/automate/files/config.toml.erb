@@ -262,3 +262,7 @@
 <% if overrides[:automate_config_file] %>
 <%= File.read(overrides[:automate_config_file]) %>
 <% end %>
+
+[erchef.v1.sys.api]
+  s3_url_ttl = 28800
+  

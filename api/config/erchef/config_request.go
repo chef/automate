@@ -25,6 +25,7 @@ func NewConfigRequest() *ConfigRequest {
 				DataCollector: &ConfigRequest_V1_System_DataCollector{},
 				Depsolver:     &ConfigRequest_V1_System_Depsolver{},
 				Memory:        &ConfigRequest_V1_System_Memory{},
+				Ibrowse:       &ConfigRequest_V1_System_IBrowse{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -49,6 +50,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Api.BaseResourceUrl = w.String("host_header")
 	c.V1.Sys.Api.StrictSearchResultAcls = w.Bool(false)
 	c.V1.Sys.Api.ActionsFqdn = w.String("")
+	c.V1.Sys.Api.S3UrlTtl = w.Int32(900)
 
 	c.V1.Sys.Keygen.WorkerCount = w.Int32(2)
 	c.V1.Sys.Keygen.CacheSize = w.Int32(10)
@@ -72,6 +74,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Authz.PoolMaxSize = w.Int32(100)
 	c.V1.Sys.Authz.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Authz.PoolQueueTimeout = w.Int32(2000)
+	c.V1.Sys.Authz.CleanupBatchSize = w.Int32(0)
 
 	c.V1.Sys.Sql.Timeout = w.Int32(5000)
 	c.V1.Sys.Sql.PoolInitSize = w.Int32(10)
@@ -96,6 +99,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Depsolver.PoolMaxSize = w.Int32(5)
 	c.V1.Sys.Depsolver.PoolQueueMax = w.Int32(50)
 	c.V1.Sys.Depsolver.PoolQueueTimeout = w.Int32(0)
+
+	c.V1.Sys.Ibrowse.IbrowseMaxPipelineSize = w.Int32(1)
+	c.V1.Sys.Ibrowse.IbrowseMaxSessions = w.Int32(256)
 
 	return c
 }
