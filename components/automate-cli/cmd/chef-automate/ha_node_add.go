@@ -133,7 +133,6 @@ func (ani *AddNodeImpl) prepare() error {
 func (ani *AddNodeImpl) validate() error {
 	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil)
 	if err != nil {
-		fmt.Println(":::::::11111", err)
 		return err
 	}
 	ani.config = *updatedConfig
@@ -159,7 +158,7 @@ func (ani *AddNodeImpl) validate() error {
 			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 		}
 	} else {
-		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", ani.configpath))
+		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", ani.configpath))
 	}
 	return nil
 }

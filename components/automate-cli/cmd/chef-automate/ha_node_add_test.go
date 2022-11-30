@@ -50,6 +50,29 @@ func (msu *MockSSHUtilsImpl) copyFileFromRemote(remoteFilePath string, outputFil
 	return msu.copyFileFromRemoteFunc(remoteFilePath, outputFileName)
 }
 
+func TestAddnodeValidateNotExistingInfra(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		automateIp: "10.2.1.67,ewewedw",
+	}
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return AWS_MODE, nil
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Unsupported deployment type. Please check "+CONFIG_TOML_PATH+"/config.toml")
+}
+
 func TestAddnodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
@@ -448,6 +471,73 @@ This will add the new nodes to your existing setup. It might take a while. Are y
 	err = nodeAdd.runDeploy()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
+}
+
+func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: TEST_IP_1,
+	}
+	var filewritten, deployed bool
+	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			deployed = true
+			return nil
+		},
+		genConfigfunc: func(path string) error {
+			return nil
+		},
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		checkIfFileExistFunc: func(path string) bool {
+			return checkIfFileExist(path)
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
+			if err != nil {
+				return nil, err
+			}
+			cfg.Automate.Config.CertsByIP = []CertByIP{}
+			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
+			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
+			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
+			return &cfg, nil
+		},
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
+		WriteToFileFunc: func(filepath string, data []byte) error {
+			filewritten = true
+			return nil
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.Execute(nil, nil)
+	assert.NoError(t, err)
+	assert.Contains(t, w.Output(), `Existing nodes:
+================================================
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
+
+New nodes to be added:
+================================================
+OpenSearch => 192.0.2.11
+This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	assert.Equal(t, true, filewritten)
+	assert.Equal(t, true, deployed)
 }
 
 func TestAddnodeExecuteWithNewOSNode(t *testing.T) {

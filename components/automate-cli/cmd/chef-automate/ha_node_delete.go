@@ -142,7 +142,7 @@ func (dni *DeleteNodeImpl) validate() error {
 			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 		}
 	} else {
-		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", dni.configpath))
+		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", dni.configpath))
 	}
 	return nil
 }
