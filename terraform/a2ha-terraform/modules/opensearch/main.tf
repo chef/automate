@@ -42,7 +42,7 @@ locals {
     opensearch_user_password        = var.opensearch_user_password
   })
 
-  keystore = templatefile("${path.module}/templates/opensearch.keystore.sh.tpl", {
+  keystore = templatefile("${path.module}/templates/opensearch-keystore.sh.tpl", {
     opensearch_pkg_ident            = var.opensearch_pkg_ident,
     backup_config_s3                = var.backup_config_s3
     access_key                      = var.access_key
