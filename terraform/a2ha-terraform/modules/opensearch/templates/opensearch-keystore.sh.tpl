@@ -11,7 +11,7 @@ OS_ORIGIN_NAME=$(echo "${opensearch_pkg_ident}" | awk -F/ '{print $1}')
 export OS_ORIGIN_NAME
 OS_PKG_NAME=$(echo "${opensearch_pkg_ident}" | awk -F/ '{print $2}')
 export OS_PKG_NAME
-OS_SETUP_FILE="opensearch.keystore.done"
+OS_SETUP_FILE="opensearchkeystore.done"
 export OS_SETUP_FILE
 
 # 
@@ -49,7 +49,7 @@ done
   echo "${access_key}" | hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force s3.client.default.access_key
   echo "${secret_key}" | hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force s3.client.default.secret_key
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
-  sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
+  sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearchkeystore
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
   curl -k -X POST "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty" -u "${opensearch_username}:${opensearch_user_password}"
   sudo touch $OPENSEARCH_PATH_CONF/$OS_SETUP_FILE
