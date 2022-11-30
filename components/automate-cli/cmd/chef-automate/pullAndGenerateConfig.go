@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,16 +13,6 @@ import (
 	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
-
-var tfVarRbTemp = `
-require 'json'
-
-%s
-
-puts({
-    %s
-}.to_json)
-`
 
 type ConfigKeys struct {
 	rootCA     string
@@ -238,17 +227,15 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 			}
 			osCerts = append(osCerts, certByIP)
 		}
-
 		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
-
 		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
-
 		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
 		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
 		if err != nil {
 			writer.Fail(err.Error())
 		}
 		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
+		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
 
 		var pgCerts []CertByIP
 		for key, ele := range pgConfigMap {
@@ -264,10 +251,9 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 			}
 			pgCerts = append(pgCerts, certByIP)
 		}
-
 		sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
-
 		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
+		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	}
 
 	var a2Certs []CertByIP
@@ -281,8 +267,7 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
-
-	sharedConfigToml.Automate.Config.RootCA = getA2ORCSRootCA(a2ConfigMap)
+	sharedConfigToml.Automate.Config.EnableCustomCerts = true
 
 	var csCerts []CertByIP
 	for key, ele := range csConfigMap {
@@ -297,6 +282,8 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
+	sharedConfigToml.Automate.Config.RootCA = getRootCAFromCS(csConfigMap)
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
@@ -317,12 +304,8 @@ func getHAConfig() (*ExistingInfraConfigToml, error) {
 		}
 		return sharedConfigToml, nil
 	} else {
-		contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars")) // nosemgrep
-		if err != nil {
-			writer.Println(err.Error())
-			return nil, err
-		}
-		tfvarConfig, err := getJsonFromTerraformTfVarsFile(string(contentByte))
+		jsonString := convTfvarToJson(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars"))
+		tfvarConfig, err := getJsonFromTerraformTfVarsFile(jsonString)
 		if err != nil {
 			return nil, err
 		}
@@ -415,6 +398,15 @@ func getOSORPGRootCA(config map[string]*ConfigKeys) string {
 	return ""
 }
 
+func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.GetGlobal().V1.External != nil && ele.GetGlobal().V1.External.Automate != nil && ele.GetGlobal().V1.External.Automate.Ssl.RootCert != nil {
+			return ele.GetGlobal().V1.External.Automate.Ssl.RootCert.Value
+		}
+	}
+	return ""
+}
+
 func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
 	for _, ele := range config {
 		if len(strings.TrimSpace(ele.adminCert)) > 0 && len(strings.TrimSpace(ele.adminKey)) > 0 {
@@ -437,30 +429,9 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
-func getJsonFromTerraformTfVarsFile(tfvarsContent string) (*HATfvars, error) {
-	rbScript := fmt.Sprintf(tfVarRbTemp, tfvarsContent, getKeysFromTfvars(tfvarsContent))
-	filenamePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "tfvar_json_script.rb")
-	err := ioutil.WriteFile(filenamePath, []byte(rbScript), 777) // nosemgrep
-	if err != nil {
-		writer.Println(err.Error())
-	}
-
-	pkgcmd := "HAB_LICENSE=accept-no-persist hab pkg path core/ruby30"
-	out, err := exec.Command("/bin/sh", "-c", pkgcmd).Output()
-	if err != nil {
-		writer.Fail(err.Error())
-		return nil, err
-	}
-	rubyBin := string(out)
-	rubyBin = strings.TrimSpace(rubyBin) + "/bin/ruby"
-
-	jsonStr, err := exec.Command(rubyBin, filenamePath).Output()
-	if err != nil {
-		writer.Println(err.Error())
-		return nil, err
-	}
+func getJsonFromTerraformTfVarsFile(jsonString string) (*HATfvars, error) {
 	params := HATfvars{}
-	err = json.Unmarshal(jsonStr, &params)
+	err := json.Unmarshal([]byte(jsonString), &params)
 	if err != nil {
 		writer.Fail(err.Error())
 		return nil, err
@@ -488,7 +459,6 @@ func getModeOfDeployment() string {
 		return ""
 	}
 	deploymentMode := strings.TrimSpace(string(contentByte))
-
 	if strings.EqualFold(deploymentMode, "existing_nodes") {
 		return EXISTING_INFRA_MODE
 	}

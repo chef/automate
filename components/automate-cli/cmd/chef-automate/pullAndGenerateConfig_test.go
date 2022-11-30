@@ -4,40 +4,13 @@ import (
 	"encoding/json"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	shared "github.com/chef/automate/api/config/shared"
 	"github.com/stretchr/testify/assert"
 )
-
-var tfVarFileStubb = `
-backup_config_efs = "true"
-
-
-# Existing nodes
-################################################################################
-existing_automate_private_ips = ["10.1.0.77"]
-existing_chef_server_private_ips = ["10.1.0.81"]
-existing_opensearch_private_ips = ["10.1.0.141", "10.1.1.250", "10.1.2.248"]
-existing_postgresql_private_ips = ["10.1.0.179", "10.1.1.9", "10.1.2.206"]
-
-# Common
-################################################################################
-automate_config_file = "/hab/a2_deploy_workspace/configs/automate.toml"
-automate_fqdn = "A2-c61bc8d7-automate-lb-1903596929.ap-southeast-1.elb.amazonaws.com" # leave commented out for AWS, othewise must be assigned
-automate_instance_count = 1
-chef_server_instance_count = 1
-opensearch_instance_count = 3
-nfs_mount_path = "/mnt/automate_backups"
-postgresql_instance_count = 3
-postgresql_archive_disk_fs_path = "/mnt/automate_backups/postgresql"
-
-habitat_uid_gid = ""
-ssh_user = "ec2-user"
-ssh_port = "22"
-ssh_key_file = "/home/ec2-user/a2ha-jay-sg.pem"
-`
 
 var haTfvarsJsonString = `
 {"backup_config_efs":"true","existing_automate_private_ips":["10.1.0.150"],"existing_chef_server_private_ips":["10.1.0.151"],"existing_opensearch_private_ips":["10.1.0.202","10.1.1.201","10.1.2.200"],"existing_postgresql_private_ips":["10.1.0.100","10.1.1.101","10.1.2.102"],"automate_config_file":"/hab/a2_deploy_workspace/configs/automate.toml","automate_fqdn":"A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com","automate_instance_count":1,"chef_server_instance_count":1,"opensearch_instance_count":3,"nfs_mount_path":"/mnt/automate_backups","postgresql_instance_count":3,"postgresql_archive_disk_fs_path":"/mnt/automate_backups/postgresql","habitat_uid_gid":"","ssh_user":"test-user","ssh_port":"22","ssh_key_file":"/home/test-user/keys.pem"}
@@ -75,9 +48,15 @@ var automateEmptySysConfigStubb = &dc.AutomateConfig{
 }
 
 func TestGetJsonFromTerraformTfVarsFile(t *testing.T) {
-	data, err := getJsonFromTerraformTfVarsFile(tfVarFileStubb)
-	assert.Error(t, err)
-	assert.Empty(t, data)
+	jsonStrings := convTfvarToJson("../../pkg/testfiles/terraform.tfvars")
+	assert.NotEqual(t, 0, len(strings.TrimSpace(jsonStrings)))
+	data, err := getJsonFromTerraformTfVarsFile(jsonStrings)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, data)
+	assert.NotEmpty(t, data.AutomateCertsByIp)
+	assert.NotEmpty(t, data.ChefServerCertsByIp)
+	assert.NotEmpty(t, data.OpensearchCertsByIp)
+	assert.NotEmpty(t, data.PostgresqlCertsByIp)
 }
 
 func TestGetA2ORCSRootCATLSEmpty(t *testing.T) {
