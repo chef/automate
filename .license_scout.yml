@@ -326,6 +326,9 @@ fallbacks:
     - name: golang.org/x/crypto
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/crypto/master/LICENSE
+    - name: github.com/apparentlymart/go-textseg
+      license_id: Unlicense
+      license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
 
   habitat:
     - name: chef/mlsa
