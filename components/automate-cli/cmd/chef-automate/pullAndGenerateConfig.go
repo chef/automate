@@ -441,18 +441,6 @@ func getJsonFromTerraformTfVarsFile(jsonString string) (*HATfvars, error) {
 
 }
 
-func getKeysFromTfvars(text string) string {
-	var keys string
-	tokens := strings.Split(text, "\n")
-	for _, token := range tokens {
-		if len(token) > 0 && strings.Contains(token, "=") {
-			key := strings.TrimSpace(token[0:strings.Index(token, "=")])
-			keys = keys + ":" + key + " => " + key + ", \n"
-		}
-	}
-	return keys
-}
-
 func getModeOfDeployment() string {
 	contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 	if err != nil {
