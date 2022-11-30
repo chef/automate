@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func PullConfFunc(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
 	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
@@ -153,7 +153,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
@@ -469,7 +469,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		taintTerraformFunc: func(path string) error {
 			return nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err

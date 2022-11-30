@@ -32,7 +32,7 @@ type MockNodeUtilsImpl struct {
 	isA2HARBFileExistFunc                     func() bool
 	getModeFromConfigFunc                     func(path string) (string, error)
 	checkIfFileExistFunc                      func(path string) bool
-	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
+	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -56,8 +56,8 @@ func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
 func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
 	return mnu.checkIfFileExistFunc(path)
 }
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
-	return mnu.pullAndUpdateConfigFunc(sshUtil)
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
 }
 
 type NodeOpUtils interface {
@@ -68,7 +68,7 @@ type NodeOpUtils interface {
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
-	pullAndUpdateConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
+	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
 }
 
 type NodeUtilsImpl struct{}
@@ -77,13 +77,14 @@ func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
 		return nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
 	configPuller := NewPullConfigs(infra, *sshUtil)
+	configPuller.setExceptionIps(exceptionIps)
 	return configPuller.generateConfig()
 }
 
