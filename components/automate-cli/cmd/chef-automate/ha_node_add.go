@@ -101,40 +101,27 @@ func (ani *AddNodeImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
 	}
-	configFilePath := filepath.Join(ani.configpath)
-	if !ani.nodeUtils.checkIfFileExist(configFilePath) {
-		return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
-	}
-	// check deployment type AWS or ExistingInfra
-	deployerType, err := ani.nodeUtils.getModeFromConfig(configFilePath)
+	err := ani.validate()
 	if err != nil {
 		return err
 	}
-	if deployerType == EXISTING_INFRA_MODE {
-		err = ani.validate()
+	err = ani.modifyConfig()
+	if err != nil {
+		return err
+	}
+	if !ani.flags.autoAccept {
+		res, err := ani.promptUserConfirmation()
 		if err != nil {
 			return err
 		}
-		err = ani.modifyConfig()
-		if err != nil {
-			return err
+		if !res {
+			return nil
 		}
-		if !ani.flags.autoAccept {
-			res, err := ani.promptUserConfirmation()
-			if err != nil {
-				return err
-			}
-			if !res {
-				return nil
-			}
-		}
-		ani.prepare()
-		err = ani.runDeploy()
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
+	}
+	ani.prepare()
+	err = ani.runDeploy()
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -144,26 +131,35 @@ func (ani *AddNodeImpl) prepare() error {
 }
 
 func (ani *AddNodeImpl) validate() error {
-	var err error
-	ani.config, err = ani.nodeUtils.readConfig(ani.configpath)
+	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil)
+	if err != nil {
+		fmt.Println(":::::::11111", err)
+		return err
+	}
+	ani.config = *updatedConfig
+	ani.copyConfigForUserPrompt = ani.config
+	deployerType, err := ani.nodeUtils.getModeFromConfig(ani.configpath)
 	if err != nil {
 		return err
 	}
-	ani.copyConfigForUserPrompt = ani.config
-	ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = splitIPCSV(
-		ani.flags.automateIp,
-		ani.flags.chefServerIp,
-		ani.flags.opensearchIp,
-		ani.flags.postgresqlIp,
-	)
-	if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-		if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
-			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+	if deployerType == EXISTING_INFRA_MODE {
+		ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = splitIPCSV(
+			ani.flags.automateIp,
+			ani.flags.chefServerIp,
+			ani.flags.opensearchIp,
+			ani.flags.postgresqlIp,
+		)
+		if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
+			if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
+				return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+			}
 		}
-	}
-	errorList := ani.validateCmdArgs(ani.automateIpList, ani.chefServerIpList, ani.postgresqlIp, ani.opensearchIpList, ani.config)
-	if errorList != nil && errorList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		errorList := ani.validateCmdArgs(ani.automateIpList, ani.chefServerIpList, ani.postgresqlIp, ani.opensearchIpList, ani.config)
+		if errorList != nil && errorList.Len() > 0 {
+			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		}
+	} else {
+		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", ani.configpath))
 	}
 	return nil
 }
@@ -293,7 +289,7 @@ func (ani *AddNodeImpl) validateIPAddresses(config ExistingInfraConfigToml, ips 
 }
 
 func (ani *AddNodeImpl) validateConnection(ip string) error {
-	sshConfig, err := ani.nodeUtils.getHaInfraDetails()
+	_, sshConfig, err := ani.nodeUtils.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
