@@ -402,8 +402,11 @@ func getOSORPGRootCA(config map[string]*ConfigKeys) string {
 }
 
 func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
+	if config == nil {
+		return ""
+	}
 	for _, ele := range config {
-		if ele.GetGlobal().V1.External != nil && ele.GetGlobal().V1.External.Automate != nil && ele.GetGlobal().V1.External.Automate.Ssl.RootCert != nil {
+		if ele.Global.V1.External != nil && ele.Global.V1.External.Automate != nil && ele.Global.V1.External.Automate.Ssl != nil && ele.Global.V1.External.Automate.Ssl.RootCert != nil {
 			return ele.GetGlobal().V1.External.Automate.Ssl.RootCert.Value
 		}
 	}
