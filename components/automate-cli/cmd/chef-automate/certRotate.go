@@ -466,6 +466,24 @@ func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetai
 	return []string{}
 }
 
+func (c *certRotateFlow) isIPInCluster(ip string, infra *AutomteHAInfraDetails) bool {
+	cluster := c.getAllIPs(infra)
+	for _, clusterIP := range cluster {
+		if ip == clusterIP {
+			return true
+		}
+	}
+	return false
+}
+
+// getAllIps will return all the ips of the cluster.
+func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
+	ips := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
+	ips = append(ips, infra.Outputs.PostgresqlPrivateIps.Value...)
+	ips = append(ips, infra.Outputs.OpensearchPrivateIps.Value...)
+	return ips
+}
+
 // getCerts will read the certificate paths, and then return the required certificates.
 func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags) (*certificates, error) {
 	privateCertPath := flagsObj.privateCertPath
@@ -559,7 +577,7 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 	certPath = strings.TrimSpace(certPath)
 	// Checking if the given path is remote or local.
 	if c.IsRemotePath(certPath) {
-		remoteFilePath, fileName, hostIP, err := c.GetRemoteFileDetails(certPath)
+		remoteFilePath, fileName, hostIP, err := c.GetRemoteFileDetails(certPath, infra)
 		if err != nil {
 			return nil, err
 		}
@@ -579,11 +597,16 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 }
 
 // GetRemoteFileDetails returns the remote file details from the remotePath.
-func (c *certRotateFlow) GetRemoteFileDetails(remotePath string) (string, string, string, error) {
+func (c *certRotateFlow) GetRemoteFileDetails(remotePath string, infra *AutomteHAInfraDetails) (string, string, string, error) {
 	// Get Host IP from the given path and validate it.
 	hostIP := c.GetIPV4(remotePath)
 	if net.ParseIP(hostIP).To4() == nil {
 		return "", "", "", errors.New(fmt.Sprintf("%v is not a valid IPv4 address", hostIP))
+	}
+
+	// Check if given IP is part cluster.
+	if !c.isIPInCluster(hostIP, infra) {
+		return "", "", "", errors.New(fmt.Sprintf("%v is not part of the cluster", hostIP))
 	}
 
 	// Get the file path and filename from the given remote address.
