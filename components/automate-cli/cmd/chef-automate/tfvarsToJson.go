@@ -15,7 +15,7 @@ func convTfvarToJson(filename string) string {
 		writer.Printf("Invalid or empty argument")
 		return ""
 	}
-	src, err := ioutil.ReadFile(filename)
+	src, err := ioutil.ReadFile(filename) // nosemgrep
 	if err != nil {
 		writer.Printf("Error reading %q: %s", filename, err)
 		return ""
