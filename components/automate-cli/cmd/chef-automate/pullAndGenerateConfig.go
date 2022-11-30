@@ -9,7 +9,9 @@ import (
 	"strings"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
@@ -98,11 +100,14 @@ type PullConfigs interface {
 	pullAutomateConfigs() (map[string]*dc.AutomateConfig, error)
 	pullChefServerConfigs() (map[string]*dc.AutomateConfig, error)
 	generateConfig() (*ExistingInfraConfigToml, error)
+	getExceptionIps() []string
+	setExceptionIps(ips []string)
 }
 
 type PullConfigsImpl struct {
-	infra   *AutomteHAInfraDetails
-	sshUtil SSHUtil
+	infra        *AutomteHAInfraDetails
+	sshUtil      SSHUtil
+	exceptionIps []string
 }
 
 func NewPullConfigs(infra *AutomteHAInfraDetails, sshUtil SSHUtil) PullConfigs {
@@ -112,9 +117,20 @@ func NewPullConfigs(infra *AutomteHAInfraDetails, sshUtil SSHUtil) PullConfigs {
 	}
 }
 
+func (p *PullConfigsImpl) getExceptionIps() []string {
+	return p.exceptionIps
+}
+
+func (p *PullConfigsImpl) setExceptionIps(ips []string) {
+	p.exceptionIps = ips
+}
+
 func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error) {
 	ipConfigMap := make(map[string]*ConfigKeys)
 	for _, ip := range p.infra.Outputs.OpensearchPrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		scriptCommands := fmt.Sprintf(GET_CONFIG, opensearch_const)
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
@@ -139,6 +155,9 @@ func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error
 func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 	ipConfigMap := make(map[string]*ConfigKeys)
 	for _, ip := range p.infra.Outputs.PostgresqlPrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		scriptCommands := fmt.Sprintf(GET_CONFIG, postgresql)
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
@@ -161,6 +180,9 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_FRONTEND_CONFIG, true)
 		if err != nil {
@@ -179,6 +201,9 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig, error) {
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.ChefServerPrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_FRONTEND_CONFIG, true)
 		if err != nil {
@@ -196,34 +221,39 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := getHAConfig()
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 	a2ConfigMap, err := p.pullAutomateConfigs()
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
 	}
 	csConfigMap, err := p.pullChefServerConfigs()
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
 	// checking onprem with managed or self managed services
 	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
 	if len(strings.TrimSpace(sharedConfigToml.ExternalDB.Database.Type)) < 1 {
 		osConfigMap, err := p.pullOpensearchConfigs()
 		if err != nil {
-			return nil, err
+			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
 		}
 		pgConfigMap, err := p.pullPGConfigs()
 		if err != nil {
-			return nil, err
+			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
 		}
 
 		var osCerts []CertByIP
 		for key, ele := range osConfigMap {
+			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
+			if err != nil {
+				writer.Fail(err.Error())
+			}
 			certByIP := CertByIP{
 				IP:         key,
 				PrivateKey: ele.privateKey,
 				PublicKey:  ele.publicKey,
+				NodesDn:    fmt.Sprintf("%v", nodeDn),
 			}
 			osCerts = append(osCerts, certByIP)
 		}
@@ -239,15 +269,10 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 
 		var pgCerts []CertByIP
 		for key, ele := range pgConfigMap {
-			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
-			if err != nil {
-				writer.Fail(err.Error())
-			}
 			certByIP := CertByIP{
 				IP:         key,
 				PrivateKey: ele.privateKey,
 				PublicKey:  ele.publicKey,
-				NodesDn:    fmt.Sprintf("%v", nodeDn),
 			}
 			pgCerts = append(pgCerts, certByIP)
 		}
@@ -287,11 +312,11 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 	}
 	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 	}
 	return sharedConfigToml, nil
 }
