@@ -100,7 +100,13 @@ func (s *SSHUtilImpl) getConnection() (*ssh.Client, error) {
 		return nil, err
 	}
 	// Open connection
-	conn, err := ssh.Dial("tcp", s.SshConfig.hostIP+":"+s.SshConfig.sshPort, config)
+	addr := s.SshConfig.hostIP
+	if len(strings.TrimSpace(s.SshConfig.sshPort)) > 0 {
+		addr = addr + ":" + s.SshConfig.sshPort
+	} else {
+		addr = addr + ":22"
+	}
+	conn, err := ssh.Dial("tcp", addr, config)
 	if conn == nil || err != nil {
 		writer.Errorf("dial failed:%v\n", err)
 		return nil, err
