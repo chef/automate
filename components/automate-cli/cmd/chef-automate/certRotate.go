@@ -466,6 +466,7 @@ func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetai
 	return []string{}
 }
 
+// isIPInCluster will check whether the given ip is in the cluster or not.
 func (c *certRotateFlow) isIPInCluster(ip string, infra *AutomteHAInfraDetails) bool {
 	cluster := c.getAllIPs(infra)
 	for _, clusterIP := range cluster {
