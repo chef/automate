@@ -62,4 +62,4 @@ The list of parameters are as follows:
 | oc_bifrost['extended_perf_log']                 | TRUE                                      | TRUE                             | ```bifrost.v1.sys.log.extended_perf_log```                 |
 | bookshelf['stream_download']                    | TRUE                                      | TRUE                             | ```bookshelf.v1.sys.bookshelf.stream_download```           |
 
-Click [here](https://docs.chef.io/server/ctl_chef_server/) for the detailed description of the above parameters.
+Click [here](https://docs.chef.io/server/config_rb_server_optional_settings/) for the detailed description of the above parameters.
