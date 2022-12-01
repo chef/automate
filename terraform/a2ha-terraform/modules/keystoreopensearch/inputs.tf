@@ -1,23 +1,13 @@
-variable "opensearch_instance_count" {
-  default = 3
-}
-
-variable "secret_key" {
-  default = ""
-}
 variable "access_key" {
   default = ""
 }
 
-variable "ssh_key_file" {
+variable "backup_config_s3" {
+  default = "false"
 }
 
-variable "ssh_port" {
-  default = 22
-}
-
-variable "private_ips" {
-  default = []
+variable "opensearch_instance_count" {
+  default = 3
 }
 
 variable "opensearch_listen_port" {
@@ -26,6 +16,21 @@ variable "opensearch_listen_port" {
 
 variable "opensearch_pkg_ident" {
   default = "chef/automate-ha-opensearch"
+}
+
+variable "private_ips" {
+  default = []
+}
+
+variable "secret_key" {
+  default = ""
+}
+
+variable "ssh_key_file" {
+}
+
+variable "ssh_port" {
+  default = 22
 }
 
 variable "ssh_user" {
@@ -41,8 +46,4 @@ variable "sudo_cmd" {
 
 variable "tmp_path" {
   default = "/hab/var/automate-ha"
-}
-
-variable "backup_config_s3" {
-  default = "false"
 }
