@@ -496,7 +496,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 	var rootCA, adminCert, adminKey []byte
 	var err error
 
-	const fileAccessErrorMsg string = "failed reading data from the given source, %s"
+	const fileAccessErrorMsg string = "failed reading data from the given source"
 
 	if privateCertPath == "" || publicCertPath == "" {
 		return nil, errors.New("Please provide public and private cert paths")
@@ -507,7 +507,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 		return nil, status.Wrap(
 			err,
 			status.FileAccessError,
-			fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+			fileAccessErrorMsg,
 		)
 	}
 
@@ -516,7 +516,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 		return nil, status.Wrap(
 			err,
 			status.FileAccessError,
-			fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+			fileAccessErrorMsg,
 		)
 	}
 
@@ -531,7 +531,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 				return nil, status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+					fileAccessErrorMsg,
 				)
 			}
 		}
@@ -548,7 +548,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 				return nil, status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+					fileAccessErrorMsg,
 				)
 			}
 
@@ -557,7 +557,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 				return nil, status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+					fileAccessErrorMsg,
 				)
 			}
 		}
