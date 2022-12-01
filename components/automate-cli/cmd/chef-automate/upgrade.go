@@ -386,7 +386,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
 	if !upgradeRunCmdFlags.acceptMLSA {
-		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		response, err := writer.Prompt("press y to start upgrade, n to to abort? [y/n]")
 		if err != nil {
 			return err
 		}

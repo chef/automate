@@ -268,6 +268,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			const remoteService string = "opensearch"
 			err = setConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
 
+		} else {
+			writer.Println(cmd.UsageString())
 		}
 		if err != nil {
 			writer.Errorf("%v", err)
