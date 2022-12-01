@@ -152,7 +152,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			writer.Success("Configuration from " + hostIpArray[i] + "node:\n")
+			writer.Success("Configuration from " + hostIpArray[i] + " node:\n")
 			writer.Println(output)
 		}
 
