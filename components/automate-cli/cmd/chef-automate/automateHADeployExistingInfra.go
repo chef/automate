@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -15,6 +16,12 @@ import (
 type existingInfra struct {
 	config     ExistingInfraConfigToml
 	configPath string
+}
+
+type keydetails struct {
+	key      string
+	certtype string
+	svc      string
 }
 
 func newExistingInfa(configPath string) *existingInfra {
@@ -51,7 +58,7 @@ func (e *existingInfra) generateConfig() error {
 	}
 	errList := e.validateConfigFields()
 	if errList != nil && errList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
+		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
 	err = e.addDNTocertConfig()
 	if err != nil {
@@ -250,6 +257,9 @@ func (e *existingInfra) validateCerts() *list.List {
 			if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) < 1 {
 				errorList.PushBack("Automate root_ca is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+			}))
 			if !stringutils.SubSlice(e.config.ExistingInfra.Config.AutomatePrivateIps, extractIPsFromCertsByIP(e.config.Automate.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some automate private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(e.config.ExistingInfra.Config.AutomatePrivateIps, ", "))
 			}
@@ -260,6 +270,10 @@ func (e *existingInfra) validateCerts() *list.List {
 					len(strings.TrimSpace(node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for Automate requires ip, private_key and public_key. Some of them are missing.")
 				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "automate cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "automate cert_by_ip for ip " + node.IP},
+				}))
 			}
 		} else {
 			// check if all the default certs are given
@@ -268,6 +282,11 @@ func (e *existingInfra) validateCerts() *list.List {
 				len(strings.TrimSpace(e.config.Automate.Config.PublicKey)) < 1 {
 				errorList.PushBack("Automate root_ca and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+				{key: e.config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
+				{key: e.config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
+			}))
 		}
 
 	}
@@ -285,6 +304,10 @@ func (e *existingInfra) validateCerts() *list.List {
 					len(strings.TrimSpace(node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for chef_server requires ip, private_key and public_key. Some of them are missing.")
 				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "chef-server cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "chef-server cert_by_ip for ip " + node.IP},
+				}))
 			}
 		} else {
 			// check if all the default certs are given
@@ -292,6 +315,10 @@ func (e *existingInfra) validateCerts() *list.List {
 				len(strings.TrimSpace(e.config.ChefServer.Config.PublicKey)) < 1 {
 				errorList.PushBack("ChefServer public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
+				{key: e.config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
+			}))
 		}
 	}
 
@@ -301,6 +328,9 @@ func (e *existingInfra) validateCerts() *list.List {
 			if len(strings.TrimSpace(e.config.Postgresql.Config.RootCA)) < 1 {
 				errorList.PushBack("Postgresql root_ca is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+			}))
 			if !stringutils.SubSlice(e.config.ExistingInfra.Config.PostgresqlPrivateIps, extractIPsFromCertsByIP(e.config.Postgresql.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some Postgresql private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(e.config.ExistingInfra.Config.PostgresqlPrivateIps, ", "))
 			}
@@ -311,6 +341,10 @@ func (e *existingInfra) validateCerts() *list.List {
 					len(strings.TrimSpace(node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for postgresql requires ip, private_key and public_key. Some of them are missing.")
 				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "postgresql cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "postgresql cert_by_ip for ip " + node.IP},
+				}))
 			}
 		} else {
 			// check if all the default certs are given
@@ -319,6 +353,11 @@ func (e *existingInfra) validateCerts() *list.List {
 				len(strings.TrimSpace(e.config.Postgresql.Config.PublicKey)) < 1 {
 				errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+				{key: e.config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
+				{key: e.config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+			}))
 		}
 	}
 
@@ -330,6 +369,11 @@ func (e *existingInfra) validateCerts() *list.List {
 				len(strings.TrimSpace(e.config.Opensearch.Config.AdminCert)) < 1 {
 				errorList.PushBack("Opensearch root_ca, admin_key or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+				{key: e.config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+				{key: e.config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+			}))
 			if !stringutils.SubSlice(e.config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(e.config.Opensearch.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(e.config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
 			}
@@ -340,6 +384,10 @@ func (e *existingInfra) validateCerts() *list.List {
 					len(strings.TrimSpace(node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
 				}
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: node.PrivateKey, certtype: "private_key", svc: "opensearch cert_by_ip for ip " + node.IP},
+					{key: node.PublicKey, certtype: "public_key", svc: "opensearch cert_by_ip for ip " + node.IP},
+				}))
 			}
 		} else {
 			// check if all the default certs are given
@@ -350,6 +398,13 @@ func (e *existingInfra) validateCerts() *list.List {
 				len(strings.TrimSpace(e.config.Opensearch.Config.PublicKey)) < 1 {
 				errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: e.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+				{key: e.config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+				{key: e.config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+				{key: e.config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
+				{key: e.config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+			}))
 		}
 	}
 	return errorList
@@ -416,5 +471,16 @@ func (e *existingInfra) validateIPs() *list.List {
 		}
 	}
 
+	return errorList
+}
+
+func checkCertValid(keys []keydetails) *list.List {
+	errorList := list.New()
+	for _, el := range keys {
+		block, _ := pem.Decode([]byte(el.key))
+		if block == nil {
+			errorList.PushBack("Invalid format. Failed to decode " + el.certtype + " for " + el.svc)
+		}
+	}
 	return errorList
 }

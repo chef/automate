@@ -10,19 +10,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
+	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
+	if err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
 func TestDeleteNodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "10.2.1.67,ewewedw",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
@@ -40,13 +53,18 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 		opensearchIp: "10.2.1.61,ewewedw",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
@@ -70,13 +88,18 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 		automateIp: "192.0.2.0",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -93,18 +116,25 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		postgresqlIp: TEST_IP_1,
 	}
 	nodeAdd := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			cfg, err := readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return ExistingInfraConfigToml{}, err
+				return nil, err
 			}
 			cfg.ExternalDB.Database.Type = TYPE_AWS
-			return cfg, nil
+			return &cfg, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+	})
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
@@ -117,18 +147,25 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		automateIp:   TEST_IP_2,
 	}
 	nodeAdd := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			cfg, err := readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
-				return ExistingInfraConfigToml{}, err
+				return nil, err
 			}
 			cfg.ExternalDB.Database.Type = TYPE_AWS
-			return cfg, nil
+			return &cfg, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+	})
 	err := nodeAdd.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
@@ -140,13 +177,18 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 		chefServerIp: "192.0.2.2",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Chef Server instance count cannot be less than 1. Final count 0 not allowed.")
@@ -165,13 +207,18 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 		opensearchIp: "192.0.2.6",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -188,13 +235,18 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 		postgresqlIp: "192.0.2.9",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
@@ -213,13 +265,18 @@ func TestDeleteNodePrompt(t *testing.T) {
 		automateIp: "192.0.2.0",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{})
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
 	err := nodedelete.validate()
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
@@ -248,11 +305,8 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 	}
 	var filewritten, deployed bool
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
-		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			deployed = true
@@ -261,10 +315,18 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			filewritten = true
 			return nil
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
 		},
 	})
 	err := nodedelete.validate()
@@ -298,11 +360,8 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		opensearchIp: "192.0.2.3,192.0.2.5",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
-		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
@@ -310,9 +369,17 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			return errors.New("random")
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
 		},
 	})
 	err := nodedelete.validate()
@@ -327,11 +394,8 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		opensearchIp: "192.0.2.3",
 	}
 	nodedelete := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
-		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
@@ -339,9 +403,17 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		genConfigfunc: func(path string) error {
 			return nil
 		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			return errors.New("random")
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
 		},
 	})
 	err := nodedelete.validate()
@@ -368,18 +440,15 @@ This will delete the above nodes from your existing setup. It might take a while
 	assert.Contains(t, err.Error(), "random")
 }
 
-func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
+func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
 	}
 	var filewritten, deployed bool
 	nodeAdd := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		readConfigfunc: func(path string) (ExistingInfraConfigToml, error) {
-			return readConfig(path)
-		},
-		getHaInfraDetailsfunc: func() (*SSHConfig, error) {
-			return &SSHConfig{}, nil
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			deployed = true
@@ -400,10 +469,82 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		taintTerraformFunc: func(path string) error {
 			return nil
 		},
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
+			if err != nil {
+				return nil, err
+			}
+			cfg.Automate.Config.CertsByIP = []CertByIP{}
+			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
+			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
+			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
+			return &cfg, nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			filewritten = true
 			return nil
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.Execute(nil, nil)
+	assert.NoError(t, err)
+	assert.Contains(t, w.Output(), `Existing nodes:
+================================================
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
+
+Nodes to be deleted:
+================================================
+OpenSearch => 192.0.2.6
+This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	assert.Equal(t, true, filewritten)
+	assert.Equal(t, true, deployed)
+}
+
+func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: "192.0.2.6",
+	}
+	var filewritten, deployed bool
+	nodeAdd := NewDeleteNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			deployed = true
+			return nil
+		},
+		genConfigfunc: func(path string) error {
+			return nil
+		},
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		checkIfFileExistFunc: func(path string) bool {
+			return checkIfFileExist(path)
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
+		WriteToFileFunc: func(filepath string, data []byte) error {
+			filewritten = true
+			return nil
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
 		},
 	})
 	err := nodeAdd.Execute(nil, nil)

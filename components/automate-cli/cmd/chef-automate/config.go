@@ -152,7 +152,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-			writer.Success("Configuration from " + hostIpArray[i] + "node:\n")
+			writer.Success("Configuration from " + hostIpArray[i] + " node:\n")
 			writer.Println(output)
 		}
 
@@ -268,6 +268,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			const remoteService string = "opensearch"
 			err = setConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
 
+		} else {
+			writer.Println(cmd.UsageString())
 		}
 		if err != nil {
 			writer.Errorf("%v", err)

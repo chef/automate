@@ -161,24 +161,24 @@ type AwsConfigToml struct {
 type ExistingInfraConfigToml struct {
 	Architecture struct {
 		ConfigInitials struct {
-			SecretsKeyFile              string `toml:"secrets_key_file"`
-			SecretsStoreFile            string `toml:"secrets_store_file"`
-			Architecture                string `toml:"architecture"`
-			WorkspacePath               string `toml:"workspace_path"`
-			SSHUser                     string `toml:"ssh_user"`
-			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort                     string `toml:"ssh_port"`
-			SudoPassword                string `toml:"sudo_password"`
-			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
-			NewElk                      string `toml:"new_elk"`
-			ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip"`
-			ExistingElkPort             string `toml:"existing_elk_port"`
-			ExistingElkCert             string `toml:"existing_elk_cert"`
-			ExistingElkUsername         string `toml:"existing_elk_username"`
-			ExistingElkPassword         string `toml:"existing_elk_password"`
-			BackupMount                 string `toml:"backup_mount"`
-			HabitatUIDGid               string `toml:"habitat_uid_gid"`
-			BackupConfig                string `toml:"backup_config"`
+			SecretsKeyFile              string `toml:"secrets_key_file,omitempty"`
+			SecretsStoreFile            string `toml:"secrets_store_file,omitempty"`
+			Architecture                string `toml:"architecture,omitempty"`
+			WorkspacePath               string `toml:"workspace_path,omitempty"`
+			SSHUser                     string `toml:"ssh_user,omitempty"`
+			SSHKeyFile                  string `toml:"ssh_key_file,omitempty"`
+			SSHPort                     string `toml:"ssh_port,omitempty"`
+			SudoPassword                string `toml:"sudo_password,omitempty"`
+			LoggingMonitoringManagement string `toml:"logging_monitoring_management,omitempty"`
+			NewElk                      string `toml:"new_elk,omitempty"`
+			ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip,omitempty"`
+			ExistingElkPort             string `toml:"existing_elk_port,omitempty"`
+			ExistingElkCert             string `toml:"existing_elk_cert,omitempty"`
+			ExistingElkUsername         string `toml:"existing_elk_username,omitempty"`
+			ExistingElkPassword         string `toml:"existing_elk_password,omitempty"`
+			BackupMount                 string `toml:"backup_mount,omitempty"`
+			HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
+			BackupConfig                string `toml:"backup_config,omitempty"`
 		} `toml:"existing_infra"`
 	} `toml:"architecture"`
 	Automate struct {
@@ -186,7 +186,7 @@ type ExistingInfraConfigToml struct {
 			AdminPassword     string     `toml:"admin_password"`
 			Fqdn              string     `toml:"fqdn"`
 			InstanceCount     string     `toml:"instance_count"`
-			TeamsPort         string     `toml:"teams_port"`
+			TeamsPort         string     `toml:"teams_port,omitempty"`
 			ConfigFile        string     `toml:"config_file"`
 			EnableCustomCerts bool       `toml:"enable_custom_certs"`
 			RootCA            string     `toml:"root_ca"`

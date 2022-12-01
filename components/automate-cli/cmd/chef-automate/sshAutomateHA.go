@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	dc "github.com/chef/automate/api/config/deployment"
 	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
+
+	dc "github.com/chef/automate/api/config/deployment"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
@@ -247,6 +248,7 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		if err != nil {
 			return nil, err
 		}
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 		return automateHAInfraDetails, nil
 	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
 		automateHAInfraDetails := &AutomteHAInfraDetails{}
@@ -258,10 +260,30 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		if err != nil {
 			return nil, err
 		}
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 		return automateHAInfraDetails, nil
 	} else {
 		writer.Error("Automate Ha infra confile file not exits.")
 		return nil, nil
+	}
+}
+
+func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomteHAInfraDetails) {
+	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
+		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
+		lastspaceIndex := strings.LastIndex(automateSSH, " ")
+		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) < 1 {
+			if strings.Contains(automateSSH, "-p") {
+				port := strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastspaceIndex])
+				automateHAInfraDetails.Outputs.SSHPort.Value = port
+			} else {
+				automateHAInfraDetails.Outputs.SSHPort.Value = "22"
+			}
+		}
+		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) < 1 {
+			sshUser := strings.TrimSpace(automateSSH[lastspaceIndex:strings.LastIndex(automateSSH, "@")])
+			automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
+		}
 	}
 }
 

@@ -4,26 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
-
-var tfVarRbTemp = `
-require 'json'
-
-%s
-
-puts({
-    %s
-}.to_json)
-`
 
 type ConfigKeys struct {
 	rootCA     string
@@ -109,11 +100,14 @@ type PullConfigs interface {
 	pullAutomateConfigs() (map[string]*dc.AutomateConfig, error)
 	pullChefServerConfigs() (map[string]*dc.AutomateConfig, error)
 	generateConfig() (*ExistingInfraConfigToml, error)
+	getExceptionIps() []string
+	setExceptionIps(ips []string)
 }
 
 type PullConfigsImpl struct {
-	infra   *AutomteHAInfraDetails
-	sshUtil SSHUtil
+	infra        *AutomteHAInfraDetails
+	sshUtil      SSHUtil
+	exceptionIps []string
 }
 
 func NewPullConfigs(infra *AutomteHAInfraDetails, sshUtil SSHUtil) PullConfigs {
@@ -123,9 +117,20 @@ func NewPullConfigs(infra *AutomteHAInfraDetails, sshUtil SSHUtil) PullConfigs {
 	}
 }
 
+func (p *PullConfigsImpl) getExceptionIps() []string {
+	return p.exceptionIps
+}
+
+func (p *PullConfigsImpl) setExceptionIps(ips []string) {
+	p.exceptionIps = ips
+}
+
 func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error) {
 	ipConfigMap := make(map[string]*ConfigKeys)
 	for _, ip := range p.infra.Outputs.OpensearchPrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		scriptCommands := fmt.Sprintf(GET_CONFIG, opensearch_const)
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
@@ -150,6 +155,9 @@ func (p *PullConfigsImpl) pullOpensearchConfigs() (map[string]*ConfigKeys, error
 func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 	ipConfigMap := make(map[string]*ConfigKeys)
 	for _, ip := range p.infra.Outputs.PostgresqlPrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		scriptCommands := fmt.Sprintf(GET_CONFIG, postgresql)
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
@@ -172,6 +180,9 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_FRONTEND_CONFIG, true)
 		if err != nil {
@@ -190,6 +201,9 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig, error) {
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.ChefServerPrivateIps.Value {
+		if stringutils.SliceContains(p.exceptionIps, ip) {
+			continue
+		}
 		p.sshUtil.getSSHConfig().hostIP = ip
 		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_FRONTEND_CONFIG, true)
 		if err != nil {
@@ -207,51 +221,30 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := getHAConfig()
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 	a2ConfigMap, err := p.pullAutomateConfigs()
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
 	}
 	csConfigMap, err := p.pullChefServerConfigs()
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
 	// checking onprem with managed or self managed services
 	logrus.Debug(sharedConfigToml.ExternalDB.Database.Type)
 	if len(strings.TrimSpace(sharedConfigToml.ExternalDB.Database.Type)) < 1 {
 		osConfigMap, err := p.pullOpensearchConfigs()
 		if err != nil {
-			return nil, err
+			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
 		}
 		pgConfigMap, err := p.pullPGConfigs()
 		if err != nil {
-			return nil, err
+			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
 		}
 
 		var osCerts []CertByIP
 		for key, ele := range osConfigMap {
-			certByIP := CertByIP{
-				IP:         key,
-				PrivateKey: ele.privateKey,
-				PublicKey:  ele.publicKey,
-			}
-			osCerts = append(osCerts, certByIP)
-		}
-
-		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
-
-		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
-
-		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
-		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
-		if err != nil {
-			writer.Fail(err.Error())
-		}
-		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
-
-		var pgCerts []CertByIP
-		for key, ele := range pgConfigMap {
 			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
 			if err != nil {
 				writer.Fail(err.Error())
@@ -262,12 +255,30 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 				PublicKey:  ele.publicKey,
 				NodesDn:    fmt.Sprintf("%v", nodeDn),
 			}
+			osCerts = append(osCerts, certByIP)
+		}
+		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
+		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
+		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
+		if err != nil {
+			writer.Fail(err.Error())
+		}
+		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
+		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
+
+		var pgCerts []CertByIP
+		for key, ele := range pgConfigMap {
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.privateKey,
+				PublicKey:  ele.publicKey,
+			}
 			pgCerts = append(pgCerts, certByIP)
 		}
-
 		sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
-
 		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
+		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	}
 
 	var a2Certs []CertByIP
@@ -281,8 +292,7 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
-
-	sharedConfigToml.Automate.Config.RootCA = getA2ORCSRootCA(a2ConfigMap)
+	sharedConfigToml.Automate.Config.EnableCustomCerts = true
 
 	var csCerts []CertByIP
 	for key, ele := range csConfigMap {
@@ -297,14 +307,16 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
+	sharedConfigToml.Automate.Config.RootCA = getRootCAFromCS(csConfigMap)
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 	}
 	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 	if err != nil {
-		return nil, err
+		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 	}
 	return sharedConfigToml, nil
 }
@@ -317,12 +329,8 @@ func getHAConfig() (*ExistingInfraConfigToml, error) {
 		}
 		return sharedConfigToml, nil
 	} else {
-		contentByte, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars")) // nosemgrep
-		if err != nil {
-			writer.Println(err.Error())
-			return nil, err
-		}
-		tfvarConfig, err := getJsonFromTerraformTfVarsFile(string(contentByte))
+		jsonString := convTfvarToJson(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars"))
+		tfvarConfig, err := getJsonFromTerraformTfVarsFile(jsonString)
 		if err != nil {
 			return nil, err
 		}
@@ -351,17 +359,20 @@ func getHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, err
 	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigEFS), "true") {
 		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "file_system"
 	}
+	if tfvarConfig.TeamsPort > 0 {
+		sharedConfigToml.Automate.Config.TeamsPort = strconv.Itoa(tfvarConfig.TeamsPort)
+	}
 	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(tfvarConfig.NfsMountPath)
 	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(tfvarConfig.HabitatUidGid)
 	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
 	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
+	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
 	sharedConfigToml.Automate.Config.Fqdn = strings.TrimSpace(tfvarConfig.AutomateFqdn)
 	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
 	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
 	sharedConfigToml.Automate.Config.EnableCustomCerts = tfvarConfig.AutomateCustomCertsEnabled
 	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(tfvarConfig.AutomateAdminPassword)
-	sharedConfigToml.Automate.Config.TeamsPort = strconv.Itoa(tfvarConfig.TeamsPort)
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = tfvarConfig.ChefServerCustomCertsEnabled
 	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(tfvarConfig.ChefServerInstanceCount)
 	sharedConfigToml.Postgresql.Config.EnableCustomCerts = tfvarConfig.PostgresqlCustomCertsEnabled
@@ -415,6 +426,18 @@ func getOSORPGRootCA(config map[string]*ConfigKeys) string {
 	return ""
 }
 
+func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
+	if config == nil {
+		return ""
+	}
+	for _, ele := range config {
+		if ele.Global.V1.External != nil && ele.Global.V1.External.Automate != nil && ele.Global.V1.External.Automate.Ssl != nil && ele.Global.V1.External.Automate.Ssl.RootCert != nil {
+			return ele.GetGlobal().V1.External.Automate.Ssl.RootCert.Value
+		}
+	}
+	return ""
+}
+
 func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
 	for _, ele := range config {
 		if len(strings.TrimSpace(ele.adminCert)) > 0 && len(strings.TrimSpace(ele.adminKey)) > 0 {
@@ -437,48 +460,15 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
-func getJsonFromTerraformTfVarsFile(tfvarsContent string) (*HATfvars, error) {
-	rbScript := fmt.Sprintf(tfVarRbTemp, tfvarsContent, getKeysFromTfvars(tfvarsContent))
-	filenamePath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "tfvar_json_script.rb")
-	err := ioutil.WriteFile(filenamePath, []byte(rbScript), 777) // nosemgrep
-	if err != nil {
-		writer.Println(err.Error())
-	}
-
-	pkgcmd := "HAB_LICENSE=accept-no-persist hab pkg path core/ruby30"
-	out, err := exec.Command("/bin/sh", "-c", pkgcmd).Output()
-	if err != nil {
-		writer.Fail(err.Error())
-		return nil, err
-	}
-	rubyBin := string(out)
-	rubyBin = strings.TrimSpace(rubyBin) + "/bin/ruby"
-
-	jsonStr, err := exec.Command(rubyBin, filenamePath).Output()
-	if err != nil {
-		writer.Println(err.Error())
-		return nil, err
-	}
+func getJsonFromTerraformTfVarsFile(jsonString string) (*HATfvars, error) {
 	params := HATfvars{}
-	err = json.Unmarshal(jsonStr, &params)
+	err := json.Unmarshal([]byte(jsonString), &params)
 	if err != nil {
 		writer.Fail(err.Error())
 		return nil, err
 	}
 	return &params, nil
 
-}
-
-func getKeysFromTfvars(text string) string {
-	var keys string
-	tokens := strings.Split(text, "\n")
-	for _, token := range tokens {
-		if len(token) > 0 && strings.Contains(token, "=") {
-			key := strings.TrimSpace(token[0:strings.Index(token, "=")])
-			keys = keys + ":" + key + " => " + key + ", \n"
-		}
-	}
-	return keys
 }
 
 func getModeOfDeployment() string {
@@ -488,7 +478,6 @@ func getModeOfDeployment() string {
 		return ""
 	}
 	deploymentMode := strings.TrimSpace(string(contentByte))
-
 	if strings.EqualFold(deploymentMode, "existing_nodes") {
 		return EXISTING_INFRA_MODE
 	}

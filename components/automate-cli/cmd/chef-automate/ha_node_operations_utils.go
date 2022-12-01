@@ -25,23 +25,20 @@ type HAModifyAndDeploy interface {
 }
 
 type MockNodeUtilsImpl struct {
-	readConfigfunc                            func(path string) (ExistingInfraConfigToml, error)
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
-	getHaInfraDetailsfunc                     func() (*SSHConfig, error)
+	getHaInfraDetailsfunc                     func() (*AutomteHAInfraDetails, *SSHConfig, error)
 	genConfigfunc                             func(path string) error
 	taintTerraformFunc                        func(path string) error
 	isA2HARBFileExistFunc                     func() bool
 	getModeFromConfigFunc                     func(path string) (string, error)
 	checkIfFileExistFunc                      func(path string) bool
+	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
 }
 
-func (mnu *MockNodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
-	return mnu.readConfigfunc(path)
-}
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	return mnu.executeAutomateClusterCtlCommandAsyncfunc(command, args, helpDocs)
 }
-func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*SSHConfig, error) {
+func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()
 }
 func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
@@ -59,22 +56,36 @@ func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
 func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
 	return mnu.checkIfFileExistFunc(path)
 }
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
+}
 
 type NodeOpUtils interface {
-	readConfig(path string) (ExistingInfraConfigToml, error)
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
-	getHaInfraDetails() (*SSHConfig, error)
+	getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error)
 	genConfig(path string) error
 	taintTerraform(path string) error
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
+	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
 }
 
 type NodeUtilsImpl struct{}
 
 func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
+}
+
+func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+	infra, cfg, err := nu.getHaInfraDetails()
+	if err != nil {
+		return nil, err
+	}
+	(*sshUtil).setSSHConfig(cfg)
+	configPuller := NewPullConfigs(infra, *sshUtil)
+	configPuller.setExceptionIps(exceptionIps)
+	return configPuller.generateConfig()
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
@@ -105,17 +116,17 @@ func (nu *NodeUtilsImpl) genConfig(path string) error {
 	return e.generateConfig()
 }
 
-func (nu *NodeUtilsImpl) getHaInfraDetails() (*SSHConfig, error) {
+func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
-		return &SSHConfig{}, err
+		return nil, nil, err
 	}
 	sshconfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshPort:    infra.Outputs.SSHPort.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 	}
-	return sshconfig, nil
+	return infra, sshconfig, nil
 }
 
 func trimSliceSpace(slc []string) []string {
@@ -135,13 +146,15 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 	if err != nil {
 		return err
 	}
-	for _, ip := range newIps {
-		c := CertByIP{
-			IP:         ip,
-			PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
-			PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
+	if len(*certsIp) > 0 {
+		for _, ip := range newIps {
+			c := CertByIP{
+				IP:         ip,
+				PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
+				PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
+			}
+			*certsIp = append(*certsIp, c)
 		}
-		*certsIp = append(*certsIp, c)
 	}
 	return nil
 }

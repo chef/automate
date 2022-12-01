@@ -40,7 +40,8 @@ func deleteNodeHACmd() *cobra.Command {
 
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
-		nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{})
+		sshconfig := &SSHConfig{}
+		nodedeleter := NewDeleteNode(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(sshconfig))
 		return nodedeleter.Execute(c, args)
 	}
 }
@@ -58,9 +59,10 @@ type DeleteNodeImpl struct {
 	terraformPath           string
 	writer                  *cli.Writer
 	fileUtils               fileutils.FileUtils
+	sshUtil                 SSHUtil
 }
 
-func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils) HAModifyAndDeploy {
+func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
 	return &DeleteNodeImpl{
 		flags:         flags,
 		writer:        writer,
@@ -68,6 +70,7 @@ func NewDeleteNode(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils 
 		configpath:    filepath.Join(haDirPath, "config.toml"),
 		terraformPath: filepath.Join(haDirPath, "terraform"),
 		fileUtils:     fileutils,
+		sshUtil:       sshUtil,
 	}
 }
 
@@ -82,40 +85,27 @@ func (dni *DeleteNodeImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
-	configFilePath := filepath.Join(dni.configpath)
-	if !dni.nodeUtils.checkIfFileExist(configFilePath) {
-		return status.New(status.FileAccessError, fmt.Sprintf("%s file not found.", configFilePath))
-	}
-	// check deployment type AWS or ExistingInfra
-	deployerType, err := dni.nodeUtils.getModeFromConfig(configFilePath)
+	err := dni.validate()
 	if err != nil {
 		return err
 	}
-	if deployerType == EXISTING_INFRA_MODE {
-		err := dni.validate()
+	err = dni.modifyConfig()
+	if err != nil {
+		return err
+	}
+	if !dni.flags.autoAccept {
+		res, err := dni.promptUserConfirmation()
 		if err != nil {
 			return err
 		}
-		err = dni.modifyConfig()
-		if err != nil {
-			return err
+		if !res {
+			return nil
 		}
-		if !dni.flags.autoAccept {
-			res, err := dni.promptUserConfirmation()
-			if err != nil {
-				return err
-			}
-			if !res {
-				return nil
-			}
-		}
-		dni.prepare()
-		err = dni.runDeploy()
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Failed to get deployment type. Please check %s", configFilePath))
+	}
+	dni.prepare()
+	err = dni.runDeploy()
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -125,26 +115,39 @@ func (dni *DeleteNodeImpl) prepare() error {
 }
 
 func (dni *DeleteNodeImpl) validate() error {
-	var err error
-	dni.config, err = dni.nodeUtils.readConfig(dni.configpath)
-	if err != nil {
-		return err
-	}
-	dni.copyConfigForUserPrompt = dni.config
 	dni.automateIpList, dni.chefServerIpList, dni.opensearchIpList, dni.postgresqlIp = splitIPCSV(
 		dni.flags.automateIp,
 		dni.flags.chefServerIp,
 		dni.flags.opensearchIp,
 		dni.flags.postgresqlIp,
 	)
-	if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-		if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIp) > 0 {
-			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
-		}
+	var exceptionIps []string
+	exceptionIps = append(exceptionIps, dni.automateIpList...)
+	exceptionIps = append(exceptionIps, dni.chefServerIpList...)
+	exceptionIps = append(exceptionIps, dni.opensearchIpList...)
+	exceptionIps = append(exceptionIps, dni.postgresqlIp...)
+	updatedConfig, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, exceptionIps)
+	if err != nil {
+		return err
 	}
-	errorList := dni.validateCmdArgs(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIp, dni.opensearchIpList, dni.config)
-	if errorList != nil && errorList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+	dni.config = *updatedConfig
+	dni.copyConfigForUserPrompt = dni.config
+	deployerType, err := dni.nodeUtils.getModeFromConfig(dni.configpath)
+	if err != nil {
+		return err
+	}
+	if deployerType == EXISTING_INFRA_MODE {
+		if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
+			if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIp) > 0 {
+				return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+			}
+		}
+		errorList := dni.validateCmdArgs(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIp, dni.opensearchIpList, dni.config)
+		if errorList != nil && errorList.Len() > 0 {
+			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		}
+	} else {
+		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", dni.configpath))
 	}
 	return nil
 }
