@@ -36,7 +36,7 @@
     <% end %>
 <% elsif overrides[:setup_managed_services] == true && overrides[:setup_self_managed_services] == true -%> 
     enable = true
-    nodes = ["https://<%= services[:opensearch][:managed_opensearch_domain_url] %>"]
+    nodes = ["<%= services[:opensearch][:protocol] %>://<%= services[:opensearch][:managed_opensearch_domain_url] %>"]
     [global.v1.external.opensearch.auth]
       scheme = "basic_auth"
       [global.v1.external.opensearch.auth.basic_auth]

@@ -469,7 +469,8 @@ dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
 
-# In case of AWS managed RDS leave it blank
+# In case of AWS managed RDS leave it empty
+# In case of self-managed without 'https' protocol, leave it empty
 postgresql_root_cert = "<cert_content>"
 
 [external.database.open_search]
@@ -486,7 +487,8 @@ opensearch_username = ""
 # eg: opensearch_user_password = "Progress@123"
 opensearch_user_password = ""
 
-# In case of AWS managed opensearch leave it blank
+# In case of AWS managed opensearch leave it empty
+# In case of self-managed without 'https' protocol, leave it empty
 opensearch_root_cert = "<cert_content>"
 
 [external.database.open_search.aws]

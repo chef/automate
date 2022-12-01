@@ -33,6 +33,7 @@ locals {
       setup_managed_services             = var.setup_managed_services,
       setup_self_managed_services        = var.setup_self_managed_services,
       opensearch_root_cert               = var.opensearch_root_cert,
+      protocol                           = length(trimspace(var.opensearch_root_cert)) < 1 ? "http" : "https"
       postgresql_root_cert               = var.postgresql_root_cert,
       teams_port                         = var.teams_port,
       tmp_path                           = var.tmp_path,

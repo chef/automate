@@ -49,6 +49,7 @@
   os_snapshot_user_access_key_id = "${os_snapshot_user_access_key_id}"
   os_snapshot_user_access_key_secret = "${os_snapshot_user_access_key_secret}"
   opensearch_root_cert = """${opensearch_root_cert}"""
+  protocol="${protocol}"
 
   [services.postgresql]
   ips = ${postgresql_ips}
