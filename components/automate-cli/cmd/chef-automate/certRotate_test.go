@@ -118,6 +118,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 		expectedRemoteFilePath string
 		expectedFileName       string
 		expectedHostIP         string
+		clusterIPs             []string
 	}
 
 	testCases := []testCaseInfo{
@@ -129,6 +130,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 			expectedRemoteFilePath: LocalFilePath,
 			expectedFileName:       "public.pem",
 			expectedHostIP:         ValidIP,
+			clusterIPs:             []string{ValidIP},
 		},
 		{
 			testCaseDescription:    "Invalid Remote Path - Local path",
@@ -138,6 +140,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 			expectedRemoteFilePath: "",
 			expectedFileName:       "",
 			expectedHostIP:         "",
+			clusterIPs:             []string{ValidIP},
 		},
 		{
 			testCaseDescription:    "Invalid Remote Path - Colon missing",
@@ -147,6 +150,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 			expectedRemoteFilePath: "",
 			expectedFileName:       "",
 			expectedHostIP:         "",
+			clusterIPs:             []string{ValidIP},
 		},
 		{
 			testCaseDescription:    "Invalid Remote Path - No filename",
@@ -156,6 +160,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 			expectedRemoteFilePath: "/home/ec2-user/certs/public",
 			expectedFileName:       "public",
 			expectedHostIP:         ValidIP,
+			clusterIPs:             []string{ValidIP},
 		},
 		{
 			testCaseDescription:    "Invalid Remote Path - Reverse",
@@ -165,6 +170,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 			expectedRemoteFilePath: ValidIP,
 			expectedFileName:       ValidIP,
 			expectedHostIP:         ValidIP,
+			clusterIPs:             []string{ValidIP},
 		},
 		{
 			testCaseDescription:    "Invalid Remote Path - Empty Path",
@@ -174,12 +180,15 @@ func TestGetRemoteFileDetails(t *testing.T) {
 			expectedRemoteFilePath: "",
 			expectedFileName:       "",
 			expectedHostIP:         "",
+			clusterIPs:             []string{ValidIP},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			remoteFilePathRes, fileNameRes, hostIPRes, err := c.GetRemoteFileDetails(tc.input)
+			infra := &AutomteHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = tc.clusterIPs
+			remoteFilePathRes, fileNameRes, hostIPRes, err := c.GetRemoteFileDetails(tc.input, infra)
 			if tc.isError {
 				assert.Error(t, err)
 				assert.Equal(t, tc.expectedErrorMessage, err.Error())
@@ -196,7 +205,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 func TestGetCerts(t *testing.T) {
 	c := certRotateFlow{FileUtils: mockFS()}
 
-	var infra *AutomteHAInfraDetails = &AutomteHAInfraDetails{}
+	infra := &AutomteHAInfraDetails{}
 
 	type testCaseInfo struct {
 		testCaseDescription string
