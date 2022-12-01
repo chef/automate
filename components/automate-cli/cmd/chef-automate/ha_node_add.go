@@ -131,7 +131,7 @@ func (ani *AddNodeImpl) prepare() error {
 }
 
 func (ani *AddNodeImpl) validate() error {
-	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil)
+	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil, []string{})
 	if err != nil {
 		return err
 	}
