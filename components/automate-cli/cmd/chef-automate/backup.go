@@ -1218,12 +1218,12 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
 
 func startFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
 	writer.Println("starting frontend nodes")
-	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_STOP)
+	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_START)
 }
 
 func stopFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
 	writer.Println("stopping frontend nodes")
-	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_START)
+	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_STOP)
 }
 
 func executeOnFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string, cmd string) error {
