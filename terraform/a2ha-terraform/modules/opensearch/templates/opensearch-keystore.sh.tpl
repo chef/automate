@@ -51,7 +51,7 @@ done
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
   sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
-  sudo curl "https://localhost:${listen_port}/_cat/indices" -k --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+  sudo curl "https://127.0.0.1:${listen_port}/_cat/indices" -k --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
   sudo touch $OPENSEARCH_PATH_CONF/$OS_SETUP_FILE
 fi
 fi
