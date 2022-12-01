@@ -513,7 +513,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 	}
 	block, _ := pem.Decode(privateCert)
 	if block == nil {
-		return &certificates{}, errors.New("Please provide a valid certificate")
+		return &certificates{}, errors.New("Please provide the valid certificate for privateCert")
 	}
 
 	publicCert, err := c.getCertFromFile(publicCertPath, infra)
@@ -526,7 +526,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 	}
 	block, _ = pem.Decode(publicCert)
 	if block == nil {
-		return &certificates{}, errors.New("Please provide a valid certificate")
+		return &certificates{}, errors.New("Please provide the valid certificate for publicCert")
 	}
 
 	// Root CA is mandatory for A2, PG and OS nodes. But root CA is ignored when node flag is provided
@@ -545,7 +545,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 			}
 			block, _ = pem.Decode(rootCA)
 			if block == nil {
-				return &certificates{}, errors.New("Please provide a valid certificate")
+				return &certificates{}, errors.New("Please provide the valid certificate for rootCA")
 			}
 		}
 	}
@@ -566,7 +566,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 			}
 			block, _ = pem.Decode(adminCert)
 			if block == nil {
-				return &certificates{}, errors.New("Please provide a valid certificate")
+				return &certificates{}, errors.New("Please provide the valid certificate for adminCert")
 			}
 
 			adminKey, err = c.getCertFromFile(adminKeyPath, infra)
@@ -579,7 +579,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 			}
 			block, _ = pem.Decode(adminKey)
 			if block == nil {
-				return &certificates{}, errors.New("Please provide a valid certificate")
+				return &certificates{}, errors.New("Please provide the valid certificate for adminKey")
 			}
 		}
 	}
