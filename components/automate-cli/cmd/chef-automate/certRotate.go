@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/x509/pkix"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -171,7 +170,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 
 		certs, err := c.getCerts(infra, flagsObj)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		// we need to ignore root-ca, adminCert and adminKey in the case of each node
@@ -187,21 +186,21 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		if flagsObj.automate || flagsObj.chefserver {
 			err := c.certRotateFrontend(sshUtil, certs, infra, flagsObj)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 		} else if flagsObj.postgres {
 			err := c.certRotatePG(sshUtil, certs, infra, flagsObj)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 		} else if flagsObj.opensearch {
 			err := c.certRotateOS(sshUtil, certs, infra, flagsObj)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 		}
 	} else {
-		log.Fatal(fmt.Errorf("cert-rotate command should be executed from Automate HA Bastion Node"))
+		return fmt.Errorf("cert-rotate command should be executed from Automate HA Bastion Node")
 	}
 
 	return nil
@@ -222,7 +221,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
 	err := c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// ignore root-ca when node flag is provided
@@ -234,7 +233,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	if flagsObj.automate {
 		err = c.patchRootCAinCS(sshUtil, certs.rootCA, timestamp, infra, flagsObj)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 	return nil
@@ -259,7 +258,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 
 	err := c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// ignore patching of root-ca when node flag is provided
@@ -273,7 +272,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	configFe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, certs.rootCA)
 	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
@@ -309,7 +308,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	}
 	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
@@ -326,7 +325,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	}
 	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
@@ -335,11 +334,11 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails, flagsObj *flags) error {
 	f, err := os.Create(filename)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	_, err = f.Write([]byte(config))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	f.Close()
 
@@ -366,7 +365,7 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 	}
 	err = c.copyAndExecute(ips, sshUtil, timestamp, remoteService, filename, scriptCommands, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
@@ -384,13 +383,13 @@ func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp stri
 	sshUtil.getSSHConfig().hostIP = ips[0]
 	fqdn, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	config := fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
 	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
@@ -466,6 +465,25 @@ func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetai
 	return []string{}
 }
 
+// isIPInCluster will check whether the given ip is in the cluster or not.
+func (c *certRotateFlow) isIPInCluster(ip string, infra *AutomteHAInfraDetails) bool {
+	cluster := c.getAllIPs(infra)
+	for _, clusterIP := range cluster {
+		if ip == clusterIP {
+			return true
+		}
+	}
+	return false
+}
+
+// getAllIps will return all the ips of the cluster.
+func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
+	ips := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
+	ips = append(ips, infra.Outputs.PostgresqlPrivateIps.Value...)
+	ips = append(ips, infra.Outputs.OpensearchPrivateIps.Value...)
+	return ips
+}
+
 // getCerts will read the certificate paths, and then return the required certificates.
 func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags) (*certificates, error) {
 	privateCertPath := flagsObj.privateCertPath
@@ -477,7 +495,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 	var rootCA, adminCert, adminKey []byte
 	var err error
 
-	const fileAccessErrorMsg string = "failed reading data from the given source, %s"
+	const fileAccessErrorMsg string = "failed reading data from the given source"
 
 	if privateCertPath == "" || publicCertPath == "" {
 		return nil, errors.New("Please provide public and private cert paths")
@@ -488,7 +506,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 		return nil, status.Wrap(
 			err,
 			status.FileAccessError,
-			fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+			fileAccessErrorMsg,
 		)
 	}
 
@@ -497,7 +515,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 		return nil, status.Wrap(
 			err,
 			status.FileAccessError,
-			fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+			fileAccessErrorMsg,
 		)
 	}
 
@@ -512,7 +530,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 				return nil, status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+					fileAccessErrorMsg,
 				)
 			}
 		}
@@ -529,7 +547,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 				return nil, status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+					fileAccessErrorMsg,
 				)
 			}
 
@@ -538,7 +556,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags)
 				return nil, status.Wrap(
 					err,
 					status.FileAccessError,
-					fmt.Sprintf(fileAccessErrorMsg, err.Error()),
+					fileAccessErrorMsg,
 				)
 			}
 		}
@@ -559,7 +577,7 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 	certPath = strings.TrimSpace(certPath)
 	// Checking if the given path is remote or local.
 	if c.IsRemotePath(certPath) {
-		remoteFilePath, fileName, hostIP, err := c.GetRemoteFileDetails(certPath)
+		remoteFilePath, fileName, hostIP, err := c.GetRemoteFileDetails(certPath, infra)
 		if err != nil {
 			return nil, err
 		}
@@ -579,11 +597,16 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 }
 
 // GetRemoteFileDetails returns the remote file details from the remotePath.
-func (c *certRotateFlow) GetRemoteFileDetails(remotePath string) (string, string, string, error) {
+func (c *certRotateFlow) GetRemoteFileDetails(remotePath string, infra *AutomteHAInfraDetails) (string, string, string, error) {
 	// Get Host IP from the given path and validate it.
 	hostIP := c.GetIPV4(remotePath)
 	if net.ParseIP(hostIP).To4() == nil {
 		return "", "", "", errors.New(fmt.Sprintf("%v is not a valid IPv4 address", hostIP))
+	}
+
+	// Check if given IP is part cluster.
+	if !c.isIPInCluster(hostIP, infra) {
+		return "", "", "", errors.New(fmt.Sprintf("%v is not part of the cluster", hostIP))
 	}
 
 	// Get the file path and filename from the given remote address.
