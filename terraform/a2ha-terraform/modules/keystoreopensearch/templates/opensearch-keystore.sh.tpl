@@ -30,7 +30,7 @@ SERVICE_UP_TIME=$(hab svc status  | awk  '{print $5}' | tail -1)
 if [ "${backup_config_s3}" == "true" ]; then
 
 export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
-if [ ! -f $OPENSEARCH_PATH_CONF/$OS_SETUP_FILE ]; then
+if [ ! -f ${tmp_path}/$OS_SETUP_FILE ]; then
 max=15
 n=0
 until [ "$SERVICE_UP_TIME" -gt 30 -a $n -lt $max ]
@@ -51,7 +51,7 @@ done
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
   sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
-  sudo curl "https://127.0.0.1:${listen_port}/_cat/indices" -k --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
-  sudo touch $OPENSEARCH_PATH_CONF/$OS_SETUP_FILE
+  curl -k -X POST --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty"
+  sudo touch ${tmp_path}/$OS_SETUP_FILE
 fi
 fi
