@@ -879,7 +879,7 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 }
 
 func checkFlags(f *flag.Flag) {
-	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") {
+	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") {
 		allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
 	}
 }
@@ -1148,8 +1148,23 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	if stopFrontends {
 		if len(backupCmdFlags.airgap) > 0 {
 			sshUtil.getSSHConfig().hostIP = automateIps[0]
-			sshUtil.copyFileToRemote(backupCmdFlags.airgap, "automate-ha/"+filepath.Base(backupCmdFlags.airgap), false)
-			commandString = commandString + " --airgap-bundle " + "/tmp/automate-ha/" + filepath.Base(backupCmdFlags.airgap)
+			sshUtil.copyFileToRemote(backupCmdFlags.airgap, filepath.Base(backupCmdFlags.airgap), false)
+			commandString = commandString + " --airgap-bundle " + "/tmp/" + filepath.Base(backupCmdFlags.airgap)
+		}
+		if len(backupCmdFlags.patchConfigPath) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.patchConfigPath, filepath.Base(backupCmdFlags.patchConfigPath), false)
+			commandString = commandString + " --patch-config " + "/tmp/" + filepath.Base(backupCmdFlags.patchConfigPath)
+		}
+		if len(backupCmdFlags.setConfigPath) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.setConfigPath, filepath.Base(backupCmdFlags.setConfigPath), false)
+			commandString = commandString + " --set-config " + "/tmp/" + filepath.Base(backupCmdFlags.setConfigPath)
+		}
+		if len(backupCmdFlags.gcsCredentialsPath) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.gcsCredentialsPath, filepath.Base(backupCmdFlags.gcsCredentialsPath), false)
+			commandString = commandString + " --gcs-credentials-path " + "/tmp/" + filepath.Base(backupCmdFlags.gcsCredentialsPath)
 		}
 		err := stopFrontendNodes(sshUtil, automateIps[1:], chefServerIps)
 		if err != nil {
