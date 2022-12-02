@@ -244,7 +244,7 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		writer.Printf("Failed to copy TOML file to remote %s\n", err.Error())
+		writer.Printf("Failed to copy config file to remote %s\n", err.Error())
 		return err
 	}
 	if removeFile {
