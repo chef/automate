@@ -131,7 +131,7 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 ### Backup
 
--   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -142,6 +142,12 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 To restore backed-up data of the Chef Automate High Availability (HA) using External AWS S3, follow the steps given below:
 
 -   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+
+-   Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+
+NOTE: Currently "--skip-preflight" flag is not supported from the bastion, If you want to use the "--skip-preflight" follow the steps given below.
+
+### Restore with --skip-preflight
 
 -   Shutdown Chef Automate service on all front-end nodes.
 
@@ -161,3 +167,13 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
     ```
 
 {{< /note >}}
+
+## Troubleshooting
+
+While running the restore command, If it prompts any error follow the steps given below.
+
+- check the hab svc status in automate node by running `hab svc status`.
+
+- If the deployment service is not healthy, run  `hab svc load chef/deployment-service`.
+
+- check the Automate node status by running `chef-automate status` then try the restore command from bastion.
