@@ -199,7 +199,7 @@ Once done with the OpenSearch setup, add the following `automate.toml` file and 
 
 ### Backup
 
--   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, run the backup command from the bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -222,6 +222,12 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 -   Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
 
+-   Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint <>`.
+
+NOTE: Currently "--skip-preflight" flag is not supported from the bastion, If you want to use the "--skip-preflight" follow the steps given below.
+
+### Restore with --skip-preflight
+
 -   Shutdown Chef Automate service on all front-end nodes
 
     -   Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
@@ -240,3 +246,13 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
     ```
 
 {{< /note >}}
+
+## Troubleshooting
+
+While running the restore command, If it prompts any error follow the steps given below.
+
+- check the hab svc status in automate node by running `hab svc status`.
+
+- If the deployment service is not healthy, run  `hab svc load chef/deployment-service`.
+
+- check the Automate node status by running `chef-automate status` then try the restore command from bastion.
