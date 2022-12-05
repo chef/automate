@@ -14,6 +14,7 @@ import (
 	"unicode"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
@@ -151,6 +152,8 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 }
 
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error) {
+	logrus.Debug("Executing command ......")
+	logrus.Debug(remoteCommands)
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -180,10 +183,13 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 		return "", err
 	}
 	defer session.Close()
+	logrus.Debug("Execution of command done......")
 	return string(output), nil
 }
 
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error) {
+	logrus.Debug("Executing command ......")
+	logrus.Debug(remoteCommands)
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -237,6 +243,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands
 	close(spinnerChannel)
 	close(wr)
 	close(outchan)
+	logrus.Debug("Execution of command done......")
 	return output, nil
 }
 
