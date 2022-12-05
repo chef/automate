@@ -13,4 +13,3 @@ Non-service package.
 ## Usage
 
 `automate-backend-ctl help`
-
