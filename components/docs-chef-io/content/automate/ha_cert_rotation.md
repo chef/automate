@@ -91,3 +91,5 @@ You can also use `--postgresql` or `-p` instead of the pg flag.
 `chef-automate cert-rotate --public-cert <path of public certificate> --private-cert <path of private certificate> --os --node <IP of a particular opensearch node>`
 
 You can also use `--opensearch` or `-o` instead of the os flag
+
+{{< note >}} Since, admin-cert and admin-key is common in all nodes, So if you want to rotate admin-cert and admin-key then you have to first run the above opensearch cluster command. {{< /note >}}
