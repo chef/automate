@@ -879,8 +879,16 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 }
 
 func checkFlags(f *flag.Flag) {
-	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") && !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") {
-		allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
+	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "patch-config") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "set-config") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "gcs-credentials-path") {
+		if f.Value.Type() == "bool" && f.Value.String() == "true" {
+			allPassedFlags = allPassedFlags + " --" + f.Name + " "
+		} else {
+			allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
+		}
 	}
 }
 
