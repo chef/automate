@@ -24,6 +24,13 @@ type ConfigKeys struct {
 	adminKey   string
 }
 
+type S3ConfigKeys struct {
+	accessKey     string
+	secretKey string
+	endpoint  string
+	bucketname  string
+}
+
 type HATfvars struct {
 	Region                          string      `json:"region"`
 	Endpoint                        string      `json:"endpoint"`
@@ -67,6 +74,12 @@ type HATfvars struct {
 	AutomateConfigFile              string      `json:"automate_config_file"`
 	OpensearchRootCert              string      `json:"opensearch_root_cert"`
 	PostgresqlRootCert              string      `json:"postgresql_root_cert"`
+	AwsVpcId                        string      `json:"aws_vpc_id"` 
+	AmiID							string      `json:"ami_id"`
+	AwsCidrBlockAddr                string      `json:"aws_cidr_block_addr"`
+	PrivateCustomSubnets			[]string    `json:"private_custom_subnets"`
+	PublicCustomSubnets             []string    `json:"public_custom_subnets"`
+	SSHKeyPairName                  string      `json:"ssh_key_pair_name"`
 	ManagedRdsPostgresqlCertificate string      `json:"managed_rds_postgresql_certificate"`
 	ManagedRdsDbuserPassword        string      `json:"managed_rds_dbuser_password"`
 	ManagedRdsDbuserUsername        string      `json:"managed_rds_dbuser_username"`
@@ -178,6 +191,7 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 }
 
 func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
+	s3ConfigMap := make(map[string]*dc.AutomateConfig)
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -192,7 +206,14 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
 			return nil, err
 		}
+		// s3ConfigMap[ip] = &S3ConfigKeys{
+		// 	AccessKey  :     src.Global.V1.Backups.S3.Credentials.AccessKey.Value,
+		// 	SecretKey : src.Global.V1.Backups.S3.Credentials.SecretKey.Value,
+		// 	Endpoint: src.Global.V1.Backups.S3.Bucket.Endpoint.Value,
+		// 	BucketName: src.Global.V1.Backups.S3.Bucket.Name.Value,
+		// }
 		ipConfigMap[ip] = &src
+		s3ConfigMap[ip] = &src
 	}
 	return ipConfigMap, nil
 
@@ -219,7 +240,7 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 }
 
 func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
-	sharedConfigToml, err := getHAConfig()
+	sharedConfigToml, err := getExistingHAConfig()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
@@ -321,7 +342,7 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	return sharedConfigToml, nil
 }
 
-func getHAConfig() (*ExistingInfraConfigToml, error) {
+func getExistingHAConfig() (*ExistingInfraConfigToml, error) {
 	if checkSharedConfigFile() {
 		sharedConfigToml, err := getExistingInfraConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
 		if err != nil {
@@ -334,11 +355,28 @@ func getHAConfig() (*ExistingInfraConfigToml, error) {
 		if err != nil {
 			return nil, err
 		}
-		return getHAConfigFromTFVars(tfvarConfig)
+		return getExistingHAConfigFromTFVars(tfvarConfig)
 	}
 }
 
-func getHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, error) {
+func getAwsHAConfig() (*AwsConfigToml, error) {
+	if checkSharedConfigFile() {
+		sharedConfigToml, err := getAwsConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
+		if err != nil {
+			return nil, err
+		}
+		return sharedConfigToml, nil
+	} else {
+		jsonString := convTfvarToJson(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "terraform.tfvars"))
+		tfvarConfig, err := getJsonFromTerraformTfVarsFile(jsonString)
+		if err != nil {
+			return nil, err
+		}
+		return getAwsHAConfigFromTFVars(tfvarConfig)
+	}
+}
+
+func getExistingHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, error) {
 	sharedConfigToml := &ExistingInfraConfigToml{}
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = "existing_nodes"
 	if len(strings.TrimSpace(tfvarConfig.SecretsKeyFile)) < 1 {
@@ -417,6 +455,89 @@ func getHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigToml, err
 	return sharedConfigToml, nil
 }
 
+func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars) (*AwsConfigToml, error) {
+	sharedConfigToml := &AwsConfigToml{}
+	sharedConfigToml.Architecture.ConfigInitials.Architecture = "aws"
+	if len(strings.TrimSpace(tfvarConfig.SecretsKeyFile)) < 1 {
+		sharedConfigToml.Architecture.ConfigInitials.SecretsKeyFile = filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "secrets.key")
+	} else {
+		sharedConfigToml.Architecture.ConfigInitials.SecretsKeyFile = tfvarConfig.SecretsKeyFile
+	}
+
+	if len(strings.TrimSpace(tfvarConfig.SecretsStoreFile)) < 1 {
+		sharedConfigToml.Architecture.ConfigInitials.SecretsStoreFile = filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "secrets.json")
+	} else {
+		sharedConfigToml.Architecture.ConfigInitials.SecretsStoreFile = tfvarConfig.SecretsStoreFile
+	}
+
+	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigS3), "true") {
+		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "s3"
+	}
+	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigEFS), "true") {
+		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "efs"
+	}
+	if tfvarConfig.TeamsPort > 0 {
+		sharedConfigToml.Automate.Config.TeamsPort = strconv.Itoa(tfvarConfig.TeamsPort)
+	}
+	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(tfvarConfig.NfsMountPath)
+	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(tfvarConfig.HabitatUidGid)
+	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
+	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
+	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
+	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
+	sharedConfigToml.Automate.Config.Fqdn = strings.TrimSpace(tfvarConfig.AutomateFqdn)
+	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
+	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
+	sharedConfigToml.Automate.Config.EnableCustomCerts = tfvarConfig.AutomateCustomCertsEnabled
+	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(tfvarConfig.AutomateAdminPassword)
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = tfvarConfig.ChefServerCustomCertsEnabled
+	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(tfvarConfig.ChefServerInstanceCount)
+	sharedConfigToml.Postgresql.Config.EnableCustomCerts = tfvarConfig.PostgresqlCustomCertsEnabled
+	sharedConfigToml.Postgresql.Config.InstanceCount = strconv.Itoa(tfvarConfig.PostgresqlInstanceCount)
+	sharedConfigToml.Opensearch.Config.EnableCustomCerts = tfvarConfig.OpensearchCustomCertsEnabled
+	sharedConfigToml.Opensearch.Config.InstanceCount = strconv.Itoa(tfvarConfig.OpensearchInstanceCount)
+	sharedConfigToml.Opensearch.Config.AdminDn = strings.TrimSpace(tfvarConfig.OpensearchAdminDn)
+	sharedConfigToml.Opensearch.Config.NodesDn = strings.TrimSpace(tfvarConfig.OpensearchNodesDn)
+	// sharedConfigToml.ExistingInfra.Config.AutomatePrivateIps = tfvarConfig.ExistingAutomatePrivateIps
+	// sharedConfigToml.ExistingInfra.Config.ChefServerPrivateIps = tfvarConfig.ExistingChefServerPrivateIps
+	// sharedConfigToml.ExistingInfra.Config.PostgresqlPrivateIps = tfvarConfig.ExistingPostgresqlPrivateIps
+	// sharedConfigToml.ExistingInfra.Config.OpensearchPrivateIps = tfvarConfig.ExistingOpensearchPrivateIps
+	// sharedConfigToml.ObjectStorage.Config.AccessKey = strings.TrimSpace(tfvarConfig.AccessKey)
+	// sharedConfigToml.ObjectStorage.Config.SecretKey = strings.TrimSpace(tfvarConfig.SecretKey)
+	// sharedConfigToml.ObjectStorage.Config.BucketName = strings.TrimSpace(tfvarConfig.BucketName)
+	// sharedConfigToml.ObjectStorage.Config.Endpoint = strings.TrimSpace(tfvarConfig.Endpoint)
+	sharedConfigToml.Aws.Config.Region = strings.TrimSpace(tfvarConfig.Region)
+	sharedConfigToml.Aws.Config.AwsVpcId = strings.TrimSpace(tfvarConfig.AwsVpcId)
+	sharedConfigToml.Aws.Config.AmiID = strings.TrimSpace(tfvarConfig.AmiID)
+	sharedConfigToml.Aws.Config.AwsCidrBlockAddr = strings.TrimSpace(tfvarConfig.AwsCidrBlockAddr)
+	sharedConfigToml.Aws.Config.PrivateCustomSubnets = tfvarConfig.PrivateCustomSubnets
+	sharedConfigToml.Aws.Config.PublicCustomSubnets = tfvarConfig.PublicCustomSubnets
+	sharedConfigToml.Aws.Config.SSHKeyPairName = strings.TrimSpace(tfvarConfig.SSHKeyPairName)
+	sharedConfigToml.Aws.Config.OpensearchDomainUrl = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainUrl)
+    sharedConfigToml.Aws.Config.OpensearchDomainName = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainName)
+    sharedConfigToml.Aws.Config.OpensearchCertificate = strings.TrimSpace(tfvarConfig.ManagedOpensearchCertificate)
+    sharedConfigToml.Aws.Config.OpensearchUsername = strings.TrimSpace(tfvarConfig.ManagedOpensearchUsername)
+    sharedConfigToml.Aws.Config.OpensearchUserPassword = strings.TrimSpace(tfvarConfig.ManagedOpensearchUserPassword)
+    sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = strings.TrimSpace(tfvarConfig.AwsOsSnapshotRoleArn)
+    sharedConfigToml.Aws.Config.OsUserAccessKeyId = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeyId)
+    sharedConfigToml.Aws.Config.OsUserAccessKeySecret = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeySecret)
+    sharedConfigToml.Aws.Config.RDSCertificate = strings.TrimSpace(tfvarConfig.ManagedRdsPostgresqlCertificate)
+    sharedConfigToml.Aws.Config.RDSDBUserName = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserUsername)
+    sharedConfigToml.Aws.Config.RDSDBUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserPassword)
+    sharedConfigToml.Aws.Config.RDSInstanceUrl = strings.TrimSpace(tfvarConfig.ManagedRdsInstanceUrl)
+    //sharedConfigToml.Aws.Config.PostgreSQLRootCert = strings.TrimSpace(tfvarConfig.PostgresqlRootCert)
+    sharedConfigToml.Aws.Config.RDSSuperUserName = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserUsername)
+    sharedConfigToml.Aws.Config.RDSSuperUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserPassword)
+	setupManagedServices := strings.TrimSpace(tfvarConfig.SetupManagedServices)
+	// if strings.EqualFold(setupManagedServices, "true") && strings.EqualFold(setupSelfManagedServices, "true") {
+	// 	sharedConfigToml.ExternalDB.Database.Type = "self-managed"
+	// }
+	if strings.EqualFold(setupManagedServices, "true")  {
+		sharedConfigToml.Aws.Config.SetupManagedServices = true
+	}
+	return sharedConfigToml, nil
+}
+
 func getOSORPGRootCA(config map[string]*ConfigKeys) string {
 	for _, ele := range config {
 		if len(strings.TrimSpace(ele.rootCA)) > 0 {
@@ -460,6 +581,24 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
+func getS3bucketnamefromA2(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.Global.V1.Backups != nil && ele.Global.V1.Backups.S3 != nil && len(strings.TrimSpace(ele.Global.V1.Backups.S3.Bucket.Name.Value)) > 0 {
+			return ele.Global.V1.Backups.S3.Bucket.Name.Value
+		}
+	}
+	return ""
+}
+
+func gets3configfromA2(config map[string]*HATfvars) (string, string, string) {
+	for _, ele := range config {
+		if len(strings.TrimSpace(ele.AccessKey)) > 0 && len(strings.TrimSpace(ele.SecretKey)) > 0 && len(strings.TrimSpace(ele.Endpoint)) > 0{
+			return strings.TrimSpace(ele.AccessKey), strings.TrimSpace(ele.SecretKey), strings.TrimSpace(ele.Endpoint)
+		}
+	}
+	return "", "", ""
+}
+
 func getJsonFromTerraformTfVarsFile(jsonString string) (*HATfvars, error) {
 	params := HATfvars{}
 	err := json.Unmarshal([]byte(jsonString), &params)
@@ -480,6 +619,8 @@ func getModeOfDeployment() string {
 	deploymentMode := strings.TrimSpace(string(contentByte))
 	if strings.EqualFold(deploymentMode, "existing_nodes") {
 		return EXISTING_INFRA_MODE
+	} else if strings.EqualFold(deploymentMode, "aws"){
+		return AWS_MODE 
 	}
 	return AWS_MODE
 }
