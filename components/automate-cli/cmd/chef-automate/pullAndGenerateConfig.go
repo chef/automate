@@ -191,7 +191,7 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 }
 
 func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
-	s3ConfigMap := make(map[string]*dc.AutomateConfig)
+	s3ConfigMap := make(map[string]*S3ConfigKeys)
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -206,14 +206,14 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
 			return nil, err
 		}
-		// s3ConfigMap[ip] = &S3ConfigKeys{
-		// 	AccessKey  :     src.Global.V1.Backups.S3.Credentials.AccessKey.Value,
-		// 	SecretKey : src.Global.V1.Backups.S3.Credentials.SecretKey.Value,
-		// 	Endpoint: src.Global.V1.Backups.S3.Bucket.Endpoint.Value,
-		// 	BucketName: src.Global.V1.Backups.S3.Bucket.Name.Value,
-		// }
+		s3ConfigMap[ip] = &S3ConfigKeys{
+			accessKey  :     src.Global.V1.Backups.S3.Credentials.AccessKey.Value,
+			secretKey : src.Global.V1.Backups.S3.Credentials.SecretKey.Value,
+			endpoint: src.Global.V1.Backups.S3.Bucket.Endpoint.Value,
+			bucketname: src.Global.V1.Backups.S3.Bucket.Name.Value,
+		}
 		ipConfigMap[ip] = &src
-		s3ConfigMap[ip] = &src
+		// s3ConfigMap[ip] = &src
 	}
 	return ipConfigMap, nil
 

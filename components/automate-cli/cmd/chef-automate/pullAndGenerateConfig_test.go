@@ -138,7 +138,7 @@ func TestGetHAConfigFromTFVars(t *testing.T) {
 	err := json.Unmarshal([]byte(haTfvarsJsonString), &params)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, params)
-	config, err := getHAConfigFromTFVars(&params)
+	config, err := getExistingHAConfigFromTFVars(&params)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, config)
 	assert.Equal(t, "file_system", config.Architecture.ConfigInitials.BackupConfig)
