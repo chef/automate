@@ -333,6 +333,7 @@ backup_config = ""
 bucket_name = ""
 access_key = ""
 secret_key = ""
+# For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
 endpoint = ""
 
 # [Optional] Mention object_storage region if applicable

@@ -35,6 +35,7 @@ var configCmdFlags = struct {
 	file             string
 }{}
 
+
 const (
 	dateFormat       = "%Y%m%d%H%M%S"
 	postgresql       = "postgresql"
