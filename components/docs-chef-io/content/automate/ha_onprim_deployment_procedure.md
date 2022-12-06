@@ -555,7 +555,7 @@ The below section will uninstall the chef automate HA
 To uninstall chef automate HA instances after unsuccessful deployment, run the below command in your bastion host.
 
 ```bash
-    chef-automate cleanup --onprem
+    chef-automate cleanup --onprem-deployment
 ```
 
 ### Troubleshooting
