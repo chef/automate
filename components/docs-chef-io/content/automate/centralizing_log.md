@@ -29,7 +29,7 @@ To view the logs, run the following command:
 journalctl -u chef-automate -f
 ```
 
-Click [here](/log_management) to learn more about Log Management.
+Click [here](/automate/log_management) to learn more about Log Management.
 
 ## Prerequisites
 
