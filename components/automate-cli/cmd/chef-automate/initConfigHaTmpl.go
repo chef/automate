@@ -334,6 +334,7 @@ bucket_name = ""
 access_key = ""
 secret_key = ""
 # For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
+# Include protocol to the enpoint value. Eg: https://customdns1.com or http://customdns2.com
 endpoint = ""
 
 # [Optional] Mention object_storage region if applicable
