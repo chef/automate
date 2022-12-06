@@ -315,6 +315,16 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 
 // setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
 func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
+	if isManagedServicesOn() {
+		writer.Warn("Patching the configuration for managed services is not possible!")
+		return nil
+	}
+	if !(len(infra.Outputs.PostgresqlPrivateIps.Value) > 0) {
+		writer.Error("Postgres IPs not found in the config. Please contact the support team")
+		return nil
+
+	}
+
 	//checking for log configuration
 	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value)
 	if err != nil {
@@ -325,6 +335,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 	if err != nil {
 		return err
 	}
+
 	isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
 	//Implementing the config if there is some change in the database configuration
 	if isConfigChangedDatabase {
@@ -334,31 +345,37 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 			return err
 		}
 		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-		if len(infra.Outputs.PostgresqlPrivateIps.Value) > 0 {
-			sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
-			writer.Print("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
-			err := sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
-			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
-			writer.Printf(output + "\n")
-			writer.Success("Patching is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
+		sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
+		writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
+		err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
 		}
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		writer.Printf(output + "\n")
+		writer.Success("Patching is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
 
-	} else {
-		writer.Println("There is no change in the configuration")
 	}
+
 	return nil
 }
 
 // setConfigForOpensearch patches the config for open-search nodes in Automate HA
 func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
+	if isManagedServicesOn() {
+		writer.Warn("Patching the configuration for managed services is not possible!")
+		return nil
+	}
+	if !(len(infra.Outputs.OpensearchPrivateIps.Value) > 0) {
+		writer.Error("Postgres IPs not found in the config. Please contact the support team")
+		return nil
+
+	}
 	//checking for log configuration
 	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value)
 	if err != nil {
@@ -380,26 +397,23 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 			return err
 		}
 		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-		if len(infra.Outputs.OpensearchPrivateIps.Value) > 0 {
-			sshUtil.getSSHConfig().hostIP = infra.Outputs.OpensearchPrivateIps.Value[0]
-			writer.Print("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
-			err := sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
-			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-			if err != nil {
-				writer.Errorf("%v", err)
-				return err
-			}
-			writer.Printf(output + "\n")
-			writer.Success("Patching is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
-		}
 
-	} else {
-		writer.Println("There is no change in the configuration")
+		sshUtil.getSSHConfig().hostIP = infra.Outputs.OpensearchPrivateIps.Value[0]
+		writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
+		err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		writer.Printf(output + "\n")
+		writer.Success("Patching is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
 	}
+
 	return nil
 }
 
