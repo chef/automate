@@ -22,7 +22,7 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ### Post Automate HA deployment, if chef-server service is in critical state.
 - Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
-  if gettign an 500 internal server error with data-collector endpoint, it means that
+  if getting an 500 internal server error with data-collector endpoint, it means that
   Chef Infra Server not able to communicate to the Chef Automate data-collector endpoint
   
   ssh to the Automate HA Chef Infra Server, and get token and automate-lb-url from the config.

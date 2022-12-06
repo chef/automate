@@ -37,7 +37,7 @@ This section will discuss the steps to deploy Chef Automate HA on-premise machin
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
 - Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
-- If DNS is not used, then these records should be added to `/etc/hosts` in all the machines, including Bastion:
+- If DNS is not used, add the records to `/etc/hosts` in all the machines, including Bastion:
 
 ```bash
 sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
@@ -49,6 +49,9 @@ sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<P
 ```bash
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ```
+
+{{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+{{< /warning >}}
 
 ### Run these steps on Bastion Host Machine
 
@@ -95,16 +98,18 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
    - Add the IP address of each machine in the relevant service section; multiple IPs should be in double quotes (`"`) and separated with a comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
-      - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall, there will 3 machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Minimum 3 VMs or Machines will be used for Both OpenSearch and Postgresql running together on all 3 machines.
-      - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be 2 machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both 2 machines.
+      - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
+      - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be two machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
       - Thus, the overall minimum number of machines needed will be 5.
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs.
    - `sudo_password` is only meant to switch to sudo user. If you have configured a password for the sudo user, please provide it here.
    - We support only private key authentication.
-   - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VMs. Example: `chefautomate.example.com`
-   - Set the `admin_password` to what you want to use to log in to Chef Automate when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
+   - Provide `backup_config` based on the type of backup storage you have. This field can be optionally left empty during deployment and can be patched at later point. Allowed values are `object_storage` and `file_system`.
+   - If `backup_config` is `object_storage`, make sure to fill values under `[object_storage.config]`
+   - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
+   - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
 
@@ -128,7 +133,10 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ### Sample config
 
 {{< note >}}
-Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for OpenSearch)
+
+- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+- Following config will by default leave the backup configuration empty
+
 {{< /note >}}
 
 ```config
@@ -144,8 +152,8 @@ ssh_port = "22"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
+# DON'T MODIFY THE BELOW LINE (workspace_path)
 workspace_path = "/hab/a2_deploy_workspace"
-# DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
 
 # Eg.: backup_config = "object_storage" or "file_system"
@@ -171,7 +179,7 @@ enable_custom_certs = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
-# Or you can provide certificates at node level using below fields
+# Or you can provide certificates at the node level using the below fields
 # [[automate.config.certs_by_ip]]
 # ip = "A.B.C.D"
 # private_key = ""
@@ -184,7 +192,7 @@ enable_custom_certs = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
-# Or you can provide certificates at node level using below fields
+# Or you can provide certificates at the node level using the below fields
 # [[chef_server.config.certs_by_ip]]
 # ip = "I.J.K.L"
 # private_key = ""
@@ -199,7 +207,7 @@ enable_custom_certs = false
 # admin_cert = ""
 # private_key = ""
 # public_key = ""
-# Or you can provide certificates at node level using below fields
+# Or you can provide certificates at the node level using the below fields
 # [[opensearch.config.certs_by_ip]]
 # ip = "A1.A2.A3.A4"
 # private_key = ""
@@ -212,7 +220,7 @@ enable_custom_certs = false
 # root_ca = ""
 # private_key = ""
 # public_key = ""
-# Or you can provide certificates at node level using below fields
+# Or you can provide certificates at the node level using the below fields
 # [[postgresql.config.certs_by_ip]]
 # ip = "D1.D2.D3.D4"
 # private_key = ""
@@ -220,7 +228,7 @@ enable_custom_certs = false
 [existing_infra.config]
 ## === INPUT NEEDED ===
 # provide comma separate IP address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
-# No of ip address should be same as No of instance_count count mentioned above in
+# No of IP address should be same as No of instance_count count mentioned above in
 # automate.config, chef_server.config, opensearch.config, and postgresql.config
 automate_private_ips = ["A.B.C.D","D.E.F.G"]
 chef_server_private_ips = ["I.J.K.L","M.N.O.P"]
@@ -232,13 +240,13 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
-- Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VMs. Eg: `chefautomate.example.com`
+- Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VMs. E.g.: `chefautomate.example.com`
 - `automate_private_ips` Eg: ["192.0.0.1"]
 - `chef_server_private_ips` Eg: ["192.0.1.1"]
 - `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 - `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
-- *Optional - In case of adding backup configuration make sure to fill the following configuration in the sample. 
-    - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`. 
+- *Optional - In case of adding a backup configuration, make sure to fill in the following format in the sample. 
+    - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - in are `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`. 
     - For **File System** - `backup_config = "file_system"`.
 
 ## On-Premise Setup with AWS Managed Services
@@ -251,7 +259,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - Set up AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about how to create IAM Users.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 
 See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
@@ -260,7 +268,7 @@ Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_pr
 - Set AWS Config Details:
 
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
-  - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+  - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
   - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
   - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
   - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
@@ -289,7 +297,7 @@ Continue with the deployment after updating the config:
 # ============== External Database Services ======================
 ## === INPUT NEEDED ===
 # In case you are trying to deploy with AWS Managed Services, set the type as "aws"
-# If you are trying externally managed database set type as "self-managed"
+# If you are trying an externally managed database set type as "self-managed"
 [external.database]
 # eg type = "aws" or "self-managed"
 type = "aws"
@@ -304,7 +312,7 @@ superuser_password = ""
 dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
-# In the case of AWS-managed RDS leave it blank
+# In the case of AWS-managed RDS, leave it blank
 # eg: postgresql_root_cert = "<cert_content>"
 postgresql_root_cert = ""
 [external.database.open_search]
@@ -316,7 +324,7 @@ opensearch_domain_url = ""
 opensearch_username = ""
 # eg: opensearch_user_password = "Progress@123"
 opensearch_user_password = ""
-# In case of AWS-managed OpenSearch leave it blank
+# In the case of AWS-managed OpenSearch, leave it blanks
 # eg: opensearch_root_cert = "<cert_content>"
 opensearch_root_cert = ""
 [external.database.open_search.aws]
@@ -341,7 +349,7 @@ Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_pr
 
 - Set Self-Managed Config Details:
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
-  - Set `type` as `self-managed`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should be changed.
+  - Set `type` as `self-managed`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
   - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for your Self Managed RDS.
   - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
   - Provide the Root ca value of Postgresql `postgresql_root_cert`.
@@ -371,7 +379,7 @@ Continue with the deployment after updating the config:
 # ============== External Database Services ======================
 ## === INPUT NEEDED ===
 # In case you are trying to deploy with AWS Managed Services, set the type as "aws"
-# If you are trying externally managed database set type as "self-managed"
+# If you are trying an externally managed database set type as "self-managed"
 [external.database]
 # eg type = "aws" or "self-managed"
 type = "self-managed"
@@ -386,7 +394,7 @@ superuser_password = ""
 dbuser_username = ""
 # eg: dbuser_password = "Progress123"
 dbuser_password = ""
-# In the case of AWS-managed RDS leave it blank
+# In the case of AWS-managed RDS, leave it blank
 # eg: postgresql_root_cert = "<cert_content>"
 postgresql_root_cert = ""
 [external.database.open_search]
@@ -398,7 +406,7 @@ opensearch_domain_url = ""
 opensearch_username = ""
 # eg: opensearch_user_password = "Progress@123"
 opensearch_user_password = ""
-# In case of AWS-managed OpenSearch leave it blank
+# In the case of AWS-managed OpenSearch, leave it blanks
 # eg: opensearch_root_cert = "<cert_content>"
 opensearch_root_cert = ""
 [external.database.open_search.aws]
@@ -410,153 +418,131 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-### How To Add More Nodes to the On-Prem Deployment
+### How To Add More Nodes to the OnPrem Deployment
 
-- Open the `config.toml` at the bastion node
-- Change the `instance_count` value, as explained in the below example.
-- Add the `Ip address` for the respective node at the end, as explained in the example.
-- Make sure that all the necessary ports and firewall settings are aligned in the new node.
+The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
+For example,
 
-For example: Add a new Automate node to the existing deployed cluster.
-
-  | Old Config | => | New Config |
-  | :--- | :--- | :--- |
-  | [automate.config] <br/> instance_count = "1" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
-
-- Trigger the deployment command again from the bastion node.
-- To trigger the deploy command, we required the chef-automate airgap bundle; use the airgap bundle running on the current cluster. In case of the bundle is missing or deleted from the bastion, then we need to download the airgap bundle again.
-  - In case you do not know which Chef-Automate version is running, then ssh to one of the frontend nodes and run the below command.
+- if you want to add nodes with IP 10.1.2.23 to automate, you have to run the:
 
     ```sh
-    sudo chef-automate version
+    chef-automate node add --automate 10.1.2.23
     ```
 
-  - Output
+- If you want to add nodes with IP 10.1.2.23 and 10.0.1.42 to the chef-server, you have to run the:
 
     ```sh
-    Version: 2
-    CLI Build: 20220920122615
-    Server Build: 4.X.Y
+    chef-automate node add --chef-server 10.1.2.23,10.0.1.42
     ```
 
-  - To download the airgap bundle, please run the command from the machine where we have internet access.
+- If you want to add nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, you have to run the:
 
     ```sh
-    chef-automate create airgap bundle --version 4.X.Y
+    chef-automate node add --opensearch 10.1.2.23,10.0.1.42
     ```
 
-  - Copy the airgap bundle to the bastion host.
+- If you want to add nodes with IP 10.1.2.23, 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
 
-- Run the `deploy` command to add the new node.
+    ```sh
+    chef-automate node add --postgresql 10.1.2.23,10.0.1.42,10.0.1.54
+    ```
 
-  ```sh
-    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
-  ```
+You can mix and match different services if you want to add nodes across various services.
 
-- Above process can be done for `chef-server`, `postgresql` and `opensearch` clusters as well
-- In case of Deployment fails, refer to the troubleshooting document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+- If you want to add nodes with IP 10.1.2.23 to automate and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL, you have to run:
 
-### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
+    ```sh
+    chef-automate node add --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+    ```
+
+- If you want to add nodes with IP 10.1.2.23 to automate, nodes with IP 10.1.0.36 and 10.0.1.233 to chef-server, and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
+
+    ```sh
+    chef-automate node add --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+    ```
+
+Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
+
+{{< note >}}
+
+- If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
+For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+- The new node will be configured with the certificates which were already configured in your HA setup.
+- If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
+- If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
+
+{{< /note >}}
+
+{{< warning >}}
+It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
+{{< /warning >}}
+
+### How To Remove Any Nodes From Frontend Cluster OnPrem Deployment
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but the replacement of the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
 - Below process can be done for `chef-server` and `automate`.
 
 {{< /warning >}}
 
-- Open the `config.toml` at the bastion node.
-- change the `instance_count` value, as explained in the below example.
-- Remove the `Ip address` for the respective node, as explained in the example.
+The commands require some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes you want to remove as comma-separate values with no spaces in between.
+For example,
 
-For example: Remove Automate node to the existing deployed cluster.
-  | Old Config | => | New Config |
-  | :--- | :--- | :--- |
-  | [automate.config] <br/> instance_count = "3" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
-
-- Trigger the deployment command again from the bastion node.
-- To trigger the deploy command, we required the chef-automate airgap bundle, use the airgap bundle running on the current cluster. In case of the bundle is missing or deleted from the bastion, then we need to download the airgap bundle again.
-  - In case you do not know which Chef-Automate version is running, then ssh to one of the frontend nodes and run the below command.
+- if you want to remove nodes with IP 10.1.2.23 to automate, you have to run the:
 
     ```sh
-    sudo chef-automate version
+    chef-automate node remove --automate 10.1.2.23
     ```
 
-  - Output
+- If you want to remove nodes with IP 10.1.2.23 and 10.0.1.42 to chef-server you have to run the:
 
     ```sh
-    Version: 2
-    CLI Build: 20220920122615
-    Server Build: 4.X.Y
+    chef-automate node remove --chef-server 10.1.2.23,10.0.1.42
     ```
 
-  - To download the airgap bundle, please run the command from the machine where we have internet access.
+- If you want to remove nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, you have to run:
 
     ```sh
-    chef-automate create airgap bundle --version 4.X.Y
+    chef-automate node remove --opensearch 10.1.2.23,10.0.1.42
     ```
 
-  - Copy the airgap bundle to the bastion host.
+  - If you want to remove nodes with IP 10.1.2.23, 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
 
-- Run the `deploy` command to remove the node.
+    ```sh
+    chef-automate node remove --postgresql 10.1.2.23,10.0.1.42,10.0.1.54
+    ```
 
-  ```sh
-    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
-  ```
+You can mix and match different services to remove nodes across various services.
 
-- Above process can be done for `chef-server` and `automate`.
-- In case of Deployment fails, refer to the troubleshooting document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+- If you want to remove nodes with IP 10.1.2.23 to automate and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL, you have to run:
+
+    ```sh
+    chef-automate node remove --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+    ```
+
+- If you want to remove nodes with IP 10.1.2.23 to automate, nodes with IP 10.1.0.36 and 10.0.1.233 to chef-server, and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
+
+    ```sh
+    chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+    ```
+
+Once the command executes, it will remove the supplied nodes from your automate setup. The changes might take a while.
+
+{{< note >}}
+
+- The IPs provided need to be associated with a node in your HA setup.
+- Automate instance count cannot be less than 1.
+- Chef Server instance count cannot be less than 1.
+- Open search instance count cannot be less than 3.
+- Postgresql instance count cannot be less than 3.
+
+{{< /note >}}
 
 ### How to Replace Node in Automate HA Cluster
 
-- Open the `config.toml` at the bastion node.
-- Remove the `Ip Address` of unhealthy node as explained in the below example.
-- Add the new `Ip address` value, as explained in the below example.
-- Make sure that all the necessary port and firewall settings are aligned in the new node.
-
- For example: Remove node to the existing deployed Postgres cluster.
- In the example, we are replacing the node `10.0.7.0` with `10.0.9.0`.
-
-  | Old Config | => | New Config |
-  | :--- | :--- | :--- |
-  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
-
-- Run the below command from the bastion node.
-
-  ```sh
-  cd /hab/a2_deploy_workspace/terraform
-  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
-  cd -
-  ```
-
-- To trigger the deploy command, we required the chef-automate airgap bundle, use the airgap bundle running on the current cluster. In case of the bundle is missing or deleted from the bastion, then we need to download the airgap bundle again.
-  - In case you do not know which Chef-Automate version is running, then ssh to one of the frontend nodes and run the below command.
-
-    ```sh
-    sudo chef-automate version
-    ```
-
-  - Output
-
-    ```sh
-    Version: 2
-    CLI Build: 20220920122615
-    Server Build: 4.X.Y
-    ```
-
-  - To download the airgap bundle, please run the command from the machine where we have internet access.
-
-    ```sh
-    chef-automate create airgap bundle --version 4.X.Y
-    ```
-
-  - Copy the airgap bundle to the bastion host.
-
-- Run the `deploy` command to replace a node.
-
-  ```sh
-    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
-  ```
+- First Add a New Node follow [this](#How-To-Add-More-Nodes-to-the-OnPrem-Deployment).
+- Delete a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster-OnPrem-Deployment).
 
 ### Uninstall chef automate HA
 
@@ -574,7 +560,7 @@ To uninstall chef automate HA instances after unsuccessful deployment, run the b
 
 ### Troubleshooting
 
-#### Failure in adding nodes
+#### Failure to replacing nodes
 
   ```bash
   Error: Upload failed: scp: /var/automate-ha: Permission denied

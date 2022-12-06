@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	dc "github.com/chef/automate/api/config/deployment"
+
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
@@ -246,6 +248,7 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		if err != nil {
 			return nil, err
 		}
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 		return automateHAInfraDetails, nil
 	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
 		automateHAInfraDetails := &AutomteHAInfraDetails{}
@@ -257,10 +260,30 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		if err != nil {
 			return nil, err
 		}
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 		return automateHAInfraDetails, nil
 	} else {
 		writer.Error("Automate Ha infra confile file not exits.")
 		return nil, nil
+	}
+}
+
+func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomteHAInfraDetails) {
+	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
+		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
+		lastspaceIndex := strings.LastIndex(automateSSH, " ")
+		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) < 1 {
+			if strings.Contains(automateSSH, "-p") {
+				port := strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastspaceIndex])
+				automateHAInfraDetails.Outputs.SSHPort.Value = port
+			} else {
+				automateHAInfraDetails.Outputs.SSHPort.Value = "22"
+			}
+		}
+		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) < 1 {
+			sshUser := strings.TrimSpace(automateSSH[lastspaceIndex:strings.LastIndex(automateSSH, "@")])
+			automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
+		}
 	}
 }
 
@@ -284,4 +307,28 @@ func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]str
 	default:
 		return nil, errors.New("invalid hostname possible values should be any one of automate/a2, chef_server/cs, postgresql/pg or opensearch/os")
 	}
+}
+
+func getPostgresOrOpenSearchExistingLogConfig(remoteType string) (*dc.AutomateConfig, error) {
+	var log dc.AutomateConfig
+	var fileName string
+	if remoteType == "postgresql" {
+		fileName = postgresLogConfig
+	} else {
+		fileName = opensearchConfig
+	}
+	if checkIfFileExist(fileName) {
+		contents, err := ioutil.ReadFile(fileName) // nosemgrep
+		if err != nil {
+			return nil, err
+		}
+		destString := string(contents)
+		log1, err := decodeLogConfig(destString)
+		log = *log1
+		if err != nil {
+			return &log, err
+		}
+	}
+	return &log, nil
+
 }

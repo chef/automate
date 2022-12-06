@@ -431,3 +431,22 @@ module "chef_server" {
   nfs_mount_path                     = var.nfs_mount_path
   depends_on                         = [module.bootstrap_automate]
 }
+
+module "keystore_opensearch" {
+  source                          = "./modules/keystoreopensearch"
+  count                           = var.setup_managed_services ? 0 : 1
+  opensearch_instance_count       = var.opensearch_instance_count
+  opensearch_listen_port          = var.opensearch_listen_port
+  opensearch_pkg_ident            = var.opensearch_pkg_ident
+  private_ips                     = var.existing_opensearch_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
+  backup_config_s3                = var.backup_config_s3
+  access_key                      = var.access_key
+  secret_key                      = var.secret_key
+  tmp_path                        = var.tmp_path
+  depends_on                      = [module.bootstrap_automate]
+}

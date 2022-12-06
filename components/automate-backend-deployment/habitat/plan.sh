@@ -25,7 +25,7 @@ pkg_deps=(
   core/busybox-static
   chef/automate-ha-cluster-ctl
 )
-
+ 
 pkg_build_deps=(
   core/gcc
 )
@@ -109,6 +109,7 @@ do_install() {
   rm -f $pkg_prefix/workspace/terraform/versions.tf
   rm -f $pkg_prefix/workspace/backups
 }
+
 
 do_strip() {
   return 0

@@ -62,6 +62,7 @@ require (
 	github.com/hashicorp/go-hclog v0.12.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.1.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/hashicorp/hcl/v2 v2.0.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365 // indirect
 	github.com/imdario/mergo v0.3.13
@@ -114,6 +115,7 @@ require (
 	github.com/uber/jaeger-lib v1.3.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20170218160415-a3153f7040e9 // indirect
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
+	github.com/zclconf/go-cty v1.1.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/atomic v1.6.0
 	go.uber.org/multierr v1.5.0

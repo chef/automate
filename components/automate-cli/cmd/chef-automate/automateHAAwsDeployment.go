@@ -67,7 +67,7 @@ func (a *awsDeployment) generateConfig() error {
 	}
 	errList := a.validateConfigFields()
 	if errList != nil && errList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
+		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid")
 	}
 	if a.config.Opensearch.Config.EnableCustomCerts {
 		admin_dn, err := a.getDistinguishedNameFromKey(a.config.Opensearch.Config.AdminCert)
@@ -239,12 +239,21 @@ func (a *awsDeployment) validateCerts() *list.List {
 			len(strings.TrimSpace(a.config.Automate.Config.PublicKey)) < 1 {
 			errorList.PushBack("Automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: a.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+			{key: a.config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
+			{key: a.config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
+		}))
 	}
 	if a.config.ChefServer.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(a.config.ChefServer.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(a.config.ChefServer.Config.PublicKey)) < 1 {
 			errorList.PushBack("ChefServer root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: a.config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
+			{key: a.config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
+		}))
 	}
 	if a.config.Postgresql.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 ||
@@ -252,6 +261,11 @@ func (a *awsDeployment) validateCerts() *list.List {
 			len(strings.TrimSpace(a.config.Postgresql.Config.PublicKey)) < 1 {
 			errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: a.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+			{key: a.config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
+			{key: a.config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+		}))
 	}
 	if a.config.Opensearch.Config.EnableCustomCerts {
 		if len(strings.TrimSpace(a.config.Opensearch.Config.RootCA)) < 1 ||
@@ -261,6 +275,13 @@ func (a *awsDeployment) validateCerts() *list.List {
 			len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) < 1 {
 			errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
 		}
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: a.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+			{key: a.config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+			{key: a.config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+			{key: a.config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
+			{key: a.config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+		}))
 	}
 	return errorList
 }

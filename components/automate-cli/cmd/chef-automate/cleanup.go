@@ -55,6 +55,7 @@ const (
 	BACKENDCLEANUP_COMMANDS = `
 		sudo systemctl stop hab-sup;
 		sudo rm -rf /hab; 
+		sudo rm -rf /bin/hab;
 		sudo rm -rf /var/automate-ha;
 		`
 )
@@ -66,9 +67,11 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 	}
 	if infra != nil {
 		if isA2HARBFileExist() {
-			sshUser := infra.Outputs.SSHUser.Value
-			sshKeyFile := infra.Outputs.SSHKeyFile.Value
-			sshPort := infra.Outputs.SSHPort.Value
+			sshconfig := &SSHConfig{}
+			sshconfig.sshUser = infra.Outputs.SSHUser.Value
+			sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+			sshconfig.sshPort = infra.Outputs.SSHPort.Value
+			sshUtil := NewSSHUtil(sshconfig)
 			if cleanupFlags.onprem {
 
 				res, err := writer.Prompt("Cleanup will remove all the Automate HA resources created by deploy command. Do you want to continue?\nPress y to agree, n to disagree? [y/n]")
@@ -80,22 +83,23 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 					return nil
 				}
 				automateIps := infra.Outputs.AutomatePrivateIps.Value
-				err = executeCommandForArrayofIPs(sshUser, sshPort, sshKeyFile, automateIps, FRONTENDCLEANUP_COMMANDS, "automate")
+				err = executeCommandForArrayofIPs(sshUtil, automateIps, FRONTENDCLEANUP_COMMANDS, "automate")
 				if err != nil {
 					return err
 				}
 				chefserverIps := infra.Outputs.ChefServerPrivateIps.Value
-				err = executeCommandForArrayofIPs(sshUser, sshPort, sshKeyFile, chefserverIps, FRONTENDCLEANUP_COMMANDS, "chef-server")
+				err = executeCommandForArrayofIPs(sshUtil, chefserverIps, FRONTENDCLEANUP_COMMANDS, "chef-server")
 				if err != nil {
 					return err
 				}
 				postgresqlIps := infra.Outputs.PostgresqlPrivateIps.Value
-				err = executeCommandForArrayofIPs(sshUser, sshPort, sshKeyFile, postgresqlIps, BACKENDCLEANUP_COMMANDS, "postgresql")
+				err = executeCommandForArrayofIPs(sshUtil, postgresqlIps, BACKENDCLEANUP_COMMANDS, "postgresql")
 				if err != nil {
 					return err
 				}
 				opensearchIps := infra.Outputs.OpensearchPrivateIps.Value
-				err = executeCommandForArrayofIPs(sshUser, sshPort, sshKeyFile, opensearchIps, BACKENDCLEANUP_COMMANDS, "opensearch")
+
+				err = executeCommandForArrayofIPs(sshUtil, opensearchIps, BACKENDCLEANUP_COMMANDS, "opensearch")
 				if err != nil {
 					return err
 				}
@@ -162,10 +166,11 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func executeCommandForArrayofIPs(sshUser string, sshPort string, sshKeyFile string, remoteIps []string, script string, servername string) error {
+func executeCommandForArrayofIPs(sshUtil SSHUtil, remoteIps []string, script string, servername string) error {
 	for i := 0; i < len(remoteIps); i++ {
+		sshUtil.getSSHConfig().hostIP = remoteIps[i]
 		writer.Println("Cleanup has started on " + servername + " node : " + remoteIps[i] + "\n")
-		_, err := ConnectAndExecuteCommandOnRemote(sshUser, sshPort, sshKeyFile, remoteIps[i], script)
+		_, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 		if err != nil {
 			writer.Error(err.Error())
 			return err

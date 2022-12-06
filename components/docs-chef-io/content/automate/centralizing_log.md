@@ -29,7 +29,7 @@ To view the logs, run the following command:
 journalctl -u chef-automate -f
 ```
 
-Click [here](/automate/configuring_automate/log_management) to learn more about Log Management.
+Click [here](/log_management) to learn more about Log Management.
 
 ## Prerequisites
 
@@ -45,6 +45,7 @@ The above modules come by default with all the operating systems we support.
 Once you centralize the log, you can run the above command sparingly to check the log. The configuration to centralize the log in a file is shown below:
 
 ```toml
+[global.v1.log]
 redirect_sys_log = true //centralize the log
 redirect_log_file_path = "PATH OF THE LOG FILE" //set the location of the log file. syntax: /var/tmp/
 ```
@@ -74,6 +75,7 @@ sudo chef-automate config patch config.toml
 The centralizing log also comes with log rotation with the following specifications:
 
 ```toml
+[global.v1.log]
 redirect_sys_log = true //centralize the log
 redirect_log_file_path = "/var/tmp/" //set the location of the log file
 
@@ -91,7 +93,7 @@ In the above specifications:
 
 {{< note >}} The default value of `max_number_rotated_logs` is **10M**. If you don't want to keep more than one log file in your storage, set the value of `max_number_rotated_logs` to **1**. {{< /note >}}
 
-## Configure Logs for OpenSearch in Chef Automate HA
+## Configure Logs for OpenSearch and PostgreSQL in Chef Automate HA
 
 To configure the centralizing log feature for OpenSearch in Chef Automate HA, run the following command:
 

@@ -71,7 +71,7 @@ func TestCalculateMaxTotalShardsLessThan1500(t *testing.T) {
 	var minShardVal int32 = MINIMUM_SHARD_VALUE
 	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT
 	maxTotalShards := poc.calculateMaxTotalShards(shardsUsed, minShardVal, incrementShardValue)
-	var expectedCount int32 = 2000
+	var expectedCount int32 = 2500
 	assert.Equal(t, expectedCount, maxTotalShards)
 }
 
@@ -84,6 +84,6 @@ func TestCalculateMaxTotalShardsMoreThan1500(t *testing.T) {
 	var minShardVal int32 = MINIMUM_SHARD_VALUE
 	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT
 	maxTotalShards := poc.calculateMaxTotalShards(shardsUsed, minShardVal, incrementShardValue)
-	var expectedCount int32 = 2300
+	var expectedCount int32 = 2800
 	assert.Equal(t, expectedCount, maxTotalShards)
 }

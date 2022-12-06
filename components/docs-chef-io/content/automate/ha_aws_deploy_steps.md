@@ -43,6 +43,9 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
     Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrase for Private Key authentication.
 
+{{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+{{< /warning >}}
+
 ### Deployment
 
 Run the following steps on Bastion Host Machine:
@@ -206,8 +209,8 @@ backup_config = "s3"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "aws"
+# DON'T MODIFY THE BELOW LINE (workspace_path)
 workspace_path = "/hab/a2_deploy_workspace"
-# DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
 [automate.config]
 admin_password = ""

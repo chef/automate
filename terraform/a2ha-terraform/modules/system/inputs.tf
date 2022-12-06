@@ -37,5 +37,5 @@ variable "sudo_cmd" {
 }
 
 variable "tmp_path" {
-  default = "/var/automate-ha"
+  default = "/hab/var/automate-ha"
 }

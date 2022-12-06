@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
+	flag "github.com/spf13/pflag"
 )
 
 const restoreRecovery = `Check the logs (journalctl -u chef-automate) for errors related
@@ -37,6 +38,20 @@ Under normal circumstances, restoring over an existing Chef Automate installatio
 some services are down will work correctly. If such a restore does not work correctly, ensure that
 either all services are up (chef-automate restart-services)
 or all services are down (chef-automate stop) before retrying the restore.`
+
+var allPassedFlags string = ""
+
+const (
+	AUTOMATE_CMD_STOP  = "sudo chef-automate stop"
+	AUTOMATE_CMD_START = "sudo chef-automate start"
+)
+
+type BackupFromBashtion interface {
+	isBastionHost() bool
+	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error
+}
+
+type BackupFromBashtionImp struct{}
 
 var backupCmdFlags = struct {
 	noProgress     bool
@@ -87,6 +102,7 @@ func init() {
 	backupCmd.AddCommand(statusBackupCmd)
 	backupCmd.AddCommand(cancelBackupCmd)
 	backupCmd.AddCommand(integrityBackupCmd)
+	backupCmd.AddCommand(streamStatusBackupCmd)
 
 	backupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.noProgress, "no-progress", "", false, "Don't follow operation progress")
 	backupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.requestTimeout, "request-timeout", "r", 20, "API request timeout for deployment-service in seconds")
@@ -136,8 +152,9 @@ func init() {
 }
 
 var backupCmd = &cobra.Command{
-	Use:   "backup COMMAND",
-	Short: "Chef Automate backup",
+	Use:               "backup COMMAND",
+	Short:             "Chef Automate backup",
+	PersistentPreRunE: preBackupCmd,
 }
 
 var createBackupCmd = &cobra.Command{
@@ -204,6 +221,14 @@ var statusBackupCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(0),
 }
 
+var streamStatusBackupCmd = &cobra.Command{
+	Use:   "stream-status",
+	Short: "Stream the Chef Automate backup runner status",
+	Long:  "Stream the Chef Automate backup runner status",
+	RunE:  runStreamBackupStatus,
+	Args:  cobra.ExactArgs(1),
+}
+
 var cancelBackupCmd = &cobra.Command{
 	Use:   "cancel",
 	Short: "cancel the running backup operation",
@@ -230,6 +255,103 @@ var integrityBackupValidateCmd = &cobra.Command{
 	Short: "validate the shared object integrity",
 	Long:  "Validate the shared object integrity. If one or more snapshot IDs is not given all snapshots will be validated",
 	RunE:  runValidateBackupIntegrity,
+}
+
+func preBackupCmd(cmd *cobra.Command, args []string) error {
+	if NewBackupFromBashtion().isBastionHost() {
+		//Enhancments:  need to handle airgap bundle path from bastion host
+		//Enhancments: how to pass missing opensearch credentials
+		allPassedFlags = ""
+		cmd.Flags().Visit(checkFlags)
+		commandString := prepareCommandString(cmd, args, allPassedFlags)
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
+			return err
+			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
+		}
+		err = handleBackupCommands(cmd, args, commandString, infra)
+		if err != nil {
+			return err
+		}
+		// NOTE: used os.exit as need to stop next lifecycle method to execute
+		os.Exit(1)
+	}
+	return nil
+}
+
+func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) string {
+	commandString := cmd.CommandPath() + " "
+	if !strings.Contains(commandString, "sudo") {
+		commandString = "sudo " + commandString
+	}
+	if len(args) > 0 {
+		for _, ar := range args {
+			commandString = commandString + ar + " "
+		}
+	}
+	commandString = commandString + allPassedFlags
+	commandString = commandString + "--no-progress "
+	return commandString
+}
+
+func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
+	if strings.Contains(cmd.CommandPath(), "create") {
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
+		if err != nil {
+			return err
+		}
+		os.Exit(1)
+	}
+	if strings.Contains(cmd.CommandPath(), "restore") {
+		if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
+			yes, err := writer.Confirm(strings.TrimSpace(a2AlreadyDeployedMessage))
+			if err != nil {
+				return status.Annotate(err, status.BackupError)
+			}
+			if !yes {
+				return status.New(status.InvalidCommandArgsError, "A2 is currently deployed")
+			}
+			commandString = commandString + " --yes"
+		}
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
+		if err != nil {
+			return err
+		}
+		os.Exit(1)
+	}
+	if strings.Contains(cmd.CommandPath(), "delete") {
+		affirmation, err := takeDeleteAffirmation(args)
+		if err != nil {
+			return err
+		}
+		if affirmation {
+			commandString = commandString + " --yes"
+		}
+	}
+	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func takeDeleteAffirmation(args []string) (bool, error) {
+	if !backupDeleteCmdFlags.yes {
+		yes, err := writer.Confirm(
+			fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+				strings.Join(args, "\n"),
+			),
+		)
+		if err != nil {
+			return false, status.Annotate(err, status.BackupError)
+		}
+		if !yes {
+			return false, status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
+		}
+		return true, nil
+	}
+	return false, nil
 }
 
 func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
@@ -268,6 +390,32 @@ func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	writer.Successf("Created backup %s", res.Backup.TaskID())
+	return nil
+}
+
+func runStreamBackupStatus(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return errors.New("*Required args Backup Id, to Stream backup status backup id is required")
+	}
+	backupTaskId := args[0]
+	lastEvent, err := client.StreamBackupStatus(
+		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+		time.Duration(backupCmdFlags.createWaitTimeout)*time.Second,
+		backupTaskId,
+		writer,
+	)
+	if err != nil {
+		return status.Wrap(err, status.BackupError, "Streaming backup events failed")
+	}
+
+	if lastEvent != nil && lastEvent.GetBackup() != nil {
+		status.GlobalResult = createBackupResult{
+			BackupId: backupTaskId,
+			SHA256:   lastEvent.GetBackup().Description.Sha256,
+		}
+	}
+
+	writer.Successf("Created backup %s", backupTaskId)
 	return nil
 }
 
@@ -730,6 +878,20 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 	return parsedBackups[0].task, nil
 }
 
+func checkFlags(f *flag.Flag) {
+	if !strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "no-progress") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "airgap-bundle") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "patch-config") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "set-config") &&
+		!strings.EqualFold(strings.TrimSpace(strings.ToLower(f.Name)), "gcs-credentials-path") {
+		if f.Value.Type() == "bool" && f.Value.String() == "true" {
+			allPassedFlags = allPassedFlags + " --" + f.Name + " "
+		} else {
+			allPassedFlags = allPassedFlags + " --" + f.Name + " " + f.Value.String() + " "
+		}
+	}
+}
+
 // nolint: gocyclo
 func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
@@ -970,4 +1132,147 @@ func idsToBackupTasks(args []string) ([]*api.BackupTask, error) {
 	}
 
 	return ids, nil
+}
+
+func NewBackupFromBashtion() BackupFromBashtion {
+	return &BackupFromBashtionImp{}
+}
+
+func (ins *BackupFromBashtionImp) isBastionHost() bool {
+	return isA2HARBFileExist()
+}
+
+func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error {
+	sshconfig := &SSHConfig{}
+	sshconfig.sshUser = infra.Outputs.SSHUser.Value
+	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+	sshconfig.sshPort = infra.Outputs.SSHPort.Value
+	sshUtil := NewSSHUtil(sshconfig)
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
+	chefServerIps := infra.Outputs.ChefServerPrivateIps.Value
+	if automateIps == nil || len(automateIps) < 1 {
+		return status.Errorf(status.ConfigError, "Invalid deployment config")
+	}
+	if stopFrontends {
+		if len(backupCmdFlags.airgap) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.airgap, filepath.Base(backupCmdFlags.airgap), false)
+			commandString = commandString + " --airgap-bundle " + "/tmp/" + filepath.Base(backupCmdFlags.airgap)
+		}
+		if len(backupCmdFlags.patchConfigPath) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.patchConfigPath, filepath.Base(backupCmdFlags.patchConfigPath), false)
+			commandString = commandString + " --patch-config " + "/tmp/" + filepath.Base(backupCmdFlags.patchConfigPath)
+		}
+		if len(backupCmdFlags.setConfigPath) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.setConfigPath, filepath.Base(backupCmdFlags.setConfigPath), false)
+			commandString = commandString + " --set-config " + "/tmp/" + filepath.Base(backupCmdFlags.setConfigPath)
+		}
+		if len(backupCmdFlags.gcsCredentialsPath) > 0 {
+			sshUtil.getSSHConfig().hostIP = automateIps[0]
+			sshUtil.copyFileToRemote(backupCmdFlags.gcsCredentialsPath, filepath.Base(backupCmdFlags.gcsCredentialsPath), false)
+			commandString = commandString + " --gcs-credentials-path " + "/tmp/" + filepath.Base(backupCmdFlags.gcsCredentialsPath)
+		}
+		err := stopFrontendNodes(sshUtil, automateIps[1:], chefServerIps)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			err := startFrontendNodes(sshUtil, automateIps[1:], chefServerIps)
+			if err != nil {
+				writer.Println(err.Error())
+				return
+			}
+		}()
+	}
+	sshUtil.getSSHConfig().hostIP = automateIps[0]
+	if pooling {
+		cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString, true)
+		if err != nil {
+			writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
+			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s", automateIps[0])
+		}
+		writer.Printf("triggered backup commands on Automate node %s \n %s \n", automateIps[0], cmdRes)
+		writer.StartSpinner()
+		err = poolStatus(sshUtil, cmdRes, backupState)
+		writer.StopSpinner()
+		if err != nil {
+			return status.Wrapf(err, status.BackupRestoreError, "error in polling status")
+		}
+		return nil
+	} else {
+		_, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
+		if err != nil {
+			writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
+			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s", automateIps[0])
+		}
+		return nil
+	}
+}
+
+func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
+	for {
+		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status", false)
+		if err != nil {
+			writer.Errorf("error in polling backup status %s \n", err.Error())
+			return err
+		}
+		if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
+			if backupState {
+				backupList, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup list", false)
+				if err != nil {
+					writer.Errorf("error in getting backup list %s \n", err.Error())
+					break
+				}
+				backupState := getBackupStateFromList(backupList, cmdRes)
+				writer.Println(backupState)
+			}
+			writer.Println("backup operation completed")
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
+	return nil
+}
+
+func startFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
+	writer.Println("starting frontend nodes")
+	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_START)
+}
+
+func stopFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
+	writer.Println("stopping frontend nodes")
+	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_STOP)
+}
+
+func executeOnFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string, cmd string) error {
+	for _, automateIp := range automateIps {
+		writer.Printf("executing on automate nodes %s \n", automateIp)
+		sshUtil.getSSHConfig().hostIP = automateIp
+		stopA2Res, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
+		if err != nil {
+			writer.Errorf("error in excuting chef-automate on automate nodes %s \n", err.Error())
+			return status.Wrap(err, status.BackupRestoreError, "error in excuting chef-automate on automate nodes")
+		}
+		writer.Printf("executed chef-automate from automate node \n %s : %s \n", stopA2Res, automateIp)
+	}
+	for _, chefServerIp := range chefServerIps {
+		writer.Printf("executing chef server nodes %s \n", chefServerIp)
+		sshUtil.getSSHConfig().hostIP = chefServerIp
+		stopCSRes, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
+		if err != nil {
+			writer.Errorf("error in executing chef-automate on chef server nodes %s \n", err.Error())
+			return status.Wrap(err, status.BackupRestoreError, "error in executing chef-automate on chef server nodes")
+		}
+		writer.Printf("executed chef-automate from chef server node \n %s : %s \n", stopCSRes, chefServerIp)
+	}
+	return nil
+}
+
+func getBackupStateFromList(output string, backupId string) string {
+	idxFind := strings.Index(output, strings.TrimSpace(backupId))
+	left := strings.LastIndex(output[:idxFind], "\n")
+	right := strings.Index(output[idxFind:], "\n")
+	return output[left : idxFind+right]
 }

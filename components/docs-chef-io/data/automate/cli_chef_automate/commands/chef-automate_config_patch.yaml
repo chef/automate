@@ -4,6 +4,20 @@ usage: chef-automate config patch path/to/config.toml [flags]
 description: |
   Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.
 options:
+- name: a2
+  default_value: "false"
+  usage: Patch toml configuration to the automate node[DUPLICATE]
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Patch toml configuration to the automate node
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Patch toml configuration to the chef_server node
+- name: cs
+  default_value: "false"
+  usage: Patch toml configuration to the chef_server node[DUPLICATE]
 - name: fe
   default_value: "false"
   usage: |
@@ -20,6 +34,12 @@ options:
   shorthand: o
   default_value: "false"
   usage: Patch toml configuration to the opensearch node
+- name: os
+  default_value: "false"
+  usage: Patch toml configuration to the opensearch node[DUPLICATE]
+- name: pg
+  default_value: "false"
+  usage: Patch toml configuration to the postgresql node[DUPLICATE]
 - name: postgresql
   shorthand: p
   default_value: "false"

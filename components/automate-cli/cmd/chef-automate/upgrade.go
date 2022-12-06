@@ -386,13 +386,34 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
 	if !upgradeRunCmdFlags.acceptMLSA {
-		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		response, err := writer.Prompt("press y to start upgrade, n to to abort? [y/n]")
 		if err != nil {
 			return err
 		}
 		if !strings.Contains(response, "y") {
 			return errors.New("canceled upgrade")
 		}
+	}
+	modeOfDeployment := getModeOfDeployment()
+	if modeOfDeployment == EXISTING_INFRA_MODE {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
+		config, err := configPuller.generateConfig()
+		if err != nil {
+			return err
+		}
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
+		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writer.Println("a2ha.rb has regenerated...")
 	}
 
 	if offlineMode {

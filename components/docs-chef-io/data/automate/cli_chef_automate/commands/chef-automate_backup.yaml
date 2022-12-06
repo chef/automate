@@ -44,3 +44,4 @@ see_also:
 - restore - restore a Chef Automate backup
 - show - show the Chef Automate backup details
 - status - show the Chef Automate backup runner status
+- stream-status - Stream the Chef Automate backup runner status
