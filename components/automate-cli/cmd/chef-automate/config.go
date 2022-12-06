@@ -316,10 +316,10 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 // setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
 func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		writer.Warn("Patching the configuration for managed services is not possible!")
+		writer.Warn("Patching the configuration for third party managed services is not supported.")
 		return nil
 	}
-	if !(len(infra.Outputs.PostgresqlPrivateIps.Value) > 0) {
+	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
 		writer.Error("Postgres IPs not found in the config. Please contact the support team")
 		return nil
 
@@ -368,10 +368,10 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 // setConfigForOpensearch patches the config for open-search nodes in Automate HA
 func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		writer.Warn("Patching the configuration for managed services is not possible!")
+		writer.Warn("Patching the configuration for third party managed services is not supported.")
 		return nil
 	}
-	if !(len(infra.Outputs.OpensearchPrivateIps.Value) > 0) {
+	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
 		writer.Error("Postgres IPs not found in the config. Please contact the support team")
 		return nil
 
