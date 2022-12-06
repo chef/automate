@@ -13,6 +13,7 @@ ${ "${backup_config}" == "s3" ? <<EOT
 [s3]
   [s3.client.default]
     endpoint = "${endpoint}"
+    protocol = "${protocol}"
 
 EOT 
 : "${backup_config}" == "efs" ? <<EOT

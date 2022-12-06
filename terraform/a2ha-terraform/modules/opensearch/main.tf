@@ -9,7 +9,8 @@ locals {
       nodes_list                      = join(", ", formatlist("\"%s\"", var.private_ips))
       tmp_path                        = var.tmp_path
       backup_config                   = var.backup_config_s3 == "true" ? "s3" : var.backup_config_efs == "true" ? "efs" : ""
-      endpoint                        = var.s3_endpoint
+      protocol                        = length(split("://", var.s3_endpoint)) > 1 ? split("://", var.s3_endpoint)[0] : "https"
+      endpoint                        = length(split("://", var.s3_endpoint)) > 1 ? split("://", var.s3_endpoint)[1] : length(split("://", var.s3_endpoint)) == 1 ? split("://", var.s3_endpoint)[0] : "s3.amazonaws.com"
       nfs_mount_path                  = var.nfs_mount_path
       opensearch_custom_certs_enabled = var.opensearch_custom_certs_enabled
       opensearch_root_ca              = var.opensearch_root_ca
