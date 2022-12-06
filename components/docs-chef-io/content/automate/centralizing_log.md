@@ -93,12 +93,19 @@ In the above specifications:
 
 {{< note >}} The default value of `max_number_rotated_logs` is **10M**. If you don't want to keep more than one log file in your storage, set the value of `max_number_rotated_logs` to **1**. {{< /note >}}
 
-## Configure Logs for OpenSearch and PostgreSQL in Chef Automate HA
+## Configure Logs for OpenSearch in Chef Automate HA
 
 To configure the centralizing log feature for OpenSearch in Chef Automate HA, run the following command:
 
 ```toml
 chef-automate config patch --opensearch <file/path/to/toml>
+```
+
+## Configure Logs for PostgreSQL in Chef Automate HA
+
+To configure the centralizing log feature for PostgreSQL in Chef Automate HA, run the following command:
+
+```toml
 chef-automate config patch --postgresql <file/path/to/toml>
 ```
 
