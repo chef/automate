@@ -229,7 +229,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 -   Log in to the one of Chef Automate front-end nodes.
 
--   Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint <>`.
+-   Execute the restore command `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --airgap-bundle <path/to/bundle> --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint <>`.
 
 {{< note >}}
 
