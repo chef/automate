@@ -143,9 +143,9 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 -   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
--   Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+-   Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --skip-preflight`.
 
-NOTE: Currently "--skip-preflight" flag is not supported from the bastion, If you want to use the "--skip-preflight" follow the steps given below.
+-   In case of Airgapped Environment, Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --airgap-bundle </path/to/bundle> --skip-preflight`.
 
 ## Troubleshooting
 
