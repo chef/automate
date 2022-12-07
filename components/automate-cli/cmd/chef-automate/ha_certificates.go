@@ -55,7 +55,7 @@ func init() {
 	}
 
 	certShowCmd := &cobra.Command{
-		Use:   "show COMMAND",
+		Use:   "show",
 		Short: "Chef Automate Certificates Show",
 		Long:  "Chef Automate CLI command to show certificates, this command should always be executed from AutomateHA Bastion Node",
 		RunE:  certShowCmdFunc(&flagsObj),
@@ -150,6 +150,8 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 		return err
 	}
 	certInfo := c.getCerts(config)
+
+	c.writer.Printf("Node: %s\n", c.flags.node)
 
 	switch remoteService {
 	case CONST_AUTOMATE:
