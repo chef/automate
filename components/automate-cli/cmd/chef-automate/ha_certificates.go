@@ -6,7 +6,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -145,7 +144,7 @@ func certShowOpensearchCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command,
 
 func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService string) error {
 	if !isA2HARBFileExist() {
-		return errors.New(AUTOMATE_HA_INVALID_BASTION)
+		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
 	}
 	config, err := c.getHAConfig()
 	if err != nil {
@@ -166,7 +165,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 		c.printChefServerCertificates(certInfo)
 	case CONST_POSTGRESQL:
 		if isManagedServicesOn() {
-			return errors.New("This command is not supported in Managed Services")
+			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
 		}
 		if err := c.validateNode(certInfo.PostgresqlCertsByIP, CONST_POSTGRESQL); err != nil {
 			return err
@@ -174,7 +173,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 		c.printPostgresqlCertificates(certInfo)
 	case CONST_OPENSEARCH:
 		if isManagedServicesOn() {
-			return errors.New("This command is not supported in Managed Services")
+			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
 		}
 		if err := c.validateNode(certInfo.OpensearchCertsByIP, CONST_OPENSEARCH); err != nil {
 			return err
