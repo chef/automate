@@ -8,6 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	CONST_AUTOMATE    = "automate"
+	CONST_CHEF_SERVER = "chef-server"
+	CONST_POSTGRESQL  = "postgresql"
+	CONST_OPENSEARCH  = "opensearch"
+)
+
 type certShowFlags struct {
 	node string
 }
@@ -54,43 +61,41 @@ func init() {
 		RunE:  certShowCmdFunc(&flagsObj),
 	}
 
-	/*
-		certShowAutomateCmd := &cobra.Command{
-			Use:   "automate",
-			Short: "Chef Automate Certificates Show Automate",
-			Long:  "Chef Automate CLI command to show Automate certificates, this command should always be executed from AutomateHA Bastion Node",
-			RunE:  certShowAutomateCmdFunc(&flagsObj),
-		}
-		certShowAutomateCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Automate Node")
-		certShowCmd.AddCommand(certShowAutomateCmd)
+	certShowAutomateCmd := &cobra.Command{
+		Use:   "automate",
+		Short: "Chef Automate Certificates Show Automate",
+		Long:  "Chef Automate CLI command to show Automate certificates, this command should always be executed from AutomateHA Bastion Node",
+		RunE:  certShowAutomateCmdFunc(&flagsObj),
+	}
+	certShowAutomateCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Automate Node")
+	certShowCmd.AddCommand(certShowAutomateCmd)
 
-		certShowChefServerCmd := &cobra.Command{
-			Use:   "chef-server",
-			Short: "Chef Automate Certificates Show Chef-Server",
-			Long:  "Chef Automate CLI command to show Chef Server certificates, this command should always be executed from AutomateHA Bastion Node",
-			RunE:  certShowChefServerCmdFunc(&flagsObj),
-		}
-		certShowChefServerCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Server Node")
-		certShowCmd.AddCommand(certShowChefServerCmd)
+	certShowChefServerCmd := &cobra.Command{
+		Use:   "chef-server",
+		Short: "Chef Automate Certificates Show Chef-Server",
+		Long:  "Chef Automate CLI command to show Chef Server certificates, this command should always be executed from AutomateHA Bastion Node",
+		RunE:  certShowChefServerCmdFunc(&flagsObj),
+	}
+	certShowChefServerCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Server Node")
+	certShowCmd.AddCommand(certShowChefServerCmd)
 
-		certShowPostgresqlCmd := &cobra.Command{
-			Use:   "postgresql",
-			Short: "Chef Automate Certificates Show Postgresql",
-			Long:  "Chef Automate CLI command to show Postgresql certificates, this command should always be executed from AutomateHA Bastion Node",
-			RunE:  certShowPostgresqlCmdFunc(&flagsObj),
-		}
-		certShowPostgresqlCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Postgresql Node")
-		certShowCmd.AddCommand(certShowPostgresqlCmd)
+	certShowPostgresqlCmd := &cobra.Command{
+		Use:   "postgresql",
+		Short: "Chef Automate Certificates Show Postgresql",
+		Long:  "Chef Automate CLI command to show Postgresql certificates, this command should always be executed from AutomateHA Bastion Node",
+		RunE:  certShowPostgresqlCmdFunc(&flagsObj),
+	}
+	certShowPostgresqlCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Postgresql Node")
+	certShowCmd.AddCommand(certShowPostgresqlCmd)
 
-		certShowOpensearchCmd := &cobra.Command{
-			Use:   "opensearch",
-			Short: "Chef Automate Certificates Show Opensearch",
-			Long:  "Chef Automate CLI command to show Opensearch certificates, this command should always be executed from AutomateHA Bastion Node",
-			RunE:  certShowOpensearchCmdFunc(&flagsObj),
-		}
-		certShowOpensearchCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Opensearch Node")
-		certShowCmd.AddCommand(certShowOpensearchCmd)
-	*/
+	certShowOpensearchCmd := &cobra.Command{
+		Use:   "opensearch",
+		Short: "Chef Automate Certificates Show Opensearch",
+		Long:  "Chef Automate CLI command to show Opensearch certificates, this command should always be executed from AutomateHA Bastion Node",
+		RunE:  certShowOpensearchCmdFunc(&flagsObj),
+	}
+	certShowOpensearchCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Opensearch Node")
+	certShowCmd.AddCommand(certShowOpensearchCmd)
 
 	certCmd.AddCommand(certShowCmd)
 	RootCmd.AddCommand(certCmd)
@@ -108,11 +113,35 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args)
+		return cs.certShow(cmd, args, "")
+	}
+}
+func certShowAutomateCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
+		return cs.certShow(cmd, args, CONST_AUTOMATE)
+	}
+}
+func certShowChefServerCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
+		return cs.certShow(cmd, args, CONST_CHEF_SERVER)
+	}
+}
+func certShowPostgresqlCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
+		return cs.certShow(cmd, args, CONST_POSTGRESQL)
+	}
+}
+func certShowOpensearchCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
+		return cs.certShow(cmd, args, CONST_OPENSEARCH)
 	}
 }
 
-func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
+func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService string) error {
 	if !isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
@@ -121,7 +150,19 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	certInfo := c.getCerts(config)
-	c.printCertificates(certInfo)
+
+	if remoteService == CONST_AUTOMATE {
+		c.printAutomateCertificates(certInfo)
+	} else if remoteService == CONST_CHEF_SERVER {
+		c.printChefServerCertificates(certInfo)
+	} else if remoteService == CONST_POSTGRESQL {
+		c.printPostgresqlCertificates(certInfo)
+	} else if remoteService == CONST_OPENSEARCH {
+		c.printOpensearchCertificates(certInfo)
+	} else {
+		c.printCertificates(certInfo)
+	}
+
 	return nil
 }
 
