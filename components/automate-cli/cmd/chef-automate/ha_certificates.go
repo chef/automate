@@ -155,22 +155,30 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 
 	switch remoteService {
 	case CONST_AUTOMATE:
-		c.validateNode(certInfo.AutomateCertsByIP)
+		if err := c.validateNode(certInfo.AutomateCertsByIP); err != nil {
+			return err
+		}
 		c.printAutomateCertificates(certInfo)
 	case CONST_CHEF_SERVER:
-		c.validateNode(certInfo.ChefServerCertsByIP)
+		if err := c.validateNode(certInfo.ChefServerCertsByIP); err != nil {
+			return err
+		}
 		c.printChefServerCertificates(certInfo)
 	case CONST_POSTGRESQL:
 		if isManagedServicesOn() {
 			return errors.New("This command is not supported in Managed Services")
 		}
-		c.validateNode(certInfo.PostgresqlCertsByIP)
+		if err := c.validateNode(certInfo.PostgresqlCertsByIP); err != nil {
+			return err
+		}
 		c.printPostgresqlCertificates(certInfo)
 	case CONST_OPENSEARCH:
 		if isManagedServicesOn() {
 			return errors.New("This command is not supported in Managed Services")
 		}
-		c.validateNode(certInfo.OpensearchCertsByIP)
+		if err := c.validateNode(certInfo.OpensearchCertsByIP); err != nil {
+			return err
+		}
 		c.printOpensearchCertificates(certInfo)
 	default:
 		c.printCertificates(certInfo)
@@ -269,7 +277,7 @@ func (c *certShowImpl) printPublicAndPrivateKeys(certs CertByIP, remoteService s
 	c.writer.Println(fmt.Sprintf("\n%s Certificates for %s\n", remoteService, certs.IP))
 	c.writer.Println(fmt.Sprintf("=======================%s Public Key=======================", remoteService))
 	c.writer.Println(certs.PublicKey)
-	c.writer.Println(fmt.Sprintf("======================%s Private Key======================", remoteService))
+	c.writer.Println(fmt.Sprintf("\n======================%s Private Key======================", remoteService))
 	c.writer.Println(certs.PrivateKey)
 }
 
