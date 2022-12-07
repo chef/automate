@@ -232,7 +232,7 @@ func TestGetCerts(t *testing.T) {
 
 	type testCaseInfo struct {
 		testCaseDescription string
-		flagsObj            flags
+		flagsObj            certRotateFlags
 		rootCaWant          string
 		publicCertWant      string
 		privateCertWant     string
@@ -244,7 +244,7 @@ func TestGetCerts(t *testing.T) {
 	testCases := []testCaseInfo{
 		{
 			testCaseDescription: "All paths given and flag is automate service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				automate:        true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -259,7 +259,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths given except root-ca flag is automate service and node flag given",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				automate:        true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -274,7 +274,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths given and flag is opensearch service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				opensearch:      true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -291,7 +291,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths empty and flag for automate service",
-			flagsObj:            flags{},
+			flagsObj:            certRotateFlags{},
 			rootCaWant:          "",
 			publicCertWant:      "",
 			privateCertWant:     "",
@@ -301,7 +301,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "some invalid paths given and flag is automate service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				automate:        true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  "./xyx-cert.go",
@@ -316,7 +316,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths given but invalid (file not exist in (f.s)and flag is automate service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				automate:        true,
 				privateCertPath: "./xyz.go",
 				publicCertPath:  "./xyz.go",
@@ -331,7 +331,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths given except root-ca and flag is automate service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				automate:        true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -345,7 +345,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "All paths given but root-ca path is invalid(file not exist) flag is automate service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				automate:        true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -360,7 +360,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Some mandatory path not given and flag is opensearch service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				opensearch:      true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -377,7 +377,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Invalid adminCert path and flag is opensearch service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				opensearch:      true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
@@ -394,7 +394,7 @@ func TestGetCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Invalid adminKey path and flag is opensearch service",
-			flagsObj: flags{
+			flagsObj: certRotateFlags{
 				opensearch:      true,
 				privateCertPath: ValidCertPath,
 				publicCertPath:  ValidCertPath,
