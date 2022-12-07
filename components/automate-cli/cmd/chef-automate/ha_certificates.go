@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -112,6 +113,9 @@ func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []st
 }
 
 func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
+	if !isA2HARBFileExist() {
+		return errors.New("cert show command should be executed from Automate HA Bastion Node")
+	}
 	config, err := c.getHAConfig()
 	if err != nil {
 		return err
