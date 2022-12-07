@@ -151,15 +151,26 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 	}
 	certInfo := c.getCerts(config)
 
-	if remoteService == CONST_AUTOMATE {
+	switch remoteService {
+	case CONST_AUTOMATE:
+		c.validateNode(certInfo.AutomateCertsByIP)
 		c.printAutomateCertificates(certInfo)
-	} else if remoteService == CONST_CHEF_SERVER {
+	case CONST_CHEF_SERVER:
+		c.validateNode(certInfo.ChefServerCertsByIP)
 		c.printChefServerCertificates(certInfo)
-	} else if remoteService == CONST_POSTGRESQL {
+	case CONST_POSTGRESQL:
+		if isManagedServicesOn() {
+			return errors.New("This command is not supported in Managed Services")
+		}
+		c.validateNode(certInfo.PostgresqlCertsByIP)
 		c.printPostgresqlCertificates(certInfo)
-	} else if remoteService == CONST_OPENSEARCH {
+	case CONST_OPENSEARCH:
+		if isManagedServicesOn() {
+			return errors.New("This command is not supported in Managed Services")
+		}
+		c.validateNode(certInfo.OpensearchCertsByIP)
 		c.printOpensearchCertificates(certInfo)
-	} else {
+	default:
 		c.printCertificates(certInfo)
 	}
 
@@ -213,11 +224,7 @@ func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) 
 	c.writer.Println("========================Automate Root CA========================")
 	c.writer.Println(certInfo.AutomateRootCert)
 	for _, certs := range certInfo.AutomateCertsByIP {
-		c.writer.Println(fmt.Sprintf("\nAutomate Certificates for %s\n", certs.IP))
-		c.writer.Println("=======================Automate Public Key=======================")
-		c.writer.Println(certs.PublicKey)
-		c.writer.Println("======================Automate Private Key======================")
-		c.writer.Println(certs.PrivateKey)
+		c.printPublicAndPrivateKeys(certs, "Automate")
 	}
 }
 
@@ -225,11 +232,7 @@ func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates
 	c.writer.Title("Chef Server Certificates")
 	c.writer.HR()
 	for _, certs := range certInfo.ChefServerCertsByIP {
-		c.writer.Println(fmt.Sprintf("\nChef Server Certificates for %s\n", certs.IP))
-		c.writer.Println("=====================Chef Server Public Key=====================")
-		c.writer.Println(certs.PublicKey)
-		c.writer.Println("=====================Chef Server Private Key=====================")
-		c.writer.Println(certs.PrivateKey)
+		c.printPublicAndPrivateKeys(certs, "Chef Server")
 	}
 }
 
@@ -239,11 +242,7 @@ func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates
 	c.writer.Println("=======================Postgresql Root CA=======================")
 	c.writer.Println(certInfo.PostgresqlRootCert)
 	for _, certs := range certInfo.PostgresqlCertsByIP {
-		c.writer.Println(fmt.Sprintf("\nPostgresql Certificates for %s\n", certs.IP))
-		c.writer.Println("\n======================Postgresql Public Key======================")
-		c.writer.Println(certs.PublicKey)
-		c.writer.Println("\n=====================Postgresql Private Key=====================")
-		c.writer.Println(certs.PrivateKey)
+		c.printPublicAndPrivateKeys(certs, "Postgresql")
 	}
 }
 
@@ -257,10 +256,29 @@ func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates
 	c.writer.Println("\n======================Opensearch Admin Cert======================")
 	c.writer.Println(certInfo.OpensearchAdminCert)
 	for _, certs := range certInfo.OpensearchCertsByIP {
-		c.writer.Println(fmt.Sprintf("\nOpensearch Certificates for %s\n", certs.IP))
-		c.writer.Println("\n======================Opensearch Public Key======================")
-		c.writer.Println(certs.PublicKey)
-		c.writer.Println("\n=====================Opensearch Private Key=====================")
-		c.writer.Println(certs.PrivateKey)
+		c.printPublicAndPrivateKeys(certs, "Opensearch")
 	}
+}
+
+func (c *certShowImpl) printPublicAndPrivateKeys(certs CertByIP, remoteService string) {
+	if c.flags.node != "" && c.flags.node != certs.IP {
+		return
+	}
+	c.writer.Println(fmt.Sprintf("\n%s Certificates for %s\n", remoteService, certs.IP))
+	c.writer.Println(fmt.Sprintf("=======================%s Public Key=======================", remoteService))
+	c.writer.Println(certs.PublicKey)
+	c.writer.Println(fmt.Sprintf("======================%s Private Key======================", remoteService))
+	c.writer.Println(certs.PrivateKey)
+}
+
+func (c *certShowImpl) validateNode(certs []CertByIP) error {
+	if c.flags.node != "" {
+		for _, cert := range certs {
+			if cert.IP == c.flags.node {
+				return nil
+			}
+		}
+		return errors.New(fmt.Sprintf("Node %s does not exist in the cluster", c.flags.node))
+	}
+	return nil
 }
