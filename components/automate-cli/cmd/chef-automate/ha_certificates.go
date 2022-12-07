@@ -172,10 +172,10 @@ func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) 
 	c.writer.Println("========================Automate Root CA========================")
 	c.writer.Println(certInfo.AutomateRootCert)
 	for _, certs := range certInfo.AutomateCertsByIP {
-		c.writer.Println(fmt.Sprintf("Automate Certificates for %s", certs.IP))
-		c.writer.Println("========================Automate Public Key========================")
+		c.writer.Println(fmt.Sprintf("\nAutomate Certificates for %s\n", certs.IP))
+		c.writer.Println("=======================Automate Public Key=======================")
 		c.writer.Println(certs.PublicKey)
-		c.writer.Println("========================Automate Private Key========================")
+		c.writer.Println("======================Automate Private Key======================")
 		c.writer.Println(certs.PrivateKey)
 	}
 }
@@ -184,10 +184,10 @@ func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates
 	c.writer.Title("Chef Server Certificates")
 	c.writer.HR()
 	for _, certs := range certInfo.ChefServerCertsByIP {
-		c.writer.Println(fmt.Sprintf("Chef Server Certificates for %s", certs.IP))
-		c.writer.Println("========================Chef Server Public Key========================")
+		c.writer.Println(fmt.Sprintf("\nChef Server Certificates for %s\n", certs.IP))
+		c.writer.Println("=====================Chef Server Public Key=====================")
 		c.writer.Println(certs.PublicKey)
-		c.writer.Println("========================Chef Server Private Key========================")
+		c.writer.Println("=====================Chef Server Private Key=====================")
 		c.writer.Println(certs.PrivateKey)
 	}
 }
@@ -195,13 +195,13 @@ func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates
 func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates) {
 	c.writer.Title("Postgresql Certificates")
 	c.writer.HR()
-	c.writer.Println("========================Postgresql Root CA========================")
+	c.writer.Println("=======================Postgresql Root CA=======================")
 	c.writer.Println(certInfo.PostgresqlRootCert)
 	for _, certs := range certInfo.PostgresqlCertsByIP {
-		c.writer.Println(fmt.Sprintf("Postgresql Certificates for %s", certs.IP))
-		c.writer.Println("========================Postgresql Public Key========================")
+		c.writer.Println(fmt.Sprintf("\nPostgresql Certificates for %s\n", certs.IP))
+		c.writer.Println("\n======================Postgresql Public Key======================")
 		c.writer.Println(certs.PublicKey)
-		c.writer.Println("========================Postgresql Private Key========================")
+		c.writer.Println("\n=====================Postgresql Private Key=====================")
 		c.writer.Println(certs.PrivateKey)
 	}
 }
@@ -209,17 +209,17 @@ func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates
 func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates) {
 	c.writer.Title("Opensearch Certificates")
 	c.writer.HR()
-	c.writer.Println("========================Opensearch Root CA========================")
+	c.writer.Println("=======================Opensearch Root CA=======================")
 	c.writer.Println(certInfo.OpensearchRootCert)
-	c.writer.Println("========================Opensearch Admin Key========================")
+	c.writer.Println("\n======================Opensearch Admin Key======================")
 	c.writer.Println(certInfo.OpensearchAdminKey)
-	c.writer.Println("========================Opensearch Admin Cert========================")
+	c.writer.Println("\n======================Opensearch Admin Cert======================")
 	c.writer.Println(certInfo.OpensearchAdminCert)
 	for _, certs := range certInfo.OpensearchCertsByIP {
-		c.writer.Println(fmt.Sprintf("Opensearch Certificates for %s", certs.IP))
-		c.writer.Println("========================Opensearch Public Key========================")
+		c.writer.Println(fmt.Sprintf("\nOpensearch Certificates for %s\n", certs.IP))
+		c.writer.Println("\n======================Opensearch Public Key======================")
 		c.writer.Println(certs.PublicKey)
-		c.writer.Println("========================Opensearch Private Key========================")
+		c.writer.Println("\n=====================Opensearch Private Key=====================")
 		c.writer.Println(certs.PrivateKey)
 	}
 }
