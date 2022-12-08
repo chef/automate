@@ -84,7 +84,9 @@ func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []st
 	}
 	(*sshUtil).setSSHConfig(cfg)
 	configPuller := NewPullConfigs(infra, *sshUtil)
-	configPuller.setExceptionIps(exceptionIps)
+	if len(exceptionIps) > 0 {
+		configPuller.setExceptionIps(exceptionIps)
+	}
 	return configPuller.generateConfig()
 }
 

@@ -153,11 +153,11 @@ func certShowOpensearchCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command,
 
 // certShow is the return function for all cert show commands
 func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService string) error {
-	if !isA2HARBFileExist() {
+	if !c.nodeUtils.isA2HARBFileExist() {
 		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
 	}
 
-	config, err := c.getHAConfig()
+	config, err := c.nodeUtils.pullAndUpdateConfig(&c.sshUtil, nil)
 	if err != nil {
 		return err
 	}
@@ -195,17 +195,6 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 	}
 
 	return nil
-}
-
-// getHAConfig returns the config from the HA config file
-func (c *certShowImpl) getHAConfig() (*ExistingInfraConfigToml, error) {
-	infra, cfg, err := c.nodeUtils.getHaInfraDetails()
-	if err != nil {
-		return nil, err
-	}
-	c.sshUtil.setSSHConfig(cfg)
-	configPuller := NewPullConfigs(infra, c.sshUtil)
-	return configPuller.generateConfig()
 }
 
 // getCerts returns the certificates from the config

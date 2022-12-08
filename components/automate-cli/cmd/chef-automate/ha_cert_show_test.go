@@ -1,0 +1,99 @@
+package main
+
+import (
+	"testing"
+
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestIsCommonCerts(t *testing.T) {
+	flagsObj := certShowFlags{
+		node: "198.51.100.0",
+	}
+
+	cs := NewCertShowImpl(flagsObj, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               []CertByIP
+		expected            bool
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Common certs",
+			input: []CertByIP{
+				{
+					IP:         "198.51.100.0",
+					PrivateKey: "private_key_1",
+					PublicKey:  "public_key_1",
+					NodesDn:    "",
+				},
+				{
+					IP:         "198.51.100.1",
+					PrivateKey: "private_key_1",
+					PublicKey:  "public_key_1",
+					NodesDn:    "",
+				},
+			},
+			expected: true,
+		},
+		{
+			testCaseDescription: "Uncommon certs",
+			input: []CertByIP{
+				{
+					IP:         "198.51.100.0",
+					PrivateKey: "private_key_1",
+					PublicKey:  "public_key_1",
+					NodesDn:    "",
+				},
+				{
+					IP:         "198.51.100.1",
+					PrivateKey: "private_key_2",
+					PublicKey:  "public_key_2",
+					NodesDn:    "",
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			err := cs.certShow(nil, nil, "")
+			assert.NoError(t, err)
+
+			actual := cs.isCommonCerts(tc.input)
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
+	return &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return AWS_MODE, nil
+		},
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}
+}
+
+func getMockSSHUtilsImpl() *MockSSHUtilsImpl {
+	return &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	}
+}
+
+func getMockWriterImpl() *cli.Writer {
+	return majorupgrade_utils.NewCustomWriterWithInputs("x").CliWriter
+}
