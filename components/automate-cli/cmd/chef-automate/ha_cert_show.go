@@ -258,7 +258,7 @@ func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) 
 		return
 	}
 
-	if c.isCommonCerts(certInfo.AutomateCertsByIP) {
+	if c.flags.node == "" && c.isCommonCerts(certInfo.AutomateCertsByIP) {
 		c.writer.Println("\nAutomate certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.AutomateCertsByIP[0], "Automate", false)
 		return
@@ -280,7 +280,7 @@ func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates
 		return
 	}
 
-	if c.isCommonCerts(certInfo.ChefServerCertsByIP) {
+	if c.flags.node == "" && c.isCommonCerts(certInfo.ChefServerCertsByIP) {
 		c.writer.Println("\nChef Server certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.ChefServerCertsByIP[0], "Chef Server", false)
 		return
@@ -309,7 +309,7 @@ func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates
 		return
 	}
 
-	if c.isCommonCerts(certInfo.PostgresqlCertsByIP) {
+	if c.flags.node == "" && c.isCommonCerts(certInfo.PostgresqlCertsByIP) {
 		c.writer.Println("\nPostgresql certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.PostgresqlCertsByIP[0], "Postgresql", false)
 		return
@@ -352,7 +352,7 @@ func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates
 		return
 	}
 
-	if c.isCommonCerts(certInfo.OpensearchCertsByIP) {
+	if c.flags.node == "" && c.isCommonCerts(certInfo.OpensearchCertsByIP) {
 		c.writer.Println("\nOpensearch certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.OpensearchCertsByIP[0], "Opensearch", false)
 		return
