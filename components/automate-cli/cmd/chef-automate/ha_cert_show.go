@@ -175,7 +175,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 		}
 		c.printChefServerCertificates(certInfo)
 	case CONST_POSTGRESQL:
-		if isManagedServicesOn() {
+		if c.nodeUtils.isManagedServicesOn() {
 			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
 		}
 		if err := c.validateNode(certInfo.PostgresqlCertsByIP, CONST_POSTGRESQL); err != nil {
@@ -183,7 +183,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 		}
 		c.printPostgresqlCertificates(certInfo)
 	case CONST_OPENSEARCH:
-		if isManagedServicesOn() {
+		if c.nodeUtils.isManagedServicesOn() {
 			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
 		}
 		if err := c.validateNode(certInfo.OpensearchCertsByIP, CONST_OPENSEARCH); err != nil {
@@ -206,7 +206,7 @@ func (c *certShowImpl) getCerts(config *ExistingInfraConfigToml) certShowCertifi
 
 	certInfo.ChefServerCertsByIP = config.ChefServer.Config.CertsByIP
 
-	if !isManagedServicesOn() {
+	if !c.nodeUtils.isManagedServicesOn() {
 		certInfo.PostgresqlRootCert = config.Postgresql.Config.RootCA
 		certInfo.PostgresqlCertsByIP = config.Postgresql.Config.CertsByIP
 
@@ -224,7 +224,7 @@ func (c *certShowImpl) printCertificates(certInfo certShowCertificates) {
 	c.printAutomateCertificates(certInfo)
 	c.printChefServerCertificates(certInfo)
 
-	if !isManagedServicesOn() {
+	if !c.nodeUtils.isManagedServicesOn() {
 		c.printPostgresqlCertificates(certInfo)
 		c.printOpensearchCertificates(certInfo)
 	}

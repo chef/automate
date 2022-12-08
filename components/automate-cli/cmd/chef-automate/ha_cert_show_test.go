@@ -82,6 +82,9 @@ func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 		isA2HARBFileExistFunc: func() bool {
 			return true
 		},
+		isManagedServicesOnFunc: func() bool {
+			return true
+		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}
 }

@@ -33,6 +33,7 @@ type MockNodeUtilsImpl struct {
 	getModeFromConfigFunc                     func(path string) (string, error)
 	checkIfFileExistFunc                      func(path string) bool
 	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
+	isManagedServicesOnFunc                   func() bool
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -59,6 +60,9 @@ func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
 func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
 }
+func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
+	return mnu.isManagedServicesOnFunc()
+}
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
@@ -69,6 +73,7 @@ type NodeOpUtils interface {
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
 	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
+	isManagedServicesOn() bool
 }
 
 type NodeUtilsImpl struct{}
@@ -129,6 +134,10 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 	}
 	return infra, sshconfig, nil
+}
+
+func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
+	return isManagedServicesOn()
 }
 
 func trimSliceSpace(slc []string) []string {
