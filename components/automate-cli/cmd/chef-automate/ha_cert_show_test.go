@@ -10,7 +10,7 @@ import (
 
 func TestIsCommonCerts(t *testing.T) {
 	flagsObj := certShowFlags{
-		node: "198.51.100.0",
+		node: ValidIP,
 	}
 
 	cs := NewCertShowImpl(flagsObj, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
@@ -26,7 +26,7 @@ func TestIsCommonCerts(t *testing.T) {
 			testCaseDescription: "Common certs",
 			input: []CertByIP{
 				{
-					IP:         "198.51.100.0",
+					IP:         ValidIP,
 					PrivateKey: "private_key_1",
 					PublicKey:  "public_key_1",
 					NodesDn:    "",
@@ -44,7 +44,7 @@ func TestIsCommonCerts(t *testing.T) {
 			testCaseDescription: "Uncommon certs",
 			input: []CertByIP{
 				{
-					IP:         "198.51.100.0",
+					IP:         ValidIP,
 					PrivateKey: "private_key_1",
 					PublicKey:  "public_key_1",
 					NodesDn:    "",
