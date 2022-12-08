@@ -111,30 +111,39 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 	}
 }
 
+// certShowCmdFunc is the main function for the cert show command
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args, "")
 	}
 }
+
+// certShowAutomateCmdFunc is the main function for the cert show automate command
 func certShowAutomateCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args, CONST_AUTOMATE)
 	}
 }
+
+// certShowChefServerCmdFunc is the main function for the cert show chef-server command
 func certShowChefServerCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args, CONST_CHEF_SERVER)
 	}
 }
+
+// certShowPostgresqlCmdFunc is the main function for the cert show postgresql command
 func certShowPostgresqlCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args, CONST_POSTGRESQL)
 	}
 }
+
+// certShowOpensearchCmdFunc is the main function for the cert show opensearch command
 func certShowOpensearchCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
@@ -142,6 +151,7 @@ func certShowOpensearchCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command,
 	}
 }
 
+// certShow is the return function for all cert show commands
 func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService string) error {
 	if !isA2HARBFileExist() {
 		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
@@ -186,6 +196,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 	return nil
 }
 
+// getHAConfig returns the config from the HA config file
 func (c *certShowImpl) getHAConfig() (*ExistingInfraConfigToml, error) {
 	infra, cfg, err := c.nodeUtils.getHaInfraDetails()
 	if err != nil {
@@ -196,6 +207,7 @@ func (c *certShowImpl) getHAConfig() (*ExistingInfraConfigToml, error) {
 	return configPuller.generateConfig()
 }
 
+// getCerts returns the certificates from the config
 func (c *certShowImpl) getCerts(config *ExistingInfraConfigToml) certShowCertificates {
 	certInfo := certShowCertificates{}
 
@@ -217,6 +229,7 @@ func (c *certShowImpl) getCerts(config *ExistingInfraConfigToml) certShowCertifi
 	return certInfo
 }
 
+// printCertificates prints all certificates
 func (c *certShowImpl) printCertificates(certInfo certShowCertificates) {
 	c.printAutomateCertificates(certInfo)
 	c.printChefServerCertificates(certInfo)
@@ -227,87 +240,151 @@ func (c *certShowImpl) printCertificates(certInfo certShowCertificates) {
 	}
 }
 
+// printAutomateCertificates prints automate certificates
 func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) {
 	c.writer.Title("Automate Certificates")
 	c.writer.HR()
+
 	c.writer.Println("========================Automate Root CA========================")
 	if len(strings.TrimSpace(certInfo.AutomateRootCert)) == 0 {
-		c.writer.Println("No root certificate found")
+		c.writer.Println("No Automate root certificate found")
 	} else {
 		c.writer.Println(certInfo.AutomateRootCert)
 	}
-	for _, certs := range certInfo.AutomateCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Automate")
+
+	if len(certInfo.AutomateCertsByIP) == 0 {
+		c.writer.Println("No public and private key found for Automate")
+		return
 	}
+
+	if c.isCommonCerts(certInfo.AutomateCertsByIP) {
+		c.printPublicAndPrivateKeys(certInfo.AutomateCertsByIP[0], "Automate", false)
+		return
+	}
+
+	for _, certs := range certInfo.AutomateCertsByIP {
+		c.printPublicAndPrivateKeys(certs, "Automate", true)
+	}
+
 }
 
+// printChefServerCertificates prints the chef server certificates
 func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates) {
 	c.writer.Title("Chef Server Certificates")
 	c.writer.HR()
-	for _, certs := range certInfo.ChefServerCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Chef Server")
+
+	if len(certInfo.ChefServerCertsByIP) == 0 {
+		c.writer.Println("No public and private key found for Chef Server")
+		return
 	}
+
+	if c.isCommonCerts(certInfo.ChefServerCertsByIP) {
+		c.printPublicAndPrivateKeys(certInfo.ChefServerCertsByIP[0], "Chef Server", false)
+		return
+	}
+
+	for _, certs := range certInfo.ChefServerCertsByIP {
+		c.printPublicAndPrivateKeys(certs, "Chef Server", true)
+	}
+
 }
 
+// printPostgresqlCertificates prints the postgresql certificates
 func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates) {
 	c.writer.Title("Postgresql Certificates")
 	c.writer.HR()
+
 	c.writer.Println("=======================Postgresql Root CA=======================")
 	if len(strings.TrimSpace(certInfo.PostgresqlRootCert)) == 0 {
-		c.writer.Println("No root certificate found")
+		c.writer.Println("No Postgresql root certificate found")
 	} else {
 		c.writer.Println(certInfo.PostgresqlRootCert)
 	}
-	for _, certs := range certInfo.PostgresqlCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Postgresql")
+
+	if len(certInfo.PostgresqlCertsByIP) == 0 {
+		c.writer.Println("No public and private key found for Postgresql")
+		return
 	}
+
+	if c.isCommonCerts(certInfo.PostgresqlCertsByIP) {
+		c.printPublicAndPrivateKeys(certInfo.PostgresqlCertsByIP[0], "Postgresql", false)
+		return
+	}
+
+	for _, certs := range certInfo.PostgresqlCertsByIP {
+		c.printPublicAndPrivateKeys(certs, "Postgresql", true)
+	}
+
 }
 
+// printOpensearchCertificates prints the opensearch certificates
 func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates) {
 	c.writer.Title("Opensearch Certificates")
 	c.writer.HR()
+
 	c.writer.Println("=======================Opensearch Root CA=======================")
 	if len(strings.TrimSpace(certInfo.OpensearchRootCert)) == 0 {
-		c.writer.Println("No root certificate found")
+		c.writer.Println("No Opensearch root certificate found")
 	} else {
 		c.writer.Println(certInfo.OpensearchRootCert)
 	}
+
 	c.writer.Println("\n======================Opensearch Admin Key======================")
 	if len(strings.TrimSpace(certInfo.OpensearchAdminKey)) == 0 {
 		c.writer.Println("No admin key found")
 	} else {
 		c.writer.Println(certInfo.OpensearchAdminKey)
 	}
+
 	c.writer.Println("\n======================Opensearch Admin Cert======================")
 	if len(strings.TrimSpace(certInfo.OpensearchAdminCert)) == 0 {
 		c.writer.Println("No admin certificate found")
 	} else {
 		c.writer.Println(certInfo.OpensearchAdminCert)
 	}
-	for _, certs := range certInfo.OpensearchCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Opensearch")
+
+	if len(certInfo.OpensearchCertsByIP) == 0 {
+		c.writer.Println("No public and private key found for Opensearch")
+		return
 	}
+
+	if c.isCommonCerts(certInfo.OpensearchCertsByIP) {
+		c.printPublicAndPrivateKeys(certInfo.OpensearchCertsByIP[0], "Opensearch", false)
+		return
+	}
+
+	for _, certs := range certInfo.OpensearchCertsByIP {
+		c.printPublicAndPrivateKeys(certs, "Opensearch", true)
+	}
+
 }
 
-func (c *certShowImpl) printPublicAndPrivateKeys(certs CertByIP, remoteService string) {
+// printPublicAndPrivateKeys prints the public and private keys for a given service
+func (c *certShowImpl) printPublicAndPrivateKeys(certs CertByIP, remoteService string, printNode bool) {
 	if c.flags.node != "" && c.flags.node != certs.IP {
 		return
 	}
-	c.writer.Println(fmt.Sprintf("\n%s Certificates for %s\n", remoteService, certs.IP))
+
+	if printNode {
+		c.writer.Println(fmt.Sprintf("\n%s Certificates for %s\n", remoteService, certs.IP))
+	}
+
 	c.writer.Println(fmt.Sprintf("=======================%s Public Key=======================", remoteService))
 	if len(strings.TrimSpace(certs.PublicKey)) == 0 {
-		c.writer.Println("No public key found")
+		c.writer.Println(fmt.Sprintf("No %s public key found", remoteService))
 	} else {
 		c.writer.Println(certs.PublicKey)
 	}
+
 	c.writer.Println(fmt.Sprintf("\n======================%s Private Key======================", remoteService))
 	if len(strings.TrimSpace(certs.PrivateKey)) == 0 {
-		c.writer.Println("No private key found")
+		c.writer.Println(fmt.Sprintf("No %s private key found", remoteService))
 	} else {
 		c.writer.Println(certs.PrivateKey)
 	}
 }
 
+// validateNode validates if the node exists in the cluster
 func (c *certShowImpl) validateNode(certs []CertByIP, remoteService string) error {
 	if c.flags.node != "" {
 		for _, cert := range certs {
@@ -318,4 +395,26 @@ func (c *certShowImpl) validateNode(certs []CertByIP, remoteService string) erro
 		return status.New(status.InvalidCommandArgsError, fmt.Sprintf("Node %s does not exist in the %s cluster.", c.flags.node, remoteService))
 	}
 	return nil
+}
+
+// isCertSame checks if the certificate is the same as the one in the config
+func (c *certShowImpl) isCertSame(certA string, CertB string) bool {
+	if len(strings.TrimSpace(certA)) == 0 {
+		return true
+	}
+	certA = strings.TrimSpace(certA)
+	CertB = strings.TrimSpace(CertB)
+	return certA == CertB
+}
+
+// isCommonCerts compares the certificates of all nodes in the cluster
+func (c *certShowImpl) isCommonCerts(certs []CertByIP) bool {
+	for _, cert := range certs {
+		if c.isCertSame(cert.PublicKey, certs[0].PublicKey) && c.isCertSame(cert.PrivateKey, certs[0].PrivateKey) {
+			continue
+		} else {
+			return false
+		}
+	}
+	return true
 }
