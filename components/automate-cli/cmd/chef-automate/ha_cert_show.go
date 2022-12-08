@@ -156,6 +156,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 	if !isA2HARBFileExist() {
 		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
 	}
+
 	config, err := c.getHAConfig()
 	if err != nil {
 		return err
@@ -258,6 +259,7 @@ func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) 
 	}
 
 	if c.isCommonCerts(certInfo.AutomateCertsByIP) {
+		c.writer.Println("\nAutomate certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.AutomateCertsByIP[0], "Automate", false)
 		return
 	}
@@ -279,6 +281,7 @@ func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates
 	}
 
 	if c.isCommonCerts(certInfo.ChefServerCertsByIP) {
+		c.writer.Println("\nChef Server certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.ChefServerCertsByIP[0], "Chef Server", false)
 		return
 	}
@@ -307,6 +310,7 @@ func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates
 	}
 
 	if c.isCommonCerts(certInfo.PostgresqlCertsByIP) {
+		c.writer.Println("\nPostgresql certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.PostgresqlCertsByIP[0], "Postgresql", false)
 		return
 	}
@@ -349,6 +353,7 @@ func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates
 	}
 
 	if c.isCommonCerts(certInfo.OpensearchCertsByIP) {
+		c.writer.Println("\nOpensearch certificates are common across all nodes.\n")
 		c.printPublicAndPrivateKeys(certInfo.OpensearchCertsByIP[0], "Opensearch", false)
 		return
 	}
