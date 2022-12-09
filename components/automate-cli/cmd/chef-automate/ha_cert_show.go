@@ -9,13 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	CONST_AUTOMATE    = "automate"
-	CONST_CHEF_SERVER = "chef_server"
-	CONST_POSTGRESQL  = "postgresql"
-	CONST_OPENSEARCH  = "opensearch"
-)
-
 type certShowFlags struct {
 	automate   bool
 	chefserver bool
@@ -67,16 +60,16 @@ func init() {
 		RunE:  certShowCmdFunc(&flagsObj),
 	}
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.automate, "automate", "a", false, "Show Automate Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Show Automate Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Show Automate Certificates")
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, "chef_server", "c", false, "Show Chef Server Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CONST_CHEF_SERVER, "c", false, "Show Chef Server Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Show Chef Server Certificates")
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.postgresql, "postgresql", "p", false, "Show Postgres Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.postgresql, CONST_POSTGRESQL, "p", false, "Show Postgres Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.postgresql, "pg", false, "Show Postgres Certificates")
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, "opensearch", "o", false, "Show Opensearch Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, CONST_OPENSEARCH, "o", false, "Show Opensearch Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "Show Opensearch Certificates")
 
 	certShowCmd.PersistentFlags().StringVarP(&flagsObj.node, "node", "n", "", "Service cluster's node IP address to show certificates, if not provided then all nodes certificates will be shown")

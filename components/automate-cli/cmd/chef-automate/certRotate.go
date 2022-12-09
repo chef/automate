@@ -134,13 +134,13 @@ func init() {
 		RunE:  certRotateCmdFunc(&flagsObj),
 	}
 
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, "automate", "a", false, "Automate Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Automate Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Automate Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, "chef_server", "c", false, "Chef Infra Server Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CONST_CHEF_SERVER, "c", false, "Chef Infra Server Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Chef Infra Server Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, "postgresql", "p", false, "Postgres Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, CONST_POSTGRESQL, "p", false, "Postgres Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.postgres, "pg", false, "Postgres Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, "opensearch", "o", false, "OS Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, CONST_OPENSEARCH, "o", false, "OS Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "OS Certificate Rotation")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.privateCertPath, "private-cert", "", "Private certificate")
@@ -215,9 +215,9 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	var remoteService string
 
 	if flagsObj.automate {
-		remoteService = "automate"
+		remoteService = CONST_AUTOMATE
 	} else if flagsObj.chefserver {
-		remoteService = "chefserver"
+		remoteService = CONST_CHEF_SERVER
 	}
 	// Creating and patching the required configurations.
 	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
@@ -248,7 +248,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := "postgresql"
+	remoteService := CONST_POSTGRESQL
 
 	// Creating and patching the required configurations.
 	var config string
@@ -286,7 +286,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	}
 	fileName := "cert-rotate-os.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := "opensearch"
+	remoteService := CONST_OPENSEARCH
 
 	var adminDn pkix.Name
 	var err error
@@ -360,9 +360,9 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
-	if remoteService == "automate" || remoteService == "chefserver" || remoteService == "frontend" {
+	if remoteService == CONST_AUTOMATE || remoteService == CONST_CHEF_SERVER || remoteService == "frontend" {
 		scriptCommands = fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-	} else if remoteService == "postgresql" || remoteService == "opensearch" {
+	} else if remoteService == CONST_POSTGRESQL || remoteService == CONST_OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
 	}
 	err = c.copyAndExecute(ips, sshUtil, timestamp, remoteService, filename, scriptCommands, flagsObj)
@@ -376,7 +376,7 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) error {
 
 	fileName := "rotate-root_CA.toml"
-	remoteService := "chefserver"
+	remoteService := CONST_CHEF_SERVER
 	cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
 	ips := c.getIps(remoteService, infra)
 	if len(ips) == 0 {
@@ -453,13 +453,13 @@ func (c *certRotateFlow) getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig 
 
 // getIps will return the Ips based on the given remote service.
 func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetails) []string {
-	if remoteService == "automate" {
+	if remoteService == CONST_AUTOMATE {
 		return infra.Outputs.AutomatePrivateIps.Value
-	} else if remoteService == "chefserver" {
+	} else if remoteService == CONST_CHEF_SERVER {
 		return infra.Outputs.ChefServerPrivateIps.Value
-	} else if remoteService == "postgresql" {
+	} else if remoteService == CONST_POSTGRESQL {
 		return infra.Outputs.PostgresqlPrivateIps.Value
-	} else if remoteService == "opensearch" {
+	} else if remoteService == CONST_OPENSEARCH {
 		return infra.Outputs.OpensearchPrivateIps.Value
 	} else if remoteService == "frontend" {
 		return append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
@@ -686,7 +686,7 @@ func (c *certRotateFlow) getMerger(fileName string, timestamp string, remoteType
 		dest interface{}
 		err1 error
 	)
-	if remoteType == "opensearch" {
+	if remoteType == CONST_OPENSEARCH {
 		dest, err1 = getMergedOpensearchInterface(rawOutput, fileName, remoteType)
 	} else {
 		dest, err1 = getMergedPostgresqlInterface(rawOutput, fileName, remoteType)
