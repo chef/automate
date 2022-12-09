@@ -59,14 +59,14 @@ func init() {
 		Use:   "show",
 		Short: "Chef Automate Certificates Show",
 		Long:  "Chef Automate CLI command to show certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowCmdFunc(&flagsObj),
+		RunE:  certShowCmdFunc(&flagsObj, ""),
 	}
 
 	certShowAutomateCmd := &cobra.Command{
 		Use:   "automate",
 		Short: "Chef Automate Certificates Show Automate",
 		Long:  "Chef Automate CLI command to show Automate certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowAutomateCmdFunc(&flagsObj),
+		RunE:  certShowCmdFunc(&flagsObj, CONST_AUTOMATE),
 	}
 	certShowAutomateCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Automate Node")
 	certShowCmd.AddCommand(certShowAutomateCmd)
@@ -75,7 +75,7 @@ func init() {
 		Use:   "chef-server",
 		Short: "Chef Automate Certificates Show Chef-Server",
 		Long:  "Chef Automate CLI command to show Chef Server certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowChefServerCmdFunc(&flagsObj),
+		RunE:  certShowCmdFunc(&flagsObj, CONST_CHEF_SERVER),
 	}
 	certShowChefServerCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Server Node")
 	certShowCmd.AddCommand(certShowChefServerCmd)
@@ -84,7 +84,7 @@ func init() {
 		Use:   "postgresql",
 		Short: "Chef Automate Certificates Show Postgresql",
 		Long:  "Chef Automate CLI command to show Postgresql certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowPostgresqlCmdFunc(&flagsObj),
+		RunE:  certShowCmdFunc(&flagsObj, CONST_POSTGRESQL),
 	}
 	certShowPostgresqlCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Postgresql Node")
 	certShowCmd.AddCommand(certShowPostgresqlCmd)
@@ -93,7 +93,7 @@ func init() {
 		Use:   "opensearch",
 		Short: "Chef Automate Certificates Show Opensearch",
 		Long:  "Chef Automate CLI command to show Opensearch certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowOpensearchCmdFunc(&flagsObj),
+		RunE:  certShowCmdFunc(&flagsObj, CONST_OPENSEARCH),
 	}
 	certShowOpensearchCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Opensearch Node")
 	certShowCmd.AddCommand(certShowOpensearchCmd)
@@ -112,42 +112,10 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 }
 
 // certShowCmdFunc is the main function for the cert show command
-func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
+func certShowCmdFunc(flagsObj *certShowFlags, remoteService string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args, "")
-	}
-}
-
-// certShowAutomateCmdFunc is the main function for the cert show automate command
-func certShowAutomateCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args, CONST_AUTOMATE)
-	}
-}
-
-// certShowChefServerCmdFunc is the main function for the cert show chef-server command
-func certShowChefServerCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args, CONST_CHEF_SERVER)
-	}
-}
-
-// certShowPostgresqlCmdFunc is the main function for the cert show postgresql command
-func certShowPostgresqlCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args, CONST_POSTGRESQL)
-	}
-}
-
-// certShowOpensearchCmdFunc is the main function for the cert show opensearch command
-func certShowOpensearchCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args, CONST_OPENSEARCH)
+		return cs.certShow(cmd, args, remoteService)
 	}
 }
 
