@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/spf13/cobra"
 )
 
@@ -199,12 +200,12 @@ func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) 
 
 	if c.flags.node == "" && c.isCommonCerts(certInfo.AutomateCertsByIP) {
 		c.writer.Println("\nAutomate certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.AutomateCertsByIP[0], "Automate", false)
+		c.printPublicAndPrivateKeys(certInfo.AutomateCertsByIP[0], stringutils.Title(CONST_AUTOMATE), false)
 		return
 	}
 
 	for _, certs := range certInfo.AutomateCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Automate", true)
+		c.printPublicAndPrivateKeys(certs, stringutils.Title(CONST_AUTOMATE), true)
 	}
 
 }
@@ -221,12 +222,12 @@ func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates
 
 	if c.flags.node == "" && c.isCommonCerts(certInfo.ChefServerCertsByIP) {
 		c.writer.Println("\nChef Server certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.ChefServerCertsByIP[0], "Chef Server", false)
+		c.printPublicAndPrivateKeys(certInfo.ChefServerCertsByIP[0], stringutils.TitleSplit(CONST_CHEF_SERVER, "_"), false)
 		return
 	}
 
 	for _, certs := range certInfo.ChefServerCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Chef Server", true)
+		c.printPublicAndPrivateKeys(certs, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"), true)
 	}
 
 }
@@ -250,12 +251,12 @@ func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates
 
 	if c.flags.node == "" && c.isCommonCerts(certInfo.PostgresqlCertsByIP) {
 		c.writer.Println("\nPostgresql certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.PostgresqlCertsByIP[0], "Postgresql", false)
+		c.printPublicAndPrivateKeys(certInfo.PostgresqlCertsByIP[0], stringutils.Title(CONST_POSTGRESQL), false)
 		return
 	}
 
 	for _, certs := range certInfo.PostgresqlCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Postgresql", true)
+		c.printPublicAndPrivateKeys(certs, stringutils.Title(CONST_POSTGRESQL), true)
 	}
 
 }
@@ -293,12 +294,12 @@ func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates
 
 	if c.flags.node == "" && c.isCommonCerts(certInfo.OpensearchCertsByIP) {
 		c.writer.Println("\nOpensearch certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.OpensearchCertsByIP[0], "Opensearch", false)
+		c.printPublicAndPrivateKeys(certInfo.OpensearchCertsByIP[0], stringutils.Title(CONST_OPENSEARCH), false)
 		return
 	}
 
 	for _, certs := range certInfo.OpensearchCertsByIP {
-		c.printPublicAndPrivateKeys(certs, "Opensearch", true)
+		c.printPublicAndPrivateKeys(certs, stringutils.Title(CONST_OPENSEARCH), true)
 	}
 
 }
