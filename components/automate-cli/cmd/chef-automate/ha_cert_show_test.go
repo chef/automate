@@ -9,11 +9,7 @@ import (
 )
 
 func TestIsCommonCerts(t *testing.T) {
-	flagsObj := certShowFlags{
-		node: ValidIP,
-	}
-
-	cs := NewCertShowImpl(flagsObj, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
+	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -62,7 +58,7 @@ func TestIsCommonCerts(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			err := cs.certShow(nil, nil, "")
+			err := cs.certShow(nil, nil)
 			assert.NoError(t, err)
 
 			actual := cs.isCommonCerts(tc.input)

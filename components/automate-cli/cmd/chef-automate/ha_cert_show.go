@@ -11,12 +11,17 @@ import (
 
 const (
 	CONST_AUTOMATE    = "automate"
-	CONST_CHEF_SERVER = "chef-server"
+	CONST_CHEF_SERVER = "chef_server"
 	CONST_POSTGRESQL  = "postgresql"
 	CONST_OPENSEARCH  = "opensearch"
 )
 
 type certShowFlags struct {
+	automate   bool
+	chefserver bool
+	postgresql bool
+	opensearch bool
+
 	node string
 }
 
@@ -58,45 +63,23 @@ func init() {
 	certShowCmd := &cobra.Command{
 		Use:   "show",
 		Short: "Chef Automate Certificates Show",
-		Long:  "Chef Automate CLI command to show certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowCmdFunc(&flagsObj, ""),
+		Long:  "Chef Automate CLI command to show all certificates on HA cluster, this command should always be executed from AutomateHA Bastion Node",
+		RunE:  certShowCmdFunc(&flagsObj),
 	}
 
-	certShowAutomateCmd := &cobra.Command{
-		Use:   "automate",
-		Short: "Chef Automate Certificates Show Automate",
-		Long:  "Chef Automate CLI command to show Automate certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowCmdFunc(&flagsObj, CONST_AUTOMATE),
-	}
-	certShowAutomateCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Automate Node")
-	certShowCmd.AddCommand(certShowAutomateCmd)
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.automate, "automate", "a", false, "Show Automate Certificates")
+	certShowCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Show Automate Certificates")
 
-	certShowChefServerCmd := &cobra.Command{
-		Use:   "chef-server",
-		Short: "Chef Automate Certificates Show Chef-Server",
-		Long:  "Chef Automate CLI command to show Chef Server certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowCmdFunc(&flagsObj, CONST_CHEF_SERVER),
-	}
-	certShowChefServerCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Chef Server Node")
-	certShowCmd.AddCommand(certShowChefServerCmd)
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, "chef_server", "c", false, "Show Chef Server Certificates")
+	certShowCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Show Chef Server Certificates")
 
-	certShowPostgresqlCmd := &cobra.Command{
-		Use:   "postgresql",
-		Short: "Chef Automate Certificates Show Postgresql",
-		Long:  "Chef Automate CLI command to show Postgresql certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowCmdFunc(&flagsObj, CONST_POSTGRESQL),
-	}
-	certShowPostgresqlCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Postgresql Node")
-	certShowCmd.AddCommand(certShowPostgresqlCmd)
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.postgresql, "postgresql", "p", false, "Show Postgres Certificates")
+	certShowCmd.PersistentFlags().BoolVar(&flagsObj.postgresql, "pg", false, "Show Postgres Certificates")
 
-	certShowOpensearchCmd := &cobra.Command{
-		Use:   "opensearch",
-		Short: "Chef Automate Certificates Show Opensearch",
-		Long:  "Chef Automate CLI command to show Opensearch certificates, this command should always be executed from AutomateHA Bastion Node",
-		RunE:  certShowCmdFunc(&flagsObj, CONST_OPENSEARCH),
-	}
-	certShowOpensearchCmd.Flags().StringVarP(&flagsObj.node, "node", "n", "", "Opensearch Node")
-	certShowCmd.AddCommand(certShowOpensearchCmd)
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, "opensearch", "o", false, "Show Opensearch Certificates")
+	certShowCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "Show Opensearch Certificates")
+
+	certShowCmd.PersistentFlags().StringVarP(&flagsObj.node, "node", "n", "", "Node IP address to show certificates, if not provided all nodes certificates will be shown")
 
 	certCmd.AddCommand(certShowCmd)
 	RootCmd.AddCommand(certCmd)
@@ -112,15 +95,15 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 }
 
 // certShowCmdFunc is the main function for the cert show command
-func certShowCmdFunc(flagsObj *certShowFlags, remoteService string) func(cmd *cobra.Command, args []string) error {
+func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
-		return cs.certShow(cmd, args, remoteService)
+		return cs.certShow(cmd, args)
 	}
 }
 
 // certShow is the return function for all cert show commands
-func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService string) error {
+func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 	if !c.nodeUtils.isA2HARBFileExist() {
 		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
 	}
@@ -131,7 +114,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string, remoteService
 	}
 	certInfo := c.getCerts(config)
 
-	switch remoteService {
+	switch c.getRemoteService() {
 	case CONST_AUTOMATE:
 		if err := c.validateNode(certInfo.AutomateCertsByIP, CONST_AUTOMATE); err != nil {
 			return err
@@ -379,4 +362,19 @@ func (c *certShowImpl) isCommonCerts(certs []CertByIP) bool {
 		}
 	}
 	return true
+}
+
+// getRemoteService returns the remote service name based on the flags
+func (c *certShowImpl) getRemoteService() string {
+	if c.flags.automate {
+		return CONST_AUTOMATE
+	} else if c.flags.chefserver {
+		return CONST_CHEF_SERVER
+	} else if c.flags.postgresql {
+		return CONST_POSTGRESQL
+	} else if c.flags.opensearch {
+		return CONST_OPENSEARCH
+	} else {
+		return ""
+	}
 }
