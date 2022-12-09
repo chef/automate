@@ -32,7 +32,11 @@ chef-automate cert show
 To view certificates of Automate cluster, run the following command:
 
 ```bash
-chef-automate cert show automate
+chef-automate cert show --automate
+#or
+chef-automate cert show -a
+#or
+chef-automate cert show --a2
 ```
 
 ## Viewing certificates of Chef Server cluster
@@ -40,7 +44,11 @@ chef-automate cert show automate
 To view certificates of Chef Server cluster, run the following command:
 
 ```bash
-chef-automate cert show chef-server
+chef-automate cert show --chef_server
+#or
+chef-automate cert show -c
+#or
+chef-automate cert show --cs
 ```
 
 ## Viewing certificates of Postgresql cluster
@@ -48,7 +56,11 @@ chef-automate cert show chef-server
 To view certificates of Postgresql cluster, run the following command:
 
 ```bash
-chef-automate cert show postgresql
+chef-automate cert show --postgresql
+#or
+chef-automate cert show -p
+#or
+chef-automate cert show --pg
 ```
 
 ## Viewing certificates of OpenSearch cluster
@@ -56,7 +68,11 @@ chef-automate cert show postgresql
 To view certificates of OpenSearch cluster, run the following command:
 
 ```bash
-chef-automate cert show opensearch
+chef-automate cert show --opensearch
+#or
+chef-automate cert show -o
+#or
+chef-automate cert show --os
 ```
 
 {{< note >}}
