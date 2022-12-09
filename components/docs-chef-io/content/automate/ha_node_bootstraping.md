@@ -168,15 +168,27 @@ host: "<MY-HOSTNAME>"
 
 - patch the below config in chef-server.
 
+```sh
+[cs_nginx.v1.sys.ngx.http]
+  ssl_verify_depth = 6
+[global.v1.external.automate.ssl]
+  server_name = "AUTOMATE-FQDN-WITHOUT-HTTP-PROTOCOL"
+  root_cert = """MY-ROOT-CA"""
+```
+
+- Command to patch the config
+
 ```cmd
 chef-automate config patch <toml-file> --cs
 ```
+
+For example:
 
 ```sh
 [cs_nginx.v1.sys.ngx.http]
   ssl_verify_depth = 6
 [global.v1.external.automate.ssl]
-  server_name = "AUTOMATE-FQDN-WITHOUT-HTTP"
+  server_name = "myautomate-fqdn.com"
   root_cert = """-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
