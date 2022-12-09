@@ -79,7 +79,7 @@ func init() {
 	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, "opensearch", "o", false, "Show Opensearch Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "Show Opensearch Certificates")
 
-	certShowCmd.PersistentFlags().StringVarP(&flagsObj.node, "node", "n", "", "Node IP address to show certificates, if not provided all nodes certificates will be shown")
+	certShowCmd.PersistentFlags().StringVarP(&flagsObj.node, "node", "n", "", "Service cluster's node IP address to show certificates, if not provided then all nodes certificates will be shown")
 
 	certCmd.AddCommand(certShowCmd)
 	RootCmd.AddCommand(certCmd)
