@@ -108,13 +108,19 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
 	}
 
+	remoteService := c.getRemoteService()
+
+	if remoteService == "" && len(strings.TrimSpace(c.flags.node)) > 0 {
+		return status.New(status.InvalidCommandArgsError, "Node flag can only be used with service flags like --automate, --chef_server, --postgresql or --opensearch")
+	}
+
 	config, err := c.nodeUtils.pullAndUpdateConfig(&c.sshUtil, nil)
 	if err != nil {
 		return err
 	}
 	certInfo := c.getCerts(config)
 
-	switch c.getRemoteService() {
+	switch remoteService {
 	case CONST_AUTOMATE:
 		if err := c.validateNode(certInfo.AutomateCertsByIP, CONST_AUTOMATE); err != nil {
 			return err
