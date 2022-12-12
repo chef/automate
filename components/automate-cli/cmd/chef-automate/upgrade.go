@@ -414,6 +414,25 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
+	} else if modeOfDeployment == AWS_MODE {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig {
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
+		config, err := configPuller.generateAwsConfig()
+		if err != nil {
+			return err
+		}
+		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, config)
+		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writer.Println("a2ha.rb has regenerated...")
 	}
 
 	if offlineMode {
@@ -468,7 +487,6 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			args = append(args, "--skip-deploy")
 		} */
 	}
-
 	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc)
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -24,11 +25,99 @@ type ConfigKeys struct {
 	adminKey   string
 }
 
-type S3ConfigKeys struct {
-	accessKey     string
-	secretKey string
-	endpoint  string
-	bucketname  string
+type HAAwsAutoTfvars struct {
+	AwsProfile                         string      `json:"aws_profile"`
+	AwsRegion                          string      `json:"aws_region"`
+	Endpoint                           string      `json:"endpoint"`
+	SecretKey                          string      `json:"secret_key"`
+	AccessKey                          string      `json:"access_key"`
+	BucketName                         string      `json:"bucket_name"`
+	Architecture                       string      `json:"architecture"`
+	SshKeyFileName                     string      `json:"aws_ssh_key_pair_name"`
+	AwsSshKeyFile                      string      `json:"ssh_key_file"`
+	SshPort                            string      `json:"ssh_port"`
+	SshUser                            string      `json:"ssh_user"`
+	HabitatUidGid                      string      `json:"habitat_uid_gid"`
+	PostgresqlArchiveDiskFsPath        string      `json:"postgresql_archive_disk_fs_path"`
+	PostgresqlInstanceCount            int         `json:"postgresql_instance_count"`
+	NfsMountPath                       string      `json:"nfs_mount_path"`
+	OpensearchCertsByIp                interface{} `json:"opensearch_certs_by_ip"`
+	PostgresqlCertsByIp                interface{} `json:"postgresql_certs_by_ip"`
+	ChefServerCertsByIp                interface{} `json:"chef_server_certs_by_ip"`
+	AutomateCertsByIp                  interface{} `json:"automate_certs_by_ip"`
+	OpensearchNodesDn                  string      `json:"opensearch_nodes_dn"`
+	OpensearchAdminDn                  string      `json:"opensearch_admin_dn"`
+	OpensearchCustomCertsEnabled       bool        `json:"opensearch_custom_certs_enabled"`
+	PostgresqlCustomCertsEnabled       bool        `json:"postgresql_custom_certs_enabled"`
+	ChefServerCustomCertsEnabled       bool        `json:"chef_server_custom_certs_enabled"`
+	AutomateCustomCertsEnabled         bool        `json:"automate_custom_certs_enabled"`
+	PostgresqlPublicKey                string      `json:"postgresql_public_key"`
+	OpensearchAdminCert                string      `json:"opensearch_admin_cert"`
+	OpensearchPublicKey                string      `json:"opensearch_public_key"`
+	ChefServerPublicKey                string      `json:"chef_server_public_key"`
+	AutomatePublicKey                  string      `json:"automate_public_key"`
+	PostgresqlPrivateKey               string      `json:"postgresql_private_key"`
+	OpensearchPrivateKey               string      `json:"opensearch_private_key"`
+	OpensearchAdminKey                 string      `json:"opensearch_admin_key"`
+	ChefServerPrivateKey               string      `json:"chef_server_private_key"`
+	AutomatePrivateKey                 string      `json:"automate_private_key"`
+	PostgresqlRootCa                   string      `json:"postgresql_root_ca"`
+	OpensearchRootCa                   string      `json:"opensearch_root_ca"`
+	AutomateRootCa                     string      `json:"automate_root_ca"`
+	OpensearchInstanceCount            int         `json:"opensearch_instance_count"`
+	ChefServerInstanceCount            int         `json:"chef_server_instance_count"`
+	AutomateInstanceCount              int         `json:"automate_instance_count"`
+	AutomateFqdn                       string      `json:"automate_fqdn"`
+	AutomateConfigFile                 string      `json:"automate_config_file"`
+	OpensearchRootCert                 string      `json:"opensearch_root_cert"`
+	PostgresqlRootCert                 string      `json:"postgresql_root_cert"`
+	AwsVpcId                           string      `json:"aws_vpc_id"`
+	AmiID                              string      `json:"aws_ami_id"`
+	AwsCidrBlockAddr                   string      `json:"aws_cidr_block_addr"`
+	PrivateCustomSubnets               []string    `json:"private_custom_subnets"`
+	PublicCustomSubnets                []string    `json:"public_custom_subnets"`
+	AutomateLbCertificateArn           string      `json:"automate_lb_certificate_arn"`
+	ChefServerLbCertificateArn         string      `json:"chef_server_lb_certificate_arn"`
+	AwsManagedRdsPostgresqlCertificate string      `json:"managed_rds_certificate"`
+	ManagedRdsDbuserPassword           string      `json:"managed_rds_dbuser_password"`
+	ManagedRdsDbuserUsername           string      `json:"managed_rds_dbuser_username"`
+	ManagedRdsSuperuserPassword        string      `json:"managed_rds_superuser_password"`
+	ManagedRdsSuperuserUsername        string      `json:"managed_rds_superuser_username"`
+	ManagedRdsInstanceUrl              string      `json:"managed_rds_instance_url"`
+	OsSnapshotUserAccessKeySecret      string      `json:"os_snapshot_user_access_key_secret"`
+	OsSnapshotUserAccessKeyId          string      `json:"os_snapshot_user_access_key_id"`
+	AwsOsSnapshotRoleArn               string      `json:"aws_os_snapshot_role_arn"`
+	ManagedOpensearchCertificate       string      `json:"managed_opensearch_certificate"`
+	ManagedOpensearchUserPassword      string      `json:"managed_opensearch_user_password"`
+	ManagedOpensearchUsername          string      `json:"managed_opensearch_username"`
+	ManagedOpensearchDomainUrl         string      `json:"managed_opensearch_domain_url"`
+	ManagedOpensearchDomainName        string      `json:"managed_opensearch_domain_name"`
+	AwsSetupManagedServices            bool        `json:"setup_managed_services"`
+	ExistingPostgresqlPrivateIps       []string    `json:"existing_postgresql_private_ips"`
+	ExistingOpensearchPrivateIps       []string    `json:"existing_opensearch_private_ips"`
+	ExistingChefServerPrivateIps       []string    `json:"existing_chef_server_private_ips"`
+	ExistingAutomatePrivateIps         []string    `json:"existing_automate_private_ips"`
+	BackupConfigS3                     string      `json:"backup_config_s3"`
+	BackupConfigEFS                    string      `json:"backup_config_efs"`
+	AutomateAdminPassword              string      `json:"automate_admin_password"`
+	LBAccessLogs                       string      `json:"lb_access_logs"`
+	DeleteOnTermination                string      `json:"delete_on_termination"`
+	AutomateServerInstanceType         string      `json:"automate_server_instance_type"`
+	AutomateEbsVolumeIops              string      `json:"automate_ebs_volume_iops"`
+	AutomateEbsVolumeSize              string      `json:"automate_ebs_volume_size"`
+	AutomateEbsVolumeType              string      `json:"automate_ebs_volume_type"`
+	ChefServerInstanceType             string      `json:"chef_server_instance_type"`
+	ChefEbsVolumeIops                  string      `json:"chef_ebs_volume_iops"`
+	ChefEbsVolumeSize                  string      `json:"chef_ebs_volume_size"`
+	ChefEbsVolumeType                  string      `json:"chef_ebs_volume_type"`
+	OpensearchServerInstanceType       string      `json:"opensearch_server_instance_type"`
+	OpensearchEbsVolumeIops            string      `json:"opensearch_ebs_volume_iops"`
+	OpensearchEbsVolumeSize            string      `json:"opensearch_ebs_volume_size"`
+	OpensearchEbsVolumeType            string      `json:"opensearch_ebs_volume_type"`
+	PostgresqlServerInstanceType       string      `json:"postgresql_server_instance_type"`
+	PostgresqlEbsVolumeIops            string      `json:"postgresql_ebs_volume_iops"`
+	PostgresqlEbsVolumeSize            string      `json:"postgresql_ebs_volume_size"`
+	PostgresqlEbsVolumeType            string      `json:"postgresql_ebs_volume_type"`
 }
 
 type HATfvars struct {
@@ -74,10 +163,10 @@ type HATfvars struct {
 	AutomateConfigFile              string      `json:"automate_config_file"`
 	OpensearchRootCert              string      `json:"opensearch_root_cert"`
 	PostgresqlRootCert              string      `json:"postgresql_root_cert"`
-	AwsVpcId                        string      `json:"aws_vpc_id"` 
-	AmiID							string      `json:"ami_id"`
+	AwsVpcId                        string      `json:"aws_vpc_id"`
+	AmiID                           string      `json:"ami_id"`
 	AwsCidrBlockAddr                string      `json:"aws_cidr_block_addr"`
-	PrivateCustomSubnets			[]string    `json:"private_custom_subnets"`
+	PrivateCustomSubnets            []string    `json:"private_custom_subnets"`
 	PublicCustomSubnets             []string    `json:"public_custom_subnets"`
 	SSHKeyPairName                  string      `json:"ssh_key_pair_name"`
 	ManagedRdsPostgresqlCertificate string      `json:"managed_rds_postgresql_certificate"`
@@ -113,6 +202,7 @@ type PullConfigs interface {
 	pullAutomateConfigs() (map[string]*dc.AutomateConfig, error)
 	pullChefServerConfigs() (map[string]*dc.AutomateConfig, error)
 	generateConfig() (*ExistingInfraConfigToml, error)
+	generateAwsConfig() (*AwsConfigToml, error)
 	getExceptionIps() []string
 	setExceptionIps(ips []string)
 }
@@ -191,7 +281,6 @@ func (p *PullConfigsImpl) pullPGConfigs() (map[string]*ConfigKeys, error) {
 }
 
 func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
-	s3ConfigMap := make(map[string]*S3ConfigKeys)
 	ipConfigMap := make(map[string]*dc.AutomateConfig)
 	for _, ip := range p.infra.Outputs.AutomatePrivateIps.Value {
 		if stringutils.SliceContains(p.exceptionIps, ip) {
@@ -206,14 +295,7 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 		if _, err := toml.Decode(cleanToml(rawOutput), &src); err != nil {
 			return nil, err
 		}
-		s3ConfigMap[ip] = &S3ConfigKeys{
-			accessKey  :     src.Global.V1.Backups.S3.Credentials.AccessKey.Value,
-			secretKey : src.Global.V1.Backups.S3.Credentials.SecretKey.Value,
-			endpoint: src.Global.V1.Backups.S3.Bucket.Endpoint.Value,
-			bucketname: src.Global.V1.Backups.S3.Bucket.Name.Value,
-		}
 		ipConfigMap[ip] = &src
-		// s3ConfigMap[ip] = &src
 	}
 	return ipConfigMap, nil
 
@@ -342,6 +424,124 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	return sharedConfigToml, nil
 }
 
+func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
+	sharedConfigToml, err := getAwsHAConfig()
+	archBytes, err := ioutil.ReadFile("/hab/a2_deploy_workspace/terraform/.tf_arch") // nosemgrep
+	if err != nil {
+		writer.Errorf("%s", err.Error())
+		return nil, err
+	}
+	var arch = strings.Trim(string(archBytes), "\n")
+	writer.Println("Reference architecture type :" + arch)
+	sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+	}
+	a2ConfigMap, err := p.pullAutomateConfigs()
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
+	}
+	csConfigMap, err := p.pullChefServerConfigs()
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
+	}
+	// checking onprem with managed or self managed services
+	logrus.Debug(sharedConfigToml.Aws.Config.SetupManagedServices)
+	if !isManagedServicesOn() {
+		osConfigMap, err := p.pullOpensearchConfigs()
+		if err != nil {
+			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
+		}
+		writer.Println("end of pulling os config")
+		pgConfigMap, err := p.pullPGConfigs()
+		if err != nil {
+			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
+		}
+
+		var osCerts []CertByIP
+		for key, ele := range osConfigMap {
+			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
+			if err != nil {
+				writer.Fail(err.Error())
+			}
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.privateKey,
+				PublicKey:  ele.publicKey,
+				NodesDn:    fmt.Sprintf("%v", nodeDn),
+			}
+			osCerts = append(osCerts, certByIP)
+		}
+		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
+		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
+		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
+		if err != nil {
+			writer.Fail(err.Error())
+		}
+		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
+		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
+
+		var pgCerts []CertByIP
+		for key, ele := range pgConfigMap {
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.privateKey,
+				PublicKey:  ele.publicKey,
+			}
+			pgCerts = append(pgCerts, certByIP)
+		}
+		sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
+		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
+		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+	}
+
+	var a2Certs []CertByIP
+	for key, ele := range a2ConfigMap {
+		certByIP := CertByIP{
+			IP:         key,
+			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
+			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
+		}
+		a2Certs = append(a2Certs, certByIP)
+	}
+
+	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
+	sharedConfigToml.Automate.Config.Fqdn = getA2fqdn(a2ConfigMap)
+	sharedConfigToml.Architecture.ConfigInitials.S3BucketName = getS3Bucket(a2ConfigMap)
+	sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = getOsRoleArn(a2ConfigMap)
+	sharedConfigToml.Aws.Config.OsUserAccessKeyId = getOsAccessKey(a2ConfigMap)
+	sharedConfigToml.Aws.Config.OsUserAccessKeySecret = getOsSecretKey(a2ConfigMap)
+	sharedConfigToml.Automate.Config.EnableCustomCerts = true
+
+	var csCerts []CertByIP
+	for key, ele := range csConfigMap {
+		if len(ele.Global.V1.FrontendTls) > 0 {
+			certByIP := CertByIP{
+				IP:         key,
+				PrivateKey: ele.Global.V1.FrontendTls[0].Key,
+				PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
+			}
+			csCerts = append(csCerts, certByIP)
+		}
+	}
+
+	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
+	writer.Println(" 4 : setting certsByIp with sharedconfigtoml for cs")
+	sharedConfigToml.Automate.Config.RootCA = getRootCAFromCS(csConfigMap)
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
+
+	shardConfig, err := mtoml.Marshal(sharedConfigToml)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
+	}
+	err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
+	}
+	return sharedConfigToml, nil
+}
+
 func getExistingHAConfig() (*ExistingInfraConfigToml, error) {
 	if checkSharedConfigFile() {
 		sharedConfigToml, err := getExistingInfraConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
@@ -372,7 +572,12 @@ func getAwsHAConfig() (*AwsConfigToml, error) {
 		if err != nil {
 			return nil, err
 		}
-		return getAwsHAConfigFromTFVars(tfvarConfig)
+		AwsConfigJsonString := convTfvarToJson(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "aws.auto.tfvars"))
+		awsAutoTfvarConfig, err := getJsonFromTerraformAwsAutoTfVarsFile(AwsConfigJsonString)
+		if err != nil {
+			return nil, err
+		}
+		return getAwsHAConfigFromTFVars(tfvarConfig, awsAutoTfvarConfig)
 	}
 }
 
@@ -455,9 +660,10 @@ func getExistingHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigT
 	return sharedConfigToml, nil
 }
 
-func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars) (*AwsConfigToml, error) {
+func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAutoTfvars) (*AwsConfigToml, error) {
 	sharedConfigToml := &AwsConfigToml{}
-	sharedConfigToml.Architecture.ConfigInitials.Architecture = "aws"
+	sharedConfigToml.Architecture.ConfigInitials.Architecture = "deployment"
+
 	if len(strings.TrimSpace(tfvarConfig.SecretsKeyFile)) < 1 {
 		sharedConfigToml.Architecture.ConfigInitials.SecretsKeyFile = filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "secrets.key")
 	} else {
@@ -470,72 +676,113 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars) (*AwsConfigToml, error) {
 		sharedConfigToml.Architecture.ConfigInitials.SecretsStoreFile = tfvarConfig.SecretsStoreFile
 	}
 
-	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigS3), "true") {
+	if strings.EqualFold(strings.TrimSpace(awsAutoTfvarConfig.BackupConfigS3), "true") {
 		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "s3"
 	}
-	if strings.EqualFold(strings.TrimSpace(tfvarConfig.BackupConfigEFS), "true") {
+
+	if strings.EqualFold(strings.TrimSpace(awsAutoTfvarConfig.BackupConfigEFS), "true") {
 		sharedConfigToml.Architecture.ConfigInitials.BackupConfig = "efs"
 	}
+
 	if tfvarConfig.TeamsPort > 0 {
 		sharedConfigToml.Automate.Config.TeamsPort = strconv.Itoa(tfvarConfig.TeamsPort)
 	}
-	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(tfvarConfig.NfsMountPath)
-	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(tfvarConfig.HabitatUidGid)
-	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
-	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
-	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
+
+	sharedConfigToml.Architecture.ConfigInitials.BackupMount = strings.TrimSpace(awsAutoTfvarConfig.NfsMountPath)
+	sharedConfigToml.Architecture.ConfigInitials.HabitatUIDGid = strings.TrimSpace(awsAutoTfvarConfig.HabitatUidGid)
+	sharedConfigToml.Architecture.ConfigInitials.Architecture = strings.TrimSpace(awsAutoTfvarConfig.Architecture)
+	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(awsAutoTfvarConfig.AwsSshKeyFile)
+	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(awsAutoTfvarConfig.SshPort)
+	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(awsAutoTfvarConfig.SshUser)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
-	sharedConfigToml.Automate.Config.Fqdn = strings.TrimSpace(tfvarConfig.AutomateFqdn)
-	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
-	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(tfvarConfig.AutomateConfigFile)
-	sharedConfigToml.Automate.Config.EnableCustomCerts = tfvarConfig.AutomateCustomCertsEnabled
-	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(tfvarConfig.AutomateAdminPassword)
-	sharedConfigToml.ChefServer.Config.EnableCustomCerts = tfvarConfig.ChefServerCustomCertsEnabled
-	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(tfvarConfig.ChefServerInstanceCount)
-	sharedConfigToml.Postgresql.Config.EnableCustomCerts = tfvarConfig.PostgresqlCustomCertsEnabled
-	sharedConfigToml.Postgresql.Config.InstanceCount = strconv.Itoa(tfvarConfig.PostgresqlInstanceCount)
-	sharedConfigToml.Opensearch.Config.EnableCustomCerts = tfvarConfig.OpensearchCustomCertsEnabled
-	sharedConfigToml.Opensearch.Config.InstanceCount = strconv.Itoa(tfvarConfig.OpensearchInstanceCount)
-	sharedConfigToml.Opensearch.Config.AdminDn = strings.TrimSpace(tfvarConfig.OpensearchAdminDn)
-	sharedConfigToml.Opensearch.Config.NodesDn = strings.TrimSpace(tfvarConfig.OpensearchNodesDn)
-	// sharedConfigToml.ExistingInfra.Config.AutomatePrivateIps = tfvarConfig.ExistingAutomatePrivateIps
-	// sharedConfigToml.ExistingInfra.Config.ChefServerPrivateIps = tfvarConfig.ExistingChefServerPrivateIps
-	// sharedConfigToml.ExistingInfra.Config.PostgresqlPrivateIps = tfvarConfig.ExistingPostgresqlPrivateIps
-	// sharedConfigToml.ExistingInfra.Config.OpensearchPrivateIps = tfvarConfig.ExistingOpensearchPrivateIps
-	// sharedConfigToml.ObjectStorage.Config.AccessKey = strings.TrimSpace(tfvarConfig.AccessKey)
-	// sharedConfigToml.ObjectStorage.Config.SecretKey = strings.TrimSpace(tfvarConfig.SecretKey)
-	// sharedConfigToml.ObjectStorage.Config.BucketName = strings.TrimSpace(tfvarConfig.BucketName)
-	// sharedConfigToml.ObjectStorage.Config.Endpoint = strings.TrimSpace(tfvarConfig.Endpoint)
-	sharedConfigToml.Aws.Config.Region = strings.TrimSpace(tfvarConfig.Region)
-	sharedConfigToml.Aws.Config.AwsVpcId = strings.TrimSpace(tfvarConfig.AwsVpcId)
-	sharedConfigToml.Aws.Config.AmiID = strings.TrimSpace(tfvarConfig.AmiID)
-	sharedConfigToml.Aws.Config.AwsCidrBlockAddr = strings.TrimSpace(tfvarConfig.AwsCidrBlockAddr)
-	sharedConfigToml.Aws.Config.PrivateCustomSubnets = tfvarConfig.PrivateCustomSubnets
-	sharedConfigToml.Aws.Config.PublicCustomSubnets = tfvarConfig.PublicCustomSubnets
-	sharedConfigToml.Aws.Config.SSHKeyPairName = strings.TrimSpace(tfvarConfig.SSHKeyPairName)
-	sharedConfigToml.Aws.Config.OpensearchDomainUrl = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainUrl)
-    sharedConfigToml.Aws.Config.OpensearchDomainName = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainName)
-    sharedConfigToml.Aws.Config.OpensearchCertificate = strings.TrimSpace(tfvarConfig.ManagedOpensearchCertificate)
-    sharedConfigToml.Aws.Config.OpensearchUsername = strings.TrimSpace(tfvarConfig.ManagedOpensearchUsername)
-    sharedConfigToml.Aws.Config.OpensearchUserPassword = strings.TrimSpace(tfvarConfig.ManagedOpensearchUserPassword)
-    sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = strings.TrimSpace(tfvarConfig.AwsOsSnapshotRoleArn)
-    sharedConfigToml.Aws.Config.OsUserAccessKeyId = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeyId)
-    sharedConfigToml.Aws.Config.OsUserAccessKeySecret = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeySecret)
-    sharedConfigToml.Aws.Config.RDSCertificate = strings.TrimSpace(tfvarConfig.ManagedRdsPostgresqlCertificate)
-    sharedConfigToml.Aws.Config.RDSDBUserName = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserUsername)
-    sharedConfigToml.Aws.Config.RDSDBUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserPassword)
-    sharedConfigToml.Aws.Config.RDSInstanceUrl = strings.TrimSpace(tfvarConfig.ManagedRdsInstanceUrl)
-    //sharedConfigToml.Aws.Config.PostgreSQLRootCert = strings.TrimSpace(tfvarConfig.PostgresqlRootCert)
-    sharedConfigToml.Aws.Config.RDSSuperUserName = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserUsername)
-    sharedConfigToml.Aws.Config.RDSSuperUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsSuperuserPassword)
-	setupManagedServices := strings.TrimSpace(tfvarConfig.SetupManagedServices)
-	// if strings.EqualFold(setupManagedServices, "true") && strings.EqualFold(setupSelfManagedServices, "true") {
-	// 	sharedConfigToml.ExternalDB.Database.Type = "self-managed"
-	// }
-	if strings.EqualFold(setupManagedServices, "true")  {
-		sharedConfigToml.Aws.Config.SetupManagedServices = true
-	}
+	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.AutomateInstanceCount)
+	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(awsAutoTfvarConfig.AutomateConfigFile)
+	sharedConfigToml.Automate.Config.EnableCustomCerts = awsAutoTfvarConfig.AutomateCustomCertsEnabled
+	sharedConfigToml.Automate.Config.AdminPassword = strings.TrimSpace(awsAutoTfvarConfig.AutomateAdminPassword)
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = awsAutoTfvarConfig.ChefServerCustomCertsEnabled
+	sharedConfigToml.ChefServer.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.ChefServerInstanceCount)
+	sharedConfigToml.Postgresql.Config.EnableCustomCerts = awsAutoTfvarConfig.PostgresqlCustomCertsEnabled
+	sharedConfigToml.Postgresql.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.PostgresqlInstanceCount)
+	sharedConfigToml.Opensearch.Config.EnableCustomCerts = awsAutoTfvarConfig.OpensearchCustomCertsEnabled
+	sharedConfigToml.Opensearch.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.OpensearchInstanceCount)
+	sharedConfigToml.Opensearch.Config.AdminDn = strings.TrimSpace(awsAutoTfvarConfig.OpensearchAdminDn)
+	sharedConfigToml.Opensearch.Config.NodesDn = strings.TrimSpace(awsAutoTfvarConfig.OpensearchNodesDn)
+	sharedConfigToml.Aws.Config.Profile = strings.TrimSpace(awsAutoTfvarConfig.AwsProfile)
+	sharedConfigToml.Aws.Config.Region = strings.TrimSpace(awsAutoTfvarConfig.AwsRegion)
+	sharedConfigToml.Aws.Config.AwsVpcId = strings.TrimSpace(awsAutoTfvarConfig.AwsVpcId)
+	sharedConfigToml.Aws.Config.AmiID = strings.TrimSpace(awsAutoTfvarConfig.AmiID)
+	sharedConfigToml.Aws.Config.SSHKeyPairName = strings.TrimSpace(awsAutoTfvarConfig.SshKeyFileName)
+	sharedConfigToml.Aws.Config.AwsCidrBlockAddr = strings.TrimSpace(awsAutoTfvarConfig.AwsCidrBlockAddr)
+	sharedConfigToml.Aws.Config.PrivateCustomSubnets = awsAutoTfvarConfig.PrivateCustomSubnets
+	sharedConfigToml.Aws.Config.PublicCustomSubnets = awsAutoTfvarConfig.PublicCustomSubnets
+	sharedConfigToml.Aws.Config.SSHKeyPairName = strings.TrimSpace(awsAutoTfvarConfig.SshKeyFileName)
+	sharedConfigToml.Aws.Config.AutomateLbCertificateArn = strings.TrimSpace(awsAutoTfvarConfig.AutomateLbCertificateArn)
+	sharedConfigToml.Aws.Config.ChefServerLbCertificateArn = strings.TrimSpace(awsAutoTfvarConfig.ChefServerLbCertificateArn)
+	sharedConfigToml.Aws.Config.OpensearchDomainUrl = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchDomainUrl)
+	sharedConfigToml.Aws.Config.OpensearchDomainName = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchDomainName)
+	sharedConfigToml.Aws.Config.OpensearchCertificate = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchCertificate)
+	sharedConfigToml.Aws.Config.OpensearchUsername = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchUsername)
+	sharedConfigToml.Aws.Config.OpensearchUserPassword = strings.TrimSpace(awsAutoTfvarConfig.ManagedOpensearchUserPassword)
+	sharedConfigToml.Aws.Config.RDSCertificate = strings.TrimSpace(awsAutoTfvarConfig.AwsManagedRdsPostgresqlCertificate)
+	sharedConfigToml.Aws.Config.RDSDBUserName = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsDbuserUsername)
+	sharedConfigToml.Aws.Config.RDSDBUserPassword = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsDbuserPassword)
+	sharedConfigToml.Aws.Config.RDSInstanceUrl = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsInstanceUrl)
+	sharedConfigToml.Aws.Config.RDSSuperUserName = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsSuperuserUsername)
+	sharedConfigToml.Aws.Config.RDSSuperUserPassword = strings.TrimSpace(awsAutoTfvarConfig.ManagedRdsSuperuserPassword)
+	sharedConfigToml.Aws.Config.LBAccessLogs = strings.TrimSpace(awsAutoTfvarConfig.LBAccessLogs)
+	sharedConfigToml.Aws.Config.DeleteOnTermination, _ = strconv.ParseBool(awsAutoTfvarConfig.DeleteOnTermination)
+	sharedConfigToml.Aws.Config.AutomateServerInstanceType = strings.TrimSpace(awsAutoTfvarConfig.AutomateServerInstanceType)
+	sharedConfigToml.Aws.Config.AutomateEbsVolumeIops = strings.TrimSpace(awsAutoTfvarConfig.AutomateEbsVolumeIops)
+	sharedConfigToml.Aws.Config.AutomateEbsVolumeSize = strings.TrimSpace(awsAutoTfvarConfig.AutomateEbsVolumeSize)
+	sharedConfigToml.Aws.Config.AutomateEbsVolumeType = strings.TrimSpace(awsAutoTfvarConfig.AutomateEbsVolumeType)
+	sharedConfigToml.Aws.Config.ChefServerInstanceType = strings.TrimSpace(awsAutoTfvarConfig.ChefServerInstanceType)
+	sharedConfigToml.Aws.Config.ChefEbsVolumeSize = strings.TrimSpace(awsAutoTfvarConfig.ChefEbsVolumeSize)
+	sharedConfigToml.Aws.Config.ChefEbsVolumeType = strings.TrimSpace(awsAutoTfvarConfig.ChefEbsVolumeType)
+	sharedConfigToml.Aws.Config.OpensearchServerInstanceType = strings.TrimSpace(awsAutoTfvarConfig.OpensearchServerInstanceType)
+	sharedConfigToml.Aws.Config.OpensearchEbsVolumeIops = strings.TrimSpace(awsAutoTfvarConfig.OpensearchEbsVolumeIops)
+	sharedConfigToml.Aws.Config.OpensearchEbsVolumeSize = strings.TrimSpace(awsAutoTfvarConfig.OpensearchEbsVolumeSize)
+	sharedConfigToml.Aws.Config.OpensearchEbsVolumeType = strings.TrimSpace(awsAutoTfvarConfig.OpensearchEbsVolumeType)
+	sharedConfigToml.Aws.Config.PostgresqlServerInstanceType = strings.TrimSpace(awsAutoTfvarConfig.PostgresqlServerInstanceType)
+	sharedConfigToml.Aws.Config.PostgresqlEbsVolumeIops = strings.TrimSpace(awsAutoTfvarConfig.PostgresqlEbsVolumeIops)
+	sharedConfigToml.Aws.Config.PostgresqlEbsVolumeSize = strings.TrimSpace(awsAutoTfvarConfig.PostgresqlEbsVolumeSize)
+	sharedConfigToml.Aws.Config.PostgresqlEbsVolumeType = strings.TrimSpace(awsAutoTfvarConfig.PostgresqlEbsVolumeType)
+	sharedConfigToml.Aws.Config.SetupManagedServices = awsAutoTfvarConfig.AwsSetupManagedServices
+	sharedConfigToml.Aws.Config.ChefEbsVolumeIops, _ = getTheValueFromA2HARB("chef_ebs_volume_iops")
 	return sharedConfigToml, nil
+}
+
+func trimstr(str string) string {
+	if len(str) > 0 && str[0] == '"' {
+		str = str[1 : len(str)-2]
+		fmt.Println("Final string : ", str)
+	}
+	return str
+}
+
+func getTheValueFromA2HARB(key string) (string, error) {
+	wordCountCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | wc -l`
+	WordCountF := fmt.Sprintf(wordCountCmd, key)
+	output, err := exec.Command("/bin/sh", "-c", WordCountF).Output()
+	if err != nil {
+		return "", err
+	}
+	value := string(output)
+	count, _ := strconv.Atoi(value)
+	if count > 1 {
+		writer.Println("The key has more than one value it cannot be executed")
+		return "", nil
+	} else {
+		GrepCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | hab pkg exec core/gawk gawk '{print $2}'`
+		GrepCmdF := fmt.Sprintf(GrepCmd, key)
+		writer.Println("Grep command : " + GrepCmdF)
+		output, err := exec.Command("/bin/sh", "-c", GrepCmdF).Output()
+		if err != nil {
+			return "", err
+		}
+		value := string(output)
+		KeyV := trimstr(value)
+		return strings.TrimSpace(KeyV), nil
+	}
 }
 
 func getOSORPGRootCA(config map[string]*ConfigKeys) string {
@@ -581,26 +828,63 @@ func getA2ORCSRootCA(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
-func getS3bucketnamefromA2(config map[string]*dc.AutomateConfig) string {
+func getA2fqdn(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
-		if ele.Global.V1.Backups != nil && ele.Global.V1.Backups.S3 != nil && len(strings.TrimSpace(ele.Global.V1.Backups.S3.Bucket.Name.Value)) > 0 {
-			return ele.Global.V1.Backups.S3.Bucket.Name.Value
+		if ele.Global != nil && ele.Global.V1 != nil && len(strings.TrimSpace(ele.Global.V1.Fqdn.Value)) > 0 {
+			return ele.Global.V1.Fqdn.Value
 		}
 	}
 	return ""
 }
 
-func gets3configfromA2(config map[string]*HATfvars) (string, string, string) {
+func getS3Bucket(config map[string]*dc.AutomateConfig) string {
 	for _, ele := range config {
-		if len(strings.TrimSpace(ele.AccessKey)) > 0 && len(strings.TrimSpace(ele.SecretKey)) > 0 && len(strings.TrimSpace(ele.Endpoint)) > 0{
-			return strings.TrimSpace(ele.AccessKey), strings.TrimSpace(ele.SecretKey), strings.TrimSpace(ele.Endpoint)
+		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Backup != nil && ele.Global.V1.External.Opensearch.Backup.S3 != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.S3.Bucket.Value)) > 0 {
+			return ele.Global.V1.External.Opensearch.Backup.S3.Bucket.Value
 		}
 	}
-	return "", "", ""
+	return ""
+}
+
+func getOsRoleArn(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Backup != nil && ele.Global.V1.External.Opensearch.Backup.S3 != nil && ele.Global.V1.External.Opensearch.Backup.S3.Settings != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value)) > 0 {
+			return ele.Global.V1.External.Opensearch.Backup.S3.Settings.RoleArn.Value
+		}
+	}
+	return ""
+}
+
+func getOsAccessKey(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Auth != nil && ele.Global.V1.External.Opensearch.Auth.AwsOs != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value)) > 0 {
+			return ele.Global.V1.External.Opensearch.Auth.AwsOs.AccessKey.Value
+		}
+	}
+	return ""
+}
+
+func getOsSecretKey(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		if ele.Global.V1.External.Opensearch != nil && ele.Global.V1.External.Opensearch.Auth != nil && ele.Global.V1.External.Opensearch.Auth.AwsOs != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value)) > 0 {
+			return ele.Global.V1.External.Opensearch.Auth.AwsOs.SecretKey.Value
+		}
+	}
+	return ""
 }
 
 func getJsonFromTerraformTfVarsFile(jsonString string) (*HATfvars, error) {
 	params := HATfvars{}
+	err := json.Unmarshal([]byte(jsonString), &params)
+	if err != nil {
+		writer.Fail(err.Error())
+		return nil, err
+	}
+	return &params, nil
+
+}
+func getJsonFromTerraformAwsAutoTfVarsFile(jsonString string) (*HAAwsAutoTfvars, error) {
+	params := HAAwsAutoTfvars{}
 	err := json.Unmarshal([]byte(jsonString), &params)
 	if err != nil {
 		writer.Fail(err.Error())
@@ -619,8 +903,8 @@ func getModeOfDeployment() string {
 	deploymentMode := strings.TrimSpace(string(contentByte))
 	if strings.EqualFold(deploymentMode, "existing_nodes") {
 		return EXISTING_INFRA_MODE
-	} else if strings.EqualFold(deploymentMode, "aws"){
-		return AWS_MODE 
+	} else if strings.EqualFold(deploymentMode, "aws") {
+		return AWS_MODE
 	}
 	return AWS_MODE
 }
