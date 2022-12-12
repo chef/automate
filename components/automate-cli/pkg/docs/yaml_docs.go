@@ -38,10 +38,11 @@ var skipCommands = []string{
 }
 
 type cmdOption struct {
-	Name         string
-	Shorthand    string `yaml:",omitempty"`
-	DefaultValue string `yaml:"default_value,omitempty"`
-	Usage        string `yaml:",omitempty"`
+	Name                string
+	Shorthand           string `yaml:",omitempty"`
+	DefaultValue        string `yaml:"default_value,omitempty"`
+	Usage               string `yaml:",omitempty"`
+	CompatibilityString string `yaml:",omitempty"`
 }
 
 type cmdDoc struct {
@@ -204,12 +205,28 @@ func genFlagResult(flags *pflag.FlagSet) []cmdOption {
 				DefaultValue: flag.DefValue,
 				Usage:        forceMultiLine(flag.Usage),
 			}
+			if len(flag.Annotations["compatibility"]) > 0 {
+				switch flag.Annotations["compatibility"][0] {
+				case "forHA":
+					opt.CompatibilityString = "This command is valid for Automate HA deployment only"
+				case "forStandalone":
+					opt.CompatibilityString = "This command is valid for Standalone Automate deployment only"
+				}
+			}
 			result = append(result, opt)
 		} else {
 			opt := cmdOption{
 				Name:         flag.Name,
 				DefaultValue: forceMultiLine(flag.DefValue),
 				Usage:        forceMultiLine(flag.Usage),
+			}
+			if len(flag.Annotations["compatibility"]) > 0 {
+				switch flag.Annotations["compatibility"][0] {
+				case "forHA":
+					opt.CompatibilityString = "This command is valid for Automate HA deployment only"
+				case "forStandalone":
+					opt.CompatibilityString = "This command is valid for Standalone Automate deployment only"
+				}
 			}
 			result = append(result, opt)
 		}
