@@ -54,6 +54,7 @@ type cmdDoc struct {
 	Example          string      `yaml:",omitempty"`
 	SeeAlso          []string    `yaml:"see_also,omitempty"`
 	Aliases          []string    `yaml:"aliases,omitempty"`
+	CompatibleString string      `yaml:",omitempty"`
 }
 
 type statusDoc struct {
@@ -130,7 +131,17 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	yamlDoc.Synopsis = forceMultiLine(cmd.Short)
 	yamlDoc.Description = forceMultiLine(cmd.Long)
 	yamlDoc.Usage = forceMultiLine(cmd.UseLine())
+	yamlDoc.CompatibleString = ""
 
+	annotations := cmd.Annotations
+	if len(annotations) > 0 {
+		switch annotations["compatibility"] {
+		case "forHA":
+			yamlDoc.CompatibleString = "This command is valid for Automate HA deployment only"
+		case "forStandalone":
+			yamlDoc.CompatibleString = "This command is valid for Standalone Automate deployment only"
+		}
+	}
 	if len(cmd.Aliases) > 0 {
 		yamlDoc.Aliases = cmd.Aliases
 	}
