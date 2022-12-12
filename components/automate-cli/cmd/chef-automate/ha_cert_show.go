@@ -114,6 +114,10 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 	}
 	certInfo := c.getCerts(config)
 
+	return c.validateAndPrintCertificates(remoteService, certInfo)
+}
+
+func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certInfo certShowCertificates) error {
 	switch remoteService {
 	case CONST_AUTOMATE:
 		if err := c.validateNode(certInfo.AutomateCertsByIP, CONST_AUTOMATE); err != nil {
@@ -142,9 +146,8 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 		}
 		c.printOpensearchCertificates(certInfo)
 	default:
-		c.printCertificates(certInfo)
+		c.printAllCertificates(certInfo)
 	}
-
 	return nil
 }
 
@@ -170,8 +173,8 @@ func (c *certShowImpl) getCerts(config *ExistingInfraConfigToml) certShowCertifi
 	return certInfo
 }
 
-// printCertificates prints all certificates
-func (c *certShowImpl) printCertificates(certInfo certShowCertificates) {
+// printAllCertificates prints all certificates
+func (c *certShowImpl) printAllCertificates(certInfo certShowCertificates) {
 	c.printAutomateCertificates(certInfo)
 	c.printChefServerCertificates(certInfo)
 
