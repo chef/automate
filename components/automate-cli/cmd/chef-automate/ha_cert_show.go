@@ -123,12 +123,12 @@ func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certIn
 		if err := c.validateNode(certInfo.AutomateCertsByIP, CONST_AUTOMATE); err != nil {
 			return err
 		}
-		c.printAutomateCertificates(certInfo)
+		c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(CONST_AUTOMATE))
 	case CONST_CHEF_SERVER:
 		if err := c.validateNode(certInfo.ChefServerCertsByIP, CONST_CHEF_SERVER); err != nil {
 			return err
 		}
-		c.printChefServerCertificates(certInfo)
+		c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"))
 	case CONST_POSTGRESQL:
 		if c.nodeUtils.isManagedServicesOn() {
 			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
@@ -136,7 +136,7 @@ func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certIn
 		if err := c.validateNode(certInfo.PostgresqlCertsByIP, CONST_POSTGRESQL); err != nil {
 			return err
 		}
-		c.printPostgresqlCertificates(certInfo)
+		c.printPostgresqlAndOSCertificates(certInfo.PostgresqlRootCert, "", "", certInfo.PostgresqlCertsByIP, stringutils.Title(CONST_POSTGRESQL))
 	case CONST_OPENSEARCH:
 		if c.nodeUtils.isManagedServicesOn() {
 			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
@@ -144,7 +144,7 @@ func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certIn
 		if err := c.validateNode(certInfo.OpensearchCertsByIP, CONST_OPENSEARCH); err != nil {
 			return err
 		}
-		c.printOpensearchCertificates(certInfo)
+		c.printPostgresqlAndOSCertificates(certInfo.OpensearchRootCert, certInfo.OpensearchAdminKey, certInfo.OpensearchAdminCert, certInfo.OpensearchCertsByIP, stringutils.Title(CONST_OPENSEARCH))
 	default:
 		c.printAllCertificates(certInfo)
 	}
@@ -175,134 +175,86 @@ func (c *certShowImpl) getCerts(config *ExistingInfraConfigToml) certShowCertifi
 
 // printAllCertificates prints all certificates
 func (c *certShowImpl) printAllCertificates(certInfo certShowCertificates) {
-	c.printAutomateCertificates(certInfo)
-	c.printChefServerCertificates(certInfo)
+	c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(CONST_AUTOMATE))
+	c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"))
 
 	if !c.nodeUtils.isManagedServicesOn() {
-		c.printPostgresqlCertificates(certInfo)
-		c.printOpensearchCertificates(certInfo)
+		c.printPostgresqlAndOSCertificates(certInfo.PostgresqlRootCert, "", "", certInfo.PostgresqlCertsByIP, stringutils.Title(CONST_POSTGRESQL))
+		c.printPostgresqlAndOSCertificates(certInfo.OpensearchRootCert, certInfo.OpensearchAdminKey, certInfo.OpensearchAdminCert, certInfo.OpensearchCertsByIP, stringutils.Title(CONST_OPENSEARCH))
 	}
 }
 
-// printAutomateCertificates prints automate certificates
-func (c *certShowImpl) printAutomateCertificates(certInfo certShowCertificates) {
-	c.writer.Title("Automate Certificates")
+// printAutomateAndCSCertificates prints automate or chef server certificates
+func (c *certShowImpl) printAutomateAndCSCertificates(rootCA string, certsByIP []CertByIP, remoteServiceName string) {
+	c.writer.Title(fmt.Sprintf("%s Certificates", remoteServiceName))
 	c.writer.HR()
 
-	c.writer.Println("========================Automate Root CA========================")
-	if len(strings.TrimSpace(certInfo.AutomateRootCert)) == 0 {
-		c.writer.Println("No Automate root certificate found")
-	} else {
-		c.writer.Println(certInfo.AutomateRootCert)
+	if remoteServiceName == stringutils.Title(CONST_AUTOMATE) {
+		c.writer.Println("========================Automate Root CA========================")
+		if len(strings.TrimSpace(rootCA)) == 0 {
+			c.writer.Println("No Automate root certificate found")
+		} else {
+			c.writer.Println(rootCA)
+		}
 	}
 
-	if len(certInfo.AutomateCertsByIP) == 0 {
-		c.writer.Println("No public and private key found for Automate")
+	if len(certsByIP) == 0 {
+		c.writer.Println(fmt.Sprintf("No public and private key found for %s", remoteServiceName))
 		return
 	}
 
-	if c.flags.node == "" && c.isCommonCerts(certInfo.AutomateCertsByIP) {
-		c.writer.Println("\nAutomate certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.AutomateCertsByIP[0], stringutils.Title(CONST_AUTOMATE), false)
+	if c.flags.node == "" && c.isCommonCerts(certsByIP) {
+		c.writer.Println(fmt.Sprintf("\n%s certificates are common across all nodes.\n", remoteServiceName))
+		c.printPublicAndPrivateKeys(certsByIP[0], remoteServiceName, false)
 		return
 	}
 
-	for _, certs := range certInfo.AutomateCertsByIP {
-		c.printPublicAndPrivateKeys(certs, stringutils.Title(CONST_AUTOMATE), true)
-	}
-
-}
-
-// printChefServerCertificates prints the chef server certificates
-func (c *certShowImpl) printChefServerCertificates(certInfo certShowCertificates) {
-	c.writer.Title("Chef Server Certificates")
-	c.writer.HR()
-
-	if len(certInfo.ChefServerCertsByIP) == 0 {
-		c.writer.Println("No public and private key found for Chef Server")
-		return
-	}
-
-	if c.flags.node == "" && c.isCommonCerts(certInfo.ChefServerCertsByIP) {
-		c.writer.Println("\nChef Server certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.ChefServerCertsByIP[0], stringutils.TitleSplit(CONST_CHEF_SERVER, "_"), false)
-		return
-	}
-
-	for _, certs := range certInfo.ChefServerCertsByIP {
-		c.printPublicAndPrivateKeys(certs, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"), true)
+	for _, certs := range certsByIP {
+		c.printPublicAndPrivateKeys(certs, remoteServiceName, true)
 	}
 
 }
 
-// printPostgresqlCertificates prints the postgresql certificates
-func (c *certShowImpl) printPostgresqlCertificates(certInfo certShowCertificates) {
-	c.writer.Title("Postgresql Certificates")
+// printPostgresqlAndOSCertificates prints the postgresql and opensearch certificates
+func (c *certShowImpl) printPostgresqlAndOSCertificates(rootCA, adminKey, adminCert string, certsByIP []CertByIP, remoteServiceName string) {
+	c.writer.Title(fmt.Sprintf("%s Certificates", remoteServiceName))
 	c.writer.HR()
 
-	c.writer.Println("=======================Postgresql Root CA=======================")
-	if len(strings.TrimSpace(certInfo.PostgresqlRootCert)) == 0 {
-		c.writer.Println("No Postgresql root certificate found")
+	c.writer.Println(fmt.Sprintf("=======================%s Root CA=======================", remoteServiceName))
+	if len(strings.TrimSpace(rootCA)) == 0 {
+		c.writer.Println(fmt.Sprintf("No %s root certificate found", remoteServiceName))
 	} else {
-		c.writer.Println(certInfo.PostgresqlRootCert)
+		c.writer.Println(rootCA)
 	}
 
-	if len(certInfo.PostgresqlCertsByIP) == 0 {
-		c.writer.Println("No public and private key found for Postgresql")
+	if remoteServiceName == stringutils.Title(CONST_OPENSEARCH) {
+		c.writer.Println("\n======================Opensearch Admin Key======================")
+		if len(strings.TrimSpace(adminKey)) == 0 {
+			c.writer.Println("No admin key found")
+		} else {
+			c.writer.Println(adminKey)
+		}
+		c.writer.Println("\n======================Opensearch Admin Cert======================")
+		if len(strings.TrimSpace(adminCert)) == 0 {
+			c.writer.Println("No admin certificate found")
+		} else {
+			c.writer.Println(adminCert)
+		}
+	}
+
+	if len(certsByIP) == 0 {
+		c.writer.Println(fmt.Sprintf("No public and private key found for %s", remoteServiceName))
 		return
 	}
 
-	if c.flags.node == "" && c.isCommonCerts(certInfo.PostgresqlCertsByIP) {
-		c.writer.Println("\nPostgresql certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.PostgresqlCertsByIP[0], stringutils.Title(CONST_POSTGRESQL), false)
+	if c.flags.node == "" && c.isCommonCerts(certsByIP) {
+		c.writer.Println(fmt.Sprintf("\n%s certificates are common across all nodes.\n", remoteServiceName))
+		c.printPublicAndPrivateKeys(certsByIP[0], remoteServiceName, false)
 		return
 	}
 
-	for _, certs := range certInfo.PostgresqlCertsByIP {
-		c.printPublicAndPrivateKeys(certs, stringutils.Title(CONST_POSTGRESQL), true)
-	}
-
-}
-
-// printOpensearchCertificates prints the opensearch certificates
-func (c *certShowImpl) printOpensearchCertificates(certInfo certShowCertificates) {
-	c.writer.Title("Opensearch Certificates")
-	c.writer.HR()
-
-	c.writer.Println("=======================Opensearch Root CA=======================")
-	if len(strings.TrimSpace(certInfo.OpensearchRootCert)) == 0 {
-		c.writer.Println("No Opensearch root certificate found")
-	} else {
-		c.writer.Println(certInfo.OpensearchRootCert)
-	}
-
-	c.writer.Println("\n======================Opensearch Admin Key======================")
-	if len(strings.TrimSpace(certInfo.OpensearchAdminKey)) == 0 {
-		c.writer.Println("No admin key found")
-	} else {
-		c.writer.Println(certInfo.OpensearchAdminKey)
-	}
-
-	c.writer.Println("\n======================Opensearch Admin Cert======================")
-	if len(strings.TrimSpace(certInfo.OpensearchAdminCert)) == 0 {
-		c.writer.Println("No admin certificate found")
-	} else {
-		c.writer.Println(certInfo.OpensearchAdminCert)
-	}
-
-	if len(certInfo.OpensearchCertsByIP) == 0 {
-		c.writer.Println("No public and private key found for Opensearch")
-		return
-	}
-
-	if c.flags.node == "" && c.isCommonCerts(certInfo.OpensearchCertsByIP) {
-		c.writer.Println("\nOpensearch certificates are common across all nodes.\n")
-		c.printPublicAndPrivateKeys(certInfo.OpensearchCertsByIP[0], stringutils.Title(CONST_OPENSEARCH), false)
-		return
-	}
-
-	for _, certs := range certInfo.OpensearchCertsByIP {
-		c.printPublicAndPrivateKeys(certs, stringutils.Title(CONST_OPENSEARCH), true)
+	for _, certs := range certsByIP {
+		c.printPublicAndPrivateKeys(certs, remoteServiceName, true)
 	}
 
 }
