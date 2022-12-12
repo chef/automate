@@ -123,6 +123,9 @@
   [global.v1.external.automate]
     enable = true
     node = "https://<%= overrides[:automate_fqdn] %>"
+  
+  [cs_nginx.v1.sys.ngx.main]
+    worker_processes = 2  
 
   [global.v1.external.automate.auth]
     token = "<%= overrides[:automate_dc_token] %>"
@@ -259,3 +262,7 @@
 <% if overrides[:automate_config_file] %>
 <%= File.read(overrides[:automate_config_file]) %>
 <% end %>
+
+[erchef.v1.sys.api]
+  s3_url_ttl = 28800
+  

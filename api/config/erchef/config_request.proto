@@ -31,6 +31,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 11;
 			Memory memory = 12;
 			chef.automate.infra.config.External.Automate external_automate = 13;
+			IBrowse ibrowse = 14;
 
 			message Network {
 				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10203, protocol: "https" } ];
@@ -64,6 +65,7 @@ message ConfigRequest {
 				google.protobuf.StringValue actions_fqdn = 6;
 				google.protobuf.BoolValue cbv_cache_enabled = 7;
 				google.protobuf.Int32Value cbv_cache_item_ttl = 8;
+				google.protobuf.Int32Value s3_url_ttl = 9;
 			}
 
 			message Indexing {
@@ -90,6 +92,8 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_max_size = 4;
 				google.protobuf.Int32Value pool_queue_max = 5;
 				google.protobuf.Int32Value pool_queue_timeout = 6;
+				google.protobuf.Int32Value cleanup_batch_size = 7;
+				
 			}
 
 			message Sql {
@@ -106,6 +110,12 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_max_size = 3;
 				google.protobuf.Int32Value pool_queue_max = 4;
 				google.protobuf.BoolValue enabled = 5;
+				google.protobuf.Int32Value pool_max_age = 6;
+				google.protobuf.Int32Value pool_cull_interval = 7;
+				google.protobuf.Int32Value max_connection_duration = 8;
+				google.protobuf.Int32Value ibrowse_timeout= 9;
+
+
 			}
 
 			message Depsolver {
@@ -120,6 +130,10 @@ message ConfigRequest {
 				google.protobuf.Int64Value max_bytes = 1;
 			}
 
+			message IBrowse {
+				google.protobuf.Int32Value ibrowse_max_pipeline_size = 1;
+				google.protobuf.Int32Value ibrowse_max_sessions = 2;
+			}
 		}
 		message Service {}
 	}

@@ -47,7 +47,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ngx.Main.WorkerProcesses = w.Int32(4)
 
-	c.V1.Sys.Ngx.Events.WorkerConnections = w.Int32(1024)
+	c.V1.Sys.Ngx.Events.WorkerConnections = w.Int32(10240)
 
 	c.V1.Sys.Ngx.Http.ServerNamesHashBucketSize = w.Int32(128)
 	c.V1.Sys.Ngx.Http.ClientMaxBodySize = w.String("250m")
