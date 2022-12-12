@@ -11,9 +11,9 @@ func TestTitle(t *testing.T) {
 	assert.Equal(t, "Hello", stringutils.Title("hello"))
 	assert.NotEqual(t, "hello", stringutils.Title("hello"))
 	assert.Equal(t, "Hello", stringutils.Title("Hello"))
-	assert.NotEqual(t, "Hello", stringutils.Title("HELLO"))
+	assert.NotEqual(t, "HELLO", stringutils.Title("HELLO"))
 	assert.Equal(t, "Foo Bar", stringutils.Title("foo bar"))
-	assert.Equal(t, "HeLLo WorLd", stringutils.Title("heLLo worLd"))
+	assert.Equal(t, "Hello World", stringutils.Title("heLLo worLd"))
 }
 
 func TestTitleSplit(t *testing.T) {
@@ -23,4 +23,5 @@ func TestTitleSplit(t *testing.T) {
 
 	assert.Equal(t, "Hello-World", stringutils.TitleSplit("hello-world", " "))
 	assert.Equal(t, "Foo Bar", stringutils.TitleSplit("foo-bar", "-"))
+	assert.Equal(t, "Foo", stringutils.TitleSplit("foo", "-"))
 }

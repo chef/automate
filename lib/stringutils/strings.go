@@ -7,6 +7,7 @@ import (
 // Title returns a copy of the string s with all Unicode letters that begin words mapped to their title case.
 // strings.Title has been deprecated since Go 1.18
 func Title(s string) string {
+	s = strings.ToLower(s)
 	return strings.Title(s)
 }
 
