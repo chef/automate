@@ -67,6 +67,74 @@ func TestIsCommonCerts(t *testing.T) {
 	}
 }
 
+func TestValidateNode(t *testing.T) {
+	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		inputIPs            []CertByIP
+		inputNode           string
+		inputRemoteService  string
+		expectedError       bool
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Node is part of cluster",
+			inputIPs: []CertByIP{
+				{
+					IP:         ValidIP,
+					PrivateKey: "private_key_1",
+					PublicKey:  "public_key_1",
+					NodesDn:    "",
+				},
+				{
+					IP:         "198.51.100.1",
+					PrivateKey: "private_key_1",
+					PublicKey:  "public_key_1",
+					NodesDn:    "",
+				},
+			},
+			inputNode:          ValidIP,
+			inputRemoteService: "automate",
+			expectedError:      false,
+		},
+		{
+			testCaseDescription: "Node is not part of cluster",
+			inputIPs: []CertByIP{
+				{
+					IP:         ValidIP,
+					PrivateKey: "private_key_1",
+					PublicKey:  "public_key_1",
+					NodesDn:    "",
+				},
+				{
+					IP:         "198.51.100.1",
+					PrivateKey: "private_key_2",
+					PublicKey:  "public_key_2",
+					NodesDn:    "",
+				},
+			},
+			inputNode:          "198.51.100.2",
+			inputRemoteService: "opensearch",
+			expectedError:      true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			cs.flags.node = tc.inputNode
+			actualError := cs.validateNode(tc.inputIPs, tc.inputRemoteService)
+			if tc.expectedError {
+				assert.Error(t, actualError)
+				assert.Contains(t, actualError.Error(), "does not exist in the")
+			} else {
+				assert.NoError(t, actualError)
+			}
+		})
+	}
+}
+
 func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 	return &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
