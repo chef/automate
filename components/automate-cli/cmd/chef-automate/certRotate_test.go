@@ -13,6 +13,9 @@ const (
 	RemoteFilePath = "198.51.100.0:/home/ec2-user/certs/public.pem"
 	LocalFilePath  = "/home/ec2-user/certs/public.pem"
 	ValidIP        = "198.51.100.0"
+	ValidIP1       = "198.51.100.1"
+	ValidIP2       = "198.51.100.2"
+	ValidIP3       = "198.51.100.3"
 	FileContent    = `-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp

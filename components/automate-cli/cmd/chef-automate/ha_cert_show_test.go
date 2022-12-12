@@ -28,7 +28,7 @@ func TestIsCommonCerts(t *testing.T) {
 					NodesDn:    "",
 				},
 				{
-					IP:         "198.51.100.1",
+					IP:         ValidIP1,
 					PrivateKey: "private_key_1",
 					PublicKey:  "public_key_1",
 					NodesDn:    "",
@@ -46,7 +46,7 @@ func TestIsCommonCerts(t *testing.T) {
 					NodesDn:    "",
 				},
 				{
-					IP:         "198.51.100.1",
+					IP:         ValidIP1,
 					PrivateKey: "private_key_2",
 					PublicKey:  "public_key_2",
 					NodesDn:    "",
@@ -89,7 +89,7 @@ func TestValidateNode(t *testing.T) {
 					NodesDn:    "",
 				},
 				{
-					IP:         "198.51.100.1",
+					IP:         ValidIP1,
 					PrivateKey: "private_key_1",
 					PublicKey:  "public_key_1",
 					NodesDn:    "",
@@ -109,13 +109,13 @@ func TestValidateNode(t *testing.T) {
 					NodesDn:    "",
 				},
 				{
-					IP:         "198.51.100.1",
+					IP:         ValidIP1,
 					PrivateKey: "private_key_2",
 					PublicKey:  "public_key_2",
 					NodesDn:    "",
 				},
 			},
-			inputNode:          "198.51.100.2",
+			inputNode:          ValidIP2,
 			inputRemoteService: "opensearch",
 			expectedError:      true,
 		},
