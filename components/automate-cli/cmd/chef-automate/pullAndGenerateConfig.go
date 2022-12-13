@@ -432,7 +432,7 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 		return nil, err
 	}
 	var arch = strings.Trim(string(archBytes), "\n")
-	writer.Println("Reference architecture type :" + arch)
+	writer.Println("Reference architecture type : " + arch)
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
@@ -445,92 +445,47 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Chef Server config")
 	}
-	// checking onprem with managed or self managed services
+	// checking AWS with managed services or Non managed services
 	logrus.Debug(sharedConfigToml.Aws.Config.SetupManagedServices)
 	if !isManagedServicesOn() {
 		osConfigMap, err := p.pullOpensearchConfigs()
 		if err != nil {
 			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Opensearch config")
 		}
-		writer.Println("end of pulling os config")
 		pgConfigMap, err := p.pullPGConfigs()
 		if err != nil {
 			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
 		}
-
-		var osCerts []CertByIP
-		for key, ele := range osConfigMap {
-			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
-			if err != nil {
-				writer.Fail(err.Error())
-			}
-			certByIP := CertByIP{
-				IP:         key,
-				PrivateKey: ele.privateKey,
-				PublicKey:  ele.publicKey,
-				NodesDn:    fmt.Sprintf("%v", nodeDn),
-			}
-			osCerts = append(osCerts, certByIP)
-		}
-		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
 		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
 		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+		sharedConfigToml.Opensearch.Config.PrivateKey, sharedConfigToml.Opensearch.Config.PublicKey = getPrivateKeyAndPublicKeyFromBE(osConfigMap)
+		nodeDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.PublicKey)
+		if err != nil {
+			writer.Fail(err.Error())
+		}
 		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
 		if err != nil {
 			writer.Fail(err.Error())
 		}
+		sharedConfigToml.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodeDn)
 		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
 		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
-
-		var pgCerts []CertByIP
-		for key, ele := range pgConfigMap {
-			certByIP := CertByIP{
-				IP:         key,
-				PrivateKey: ele.privateKey,
-				PublicKey:  ele.publicKey,
-			}
-			pgCerts = append(pgCerts, certByIP)
-		}
-		sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
 		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
+		sharedConfigToml.Postgresql.Config.PrivateKey, sharedConfigToml.Postgresql.Config.PublicKey = getPrivateKeyAndPublicKeyFromBE(pgConfigMap)
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	}
-
-	var a2Certs []CertByIP
-	for key, ele := range a2ConfigMap {
-		certByIP := CertByIP{
-			IP:         key,
-			PrivateKey: ele.Global.V1.FrontendTls[0].Key,
-			PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
-		}
-		a2Certs = append(a2Certs, certByIP)
-	}
-
-	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
 	sharedConfigToml.Automate.Config.Fqdn = getA2fqdn(a2ConfigMap)
+	sharedConfigToml.Automate.Config.PrivateKey = getPrivateKeyFromFE(a2ConfigMap)
+	sharedConfigToml.Automate.Config.PublicKey = getPublicKeyFromFE(a2ConfigMap)
 	sharedConfigToml.Architecture.ConfigInitials.S3BucketName = getS3Bucket(a2ConfigMap)
 	sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = getOsRoleArn(a2ConfigMap)
 	sharedConfigToml.Aws.Config.OsUserAccessKeyId = getOsAccessKey(a2ConfigMap)
 	sharedConfigToml.Aws.Config.OsUserAccessKeySecret = getOsSecretKey(a2ConfigMap)
 	sharedConfigToml.Automate.Config.EnableCustomCerts = true
-
-	var csCerts []CertByIP
-	for key, ele := range csConfigMap {
-		if len(ele.Global.V1.FrontendTls) > 0 {
-			certByIP := CertByIP{
-				IP:         key,
-				PrivateKey: ele.Global.V1.FrontendTls[0].Key,
-				PublicKey:  ele.Global.V1.FrontendTls[0].Cert,
-			}
-			csCerts = append(csCerts, certByIP)
-		}
-	}
-
-	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
-	writer.Println(" 4 : setting certsByIp with sharedconfigtoml for cs")
 	sharedConfigToml.Automate.Config.RootCA = getRootCAFromCS(csConfigMap)
+	sharedConfigToml.ChefServer.Config.PrivateKey = getPrivateKeyFromFE(csConfigMap)
+	sharedConfigToml.ChefServer.Config.PublicKey = getPublicKeyFromFE(csConfigMap)
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
-
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
@@ -751,22 +706,7 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 	return sharedConfigToml, nil
 }
 
-func trimstr(str string) string {
-	if len(str) < 1 {
-		writer.Println("String is empty")
-	} 
-	if str[0] != '"' {
-		return str
-	}
-	if len(str) > 0 && str[0] == '"' {
-		str = str[1 : len(str)-1]
-		fmt.Println("Final string after Trimming : ", str)
-		return str
-	}
-	return ""
-}
-
-func getTheValueFromA2HARB(key string ) (string, error) {
+func getTheValueFromA2HARB(key string) (string, error) {
 	wordCountCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | wc -l`
 	WordCountF := fmt.Sprintf(wordCountCmd, key)
 	output, err := exec.Command("/bin/sh", "-c", WordCountF).Output()
@@ -781,14 +721,17 @@ func getTheValueFromA2HARB(key string ) (string, error) {
 	} else {
 		GrepCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | hab pkg exec core/gawk gawk '{print $2}'`
 		GrepCmdF := fmt.Sprintf(GrepCmd, key)
-		writer.Println("Grep command : " + GrepCmdF)
+		writer.Println("Grep command for getting the value from A2ha.rb: " + GrepCmdF)
 		output, err := exec.Command("/bin/sh", "-c", GrepCmdF).Output()
 		if err != nil {
 			return "", err
 		}
 		value := string(output)
 		read_line := strings.TrimSuffix(value, "\n")
-		KeyV := trimstr(read_line)
+		KeyV, err := strconv.Unquote(read_line)
+		if err != nil {
+			return "", err
+		}
 		return strings.TrimSpace(KeyV), nil
 	}
 }
@@ -814,6 +757,30 @@ func getRootCAFromCS(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
+func getPrivateKeyFromFE(config map[string]*dc.AutomateConfig) string {
+	if config == nil {
+		return ""
+	}
+	for _, ele := range config {
+		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Key != "" {
+			return ele.GetGlobal().V1.FrontendTls[0].Key
+		}
+	}
+	return ""
+}
+
+func getPublicKeyFromFE(config map[string]*dc.AutomateConfig) string {
+	if config == nil {
+		return ""
+	}
+	for _, ele := range config {
+		if ele.Global.V1.FrontendTls[0] != nil && ele.Global.V1.FrontendTls[0].Cert != "" {
+			return ele.GetGlobal().V1.FrontendTls[0].Cert
+		}
+	}
+	return ""
+}
+
 func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
 	for _, ele := range config {
 		if len(strings.TrimSpace(ele.adminCert)) > 0 && len(strings.TrimSpace(ele.adminKey)) > 0 {
@@ -822,6 +789,19 @@ func getOSAdminCertAndAdminKey(config map[string]*ConfigKeys) (string, string) {
 			return strings.TrimSpace(ele.adminCert), ""
 		} else if len(strings.TrimSpace(ele.adminKey)) > 0 {
 			return "", strings.TrimSpace(ele.adminKey)
+		}
+	}
+	return "", ""
+}
+
+func getPrivateKeyAndPublicKeyFromBE(config map[string]*ConfigKeys) (string, string) {
+	for _, ele := range config {
+		if len(strings.TrimSpace(ele.privateKey)) > 0 && len(strings.TrimSpace(ele.publicKey)) > 0 {
+			return strings.TrimSpace(ele.privateKey), strings.TrimSpace(ele.publicKey)
+		} else if len(strings.TrimSpace(ele.privateKey)) > 0 {
+			return strings.TrimSpace(ele.privateKey), ""
+		} else if len(strings.TrimSpace(ele.publicKey)) > 0 {
+			return "", strings.TrimSpace(ele.publicKey)
 		}
 	}
 	return "", ""

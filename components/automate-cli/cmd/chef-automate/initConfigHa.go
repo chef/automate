@@ -60,7 +60,6 @@ type AwsConfigToml struct {
 			RootCA            string `toml:"root_ca"`
 			PrivateKey        string `toml:"private_key"`
 			PublicKey         string `toml:"public_key"`
-			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
@@ -69,7 +68,6 @@ type AwsConfigToml struct {
 			EnableCustomCerts bool   `toml:"enable_custom_certs"`
 			PrivateKey        string `toml:"private_key"`
 			PublicKey         string `toml:"public_key"`
-			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Opensearch struct {
@@ -83,7 +81,6 @@ type AwsConfigToml struct {
 			PublicKey         string `toml:"public_key"`
 			AdminDn           string `toml:"admin_dn"`
 			NodesDn           string `toml:"nodes_dn"`
-			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
@@ -93,7 +90,6 @@ type AwsConfigToml struct {
 			RootCA            string `toml:"root_ca"`
 			PrivateKey        string `toml:"private_key"`
 			PublicKey         string `toml:"public_key"`
-			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"postgresql"`
 	Aws struct {
