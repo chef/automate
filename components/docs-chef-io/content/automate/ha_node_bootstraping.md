@@ -34,15 +34,15 @@ The Chef Infra Client installer puts everything into a unique directory (/opt/ch
 
 1. ssh in the bastion host and follow the below steps.
 
-2. ssh in chef_server instance.
+1. ssh in chef_server instance.
 
 `sudo chef-automate ssh --hostname chef_server`
 
-3. Ensure all the front-end instances are up and running.
+1. Ensure all the front-end instances are up and running.
 
 `sudo chef-automate status`
 
-4. Create a User.
+1. Create a User.
 
 Syntax:
 
@@ -58,7 +58,7 @@ sudo chef-server-ctl user-create johndoe John Doe john.doe@example.com John@123 
 
 Created users can be listed using `sudo chef-server-ctl user-list`
 
-5. Create an organization.
+1. Create an organization.
 
 Syntax:
 
@@ -74,25 +74,25 @@ sudo chef-server-ctl org-create new_org 'New Organization' --association_user jo
 
 Created organization can be listed using `sudo chef-server-ctl org-list`
 
-7. Copy the `pem` files and save them to a safe location.
+1. Copy the `pem` files and save them to a safe location.
 
 ### Workstation Setup
 
 1. To set up the workstation on your machine, follow the steps given below:
 
--   Install the latest version of chef Workstation on the ubuntu system.
+- Install the latest version of chef Workstation on the ubuntu system.
 
 ```bash
 wget https://packages.chef.io/files/stable/chef-workstation/21.7.524/ubuntu/20.04/chef-workstation_21.7.524-1_amd64.deb
 ```
 
--   To install the same:
+- To install the same:
 
 ```bash
 dpkg -i chef-workstation_21.7.524-1_amd64.deb
 ```
 
--   Verify the installation using following command:
+- Verify the installation using following command:
 
 ```bash
 chef -v
@@ -100,15 +100,15 @@ chef -v
 
 Click [here](https://docs.chef.io/workstation/install_workstation/) for any additional information.
 
-2. Generate chef-repo using `chef generate repo chef-repo`. Click [here]https://docs.chef.io/workstation/getting_started/ to know more.
+1. Generate chef-repo using `chef generate repo chef-repo`. Click [here]https://docs.chef.io/workstation/getting_started/ to know more.
 
-3. Paste `pem` files of user and organization inside `/root/.chef/`. For example: `Eg.: /root/.chef/johndoe.pem , /root/.chef/new_org.pem`
+1. Paste `pem` files of user and organization inside `/root/.chef/`. For example: `Eg.: /root/.chef/johndoe.pem , /root/.chef/new_org.pem`
 
-4. Paste ssh key of node which you want to bootstrap inside `/root/.ssh/<ssh_key_of_node>`.
+1. Paste ssh key of node which you want to bootstrap inside `/root/.ssh/<ssh_key_of_node>`.
 
-5. Edit Credentials file `vi /root/.chef/credentials` or run `knife configure` to configure the credentials.
+1. Edit Credentials file `vi /root/.chef/credentials` or run `knife configure` to configure the credentials.
 
-6. Provide the name of user-created in chef_server, correct path of pem file of user and chef server URL (or associated DNS), and organization name.
+1. Provide the name of user-created in chef_server, correct path of pem file of user and chef server URL (or associated DNS), and organization name.
 
 Once configured, `/root/.chef/credentials` will look like as shown below:
 
@@ -119,10 +119,10 @@ Once configured, `/root/.chef/credentials` will look like as shown below:
   chef_server_url = "https://demo-server.saas.chef.io/organizations/<name_of_organization>/"
 ```
 
-7. Run the following command:
+1. Run the following command:
 
 ```bash
-knife ssh fetch
+knife ssl fetch
 knife ssl check
 ```
 
@@ -130,25 +130,68 @@ knife ssl check
 
 The above command will fetch certificate details, save them to the trusted_cert folder in **/root/.chef/**, and verify the same.
 
-8. Run the bootstrap command.
+1. Run the bootstrap command.
 
 `knife bootstrap <Public_ip> -i ~/<pem_file_of_node> -U ubuntu -N <name_of_node> --sudo`
 
--   **Public IP:** IP address of the node which we are bootstrapping.
+- **Public IP:** IP address of the node which we are bootstrapping.
 
--   **pem_file_of_node:** `pem` file of node which we have saved at `/root/.ssh/<pem_file_of_node>`.
+- **pem_file_of_node:** `pem` file of node which we have saved at `/root/.ssh/<pem_file_of_node>`.
 
--   **name_of_node:** You can provide any name to your node.
+- **name_of_node:** You can provide any name to your node.
 
 For example: `knife bootstrap 3.124.**.** -i ~/.ssh/rsa.pem -U ubuntu -N johndoe`
 
 ## Troubleshoot
 
-If `knife bootstrap` throws permission denied or cannot create directory error, add the following configuration in `/root/.chef/credentials` and then run the bootstrap command as shown in _Step No. 8_.
+- If `knife bootstrap` throws permission denied or cannot create directory error, add the following configuration in `/root/.chef/credentials` and then run the bootstrap command as shown in _Step No. 8_.
+
+**Resoultion** 
 
 ```bash
 [default.knife]
 ssh_user = 'ubuntu' # this would have been knife[:ssh_user] in your config.rb
 aws_profile = 'default'
 use_sudo = true
+```
+
+- If you an error while doing bootstraping 
+
+```automate-cs-nginx.default(O): 2022/10/21 08:53:02 [error] 5742#0: *2490 upstream SSL certificate verify 
+error: (20:unable to get local issuer certificate) while SSL handshaking to upstream, client: 127.0.0.1, server: , 
+request: "POST /organizations/MYORGS/data-collector HTTP/1.1", 
+upstream: "https://<MP-AUTOMATE-FQDN>:443/data-collector/v0/", 
+host: "<MY-HOSTNAME>"
+```
+
+**Resoultion** 
+
+- patch the below config in chef-server.
+
+```sh
+[cs_nginx.v1.sys.ngx.http]
+  ssl_verify_depth = 6
+[global.v1.external.automate.ssl]
+  server_name = "AUTOMATE-FQDN-WITHOUT-HTTP-PROTOCOL"
+  root_cert = """MY-AUTOMATE-FQDN-ROOT-CA"""
+```
+
+- Command to patch the config
+
+```cmd
+chef-automate config patch <toml-file> --cs
+```
+
+For example:
+
+```sh
+[cs_nginx.v1.sys.ngx.http]
+  ssl_verify_depth = 6
+[global.v1.external.automate.ssl]
+  server_name = "myautomate-fqdn.com"
+  root_cert = """-----BEGIN CERTIFICATE-----
+X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
+WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=
+-----END CERTIFICATE-----
+"""
 ```
