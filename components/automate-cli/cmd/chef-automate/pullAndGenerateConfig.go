@@ -759,7 +759,7 @@ func trimstr(str string) string {
 		return str
 	}
 	if len(str) > 0 && str[0] == '"' {
-		str = str[1 : len(str)-2]
+		str = str[1 : len(str)-1]
 		fmt.Println("Final string after Trimming : ", str)
 		return str
 	}
@@ -787,7 +787,8 @@ func getTheValueFromA2HARB(key string ) (string, error) {
 			return "", err
 		}
 		value := string(output)
-		KeyV := trimstr(value)
+		read_line := strings.TrimSuffix(value, "\n")
+		KeyV := trimstr(read_line)
 		return strings.TrimSpace(KeyV), nil
 	}
 }
