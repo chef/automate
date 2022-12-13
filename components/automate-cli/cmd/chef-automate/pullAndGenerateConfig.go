@@ -760,7 +760,7 @@ func trimstr(str string) string {
 	}
 	if len(str) > 0 && str[0] == '"' {
 		str = str[1 : len(str)-2]
-		fmt.Println("Final string : ", str)
+		fmt.Println("Final string after Trimming : ", str)
 		return str
 	}
 	return ""
