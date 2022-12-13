@@ -752,14 +752,21 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 }
 
 func trimstr(str string) string {
+	if len(str) < 1 {
+		writer.Println("String is empty")
+	} 
+	if str[0] != '"' {
+		return str
+	}
 	if len(str) > 0 && str[0] == '"' {
 		str = str[1 : len(str)-2]
 		fmt.Println("Final string : ", str)
+		return str
 	}
-	return str
+	return ""
 }
 
-func getTheValueFromA2HARB(key string) (string, error) {
+func getTheValueFromA2HARB(key string ) (string, error) {
 	wordCountCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | wc -l`
 	WordCountF := fmt.Sprintf(wordCountCmd, key)
 	output, err := exec.Command("/bin/sh", "-c", WordCountF).Output()
