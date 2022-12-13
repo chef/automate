@@ -35,11 +35,14 @@ var configCmdFlags = struct {
 	file             string
 }{}
 
-
 const (
 	dateFormat       = "%Y%m%d%H%M%S"
 	postgresql       = "postgresql"
 	opensearch_const = "opensearch"
+	PRODUCT_WARNING  = `Ignored 'products' from [deployment.v1.svc]`
+	CERT_WARNING     = `Ignored values from [%s]
+	Please use 'cert-rotate' command to rotate certificate. 
+	For more information, run: 'chef-automate cert-rotate --help'`
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -295,10 +298,14 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 // setConfigForFrontEndNodes patches the configuration for front end nodes in Automate HA
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
+	srcPath, err := parseAndRemoveRestrictedKeysFromSrcFile(args[0])
+	if err != nil {
+		return err
+	}
 	for i := 0; i < len(frontendIps); i++ {
 		writer.Print("Connecting to the " + remoteService + " node : " + frontendIps[i])
 		sshUtil.getSSHConfig().hostIP = frontendIps[i]
-		err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
+		err := sshUtil.copyFileToRemote(srcPath, remoteService+timestamp, false)
 		if err != nil {
 			writer.Errorf("%v", err)
 			return err
@@ -341,6 +348,10 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 	//Implementing the config if there is some change in the database configuration
 	if isConfigChangedDatabase {
 		tomlFile := args[0] + timestamp
+		if reqConfig.Ssl != nil {
+			writer.Warn(fmt.Sprintf(CERT_WARNING, "ssl"))
+		}
+		reqConfig.Ssl = nil
 		tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
 		if err != nil {
 			return err
@@ -391,7 +402,11 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 	//Implementing the config if there is some change in the database configuration
 	if isConfigChangedDatabase {
 		tomlFile := args[0] + timestamp
-		// reqConfig.TLS = nil
+
+		if reqConfig.TLS != nil {
+			writer.Warn(fmt.Sprintf(CERT_WARNING, "tls"))
+		}
+		reqConfig.TLS = nil
 		tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
 
 		if err != nil {
@@ -677,4 +692,31 @@ func createTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 
 	return tomlFile, nil
 
+}
+
+func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
+
+	tomlbyt, _ := ioutil.ReadFile(srcString) // nosemgrep
+	destString := string(tomlbyt)
+	var dest dc.AutomateConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		fmt.Println(err)
+	}
+
+	if dest.Deployment == nil ||
+		dest.Deployment.V1 == nil ||
+		dest.Deployment.V1.Svc == nil ||
+		dest.Deployment.V1.Svc.Products == nil {
+		return srcString, nil
+	} else {
+		// Following are the unsupported or restricted key to patch via bastion
+		writer.Warn(PRODUCT_WARNING)
+		dest.Deployment.V1.Svc.Products = nil
+
+		srcString, err := createTomlFileFromConfig(dest, srcString)
+		if err != nil {
+			return "", err
+		}
+		return srcString, nil
+	}
 }
