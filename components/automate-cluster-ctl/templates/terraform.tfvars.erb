@@ -272,6 +272,8 @@ opensearch_certs_by_ip = <%= config.opensearch.certs_by_ip %>
 
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
+automate_archive_disk_fs_path = "<%= config.backup_mount %>/automate"
+opensearch_archive_disk_fs_path = "<%= config.backup_mount %>/opensearch"
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
 
 habitat_uid_gid = "<%= config.habitat_uid_gid %>"

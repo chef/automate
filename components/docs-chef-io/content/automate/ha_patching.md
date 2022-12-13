@@ -44,5 +44,6 @@ For Example: `chef-automate config patch --frontend /home/frontend.toml`
 {{< warning >}}
 
 -   For certificate rotation, don't use `config patch`. Instead `cert-rotate` command can be used. To know more about certificate rotation click [here](/automate/ha_cert_rotaion)
+-   While patching the same from **the provision host**, structures such as TLS from OpenSearch configuration toml file and SSL from PostgreQL configuration toml file will be ignored.
 
 {{< /warning >}}
