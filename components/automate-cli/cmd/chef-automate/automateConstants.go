@@ -32,6 +32,12 @@ const AUTOMATE_HA_PKG_PG = "automate-ha-postgresql"
 const AUTOMATE_HA_PKG_HA_PROXY = "automate-ha-haproxy"
 const AUTOMATE_HA_OS = "automate-ha-opensearch"
 const AUTOMATE_HA_ES_CAR = "automate-ha-elasticsidecar"
+const AUTOMATE_HA_CTL = "automate-ha-ctl"
+const AUTOMATE_HA_DEPLOYMENT = "automate-ha-deployment"
+const AUTOMATE_CLI = "automate-cli"
+const AUTOMATE_CURATOR = "automate-ha-curator"
+
+var AUTOMATE_HA_BACKEND_PKGS = [...]string{AUTOMATE_HA_PKG_PG_LDR_CHK, AUTOMATE_HA_PKG_PG, AUTOMATE_HA_PKG_HA_PROXY, AUTOMATE_HA_OS, AUTOMATE_HA_ES_CAR, AUTOMATE_HA_CTL, AUTOMATE_HA_DEPLOYMENT, AUTOMATE_CLI, AUTOMATE_CURATOR}
 
 const ORIGIN_PATTERN = `[a-zA-z0-9]*`
 const PACKAGE_NAME_PATTERN = `-[a-zA-Z0-9]*-.*-\d+\.`
