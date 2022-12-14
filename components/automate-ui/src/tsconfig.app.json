@@ -5,7 +5,8 @@
     "baseUrl": "./"
 },
   "angularCompilerOptions": {
-    "preserveWhitespaces": true
+    "preserveWhitespaces": true,
+    "enableIvy": true
   },
   "files": [
     "main.ts",
@@ -15,3 +16,6 @@
     "src/**/*.d.ts"
   ]
 }
+
+
+//https://github.com/module-federation/module-federation-examples/tree/master/angular11-microfrontends-scully
