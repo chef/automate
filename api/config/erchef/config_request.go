@@ -26,6 +26,7 @@ func NewConfigRequest() *ConfigRequest {
 				Depsolver:     &ConfigRequest_V1_System_Depsolver{},
 				Memory:        &ConfigRequest_V1_System_Memory{},
 				Ibrowse:       &ConfigRequest_V1_System_IBrowse{},
+				Health:        &ConfigRequest_V1_System_HealthCheck{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -102,6 +103,8 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ibrowse.IbrowseMaxPipelineSize = w.Int32(1)
 	c.V1.Sys.Ibrowse.IbrowseMaxSessions = w.Int32(256)
+
+	c.V1.Sys.Health.HealthPingTimeout = w.Int32(400)
 
 	return c
 }

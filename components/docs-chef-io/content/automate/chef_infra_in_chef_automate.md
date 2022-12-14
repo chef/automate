@@ -61,5 +61,6 @@ The list of parameters are as follows:
 | oc_bifrost['db_pool_queue_max']                 | 50                                        | 50                               | ```bifrost.v1.sys.sql.pool_queue_max```                    |
 | oc_bifrost['extended_perf_log']                 | TRUE                                      | TRUE                             | ```bifrost.v1.sys.log.extended_perf_log```                 |
 | bookshelf['stream_download']                    | TRUE                                      | TRUE                             | ```bookshelf.v1.sys.bookshelf.stream_download```           |
+| oc_chef_wm['health_ping_timeout']               | 400                                      | 400                             | ```erchef.v1.sys.health.health_ping_timeout```           |
 
 Click [here](https://docs.chef.io/server/config_rb_server_optional_settings/) for the detailed description of the above parameters.

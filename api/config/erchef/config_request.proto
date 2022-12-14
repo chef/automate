@@ -32,6 +32,7 @@ message ConfigRequest {
 			Memory memory = 12;
 			chef.automate.infra.config.External.Automate external_automate = 13;
 			IBrowse ibrowse = 14;
+			HealthCheck health = 15;
 
 			message Network {
 				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10203, protocol: "https" } ];
@@ -128,6 +129,10 @@ message ConfigRequest {
 
 			message Memory {
 				google.protobuf.Int64Value max_bytes = 1;
+			}
+			 
+			message HealthCheck { 
+				google.protobuf.Int32Value health_ping_timeout =  1;
 			}
 
 			message IBrowse {
