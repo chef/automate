@@ -721,7 +721,6 @@ func getTheValueFromA2HARB(key string) (string, error) {
 	} else {
 		GrepCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | hab pkg exec core/gawk gawk '{print $2}'`
 		GrepCmdF := fmt.Sprintf(GrepCmd, key)
-		writer.Println("Grep command for getting the value from A2ha.rb: " + GrepCmdF)
 		output, err := exec.Command("/bin/sh", "-c", GrepCmdF).Output()
 		if err != nil {
 			return "", err
