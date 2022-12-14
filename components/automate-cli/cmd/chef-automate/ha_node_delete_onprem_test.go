@@ -8,77 +8,22 @@ import (
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/crypto/ssh"
 )
 
-const CONFIG_TOML_PATH = "../../pkg/testfiles"
-const TEST_IP_1 = "192.0.2.11"
-
-type MockSSHUtilsImpl struct {
-	getSSHConfigFunc                                func() *SSHConfig
-	setSSHConfigFunc                                func(sshConfig *SSHConfig)
-	getClientConfigFunc                             func() (*ssh.ClientConfig, error)
-	getConnectionFunc                               func() (*ssh.Client, error)
-	connectAndExecuteCommandOnRemoteFunc            func(remoteCommands string, spinner bool) (string, error)
-	connectAndExecuteCommandOnRemoteSteamOutputFunc func(remoteCommands string) (string, error)
-	copyFileToRemoteFunc                            func(srcFilePath string, destFileName string, removeFile bool) error
-	copyFileFromRemoteFunc                          func(remoteFilePath string, outputFileName string) (string, error)
+func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
+	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
+	if err != nil {
+		return nil, err
+	}
+	return &cfg, nil
 }
 
-func (msu *MockSSHUtilsImpl) getSSHConfig() *SSHConfig {
-	return msu.getSSHConfigFunc()
-}
-func (msu *MockSSHUtilsImpl) setSSHConfig(sshConfig *SSHConfig) {
-	return
-}
-func (msu *MockSSHUtilsImpl) getClientConfig() (*ssh.ClientConfig, error) {
-	return msu.getClientConfigFunc()
-}
-func (msu *MockSSHUtilsImpl) getConnection() (*ssh.Client, error) {
-	return msu.getConnectionFunc()
-}
-func (msu *MockSSHUtilsImpl) connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error) {
-	return msu.connectAndExecuteCommandOnRemoteFunc(remoteCommands, spinner)
-}
-func (msu *MockSSHUtilsImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error) {
-	return msu.connectAndExecuteCommandOnRemoteSteamOutputFunc(remoteCommands)
-}
-func (msu *MockSSHUtilsImpl) copyFileToRemote(srcFilePath string, destFileName string, removeFile bool) error {
-	return msu.copyFileToRemoteFunc(srcFilePath, destFileName, removeFile)
-}
-func (msu *MockSSHUtilsImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
-	return msu.copyFileFromRemoteFunc(remoteFilePath, outputFileName)
-}
-
-func TestAddnodeValidateNotExistingInfra(t *testing.T) {
+func TestDeleteNodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "10.2.1.67,ewewedw",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
-		},
-		getModeFromConfigFunc: func(path string) (string, error) {
-			return AWS_MODE, nil
-		},
-		pullAndUpdateConfigFunc: PullConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
-		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-			return "", nil
-		},
-	})
-	err := nodeAdd.validate()
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unsupported deployment type. Please check "+CONFIG_TOML_PATH+"/config.toml")
-}
-
-func TestAddnodeValidateError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
-	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67,ewewedw",
-	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -91,12 +36,15 @@ func TestAddnodeValidateError(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "IP address validation failed: \nIncorrect Automate IP address format for ip ewewedw")
+	assert.Contains(t, err.Error(), `IP address validation failed: 
+Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
+Automate Ip 10.2.1.67 is not present in existing list of ip addresses. Please use a different private ip.
+Automate Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.`)
 }
 
-func TestAddnodeValidateErrorMultiple(t *testing.T) {
+func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp:   "10.2.1.67,ewewedw",
@@ -104,7 +52,7 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 		postgresqlIp: "10.2.1.657,ewewedw",
 		opensearchIp: "10.2.1.61,ewewedw",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -117,48 +65,57 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), `IP address validation failed: 
-Incorrect Automate IP address format for ip ewewedw
-Incorrect Chef-Server IP address format for ip 10.2.1.637
-Incorrect Chef-Server IP address format for ip ewewedw
-Incorrect OpenSearch IP address format for ip ewewedw
-Incorrect Postgresql IP address format for ip 10.2.1.657
-Incorrect Postgresql IP address format for ip ewewedw`)
+Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
+Automate Ip 10.2.1.67 is not present in existing list of ip addresses. Please use a different private ip.
+Automate Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.
+Unable to remove node. Chef Server instance count cannot be less than 1. Final count -1 not allowed.
+Chef-Server Ip 10.2.1.637 is not present in existing list of ip addresses. Please use a different private ip.
+Chef-Server Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.
+Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
+OpenSearch Ip 10.2.1.61 is not present in existing list of ip addresses. Please use a different private ip.
+OpenSearch Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.
+Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.
+Postgresql Ip 10.2.1.657 is not present in existing list of ip addresses. Please use a different private ip.
+Postgresql Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.`)
 }
 
-func TestAddnodeReadfileError(t *testing.T) {
+func TestDeleteNodeModifyAutomate(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: TEST_IP_1,
+		automateIp: "192.0.2.0",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
-			return nil, errors.New("random")
-		},
+		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "random")
+	err := nodedelete.validate()
+	assert.NoError(t, err)
+	err = nodedelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).automateIpList[0])
+	assert.Equal(t, "1", nodedelete.(*DeleteNodeOnPremImpl).config.Automate.Config.InstanceCount)
+	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeOnPremImpl).config.Automate.Config.CertsByIP))
+	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.AutomatePrivateIps))
 }
 
-func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
+func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		postgresqlIp: TEST_IP_1,
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodeAdd := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -180,16 +137,16 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 	})
 	err := nodeAdd.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
+	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
 }
 
-func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
+func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: TEST_IP_1,
 		automateIp:   TEST_IP_2,
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodeAdd := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -211,15 +168,15 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 	})
 	err := nodeAdd.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "add"))
+	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
 }
 
-func TestAddnodeModifyAutomate(t *testing.T) {
+func TestDeleteNodeModifyInfra(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: TEST_IP_1,
+		chefServerIp: "192.0.2.2",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -232,22 +189,24 @@ func TestAddnodeModifyAutomate(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Unable to remove node. Chef Server instance count cannot be less than 1. Final count 0 not allowed.")
+	// even though validation will fail still we check if modify config is working as expected or not
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
-	assert.NoError(t, err)
-	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeImpl).automateIpList[0])
-	assert.Equal(t, "3", nodeAdd.(*AddNodeImpl).config.Automate.Config.InstanceCount)
-	assert.Equal(t, 3, len(nodeAdd.(*AddNodeImpl).config.Automate.Config.CertsByIP))
-	assert.Equal(t, 3, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.AutomatePrivateIps))
+	assert.Equal(t, flags.chefServerIp, nodedelete.(*DeleteNodeOnPremImpl).chefServerIpList[0])
+	assert.Equal(t, "0", nodedelete.(*DeleteNodeOnPremImpl).config.ChefServer.Config.InstanceCount)
+	assert.Equal(t, 0, len(nodedelete.(*DeleteNodeOnPremImpl).config.ChefServer.Config.CertsByIP))
+	assert.Equal(t, 0, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.ChefServerPrivateIps))
 }
 
-func TestAddnodeModifyInfra(t *testing.T) {
+func TestDeletenodeModifyOpensearch(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		chefServerIp: TEST_IP_1,
+		opensearchIp: "192.0.2.6",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -260,22 +219,22 @@ func TestAddnodeModifyInfra(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.chefServerIp, nodeAdd.(*AddNodeImpl).chefServerIpList[0])
-	assert.Equal(t, "2", nodeAdd.(*AddNodeImpl).config.ChefServer.Config.InstanceCount)
-	assert.Equal(t, 2, len(nodeAdd.(*AddNodeImpl).config.ChefServer.Config.CertsByIP))
-	assert.Equal(t, 2, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.ChefServerPrivateIps))
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).opensearchIpList[0])
+	assert.Equal(t, "3", nodedelete.(*DeleteNodeOnPremImpl).config.Opensearch.Config.InstanceCount)
+	assert.Equal(t, 3, len(nodedelete.(*DeleteNodeOnPremImpl).config.Opensearch.Config.CertsByIP))
+	assert.Equal(t, 3, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.OpensearchPrivateIps))
 }
 
-func TestAddnodeModifyPostgresql(t *testing.T) {
+func TestDeletenodeModifyPostgresql(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		postgresqlIp: TEST_IP_1,
+		postgresqlIp: "192.0.2.9",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -288,50 +247,24 @@ func TestAddnodeModifyPostgresql(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Unable to remove node. Postgresql instance count cannot be less than 3. Final count 2 not allowed.")
+	// even though validation will fail still we check if modify config is working as expected or not
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
-	assert.NoError(t, err)
-	assert.Equal(t, flags.postgresqlIp, nodeAdd.(*AddNodeImpl).postgresqlIp[0])
-	assert.Equal(t, "4", nodeAdd.(*AddNodeImpl).config.Postgresql.Config.InstanceCount)
-	assert.Equal(t, 4, len(nodeAdd.(*AddNodeImpl).config.Postgresql.Config.CertsByIP))
-	assert.Equal(t, 4, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))
+	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).postgresqlIp[0])
+	assert.Equal(t, "2", nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
+	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.CertsByIP))
+	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))
 }
 
-func TestAddnodeModifyOpensearch(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
-	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: TEST_IP_1,
-	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
-		},
-		getModeFromConfigFunc: func(path string) (string, error) {
-			return EXISTING_INFRA_MODE, nil
-		},
-		pullAndUpdateConfigFunc: PullConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
-		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-			return "", nil
-		},
-	})
-	err := nodeAdd.validate()
-	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
-	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeImpl).opensearchIpList[0])
-	assert.Equal(t, "5", nodeAdd.(*AddNodeImpl).config.Opensearch.Config.InstanceCount)
-	assert.Equal(t, 5, len(nodeAdd.(*AddNodeImpl).config.Opensearch.Config.CertsByIP))
-	assert.Equal(t, 5, len(nodeAdd.(*AddNodeImpl).config.ExistingInfra.Config.OpensearchPrivateIps))
-}
-
-func TestAddnodePrompt(t *testing.T) {
+func TestDeleteNodePrompt(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: TEST_IP_1,
+		automateIp: "192.0.2.0",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -344,12 +277,12 @@ func TestAddnodePrompt(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.automateIp, nodeAdd.(*AddNodeImpl).automateIpList[0])
-	res, err := nodeAdd.promptUserConfirmation()
+	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).automateIpList[0])
+	res, err := nodedelete.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -359,19 +292,19 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-New nodes to be added:
+Nodes to be deleted:
 ================================================
-Automate => 192.0.2.11
-This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Automate => 192.0.2.0
+This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
-func TestAddnodeDeployWithNewOSNode(t *testing.T) {
+func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: TEST_IP_1,
+		opensearchIp: "192.0.2.3",
 	}
 	var filewritten, deployed bool
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -396,12 +329,12 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeImpl).opensearchIpList[0])
-	res, err := nodeAdd.promptUserConfirmation()
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).opensearchIpList[0])
+	res, err := nodedelete.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -411,22 +344,22 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-New nodes to be added:
+Nodes to be deleted:
 ================================================
-OpenSearch => 192.0.2.11
-This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy()
+OpenSearch => 192.0.2.3
+This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	err = nodedelete.runDeploy()
 	assert.NoError(t, err)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
 }
 
-func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
+func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: TEST_IP_1,
+		opensearchIp: "192.0.2.3,192.0.2.5",
 	}
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -434,7 +367,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 			return nil
 		},
 		genConfigfunc: func(path string) error {
-			return errors.New("random")
+			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
@@ -442,19 +375,53 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
-			return nil
+			return errors.New("random")
 		},
 	}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodeAdd.validate()
+	err := nodedelete.validate()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), `IP address validation failed: 
+Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.`)
+}
+
+func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: "192.0.2.3",
+	}
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
+		genConfigfunc: func(path string) error {
+			return nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
+		WriteToFileFunc: func(filepath string, data []byte) error {
+			return errors.New("random")
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodedelete.validate()
 	assert.NoError(t, err)
-	err = nodeAdd.modifyConfig()
+	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodeAdd.(*AddNodeImpl).opensearchIpList[0])
-	res, err := nodeAdd.promptUserConfirmation()
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).opensearchIpList[0])
+	res, err := nodedelete.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing nodes:
@@ -464,22 +431,22 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-New nodes to be added:
+Nodes to be deleted:
 ================================================
-OpenSearch => 192.0.2.11
-This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodeAdd.runDeploy()
+OpenSearch => 192.0.2.3
+This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	err = nodedelete.runDeploy()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
 
-func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
+func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: TEST_IP_1,
+		opensearchIp: "192.0.2.6",
 	}
 	var filewritten, deployed bool
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodeAdd := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -532,21 +499,21 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-New nodes to be added:
+Nodes to be deleted:
 ================================================
-OpenSearch => 192.0.2.11
-This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+OpenSearch => 192.0.2.6
+This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
 }
 
-func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
+func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
-		opensearchIp: TEST_IP_1,
+		opensearchIp: "192.0.2.6",
 	}
 	var filewritten, deployed bool
-	nodeAdd := NewAddNode(w.CliWriter, flags, &MockNodeUtilsImpl{
+	nodeAdd := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
@@ -589,10 +556,10 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-New nodes to be added:
+Nodes to be deleted:
 ================================================
-OpenSearch => 192.0.2.11
-This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+OpenSearch => 192.0.2.6
+This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
 }
