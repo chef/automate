@@ -473,10 +473,7 @@ func generateChecksumFile(sourceFileName string, checksumFileName string) error 
 }
 
 func isA2HARBFileExist() bool {
-	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
-		return true
-	}
-	return false
+	return checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
 }
 
 func checkIfFileExist(path string) bool {

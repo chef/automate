@@ -102,7 +102,7 @@ type certificates struct {
 	adminKey    string
 }
 
-type flags struct {
+type certRotateFlags struct {
 	//SSH
 	automate   bool
 	chefserver bool
@@ -125,7 +125,7 @@ type certRotateFlow struct {
 }
 
 func init() {
-	flagsObj := flags{}
+	flagsObj := certRotateFlags{}
 
 	certRotateCmd := &cobra.Command{
 		Use:   "cert-rotate",
@@ -134,13 +134,13 @@ func init() {
 		RunE:  certRotateCmdFunc(&flagsObj),
 	}
 
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, "automate", "a", false, "Automate Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Automate Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Automate Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, "chef_server", "c", false, "Chef Infra Server Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CONST_CHEF_SERVER, "c", false, "Chef Infra Server Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Chef Infra Server Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, "postgresql", "p", false, "Postgres Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, CONST_POSTGRESQL, "p", false, "Postgres Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.postgres, "pg", false, "Postgres Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, "opensearch", "o", false, "OS Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, CONST_OPENSEARCH, "o", false, "OS Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "OS Certificate Rotation")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.privateCertPath, "private-cert", "", "Private certificate")
@@ -154,7 +154,7 @@ func init() {
 	RootCmd.AddCommand(certRotateCmd)
 }
 
-func certRotateCmdFunc(flagsObj *flags) func(cmd *cobra.Command, args []string) error {
+func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c := certRotateFlow{FileUtils: &fileutils.FileSystemUtils{}}
 		return c.certRotate(cmd, args, flagsObj)
@@ -162,7 +162,7 @@ func certRotateCmdFunc(flagsObj *flags) func(cmd *cobra.Command, args []string) 
 }
 
 // certRotate will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
-func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj *flags) error {
+func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj *certRotateFlags) error {
 	if isA2HARBFileExist() {
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
@@ -209,15 +209,15 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 }
 
 // certRotateFrontend will rotate the certificates of Automate and Chef Infra Server.
-func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *flags) error {
+func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) error {
 	fileName := "cert-rotate-fe.toml"
 	timestamp := time.Now().Format("20060102150405")
 	var remoteService string
 
 	if flagsObj.automate {
-		remoteService = "automate"
+		remoteService = CONST_AUTOMATE
 	} else if flagsObj.chefserver {
-		remoteService = "chefserver"
+		remoteService = CONST_CHEF_SERVER
 	}
 	// Creating and patching the required configurations.
 	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
@@ -242,13 +242,13 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 }
 
 // certRotatePG will rotate the certificates of Postgres.
-func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *flags) error {
+func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) error {
 	if isManagedServicesOn() {
 		return errors.New("You can not rotate certs for AWS managed services")
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := "postgresql"
+	remoteService := CONST_POSTGRESQL
 
 	// Creating and patching the required configurations.
 	var config string
@@ -280,13 +280,13 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 }
 
 // certRotateOS will rotate the certificates of OpenSearch.
-func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *flags) error {
+func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) error {
 	if isManagedServicesOn() {
 		return errors.New("You can not rotate certs for AWS managed services")
 	}
 	fileName := "cert-rotate-os.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := "opensearch"
+	remoteService := CONST_OPENSEARCH
 
 	var adminDn pkix.Name
 	var err error
@@ -333,8 +333,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 }
 
 // patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails,
-	flagsObj *flags) error {
+func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -361,9 +360,9 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
-	if remoteService == "automate" || remoteService == "chefserver" || remoteService == "frontend" {
+	if remoteService == CONST_AUTOMATE || remoteService == CONST_CHEF_SERVER || remoteService == "frontend" {
 		scriptCommands = fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
-	} else if remoteService == "postgresql" || remoteService == "opensearch" {
+	} else if remoteService == CONST_POSTGRESQL || remoteService == CONST_OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
 	}
 	err = c.copyAndExecute(ips, sshUtil, timestamp, remoteService, filename, scriptCommands, flagsObj)
@@ -374,10 +373,10 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 }
 
 // patchRootCAinCS will rotate the root-ca in the ChefServer to maintain the connection.
-func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomteHAInfraDetails, flagsObj *flags) error {
+func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) error {
 
 	fileName := "rotate-root_CA.toml"
-	remoteService := "chefserver"
+	remoteService := CONST_CHEF_SERVER
 	cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
 	ips := c.getIps(remoteService, infra)
 	if len(ips) == 0 {
@@ -398,7 +397,7 @@ func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp stri
 }
 
 // copyAndExecute will copy the toml file to each required node and then execute the set of commands.
-func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *flags) error {
+func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp string, remoteService string, fileName string, scriptCommands string, flagsObj *certRotateFlags) error {
 
 	var err error
 	var tomlFilePath string
@@ -432,7 +431,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 }
 
 // validateEachIp validate given ip with the remoteService cluster.
-func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomteHAInfraDetails, flagsObj *flags) bool {
+func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) bool {
 	ips := c.getIps(remoteService, infra)
 	for i := 0; i < len(ips); i++ {
 		if ips[i] == flagsObj.node {
@@ -454,13 +453,13 @@ func (c *certRotateFlow) getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig 
 
 // getIps will return the Ips based on the given remote service.
 func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetails) []string {
-	if remoteService == "automate" {
+	if remoteService == CONST_AUTOMATE {
 		return infra.Outputs.AutomatePrivateIps.Value
-	} else if remoteService == "chefserver" {
+	} else if remoteService == CONST_CHEF_SERVER {
 		return infra.Outputs.ChefServerPrivateIps.Value
-	} else if remoteService == "postgresql" {
+	} else if remoteService == CONST_POSTGRESQL {
 		return infra.Outputs.PostgresqlPrivateIps.Value
-	} else if remoteService == "opensearch" {
+	} else if remoteService == CONST_OPENSEARCH {
 		return infra.Outputs.OpensearchPrivateIps.Value
 	} else if remoteService == "frontend" {
 		return append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
@@ -488,7 +487,7 @@ func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
 }
 
 // getCerts will read the certificate paths, and then return the required certificates.
-func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *flags) (*certificates, error) {
+func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) (*certificates, error) {
 	privateCertPath := flagsObj.privateCertPath
 	publicCertPath := flagsObj.publicCertPath
 	rootCaPath := flagsObj.rootCAPath
@@ -687,7 +686,7 @@ func (c *certRotateFlow) getMerger(fileName string, timestamp string, remoteType
 		dest interface{}
 		err1 error
 	)
-	if remoteType == "opensearch" {
+	if remoteType == CONST_OPENSEARCH {
 		dest, err1 = getMergedOpensearchInterface(rawOutput, fileName, remoteType)
 	} else {
 		dest, err1 = getMergedPostgresqlInterface(rawOutput, fileName, remoteType)
