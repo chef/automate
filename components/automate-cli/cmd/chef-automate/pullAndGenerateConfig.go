@@ -426,6 +426,9 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 
 func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 	sharedConfigToml, err := getAwsHAConfig()
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+	}
 	archBytes, err := ioutil.ReadFile("/hab/a2_deploy_workspace/terraform/.tf_arch") // nosemgrep
 	if err != nil {
 		writer.Errorf("%s", err.Error())
@@ -434,9 +437,6 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 	var arch = strings.Trim(string(archBytes), "\n")
 	writer.Println("Reference architecture type : " + arch)
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
-	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
-	}
 	a2ConfigMap, err := p.pullAutomateConfigs()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
@@ -707,7 +707,7 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 }
 
 func getTheValueFromA2HARB(key string) (string, error) {
-	wordCountCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | wc -l`
+	wordCountCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | wc -l`
 	WordCountF := fmt.Sprintf(wordCountCmd, key)
 	output, err := exec.Command("/bin/sh", "-c", WordCountF).Output()
 	if err != nil {
@@ -719,7 +719,7 @@ func getTheValueFromA2HARB(key string) (string, error) {
 		writer.Println("The key has more than one value it cannot be executed")
 		return "", nil
 	} else {
-		GrepCmd := `hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | hab pkg exec core/gawk gawk '{print $2}'`
+		GrepCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | hab pkg exec core/gawk gawk '{print $2}'`
 		GrepCmdF := fmt.Sprintf(GrepCmd, key)
 		writer.Println("Grep command for getting the value from A2ha.rb: " + GrepCmdF)
 		output, err := exec.Command("/bin/sh", "-c", GrepCmdF).Output()

@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
+	mtoml "github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/local-user-service/password"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
@@ -30,7 +31,30 @@ func newAwsDeployemnt(configPath string) *awsDeployment {
 func (a *awsDeployment) doDeployWork(args []string) error {
 	if isA2HARBFileExist() {
 		err := executeDeployment(args)
-		return err
+		if err != nil {
+			return err
+		}
+		sharedConfigToml, err := getAwsHAConfig()
+		if err != nil {
+			return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+		}
+		archBytes, err := ioutil.ReadFile("/hab/a2_deploy_workspace/terraform/.tf_arch") // nosemgrep
+		if err != nil {
+			writer.Errorf("%s", err.Error())
+			return  err
+		}
+		var arch = strings.Trim(string(archBytes), "\n")
+		sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
+		writer.Println("Reference architecture type : " + arch)
+		shardConfig, err := mtoml.Marshal(sharedConfigToml)
+		if err != nil {
+			return  status.Wrap(err, status.ConfigError, "unable to marshal config to file")
+		}
+		err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
+		if err != nil {
+			return status.Wrap(err, status.ConfigError, "unable to write config toml to file")
+		}
+		return nil
 	} else {
 		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
 	}
