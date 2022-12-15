@@ -28,6 +28,7 @@ type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
 	getHaInfraDetailsfunc                     func() (*AutomteHAInfraDetails, *SSHConfig, error)
 	genConfigfunc                             func(path string) error
+	genConfigAWSfunc                          func(path string) error
 	taintTerraformFunc                        func(path string) error
 	isA2HARBFileExistFunc                     func() bool
 	getModeFromConfigFunc                     func(path string) (string, error)
@@ -44,6 +45,9 @@ func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHC
 }
 func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
 	return mnu.genConfigfunc(path)
+}
+func (mnu *MockNodeUtilsImpl) genConfigAWS(path string) error {
+	return mnu.genConfigAWSfunc(path)
 }
 func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
 	return mnu.taintTerraformFunc(path)
@@ -68,6 +72,7 @@ type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error)
 	genConfig(path string) error
+	genConfigAWS(path string) error
 	taintTerraform(path string) error
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
@@ -120,6 +125,11 @@ func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, a
 
 func (nu *NodeUtilsImpl) genConfig(path string) error {
 	e := newExistingInfa(path)
+	return e.generateConfig()
+}
+
+func (nu *NodeUtilsImpl) genConfigAWS(path string) error {
+	e := newAwsDeployemnt(path)
 	return e.generateConfig()
 }
 
@@ -276,6 +286,19 @@ func readConfig(path string) (ExistingInfraConfigToml, error) {
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
 		return ExistingInfraConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return config, nil
+}
+
+func readConfigAWS(path string) (AwsConfigToml, error) {
+	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	if err != nil {
+		return AwsConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	config := AwsConfigToml{}
+	err = ptoml.Unmarshal(templateBytes, &config)
+	if err != nil {
+		return AwsConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}
 	return config, nil
 }

@@ -34,7 +34,7 @@ func deleteNodeHACmd() *cobra.Command {
 
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
-		nodeDeleter, err := haAddNodeFactory(addDeleteNodeHACmdFlags)
+		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags)
 		if err != nil {
 			return err
 		}
