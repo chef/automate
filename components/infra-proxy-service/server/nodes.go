@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,7 +12,7 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 
-	"github.com/sirupsen/logrus"
+	log1 "github.com/sirupsen/logrus"
 )
 
 // GetNodes fetches the nodes from chef infra server
@@ -335,8 +334,20 @@ func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeEx
 
 	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
 	if err != nil {
-		logrus.Errorf("Failed while listing cookbooks for %s: %+v", req.Environment, err)
-		return nil, ParseAPIError(err)
+		log1.Info("Failed while listing cookbooks for ", req.Environment)
+		log1.Error(err)
+		//return nil, ParseAPIError(err)
+	}
+
+	defaultCookbooks, err := c.client.Environments.ListCookbooks("default", "1")
+	if err != nil {
+		log1.Info("Failed while listing cookbooks for default")
+		log1.Error(err)
+		//return nil, ParseAPIError(err)
+	}
+
+	for k, v := range defaultCookbooks {
+		cookbooks[k] = v
 	}
 
 	var runlistCache = RunListCache{}
