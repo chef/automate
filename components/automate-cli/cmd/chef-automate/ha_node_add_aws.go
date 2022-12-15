@@ -13,8 +13,8 @@ import (
 )
 
 type AddNodeAWSImpl struct {
-	config                  ExistingInfraConfigToml
-	copyConfigForUserPrompt ExistingInfraConfigToml
+	config                  AwsConfigToml
+	copyConfigForUserPrompt AwsConfigToml
 	automateIpList          []string
 	chefServerIpList        []string
 	opensearchIpList        []string
@@ -74,22 +74,22 @@ func (ani *AddNodeAWSImpl) prepare() error {
 }
 
 func (ani *AddNodeAWSImpl) validate() error {
-	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfig(&ani.sshUtil, []string{})
+	updatedConfig, err := readConfigAWS(ani.configpath)
 	if err != nil {
 		return err
 	}
-	ani.config = *updatedConfig
+	ani.config = updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
 	deployerType, err := ani.nodeUtils.getModeFromConfig(ani.configpath)
 	if err != nil {
 		return err
 	}
 	if deployerType == AWS_MODE {
-		if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-			if ani.flags.opensearchCount > 0 || ani.flags.postgresqlCount > 0 {
-				return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
-			}
-		}
+		// if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
+		// 	if ani.flags.opensearchCount > 0 || ani.flags.postgresqlCount > 0 {
+		// 		return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+		// 	}
+		// }
 		if ani.flags.automateCount == 0 &&
 			ani.flags.chefServerCount == 0 &&
 			ani.flags.opensearchCount == 0 &&
@@ -152,12 +152,12 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	err = ani.nodeUtils.genConfig(ani.configpath)
+	err = ani.nodeUtils.genConfigAWS(ani.configpath)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
-	err = executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
+	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
 	if err != nil {
 		return err
 	}

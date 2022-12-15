@@ -14,8 +14,8 @@ import (
 )
 
 type DeleteNodeAWSImpl struct {
-	config                  ExistingInfraConfigToml
-	copyConfigForUserPrompt ExistingInfraConfigToml
+	config                  AwsConfigToml
+	copyConfigForUserPrompt AwsConfigToml
 	automateIpList          []string
 	chefServerIpList        []string
 	opensearchIpList        []string
@@ -75,22 +75,22 @@ func (dni *DeleteNodeAWSImpl) prepare() error {
 }
 
 func (dni *DeleteNodeAWSImpl) validate() error {
-	updatedConfig, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, []string{})
+	updatedConfig, err := readConfigAWS(dni.configpath)
 	if err != nil {
 		return err
 	}
-	dni.config = *updatedConfig
+	dni.config = updatedConfig
 	dni.copyConfigForUserPrompt = dni.config
 	deployerType, err := dni.nodeUtils.getModeFromConfig(dni.configpath)
 	if err != nil {
 		return err
 	}
 	if deployerType == AWS_MODE {
-		if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-			if dni.flags.opensearchCount > 0 || dni.flags.postgresqlCount > 0 {
-				return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
-			}
-		}
+		// if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
+		// 	if dni.flags.opensearchCount > 0 || dni.flags.postgresqlCount > 0 {
+		// 		return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+		// 	}
+		// }
 		if dni.flags.automateCount == 0 &&
 			dni.flags.chefServerCount == 0 &&
 			dni.flags.opensearchCount == 0 &&
@@ -198,12 +198,12 @@ func (dni *DeleteNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	err = dni.nodeUtils.genConfig(dni.configpath)
+	err = dni.nodeUtils.genConfigAWS(dni.configpath)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
-	err = executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
+	err = dni.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
 	if err != nil {
 		return err
 	}
