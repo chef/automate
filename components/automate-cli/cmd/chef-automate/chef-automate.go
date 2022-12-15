@@ -87,6 +87,53 @@ func Execute() {
 	handleResultAndExit(status.NewCmdResult(RootCmd.Execute()))
 }
 
+func commandPrePersistent(cmd *cobra.Command) error {
+
+	if globalOpts.debug {
+		logrus.SetLevel(logrus.DebugLevel)
+		logrus.Debugf("chef-automate %s (%s)", version.Version, version.GitSHA)
+	} else {
+		logrus.SetLevel(logrus.WarnLevel)
+	}
+
+	if !cmd.IsAvailableCommand() && !cmd.Hidden {
+		// Allow for soft deprecation: we allow command to be run but warn that it will be deprecated
+		// in the future.
+		if cmd.Deprecated != "" {
+			logrus.Debugf("Running deprecated command: %s", cmd.Name())
+		} else {
+			return status.Errorf(status.InvalidCommandArgsError, "%s is not a command", cmd.Name())
+		}
+	}
+
+	if _, found := cmd.Annotations[NoRequireRootAnnotation]; found {
+		logrus.Debug("Skipping root user check")
+	} else {
+		if os.Geteuid() != 0 {
+			return status.Errorf(status.MustBeRootError, "%s must be run as the root user", cmd.Name())
+		}
+	}
+
+	// Set HAB_LICENSE to ensure any hab commands
+	// we call get this variable by default.
+	err := os.Setenv("HAB_LICENSE", "accept-no-persist")
+	if err != nil {
+		logrus.WithError(err).Warn("Could not set HAB_LICENSE=accept-no-persist")
+	}
+
+	if _, found := cmd.Annotations[NoCheckVersionAnnotation]; found || globalOpts.noCheckVersion || disableAutoUpdate() {
+		logrus.Debug("Not checking version")
+	} else {
+		err := runCLIFromDS()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+
+}
+
 func newRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "chef-automate COMMAND",
@@ -100,48 +147,7 @@ func newRootCmd() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if globalOpts.debug {
-				logrus.SetLevel(logrus.DebugLevel)
-				logrus.Debugf("chef-automate %s (%s)", version.Version, version.GitSHA)
-			} else {
-				logrus.SetLevel(logrus.WarnLevel)
-			}
-
-			if !cmd.IsAvailableCommand() && !cmd.Hidden {
-				// Allow for soft deprecation: we allow command to be run but warn that it will be deprecated
-				// in the future.
-				if cmd.Deprecated != "" {
-					logrus.Debugf("Running deprecated command: %s", cmd.Name())
-				} else {
-					return status.Errorf(status.InvalidCommandArgsError, "%s is not a command", cmd.Name())
-				}
-			}
-
-			if _, found := cmd.Annotations[NoRequireRootAnnotation]; found {
-				logrus.Debug("Skipping root user check")
-			} else {
-				if os.Geteuid() != 0 {
-					return status.Errorf(status.MustBeRootError, "%s must be run as the root user", cmd.Name())
-				}
-			}
-
-			// Set HAB_LICENSE to ensure any hab commands
-			// we call get this variable by default.
-			err := os.Setenv("HAB_LICENSE", "accept-no-persist")
-			if err != nil {
-				logrus.WithError(err).Warn("Could not set HAB_LICENSE=accept-no-persist")
-			}
-
-			if _, found := cmd.Annotations[NoCheckVersionAnnotation]; found || globalOpts.noCheckVersion || disableAutoUpdate() {
-				logrus.Debug("Not checking version")
-			} else {
-				err := runCLIFromDS()
-				if err != nil {
-					return err
-				}
-			}
-
-			return nil
+			return commandPrePersistent(cmd)
 		},
 	}
 
