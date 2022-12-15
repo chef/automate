@@ -15,6 +15,13 @@ import (
 var haTfvarsJsonString = `
 {"backup_config_efs":"true","existing_automate_private_ips":["10.1.0.150"],"existing_chef_server_private_ips":["10.1.0.151"],"existing_opensearch_private_ips":["10.1.0.202","10.1.1.201","10.1.2.200"],"existing_postgresql_private_ips":["10.1.0.100","10.1.1.101","10.1.2.102"],"automate_config_file":"/hab/a2_deploy_workspace/configs/automate.toml","automate_fqdn":"A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com","automate_instance_count":1,"chef_server_instance_count":1,"opensearch_instance_count":3,"nfs_mount_path":"/mnt/automate_backups","postgresql_instance_count":3,"postgresql_archive_disk_fs_path":"/mnt/automate_backups/postgresql","habitat_uid_gid":"","ssh_user":"test-user","ssh_port":"22","ssh_key_file":"/home/test-user/keys.pem"}
 `
+var haAwsAutoTfvarsJsonString = `
+{"backup_config_efs":"true","automate_config_file":"/hab/a2_deploy_workspace/configs/automate.toml","automate_fqdn":"A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com","automate_instance_count":1,"chef_server_instance_count":1,"opensearch_instance_count":3,"nfs_mount_path":"/mnt/automate_backups","postgresql_instance_count":3,"postgresql_archive_disk_fs_path":"/mnt/automate_backups/postgresql","habitat_uid_gid":"","ssh_user":"test-user","ssh_port":"22","ssh_key_file":"/home/test-user/keys.pem"}
+`
+
+// var awsHaTfvarsJsonString = `
+// {"backup_config_efs":"true","automate_config_file":"/hab/a2_deploy_workspace/configs/automate.toml","automate_fqdn":"A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com","automate_instance_count":1,"chef_server_instance_count":1,"opensearch_instance_count":3,"nfs_mount_path":"/mnt/automate_backups","postgresql_instance_count":3,"postgresql_archive_disk_fs_path":"/mnt/automate_backups/postgresql","habitat_uid_gid":"","ssh_user":"test-user","ssh_port":"22","ssh_key_file":"/home/test-user/keys.pem"}
+// `
 
 const (
 	ip1        = "127.0.0.1"
@@ -23,6 +30,8 @@ const (
 	adminCert  = "it is a admin cert"
 	adminKey   = "it is a admin key"
 	rootCACert = "It is a root ca certificates"
+	privateKey = "It is a private key"
+	publicKey  = "It is a public key"
 )
 
 var parsedJsonFromTfVarsStubb = &HATfvars{
@@ -113,6 +122,11 @@ func TestGetOSORPGRootCAEmpty(t *testing.T) {
 	assert.Equal(t, "", out)
 }
 
+func Test_getPrivateKeyFromFE(t *testing.T) {
+	out := getPrivateKeyFromFE(rootCA: rootCACert)
+	assert.Equal(t, rootCACert, out)
+}
+
 func TestValidateJsonFromRubyScript(t *testing.T) {
 	params := HATfvars{}
 	err := json.Unmarshal([]byte(haTfvarsJsonString), &params)
@@ -154,4 +168,37 @@ func TestGetHAConfigFromTFVars(t *testing.T) {
 	assert.True(t, reflect.DeepEqual(params.ExistingOpensearchPrivateIps, config.ExistingInfra.Config.OpensearchPrivateIps))
 	assert.True(t, reflect.DeepEqual(params.ExistingPostgresqlPrivateIps, config.ExistingInfra.Config.PostgresqlPrivateIps))
 	assert.Equal(t, params.AutomateFqdn, config.Automate.Config.Fqdn)
+}
+
+func TestAwsValidateJsonFromRubyScript(t *testing.T) {
+	params := HATfvars{}
+	err := json.Unmarshal([]byte(haAwsAutoTfvarsJsonString), &params)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, params)
+	assert.Equal(t, "true", params.BackupConfigEFS)
+	assert.Equal(t, "/home/test-user/keys.pem", params.SshKeyFile)
+	assert.Equal(t, "22", params.SshPort)
+	assert.Equal(t, 3, params.PostgresqlInstanceCount)
+	assert.Equal(t, 1, params.AutomateInstanceCount)
+	assert.Equal(t, 3, params.OpensearchInstanceCount)
+	assert.Equal(t, 1, params.ChefServerInstanceCount)
+	assert.Equal(t, "test-user", params.SshUser)
+	assert.Equal(t, "A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com", params.AutomateFqdn)
+}
+
+func Test_getAwsHAConfigFromTFVars(t *testing.T) {
+	params := HAAwsAutoTfvars{}
+	err := json.Unmarshal([]byte(haAwsAutoTfvarsJsonString), &params)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, params)
+	assert.Equal(t, "true", params.BackupConfigEFS)
+	assert.Equal(t, "/home/test-user/keys.pem", params.AwsSshKeyFile)
+	assert.Equal(t, "22", params.SshPort)
+	assert.Equal(t, 3, params.PostgresqlInstanceCount)
+	assert.Equal(t, 1, params.AutomateInstanceCount)
+	assert.Equal(t, 3, params.OpensearchInstanceCount)
+	assert.Equal(t, 1, params.ChefServerInstanceCount)
+	assert.Equal(t, "test-user", params.SshUser)
+	assert.Equal(t, "A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com", params.AutomateFqdn)
+
 }

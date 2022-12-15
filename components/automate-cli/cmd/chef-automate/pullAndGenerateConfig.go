@@ -429,7 +429,7 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
-	archBytes, err := ioutil.ReadFile("/hab/a2_deploy_workspace/terraform/.tf_arch") // nosemgrep
+	archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 	if err != nil {
 		writer.Errorf("%s", err.Error())
 		return nil, err
