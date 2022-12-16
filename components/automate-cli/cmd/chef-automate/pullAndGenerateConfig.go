@@ -430,13 +430,13 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 	archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
-	if err != nil {
-		writer.Errorf("%s", err.Error())
-		return nil, err
-	}
+		if err != nil {
+			writer.Errorf("%s", err.Error())
+			return  nil,err
+		}
 	var arch = strings.Trim(string(archBytes), "\n")
-	writer.Println("Reference architecture type : " + arch)
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
+	
 	a2ConfigMap, err := p.pullAutomateConfigs()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
@@ -707,8 +707,8 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 }
 
 func getTheValueFromA2HARB(key string) (string, error) {
-	wordCountCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | wc -l`
-	WordCountF := fmt.Sprintf(wordCountCmd, key)
+	wordCountCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s %s | wc -l`
+	WordCountF := fmt.Sprintf(wordCountCmd, key , AUTOMATE_HA_WORKSPACE_A2HARB_FILE)
 	output, err := exec.Command("/bin/sh", "-c", WordCountF).Output()
 	if err != nil {
 		return "", err
@@ -716,11 +716,11 @@ func getTheValueFromA2HARB(key string) (string, error) {
 	value := string(output)
 	count, _ := strconv.Atoi(value)
 	if count > 1 {
-		writer.Println("The key has more than one value it cannot be executed")
+		logrus.Debug("The Key has more than one value it cannot be executed")
 		return "", nil
 	} else {
-		GrepCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s /hab/a2_deploy_workspace/a2ha.rb | hab pkg exec core/gawk gawk '{print $2}'`
-		GrepCmdF := fmt.Sprintf(GrepCmd, key)
+		GrepCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s %s | hab pkg exec core/gawk gawk '{print $2}'`
+		GrepCmdF := fmt.Sprintf(GrepCmd, key , AUTOMATE_HA_WORKSPACE_A2HARB_FILE)
 		output, err := exec.Command("/bin/sh", "-c", GrepCmdF).Output()
 		if err != nil {
 			return "", err
