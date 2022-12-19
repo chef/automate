@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -325,6 +327,8 @@ func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeEx
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
+	log.Println("********************************************************")
+	log.Printf("PolicyGroup: %+v", res.PolicyGroup)
 
 	runList := res.RunList
 
@@ -336,7 +340,7 @@ func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeEx
 		//return nil, ParseAPIError(err)
 	}
 
-	defaultCookbooks, err := c.client.Environments.ListCookbooks("default", "1")
+	defaultCookbooks, err := c.client.Environments.ListCookbooks("_default", "1")
 	if err != nil {
 		log1.Info("Failed while listing cookbooks for default")
 		log1.Error(err)
