@@ -13,11 +13,11 @@ gh_repo = "automate"
 +++
 
 
-The Chef Infra server has Chef Automate embedded settings in multiple services. This page lists down the Chef Infra server keys that can be configured in Stanalone Automate and Automate HA.
+The Chef Infra server has Chef Automate embedded settings in multiple services. This page lists the Chef Infra server keys that can be configured in Standalone Automate and Automate HA.
 
-When operated in a standalone mode, the list contains specific parameters which are available which a person can patch or modify beyond what the values are in Chef Infra Server. All the parameters have their own default values in Chef Infra Server. Now, you can access to the same parameters from Chef Automate which you can patch or you can change the values by overriding that from a configuration file.
+When operated in a standalone mode, the list contains specific available parameters that a person can patch or modify beyond what the values are in Chef Infra Server. All the parameters have their default values in Chef Infra Server. Now, you can access the same parameters from Chef Automate, which you can patch or change the values by overriding from a configuration file.
 
-The list of parameters are as follows:
+The list of parameters is as follows:
 
 | Parameters                                      | Default Values In Standalone Infra Server | Default Values In Backend Server | Automate Configuration                                     |
 | ----------------------------------------------- | ----------------------------------------- | -------------------------------- | ---------------------------------------------------------- |
@@ -63,4 +63,4 @@ The list of parameters are as follows:
 | bookshelf['stream_download']                    | TRUE                                      | TRUE                             | ```bookshelf.v1.sys.bookshelf.stream_download```           |
 | oc_chef_wm['health_ping_timeout']               | 400                                      | 400                             | ```erchef.v1.sys.health.health_ping_timeout```           |
 
-Click [here](https://docs.chef.io/server/config_rb_server_optional_settings/) for the detailed description of the above parameters.
+Click [here](https://docs.chef.io/server/config_rb_server_optional_settings/) for the detailed description of a above parameters.
