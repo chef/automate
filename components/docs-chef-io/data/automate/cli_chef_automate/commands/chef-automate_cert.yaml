@@ -1,0 +1,23 @@
+name: chef-automate cert
+synopsis: Chef Automate Certificate Management
+usage: chef-automate cert COMMAND [flags]
+description: |
+  Chef Automate certificate management, this command should always be executed from AutomateHA Bastion Node.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for cert
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI
+- show - Chef Automate Certificates Show

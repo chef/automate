@@ -24,6 +24,7 @@ see_also:
 - 'airgap - '
 - applications - Manage applications observability features
 - backup - Chef Automate backup
+- cert - Chef Automate Certificate Management
 - cert-rotate - Chef Automate rotate cert
 - config - Chef Automate configuration
 - deploy - Deploy Chef Automate

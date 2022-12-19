@@ -1,0 +1,54 @@
+name: chef-automate cert show
+synopsis: Chef Automate Certificates Show
+usage: chef-automate cert show [flags]
+description: |
+  Chef Automate CLI command to show all certificates on HA cluster, this command should always be executed from AutomateHA Bastion Node
+options:
+- name: a2
+  default_value: "false"
+  usage: Show Automate Certificates
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Show Automate Certificates
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Show Chef Server Certificates
+- name: cs
+  default_value: "false"
+  usage: Show Chef Server Certificates
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for show
+- name: node
+  shorthand: "n"
+  usage: |
+    Service cluster's node IP address to show certificates, if not provided then all nodes certificates will be shown
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: Show Opensearch Certificates
+- name: os
+  default_value: "false"
+  usage: Show Opensearch Certificates
+- name: pg
+  default_value: "false"
+  usage: Show Postgres Certificates
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: Show Postgres Certificates
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate cert - Chef Automate Certificate Management
