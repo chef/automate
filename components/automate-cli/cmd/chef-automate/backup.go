@@ -258,6 +258,10 @@ var integrityBackupValidateCmd = &cobra.Command{
 }
 
 func preBackupCmd(cmd *cobra.Command, args []string) error {
+	err := commandPrePersistent(cmd)
+	if err != nil {
+		return status.Wrap(err, status.BackupError, "unable to set command parent settings")
+	}
 	if NewBackupFromBashtion().isBastionHost() {
 		//Enhancments:  need to handle airgap bundle path from bastion host
 		//Enhancments: how to pass missing opensearch credentials
