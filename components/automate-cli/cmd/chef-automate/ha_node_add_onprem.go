@@ -112,28 +112,20 @@ func (ani *AddNodeOnPremImpl) validate() error {
 	}
 	ani.config = *updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
-	deployerType, err := ani.nodeUtils.getModeFromConfig(ani.configpath)
-	if err != nil {
-		return err
+	ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = splitIPCSV(
+		ani.flags.automateIp,
+		ani.flags.chefServerIp,
+		ani.flags.opensearchIp,
+		ani.flags.postgresqlIp,
+	)
+	if ani.nodeUtils.isManagedServicesOn() {
+		if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
+		}
 	}
-	if deployerType == EXISTING_INFRA_MODE {
-		ani.automateIpList, ani.chefServerIpList, ani.opensearchIpList, ani.postgresqlIp = splitIPCSV(
-			ani.flags.automateIp,
-			ani.flags.chefServerIp,
-			ani.flags.opensearchIp,
-			ani.flags.postgresqlIp,
-		)
-		if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-			if len(ani.opensearchIpList) > 0 || len(ani.postgresqlIp) > 0 {
-				return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
-			}
-		}
-		errorList := ani.validateCmdArgs()
-		if errorList != nil && errorList.Len() > 0 {
-			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", ani.configpath))
+	errorList := ani.validateCmdArgs()
+	if errorList != nil && errorList.Len() > 0 {
+		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 	}
 	return nil
 }

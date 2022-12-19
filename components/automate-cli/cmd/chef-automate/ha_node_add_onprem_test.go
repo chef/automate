@@ -50,29 +50,6 @@ func (msu *MockSSHUtilsImpl) copyFileFromRemote(remoteFilePath string, outputFil
 	return msu.copyFileFromRemoteFunc(remoteFilePath, outputFileName)
 }
 
-func TestAddnodeValidateNotExistingInfra(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
-	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67,ewewedw",
-	}
-	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
-		},
-		getModeFromConfigFunc: func(path string) (string, error) {
-			return AWS_MODE, nil
-		},
-		pullAndUpdateConfigFunc: PullConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
-		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-			return "", nil
-		},
-	})
-	err := nodeAdd.validate()
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unsupported deployment type. Please check "+CONFIG_TOML_PATH+"/config.toml")
-}
-
 func TestAddnodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
@@ -84,6 +61,9 @@ func TestAddnodeValidateError(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -110,6 +90,9 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -143,6 +126,9 @@ func TestAddnodeReadfileError(t *testing.T) {
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			return nil, errors.New("random")
 		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -165,12 +151,14 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
+		isManagedServicesOnFunc: func() bool {
+			return true
+		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
 			}
-			cfg.ExternalDB.Database.Type = TYPE_AWS
 			return &cfg, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -196,12 +184,14 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
+		isManagedServicesOnFunc: func() bool {
+			return true
+		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
 			}
-			cfg.ExternalDB.Database.Type = TYPE_AWS
 			return &cfg, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -225,6 +215,9 @@ func TestAddnodeModifyAutomate(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -254,6 +247,9 @@ func TestAddnodeModifyInfra(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
@@ -281,6 +277,9 @@ func TestAddnodeModifyPostgresql(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -310,6 +309,9 @@ func TestAddnodeModifyOpensearch(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
@@ -337,6 +339,9 @@ func TestAddnodePrompt(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -384,6 +389,9 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
@@ -438,6 +446,9 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
@@ -501,6 +512,9 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 		},
 		taintTerraformFunc: func(path string) error {
 			return nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
@@ -568,6 +582,9 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 		},
 		taintTerraformFunc: func(path string) error {
 			return nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{

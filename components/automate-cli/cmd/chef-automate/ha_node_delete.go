@@ -34,7 +34,12 @@ func deleteNodeHACmd() *cobra.Command {
 
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
-		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags)
+		configPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
+		deployerType, err := getModeFromConfig(configPath)
+		if err != nil {
+			return err
+		}
+		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType, configPath)
 		if err != nil {
 			return err
 		}
@@ -42,22 +47,27 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 	}
 }
 
-func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) (HAModifyAndDeploy, error) {
-	if addDeleteNodeHACmdFlags.onPremMode {
-		return NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{})), nil
-	} else if addDeleteNodeHACmdFlags.awsMode {
-		return NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{})), nil
-	} else {
-		deployerType, err := getModeFromConfig(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"))
-		if err != nil {
-			return nil, err
-		}
-		if deployerType == EXISTING_INFRA_MODE {
-			return NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{})), nil
-		} else if deployerType == AWS_MODE {
-			return NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{})), nil
-		} else {
-			return nil, errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")))
-		}
+func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployerType, configPath string) (HAModifyAndDeploy, error) {
+	if addDeleteNodeHACmdFlags.onPremMode && addDeleteNodeHACmdFlags.awsMode {
+		return nil, errors.New("Cannot use both --onprem-mode and --aws-mode together. Provide only one at a time")
 	}
+	var hamd HAModifyAndDeploy
+	var err error
+	switch deployerType {
+	case EXISTING_INFRA_MODE:
+		if !addDeleteNodeHACmdFlags.awsMode {
+			hamd = NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+		} else {
+			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
+		}
+	case AWS_MODE:
+		if !addDeleteNodeHACmdFlags.onPremMode {
+			hamd = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+		} else {
+			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
+		}
+	default:
+		err = fmt.Errorf("Unsupported deployment type. Please check %s", configPath)
+	}
+	return hamd, err
 }

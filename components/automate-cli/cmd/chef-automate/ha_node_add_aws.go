@@ -80,24 +80,16 @@ func (ani *AddNodeAWSImpl) validate() error {
 	}
 	ani.config = updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
-	deployerType, err := ani.nodeUtils.getModeFromConfig(ani.configpath)
-	if err != nil {
-		return err
+	if ani.flags.automateCount == 0 &&
+		ani.flags.chefServerCount == 0 &&
+		ani.flags.opensearchCount == 0 &&
+		ani.flags.postgresqlCount == 0 {
+		return errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
 	}
-	if deployerType == AWS_MODE {
-		// if ani.config.ExternalDB.Database.Type == TYPE_AWS || ani.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-		// 	if ani.flags.opensearchCount > 0 || ani.flags.postgresqlCount > 0 {
-		// 		return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
-		// 	}
-		// }
-		if ani.flags.automateCount == 0 &&
-			ani.flags.chefServerCount == 0 &&
-			ani.flags.opensearchCount == 0 &&
-			ani.flags.postgresqlCount == 0 {
-			return errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
+	if ani.nodeUtils.isManagedServicesOn() {
+		if ani.flags.opensearchCount > 0 || ani.flags.postgresqlCount > 0 {
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "add"))
 		}
-	} else {
-		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", ani.configpath))
 	}
 	return nil
 }
