@@ -13,15 +13,15 @@ gh_repo = "automate"
 +++
 
 
-The Chef Infra server has Chef Automate embedded settings in multiple services. This page lists the Chef Infra server keys that can be configured in Standalone Automate and Automate HA.
+This page lists the Chef Infra server keys that can be configured in Standalone Automate and Automate HA.
 
 When operated in a standalone mode, the list contains specific available parameters that a person can patch or modify beyond what the values are in Chef Infra Server. All the parameters have their default values in Chef Infra Server. Now, you can access the same parameters from Chef Automate, which you can patch or change the values from the configuration file.
 
-The list of parameters is as follows:
+The list of parameters are as follows:
 
-| Parameters                                      | Default Values In Standalone Infra Server | Default Values In HA Backend Server | Automate Configuration                                     |
+| Chef Infra Server Key                           | Default Values In Automate (Having Infra Server Package) | Default Values In Automate HA | Automate Configuration                                     |
 | ----------------------------------------------- | ----------------------------------------- | ----------------------------------- | ---------------------------------------------------------- |
-| nginx['client_max_body_size']                   | 250                                       | 250m                                | ```cs_nginx.v1.sys.ngx.http.client_max_body_size```        |
+| nginx['client_max_body_size']                   | 250                                       | 250                                 | ```cs_nginx.v1.sys.ngx.http.client_max_body_size```        |
 | nginx['ssl_protocols']                          | TLSv1.2                                   | TLSv1.2                             | ```cs_nginx.v1.sys.ngx.http.ssl_protocols```               |
 | nginx['worker_connections']                     | 10240                                     | 10240                               | ```cs_nginx.v1.sys.ngx.events.worker_connections```        |
 | nginx['worker_processes']                       | 4                                         | 2                                   | ```cs_nginx.v1.sys.ngx.main.worker_processes```            |
