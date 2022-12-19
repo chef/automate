@@ -107,22 +107,14 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 	}
 	dni.config = *updatedConfig
 	dni.copyConfigForUserPrompt = dni.config
-	deployerType, err := dni.nodeUtils.getModeFromConfig(dni.configpath)
-	if err != nil {
-		return err
+	if dni.nodeUtils.isManagedServicesOn() {
+		if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIp) > 0 {
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+		}
 	}
-	if deployerType == EXISTING_INFRA_MODE {
-		if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-			if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIp) > 0 {
-				return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
-			}
-		}
-		errorList := dni.validateCmdArgs()
-		if errorList != nil && errorList.Len() > 0 {
-			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", dni.configpath))
+	errorList := dni.validateCmdArgs()
+	if errorList != nil && errorList.Len() > 0 {
+		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
 	}
 	return nil
 }

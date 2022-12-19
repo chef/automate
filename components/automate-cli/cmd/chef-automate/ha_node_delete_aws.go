@@ -81,28 +81,20 @@ func (dni *DeleteNodeAWSImpl) validate() error {
 	}
 	dni.config = updatedConfig
 	dni.copyConfigForUserPrompt = dni.config
-	deployerType, err := dni.nodeUtils.getModeFromConfig(dni.configpath)
-	if err != nil {
-		return err
+	if dni.nodeUtils.isManagedServicesOn() {
+		if dni.flags.opensearchCount > 0 || dni.flags.postgresqlCount > 0 {
+			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
+		}
 	}
-	if deployerType == AWS_MODE {
-		// if dni.config.ExternalDB.Database.Type == TYPE_AWS || dni.config.ExternalDB.Database.Type == TYPE_SELF_MANAGED {
-		// 	if dni.flags.opensearchCount > 0 || dni.flags.postgresqlCount > 0 {
-		// 		return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
-		// 	}
-		// }
-		if dni.flags.automateCount == 0 &&
-			dni.flags.chefServerCount == 0 &&
-			dni.flags.opensearchCount == 0 &&
-			dni.flags.postgresqlCount == 0 {
-			return errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
-		}
-		errorList := dni.validateCmdArgs()
-		if errorList != nil && errorList.Len() > 0 {
-			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "Instance count validation failed")
-		}
-	} else {
-		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", dni.configpath))
+	if dni.flags.automateCount == 0 &&
+		dni.flags.chefServerCount == 0 &&
+		dni.flags.opensearchCount == 0 &&
+		dni.flags.postgresqlCount == 0 {
+		return errors.New("Either one of automate-count or chef-server-count or opensearch-count or postgresql-count must be more than 0.")
+	}
+	errorList := dni.validateCmdArgs()
+	if errorList != nil && errorList.Len() > 0 {
+		return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "Instance count validation failed")
 	}
 	return nil
 }
