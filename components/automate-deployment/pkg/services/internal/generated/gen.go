@@ -497,10 +497,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-elasticsearch",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-knife-ec-backup",
       "metadata": null
     },
