@@ -588,6 +588,7 @@ type Rule struct {
 	Name  string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Event Rule_Event `protobuf:"varint,3,opt,name=event,proto3,enum=notifications.Rule_Event" json:"event,omitempty"`
 	// Types that are assignable to Action:
+	//
 	//	*Rule_SlackAlert
 	//	*Rule_WebhookAlert
 	//	*Rule_ServiceNowAlert
@@ -806,6 +807,7 @@ type URLValidationRequest struct {
 
 	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	// Types that are assignable to Credentials:
+	//
 	//	*URLValidationRequest_UsernamePassword
 	//	*URLValidationRequest_SecretId
 	//	*URLValidationRequest_None

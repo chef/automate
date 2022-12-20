@@ -418,15 +418,15 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ReportManagerServiceClient interface {
+	// List Download Report Requests
 	//
-	//List Download Report Requests
+	// Returns the details of the download report requests placed by the user.
 	//
-	//Returns the details of the download report requests placed by the user.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//reportmanager:requests:list
-	//```
 	ListDownloadReportRequests(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListDownloadReportRequestsResponse, error)
 	ExportFromReportManager(ctx context.Context, in *ExportFromReportManagerRequest, opts ...grpc.CallOption) (ReportManagerService_ExportFromReportManagerClient, error)
 }
@@ -482,15 +482,15 @@ func (x *reportManagerServiceExportFromReportManagerClient) Recv() (*common.Expo
 
 // ReportManagerServiceServer is the server API for ReportManagerService service.
 type ReportManagerServiceServer interface {
+	// List Download Report Requests
 	//
-	//List Download Report Requests
+	// Returns the details of the download report requests placed by the user.
 	//
-	//Returns the details of the download report requests placed by the user.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//reportmanager:requests:list
-	//```
 	ListDownloadReportRequests(context.Context, *emptypb.Empty) (*ListDownloadReportRequestsResponse, error)
 	ExportFromReportManager(*ExportFromReportManagerRequest, ReportManagerService_ExportFromReportManagerServer) error
 }
