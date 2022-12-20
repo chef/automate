@@ -327,29 +327,22 @@ func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeEx
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
-	log.Println("********************************************************")
-	log.Printf("PolicyGroup: %+v", res.PolicyGroup)
 
 	runList := res.RunList
 
-	// Fetches cookbooks to evaluate recipes version.
-	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
-	if err != nil {
-		log1.Info("Failed while listing cookbooks for ", req.Environment)
-		log1.Error(err)
-		//return nil, ParseAPIError(err)
+	if res.PolicyGroup != "" {
+		req.Environment = "_default"
 	}
 
-	defaultCookbooks, err := c.client.Environments.ListCookbooks("_default", "1")
+	log.Printf("Environment: %+v", res.Environment)
+	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
 	if err != nil {
 		log1.Info("Failed while listing cookbooks for default")
 		log1.Error(err)
-		//return nil, ParseAPIError(err)
+		return nil, ParseAPIError(err)
 	}
 
-	for k, v := range defaultCookbooks {
-		cookbooks[k] = v
-	}
+	log.Printf("defaultCookbooks: %+v", cookbooks)
 
 	var runlistCache = RunListCache{}
 
