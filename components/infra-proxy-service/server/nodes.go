@@ -335,7 +335,7 @@ func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeEx
 
 	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
 	if err != nil {
-		logrus.Errorf("Failed while listing cookbooks for default: %+v", err)
+		logrus.Errorf("Failed while listing cookbooks for %s: %+v", req.Environment, err)
 		return nil, ParseAPIError(err)
 	}
 
