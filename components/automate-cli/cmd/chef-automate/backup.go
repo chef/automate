@@ -1216,6 +1216,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 }
 
 func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
+
 	for {
 		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status", false)
 		if err != nil {
