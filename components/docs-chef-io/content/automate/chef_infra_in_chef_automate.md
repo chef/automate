@@ -21,7 +21,7 @@ The list of parameters are as follows:
 
 | Chef Infra Server Key                           | Default Values In Automate (Having Infra Server Package) | Default Values In Automate HA | Automate Configuration                                     |
 | ----------------------------------------------- | ----------------------------------------- | ----------------------------------- | ---------------------------------------------------------- |
-| nginx['client_max_body_size']                   | 250                                       | 250                                 | [cs_nginx.v1.sys.ngx.http]<br>```client_max_body_size=90```        |
+| nginx['client_max_body_size']                   | 250                                       | 250                                 | ```[cs_nginx.v1.sys.ngx.http]```<br>```client_max_body_size=90```        |
 | nginx['ssl_protocols']                          | TLSv1.2                                   | TLSv1.2                             | ```cs_nginx.v1.sys.ngx.http.ssl_protocols```               |
 | nginx['worker_connections']                     | 10240                                     | 10240                               | ```cs_nginx.v1.sys.ngx.events.worker_connections```        |
 | nginx['worker_processes']                       | 4                                         | 2                                   | ```cs_nginx.v1.sys.ngx.main.worker_processes```            |
