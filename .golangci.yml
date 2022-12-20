@@ -19,6 +19,7 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+    - bodyclose
     - dogsled
     - dupl
     - funlen
