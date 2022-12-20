@@ -717,7 +717,7 @@ steps:
   - label: "backup to s3"
     command:
       - integration/run_test integration/tests/backup_s3.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 40
     expeditor:
       accounts:
         - aws/chef-cd
