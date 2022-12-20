@@ -10,10 +10,12 @@ delete_backup_and_assert_idempotent() {
     # Delete the backup
     #shellcheck disable=SC2154
     log_info "deleting backup ${test_backup_id}"
-    sudo hab svc status
-    sudo chef-automate status
+    hab svc status
+    chef-automate status
     sleep 60
-    chef-automate backup delete -t 300 --yes "${test_backup_id}" || return 1
+    echo "after"
+    chef-automate status
+    chef-automate backup delete -t 900 --yes "${test_backup_id}" || return 1
     # Make sure that our backup is not in the list
     log_info "checking to make sure backup doesn't exist"
     assert_backup_missing "${test_backup_id}"
