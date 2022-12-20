@@ -22,8 +22,7 @@ This copy of chef-server-ctl exists to support the
 implementation of the 'chef-server-ctl stop' subcommand only. You probably
 meant to run the copy of 'chef-server-ctl' provided by A2's Chef Server
 integration. When everything is working correctly, you can find that copy of
-'chef-server-ctl' in /bin or /hab/bin.
-`
+'chef-server-ctl' in /bin or /hab/bin.`
 
 func chefServerCtlUnimplementedCmds() []*cobra.Command {
 	subcommandNames := []string{

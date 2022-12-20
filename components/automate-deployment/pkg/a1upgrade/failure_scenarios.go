@@ -168,9 +168,11 @@ func condition(maybeCondition initialCondition) bool { // nolint: deadcode
 
 // Failure determines if the given maybeFailure FailureScenario was set by the
 // user. EX:
-// if Failure(A1ShutdownFail) {
-//   return aCannedError()
-// }
+//
+//	if Failure(A1ShutdownFail) {
+//	  return aCannedError()
+//	}
+//
 // // normal program execution...
 func Failure(maybeFailure FailureScenario) bool {
 	return maybeFailure == requestedFailure
