@@ -4,16 +4,24 @@ import (
 	"container/list"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-const TAINT_TERRAFORM = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
+const (
+	TAINT_TERRAFORM    = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
+	AWS_AUTO_TFVARS    = "aws.auto.tfvars"
+	DESTROY_AWS_FOLDER = "destroy/aws/"
+	TF_ARCH_FILE       = ".tf_arch"
+)
 
 type HAModifyAndDeploy interface {
 	Execute(c *cobra.Command, args []string) error
@@ -34,11 +42,14 @@ type MockNodeUtilsImpl struct {
 	getModeFromConfigFunc                     func(path string) (string, error)
 	checkIfFileExistFunc                      func(path string) bool
 	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
+	pullAndUpdateConfigAwsFunc                func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
 	isManagedServicesOnFunc                   func() bool
 	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
 	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
 	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
 	getModeOfDeploymentFunc                   func() string
+	moveAWSAutoTfvarsFileFunc                 func(path string) error
+	modifyTfArchFileFunc                      func(path string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -82,6 +93,14 @@ func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, er
 }
 func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
 	return mnu.getModeOfDeploymentFunc()
+func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
+	return mnu.moveAWSAutoTfvarsFileFunc(path)
+}
+func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
+	return mnu.modifyTfArchFileFunc(path)
+}
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
 }
 
 type NodeOpUtils interface {
@@ -94,11 +113,14 @@ type NodeOpUtils interface {
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
 	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
+	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
 	isManagedServicesOn() bool
 	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
 	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
 	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
 	getModeOfDeployment() string
+	moveAWSAutoTfvarsFile(string) error
+	modifyTfArchFile(string) error
 }
 
 type NodeUtilsImpl struct{}
@@ -143,6 +165,19 @@ func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) 
 	return NewPullConfigs(infra, *sshUtil), nil
 }
 
+func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+	infra, cfg, err := nu.getHaInfraDetails()
+	if err != nil {
+		return nil, err
+	}
+	(*sshUtil).setSSHConfig(cfg)
+	configPuller := NewPullConfigs(infra, *sshUtil)
+	if len(exceptionIps) > 0 {
+		configPuller.setExceptionIps(exceptionIps)
+	}
+	return configPuller.generateAwsConfig()
+}
+
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
 	return checkIfFileExist(path)
 }
@@ -174,6 +209,61 @@ func (nu *NodeUtilsImpl) genConfig(path string) error {
 func (nu *NodeUtilsImpl) genConfigAWS(path string) error {
 	e := newAwsDeployemnt(path)
 	return e.generateConfig()
+}
+
+func (nu *NodeUtilsImpl) moveAWSAutoTfvarsFile(terraformPath string) error {
+	AwsAutoTfvarsExist, err := dirExists(filepath.Join(terraformPath, AWS_AUTO_TFVARS))
+	if err != nil {
+		return err
+	}
+	if !AwsAutoTfvarsExist {
+		return errors.New("Missing " + filepath.Join(terraformPath, AWS_AUTO_TFVARS))
+	}
+	destroyAwsFolderExist, err := dirExists(filepath.Join(terraformPath, DESTROY_AWS_FOLDER))
+	if err != nil {
+		return err
+	}
+	if !destroyAwsFolderExist {
+		return errors.New("Missing " + filepath.Join(terraformPath, DESTROY_AWS_FOLDER))
+	}
+	arg := []string{
+		filepath.Join(terraformPath, AWS_AUTO_TFVARS),
+		filepath.Join(terraformPath, DESTROY_AWS_FOLDER),
+	}
+	err = executeCommand("mv", arg, "")
+	if err != nil {
+		return errors.Wrap(err, "Failed to move aws.auto.tfvars")
+	}
+	return nil
+}
+
+func (nu *NodeUtilsImpl) modifyTfArchFile(terraformPath string) error {
+	tfArchPath := filepath.Join(terraformPath, TF_ARCH_FILE)
+	data, err := ioutil.ReadFile(tfArchPath)
+	if err != nil {
+		return errors.Wrap(err, "Failed to read .tf_arch file")
+	}
+
+	if string(data) == "aws" {
+		return nil
+	}
+
+	err = os.Remove(tfArchPath)
+	if err != nil {
+		return errors.Wrap(err, "Failed to remove .tf_arch file")
+	}
+
+	f, err := os.Create(tfArchPath)
+	if err != nil {
+		return errors.Wrap(err, "Failed to create .tf_arch file")
+	}
+
+	_, err = f.WriteString("aws")
+	if err != nil {
+		return errors.Wrap(err, "Failed to write aws in .tf_arch file")
+	}
+	f.Close()
+	return nil
 }
 
 func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {

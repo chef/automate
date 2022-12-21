@@ -74,11 +74,11 @@ func (ani *AddNodeAWSImpl) prepare() error {
 }
 
 func (ani *AddNodeAWSImpl) validate() error {
-	updatedConfig, err := readConfigAWS(ani.configpath)
+	updatedConfig, err := ani.nodeUtils.pullAndUpdateConfigAws(&ani.sshUtil, []string{})
 	if err != nil {
 		return err
 	}
-	ani.config = updatedConfig
+	ani.config = *updatedConfig
 	ani.copyConfigForUserPrompt = ani.config
 	if ani.flags.automateCount == 0 &&
 		ani.flags.chefServerCount == 0 &&
@@ -141,6 +141,14 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
 	}
 	err = ani.fileutils.WriteToFile(ani.configpath, tomlbytes)
+	if err != nil {
+		return err
+	}
+	err = ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
+	if err != nil {
+		return err
+	}
+	err = ani.nodeUtils.modifyTfArchFile(ani.terraformPath)
 	if err != nil {
 		return err
 	}
