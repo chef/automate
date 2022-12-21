@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": false
+  },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
@@ -9,7 +12,7 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "ngx-build-plus:browser",
           "options": {
             "aot": true,
             "outputPath": "dist",
@@ -27,6 +30,7 @@
             "scripts": [
               "src/modernizr-custom.js"
             ],
+            "extraWebpackConfig": "webpack.config.js",
             "allowedCommonJsDependencies": [
               "hogan.js"
             ]
@@ -53,6 +57,7 @@
                   "maximumWarning": "6kb"
                 }
               ],
+              "extraWebpackConfig": "webpack.prod.config.js",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -71,7 +76,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "ngx-build-plus:dev-server",
           "options": {
             "browserTarget": "automate-ui:build"
           },
@@ -84,7 +89,8 @@
               "baseHref": "/"
             },
             "production": {
-              "browserTarget": "automate-ui:build:production"
+              "browserTarget": "automate-ui:build:production",
+							"extraWebpackConfig": "webpack.prod.config.js"
             },
             "e2e": {
               "browserTarget": "automate-ui:build:no_auth",

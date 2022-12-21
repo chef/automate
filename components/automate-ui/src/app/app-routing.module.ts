@@ -205,11 +205,11 @@ const routes: Routes = [
       component: UserDetailsComponent,
       resolve: { isNonAdmin: UserDetailsNonAdminResolve }
     },
-    {
-      path: 'compliance',
-      loadChildren: () => import('app/pages/+compliance/compliance.module')
-        .then(m => m.ComplianceModule)
-    },
+    // {
+    //   path: 'compliance',
+    //   loadChildren: () => import('app/pages/+compliance/compliance.module')
+    //     .then(m => m.ComplianceModule)
+    // },
     {
       path: 'infrastructure',
       children: [
@@ -414,11 +414,13 @@ const routes: Routes = [
     path: 'reload',
     children: []
   },
+  { path: 'compliance', loadChildren: ()=> import('compliance/Module').then(m => m.AppModule)},
   // END Deprecated routes.
   {
     path: '**',
     redirectTo: ''
-  }
+  },
+
 ];
 
 @NgModule({
