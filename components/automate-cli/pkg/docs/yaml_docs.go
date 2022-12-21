@@ -140,6 +140,8 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 			yamlDoc.CompatibleString = "HA"
 		case "forStandalone":
 			yamlDoc.CompatibleString = "Automate"
+		case "compatible":
+			yamlDoc.CompatibleString = "Automate"
 		}
 	}
 	if len(cmd.Aliases) > 0 {
