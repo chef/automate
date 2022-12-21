@@ -18,6 +18,14 @@ func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, erro
 	return &cfg, nil
 }
 
+func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
+	cfg, err := readConfigAWS(CONFIG_TOML_PATH + "/aws_config.toml")
+	if err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
 func TestDeleteNodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{

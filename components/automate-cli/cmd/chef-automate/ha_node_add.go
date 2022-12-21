@@ -68,6 +68,7 @@ func haAddNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployer
 		}
 	case AWS_MODE:
 		if !addDeleteNodeHACmdFlags.onPremMode {
+			fmt.Println(initConfigHabA2HAPathFlag.a2haDirPath)
 			hamd = NewAddNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
 			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
