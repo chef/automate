@@ -13,7 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 package docs
 
 import (
@@ -138,9 +137,9 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	if len(annotations) > 0 {
 		switch annotations["compatibility"] {
 		case "forHA":
-			yamlDoc.CompatibleString = "This command is valid for Automate HA deployment only"
+			yamlDoc.CompatibleString = "HA"
 		case "forStandalone":
-			yamlDoc.CompatibleString = "This command is valid for Standalone Automate deployment only"
+			yamlDoc.CompatibleString = "Automate"
 		}
 	}
 	if len(cmd.Aliases) > 0 {
