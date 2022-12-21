@@ -48,7 +48,7 @@ const (
 
 type BackupFromBashtion interface {
 	isBastionHost() bool
-	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error
+	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool, subCommand string) error
 }
 
 type BackupFromBashtionImp struct{}
@@ -274,7 +274,7 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 			return err
 			//return status.Errorf(status.DeployError, "invalid deployment not able to find infra details", err)
 		}
-		err = handleBackupCommands(cmd, args, commandString, infra)
+		err = handleBackupCommands(cmd, args, commandString, infra, cmd.CalledAs())
 		if err != nil {
 			return err
 		}
@@ -299,9 +299,9 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 	return commandString
 }
 
-func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails) error {
+func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails, subCommand string) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true, subCommand)
 		if err != nil {
 			return err
 		}
@@ -318,7 +318,7 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			}
 			commandString = commandString + " --yes"
 		}
-		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false)
+		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, true, false, subCommand)
 		if err != nil {
 			return err
 		}
@@ -333,7 +333,7 @@ func handleBackupCommands(cmd *cobra.Command, args []string, commandString strin
 			commandString = commandString + " --yes"
 		}
 	}
-	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false)
+	err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, false, false, false, subCommand)
 	if err != nil {
 		return err
 	}
@@ -1146,7 +1146,7 @@ func (ins *BackupFromBashtionImp) isBastionHost() bool {
 	return isA2HARBFileExist()
 }
 
-func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool) error {
+func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool, subCommand string) error {
 	sshconfig := &SSHConfig{}
 	sshconfig.sshUser = infra.Outputs.SSHUser.Value
 	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
@@ -1194,12 +1194,12 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	if pooling {
 		cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString, true)
 		if err != nil {
-			writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
+			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n", subCommand, automateIps[0], err.Error())
 			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s", automateIps[0])
 		}
-		writer.Printf("triggered backup commands on Automate node %s \n %s \n", automateIps[0], cmdRes)
+		writer.Printf("triggered backup %s commands on Automate node %s \n %s \n", subCommand, automateIps[0], cmdRes)
 		writer.StartSpinner()
-		err = poolStatus(sshUtil, cmdRes, backupState)
+		err = poolStatus(sshUtil, cmdRes, backupState, subCommand)
 		writer.StopSpinner()
 		if err != nil {
 			return status.Wrapf(err, status.BackupRestoreError, "error in polling status")
@@ -1208,14 +1208,15 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	} else {
 		_, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
 		if err != nil {
-			writer.Errorf("error in executing backup commands on Automate node %s,  %s \n", automateIps[0], err.Error())
-			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s", automateIps[0])
+			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n", subCommand, automateIps[0], err.Error())
+			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup %s commands on Automate node %s", subCommand, automateIps[0])
 		}
 		return nil
 	}
 }
 
-func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
+func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand string) error {
+
 	for {
 		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status", false)
 		if err != nil {
@@ -1232,7 +1233,7 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool) error {
 				backupState := getBackupStateFromList(backupList, cmdRes)
 				writer.Println(backupState)
 			}
-			writer.Println("backup operation completed")
+			writer.Printf("backup %s operation completed \n", subCommand)
 			break
 		}
 		time.Sleep(5 * time.Second)

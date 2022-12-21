@@ -25,6 +25,14 @@ type ConfigKeys struct {
 	adminKey   string
 }
 
+type ObjectStorageConfig struct {
+	accessKey  string
+	secrectKey string
+	endpoint   string
+	bucketName string
+	RoleArn    string
+}
+
 type HAAwsAutoTfvars struct {
 	AwsProfile                         string      `json:"aws_profile"`
 	AwsRegion                          string      `json:"aws_region"`
@@ -361,8 +369,16 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 			osCerts = append(osCerts, certByIP)
 		}
 		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
-		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
-		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
+		if osRootCA := getOSORPGRootCA(osConfigMap); len(osRootCA) > 0 {
+			sharedConfigToml.Opensearch.Config.RootCA = osRootCA
+		}
+		osAdminCert, osAdminKey := getOSAdminCertAndAdminKey(osConfigMap)
+		if len(osAdminCert) > 0 {
+			sharedConfigToml.Opensearch.Config.AdminCert = osAdminCert
+		}
+		if len(osAdminKey) > 0 {
+			sharedConfigToml.Opensearch.Config.AdminKey = osAdminKey
+		}
 		adminDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.AdminCert)
 		if err != nil {
 			writer.Fail(err.Error())
@@ -380,7 +396,9 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 			pgCerts = append(pgCerts, certByIP)
 		}
 		sharedConfigToml.Postgresql.Config.CertsByIP = pgCerts
-		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
+		if pgRootCA := getOSORPGRootCA(pgConfigMap); len(pgRootCA) > 0 {
+			sharedConfigToml.Postgresql.Config.RootCA = pgRootCA
+		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	}
 
@@ -410,8 +428,26 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	}
 
 	sharedConfigToml.ChefServer.Config.CertsByIP = csCerts
-	sharedConfigToml.Automate.Config.RootCA = getRootCAFromCS(csConfigMap)
+	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
+		sharedConfigToml.Automate.Config.RootCA = csRootCA
+	}
+
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
+	objectStorageConfig := getS3BackConfig(a2ConfigMap)
+	if len(objectStorageConfig.accessKey) > 0 {
+		sharedConfigToml.ObjectStorage.Config.AccessKey = objectStorageConfig.accessKey
+	}
+	if len(objectStorageConfig.secrectKey) > 0 {
+		sharedConfigToml.ObjectStorage.Config.SecretKey = objectStorageConfig.secrectKey
+
+	}
+	if len(objectStorageConfig.bucketName) > 0 {
+		sharedConfigToml.ObjectStorage.Config.BucketName = objectStorageConfig.bucketName
+	}
+
+	if len(objectStorageConfig.endpoint) > 0 {
+		sharedConfigToml.ObjectStorage.Config.Endpoint = objectStorageConfig.endpoint
+	}
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
@@ -430,13 +466,13 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 	archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
-		if err != nil {
-			writer.Errorf("%s", err.Error())
-			return  nil,err
-		}
+	if err != nil {
+		writer.Errorf("%s", err.Error())
+		return nil, err
+	}
 	var arch = strings.Trim(string(archBytes), "\n")
 	sharedConfigToml.Architecture.ConfigInitials.Architecture = arch
-	
+
 	a2ConfigMap, err := p.pullAutomateConfigs()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch Automate config")
@@ -456,9 +492,24 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 		if err != nil {
 			return nil, status.Wrap(err, status.ConfigError, "unable to fetch Postgresql config")
 		}
-		sharedConfigToml.Opensearch.Config.RootCA = getOSORPGRootCA(osConfigMap)
-		sharedConfigToml.Opensearch.Config.AdminCert, sharedConfigToml.Opensearch.Config.AdminKey = getOSAdminCertAndAdminKey(osConfigMap)
-		sharedConfigToml.Opensearch.Config.PrivateKey, sharedConfigToml.Opensearch.Config.PublicKey = getPrivateKeyAndPublicKeyFromBE(osConfigMap)
+		if osRootCA := getOSORPGRootCA(osConfigMap); len(osRootCA) > 0 {
+			sharedConfigToml.Opensearch.Config.RootCA = osRootCA
+		}
+		osAdminCert, osAdminKey := getOSAdminCertAndAdminKey(osConfigMap)
+		if len(osAdminCert) > 0 {
+			sharedConfigToml.Opensearch.Config.AdminCert = osAdminCert
+		}
+		if len(osAdminKey) > 0 {
+			sharedConfigToml.Opensearch.Config.AdminKey = osAdminKey
+		}
+
+		osPrivKey, osPubKey := getPrivateKeyAndPublicKeyFromBE(osConfigMap)
+		if len(osPrivKey) > 0 {
+			sharedConfigToml.Opensearch.Config.PrivateKey = osPrivKey
+		}
+		if len(osPubKey) > 0 {
+			sharedConfigToml.Opensearch.Config.PublicKey = osPubKey
+		}
 		nodeDn, err := getDistinguishedNameFromKey(sharedConfigToml.Opensearch.Config.PublicKey)
 		if err != nil {
 			writer.Fail(err.Error())
@@ -470,21 +521,54 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 		sharedConfigToml.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodeDn)
 		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
 		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
-		sharedConfigToml.Postgresql.Config.RootCA = getOSORPGRootCA(pgConfigMap)
-		sharedConfigToml.Postgresql.Config.PrivateKey, sharedConfigToml.Postgresql.Config.PublicKey = getPrivateKeyAndPublicKeyFromBE(pgConfigMap)
+		if pgRootCA := getOSORPGRootCA(pgConfigMap); len(pgRootCA) > 0 {
+			sharedConfigToml.Postgresql.Config.RootCA = pgRootCA
+		}
+		pgPrivKey, pgPubKey := getPrivateKeyAndPublicKeyFromBE(pgConfigMap)
+		if len(pgPrivKey) > 0 {
+			sharedConfigToml.Postgresql.Config.PrivateKey = pgPrivKey
+		}
+		if len(pgPubKey) > 0 {
+			sharedConfigToml.Postgresql.Config.PublicKey = pgPubKey
+		}
 		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
 	}
-	sharedConfigToml.Automate.Config.Fqdn = getA2fqdn(a2ConfigMap)
-	sharedConfigToml.Automate.Config.PrivateKey = getPrivateKeyFromFE(a2ConfigMap)
-	sharedConfigToml.Automate.Config.PublicKey = getPublicKeyFromFE(a2ConfigMap)
-	sharedConfigToml.Architecture.ConfigInitials.S3BucketName = getS3Bucket(a2ConfigMap)
-	sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = getOsRoleArn(a2ConfigMap)
-	sharedConfigToml.Aws.Config.OsUserAccessKeyId = getOsAccessKey(a2ConfigMap)
-	sharedConfigToml.Aws.Config.OsUserAccessKeySecret = getOsSecretKey(a2ConfigMap)
+	a2Fqdn := getA2fqdn(a2ConfigMap)
+	if len(a2Fqdn) > 0 {
+		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
+	}
+
+	if a2PrivKey := getPrivateKeyFromFE(a2ConfigMap); len(a2PrivKey) > 0 {
+		sharedConfigToml.Automate.Config.PrivateKey = a2PrivKey
+	}
+
+	if a2PubKey := getPublicKeyFromFE(a2ConfigMap); len(a2PubKey) > 0 {
+		sharedConfigToml.Automate.Config.PublicKey = a2PubKey
+	}
+
+	objStorageConfig := getOpenSearchObjectStorageConfig(a2ConfigMap)
+	if len(objStorageConfig.bucketName) > 0 {
+		sharedConfigToml.Architecture.ConfigInitials.S3BucketName = objStorageConfig.bucketName
+	}
+	if len(objStorageConfig.RoleArn) > 0 {
+		sharedConfigToml.Aws.Config.AwsOsSnapshotRoleArn = objStorageConfig.RoleArn
+	}
+	if len(objStorageConfig.accessKey) > 0 {
+		sharedConfigToml.Aws.Config.OsUserAccessKeyId = objStorageConfig.accessKey
+	}
+	if len(objStorageConfig.secrectKey) > 0 {
+		sharedConfigToml.Aws.Config.OsUserAccessKeySecret = objStorageConfig.secrectKey
+	}
 	sharedConfigToml.Automate.Config.EnableCustomCerts = true
-	sharedConfigToml.Automate.Config.RootCA = getRootCAFromCS(csConfigMap)
-	sharedConfigToml.ChefServer.Config.PrivateKey = getPrivateKeyFromFE(csConfigMap)
-	sharedConfigToml.ChefServer.Config.PublicKey = getPublicKeyFromFE(csConfigMap)
+	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
+		sharedConfigToml.Automate.Config.RootCA = csRootCA
+	}
+	if csPrivKey := getPrivateKeyFromFE(csConfigMap); len(csPrivKey) > 0 {
+		sharedConfigToml.ChefServer.Config.PrivateKey = csPrivKey
+	}
+	if csPubKey := getPublicKeyFromFE(csConfigMap); len(csPubKey) > 0 {
+		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
+	}
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
@@ -708,7 +792,7 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 
 func getTheValueFromA2HARB(key string) (string, error) {
 	wordCountCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s %s | wc -l`
-	WordCountF := fmt.Sprintf(wordCountCmd, key , AUTOMATE_HA_WORKSPACE_A2HARB_FILE)
+	WordCountF := fmt.Sprintf(wordCountCmd, key, AUTOMATE_HA_WORKSPACE_A2HARB_FILE)
 	output, err := exec.Command("/bin/sh", "-c", WordCountF).Output()
 	if err != nil {
 		return "", err
@@ -720,7 +804,7 @@ func getTheValueFromA2HARB(key string) (string, error) {
 		return "", nil
 	} else {
 		GrepCmd := `HAB_LICENSE=accept-no-persist hab pkg exec core/grep grep %s %s | hab pkg exec core/gawk gawk '{print $2}'`
-		GrepCmdF := fmt.Sprintf(GrepCmd, key , AUTOMATE_HA_WORKSPACE_A2HARB_FILE)
+		GrepCmdF := fmt.Sprintf(GrepCmd, key, AUTOMATE_HA_WORKSPACE_A2HARB_FILE)
 		output, err := exec.Command("/bin/sh", "-c", GrepCmdF).Output()
 		if err != nil {
 			return "", err
@@ -860,6 +944,15 @@ func getOsSecretKey(config map[string]*dc.AutomateConfig) string {
 	return ""
 }
 
+func getOpenSearchObjectStorageConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig {
+	objStoage := &ObjectStorageConfig{}
+	objStoage.accessKey = getOsAccessKey(config)
+	objStoage.secrectKey = getOsSecretKey(config)
+	objStoage.RoleArn = getOsRoleArn(config)
+	objStoage.bucketName = getS3Bucket(config)
+	return objStoage
+}
+
 func getJsonFromTerraformTfVarsFile(jsonString string) (*HATfvars, error) {
 	params := HATfvars{}
 	err := json.Unmarshal([]byte(jsonString), &params)
@@ -894,4 +987,22 @@ func getModeOfDeployment() string {
 		return AWS_MODE
 	}
 	return AWS_MODE
+}
+
+func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig {
+	objStoage := &ObjectStorageConfig{}
+	for _, ele := range config {
+		if ele.Global.V1.Backups != nil && ele.Global.V1.Backups.S3 != nil {
+			if ele.Global.V1.Backups.S3.Credentials != nil {
+				objStoage.accessKey = ele.Global.V1.Backups.S3.Credentials.AccessKey.Value
+				objStoage.secrectKey = ele.Global.V1.Backups.S3.Credentials.SecretKey.Value
+			}
+			if ele.Global.V1.Backups.S3.Bucket != nil {
+				objStoage.bucketName = ele.Global.V1.Backups.S3.Bucket.Name.Value
+				objStoage.endpoint = ele.Global.V1.Backups.S3.Bucket.Endpoint.Value
+			}
+			break
+		}
+	}
+	return objStoage
 }
