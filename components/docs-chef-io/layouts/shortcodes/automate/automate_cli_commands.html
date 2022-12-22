@@ -5,10 +5,8 @@
   <h3 id="{{ $id }}">{{ .name }}</h2>
   <div>
     <b style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;background:#99E0F1;">
-      {{- range .compatiblestring -}}
-      <i>{{ . }}</i>
-      {{- end -}}
-    </b>
+      <i>{{ .compatiblestring }}</i>
+     </b>
   </div>
   <p>{{ .description }}</p>
 
