@@ -30,3 +30,4 @@ see_also:
 compatiblestring: 
 - id: Automate_HA
   name: Automate HA
+  tag: Opensearch

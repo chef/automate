@@ -6,7 +6,8 @@
   <div>
     {{- range .compatiblestring -}}
     <b class="{{ .id }}" style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;">
-      <i>{{ .name }}</i>
+      <i>{{ .name }}</i> &nbsp; {{ if .tag != ""}} <i> {{.tag}} </i> {{ end }}
+
      </b>
      {{- end -}}
   </div>
