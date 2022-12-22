@@ -47,6 +47,7 @@ type cmdOption struct {
 type compatibleString struct {
 	Id   string
 	Name string
+	Tag  string
 }
 
 type cmdDoc struct {
@@ -145,6 +146,7 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
 				Id:   "Automate_HA",
 				Name: "Automate HA",
+				Tag:  "Opensearch",
 			})
 		case "forStandalone":
 			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
@@ -156,6 +158,7 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 				{
 					Id:   "Automate_HA",
 					Name: "Automate HA",
+					Tag:  "Opensearch",
 				},
 				{
 					Id:   "Automate",
