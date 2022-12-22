@@ -44,17 +44,22 @@ type cmdOption struct {
 	CompatibilityString string `yaml:",omitempty"`
 }
 
+type compatibleString struct {
+	Id   string
+	Name string
+}
+
 type cmdDoc struct {
 	Name             string
-	Synopsis         string      `yaml:",omitempty"`
-	Usage            string      `yaml:",omitempty"`
-	Description      string      `yaml:",omitempty"`
-	Options          []cmdOption `yaml:",omitempty"`
-	InheritedOptions []cmdOption `yaml:"inherited_options,omitempty"`
-	Example          string      `yaml:",omitempty"`
-	SeeAlso          []string    `yaml:"see_also,omitempty"`
-	Aliases          []string    `yaml:"aliases,omitempty"`
-	CompatibleString []string    `yaml:",omitempty"`
+	Synopsis         string             `yaml:",omitempty"`
+	Usage            string             `yaml:",omitempty"`
+	Description      string             `yaml:",omitempty"`
+	Options          []cmdOption        `yaml:",omitempty"`
+	InheritedOptions []cmdOption        `yaml:"inherited_options,omitempty"`
+	Example          string             `yaml:",omitempty"`
+	SeeAlso          []string           `yaml:"see_also,omitempty"`
+	Aliases          []string           `yaml:"aliases,omitempty"`
+	CompatibleString []compatibleString `yaml:",omitempty"`
 }
 
 type statusDoc struct {
@@ -131,17 +136,32 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	yamlDoc.Synopsis = forceMultiLine(cmd.Short)
 	yamlDoc.Description = forceMultiLine(cmd.Long)
 	yamlDoc.Usage = forceMultiLine(cmd.UseLine())
-	yamlDoc.CompatibleString = make([]string, 0)
+	yamlDoc.CompatibleString = make([]compatibleString, 0)
 
 	annotations := cmd.Annotations
 	if len(annotations) > 0 {
 		switch annotations["compatibility"] {
 		case "forHA":
-			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, "Automate HA")
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
+				Id:   "Automate_HA",
+				Name: "Automate HA",
+			})
 		case "forStandalone":
-			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, "Automate")
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
+				Id:   "Automate",
+				Name: "Automate",
+			})
 		case "compatible":
-			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, []string{"Automate", " Automate HA"}...)
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, []compatibleString{
+				{
+					Id:   "Automate_HA",
+					Name: "Automate HA",
+				},
+				{
+					Id:   "Automate",
+					Name: "Automate",
+				},
+			}...)
 		}
 	}
 	if len(cmd.Aliases) > 0 {
