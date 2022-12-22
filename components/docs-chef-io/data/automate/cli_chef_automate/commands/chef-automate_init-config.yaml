@@ -46,5 +46,5 @@ see_also:
 compatiblestring: 
 - id: Automate_HA
   name: Automate HA
-- id: AutomateHA
-  name: Automate HA  
+- id: Automate
+  name: Automate  
