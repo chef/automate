@@ -95,6 +95,7 @@ func (ani *AddNodeAWSImpl) validate() error {
 }
 
 func (ani *AddNodeAWSImpl) modifyConfig() error {
+	ani.config.Architecture.ConfigInitials.Architecture = "aws"
 	inc, err := modifyInstanceCount(ani.config.Automate.Config.InstanceCount, ani.flags.automateCount)
 	if err != nil {
 		return err
