@@ -14,6 +14,8 @@ linters-settings:
       - NOCOMMIT
   govet:
     disable:
+      - assign
+      - atomic
       - copylocks
 
 linters:
@@ -29,6 +31,7 @@ linters:
     - goerr113
     - goimports
     - gomnd
+    - goprintffuncname
     - maligned
     - megacheck
     - nestif
