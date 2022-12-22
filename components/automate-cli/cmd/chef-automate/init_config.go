@@ -83,6 +83,7 @@ var initConfigCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		Compatiblity:             "compatible",
+		Tag:                      "opensearch",
 	},
 	RunE: runInitConfigCmd,
 }

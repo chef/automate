@@ -146,7 +146,7 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
 				Id:   "Automate_HA",
 				Name: "Automate HA",
-				Tag:  "Opensearch",
+				Tag:  annotations["tag"],
 			})
 		case "forStandalone":
 			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{

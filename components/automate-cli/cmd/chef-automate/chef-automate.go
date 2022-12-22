@@ -34,6 +34,7 @@ const (
 	Compatiblity             = "compatibility"
 	CompatiblewithStandalone = "forStandalone"
 	CompatiblewithHA         = "forHA"
+	Tag                      = "tag"
 )
 
 var writer *cli.Writer
