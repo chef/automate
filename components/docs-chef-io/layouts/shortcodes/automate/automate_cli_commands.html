@@ -17,11 +17,11 @@
   <div class="fake-code grid-x">
     {{- range .options -}}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
-    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:red;'>/b></div>
+    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:red;'>{{ .compatiblestring }}</b></div>
     {{- end -}}
     {{- range .inherited_options -}}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
-    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:red;'></b></div>
+    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:red;'>{{ .compatiblestring }}</b></div>
     {{- end -}}
   </div>
 
