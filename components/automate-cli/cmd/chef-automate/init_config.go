@@ -82,6 +82,7 @@ var initConfigCmd = &cobra.Command{
 	Long:  "Initialize default configuration and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		Compatiblity:             fmt.Sprintf("%s,%s", CompatiblewithHA, CompatiblewithStandalone),
 	},
 	RunE: runInitConfigCmd,
 }

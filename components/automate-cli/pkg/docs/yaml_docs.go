@@ -137,11 +137,11 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	if len(annotations) > 0 {
 		switch annotations["compatibility"] {
 		case "forHA":
-			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, "HA")
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, "Automate HA")
 		case "forStandalone":
 			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, "Automate")
 		case "compatible":
-			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, []string{"Automate", "HA"}...)
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, []string{"Automate", " Automate HA"}...)
 		}
 	}
 	if len(cmd.Aliases) > 0 {
