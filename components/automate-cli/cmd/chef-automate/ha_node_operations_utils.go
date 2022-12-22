@@ -258,7 +258,7 @@ func (nu *NodeUtilsImpl) modifyTfArchFile(terraformPath string) error {
 		return errors.Wrap(err, "Failed to create .tf_arch file")
 	}
 
-	_, err = f.WriteString("aws")
+	_, err = f.WriteString("aws\n")
 	if err != nil {
 		return errors.Wrap(err, "Failed to write aws in .tf_arch file")
 	}
