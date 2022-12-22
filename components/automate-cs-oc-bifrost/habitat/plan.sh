@@ -7,16 +7,17 @@ pkg_name="automate-cs-oc-bifrost"
 pkg_description="Wrapper package for chef/oc_bifrost"
 pkg_origin="chef"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.15.10"
+pkg_version="15.3.2"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
+  core/erlang24/24.3.4.2/20220719080322
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_bifrost/14.15.10/20220516082214"
+  "${vendor_origin}/oc_bifrost/15.3.2/20221108221436"
 )
 
 pkg_binds=(
