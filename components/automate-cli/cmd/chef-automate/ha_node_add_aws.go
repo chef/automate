@@ -137,19 +137,19 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {
+	err := ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
+	if err != nil {
+		return err
+	}
+	err = ani.nodeUtils.modifyTfArchFile(ani.terraformPath)
+	if err != nil {
+		return err
+	}
 	tomlbytes, err := ptoml.Marshal(ani.config)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
 	}
 	err = ani.fileutils.WriteToFile(ani.configpath, tomlbytes)
-	if err != nil {
-		return err
-	}
-	err = ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
-	if err != nil {
-		return err
-	}
-	err = ani.nodeUtils.modifyTfArchFile(ani.terraformPath)
 	if err != nil {
 		return err
 	}

@@ -6,8 +6,11 @@ import (
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
+
+const CONFIG_TOML_PATH_AWS = "../../pkg/testfiles/aws"
 
 func TestAddnodeAWSValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
@@ -23,7 +26,7 @@ func TestAddnodeAWSValidateError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -47,7 +50,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -71,7 +74,7 @@ func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
 			return true
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -97,7 +100,7 @@ func TestAddnodeModifyAws(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -122,7 +125,7 @@ func TestAddAwsnodePrompt(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -154,7 +157,7 @@ This will add the new nodes to your existing setup. It might take a while. Are y
 func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
-	var filewritten, deployed,autoFileMoved, tfArchModified bool
+	var filewritten, deployed, autoFileMoved, tfArchModified bool
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
@@ -173,15 +176,15 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-		moveAWSAutoTfvarsFileFunc: func (path string) error {
+		moveAWSAutoTfvarsFileFunc: func(path string) error {
 			autoFileMoved = true
 			return nil
 		},
-		modifyTfArchFileFunc: func (path string) error {
+		modifyTfArchFileFunc: func(path string) error {
 			tfArchModified = true
 			return nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			filewritten = true
 			return nil
@@ -221,10 +224,97 @@ This will add the new nodes to your existing setup. It might take a while. Are y
 	assert.Equal(t, true, deployed)
 }
 
-func TestAddnodeWithExecuteFun(t *testing.T) {
+func TestAddnodeWithExecuteA2haRbNotExist(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
-	var filewritten, deployed,autoFileMoved, tfArchModified bool
+	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
+		isA2HARBFileExistFunc: func() bool {
+			return false
+		},
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
+		WriteToFileFunc: func(filepath string, data []byte) error {
+			return nil
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.Execute(nil, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), `Invalid bastion, to run this command use automate bastion`)
+}
+
+func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
+	var filewritten, autoFileMoved, tfArchModified bool
+	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
+		genConfigAWSfunc: func(path string) error {
+			return errors.New("random")
+		},
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return AWS_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+		moveAWSAutoTfvarsFileFunc: func(path string) error {
+			autoFileMoved = true
+			return nil
+		},
+		modifyTfArchFileFunc: func(path string) error {
+			tfArchModified = true
+			return nil
+		},
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
+		WriteToFileFunc: func(filepath string, data []byte) error {
+			filewritten = true
+			return nil
+		},
+	}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	})
+	err := nodeAdd.Execute(nil, nil)
+	assert.Contains(t, w.Output(), `Existing node count:
+================================================
+Automate => 5
+Chef-Server => 1
+OpenSearch => 3
+Postgresql => 4
+
+New node count:
+================================================
+Automate => 5
+Chef-Server => 1
+OpenSearch => 4
+Postgresql => 4
+This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	assert.Equal(t, true, autoFileMoved)
+	assert.Equal(t, true, tfArchModified)
+	assert.Equal(t, true, filewritten)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "random")
+}
+func TestAddnodeWithExecuteFunc(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
+	var filewritten, deployed, autoFileMoved, tfArchModified bool
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
@@ -249,20 +339,19 @@ func TestAddnodeWithExecuteFun(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-		moveAWSAutoTfvarsFileFunc: func (path string) error {
+		moveAWSAutoTfvarsFileFunc: func(path string) error {
 			autoFileMoved = true
 			return nil
 		},
-		modifyTfArchFileFunc: func (path string) error {
+		modifyTfArchFileFunc: func(path string) error {
 			tfArchModified = true
 			return nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
 		WriteToFileFunc: func(filepath string, data []byte) error {
 			filewritten = true
 			return nil
 		},
-		
 	}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil

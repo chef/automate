@@ -19,7 +19,7 @@ func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, erro
 }
 
 func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
-	cfg, err := readConfigAWS(CONFIG_TOML_PATH + "/aws_config.toml")
+	cfg, err := readConfigAWS(CONFIG_TOML_PATH_AWS + "/config.toml")
 	if err != nil {
 		return nil, err
 	}
