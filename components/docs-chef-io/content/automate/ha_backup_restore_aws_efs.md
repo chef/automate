@@ -135,7 +135,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 -   Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
--   Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
+-   Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml --airgap-bundle <path/to/bundle>`.
 
 {{< note >}}
 
