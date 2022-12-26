@@ -76,13 +76,11 @@ The centralizing log also comes with log rotation with the following specificati
 
 ```toml
 [global.v1.log]
-redirect_sys_log = true //centralize the log
-redirect_log_file_path = "/var/tmp/" //set the location of the log file
-
-//log rotation configurations
-compress_rotated_logs = true //compress the log file
-max_size_rotate = "10M" //set the max size of the file. syntax: 10M, 90k
-max_number_rotated_logs = 10 //number of backup files to be stored
+redirect_sys_log = true ##centralize the log
+redirect_log_file_path = "/var/tmp/" ##set the location of the log file
+compress_rotated_logs = true ##compress the log file
+max_size_rotate_logs = "10M" ##set the max size of the file. syntax: 10M, 90k
+max_number_rotated_logs = 10 ##number of backup files to be stored
 ```
 
 In the above specifications:

@@ -125,7 +125,7 @@
     node = "https://<%= overrides[:automate_fqdn] %>"
   
   [cs_nginx.v1.sys.ngx.main]
-    worker_processes = 2  
+    worker_processes = 4  
 
   [global.v1.external.automate.auth]
     token = "<%= overrides[:automate_dc_token] %>"
@@ -260,9 +260,24 @@
 <% end %>
 
 <% if overrides[:automate_config_file] %>
-<%= File.read(overrides[:automate_config_file]) %>
+<%= File.read(overrides[:automate_config_file]) %> 
 <% end %>
 
 [erchef.v1.sys.api]
   s3_url_ttl = 28800
+
+[erchef.v1.sys.depsolver]
+  pool_queue_timeout= 0
+  pool_queue_max= 50
+
+[erchef.v1.sys.sql]
+  pool_max_size= 20
+  pool_queue_max= 20  
+
+[erchef.v1.sys.keygen]
+  cache_size=10
+
+  
+  
+
   
