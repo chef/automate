@@ -47,14 +47,14 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Api.AuthSkew = w.Int32(900)
 	c.V1.Sys.Api.BulkFetchBatchSize = w.Int32(5)
-	c.V1.Sys.Api.MaxRequestSize = w.Int32(4000000)
+	c.V1.Sys.Api.MaxRequestSize = w.Int32(2000000)
 	c.V1.Sys.Api.BaseResourceUrl = w.String("host_header")
 	c.V1.Sys.Api.StrictSearchResultAcls = w.Bool(false)
 	c.V1.Sys.Api.ActionsFqdn = w.String("")
 	c.V1.Sys.Api.S3UrlTtl = w.Int32(900)
 
 	c.V1.Sys.Keygen.WorkerCount = w.Int32(2)
-	c.V1.Sys.Keygen.CacheSize = w.Int32(10)
+	c.V1.Sys.Keygen.CacheSize = w.Int32(1000)
 	c.V1.Sys.Keygen.StartSize = w.Int32(2)
 	c.V1.Sys.Keygen.Timeout = w.Int32(20000)
 
@@ -65,22 +65,22 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Index.BatchSize = w.Int32(5000000)
 	c.V1.Sys.Index.BatchMaxWait = w.Int32(10)
 	c.V1.Sys.Index.ReindexBatchSize = w.Int32(10)
-	c.V1.Sys.Index.ReindexSleepMinMs = w.Int32(50)
+	c.V1.Sys.Index.ReindexSleepMinMs = w.Int32(500)
 	c.V1.Sys.Index.ReindexSleepMaxMs = w.Int32(2000)
 	c.V1.Sys.Index.ReindexItemRetries = w.Int32(3)
 
 	c.V1.Sys.Authz.Fanout = w.Int32(20)
 	c.V1.Sys.Authz.Timeout = w.Int32(2000)
-	c.V1.Sys.Authz.PoolInitSize = w.Int32(25)
+	c.V1.Sys.Authz.PoolInitSize = w.Int32(100)
 	c.V1.Sys.Authz.PoolMaxSize = w.Int32(100)
-	c.V1.Sys.Authz.PoolQueueMax = w.Int32(50)
+	c.V1.Sys.Authz.PoolQueueMax = w.Int32(200)
 	c.V1.Sys.Authz.PoolQueueTimeout = w.Int32(2000)
 	c.V1.Sys.Authz.CleanupBatchSize = w.Int32(0)
 
 	c.V1.Sys.Sql.Timeout = w.Int32(5000)
 	c.V1.Sys.Sql.PoolInitSize = w.Int32(10)
-	c.V1.Sys.Sql.PoolMaxSize = w.Int32(20)
-	c.V1.Sys.Sql.PoolQueueMax = w.Int32(50)
+	c.V1.Sys.Sql.PoolMaxSize = w.Int32(40)
+	c.V1.Sys.Sql.PoolQueueMax = w.Int32(40)
 	c.V1.Sys.Sql.PoolQueueTimeout = w.Int32(2000)
 
 	c.V1.Sys.DataCollector.Timeout = w.Int32(30000)
@@ -95,11 +95,11 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	// TODO(ssd) 2018-07-24: We should auto-calculate this based
 	// on CPU on the target.
-	c.V1.Sys.Depsolver.Timeout = w.Int32(20000)
+	c.V1.Sys.Depsolver.Timeout = w.Int32(5000)
 	c.V1.Sys.Depsolver.PoolInitSize = w.Int32(5)
 	c.V1.Sys.Depsolver.PoolMaxSize = w.Int32(5)
-	c.V1.Sys.Depsolver.PoolQueueMax = w.Int32(50)
-	c.V1.Sys.Depsolver.PoolQueueTimeout = w.Int32(0)
+	c.V1.Sys.Depsolver.PoolQueueMax = w.Int32(10)
+	c.V1.Sys.Depsolver.PoolQueueTimeout = w.Int32(100000)
 
 	c.V1.Sys.Ibrowse.IbrowseMaxPipelineSize = w.Int32(1)
 	c.V1.Sys.Ibrowse.IbrowseMaxSessions = w.Int32(256)
