@@ -317,3 +317,26 @@ func readConfig(path string) (ExistingInfraConfigToml, error) {
 	}
 	return config, nil
 }
+
+func readAnyConfig(path string, configType string) (interface{}, error) {
+	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	if err != nil {
+		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	var config interface{}
+	switch configType {
+	case EXISTING_INFRA_MODE:
+		c := ExistingInfraConfigToml{}
+		config = &c
+	case AWS_MODE:
+		c := AwsConfigToml{}
+		config = &c
+	default:
+		return nil, fmt.Errorf("invalid config type: %s", configType)
+	}
+	err = ptoml.Unmarshal(templateBytes, config)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return config, nil
+}

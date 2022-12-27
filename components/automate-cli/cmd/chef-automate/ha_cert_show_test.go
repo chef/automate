@@ -5,11 +5,12 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIsCommonCerts(t *testing.T) {
-	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
+	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl(), CONFIG_TOML_PATH)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -68,7 +69,7 @@ func TestIsCommonCerts(t *testing.T) {
 }
 
 func TestValidateNode(t *testing.T) {
-	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
+	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl(), CONFIG_TOML_PATH)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -149,7 +150,28 @@ func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: PullConfFunc,
+		getInfraConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+			config, err := getMockReadAnyConfig(EXISTING_INFRA_MODE)
+			if err != nil {
+				return nil, err
+			}
+			infraConfig, ok := config.(*ExistingInfraConfigToml)
+			if !ok {
+				return nil, errors.New("Failed to convert config to ExistingInfraConfigToml")
+			}
+			return infraConfig, nil
+		},
+		getAWSConfigFunc: func(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+			config, err := getMockReadAnyConfig(AWS_MODE)
+			if err != nil {
+				return nil, err
+			}
+			awsConfig, ok := config.(*AwsConfigToml)
+			if !ok {
+				return nil, errors.New("Failed to convert config to AwsConfigToml")
+			}
+			return awsConfig, nil
+		},
 	}
 }
 
@@ -163,4 +185,12 @@ func getMockSSHUtilsImpl() *MockSSHUtilsImpl {
 
 func getMockWriterImpl() *cli.Writer {
 	return majorupgrade_utils.NewCustomWriterWithInputs("x").CliWriter
+}
+
+func getMockReadAnyConfig(configType string) (interface{}, error) {
+	cfg, err := readAnyConfig(CONFIG_TOML_PATH+"/config.toml", configType)
+	if err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }
