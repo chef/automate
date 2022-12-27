@@ -50,46 +50,50 @@ type AwsConfigToml struct {
 	} `toml:"architecture"`
 	Automate struct {
 		Config struct {
-			AdminPassword     string `toml:"admin_password"`
-			Fqdn              string `toml:"fqdn"`
-			AutomateSetupType string `toml:"automate_setup_type"`
-			InstanceCount     string `toml:"instance_count"`
-			TeamsPort         string `toml:"teams_port"`
-			ConfigFile        string `toml:"config_file"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			RootCA            string `toml:"root_ca"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
+			AdminPassword     string     `toml:"admin_password"`
+			Fqdn              string     `toml:"fqdn"`
+			AutomateSetupType string     `toml:"automate_setup_type"`
+			InstanceCount     string     `toml:"instance_count"`
+			TeamsPort         string     `toml:"teams_port"`
+			ConfigFile        string     `toml:"config_file"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			RootCA            string     `toml:"root_ca"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
 		Config struct {
-			InstanceCount     string `toml:"instance_count"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
+			InstanceCount     string     `toml:"instance_count"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Opensearch struct {
 		Config struct {
-			InstanceCount     string `toml:"instance_count"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			RootCA            string `toml:"root_ca"`
-			AdminCert         string `toml:"admin_cert"`
-			AdminKey          string `toml:"admin_key"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
-			AdminDn           string `toml:"admin_dn"`
-			NodesDn           string `toml:"nodes_dn"`
+			InstanceCount     string     `toml:"instance_count"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			RootCA            string     `toml:"root_ca"`
+			AdminCert         string     `toml:"admin_cert"`
+			AdminKey          string     `toml:"admin_key"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			AdminDn           string     `toml:"admin_dn"`
+			NodesDn           string     `toml:"nodes_dn"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"opensearch"`
 	Postgresql struct {
 		Config struct {
-			InstanceCount     string `toml:"instance_count"`
-			EnableCustomCerts bool   `toml:"enable_custom_certs"`
-			RootCA            string `toml:"root_ca"`
-			PrivateKey        string `toml:"private_key"`
-			PublicKey         string `toml:"public_key"`
+			InstanceCount     string     `toml:"instance_count"`
+			EnableCustomCerts bool       `toml:"enable_custom_certs"`
+			RootCA            string     `toml:"root_ca"`
+			PrivateKey        string     `toml:"private_key"`
+			PublicKey         string     `toml:"public_key"`
+			CertsByIP         []CertByIP `toml:"certs_by_ip"`
 		} `toml:"config"`
 	} `toml:"postgresql"`
 	Aws struct {
