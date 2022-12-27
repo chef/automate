@@ -209,7 +209,9 @@ type PullConfigs interface {
 	pullPGConfigs() (map[string]*ConfigKeys, error)
 	pullAutomateConfigs() (map[string]*dc.AutomateConfig, error)
 	pullChefServerConfigs() (map[string]*dc.AutomateConfig, error)
-	generateConfig() (*ExistingInfraConfigToml, error)
+	fetchInfraConfig() (*ExistingInfraConfigToml, error)
+	generateInfraConfig() (*ExistingInfraConfigToml, error)
+	fetchAwsConfig() (*AwsConfigToml, error)
 	generateAwsConfig() (*AwsConfigToml, error)
 	getExceptionIps() []string
 	setExceptionIps(ips []string)
@@ -329,7 +331,7 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 	return ipConfigMap, nil
 }
 
-func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
+func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := getExistingHAConfig()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
@@ -448,6 +450,14 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	if len(objectStorageConfig.endpoint) > 0 {
 		sharedConfigToml.ObjectStorage.Config.Endpoint = objectStorageConfig.endpoint
 	}
+	return sharedConfigToml, nil
+}
+
+func (p *PullConfigsImpl) generateInfraConfig() (*ExistingInfraConfigToml, error) {
+	sharedConfigToml, err := p.fetchInfraConfig()
+	if err != nil {
+		return nil, err
+	}
 
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
@@ -457,10 +467,11 @@ func (p *PullConfigsImpl) generateConfig() (*ExistingInfraConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 	}
+
 	return sharedConfigToml, nil
 }
 
-func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
+func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	sharedConfigToml, err := getAwsHAConfig()
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
@@ -570,6 +581,16 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
 	}
 	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
+
+	return sharedConfigToml, nil
+}
+
+func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
+	sharedConfigToml, err := p.fetchAwsConfig()
+	if err != nil {
+		return nil, err
+	}
+
 	shardConfig, err := mtoml.Marshal(sharedConfigToml)
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to marshal config to file")
@@ -578,6 +599,7 @@ func (p *PullConfigsImpl) generateAwsConfig() (*AwsConfigToml, error) {
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 	}
+
 	return sharedConfigToml, nil
 }
 

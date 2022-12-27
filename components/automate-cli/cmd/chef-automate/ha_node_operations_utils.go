@@ -92,7 +92,7 @@ func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []st
 	if len(exceptionIps) > 0 {
 		configPuller.setExceptionIps(exceptionIps)
 	}
-	return configPuller.generateConfig()
+	return configPuller.generateInfraConfig()
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
