@@ -232,9 +232,9 @@ func genFlagResult(flags *pflag.FlagSet) []cmdOption {
 			if len(flag.Annotations["compatibility"]) > 0 {
 				switch flag.Annotations["compatibility"][0] {
 				case "forHA":
-					opt.CompatibilityString = "This command is valid for Automate HA deployment only"
+					opt.CompatibilityString = "Automate HA Only"
 				case "forStandalone":
-					opt.CompatibilityString = "This command is valid for Standalone Automate deployment only"
+					opt.CompatibilityString = "Automate Only"
 				}
 			}
 			result = append(result, opt)
@@ -247,9 +247,9 @@ func genFlagResult(flags *pflag.FlagSet) []cmdOption {
 			if len(flag.Annotations["compatibility"]) > 0 {
 				switch flag.Annotations["compatibility"][0] {
 				case "forHA":
-					opt.CompatibilityString = "This command is valid for Automate HA deployment only"
+					opt.CompatibilityString = "Automate HA Only"
 				case "forStandalone":
-					opt.CompatibilityString = "This command is valid for Standalone Automate deployment only"
+					opt.CompatibilityString = "Automate Only"
 				}
 			}
 			result = append(result, opt)
