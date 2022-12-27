@@ -14,7 +14,7 @@ options:
 - name: path
   default_value: /hab/a2_deploy_workspace/
   usage: a2ha hab workspace dir path
-  compatibilitystring: This command is valid for Automate HA deployment only
+  compatibilitystring: Automate HA Only
 inherited_options:
 - name: debug
   shorthand: d
