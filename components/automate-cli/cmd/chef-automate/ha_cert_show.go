@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -20,10 +21,11 @@ type certShowFlags struct {
 }
 
 type certShowImpl struct {
-	flags     certShowFlags
-	nodeUtils NodeOpUtils
-	sshUtil   SSHUtil
-	writer    *cli.Writer
+	flags      certShowFlags
+	nodeUtils  NodeOpUtils
+	sshUtil    SSHUtil
+	writer     *cli.Writer
+	configpath string
 }
 
 type certShowCertificates struct {
@@ -79,19 +81,20 @@ func init() {
 	RootCmd.AddCommand(certCmd)
 }
 
-func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil, writer *cli.Writer) certShowImpl {
+func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil, writer *cli.Writer, haDirPath string) certShowImpl {
 	return certShowImpl{
-		flags:     flags,
-		nodeUtils: nodeUtils,
-		sshUtil:   sshUtil,
-		writer:    writer,
+		flags:      flags,
+		nodeUtils:  nodeUtils,
+		sshUtil:    sshUtil,
+		writer:     writer,
+		configpath: filepath.Join(haDirPath, "config.toml"),
 	}
 }
 
 // certShowCmdFunc is the main function for the cert show command
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer, initConfigHabA2HAPathFlag.a2haDirPath)
 		return cs.certShow(cmd, args)
 	}
 }
@@ -108,16 +111,38 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, "Node flag can only be used with service flags like --automate, --chef_server, --postgresql or --opensearch")
 	}
 
-	config, err := c.nodeUtils.pullAndUpdateConfig(&c.sshUtil, nil)
+	deployerType, err := c.nodeUtils.getModeFromConfig(c.configpath)
 	if err != nil {
 		return err
 	}
-	certInfo := c.getCerts(config)
+
+	var certInfo *certShowCertificates
+	if deployerType == EXISTING_INFRA_MODE {
+		config, err := c.nodeUtils.getInfraConfig(&c.sshUtil)
+		if err != nil {
+			return err
+		}
+		certInfo, err = c.getCerts(config)
+		if err != nil {
+			return err
+		}
+	} else if deployerType == AWS_MODE {
+		config, err := c.nodeUtils.getAWSConfig(&c.sshUtil)
+		if err != nil {
+			return err
+		}
+		certInfo, err = c.getCerts(config)
+		if err != nil {
+			return err
+		}
+	} else {
+		return status.New(status.ConfigError, "Invalid deployer type. Either architecture.existing_infra or architecture.aws must be set in config.toml")
+	}
 
 	return c.validateAndPrintCertificates(remoteService, certInfo)
 }
 
-func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certInfo certShowCertificates) error {
+func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certInfo *certShowCertificates) error {
 	switch remoteService {
 	case CONST_AUTOMATE:
 		if err := c.validateNode(certInfo.AutomateCertsByIP, CONST_AUTOMATE); err != nil {
@@ -152,29 +177,43 @@ func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certIn
 }
 
 // getCerts returns the certificates from the config
-func (c *certShowImpl) getCerts(config *ExistingInfraConfigToml) certShowCertificates {
-	certInfo := certShowCertificates{}
+func (c *certShowImpl) getCerts(config interface{}) (*certShowCertificates, error) {
+	var values certShowCertificates
+	switch v := config.(type) {
+	case *ExistingInfraConfigToml:
+		values.AutomateRootCert = v.Automate.Config.RootCA
+		values.AutomateCertsByIP = v.Automate.Config.CertsByIP
+		values.ChefServerCertsByIP = v.ChefServer.Config.CertsByIP
 
-	certInfo.AutomateRootCert = config.Automate.Config.RootCA
-	certInfo.AutomateCertsByIP = config.Automate.Config.CertsByIP
+		if !c.nodeUtils.isManagedServicesOn() {
+			values.PostgresqlRootCert = v.Postgresql.Config.RootCA
+			values.PostgresqlCertsByIP = v.Postgresql.Config.CertsByIP
+			values.OpensearchRootCert = v.Opensearch.Config.RootCA
+			values.OpensearchAdminKey = v.Opensearch.Config.AdminKey
+			values.OpensearchAdminCert = v.Opensearch.Config.AdminCert
+			values.OpensearchCertsByIP = v.Opensearch.Config.CertsByIP
+		}
+	case *AwsConfigToml:
+		values.AutomateRootCert = v.Automate.Config.RootCA
+		values.AutomateCertsByIP = v.Automate.Config.CertsByIP
+		values.ChefServerCertsByIP = v.ChefServer.Config.CertsByIP
 
-	certInfo.ChefServerCertsByIP = config.ChefServer.Config.CertsByIP
-
-	if !c.nodeUtils.isManagedServicesOn() {
-		certInfo.PostgresqlRootCert = config.Postgresql.Config.RootCA
-		certInfo.PostgresqlCertsByIP = config.Postgresql.Config.CertsByIP
-
-		certInfo.OpensearchRootCert = config.Opensearch.Config.RootCA
-		certInfo.OpensearchAdminKey = config.Opensearch.Config.AdminKey
-		certInfo.OpensearchAdminCert = config.Opensearch.Config.AdminCert
-		certInfo.OpensearchCertsByIP = config.Opensearch.Config.CertsByIP
+		if !c.nodeUtils.isManagedServicesOn() {
+			values.PostgresqlRootCert = v.Postgresql.Config.RootCA
+			values.PostgresqlCertsByIP = v.Postgresql.Config.CertsByIP
+			values.OpensearchRootCert = v.Opensearch.Config.RootCA
+			values.OpensearchAdminKey = v.Opensearch.Config.AdminKey
+			values.OpensearchAdminCert = v.Opensearch.Config.AdminCert
+			values.OpensearchCertsByIP = v.Opensearch.Config.CertsByIP
+		}
+	default:
+		return nil, fmt.Errorf("unexpected type %T", v)
 	}
-
-	return certInfo
+	return &values, nil
 }
 
 // printAllCertificates prints all certificates
-func (c *certShowImpl) printAllCertificates(certInfo certShowCertificates) {
+func (c *certShowImpl) printAllCertificates(certInfo *certShowCertificates) {
 	c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(CONST_AUTOMATE))
 	c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"))
 
