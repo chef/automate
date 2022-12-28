@@ -407,7 +407,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateConfig()
+		config, err := configPuller.generateInfraConfig()
 		if err != nil {
 			return err
 		}
@@ -419,7 +419,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if err != nil {
 			return err
 		}
-		sshConfig := &SSHConfig {
+		sshConfig := &SSHConfig{
 			sshUser:    infra.Outputs.SSHUser.Value,
 			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 			sshPort:    infra.Outputs.SSHPort.Value,

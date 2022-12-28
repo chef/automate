@@ -34,6 +34,10 @@ type MockNodeUtilsImpl struct {
 	checkIfFileExistFunc                      func(path string) bool
 	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
 	isManagedServicesOnFunc                   func() bool
+	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
+	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
+	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getModeOfDeploymentFunc                   func() string
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -63,6 +67,18 @@ func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps
 func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
 	return mnu.isManagedServicesOnFunc()
 }
+func (mnu *MockNodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
+	return mnu.getConfigPullerFunc(sshUtil)
+}
+func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+	return mnu.getInfraConfigFunc(sshUtil)
+}
+func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+	return mnu.getAWSConfigFunc(sshUtil)
+}
+func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
+	return mnu.getModeOfDeploymentFunc()
+}
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
@@ -74,6 +90,10 @@ type NodeOpUtils interface {
 	checkIfFileExist(path string) bool
 	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
 	isManagedServicesOn() bool
+	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
+	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
+	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getModeOfDeployment() string
 }
 
 type NodeUtilsImpl struct{}
@@ -83,16 +103,39 @@ func NewNodeUtils() NodeOpUtils {
 }
 
 func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+	configPuller, err := nu.getConfigPuller(sshUtil)
+	if err != nil {
+		return nil, err
+	}
+	if len(exceptionIps) > 0 {
+		configPuller.setExceptionIps(exceptionIps)
+	}
+	return configPuller.generateInfraConfig()
+}
+
+func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+	configPuller, err := nu.getConfigPuller(sshUtil)
+	if err != nil {
+		return nil, err
+	}
+	return configPuller.fetchInfraConfig()
+}
+
+func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+	configPuller, err := nu.getConfigPuller(sshUtil)
+	if err != nil {
+		return nil, err
+	}
+	return configPuller.fetchAwsConfig()
+}
+
+func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
 		return nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
-	configPuller := NewPullConfigs(infra, *sshUtil)
-	if len(exceptionIps) > 0 {
-		configPuller.setExceptionIps(exceptionIps)
-	}
-	return configPuller.generateConfig()
+	return NewPullConfigs(infra, *sshUtil), nil
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
@@ -138,6 +181,11 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig
 
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 	return isManagedServicesOn()
+}
+
+// GetModeOfDeployment returns the mode of deployment ie. EXISTING_INFRA_MODE or AWS_MODE using terraform.tf_arch file
+func (nu *NodeUtilsImpl) getModeOfDeployment() string {
+	return getModeOfDeployment()
 }
 
 func trimSliceSpace(slc []string) []string {
@@ -276,6 +324,27 @@ func readConfig(path string) (ExistingInfraConfigToml, error) {
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
 		return ExistingInfraConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return config, nil
+}
+
+func readAnyConfig(path string, configType string) (interface{}, error) {
+	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	if err != nil {
+		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	var config interface{}
+	switch configType {
+	case EXISTING_INFRA_MODE:
+		config = &ExistingInfraConfigToml{}
+	case AWS_MODE:
+		config = &AwsConfigToml{}
+	default:
+		return nil, fmt.Errorf("invalid config type: %s", configType)
+	}
+	err = ptoml.Unmarshal(templateBytes, config)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}
 	return config, nil
 }
