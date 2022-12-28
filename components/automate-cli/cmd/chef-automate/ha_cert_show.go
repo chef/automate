@@ -111,10 +111,7 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, "Node flag can only be used with service flags like --automate, --chef_server, --postgresql or --opensearch")
 	}
 
-	deployerType, err := c.nodeUtils.getModeFromConfig(c.configpath)
-	if err != nil {
-		return err
-	}
+	deployerType := c.nodeUtils.getModeOfDeployment()
 
 	var certInfo *certShowCertificates
 	if deployerType == EXISTING_INFRA_MODE {

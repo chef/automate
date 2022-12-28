@@ -37,6 +37,7 @@ type MockNodeUtilsImpl struct {
 	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
 	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
 	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getModeOfDeploymentFunc                   func() string
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -75,6 +76,9 @@ func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraCo
 func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
 	return mnu.getAWSConfigFunc(sshUtil)
 }
+func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
+	return mnu.getModeOfDeploymentFunc()
+}
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
@@ -89,6 +93,7 @@ type NodeOpUtils interface {
 	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
 	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
 	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getModeOfDeployment() string
 }
 
 type NodeUtilsImpl struct{}
@@ -176,6 +181,11 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig
 
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 	return isManagedServicesOn()
+}
+
+// GetModeOfDeployment returns the mode of deployment ie. EXISTING_INFRA_MODE or AWS_MODE using terraform.tf_arch file
+func (nu *NodeUtilsImpl) getModeOfDeployment() string {
+	return getModeOfDeployment()
 }
 
 func trimSliceSpace(slc []string) []string {

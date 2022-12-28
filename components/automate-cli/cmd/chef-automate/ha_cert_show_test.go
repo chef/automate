@@ -141,8 +141,8 @@ func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
-		getModeFromConfigFunc: func(path string) (string, error) {
-			return AWS_MODE, nil
+		getModeOfDeploymentFunc: func() string {
+			return AWS_MODE
 		},
 		isA2HARBFileExistFunc: func() bool {
 			return true
