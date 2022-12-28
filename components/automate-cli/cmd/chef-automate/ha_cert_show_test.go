@@ -10,7 +10,7 @@ import (
 )
 
 func TestIsCommonCerts(t *testing.T) {
-	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl(), CONFIG_TOML_PATH)
+	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -69,7 +69,7 @@ func TestIsCommonCerts(t *testing.T) {
 }
 
 func TestValidateNode(t *testing.T) {
-	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl(), CONFIG_TOML_PATH)
+	cs := NewCertShowImpl(certShowFlags{}, getMockNodeUtilsImpl(), getMockSSHUtilsImpl(), getMockWriterImpl())
 
 	type testCaseInfo struct {
 		testCaseDescription string

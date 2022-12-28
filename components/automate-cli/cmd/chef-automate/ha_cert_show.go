@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -21,11 +20,10 @@ type certShowFlags struct {
 }
 
 type certShowImpl struct {
-	flags      certShowFlags
-	nodeUtils  NodeOpUtils
-	sshUtil    SSHUtil
-	writer     *cli.Writer
-	configpath string
+	flags     certShowFlags
+	nodeUtils NodeOpUtils
+	sshUtil   SSHUtil
+	writer    *cli.Writer
 }
 
 type certShowCertificates struct {
@@ -81,20 +79,19 @@ func init() {
 	RootCmd.AddCommand(certCmd)
 }
 
-func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil, writer *cli.Writer, haDirPath string) certShowImpl {
+func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil, writer *cli.Writer) certShowImpl {
 	return certShowImpl{
-		flags:      flags,
-		nodeUtils:  nodeUtils,
-		sshUtil:    sshUtil,
-		writer:     writer,
-		configpath: filepath.Join(haDirPath, "config.toml"),
+		flags:     flags,
+		nodeUtils: nodeUtils,
+		sshUtil:   sshUtil,
+		writer:    writer,
 	}
 }
 
 // certShowCmdFunc is the main function for the cert show command
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer, initConfigHabA2HAPathFlag.a2haDirPath)
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args)
 	}
 }
