@@ -326,11 +326,9 @@ func readAnyConfig(path string, configType string) (interface{}, error) {
 	var config interface{}
 	switch configType {
 	case EXISTING_INFRA_MODE:
-		c := ExistingInfraConfigToml{}
-		config = &c
+		config = &ExistingInfraConfigToml{}
 	case AWS_MODE:
-		c := AwsConfigToml{}
-		config = &c
+		config = &AwsConfigToml{}
 	default:
 		return nil, fmt.Errorf("invalid config type: %s", configType)
 	}
