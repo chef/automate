@@ -22,7 +22,7 @@ class AutomateClusterStatus < AutomateCluster::Command
         fe_service_data += fe_status('automate') if name.nil? || name == 'automate'
         fe_service_data += fe_status('chef_server') if name.nil? || name == 'chef_server'
       end
-      render_status(['Service', 'Public IP', 'Status', 'Opensearch'], fe_service_data, title: "Frontend Services")
+      render_status(['Service', 'IP Address', 'Status', 'Opensearch'], fe_service_data, title: "Frontend Services")
     else    
       wait_while 'Fetching service status' do
         fe_service_data += fe_status('automate') if name.nil? || name == 'automate'
@@ -30,8 +30,8 @@ class AutomateClusterStatus < AutomateCluster::Command
         be_service_data += postgresql_status if name.nil? || name == 'postgresql'
         be_service_data += opensearch_status if name.nil? || name == 'opensearch'
       end
-      render_status(['Service', 'Public IP', 'Status', 'Opensearch'], fe_service_data, title: "Frontend Services")
-      render_status(['Service', 'Public IP', 'Health', 'Process', 'Uptime', 'Role'], be_service_data, title: 'Backend Services')
+      render_status(['Service', 'IP Address', 'Status', 'Opensearch'], fe_service_data, title: "Frontend Services")
+      render_status(['Service', 'IP Address', 'Health', 'Process', 'Uptime', 'Role'], be_service_data, title: 'Backend Services')
     end  
   end
 
