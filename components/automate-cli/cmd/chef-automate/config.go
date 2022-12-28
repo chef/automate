@@ -136,10 +136,10 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		var hostIpArray []string
 		switch true {
 		case configCmdFlags.automate:
-			hostIpArray = append(hostIpArray, infra.Outputs.AutomatePrivateIps.Value[0])
+			hostIpArray = infra.Outputs.AutomatePrivateIps.Value
 			scriptCommand = GET_FRONTEND_CONFIG
 		case configCmdFlags.chef_server:
-			hostIpArray = append(hostIpArray, infra.Outputs.ChefServerPrivateIps.Value[0])
+			hostIpArray = infra.Outputs.ChefServerPrivateIps.Value
 			scriptCommand = GET_FRONTEND_CONFIG
 		case configCmdFlags.postgresql:
 			hostIpArray = infra.Outputs.PostgresqlPrivateIps.Value
