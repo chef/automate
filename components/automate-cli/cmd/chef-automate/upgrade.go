@@ -436,6 +436,8 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 
 	if offlineMode {
+		// Always upgrade the workspace
+		upgradeRunCmdFlags.upgradeHAWorkspace = "yes"
 		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap, upgradeRunCmdFlags.saas)
 		if uperr != nil {
 			return status.Annotate(uperr, status.UpgradeError)
