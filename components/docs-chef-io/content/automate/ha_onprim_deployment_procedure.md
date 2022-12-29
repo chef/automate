@@ -482,11 +482,13 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 {{< warning >}}
 
 - We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+
 - Below process can be done for `chef-server` and `automate`.
 
 {{< /warning >}}
 
 The commands require some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes you want to remove as comma-separate values with no spaces in between.
+
 For example,
 
 - if you want to remove nodes with IP 10.1.2.23 to automate, you have to run the:
@@ -536,13 +538,14 @@ Once the command executes, it will remove the supplied nodes from your automate 
 - Chef Server instance count cannot be less than 1.
 - Open search instance count cannot be less than 3.
 - Postgresql instance count cannot be less than 3.
-
-{{< /note >}}
+ {{< /note >}}
 
 ### How to Replace Node in Automate HA Cluster
 
 - First Add a New Node follow [this](#How-To-Add-More-Nodes-to-the-OnPrem-Deployment).
-- Delete a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster-OnPrem-Deployment).
+- Stop the Habitat Supervisior on the node .i.e going to be removed, use `systemctl stop hab-sup` command to stop the
+  habitat supervisior.
+- Remove a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster-OnPrem-Deployment).
 
 ### Uninstall chef automate HA
 
