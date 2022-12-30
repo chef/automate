@@ -322,7 +322,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	}
 
 	//Rollback the config if requested
-	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
+	if req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog() != nil && req.GetConfig().GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == false &&
 		existingCopy.GetGlobal().GetV1().GetLog().GetRedirectSysLog().GetValue() == true {
 		err := removeConfigFileForAutomateSyslog()
 		if err != nil {
@@ -377,9 +377,13 @@ func createConfigFileForAutomateSysLog(pathForLog string) error {
 
 //removeConfigFileForAutomateSyslog Deletes the file /etc/rsyslog.d/automate.conf, to disable redirecting logs
 func removeConfigFileForAutomateSyslog() error {
-	err := os.Remove(rsyslogConfigFile)
-	if err != nil {
-		return status.Error(codes.Internal, errors.Wrap(err, "Unable to delete the  rsyslog configuration file for automate").Error())
+	//Checking If the file exist
+	if _, err := os.Stat(rsyslogConfigFile); errors.Is(err, nil) {
+		err := os.Remove(rsyslogConfigFile)
+		if err != nil {
+			logrus.Error("Error recived while deleteing rsyslogconfigfile", err)
+			return status.Error(codes.Internal, errors.Wrap(err, "Unable to delete the rsyslog configuration file for automate").Error())
+		}
 	}
 
 	return nil
@@ -449,7 +453,14 @@ func configLogrotate(req *config.Log) error {
 }
 
 func rollbackLogrotate() error {
-	return os.Remove(logRotateConfigFile)
+
+	if _, err := os.Stat(logRotateConfigFile); errors.Is(err, nil) {
+		return os.Remove(logRotateConfigFile)
+
+	}
+
+	return nil
+
 }
 
 // UpdateOfLogroateConfigMergingStructs merges existing config to requested config if the keys are missing in requested structs
