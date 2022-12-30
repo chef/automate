@@ -29,9 +29,20 @@ if (environment.production) {
 
 // platformBrowserDynamic().bootstrapModule(AppModule, { preserveWhitespaces: true });
 platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+  .catch(err => console.error(err, 'BOOTSTRAP FILE ERROR'));
 applyPolyfills().then(() => {
-  defineCustomElements(window);
+  return defineCustomElements(window);
 });
 
+// import { AppModule } from './app/app.module';
+// import { environment } from './environments/environment';
+// import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+// import { enableProdMode } from '@angular/core';
 
+// if (environment.production) {
+//   enableProdMode();
+// }
+
+// platformBrowserDynamic().bootstrapModule(AppModule)
+//   .catch(err => console.error(err));
+  

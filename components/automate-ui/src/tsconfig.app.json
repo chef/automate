@@ -2,7 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/app",
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "paths": { "@angular/*": [ "../node_modules/@angular/*" ] }
 },
   "angularCompilerOptions": {
     "preserveWhitespaces": true

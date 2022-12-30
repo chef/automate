@@ -219,7 +219,7 @@ import {
 } from './page-components/data-feed-table/data-feed-table.component';
 import { SigninService } from './services/signin/signin.service';
 import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-banner/manual-upgrade-banner.component';
-import { MfeComplianceComponent } from './pages/mfe-compliance/mfe-compliance.component';
+// import { MfeComplianceComponent } from './pages/mfe-compliance/mfe-compliance.component';
 
 
 @NgModule({
@@ -284,7 +284,7 @@ import { MfeComplianceComponent } from './pages/mfe-compliance/mfe-compliance.co
     DataFeedConfigDetailsComponent,
     DataFeedTableComponent,
     ManualUpgradeBannerComponent,
-    MfeComplianceComponent
+    // MfeComplianceComponent
   ],
   imports: [
     ApiTokenModule,

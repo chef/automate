@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { loadRemoteModule } from "@angular-architects/module-federation";
 
 // Views
 import {
@@ -67,6 +68,7 @@ import {
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
+// import console = require('console');
 
 const routes: Routes = [
   {
@@ -414,7 +416,28 @@ const routes: Routes = [
     path: 'reload',
     children: []
   },
-  { path: 'compliance', loadChildren: ()=> import('compliance/Module').then(m => m.AppModule)},
+
+  {
+    path: 'compliance',
+    loadChildren: () =>
+         loadRemoteModule({
+            type: 'module',
+            remoteEntry: 'http://localhost:4209/remoteEntry.js',
+            exposedModule: './Module'
+        })
+        .then(m => m.BlogsModule)
+},
+  // {
+  //   path: 'compliance',
+  //   loadChildren: () => loadRemoteModule({
+  //     remoteEntry: 'http://localhost:4209/remoteEntry.js',
+  //     type: 'module',
+  //     exposedModule: './Module'
+  //   })
+  //   .then(m =>{
+  //     console.log('its is working @@@@&&& &&&&', m.AppModule )
+  //    return m.AppModule})
+  // },
   // END Deprecated routes.
   {
     path: '**',
@@ -428,3 +451,13 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+
+// {
+//   path: 'abc',
+//   loadChildren: () => loadRemoteModule({
+//     remoteEntry: 'http://localhost:4201/remoteEntry.js',
+//     type: 'module',
+//     exposedModule: './Module'
+//   })
+//   .then(m => m.AbcModule)
+// }
