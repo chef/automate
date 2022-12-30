@@ -797,24 +797,23 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		location := "/var/opt/chef-automate/backups/" + args[i]
 		_, err := parseLocationSpecFromCLIArgs(location)
 		if err != nil {
-			writer.Errorf("%s %s", "Invalid backupId", args[i])
+			writer.Failf("%s %s", args[i], "Invalid backupId")
 		} else {
 			newArgs = append(newArgs, args[i])
 		}
 	}
-	if len(newArgs) > 0 {
-		if !backupDeleteCmdFlags.yes {
-			yes, err := writer.Confirm(
-				fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
-					strings.Join(newArgs, "\n"),
-				),
-			)
-			if err != nil {
-				return status.Annotate(err, status.BackupError)
-			}
-			if !yes {
-				return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
-			}
+
+	if !backupDeleteCmdFlags.yes && len(newArgs) > 0 {
+		yes, err := writer.Confirm(
+			fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+				strings.Join(newArgs, "\n"),
+			),
+		)
+		if err != nil {
+			return status.Annotate(err, status.BackupError)
+		}
+		if !yes {
+			return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
 		}
 
 		_, err = client.DeleteBackups(
@@ -827,6 +826,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		}
 		writer.Success("Backups deleted")
 	}
+
 	return nil
 }
 
