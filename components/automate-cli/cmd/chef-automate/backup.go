@@ -580,43 +580,14 @@ type listBackupsResult struct {
 
 func runListBackupCmd(cmd *cobra.Command, args []string) error {
 	var backups []*api.BackupTask
-
+	var location string
 	if len(args) > 0 {
-		locationSpec, err := parseLocationSpecFromCLIArgs(args[0])
-		if err != nil {
-			return status.Annotate(err, status.BackupError)
-		}
+		location = args[0]
+	}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.listWaitTimeout)*time.Second)
-		defer cancel()
-
-		writer.Printf("Listing backups from %s\n", locationSpec)
-		backups, err = listBackupsLocally(ctx, locationSpec)
-		if err != nil {
-			return status.Wrapf(
-				err,
-				status.BackupError,
-				"Listing local backup directory %s failed",
-				args[0],
-			)
-		}
-	} else {
-		res, err := client.ListBackups(
-			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-			time.Duration(backupCmdFlags.listWaitTimeout)*time.Second,
-		)
-		if err != nil {
-			if errors.Cause(err) == context.DeadlineExceeded {
-				err = status.Wrapf(
-					err,
-					status.BackupError,
-					offlineHelpMsg,
-					os.Args[0],
-				)
-			}
-			return status.Annotate(err, status.BackupError)
-		}
-		backups = res.Backups
+	backups, err := getBackupTask(location)
+	if err != nil {
+		return err
 	}
 
 	formattedBackups := make([]api.FormattedBackupTask, len(backups))
@@ -671,6 +642,47 @@ func runListBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func getBackupTask(location string) ([]*api.BackupTask, error) {
+	var backups []*api.BackupTask
+	if location != "" {
+		locationSpec, err := parseLocationSpecFromCLIArgs(location)
+		if err != nil {
+			return nil, status.Annotate(err, status.BackupError)
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.listWaitTimeout)*time.Second)
+		defer cancel()
+
+		writer.Printf("Listing backups from %s\n", locationSpec)
+		backups, err = listBackupsLocally(ctx, locationSpec)
+		if err != nil {
+			return nil, status.Wrapf(
+				err,
+				status.BackupError,
+				"Listing local backup directory %s failed",
+			)
+		}
+	} else {
+		res, err := client.ListBackups(
+			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+			time.Duration(backupCmdFlags.listWaitTimeout)*time.Second,
+		)
+		if err != nil {
+			if errors.Cause(err) == context.DeadlineExceeded {
+				err = status.Wrapf(
+					err,
+					status.BackupError,
+					offlineHelpMsg,
+					os.Args[0],
+				)
+			}
+			return nil, status.Annotate(err, status.BackupError)
+		}
+		backups = res.Backups
+	}
+	return backups, nil
 }
 
 func maybeS(value int64) string {
@@ -785,19 +797,34 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 			"Must specify a backup",
 		)
 	}
+	var location string
+	start := 0
+	var newArgs []string
+	var backup []*api.BackupTask
+
+	if strings.Contains(args[0], "//") || strings.Contains(args[0], "\\") {
+		location = args[0]
+		start = 1
+	}
+
+	backup, err := getBackupTask(location)
+	if err != nil {
+		return errors.Errorf("Unable to fetch the backup list with error: %v", err.Error())
+	}
+
+	backupMap := getBackupMapFromBackupList(backup)
 
 	ids, err := idsToBackupTasks(args)
 	if err != nil {
 		return err
-
 	}
-	var newArgs []string
 
-	for i := 0; i < len(args); i++ {
-		location := "/var/opt/chef-automate/backups/" + args[i]
-		_, err := parseLocationSpecFromCLIArgs(location)
-		if err != nil {
+	for i := start; i < len(args); i++ {
+		backupState, ok := backupMap[args[i]]
+		if !ok {
 			writer.Failf("The backup Id %s is either removed or typed incorrect.", args[i])
+		} else if !getBackupStatusAsCompletedOrFailed(backupState) {
+			writer.Failf("The backup Id %s is still in progress", args[i])
 		} else {
 			newArgs = append(newArgs, args[i])
 		}
@@ -1292,4 +1319,22 @@ func getBackupStateFromList(output string, backupId string) string {
 	left := strings.LastIndex(output[:idxFind], "\n")
 	right := strings.Index(output[idxFind:], "\n")
 	return output[left : idxFind+right]
+}
+
+func getBackupMapFromBackupList(backups []*api.BackupTask) map[string]*api.BackupTask {
+	backupMap := make(map[string]*api.BackupTask)
+	for _, b := range backups {
+		backupMap[b.TaskID()] = b
+	}
+
+	return backupMap
+}
+
+func getBackupStatusAsCompletedOrFailed(backup *api.BackupTask) bool {
+	if backup.State == api.BackupTask_COMPLETED || backup.State == api.BackupTask_FAILED {
+		return true
+	}
+
+	return false
+
 }
