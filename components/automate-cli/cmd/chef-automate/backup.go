@@ -802,7 +802,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 	var newArgs []string
 	var backup []*api.BackupTask
 
-	if strings.Contains(args[0], "//") || strings.Contains(args[0], "\\") {
+	if strings.Contains(args[0], "/") || strings.Contains(args[0], "\\") {
 		location = args[0]
 		start = 1
 	}
