@@ -20,6 +20,7 @@ gh_repo = "automate"
 {{< note >}}
 
 -   If the user chooses `backup_config` as `file_system` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
+-   In case of AWS managed services **file_system** is not supported. In such case, make sure to follow [On-Premise Deployment using Object Storage](/automate/ha_backup_restore_object_storage/)
 
 {{< /note >}}
 
@@ -139,7 +140,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+-   check the chef-automate status in Automate node by running `chef-automate status`.
+-   Also check the hab svc status in automate node by running `hab svc status`.
+-   If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+-   Now, check the status of Automate node and then try running the restore command from bastion.
