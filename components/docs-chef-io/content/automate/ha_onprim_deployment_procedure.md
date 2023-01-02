@@ -253,7 +253,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 {{< note >}}
 
--   For AWS managed services, only supported backup is **AWS S3 bucket** (object_storage). Back up and restore might file in case if **file_system** or any other **object_storage**
+-   For AWS-managed services, the only supported backup is **AWS S3 bucket** (object_storage). Back up and restore might file in case of **file_system** or any other **object_storage**
 
 {{< /note >}}
 

@@ -20,7 +20,7 @@ gh_repo = "automate"
 {{< note >}}
 
 -   If the user chooses `backup_config` as `object_storage` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
--   In case of AWS managed services the only supported **object_storage** is **AWS S3**.
+-   In the case of AWS-managed services, the only supported **object_storage** is **AWS S3**.
 
 {{< /note >}}
 
