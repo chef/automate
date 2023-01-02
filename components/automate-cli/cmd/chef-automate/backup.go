@@ -797,7 +797,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		location := "/var/opt/chef-automate/backups/" + args[i]
 		_, err := parseLocationSpecFromCLIArgs(location)
 		if err != nil {
-			writer.Failf("Oops! The backup Id %s is either removed or typed incorrect.", args[i])
+			writer.Failf("The backup Id %s is either removed or typed incorrect.", args[i])
 		} else {
 			newArgs = append(newArgs, args[i])
 		}
