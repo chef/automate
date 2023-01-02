@@ -116,7 +116,7 @@ Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch serve
 
 ### Backup
 
--   To create the backup, by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+-   To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -128,19 +128,13 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 -   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
--   Shutdown Chef Automate service on all front-end nodes
+-   Execute the restore command from bastion`chef-automate backup restore <BACKUP-ID> -b /mnt/automate_backups/backups --airgap-bundle </path/to/bundle>`.
 
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
-    -   Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server
+## Troubleshooting
 
--   Log in to the same instance of Chef Automate front-end node from which backup is taken.
+While running the restore command, If it prompts any error follow the steps given below.
 
--   Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
-
-{{< note >}}
-
-After the restore command is successfully executed, we need to start the services on the other frontend nodes. use the below command to start all the services
-
-`sh sudo systemctl start chef-automate `
-
-{{< /note >}}
+-  check the chef-automate status in Automate node by running `chef-automate status`.
+-  Also check the hab svc status in automate node by running `hab svc status`.
+-  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+-  Now, check the status of Automate node and then try running the restore command from bastion.
