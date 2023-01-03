@@ -21,19 +21,31 @@
         <td>--file</td>
         <td>File path to write the config (default: config.toml)</td>
       </tr>
+      <tr>
+        <td>-h, --help</td>
+        <td>help for init-config-ha (default: false)</td>
+      </tr>
+      <tr>
+        <td>--path</td>
+        <td>a2ha hab workspace dir path (default: /hab/a2_deploy_workspace/)</td>
+      </tr>
     </table>
-    <h5>Automate</h5>
+    <h5>Automate Specific</h5>
       <table style="width:100%">
         <tr>
-          <td>--help</td>
-          <td>help for init-config-ha (default: false)</td>
+          <td>-d, --debug</td>
+          <td>Enable debug output (default: false)</td>
+        </tr>
+        <tr>
+          <td>--no-check-version</td>
+          <td>Disable version check (default: false)</td>
         </tr>
       </table>
-    <h5>Automate HA</h5>
+    <h5>Automate HA Specific</h5>
       <table style="width:100%">
         <tr>
-          <td>--path</td>
-          <td>a2ha hab workspace dir path (default: /hab/a2_deploy_workspace/)</td>
+          <td>--result-json</td>
+          <td>Write command result as JSON to PATH</td>
         </tr>
       </table>
   </div>
