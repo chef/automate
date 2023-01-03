@@ -27,7 +27,20 @@ gh_repo = "automate"
 
 A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
 
-### Setting up the backup configuration
+## Setting up the backup configuration
+
+{{< note >}}
+
+-   In this page, `/mnt/automate_backups` is used as the default path for the backup mount. This can be changed to any other value as per configuration in frontend nodes.
+
+{{< /note >}}
+
+There are 2 scenarios
+
+1. Adding backup configuration to infrastructure with Automate managed opensearch and postgres cluster
+2. Adding backup configuration to infrastructure with customer managed opensearch and postgres cluster
+
+### Automate Managed OpenSearch and Postgres Cluster
 
 #### Configuration in OpenSearch Node
 
@@ -36,12 +49,6 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
     ```sh
     mount /mnt/automate_backups
     ```
-
-{{< note >}}
-
--   `/mnt/automate_backups` is the default value for the backup path, we can change it to any other value.
-
-{{< /note >}}
 
 Apply the following steps on **all of the OpenSearch server** node
 
@@ -63,9 +70,30 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
       repo = "/mnt/automate_backups/opensearch"
     ```
 -   Following command will add the configuration to the OpenSearch node.
+
     ```sh
       chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>
     ```
+
+-   Find the remaining configuration for Automate node in [here](/automate/ha_backup_restore_file_system#configuration-for-automate-node-from-provision-host)
+
+### Customer-Managed OpenSearch and Postgres Cluster
+
+#### Configuration in OpenSearch Node
+
+-   Mount the shared file system on **all** OpenSearch and Frontend servers :
+
+    ```sh
+    mount /mnt/automate_backups
+    ```
+
+-   Locate `opensearch.yml` file from all opensearch nodes and add **path.repo** value to it
+    ```sh
+    path.repo: /mnt/automate_backups/opensearch
+    ```
+-   Restart the opensearch services in all nodes in the cluster
+
+-   Find the remaining configuration for Automate node in [here](/automate/ha_backup_restore_object_storage#configuration-for-automate-node-from-provision-host)
 
 ##### Healthcheck commands
 
@@ -86,7 +114,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
     journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
     ```
 
-#### Configuration for Automate Node from Provision Host
+### Configuration for Automate Node from Provision Host
 
 -   Configure Automate to handle _External OpenSearch Backups_.
 
@@ -139,7 +167,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+-   check the chef-automate status in Automate node by running `chef-automate status`.
+-   Also check the hab svc status in automate node by running `hab svc status`.
+-   If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+-   Now, check the status of Automate node and then try running the restore command from bastion.

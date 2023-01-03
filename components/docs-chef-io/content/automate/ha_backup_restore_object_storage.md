@@ -27,7 +27,7 @@ gh_repo = "automate"
 
 This section provides the pre-backup configuration required to back up the data on Object Storage System (Other than AWS S3) like Minio, Non-AWS S3. The steps to set a secret key using commands are given below:
 
-### Configuration in OpenSearch Node
+### Configuration in OpenSearch Node - For Chef Managed
 
 This section provides the pre-backup configuration required to back up the data on Object Storage Systems like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
@@ -224,7 +224,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+-   check the chef-automate status in Automate node by running `chef-automate status`.
+-   Also check the hab svc status in automate node by running `hab svc status`.
+-   If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+-   Now, check the status of Automate node and then try running the restore command from bastion.
