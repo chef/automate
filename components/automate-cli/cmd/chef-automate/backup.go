@@ -799,7 +799,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 	var location string
 	start := 0
-	var newArgs []string
+	var validIds []string
 	var backup []*api.BackupTask
 
 	if strings.Contains(args[0], "/") || strings.Contains(args[0], "\\") {
@@ -814,26 +814,25 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 
 	backupMap := getBackupMapFromBackupList(backup)
 
-	ids, err := idsToBackupTasks(args)
-	if err != nil {
-		return err
-	}
-
 	for i := start; i < len(args); i++ {
 		backupState, ok := backupMap[args[i]]
 		if !ok {
 			writer.Failf("The backup Id %s is either removed or typed incorrect.", args[i])
 		} else if !getBackupStatusAsCompletedOrFailed(backupState) {
-			writer.Failf("The backup Id %s is still in progress", args[i])
+			writer.Failf("The backup ID %s cannot be deleted currently", args[i])
 		} else {
-			newArgs = append(newArgs, args[i])
+			validIds = append(validIds, args[i])
 		}
 	}
 
-	if !backupDeleteCmdFlags.yes && len(newArgs) > 0 {
+	if !backupDeleteCmdFlags.yes && len(validIds) > 0 {
+		ids, err := idsToBackupTasks(validIds)
+		if err != nil {
+			return err
+		}
 		yes, err := writer.Confirm(
 			fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
-				strings.Join(newArgs, "\n"),
+				strings.Join(validIds, "\n"),
 			),
 		)
 		if err != nil {
