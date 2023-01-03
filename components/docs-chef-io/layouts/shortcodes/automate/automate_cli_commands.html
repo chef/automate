@@ -15,6 +15,20 @@
   <pre><code>{{ .usage }}</code></pre>
 
   <h4 id="{{ $id }}-flags">Flags</h3>
+  <div>
+    <table style="width:100%">
+      <tr>
+        <td>--file</td>
+        <td>File path to write the config (default: config.toml)</td>
+      </tr>
+      <tr>
+        <td>-h, --help</td>
+        <td>help for init-config-ha (default: false)</td>
+      </tr>
+    </table>
+  </div>
+  <!--
+  <h4 id="{{ $id }}-flags">Flags</h3>
   <div class="fake-code grid-x">
     {{- range .options -}}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
@@ -25,6 +39,7 @@
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
   </div>
+  -->
 
   <h4 id="{{ $id }}-see-also">See Also</h3>
   <div class="grid-x">
@@ -61,5 +76,8 @@
   background: #9bf285;
 }
 
+table, th, td {
+  border: 1px solid white;
+}
 
 </style>
