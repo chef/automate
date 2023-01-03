@@ -797,7 +797,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 	start := 0
 	var validIds []string
 	var backup []*api.BackupTask
-
+	
 	if strings.Contains(args[0], "/") || strings.Contains(args[0], "\\") {
 		location = args[0]
 		start = 1
@@ -821,23 +821,24 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if !backupDeleteCmdFlags.yes && len(validIds) > 0 {
+	if len(validIds) > 0 {
+		if !backupDeleteCmdFlags.yes {
+			yes, err := writer.Confirm(
+				fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+					strings.Join(validIds, "\n"),
+				),
+			)
+			if err != nil {
+				return status.Annotate(err, status.BackupError)
+			}
+			if !yes {
+				return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
+			}
+		}
 		ids, err := idsToBackupTasks(validIds)
 		if err != nil {
 			return err
 		}
-		yes, err := writer.Confirm(
-			fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
-				strings.Join(validIds, "\n"),
-			),
-		)
-		if err != nil {
-			return status.Annotate(err, status.BackupError)
-		}
-		if !yes {
-			return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
-		}
-
 		_, err = client.DeleteBackups(
 			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
 			time.Duration(backupCmdFlags.deleteWaitTimeout)*time.Second,
@@ -848,7 +849,6 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		}
 		writer.Success("Backups deleted")
 	}
-
 	return nil
 }
 
