@@ -580,43 +580,14 @@ type listBackupsResult struct {
 
 func runListBackupCmd(cmd *cobra.Command, args []string) error {
 	var backups []*api.BackupTask
-
+	var location string
 	if len(args) > 0 {
-		locationSpec, err := parseLocationSpecFromCLIArgs(args[0])
-		if err != nil {
-			return status.Annotate(err, status.BackupError)
-		}
+		location = args[0]
+	}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.listWaitTimeout)*time.Second)
-		defer cancel()
-
-		writer.Printf("Listing backups from %s\n", locationSpec)
-		backups, err = listBackupsLocally(ctx, locationSpec)
-		if err != nil {
-			return status.Wrapf(
-				err,
-				status.BackupError,
-				"Listing local backup directory %s failed",
-				args[0],
-			)
-		}
-	} else {
-		res, err := client.ListBackups(
-			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-			time.Duration(backupCmdFlags.listWaitTimeout)*time.Second,
-		)
-		if err != nil {
-			if errors.Cause(err) == context.DeadlineExceeded {
-				err = status.Wrapf(
-					err,
-					status.BackupError,
-					offlineHelpMsg,
-					os.Args[0],
-				)
-			}
-			return status.Annotate(err, status.BackupError)
-		}
-		backups = res.Backups
+	backups, err := getBackupTask(location)
+	if err != nil {
+		return err
 	}
 
 	formattedBackups := make([]api.FormattedBackupTask, len(backups))
@@ -671,6 +642,43 @@ func runListBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func getBackupTask(location string) ([]*api.BackupTask, error) {
+	var backups []*api.BackupTask
+	if location != "" {
+		locationSpec, err := parseLocationSpecFromCLIArgs(location)
+		if err != nil {
+			return nil, status.Annotate(err, status.BackupError)
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.listWaitTimeout)*time.Second)
+		defer cancel()
+
+		writer.Printf("Listing backups from %s\n", locationSpec)
+		backups, err = listBackupsLocally(ctx, locationSpec)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		res, err := client.ListBackups(
+			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+			time.Duration(backupCmdFlags.listWaitTimeout)*time.Second,
+		)
+		if err != nil {
+			if errors.Cause(err) == context.DeadlineExceeded {
+				err = status.Wrapf(
+					err,
+					status.BackupError,
+					offlineHelpMsg,
+					os.Args[0],
+				)
+			}
+			return nil, status.Annotate(err, status.BackupError)
+		}
+		backups = res.Backups
+	}
+	return backups, nil
 }
 
 func maybeS(value int64) string {
@@ -785,36 +793,62 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 			"Must specify a backup",
 		)
 	}
-
-	ids, err := idsToBackupTasks(args)
-	if err != nil {
-		return err
-
+	var location string
+	start := 0
+	var validIds []string
+	var backup []*api.BackupTask
+	
+	if strings.Contains(args[0], "/") || strings.Contains(args[0], "\\") {
+		location = args[0]
+		start = 1
 	}
 
-	if !backupDeleteCmdFlags.yes {
-		yes, err := writer.Confirm(
-			fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
-				strings.Join(args, "\n"),
-			),
+	backup, err := getBackupTask(location)
+	if err != nil {
+		return errors.Errorf("Unable to fetch the backup list with error: %v", err.Error())
+	}
+
+	backupMap := getBackupMapFromBackupList(backup)
+
+	for i := start; i < len(args); i++ {
+		backupState, ok := backupMap[args[i]]
+		if !ok {
+			writer.Failf("The backup Id %s is either removed or typed incorrect.", args[i])
+		} else if !getBackupStatusAsCompletedOrFailed(backupState) {
+			writer.Failf("The backup ID %s cannot be deleted currently", args[i])
+		} else {
+			validIds = append(validIds, args[i])
+		}
+	}
+
+	if len(validIds) > 0 {
+		if !backupDeleteCmdFlags.yes {
+			yes, err := writer.Confirm(
+				fmt.Sprintf("The following backups will be permanently deleted:\n%s\nAre you sure you want to continue?",
+					strings.Join(validIds, "\n"),
+				),
+			)
+			if err != nil {
+				return status.Annotate(err, status.BackupError)
+			}
+			if !yes {
+				return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
+			}
+		}
+		ids, err := idsToBackupTasks(validIds)
+		if err != nil {
+			return err
+		}
+		_, err = client.DeleteBackups(
+			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+			time.Duration(backupCmdFlags.deleteWaitTimeout)*time.Second,
+			ids,
 		)
 		if err != nil {
-			return status.Annotate(err, status.BackupError)
+			return err
 		}
-		if !yes {
-			return status.New(status.InvalidCommandArgsError, "failed to confirm backup deletion")
-		}
+		writer.Success("Backups deleted")
 	}
-
-	_, err = client.DeleteBackups(
-		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.deleteWaitTimeout)*time.Second,
-		ids,
-	)
-	if err != nil {
-		return err
-	}
-	writer.Success("Backups deleted")
 	return nil
 }
 
@@ -1280,4 +1314,22 @@ func getBackupStateFromList(output string, backupId string) string {
 	left := strings.LastIndex(output[:idxFind], "\n")
 	right := strings.Index(output[idxFind:], "\n")
 	return output[left : idxFind+right]
+}
+
+func getBackupMapFromBackupList(backups []*api.BackupTask) map[string]*api.BackupTask {
+	backupMap := make(map[string]*api.BackupTask)
+	for _, b := range backups {
+		backupMap[b.TaskID()] = b
+	}
+
+	return backupMap
+}
+
+func getBackupStatusAsCompletedOrFailed(backup *api.BackupTask) bool {
+	if backup.State == api.BackupTask_COMPLETED || backup.State == api.BackupTask_FAILED {
+		return true
+	}
+
+	return false
+
 }
