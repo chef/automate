@@ -658,11 +658,7 @@ func getBackupTask(location string) ([]*api.BackupTask, error) {
 		writer.Printf("Listing backups from %s\n", locationSpec)
 		backups, err = listBackupsLocally(ctx, locationSpec)
 		if err != nil {
-			return nil, status.Wrapf(
-				err,
-				status.BackupError,
-				"Listing local backup directory %s failed",
-			)
+			return nil, err
 		}
 	} else {
 		res, err := client.ListBackups(
