@@ -20,7 +20,7 @@ gh_repo = "automate"
 {{< note >}}
 
 -   If the user chooses `backup_config` as `file_system` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
--   In the case of AWS-managed services, **file_system** is not supported. In such case, make sure to follow [On-Premise Deployment using Object Storage](/automate/ha_backup_restore_object_storage/)
+-   In the case of AWS-managed Opensearch and PostgresQL services, `backup_config` as `file_system` is not supported. In such case, make sure to follow [On-Premise Deployment using Object Storage](/automate/ha_backup_restore_object_storage/)
 
 {{< /note >}}
 
