@@ -150,6 +150,12 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		default:
 			return errors.New("Missing or Unsupported flag\n Please run the following command to see all available flags \n\n`chef-automate config show --help`\n")
 		}
+
+		if isManagedServicesOn() && (configCmdFlags.postgresql || configCmdFlags.opensearch) {
+			writer.Warn("Showing the configuration for third party managed services is not supported.")
+			return nil
+		}
+
 		for i := 0; i < len(hostIpArray); i++ {
 			sshUtil.getSSHConfig().hostIP = hostIpArray[i]
 			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommand, true)
