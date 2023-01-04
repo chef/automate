@@ -62,14 +62,14 @@
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
   </div>
-  {{ if ( ne 0 (len .standaloneoptions) )}}
+  {{ if .standaloneoptions }}
   <h5 id="{{ $id }}-Automate-flags">Automate Only Flags</h5>
     {{- range .standaloneoptions -}}
       <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
       <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
   {{ end }}
-  {{ if ( ne 0 (len .haoptions) )}}
+  {{ if .haoptions }}
   <h5 id="{{ $id }}-HA-flags">Automate-HA Only Flags</h5>
     {{- range .haoptions -}}
       <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
