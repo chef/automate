@@ -56,8 +56,8 @@ const (
 )
 
 var commandIDs = map[string]string{
-	ForHA:         AutomateHACommandTag,
-	ForStandalone: AutomateCommandTag,
+	ForHA:         AutomateHACommandID,
+	ForStandalone: AutomateCommandID,
 }
 
 var commandTags = map[string]string{
