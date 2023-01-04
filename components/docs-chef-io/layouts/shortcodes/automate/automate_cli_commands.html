@@ -5,7 +5,7 @@
   <h3 id="{{ $id }}">{{ .name }}</h2>
   <div>
     {{- range .compatiblestring -}}
-      <b class="{{ .id }}" style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;">
+      <b class="{{ .id }}" class="tooltiptext" style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;">
       <i class="tooltip">{{ .name }}</i> </b> &nbsp; {{ if .tag }}</b> <b style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;background-color: #E4B2F2;"> <i> Node:{{ .tag }} </i> </b>{{ end }}
      {{- end -}}
   </div>
@@ -108,14 +108,11 @@ h5 {
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black;
 }
 
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 120px;
-  background-color: black;
-  color: #fff;
   text-align: center;
   border-radius: 6px;
   padding: 5px 0;
