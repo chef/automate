@@ -28,8 +28,10 @@ gh_repo = "automate"
 
 This section provides the pre-backup configuration required to back up the data on Object Storage System (Other than AWS S3) like Minio, Non-AWS S3. The steps to set a secret key using commands are given below:
 
+
 ### Configuration in OpenSearch Node
 
+#### For Chef Managed Opensearch and PostgresQL services
 This section provides the pre-backup configuration required to back up the data on Object Storage Systems like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
 1. Log in to all the OpenSearch nodes and follow the steps on all the OpenSearch nodes.
@@ -63,6 +65,12 @@ The final output after running the curl command on all nodes is given below:
 	}
 }
 ```
+
+{{< note >}}
+
+For Customer Managed Opensearch and PostgresQL services, make sure to the services either have IAM role of S3 bucket access attached or `s3.client.default.access_key` and `s3.client.default.secret_key` is added to opensearch-keystore. 
+
+{{< /note >}}
 
 #### Configuration for Automate Node from Provision Host
 
