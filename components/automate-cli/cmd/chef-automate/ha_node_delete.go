@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
@@ -34,12 +33,8 @@ func deleteNodeHACmd() *cobra.Command {
 
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
-		configPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")
-		deployerType, err := getModeFromConfig(configPath)
-		if err != nil {
-			return err
-		}
-		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType, configPath)
+		deployerType := getModeOfDeployment()
+		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 		if err != nil {
 			return err
 		}
@@ -47,7 +42,7 @@ func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c
 	}
 }
 
-func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployerType, configPath string) (HAModifyAndDeploy, error) {
+func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployerType string) (HAModifyAndDeploy, error) {
 	if addDeleteNodeHACmdFlags.onPremMode && addDeleteNodeHACmdFlags.awsMode {
 		return nil, errors.New("Cannot use both --onprem-mode and --aws-mode together. Provide only one at a time")
 	}
@@ -58,16 +53,16 @@ func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deplo
 		if !addDeleteNodeHACmdFlags.awsMode {
 			hamd = NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
-			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
+			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
 		}
 	case AWS_MODE:
 		if !addDeleteNodeHACmdFlags.onPremMode {
 			err = fmt.Errorf("Remove node command is not supported in AWS mode yet")
 		} else {
-			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
+			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
 		}
 	default:
-		err = fmt.Errorf("Unsupported deployment type. Please check %s", configPath)
+		err = fmt.Errorf("Unsupported deployment type. Current deployment type is %s", deployerType)
 	}
 	return hamd, err
 }

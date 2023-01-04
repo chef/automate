@@ -6,91 +6,90 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHaNodeAddFactoryIfDeployerTypeMatchesFlagAWS(t *testing.T) {
+func TestHaNodeDeleteFactoryIfDeployerTypeMatchesFlagAWS(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{
 		awsMode: true,
 	}
 	deployerType := AWS_MODE
-	addNode, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
-	assert.NoError(t, err)
-	_, ok := addNode.(*AddNodeAWSImpl)
-	assert.True(t, ok)
+	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Remove node command is not supported in AWS mode yet")
 }
 
-func TestHaNodeAddFactoryIfDeployerTypeMatchesFlagOnPrem(t *testing.T) {
+func TestHaNodeDeleteFactoryIfDeployerTypeMatchesFlagOnPrem(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{
 		onPremMode: true,
 	}
 	deployerType := EXISTING_INFRA_MODE
-	addNode, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	deleteNode, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.NoError(t, err)
-	_, ok := addNode.(*AddNodeOnPremImpl)
+	_, ok := deleteNode.(*DeleteNodeOnPremImpl)
 	assert.True(t, ok)
 }
 
-func TestHaNodeAddFactoryIfNoFlagGivenTypeOnprem(t *testing.T) {
+func TestHaNodeDeleteFactoryIfNoFlagGivenTypeOnprem(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{}
 	deployerType := EXISTING_INFRA_MODE
-	addNode, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	deleteNode, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.NoError(t, err)
-	_, ok := addNode.(*AddNodeOnPremImpl)
+	_, ok := deleteNode.(*DeleteNodeOnPremImpl)
 	assert.True(t, ok)
 }
 
-func TestHaNodeAddFactoryIfNoFlagGivenTypeAWS(t *testing.T) {
+func TestHaNodeDeleteFactoryIfNoFlagGivenTypeAWS(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{}
 	deployerType := AWS_MODE
-	addNode, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	deleteNode, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.NoError(t, err)
-	_, ok := addNode.(*AddNodeAWSImpl)
+	_, ok := deleteNode.(*AddNodeAWSImpl)
 	assert.True(t, ok)
 }
 
-func TestHaNodeAddFactoryIfDeployerTypeDoesNotMatchFlagAWS(t *testing.T) {
+func TestHaNodeDeleteFactoryIfDeployerTypeDoesNotMatchFlagAWS(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{
 		onPremMode: true,
 	}
 	deployerType := AWS_MODE
-	_, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Flag given does not match with the current deployment type AWS_MODE. Try with --aws-mode flag")
 }
 
-func TestHaNodeAddFactoryIfDeployerTypeDoesNotMatchFlagOnPrem(t *testing.T) {
+func TestHaNodeDeleteFactoryIfDeployerTypeDoesNotMatchFlagOnPrem(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{
 		awsMode: true,
 	}
 	deployerType := EXISTING_INFRA_MODE
-	_, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Flag given does not match with the current deployment type EXISTING_INFRA_MODE. Try with --onprem-mode flag")
 }
 
-func TestHaNodeAddFactoryIfBothflagGiven(t *testing.T) {
+func TestHaNodeDeleteFactoryIfBothflagGiven(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{
 		awsMode:    true,
 		onPremMode: true,
 	}
 	deployerType := EXISTING_INFRA_MODE
-	_, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Cannot use both --onprem-mode and --aws-mode together. Provide only one at a time")
 }
 
-func TestHaNodeAddFactoryWithFlagOrDeployerModeNotMatch(t *testing.T) {
+func TestHaNodeDeleteFactoryWithFlagOrDeployerModeNotMatch(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{
 		awsMode: true,
 	}
 	deployerType := "SOMETHING_ELSE"
-	_, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unsupported deployment type. Current deployment type is SOMETHING_ELSE")
 }
 
-func TestHaNodeAddFactoryNoFlagOrDeployerModeNotMatch(t *testing.T) {
+func TestHaNodeDeleteFactoryNoFlagOrDeployerModeNotMatch(t *testing.T) {
 	addDeleteNodeHACmdFlags := &AddDeleteNodeHACmdFlags{}
 	deployerType := "SOMETHING_ELSE"
-	_, err := haAddNodeFactory(addDeleteNodeHACmdFlags, deployerType)
+	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unsupported deployment type. Current deployment type is SOMETHING_ELSE")
 }

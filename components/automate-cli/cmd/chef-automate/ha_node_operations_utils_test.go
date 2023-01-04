@@ -229,7 +229,7 @@ func TestModifyTfArchFile(t *testing.T) {
 	assert.NoError(t, err)
 	data, err := ioutil.ReadFile(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
-	assert.Equal(t, "aws", string(data))
+	assert.Equal(t, "aws\n", string(data))
 }
 
 func TestModifyTfArchFileNotExist(t *testing.T) {

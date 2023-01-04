@@ -93,6 +93,7 @@ func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, er
 }
 func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
 	return mnu.getModeOfDeploymentFunc()
+}
 func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
 	return mnu.moveAWSAutoTfvarsFileFunc(path)
 }
