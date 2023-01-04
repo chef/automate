@@ -105,13 +105,13 @@ table, th, td {
 h5 {
   font-size: 11px;
 }
-b {
+.tooltip {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted black;
 }
 
-b {
+.tooltip .tooltiptext {
   visibility: hidden;
   width: 120px;
   background-color: black;
@@ -125,7 +125,7 @@ b {
   z-index: 1;
 }
 
-b {
+.tooltip:hover .tooltiptext {
   visibility: visible;
 }
 </style>
