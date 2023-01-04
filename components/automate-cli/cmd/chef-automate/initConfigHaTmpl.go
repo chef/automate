@@ -193,8 +193,8 @@ managed_rds_dbuser_username = ""
 # eg: managed_rds_dbuser_password = "Progress123"
 managed_rds_dbuser_password = ""
 
-# eg: managed_rds_certificate =
-managed_rds_certificate = "<cert content>"
+# eg: managed_rds_certificate = "<cert content>"
+managed_rds_certificate = ""
 
 ## === ===
 
