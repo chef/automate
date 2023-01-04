@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
 	"github.com/pkg/errors"
@@ -95,7 +96,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	isSuccess := false
 	go tailFile(logFilePath, executed)
 	x, err := c.Process.Wait()
-	logString, err := ioutil.ReadFile(logFilePath)
+	logString, err := fileutils.ReadFile(logFilePath)
 	if strings.Contains(string(logString), "Apply complete!") {
 		isSuccess = true
 	}
