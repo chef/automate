@@ -13,7 +13,7 @@
 
   <h4 id="{{ $id }}-usage">Usage</h3>
   <pre><code>{{ .usage }}</code></pre>
-
+<!--
   <h4 id="{{ $id }}-flags">Flags</h3>
   <div>
     <table style="width:100%">
@@ -49,8 +49,9 @@
         </tr>
       </table>
   </div>
-  <!--
-  <h4 id="{{ $id }}-flags">Flags</h3>
+  -->
+
+  <h6 id="{{ $id }}-flags">Flags</h6>
   <div class="fake-code grid-x">
     {{- range .options -}}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
@@ -61,9 +62,21 @@
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
   </div>
-  -->
-
-  <h4 id="{{ $id }}-see-also">See Also</h3>
+  {{ if ( ne 0 (len .standaloneoptions) )}}
+  <h5 id="{{ $id }}-Automate-flags">Automate Only Flags</h5>
+    {{ range .standaloneoptions }}
+      <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
+      <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
+    {{- end -}}
+  {{ end }}
+  {{ if ( ne 0 (len .haoptions) )}}
+  <h5 id="{{ $id }}-HA-flags">Automate HA Only Flags</h5>
+    {{ range .haoptions }}
+      <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
+      <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
+    {{- end -}}
+  {{ end }}
+  <h4 id="{{ $id }}-see-also">See Also</h4>
   <div class="grid-x">
     {{ range .see_also }}
     {{ $sa_bits := split . " - " }}

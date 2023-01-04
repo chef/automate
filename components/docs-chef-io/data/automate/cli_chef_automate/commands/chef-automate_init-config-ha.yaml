@@ -4,17 +4,18 @@ usage: chef-automate init-config-ha [flags]
 description: |
   Initialized default configuration for HA and save it to a file.
 options:
-- name: file
-  default_value: config.toml
-  usage: File path to write the config
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for init-config-ha
+standaloneoptions:
+- name: file
+  default_value: config.toml
+  usage: File path to write the config
+haoptions:
 - name: path
   default_value: /hab/a2_deploy_workspace/
   usage: a2ha hab workspace dir path
-  compatibilitystring: Automate HA Only
 inherited_options:
 - name: debug
   shorthand: d
@@ -27,7 +28,10 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-compatiblestring: 
-- id: Automate_HA
+compatiblestring:
+- id: Automate HA
   name: Automate HA
-  tag: Opensearch
+  tag: Node:Bastion
+  tooltip: This command can be run from Bastion node
+- id: Automate
+  name: Automate

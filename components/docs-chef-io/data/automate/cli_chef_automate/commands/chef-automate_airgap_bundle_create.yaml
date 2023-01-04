@@ -38,3 +38,8 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - 'chef-automate airgap bundle - '
+compatiblestring:
+- id: Automate HA
+  name: Automate HA
+- id: Automate
+  name: Automate

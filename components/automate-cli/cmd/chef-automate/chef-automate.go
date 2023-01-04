@@ -34,7 +34,13 @@ const (
 	Compatiblity             = "compatibility"
 	CompatiblewithStandalone = "forStandalone"
 	CompatiblewithHA         = "forHA"
-	Tag                      = "tag"
+	CompatibleWithAll        = "common"
+	RunFrom                  = "runFrom"
+	RunFromBastion           = "bastion"
+	RunFromAutomateNode      = "automate"
+	RunFromChefServerNode    = "cs"
+	RunFromOpenSearchNode    = "opensearch"
+	RunFromPGNode            = "pg"
 )
 
 var writer *cli.Writer
