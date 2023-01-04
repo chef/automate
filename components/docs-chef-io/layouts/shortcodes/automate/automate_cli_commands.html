@@ -70,7 +70,7 @@
     {{- end -}}
   {{ end }}
   {{ if ( ne 0 (len .haoptions) )}}
-  <h5 id="{{ $id }}-HA-flags">Automate HA Only Flags</h5>
+  <h5 id="{{ $id }}-HA-flags">Automate-HA Only Flags</h5>
     {{ range .haoptions }}
       <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
       <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='color:black;'>{{ .compatibilitystring }}</b></div>
