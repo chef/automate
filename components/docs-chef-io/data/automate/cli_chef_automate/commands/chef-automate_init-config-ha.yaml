@@ -29,7 +29,7 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 compatiblestring:
-- id: Automate HA
+- id: Automate_HA
   name: Automate HA
   tag: Node:Bastion
   tooltip: This command can be run from Bastion node

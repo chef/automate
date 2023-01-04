@@ -44,7 +44,7 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 compatiblestring:
-- id: Automate HA
+- id: Automate_HA
   name: Automate HA
 - id: Automate
   name: Automate
