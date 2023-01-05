@@ -152,7 +152,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if isManagedServicesOn() && (configCmdFlags.postgresql || configCmdFlags.opensearch) {
-			writer.Warn("Showing the configuration for third party managed services is not supported.")
+			writer.Warn("Showing the configuration for externally configured OpenSearch/Postgresql is not supported.")
 			return nil
 		}
 
@@ -330,7 +330,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 // setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
 func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		writer.Warn("Patching the configuration for third party managed services is not supported.")
+		writer.Warn("Patching the configuration for externally configured Postgresql is not supported.")
 		return nil
 	}
 	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
@@ -386,11 +386,11 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 // setConfigForOpensearch patches the config for open-search nodes in Automate HA
 func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		writer.Warn("Patching the configuration for third party managed services is not supported.")
+		writer.Warn("Patching the configuration for externally configured Opensearch is not supported.")
 		return nil
 	}
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
-		writer.Error("Postgres IPs not found in the config. Please contact the support team")
+		writer.Error("Opensearch IPs not found in the config. Please contact the support team")
 		return nil
 
 	}
