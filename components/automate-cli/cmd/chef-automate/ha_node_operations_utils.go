@@ -3,7 +3,6 @@ package main
 import (
 	"container/list"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -418,7 +417,7 @@ func checkIfPresentInPrivateIPList(existingIPArray []string, ips []string, error
 }
 
 func readConfig(path string) (ExistingInfraConfigToml, error) {
-	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	templateBytes, err := fileutils.ReadFile(path)
 	if err != nil {
 		return ExistingInfraConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
@@ -431,7 +430,7 @@ func readConfig(path string) (ExistingInfraConfigToml, error) {
 }
 
 func readAnyConfig(path string, configType string) (interface{}, error) {
-	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	templateBytes, err := fileutils.ReadFile(path) // nosemgrep
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
@@ -452,7 +451,7 @@ func readAnyConfig(path string, configType string) (interface{}, error) {
 }
 
 func readConfigAWS(path string) (AwsConfigToml, error) {
-	templateBytes, err := ioutil.ReadFile(path) // nosemgrep
+	templateBytes, err := fileutils.ReadFile(path) // nosemgrep
 	if err != nil {
 		return AwsConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}

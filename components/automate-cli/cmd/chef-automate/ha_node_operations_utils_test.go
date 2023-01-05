@@ -1,11 +1,11 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -227,7 +227,7 @@ func TestModifyTfArchFile(t *testing.T) {
 
 	err = nodeUtil.modifyTfArchFile(dir)
 	assert.NoError(t, err)
-	data, err := ioutil.ReadFile(filepath.Join(dir, TF_ARCH_FILE))
+	data, err := fileutils.ReadFile(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
 	assert.Equal(t, "aws\n", string(data))
 }
