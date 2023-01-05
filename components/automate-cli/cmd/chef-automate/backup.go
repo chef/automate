@@ -1224,7 +1224,25 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 			}
 		}()
 	}
+
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
+
+	// If managed service and filesystem backup, info: "we don't have support for this configurations"
+	config, err := getExistingHAConfig()
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+	}
+
+	sharedConfigToml, err := getAwsHAConfig()
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+	}
+
+	if config.Architecture.ConfigInitials.BackupConfig == "file_system" && sharedConfigToml.Aws.Config.SetupManagedServices == true {
+		writer.Printf("INFO: currently we don't have support for file_system backup and menaged service")
+		return nil
+	}
+
 	if pooling {
 		cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString, true)
 		if err != nil {
