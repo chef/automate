@@ -143,8 +143,8 @@ func (dni *DeleteNodeImpl) validate() error {
 			}
 		}
 		errorList := dni.validateCmdArgs(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIp, dni.opensearchIpList, dni.config)
-		if errorList != nil && errorList.Len() > 0 {
-			return status.Wrap(getSingleErrorFromList(errorList), status.ConfigError, "IP address validation failed")
+		if errorList.Len() > 0 {
+			return getSingleErrorFromList(errorList)
 		}
 	} else {
 		return errors.New(fmt.Sprintf("Unsupported deployment type. Please check %s", dni.configpath))
@@ -261,6 +261,7 @@ func (dni *DeleteNodeImpl) validateCmdArgs(automateIpList, chefServerIpList, pos
 		}
 		if !allowed {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. OpenSearch instance count cannot be less than %d. Final count %d not allowed.", OPENSEARCH_MIN_INSTANCE_COUNT, finalCount))
+			return errorList
 		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(config.ExistingInfra.Config.OpensearchPrivateIps, opensearchIpList, "OpenSearch"))
 	}
