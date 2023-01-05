@@ -5,7 +5,7 @@
   <h3 id="{{ $id }}">{{ .name }}</h2>
   <div>
     {{- range .compatiblestring -}}
-      <b class="{{ .id }}" style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;">
+      <b class="{{ .id }}" style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;">
       <i>{{ .name }}</i> </b> &nbsp; {{ if .tag }}</b> <b style="font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;background-color: #E4B2F2;"> <i> Node:{{ .tag }} </i> </b>{{ end }}
      {{- end -}}
   </div>
@@ -18,11 +18,11 @@
   <div class="fake-code grid-x">
     {{- range .options -}}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
-    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;'>{{ .compatibilitystring }}</b></div>
+    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
     {{- range .inherited_options -}}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
-    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:6px;display:inline-block;'>{{ .compatibilitystring }}</b></div>
+    <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
   </div>
 
