@@ -152,7 +152,13 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if isManagedServicesOn() && (configCmdFlags.postgresql || configCmdFlags.opensearch) {
-			writer.Warn("Showing the configuration for externally configured OpenSearch/Postgresql is not supported.")
+
+			if configCmdFlags.postgresql {
+				writer.Warn("Showing the configuration for externally configured Postgresql is not supported.")
+			}
+			if configCmdFlags.opensearch {
+				writer.Warn("Showing the configuration for externally configured OpenSearch is not supported.")
+			}
 			return nil
 		}
 
