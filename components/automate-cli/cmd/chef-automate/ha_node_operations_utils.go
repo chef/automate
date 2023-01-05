@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
@@ -240,7 +241,7 @@ func (nu *NodeUtilsImpl) moveAWSAutoTfvarsFile(terraformPath string) error {
 
 func (nu *NodeUtilsImpl) modifyTfArchFile(terraformPath string) error {
 	tfArchPath := filepath.Join(terraformPath, TF_ARCH_FILE)
-	data, err := ioutil.ReadFile(tfArchPath)
+	data, err := fileutils.ReadFile(tfArchPath)
 	if err != nil {
 		return errors.Wrap(err, "Failed to read .tf_arch file")
 	}
