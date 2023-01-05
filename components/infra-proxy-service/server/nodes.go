@@ -12,6 +12,8 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+
+	"github.com/sirupsen/logrus"
 )
 
 // GetNodes fetches the nodes from chef infra server
@@ -327,9 +329,13 @@ func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeEx
 
 	runList := res.RunList
 
-	// Fetches cookbooks to evaluate recipes version.
+	if res.PolicyGroup != "" {
+		req.Environment = "_default"
+	}
+
 	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
 	if err != nil {
+		logrus.Errorf("Failed while listing cookbooks for %s: %+v", req.Environment, err)
 		return nil, ParseAPIError(err)
 	}
 

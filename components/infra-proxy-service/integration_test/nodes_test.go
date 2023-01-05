@@ -591,4 +591,81 @@ func TestNodeExpnadNodeRunList(t *testing.T) {
 
 		require.Equal(t, runList.Id, "_default")
 	})
+
+	t.Run("checking the runlist with children but no environment but policy group", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+
+		// Create the base role
+		starterRoleName := fmt.Sprintf("chef-starter-role-%d", time.Now().Nanosecond())
+		starterRoleReq := &request.CreateRole{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        starterRoleName,
+			Description: "auto generated role",
+			RunList: []string{
+				"recipe[starter]",
+			},
+		}
+		_, err := infraProxy.CreateRole(ctx, starterRoleReq)
+
+		// Create the next level role
+		roleName := fmt.Sprintf("chef-load-role-%d", time.Now().Nanosecond())
+		roleReq := &request.CreateRole{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        roleName,
+			Description: "auto generated role",
+			RunList: []string{
+				fmt.Sprintf("role[%s]", starterRoleName),
+				"recipe[chef-client::default]",
+			},
+		}
+		_, err = infraProxy.CreateRole(ctx, roleReq)
+
+		// Create the node
+		reqNode := &request.NodeDetails{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Environment: "Test_ENV",
+			PolicyGroup: "Test_policy",
+			RunList: []string{
+				"recipe[audit::default]",
+				"recipe[chef-client::default]",
+				fmt.Sprintf("role[%s]", roleName),
+			},
+		}
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		require.NoError(t, err, "Error while creating Node")
+		require.NotNil(t, node, "Created node is nil")
+
+		// Get the runList of the node
+		reqRunList := &request.NodeExpandedRunList{
+			OrgId:       autoDeployedChefOrganizationID,
+			ServerId:    autoDeployedChefServerID,
+			Name:        name,
+			Environment: node.Environment,
+		}
+		runList, err := infraProxy.GetNodeExpandedRunList(ctx, reqRunList)
+
+		require.Nil(t, err, "Error while getting expanded node runlist")
+		require.NotNil(t, runList)
+
+		// Based on the node Runlist
+		require.Len(t, runList.RunList, 3)
+		require.Len(t, runList.RunList[2].Children, 2)
+
+		require.Equal(t, runList.RunList[2].Children[1].Name, "chef-client::default")
+		require.Equal(t, runList.RunList[2].Children[1].Type, "recipe")
+		require.True(t, runList.RunList[2].Children[1].Skipped)
+
+		require.Equal(t, int(runList.RunList[2].Children[1].Position), -1)
+		require.Equal(t, runList.RunList[2].Children[0].Name, starterRoleName)
+		require.Equal(t, runList.RunList[2].Children[0].Type, "role")
+		require.Equal(t, runList.RunList[2].Children[0].Children[0].Type, "recipe")
+		require.Equal(t, runList.RunList[2].Children[0].Children[0].Name, "starter")
+
+		require.Equal(t, runList.Id, "_default")
+	})
+
 }
