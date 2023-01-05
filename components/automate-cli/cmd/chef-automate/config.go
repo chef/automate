@@ -43,6 +43,8 @@ const (
 	CERT_WARNING     = `Ignored values from [%s]
 	Please use 'cert-rotate' command to rotate certificate. 
 	For more information, run: 'chef-automate cert-rotate --help'`
+	ERROR_SELF_MANAGED_CONFIG_SHOW = "Showing the configuration for externally configured %s is not supported."
+	ERROR_SELF_MANAGED_CONFIG_PATCH = "Patching the configuration for externally configured %s is not supported."
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -112,6 +114,10 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 
 	if isA2HARBFileExist() {
 
+		err := errorOnSelfManaged()
+		if err != nil {
+			return err
+		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -149,17 +155,6 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			scriptCommand = fmt.Sprintf(GET_CONFIG, "opensearch")
 		default:
 			return errors.New("Missing or Unsupported flag\n Please run the following command to see all available flags \n\n`chef-automate config show --help`\n")
-		}
-
-		if isManagedServicesOn() && (configCmdFlags.postgresql || configCmdFlags.opensearch) {
-
-			if configCmdFlags.postgresql {
-				writer.Warn("Showing the configuration for externally configured Postgresql is not supported.")
-			}
-			if configCmdFlags.opensearch {
-				writer.Warn("Showing the configuration for externally configured OpenSearch is not supported.")
-			}
-			return nil
 		}
 
 		for i := 0; i < len(hostIpArray); i++ {
@@ -228,6 +223,19 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 	writer.Println(string(t))
 	return nil
 }
+
+func errorOnSelfManaged() error {
+	if isManagedServicesOn() {
+		if configCmdFlags.postgresql {
+			return errors.Errorf(ERROR_SELF_MANAGED_CONFIG_SHOW, "Postgresql")
+		}
+		if configCmdFlags.opensearch {
+			return errors.Errorf(ERROR_SELF_MANAGED_CONFIG_SHOW, "OpenSearch")
+		}
+	}
+	return nil
+}
+
 func runPatchCommand(cmd *cobra.Command, args []string) error {
 	/*
 		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
@@ -288,7 +296,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			writer.Println(cmd.UsageString())
 		}
 		if err != nil {
-			writer.Errorf("%v", err)
 			return err
 		}
 
@@ -336,13 +343,11 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 // setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
 func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		writer.Warn("Patching the configuration for externally configured Postgresql is not supported.")
-		return nil
+		return errors.Errorf(ERROR_SELF_MANAGED_CONFIG_PATCH,"Postgresql")
 	}
 	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
 		writer.Error("Postgres IPs not found in the config. Please contact the support team")
 		return nil
-
 	}
 
 	//checking for log configuration
@@ -392,13 +397,11 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 // setConfigForOpensearch patches the config for open-search nodes in Automate HA
 func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		writer.Warn("Patching the configuration for externally configured Opensearch is not supported.")
-		return nil
+		return errors.Errorf(ERROR_SELF_MANAGED_CONFIG_PATCH,"OpenSearch")
 	}
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
-		writer.Error("Opensearch IPs not found in the config. Please contact the support team")
+		writer.Error("OpenSearch IPs not found in the config. Please contact the support team")
 		return nil
-
 	}
 	//checking for log configuration
 	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value)
