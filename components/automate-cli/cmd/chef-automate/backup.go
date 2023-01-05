@@ -1232,13 +1232,8 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 
-	awsHAConfig, err := getAwsHAConfig()
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
-	}
-
-	if config.Architecture.ConfigInitials.BackupConfig == "file_system" && awsHAConfig.Aws.Config.SetupManagedServices == true {
-		writer.Printf("INFO: currently we don't have support for file_system backup and menaged service")
+	if config.Architecture.ConfigInitials.BackupConfig == "file_system" && isManagedServicesOn() {
+		writer.Printf("INFO: currently we don't have support for file_system backup and managed service\n")
 		return nil
 	}
 
