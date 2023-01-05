@@ -44,6 +44,7 @@ var allPassedFlags string = ""
 const (
 	AUTOMATE_CMD_STOP  = "sudo chef-automate stop"
 	AUTOMATE_CMD_START = "sudo chef-automate start"
+	BACKUP_CONFIG      = "file_system"
 )
 
 type BackupFromBashtion interface {
@@ -1232,8 +1233,8 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
 
-	if config.Architecture.ConfigInitials.BackupConfig == "file_system" && isManagedServicesOn() {
-		writer.Printf("INFO: currently we don't have support for file_system backup and managed service\n")
+	if config.Architecture.ConfigInitials.BackupConfig == BACKUP_CONFIG && isManagedServicesOn() {
+		writer.Printf("currently we don't have support for file_system backup with AWS managed DB\n")
 		return nil
 	}
 
