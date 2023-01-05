@@ -45,6 +45,6 @@ see_also:
 - chef-automate - Chef Automate CLI
 compatiblestring:
 - id: Automate
-  name: Automate
+  name: A
 - id: Automate_HA
-  name: Automate HA
+  name: HA

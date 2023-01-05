@@ -14,7 +14,7 @@ options:
 - name: path
   default_value: /hab/a2_deploy_workspace/
   usage: a2ha hab workspace dir path
-  compatibilitystring: Automate HA Only
+  compatibilitystring: HA
 inherited_options:
 - name: debug
   shorthand: d
@@ -29,5 +29,5 @@ see_also:
 - chef-automate - Chef Automate CLI
 compatiblestring: 
 - id: Automate_HA
-  name: Automate HA
+  name: HA
   tag: Opensearch
