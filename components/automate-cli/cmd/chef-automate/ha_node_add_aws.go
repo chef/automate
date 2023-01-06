@@ -7,7 +7,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
-	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -141,15 +140,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	tomlbytes, err := ptoml.Marshal(ani.config)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
-	}
-	err = ani.fileutils.WriteToFile(ani.configpath, tomlbytes)
-	if err != nil {
-		return err
-	}
-	err = ani.nodeUtils.genConfigAWS(ani.configpath)
+	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config)
 	if err != nil {
 		return err
 	}

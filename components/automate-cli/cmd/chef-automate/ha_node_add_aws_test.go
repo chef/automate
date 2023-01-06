@@ -166,7 +166,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		genConfigAWSfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -256,7 +256,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		genConfigAWSfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
 			return errors.New("random")
 		},
 		isA2HARBFileExistFunc: func() bool {
@@ -323,7 +323,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		genConfigAWSfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
 			return nil
 		},
 		isA2HARBFileExistFunc: func() bool {

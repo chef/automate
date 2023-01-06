@@ -12,7 +12,6 @@ import (
 	cli "github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
-	ptoml "github.com/pelletier/go-toml"
 	"github.com/spf13/cobra"
 )
 
@@ -192,15 +191,7 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	tomlbytes, err := ptoml.Marshal(ani.config)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
-	}
-	err = ani.fileutils.WriteToFile(ani.configpath, tomlbytes)
-	if err != nil {
-		return err
-	}
-	err = ani.nodeUtils.genConfig(ani.configpath)
+	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
 	if err != nil {
 		return err
 	}

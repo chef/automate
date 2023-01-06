@@ -35,8 +35,7 @@ type HAModifyAndDeploy interface {
 type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
 	getHaInfraDetailsfunc                     func() (*AutomteHAInfraDetails, *SSHConfig, error)
-	genConfigfunc                             func(path string) error
-	genConfigAWSfunc                          func(path string) error
+	writeHAConfigFilesFunc                    func(templateName string, data interface{}) error
 	taintTerraformFunc                        func(path string) error
 	isA2HARBFileExistFunc                     func() bool
 	getModeFromConfigFunc                     func(path string) (string, error)
@@ -58,11 +57,8 @@ func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command stri
 func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()
 }
-func (mnu *MockNodeUtilsImpl) genConfig(path string) error {
-	return mnu.genConfigfunc(path)
-}
-func (mnu *MockNodeUtilsImpl) genConfigAWS(path string) error {
-	return mnu.genConfigAWSfunc(path)
+func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
+	return mnu.writeHAConfigFilesFunc(templateName, data)
 }
 func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
 	return mnu.taintTerraformFunc(path)
@@ -107,8 +103,7 @@ func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exception
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error)
-	genConfig(path string) error
-	genConfigAWS(path string) error
+	writeHAConfigFiles(templateName string, data interface{}) error
 	taintTerraform(path string) error
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
@@ -202,14 +197,8 @@ func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, a
 	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs)
 }
 
-func (nu *NodeUtilsImpl) genConfig(path string) error {
-	e := newExistingInfa(path)
-	return e.generateConfig()
-}
-
-func (nu *NodeUtilsImpl) genConfigAWS(path string) error {
-	e := newAwsDeployemnt(path)
-	return e.generateConfig()
+func (nu *NodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
+	return writeHAConfigFiles(templateName, data)
 }
 
 func (nu *NodeUtilsImpl) moveAWSAutoTfvarsFile(terraformPath string) error {

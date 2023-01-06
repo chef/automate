@@ -104,17 +104,7 @@ func (a *awsDeployment) generateConfig() error {
 		}
 		a.config.Opensearch.Config.NodesDn = nodes_dn
 	}
-	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, a.config)
-	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
-	config, err := toml.Marshal(a.config)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600) // nosemgrep
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeHAConfigFiles(awsA2harbTemplate, a.config)
 }
 
 func (a *awsDeployment) getDistinguishedNameFromKey(publicKey string) (string, error) {

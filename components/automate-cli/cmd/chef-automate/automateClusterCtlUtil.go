@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
@@ -572,4 +573,18 @@ func isManagedServicesOn() bool {
 		return true
 	}
 	return false
+}
+
+func writeHAConfigFiles(templateName string, data interface{}) error {
+	finalTemplate := renderSettingsToA2HARBFile(templateName, data)
+	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
+	config, err := toml.Marshal(data)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600) // nosemgrep
+	if err != nil {
+		return err
+	}
+	return nil
 }
