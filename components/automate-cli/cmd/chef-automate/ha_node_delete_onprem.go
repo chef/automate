@@ -78,11 +78,7 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		}
 	}
 	dni.prepare()
-	err = dni.runDeploy()
-	if err != nil {
-		return err
-	}
-	return nil
+	return dni.runDeploy()
 }
 
 func (dni *DeleteNodeOnPremImpl) prepare() error {
