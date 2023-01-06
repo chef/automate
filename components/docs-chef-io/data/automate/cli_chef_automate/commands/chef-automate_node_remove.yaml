@@ -8,21 +8,51 @@ options:
   default_value: "false"
   usage: auto-accept
 - name: automate
+  shorthand: A
+  usage: |
+    Automate ip addresses to be removed. Works with --onprem-mode flag
+- name: automate-count
   shorthand: a
-  usage: new automate ip addresses
+  default_value: "0"
+  usage: |
+    No of Automate instances to be removed. Works with --aws-mode flag
+- name: aws-mode
+  default_value: "false"
+  usage: Use this flag if the deployment type is AWS
 - name: chef-server
+  shorthand: C
+  usage: |
+    Chef-server ip addresses to be removed. Works with --onprem-mode flag
+- name: chef-server-count
   shorthand: c
-  usage: new chef-server ip addresses
+  default_value: "0"
+  usage: |
+    No of chef-server instances to be removed. Works with --aws-mode flag
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for remove
+- name: onprem-mode
+  default_value: "false"
+  usage: Use this flag if the deployment type is on prem
 - name: opensearch
+  shorthand: O
+  usage: |
+    OpenSearch ip addresses to be removed. Works with --onprem-mode flag
+- name: opensearch-count
   shorthand: o
-  usage: new opensearch ip addresses
+  default_value: "0"
+  usage: |
+    No of opensearch instances to be removed. Works with --aws-mode flag
 - name: postgresql
+  shorthand: P
+  usage: |
+    Postgresql ip addresses to be removed. Works with --onprem-mode flag
+- name: postgresql-count
   shorthand: p
-  usage: new postgresql ip addresses
+  default_value: "0"
+  usage: |
+    No of postgresql instances to be removed. Works with --aws-mode flag
 inherited_options:
 - name: debug
   shorthand: d

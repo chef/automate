@@ -7,22 +7,52 @@ options:
   shorthand: "y"
   default_value: "false"
   usage: auto-accept
-- name: automate
+- name: automate-count
   shorthand: a
-  usage: new automate ip addresses
-- name: chef-server
+  default_value: "0"
+  usage: |
+    New automate instances to be added. Works with --aws-mode flag
+- name: automate-ips
+  shorthand: A
+  usage: |
+    New automate ip addresses to be added. Works with --onprem-mode flag
+- name: aws-mode
+  default_value: "false"
+  usage: Use this flag if the deployment type is AWS
+- name: chef-server-count
   shorthand: c
-  usage: new chef-server ip addresses
+  default_value: "0"
+  usage: |
+    New chef-server instances to be added. Works with --aws-mode flag
+- name: chef-server-ips
+  shorthand: C
+  usage: |
+    New chef-server ip addresses to be added. Works with --onprem-mode flag
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for add
-- name: opensearch
+- name: onprem-mode
+  default_value: "false"
+  usage: Use this flag if the deployment type is on prem
+- name: opensearch-count
   shorthand: o
-  usage: new opensearch ip addresses
-- name: postgresql
+  default_value: "0"
+  usage: |
+    New opensearch instances to be added. Works with --aws-mode flag
+- name: opensearch-ips
+  shorthand: O
+  usage: |
+    New opensearch ip addresses to be added. Works with --onprem-mode flag
+- name: postgresql-count
   shorthand: p
-  usage: new postgres ip addresses
+  default_value: "0"
+  usage: |
+    New postgresql instances to be added. Works with --aws-mode flag
+- name: postgresql-ips
+  shorthand: P
+  usage: |
+    New postgres ip addresses to be added. Works with --onprem-mode flag
 inherited_options:
 - name: debug
   shorthand: d
