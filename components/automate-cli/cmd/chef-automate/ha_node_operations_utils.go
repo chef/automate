@@ -312,6 +312,7 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 				IP:         ip,
 				PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
 				PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
+				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
 			}
 			*certsIp = append(*certsIp, c)
 		}

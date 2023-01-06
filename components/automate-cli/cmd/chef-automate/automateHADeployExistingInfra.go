@@ -254,12 +254,12 @@ func (e *existingInfra) validateCerts() *list.List {
 	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if e.config.Automate.Config.EnableCustomCerts {
 		if len(e.config.Automate.Config.CertsByIP) > 0 {
-			if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) < 1 {
-				errorList.PushBack("Automate root_ca is missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			// if root_ca is provided, then check if it is valid
+			if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) > 0 {
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: e.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+				}))
 			}
-			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: e.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
-			}))
 			if !stringutils.SubSlice(e.config.ExistingInfra.Config.AutomatePrivateIps, extractIPsFromCertsByIP(e.config.Automate.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some automate private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(e.config.ExistingInfra.Config.AutomatePrivateIps, ", "))
 			}
@@ -277,13 +277,17 @@ func (e *existingInfra) validateCerts() *list.List {
 			}
 		} else {
 			// check if all the default certs are given
-			if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) < 1 ||
-				len(strings.TrimSpace(e.config.Automate.Config.PrivateKey)) < 1 ||
+			if len(strings.TrimSpace(e.config.Automate.Config.PrivateKey)) < 1 ||
 				len(strings.TrimSpace(e.config.Automate.Config.PublicKey)) < 1 {
-				errorList.PushBack("Automate root_ca and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+				errorList.PushBack("Automate public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+			}
+			// if root_ca is provided, then check if it is valid
+			if len(strings.TrimSpace(e.config.Automate.Config.RootCA)) > 0 {
+				errorList.PushBackList(checkCertValid([]keydetails{
+					{key: e.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+				}))
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: e.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
 				{key: e.config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
 				{key: e.config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
 			}))
