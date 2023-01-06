@@ -1,8 +1,11 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -177,4 +180,61 @@ func TestIsFinalInstanceCountAllowed(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, allowed)
 	assert.Equal(t, 3, finalcount)
+}
+
+func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
+	nodeUtil := NewNodeUtils()
+	dir := t.TempDir()
+	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
+	assert.NoError(t, err)
+	err = os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
+	assert.NoError(t, err)
+
+	err = nodeUtil.moveAWSAutoTfvarsFile(dir)
+	assert.NoError(t, err)
+}
+
+func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
+	nodeUtil := NewNodeUtils()
+	dir := t.TempDir()
+
+	err := os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
+	assert.NoError(t, err)
+
+	err = nodeUtil.moveAWSAutoTfvarsFile(dir)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Missing "+filepath.Join(dir, AWS_AUTO_TFVARS))
+}
+
+func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
+	nodeUtil := NewNodeUtils()
+	dir := t.TempDir()
+
+	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
+	assert.NoError(t, err)
+
+	err = nodeUtil.moveAWSAutoTfvarsFile(dir)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Missing "+filepath.Join(dir, DESTROY_AWS_FOLDER))
+
+}
+
+func TestModifyTfArchFile(t *testing.T) {
+	nodeUtil := NewNodeUtils()
+	dir := t.TempDir()
+	_, err := os.Create(filepath.Join(dir, TF_ARCH_FILE))
+	assert.NoError(t, err)
+
+	err = nodeUtil.modifyTfArchFile(dir)
+	assert.NoError(t, err)
+	data, err := fileutils.ReadFile(filepath.Join(dir, TF_ARCH_FILE))
+	assert.NoError(t, err)
+	assert.Equal(t, "aws\n", string(data))
+}
+
+func TestModifyTfArchFileNotExist(t *testing.T) {
+	nodeUtil := NewNodeUtils()
+	dir := t.TempDir()
+	err := nodeUtil.modifyTfArchFile(dir)
+	assert.Error(t, err)
 }

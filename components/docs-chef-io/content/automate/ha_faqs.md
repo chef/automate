@@ -54,21 +54,61 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 
 ### How to Add more nodes In AWS Deployment, post deployment. 
-- Move `/hab/a2_deploy_workspace/terraform/aws.auto.tfvars` to `/hab/a2_deploy_workspace/terraform/destroy/aws/`
-- Modify `/hab/a2_deploy_workspace/terraform/.tf_arch` from `deployment` to `aws`
-- Modify the `instance_count` in config.toml
-- Run the Provision command (This will create or destroy the resources):
-  ``` bash 
-  chef-automate provision-infra config.toml --airgap-bundle <BUNDLE_NAME>
-  ```
-  
-- Redeploy the cluster
-  ``` bash
-  chef-automate deploy config.toml --airgap-bundle <BUNDLE_NAME>
-  ```
+The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
+For example,
+
+- if you want to add 2 nodes to automate, you have to run the:
+
+    ```sh
+    chef-automate node add --automate-count 2
+    ```
+
+- If you want to add 3 nodes to chef-server, you have to run the:
+
+    ```sh
+    chef-automate node add --chef-server-count 3
+    ```
+
+- If you want to add 1 node to OpenSearch, you have to run the:
+
+    ```sh
+    chef-automate node add --opensearch-count 1
+    ```
+
+- If you want to add 2 nodes to PostgreSQL you have to run:
+
+    ```sh
+    chef-automate node add --postgresql-count 2
+    ```
+
+You can mix and match different services if you want to add nodes across various services.
+
+- If you want to add 1 node to automate and 2 nodes to PostgreSQL, you have to run:
+
+    ```sh
+    chef-automate node add --automate-count 1 --postgresql-count 2
+    ```
+
+- If you want to add 1 node to automate, 2 nodes to chef-server, and 2 nodes to PostgreSQL you have to run:
+
+    ```sh
+    chef-automate node add --automate-count 1 --chef-server-count 2 --postgresql-count 2
+    ```
+
+Once the command executes, it will add the supplied number of nodes to your automate setup. The changes might take a while.
+
 {{< note >}}
+
+- If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
+For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+- The new node will be configured with the certificates which were already configured in your HA setup.
+
+{{< /note >}}
+
+
+{{< warning >}}
   Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
-{{< /note >}}  
+{{< /warning >}}
 
 ### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
  - No, Automate HA support https connection only with Managed services. 

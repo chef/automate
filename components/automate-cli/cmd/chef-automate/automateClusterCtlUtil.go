@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
-	"errors"
+
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,8 +26,10 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -91,10 +93,15 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	}
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
 	executed := make(chan struct{})
+	isSuccess := false
 	go tailFile(logFilePath, executed)
-	_, err = c.Process.Wait()
-	if err != nil {
-		return err
+	x, err := c.Process.Wait()
+	logString, err := fileutils.ReadFile(logFilePath)
+	if strings.Contains(string(logString), "Apply complete!") {
+		isSuccess = true
+	}
+	if x.ExitCode() != 0 || !isSuccess || err != nil {
+		err = status.Wrap(err, x.ExitCode(), "Command did not exit gracefully")
 	}
 	time.Sleep(5 * time.Second)
 	close(executed)
