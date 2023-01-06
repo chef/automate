@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+	"testing"
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
 )
 
 var fqdn = "a2.test.com"
@@ -99,4 +100,37 @@ func TestTomlFileCreateFromReqConfigLog(t *testing.T) {
 	createTomlFileFromConfig(req, fileName)
 	assert.FileExists(t, fileName)
 	os.Remove(fileName)
+}
+
+func TestErrorOnSelfManaged(t *testing.T) {
+	testCases := []struct {
+		isPostgresql bool
+		isOpenSearch bool
+		errorWant   error
+	}{
+		{
+			true,
+			false,
+			errors.Errorf(ERROR_SELF_MANAGED_CONFIG_SHOW, "Postgresql"),
+		},
+		{
+			false,
+			true,
+			errors.Errorf(ERROR_SELF_MANAGED_CONFIG_SHOW, "OpenSearch"),
+		},
+		{
+			false,
+			false,
+			nil,
+		},
+	}
+
+	for _, testCase := range testCases {
+		errGot := errorOnSelfManaged(testCase.isPostgresql,testCase.isOpenSearch)
+		if errGot == nil {
+			assert.Equal(t, testCase.errorWant, errGot)
+		} else {
+			assert.EqualError(t, testCase.errorWant, errGot.Error())
+		}
+	}
 }
