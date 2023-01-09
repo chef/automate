@@ -111,9 +111,6 @@ func TestGetClients(t *testing.T) {
 			PerPage: 5,
 		}
 		res, err := infraProxy.GetClients(ctx, req)
-		if err != nil {
-			fmt.Println("error we got is err", err)
-		}
 		require.NoError(t, err)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 0, int(res.Total))
