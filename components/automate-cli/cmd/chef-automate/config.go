@@ -117,7 +117,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		if isManagedServicesOn() {
 			err := errorOnSelfManaged(configCmdFlags.postgresql, configCmdFlags.opensearch)
 			if err != nil {
-				return err
+				return status.Annotate(err,status.InvalidCommandArgsError)
 			}
 		}
 
@@ -345,7 +345,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 // setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
 func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		return errors.Errorf(ERROR_SELF_MANAGED_CONFIG_PATCH, "Postgresql")
+		return status.Errorf(status.InvalidCommandArgsError,ERROR_SELF_MANAGED_CONFIG_PATCH, "Postgresql")
 	}
 	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
 		writer.Error("Postgres IPs not found in the config. Please contact the support team")
@@ -399,7 +399,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 // setConfigForOpensearch patches the config for open-search nodes in Automate HA
 func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		return errors.Errorf(ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
+		return status.Errorf(status.InvalidCommandArgsError,ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
 	}
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
 		writer.Error("OpenSearch IPs not found in the config. Please contact the support team")
