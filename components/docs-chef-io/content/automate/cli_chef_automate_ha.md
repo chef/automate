@@ -17,7 +17,7 @@ toc_layout = "cli_chef_automate_toc"
 
 ## Chef Automate CLI Commands
 
-{{< automate/automate_cli_commands_ha data_path="automate/cli_chef_automate_ha/commands" >}}
+{{< automate/automate_cli_commands_ha data_path="automate/cli_chef_automate/commands" >}}
 
 ## Error Codes
 
