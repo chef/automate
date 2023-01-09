@@ -44,6 +44,7 @@ var allPassedFlags string = ""
 const (
 	AUTOMATE_CMD_STOP  = "sudo chef-automate stop"
 	AUTOMATE_CMD_START = "sudo chef-automate start"
+	BACKUP_CONFIG      = "file_system"
 )
 
 type BackupFromBashtion interface {
@@ -797,7 +798,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 	start := 0
 	var validIds []string
 	var backup []*api.BackupTask
-	
+
 	if strings.Contains(args[0], "/") || strings.Contains(args[0], "\\") {
 		location = args[0]
 		start = 1
@@ -1225,6 +1226,18 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		}()
 	}
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
+
+	// If managed service and filesystem backup, info: "we don't have support for this configurations"
+	config, err := getExistingHAConfig()
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
+	}
+
+	if config.Architecture.ConfigInitials.BackupConfig == BACKUP_CONFIG && isManagedServicesOn() {
+		writer.Printf("As of now, we do not support file_system backup with AWS managed DB.\n")
+		return nil
+	}
+
 	if pooling {
 		cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString, true)
 		if err != nil {
