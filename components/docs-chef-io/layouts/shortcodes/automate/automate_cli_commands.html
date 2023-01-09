@@ -17,11 +17,11 @@
   <h4 id="{{ $id }}-flags">Flags</h3>
   <div class="fake-code grid-x">
     {{- range .options -}}
-    <div class="cell medium-4"><b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>{{ .compatibilitystring }}</b>{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
+    <div class="cell medium-4">{{ .compatibilitystring }}</b>{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
     {{- range .inherited_options -}}
-    <div class="cell medium-4"><b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>{{ .compatibilitystring }}</b>{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
+    <div class="cell medium-4">{{ .compatibilitystring }}</b>{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}<b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>{{ .compatibilitystring }}</b></div>
     {{- end -}}
   </div>
