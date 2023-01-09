@@ -798,7 +798,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 	start := 0
 	var validIds []string
 	var backup []*api.BackupTask
-	
+
 	if strings.Contains(args[0], "/") || strings.Contains(args[0], "\\") {
 		location = args[0]
 		start = 1
@@ -1234,7 +1234,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	}
 
 	if config.Architecture.ConfigInitials.BackupConfig == BACKUP_CONFIG && isManagedServicesOn() {
-		writer.Printf("currently we don't have support for file_system backup with AWS managed DB\n")
+		writer.Printf("As of now, we do not support file_system backup with AWS managed DB.\n")
 		return nil
 	}
 
