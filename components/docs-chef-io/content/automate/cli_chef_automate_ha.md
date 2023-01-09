@@ -24,4 +24,4 @@ toc_layout = "cli_chef_automate_toc"
 If `chef-automate` encounters an error during execution, it exits with a non-zero
 error code. Here's what our error codes mean:
 
-{{< automate/automate_cli_status_errors data_path="automate/cli_chef_automate_ha/status/errors" >}}
+{{< automate/automate_cli_status_errors data_path="automate/cli_chef_automate/status/errors" >}}
