@@ -2,6 +2,7 @@ package fileutils
 
 import (
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -27,6 +28,7 @@ type FileUtils interface {
 	GetHabRootPath() string
 	WriteToFile(filepath string, data []byte) error
 	ReadFile(filename string) ([]byte, error)
+	WriteFile(filepath string, data []byte, perm fs.FileMode) error
 }
 
 type FileSystemUtils struct{}
@@ -54,6 +56,9 @@ func (fsu *FileSystemUtils) WriteToFile(filepath string, data []byte) error {
 }
 func (fsu *FileSystemUtils) ReadFile(filename string) ([]byte, error) {
 	return ReadFile(filename)
+}
+func (fsu *FileSystemUtils) WriteFile(filepath string, data []byte, perm fs.FileMode) error {
+	return WriteFile(filepath, data, perm)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -133,9 +138,13 @@ func GetHabRootPath() string {
 }
 
 func WriteToFile(filepath string, data []byte) error {
-	return ioutil.WriteFile(filepath, data, 0775) // nosemgrep
+	return WriteFile(filepath, data, 0775)
 }
 
 func ReadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename) // nosemgrep
+}
+
+func WriteFile(filepath string, data []byte, perm fs.FileMode) error {
+	return ioutil.WriteFile(filepath, data, perm) // nosemgrep
 }
