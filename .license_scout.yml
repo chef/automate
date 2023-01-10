@@ -647,7 +647,7 @@ fallbacks:
     - name: github.com/kr/pty
       license_id: MIT
       license_content: https://raw.githubusercontent.com/kr/pty/master/LICENSE
-     - name: github.com/kr/text
+    - name: github.com/kr/text
       license_id: MIT
       license_content: https://raw.githubusercontent.com/kr/text/main/License
     - name: github.com/mattn/go-ieproxy
