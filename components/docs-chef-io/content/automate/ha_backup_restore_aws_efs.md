@@ -69,12 +69,6 @@ Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch serve
 -   Following command can be run in the OpenSearch node
 
     ```sh
-    chef-automate status
-    ```
-
--   Following command can be run in the OpenSearch node
-
-    ```sh
     hab svc status (check whether OpenSearch service is up or not)
 
     curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices are green or not)
