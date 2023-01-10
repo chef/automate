@@ -525,7 +525,7 @@ fallbacks:
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/google/gofuzz/master/LICENSE
     - name: github.com/google/gops
-      license_id: BDS-3-Clause
+      license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/google/gops/master/LICENSE
     - name: github.com/google/martian
       license_id: Apache-2.0
@@ -540,7 +540,7 @@ fallbacks:
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/google/subcommands/master/LICENSE
     - name: github.com/gopherjs/gopherjs
-      license_id: BDS-2-Clause
+      license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/gopherjs/gopherjs/master/LICENSE
     - name: github.com/gordonklaus/ineffassign 
       license_id: MIT
