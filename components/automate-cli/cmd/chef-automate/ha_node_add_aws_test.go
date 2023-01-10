@@ -167,6 +167,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			return nil
 		},
 		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -184,12 +185,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			filewritten = true
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -231,11 +227,7 @@ func TestAddnodeWithExecuteA2haRbNotExist(t *testing.T) {
 		isA2HARBFileExistFunc: func() bool {
 			return false
 		},
-	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -257,6 +249,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 			return nil
 		},
 		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
 			return errors.New("random")
 		},
 		isA2HARBFileExistFunc: func() bool {
@@ -280,12 +273,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			filewritten = true
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -324,6 +312,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 			return nil
 		},
 		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
 			return nil
 		},
 		isA2HARBFileExistFunc: func() bool {
@@ -347,12 +336,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			filewritten = true
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
