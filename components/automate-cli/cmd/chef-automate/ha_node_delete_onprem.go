@@ -238,9 +238,8 @@ func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
 		if !allowed {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. Postgresql instance count cannot be less than %d. Final count %d not allowed.", POSTGRESQL_MIN_INSTANCE_COUNT, finalCount))
 			return errorList
-		} else {
-			errorList.PushBackList(checkIfPresentInPrivateIPList(dni.config.ExistingInfra.Config.PostgresqlPrivateIps, dni.postgresqlIp, "Postgresql"))
 		}
+		errorList.PushBackList(checkIfPresentInPrivateIPList(dni.config.ExistingInfra.Config.PostgresqlPrivateIps, dni.postgresqlIp, "Postgresql"))
 	}
 	return errorList
 }
