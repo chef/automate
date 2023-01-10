@@ -49,10 +49,8 @@ func TestDeleteNodeValidateError(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), `IP address validation failed: 
-Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
-Automate Ip 10.2.1.67 is not present in existing list of ip addresses. Please use a different private ip.
-Automate Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.`)
+	assert.Contains(t, err.Error(),
+		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.`)
 }
 
 func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
@@ -81,19 +79,11 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), `IP address validation failed: 
-Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
-Automate Ip 10.2.1.67 is not present in existing list of ip addresses. Please use a different private ip.
-Automate Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.
+	assert.Contains(t, err.Error(),
+		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
 Unable to remove node. Chef Server instance count cannot be less than 1. Final count -1 not allowed.
-Chef-Server Ip 10.2.1.637 is not present in existing list of ip addresses. Please use a different private ip.
-Chef-Server Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.
 Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
-OpenSearch Ip 10.2.1.61 is not present in existing list of ip addresses. Please use a different private ip.
-OpenSearch Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.
-Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.
-Postgresql Ip 10.2.1.657 is not present in existing list of ip addresses. Please use a different private ip.
-Postgresql Ip ewewedw is not present in existing list of ip addresses. Please use a different private ip.`)
+Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.`)
 }
 
 func TestDeleteNodeModifyAutomate(t *testing.T) {
@@ -423,8 +413,8 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), `IP address validation failed: 
-Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.`)
+	assert.Contains(t, err.Error(),
+		`Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.`)
 }
 
 func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
