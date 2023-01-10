@@ -27,7 +27,7 @@ func TestGetDatabags(t *testing.T) {
 	existingTotal := len(res.DataBags)
 
 	// Add a data bag
-	dataBagName := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+	dataBagName := fmt.Sprintf("data-bag-test-%d", time.Now().Nanosecond())
 	dataBag, err := infraProxy.CreateDataBag(ctx, &request.CreateDataBag{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -42,23 +42,9 @@ func TestGetDatabags(t *testing.T) {
 }
 
 func TestGetDatabagItems(t *testing.T) {
-	// Add a data bag
-	dataBagName := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
-	dataBag, err := infraProxy.CreateDataBag(ctx, &request.CreateDataBag{
-		ServerId: autoDeployedChefServerID,
-		OrgId:    autoDeployedChefOrganizationID,
-		Name:     dataBagName,
-	})
-	assert.NoError(t, err)
-	assert.NotNil(t, dataBag)
-
-	req := &request.DataBagItems{
-		ServerId: autoDeployedChefServerID,
-		OrgId:    autoDeployedChefOrganizationID,
-		Name:     dataBagName,
-	}
 
 	t.Run("when the data bag is having no items", func(t *testing.T) {
+		req, dataBagName := createDataBag(1)
 		res, err := infraProxy.GetDataBagItems(ctx, req)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(res.GetItems()))
@@ -68,6 +54,7 @@ func TestGetDatabagItems(t *testing.T) {
 	})
 
 	t.Run("items list with a per_page search param", func(t *testing.T) {
+		req, dataBagName := createDataBag(2)
 		itemId := fmt.Sprintf("item-%d", time.Now().Nanosecond())
 		createReq := &request.CreateDataBagItem{
 			ServerId: autoDeployedChefServerID,
@@ -84,6 +71,7 @@ func TestGetDatabagItems(t *testing.T) {
 		dbItem, err := infraProxy.CreateDataBagItem(ctx, createReq)
 		assert.NoError(t, err)
 		assert.NotNil(t, dbItem)
+		time.Sleep(5 * time.Second)
 
 		req.SearchQuery = &request.SearchQuery{
 			PerPage: 1,
@@ -98,6 +86,8 @@ func TestGetDatabagItems(t *testing.T) {
 	})
 
 	t.Run("items list with a page search param", func(t *testing.T) {
+		req, dataBagName := createDataBag(3)
+		time.Sleep(2 * time.Second)
 		itemId1 := fmt.Sprintf("item-%d", time.Now().Nanosecond())
 		createReq1 := &request.CreateDataBagItem{
 			ServerId: autoDeployedChefServerID,
@@ -112,6 +102,7 @@ func TestGetDatabagItems(t *testing.T) {
 		dbItem1, err := infraProxy.CreateDataBagItem(ctx, createReq1)
 		assert.NoError(t, err)
 		assert.NotNil(t, dbItem1)
+		time.Sleep(2 * time.Second)
 
 		itemId2 := fmt.Sprintf("item-%d", time.Now().Nanosecond())
 		createReq2 := &request.CreateDataBagItem{
@@ -127,6 +118,7 @@ func TestGetDatabagItems(t *testing.T) {
 		dbItem2, err := infraProxy.CreateDataBagItem(ctx, createReq2)
 		assert.NoError(t, err)
 		assert.NotNil(t, dbItem2)
+		time.Sleep(2 * time.Second)
 
 		req.SearchQuery = &request.SearchQuery{
 			PerPage: 1,
@@ -142,6 +134,7 @@ func TestGetDatabagItems(t *testing.T) {
 	})
 
 	t.Run("items list with an invalid query search param", func(t *testing.T) {
+		req, _ := createDataBag(4)
 		req.SearchQuery = &request.SearchQuery{
 			Q:       "NO_KEY:NO_VALUE",
 			Page:    0,
@@ -156,8 +149,9 @@ func TestGetDatabagItems(t *testing.T) {
 	})
 
 	t.Run("items list with an invalid query search param", func(t *testing.T) {
+		req, _ := createDataBag(5)
 		req.SearchQuery = &request.SearchQuery{
-			Q:       "INVALID_QUERY",
+			Q:       "INVALID_QUERY:INVALID_QUERY",
 			Page:    0,
 			PerPage: 5,
 		}
@@ -172,7 +166,7 @@ func TestGetDatabagItems(t *testing.T) {
 func TestCreateDatabag(t *testing.T) {
 	ctx := context.Background()
 	t.Run("when a valid data bag is submitted, creates the new data bag successfully", func(t *testing.T) {
-		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("data-bag-create-test-%d", time.Now().Nanosecond())
 		req := &request.CreateDataBag{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -185,7 +179,7 @@ func TestCreateDatabag(t *testing.T) {
 	})
 
 	t.Run("when the data bag already exists, raise the error data bag already exists", func(t *testing.T) {
-		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("data-bag-create-test-1-%d", time.Now().Nanosecond())
 		req := &request.CreateDataBag{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -216,7 +210,7 @@ func TestCreateDatabag(t *testing.T) {
 func TestCreateDatabagItem(t *testing.T) {
 	ctx := context.Background()
 	t.Run("when a valid data bag item is submitted, creates the new data bag item successfully", func(t *testing.T) {
-		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("data-bag-create-databag-item-%d", time.Now().Nanosecond())
 		dataReq := &request.CreateDataBag{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -245,7 +239,7 @@ func TestCreateDatabagItem(t *testing.T) {
 	})
 
 	t.Run("when the data bag item already exists, raise the error data bag item already exists", func(t *testing.T) {
-		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("data-bag-bag-create-databag-item-1-%d", time.Now().Nanosecond())
 		dataReq := &request.CreateDataBag{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -291,7 +285,7 @@ func TestCreateDatabagItem(t *testing.T) {
 		req := &request.CreateDataBagItem{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
-			Name:     fmt.Sprintf("data-bag-%d", time.Now().Nanosecond()),
+			Name:     fmt.Sprintf("data-bag-bag-create-databag-item-2-%d", time.Now().Nanosecond()),
 		}
 		res, err := infraProxy.CreateDataBagItem(ctx, req)
 		assert.Nil(t, res)
@@ -369,4 +363,25 @@ func addDataBagItems(dabaBagName string, n int) int {
 	}
 
 	return total
+}
+
+// create data bag items for test scenario
+func createDataBag(n int) (*request.DataBagItems, string) {
+	dataBagName := fmt.Sprintf("data-bag-%d-test-%d", n, time.Now().Nanosecond())
+	_, err := infraProxy.CreateDataBag(ctx, &request.CreateDataBag{
+		ServerId: autoDeployedChefServerID,
+		OrgId:    autoDeployedChefOrganizationID,
+		Name:     dataBagName,
+	})
+	if err != nil {
+		return nil, dataBagName
+	}
+
+	req := &request.DataBagItems{
+		ServerId: autoDeployedChefServerID,
+		OrgId:    autoDeployedChefOrganizationID,
+		Name:     dataBagName,
+	}
+
+	return req, dataBagName
 }

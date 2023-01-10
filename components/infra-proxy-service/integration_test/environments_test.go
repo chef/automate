@@ -81,7 +81,7 @@ func TestGetEnvironments(t *testing.T) {
 	})
 
 	t.Run("Environments list with a valid query search param", func(t *testing.T) {
-		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("chef-environment-1-test%d", time.Now().Nanosecond())
 		createReq := &request.CreateEnvironment{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -90,6 +90,7 @@ func TestGetEnvironments(t *testing.T) {
 		env, err := infraProxy.CreateEnvironment(ctx, createReq)
 		assert.NoError(t, err)
 		assert.NotNil(t, env)
+		time.Sleep(2 * time.Second)
 
 		req.SearchQuery = &request.SearchQuery{
 			Q:       fmt.Sprintf("name:%s", name),
@@ -145,7 +146,7 @@ func TestGetEnvironment(t *testing.T) {
 func TestCreateEnvironment(t *testing.T) {
 	// rpc GetEnvironment (request.Environment) returns (response.Environment)
 	t.Run("when a valid environment is submitted, creates the new environment successfully", func(t *testing.T) {
-		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("chef-environment-2-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId:    autoDeployedChefServerID,
 			OrgId:       autoDeployedChefOrganizationID,
@@ -177,7 +178,7 @@ func TestCreateEnvironment(t *testing.T) {
 	})
 
 	t.Run("when the environment exists, raise the error environment already exists", func(t *testing.T) {
-		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("chef-environment-3-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -208,7 +209,7 @@ func TestCreateEnvironment(t *testing.T) {
 func TestUpdateEnvironment(t *testing.T) {
 	// rpc UpdateEnvironment (request.UpdateEnvironment) returns (response.Environment)
 	t.Run("when a valid environment is submitted, updates the environment successfully", func(t *testing.T) {
-		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("chef-environment-4-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId:    autoDeployedChefServerID,
 			OrgId:       autoDeployedChefOrganizationID,
@@ -260,7 +261,7 @@ func TestUpdateEnvironment(t *testing.T) {
 func TestDeleteEnvironment(t *testing.T) {
 	// rpc DeleteEnvironment (request.Environment) returns (response.Environment)
 	t.Run("when a valid environment is submitted, deletes the environment successfully", func(t *testing.T) {
-		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		name := fmt.Sprintf("chef-environment-5-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId:    autoDeployedChefServerID,
 			OrgId:       autoDeployedChefOrganizationID,

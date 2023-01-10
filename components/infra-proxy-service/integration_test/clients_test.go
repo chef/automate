@@ -94,7 +94,6 @@ func TestGetClients(t *testing.T) {
 	t.Run("Clients list with an invalid query search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
 			Q:       "NO_KEY:NO_VALUE",
-			Page:    0,
 			PerPage: 5,
 		}
 		res, err := infraProxy.GetClients(ctx, req)
@@ -107,7 +106,7 @@ func TestGetClients(t *testing.T) {
 
 	t.Run("Clients list with an invalid query search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
-			Q:       "INVALID_QUERY",
+			Q:       "INVALID_QUERY:INVALID_QUERY",
 			Page:    0,
 			PerPage: 5,
 		}
