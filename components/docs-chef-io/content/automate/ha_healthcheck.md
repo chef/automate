@@ -1,5 +1,5 @@
 +++
-title = "Health Check Commands"
+title = "HA Commands"
 
 draft = false
 
@@ -81,12 +81,15 @@ This page includes commands that can be executed for the Chef Automate cluster p
     hab svc status
 ```
 
+
+
 - Patch a config to the Front end nodes (Automate)
   - create a config file `automate.toml`
   
 ``` cmd
     chef-automate config patch automate.toml --automate
 ```
+sorthands for --automate is --a2 and -a
 
 - Patch a config to the Front end nodes (Chef Server)
   - create a config file `chefserver.toml`
@@ -94,6 +97,15 @@ This page includes commands that can be executed for the Chef Automate cluster p
 ``` cmd
     chef-automate config patch chefserver.toml --chef_server
 ```
+sorthands for --chef_server is --cs and -c
+
+- Patch a config to the all Front end nodes (Chef Server + Automate)
+  - create a config file `frontend.toml`
+  
+``` cmd
+    chef-automate config patch frontend.toml --frontend
+```
+sorthands for --chef_server is --fe and -f
 
 - Patch a config to the Back end nodes (Open Search)
   - create a config file `opensearch.toml`
@@ -101,20 +113,15 @@ This page includes commands that can be executed for the Chef Automate cluster p
 ``` cmd
     chef-automate config patch opensearch.toml --opensearch
 ```
+sorthands for --opensearch is --os and -o
 
-- Patch a config to the Back end nodes (Open Search)
+- Patch a config to the Back end nodes (Postgresql)
   - create a config file `postgresql.toml`
 
 ``` cmd
     chef-automate config patch postgresql.toml --postgresql
 ```
-
-- Collect the Gatherlogs for Automate HA cluster,run the command from bastion node.  
-  - logs are collected at `/var/tmp`
-
-```cmd
-    chef-automate gather-logs
-```
+sorthands for --postgresql is --pg and -p
 
 {{< note >}}
 
@@ -130,6 +137,13 @@ This page includes commands that can be executed for the Chef Automate cluster p
 - While patching the same from **the provision host**, structures such as TLS from OpenSearch configuration toml file and SSL from PostgreQL configuration toml file will be ignored.
 
 {{< /warning >}}
+
+- Collect the Gatherlogs for Automate HA cluster,run the command from bastion node.  
+  - logs are collected at `/var/tmp`
+
+```cmd
+    chef-automate gather-logs
+```
 
 - View the active Habitat gossiped toml config for any locally loaded service:
   - ssh to the backend opensearch nodes `chef-automate ssh --hostname os`
