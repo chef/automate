@@ -1,6 +1,6 @@
 package fileutils
 
-import "io/fs"
+import "os"
 
 type MockFileSystemUtils struct {
 	PathExistsFunc             func(path string) (bool, error)
@@ -11,7 +11,7 @@ type MockFileSystemUtils struct {
 	GetHabRootPathFunc         func() string
 	WriteToFileFunc            func(filepath string, data []byte) error
 	ReadFileFunc               func(filepath string) ([]byte, error)
-	WriteFileFunc              func(filepath string, data []byte, perm fs.FileMode) error
+	WriteFileFunc              func(filepath string, data []byte, perm os.FileMode) error
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -38,6 +38,6 @@ func (fsu *MockFileSystemUtils) WriteToFile(filepath string, data []byte) error 
 func (fsu *MockFileSystemUtils) ReadFile(filepath string) ([]byte, error) {
 	return fsu.ReadFileFunc(filepath)
 }
-func (fsu *MockFileSystemUtils) WriteFile(filepath string, data []byte, perm fs.FileMode) error {
+func (fsu *MockFileSystemUtils) WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return fsu.WriteFileFunc(filepath, data, perm)
 }
