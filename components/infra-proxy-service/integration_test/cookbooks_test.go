@@ -65,7 +65,7 @@ func TestGetCookBooks(t *testing.T) {
 
 	})
 
-	t.Run("Get Cookbook Versions of a cookbook with CookBook Name", func(t *testing.T) {
+	t.Run("Get Cookbook Versions with CookBook Name", func(t *testing.T) {
 		req := &request.CookbookVersions{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -77,7 +77,7 @@ func TestGetCookBooks(t *testing.T) {
 		assert.Equal(t, 1, len(res.Versions))
 	})
 
-	t.Run("Get Cookbook Versions of a cookbook without CookBook Name", func(t *testing.T) {
+	t.Run("Get Cookbook Versions without CookBook Name", func(t *testing.T) {
 		req := &request.CookbookVersions{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
