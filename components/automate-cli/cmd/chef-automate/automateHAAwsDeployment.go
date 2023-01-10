@@ -233,23 +233,25 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.ChefEbsVolumeType) < 1 {
 		errorList.PushBack("Invalid or empty aws chef_ebs_volume_type")
 	}
-	if !a.config.Aws.Config.SetupManagedServices && len(a.config.Aws.Config.OpensearchEbsVolumeIops) < 1 {
-		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_iops")
-	}
-	if !a.config.Aws.Config.SetupManagedServices && len(a.config.Aws.Config.OpensearchEbsVolumeSize) < 1 {
-		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_size")
-	}
-	if !a.config.Aws.Config.SetupManagedServices && len(a.config.Aws.Config.OpensearchEbsVolumeType) < 1 {
-		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_type")
-	}
-	if !a.config.Aws.Config.SetupManagedServices && len(a.config.Aws.Config.PostgresqlEbsVolumeIops) < 1 {
-		errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_iops")
-	}
-	if !a.config.Aws.Config.SetupManagedServices && len(a.config.Aws.Config.PostgresqlEbsVolumeSize) < 1 {
-		errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_size")
-	}
-	if !a.config.Aws.Config.SetupManagedServices && len(a.config.Aws.Config.PostgresqlEbsVolumeType) < 1 {
-		errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_type")
+	if !a.config.Aws.Config.SetupManagedServices {
+		if len(a.config.Aws.Config.OpensearchEbsVolumeIops) < 1 {
+			errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_iops")
+		}
+		if len(a.config.Aws.Config.OpensearchEbsVolumeSize) < 1 {
+			errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_size")
+		}
+		if len(a.config.Aws.Config.OpensearchEbsVolumeType) < 1 {
+			errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_type")
+		}
+		if len(a.config.Aws.Config.PostgresqlEbsVolumeIops) < 1 {
+			errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_iops")
+		}
+		if len(a.config.Aws.Config.PostgresqlEbsVolumeSize) < 1 {
+			errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_size")
+		}
+		if len(a.config.Aws.Config.PostgresqlEbsVolumeType) < 1 {
+			errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_type")
+		}
 	}
 	return errorList
 }
