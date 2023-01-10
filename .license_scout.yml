@@ -765,16 +765,16 @@ fallbacks:
       license_id: MIT
       license_content: https://raw.githubusercontent.com/uber-go/tools/master/LICENSE
     - name: golang.org/x/image
-      license_id: BDS-3-Clause
+      license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
     - name: golang.org/x/mobile
-      license_id: BDS-3-Clause
+      license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
     - name: golang.org/x/time
-      license_id: BDS-3-Clause
+      license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
     - name: golang.org/x/time
-      license_id: BDS-3-Clause
+      license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/go/master/LICENSE
     - name: gopkg.in/airbrake/gobrake.v2
       license_id: MIT
@@ -783,7 +783,7 @@ fallbacks:
       license_id: MIT
       license_content: https://raw.githubusercontent.com/alecthomas/kingpin/master/COPYING
     - name: gopkg.in/errgo.v2
-      license_id: BDS-3-Clause
+      license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/go-errgo/errgo/v1/LICENSE
     - name: gopkg.in/gemnasium/logrus-airbrake-hook.v2 
       license_id: MIT
@@ -806,6 +806,9 @@ fallbacks:
     - name: rsc.io/sampler
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/rsc/sampler/master/LICENSE
+    - name: github.com/soheilhy/cmux
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/soheilhy/cmux/master/LICENSE
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
