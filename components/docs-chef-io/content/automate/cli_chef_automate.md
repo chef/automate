@@ -12,7 +12,7 @@ toc_layout = "cli_chef_automate_toc"
     title = "chef-automate CLI"
     parent = "automate/reference"
     identifier = "automate/reference/cli_chef_automate.md chef-automate CLI"
-    weight = 20
+    weight = 24
 +++
 
 ## Chef Automate CLI Commands
