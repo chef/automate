@@ -426,25 +426,25 @@ For example,
 - if you want to add nodes with IP 10.1.2.23 to automate, you have to run the:
 
     ```sh
-    chef-automate node add --automate 10.1.2.23
+    chef-automate node add --automate-ips 10.1.2.23
     ```
 
 - If you want to add nodes with IP 10.1.2.23 and 10.0.1.42 to the chef-server, you have to run the:
 
     ```sh
-    chef-automate node add --chef-server 10.1.2.23,10.0.1.42
+    chef-automate node add --chef-server-ips 10.1.2.23,10.0.1.42
     ```
 
 - If you want to add nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, you have to run the:
 
     ```sh
-    chef-automate node add --opensearch 10.1.2.23,10.0.1.42
+    chef-automate node add --opensearch-ips 10.1.2.23,10.0.1.42
     ```
 
 - If you want to add nodes with IP 10.1.2.23, 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
 
     ```sh
-    chef-automate node add --postgresql 10.1.2.23,10.0.1.42,10.0.1.54
+    chef-automate node add --postgresql-ips 10.1.2.23,10.0.1.42,10.0.1.54
     ```
 
 You can mix and match different services if you want to add nodes across various services.
@@ -452,13 +452,13 @@ You can mix and match different services if you want to add nodes across various
 - If you want to add nodes with IP 10.1.2.23 to automate and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL, you have to run:
 
     ```sh
-    chef-automate node add --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+    chef-automate node add --automate-ips 10.1.2.23 --postgresql-ips 10.0.1.42,10.0.1.54
     ```
 
 - If you want to add nodes with IP 10.1.2.23 to automate, nodes with IP 10.1.0.36 and 10.0.1.233 to chef-server, and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
 
     ```sh
-    chef-automate node add --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+    chef-automate node add --automate-ips 10.1.2.23 --chef-server-ips 10.1.0.36,10.0.1.233  --postgresql-ips 10.0.1.42,10.0.1.54
     ```
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
