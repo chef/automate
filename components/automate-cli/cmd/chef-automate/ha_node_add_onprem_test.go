@@ -384,7 +384,8 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		genConfigfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -394,12 +395,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			filewritten = true
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -441,7 +437,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		genConfigfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
 			return errors.New("random")
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -451,11 +447,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -498,7 +490,8 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		genConfigfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
 			return nil
 		},
 		isA2HARBFileExistFunc: func() bool {
@@ -527,12 +520,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
 		},
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			filewritten = true
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
@@ -568,7 +556,8 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		genConfigfunc: func(path string) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
 			return nil
 		},
 		isA2HARBFileExistFunc: func() bool {
@@ -587,12 +576,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{
-		WriteToFileFunc: func(filepath string, data []byte) error {
-			filewritten = true
-			return nil
-		},
-	}, &MockSSHUtilsImpl{
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},

@@ -104,17 +104,7 @@ func (a *awsDeployment) generateConfig() error {
 		}
 		a.config.Opensearch.Config.NodesDn = nodes_dn
 	}
-	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, a.config)
-	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
-	config, err := toml.Marshal(a.config)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600) // nosemgrep
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeHAConfigFiles(awsA2harbTemplate, a.config)
 }
 
 func (a *awsDeployment) getDistinguishedNameFromKey(publicKey string) (string, error) {
@@ -259,13 +249,17 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 func (a *awsDeployment) validateCerts() *list.List {
 	errorList := list.New()
 	if a.config.Automate.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(a.config.Automate.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(a.config.Automate.Config.PrivateKey)) < 1 ||
+		if len(strings.TrimSpace(a.config.Automate.Config.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(a.config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+			errorList.PushBack("Automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		}
+		// If root_ca is provided, check that it is valid
+		if len(strings.TrimSpace(a.config.Automate.Config.RootCA)) > 0 {
+			errorList.PushBackList(checkCertValid([]keydetails{
+				{key: a.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+			}))
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: a.config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
 			{key: a.config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
 			{key: a.config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
 		}))

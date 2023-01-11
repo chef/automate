@@ -9,7 +9,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
-	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -179,15 +178,7 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {
-	tomlbytes, err := ptoml.Marshal(dni.config)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error converting config to bytes")
-	}
-	err = dni.fileUtils.WriteToFile(dni.configpath, tomlbytes)
-	if err != nil {
-		return err
-	}
-	err = dni.nodeUtils.genConfig(dni.configpath)
+	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config)
 	if err != nil {
 		return err
 	}
