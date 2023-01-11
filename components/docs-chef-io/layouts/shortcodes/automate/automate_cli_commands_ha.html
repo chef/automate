@@ -2,6 +2,27 @@
 {{ range $data_path }}
 {{ $id := urlize .name }}
 {{ $command := strings.TrimPrefix "chef-automate " .name }}
+
+<div>
+    <table>
+        <tr>
+            <th>Tags</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><b style='background: #9bf285;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>A</b></td>
+            <td>The CLI can run in Standalone Automate.</td>
+        </tr>
+        <tr>
+            <td><b style='background: #8FECE6;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>HA</b></td>
+            <td>The CLI can run in Automate HA.</td>
+        </tr>
+        <tr>
+            <td><b style='background: #E4B2F2;font-size: 10px;font-weight:600;line-height:20px;padding:0px 5px;margin:3px 0;border-radius:36px;display:inline-block;'>Node: XYZ</b></td>
+            <td>The CLI can run from the mentioned Node.</td>
+        </tr>
+    </table>
+</div>
   <h3 id="{{ $id }}">{{ .name }}</h2>
   <div>
     {{- range .compatiblestring -}}
