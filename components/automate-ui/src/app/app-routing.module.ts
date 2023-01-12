@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { loadRemoteModule } from "@angular-architects/module-federation";
 
 // Views
 import {
@@ -207,11 +206,11 @@ const routes: Routes = [
       component: UserDetailsComponent,
       resolve: { isNonAdmin: UserDetailsNonAdminResolve }
     },
-    // {
-    //   path: 'compliance',
-    //   loadChildren: () => import('app/pages/+compliance/compliance.module')
-    //     .then(m => m.ComplianceModule)
-    // },
+    {
+      path: 'compliance',
+      loadChildren: () => import('app/pages/+compliance/compliance.module')
+        .then(m => m.ComplianceModule)
+    },
     {
       path: 'infrastructure',
       children: [
@@ -416,29 +415,16 @@ const routes: Routes = [
     path: 'reload',
     children: []
   },
-
-  {
-    path: 'compliance',
-    loadChildren: () =>
-         loadRemoteModule({
-            type: 'module',
-            remoteEntry: 'http://localhost:4209/remoteEntry.js',
-            exposedModule: './Module'
-        })
-        .then(m => m.BlogsModule)
-},
-  // {
-  //   path: 'compliance',
-  //   loadChildren: () => loadRemoteModule({
-  //     remoteEntry: 'http://localhost:4209/remoteEntry.js',
-  //     type: 'module',
-  //     exposedModule: './Module'
-  //   })
-  //   .then(m =>{
-  //     console.log('its is working @@@@&&& &&&&', m.AppModule )
-  //    return m.AppModule})
-  // },
-  // END Deprecated routes.
+// {
+//   path: 'compliance',
+//   loadChildren: () =>
+//        loadRemoteModule({
+//           type: 'module',
+//           remoteEntry: 'http://localhost:4209/remoteEntry.js',
+//           exposedModule: './complianceAdminModule'
+//       })
+//       .then(m => m.AdminModule)
+// },
   {
     path: '**',
     redirectTo: ''
@@ -451,13 +437,3 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
-
-// {
-//   path: 'abc',
-//   loadChildren: () => loadRemoteModule({
-//     remoteEntry: 'http://localhost:4201/remoteEntry.js',
-//     type: 'module',
-//     exposedModule: './Module'
-//   })
-//   .then(m => m.AbcModule)
-// }

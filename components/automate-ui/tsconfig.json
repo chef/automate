@@ -11,18 +11,22 @@
     "importHelpers": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
-    "declaration": false,
+    "declaration": true,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
+      "src/typings"
     ],
     "baseUrl": "./src",
     "allowJs": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
+  "files": [
+		"src/decl.d.ts"
+	],
   "angularCompilerOptions": {
     "strictInjectionParameters": true,
     "strictInputTypes": false,
@@ -36,6 +40,9 @@
     "strictLiteralTypes": true,
     "fullTemplateTypeCheck": true
   },
+  "include" : [
+    "src/decl.d.ts"
+  ],
   "exclude": [
     "**/node_modules/*",
     "dist/*",

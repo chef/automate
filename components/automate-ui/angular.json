@@ -20,9 +20,11 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "preserveSymlinks": true,
             "assets": [
               "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              "src/decl.d.ts"
             ],
             "styles": [
               "src/styles.scss"
@@ -43,6 +45,7 @@
                   "maximumWarning": "6kb"
                 }
               ],
+              "extraWebpackConfig": "webpack.config.js",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -50,6 +53,14 @@
                 }
               ]
             },
+            "development": {
+							"buildOptimizer": false,
+							"optimization": false,
+							"vendorChunk": true,
+							"extractLicenses": false,
+							"sourceMap": true,
+							"namedChunks": true
+						},
             "production": {
               "budgets": [
                 {
@@ -76,9 +87,28 @@
           }
         },
         "serve": {
+					"builder": "ngx-build-plus:dev-server",
+					"configurations": {
+						"production": {
+							"browserTarget": "automate-ui:build:production",
+							"extraWebpackConfig": "webpack.prod.config.js"
+						},
+						"development": {
+							"browserTarget": "automate-ui:build:development"
+						}
+					},
+					"defaultConfiguration": "development",
+					"options": {
+						"extraWebpackConfig": "webpack.config.js"
+					}
+				},
+        "serve-old": {
           "builder": "ngx-build-plus:dev-server",
           "options": {
-            "browserTarget": "automate-ui:build"
+            "browserTarget": "automate-ui:build",
+            "publicHost": "http://localhost:4200",
+						"port": 4200,
+            "extraWebpackConfig": "webpack.config.js"
           },
           "configurations": {
             "prod": {
@@ -86,7 +116,7 @@
             },
             "no_auth": {
               "browserTarget": "automate-ui:build:no_auth",
-              "baseHref": "/"
+              "extraWebpackConfig": "webpack.config.js"
             },
             "production": {
               "browserTarget": "automate-ui:build:production",

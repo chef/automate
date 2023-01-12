@@ -7,12 +7,15 @@ import { ComplianceRoutingModule } from './compliance.routing';
 import {
   ComplianceLandingComponent
 } from 'app/pages/compliance-landing/compliance-landing.component';
+
+import { PluginProxyComponent } from './mfe-proxy/plugin-proxy.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
+    PluginProxyComponent,
     ComplianceRoutingModule,
     ChefComponentsModule
   ],

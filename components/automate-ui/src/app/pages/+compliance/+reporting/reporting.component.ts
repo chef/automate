@@ -39,6 +39,13 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 import { DownloadReportsService } from 'app/entities/download-reports/download-reports.service';
+import { LoadRemoteModuleOptions } from '@angular-architects/module-federation';
+import {LookupService} from '../mfe-proxy/lookup.service'
+
+type PluginOptions =  LoadRemoteModuleOptions & {
+  displayName: string;
+  componentName: string;
+}
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -47,6 +54,47 @@ import { DownloadReportsService } from 'app/entities/download-reports/download-r
 })
 
 export class ReportingComponent implements OnInit, OnDestroy {
+
+  plugins: PluginOptions[] = [];
+  workflow: PluginOptions[] = [];
+
+  // lookup(): Promise<PluginOptions[]> {
+  //   return Promise.resolve([
+  //       {
+  //           type: 'module',
+  //           remoteEntry: 'http://localhost:4201/remoteEntry.js',
+  //           exposedModule: './homeComponent',
+
+  //           displayName: 'homeComponent',
+  //           componentName: 'HomeComponent'
+  //       },
+  //       {
+  //           type: 'module',
+  //           remoteEntry: 'http://localhost:4201/remoteEntry.js',
+  //           exposedModule: './Upload',
+
+  //           displayName: 'Upload',
+  //           componentName: 'UploadComponent'
+  //       },
+  //       {
+  //           type: 'module',
+  //           remoteEntry: 'http://localhost:4202/remoteEntry.js',
+  //           exposedModule: './Analyze',
+
+  //           displayName: 'Analyze',
+  //           componentName: 'AnalyzeComponent'
+  //       },
+  //       {
+  //           type: 'module',
+  //           remoteEntry: 'http://localhost:4202/remoteEntry.js',
+  //           exposedModule: './Enrich',
+
+  //           displayName: 'Enrich',
+  //           componentName: 'EnrichComponent'
+  //       }
+  //   ] as PluginOptions[]);
+  // }
+
   allowedURLFilterTypes = [
     ReportingFilterTypes.CHEF_SERVER,
     ReportingFilterTypes.CHEF_TAGS,
@@ -201,7 +249,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
     public appConfigService: AppConfigService,
-    public downloadReportsService: DownloadReportsService
+    public downloadReportsService: DownloadReportsService,
+    private lookupService:LookupService
   ) {}
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
@@ -213,7 +262,16 @@ export class ReportingComponent implements OnInit, OnDestroy {
     }));
   }
 
-  ngOnInit() {
+
+  // async ngOnInit(): Promise<void> {
+  //   this.plugins = await this.lookupService.lookup();
+  // }
+
+
+  async ngOnInit(): Promise<void> {
+    this.plugins = await this.lookupService.lookup();
+    console.warn('on it fun run', this.plugins)
+
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     const allUrlParameters$ = this.getAllUrlParameters();
 
@@ -553,5 +611,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   isLast24h(urlFilters: Chicklet[]): boolean {
     return !urlFilters.some((filter: Chicklet) => filter.type === 'end_time');
+  }
+
+  add(plugin: PluginOptions): void {
+    console.warn('@@@@@####', plugin)
+    this.workflow.push(plugin);
   }
 }

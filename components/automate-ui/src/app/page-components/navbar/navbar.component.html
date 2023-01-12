@@ -56,6 +56,9 @@
             ['/apis/iam/v2/projects', 'get']] ">
         <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
       </app-authorized>
+
+      <!-- <a *ngFor="let p of plugins" (click)="add(p)">Add {{p.displayName}}</a> -->
+
     </div>
     <div class="right-nav">
       <app-projects-filter role="menuitem"></app-projects-filter>

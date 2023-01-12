@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "baseUrl": "./",
-    "paths": { "@angular/*": [ "../node_modules/@angular/*" ] }
-},
+    "paths": { "@angular/*": [ "../node_modules/@angular/*" ] },
+  },
   "angularCompilerOptions": {
     "preserveWhitespaces": true
   },
@@ -13,6 +13,6 @@
     "polyfills.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "**/*.d.ts"
   ]
 }

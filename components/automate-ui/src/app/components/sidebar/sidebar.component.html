@@ -47,7 +47,8 @@
         </div>
       </ng-container>
     </div>
-
     <ng-content select=".nav-items"></ng-content>
+
+    <a *ngFor="let p of plugins" (click)="add(p)">{{p.displayName}} <br></a>
   </nav>
 </aside>
