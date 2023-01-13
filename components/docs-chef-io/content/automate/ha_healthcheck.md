@@ -1,14 +1,14 @@
 +++
-title = "HA Commands"
+title = "Automate HA Commands"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Health Check Commands"
+    title = "Automate HA Commands"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/deploy_high_availability/ha_healthcheck.md Health Check Commands"
+    identifier = "automate/deploy_high_availability/ha_healthcheck.md Automate HA Commands"
     weight = 90
 +++
 
