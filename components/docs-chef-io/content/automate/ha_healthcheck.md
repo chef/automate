@@ -26,7 +26,7 @@ This page includes commands that can be executed for the Chef Automate cluster p
     chef-automate info 
 ```
 
-- Post Deployment, run smoke test cases on Automate HA cluster, please run the command from bation node
+- Post Deployment, run the smoke test cases on Automate HA cluster and run the command from the bastion node.
   
 ```cmd
     chef-automate test --full 
@@ -47,7 +47,7 @@ This page includes commands that can be executed for the Chef Automate cluster p
     chef-automate test postgresql 
   ```
 
-- To get the status of the cluster, run the command from bastion node. 
+- To get the status of the cluster, run the command from the bastion node.
   
   ```cmd
     chef-automate status 
@@ -125,20 +125,19 @@ sorthands for --postgresql is --pg and -p
 
 {{< note >}}
 
-- Frontend patch will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node
-    of the cluser.
-- After patching some services will go restart. So the health status will take upto 2 minutes to show healthy.
+- Frontend patch will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node.
+- After patching, some services will go restart. So the health status will take up to 2 minutes to show healthy.
 
 {{< /note >}}
 
 {{< warning >}}
 
-- For certificate rotation, don't use `config patch`. Instead `cert-rotate` command can be used. To know more about certificate rotation click [here](/automate/ha_cert_rotaion)
+- For certificate rotation, don't use config patch. Instead, the cert-rotate command can be used. To learn more about certificate rotation, click [here](/automate/ha_cert_rotaion)
 - While patching the same from **the provision host**, structures such as TLS from OpenSearch configuration toml file and SSL from PostgreQL configuration toml file will be ignored.
 
 {{< /warning >}}
 
-- Collect the Gatherlogs for Automate HA cluster,run the command from bastion node.  
+- Collect the Gatherlogs for Automate HA cluster, and run the command from the bastion node.  
   - logs are collected at `/var/tmp`
 
 ```cmd
