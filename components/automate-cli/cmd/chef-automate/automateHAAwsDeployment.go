@@ -279,6 +279,42 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.PostgresqlRootEbsVolumeType) < 1 {
 		errorList.PushBack("Invalid or empty aws postgresql_root_ebs_volume_type")
 	}
+	if len(a.config.Aws.Config.AutomateRootEbsVolumeIops) < 1 {
+		errorList.PushBack("Invalid or empty aws automate_root_ebs_volume_iops")
+	}
+	if len(a.config.Aws.Config.AutomateRootEbsVolumeSize) < 1 {
+		errorList.PushBack("Invalid or empty aws automate_root_ebs_volume_size")
+	}
+	if len(a.config.Aws.Config.AutomateRootEbsVolumeType) < 1 {
+		errorList.PushBack("Invalid or empty aws automate_root_ebs_volume_type")
+	}
+	if len(a.config.Aws.Config.ChefRootEbsVolumeIops) < 1 {
+		errorList.PushBack("Invalid or empty aws chef_root_ebs_volume_iops")
+	}
+	if len(a.config.Aws.Config.ChefRootEbsVolumeSize) < 1 {
+		errorList.PushBack("Invalid or empty aws chef_root_ebs_volume_size")
+	}
+	if len(a.config.Aws.Config.ChefRootEbsVolumeType) < 1 {
+		errorList.PushBack("Invalid or empty aws chef_root_ebs_volume_type")
+	}
+	if len(a.config.Aws.Config.OpensearchRootEbsVolumeIops) < 1 {
+		errorList.PushBack("Invalid or empty aws opensearch_root_ebs_volume_iops")
+	}
+	if len(a.config.Aws.Config.OpensearchRootEbsVolumeSize) < 1 {
+		errorList.PushBack("Invalid or empty aws opensearch_root_ebs_volume_size")
+	}
+	if len(a.config.Aws.Config.OpensearchRootEbsVolumeType) < 1 {
+		errorList.PushBack("Invalid or empty aws opensearch_root_ebs_volume_type")
+	}
+	if len(a.config.Aws.Config.PostgresqlRootEbsVolumeIops) < 1 {
+		errorList.PushBack("Invalid or empty aws postgresql_root_ebs_volume_iops")
+	}
+	if len(a.config.Aws.Config.PostgresqlRootEbsVolumeSize) < 1 {
+		errorList.PushBack("Invalid or empty aws postgresql_root_ebs_volume_size")
+	}
+	if len(a.config.Aws.Config.PostgresqlRootEbsVolumeType) < 1 {
+		errorList.PushBack("Invalid or empty aws postgresql_root_ebs_volume_type")
+	}
 	return errorList
 }
 
