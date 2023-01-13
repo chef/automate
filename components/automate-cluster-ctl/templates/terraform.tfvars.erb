@@ -80,6 +80,18 @@ automate_ebs_volume_size = "<%= config.aws.automate_ebs_volume_size %>"
 automate_ebs_volume_type = "<%= config.aws.automate_ebs_volume_type %>"
 <% end %>
 
+<% if config.aws.automate_root_ebs_volume_iops %>
+automate_root_ebs_volume_iops = "<%= config.aws.automate_root_ebs_volume_iops %>"
+<% end %>
+
+<% if config.aws.automate_root_ebs_volume_size %>
+automate_root_ebs_volume_size = "<%= config.aws.automate_root_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.automate_root_ebs_volume_type %>
+automate_root_ebs_volume_type = "<%= config.aws.automate_root_ebs_volume_type %>"
+<% end %>
+
 chef_server_instance_type = "<%= config.aws.chef_server_instance_type %>"
 
 <% if config.aws.chef_ebs_volume_size %>
@@ -88,6 +100,14 @@ chef_ebs_volume_size = "<%= config.aws.chef_ebs_volume_size %>"
 
 <% if config.aws.chef_ebs_volume_type %>
 chef_ebs_volume_type = "<%= config.aws.chef_ebs_volume_type %>"
+<% end %>
+
+<% if config.aws.chef_root_ebs_volume_size %>
+chef_root_ebs_volume_size = "<%= config.aws.chef_root_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.chef_root_ebs_volume_type %>
+chef_root_ebs_volume_type = "<%= config.aws.chef_root_ebs_volume_type %>"
 <% end %>
 
 opensearch_server_instance_type = "<%= config.aws.opensearch_server_instance_type %>"
@@ -104,6 +124,18 @@ opensearch_ebs_volume_size = "<%= config.aws.opensearch_ebs_volume_size %>"
 opensearch_ebs_volume_type = "<%= config.aws.opensearch_ebs_volume_type %>"
 <% end %>
 
+<% if config.aws.opensearch_root_ebs_volume_iops %>
+opensearch_root_ebs_volume_iops = "<%= config.aws.opensearch_root_ebs_volume_iops %>"
+<% end %>
+
+<% if config.aws.opensearch_root_ebs_volume_size %>
+opensearch_root_ebs_volume_size = "<%= config.aws.opensearch_root_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.opensearch_root_ebs_volume_type %>
+opensearch_root_ebs_volume_type = "<%= config.aws.opensearch_root_ebs_volume_type %>"
+<% end %>
+
 postgresql_server_instance_type = "<%= config.aws.postgresql_server_instance_type %>"
 
 <% if config.aws.postgresql_ebs_volume_iops %>
@@ -116,6 +148,18 @@ postgresql_ebs_volume_size = "<%= config.aws.postgresql_ebs_volume_size %>"
 
 <% if config.aws.postgresql_ebs_volume_type %>
 postgresql_ebs_volume_type = "<%= config.aws.postgresql_ebs_volume_type %>"
+<% end %>
+
+<% if config.aws.postgresql_root_ebs_volume_iops %>
+postgresql_root_ebs_volume_iops = "<%= config.aws.postgresql_root_ebs_volume_iops %>"
+<% end %>
+
+<% if config.aws.postgresql_root_ebs_volume_size %>
+postgresql_root_ebs_volume_size = "<%= config.aws.postgresql_root_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.postgresql_root_ebs_volume_type %>
+postgresql_root_ebs_volume_type = "<%= config.aws.postgresql_root_ebs_volume_type %>"
 <% end %>
 
 <% end %>

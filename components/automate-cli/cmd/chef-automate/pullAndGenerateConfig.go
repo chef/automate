@@ -114,18 +114,30 @@ type HAAwsAutoTfvars struct {
 	AutomateEbsVolumeIops              string      `json:"automate_ebs_volume_iops"`
 	AutomateEbsVolumeSize              string      `json:"automate_ebs_volume_size"`
 	AutomateEbsVolumeType              string      `json:"automate_ebs_volume_type"`
+	AutomateRootEbsVolumeIops          string      `json:"automate_root_ebs_volume_iops"`
+	AutomateRootEbsVolumeSize          string      `json:"automate_root_ebs_volume_size"`
+	AutomateRootEbsVolumeType          string      `json:"automate_root_ebs_volume_type"`
 	ChefServerInstanceType             string      `json:"chef_server_instance_type"`
 	ChefEbsVolumeIops                  string      `json:"chef_ebs_volume_iops"`
 	ChefEbsVolumeSize                  string      `json:"chef_ebs_volume_size"`
 	ChefEbsVolumeType                  string      `json:"chef_ebs_volume_type"`
+	ChefRootEbsVolumeIops              string      `json:"chef_root_ebs_volume_iops"`
+	ChefRootEbsVolumeSize              string      `json:"chef_root_ebs_volume_size"`
+	ChefRootEbsVolumeType              string      `json:"chef_root_ebs_volume_type"`
 	OpensearchServerInstanceType       string      `json:"opensearch_server_instance_type"`
 	OpensearchEbsVolumeIops            string      `json:"opensearch_ebs_volume_iops"`
 	OpensearchEbsVolumeSize            string      `json:"opensearch_ebs_volume_size"`
 	OpensearchEbsVolumeType            string      `json:"opensearch_ebs_volume_type"`
+	OpensearchRootEbsVolumeIops        string      `json:"opensearch_root_ebs_volume_iops"`
+	OpensearchRootEbsVolumeSize        string      `json:"opensearch_root_ebs_volume_size"`
+	OpensearchRootEbsVolumeType        string      `json:"opensearch_root_ebs_volume_type"`
 	PostgresqlServerInstanceType       string      `json:"postgresql_server_instance_type"`
 	PostgresqlEbsVolumeIops            string      `json:"postgresql_ebs_volume_iops"`
 	PostgresqlEbsVolumeSize            string      `json:"postgresql_ebs_volume_size"`
 	PostgresqlEbsVolumeType            string      `json:"postgresql_ebs_volume_type"`
+	PostgresqlRootEbsVolumeIops        string      `json:"postgresql_root_ebs_volume_iops"`
+	PostgresqlRootEbsVolumeSize        string      `json:"postgresql_root_ebs_volume_size"`
+	PostgresqlRootEbsVolumeType        string      `json:"postgresql_root_ebs_volume_type"`
 }
 
 type HATfvars struct {
