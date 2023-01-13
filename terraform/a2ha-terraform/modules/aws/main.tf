@@ -13,6 +13,8 @@ data "aws_vpc" "default" {
 locals {                                                            
   private_subnet_ids_string = join(",", var.private_custom_subnets)
   private_subnet_ids_list = split(",", local.private_subnet_ids_string)
+
+  mount_script = templatefile("${path.module}/templates/mount.sh")
 }
 
 data "aws_subnet" "default" {                                  
@@ -223,21 +225,24 @@ resource "aws_volume_attachment" "chef_automate_postgresql" {
   volume_id = aws_ebs_volume.chef_automate_postgresql[count.index].id
   instance_id = aws_instance.chef_automate_postgresql[count.index].id
 
-    provisioner "remote-exec" {
+  connection {
+    user        = var.aws_ssh_user
+    private_key = file(var.aws_ssh_key_file)
+    host        = aws_instance.chef_automate_postgresql[count.index].private_ip
+    port        = var.aws_ssh_port
+  }
 
-    connection {
-      user        = var.aws_ssh_user
-      private_key = file(var.aws_ssh_key_file)
-      host        = aws_instance.chef_automate_postgresql[count.index].private_ip
-      port        = var.aws_ssh_port
-    }
+  provisioner "file" {
+    destination = "${var.tmp_path}/mount.sh"
+    source = "${path.module}/template/mount.sh"
+  }
 
+  provisioner "remote-exec" {
     inline = [
-        "sudo mkdir -p /hab",
-        "export DNAME=$(lsblk -o NAME,MOUNTPOINT | grep nvme[1-9] | awk 'length($2) == 0')",
-        "echo '/dev/$DNAME  /hab xfs defaults 0 0' >> sudo /etc/fstab",
-        "sudo mkfs -t xfs /dev/$DNAME ",
-        "sudo mount /dev/$DNAME  /hab/",
+        "echo \" Remote execution started\"",
+        "chmod 0700 ${var.tmp_path}/mount.sh",
+        "sudo -S ${var.tmp_path}/mount.sh",
+        "echo \" Remote execution ended\""
     ]
   }
 }
