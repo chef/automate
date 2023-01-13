@@ -1,5 +1,5 @@
 +++
-title = "Automate CLI"
+title = "Automate CLI (Standalone)"
 
 date = 2018-03-26T15:29:24-07:00
 draft = false
@@ -9,10 +9,10 @@ toc_layout = "cli_chef_automate_toc"
 
 [menu]
   [menu.automate]
-    title = "Automate CLI"
+    title = "Automate CLI (Standalone)"
     parent = "automate/reference"
-    identifier = "automate/reference/cli_chef_automate.md Automate CLI"
-    weight = 20
+    identifier = "automate/reference/cli_chef_automate.md Automate CLI (Standalone)"
+    weight = 24
 +++
 
 ## Chef Automate CLI Commands

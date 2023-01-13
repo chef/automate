@@ -1,5 +1,5 @@
 +++
-title = "Automate HA CLI"
+title = "Automate CLI (HA)"
 
 date = 2018-03-26T15:29:24-07:00
 draft = false
@@ -9,9 +9,9 @@ toc_layout = "cli_chef_automate_toc"
 
 [menu]
   [menu.automate]
-    title = "Automate HA CLI"
+    title = "Automate CLI (HA)"
     parent = "automate/reference"
-    identifier = "automate/reference/cli_chef_automate_ha.md Automate HA CLI"
+    identifier = "automate/reference/cli_chef_automate_ha.md Automate CLI (HA)"
     weight = 25
 +++
 
