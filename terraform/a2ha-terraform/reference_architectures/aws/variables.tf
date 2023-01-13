@@ -22,6 +22,18 @@ variable "automate_ebs_volume_type" {
   default = "gp3"
 }
 
+variable "automate_root_ebs_volume_iops" {
+  default = 100
+}
+
+variable "automate_root_ebs_volume_size" {
+  default = 50
+}
+
+variable "automate_root_ebs_volume_type" {
+  default = "gp3"
+}
+
 variable "automate_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
@@ -86,6 +98,18 @@ variable "chef_ebs_volume_size" {
 }
 
 variable "chef_ebs_volume_type" {
+  default = "gp3"
+}
+
+variable "chef_root_ebs_volume_iops" {
+  default = 100
+}
+
+variable "chef_root_ebs_volume_size" {
+  default = 50
+}
+
+variable "chef_root_ebs_volume_type" {
   default = "gp3"
 }
 
@@ -161,6 +185,18 @@ variable "opensearch_ebs_volume_type" {
   default = "gp3"
 }
 
+variable "opensearch_root_ebs_volume_iops" {
+  default = 300
+}
+
+variable "opensearch_root_ebs_volume_size" {
+  default = 50
+}
+
+variable "opensearch_root_ebs_volume_type" {
+  default = "gp3"
+}
+
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
@@ -182,6 +218,18 @@ variable "postgresql_ebs_volume_size" {
 }
 
 variable "postgresql_ebs_volume_type" {
+  default = "gp3"
+}
+
+variable "postgresql_root_ebs_volume_iops" {
+  default = 150
+}
+
+variable "postgresql_root_ebs_volume_size" {
+  default = 50
+}
+
+variable "postgresql_root_ebs_volume_type" {
   default = "gp3"
 }
 

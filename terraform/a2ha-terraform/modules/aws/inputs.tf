@@ -14,11 +14,23 @@ variable "automate_ebs_volume_iops" {
   default = 100
 }
 
+variable "automate_root_ebs_volume_iops" {
+  default = 100
+}
+
 variable "automate_ebs_volume_size" {
   default = 50
 }
 
+variable "automate_root_ebs_volume_size" {
+  default = 50
+}
+
 variable "automate_ebs_volume_type" {
+  default = "gp3"
+}
+
+variable "automate_root_ebs_volume_type" {
   default = "gp3"
 }
 
@@ -78,11 +90,23 @@ variable "chef_ebs_volume_iops" {
   default = 100
 }
 
+variable "chef_root_ebs_volume_iops" {
+  default = 100
+}
+
 variable "chef_ebs_volume_size" {
   default = 50
 }
 
+variable "chef_root_ebs_volume_size" {
+  default = 50
+}
+
 variable "chef_ebs_volume_type" {
+  default = "gp3"
+}
+
+variable "chef_root_ebs_volume_type" {
   default = "gp3"
 }
 
@@ -99,6 +123,10 @@ variable "chef_server_lb_certificate_arn" {
 
 variable "delete_on_termination" {
   default = true
+}
+
+variable "device_name" {
+  default = "/dev/sdh"
 }
 
 variable "json_data" {
@@ -128,11 +156,23 @@ variable "opensearch_ebs_volume_iops" {
   default = 300
 }
 
+variable "opensearch_root_ebs_volume_iops" {
+  default = 300
+}
+
 variable "opensearch_ebs_volume_size" {
   default = 50
 }
 
+variable "opensearch_root_ebs_volume_size" {
+  default = 50
+}
+
 variable "opensearch_ebs_volume_type" {
+  default = "gp3"
+}
+
+variable "opensearch_root_ebs_volume_type" {
   default = "gp3"
 }
 
@@ -164,11 +204,23 @@ variable "postgresql_ebs_volume_iops" {
   default = 150
 }
 
+variable "postgresql_root_ebs_volume_iops" {
+  default = 150
+}
+
 variable "postgresql_ebs_volume_size" {
   default = 50
 }
 
+variable "postgresql_root_ebs_volume_size" {
+  default = 50
+}
+
 variable "postgresql_ebs_volume_type" {
+  default = "gp3"
+}
+
+variable "postgresql_root_ebs_volume_type" {
   default = "gp3"
 }
 
