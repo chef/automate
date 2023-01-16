@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/chef/automate/lib/tls/certs"
-
 	log "github.com/sirupsen/logrus"
 )
 
