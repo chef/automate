@@ -2,7 +2,7 @@
 {{ range $data_path }}
 {{ $id := urlize .name }}
 {{ $command := strings.TrimPrefix "chef-automate " .name }}
-{{ if .compatible_with }} --
+{{ if (eq .compatible_with "AutomateHA") }}
   <h3 id="{{ $id }}">{{ .name }}</h2>
 
     <p>{{ .description }}</p>
