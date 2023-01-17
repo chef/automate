@@ -66,4 +66,7 @@ linters:
     - tagliatelle
     - varnamelen
     - wrapcheck
-    
+    - exhaustruct
+    - interfacebloat
+    - ireturn
+
