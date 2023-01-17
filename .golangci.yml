@@ -49,3 +49,6 @@ linters:
     - lll
     - whitespace
     - wsl
+    - gci
+    - gofumpt
+    - gofmt
