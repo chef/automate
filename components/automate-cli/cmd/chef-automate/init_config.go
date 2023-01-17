@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 )
@@ -32,11 +33,13 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
+	initConfigCmd.PersistentFlags().SetAnnotation("file", docs.Compatiblity, []string{docs.CompatiblewithStandalone})
 	initConfigCmd.PersistentFlags().StringVar(
 		&initConfigFlags.channel,
 		"channel",
 		"current",
 		"Release channel to deploy all services from")
+	initConfigCmd.PersistentFlags().SetAnnotation("channel", docs.Compatiblity, []string{docs.CompatiblewithStandalone})
 	initConfigCmd.PersistentFlags().StringVar(
 		&initConfigFlags.upgradeStrategy,
 		"upgrade-strategy",
@@ -82,6 +85,7 @@ var initConfigCmd = &cobra.Command{
 	Long:  "Initialize default configuration and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatiblity:        docs.CompatiblewithStandalone,
 	},
 	RunE: runInitConfigCmd,
 }

@@ -14,6 +14,7 @@ options:
 - name: path
   default_value: /hab/a2_deploy_workspace/
   usage: a2ha hab workspace dir path
+  compatible_with: AutomateHA
 inherited_options:
 - name: debug
   shorthand: d
@@ -26,3 +27,5 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+compatible_with: AutomateHA
+supported_on: Bastion

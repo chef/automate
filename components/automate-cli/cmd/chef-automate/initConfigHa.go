@@ -5,6 +5,7 @@ package main
 import (
 	"errors"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
@@ -292,6 +293,7 @@ func init() {
 		"/hab/a2_deploy_workspace/",
 		"a2ha hab workspace dir path")
 	initConfigHACmd.SetUsageTemplate(UsageTemplate)
+	initConfigHACmd.PersistentFlags().SetAnnotation("path", docs.Compatiblity, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(initConfigHACmd)
 }
 
@@ -301,6 +303,7 @@ var initConfigHACmd = &cobra.Command{
 	Long:  "Initialized default configuration for HA and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatiblity:        docs.CompatiblewithHA,
 	},
 	RunE: runInitConfigHACmd,
 }

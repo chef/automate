@@ -9,12 +9,14 @@ options:
 - name: channel
   default_value: current
   usage: Release channel to deploy all services from
+  compatible_with: Automate
 - name: es-mem
   usage: |
     The amount of system memory to allocate to Elasticsearch's heap.  (default: 25% of system memory)
 - name: file
   default_value: config.toml
   usage: File path to write the config
+  compatible_with: Automate
 - name: fqdn
   usage: |
     The fully-qualified domain name that Chef Automate can be accessed at. (default: hostname of this machine)
@@ -43,3 +45,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+compatible_with: Automate
