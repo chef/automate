@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -167,6 +168,9 @@ func (c *HTTP) GetManifest(ctx context.Context, release string) (*manifest.A2, e
 }
 
 func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, error) {
+	c.HTTPClient.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
