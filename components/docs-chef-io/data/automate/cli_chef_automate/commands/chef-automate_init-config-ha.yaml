@@ -14,7 +14,7 @@ options:
 - name: path
   default_value: /hab/a2_deploy_workspace/
   usage: a2ha hab workspace dir path
-  compatible_with: AutomateHA
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: debug
   shorthand: d
