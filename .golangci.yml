@@ -69,4 +69,10 @@ linters:
     - exhaustruct
     - interfacebloat
     - ireturn
-
+    - makezero
+    - dupword
+    - ifshort
+    - maintidx
+    - nilerr
+    - nonamedreturns
+    - predeclared
