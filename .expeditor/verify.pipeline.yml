@@ -336,17 +336,17 @@ steps:
       executor:
         docker:
 
-  # - label: "[unit] automate-ui"
-  #   command:
-  #     - cd components/automate-ui
-  #     - make install lint unit
-  #   timeout_in_minutes: 20
-  #   retry:
-  #     automatic:
-  #       limit: 1
-  #   expeditor:
-  #     executor:
-  #       docker:
+  - label: "[unit] automate-ui"
+    command:
+      - cd components/automate-ui
+      - make install lint unit
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
 
   - label: "[unit] chef-ui-library"
     command:
