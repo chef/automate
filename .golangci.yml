@@ -52,3 +52,18 @@ linters:
     - gci
     - gofumpt
     - gofmt
+    - gomoddirectives
+    - revive
+    - containedctx
+    - cyclop
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - exhaustivestruct
+    - forcetypeassert
+    - nlreturn
+    - nosnakecase
+    - tagliatelle
+    - varnamelen
+    - wrapcheck
+    
