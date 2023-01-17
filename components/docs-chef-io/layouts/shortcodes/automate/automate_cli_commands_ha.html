@@ -2,7 +2,7 @@
 {{ range $data_path }}
 {{ $id := urlize .name }}
 {{ $command := strings.TrimPrefix "chef-automate " .name }}
-{{ if (eq .compatible_with "AutomateHA") }}
+{{ if or (not .compatible_with) (eq .compatible_with "AutomateHA") }}
   <h3 id="{{ $id }}">{{ .name }}</h2>
 
     <p>{{ .description }}</p>
@@ -23,7 +23,7 @@
   </div>
 
   <h4>Supported On</h4>
-  <p>OpenSearch Nodes</p>
+  <p>{{ .supported_on }}</p>
 
   <h4 id="{{ $id }}-see-also">See Also</h3>
   <div class="grid-x">
