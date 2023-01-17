@@ -2,6 +2,7 @@
 {{ range $data_path }}
 {{ $id := urlize .name }}
 {{ $command := strings.TrimPrefix "chef-automate " .name }}
+{{ if .compatible_with }} --
   <h3 id="{{ $id }}">{{ .name }}</h2>
 
     <p>{{ .description }}</p>
@@ -46,4 +47,7 @@
     <div class="cell medium-9">{{ $sa_string }}</div>
     {{ end }}
   </div>
+ 
+   {{ end }}
+
 {{ end }}
