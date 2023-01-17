@@ -42,7 +42,7 @@ type cmdOption struct {
 	Shorthand      string `yaml:",omitempty"`
 	DefaultValue   string `yaml:"default_value,omitempty"`
 	Usage          string `yaml:",omitempty"`
-	CompatibleWith string `yaml:"compatible_with,omitempty"`
+	CompatibleWith string `yaml:"compatible_with_options,omitempty"`
 }
 
 type cmdDoc struct {
