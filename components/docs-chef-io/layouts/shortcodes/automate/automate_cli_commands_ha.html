@@ -13,14 +13,14 @@
   <h4 id="{{ $id }}-flags">Flags</h3>
   <div class="fake-code grid-x">
     {{- range .options -}}
-    {{ if (eq .compatible_with "AutomateHA") }}
+    {{ if (eq .compatible_with_options "AutomateHA") }}
     <div class="cell medium-4"></b>{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div>
     {{ end }}
+   {{- end -}}
 
-    {{- end -}}
     {{- range .inherited_options -}}
-    {{ if (eq .compatible_with "AutomateHA") }}
+    {{ if (eq .compatible_with_options "AutomateHA") }}
     <div class="cell medium-4"></b>{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div>
     {{ end }}
