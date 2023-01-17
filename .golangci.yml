@@ -69,8 +69,6 @@ linters:
     - interfacebloat
     - ireturn
     - makezero
-    - dupword
-    - ifshort
     - maintidx
     - nilerr
     - nonamedreturns
