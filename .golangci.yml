@@ -56,7 +56,6 @@ linters:
     - revive
     - containedctx
     - cyclop
-    - errchkjson
     - errorlint
     - exhaustive
     - exhaustivestruct
