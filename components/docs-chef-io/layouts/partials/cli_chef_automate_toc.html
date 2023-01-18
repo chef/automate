@@ -29,6 +29,19 @@
             </li>
           {{ end }}
           {{ end }} 
+          {{ if and (eq $page "Automate CLI (Standalone)") (eq .compatible_with "Automate") }}
+          {{ $command := .name }}
+          {{ if ne $command "chef-automate"}}
+            {{ $command := replaceRE `chef-automate ` "" $command }}
+            <li>
+              <a href = "#{{ .name | urlize}}">{{ $command }}</a>
+            </li>
+          {{ else}}
+            <li>
+              <a href = "#{{ .name | urlize}}">{{ $command }}</a>
+            </li>
+          {{ end }}
+          {{ end }} 
 
         {{ end }}
       </ul>
