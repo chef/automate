@@ -20,9 +20,9 @@ import (
 )
 
 const (
-	defaultSemanticManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest_semver.json"
-	defaultLatestManifestURLFmt   = "https://packages.chef.io/manifests/%s/automate/latest.json"
-	defaultManifestURLFmt         = "https://packages.chef.io/manifests/automate/%s.json"
+	defaultSemanticManifestURLFmt = "http://packages.chef.io/manifests/%s/automate/latest_semver.json"
+	defaultLatestManifestURLFmt   = "http://packages.chef.io/manifests/%s/automate/latest.json"
+	defaultManifestURLFmt         = "http://packages.chef.io/manifests/automate/%s.json"
 	packagesChefIOSigAsc          = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.12 (Darwin)
 Comment: GPGTools - http://gpgtools.org
