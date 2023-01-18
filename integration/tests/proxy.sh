@@ -5,6 +5,10 @@ test_name="proxy"
 test_proxy="true"
 
 do_deploy() {
+    log_info "$test_hartifacts_path"
+    log_info "$HAB_ORIGIN"
+    log_info "$test_manifest_path"
+
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --product automate \
