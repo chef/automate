@@ -9,6 +9,9 @@ do_deploy() {
     log_info "$HAB_ORIGIN"
     log_info "$test_manifest_path"
 
+    ls $test_hartifacts_path
+    cat $test_manifest_path
+    
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --product automate \
