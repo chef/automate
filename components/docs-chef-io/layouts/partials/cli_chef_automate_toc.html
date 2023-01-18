@@ -16,7 +16,7 @@
       <a href = "#automate-cli-commands">Automate CLI Commands</a>
       <ul>
         {{ range .Site.Data.automate.cli_chef_automate.commands }}
-        {{ if and ($page eq "Automate CLI (HA)") (.compatible_with eq "AutomateHA") }}
+        {{ if and (eq $page "Automate CLI (HA)") (eq .compatible_with "AutomateHA") }}
           {{ $command := .name }}
           {{ if ne $command "chef-automate"}}
             {{ $command := replaceRE `chef-automate ` "" $command }}
