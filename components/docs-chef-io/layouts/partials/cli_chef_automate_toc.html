@@ -9,12 +9,14 @@
   </span>
   <p>
     <a href="#{{ anchorize ( .Title )}}">{{ .Title }}</a>
+    {{ $page := .Title }}
   </p>
   <ul>
     <li>
       <a href = "#automate-cli-commands">Automate CLI Commands</a>
       <ul>
         {{ range .Site.Data.automate.cli_chef_automate.commands }}
+        {{ if and ($page eq "Automate CLI (HA)") (.compatible_with eq "AutomateHA") }}
           {{ $command := .name }}
           {{ if ne $command "chef-automate"}}
             {{ $command := replaceRE `chef-automate ` "" $command }}
@@ -26,6 +28,7 @@
               <a href = "#{{ .name | urlize}}">{{ $command }}</a>
             </li>
           {{ end }}
+          {{ end }} 
 
         {{ end }}
       </ul>
