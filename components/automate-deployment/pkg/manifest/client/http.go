@@ -89,6 +89,12 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		HTTPClient: &http.Client{},
 	}
 
+	c.HTTPClient.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true},
+	}
+
 	for _, option := range options {
 		option(c)
 	}
