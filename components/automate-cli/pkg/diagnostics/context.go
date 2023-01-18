@@ -196,12 +196,6 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 			return nil, err
 		}
 
-		c.httpClient.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{
-				MinVersion:         tls.VersionTLS12,
-				InsecureSkipVerify: true},
-		}
-
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
 			lastErr = err

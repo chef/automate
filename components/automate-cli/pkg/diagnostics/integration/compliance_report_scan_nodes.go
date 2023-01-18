@@ -180,27 +180,27 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				assert.Equal(tstCtx, "OK", resp.Status)
 				assert.Equal(tstCtx, 0, resp.ErrorCode)
 
-				// containsEntity := false
+				containsEntity := false
 				for _, node := range resp.Result.ScannedNodes {
 					if node.ID == loaded.ID {
-						// containsEntity = true
+						containsEntity = true
 						break
 					}
 
 					// All nodes should have these values set to something.
-					// assert.NotEqual(tstCtx, "", node.ID)
-					// assert.NotEqual(tstCtx, "", node.Name)
-					// assert.NotEqual(tstCtx, "", node.ScanJobID)
+					assert.NotEqual(tstCtx, "", node.ID)
+					assert.NotEqual(tstCtx, "", node.Name)
+					assert.NotEqual(tstCtx, "", node.ScanJobID)
 					//assert.NotEqual(tstCtx, "", node.LastSeen)
 				}
 
-				// if !containsEntity {
-				// 	return errors.Errorf("Could not find node %s in usage's list of scanned nodes", loaded.ID)
-				// }
+				if !containsEntity {
+					return errors.Errorf("Could not find node %s in usage's list of scanned nodes", loaded.ID)
+				}
 
 				return nil
 			})
-			// require.NoError(tstCtx, err)
+			require.NoError(tstCtx, err)
 		},
 
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
