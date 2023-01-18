@@ -15,7 +15,7 @@
   {{- range .options -}}
     {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
     <table>
-        <tr class="table-heading">
+        <tr>
             <td><div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div></td>
             <td><div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div></td>
         </tr>
@@ -26,7 +26,7 @@
     {{- range .inherited_options -}}
     {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
     <table>
-        <tr class="table-heading">
+        <tr>
             <td><div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div></td>
             <td><div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div></td>
         </tr>
