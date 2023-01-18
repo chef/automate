@@ -12,19 +12,17 @@ do_deploy() {
     ls $test_hartifacts_path
     cat $test_manifest_path
 
-    log_info "$HTTP_PROXY"
-
-    curl -x $HTTP_PROXY --proxy-user admin:chefautomate -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
-    curl -x $HTTP_PROXY --proxy-user admin:chefautomate -L https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-latest.aib
+    # curl -x $HTTP_PROXY --proxy-user admin:chefautomate -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+    # curl -x $HTTP_PROXY --proxy-user admin:chefautomate -L https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-latest.aib
 
     #shellcheck disable=SC2154
-    ./chef-automate deploy config.toml \
+    chef-automate deploy config.toml \
         --product automate \
         --product builder \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
+        --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
-        --airgap-bundle automate-latest.aib \
         --accept-terms-and-mlsa
 
     log_info "applying dev license"
