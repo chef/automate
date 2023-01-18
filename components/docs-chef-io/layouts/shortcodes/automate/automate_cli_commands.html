@@ -2,7 +2,8 @@
 {{ range $data_path }}
 {{ $id := urlize .name }}
 {{ $command := strings.TrimPrefix "chef-automate " .name }}
-  <h3 id="{{ $id }}">{{ .name }}</h2>
+{{ if or (not .compatible_with) (eq .compatible_with "Automate") }}
+<h3 id="{{ $id }}">{{ .name }}</h2>
   <p>{{ .description }}</p>
 
   <h4 id="{{ $id }}-usage">Usage</h3>
@@ -11,12 +12,16 @@
   <h4 id="{{ $id }}-flags">Flags</h3>
   <div class="fake-code grid-x">
     {{- range .options -}}
+    {{ if or (not .compatible_with_options) (eq .compatible_with_options "Automate") }}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div>
+    {{ end }}
     {{- end -}}
     {{- range .inherited_options -}}
+    {{ if or (not .compatible_with_options) (eq .compatible_with_options "Automate") }}
     <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
     <div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div>
+    {{ end }}
     {{- end -}}
   </div>
 
