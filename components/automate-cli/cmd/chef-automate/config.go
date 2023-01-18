@@ -117,7 +117,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		if isManagedServicesOn() {
 			err := errorOnSelfManaged(configCmdFlags.postgresql, configCmdFlags.opensearch)
 			if err != nil {
-				return status.Annotate(err,status.InvalidCommandArgsError)
+				return status.Annotate(err, status.InvalidCommandArgsError)
 			}
 		}
 
@@ -270,7 +270,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				os.Exit(1)
 			}
 			const remoteService string = "frontend"
-			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+			err = patchConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
 		} else if configCmdFlags.automate {
 			frontendIps := infra.Outputs.AutomatePrivateIps.Value
 			if len(frontendIps) == 0 {
@@ -278,7 +278,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				os.Exit(1)
 			}
 			const remoteService string = "automate"
-			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+			err = patchConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
 		} else if configCmdFlags.chef_server {
 			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
 			if len(frontendIps) == 0 {
@@ -286,13 +286,13 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				os.Exit(1)
 			}
 			const remoteService string = "chef-server"
-			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+			err = patchConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
 		} else if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
-			err = setConfigForPostgresqlNodes(args, remoteService, sshUtil, infra, timestamp)
+			err = patchConfigForPostgresqlNodes(args, remoteService, sshUtil, infra, timestamp)
 		} else if configCmdFlags.opensearch {
 			const remoteService string = "opensearch"
-			err = setConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
+			err = patchConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
 
 		} else {
 			writer.Println(cmd.UsageString())
@@ -316,9 +316,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// setConfigForFrontEndNodes patches the configuration for front end nodes in Automate HA
-func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
-	scriptCommands := fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
+// patchConfigForFrontEndNodes patches the configuration for front end nodes in Automate HA
+func patchConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, dateFormat)
 	srcPath, err := parseAndRemoveRestrictedKeysFromSrcFile(args[0])
 	if err != nil {
 		return err
@@ -342,10 +342,10 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 	return nil
 }
 
-// setConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
-func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
+// patchConfigForPostgresqlNodes patches the config for postgresql nodes in Automate HA
+func patchConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError,ERROR_SELF_MANAGED_CONFIG_PATCH, "Postgresql")
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "Postgresql")
 	}
 	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
 		writer.Error("Postgres IPs not found in the config. Please contact the support team")
@@ -396,10 +396,10 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 	return nil
 }
 
-// setConfigForOpensearch patches the config for open-search nodes in Automate HA
-func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
+// patchConfigForOpensearch patches the config for open-search nodes in Automate HA
+func patchConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError,ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
 	}
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
 		writer.Error("OpenSearch IPs not found in the config. Please contact the support team")
@@ -451,16 +451,98 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
-	cfg, err := dc.LoadUserOverrideConfigFile(args[0])
-	if err != nil {
-		return status.Annotate(err, status.ConfigError)
+	if isA2HARBFileExist() {
+
+		var err error
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+
+		sshUser := infra.Outputs.SSHUser.Value
+		sskKeyFile := infra.Outputs.SSHKeyFile.Value
+		sshPort := infra.Outputs.SSHPort.Value
+
+		timestamp := time.Now().Format("20060102150405")
+		sshConfig := &SSHConfig{
+			sshUser:    sshUser,
+			sshKeyFile: sskKeyFile,
+			sshPort:    sshPort,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		if configCmdFlags.frontend {
+			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
+			if len(frontendIps) == 0 {
+				writer.Error("No frontend IPs are found")
+				os.Exit(1)
+			}
+			const remoteService string = "frontend"
+			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+		} else if configCmdFlags.automate {
+			frontendIps := infra.Outputs.AutomatePrivateIps.Value
+			if len(frontendIps) == 0 {
+				writer.Error("No automate IPs are found")
+				os.Exit(1)
+			}
+			const remoteService string = "automate"
+			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+		} else if configCmdFlags.chef_server {
+			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
+			if len(frontendIps) == 0 {
+				writer.Error("No chef-server IPs are found")
+				os.Exit(1)
+			}
+			const remoteService string = "chef-server"
+			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
+			// } else if configCmdFlags.postgresql {
+			// 	const remoteService string = "postgresql"
+			// 	err = patchConfigForPostgresqlNodes(args, remoteService, sshUtil, infra, timestamp)
+			// } else if configCmdFlags.opensearch {
+			// 	const remoteService string = "opensearch"
+			// 	err = patchConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
+
+		} else {
+			writer.Println(cmd.UsageString())
+		}
+		if err != nil {
+			return err
+		}
+
+	} else {
+		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+
+		if err := client.SetAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
+			return err
+		}
+		writer.Success("Configuration set")
 	}
 
-	if err := client.SetAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
-		return err
-	}
+	return nil
+}
 
-	writer.Success("Configuration set")
+// setConfigForFrontEndNodes set the configuration for front end nodes in Automate HA
+func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, remoteService+timestamp, dateFormat)
+
+	for i := 0; i < len(frontendIps); i++ {
+		writer.Print("Connecting to the " + remoteService + " node : " + frontendIps[i])
+		sshUtil.getSSHConfig().hostIP = frontendIps[i]
+		err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+		if err != nil {
+			writer.Errorf("%v", err)
+			return err
+		}
+		writer.Printf(output + "\n")
+		writer.Success("Configuration set is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
+	}
 	return nil
 }
 
