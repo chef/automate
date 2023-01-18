@@ -12,6 +12,8 @@ do_deploy() {
     ls $test_hartifacts_path
     cat $test_manifest_path
 
+    log_info "$HTTP_PROXY"
+
     curl -x $HTTP_PROXY --proxy-user admin:chefautomate -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
     curl -x $HTTP_PROXY --proxy-user admin:chefautomate -L https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-latest.aib
 
