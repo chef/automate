@@ -16,7 +16,7 @@
       <a href = "#automate-cli-commands">Automate CLI Commands</a>
       <ul>
         {{ range .Site.Data.automate.cli_chef_automate.commands }}
-        {{ if and (eq $page "Automate CLI (HA)") (eq .compatible_with "AutomateHA") }}
+        {{ if and (eq $page "Automate CLI (HA)") (or (not .compatible_with) (eq .compatible_with "AutomateHA")) }}
           {{ $command := .name }}
           {{ if ne $command "chef-automate"}}
             {{ $command := replaceRE `chef-automate ` "" $command }}
@@ -29,7 +29,7 @@
             </li>
           {{ end }}
           {{ end }} 
-          {{ if and (eq $page "Automate CLI (Standalone)") (eq .compatible_with "Automate") }}
+          {{ if and (eq $page "Automate CLI (Standalone)") (or (not .compatible_with) (eq .compatible_with "Automate")) }}
           {{ $command := .name }}
           {{ if ne $command "chef-automate"}}
             {{ $command := replaceRE `chef-automate ` "" $command }}
