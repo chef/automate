@@ -205,7 +205,12 @@ resource "aws_instance" "chef_automate_postgresql" {
       )
     )
   )
-
+  lifecycle {
+    ignore_changes = [
+      "tags",
+      "tags_all"
+    ]
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
@@ -235,7 +240,12 @@ resource "aws_instance" "chef_automate_opensearch" {
       format("${var.tag_name}_${random_id.random.hex}_chef_automate_opensearch_%02d", count.index + 1)
     )
   )
-
+  lifecycle {
+    ignore_changes = [
+      "tags",
+      "tags_all"
+    ]
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
@@ -266,6 +276,14 @@ resource "aws_instance" "chef_automate" {
       format("${var.tag_name}_${random_id.random.hex}_chef_automate_%02d", count.index + 1)
     )
   )
+
+  lifecycle {
+    ignore_changes = [
+      "tags",
+      "tags_all",
+      "root_block_device"
+    ]
+  }
 
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
   
@@ -298,6 +316,13 @@ resource "aws_instance" "chef_server" {
       format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)
     )
   )
+
+  lifecycle {
+    ignore_changes = [
+      "tags",
+      "tags_all"
+    ]
+  }
   
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 

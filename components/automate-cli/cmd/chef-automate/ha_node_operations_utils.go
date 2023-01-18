@@ -327,6 +327,19 @@ func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]stri
 	return nil
 }
 
+
+func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string) error {
+	if len(newIps) == 0 {
+		return nil
+	}
+	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	if err != nil {
+		return err
+	}
+	*instanceCount = inc
+	return nil
+}
+
 func difference(a, b []string) []string {
 	mb := make(map[string]struct{}, len(b))
 	for _, x := range b {
