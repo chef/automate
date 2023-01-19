@@ -904,18 +904,18 @@ steps:
 #         linux:
 #           privileged: true
 
-#   - label: "proxy"
-#     command:
-#       - integration/run_test integration/tests/proxy.sh
-#     timeout_in_minutes: 20
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "proxy"
+    command:
+      - integration/run_test integration/tests/proxy.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
 #   - label: "ldap hab user"
 #     command:
