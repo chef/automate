@@ -217,7 +217,7 @@ steps:
       - scripts/install_golang.sh
       - scripts/setup_buildkite_pg.sh cereal_test
       - cd lib
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH GODEBUG=x509ignoreCN=0 make lint unit cereal_integration
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH make lint unit cereal_integration
     timeout_in_minutes: 10
     retry:
       automatic:
