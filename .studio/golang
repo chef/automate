@@ -282,6 +282,8 @@ function install_golangci() {
         return 1
     fi
     (
+        install_if_missing core/curl curl
+        curl --output ./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64.tar.gz -L https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCILINTVERSION}/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64.tar.gz
         local lint_bin="./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64/golangci-lint"
         local lint_tarball="./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64.tar.gz"
         if [[ ! -f  "$lint_bin" ]]; then

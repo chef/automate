@@ -28,11 +28,11 @@ const (
 // Health message
 //
 // The ingest-service health is constructed with:
-// * Status:
-//            => ok:             Everything is alright
-//            => initialization: The service is in its initialization process
-//            => warning:        Something might be wrong?
-//            => critical:       Something is wrong!
+//   - Status:
+//     => ok:             Everything is alright
+//     => initialization: The service is in its initialization process
+//     => warning:        Something might be wrong?
+//     => critical:       Something is wrong!
 //
 // @afiune: Here we can add more health information to the response
 type Health struct {

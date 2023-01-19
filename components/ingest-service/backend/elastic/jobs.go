@@ -114,7 +114,7 @@ func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (upd
 	nodesIndex := mappings.NodeState.Alias
 	allConvergeHistoryIndex := mappings.ConvergeHistory.Index + "-*"
 
-	// The range query that will gather the nodes that have
+	// The range query that will gather the nodes that
 	// have been marked for delete longer than the threshold,
 	rangeQueryThreshold := elastic.NewRangeQuery(timestamp).Lt("now-" + threshold)
 	// Collect only nodes that have been marked for delete (exists=false)

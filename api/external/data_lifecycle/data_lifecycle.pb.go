@@ -2976,9 +2976,7 @@ type DataLifecycleClient interface {
 	RunInfra(ctx context.Context, in *RunInfraRequest, opts ...grpc.CallOption) (*RunInfraResponse, error)
 	// SetInfraConfig configures the infra data lifecycle scheduler and jobs
 	SetInfraConfig(ctx context.Context, in *SetInfraConfigRequest, opts ...grpc.CallOption) (*SetInfraConfigResponse, error)
-	//
 	// Services
-	//
 	GetServicesStatus(ctx context.Context, in *GetServicesStatusRequest, opts ...grpc.CallOption) (*GetServicesStatusResponse, error)
 	RunServices(ctx context.Context, in *RunServicesRequest, opts ...grpc.CallOption) (*RunServicesResponse, error)
 	SetServicesConfig(ctx context.Context, in *SetServicesConfigRequest, opts ...grpc.CallOption) (*SetServicesConfigResponse, error)
@@ -3153,9 +3151,7 @@ type DataLifecycleServer interface {
 	RunInfra(context.Context, *RunInfraRequest) (*RunInfraResponse, error)
 	// SetInfraConfig configures the infra data lifecycle scheduler and jobs
 	SetInfraConfig(context.Context, *SetInfraConfigRequest) (*SetInfraConfigResponse, error)
-	//
 	// Services
-	//
 	GetServicesStatus(context.Context, *GetServicesStatusRequest) (*GetServicesStatusResponse, error)
 	RunServices(context.Context, *RunServicesRequest) (*RunServicesResponse, error)
 	SetServicesConfig(context.Context, *SetServicesConfigRequest) (*SetServicesConfigResponse, error)

@@ -1366,6 +1366,7 @@ type URLValidationRequest struct {
 
 	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	// Types that are assignable to Credentials:
+	//
 	//	*URLValidationRequest_UsernamePassword
 	//	*URLValidationRequest_SecretId
 	//	*URLValidationRequest_SecretIdWithAddon

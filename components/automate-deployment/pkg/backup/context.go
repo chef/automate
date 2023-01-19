@@ -182,11 +182,12 @@ type TransactFunc func(Context) error
 // 'completed'. Otherwise, it will be overwritten with 'failed'.
 //
 // NOTE: Transact used to move a completed backup into place atomically. This
-//       assumed that we could do a rename. We now use a blob like api, and
-//       there exists no atomic rename. With the blob api, this changed to
-//       using a status file. Since the status file did not exist before,
-//       a successful backup is one where either there is no status file,
-//       or one where the status file contains 'completed'.
+//
+//	assumed that we could do a rename. We now use a blob like api, and
+//	there exists no atomic rename. With the blob api, this changed to
+//	using a status file. Since the status file did not exist before,
+//	a successful backup is one where either there is no status file,
+//	or one where the status file contains 'completed'.
 func (ctx Context) Transact(f TransactFunc) (string, error) {
 	if err := ctx.writeStatus(BackupStatusInProgress); err != nil {
 		return "", errors.Wrap(err, "Failed to set status object to pending")

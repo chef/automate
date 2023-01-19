@@ -293,8 +293,7 @@ func (ms *Status) updateErr(errMessage, s string) {
 	logFatal(errMessage, s)
 	ms.status = "Error: " + s
 	ms.finished = true
-	err := ms.unlock()
-	if err != nil {
+	if err := ms.unlock(); err != nil {
 		logFatal(err.Error(), "Failed to unlock migration in postgresql")
 	}
 }
@@ -304,8 +303,7 @@ func (ms *Status) finish(s string) {
 	logInfo(s)
 	ms.status = s
 	ms.finished = true
-	err := ms.unlock()
-	if err != nil {
+	if err := ms.unlock(); err != nil {
 		logFatal(err.Error(), "Failed to unlock migration in postgresql")
 	}
 }
