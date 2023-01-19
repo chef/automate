@@ -540,9 +540,15 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 		}
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
-			writer.Errorf("New Frontend Error: %v", err)
+			writer.Errorf("%v", err)
 			return err
 		}
+
+		err = checkOutputForError(output)
+		if err != nil {
+			return err
+		}
+
 		writer.Printf(output + "\n")
 		writer.Success("Setting config is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
 	}
@@ -595,6 +601,11 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 		return err
 	}
 
+	err = checkOutputForError(output)
+	if err != nil {
+		return err
+	}
+
 	writer.Printf(output + "\n")
 	writer.Success("Setting config is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
 
@@ -643,6 +654,11 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 	if err != nil {
 		writer.Errorf("%v", err)
+		return err
+	}
+
+	err = checkOutputForError(output)
+	if err != nil {
 		return err
 	}
 
@@ -924,4 +940,13 @@ func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		}
 		return srcString, nil
 	}
+}
+
+// If the output contains the word "error" then return error
+func checkOutputForError(output string) error {
+	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
+		writer.Errorf("%v", output)
+		return errors.New(output)
+	}
+	return nil
 }
