@@ -48,7 +48,7 @@ export class ScannerComponent implements OnInit {
   }
 
   add(plugin: PluginOptions): void {
-    console.warn('@@@@@####', plugin)
+    console.warn('plugin', plugin)
     this.workflow.push(plugin);
   }
 
