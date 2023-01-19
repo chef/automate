@@ -56,8 +56,12 @@
       {{ $sa_command = print $command " " $sa_id }}
     {{ end }}
 
-    <div class="cell medium-3"><a href="#{{ $sa_command_id }}">{{ $sa_command }}</a></div>
-    <div class="cell medium-9">{{ $sa_string }}</div>
+    <table>
+      <tr>
+        <td><div class="cell medium-3"><a href="#{{ $sa_command_id }}">{{ $sa_command }}</a></div></td>
+        <td><div class="cell medium-9">{{ $sa_string }}</div></td>
+      </tr>
+    </table>
     {{ end }}
   </div>
  
