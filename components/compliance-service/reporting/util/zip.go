@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -29,6 +30,7 @@ func Zip2Path(zipPath string, extractPath string) error {
 	defer reader.Close() // nolint: errcheck
 
 	for _, curFile := range reader.File {
+		buf := make([]byte, 1024)
 		rc, err := curFile.Open()
 		if err != nil {
 			return err
@@ -48,7 +50,19 @@ func Zip2Path(zipPath string, extractPath string) error {
 			if err != nil {
 				return err
 			}
-			_, err = io.Copy(f, rc) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
+			for {
+				n, err := rc.Read(buf)
+				if err != nil && err != io.EOF {
+					log.Fatal(err)
+				}
+				if n == 0 {
+					break
+				}
+
+				if _, err := f.Write(buf[:n]); err != nil {
+					log.Fatal(err)
+				}
+			}
 			cerr := rc.Close()
 			ferr := f.Close()
 			if err != nil {
