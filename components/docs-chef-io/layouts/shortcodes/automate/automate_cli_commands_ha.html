@@ -13,6 +13,10 @@
   <h4 id="{{ $id }}-flags">Flags</h3>
   <div class="fake-code grid-x">
     <table>
+      <tr>
+        <th>Flags</th>
+        <th>Description</th>
+      </tr>
       {{- range .options -}}
         {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
           <tr>
@@ -22,17 +26,20 @@
         {{ end }}
       {{- end -}}
     </table>
-
+    <table>
+      <tr>
+        <th>Commands</th>
+        <th>Description</th>
+      </tr>
     {{- range .inherited_options -}}
     {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
-    <table>
         <tr>
             <td><div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div></td>
             <td><div class="cell medium-8">{{ .usage }}{{ if .default_value }} (default: {{ .default_value }}){{ end }}</div></td>
         </tr>
-    </table>
     {{ end }}
     {{- end -}}
+  </table>
   </div>
 
   <h4>Supported On</h4>
