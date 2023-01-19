@@ -78,8 +78,6 @@ func init() {
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Patch toml configuration to the postgresql node[DUPLICATE]")
 
 	// config set flags
-	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Set toml configuration to the all frontend nodes")
-	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Set toml configuration to the all frontend nodes[DUPLICATE]")
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Set toml configuration to the automate node")
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Set toml configuration to the automate node[DUPLICATE]")
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Set toml configuration to the chef_server node")
@@ -483,15 +481,7 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 			sshPort:    sshPort,
 		}
 		sshUtil := NewSSHUtil(sshConfig)
-		if configCmdFlags.frontend {
-			frontendIps := append(infra.Outputs.ChefServerPrivateIps.Value, infra.Outputs.AutomatePrivateIps.Value...)
-			if len(frontendIps) == 0 {
-				writer.Error("No frontend IPs are found")
-				os.Exit(1)
-			}
-			const remoteService string = "frontend"
-			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
-		} else if configCmdFlags.automate {
+		if configCmdFlags.automate {
 			frontendIps := infra.Outputs.AutomatePrivateIps.Value
 			if len(frontendIps) == 0 {
 				writer.Error("No automate IPs are found")
