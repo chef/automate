@@ -28,7 +28,7 @@
     </table>
     <table>
       <tr>
-        <th>Commands</th>
+        <th>Flags</th>
         <th>Description</th>
       </tr>
     {{- range .inherited_options -}}
@@ -46,6 +46,11 @@
   <p>{{ .supported_on }}</p>
 
   <h4 id="{{ $id }}-see-also">See Also</h3>
+    <table>
+      <tr>
+        <th>Commands</th>
+        <th>Description</th>
+      </tr>
   <div class="grid-x">
     {{ range .see_also }}
     {{ $sa_bits := split . " - " }}
@@ -63,13 +68,13 @@
       {{ $sa_command = print $command " " $sa_id }}
     {{ end }}
 
-    <table>
       <tr>
         <td><div class="cell medium-3"><a href="#{{ $sa_command_id }}">{{ $sa_command }}</a></div></td>
         <td><div class="cell medium-9">{{ $sa_string }}</div></td>
       </tr>
-    </table>
     {{ end }}
+
+  </table>
   </div>
  
    {{ end }}
