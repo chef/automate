@@ -501,10 +501,9 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 		} else if configCmdFlags.postgresql {
 			const remoteService string = "postgresql"
 			err = setConfigForPostgresqlNodes(args, remoteService, sshUtil, infra, timestamp)
-			// } else if configCmdFlags.opensearch {
-			// 	const remoteService string = "opensearch"
-			// 	err = patchConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
-
+		} else if configCmdFlags.opensearch {
+			const remoteService string = "opensearch"
+			err = setConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -581,7 +580,59 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 	}
 
 	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+
 	sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
+	writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
+	err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
+	if err != nil {
+		writer.Errorf("%v", err)
+		return err
+	}
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+	if err != nil {
+		writer.Errorf("%v", err)
+		return err
+	}
+
+	writer.Printf(output + "\n")
+	writer.Success("Setting config is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
+
+	return nil
+}
+
+// setConfigForOpensearch set the configuration for opensearch nodes in Automate HA
+func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
+	if isManagedServicesOn() {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_SET, "OpenSearch")
+	}
+	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
+		writer.Error("OpenSearch IPs not found in the config. Please contact the support team")
+		return nil
+	}
+	//checking for log configuration
+	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value)
+	if err != nil {
+		return err
+	}
+
+	//Getting Requested Config
+	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, opensearch_const)
+	if err != nil {
+		return err
+	}
+	reqConfig := reqConfigInterface.(OpensearchConfig)
+
+	//Setting the config
+	tomlFile := args[0] + timestamp
+	tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
+	if err != nil {
+		return err
+	}
+
+	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+
+	sshUtil.getSSHConfig().hostIP = infra.Outputs.OpensearchPrivateIps.Value[0]
 	writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
 	err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
 	if err != nil {
