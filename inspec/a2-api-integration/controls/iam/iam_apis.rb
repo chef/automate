@@ -564,6 +564,7 @@ control 'iam-api-1' do
 
       resp = automate_api_request("/apis/iam/v2/users/#{user}/teams")
       expect(resp.http_status).to eq 200
+      puts "ErrorResponseA #{resp}"
     end
 
     it "GET users for team responds properly to happy path inputs" do
@@ -680,6 +681,7 @@ control 'iam-api-1' do
 
       resp = automate_api_request("/apis/iam/v2/roles")
       expect(resp.parsed_response_body[:roles].map {|t| t[:id]}).to_not include(ROLE_ID)
+      puts "ErrorResponseA #{resp}"
     end
 
     it "GET/DELETE/PUT returns 404 Not Found if the role does not exist" do
@@ -1276,6 +1278,7 @@ EOF
       )
       expect(resp.http_status).to eq 400
       expect(resp.parsed_response_body[:error]).to eq "could not parse statements: cannot define resources on policy"
+      puts "ErrorResponseA #{resp}"
     end
 
     it "LIST policies responds properly" do

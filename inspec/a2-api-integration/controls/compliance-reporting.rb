@@ -24,6 +24,7 @@ control 'compliance-1' do
 
       it 'should ingest the data successfully' do
         expect(api_request.http_status).to eq 200
+        puts "ErrorResponseA #{api_request}"
       end
     end
   end
