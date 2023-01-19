@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -53,14 +52,14 @@ func Zip2Path(zipPath string, extractPath string) error {
 			for {
 				n, err := rc.Read(buf)
 				if err != nil && err != io.EOF {
-					log.Fatal(err)
+					return err
 				}
 				if n == 0 {
 					break
 				}
 
 				if _, err := f.Write(buf[:n]); err != nil {
-					log.Fatal(err)
+					return err
 				}
 			}
 			cerr := rc.Close()
