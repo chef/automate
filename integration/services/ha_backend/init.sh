@@ -64,12 +64,12 @@ ha_backend_setup() {
     openssl req -new -key "$certdir/odfe-admin.key" -out "$certdir/odfe-admin.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
 
     #Use the CSR to generate the signed odfe and postgresql Certificates:
-    openssl x509 -req -in "$certdir/odfe-${ha_backend_container1}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container1}.pem" -sha256
-    openssl x509 -req -in "$certdir/odfe-${ha_backend_container2}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container2}.pem" -sha256
-    openssl x509 -req -in "$certdir/postgresql.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/postgresql.pem" -sha256
+    openssl x509 -extfile <(printf "subjectAltName=DNS:chefnode") -req -in "$certdir/odfe-${ha_backend_container1}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container1}.pem" -sha256
+    openssl x509 -extfile <(printf "subjectAltName=DNS:chefnode") -req -in "$certdir/odfe-${ha_backend_container2}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container2}.pem" -sha256
+    openssl x509 -extfile <(printf "subjectAltName=DNS:chefpostgresql") -req -in "$certdir/postgresql.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/postgresql.pem" -sha256
 
     #Use the CSR to generate the signed admin Certificate:
-    openssl x509 -req -in "$certdir/odfe-admin.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-admin.pem" -sha256
+    openssl x509 -extfile <(printf "subjectAltName=DNS:chefadmin") -req -in "$certdir/odfe-admin.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-admin.pem" -sha256
 
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container1}:/setup.sh"
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container2}:/setup.sh"
