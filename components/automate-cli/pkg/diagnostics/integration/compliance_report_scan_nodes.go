@@ -172,9 +172,13 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				tstCtx.FailNow()
 			}
 
+			fmt.Println(loaded, "loadedAa")
+			fmt.Println(loaded.ID, "loadedIdAa")
+
 			err = Retry(3, 5*time.Second, func() error {
 				// Get scanned nodes from licence usage
 				resp, err := clirequest.LicenseUsage()
+				fmt.Println(resp.Result.ScannedNodes, "resp.Result.ScannedNodesAA")
 				require.NoError(tstCtx, err)
 				assert.Equal(tstCtx, "/proc/self/exe license usage --result-json /tmp/license_usage.json", resp.Command)
 				assert.Equal(tstCtx, "OK", resp.Status)
@@ -182,7 +186,11 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 
 				containsEntity := false
 				for _, node := range resp.Result.ScannedNodes {
+					fmt.Println(node.ID, "node.ID")
+					fmt.Println(loaded.ID, "loaded.ID")
 					if node.ID == loaded.ID {
+						fmt.Println(node.ID, "node.IDInside")
+						fmt.Println(loaded.ID, "loaded.IDInside")
 						containsEntity = true
 						break
 					}
