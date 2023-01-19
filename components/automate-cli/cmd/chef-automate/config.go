@@ -540,11 +540,11 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 		}
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
-			writer.Errorf("%v", err)
+			writer.Errorf("New Frontend Error: %v", err)
 			return err
 		}
 		writer.Printf(output + "\n")
-		writer.Success("Configuration set is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
+		writer.Success("Setting config is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
 	}
 	return nil
 }
