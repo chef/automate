@@ -945,7 +945,6 @@ func parseAndRemoveRestrictedKeysFromSrcFile(srcString string) (string, error) {
 // If the output contains the word "error" then return error
 func checkOutputForError(output string) error {
 	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
-		writer.Errorf("%v", output)
 		return errors.New(output)
 	}
 	return nil
