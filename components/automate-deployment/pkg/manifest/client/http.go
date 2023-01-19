@@ -170,7 +170,7 @@ func (c *HTTP) GetManifest(ctx context.Context, release string) (*manifest.A2, e
 func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, error) {
 	c.HTTPClient.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
-			MinVersion:         tls.VersionTLS13,
+			MinVersion:         tls.VersionTLS12,
 			InsecureSkipVerify: true},
 	}
 	fmt.Println("@176")
