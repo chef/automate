@@ -1,23 +1,16 @@
 <div class="content-container">
   <div class="container">
     <main>
-      <chef-page-header>
-        <chef-heading>Scan Jobs</chef-heading>
-        <chef-subheading>Compliance scan jobs run inspec exec on a set of nodes.</chef-subheading>
-      </chef-page-header>
+    
+      <a *ngFor="let p of plugins" (click)="add(p)">{{p.displayName}} <br></a>
 
-      <ul class="nav-tabs">
-        <li class="nav-tab" routerLink="/compliance/scan-jobs/jobs" routerLinkActive="active">
-          <span *ngIf="jobsCountLoaded">{{(jobsCount$ | async) === 0 ? '' : (jobsCount$ | async | number)}}</span> Scan Jobs 
-        </li>
-        <li class="nav-tab" routerLink="/compliance/scan-jobs/nodes" routerLinkActive="active">
-          <span *ngIf="nodesCountLoaded">{{(nodesCount$ | async) === 0 ? '' : (nodesCount$ | async | number)}}</span> Nodes Added
-        </li>
-      </ul>
-
-      <div class="scanner-body">
-        <router-outlet></router-outlet>
-      </div>
+      <p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</p>
+      
+      <ng-container *ngFor="let p of workflow; let last = last">
+        <plugin-proxy [pluginData]="p"></plugin-proxy>
+        <i *ngIf="!last" class="arrow right"></i>
+      </ng-container>
+      
     </main>
   </div>
 </div>

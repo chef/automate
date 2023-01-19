@@ -17,6 +17,7 @@ import { AccordionComponent } from '../../../page-components/accordion/accordion
 import { AccordionItemComponent } from '../../../page-components/accordion/accordion-item/accordion-item.component';
 import { SelectboxComponent } from '../../../page-components/selectbox/selectbox.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { PluginProxyComponent } from '../mfe-proxy/plugin/plugin-proxy.component';
 
 @NgModule({
   imports: [
@@ -41,7 +42,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     NodesEditComponent,
     AccordionComponent,
     AccordionItemComponent,
-    SelectboxComponent
+    SelectboxComponent,
+    PluginProxyComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

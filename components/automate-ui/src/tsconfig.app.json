@@ -4,6 +4,7 @@
     "outDir": "../out-tsc/app",
     "baseUrl": "./",
     "paths": { "@angular/*": [ "../node_modules/@angular/*" ] },
+    "experimentalDecorators": true
   },
   "angularCompilerOptions": {
     "preserveWhitespaces": true

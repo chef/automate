@@ -2,9 +2,9 @@ const { shareAll, withModuleFederationPlugin } = require('@angular-architects/mo
 
 module.exports = withModuleFederationPlugin({
 
-  remotes: {
-    "compliance": "http://localhost:4209/remoteEntry.js",
-  },
+  // remotes: {
+  //   "compliance": "http://localhost:4209/remoteEntry.js",
+  // },
 
   // shared: {
   //   ...shareAll({ 
@@ -15,10 +15,11 @@ module.exports = withModuleFederationPlugin({
   //     requiredVersion: 'auto'}),
   // },
   shared: {
-    // ...shareAll({ singleton: true, eager: true, strictVersion: true, requiredVersion: 'auto' }),
+    // ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
     "@angular/core": { singleton: true, eager: true, strictVersion: false, requiredVersion: '^14.0.0' },
     "@angular/common": { singleton: true, eager: true, strictVersion: false, requiredVersion: '^14.0.0' },
     "@angular/router": { singleton: true, eager: true, strictVersion: false, requiredVersion: '^14.0.0' },
+    "@angular/animations": { singleton: true, eager: true, strictVersion: false, requiredVersion: '^14.0.0' }
   },
 
 });
