@@ -26,6 +26,7 @@
         {{ end }}
       {{- end -}}
     </table>
+    <table>
     {{- range .inherited_options -}}
     {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
         <tr>
@@ -34,6 +35,7 @@
         </tr>
     {{ end }}
     {{- end -}}
+      </table>
   </div>
 
   <h4>Supported On</h4>
