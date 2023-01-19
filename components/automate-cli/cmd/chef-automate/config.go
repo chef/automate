@@ -336,7 +336,7 @@ func patchConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []s
 		return err
 	}
 	for i := 0; i < len(frontendIps); i++ {
-		writer.Print("Connecting to the " + remoteService + " node : " + frontendIps[i])
+		writer.Println("Connecting to the " + remoteService + " node : " + frontendIps[i])
 		sshUtil.getSSHConfig().hostIP = frontendIps[i]
 		err := sshUtil.copyFileToRemote(srcPath, remoteService+timestamp, false)
 		if err != nil {
@@ -531,7 +531,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, remoteService+timestamp, dateFormat)
 
 	for i := 0; i < len(frontendIps); i++ {
-		writer.Print("Connecting to the " + remoteService + " node : " + frontendIps[i])
+		writer.Println("Connecting to the " + remoteService + " node : " + frontendIps[i])
 		sshUtil.getSSHConfig().hostIP = frontendIps[i]
 		err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
 		if err != nil {
