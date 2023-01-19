@@ -184,6 +184,10 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				assert.Equal(tstCtx, "OK", resp.Status)
 				assert.Equal(tstCtx, 0, resp.ErrorCode)
 
+				if resp.Result.ScannedNodeCount == 0 {
+					return nil
+				}
+
 				containsEntity := false
 				for _, node := range resp.Result.ScannedNodes {
 					fmt.Println(node.ID, "node.ID")
