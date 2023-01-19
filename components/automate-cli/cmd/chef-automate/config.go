@@ -45,6 +45,7 @@ const (
 	For more information, run: 'chef-automate cert-rotate --help'`
 	ERROR_SELF_MANAGED_CONFIG_SHOW  = "Showing the configuration for externally configured %s is not supported."
 	ERROR_SELF_MANAGED_CONFIG_PATCH = "Patching the configuration for externally configured %s is not supported."
+	ERROR_SELF_MANAGED_CONFIG_SET   = "Setting the configuration for externally configured %s is not supported."
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -497,9 +498,9 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 			}
 			const remoteService string = "chef-server"
 			err = setConfigForFrontEndNodes(args, sshUtil, frontendIps, remoteService, timestamp)
-			// } else if configCmdFlags.postgresql {
-			// 	const remoteService string = "postgresql"
-			// 	err = patchConfigForPostgresqlNodes(args, remoteService, sshUtil, infra, timestamp)
+		} else if configCmdFlags.postgresql {
+			const remoteService string = "postgresql"
+			err = setConfigForPostgresqlNodes(args, remoteService, sshUtil, infra, timestamp)
 			// } else if configCmdFlags.opensearch {
 			// 	const remoteService string = "opensearch"
 			// 	err = patchConfigForOpensearch(args, remoteService, sshUtil, infra, timestamp)
@@ -546,6 +547,57 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 		writer.Printf(output + "\n")
 		writer.Success("Configuration set is completed on " + remoteService + " node : " + frontendIps[i] + "\n")
 	}
+	return nil
+}
+
+// setConfigForPostgresqlNodes set the configuration for postgresql nodes in Automate HA
+func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string) error {
+	if isManagedServicesOn() {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_SET, "Postgresql")
+	}
+	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
+		writer.Error("Postgres IPs not found in the config. Please contact the support team")
+		return nil
+	}
+
+	//checking for log configuration
+	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value)
+	if err != nil {
+		return err
+	}
+
+	//Getting Requested Config
+	reqConfigInterface, err := getConfigForArgsPostgresqlOrOpenSearch(args, postgresql)
+	if err != nil {
+		return err
+	}
+	reqConfig := reqConfigInterface.(PostgresqlConfig)
+
+	//Setting the config
+	tomlFile := args[0] + timestamp
+	tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
+	if err != nil {
+		return err
+	}
+
+	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+	sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
+	writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
+	err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
+	if err != nil {
+		writer.Errorf("%v", err)
+		return err
+	}
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+	if err != nil {
+		writer.Errorf("%v", err)
+		return err
+	}
+
+	writer.Printf(output + "\n")
+	writer.Success("Setting config is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
+
 	return nil
 }
 
