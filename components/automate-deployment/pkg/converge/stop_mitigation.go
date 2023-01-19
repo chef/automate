@@ -33,7 +33,6 @@ const (
 // shutdown. For instance, perhaps there are clients (such as
 // monitoring tools) outside of Habitat or perhaps the service has a
 // lot of internal cleanup to do before shutdown.
-//
 type safeServiceShutdownRunner struct {
 	stopServiceFunc func(target.Target, habpkg.Installable) error
 	stopAllowed     func(target.Target, habpkg.VersionedPackage) bool

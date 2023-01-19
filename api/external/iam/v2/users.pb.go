@@ -216,67 +216,67 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UsersClient interface {
+	// Create a user
 	//
-	//Create a user
+	// Creates a local user that can sign in to Automate and be a member of IAM teams
+	// and IAM policies.
 	//
-	//Creates a local user that can sign in to Automate and be a member of IAM teams
-	//and IAM policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:create
-	//```
 	CreateUser(ctx context.Context, in *request.CreateUserReq, opts ...grpc.CallOption) (*response.CreateUserResp, error)
+	// List all users
 	//
-	//List all users
+	// Lists all local users.
 	//
-	//Lists all local users.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:list
-	//```
 	ListUsers(ctx context.Context, in *request.ListUsersReq, opts ...grpc.CallOption) (*response.ListUsersResp, error)
+	// Get a user
 	//
-	//Get a user
+	// Returns the details for a local user.
 	//
-	//Returns the details for a local user.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:get
-	//```
 	GetUser(ctx context.Context, in *request.GetUserReq, opts ...grpc.CallOption) (*response.GetUserResp, error)
+	// Delete a user
 	//
-	//Delete a user
+	// Deletes a local user.
 	//
-	//Deletes a local user.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:delete
-	//```
 	DeleteUser(ctx context.Context, in *request.DeleteUserReq, opts ...grpc.CallOption) (*response.DeleteUserResp, error)
+	// Update a user
 	//
-	//Update a user
+	// Updates a local user's name or password.
 	//
-	//Updates a local user's name or password.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:update
-	//```
 	UpdateUser(ctx context.Context, in *request.UpdateUserReq, opts ...grpc.CallOption) (*response.UpdateUserResp, error)
+	// Update self (as user)
 	//
-	//Update self (as user)
+	// Updates a local user's own name or password.
+	// If changing the password, both "password" and "previous_password" are required.
 	//
-	//Updates a local user's own name or password.
-	//If changing the password, both "password" and "previous_password" are required.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:usersSelf:update
-	//```
 	UpdateSelf(ctx context.Context, in *request.UpdateSelfReq, opts ...grpc.CallOption) (*response.UpdateSelfResp, error)
 }
 
@@ -344,67 +344,67 @@ func (c *usersClient) UpdateSelf(ctx context.Context, in *request.UpdateSelfReq,
 
 // UsersServer is the server API for Users service.
 type UsersServer interface {
+	// Create a user
 	//
-	//Create a user
+	// Creates a local user that can sign in to Automate and be a member of IAM teams
+	// and IAM policies.
 	//
-	//Creates a local user that can sign in to Automate and be a member of IAM teams
-	//and IAM policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:create
-	//```
 	CreateUser(context.Context, *request.CreateUserReq) (*response.CreateUserResp, error)
+	// List all users
 	//
-	//List all users
+	// Lists all local users.
 	//
-	//Lists all local users.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:list
-	//```
 	ListUsers(context.Context, *request.ListUsersReq) (*response.ListUsersResp, error)
+	// Get a user
 	//
-	//Get a user
+	// Returns the details for a local user.
 	//
-	//Returns the details for a local user.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:get
-	//```
 	GetUser(context.Context, *request.GetUserReq) (*response.GetUserResp, error)
+	// Delete a user
 	//
-	//Delete a user
+	// Deletes a local user.
 	//
-	//Deletes a local user.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:delete
-	//```
 	DeleteUser(context.Context, *request.DeleteUserReq) (*response.DeleteUserResp, error)
+	// Update a user
 	//
-	//Update a user
+	// Updates a local user's name or password.
 	//
-	//Updates a local user's name or password.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:users:update
-	//```
 	UpdateUser(context.Context, *request.UpdateUserReq) (*response.UpdateUserResp, error)
+	// Update self (as user)
 	//
-	//Update self (as user)
+	// Updates a local user's own name or password.
+	// If changing the password, both "password" and "previous_password" are required.
 	//
-	//Updates a local user's own name or password.
-	//If changing the password, both "password" and "previous_password" are required.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:usersSelf:update
-	//```
 	UpdateSelf(context.Context, *request.UpdateSelfReq) (*response.UpdateSelfResp, error)
 }
 

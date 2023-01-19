@@ -5,20 +5,21 @@
 //
 // Versions:
 //   - v0: This version used gob to serialize most of the deployment. The dex
-//         config was serialized using protobuf.
+//     config was serialized using protobuf.
 //   - v1: The deployment and the config are serialized using protobuf. The
-//         deployment and config live under separate keys in the v1 bucket.
+//     deployment and config live under separate keys in the v1 bucket.
 //
 // Some reasons why a new version might be created:
-// - Assumptions have been made that api.AutomateConfig will move in a compatible
-//   way. This means you can add fields and deprecate fields, but can never change
-//   the type or reuse a deprecated field. If this is ever needed, all of
-//   api.AutomateConfig will need to be redefined under one of the versions and
-//   a new version will likely need to be created.
 //
-// - The deployment struct changes and the types no longer map well. A new version
-//   can be created to reduce some of the complexity with how things get serialized,
-//   however old versions will still need to be able to read and mapped in a sane way.
+//   - Assumptions have been made that api.AutomateConfig will move in a compatible
+//     way. This means you can add fields and deprecate fields, but can never change
+//     the type or reuse a deprecated field. If this is ever needed, all of
+//     api.AutomateConfig will need to be redefined under one of the versions and
+//     a new version will likely need to be created.
+//
+//   - The deployment struct changes and the types no longer map well. A new version
+//     can be created to reduce some of the complexity with how things get serialized,
+//     however old versions will still need to be able to read and mapped in a sane way.
 //
 // - The way the buckets and keys are organized needs to change
 package boltdb

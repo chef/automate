@@ -69,7 +69,9 @@ type A1Upgrade struct {
 //
 // ```
 // upgrade := NewA1Upgrade(a1upgrade.WithDeliverySecrets("/some/path.json"),
-//                         a1upgrade.WithDeliveryRunning("/some/other/path.json"))
+//
+//	a1upgrade.WithDeliveryRunning("/some/other/path.json"))
+//
 // ```
 type Option func(*A1Upgrade) error
 
@@ -396,9 +398,9 @@ func SkipWorkflowConfiguredCheck(workflow bool) Option {
 // GenerateA2ConfigIfNoneProvided creates an Automate 2 configuration from
 // Automate 1 configuration if a2ConfigPath is the zero value for a string
 // (""). If a2ConfigPath is not the zero value, it's assumed that
-// 1. an a2 config has been loaded via the initializer options, and:
-// 2. the a2 config that we loaded contains user customizations that we must
-//    not override.
+//  1. an a2 config has been loaded via the initializer options, and:
+//  2. the a2 config that we loaded contains user customizations that we must
+//     not override.
 func (u *A1Upgrade) GenerateA2ConfigIfNoneProvided(a2ConfigPath string) error {
 	if a2ConfigPath != "" {
 		return nil

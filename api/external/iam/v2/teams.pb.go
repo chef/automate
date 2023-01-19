@@ -283,101 +283,101 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TeamsClient interface {
+	// Creates a local team
 	//
-	//Creates a local team
+	// Creates a local team that is used to group local users as members of IAM policies.
 	//
-	//Creates a local team that is used to group local users as members of IAM policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:create
-	//```
 	CreateTeam(ctx context.Context, in *request.CreateTeamReq, opts ...grpc.CallOption) (*response.CreateTeamResp, error)
+	// Lists all local teams
 	//
-	//Lists all local teams
+	// Lists all local teams.
 	//
-	//Lists all local teams.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:list
-	//```
 	ListTeams(ctx context.Context, in *request.ListTeamsReq, opts ...grpc.CallOption) (*response.ListTeamsResp, error)
+	// Get a team
 	//
-	//Get a team
+	// Returns the details for a team.
 	//
-	//Returns the details for a team.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:get
-	//```
 	GetTeam(ctx context.Context, in *request.GetTeamReq, opts ...grpc.CallOption) (*response.GetTeamResp, error)
+	// Updates a local team
 	//
-	//Updates a local team
+	// Updates a local team.
 	//
-	//Updates a local team.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:update
-	//```
 	UpdateTeam(ctx context.Context, in *request.UpdateTeamReq, opts ...grpc.CallOption) (*response.UpdateTeamResp, error)
+	// Deletes a local team
 	//
-	//Deletes a local team
+	// Deletes a local team and removes it from any policies.
 	//
-	//Deletes a local team and removes it from any policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:delete
-	//```
 	DeleteTeam(ctx context.Context, in *request.DeleteTeamReq, opts ...grpc.CallOption) (*response.DeleteTeamResp, error)
+	// Gets local team membership
 	//
-	//Gets local team membership
+	// Lists all users of a local team. Users are listed by their membership_id.
 	//
-	//Lists all users of a local team. Users are listed by their membership_id.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teamUsers:list
-	//```
 	GetTeamMembership(ctx context.Context, in *request.GetTeamMembershipReq, opts ...grpc.CallOption) (*response.GetTeamMembershipResp, error)
+	// Adds local team membership
 	//
-	//Adds local team membership
+	// Adds a list of users to a local team. Users are added by their membership_id.
+	// The request currently does not validate that membership_id maps to a real user.
 	//
-	//Adds a list of users to a local team. Users are added by their membership_id.
-	//The request currently does not validate that membership_id maps to a real user.
+	// The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
 	//
-	//The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teamUsers:create
-	//```
 	AddTeamMembers(ctx context.Context, in *request.AddTeamMembersReq, opts ...grpc.CallOption) (*response.AddTeamMembersResp, error)
+	// Removes local team membership
 	//
-	//Removes local team membership
+	// Removes a list of users from a local team. Users are removed by their membership_id.
+	// The request currently does not validate that membership_id maps to a real user.
 	//
-	//Removes a list of users from a local team. Users are removed by their membership_id.
-	//The request currently does not validate that membership_id maps to a real user.
+	// The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
 	//
-	//The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teamUsers:delete
-	//```
 	RemoveTeamMembers(ctx context.Context, in *request.RemoveTeamMembersReq, opts ...grpc.CallOption) (*response.RemoveTeamMembersResp, error)
+	// Gets team membership for a user
 	//
-	//Gets team membership for a user
+	// Lists all local teams for a specific user. You must use their membership_id in the request URL.
 	//
-	//Lists all local teams for a specific user. You must use their membership_id in the request URL.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:userTeams:get
-	//```
 	GetTeamsForMember(ctx context.Context, in *request.GetTeamsForMemberReq, opts ...grpc.CallOption) (*response.GetTeamsForMemberResp, error)
 }
 
@@ -472,101 +472,101 @@ func (c *teamsClient) GetTeamsForMember(ctx context.Context, in *request.GetTeam
 
 // TeamsServer is the server API for Teams service.
 type TeamsServer interface {
+	// Creates a local team
 	//
-	//Creates a local team
+	// Creates a local team that is used to group local users as members of IAM policies.
 	//
-	//Creates a local team that is used to group local users as members of IAM policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:create
-	//```
 	CreateTeam(context.Context, *request.CreateTeamReq) (*response.CreateTeamResp, error)
+	// Lists all local teams
 	//
-	//Lists all local teams
+	// Lists all local teams.
 	//
-	//Lists all local teams.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:list
-	//```
 	ListTeams(context.Context, *request.ListTeamsReq) (*response.ListTeamsResp, error)
+	// Get a team
 	//
-	//Get a team
+	// Returns the details for a team.
 	//
-	//Returns the details for a team.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:get
-	//```
 	GetTeam(context.Context, *request.GetTeamReq) (*response.GetTeamResp, error)
+	// Updates a local team
 	//
-	//Updates a local team
+	// Updates a local team.
 	//
-	//Updates a local team.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:update
-	//```
 	UpdateTeam(context.Context, *request.UpdateTeamReq) (*response.UpdateTeamResp, error)
+	// Deletes a local team
 	//
-	//Deletes a local team
+	// Deletes a local team and removes it from any policies.
 	//
-	//Deletes a local team and removes it from any policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teams:delete
-	//```
 	DeleteTeam(context.Context, *request.DeleteTeamReq) (*response.DeleteTeamResp, error)
+	// Gets local team membership
 	//
-	//Gets local team membership
+	// Lists all users of a local team. Users are listed by their membership_id.
 	//
-	//Lists all users of a local team. Users are listed by their membership_id.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teamUsers:list
-	//```
 	GetTeamMembership(context.Context, *request.GetTeamMembershipReq) (*response.GetTeamMembershipResp, error)
+	// Adds local team membership
 	//
-	//Adds local team membership
+	// Adds a list of users to a local team. Users are added by their membership_id.
+	// The request currently does not validate that membership_id maps to a real user.
 	//
-	//Adds a list of users to a local team. Users are added by their membership_id.
-	//The request currently does not validate that membership_id maps to a real user.
+	// The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
 	//
-	//The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teamUsers:create
-	//```
 	AddTeamMembers(context.Context, *request.AddTeamMembersReq) (*response.AddTeamMembersResp, error)
+	// Removes local team membership
 	//
-	//Removes local team membership
+	// Removes a list of users from a local team. Users are removed by their membership_id.
+	// The request currently does not validate that membership_id maps to a real user.
 	//
-	//Removes a list of users from a local team. Users are removed by their membership_id.
-	//The request currently does not validate that membership_id maps to a real user.
+	// The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
 	//
-	//The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:teamUsers:delete
-	//```
 	RemoveTeamMembers(context.Context, *request.RemoveTeamMembersReq) (*response.RemoveTeamMembersResp, error)
+	// Gets team membership for a user
 	//
-	//Gets team membership for a user
+	// Lists all local teams for a specific user. You must use their membership_id in the request URL.
 	//
-	//Lists all local teams for a specific user. You must use their membership_id in the request URL.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:userTeams:get
-	//```
 	GetTeamsForMember(context.Context, *request.GetTeamsForMemberReq) (*response.GetTeamsForMemberResp, error)
 }
 

@@ -182,59 +182,59 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CdsClient interface {
+	// ListContentItems
 	//
-	//ListContentItems
+	// Returns a list of metadata for each CDS content. Provides a description and current
+	// state of each content item.
 	//
-	//Returns a list of metadata for each CDS content. Provides a description and current
-	//state of each content item.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:items:list
-	//```
 	ListContentItems(ctx context.Context, in *request.ContentItems, opts ...grpc.CallOption) (*response.ContentItems, error)
+	// SubmitCredentials
 	//
-	//SubmitCredentials
+	// # Submit a Chef Cloud Credentials to enable content
 	//
-	//Submit a Chef Cloud Credentials to enable content
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:credentials:add
-	//```
 	SubmitCredentials(ctx context.Context, in *request.Credentials, opts ...grpc.CallOption) (*response.Credentials, error)
+	// IsContentEnabled
 	//
-	//IsContentEnabled
+	// Check if the content is enable for this Automate instance.
 	//
-	//Check if the content is enable for this Automate instance.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:credentials:enabled
-	//```
 	IsContentEnabled(ctx context.Context, in *request.ContentEnabled, opts ...grpc.CallOption) (*response.ContentEnabled, error)
+	// InstallContentItem
 	//
-	//InstallContentItem
+	// # Installs a content item from its ID
 	//
-	//Installs a content item from its ID
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:items:install
-	//```
 	InstallContentItem(ctx context.Context, in *request.InstallContentItem, opts ...grpc.CallOption) (*response.InstallContentItem, error)
+	// DownloadContentItem
 	//
-	//DownloadContentItem
+	// # Download a content item from its ID
 	//
-	//Download a content item from its ID
+	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
+	// so we do not auto-generate the route for download; we instead custom handle with mux
 	//
-	//grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
-	//so we do not auto-generate the route for download; we instead custom handle with mux
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:items:download
-	//```
 	DownloadContentItem(ctx context.Context, in *request.DownloadContentItem, opts ...grpc.CallOption) (Cds_DownloadContentItemClient, error)
 }
 
@@ -316,59 +316,59 @@ func (x *cdsDownloadContentItemClient) Recv() (*common.ExportData, error) {
 
 // CdsServer is the server API for Cds service.
 type CdsServer interface {
+	// ListContentItems
 	//
-	//ListContentItems
+	// Returns a list of metadata for each CDS content. Provides a description and current
+	// state of each content item.
 	//
-	//Returns a list of metadata for each CDS content. Provides a description and current
-	//state of each content item.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:items:list
-	//```
 	ListContentItems(context.Context, *request.ContentItems) (*response.ContentItems, error)
+	// SubmitCredentials
 	//
-	//SubmitCredentials
+	// # Submit a Chef Cloud Credentials to enable content
 	//
-	//Submit a Chef Cloud Credentials to enable content
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:credentials:add
-	//```
 	SubmitCredentials(context.Context, *request.Credentials) (*response.Credentials, error)
+	// IsContentEnabled
 	//
-	//IsContentEnabled
+	// Check if the content is enable for this Automate instance.
 	//
-	//Check if the content is enable for this Automate instance.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:credentials:enabled
-	//```
 	IsContentEnabled(context.Context, *request.ContentEnabled) (*response.ContentEnabled, error)
+	// InstallContentItem
 	//
-	//InstallContentItem
+	// # Installs a content item from its ID
 	//
-	//Installs a content item from its ID
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:items:install
-	//```
 	InstallContentItem(context.Context, *request.InstallContentItem) (*response.InstallContentItem, error)
+	// DownloadContentItem
 	//
-	//DownloadContentItem
+	// # Download a content item from its ID
 	//
-	//Download a content item from its ID
+	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
+	// so we do not auto-generate the route for download; we instead custom handle with mux
 	//
-	//grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
-	//so we do not auto-generate the route for download; we instead custom handle with mux
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//content:items:download
-	//```
 	DownloadContentItem(*request.DownloadContentItem, Cds_DownloadContentItemServer) error
 }
 

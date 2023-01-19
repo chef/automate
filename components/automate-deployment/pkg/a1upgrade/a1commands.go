@@ -39,9 +39,10 @@ type RabbitStats struct {
 // Since elasticsearch supports requesting the status of multiple snapshots in
 // one request, the top-level json object is a one-key map of "snapshots" to an
 // Array of status objects for individual snapshots:
-// {
-//   "snapshots": [ snap1_stats, snap2_stats, ... ]
-// }
+//
+//	{
+//	  "snapshots": [ snap1_stats, snap2_stats, ... ]
+//	}
 type EsAggSnapshotStats struct {
 	// Snapshots is the JSON array of status objects for each requested snapshot
 	Snapshots []EsSnapshotStats `json:"snapshots"`
