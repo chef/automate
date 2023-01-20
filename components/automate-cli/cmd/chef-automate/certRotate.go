@@ -608,7 +608,7 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 		sshConfig.hostIP = hostIP
 		sshUtil := NewSSHUtil(sshConfig)
 
-		out, err := sshUtil.connectAndExecuteCommandOnRemote("cat "+remoteFilePath, true)
+		out, err := sshUtil.connectAndExecuteCommandOnRemote("sudo cat "+remoteFilePath, true)
 		if err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("Unable to read file from remote path: %v", certPath))
 		}
