@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"testing"
+
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
@@ -106,7 +107,7 @@ func TestErrorOnSelfManaged(t *testing.T) {
 	testCases := []struct {
 		isPostgresql bool
 		isOpenSearch bool
-		errorWant   error
+		errorWant    error
 	}{
 		{
 			true,
@@ -126,11 +127,40 @@ func TestErrorOnSelfManaged(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		errGot := errorOnSelfManaged(testCase.isPostgresql,testCase.isOpenSearch)
+		errGot := errorOnSelfManaged(testCase.isPostgresql, testCase.isOpenSearch)
 		if errGot == nil {
 			assert.Equal(t, testCase.errorWant, errGot)
 		} else {
 			assert.EqualError(t, testCase.errorWant, errGot.Error())
+		}
+	}
+}
+
+func TestCheckOutputForError(t *testing.T) {
+	testCases := []struct {
+		outputMsg string
+		isError   bool
+		err       error
+	}{
+		{
+			`New Error msg`,
+			true,
+			errors.New("New Error msg"),
+		},
+		{
+			`New msg`,
+			false,
+			errors.New("New msg"),
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := checkOutputForError(testCase.outputMsg)
+		if testCase.isError {
+			assert.Error(t, err)
+			assert.EqualError(t, testCase.err, err.Error())
+		} else {
+			assert.NoError(t, err)
 		}
 	}
 }
