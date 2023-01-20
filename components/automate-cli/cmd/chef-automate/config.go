@@ -336,7 +336,7 @@ func patchConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []s
 		return err
 	}
 	for i := 0; i < len(frontendIps); i++ {
-		writer.Println("Connecting to the " + remoteService + " node : " + frontendIps[i])
+		printConnectionMessage(remoteService, frontendIps[i])
 		sshUtil.getSSHConfig().hostIP = frontendIps[i]
 		err := sshUtil.copyFileToRemote(srcPath, remoteService+timestamp, false)
 		if err != nil {
@@ -389,7 +389,7 @@ func patchConfigForPostgresqlNodes(args []string, remoteService string, sshUtil 
 		}
 		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 		sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
-		writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
+		printConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP)
 		err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
 		if err != nil {
 			writer.Errorf("%v", err)
@@ -444,7 +444,7 @@ func patchConfigForOpensearch(args []string, remoteService string, sshUtil SSHUt
 		scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 
 		sshUtil.getSSHConfig().hostIP = infra.Outputs.OpensearchPrivateIps.Value[0]
-		writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
+		printConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP)
 		err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
 		if err != nil {
 			writer.Errorf("%v", err)
@@ -531,7 +531,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, remoteService+timestamp, dateFormat)
 
 	for i := 0; i < len(frontendIps); i++ {
-		writer.Println("Connecting to the " + remoteService + " node : " + frontendIps[i])
+		printConnectionMessage(remoteService, frontendIps[i])
 		sshUtil.getSSHConfig().hostIP = frontendIps[i]
 		err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
 		if err != nil {
@@ -560,6 +560,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_SET, "Postgresql")
 	}
+
 	if len(infra.Outputs.PostgresqlPrivateIps.Value) == 0 {
 		writer.Error("Postgres IPs not found in the config. Please contact the support team")
 		return nil
@@ -585,31 +586,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 		return err
 	}
 
-	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
-
-	sshUtil.getSSHConfig().hostIP = infra.Outputs.PostgresqlPrivateIps.Value[0]
-	writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
-	err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
-	if err != nil {
-		writer.Errorf("%v", err)
-		return err
-	}
-
-	output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-	if err != nil {
-		writer.Errorf("%v", err)
-		return err
-	}
-
-	err = checkOutputForError(output)
-	if err != nil {
-		return err
-	}
-
-	writer.Printf(output + "\n")
-	writer.Success("Setting config is completed on " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP + "\n")
-
-	return nil
+	return setConfigForPostgresqlAndOpensearch(remoteService, timestamp, sshUtil, infra.Outputs.PostgresqlPrivateIps.Value[0], tomlFilePath)
 }
 
 // setConfigForOpensearch set the configuration for opensearch nodes in Automate HA
@@ -617,10 +594,12 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_SET, "OpenSearch")
 	}
+
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
 		writer.Error("OpenSearch IPs not found in the config. Please contact the support team")
 		return nil
 	}
+
 	//checking for log configuration
 	err := enableCentralizedLogConfigForHA(args, remoteService, sshUtil, infra.Outputs.OpensearchPrivateIps.Value)
 	if err != nil {
@@ -641,11 +620,16 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 		return err
 	}
 
+	return setConfigForPostgresqlAndOpensearch(remoteService, timestamp, sshUtil, infra.Outputs.OpensearchPrivateIps.Value[0], tomlFilePath)
+}
+
+// setConfigForPostgresqlAndOpensearch set the configuration for postgresql and opensearch nodes in Automate HA
+func setConfigForPostgresqlAndOpensearch(remoteService string, timestamp string, sshUtil SSHUtil, hostIP string, tomlFilePath string) error {
 	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
 
-	sshUtil.getSSHConfig().hostIP = infra.Outputs.OpensearchPrivateIps.Value[0]
-	writer.Println("Connecting to the " + remoteService + " node : " + sshUtil.getSSHConfig().hostIP)
-	err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
+	sshUtil.getSSHConfig().hostIP = hostIP
+	printConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP)
+	err := sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, true)
 	if err != nil {
 		writer.Errorf("%v", err)
 		return err
@@ -948,4 +932,9 @@ func checkOutputForError(output string) error {
 		return errors.New(output)
 	}
 	return nil
+}
+
+// printConnectionMessage prints the connection message
+func printConnectionMessage(remoteService string, hostIP string) {
+	writer.Println("Connecting to the " + remoteService + " node : " + hostIP)
 }
