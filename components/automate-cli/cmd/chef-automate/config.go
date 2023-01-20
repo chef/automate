@@ -46,7 +46,8 @@ const (
 	ERROR_SELF_MANAGED_CONFIG_SHOW  = "Showing the configuration for externally configured %s is not supported."
 	ERROR_SELF_MANAGED_CONFIG_PATCH = "Patching the configuration for externally configured %s is not supported."
 	ERROR_SELF_MANAGED_CONFIG_SET   = "Setting the configuration for externally configured %s is not supported."
-	nodeString                      = " node : "
+	patching                        = "Patching"
+	setting                         = "Setting"
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -360,7 +361,7 @@ func patchConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []s
 		}
 
 		writer.Printf(output + "\n")
-		writer.Success("Patching is completed on " + remoteService + nodeString + frontendIps[i] + "\n")
+		printConfigSuccessMessage(patching, remoteService, frontendIps[i])
 	}
 	return nil
 }
@@ -425,7 +426,7 @@ func patchConfigForPostgresqlNodes(args []string, remoteService string, sshUtil 
 		}
 
 		writer.Printf(output + "\n")
-		writer.Success("Patching is completed on " + remoteService + nodeString + sshUtil.getSSHConfig().hostIP + "\n")
+		printConfigSuccessMessage(patching, remoteService, sshUtil.getSSHConfig().hostIP)
 	}
 	return nil
 }
@@ -490,7 +491,7 @@ func patchConfigForOpensearch(args []string, remoteService string, sshUtil SSHUt
 		}
 
 		writer.Printf(output + "\n")
-		writer.Success("Patching is completed on " + remoteService + nodeString + sshUtil.getSSHConfig().hostIP + "\n")
+		printConfigSuccessMessage(patching, remoteService, sshUtil.getSSHConfig().hostIP)
 	}
 	return nil
 }
@@ -585,7 +586,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 		}
 
 		writer.Printf(output + "\n")
-		writer.Success("Setting config is completed on " + remoteService + nodeString + frontendIps[i] + "\n")
+		printConfigSuccessMessage(setting, remoteService, frontendIps[i])
 	}
 	return nil
 }
@@ -683,7 +684,7 @@ func setConfigForPostgresqlAndOpensearch(remoteService string, timestamp string,
 	}
 
 	writer.Printf(output + "\n")
-	writer.Success("Setting config is completed on " + remoteService + nodeString + sshUtil.getSSHConfig().hostIP + "\n")
+	printConfigSuccessMessage(setting, remoteService, sshUtil.getSSHConfig().hostIP)
 
 	return nil
 }
@@ -972,5 +973,10 @@ func checkOutputForError(output string) error {
 
 // printConnectionMessage prints the connection message
 func printConnectionMessage(remoteService string, hostIP string) {
-	writer.Println("Connecting to the " + remoteService + nodeString + hostIP)
+	writer.Println("Connecting to the " + remoteService + " node : " + hostIP)
+}
+
+// printConfigSuccessMessage prints the config success message
+func printConfigSuccessMessage(configType string, remoteService string, hostIP string) {
+	writer.Success(configType + " is completed on " + remoteService + " node : " + hostIP + "\n")
 }
