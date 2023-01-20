@@ -20,6 +20,9 @@ module "aws" {
   automate_ebs_volume_iops           = var.automate_ebs_volume_iops
   automate_ebs_volume_size           = var.automate_ebs_volume_size
   automate_ebs_volume_type           = var.automate_ebs_volume_type
+  automate_root_ebs_volume_iops      = var.automate_root_ebs_volume_iops
+  automate_root_ebs_volume_size      = var.automate_root_ebs_volume_size
+  automate_root_ebs_volume_type      = var.automate_root_ebs_volume_type
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.automate_instance_count
   automate_lb_certificate_arn        = var.automate_lb_certificate_arn
@@ -33,6 +36,9 @@ module "aws" {
   chef_ebs_volume_iops               = var.automate_ebs_volume_iops
   chef_ebs_volume_size               = var.automate_ebs_volume_size
   chef_ebs_volume_type               = var.automate_ebs_volume_type
+  chef_root_ebs_volume_iops          = var.automate_root_ebs_volume_iops
+  chef_root_ebs_volume_size          = var.automate_root_ebs_volume_size
+  chef_root_ebs_volume_type          = var.automate_root_ebs_volume_type
   chef_server_instance_count         = var.chef_server_instance_count
   chef_server_instance_type          = var.chef_server_instance_type
   chef_server_lb_certificate_arn     = var.chef_server_lb_certificate_arn
@@ -41,6 +47,9 @@ module "aws" {
   opensearch_ebs_volume_iops         = var.opensearch_ebs_volume_iops
   opensearch_ebs_volume_size         = var.opensearch_ebs_volume_size
   opensearch_ebs_volume_type         = var.opensearch_ebs_volume_type
+  opensearch_root_ebs_volume_iops    = var.opensearch_root_ebs_volume_iops
+  opensearch_root_ebs_volume_size    = var.opensearch_root_ebs_volume_size
+  opensearch_root_ebs_volume_type    = var.opensearch_root_ebs_volume_type
   opensearch_instance_count          = var.opensearch_instance_count
   opensearch_listen_port             = var.opensearch_listen_port
   opensearch_server_instance_type    = var.opensearch_server_instance_type
@@ -53,6 +62,9 @@ module "aws" {
   postgresql_ebs_volume_iops         = var.postgresql_ebs_volume_iops
   postgresql_ebs_volume_size         = var.postgresql_ebs_volume_size
   postgresql_ebs_volume_type         = var.postgresql_ebs_volume_type
+  postgresql_root_ebs_volume_iops    = var.postgresql_root_ebs_volume_iops
+  postgresql_root_ebs_volume_size    = var.postgresql_root_ebs_volume_size
+  postgresql_root_ebs_volume_type    = var.postgresql_root_ebs_volume_type
   postgresql_instance_count          = var.postgresql_instance_count
   postgresql_listen_port             = var.postgresql_listen_port
   postgresql_server_instance_type    = var.postgresql_server_instance_type

@@ -135,15 +135,27 @@ type AwsConfigToml struct {
 			AutomateEbsVolumeIops        string   `toml:"automate_ebs_volume_iops"`
 			AutomateEbsVolumeSize        string   `toml:"automate_ebs_volume_size"`
 			AutomateEbsVolumeType        string   `toml:"automate_ebs_volume_type"`
+			AutomateRootEbsVolumeIops    string   `toml:"automate_root_ebs_volume_iops"`
+			AutomateRootEbsVolumeSize    string   `toml:"automate_root_ebs_volume_size"`
+			AutomateRootEbsVolumeType    string   `toml:"automate_root_ebs_volume_type"`
 			ChefEbsVolumeIops            string   `toml:"chef_ebs_volume_iops"`
 			ChefEbsVolumeSize            string   `toml:"chef_ebs_volume_size"`
 			ChefEbsVolumeType            string   `toml:"chef_ebs_volume_type"`
+			ChefRootEbsVolumeIops        string   `toml:"chef_root_ebs_volume_iops"`
+			ChefRootEbsVolumeSize        string   `toml:"chef_root_ebs_volume_size"`
+			ChefRootEbsVolumeType        string   `toml:"chef_root_ebs_volume_type"`
 			OpensearchEbsVolumeIops      string   `toml:"opensearch_ebs_volume_iops"`
 			OpensearchEbsVolumeSize      string   `toml:"opensearch_ebs_volume_size"`
 			OpensearchEbsVolumeType      string   `toml:"opensearch_ebs_volume_type"`
+			OpensearchRootEbsVolumeIops  string   `toml:"opensearch_root_ebs_volume_iops"`
+			OpensearchRootEbsVolumeSize  string   `toml:"opensearch_root_ebs_volume_size"`
+			OpensearchRootEbsVolumeType  string   `toml:"opensearch_root_ebs_volume_type"`
 			PostgresqlEbsVolumeIops      string   `toml:"postgresql_ebs_volume_iops"`
 			PostgresqlEbsVolumeSize      string   `toml:"postgresql_ebs_volume_size"`
 			PostgresqlEbsVolumeType      string   `toml:"postgresql_ebs_volume_type"`
+			PostgresqlRootEbsVolumeIops  string   `toml:"postgresql_root_ebs_volume_iops"`
+			PostgresqlRootEbsVolumeSize  string   `toml:"postgresql_root_ebs_volume_size"`
+			PostgresqlRootEbsVolumeType  string   `toml:"postgresql_root_ebs_volume_type"`
 			XContact                     string   `toml:"X-Contact"`
 			XDept                        string   `toml:"X-Dept"`
 			XProject                     string   `toml:"X-Project"`

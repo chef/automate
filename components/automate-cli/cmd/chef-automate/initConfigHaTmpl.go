@@ -232,38 +232,74 @@ chef_server_lb_certificate_arn = ""
 # eg: automate_ebs_volume_iops = "100"
 automate_ebs_volume_iops = ""
 
+# eg: automate_root_ebs_volume_iops = "100"
+automate_root_ebs_volume_iops = ""
+
 # eg: automate_ebs_volume_size = "50"
 automate_ebs_volume_size = ""
+
+# eg: automate_root_ebs_volume_size = "50"
+automate_root_ebs_volume_size = ""
 
 # eg: automate_ebs_volume_type = "gp3"
 automate_ebs_volume_type = ""
 
+# eg: automate_root_ebs_volume_type = "gp3"
+automate_root_ebs_volume_type = ""
+
 # eg: chef_ebs_volume_iops = "100"
 chef_ebs_volume_iops = ""
+
+# eg: chef_root_ebs_volume_iops = "100"
+chef_root_ebs_volume_iops = ""
 
 # eg: chef_ebs_volume_size = "50"
 chef_ebs_volume_size = ""
 
+# eg: chef_root_ebs_volume_size = "50"
+chef_root_ebs_volume_size = ""
+
 # eg: chef_ebs_volume_type = "gp3"
 chef_ebs_volume_type = ""
+
+# eg: chef_root_ebs_volume_type = "gp3"
+chef_root_ebs_volume_type = ""
 
 # eg: opensearch_ebs_volume_iops = "100"
 opensearch_ebs_volume_iops = ""
 
+# eg: opensearch_root_ebs_volume_iops = "100"
+opensearch_root_ebs_volume_iops = ""
+
 # eg: opensearch_ebs_volume_size = "50"
 opensearch_ebs_volume_size = ""
+
+# eg: opensearch_root_ebs_volume_size = "50"
+opensearch_root_ebs_volume_size = ""
 
 # eg: opensearch_ebs_volume_type = "gp3"
 opensearch_ebs_volume_type = ""
 
+# eg: opensearch_root_ebs_volume_type = "gp3"
+opensearch_root_ebs_volume_type = ""
+
 # eg: postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_iops = ""
+
+# eg: postgresql_root_ebs_volume_iops = "100"
+postgresql_root_ebs_volume_iops = ""
 
 # eg: postgresql_ebs_volume_size = "50"
 postgresql_ebs_volume_size = ""
 
+# eg: postgresql_root_ebs_volume_size = "50"
+postgresql_root_ebs_volume_size = ""
+
 # eg: postgresql_ebs_volume_type = "gp3"
 postgresql_ebs_volume_type = ""
+
+# eg: postgresql_root_ebs_volume_type = "gp3"
+postgresql_root_ebs_volume_type = ""
 
 ## === ===
 

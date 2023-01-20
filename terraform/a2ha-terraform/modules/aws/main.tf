@@ -12,7 +12,7 @@ data "aws_vpc" "default" {
 
 locals {                                                            
   private_subnet_ids_string = join(",", var.private_custom_subnets)
-  private_subnet_ids_list = split(",", local.private_subnet_ids_string)             
+  private_subnet_ids_list = split(",", local.private_subnet_ids_string)
 }
 
 data "aws_subnet" "default" {                                  
@@ -191,9 +191,9 @@ resource "aws_instance" "chef_automate_postgresql" {
 
   root_block_device {
     delete_on_termination = var.delete_on_termination
-    iops                  = var.postgresql_ebs_volume_type == "io1" ? var.postgresql_ebs_volume_iops : 0
-    volume_size           = var.postgresql_ebs_volume_size
-    volume_type           = var.postgresql_ebs_volume_type
+    iops                  = var.postgresql_root_ebs_volume_type == "io1" ? var.postgresql_root_ebs_volume_iops : 0
+    volume_size           = var.postgresql_root_ebs_volume_size
+    volume_type           = var.postgresql_root_ebs_volume_type
   }
 
   tags = merge(var.tags,
@@ -208,6 +208,43 @@ resource "aws_instance" "chef_automate_postgresql" {
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
+
+resource "aws_ebs_volume" "chef_automate_postgresql" {          // nosemgrep
+  count = var.setup_managed_services ? 0 : var.postgresql_instance_count
+  availability_zone = aws_instance.chef_automate_postgresql[count.index].availability_zone
+  size = var.postgresql_ebs_volume_size
+  type = var.postgresql_ebs_volume_type
+  iops = var.postgresql_ebs_volume_type == "io1" ? var.postgresql_ebs_volume_iops : null
+}
+
+resource "aws_volume_attachment" "chef_automate_postgresql" {
+  count = var.setup_managed_services ? 0 : var.postgresql_instance_count
+  device_name = var.device_name
+  volume_id = aws_ebs_volume.chef_automate_postgresql[count.index].id
+  instance_id = aws_instance.chef_automate_postgresql[count.index].id
+
+  connection {
+    user        = var.aws_ssh_user
+    private_key = file(var.aws_ssh_key_file)
+    host        = aws_instance.chef_automate_postgresql[count.index].private_ip
+    port        = var.aws_ssh_port
+  }
+
+  provisioner "file" {
+    destination = "${var.tmp_path}/mount.sh"
+    source = "${path.module}/template/mount.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "echo \" Remote execution started\"",
+        "chmod 0700 ${var.tmp_path}/mount.sh",
+        "sudo -S ${var.tmp_path}/mount.sh",
+        "echo \" Remote execution ended\""
+    ]
+  }
+}
+
 resource "aws_instance" "chef_automate_opensearch" {
   count = var.setup_managed_services ? 0 : var.opensearch_instance_count
 
@@ -222,9 +259,9 @@ resource "aws_instance" "chef_automate_opensearch" {
 
   root_block_device {
     delete_on_termination = var.delete_on_termination
-    iops                  = var.opensearch_ebs_volume_type == "io1" ? var.opensearch_ebs_volume_iops : 0
-    volume_size           = var.opensearch_ebs_volume_size
-    volume_type           = var.opensearch_ebs_volume_type
+    iops                  = var.opensearch_root_ebs_volume_iops == "io1" ? var.opensearch_root_ebs_volume_iops : 0
+    volume_size           = var.opensearch_root_ebs_volume_size
+    volume_type           = var.opensearch_root_ebs_volume_type
   }
 
   tags = merge(
@@ -236,6 +273,43 @@ resource "aws_instance" "chef_automate_opensearch" {
 
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
+}
+
+
+resource "aws_ebs_volume" "chef_automate_opensearch" {          // nosemgrep
+  count = var.setup_managed_services ? 0 : var.opensearch_instance_count
+  availability_zone = aws_instance.chef_automate_opensearch[count.index].availability_zone
+  size = var.opensearch_ebs_volume_size
+  type = var.opensearch_ebs_volume_type
+  iops = var.opensearch_ebs_volume_type == "io1" ? var.opensearch_ebs_volume_iops : null
+}
+
+resource "aws_volume_attachment" "chef_automate_opensearch" {
+  count = var.setup_managed_services ? 0 : var.opensearch_instance_count
+  device_name = var.device_name
+  volume_id = aws_ebs_volume.chef_automate_opensearch[count.index].id
+  instance_id = aws_instance.chef_automate_opensearch[count.index].id
+
+  connection {
+    user        = var.aws_ssh_user
+    private_key = file(var.aws_ssh_key_file)
+    host        = aws_instance.chef_automate_postgresql[count.index].private_ip
+    port        = var.aws_ssh_port
+  }
+
+  provisioner "file" {
+    destination = "${var.tmp_path}/mount.sh"
+    source = "${path.module}/template/mount.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "echo \" Remote execution started\"",
+        "chmod 0700 ${var.tmp_path}/mount.sh",
+        "sudo -S ${var.tmp_path}/mount.sh",
+        "echo \" Remote execution ended\""
+    ]
+  }
 }
 
 resource "aws_instance" "chef_automate" {
@@ -252,9 +326,9 @@ resource "aws_instance" "chef_automate" {
 
   root_block_device {
     delete_on_termination = var.delete_on_termination
-    iops                  = var.automate_ebs_volume_type == "io1" ? var.automate_ebs_volume_iops : 0
-    volume_size           = var.automate_ebs_volume_size
-    volume_type           = var.automate_ebs_volume_type
+    iops                  = var.automate_root_ebs_volume_type == "io1" ? var.automate_root_ebs_volume_iops : 0
+    volume_size           = var.automate_root_ebs_volume_size
+    volume_type           = var.automate_root_ebs_volume_type
   }
 
   tags = merge(
@@ -266,6 +340,42 @@ resource "aws_instance" "chef_automate" {
 
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
   
+}
+
+resource "aws_ebs_volume" "chef_automate" {           // nosemgrep
+  count = var.automate_instance_count
+  availability_zone = aws_instance.chef_automate[count.index].availability_zone
+  size = var.automate_ebs_volume_size
+  type = var.automate_ebs_volume_type
+  iops = var.automate_ebs_volume_type == "io1" ? var.automate_ebs_volume_iops : null
+}
+
+resource "aws_volume_attachment" "chef_automate" {
+  count = var.automate_instance_count
+  device_name = var.device_name
+  volume_id = aws_ebs_volume.chef_automate[count.index].id
+  instance_id = aws_instance.chef_automate[count.index].id
+
+  connection {
+    user        = var.aws_ssh_user
+    private_key = file(var.aws_ssh_key_file)
+    host        = aws_instance.chef_automate_postgresql[count.index].private_ip
+    port        = var.aws_ssh_port
+  }
+
+  provisioner "file" {
+    destination = "${var.tmp_path}/mount.sh"
+    source = "${path.module}/template/mount.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "echo \" Remote execution started\"",
+        "chmod 0700 ${var.tmp_path}/mount.sh",
+        "sudo -S ${var.tmp_path}/mount.sh",
+        "echo \" Remote execution ended\""
+    ]
+  }
 }
 
 resource "aws_instance" "chef_server" {
@@ -283,9 +393,9 @@ resource "aws_instance" "chef_server" {
 
   root_block_device {
     delete_on_termination = var.delete_on_termination
-    iops                  = var.chef_ebs_volume_type == "io1" ? var.chef_ebs_volume_iops : 0
-    volume_size           = var.chef_ebs_volume_size
-    volume_type           = var.chef_ebs_volume_type
+    iops                  = var.chef_root_ebs_volume_type == "io1" ? var.chef_root_ebs_volume_iops : 0
+    volume_size           = var.chef_root_ebs_volume_size
+    volume_type           = var.chef_root_ebs_volume_type
   }
 
   tags = merge(
@@ -297,4 +407,40 @@ resource "aws_instance" "chef_server" {
   
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
+}
+
+resource "aws_ebs_volume" "chef_server" {           // nosemgrep
+  count = var.chef_server_instance_count
+  availability_zone = aws_instance.chef_server[count.index].availability_zone
+  size = var.chef_ebs_volume_size
+  type = var.chef_ebs_volume_type
+  iops = var.chef_ebs_volume_type == "io1" ? var.chef_ebs_volume_iops : null
+}
+
+resource "aws_volume_attachment" "chef_server" {
+  count = var.chef_server_instance_count
+  device_name = var.device_name
+  volume_id = aws_ebs_volume.chef_server[count.index].id
+  instance_id = aws_instance.chef_server[count.index].id
+
+  connection {
+    user        = var.aws_ssh_user
+    private_key = file(var.aws_ssh_key_file)
+    host        = aws_instance.chef_automate_postgresql[count.index].private_ip
+    port        = var.aws_ssh_port
+  }
+
+  provisioner "file" {
+    destination = "${var.tmp_path}/mount.sh"
+    source = "${path.module}/template/mount.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "echo \" Remote execution started\"",
+        "chmod 0700 ${var.tmp_path}/mount.sh",
+        "sudo -S ${var.tmp_path}/mount.sh",
+        "echo \" Remote execution ended\""
+    ]
+  }
 }
