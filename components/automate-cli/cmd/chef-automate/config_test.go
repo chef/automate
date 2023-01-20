@@ -164,3 +164,68 @@ func TestCheckOutputForError(t *testing.T) {
 		}
 	}
 }
+
+func TestSetConfigForPostgresqlAndOpensearch(t *testing.T) {
+
+	testCases := []struct {
+		remoteService string
+		timestamp     string
+		sshUtil       SSHUtil
+		hostIP        string
+		tomlFilePath  string
+		isError       bool
+		err           error
+	}{
+		{
+			"postgresql",
+			"20060102150405",
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			"127.0.0.1",
+			"some_file_path",
+			false,
+			nil,
+		},
+		{
+			"opensearch",
+			"20060102150405",
+			getMockSSHUtil(&SSHConfig{}, errors.Errorf("remote copy"), "", nil),
+			"127.0.0.1",
+			"some_file_path",
+			true,
+			errors.Errorf("remote copy"),
+		},
+		{
+			"opensearch",
+			"20060102150405",
+			getMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("remote execution")),
+			"127.0.0.1",
+			"some_file_path",
+			true,
+			errors.Errorf("remote execution"),
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := setConfigForPostgresqlAndOpensearch(testCase.remoteService, testCase.timestamp, testCase.sshUtil, testCase.hostIP, testCase.tomlFilePath)
+		if testCase.isError {
+			assert.Error(t, err)
+			assert.EqualError(t, testCase.err, err.Error())
+		} else {
+			assert.NoError(t, err)
+		}
+	}
+}
+
+func getMockSSHUtil(sshConfig *SSHConfig, CFTRError error, CSECOROutput string, CSECORError error) *MockSSHUtilsImpl {
+	return &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return sshConfig
+		},
+		copyFileToRemoteFunc: func(srcFilePath string, destFileName string, removeFile bool) error {
+			return CFTRError
+		},
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return CSECOROutput, CSECORError
+		},
+	}
+}
