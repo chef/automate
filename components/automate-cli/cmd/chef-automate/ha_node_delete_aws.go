@@ -38,32 +38,15 @@ type ConfigIp struct {
 }
 
 const (
-	terrformStateFile             = "-state=/hab/a2_deploy_workspace/terraform/terraform.tfstate"
-	scriptToGenerateTfStateInJSON = `
-cd /hab/a2_deploy_workspace/terraform/destroy/aws/
-terraform init
-terraform show -json ./terraform.tfstate | jq > tfState.json
-cd -
-#`
-	tfStateInJSON         = "#/hab/a2_deploy_workspace/terraform/destroy/aws/tfState.json"
-	runTerraformInitApply = `
-cd /hab/a2_deploy_workspace/terraform
-terraform init
-cd -
-`
+	terrformStateFile    = "-state=/hab/a2_deploy_workspace/terraform/terraform.tfstate"
+	runTerraformInit     = "terraform init"
+	terraformPath        = "/hab/a2_deploy_works pace/terraform"
+	destoryTerraformPath = terraformPath + "/destroy/aws/"
 )
 
 var (
-	destoryCommand = `
-cd /hab/a2_deploy_workspace/terraform/destroy/aws/
-terraform destroy -target="module.aws.aws_instance.%[1]s[%[2]d]" -refresh=true -auto-approve
-cd -
-`
-	moveStateCommand = `
-cd /hab/a2_deploy_workspace/terraform/destroy/aws/
-terraform state mv "module.aws.aws_instance.%[1]s[%[2]d]" "module.aws.aws_instance.chef_automate[%[3]d]"
-cd -
-`
+	destoryCommand   = `terraform destroy -target="module.aws.aws_instance.%[1]s[%[2]d]" -refresh=true -auto-approve`
+	moveStateCommand = `terraform state mv "module.aws.aws_instance.%[1]s[%[2]d]" "module.aws.aws_instance.chef_automate[%[3]d]"`
 )
 
 func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) (HAModifyAndDeploy, error) {
@@ -129,6 +112,7 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	return dna.runDeploy()
 }
 func (dna *DeleteNodeAWSImpl) modifyConfig() error {
+	dna.config.Architecture.ConfigInitials.Architecture = "aws"
 	err := modifyConfigForDeleteNodeForAWS(
 		&dna.config.Automate.Config.InstanceCount,
 		dna.automateIpList,
@@ -191,12 +175,41 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
 	// remove node from destory/aws/*.tfstate
+	err := dna.runRemoveNodeFromAws()
+	if err != nil {
+		return err
+	}
+
+	err = dna.nodeUtils.moveAWSAutoTfvarsFile(dna.terraformPath)
+	if err != nil {
+		return err
+	}
+
+	err = dna.nodeUtils.modifyTfArchFile(dna.terraformPath)
+	if err != nil {
+		return err
+	}
+	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config)
+	if err != nil {
+		return err
+	}
+
+	argsdeploy := []string{"-y"}
+	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
+	if err != nil {
+		return err
+	}
+
+	return dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+}
+
+func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
 	if len(dna.automateIpList) == 1 {
 		for i := 0; i < len(dna.configAutomateIpList); i++ {
 			if dna.configAutomateIpList[i] == dna.automateIpList[0] {
 				err := dna.removeNodeFromAws("chef_automate", i, len(dna.configAutomateIpList)-1)
 				if err != nil {
-					return err
+					return status.Wrap(err, status.ConfigError, "Error removing automate node")
 				}
 				break
 			}
@@ -208,7 +221,7 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 			if dna.configChefServerIpList[i] == dna.chefServerIpList[0] {
 				err := dna.removeNodeFromAws("chef_server", i, len(dna.configChefServerIpList)-1)
 				if err != nil {
-					return err
+					return status.Wrap(err, status.ConfigError, "Error removing chef server node")
 				}
 				break
 			}
@@ -220,7 +233,7 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 			if dna.configOpensearchIpList[i] == dna.opensearchIpList[0] {
 				err := dna.removeNodeFromAws("chef_automate_opensearch", i, len(dna.configOpensearchIpList)-1)
 				if err != nil {
-					return err
+					return status.Wrap(err, status.ConfigError, "Error removing opensearch node")
 				}
 				break
 			}
@@ -232,33 +245,14 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 			if dna.configAutomateIpList[i] == dna.automateIpList[0] {
 				err := dna.removeNodeFromAws("chef_automate_postgresql", i, len(dna.configAutomateIpList)-1)
 				if err != nil {
-					return err
+					return status.Wrap(err, status.ConfigError, "Error removing postgresql node")
 				}
 				break
 			}
 		}
 	}
-
-	err := dna.nodeUtils.moveAWSAutoTfvarsFile(dna.terraformPath)
-	if err != nil {
-		return err
-	}
-	err = dna.nodeUtils.modifyTfArchFile(dna.terraformPath)
-	if err != nil {
-		return err
-	}
-	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config)
-	if err != nil {
-		return err
-	}
-	argsdeploy := []string{"-y"}
-	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
-	if err != nil {
-		return err
-	}
-	return dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	return nil
 }
-
 func (dna *DeleteNodeAWSImpl) validate() error {
 	dna.automateIpList, dna.chefServerIpList, dna.opensearchIpList, dna.postgresqlIpList = splitIPCSV(
 		dna.flags.automateIp,
@@ -343,44 +337,38 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 }
 
 func (dna *DeleteNodeAWSImpl) removeNodeFromAws(instanceType string, index int, lastIndex int) error {
-	// module.aws.aws_instance.chef_automate[0]
 	err := executeShellCommand("/bin/sh", []string{
 		"-c",
-		scriptToGenerateTfStateInJSON,
-	}, "")
+		runTerraformInit,
+	}, destoryTerraformPath)
 	if err != nil {
 		return err
 	}
 
-	// terraform destroy -target="module.aws.aws_instance.chef_automate[0]" -refresh=true -auto-approve
 	runDestoryCommand := fmt.Sprintf(destoryCommand, instanceType, index)
-	fmt.Println(runDestoryCommand, "destory command")
 	err = executeShellCommand("/bin/sh", []string{
 		"-c",
 		runDestoryCommand,
-	}, "")
+	}, destoryTerraformPath)
 	if err != nil {
 		return err
 	}
 
-	// terraform state mv "module.aws.aws_instance.chef_automate[1]" "module.aws.aws_instance.chef_automate[0]"
-	ruMoveStateCommand := fmt.Sprintf(moveStateCommand, instanceType, lastIndex, index)
-	fmt.Println(runDestoryCommand, "Move State command")
-
-	err = executeShellCommand("/bin/sh", []string{
-		"-c",
-		ruMoveStateCommand,
-	}, "")
-	if err != nil {
-		return err
+	if index != lastIndex {
+		ruMoveStateCommand := fmt.Sprintf(moveStateCommand, instanceType, lastIndex, index)
+		err = executeShellCommand("/bin/sh", []string{
+			"-c",
+			ruMoveStateCommand,
+		}, destoryTerraformPath)
+		if err != nil {
+			return err
+		}
 	}
 
-	// terraform init # not necessary everytime
-	// terraform apply -var instance_count=${result} -auto-approve
 	err = executeShellCommand("/bin/sh", []string{
 		"-c",
-		runTerraformInitApply,
-	}, "")
+		runTerraformInit,
+	}, terraformPath)
 	if err != nil {
 		return err
 	}
