@@ -121,8 +121,8 @@ class AutomateApiRequest < Inspec.resource(1)
       resp[:id_token]
       puts resp[:id_token] 
       puts "token-testttt"
-      puts resp
-      puts "Printing response"
+      # puts resp
+      # puts "Printing response"
     end
   end
 
