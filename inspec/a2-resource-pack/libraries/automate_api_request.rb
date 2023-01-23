@@ -87,7 +87,7 @@ class AutomateApiRequest < Inspec.resource(1)
   def id_token
     @@id_token ||= begin
       # init auth process
-      resp = request("/dex/auth?client_id=automate-api&scope=openid+profile+email+offline_access+groups+federated:id&response_type=code+id_token&state=inspec&nonce=yeahnotreally&redirect_uri=urn:ietf:wg:oauth:2.0:oob")
+      resp = request("/dex/auth?client_id=automate-api&scope=openid+profile+email+offline_access+groups+federated:id&response_type=code+id_token&state=inspec&nonce=yeahnotreally&redirect_uri=urn:ietf:wg:oauth:2.0:oob&exp=1676767656")
       req = if loc = resp.headers.location
               # one connector only (local) => we're being redirected
               loc.match(%r'\?req=(.+)$')[1]
