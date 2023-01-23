@@ -119,6 +119,10 @@ class AutomateApiRequest < Inspec.resource(1)
 
       resp = JSON.parse(resp.body, symbolize_names: true)
       resp[:id_token]
+      puts resp[:id_token] 
+      puts "token-testttt"
+      puts resp
+      puts "Printing response"
     end
   end
 
