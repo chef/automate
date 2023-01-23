@@ -291,9 +291,6 @@ control 'iam-api-1' do
           http_method: 'POST',
           request_body: custom_user_2.to_json
         )
-        puts "Status CodeA: #{resp.code}"
-        puts "BodyA: #{resp.body}"
-
         expect(resp.http_status).to eq 200
       end
 
