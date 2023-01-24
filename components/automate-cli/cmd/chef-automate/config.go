@@ -571,10 +571,10 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 
 	for i := 0; i < len(frontendIps); i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func(i int, hostIP string) {
 			defer wg.Done()
-			printConnectionMessage(remoteService, frontendIps[i])
-			sshUtil.getSSHConfig().hostIP = frontendIps[i]
+			printConnectionMessage(remoteService, hostIP)
+			sshUtil.getSSHConfig().hostIP = hostIP
 
 			err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
 			if err != nil {
@@ -595,7 +595,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			}
 
 			outputChan <- output
-		}(i)
+		}(i, frontendIps[i])
 	}
 
 	wg.Wait()
@@ -606,10 +606,16 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 	// Print the outputs and errors
 	for i := 0; i < len(frontendIps); i++ {
 		select {
-		case output := <-outputChan:
+		case output, ok := <-outputChan:
+			if !ok {
+				continue
+			}
 			writer.Printf(output + "\n")
 			printConfigSuccessMessage(setting, remoteService, frontendIps[i])
-		case err := <-errorChan:
+		case err, ok := <-errorChan:
+			if !ok {
+				continue
+			}
 			writer.Errorf("%v", err)
 		}
 	}
