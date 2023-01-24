@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Configuration"
-    identifier = "automate/deploy_high_availability/deployment/ha_config.md Configuration"
-    parent = "automate/deploy_high_availability/deployment"
-    weight = 100
+    identifier = "automate/deploy_high_availability/ha_config.md Configuration"
+    parent = "automate/deploy_high_availability"
+    weight = 50
 +++
 
 ## Patch Configuration
@@ -59,11 +59,11 @@ Setting new configuration in all nodes can be done from bastion server using bel
 To set configuration for Automate cluster, run the following command:
 
 ```bash
-chef-automate config set --automate
+chef-automate config set path/to/automate-config.toml --automate
 #or
-chef-automate config set -a
+chef-automate config set path/to/automate-config.toml -a
 #or
-chef-automate config set --a2
+chef-automate config set path/to/automate-config.toml --a2
 ```
 
 ### Set Configuration for Chef Server cluster
@@ -71,11 +71,11 @@ chef-automate config set --a2
 To set configuration for Chef Server cluster, run the following command:
 
 ```bash
-chef-automate config set --chef_server
+chef-automate config set path/to/chef_server-config.toml --chef_server
 #or
-chef-automate config set -c
+chef-automate config set path/to/chef_server-config.toml -c
 #or
-chef-automate config set --cs
+chef-automate config set path/to/chef_server-config.toml --cs
 ```
 
 ### Set Configuration for Postgresql cluster
@@ -83,11 +83,11 @@ chef-automate config set --cs
 To set configuration for Postgresql cluster, run the following command:
 
 ```bash
-chef-automate config set --postgresql
+chef-automate config set path/to/postgresql-config.toml --postgresql
 #or
-chef-automate config set -p
+chef-automate config set path/to/postgresql-config.toml -p
 #or
-chef-automate config set --pg
+chef-automate config set path/to/postgresql-config.toml --pg
 ```
 
 ### Set Configuration for OpenSearch cluster
@@ -95,9 +95,9 @@ chef-automate config set --pg
 To set configuration for OpenSearch cluster, run the following command:
 
 ```bash
-chef-automate config set --opensearch
+chef-automate config set path/to/opensearch-config.toml --opensearch
 #or
-chef-automate config set -o
+chef-automate config set path/to/opensearch-config.toml -o
 #or
-chef-automate config set --os
+chef-automate config set path/to/opensearch-config.toml --os
 ```
