@@ -564,12 +564,12 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 // setConfigForFrontEndNodes set the configuration for front end nodes in Automate HA
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
 	var wg sync.WaitGroup
-	outputChan := make(chan string)
-	errorChan := make(chan error)
+	outputChan := make(chan string, len(frontendIps))
+	errorChan := make(chan error, len(frontendIps))
 
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, remoteService+timestamp, dateFormat)
 
-	for i := 0; i < len(frontendIps); i++ {
+	for i, hostIP := range frontendIps {
 		wg.Add(1)
 		go func(i int, hostIP string) {
 			defer wg.Done()
@@ -595,29 +595,27 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			}
 
 			outputChan <- output
-		}(i, frontendIps[i])
+		}(i, hostIP)
 	}
 
 	wg.Wait()
-
 	close(outputChan)
 	close(errorChan)
 
 	// Print the outputs and errors
+	var output string
+	var err error
 	for i := 0; i < len(frontendIps); i++ {
 		select {
-		case output, ok := <-outputChan:
-			if !ok {
-				continue
-			}
+		case output = <-outputChan:
 			writer.Printf(output + "\n")
 			printConfigSuccessMessage(setting, remoteService, frontendIps[i])
-		case err, ok := <-errorChan:
-			if !ok {
-				continue
-			}
+		case err = <-errorChan:
 			writer.Errorf("%v", err)
 		}
+	}
+	if err != nil {
+		return err
 	}
 	return nil
 }
