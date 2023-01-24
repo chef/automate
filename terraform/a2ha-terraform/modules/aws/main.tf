@@ -194,6 +194,7 @@ resource "aws_instance" "chef_automate_postgresql" {
     iops                  = var.postgresql_ebs_volume_type == "io1" ? var.postgresql_ebs_volume_iops : 0
     volume_size           = var.postgresql_ebs_volume_size
     volume_type           = var.postgresql_ebs_volume_type
+    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)))
   }
 
   tags = merge(var.tags,
@@ -225,6 +226,7 @@ resource "aws_instance" "chef_automate_opensearch" {
     iops                  = var.opensearch_ebs_volume_type == "io1" ? var.opensearch_ebs_volume_iops : 0
     volume_size           = var.opensearch_ebs_volume_size
     volume_type           = var.opensearch_ebs_volume_type
+    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)))
   }
 
   tags = merge(
@@ -255,6 +257,7 @@ resource "aws_instance" "chef_automate" {
     iops                  = var.automate_ebs_volume_type == "io1" ? var.automate_ebs_volume_iops : 0
     volume_size           = var.automate_ebs_volume_size
     volume_type           = var.automate_ebs_volume_type
+    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)))
   }
 
   tags = merge(
@@ -286,6 +289,7 @@ resource "aws_instance" "chef_server" {
     iops                  = var.chef_ebs_volume_type == "io1" ? var.chef_ebs_volume_iops : 0
     volume_size           = var.chef_ebs_volume_size
     volume_type           = var.chef_ebs_volume_type
+    tags = merge(var.tags,map("Name",format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)))
   }
 
   tags = merge(

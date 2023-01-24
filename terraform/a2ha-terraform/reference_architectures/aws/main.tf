@@ -89,6 +89,7 @@ module "s3" {
   source            = "./modules/s3"
   count             = var.backup_config_s3 == "true" ? 1 : 0
   aws_s3_bucketName = var.aws_s3_bucketName
+  aws_region        = var.aws_region
   random_id         = module.aws.random_id
   tags              = var.tag_name
   destroy_bucket    = var.destroy_bucket
