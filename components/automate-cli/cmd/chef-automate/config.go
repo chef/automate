@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"fmt"
@@ -562,31 +563,52 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 
 // setConfigForFrontEndNodes set the configuration for front end nodes in Automate HA
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
+	var wg sync.WaitGroup
+	outputChan := make(chan string)
+	errorChan := make(chan error)
+
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, remoteService+timestamp, dateFormat)
 
 	for i := 0; i < len(frontendIps); i++ {
-		printConnectionMessage(remoteService, frontendIps[i])
-		sshUtil.getSSHConfig().hostIP = frontendIps[i]
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			printConnectionMessage(remoteService, frontendIps[i])
+			sshUtil.getSSHConfig().hostIP = frontendIps[i]
 
-		err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
-		if err != nil {
+			err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
+			if err != nil {
+				errorChan <- err
+				return
+			}
+
+			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+			if err != nil {
+				errorChan <- err
+				return
+			}
+
+			err = checkOutputForError(output)
+			if err != nil {
+				errorChan <- err
+				return
+			}
+
+			outputChan <- output
+		}(i)
+	}
+
+	wg.Wait()
+
+	// Print the outputs and errors
+	for i := 0; i < len(frontendIps); i++ {
+		select {
+		case output := <-outputChan:
+			writer.Printf(output + "\n")
+			printConfigSuccessMessage(setting, remoteService, frontendIps[i])
+		case err := <-errorChan:
 			writer.Errorf("%v", err)
-			return err
 		}
-
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-		if err != nil {
-			writer.Errorf("%v", err)
-			return err
-		}
-
-		err = checkOutputForError(output)
-		if err != nil {
-			return err
-		}
-
-		writer.Printf(output + "\n")
-		printConfigSuccessMessage(setting, remoteService, frontendIps[i])
 	}
 	return nil
 }
