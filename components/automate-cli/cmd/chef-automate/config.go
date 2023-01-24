@@ -600,6 +600,9 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 
 	wg.Wait()
 
+	close(outputChan)
+	close(errorChan)
+
 	// Print the outputs and errors
 	for i := 0; i < len(frontendIps); i++ {
 		select {
