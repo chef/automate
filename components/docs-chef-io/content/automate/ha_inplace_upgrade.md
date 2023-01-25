@@ -30,15 +30,15 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
     Above command will store backup in configured backup patch in a2ha.rb config file `/hab/a2_deploy_workspace/a2ha.rb`
     once the backup is completed successfully, save the backup Id. For example: `20210622065515`.
    If you want to use backup created previously run the command on Automate node, to get the backup id
-   `chef-automate backup list`
+   ```chef-automate backup list```
 
-          ```sh
+          
           $ chef-autoamte backup list
           Backup             State       Age
           20180508201548    completed  8 minutes old
           20180508201643    completed  8 minutes old
           20180508201952    completed  4 minutes old
-          ```
+          
 2. Create bootstrap bundle
 
       ```cmd 
@@ -63,8 +63,8 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
     sudo hab svc unload chef/automate-backend-haproxy
     sudo hab svc unload chef/automate-backend-pgleaderchk
     ```
-    check status use ```cmd hab svc status ``` none of services should be running
-    then stop habitat superviser with command ```cmd systemctl stop hab-sup ```
+    check status use ``` hab svc status ``` none of services should be running
+    then stop habitat superviser with command ``` systemctl stop hab-sup ```
     rename /hab dir to something else like /hab-old
 
 
@@ -77,8 +77,8 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
     sudo hab svc unload chef/automate-backend-curator
     sudo hab svc unload chef/automate-backend-kibana
    ```
-   check status use ```cmd hab svc status ``` none of services should be running
-   then stop habitat superviser with command ```cmd systemctl stop hab-sup ```
+   check status use ``` hab svc status ``` none of services should be running
+   then stop habitat superviser with command ``` systemctl stop hab-sup ```
    rename /hab dir to something else like /hab-old
 
 
@@ -95,7 +95,7 @@ in config.toml give same automate IPs as it was in a2ha.rb file
 once deployment is successful, 
 Now proceed with restore the backup in Automate HA, 
 login to one of automate node and take current_config,toml file
-```cmd sudo chef-automate config show > current_config.toml ```
+``` sudo chef-automate config show > current_config.toml ```
 
 add the following config to current_config.toml
 
@@ -140,7 +140,7 @@ chef-automate config set applied_config.toml
 {{< /note >}}
 
 {{< note >}}
-** In case of ```cmd backup_config = "file_system" ``` filed had be give in config.toml of Automate HA deployment, then need to patch below opensearch config from bastion before starting restore.
+** In case of ``` backup_config = "file_system" ``` filed had be give in config.toml of Automate HA deployment, then need to patch below opensearch config from bastion before starting restore.
 
 -   Create a .toml (say os_config.toml) file in **the Provision host** and copy the following template with the path to the repo.
     ```sh
@@ -168,6 +168,6 @@ sudo chef-automate bootstrap bundle unpack bootstrap.abb
 
 ## Troubleshoot
 
-1. While installing new Automate HA if postgresql not getting started, and in postgesql instance ```sh hab svc status ``` shows secret key mismatch error then try cleanup command with new Autoamte HA cli ```cmd chef-automate cleanup --onprem-deployment``` and then remove /bin/chef-automate from all frontend nodes, now try installation again
+1. While installing new Automate HA if postgresql not getting started, and in postgesql instance ``` hab svc status ``` shows secret key mismatch error then try cleanup command with new Autoamte HA cli ``` chef-automate cleanup --onprem-deployment``` and then remove /bin/chef-automate from all frontend nodes, now try installation again
 
 2. While doing restore if any error related to elasticsearch snapshot please refer Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more
