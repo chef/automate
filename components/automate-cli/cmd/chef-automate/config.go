@@ -598,10 +598,6 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 		}(i, hostIP)
 	}
 
-	wg.Wait()
-	close(outputChan)
-	close(errorChan)
-
 	// Print the outputs and errors
 	var output string
 	var err error
@@ -614,6 +610,11 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			writer.Errorf("%v", err)
 		}
 	}
+
+	wg.Wait()
+	close(outputChan)
+	close(errorChan)
+
 	if err != nil {
 		return err
 	}
