@@ -147,7 +147,7 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
     chef-automate status
     ```
 
-    - On New Cluster Trigger restore command from bastion.
+    - On New Cluster Trigger restore command from bastion. 
 
         - To run the restore command, you need to add the OpenSearch credentials to the applied config. If using Chef Managed OpenSearch,For that we need to have automate config and add the below config to it into `current_config.toml` (without any changes).
 
