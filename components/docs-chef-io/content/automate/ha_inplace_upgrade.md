@@ -16,9 +16,9 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
 
 ## Prerequisites
 
-- Ability to mount the file system, which was mounted to A2HA Cluster for backup purpose, to Automate HA.
+- A2HA cluster should be in healthy state
 
-- A2HA is configured to take backup on mounted network drive (location example : `/mnt/automate_backup`).
+- A2HA is configured to take backup on mounted network drive (location example : /mnt/automate_backup).
 
 ## Taking Backup and clean up of instances.
 
