@@ -15,7 +15,7 @@ import (
 
 type DeleteNodeAWSImpl struct {
 	config                  AwsConfigToml
-	copyConfigForUserPrompt ConfigIp
+	copyConfigForUserPrompt AWSConfigIp
 	automateIpList          []string
 	chefServerIpList        []string
 	opensearchIpList        []string
@@ -27,10 +27,10 @@ type DeleteNodeAWSImpl struct {
 	writer                  *cli.Writer
 	fileUtils               fileutils.FileUtils
 	sshUtil                 SSHUtil
-	ConfigIp
+	AWSConfigIp
 }
 
-type ConfigIp struct {
+type AWSConfigIp struct {
 	configAutomateIpList   []string
 	configChefServerIpList []string
 	configOpensearchIpList []string
@@ -40,42 +40,29 @@ type ConfigIp struct {
 const (
 	terrformStateFile    = "-state=/hab/a2_deploy_workspace/terraform/terraform.tfstate"
 	runTerraformInit     = "terraform init"
-	terraformPath        = "/hab/a2_deploy_works pace/terraform"
+	terraformPath        = "/hab/a2_deploy_workspace/terraform"
 	destoryTerraformPath = terraformPath + "/destroy/aws/"
 )
 
 var (
 	destoryCommand   = `terraform destroy -target="module.aws.aws_instance.%[1]s[%[2]d]" -refresh=true -auto-approve`
-	moveStateCommand = `terraform state mv "module.aws.aws_instance.%[1]s[%[2]d]" "module.aws.aws_instance.chef_automate[%[3]d]"`
+	moveStateCommand = `terraform state mv "module.aws.aws_instance.%[1]s[%[2]d]" "module.aws.aws_instance.%[1]s[%[3]d]"`
 )
 
 func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) (HAModifyAndDeploy, error) {
-	outputDetails, err := getAutomateHAInfraDetails()
-	if err != nil {
-		return nil, err
-	}
-
-	var ConfigIp = ConfigIp{
-		configAutomateIpList:   outputDetails.Outputs.AutomatePrivateIps.Value,
-		configChefServerIpList: outputDetails.Outputs.ChefServerPrivateIps.Value,
-		configOpensearchIpList: outputDetails.Outputs.OpensearchPrivateIps.Value,
-		configPostgresqlIpList: outputDetails.Outputs.PostgresqlPrivateIps.Value,
-	}
 	return &DeleteNodeAWSImpl{
-		config:                  AwsConfigToml{},
-		copyConfigForUserPrompt: ConfigIp,
-		automateIpList:          []string{},
-		chefServerIpList:        []string{},
-		opensearchIpList:        []string{},
-		postgresqlIpList:        []string{},
-		nodeUtils:               nodeUtils,
-		flags:                   flags,
-		configpath:              filepath.Join(haDirPath, "config.toml"),
-		terraformPath:           filepath.Join(haDirPath, "terraform"),
-		writer:                  writer,
-		fileUtils:               fileutils,
-		sshUtil:                 sshUtil,
-		ConfigIp:                ConfigIp,
+		config:           AwsConfigToml{},
+		automateIpList:   []string{},
+		chefServerIpList: []string{},
+		opensearchIpList: []string{},
+		postgresqlIpList: []string{},
+		nodeUtils:        nodeUtils,
+		flags:            flags,
+		configpath:       filepath.Join(haDirPath, "config.toml"),
+		terraformPath:    filepath.Join(haDirPath, "terraform"),
+		writer:           writer,
+		fileUtils:        fileutils,
+		sshUtil:          sshUtil,
 	}, nil
 }
 
@@ -83,6 +70,12 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if !dna.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
+
+	err := dna.getAwsHAIp()
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error getting AWS instance Ip")
+	}
+
 	if dna.flags.automateIp == "" &&
 		dna.flags.chefServerIp == "" &&
 		dna.flags.opensearchIp == "" &&
@@ -90,7 +83,7 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
-	err := dna.validate()
+	err = dna.validate()
 	if err != nil {
 		return err
 	}
@@ -174,7 +167,6 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
-	// remove node from destory/aws/*.tfstate
 	err := dna.runRemoveNodeFromAws()
 	if err != nil {
 		return err
@@ -241,9 +233,10 @@ func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
 	}
 
 	if len(dna.postgresqlIpList) == 1 {
-		for i := 0; i < len(dna.configAutomateIpList); i++ {
-			if dna.configAutomateIpList[i] == dna.automateIpList[0] {
-				err := dna.removeNodeFromAws("chef_automate_postgresql", i, len(dna.configAutomateIpList)-1)
+		for i := 0; i < len(dna.configPostgresqlIpList); i++ {
+			if dna.configPostgresqlIpList[i] == dna.postgresqlIpList[0] {
+				fmt.Println(dna.configPostgresqlIpList[i])
+				err := dna.removeNodeFromAws("chef_automate_postgresql", i, len(dna.configPostgresqlIpList)-1)
 				if err != nil {
 					return status.Wrap(err, status.ConfigError, "Error removing postgresql node")
 				}
@@ -317,7 +310,7 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 		if !allowed {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. OpenSearch instance count cannot be less than %d. Final count %d not allowed.", OPENSEARCH_MIN_INSTANCE_COUNT, finalCount))
 		}
-		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configPostgresqlIpList, dna.opensearchIpList, "OpenSearch"))
+		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configOpensearchIpList, dna.opensearchIpList, "OpenSearch"))
 	} else if len(dna.opensearchIpList) != 0 {
 		errorList.PushBack("only one opensearch is allowed to delete for aws deployment type")
 	}
@@ -337,40 +330,37 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 }
 
 func (dna *DeleteNodeAWSImpl) removeNodeFromAws(instanceType string, index int, lastIndex int) error {
-	err := executeShellCommand("/bin/sh", []string{
-		"-c",
-		runTerraformInit,
-	}, destoryTerraformPath)
+	err := dna.nodeUtils.executeShellCommand(runTerraformInit, destoryTerraformPath)
 	if err != nil {
 		return err
 	}
 
 	runDestoryCommand := fmt.Sprintf(destoryCommand, instanceType, index)
-	err = executeShellCommand("/bin/sh", []string{
-		"-c",
-		runDestoryCommand,
-	}, destoryTerraformPath)
+	err = dna.nodeUtils.executeShellCommand(runDestoryCommand, destoryTerraformPath)
 	if err != nil {
 		return err
 	}
 
 	if index != lastIndex {
 		ruMoveStateCommand := fmt.Sprintf(moveStateCommand, instanceType, lastIndex, index)
-		err = executeShellCommand("/bin/sh", []string{
-			"-c",
-			ruMoveStateCommand,
-		}, destoryTerraformPath)
+		err = dna.nodeUtils.executeShellCommand(ruMoveStateCommand, destoryTerraformPath)
 		if err != nil {
 			return err
 		}
 	}
-
-	err = executeShellCommand("/bin/sh", []string{
-		"-c",
-		runTerraformInit,
-	}, terraformPath)
+	err = dna.nodeUtils.executeShellCommand(runTerraformInit, terraformPath)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (dna *DeleteNodeAWSImpl) getAwsHAIp() error {
+	ConfigIp, err := dna.nodeUtils.getAWSConfigIp()
+	if err != nil {
+		return err
+	}
+	dna.AWSConfigIp = *ConfigIp
+	dna.copyConfigForUserPrompt = *ConfigIp
 	return nil
 }

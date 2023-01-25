@@ -12,8 +12,8 @@ func TestHaNodeDeleteFactoryIfDeployerTypeMatchesFlagAWS(t *testing.T) {
 	}
 	deployerType := AWS_MODE
 	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Remove node command is not supported in AWS mode yet")
+	assert.NoError(t, err)
+
 }
 
 func TestHaNodeDeleteFactoryIfDeployerTypeMatchesFlagOnPrem(t *testing.T) {
@@ -52,7 +52,7 @@ func TestHaNodeDeleteFactoryIfDeployerTypeDoesNotMatchFlagAWS(t *testing.T) {
 	deployerType := AWS_MODE
 	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Flag given does not match with the current deployment type AWS_MODE. Try with --aws-mode flag")
+	assert.Contains(t, err.Error(), "flag given does not match with the current deployment type AWS_MODE. Try with --aws-mode flag")
 }
 
 func TestHaNodeDeleteFactoryIfDeployerTypeDoesNotMatchFlagOnPrem(t *testing.T) {
@@ -62,7 +62,7 @@ func TestHaNodeDeleteFactoryIfDeployerTypeDoesNotMatchFlagOnPrem(t *testing.T) {
 	deployerType := EXISTING_INFRA_MODE
 	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Flag given does not match with the current deployment type EXISTING_INFRA_MODE. Try with --onprem-mode flag")
+	assert.Contains(t, err.Error(), "flag given does not match with the current deployment type EXISTING_INFRA_MODE. Try with --onprem-mode flag")
 }
 
 func TestHaNodeDeleteFactoryIfBothflagGiven(t *testing.T) {
@@ -83,7 +83,7 @@ func TestHaNodeDeleteFactoryWithFlagOrDeployerModeNotMatch(t *testing.T) {
 	deployerType := "SOMETHING_ELSE"
 	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unsupported deployment type. Current deployment type is SOMETHING_ELSE")
+	assert.Contains(t, err.Error(), "unsupported deployment type. Current deployment type is SOMETHING_ELSE")
 }
 
 func TestHaNodeDeleteFactoryNoFlagOrDeployerModeNotMatch(t *testing.T) {
@@ -91,5 +91,5 @@ func TestHaNodeDeleteFactoryNoFlagOrDeployerModeNotMatch(t *testing.T) {
 	deployerType := "SOMETHING_ELSE"
 	_, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unsupported deployment type. Current deployment type is SOMETHING_ELSE")
+	assert.Contains(t, err.Error(), "unsupported deployment type. Current deployment type is SOMETHING_ELSE")
 }
