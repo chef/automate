@@ -79,4 +79,91 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
    chef-automate upgrade run --airgap-bundle latest.aib --auto-approve --workspace-upgrade no
   ```
 
+{{< note >}}
 
+  AMI Upgrade is only for AWS deployment, as in On-Premise Deployment all the resources are managed by the customers themselves.  
+
+{{< /note >}}
+
+## AMI Upgrade Setup For AWS Deployment
+
+### Requirements
+
+1. Two identical clusters located in same/different AWS regions.
+2. Amazon S3 access for both the clusters.
+
+{{< note >}}
+
+  For AMI upgrade, The **Primary Cluster** is referred as the old cluster which donot have upgraded AMI and the **New Cluster** is referred as the cluster which have upgraded AMI.
+
+{{< /note >}}
+
+{{< note >}}
+
+  The AWS deployment should be configured with S3, Both Primary and New cluster should be configured with same s3 bucket.
+  
+{{< /note >}}
+
+### Steps to set up the AMI Upgraded Cluster
+
+1. Deploy the New cluster into a same/different region with S3 backup configuration.you can refer [AWS Deployment steps](/automate/ha_aws_deploy_steps/#deployment).
+
+2. Do the backup configuration only when you have not provided the (backup information) configuration at the time of deployment. Refer backup section for [s3 configuration](/automate/ha_backup_restore_aws_s3/#configuration-in-provision-host).
+
+3. On Primary Cluster
+
+    - Take a backup of Primary cluster from bastion by running below command:
+
+    ```sh
+    chef-automate backup create --no-progress > /var/log/automate-backups.log
+    ```
+
+    - Create a bootstrap bundle; this bundle captures any local credentials or secrets that aren't persisted to the database. To create the bootstrap bundle, run the following command in one of the Automate nodes:
+
+    ```sh
+    chef-automate bootstrap bundle create bootstrap.abb
+    ```
+
+    - Copy `bootstrap.abb` to all Automate and Chef Infra frontend nodes in the New cluster.
+
+
+4. On New AMI upgraded Cluster
+
+    - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes) by running the following command:
+
+    ```cmd
+    sudo chef-automate bootstrap bundle unpack bootstrap.abb
+    ```
+
+    - Run the following command in bastion to get the ID of the backups:
+
+    ```sh
+    chef-automate backup list
+    ```
+
+    - Make sure all the services in New cluster are up and running by running the following command from bastion:
+
+    ```sh
+    chef-automate status
+    ```
+
+    - On New Cluster Trigger restore command from bastion.
+
+        - To run the restore command, you need to add the OpenSearch credentials to the applied config. If using Chef Managed OpenSearch,For that we need to have automate config and add the below config to it into `current_config.toml` (without any changes).
+
+        ```bash
+        [global.v1.external.opensearch.auth.basic_auth]
+            username = "admin"
+            password = "admin"
+        ```
+
+        - On New cluster, use the following restore command to restore the backup of Primary Cluster from bastion.
+
+        ```cmd
+        sudo chef-automate backup restore s3://<s3-bucket-name>/<path-to-backup>/<backup-id>/ --patch-config /path/to/current_config.toml --airgap-bundle /path/to/airgap-bundle --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
+
+        ```
+
+- If you want to reuse the same custom domain used previously, then make sure to update the DNS entry to the Load-Balancer FQDN of the New cluster.
+
+- Once the restore is successful ,you can destroy the Primary Cluster.

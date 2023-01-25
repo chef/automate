@@ -138,6 +138,7 @@ When the primary cluster fails, accomplish the failover by updating DNS records 
         sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
         ```
 
+If the restore is unsuccessful check [Troubleshooting](/automate/ha_backup_restore_aws_s3/#troubleshooting)
 ### Switch to Disaster Recovery Cluster
 
 Steps to switch to the disaster recovery cluster are as follows:
