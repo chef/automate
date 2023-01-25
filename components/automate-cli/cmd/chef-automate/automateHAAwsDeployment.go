@@ -145,7 +145,7 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	if len(a.config.Architecture.ConfigInitials.BackupMount) < 1 {
 		errorList.PushBack("Invalid or empty backup_mount")
 	}
-	if a.config.Architecture.ConfigInitials.BackupConfig == "s3" && len(a.config.Architecture.ConfigInitials.S3BucketName) < 1 {
+	if a.config.Architecture.ConfigInitials.BackupConfig == "s3" && len(strings.TrimSpace(a.config.Architecture.ConfigInitials.S3BucketName)) < 1 {
 		errorList.PushBack("Invalid or empty s3_bucketName")
 	}
 	if len(a.config.Automate.Config.AdminPassword) > 0 {
