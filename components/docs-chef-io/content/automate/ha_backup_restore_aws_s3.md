@@ -158,3 +158,40 @@ While running the restore command, If it prompts any error follow the steps give
 -  Also check the hab svc status in automate node by running `hab svc status`.
 -  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
 -  Now, check the status of Automate node and then try running the restore command from bastion.
+
+For **Disaster Recovery or AMI upgarde**, while running the restore in secondary cluster which is in different region follow the steps given below.
+
+-  Make a curl request in any opensearch node`curl -XGET https://localhost:9200/_snapshot?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k`
+-  check the curl request response if the region is not matching with the primary cluster follow the below steps:
+1. Modify the region in FrontEnd nodes by patching the below configs with command, `chef-automate config patch <file-name>.toml --fe`
+
+```cmd
+[global.v1.external.opensearch.backup.s3.settings]
+              region = "<FIRST-CLUSTER-REGION>"
+```
+
+2. Make a PUT request in an Opensearch node by running this script:
+
+```cmd
+indices=(
+chef-automate-es6-automate-cs-oc-erchef
+chef-automate-es6-compliance-service
+chef-automate-es6-event-feed-service
+chef-automate-es6-ingest-service
+)
+for index in ${indices[@]}; do
+curl -XPUT -k -H 'Content-Type: application/json' https://<IP>:9200/_snapshot/$index --data-binary @- << EOF
+{
+  "type" : "s3",
+    "settings" : {
+      "bucket" : "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
+      "base_path" : "elasticsearch/automate-elasticsearch-data/$index",
+      "region" : "<YOUR-PRIMARY-CLUSTER-REGION>",
+      "role_arn" : " ",
+      "compress" : "false"
+    }
+}
+EOF
+done
+
+```
