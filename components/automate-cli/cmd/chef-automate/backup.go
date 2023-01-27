@@ -42,8 +42,8 @@ or all services are down (chef-automate stop) before retrying the restore.`
 var allPassedFlags string = ""
 
 const (
-	AUTOMATE_CMD_STOP  = "sudo chef-automate stop"
-	AUTOMATE_CMD_START = "sudo chef-automate start"
+	AUTOMATE_CMD_STOP  = "sudo systemctl stop chef-automate"
+	AUTOMATE_CMD_START = "sudo systemctl start chef-automate"
 	BACKUP_CONFIG      = "file_system"
 )
 
