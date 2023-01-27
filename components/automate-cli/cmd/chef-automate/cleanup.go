@@ -17,7 +17,9 @@ var (
 	%s
 	for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy  -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve;cd $i;done
 `
+
 	DEPLOYMENT_CLEANUP = `hab pkg uninstall chef/automate-ha-deployment`
+	DESTROY_S3_BUCKET  = `HAB_LICENSE=accept-no-persist sudo hab pkg exec core/aws-cli aws s3 rm s3://%s --recursive; sudo hab pkg exec core/aws-cli aws s3 rb s3://%s`
 )
 
 var cleanupFlags = struct {
@@ -135,12 +137,24 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 				writer.Println("Reference architecture type :" + arch)
 
 				appendString := ""
-				if infra.Outputs.BackupConfigS3.Value == "true" && cleanupFlags.force {
-					appendString = appendString + `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;cp -r ../../.tf_arch .;cp -r ../../../a2ha.rb ..;terraform apply -var="destroy_bucket=true" -auto-approve;cd $i;done`
+
+				backup_config, err := getTheValueFromA2HARB("backup_config")
+				if err != nil {
+					writer.Error("Error in getting backup_config")
+					return err
+				}
+
+				if backup_config == "s3" && cleanupFlags.force {
+					bucket_name, err := getTheValueFromA2HARB("s3_bucketName")
+					if err != nil {
+						writer.Error("Error in getting bucket_name")
+						return err
+					}
+					writer.Body("BucketName :" + bucket_name)
+					appendString = appendString + fmt.Sprintf(DESTROY_S3_BUCKET, bucket_name, bucket_name)
 				} else if infra.Outputs.BackupConfigEFS.Value == "true" && !cleanupFlags.force {
 					appendString = appendString + `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform state rm "module.efs[0].aws_efs_file_system.backups";cd $i;done`
 				}
-
 				writer.Println("Cleaning up all AWS provisioned resources.")
 
 				// 'cleanupScripts' contains array of scripts

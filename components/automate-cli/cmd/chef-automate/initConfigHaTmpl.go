@@ -24,9 +24,12 @@ ssh_key_file = ""
 # Eg.: backup_config = "efs" or "s3"
 backup_config = ""
 
+#    Note: 1. To create new bucket, make sure to give a unique name
+#          2. User can also add existing bucket 
+#
 # If s3 is selected for backup_config,
-#    then uncomment and give s3_bucketName 
-#    or else default chef-automate-ha.<deployment-string> will be used.
+#     uncomment and add the value for following 's3_bucketName' attribute
+
 # s3_bucketName = ""
 ## === ===
 

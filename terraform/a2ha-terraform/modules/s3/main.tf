@@ -43,15 +43,13 @@ resource "aws_iam_role_policy_attachment" "AdministratorAccess" {
 
 
 locals {
-  log_bucket = "${var.aws_s3_bucketName}-${var.random_id}"
+  log_bucket = "${var.aws_s3_bucketName}"
 }
 
-resource "aws_s3_bucket" "createS3bucket" {
-  bucket        = local.log_bucket
-  force_destroy = var.destroy_bucket
+# Creating s3 bucket using AWS-CLI (hab -> core/aws-cli)
+resource "null_resource" "createS3bucket" {
+  provisioner "local-exec" {
+    command = "chmod 700 ${path.module}/templates/createS3Bucket.sh; ${path.module}/templates/createS3Bucket.sh ${var.aws_s3_bucketName} ${var.aws_region}"
+  }
 }
 
-resource "aws_s3_bucket_acl" "elb_bucket_acl" {
-  bucket = local.log_bucket
-  acl    = "private"
-}
