@@ -1,14 +1,14 @@
 +++
-title = "In-Place Upgrade A2HA to Automate HA"
+title = "In-Place A2HA to Automate HA"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
 [menu.automate]
-title = "In-Place Upgrade A2HA to Automate HA"
+title = "In-Place A2HA to Automate HA"
 parent = "automate/deploy_high_availability/migration"
-identifier = "automate/deploy_high_availability/migration/ha_inplace_upgrade.md In-Place Upgrade A2HA to Automate HA"
+identifier = "automate/deploy_high_availability/migration/ha_inplace_migration.md In-Place A2HA to Automate HA"
 weight = 200
 +++
 
@@ -16,7 +16,7 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
 
 ## Prerequisites
 
-- A2HA cluster should be in healthy state
+- A2HA cluster should be in healthy state to take fresh backup
 
 - A2HA is configured to take backup on mounted network drive (location example : /mnt/automate_backup).
 
@@ -39,13 +39,13 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
           20180508201643    completed  8 minutes old
           20180508201952    completed  4 minutes old
           
-2. Create bootstrap bundle
+2. Create bootstrap bundle from one of automate node.
 
       ```cmd 
       sudo chef-automate bootstrap bundle create bootstrap.abb 
       ```
 
-    Above command will create the bootstrap bundle, copy this bastion or backup dir 
+    Above command will create the bootstrap bundle, copy the same bundle to bastion or backup dir 
 
 3.  Stop each of frontend nodes (automte and chef-server) 
 
@@ -83,17 +83,17 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
 
 
 6. In bastion host take copy of your current workspace and keep it safe for while
-7. remove or rename /hab dir in bashtion host
+7. remove or rename /hab dir in bastion host
 
 ## Installing Latest Automate HA
 Follow Automate HA installation documentations Click [here](/automate/ha_onprim_deployment_procedure/) to know more
 
-in config.toml give same automate IPs as it was in a2ha.rb file
+in config.toml give same IPs and backup config as it was in a2ha.rb file
 
 ## Restore Backup 
 
 once deployment is successful, 
-Now proceed with restore the backup in Automate HA, 
+Now proceed with restoring the backup in Automate HA, 
 login to one of automate node and take current_config,toml file
 ``` sudo chef-automate config show > current_config.toml ```
 
@@ -140,9 +140,9 @@ chef-automate config set applied_config.toml
 {{< /note >}}
 
 {{< note >}}
-** In case of ``` backup_config = "file_system" ``` filed had be give in config.toml of Automate HA deployment, then need to patch below opensearch config from bastion before starting restore.
+In case of ``` backup_config = "file_system" ``` had been provided in config.toml of Automate HA deployment, then need to patch below opensearch config from bastion before starting restore..
 
--   Create a .toml (say os_config.toml) file in **the Provision host** and copy the following template with the path to the repo.
+-   Create a .toml (say os_config.toml) file from **Provision host** and copy the following template with the path to the repo.
     ```sh
       [path]
       repo = "/mnt/automate_backups/elasticsearch"
@@ -168,6 +168,6 @@ sudo chef-automate bootstrap bundle unpack bootstrap.abb
 
 ## Troubleshoot
 
-1. While installing new Automate HA if postgresql not getting started, and in postgesql instance ``` hab svc status ``` shows secret key mismatch error then try cleanup command with new Autoamte HA cli ``` chef-automate cleanup --onprem-deployment``` and then remove /bin/chef-automate from all frontend nodes, now try installation again
+1. While installing new Automate HA if postgresql having any issue in starting, and in postgesql instance ``` hab svc status ``` shows secret key mismatch error then try cleanup command with new Autoamte HA cli ``` chef-automate cleanup --onprem-deployment``` and then remove /bin/chef-automate from all frontend nodes, now try installation again
 
 2. While doing restore if any error related to elasticsearch snapshot please refer Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more
