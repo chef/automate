@@ -47,8 +47,8 @@ const (
 	ERROR_SELF_MANAGED_CONFIG_SHOW  = "Showing the configuration for externally configured %s is not supported."
 	ERROR_SELF_MANAGED_CONFIG_PATCH = "Patching the configuration for externally configured %s is not supported."
 	ERROR_SELF_MANAGED_CONFIG_SET   = "Setting the configuration for externally configured %s is not supported."
-	patching                        = "Patching"
-	setting                         = "Setting"
+	patching                        = "Config Patch"
+	setting                         = "Config Set"
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -561,62 +561,91 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+type ResultConfigSet struct {
+	HostIP string
+	Output string
+	Error  error
+}
+
 // setConfigForFrontEndNodes set the configuration for front end nodes in Automate HA
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string) error {
 	var wg sync.WaitGroup
-	outputChan := make(chan string, len(frontendIps))
-	errorChan := make(chan error, len(frontendIps))
+	resultChan := make(chan ResultConfigSet, len(frontendIps))
+	hostIPChan := make(chan string, 1)
 	configFile := remoteService + timestamp
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, dateFormat)
 
 	for _, hostIP := range frontendIps {
 		wg.Add(1)
-		go func(hostIP string, args []string, configFile string, remoteService string, scriptCommands string, sshUtil SSHUtil, outputChan chan string, errorChan chan error, wg *sync.WaitGroup) {
+		go func(hostIP string, args []string, configFile string, remoteService string, scriptCommands string, sshUtil SSHUtil, resultChan chan ResultConfigSet, hostIPChan chan string, wg *sync.WaitGroup) {
 			defer wg.Done()
-			printConnectionMessage(remoteService, hostIP)
+
+			hostIPChan <- hostIP
 			sshUtil.getSSHConfig().hostIP = hostIP
 
+			rc := ResultConfigSet{hostIP, "", nil}
 			err := sshUtil.copyFileToRemote(args[0], configFile, false)
 			if err != nil {
-				errorChan <- err
+				rc.Error = err
+				resultChan <- rc
 				return
 			}
 
 			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
-				errorChan <- err
+				rc.Error = err
+				resultChan <- rc
 				return
 			}
 
 			err = checkOutputForError(output)
 			if err != nil {
-				errorChan <- err
+				rc.Error = err
+				resultChan <- rc
 				return
 			}
-
-			outputChan <- output
-		}(hostIP, args, configFile, remoteService, scriptCommands, sshUtil, outputChan, errorChan, &wg)
+			rc.Output = output
+			resultChan <- rc
+		}(hostIP, args, configFile, remoteService, scriptCommands, sshUtil, resultChan, hostIPChan, &wg)
 	}
+
+	go func(remoteService string, hostIPChan chan string) {
+		for hostIP := range hostIPChan {
+			printConnectionMessage(remoteService, hostIP)
+		}
+	}(remoteService, hostIPChan)
+
+	errChan := make(chan error, 1)
 
 	// Print the outputs and errors
-	var output string
-	var err error
-	for i := 0; i < len(frontendIps); i++ {
-		select {
-		case output = <-outputChan:
-			writer.Printf(output + "\n")
-			printConfigSuccessMessage(setting, remoteService, frontendIps[i])
-		case err = <-errorChan:
-			writer.Errorf("%v", err)
+	go func(resultChan chan ResultConfigSet, errChan chan error) {
+		for i := 0; i < len(frontendIps); i++ {
+			result := <-resultChan
+			if result.Error != nil {
+				err := errors.Errorf("Host IP %s %s", result.HostIP, result.Error.Error())
+				writer.Errorf("%v", err)
+				errChan <- err
+			} else {
+				writer.Printf("Host IP %s %s", result.HostIP, result.Output+"\n")
+				printConfigSuccessMessage(setting, remoteService, result.HostIP)
+			}
 		}
-	}
+	}(resultChan, errChan)
+
+	errBuffer := strings.Builder{}
+	go func(errChan chan error) {
+		for err := range errChan {
+			errBuffer.WriteString(err.Error() + "\n")
+		}
+	}(errChan)
 
 	wg.Wait()
-	close(outputChan)
-	close(errorChan)
+	close(resultChan)
+	close(hostIPChan)
+	close(errChan)
 
-	if err != nil {
-		return err
+	if errBuffer.Len() > 0 {
+		return status.Errorf(status.ConfigError, errBuffer.String())
 	}
 	return nil
 }
@@ -1004,9 +1033,11 @@ func checkOutputForError(output string) error {
 // printConnectionMessage prints the connection message
 func printConnectionMessage(remoteService string, hostIP string) {
 	writer.Println("Connecting to the " + remoteService + " node : " + hostIP)
+	writer.BufferWriter().Flush()
 }
 
 // printConfigSuccessMessage prints the config success message
 func printConfigSuccessMessage(configType string, remoteService string, hostIP string) {
 	writer.Success(configType + " is completed on " + remoteService + " node : " + hostIP + "\n")
+	writer.BufferWriter().Flush()
 }
