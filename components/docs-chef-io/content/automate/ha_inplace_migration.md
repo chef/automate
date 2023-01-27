@@ -125,7 +125,7 @@ Click [here](/automate/ha_backup_restore_file_system/) to know more.
 
 {{< note >}}
 
-- After the restore command is successfully executed, run the `chef-automate config show` command. Both the ElasticSearch and OpenSearch configs are part of Automate Config. Keep both configs; it won't impact the functionality. After restoring Automate HA will talk to OpenSearch.
+- After the restore command is successfully executed, run the `chef-automate config show` command. Both the ElasticSearch and OpenSearch configs are part of Automate Config. Keep both configs; it won't impact the functionality. After restoring Automate HA is configured to communicate with OpenSearch.
 
 OR
 
