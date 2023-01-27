@@ -87,11 +87,6 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
 
 ## AMI Upgrade Setup For AWS Deployment
 
-### Requirements
-
-1. Two identical clusters located in same/different AWS regions.
-2. Amazon S3 access for both the clusters.
-
 {{< note >}}
 
   For AMI upgrade, The **Primary Cluster** is referred as the old cluster which donot have upgraded AMI and the **New Cluster** is referred as the cluster which have upgraded AMI.
@@ -149,7 +144,13 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
 
     - On New Cluster Trigger restore command from bastion. 
 
-        - To run the restore command, you need to add the OpenSearch credentials to the applied config. If using Chef Managed OpenSearch,For that we need to have automate config and add the below config to it into `current_config.toml` (without any changes).
+        - To run the restore command, you need to add the OpenSearch credentials to the applied config. If using Chef Managed OpenSearch,we need to have automate config.Run the below command in the Chef-Automate node to get the applied config into `current_config.toml`:
+
+        ```bash
+        sudo chef-automate config show > current_config.toml
+        ```
+
+        - Add the below config into `current_config.toml` (without any changes) and copy `current_config.toml` to bastion
 
         ```bash
         [global.v1.external.opensearch.auth.basic_auth]
