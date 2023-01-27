@@ -167,7 +167,7 @@ sudo chef-automate bootstrap bundle unpack bootstrap.abb
 ```
 
 {{< note >}}
-Once Automate HA is up and running with restored data, We can remove old backed up directories sudo ```rm -rf hab-old, it will free up accuired space.
+Once Automate HA is up and running with restored data, We can remove old backed up directories sudo ``` rm -rf hab-old, it will free up accuired space.
 {{< /note >}}
 
 
