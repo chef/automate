@@ -53,12 +53,3 @@ resource "null_resource" "createS3bucket" {
   }
 }
 
-# resource "aws_s3_bucket" "createS3bucket" {
-#   bucket        = local.log_bucket
-#   force_destroy = var.destroy_bucket
-# }
-
-# resource "aws_s3_bucket_acl" "elb_bucket_acl" {
-#   bucket = local.log_bucket
-#   acl    = "private"
-# }
