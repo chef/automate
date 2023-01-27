@@ -1244,7 +1244,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n", subCommand, automateIps[0], err.Error())
 			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s", automateIps[0])
 		}
-		writer.Printf("triggered backup %s commands on Automate node %s \n %s \n", subCommand, automateIps[0], cmdRes)
+		writer.Printf("Triggered backup %s commands on Automate node %s \n %s \n", subCommand, automateIps[0], cmdRes)
 		writer.StartSpinner()
 		err = poolStatus(sshUtil, cmdRes, backupState, subCommand)
 		writer.StopSpinner()
@@ -1263,7 +1263,6 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 }
 
 func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand string) error {
-
 	for {
 		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status", false)
 		if err != nil {
@@ -1280,7 +1279,7 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 				backupState := getBackupStateFromList(backupList, cmdRes)
 				writer.Println(backupState)
 			}
-			writer.Printf("backup %s operation completed \n", subCommand)
+			writer.Printf("\nBackup %s operation completed \n", subCommand)
 			break
 		}
 		time.Sleep(5 * time.Second)
@@ -1289,35 +1288,37 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 }
 
 func startFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
-	writer.Println("starting frontend nodes")
+	writer.Println("Starting frontend nodes")
 	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_START)
 }
 
 func stopFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string) error {
-	writer.Println("stopping frontend nodes")
+	writer.Println("Stopping frontend nodes")
 	return executeOnFrontendNodes(sshUtil, automateIps, chefServerIps, AUTOMATE_CMD_STOP)
 }
 
 func executeOnFrontendNodes(sshUtil SSHUtil, automateIps []string, chefServerIps []string, cmd string) error {
 	for _, automateIp := range automateIps {
-		writer.Printf("executing on automate nodes %s \n", automateIp)
+		writer.Printf("Executing command on automate nodes %s \n", automateIp)
 		sshUtil.getSSHConfig().hostIP = automateIp
 		stopA2Res, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
 		if err != nil {
-			writer.Errorf("error in excuting chef-automate on automate nodes %s \n", err.Error())
-			return status.Wrap(err, status.BackupRestoreError, "error in excuting chef-automate on automate nodes")
+			writer.Errorf("Error in executing command on automate nodes %s \n", err.Error())
+			return status.Wrap(err, status.BackupRestoreError, "error in executing command on automate nodes")
 		}
-		writer.Printf("executed chef-automate from automate node \n %s : %s \n", stopA2Res, automateIp)
+		writer.Println(stopA2Res)
+		writer.Printf("Executed command on automate node %s \n", automateIp)
 	}
 	for _, chefServerIp := range chefServerIps {
-		writer.Printf("executing chef server nodes %s \n", chefServerIp)
+		writer.Printf("Executing command on chef server nodes %s \n", chefServerIp)
 		sshUtil.getSSHConfig().hostIP = chefServerIp
 		stopCSRes, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, true)
 		if err != nil {
-			writer.Errorf("error in executing chef-automate on chef server nodes %s \n", err.Error())
-			return status.Wrap(err, status.BackupRestoreError, "error in executing chef-automate on chef server nodes")
+			writer.Errorf("Error in executing command on chef server nodes %s \n", err.Error())
+			return status.Wrap(err, status.BackupRestoreError, "error in executing command on chef server nodes")
 		}
-		writer.Printf("executed chef-automate from chef server node \n %s : %s \n", stopCSRes, chefServerIp)
+		writer.Println(stopCSRes)
+		writer.Printf("Executed command on chef server node %s \n", chefServerIp)
 	}
 	return nil
 }
