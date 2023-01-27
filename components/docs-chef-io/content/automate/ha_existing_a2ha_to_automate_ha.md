@@ -102,7 +102,7 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
             password = "admin"
         ```
 
-    - In case of ``` backup_config = "file_system" ``` had been provided in config.toml of Automate HA deployment, then need to patch below OpenSearch config from bastion before starting the restore.
+    - In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
         - Create a .toml (say os_config.toml) file from **provision host** and copy the following template with the path to the repo.
 
         ```sh
@@ -138,19 +138,19 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-1. After successfully executing the restore, you will see the below message:
+2. After successfully executing the restore, you will see the below message:
 
     ```bash
     Success: Restored backup 20210622065515
     ```
 
-1. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
+3. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
 
     ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Start the Service in all the frontend nodes with the below command.
+4. Start the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate start

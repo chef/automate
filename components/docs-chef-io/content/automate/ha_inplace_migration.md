@@ -70,7 +70,7 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
     sudo hab svc unload chef/automate-backend-pgleaderchk
     ```
 
-    Check the status using the ```hab svc status``` command. None of the services should be running. Once checked, stop the habitat supervisor with the command ```systemctl stop hab-sup```. Rename /hab dir to something else like /hab-old.
+    Check the status using the `hab svc status` command. None of the services should be running. Once checked, stop the habitat supervisor with the command `systemctl stop hab-sup`. Rename /hab dir to something else like /hab-old.
 
 1. Unload services from each of the Elasticsearch Nodes
 
@@ -83,7 +83,7 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
     sudo hab svc unload chef/automate-backend-kibana
     ```
 
-   Check the status using the ```hab svc status``` command. None of the services should be running. Once checked, stop the habitat supervisor with the command ```systemctl stop hab-sup```. Rename /hab dir to something else like /hab-old.
+   Check the status using the `hab svc status` command. None of the services should be running. Once checked, stop the habitat supervisor with the command `systemctl stop hab-sup`. Rename /hab dir to something else like /hab-old.
 
 1. In the **bastion** host, take a copy of your current workspace and keep it safe for a while.
 1. Remove or Rename /hab dir in the bastion host.
@@ -145,7 +145,7 @@ chef-automate config set applied_config.toml
 
 {{< note >}}
 
-In case ```backup_config = "file_system"``` had been provided in **config.toml** of Automate HA deployment, patch the below OpenSearch config from bastion before starting the restore.
+In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
 
 - Create a `.toml` (say os_config.toml) file from **Provision host** and copy the following template with the path to the repo.
 
@@ -171,11 +171,11 @@ sudo chef-automate bootstrap bundle unpack bootstrap.abb
 ```
 
 {{< note >}}
-Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo ```rm -rf hab-old```, freeing up acquired space.
+Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
 {{< /note >}}
 
 ## Troubleshoot
 
-1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance ```hab svc status``` shows a secret key mismatch error, then try the cleanup command with new Automate HA cli ```chef-automate cleanup --onprem-deployment``` and then remove /bin/chef-automate from all frontend nodes, now try the installation again.
+1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA cli `chef-automate cleanup --onprem-deployment` and then remove /bin/chef-automate from all frontend nodes, now try the installation again.
 
 1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
