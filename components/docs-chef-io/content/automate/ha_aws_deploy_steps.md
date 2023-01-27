@@ -363,3 +363,63 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 {{< warning >}}
   Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
 {{< /warning >}}
+
+### How to Delete single node In AWS Deployment, post deployment.
+The commands require some arguments so that it can determine which types of nodes you want to remove to your HA setup from your bastion host. It needs the ip address of the node you want to remove as as argument when you run the command.
+For example,
+
+- if you want to remove node of automate, you have to run the:
+
+    ```sh
+    chef-automate node remove --automate-ip "<automate-ip-address>"
+    ```
+
+- If you want to remove node of chef-server, you have to run the:
+
+    ```sh
+    chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
+    ```
+
+- If you want to remove node of OpenSearch, you have to run the:
+
+    ```sh
+    chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
+    ```
+
+- If you want to remove node of PostgreSQL you have to run:
+
+    ```sh
+    chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
+    ```
+
+You can mix and match different services if you want to add nodes across various services.
+
+- If you want to remove node of automate and PostgreSQL, you have to run:
+
+    ```sh
+    chef-automate node remove --automate-ip "<automate-ip-address>" --postgresql-ip "<postgresql-ip-address>"
+    ```
+
+- If you want to remove node of automate, chef-server, PostgreSQL and OpenSearch you have to run:
+
+    ```sh
+    chef-automate node add --automate-ip "<automate-ip-address>" --postgresql-ip "<postgresql-ip-address>" --chef-server-ip "<chef-server-ip-address>" --opensearch-ip "<opensearch-ip-address>"
+    ```
+
+Once the command executes, it will remove nodes to your HA setup
+
+### Uninstall chef automate HA
+
+{{< danger >}}
+- Running clean up command will remove all AWS resources created by `provision-infra` command
+- Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
+{{< /danger >}}
+
+To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+```bash
+    chef-automate cleanup --aws-deployment --force
+```
+or
+```bash
+    chef-automate cleanup --aws-deployment
+```
