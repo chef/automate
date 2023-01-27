@@ -113,7 +113,7 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
     chef-automate backup create --no-progress > /var/log/automate-backups.log
     ```
 
-    - Create a bootstrap bundle; this bundle captures any local credentials or secrets that aren't persisted to the database. To create the bootstrap bundle, run the following command in one of the Automate nodes:
+    - Create a bootstrap bundle, this bundle captures any local credentials or secrets that aren't persisted in the database. To create the bootstrap bundle, run the following command in one of the Automate nodes:
 
     ```sh
     chef-automate bootstrap bundle create bootstrap.abb
