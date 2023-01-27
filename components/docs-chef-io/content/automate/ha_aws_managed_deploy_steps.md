@@ -149,6 +149,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    
    #Check Chef Automate HA deployment information, using the following command
    chef-automate info
+   "
    ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.

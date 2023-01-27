@@ -126,6 +126,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status
+   "
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
@@ -289,6 +290,7 @@ Continue with the deployment after updating the config:
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status
+   "
 ```
 
 ### Sample config to setup On-Premise Deployment with AWS Managed Services
@@ -371,6 +373,7 @@ Continue with the deployment after updating the config:
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status
+   "
 ```
 
 ### Sample config to setup On-Premise Deployment with Self Managed Services
