@@ -144,7 +144,7 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
 
     - On New Cluster Trigger restore command from bastion. 
 
-        - To run the restore command, you need to add the OpenSearch credentials to the applied config. If using Chef Managed OpenSearch,we need to have automate config.Run the below command in the Chef-Automate node to get the applied config into `current_config.toml`:
+        - For Chef Managed OpenSearch follow the below steps:
 
         ```bash
         sudo chef-automate config show > current_config.toml
@@ -165,6 +165,6 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
 
         ```
 
-- If you want to reuse the same custom domain used previously, then make sure to update the DNS entry to the Load-Balancer FQDN of the New cluster.
+- If you want to reuse the same custom domain used previously, update your DNS record to point to the Load-Balancer of the new cluster.
 
-- Once the restore is successful ,you can destroy the Primary Cluster.
+- Once the restore is successful you can destroy the Primary Cluster.
