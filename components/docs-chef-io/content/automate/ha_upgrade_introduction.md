@@ -89,7 +89,7 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
 
 {{< note >}}
 
-  In this following section, the old cluster with older AMI Images is referred to as the **Primary Cluster** and the cluster which has upgraded AMI is referred to as the **New Cluster**.
+  In this following section, the old cluster with older AMI Images is referred as the **Primary Cluster** and the cluster which has upgraded AMI is referred as the **New Cluster**.
 
 {{< /note >}}
 
