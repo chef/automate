@@ -566,17 +566,17 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 	var wg sync.WaitGroup
 	outputChan := make(chan string, len(frontendIps))
 	errorChan := make(chan error, len(frontendIps))
+	configFile := remoteService + timestamp
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, dateFormat)
 
-	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, remoteService+timestamp, dateFormat)
-
-	for i, hostIP := range frontendIps {
+	for _, hostIP := range frontendIps {
 		wg.Add(1)
-		go func(i int, hostIP string) {
+		go func(hostIP string, args []string, configFile string, remoteService string, scriptCommands string, sshUtil SSHUtil, outputChan chan string, errorChan chan error, wg *sync.WaitGroup) {
 			defer wg.Done()
 			printConnectionMessage(remoteService, hostIP)
 			sshUtil.getSSHConfig().hostIP = hostIP
 
-			err := sshUtil.copyFileToRemote(args[0], remoteService+timestamp, false)
+			err := sshUtil.copyFileToRemote(args[0], configFile, false)
 			if err != nil {
 				errorChan <- err
 				return
@@ -595,7 +595,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			}
 
 			outputChan <- output
-		}(i, hostIP)
+		}(hostIP, args, configFile, remoteService, scriptCommands, sshUtil, outputChan, errorChan, &wg)
 	}
 
 	// Print the outputs and errors

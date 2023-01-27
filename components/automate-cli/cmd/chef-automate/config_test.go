@@ -216,6 +216,38 @@ func TestSetConfigForPostgresqlAndOpensearch(t *testing.T) {
 	}
 }
 
+func TestSetConfigForFrontEndNodes(t *testing.T) {
+	testCases := []struct {
+		args          []string
+		sshUtil       SSHUtil
+		frontendIps   []string
+		remoteService string
+		timestamp     string
+		isError       bool
+		err           error
+	}{
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "config set", nil),
+			[]string{"127.0.0.3", "127.0.0.4"},
+			"automate",
+			"20060102150405",
+			false,
+			nil,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := setConfigForFrontEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp)
+		if testCase.isError {
+			assert.Error(t, err)
+			assert.EqualError(t, testCase.err, err.Error())
+		} else {
+			assert.NoError(t, err)
+		}
+	}
+}
+
 func getMockSSHUtil(sshConfig *SSHConfig, CFTRError error, CSECOROutput string, CSECORError error) *MockSSHUtilsImpl {
 	return &MockSSHUtilsImpl{
 		getSSHConfigFunc: func() *SSHConfig {
