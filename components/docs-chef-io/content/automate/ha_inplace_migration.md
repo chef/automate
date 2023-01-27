@@ -92,7 +92,7 @@ in config.toml give same IPs and backup config as it was in a2ha.rb file
 
 ## Restore Backup 
 
-once deployment is successful, 
+Once deployment is successful, 
 Now proceed with restoring the backup in Automate HA, 
 login to one of automate node and take current_config,toml file
 ``` sudo chef-automate config show > current_config.toml ```
@@ -121,7 +121,7 @@ Click [here](/automate/ha_backup_restore_file_system/) to know more
 
 {{< note >}}
 
-- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. We can keep both the config; it won't impact the functionality. After restoring Automate HA, talk to OpenSearch.
+- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. We can keep both the config; it won't impact the functionality. After restoring Automate HA will talk to OpenSearch.
 
 OR
 
@@ -140,7 +140,7 @@ chef-automate config set applied_config.toml
 {{< /note >}}
 
 {{< note >}}
-In case of ``` backup_config = "file_system" ``` had been provided in config.toml of Automate HA deployment, then need to patch below opensearch config from bastion before starting restore..
+In case ``` backup_config = "file_system" ``` had been provided in config.toml of Automate HA deployment, then we need to patch the below OpenSearch config from bastion before starting the restore.
 
 -   Create a .toml (say os_config.toml) file from **Provision host** and copy the following template with the path to the repo.
     ```sh
