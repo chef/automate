@@ -143,7 +143,6 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 				}
 
 				if backup_config == "s3" && cleanupFlags.force {
-					// bucket_name := config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetName().Value
 					bucket_name, err := getTheValueFromA2HARB("s3_bucketName")
 					if err != nil {
 						writer.Error("Error in getting bucket_name")
