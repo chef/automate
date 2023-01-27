@@ -19,6 +19,7 @@ This page explains In-Place migration of A2HA to Automate HA This migration invo
 - A2HA cluster should be in healthy state to take fresh backup
 
 - A2HA is configured to take backup on mounted network drive (location example : /mnt/automate_backup).
+- Make sure 60% of space is available.
 
 ## Taking Backup and clean up of instances.
 
@@ -164,6 +165,10 @@ Copy the bootstrap.abb bundle to all the Frontend nodes of the Chef Automate HA 
 ```cmd
 sudo chef-automate bootstrap bundle unpack bootstrap.abb
 ```
+
+{{< note >}}
+Once Automate HA is up and running with restored data, We can remove old backed up directories sudo ```rm -rf hab-old, it will free up accuired space.
+{{< /note >}}
 
 
 ## Troubleshoot
