@@ -606,6 +606,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			}
 			rc.Output = output
 			resultChan <- rc
+
 		}(hostIP, args, configFile, remoteService, scriptCommands, sshUtil, resultChan, hostIPChan, &wg)
 	}
 
@@ -619,8 +620,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 
 	// Print the outputs and errors
 	go func(resultChan chan ResultConfigSet, errChan chan error) {
-		for i := 0; i < len(frontendIps); i++ {
-			result := <-resultChan
+		for result := range resultChan {
 			if result.Error != nil {
 				err := errors.Errorf("Host IP %s %s", result.HostIP, result.Error.Error())
 				writer.Errorf("%v", err)
@@ -630,7 +630,12 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 				printConfigSuccessMessage(setting, remoteService, result.HostIP)
 			}
 		}
+		close(errChan)
 	}(resultChan, errChan)
+
+	wg.Wait()
+	close(resultChan)
+	close(hostIPChan)
 
 	errBuffer := strings.Builder{}
 	go func(errChan chan error) {
@@ -638,11 +643,6 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			errBuffer.WriteString(err.Error() + "\n")
 		}
 	}(errChan)
-
-	wg.Wait()
-	close(resultChan)
-	close(hostIPChan)
-	close(errChan)
 
 	if errBuffer.Len() > 0 {
 		return status.Errorf(status.ConfigError, errBuffer.String())
