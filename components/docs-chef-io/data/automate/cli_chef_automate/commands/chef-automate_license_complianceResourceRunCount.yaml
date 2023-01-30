@@ -41,3 +41,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate license - Chef Automate license management
+compatible_with: Automate

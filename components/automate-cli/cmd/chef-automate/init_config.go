@@ -33,13 +33,13 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
-	initConfigCmd.PersistentFlags().SetAnnotation("file", docs.Compatiblity, []string{docs.CompatiblewithStandalone})
+	initConfigCmd.PersistentFlags().SetAnnotation("file", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	initConfigCmd.PersistentFlags().StringVar(
 		&initConfigFlags.channel,
 		"channel",
 		"current",
 		"Release channel to deploy all services from")
-	initConfigCmd.PersistentFlags().SetAnnotation("channel", docs.Compatiblity, []string{docs.CompatiblewithStandalone})
+	initConfigCmd.PersistentFlags().SetAnnotation("channel", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	initConfigCmd.PersistentFlags().StringVar(
 		&initConfigFlags.upgradeStrategy,
 		"upgrade-strategy",
@@ -85,7 +85,7 @@ var initConfigCmd = &cobra.Command{
 	Long:  "Initialize default configuration and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
-		docs.Compatibility:        docs.CompatiblewithStandalone,
+		docs.Compatibility:       docs.CompatiblewithStandalone,
 	},
 	RunE: runInitConfigCmd,
 }

@@ -293,7 +293,7 @@ func init() {
 		"/hab/a2_deploy_workspace/",
 		"a2ha hab workspace dir path")
 	initConfigHACmd.SetUsageTemplate(UsageTemplate)
-	initConfigHACmd.PersistentFlags().SetAnnotation("path", docs.Compatiblity, []string{docs.CompatiblewithHA})
+	initConfigHACmd.PersistentFlags().SetAnnotation("path", docs.Compatibility, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(initConfigHACmd)
 }
 
