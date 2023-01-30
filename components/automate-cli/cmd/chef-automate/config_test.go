@@ -206,7 +206,7 @@ func TestSetConfigForPostgresqlAndOpensearch(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		err := setConfigForPostgresqlAndOpensearch(testCase.remoteService, testCase.timestamp, testCase.sshUtil, testCase.hostIP, testCase.tomlFilePath)
+		err := setConfigForPostgresqlAndOpensearch(testCase.remoteService, testCase.timestamp, testCase.sshUtil, testCase.hostIP, testCase.tomlFilePath, getMockWriterImpl())
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
@@ -238,7 +238,7 @@ func TestSetConfigForFrontEndNodes(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		err := setConfigForFrontEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp)
+		err := setConfigForFrontEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp, writer)
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
