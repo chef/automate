@@ -228,7 +228,7 @@ func TestSetConfigForFrontEndNodes(t *testing.T) {
 	}{
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "config set", nil),
+			getMockSSHUtil(&SSHConfig{}, nil, "config set operation completed", nil),
 			[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
 			"automate",
 			"20060102150405",

@@ -622,11 +622,11 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 	go func(resultChan chan ResultConfigSet, errChan chan error) {
 		for result := range resultChan {
 			if result.Error != nil {
-				err := errors.Errorf("Host IP %s %s", result.HostIP, result.Error.Error())
+				err := errors.Errorf("Error for Host IP %s : %s", result.HostIP, result.Error.Error())
 				writer.Errorf("%v", err)
 				errChan <- err
 			} else {
-				writer.Printf("Host IP %s %s", result.HostIP, result.Output+"\n")
+				writer.Printf("Output for Host IP %s : %s", result.HostIP, result.Output+"\n")
 				printConfigSuccessMessage(setting, remoteService, result.HostIP)
 			}
 		}
