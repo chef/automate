@@ -303,7 +303,7 @@ var initConfigHACmd = &cobra.Command{
 	Long:  "Initialized default configuration for HA and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
-		docs.Compatiblity:        docs.CompatiblewithHA,
+		docs.Compatibility:       docs.CompatiblewithHA,
 	},
 	RunE: runInitConfigHACmd,
 }

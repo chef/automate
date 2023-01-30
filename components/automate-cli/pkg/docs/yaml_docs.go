@@ -243,10 +243,10 @@ func newStatusDoc() *statusDoc {
 func getCompatibleWithFromAnnotations(cmd *cobra.Command) (string, string) {
 	annotations := cmd.Annotations
 	if len(annotations) > 0 {
-		if annotations[Tag] == "" && annotations[Compatiblity] == CompatiblewithHA {
-			return annotations[Compatiblity], BastionHost
+		if annotations[Tag] == "" && annotations[Compatibility] == CompatiblewithHA {
+			return annotations[Compatibility], BastionHost
 		}
-		return annotations[Compatiblity], annotations[Tag]
+		return annotations[Compatibility], annotations[Tag]
 	}
 
 	return "", ""

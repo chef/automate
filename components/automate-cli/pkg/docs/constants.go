@@ -2,7 +2,7 @@ package docs
 
 const (
 	// NoCheckVersionAnnotation is a cobra key for group annotations
-	Compatiblity             = "compatibility"
+	Compatibility            = "compatibility"
 	CompatiblewithStandalone = "Automate"
 	CompatiblewithHA         = "AutomateHA"
 	Tag                      = "Tag"
