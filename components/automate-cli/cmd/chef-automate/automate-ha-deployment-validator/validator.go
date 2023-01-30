@@ -78,7 +78,7 @@ type HAValidator struct {
 
 // RunHAValidator run the infra validation
 func (validator *HAValidator) RunHAValidator() error {
-	fmt.Println("Flags:", validator.Flags.All)
+	fmt.Println("All Flags:", validator.Flags.All)
 	fmt.Println("ConfigPath:", validator.ConfigPath)
 	fmt.Println("Running HA Validator")
 	if validator.Flags.All {
@@ -91,23 +91,23 @@ func (validator *HAValidator) RunHAValidator() error {
 	}
 
 	if validator.Flags.Bastion {
-		return validator.BastionValidator.Run()
+		validator.BastionValidator.Run()
 	}
 
 	if validator.Flags.Automate {
-		return validator.AutomateValidator.Run()
+		validator.AutomateValidator.Run()
 	}
 
 	if validator.Flags.Chefserver {
-		return validator.CSValidator.Run()
+		validator.CSValidator.Run()
 	}
 
 	if validator.Flags.Postgresql {
-		return validator.PGValidator.Run()
+		validator.PGValidator.Run()
 	}
 
 	if validator.Flags.Opensearch {
-		return validator.OSValidator.Run()
+		validator.OSValidator.Run()
 	}
 
 	return nil
