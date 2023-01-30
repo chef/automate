@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
@@ -23,6 +24,9 @@ var testCmd = &cobra.Command{
 	Long:  "Run smoke test for Automate HA services.",
 	Args:  cobra.RangeArgs(0, 1),
 	RunE:  runTestCmd,
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithHA,
+	},
 }
 
 func runTestCmd(cmd *cobra.Command, args []string) error {

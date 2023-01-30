@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -75,6 +76,9 @@ func newMigratePreflightCmd() *cobra.Command {
 		RunE:    runMigratePreflight,
 		Short:   "Run preflight checks specific to migrating from Chef Automate v1",
 		Aliases: []string{"upgrade-from-v1"},
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithStandalone,
+		},
 	}
 
 	cmd.PersistentFlags().StringVarP(

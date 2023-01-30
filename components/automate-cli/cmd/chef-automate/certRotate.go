@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/toml"
@@ -132,6 +133,9 @@ func init() {
 		Short: "Chef Automate rotate cert",
 		Long:  "Chef Automate CLI command to rotate certificates, this command should always be executed from AutomateHA Bastion Node",
 		RunE:  certRotateCmdFunc(&flagsObj),
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithHA,
+		},
 	}
 
 	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Automate Certificate Rotation")

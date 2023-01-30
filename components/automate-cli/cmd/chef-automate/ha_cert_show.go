@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/stringutils"
@@ -52,6 +53,9 @@ func init() {
 		Use:   "cert COMMAND",
 		Short: "Chef Automate Certificate Management",
 		Long:  "Chef Automate certificate management, this command should always be executed from AutomateHA Bastion Node.",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithHA,
+		},
 	}
 
 	certShowCmd := &cobra.Command{
@@ -59,6 +63,9 @@ func init() {
 		Short: "Chef Automate Certificates Show",
 		Long:  "Chef Automate CLI command to show all certificates on HA cluster, this command should always be executed from AutomateHA Bastion Node",
 		RunE:  certShowCmdFunc(&flagsObj),
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithHA,
+		},
 	}
 
 	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Show Automate Certificates")

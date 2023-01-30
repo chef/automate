@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -17,6 +18,7 @@ var uninstallCmd = &cobra.Command{
 	Long:  uninstallLong,
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatibility:       docs.CompatiblewithStandalone,
 	},
 	RunE: runUninstallCmd,
 }

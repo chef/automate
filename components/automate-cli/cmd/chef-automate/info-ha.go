@@ -5,6 +5,7 @@ package main
 import (
 	"errors"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +20,7 @@ var infoCmd = &cobra.Command{
 	Long:  "Info for Automate HA cluster",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatibility:       docs.CompatiblewithHA,
 	},
 	RunE: runInfoConfigCmd,
 }

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -19,6 +20,7 @@ var workspaceCmd = &cobra.Command{
 	Long:  "Set up Automate HA cluster workspace.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatibility:       docs.CompatiblewithHA,
 	},
 	RunE: runWorkspaceCmd,
 }
