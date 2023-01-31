@@ -245,6 +245,8 @@ func getCompatibleWithFromAnnotations(cmd *cobra.Command) (string, string) {
 	if len(annotations) > 0 {
 		if annotations[Tag] == "" && annotations[Compatibility] == CompatiblewithHA {
 			return annotations[Compatibility], BastionHost
+		} else if annotations[Tag] == "" && annotations[Compatibility] == "" {
+			return "", BastionHost
 		}
 		return annotations[Compatibility], annotations[Tag]
 	}
