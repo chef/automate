@@ -9,4 +9,6 @@ const (
 	BastionHost              = "Bastion"
 	Opensearch               = "Opensearch"
 	PostgreSQL               = "Postgresql"
+	Automate                 = "Automate"
+	FrontEnd                 = "FrontEnd"
 )
