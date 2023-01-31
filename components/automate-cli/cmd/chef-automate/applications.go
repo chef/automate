@@ -27,10 +27,7 @@ func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "applications COMMAND",
 		Short: "Manage applications observability features",
-	},
-	Annotations: map[string]string{
-		docs.Tag: docs.Automate,
-	},
+	}
 }
 
 type applicationsServiceFilters struct {
@@ -366,11 +363,11 @@ func (s *serviceSet) Load() error {
 }
 
 // PrintTSV prints a plain text table of the services
-// * Header: match the widths to the first row so it looks ok
-// * Header: print it to stderr so you can do easy shell redirection/pipes for text
-//   processing
-// * Print table rows as TSV for easier processing, even though the columns
-//   won't align all the time.
+//   - Header: match the widths to the first row so it looks ok
+//   - Header: print it to stderr so you can do easy shell redirection/pipes for text
+//     processing
+//   - Print table rows as TSV for easier processing, even though the columns
+//     won't align all the time.
 func (s *serviceSet) PrintTSV() error {
 	svc := &applications.Service{}
 	if len(s.services) >= 1 {
