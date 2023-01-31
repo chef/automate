@@ -249,7 +249,7 @@ func getCompatibleWithFromAnnotations(cmd *cobra.Command) (string, string) {
 		return annotations[Compatibility], annotations[Tag]
 	}
 
-	return "", ""
+	return "", BastionHost
 
 }
 

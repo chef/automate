@@ -66,3 +66,4 @@ inherited_options:
   compatible_with_options: Automate
 see_also:
 - chef-automate config - Chef Automate configuration
+supported_on: Bastion

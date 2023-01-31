@@ -43,3 +43,4 @@ inherited_options:
     How long to wait for a operation to complete before raising an error
 see_also:
 - chef-automate backup integrity - Chef Automate shared object integrity
+supported_on: Bastion

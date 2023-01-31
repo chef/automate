@@ -43,3 +43,4 @@ see_also:
 - chef-automate backup - Chef Automate backup
 - show - show the shared object integrity metadata
 - validate - validate the shared object integrity
+supported_on: Bastion

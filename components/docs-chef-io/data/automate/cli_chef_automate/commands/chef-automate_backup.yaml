@@ -46,3 +46,4 @@ see_also:
 - show - show the Chef Automate backup details
 - status - show the Chef Automate backup runner status
 - stream-status - Stream the Chef Automate backup runner status
+supported_on: Bastion

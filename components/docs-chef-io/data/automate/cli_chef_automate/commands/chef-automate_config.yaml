@@ -30,3 +30,4 @@ see_also:
 - patch - patch the Chef Automate configuration
 - set - set the Chef Automate configuration
 - show - show the Chef Automate configuration
+supported_on: Bastion
