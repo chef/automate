@@ -251,6 +251,12 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 ## On-Premise Setup with AWS Managed Services
 
+{{< note >}}
+
+-   For AWS-managed and Customer-managed Opensearch & PostgresQL services, the only supported backup is **AWS S3 bucket** (object_storage), i.e., `backup_config="object_storage"` and `endpoint="https://s3.amazonaws.com"`. Back up and restore might file in case of **file_system** or any other **object_storage**
+
+{{< /note >}}
+
 ### Prerequisites
 
 - Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites) to know more.

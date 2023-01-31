@@ -20,6 +20,7 @@ gh_repo = "automate"
 {{< note >}}
 
 -   If the user chooses `backup_config` as `object_storage` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
+-   In the case of AWS-managed and Customer-managed Opensearch & PostgresQL services, the only supported **object_storage** is **AWS S3**, i.e., `backup_config="object_storage"` and `endpoint="https://s3.amazonaws.com"`.
 
 {{< /note >}}
 
@@ -27,8 +28,10 @@ gh_repo = "automate"
 
 This section provides the pre-backup configuration required to back up the data on Object Storage System (Other than AWS S3) like Minio, Non-AWS S3. The steps to set a secret key using commands are given below:
 
+
 ### Configuration in OpenSearch Node
 
+#### For Chef Managed Opensearch and PostgresQL services
 This section provides the pre-backup configuration required to back up the data on Object Storage Systems like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
 1. Log in to all the OpenSearch nodes and follow the steps on all the OpenSearch nodes.
@@ -62,6 +65,12 @@ The final output after running the curl command on all nodes is given below:
 	}
 }
 ```
+
+{{< note >}}
+
+For Customer Managed Opensearch and PostgresQL services, make sure to the services either have IAM role of S3 bucket access attached or `s3.client.default.access_key` and `s3.client.default.secret_key` is added to opensearch-keystore. 
+
+{{< /note >}}
 
 #### Configuration for Automate Node from Provision Host
 
@@ -224,7 +233,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+-   check the chef-automate status in Automate node by running `chef-automate status`.
+-   Also check the hab svc status in automate node by running `hab svc status`.
+-   If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+-   Now, check the status of Automate node and then try running the restore command from bastion.
