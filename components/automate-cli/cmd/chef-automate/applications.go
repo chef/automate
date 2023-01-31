@@ -27,7 +27,10 @@ func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "applications COMMAND",
 		Short: "Manage applications observability features",
-	}
+	},
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 type applicationsServiceFilters struct {
