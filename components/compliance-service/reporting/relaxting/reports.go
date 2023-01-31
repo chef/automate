@@ -520,7 +520,8 @@ func (backend *ES2Backend) GetReport(reportId string, filters map[string][]strin
 }
 
 // GetNodeInfoFromReportID returns report header information of a single report
-func (backend *ES2Backend) GetNodeInfoFromReportID(reportId string, filters map[string][]string) (*reportingapi.NodeHeaderInfo, error) {
+func (backend *ES2Backend) GetNodeInfoFromReportID(reportId string, filters map[string][]string) (
+	*reportingapi.NodeHeaderInfo, error) {
 	var report *reportingapi.NodeHeaderInfo
 	depth, err := backend.NewDepth(filters, false)
 	if err != nil {
@@ -1227,7 +1228,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 
 }
 
-//getProfileMinForControlItem is parsing the  control title form the result of control list from comp-7-r-*
+// getProfileMinForControlItem is parsing the  control title form the result of control list from comp-7-r-*
 func getTitleForControlItem(controlBucket *elastic.AggregationBucketKeyItem) string {
 	var title string
 	var ok bool
@@ -1244,7 +1245,7 @@ func getTitleForControlItem(controlBucket *elastic.AggregationBucketKeyItem) str
 
 }
 
-//getEndTimeForControlItem is parsing the end time form the result of control list from comp-7-r-*
+// getEndTimeForControlItem is parsing the end time form the result of control list from comp-7-r-*
 func getEndTimeForControlItem(controlBucket *elastic.AggregationBucketKeyItem) (*timestamppb.Timestamp, error) {
 	var timestamp *timestamppb.Timestamp
 
@@ -1265,7 +1266,7 @@ func getEndTimeForControlItem(controlBucket *elastic.AggregationBucketKeyItem) (
 	return timestamp, nil
 }
 
-//getProfileMinForControlItem is parsing the profile id,title and version form the result of control list from comp-7-r-*
+// getProfileMinForControlItem is parsing the profile id,title and version form the result of control list from comp-7-r-*
 func getProfileMinForControlItem(controlBucket *elastic.AggregationBucketKeyItem, profileMin *reportingapi.ProfileMin) {
 	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
 		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
@@ -1338,10 +1339,11 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 	return waiverDataCollection, nil
 }
 
-//getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
-//  arguments: filters - is a map of filters that serve as the source for generated es query filters
-//             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
-//  return *elastic.BoolQuery
+// getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
+//
+//	arguments: filters - is a map of filters that serve as the source for generated es query filters
+//	           latestOnly - specifies whether or not we are only interested in retrieving only the latest report
+//	return *elastic.BoolQuery
 func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
 	utils.DeDupFilters(filters)
 	logrus.Debugf("????? Called getFiltersQuery with filters=%+v, latestOnly=%t", filters, latestOnly)
@@ -1605,14 +1607,14 @@ func containsWildcardChar(value string) bool {
 	return false
 }
 
-//  getFiltersQueryForDeepReport - builds up an elasticsearch query filter based on the reportId filters map passed in.
-//   This func ignores all but the profile_id and control filter.  If a single profile_id or a single profile_id and a
-//   child control from the single profile_id is passed in, then we are in deep filtering mode and the
-//   fetchSourceContexts will be adjusted accordingly
-//    arguments:
-//			reportId - the id of the report we are querying for.
-//			filters - is a map of filters that serve as the source for generated es query filters
-//    return *elastic.BoolQuery
+//	 getFiltersQueryForDeepReport - builds up an elasticsearch query filter based on the reportId filters map passed in.
+//	  This func ignores all but the profile_id and control filter.  If a single profile_id or a single profile_id and a
+//	  child control from the single profile_id is passed in, then we are in deep filtering mode and the
+//	  fetchSourceContexts will be adjusted accordingly
+//	   arguments:
+//				reportId - the id of the report we are querying for.
+//				filters - is a map of filters that serve as the source for generated es query filters
+//	   return *elastic.BoolQuery
 func getFiltersQueryForDeepReport(reportId string,
 	filters map[string][]string) *elastic.BoolQuery {
 
@@ -2197,7 +2199,7 @@ func getControlSummaryFilters(controlId []string, filters map[string][]string) *
 
 }
 
-//getMultiControlString takes the list of strings and returns the query string used in search.
+// getMultiControlString takes the list of strings and returns the query string used in search.
 func getMultiControlString(list []string) string {
 	controlList := []string{}
 	for _, control := range list {
@@ -2206,7 +2208,7 @@ func getMultiControlString(list []string) string {
 	return strings.Join(controlList, " ")
 }
 
-//handleSpecialChar takes the string, and add additional char in front of the reserved chars.
+// handleSpecialChar takes the string, and add additional char in front of the reserved chars.
 func handleSpecialChar(term string) string {
 	//maintain `\` always first in the list to stop encoding the characters we are appending.
 	reservedChar := []string{`\`, `/`, `+`, `-`, `=`, `&&`, `||`, `>`, `<`, `!`, `(`, `)`, `{`, `}`, `[`, `]`, `^`, `"`, `~`, `*`, `?`, `:`}
