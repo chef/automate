@@ -11,6 +11,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -90,6 +91,7 @@ func newDeployCmd() *cobra.Command {
 		"skip-preflight",
 		false,
 		"Deploy regardless of pre-flight conditions")
+	cmd.PersistentFlags().SetAnnotation("skip-preflight", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.overrideOrigin,
 		"override-origin",
@@ -110,21 +112,25 @@ func newDeployCmd() *cobra.Command {
 		"channel",
 		"",
 		"Release channel to deploy all services from")
+	cmd.PersistentFlags().SetAnnotation("channel", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.upgradeStrategy,
 		"upgrade-strategy",
 		"at-once",
 		"Upgrade strategy to use for this deployment.")
+	cmd.PersistentFlags().SetAnnotation("upgrade-strategy", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.certPath,
 		"certificate",
 		"",
 		"The path to a certificate that should be used for external TLS connections (web and API).")
+	cmd.PersistentFlags().SetAnnotation("certificate", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.keyPath,
 		"private-key",
 		"",
 		"The path to a private key corresponding to the TLS certificate.")
+	cmd.PersistentFlags().SetAnnotation("private-key", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.adminPassword,
 		"admin-password",
@@ -140,6 +146,7 @@ func newDeployCmd() *cobra.Command {
 		"fqdn",
 		"",
 		"The fully-qualified domain name that Chef Automate can be accessed at. (default: hostname of this machine)")
+	cmd.PersistentFlags().SetAnnotation("fqdn", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.airgap,
 		"airgap-bundle",
@@ -165,6 +172,7 @@ func newDeployCmd() *cobra.Command {
 		"product",
 		nil,
 		"Product to deploy")
+	cmd.PersistentFlags().SetAnnotation("product", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	cmd.PersistentFlags().StringVar(
 		&deployCmdFlags.bootstrapBundlePath,
 		"bootstrap-bundle",

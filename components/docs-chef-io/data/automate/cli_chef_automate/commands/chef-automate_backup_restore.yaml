@@ -47,7 +47,7 @@ inherited_options:
 - name: no-progress
   default_value: "false"
   usage: Don't follow operation progress
-  compatible_with_options: AutomateHA
+  compatible_with_options: Automate
 - name: request-timeout
   shorthand: r
   default_value: "20"

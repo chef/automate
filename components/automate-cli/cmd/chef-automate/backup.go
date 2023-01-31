@@ -107,7 +107,7 @@ func init() {
 	backupCmd.AddCommand(streamStatusBackupCmd)
 
 	backupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.noProgress, "no-progress", "", false, "Don't follow operation progress")
-	backupCmd.PersistentFlags().SetAnnotation("no-progress", docs.Compatibility, []string{docs.CompatiblewithHA})
+	backupCmd.PersistentFlags().SetAnnotation("no-progress", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	backupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.requestTimeout, "request-timeout", "r", 20, "API request timeout for deployment-service in seconds")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3Endpoint, "s3-endpoint", "", "The S3 region endpoint URL")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3AccessKey, "s3-access-key", "", "The S3 access key ID")
@@ -131,6 +131,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.hartifactsPath, "hartifacts", "", "", "The local path to search for override packages")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.channel, "channel", "c", "current", "The habitat channel from which to install packages")
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.upgrade, "upgrade", "u", false, "Upgrade to the latest package versions when restoring backups")
+	backupCmd.PersistentFlags().SetAnnotation("upgrade", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.skipPreflight, "skip-preflight", "", false, "Skip preflight checks when restoring a backup")
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.skipBootstrap, "skip-bootstrap", "", false, "Skip bootstrapping the machine with Habitat")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.airgap, "airgap-bundle", "", "The artifact to use for an air-gapped installation")

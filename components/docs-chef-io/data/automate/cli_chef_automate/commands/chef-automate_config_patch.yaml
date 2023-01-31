@@ -22,6 +22,7 @@ options:
   default_value: "false"
   usage: |
     Patch toml configuration to the all frontend nodes[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: frontend
   shorthand: f
   default_value: "false"
@@ -62,5 +63,6 @@ inherited_options:
   shorthand: t
   default_value: "10"
   usage: Request timeout in seconds
+  compatible_with_options: Automate
 see_also:
 - chef-automate config - Chef Automate configuration

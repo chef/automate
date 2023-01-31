@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -60,18 +61,28 @@ func init() {
 
 	//config show flags
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml [Standalone]")
+	showConfigCmd.PersistentFlags().SetAnnotation("overwrite", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Shows configurations from Automate node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Shows configurations from Chef-server node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Shows configurations from PostgresQL node")
+	showConfigCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Shows configurations from OpenSearch node")
+	showConfigCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Shows configurations from Automate node(HA)[DUPLICATE]")
+	showConfigCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.chef_server, "cs", false, "Shows configurations from Chef-server node(HA)[DUPLICATE]")
+	showConfigCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Shows configurations from PostgresQL node[DUPLICATE]")
+	showConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.opensearch, "os", false, "Shows configurations from OpenSearch node[DUPLICATE]")
+	showConfigCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	// config patch flags
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Patch toml configuration to the all frontend nodes")
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.frontend, "fe", false, "Patch toml configuration to the all frontend nodes[DUPLICATE]")
+	patchConfigCmd.PersistentFlags().SetAnnotation("fe", docs.Compatibility, []string{docs.CompatiblewithHA})
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Patch toml configuration to the automate node")
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Patch toml configuration to the automate node[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Patch toml configuration to the chef_server node")
@@ -93,6 +104,7 @@ func init() {
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
+	configCmd.PersistentFlags().SetAnnotation("timeout", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	RootCmd.AddCommand(configCmd)
 }
@@ -132,7 +144,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		if isManagedServicesOn() {
 			err := errorOnSelfManaged(configCmdFlags.postgresql, configCmdFlags.opensearch)
 			if err != nil {
-				return status.Annotate(err, status.InvalidCommandArgsError)
+				return status.Annotate(err,  status.InvalidCommandArgsError)
 			}
 		}
 
@@ -435,7 +447,7 @@ func patchConfigForPostgresqlNodes(args []string, remoteService string, sshUtil 
 // patchConfigForOpensearch patches the config for open-search nodes in Automate HA
 func patchConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
+		return status.Errorf(status.InvalidCommandArgsError,  ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
 	}
 
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
