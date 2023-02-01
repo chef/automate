@@ -15,5 +15,5 @@ func CommandBuilder(cmd *cobra.Command, args []string) string {
 			fullCommand += " --" + flag.Name + " " + flag.Value.String()
 		}
 	})
-	return fmt.Sprint(fullCommand + " " + strings.Join(args, " "))
+	return fmt.Sprint("sudo " + fullCommand + " " + strings.Join(args, " "))
 }
