@@ -25,6 +25,9 @@ func addNodeHACmd() *cobra.Command {
 		Short: "Add new node in HA",
 		Long:  `Add new node in HA`,
 		RunE:  runAddNodeHACmd(&addDeleteNodeHACmdFlags),
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithHA,
+		},
 	}
 	addNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.automateIp, "automate-ips", "A", "", "New automate ip addresses to be added. Works with --onprem-mode flag")
 	addNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server-ips", "C", "", "New chef-server ip addresses to be added. Works with --onprem-mode flag")
