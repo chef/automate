@@ -304,6 +304,7 @@ var initConfigHACmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		docs.Compatibility:       docs.CompatiblewithHA,
+		docs.Tag:                 docs.FrontEnd,
 	},
 	RunE: runInitConfigHACmd,
 }
