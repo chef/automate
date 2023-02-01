@@ -14,19 +14,18 @@ import (
 )
 
 type DeleteNodeAWSImpl struct {
-	config                  AwsConfigToml
-	copyConfigForUserPrompt AWSConfigIp
-	automateIpList          []string
-	chefServerIpList        []string
-	opensearchIpList        []string
-	postgresqlIpList        []string
-	nodeUtils               NodeOpUtils
-	flags                   AddDeleteNodeHACmdFlags
-	configpath              string
-	terraformPath           string
-	writer                  *cli.Writer
-	fileUtils               fileutils.FileUtils
-	sshUtil                 SSHUtil
+	config           AwsConfigToml
+	automateIpList   []string
+	chefServerIpList []string
+	opensearchIpList []string
+	postgresqlIpList []string
+	nodeUtils        NodeOpUtils
+	flags            AddDeleteNodeHACmdFlags
+	configpath       string
+	terraformPath    string
+	writer           *cli.Writer
+	fileUtils        fileutils.FileUtils
+	sshUtil          SSHUtil
 	AWSConfigIp
 }
 
@@ -144,10 +143,10 @@ func (dna *DeleteNodeAWSImpl) prepare() error {
 func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	dna.writer.Println("Existing nodes:")
 	dna.writer.Println("================================================")
-	dna.writer.Println("Automate => " + strings.Join(dna.copyConfigForUserPrompt.configAutomateIpList, ", "))
-	dna.writer.Println("Chef-Server => " + strings.Join(dna.copyConfigForUserPrompt.configChefServerIpList, ", "))
-	dna.writer.Println("OpenSearch => " + strings.Join(dna.copyConfigForUserPrompt.configOpensearchIpList, ", "))
-	dna.writer.Println("Postgresql => " + strings.Join(dna.copyConfigForUserPrompt.configPostgresqlIpList, ", "))
+	dna.writer.Println("Automate => " + strings.Join(dna.AWSConfigIp.configAutomateIpList, ", "))
+	dna.writer.Println("Chef-Server => " + strings.Join(dna.AWSConfigIp.configChefServerIpList, ", "))
+	dna.writer.Println("OpenSearch => " + strings.Join(dna.AWSConfigIp.configOpensearchIpList, ", "))
+	dna.writer.Println("Postgresql => " + strings.Join(dna.AWSConfigIp.configPostgresqlIpList, ", "))
 	dna.writer.Println("")
 	dna.writer.Println("Nodes to be deleted:")
 	dna.writer.Println("================================================")
@@ -361,6 +360,5 @@ func (dna *DeleteNodeAWSImpl) getAwsHAIp() error {
 		return err
 	}
 	dna.AWSConfigIp = *ConfigIp
-	dna.copyConfigForUserPrompt = *ConfigIp
 	return nil
 }

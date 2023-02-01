@@ -183,6 +183,59 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 	assert.Contains(t, err.Error(), multipleIpAddressError)
 }
 
+func TestDeletenodeAWSModify(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		automateIp: "192.0.0.1",
+	}
+	nodeDelete, _ := NewDeleteNodeAWS(
+		w.CliWriter,
+		flags,
+		&MockNodeUtilsImpl{
+			getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+				return &AWSConfigIp{
+					configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+					configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+					configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+				}, nil
+			},
+			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+				return nil, &SSHConfig{}, nil
+			},
+			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+				return nil
+			},
+			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+				return nil
+			},
+			getModeFromConfigFunc: func(path string) (string, error) {
+				return EXISTING_INFRA_MODE, nil
+			},
+			isManagedServicesOnFunc: func() bool {
+				return false
+			},
+			pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+			isA2HARBFileExistFunc: func() bool {
+				return true
+			},
+		},
+		CONFIG_TOML_PATH_AWS,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
+	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
+	assert.NoError(t, err)
+	err = nodeDelete.validate()
+	assert.NoError(t, err)
+	err = nodeDelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, "4", nodeDelete.(*DeleteNodeAWSImpl).config.Automate.Config.InstanceCount)
+}
+
 func TestDeletenodeAWSExecutNoError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
