@@ -7,17 +7,21 @@ options:
 - name: a2
   default_value: "false"
   usage: Patch toml configuration to the automate node[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: automate
   shorthand: a
   default_value: "false"
   usage: Patch toml configuration to the automate node
+  compatible_with_options: AutomateHA
 - name: chef_server
   shorthand: c
   default_value: "false"
   usage: Patch toml configuration to the chef_server node
+  compatible_with_options: AutomateHA
 - name: cs
   default_value: "false"
   usage: Patch toml configuration to the chef_server node[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: fe
   default_value: "false"
   usage: |
@@ -36,6 +40,7 @@ options:
   shorthand: o
   default_value: "false"
   usage: Patch toml configuration to the opensearch node
+  compatible_with_options: AutomateHA
 - name: os
   default_value: "false"
   usage: Patch toml configuration to the opensearch node[DUPLICATE]
@@ -43,10 +48,12 @@ options:
 - name: pg
   default_value: "false"
   usage: Patch toml configuration to the postgresql node[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: postgresql
   shorthand: p
   default_value: "false"
   usage: Patch toml configuration to the postgresql node
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: auto-approve
   shorthand: "y"
