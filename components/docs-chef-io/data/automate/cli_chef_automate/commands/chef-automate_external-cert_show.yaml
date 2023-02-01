@@ -25,4 +25,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate external-cert - Manage Chef Automate's external certificate
-supported_on: Bastion
+supported_on: FrontEnd
