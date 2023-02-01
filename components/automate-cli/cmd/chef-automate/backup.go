@@ -131,7 +131,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.hartifactsPath, "hartifacts", "", "", "The local path to search for override packages")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.channel, "channel", "c", "current", "The habitat channel from which to install packages")
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.upgrade, "upgrade", "u", false, "Upgrade to the latest package versions when restoring backups")
-	backupCmd.PersistentFlags().SetAnnotation("upgrade", docs.Compatibility, []string{docs.CompatiblewithStandalone})
+	restoreBackupCmd.PersistentFlags().SetAnnotation("upgrade", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.skipPreflight, "skip-preflight", "", false, "Skip preflight checks when restoring a backup")
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.skipBootstrap, "skip-bootstrap", "", false, "Skip bootstrapping the machine with Habitat")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.airgap, "airgap-bundle", "", "The artifact to use for an air-gapped installation")

@@ -26,6 +26,7 @@ options:
   default_value: "false"
   usage: |
     Upgrade to the latest package versions when restoring backups
+  compatible_with_options: Automate
 - name: wait-timeout
   shorthand: t
   default_value: "43200"
