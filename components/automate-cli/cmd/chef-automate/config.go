@@ -135,6 +135,9 @@ var setConfigCmd = &cobra.Command{
 	Long:  "Set the Chef Automate configuration for the deployment. It will replace the Chef Automate configuration with the given configuration and apply any required changes.",
 	RunE:  runSetCommand,
 	Args:  cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 func runShowCmd(cmd *cobra.Command, args []string) error {

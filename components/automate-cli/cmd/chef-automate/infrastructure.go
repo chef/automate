@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -21,6 +22,9 @@ var infrastructureCmd = &cobra.Command{
 	Use:   "infrastructure COMMAND",
 	Short: "Chef Automate infrastructure",
 	Long:  "Commands for automation infrastructure management, for data related to chef-client runs and chef-server actions.",
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var nodeDeleteCmd = &cobra.Command{
@@ -29,6 +33,9 @@ var nodeDeleteCmd = &cobra.Command{
 	Long:  "",
 	RunE:  runDeleteNodeCmd,
 	Args:  cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 func runDeleteNodeCmd(cmd *cobra.Command, args []string) error {

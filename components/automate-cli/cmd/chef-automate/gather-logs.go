@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/gatherlogs"
@@ -41,6 +42,9 @@ func newGatherLogsCmd() *cobra.Command {
 		Long:  "Collect system diagnostics and logs from Chef Automate and other services",
 		RunE:  runGatherLogsCmd,
 		Args:  cobra.RangeArgs(0, 3),
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	gatherLogsCmd.Flags().BoolVarP(
@@ -635,8 +639,8 @@ func init() {
 	RootCmd.AddCommand(newGatherLogsCmd())
 }
 
-//gatherLogsFromServerForFrontendNodes checks for hab svc status and for deployment service error
-//Gather the logs for all frontend nodes
+// gatherLogsFromServerForFrontendNodes checks for hab svc status and for deployment service error
+// Gather the logs for all frontend nodes
 func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint64) error {
 	habSupErrorMsg := `
 	* * * chef-automate node services are down
@@ -657,7 +661,7 @@ func gatherLogsFromServerForFrontendNodes(outfileOverride string, logLines uint6
 	return gatherLogsFromServer(outfileOverride, logLines)
 }
 
-//gatherLogsForBackendNodes checks for hab svc status
+// gatherLogsForBackendNodes checks for hab svc status
 // Gather the logs for all backend nodes
 func gatherLogsForBackendNodes(outfileOverride string, logLines uint64) error {
 	habSupErrorMsg := `

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -15,6 +16,9 @@ var restartServicesCmd = &cobra.Command{
 	Short: "restart deployment services",
 	Long:  "Restart services for a deployment",
 	RunE:  runRestartServices,
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 func runRestartServices(cmd *cobra.Command, args []string) error {

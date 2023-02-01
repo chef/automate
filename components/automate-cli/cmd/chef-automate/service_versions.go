@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -17,6 +18,9 @@ var serviceVersionsCmd = &cobra.Command{
 	Short: "Retrieve the versions of the individual Chef Automate services",
 	Long:  "Retrieve the versions of the individual Chef Automate services",
 	RunE:  runServiceVersionsCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 func runServiceVersionsCmd(cmd *cobra.Command, args []string) error {

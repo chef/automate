@@ -70,6 +70,9 @@ var upgradeStatusCmd = &cobra.Command{
 	Long:  "Get upgrade status of Chef Automate",
 	RunE:  statusUpgradeCmd,
 	Args:  cobra.MaximumNArgs(0),
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 const disableMaintenanceModeCmd = `chef-automate maintenance off`

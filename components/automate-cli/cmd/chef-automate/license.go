@@ -29,12 +29,18 @@ import (
 var licenseCmd = &cobra.Command{
 	Use:   "license COMMAND",
 	Short: "Chef Automate license management",
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var licenseStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Retrieve Chef Automate license status",
 	RunE:  runLicenseStatusCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var licenseApplyLong = `Apply Chef Automate license token.
@@ -47,6 +53,9 @@ var licenseApplyCmd = &cobra.Command{
 	Long:  licenseApplyLong,
 	RunE:  runLicenseApplyCmd,
 	Args:  cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var licenseUsageCmd = &cobra.Command{

@@ -231,6 +231,9 @@ var streamStatusBackupCmd = &cobra.Command{
 	Long:  "Stream the Chef Automate backup runner status",
 	RunE:  runStreamBackupStatus,
 	Args:  cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var cancelBackupCmd = &cobra.Command{
