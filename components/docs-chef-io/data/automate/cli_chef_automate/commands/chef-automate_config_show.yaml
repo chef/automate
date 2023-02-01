@@ -40,6 +40,7 @@ options:
   shorthand: O
   default_value: "false"
   usage: Overwrite existing config.toml [Standalone]
+  compatible_with_options: Automate
 - name: pg
   default_value: "false"
   usage: Shows configurations from PostgresQL node[DUPLICATE]
