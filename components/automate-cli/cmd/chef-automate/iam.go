@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -147,18 +148,53 @@ func display(v *iam_common.Version) string {
 }
 
 func runIAMVersionCmd(cmd *cobra.Command, args []string) error {
-	ctx := context.Background()
-	apiClient, err := apiclient.OpenConnection(ctx)
+	if isA2HARBFileExist() {
+		return runIAMVersionCmdOnHA(cmd, args)
+	} else {
+		ctx := context.Background()
+		apiClient, err := apiclient.OpenConnection(ctx)
+		if err != nil {
+			return status.Wrap(err, status.APIUnreachableError,
+				"Failed to create a connection to the API")
+		}
+
+		resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
+		if err != nil {
+			return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
+		}
+		writer.Printf("IAM %s\n", display(resp.Version))
+		return nil
+	}
+}
+
+func runIAMVersionCmdOnHA(cmd *cobra.Command, args []string) error {
+	script := CommandBuilder(cmd, args)
+
+	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
-		return status.Wrap(err, status.APIUnreachableError,
-			"Failed to create a connection to the API")
+		return err
 	}
 
-	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
-	if err != nil {
-		return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
+	ips := infra.Outputs.AutomatePrivateIps.Value
+	if len(ips) == 0 {
+		writer.Fail("No automate IPs are found")
+		os.Exit(1)
 	}
-	writer.Printf("IAM %s\n", display(resp.Version))
+
+	sshConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		hostIP:     ips[0],
+	}
+	sshUtil := NewSSHUtil(sshConfig)
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
+	if err != nil {
+		writer.Errorf("%v\n", err)
+		return err
+	}
+	writer.Printf(output + "\n")
 	return nil
 }
 
