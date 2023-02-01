@@ -28,6 +28,10 @@ A Data Feed operates by doing the following:
 
 By default, only Admin users of Chef Automate may create and manage Data Feeds.
 
+{{< note >}}
+You should have ServiceNow installed in your platform. Click [here]({{< relref "servicenow_integration" >}}) to know more.
+{{< /note >}}
+
 ## Data Feed Integration
 
 Data Feed instance sends client run and compliance scan data to the 3rd party integrations available. To add a Data Feed instance in Chef Automate:
