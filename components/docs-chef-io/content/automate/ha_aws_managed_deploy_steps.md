@@ -39,6 +39,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   mkdir -p ~/.aws
   echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
   echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
+  echo "region=<AWS-REGION>" >> ~/.aws/credentials
   ```
 
 - Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
@@ -46,6 +47,15 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 - Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrase for Private Key authentication.
+- Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
+- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
+- If below attribute are not privided, in that case terrafrom code will create and use it.
+  - `aws_os_snapshot_role_arn`
+  - `os_snapshot_user_access_key_id`
+  - `os_snapshot_user_access_key_secret`
+- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code wil tries to create `s3_bucketName`.
+- If you choose `backup_config` as `efs` then deployment code tries to create the EFS and mount on all frontend and backend node.
+- If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete.
 
 {{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
 {{< /warning >}}

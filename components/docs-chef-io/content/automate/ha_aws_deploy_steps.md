@@ -23,7 +23,8 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 ### Prerequisites
 
-- Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
+- Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
+- If you want to use Default VPC we have to create Public and Private Subnet if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
     Set these in `~/.aws/credentials` in Bastion Host:
 
@@ -54,7 +55,10 @@ Run the following steps on Bastion Host Machine:
 {{< note >}}
 
 - Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
-- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
+- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
+- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code wil tries to create `s3_bucketName`.
+- If you choose `backup_config` as `efs` then deployment code tries to create the EFS and mount on all frontend and backend node.
+- If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs`.
 
 {{< /note >}}
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
@@ -98,8 +102,7 @@ Run the following steps on Bastion Host Machine:
      - Set `profile`, by default `profile` is `"default"`
      - Set `region`, by default `region` is `"us-east-1"`
      - Set `aws_vpc_id`, which you had created as Prerequisite step. Example: `"vpc12318h"`
-     - If AWS VPC uses CIDR then set `aws_cidr_block_addr`.
-     - If AWS VPC uses Subnet then set `private_custom_subnets` and `public_custom_subnets` Example: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
+     - Set `private_custom_subnets` and `public_custom_subnets`: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
      - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequisite. This value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
      - Set `setup_managed_services` as `false`, As these deployment steps are for Non-Managed Services AWS Deployment. Default value is `false`.
      - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
