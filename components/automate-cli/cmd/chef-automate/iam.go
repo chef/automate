@@ -186,15 +186,15 @@ func runIAMVersionCmdOnHA(cmd *cobra.Command, args []string) error {
 		sshPort:    infra.Outputs.SSHPort.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 		hostIP:     ips[0],
+		timeout:    10,
 	}
 	sshUtil := NewSSHUtil(sshConfig)
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
-		writer.Errorf("%v\n", err)
 		return err
 	}
-	writer.Printf(output + "\n")
+	writer.Print(output)
 	return nil
 }
 
