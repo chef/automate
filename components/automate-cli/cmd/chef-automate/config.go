@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"fmt"
@@ -570,16 +569,12 @@ type ResultConfigSet struct {
 
 // setConfigForFrontEndNodes set the configuration for front end nodes in Automate HA
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
-	wg := &sync.WaitGroup{}
 	resultChan := make(chan ResultConfigSet, len(frontendIps))
-	hostIPChan := make(chan string)
 	configFile := remoteService + timestamp
 	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, dateFormat)
-
 	originalSSHConfig := sshUtil.getSSHConfig()
 
 	for _, hostIP := range frontendIps {
-
 		newSSHConfig := &SSHConfig{
 			sshUser:    originalSSHConfig.sshUser,
 			sshPort:    originalSSHConfig.sshPort,
@@ -588,20 +583,9 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 		}
 		newSSHUtil := NewSSHUtil(newSSHConfig)
 
-		wg.Add(1)
-		go func(args []string, configFile string, remoteService string, scriptCommands string, newSSHUtil SSHUtil, resultChan chan ResultConfigSet, hostIPChan chan string, wg *sync.WaitGroup) {
-			defer wg.Done()
+		printConnectionMessage(remoteService, hostIP, cliWriter)
 
-			// Close the channels when all the results are received
-			defer func(rc chan ResultConfigSet, hc chan string) {
-				if len(rc) == cap(rc) {
-					close(rc)
-					close(hc)
-				}
-			}(resultChan, hostIPChan)
-
-			hostIPChan <- newSSHUtil.getSSHConfig().hostIP
-
+		go func(args []string, configFile string, remoteService string, scriptCommands string, newSSHUtil SSHUtil, resultChan chan ResultConfigSet) {
 			rc := ResultConfigSet{newSSHUtil.getSSHConfig().hostIP, "", nil}
 			err := newSSHUtil.copyFileToRemote(args[0], configFile, false)
 			if err != nil {
@@ -609,14 +593,12 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 				resultChan <- rc
 				return
 			}
-
 			output, err := newSSHUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
 				return
 			}
-
 			err = checkOutputForError(output)
 			if err != nil {
 				rc.Error = err
@@ -625,52 +607,31 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 			}
 			rc.Output = output
 			resultChan <- rc
-
-		}(args, configFile, remoteService, scriptCommands, newSSHUtil, resultChan, hostIPChan, wg)
+		}(args, configFile, remoteService, scriptCommands, newSSHUtil, resultChan)
 	}
 
-	wg.Add(1)
-	go func(remoteService string, hostIPChan chan string, wg *sync.WaitGroup) {
-		defer wg.Done()
-		for hostIP := range hostIPChan {
-			printConnectionMessage(remoteService, hostIP, cliWriter)
+	for i := 0; i < len(frontendIps); i++ {
+		result := <-resultChan
+
+		if i == 0 {
+			writer.StopSpinner()
+			cliWriter.Println("=====================================================")
 		}
-	}(remoteService, hostIPChan, wg)
 
-	errChan := make(chan error)
-
-	// Print the outputs and errors
-	wg.Add(1)
-	go func(resultChan chan ResultConfigSet, errChan chan error, wg *sync.WaitGroup) {
-		defer wg.Done()
-		for result := range resultChan {
-			if result.Error != nil {
-				err := errors.Errorf("Error for Host IP %s : %s", result.HostIP, result.Error.Error())
-				cliWriter.Errorf("%v", err)
-				errChan <- err
-			} else {
-				cliWriter.Printf("Output for Host IP %s : %s", result.HostIP, result.Output+"\n")
-				printConfigSuccessMessage(setting, remoteService, result.HostIP, cliWriter)
-			}
+		if result.Error != nil {
+			printConfigErrorMessage(setting, remoteService, result.HostIP, cliWriter, result.Error.Error())
+		} else {
+			cliWriter.Printf("Output for Host IP %s : %s", result.HostIP, result.Output+"\n")
+			printConfigSuccessMessage(setting, remoteService, result.HostIP, cliWriter)
 		}
-		close(errChan)
-	}(resultChan, errChan, wg)
 
-	errBuffer := strings.Builder{}
-	wg.Add(1)
-	go func(errChan chan error, wg *sync.WaitGroup) {
-		defer wg.Done()
-		for err := range errChan {
-			errBuffer.WriteString(err.Error() + "\n")
+		if i < len(frontendIps)-1 {
+			cliWriter.Println("=====================================================")
+			writer.StartSpinner()
 		}
-	}(errChan, wg)
-
-	wg.Wait()
-
-	if errBuffer.Len() > 0 {
-		return status.Errorf(status.ConfigError, errBuffer.String())
 	}
 
+	close(resultChan)
 	return nil
 }
 
@@ -1057,6 +1018,12 @@ func checkOutputForError(output string) error {
 // printConnectionMessage prints the connection message
 func printConnectionMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
 	cliWriter.Println("Connecting to the " + remoteService + " node : " + hostIP)
+	cliWriter.BufferWriter().Flush()
+}
+
+// printConfigErrorMessage prints the config error message
+func printConfigErrorMessage(configType string, remoteService string, hostIP string, cliWriter *cli.Writer, err string) {
+	cliWriter.Fail(configType + " failed on " + remoteService + " node : " + hostIP + " with error:\n" + err + "\n")
 	cliWriter.BufferWriter().Flush()
 }
 
