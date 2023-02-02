@@ -39,6 +39,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
   ```bash
   mkdir -p ~/.aws
+  echo "[default]" >>  ~/.aws/credentials
   echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
   echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
   echo "region=<AWS-REGION>" >> ~/.aws/credentials
