@@ -48,7 +48,7 @@ var (
 	moveStateCommand = `terraform state mv "module.aws.aws_instance.%[1]s[%[2]d]" "module.aws.aws_instance.%[1]s[%[3]d]"`
 )
 
-func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) (HAModifyAndDeploy, error) {
+func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
 	return &DeleteNodeAWSImpl{
 		config:           AwsConfigToml{},
 		automateIpList:   []string{},
@@ -62,17 +62,12 @@ func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUti
 		writer:           writer,
 		fileUtils:        fileutils,
 		sshUtil:          sshUtil,
-	}, nil
+	}
 }
 
 func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if !dna.nodeUtils.isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
-	}
-
-	err := dna.getAwsHAIp()
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error getting AWS instance Ip")
 	}
 
 	if dna.flags.automateIp == "" &&
@@ -82,7 +77,7 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
-	err = dna.validate()
+	err := dna.validate()
 	if err != nil {
 		return err
 	}
@@ -246,6 +241,10 @@ func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
 	return nil
 }
 func (dna *DeleteNodeAWSImpl) validate() error {
+	err := dna.getAwsHAIp()
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error getting AWS instance Ip")
+	}
 	dna.automateIpList, dna.chefServerIpList, dna.opensearchIpList, dna.postgresqlIpList = splitIPCSV(
 		dna.flags.automateIp,
 		dna.flags.chefServerIp,

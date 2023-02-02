@@ -57,10 +57,7 @@ func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deplo
 		}
 	case AWS_MODE:
 		if !addDeleteNodeHACmdFlags.onPremMode {
-			hamd, err = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
-			if err != nil {
-				err = fmt.Errorf("terraform output file error")
-			}
+			hamd = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
 			err = fmt.Errorf("flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
 		}
