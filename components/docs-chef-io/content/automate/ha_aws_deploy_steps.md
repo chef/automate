@@ -58,7 +58,7 @@ Run the following steps on Bastion Host Machine:
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
 - If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code wil tries to create `s3_bucketName`.
 - If you choose `backup_config` as `efs` then deployment code tries to create the EFS and mount on all frontend and backend node.
-- If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs`.
+- If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
 
 {{< /note >}}
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
@@ -143,10 +143,42 @@ Run the following steps on Bastion Host Machine:
       "
    ```
 
-Note: DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
+1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
+  If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
+  
+- create a file `a2.fqdn.toml`
+
+  ```toml
+  [global]
+   [global.v1]
+    fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTP"
+  ```
+
+- Run the command to apply the config from bastion
+
+  ```toml
+   chef-automate config patch a2.fqdn.toml --automate
+  ```
+
+- create a file `cs.fqdn.toml`
+  
+  ```toml
+  [global]
+   [global.v1]
+    fqdn = "AUTOMATE-DNS-URL-WITHOUT-HTTPS"
+  [global.v1.external.automate]
+    node = "https://AUTOMATE-DNS-URL" 
+  ```
+
+- Run the command to apply the config from the bastion
+
+  ```toml
+   chef-automate config patch cs.fqdn.toml --chef_server
+  ```
+
+{{< note >}} DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command. {{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-
 
 #### Sample config
 
