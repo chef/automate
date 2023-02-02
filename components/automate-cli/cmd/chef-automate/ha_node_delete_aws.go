@@ -276,7 +276,9 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 
 func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 	errorList := list.New()
-	if len(dna.automateIpList) == 1 {
+	if len(dna.automateIpList) > 1 {
+		errorList.PushBack("only one automate is allowed to delete for aws deployment type")
+	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.Automate.Config.InstanceCount, -len(dna.automateIpList), AUTOMATE_MIN_INSTANCE_COUNT)
 		if err != nil {
 			errorList.PushBack("Error occurred in calculating automate final instance count")
@@ -285,10 +287,10 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. Automate instance count cannot be less than %d. Final count %d not allowed.", AUTOMATE_MIN_INSTANCE_COUNT, finalCount))
 		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configAutomateIpList, dna.automateIpList, "Automate"))
-	} else if len(dna.automateIpList) != 0 {
-		errorList.PushBack("only one automate is allowed to delete for aws deployment type")
 	}
-	if len(dna.chefServerIpList) == 1 {
+	if len(dna.chefServerIpList) > 1 {
+		errorList.PushBack("only one Chef server is allowed to delete for aws deployment type")
+	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.ChefServer.Config.InstanceCount, -len(dna.chefServerIpList), CHEF_SERVER_MIN_INSTANCE_COUNT)
 		if err != nil {
 			errorList.PushBack("Error occurred in calculating chef server final instance count")
@@ -297,10 +299,10 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. Chef Server instance count cannot be less than %d. Final count %d not allowed.", CHEF_SERVER_MIN_INSTANCE_COUNT, finalCount))
 		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configChefServerIpList, dna.chefServerIpList, "Chef-Server"))
-	} else if len(dna.chefServerIpList) != 0 {
-		errorList.PushBack("only one Chef server is allowed to delete for aws deployment type")
 	}
-	if len(dna.opensearchIpList) == 1 {
+	if len(dna.opensearchIpList) > 1 {
+		errorList.PushBack("only one opensearch is allowed to delete for aws deployment type")
+	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.Opensearch.Config.InstanceCount, -len(dna.opensearchIpList), OPENSEARCH_MIN_INSTANCE_COUNT)
 		if err != nil {
 			errorList.PushBack("Error occurred in calculating opensearch final instance count")
@@ -309,10 +311,10 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. OpenSearch instance count cannot be less than %d. Final count %d not allowed.", OPENSEARCH_MIN_INSTANCE_COUNT, finalCount))
 		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configOpensearchIpList, dna.opensearchIpList, "OpenSearch"))
-	} else if len(dna.opensearchIpList) != 0 {
-		errorList.PushBack("only one opensearch is allowed to delete for aws deployment type")
 	}
-	if len(dna.postgresqlIpList) == 1 {
+	if len(dna.postgresqlIpList) > 1 {
+		errorList.PushBack("only one postgresql is allowed to delete for aws deployment type")
+	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.Postgresql.Config.InstanceCount, -len(dna.postgresqlIpList), POSTGRESQL_MIN_INSTANCE_COUNT)
 		if err != nil {
 			errorList.PushBack("Error occurred in calculating postgresql final instance count")
@@ -321,8 +323,6 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 			errorList.PushBack(fmt.Sprintf("Unable to remove node. Postgresql instance count cannot be less than %d. Final count %d not allowed.", POSTGRESQL_MIN_INSTANCE_COUNT, finalCount))
 		}
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configPostgresqlIpList, dna.postgresqlIpList, "Postgresql"))
-	} else if len(dna.postgresqlIpList) != 0 {
-		errorList.PushBack("only one postgresql is allowed to delete for aws deployment type")
 	}
 	return errorList
 }
