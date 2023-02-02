@@ -37,7 +37,7 @@ The steps to add different notifications to the Chef Automate is shown below:
 
 To add a servicenow notification for Chef Automate, follow the steps given below:
 
-![ServiceNow notifications](/images/automate/servicenow-notifications.png)
+![ServiceNow notifications](/images/automate/servicenow-notifications-navigation.png)
 
 1. In the **Settings** tab, navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.
@@ -71,7 +71,7 @@ To delete a ServiceNow notification for Chef Automate:
 
 To add a Slack notification for Chef Automate:
 
-![Slack Navigation](/images/automate/servicenow-notifications-navigation.png)
+![Slack Navigation](/images/automate/notifications-navigation.png)
 
 1. In the **Settings** tab, navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.
