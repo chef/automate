@@ -105,14 +105,18 @@ func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []st
 
 // certShow is the return function for all cert show commands
 func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
+	_,err:=c.certShowHelper(false)
+	return err
+}
+func (c *certShowImpl) certShowHelper(helperMode bool)(*certShowCertificates,error){
 	if !c.nodeUtils.isA2HARBFileExist() {
-		return status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
+		return nil,status.New(status.InvalidCommandArgsError, AUTOMATE_HA_INVALID_BASTION)
 	}
 
 	remoteService := c.getRemoteService()
 
 	if remoteService == "" && len(strings.TrimSpace(c.flags.node)) > 0 {
-		return status.New(status.InvalidCommandArgsError, "Node flag can only be used with service flags like --automate, --chef_server, --postgresql or --opensearch")
+		return nil,status.New(status.InvalidCommandArgsError, "Node flag can only be used with service flags like --automate, --chef_server, --postgresql or --opensearch")
 	}
 
 	deployerType := c.nodeUtils.getModeOfDeployment()
@@ -121,26 +125,30 @@ func (c *certShowImpl) certShow(cmd *cobra.Command, args []string) error {
 	if deployerType == EXISTING_INFRA_MODE {
 		config, err := c.nodeUtils.getInfraConfig(&c.sshUtil)
 		if err != nil {
-			return err
+			return nil,err
 		}
 		certInfo, err = c.getCerts(config)
 		if err != nil {
-			return err
+			return nil,err
 		}
 	} else if deployerType == AWS_MODE {
 		config, err := c.nodeUtils.getAWSConfig(&c.sshUtil)
 		if err != nil {
-			return err
+			return nil,err
 		}
 		certInfo, err = c.getCerts(config)
 		if err != nil {
-			return err
+			return nil,err
 		}
 	} else {
-		return status.New(status.ConfigError, "Invalid deployer type. Either architecture.existing_infra or architecture.aws must be set in config.toml")
+		return nil,status.New(status.ConfigError, "Invalid deployer type. Either architecture.existing_infra or architecture.aws must be set in config.toml")
 	}
 
-	return c.validateAndPrintCertificates(remoteService, certInfo)
+	if helperMode {
+		return certInfo,nil //only need current-certs
+	}
+
+	return certInfo,c.validateAndPrintCertificates(remoteService, certInfo)
 }
 
 func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certInfo *certShowCertificates) error {
