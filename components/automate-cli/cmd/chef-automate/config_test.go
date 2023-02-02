@@ -238,7 +238,7 @@ func TestSetConfigForFrontEndNodes(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		err := setConfigForFrontEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp, writer)
+		err := setConfigForFrontEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp, getMockWriterImpl())
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())

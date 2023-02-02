@@ -593,18 +593,21 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 				resultChan <- rc
 				return
 			}
+
 			output, err := newSSHUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
 				return
 			}
+
 			err = checkOutputForError(output)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
 				return
 			}
+
 			rc.Output = output
 			resultChan <- rc
 		}(args, configFile, remoteService, scriptCommands, newSSHUtil, resultChan)
