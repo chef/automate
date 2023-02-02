@@ -1,4 +1,4 @@
-+++
+ha_aws_deploy_steps+++
 title = "AWS Deployment"
 
 draft = false
@@ -24,7 +24,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ### Prerequisites
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. \
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
     Set these in `~/.aws/credentials` in Bastion Host:
 
     ```bash
@@ -35,6 +35,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
     mkdir -p ~/.aws
     echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
     echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
+    echo "region=<AWS-REGION>" >> ~/.aws/credentials
     ```
 
 - Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
@@ -50,6 +51,12 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 Run the following steps on Bastion Host Machine:
 
+{{< Points To Remember >}}
+
+- Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
+- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
+
+{{< /Points To Remember >}}
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
@@ -137,49 +144,6 @@ Note: DNS should have entry for `chefautomate.example.com` and `chefinfraserver.
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-### Destroy infra
-
-{{< danger >}}
-Below section will destroy the infrastructure
-{{< /danger >}}
-
-#### To destroy AWS infra created with S3 Bucket
-
-To destroy infra after successfull provisioning, run below command in your bastion host in same order.
-
-1. This command will initialize the terraform packages
-
-    ```bash
-    for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done
-    ```
-
-2. This command will destroy all resources created while provisioning (excluding S3).
-
-    ```bash
-    for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done
-    ```
-
-#### To destroy AWS infra created with EFS Bucket
-
-To destroy infra after successfull provisioning, run below command in your bastion host in same order.
-
-1. This command will initialize the terraform packages
-
-    ```bash
-    for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done
-    ```
-
-2. Following command will remove EFS from terraform state file, so that `destroy` command will not destroy EFS.
-
-    ```bash
-    for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform state rm "module.efs[0].aws_efs_file_system.backups";cd $i;done
-    ```
-
-3. This command will destroy all resources created while provisioning (excluding EFS).
-
-    ```bash
-    for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done
-    ```
 
 #### Sample config
 
@@ -192,89 +156,91 @@ To destroy infra after successfull provisioning, run below command in your basti
 {{< note >}}
 
 - User only needs to create/setup **the bastion node** with IAM role of Admin access, and s3 bucket access attached to it.
-- It is adviceble to create bastion server (EC2 instance) in a new VPC.
+
 - Following config will create s3 bucket for backup.
 
 {{< /note >}}
 
 ```config
+ 
 [architecture.aws]
+ssh_user = "ec2-user"
 ssh_port = "22"
-ssh_user = ""
-# Private SSH key file path, which has access to all the instances.
-# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
-ssh_key_file = ""
-# Eg.: backup_config = "efs" or "s3"
+ssh_key_file = "~/.ssh/my-key.pem"
+# sudo_password = ""
 backup_config = "s3"
+s3_bucketName = "My-Bucket-Name"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "aws"
-# DON'T MODIFY THE BELOW LINE (workspace_path)
 workspace_path = "/hab/a2_deploy_workspace"
 backup_mount = "/mnt/automate_backups"
+
 [automate.config]
-admin_password = ""
-# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+admin_password = "MY-AUTOMATE-UI-PASSWORD"
 fqdn = ""
 instance_count = "1"
 config_file = "configs/automate.toml"
-# Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
 # root_ca = ""
 # private_key = ""
 # public_key = ""
+
 [chef_server.config]
 instance_count = "1"
-# Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 # Add Chef Server load balancer root-ca and keys
-# root_ca = ""
 # private_key = ""
 # public_key = ""
+
 [opensearch.config]
 instance_count = "3"
-# Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add OpenSearch load balancer root-ca and keys
 # root_ca = ""
 # admin_key = ""
 # admin_cert = ""
 # private_key = ""
 # public_key = ""
+
 [postgresql.config]
 instance_count = "3"
-# Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 # Add Postgresql load balancer root-ca and keys
 # root_ca = ""
 # private_key = ""
 # public_key = ""
+
 [aws.config]
 profile = "default"
-# Eg.: region = "us-east-1"
-region = ""
-aws_vpc_id  = ""
+region = "ap-southeast-2"
+aws_vpc_id  = "vpc12318h"
 aws_cidr_block_addr  = ""
-private_custom_subnets = []
-public_custom_subnets = []
-# ssh key pair name in AWS to access instances
-# eg: ssh_key_pair_name = "A2HA"
-ssh_key_pair_name = ""
-# ============== EC2 Instance Config ===================
-## === INPUT NEEDED ===
-# This AMI should be from the Same Region which we selected above.
-# eg: ami_id = "ami-08d4ac5b634553e16" # This ami is of Ubuntu 20.04 in us-east-1
-ami_id = ""
+private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
+public_custom_subnets = ["subnet-p556d512", "subnet-p556d513", "subnet-p556d514"]
+ssh_key_pair_name = "my-key"
+setup_managed_services = false
+managed_opensearch_domain_name = ""
+managed_opensearch_domain_url = ""
+managed_opensearch_username = ""
+managed_opensearch_user_password = ""
+managed_opensearch_certificate = ""
+aws_os_snapshot_role_arn = ""
+os_snapshot_user_access_key_id = ""
+os_snapshot_user_access_key_secret = ""
+managed_rds_instance_url = ""
+managed_rds_superuser_username = ""
+managed_rds_superuser_password = ""
+managed_rds_dbuser_username = ""
+managed_rds_dbuser_password = ""
+managed_rds_certificate = ""
+ami_id = "ami-08d4ac5b634553e16"
+delete_on_termination = true
 automate_server_instance_type = "t3.medium"
 chef_server_instance_type = "t3.medium"
 opensearch_server_instance_type = "m5.large"
-postgresql_server_instance_type = "t3.medium"
-automate_lb_certificate_arn = ""
-chef_server_lb_certificate_arn = ""
-automate_ebs_volume_iops = "100"
-automate_ebs_volume_size = "50"
-automate_ebs_volume_type = "gp3"
+postgresql_server_instance_type = "m5.large"
+automate_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
+chef_server_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
 chef_ebs_volume_iops = "100"
 chef_ebs_volume_size = "50"
 chef_ebs_volume_type = "gp3"
@@ -284,13 +250,13 @@ opensearch_ebs_volume_type = "gp3"
 postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_size = "50"
 postgresql_ebs_volume_type = "gp3"
+automate_ebs_volume_iops = "100"
+automate_ebs_volume_size = "50"
+automate_ebs_volume_type = "gp3"
 lb_access_logs = "false"
-# ======================================================
-# ============== EC2 Instance Tags =====================
 X-Contact = ""
 X-Dept = ""
-X-Project = "Test_Project"
-# ======================================================
+X-Project = ""
 ```
 
 ##### Changes to be made
@@ -298,13 +264,10 @@ X-Project = "Test_Project"
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 - Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
 - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. (optional for above configuration) Eg: `chefautomate.example.com`
-- Provide `region` Eg: `us-east-1`, `ap-northeast-1`.
+- Provide `region` Eg: `us-east-1`, `ap-northeast-1`
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`
-- Provide `aws_cidr_block_addr` Eg: `10.0.192.0`
+- Provide `private_custom_subnets` and `public_custom_subnets` OR `aws_cidr_block_addr`
 - Provide `ssh_key_pair_name` Eg: `user-key`
-- Provide `ami_filter_name` Eg: `ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*`
-- Provide `ami_filter_virt_type` Eg: `hvm`
-- Provide `ami_filter_owner` Eg: `112758395563`
 - Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
 
@@ -364,6 +327,11 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 {{< warning >}}
   Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
 {{< /warning >}}
+
+
+{{< danger >}}
+Below section will destroy the infrastructure
+{{< /danger >}}
 
 ### Uninstall chef automate HA
 
