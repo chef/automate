@@ -277,7 +277,7 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 	errorList := list.New()
 	if len(dna.automateIpList) > 1 {
-		errorList.PushBack("only one automate is allowed to delete for aws deployment type")
+		errorList.PushBack("Only one Automate is allowed to delete for AWS deployment type")
 	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.Automate.Config.InstanceCount, -len(dna.automateIpList), AUTOMATE_MIN_INSTANCE_COUNT)
 		if err != nil {
@@ -289,7 +289,7 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configAutomateIpList, dna.automateIpList, "Automate"))
 	}
 	if len(dna.chefServerIpList) > 1 {
-		errorList.PushBack("only one Chef server is allowed to delete for aws deployment type")
+		errorList.PushBack("Only one Chef Server is allowed to delete for AWS deployment type")
 	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.ChefServer.Config.InstanceCount, -len(dna.chefServerIpList), CHEF_SERVER_MIN_INSTANCE_COUNT)
 		if err != nil {
@@ -301,7 +301,7 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configChefServerIpList, dna.chefServerIpList, "Chef-Server"))
 	}
 	if len(dna.opensearchIpList) > 1 {
-		errorList.PushBack("only one opensearch is allowed to delete for aws deployment type")
+		errorList.PushBack("Only one OpenSearch is allowed to delete for AWS deployment type")
 	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.Opensearch.Config.InstanceCount, -len(dna.opensearchIpList), OPENSEARCH_MIN_INSTANCE_COUNT)
 		if err != nil {
@@ -313,7 +313,7 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 		errorList.PushBackList(checkIfPresentInPrivateIPList(dna.configOpensearchIpList, dna.opensearchIpList, "OpenSearch"))
 	}
 	if len(dna.postgresqlIpList) > 1 {
-		errorList.PushBack("only one postgresql is allowed to delete for aws deployment type")
+		errorList.PushBack("Only one Postgresql is allowed to delete for AWS deployment type")
 	} else {
 		allowed, finalCount, err := isFinalInstanceCountAllowed(dna.config.Postgresql.Config.InstanceCount, -len(dna.postgresqlIpList), POSTGRESQL_MIN_INSTANCE_COUNT)
 		if err != nil {
