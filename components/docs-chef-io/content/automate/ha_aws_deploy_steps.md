@@ -51,12 +51,12 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 Run the following steps on Bastion Host Machine:
 
-{{< Points To Remember >}}
+{{< note >}}
 
 - Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
 
-{{< /Points To Remember >}}
+{{< /note >}}
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
