@@ -55,7 +55,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
   - `os_snapshot_user_access_key_secret`
-- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code wil tries to create `s3_bucketName`.
+- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
 - We recommended that to use `backup_config` to be set to `s3` at the time of deployment.
 
 {{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"

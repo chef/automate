@@ -56,7 +56,7 @@ Run the following steps on Bastion Host Machine:
 
 - Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
-- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code wil tries to create `s3_bucketName`.
+- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
 - If you choose `backup_config` as `efs` then deployment code tries to create the EFS and mount on all frontend and backend node.
 - If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
 
@@ -301,7 +301,7 @@ X-Project = ""
 - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. (optional for above configuration) Eg: `chefautomate.example.com`
 - Provide `region` Eg: `us-east-1`, `ap-northeast-1`
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`
-- Provide `private_custom_subnets` and `public_custom_subnets` OR `aws_cidr_block_addr`
+- Provide `private_custom_subnets` and `public_custom_subnets`
 - Provide `ssh_key_pair_name` Eg: `user-key`
 - Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
@@ -371,15 +371,19 @@ Below section will destroy the infrastructure
 ### Uninstall chef automate HA
 
 {{< danger >}}
+
 - Running clean up command will remove all AWS resources created by `provision-infra` command
 - Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
 {{< /danger >}}
 
 To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+
 ```bash
     chef-automate cleanup --aws-deployment --force
 ```
-or
+
+OR
+
 ```bash
     chef-automate cleanup --aws-deployment
 ```
