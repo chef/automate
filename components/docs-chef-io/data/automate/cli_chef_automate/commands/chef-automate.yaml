@@ -48,6 +48,7 @@ see_also:
 - secrets - Set secrets to Automate HA
 - service-versions - Retrieve the versions of the individual Chef Automate services
 - ssh - SSH into Automate HA servers
+- start - Start Chef Automate
 - status - Retrieve Chef Automate status
 - stop - Stop deployment
 - system-logs - Tail Chef Automate logs
