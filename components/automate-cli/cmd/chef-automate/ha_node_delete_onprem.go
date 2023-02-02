@@ -174,6 +174,7 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	if len(dni.postgresqlIp) > 0 {
 		dni.writer.Println("Postgresql => " + strings.Join(dni.postgresqlIp, ", "))
 	}
+	dni.writer.Println("Removal of nodes for Postgresql or OpenSearch is at your own risk. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.")
 	return dni.writer.Confirm("This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 

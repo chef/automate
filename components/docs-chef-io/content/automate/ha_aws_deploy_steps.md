@@ -365,6 +365,17 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 {{< /warning >}}
 
 ### How to Delete single node In AWS Deployment, post deployment.
+
+{{< warning >}}
+
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+
+- Removal of nodes for Postgresql or OpenSearch is at your own risk. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
+
+- Below process can be done for `chef-server` and `automate`.
+
+{{< /warning >}}
+
 The commands require some arguments so that it can determine which types of nodes you want to remove to your HA setup from your bastion host. It needs the ip address of the node you want to remove as as argument when you run the command.
 For example,
 

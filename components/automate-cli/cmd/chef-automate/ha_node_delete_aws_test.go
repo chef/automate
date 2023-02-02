@@ -18,10 +18,10 @@ Unable to remove node. OpenSearch instance count cannot be less than 3. Final co
 OpenSearch Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.
 Postgresql Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.`
 	multipleIpAddressError = `IP address validation failed: 
-only one automate is allowed to delete for aws deployment type
-only one Chef server is allowed to delete for aws deployment type
-only one opensearch is allowed to delete for aws deployment type
-only one postgresql is allowed to delete for aws deployment type`
+Only one Automate is allowed to delete for AWS deployment type
+Only one Chef Server is allowed to delete for AWS deployment type
+Only one OpenSearch is allowed to delete for AWS deployment type
+Only one Postgresql is allowed to delete for AWS deployment type`
 	isManagedServicesError = `Cannot remove OpenSearch or Postgresql nodes if external.database.type is either aws or self-managed.
 Please set external.database.type to empty if you want to add OpenSearch or Postgresql nodes`
 )
@@ -298,6 +298,7 @@ Postgresql => 192.0.3.1, 192.0.3.2, 192.0.3.3, 192.0.3.4
 Nodes to be deleted:
 ================================================
 Automate => 192.0.0.1
+Removal of nodes for Postgresql or OpenSearch is at your own risk. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
@@ -381,6 +382,7 @@ Postgresql => 192.0.3.1, 192.0.3.2, 192.0.3.3, 192.0.3.4
 Nodes to be deleted:
 ================================================
 Automate => 192.0.0.1
+Removal of nodes for Postgresql or OpenSearch is at your own risk. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodeDelete.runDeploy()
 	assert.NoError(t, err)
