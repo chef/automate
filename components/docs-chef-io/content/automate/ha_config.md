@@ -28,9 +28,73 @@ gh_repo = "automate"
 
 {{< /warning >}}
 
+## Show Configuration
+
+Showing configuration in all nodes can be done from bastion server using below commands.
+
+### Show Configuration for Automate cluster
+
+To show configuration for Automate cluster, run the following command:
+
+```bash
+chef-automate config show --automate
+#or
+chef-automate config show -a
+#or
+chef-automate config show --a2
+```
+
+### Show Configuration for Chef Server cluster
+
+To show configuration for Chef Server cluster, run the following command:
+
+```bash
+chef-automate config show --chef_server
+#or
+chef-automate config show -c
+#or
+chef-automate config show --cs
+```
+
+### Show Configuration for Postgresql cluster
+
+To show configuration for Postgresql cluster, run the following command:
+
+```bash
+chef-automate config show --postgresql
+#or
+chef-automate config show -p
+#or
+chef-automate config show --pg
+```
+
+### Show Configuration for OpenSearch cluster
+
+To show configuration for OpenSearch cluster, run the following command:
+
+```bash
+chef-automate config show --opensearch
+#or
+chef-automate config show -o
+#or
+chef-automate config show --os
+```
+
 ## Patch Configuration
 
 Patching new configuration in all nodes can be done from bastion server using below commands.
+
+### Patch Configuration for Frontend cluster
+
+To patch configuration for Frontend cluster (includes Automate and Chef Server), run the following command:
+
+```bash
+chef-automate config patch path/to/automate-config.toml --frontend
+#or
+chef-automate config patch path/to/automate-config.toml -f
+#or
+chef-automate config patch path/to/automate-config.toml --fe
+```
 
 ### Patch Configuration for Automate cluster
 
