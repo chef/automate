@@ -1,4 +1,3 @@
-ha_aws_deploy_steps+++
 title = "AWS Deployment"
 
 draft = false
