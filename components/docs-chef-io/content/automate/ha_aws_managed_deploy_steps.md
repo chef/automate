@@ -25,6 +25,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC, then you have to create Public and Private Subnet, if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
+- We recommended that to create a new vpc.
 - Setup AWS RDS Postgresql 13.5 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
 - Setup AWS OpenSearch 1.3.6 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup with Managed Service we have only option is `Amazon S3`.
@@ -52,7 +53,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 - We do not support passphrase for Private Key authentication.
 - Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
-- If below attribute are not privided in `config.toml`, in that case terrafrom code will create and use it.
+- If below attribute are not provided in `config.toml`, in that case terrafrom code will create and use it.
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
   - `os_snapshot_user_access_key_secret`
