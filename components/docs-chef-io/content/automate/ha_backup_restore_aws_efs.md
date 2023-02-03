@@ -33,11 +33,13 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 - We have to mount EFS to all the vm's manually. To do that please refer [this](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-helper-ec2-linux.html) 
 
+- Let's create a folder structure `/mnt/automate_backups/` on all the Frontend and backend nodes.
+
 #### Configuration in OpenSearch Node
 
 - Mount the EFS on all OpenSearch Node. For example you mount the EFS to folder structure `/mnt/automate_backups/`
 
-- Create an OpenSearch sub-directory and set permissions to one of the OpenSearch servers (only if the network mount is correctly mounted).
+- Create an `opensearch` sub-directory and set permissionsas mention below  (all the opensearch nodes).
 
     ```sh
     sudo mkdir -p /mnt/automate_backups/opensearch
@@ -46,7 +48,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 #### Configuration for OpenSearch Node from Provision host
 
-Configure the OpenSearch `path.repo`
+Configure the OpenSearch `path.repo` attribute.
 
 - Create a toml file (`os_config.toml`) and add below template
 
@@ -61,6 +63,8 @@ Configure the OpenSearch `path.repo`
     ```sh
     chef-automate config patch --opensearch os_config.toml
     ```
+
+- Above command will restart the opensearch cluster.
 
 #### Healthcheck commands
 
