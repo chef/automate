@@ -23,7 +23,7 @@ type ValidatorFlags struct {
 
 // HADeploymentValidator interface definition
 type HADeploymentValidator interface {
-	RunHAValidator() error
+	RunHAValidator() ([]string, error)
 }
 
 // NewHADeploymentValidator returns the new HA deployment validator
@@ -77,38 +77,62 @@ type HAValidator struct {
 }
 
 // RunHAValidator run the infra validation
-func (validator *HAValidator) RunHAValidator() error {
-	fmt.Println("All Flags:", validator.Flags.All)
+func (validator *HAValidator) RunHAValidator() ([]string, error) {
+	fmt.Println("Flags:", validator.Flags)
 	fmt.Println("ConfigPath:", validator.ConfigPath)
 	fmt.Println("Running HA Validator")
-	if validator.Flags.All {
-		validator.BastionValidator.Run()
-		validator.AutomateValidator.Run()
-		validator.CSValidator.Run()
-		validator.PGValidator.Run()
-		validator.OSValidator.Run()
-		return nil
+	fmt.Println("valid config file")
+
+	var errResp error
+	validationsResp := []string{}
+	if validator.Flags.Bastion || validator.Flags.All {
+		resp, err := validator.BastionValidator.Run()
+		if err != nil {
+			errResp = fmt.Errorf("%s, %s", errResp.Error(), err.Error())
+		}
+		if len(resp) > 0 {
+			validationsResp = append(validationsResp, resp...)
+		}
 	}
 
-	if validator.Flags.Bastion {
-		validator.BastionValidator.Run()
+	if validator.Flags.Automate || validator.Flags.All {
+		resp, err := validator.AutomateValidator.Run()
+		if err != nil {
+			errResp = fmt.Errorf("%s, %s", errResp.Error(), err.Error())
+		}
+		if len(resp) > 0 {
+			validationsResp = append(validationsResp, resp...)
+		}
 	}
 
-	if validator.Flags.Automate {
-		validator.AutomateValidator.Run()
+	if validator.Flags.Chefserver || validator.Flags.All {
+		resp, err := validator.CSValidator.Run()
+		if err != nil {
+			errResp = fmt.Errorf("%s, %s", errResp.Error(), err.Error())
+		}
+		if len(resp) > 0 {
+			validationsResp = append(validationsResp, resp...)
+		}
 	}
 
-	if validator.Flags.Chefserver {
-		validator.CSValidator.Run()
+	if validator.Flags.Postgresql || validator.Flags.All {
+		resp, err := validator.PGValidator.Run()
+		if err != nil {
+			errResp = fmt.Errorf("%s, %s", errResp.Error(), err.Error())
+		}
+		if len(resp) > 0 {
+			validationsResp = append(validationsResp, resp...)
+		}
 	}
 
-	if validator.Flags.Postgresql {
-		validator.PGValidator.Run()
+	if validator.Flags.Opensearch || validator.Flags.All {
+		resp, err := validator.OSValidator.Run()
+		if err != nil {
+			errResp = fmt.Errorf("%s, %s", errResp.Error(), err.Error())
+		}
+		if len(resp) > 0 {
+			validationsResp = append(validationsResp, resp...)
+		}
 	}
-
-	if validator.Flags.Opensearch {
-		validator.OSValidator.Run()
-	}
-
-	return nil
+	return validationsResp, errResp
 }
