@@ -24,7 +24,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ### Prerequisites
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC we have to create Public and Private Subnet if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
+- If you want to use Default VPC we have to create public and private subnet, If subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
     Set these in `~/.aws/credentials` in Bastion Host:
 
@@ -55,10 +55,10 @@ Run the following steps on Bastion Host Machine:
 
 {{< note >}}
 
-- Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
+- Make sure that bastion machine is in the same vpc, as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
 - If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
-- If you choose `backup_config` as `efs` then deployment code will create the EFS and mount on all frontend and backend node.
+- If you choose `backup_config` as `efs` then we will create the EFS and mount on all frontend and backend node.
 - If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
 
 {{< /note >}}
@@ -295,12 +295,11 @@ X-Dept = ""
 X-Project = ""
 ```
 
-##### Changes to be made
+##### Minimum Changes required in sample config
 
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
-- Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
-- Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. (optional for above configuration) Eg: `chefautomate.example.com`
-- Provide `region` Eg: `us-east-1`, `ap-northeast-1`
+- Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
+- Provide `region` Eg: `us-east-1`
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`
 - Provide `private_custom_subnets` and `public_custom_subnets`
 - Provide `ssh_key_pair_name` Eg: `user-key`

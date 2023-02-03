@@ -66,11 +66,11 @@ Classless interdomain routing (CIDR) IPv4 and IPv6 blocks defines VPC IP address
 ### Create VPC with Wizard
 
 - Choose IPV4 CIDR Block
-- Number of AZ
-- Number of Public subnet
-- Number of Private subnet
-- NAT GateWays
-- VPC Endpoints
+- Number of AZ, preferable 3
+- Number of Public subnet, preferable 3, 1 for each AZ
+- Number of Private subnet,preferable 3, 1 for each AZ
+- NAT GateWays, preferable 1 per AZ
+- VPC Endpoints, S3 Gateway
 
 {{< figure src="/images/automate/create-vpc-wizard.png" alt="Create VPC with Wizard">}}
 
