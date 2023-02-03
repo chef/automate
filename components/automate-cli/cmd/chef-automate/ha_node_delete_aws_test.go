@@ -12,14 +12,14 @@ import (
 const (
 	ipAddressNotPresent = `IP address validation failed: 
 Automate Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.
-Unable to remove node. Chef Server instance count cannot be less than 1. Final count 0 not allowed.
+Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.
 Chef-Server Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.
 Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
 OpenSearch Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.
 Postgresql Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.`
 	multipleIpAddressError = `IP address validation failed: 
 Only one Automate is allowed to delete for AWS deployment type
-Only one Chef Server is allowed to delete for AWS deployment type
+Only one Chef-Server is allowed to delete for AWS deployment type
 Only one OpenSearch is allowed to delete for AWS deployment type
 Only one Postgresql is allowed to delete for AWS deployment type`
 	isManagedServicesError = `Cannot remove OpenSearch or Postgresql nodes if external.database.type is either aws or self-managed.

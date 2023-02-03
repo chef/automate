@@ -81,7 +81,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
 		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
-Unable to remove node. Chef Server instance count cannot be less than 1. Final count -1 not allowed.
+Unable to remove node. Chef-Server instance count cannot be less than 1. Final count -1 not allowed.
 Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
 Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.`)
 }
@@ -205,7 +205,7 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unable to remove node. Chef Server instance count cannot be less than 1. Final count 0 not allowed.")
+	assert.Contains(t, err.Error(), "Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.")
 	// even though validation will fail still we check if modify config is working as expected or not
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
