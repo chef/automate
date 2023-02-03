@@ -42,9 +42,12 @@ To add a servicenow notification for Chef Automate, follow the steps given below
 1. In the **Settings** tab, navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.
 1. Select **ServiceNow**.
-1. Enter a unique notification name.
-1. Select the failure type to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan.
-1. Get your ServiceNow webhook address by using the **What's this?** link, which opens an external servicenow site.
+1. Enter a unique notification **name**.
+1. Select the **failure type** to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan. According to the failure type selected, enter the **Webhook URL** as shown below:
+
+    - For Chef Infra Client Run: https://devxxxxx.service-now.com/api/x_chef_incident/v1/client_run
+    - For Inspec Scan: https://devxxxxx.service-now.com/api/x_chef_incident/v1/inspec_scan
+
 1. Enter the **ServiceNow Username**.
 1. Enter the **ServiceNow Password**.
 1. Select the **Test Notification** button to try out your ServiceNow notification. If your servicenow notification does not appear, return to the ServiceNow Webhooks Integration page to re-check the recipient and URL.
@@ -78,7 +81,7 @@ To add a Slack notification for Chef Automate:
 1. Select **Slack**.
 1. Enter a unique notification name.
 1. Select the failure type to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan
-1. Get your Slack webhook address by using the **What's this?** link, which opens an external Slack site.
+1. Get your Slack webhook address, which opens an external Slack site.
 1. On the Slack page, select a channel or user for the notification. Slack will create the new webhook and then provide a webhook URL for you to copy. After entering a recipient, use the **Add Incoming WebHooks Integration** button.
 1. Copy the URL, return to the Chef Automate page, paste the URL into the _Notifications_ form.
 1. Use the **Test Notification** button to try out your Slack notification. If your Slack notification does not appear, return to the Slack Webhooks Integration page to re-check the recipient and URL.
