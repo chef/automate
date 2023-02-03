@@ -191,56 +191,39 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 }
 
 func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
-	if len(dna.automateIpList) == 1 {
-		for i := 0; i < len(dna.configAutomateIpList); i++ {
-			if dna.configAutomateIpList[i] == dna.automateIpList[0] {
-				err := dna.removeNodeFromAws("chef_automate", i, len(dna.configAutomateIpList)-1)
-				if err != nil {
-					return status.Wrap(err, status.ConfigError, "Error removing automate node")
-				}
-				break
-			}
-		}
+	err := dna.removeNodeIfExists("chef_automate", dna.automateIpList, dna.configAutomateIpList)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error removing automate node")
 	}
 
-	if len(dna.chefServerIpList) == 1 {
-		for i := 0; i < len(dna.configChefServerIpList); i++ {
-			if dna.configChefServerIpList[i] == dna.chefServerIpList[0] {
-				err := dna.removeNodeFromAws("chef_server", i, len(dna.configChefServerIpList)-1)
-				if err != nil {
-					return status.Wrap(err, status.ConfigError, "Error removing chef server node")
-				}
-				break
-			}
-		}
+	err = dna.removeNodeIfExists("chef_server", dna.chefServerIpList, dna.configChefServerIpList)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error removing chef server node")
 	}
 
-	if len(dna.opensearchIpList) == 1 {
-		for i := 0; i < len(dna.configOpensearchIpList); i++ {
-			if dna.configOpensearchIpList[i] == dna.opensearchIpList[0] {
-				err := dna.removeNodeFromAws("chef_automate_opensearch", i, len(dna.configOpensearchIpList)-1)
-				if err != nil {
-					return status.Wrap(err, status.ConfigError, "Error removing opensearch node")
-				}
-				break
-			}
-		}
+	err = dna.removeNodeIfExists("chef_automate_opensearch", dna.opensearchIpList, dna.configOpensearchIpList)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error removing opensearch node")
 	}
 
-	if len(dna.postgresqlIpList) == 1 {
-		for i := 0; i < len(dna.configPostgresqlIpList); i++ {
-			if dna.configPostgresqlIpList[i] == dna.postgresqlIpList[0] {
-				fmt.Println(dna.configPostgresqlIpList[i])
-				err := dna.removeNodeFromAws("chef_automate_postgresql", i, len(dna.configPostgresqlIpList)-1)
-				if err != nil {
-					return status.Wrap(err, status.ConfigError, "Error removing postgresql node")
-				}
-				break
+	err = dna.removeNodeIfExists("chef_automate_postgresql", dna.postgresqlIpList, dna.configPostgresqlIpList)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, "Error removing postgresql node")
+	}
+	return nil
+}
+
+func (dna *DeleteNodeAWSImpl) removeNodeIfExists(nodeType string, nodeIpList, configNodeIpList []string) error {
+	if len(nodeIpList) == 1 {
+		for i := 0; i < len(configNodeIpList); i++ {
+			if configNodeIpList[i] == nodeIpList[0] {
+				return dna.removeNodeFromAws(nodeType, i, len(configNodeIpList)-1)
 			}
 		}
 	}
 	return nil
 }
+
 func (dna *DeleteNodeAWSImpl) validate() error {
 	err := dna.getAwsHAIp()
 	if err != nil {
