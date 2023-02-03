@@ -17,7 +17,7 @@ gh_repo = "automate"
 
 - Frontend patch/set will be applied to all nodes where are Postgresql and OpenSearch changes will be applied to only one node
     of the cluser.
-- After patching/setting some services will go restart. So the health status will take upto 2 minutes to show healthy.
+- After patching/setting some services will restart. So the health status will take upto 2 minutes to show healthy.
 
 {{< /note >}}
 
