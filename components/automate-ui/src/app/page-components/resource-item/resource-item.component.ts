@@ -17,8 +17,8 @@ export class ResourceItemComponent {
     this.showDelta = !this.showDelta;
   }
 
-  showModal(resourceId: string) {
-    this.eventsService.showModal(true, resourceId);
+  showModal() {
+    this.eventsService.showModal(true);
   }
 }
 
