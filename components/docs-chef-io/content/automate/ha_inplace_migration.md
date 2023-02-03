@@ -90,11 +90,22 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
 
 ## Installing the Latest Automate HA
 
-Follow Automate HA installation documentation. Click [here](/automate/ha_onprim_deployment_procedure/) to know more about `config.toml`, which gives the same IPs and backup config as the `a2ha.rb` file.
+Follow Automate HA installation documentation. Click [here](/automate/ha_onprim_deployment_procedure/) to know more about `config.toml`, 
+**provide** the same IPs and backup config in config.toml as it was in  `a2ha.rb` file.
+
+## EFS backup configuration
+In case if backup configuation was skipped in deployment config.toml, User need to configure EFS backup manually in Automate HA please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
+
+{{<note>}}
+While configuring backup configuration provide path of elasticsearch instead of opensearch as A2HA backup was in elasticsearch directory 
+like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`
+{{</note>}}
 
 ## Restore Backup
 
-Once deployment is successful, proceed with restoring the backup in Automate HA. Login to one of automate nodes, and take **current_config.toml** file as shown below:
+Once deployment is successful, proceed with restoring the backup in Automate HA. Click [here](/automate/ha_backup_restore_file_system/) to know more.
+
+Login to one of automate nodes, and take **current_config.toml** file as shown below:
 
 ```sudo
 sudo chef-automate config show > current_config.toml
@@ -120,8 +131,6 @@ To restore, use the below command:
 ```cmd
 sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
 ```
-
-Click [here](/automate/ha_backup_restore_file_system/) to know more.
 
 {{< note >}}
 
@@ -171,7 +180,8 @@ sudo chef-automate bootstrap bundle unpack bootstrap.abb
 ```
 
 {{< note >}}
-Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
+1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
+1. Reset backup configuration path to oepnsearch so that new backups will be stored in opensearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 {{< /note >}}
 
 ## Troubleshoot
@@ -179,3 +189,9 @@ Once Automate HA is up and running with restored data, We can remove old backed-
 1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA cli `chef-automate cleanup --onprem-deployment` and then remove /bin/chef-automate from all frontend nodes, now try the installation again.
 
 1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
+2. While restoring backup if error related to backup directory occurs like 
+> **Error in Automate node:** failed to create snapshot repository: elasticsearch repository create request failed for repo**
+> OR
+> **Error in Opensearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
+
+please re-check your EFS backup configration for the Automate and Opensearch node, click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
