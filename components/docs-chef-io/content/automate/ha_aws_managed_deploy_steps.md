@@ -187,3 +187,122 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 {{< note >}} DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command. {{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+
+#### Sample config
+
+{{< note >}}
+
+- Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, Managed RDS Postgresql and Managed Opensearch)
+
+{{< /note >}}
+
+{{< note >}}
+
+- User only needs to create/setup **the bastion node** with IAM role of Admin access, and s3 bucket access attached to it.
+
+- Following config will create s3 bucket for backup.
+
+{{< /note >}}
+
+```config
+ 
+[architecture.aws]
+ssh_user = "ec2-user"
+ssh_port = "22"
+ssh_key_file = "~/.ssh/my-key.pem"
+# sudo_password = ""
+backup_config = "s3"
+s3_bucketName = "My-Bucket-Name"
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "aws"
+workspace_path = "/hab/a2_deploy_workspace"
+backup_mount = ""
+
+[automate.config]
+admin_password = "MY-AUTOMATE-UI-PASSWORD"
+fqdn = ""
+instance_count = "1"
+config_file = "configs/automate.toml"
+enable_custom_certs = false
+# root_ca = ""
+# private_key = ""
+# public_key = ""
+
+[chef_server.config]
+instance_count = "1"
+enable_custom_certs = false
+# Add Chef Server load balancer root-ca and keys
+# private_key = ""
+# public_key = ""
+
+[opensearch.config]
+instance_count = "3"
+enable_custom_certs = false
+
+[postgresql.config]
+instance_count = "3"
+enable_custom_certs = false
+
+[aws.config]
+profile = "default"
+region = "ap-southeast-2"
+aws_vpc_id  = "vpc12318h"
+aws_cidr_block_addr  = ""
+private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
+public_custom_subnets = ["subnet-p556d512", "subnet-p556d513", "subnet-p556d514"]
+ssh_key_pair_name = "my-key"
+setup_managed_services = true
+managed_opensearch_domain_name = "automate-ha"
+managed_opensearch_domain_url = "vpc-automate-ha-a6uhtsu.ap-southeast-2.es.amazonaws.com"
+managed_opensearch_username = "MY-USER-NAME"
+managed_opensearch_user_password = "MY-OPENSEARCH-PASSWORD"
+managed_opensearch_certificate = "This is AWS ROOT-CA, we can keep this empty, this will be the part of airgap bundle, as AWS root-ca is available"
+aws_os_snapshot_role_arn = "we can keep empty, terrafrom code will create and use it"
+os_snapshot_user_access_key_id = "we can keep empty, terrafrom code will create and use it"
+os_snapshot_user_access_key_secret = "we can keep empty, terrafrom code will create and use it"
+managed_rds_instance_url = "database-1.jux.ap-southeast-2.rds.amazonaws.com:5432"
+managed_rds_superuser_username = "MY-POSTGRES-SUPER-USER-NAME"
+managed_rds_superuser_password = "MY-POSTGRES-PASSWORD"
+managed_rds_dbuser_username = "MY-DB-USERNAME"
+managed_rds_dbuser_password = "MY-DB-PASSWORD"
+managed_rds_certificate = "This is AWS ROOT-CA, we can keep this empty, this will be the part of airgap bundle, as AWS root-ca is available"
+ami_id = "ami-08d4ac5b634553e16"
+delete_on_termination = true
+automate_server_instance_type = "t3.medium"
+chef_server_instance_type = "t3.medium"
+opensearch_server_instance_type = "m5.large"
+postgresql_server_instance_type = "m5.large"
+automate_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
+chef_server_lb_certificate_arn = "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e"
+chef_ebs_volume_iops = "100"
+chef_ebs_volume_size = "50"
+chef_ebs_volume_type = "gp3"
+opensearch_ebs_volume_iops = "100"
+opensearch_ebs_volume_size = "50"
+opensearch_ebs_volume_type = "gp3"
+postgresql_ebs_volume_iops = "100"
+postgresql_ebs_volume_size = "50"
+postgresql_ebs_volume_type = "gp3"
+automate_ebs_volume_iops = "100"
+automate_ebs_volume_size = "50"
+automate_ebs_volume_type = "gp3"
+lb_access_logs = "false"
+X-Contact = ""
+X-Dept = ""
+X-Project = ""
+```
+
+##### Minimum Changes required in sample config
+
+- Give `ssh_user` which has access to all the machines. Eg: `ec2-user`
+- Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
+- Provide `region` Eg: `ap-southeast-2`
+- Provide `aws_vpc_id` Eg: `vpc-0a12*****`
+- Provide `private_custom_subnets` and `public_custom_subnets`
+- Provide `ssh_key_pair_name` Eg: `user-key`
+- Provide `setup_managed_services` Eg: `true`
+- Provide `managed_opensearch_domain_name`,`managed_opensearch_domain_url`,`managed_opensearch_username`,`managed_opensearch_user_password`
+- Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`
+- Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
+- Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
