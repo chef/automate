@@ -32,9 +32,13 @@ The Incident App generates a data stream of compliance events that you can lever
 * Your unique ServiceNow URL. It has the format: `https://ven12345.service-now.com`.
 * Setting up the Incident App requires the `x_chef_automate.api` role to configure it. Your ServiceNow administrator can enable this for you.
 
-## System Requirements
+### System Requirements
 
-* The [Integration App]({{< relref "servicenow_integration" >}}) is already installed and configured.
+* A running [Chef Automate](https://www.chef.io/automate/) instance.
+* Chef Automate has a valid SSL/TLS certificate from a trusted certificate authority (CA).
+* A running [ServiceNow](https://www.servicenow.com/) instance. The supported ServiceNow versions are **Tokyo**, **San Diego** and **Rome**.
+* The ServiceNow instance is reachable on port 443.
+* The ServiceNow instance should be compatible with **Tokyo**, **San Diego** and **Rome** versions.
 
 ## Install
 

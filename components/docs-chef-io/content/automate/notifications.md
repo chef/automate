@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 10
 +++
 
-## About Notifications
+## Notifications
 
-Chef Automate notifications uses webhooks to send alerts for failures of Chef Infra Client runs and InSpec compliance scans. You can send notifications to Slack channels, Slack users, or any other service that supports webhook integrations. Notifications are sent for all failures. To ignore a failure, set the `ignore_failure` attribute to `true` on the resource. 
+Chef Automate notifications uses webhooks to send alerts for failures of Chef Infra Client runs and InSpec compliance scans. You can send notifications to ServiceNow, Slack channels, Slack users, or any other service that supports webhook integrations. Notifications are sent for all failures. To ignore a failure, set the `ignore_failure` attribute to `true` on the resource.
 
 By default only Admins of Chef Automate may create and manage notifications.
 
@@ -23,24 +23,69 @@ By default only Admins of Chef Automate may create and manage notifications.
 Notifications sent by Chef Automate do not support retries; therefore, notifications sent while Slack or the external service receiving the notification is experiencing API issues, outages, or some other unplanned downtime may never be received. Undelivered notifications are not re-sent. Attempts to send notifications do generate log messages in your Chef Automate server.
 {{< /warning >}}
 
+Chef Automate supports three types of notifications:
+
+- ServiceNow
+- Slack
+- Webhooks
+
+The steps to add different notifications to the Chef Automate is shown below:
+
+## ServiceNow Notification
+
+### Add a ServiceNow Notification
+
+To add a servicenow notification for Chef Automate, follow the steps given below:
+
+![ServiceNow notifications](/images/automate/servicenow-notifications-navigation.png)
+
+1. In the **Settings** tab, navigate to the _Notifications_ page in the sidebar.
+1. Select **Create Notification**.
+1. Select **ServiceNow**.
+1. Enter a unique notification **name**.
+1. Select the **failure type** to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan. According to the failure type selected, enter the **Webhook URL** as shown below:
+
+    - For Chef Infra Client Run: https://devxxxxx.service-now.com/api/x_chef_incident/v1/client_run
+    - For Inspec Scan: https://devxxxxx.service-now.com/api/x_chef_incident/v1/inspec_scan
+
+1. Enter the **ServiceNow Username**.
+1. Enter the **ServiceNow Password**.
+1. Select the **Test Notification** button to try out your ServiceNow notification. If your servicenow notification does not appear, return to the ServiceNow Webhooks Integration page to re-check the recipient and URL.
+1. Select the **Create Notification** button to create the ServiceNow Notification.
+
+### Edit ServiceNow Notifications
+
+To edit a ServiceNow notification for Chef Automate:
+
+1. From the Notifications page, select the notification name to open its detail page.
+1. Edit the notification type, name, failure type, or URL.
+1. Select the **Save Notification** button to save the ServiceNow notification.
+
+### Delete ServiceNow Notifications
+
+To delete a ServiceNow notification for Chef Automate:
+
+1. From the Notifications page, select **Delete** from the menu at the end of the table row.
+1. Confirm that you wish to permanently delete this notification.
+
 ## Slack Notifications
 
 ### Add a Slack Notification
 
 To add a Slack notification for Chef Automate:
 
-![Notifications Navigation](/images/automate/notifications-navigation.png)
+![Slack Navigation](/images/automate/notifications-navigation.png)
 
 1. In the **Settings** tab, navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.
 1. Select **Slack**.
 1. Enter a unique notification name.
 1. Select the failure type to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan
-1. Get your Slack webhook address by using the **What's this?** link, which opens an external Slack site.
+1. Create a slack webhook address. For help refer [this](https://api.slack.com/messaging/webhooks).
 1. On the Slack page, select a channel or user for the notification. Slack will create the new webhook and then provide a webhook URL for you to copy. After entering a recipient, use the **Add Incoming WebHooks Integration** button.
 1. Copy the URL, return to the Chef Automate page, paste the URL into the _Notifications_ form.
-1. Use the **Send a test** button to try out your Slack notification. If your Slack notification does not appear, return to the Slack Webhooks Integration page to re-check the recipient and URL.
-1. Use the **Save Notification** button to create the Slack notification.
+1. Use the **Test Notification** button to try out your Slack notification. If your Slack notification does not appear, return to the Slack Webhooks Integration page to re-check the recipient and URL.
+1. Use the **Create Notification** button to create the Slack notification.
 
 ### Edit Slack Notifications
 
@@ -63,7 +108,7 @@ To delete a Slack notification for Chef Automate:
 
 To add a webhook notification for Chef Automate:
 
-![Notifications Navigation](/images/automate/notifications-navigation.png)
+![Webhook Navigation](/images/automate/notifications-navigation.png)
 
 1. In the **Settings** tab navigate to the _Notifications_ page in the sidebar.
 1. Select **Create Notification**.
@@ -71,8 +116,8 @@ To add a webhook notification for Chef Automate:
 1. Enter a unique notification name.
 1. Select the failure type to be notified on from the drop-down menu. Current options are Chef Infra Client run or InSpec scan
 1. Enter the webhook URL the notification should be sent to.
-1. Use the **Send Test** button to try out your webhook notification.
-1. Use the **Save Notification** button to create the webhook notification.
+1. Use the **Test Notification** button to try out your webhook notification.
+1. Use the **Create Notification** button to create the webhook notification.
 
 ### Edit Webhook Notifications
 
