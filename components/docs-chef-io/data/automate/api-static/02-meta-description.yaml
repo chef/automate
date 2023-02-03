@@ -42,7 +42,7 @@ info:
     * **[API Tokens](https://automate.chef.io/docs/api-tokens/)** explains authentication in Chef Automate.
     * **[Authorization Overview](https://automate.chef.io/docs/iam-v2-overview)** explains authorization in Chef Automate.
 
-    # Return code
+    # Status Codes
 
     | Status Code | Name                  | Description                          | Remark                                                                                                                                                                                                                                                      |
     |-------------|-----------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
