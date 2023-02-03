@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 ## Notifications
 
-Chef Automate notifications uses webhooks to send alerts for failures of Chef Infra Client runs and InSpec compliance scans. You can send notifications to ServiceNow, Slack channels, Slack users, or any other service that supports webhook integrations. Notifications are sent for all failures. To ignore a failure, set the `ignore_failure` attribute to `true` on the resource.
+Chef Automate notifications uses webhooks to send alerts for failures of Chef Infra Client runs and InSpec compliance scans. You can send notifications to Slack channels, Slack users, or any other service that supports webhook integrations. Notifications are sent for all failures. To ignore a failure, set the `ignore_failure` attribute to `true` on the resource.
 
 By default only Admins of Chef Automate may create and manage notifications.
 
