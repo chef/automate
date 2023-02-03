@@ -39,13 +39,13 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 - Mount the EFS on all OpenSearch Node. For example you mount the EFS to folder structure `/mnt/automate_backups/`
 
-- Create an `opensearch` sub-directory and set permissionsas mention below  (all the opensearch nodes).
+- Create an `opensearch` sub-directory and set permissions as mention below  (all the opensearch nodes).
 
     ```sh
     sudo mkdir -p /mnt/automate_backups/opensearch
     sudo chown hab:hab /mnt/automate_backups/opensearch/
     ```
-
+   
 #### Configuration for OpenSearch Node from Provision host
 
 Configure the OpenSearch `path.repo` attribute.
@@ -54,7 +54,6 @@ Configure the OpenSearch `path.repo` attribute.
 
     ```toml
     [path]
-    # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in config.toml
     repo = "/mnt/automate_backups/opensearch"
     ```
 
