@@ -395,8 +395,34 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
 
+	if backend.Conf.EnableEnhancedReporting {
+		return updateDayLatestToFalseForEnhancedCompliance(ctx, backend, boolQueryDayLatestThisNodeNotThisReport, index, mapping, useSummaryIndex, script)
+	}
+
+	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
+
+	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
+	// Overlapping ES updates with Refresh(false) on same indices lead to inconsistent results
+	if index == indexOneDayAgo {
+		logrus.Debug("setYesterdayLatestToFalse: day_latest not required when the report end_time is on yesterday's UTC day")
+		return nil
+	} else {
+		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
+	}
+	_, err := elastic.NewUpdateByQueryService(backend.client).
+		Index(indexOneDayAgo + "*").
+		Query(boolQueryDayLatestThisNodeNotThisReport).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
+	return errors.Wrap(err, "setYesterdayLatestToFalse")
+
+}
+
+func updateDayLatestToFalseForEnhancedCompliance(ctx context.Context, backend *ESClient, boolQueryDayLatestThisNodeNotThisReport *elastic.BoolQuery, index string, mapping mappings.Mapping, useSummaryIndex bool, script *elastic.Script) error {
 	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
 
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
 	// Making a filter query to get all the indices from today to 90 days back
 	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
 
