@@ -26,3 +26,8 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 - migrate-from-v1 - Run preflight checks specific to migrating from Chef Automate v1
+compatiblestring:
+- id: Automate_HA
+  name: Automate HA
+- id: Automate
+  name: Automate

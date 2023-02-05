@@ -284,6 +284,7 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
+	initConfigHACmd.PersistentFlags().SetAnnotation("file", Compatiblity, []string{CompatiblewithStandalone})
 	initConfigHACmd.SetUsageTemplate(UsageTemplate)
 
 	initConfigHACmd.PersistentFlags().StringVar(
@@ -291,6 +292,7 @@ func init() {
 		"path",
 		"/hab/a2_deploy_workspace/",
 		"a2ha hab workspace dir path")
+	initConfigHACmd.PersistentFlags().SetAnnotation("path", Compatiblity, []string{CompatiblewithHA})
 	initConfigHACmd.SetUsageTemplate(UsageTemplate)
 	RootCmd.AddCommand(initConfigHACmd)
 }
@@ -301,6 +303,9 @@ var initConfigHACmd = &cobra.Command{
 	Long:  "Initialized default configuration for HA and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		CompatiblewithHA:         CompatiblewithHA,
+		CompatiblewithStandalone: CompatiblewithStandalone,
+		RunFrom:                  RunFromBastion,
 	},
 	RunE: runInitConfigHACmd,
 }

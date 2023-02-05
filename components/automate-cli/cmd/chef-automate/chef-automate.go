@@ -30,6 +30,17 @@ const (
 	NoCheckVersionAnnotation = "no-check-version"
 	// NoRequireRootAnnotation is a cobra key for group annotations
 	NoRequireRootAnnotation = "no-require-root"
+	// Compatibility is a cobra key for group annotations based on deployment type
+	Compatiblity             = "compatibility"
+	CompatiblewithStandalone = "forStandalone"
+	CompatiblewithHA         = "forHA"
+	CompatibleWithAll        = "common"
+	RunFrom                  = "runFrom"
+	RunFromBastion           = "bastion"
+	RunFromAutomateNode      = "automate"
+	RunFromChefServerNode    = "cs"
+	RunFromOpenSearchNode    = "opensearch"
+	RunFromPGNode            = "pg"
 )
 
 var writer *cli.Writer

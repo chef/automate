@@ -450,7 +450,7 @@ func genDocsCmd() *cobra.Command {
 	cmd.Flags().StringVar(&devCmdFlags.docsPath,
 		"docs-dir", "./", "Directory where generated documentation will be put")
 	cmd.Flags().StringVar(&devCmdFlags.docsFormat,
-		"format", "yaml", `Generated documentation format. Only "yaml" is supported for now`)
+		"format", "yaml", `Generated documentation format. Only "yaml" is supported for now.`)
 	return cmd
 }
 

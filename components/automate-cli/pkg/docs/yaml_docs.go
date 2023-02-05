@@ -13,7 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 package docs
 
 import (
@@ -30,6 +29,58 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
+const (
+	Compatibility        = "compatibility"
+	RunFrom              = "runFrom"
+	ForStandalone        = "forStandalone"
+	ForHA                = "forHA"
+	AutomateCommandID    = "Automate"
+	AutomateCommandTag   = "Automate"
+	AutomateHACommandID  = "Automate_HA"
+	AutomateHACommandTag = "Automate HA"
+	OpenSearch           = "opensearch"
+	OpenSearchTag        = "Node:OpenSearch"
+	OpenSearchToolTip    = "This command can be run from OpenSearch node"
+	Postgres             = "pg"
+	PostgresTag          = "Node:Postgres"
+	PostgresToolTip      = "This command can be run from Postgres node"
+	ChefServer           = "cs"
+	ChefServerTag        = "Node:ChefServer"
+	ChefServerToolTip    = "This command can be run from Chef Server node"
+	Automate             = "automate"
+	AutomateTag          = "Node:Automate"
+	AutomateToolTip      = "This command can be run from Automate node"
+	Bastion              = "bastion"
+	BastionTag           = "Node:Bastion"
+	BastionToolTip       = "This command can be run from Bastion node"
+)
+
+var commandIDs = map[string]string{
+	ForHA:         AutomateHACommandID,
+	ForStandalone: AutomateCommandID,
+}
+
+var commandTags = map[string]string{
+	ForHA:         AutomateHACommandTag,
+	ForStandalone: AutomateCommandTag,
+}
+
+var haCommandTags = map[string]string{
+	OpenSearch: OpenSearchTag,
+	Postgres:   PostgresTag,
+	ChefServer: ChefServerTag,
+	Automate:   AutomateTag,
+	Bastion:    BastionTag,
+}
+
+var haCommandTips = map[string]string{
+	OpenSearch: OpenSearchToolTip,
+	Postgres:   PostgresToolTip,
+	ChefServer: ChefServerToolTip,
+	Automate:   AutomateToolTip,
+	Bastion:    BastionToolTip,
+}
+
 // skipCommands is a list of commands that should be omitted when generating
 // documentation. Hidden, deprecated and help commands are excluded by default
 // and do not need to be added here.
@@ -44,16 +95,28 @@ type cmdOption struct {
 	Usage        string `yaml:",omitempty"`
 }
 
+type compatibleString struct {
+	Id      string
+	Name    string
+	Tag     string `yaml:",omitempty"`
+	ToolTip string `yaml:",omitempty"`
+}
+
 type cmdDoc struct {
-	Name             string
-	Synopsis         string      `yaml:",omitempty"`
-	Usage            string      `yaml:",omitempty"`
-	Description      string      `yaml:",omitempty"`
-	Options          []cmdOption `yaml:",omitempty"`
-	InheritedOptions []cmdOption `yaml:"inherited_options,omitempty"`
-	Example          string      `yaml:",omitempty"`
-	SeeAlso          []string    `yaml:"see_also,omitempty"`
-	Aliases          []string    `yaml:"aliases,omitempty"`
+	Name                       string
+	Synopsis                   string             `yaml:",omitempty"`
+	Usage                      string             `yaml:",omitempty"`
+	Description                string             `yaml:",omitempty"`
+	Options                    []cmdOption        `yaml:",omitempty"`
+	StandaloneOptions          []cmdOption        `yaml:",omitempty"`
+	HaOptions                  []cmdOption        `yaml:",omitempty"`
+	InheritedOptions           []cmdOption        `yaml:"inherited_options,omitempty"`
+	StandaloneInheritedOptions []cmdOption        `yaml:"standalone_inherited_options,omitempty"`
+	HAInheritedOptions         []cmdOption        `yaml:"ha_inherited_options,omitempty"`
+	Example                    string             `yaml:",omitempty"`
+	SeeAlso                    []string           `yaml:"see_also,omitempty"`
+	Aliases                    []string           `yaml:"aliases,omitempty"`
+	CompatibleString           []compatibleString `yaml:",omitempty"`
 }
 
 type statusDoc struct {
@@ -130,7 +193,38 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	yamlDoc.Synopsis = forceMultiLine(cmd.Short)
 	yamlDoc.Description = forceMultiLine(cmd.Long)
 	yamlDoc.Usage = forceMultiLine(cmd.UseLine())
+	yamlDoc.CompatibleString = make([]compatibleString, 0)
 
+	annotations := cmd.Annotations
+	if len(annotations) > 0 {
+		switch annotations[Compatibility] {
+		case ForHA:
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
+				Id:      commandIDs[ForHA],
+				Name:    commandTags[ForHA],
+				Tag:     haCommandTags[annotations[RunFrom]],
+				ToolTip: haCommandTips[annotations[RunFrom]],
+			})
+		case ForStandalone:
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, compatibleString{
+				Id:   commandIDs[ForStandalone],
+				Name: commandTags[ForStandalone],
+			})
+		default:
+			yamlDoc.CompatibleString = append(yamlDoc.CompatibleString, []compatibleString{
+				{
+					Id:      commandIDs[ForHA],
+					Name:    commandTags[ForHA],
+					Tag:     haCommandTags[annotations[RunFrom]],
+					ToolTip: haCommandTips[annotations[RunFrom]],
+				},
+				{
+					Id:   commandIDs[ForStandalone],
+					Name: commandTags[ForStandalone],
+				},
+			}...)
+		}
+	}
 	if len(cmd.Aliases) > 0 {
 		yamlDoc.Aliases = cmd.Aliases
 	}
@@ -141,11 +235,18 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 
 	flags := cmd.NonInheritedFlags()
 	if flags.HasFlags() {
-		yamlDoc.Options = genFlagResult(flags)
+		commonOptions, haOptions, standaloneOptions := genFlagResult(flags)
+		yamlDoc.Options = commonOptions
+		yamlDoc.HaOptions = haOptions
+		yamlDoc.StandaloneOptions = standaloneOptions
 	}
 	flags = cmd.InheritedFlags()
 	if flags.HasFlags() {
-		yamlDoc.InheritedOptions = genFlagResult(flags)
+		//yamlDoc.InheritedOptions = genFlagResult(flags)
+		commonOptions, haOptions, standaloneOptions := genFlagResult(flags)
+		yamlDoc.InheritedOptions = commonOptions
+		yamlDoc.HAInheritedOptions = haOptions
+		yamlDoc.StandaloneInheritedOptions = standaloneOptions
 	}
 
 	if hasSeeAlso(cmd) {
@@ -176,8 +277,8 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	return nil
 }
 
-func genFlagResult(flags *pflag.FlagSet) []cmdOption {
-	var result []cmdOption
+func genFlagResult(flags *pflag.FlagSet) ([]cmdOption, []cmdOption, []cmdOption) {
+	var result, haResults, standaloneResults []cmdOption
 
 	flags.VisitAll(func(flag *pflag.Flag) {
 		if flag.Hidden {
@@ -193,18 +294,36 @@ func genFlagResult(flags *pflag.FlagSet) []cmdOption {
 				DefaultValue: flag.DefValue,
 				Usage:        forceMultiLine(flag.Usage),
 			}
-			result = append(result, opt)
+			if len(flag.Annotations[Compatibility]) > 0 {
+				switch flag.Annotations[Compatibility][0] {
+				case ForHA:
+					haResults = append(haResults, opt)
+				case ForStandalone:
+					standaloneResults = append(standaloneResults, opt)
+				}
+			} else {
+				result = append(result, opt)
+			}
 		} else {
 			opt := cmdOption{
 				Name:         flag.Name,
 				DefaultValue: forceMultiLine(flag.DefValue),
 				Usage:        forceMultiLine(flag.Usage),
 			}
-			result = append(result, opt)
+			if len(flag.Annotations[Compatibility]) > 0 {
+				switch flag.Annotations[Compatibility][0] {
+				case ForHA:
+					haResults = append(haResults, opt)
+				case ForStandalone:
+					standaloneResults = append(standaloneResults, opt)
+				}
+			} else {
+				result = append(result, opt)
+			}
 		}
 	})
 
-	return result
+	return result, haResults, standaloneResults
 }
 
 // isSkippedCommand determines if the given cobra command should not have its
