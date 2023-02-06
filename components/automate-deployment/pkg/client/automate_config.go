@@ -105,7 +105,7 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 				backupScript := fmt.Sprintf(backupPathFix, strings.TrimSuffix(config.Global.V1.Backups.Filesystem.Path.Value, "/"))
 				_, err := exec.Command("/bin/sh", "-c", backupScript).Output()
 				if err != nil {
-					return err
+					return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configurations")
 				}
 			}
 		}
