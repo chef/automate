@@ -4,10 +4,38 @@ usage: chef-automate config set path/to/config.toml [flags]
 description: |
   Set the Chef Automate configuration for the deployment. It will replace the Chef Automate configuration with the given configuration and apply any required changes.
 options:
+- name: a2
+  default_value: "false"
+  usage: Set toml configuration to the automate node[DUPLICATE]
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Set toml configuration to the automate node
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Set toml configuration to the chef_server node
+- name: cs
+  default_value: "false"
+  usage: Set toml configuration to the chef_server node[DUPLICATE]
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for set
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: Set toml configuration to the opensearch node
+- name: os
+  default_value: "false"
+  usage: Set toml configuration to the opensearch node[DUPLICATE]
+- name: pg
+  default_value: "false"
+  usage: Set toml configuration to the postgresql node[DUPLICATE]
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: Set toml configuration to the postgresql node
 inherited_options:
 - name: auto-approve
   shorthand: "y"
