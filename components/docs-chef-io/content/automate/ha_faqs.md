@@ -107,7 +107,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 
 {{< warning >}}
-  Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
+  Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
 {{< /warning >}}
 
 ### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
