@@ -39,8 +39,8 @@ const PACKAGE_NAME_PATTERN = `-[a-zA-Z0-9]*-.*-\d+\.`
 const RELEASE_AND_VERSION_PATTERN = `.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`
 
 const (
-	FRONTEND_COMMANDS = `
-	sudo chef-automate config patch /tmp/%s;
+	FRONTEND_COMMAND = `
+	sudo chef-automate config %s /tmp/%s;
 	export TIMESTAMP=$(date +'%s');
 	sudo mv /etc/chef-automate/config.toml /etc/chef-automate/config.toml.$TIMESTAMP;
 	sudo chef-automate config show > sudo /etc/chef-automate/config.toml`

@@ -361,7 +361,7 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
 	if remoteService == CONST_AUTOMATE || remoteService == CONST_CHEF_SERVER || remoteService == "frontend" {
-		scriptCommands = fmt.Sprintf(FRONTEND_COMMANDS, remoteService+timestamp, dateFormat)
+		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, dateFormat)
 	} else if remoteService == CONST_POSTGRESQL || remoteService == CONST_OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
 	}
