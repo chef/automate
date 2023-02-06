@@ -31,7 +31,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 #### Configuration in OpenSearch Node
 
--   Mount the shared file system on **all** OpenSearch and Frontend servers :
+- Mount the shared file system on **all** OpenSearch and Frontend servers :
 
     ```sh
     mount /mnt/automate_backups
@@ -39,43 +39,45 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 {{< note >}}
 
--   `/mnt/automate_backups` is the default value for the backup path, we can change it to any other value.
+- `/mnt/automate_backups` is the default value for the backup path, we can change it to any other value.
 
 {{< /note >}}
 
 Apply the following steps on **all of the OpenSearch server** node
 
--   Create an OpenSearch sub-directory and set permissions (only if the network mount is correctly mounted).
+- Create an OpenSearch sub-directory and set permissions (only if the network mount is correctly mounted).
 
     ```sh
     sudo mkdir /mnt/automate_backups/opensearch
     sudo chown hab:hab /mnt/automate_backups/opensearch/
     ```
 
-#### Configuration for OpenSearch Node from Provision Host
+#### Configuration for OpenSearch Node from Bastion Host
 
 Configure the OpenSearch `path.repo` setting by following the steps given below:
 
--   Create a .toml (say os_config.toml) file in **the Provision host** and copy the following template with the path to the repo.
-    ```sh
+- Create a .toml (say os_config.toml) file in **the Bastion host** and copy the following template with the path to the repo.
+
+```sh
       [path]
-      # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
+      # Replace /mnt/automate_backups with the backup_mount config found on the Bastion host in /hab/a2_deploy_workspace/a2ha.rb
       repo = "/mnt/automate_backups/opensearch"
     ```
--   Following command will add the configuration to the OpenSearch node.
+
+- Following command will add the configuration to the OpenSearch node.
     ```sh
       chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>
     ```
 
 ##### Healthcheck commands
 
--   Following command can be run in the OpenSearch node
+- Following command can be run in the OpenSearch node
 
     ```sh
     chef-automate status
     ```
 
--   Following command can be run in the OpenSearch node
+- Following command can be run in the OpenSearch node
 
     ```sh
     hab svc status (check whether OpenSearch service is up or not)
@@ -88,9 +90,9 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 #### Configuration for Automate Node from Provision Host
 
--   Configure Automate to handle _External OpenSearch Backups_.
+- Configure Automate to handle _External OpenSearch Backups_.
 
--   Create an `automate.toml` file on **the provisioning server** using the following command:
+- Create an `automate.toml` file on **the provisioning server** using the following command:
 
     ```bash
     touch automate.toml

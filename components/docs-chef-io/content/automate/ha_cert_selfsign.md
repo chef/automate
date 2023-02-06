@@ -79,5 +79,5 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
 {{< note >}}
 
 Please refer Opensearch certificate [documentation](https://opensearch.org/docs/1.2/security-plugin/configuration/tls/#x509-pem-certificates-and-pkcs-8-keys)
-{{< /note >}}
 
+{{< /note >}}
