@@ -12,6 +12,7 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 )
 
 func init() {
@@ -27,6 +28,9 @@ func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "applications COMMAND",
 		Short: "Manage applications observability features",
+		Annotations: map[string]string{
+			docs.Tag: docs.Automate,
+		},
 	}
 }
 
@@ -154,6 +158,9 @@ func newApplicationsShowSvcsCmd() *cobra.Command {
 Display a list of the habitat services stored in the applications database.
 `,
 		RunE: runApplicationsShowSvcsCmd,
+		Annotations: map[string]string{
+			docs.Tag: docs.Automate,
+		},
 	}
 
 	addFilteringFlagsToCmd(c)
@@ -181,6 +188,9 @@ a health-check at the appointed time and Automate will re-add them to the
 services database.
 `,
 		RunE: runApplicationsRemoveSvcsCmd,
+		Annotations: map[string]string{
+			docs.Tag: docs.Automate,
+		},
 	}
 
 	addFilteringFlagsToCmd(c)
@@ -363,11 +373,11 @@ func (s *serviceSet) Load() error {
 }
 
 // PrintTSV prints a plain text table of the services
-// * Header: match the widths to the first row so it looks ok
-// * Header: print it to stderr so you can do easy shell redirection/pipes for text
-//   processing
-// * Print table rows as TSV for easier processing, even though the columns
-//   won't align all the time.
+//   - Header: match the widths to the first row so it looks ok
+//   - Header: print it to stderr so you can do easy shell redirection/pipes for text
+//     processing
+//   - Print table rows as TSV for easier processing, even though the columns
+//     won't align all the time.
 func (s *serviceSet) PrintTSV() error {
 	svc := &applications.Service{}
 	if len(s.services) >= 1 {

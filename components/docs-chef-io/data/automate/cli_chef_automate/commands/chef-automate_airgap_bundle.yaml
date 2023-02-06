@@ -19,3 +19,4 @@ see_also:
 - 'chef-automate airgap - '
 - 'create - '
 - 'info - '
+supported_on: Bastion

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
@@ -18,6 +19,9 @@ var stopCmd = &cobra.Command{
 	Short: "Stop deployment",
 	Long:  "Stop a running deployment of Automate.",
 	RunE:  runStopCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 func runStopCmd(cmd *cobra.Command, args []string) error {

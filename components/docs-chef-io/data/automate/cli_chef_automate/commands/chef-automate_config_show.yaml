@@ -8,17 +8,21 @@ options:
 - name: a2
   default_value: "false"
   usage: Shows configurations from Automate node(HA)[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: automate
   shorthand: a
   default_value: "false"
   usage: Shows configurations from Automate node(HA)
+  compatible_with_options: AutomateHA
 - name: chef_server
   shorthand: c
   default_value: "false"
   usage: Shows configurations from Chef-server node(HA)
+  compatible_with_options: AutomateHA
 - name: cs
   default_value: "false"
   usage: Shows configurations from Chef-server node(HA)[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: help
   shorthand: h
   default_value: "false"
@@ -27,20 +31,25 @@ options:
   shorthand: o
   default_value: "false"
   usage: Shows configurations from OpenSearch node
+  compatible_with_options: AutomateHA
 - name: os
   default_value: "false"
   usage: Shows configurations from OpenSearch node[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: overwrite
   shorthand: O
   default_value: "false"
   usage: Overwrite existing config.toml [Standalone]
+  compatible_with_options: Automate
 - name: pg
   default_value: "false"
   usage: Shows configurations from PostgresQL node[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: postgresql
   shorthand: p
   default_value: "false"
   usage: Shows configurations from PostgresQL node
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: auto-approve
   shorthand: "y"
@@ -59,5 +68,7 @@ inherited_options:
   shorthand: t
   default_value: "10"
   usage: Request timeout in seconds
+  compatible_with_options: Automate
 see_also:
 - chef-automate config - Chef Automate configuration
+supported_on: Bastion

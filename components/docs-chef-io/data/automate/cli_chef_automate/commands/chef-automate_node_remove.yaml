@@ -65,3 +65,5 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate node - This command is used to add or delete HA nodes
+compatible_with: AutomateHA
+supported_on: Bastion

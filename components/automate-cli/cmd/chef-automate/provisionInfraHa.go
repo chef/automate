@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
@@ -12,6 +13,9 @@ func newProvisionInfraCmd() *cobra.Command {
 		Long:  "Provision infra for Automate HA deployment.",
 		Args:  cobra.RangeArgs(0, 1),
 		RunE:  runProvisionInfraCmd,
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithHA,
+		},
 	}
 
 	provisionInfraCmd.PersistentFlags().StringVar(

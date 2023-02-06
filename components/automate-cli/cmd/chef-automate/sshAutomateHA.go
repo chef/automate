@@ -10,6 +10,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
@@ -205,6 +206,7 @@ var sshCommand = &cobra.Command{
 	Long:  "SSH into Automate HA servers",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatibility:       docs.CompatiblewithHA,
 	},
 	RunE: runSshCommand,
 }

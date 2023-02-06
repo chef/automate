@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/api/external/compliance/reporting"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	generator "github.com/chef/automate/components/automate-cli/pkg/reportgenerator"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -28,12 +29,18 @@ import (
 var licenseCmd = &cobra.Command{
 	Use:   "license COMMAND",
 	Short: "Chef Automate license management",
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var licenseStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Retrieve Chef Automate license status",
 	RunE:  runLicenseStatusCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var licenseApplyLong = `Apply Chef Automate license token.
@@ -46,6 +53,9 @@ var licenseApplyCmd = &cobra.Command{
 	Long:  licenseApplyLong,
 	RunE:  runLicenseApplyCmd,
 	Args:  cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.Automate,
+	},
 }
 
 var licenseUsageCmd = &cobra.Command{
@@ -67,6 +77,9 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
+	},
 }
 
 var nodeUsageCommand = &cobra.Command{
@@ -78,6 +91,9 @@ var nodeUsageCommand = &cobra.Command{
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
 		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
+	},
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
 	},
 }
 
@@ -91,6 +107,9 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
+	},
 }
 
 var complianceResourceUsageCmd = &cobra.Command{
@@ -102,6 +121,9 @@ var complianceResourceUsageCmd = &cobra.Command{
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
 		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
+	},
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
 	},
 }
 

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
@@ -21,6 +22,7 @@ var secretsCmd = &cobra.Command{
 	Long:  "Set secrets for Automate sudo password and admin password in HA mode.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatibility:       docs.CompatiblewithHA,
 	},
 	Args: cobra.RangeArgs(0, 2),
 	RunE: runSecretsConfigCmd,

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorv4"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -77,6 +78,9 @@ var migrateCmd = &cobra.Command{
 	Use:    "post-major-upgrade COMMAND",
 	Short:  "Utilities for post-major-upgrade",
 	Hidden: false,
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
+	},
 }
 
 func newClearDataCmd() *cobra.Command {
@@ -85,6 +89,9 @@ func newClearDataCmd() *cobra.Command {
 		Short: "Chef Automate post-major-upgrade clear-data",
 		Long:  "Chef Automate post-major-upgrade to clear old pg data",
 		RunE:  runCleanup,
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithStandalone,
+		},
 	}
 	clearDataCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
 	clearDataCmd.PersistentFlags().BoolVarP(&ClearDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
@@ -98,6 +105,9 @@ func newMigrateDataCmd() *cobra.Command {
 		Short: "Chef Automate post-major-upgrade migrate",
 		Long:  "Chef Automate migrate. migrate can be used to migrate pg or migrate es",
 		RunE:  runMigrateDataCmd,
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithStandalone,
+		},
 	}
 	migrateDataCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
 	migrateDataCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")

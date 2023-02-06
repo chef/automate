@@ -6,6 +6,7 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/load_balancer"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -26,6 +27,9 @@ var maintenanceCmd = &cobra.Command{
 	Long:  "Chef Automate maintenance mode keeps all services running but rejects new connections at the load balancer so that maintenance operations can be performed.",
 	Args:  cobra.ExactArgs(1),
 	RunE:  runMaintenanceCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 func runMaintenanceCmd(cmd *cobra.Command, args []string) error {

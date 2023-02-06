@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -32,14 +33,17 @@ func newStatusCmd() *cobra.Command {
 		&statusCmdFlags.waitForHealthy, "wait-for-healthy", "w", false,
 		"Wait until the status response is healthy or the timeout is reached",
 	)
+	statusCmd.PersistentFlags().SetAnnotation("wait-for-healthy", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	statusCmd.PersistentFlags().Int64VarP(
 		&statusCmdFlags.waitTimeout, "wait-timeout", "t", 600,
 		"How many seconds to wait for the status to be healthy before returning an error",
 	)
+	statusCmd.PersistentFlags().SetAnnotation("wait-timeout", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	statusCmd.PersistentFlags().Int64VarP(
 		&statusCmdFlags.waitRefreshInterval, "wait-refresh-interval", "r", 2,
 		"How many seconds to wait between polling for status updates",
 	)
+	statusCmd.PersistentFlags().SetAnnotation("wait-refresh-interval", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	return statusCmd
 }

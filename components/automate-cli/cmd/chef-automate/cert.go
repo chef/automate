@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/api/config/shared"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -44,6 +45,9 @@ func certCmd() *cobra.Command {
 		Use:   "external-cert COMMAND",
 		Short: "Manage Chef Automate's external certificate",
 		Long:  "Manage Chef Automate's external certificate authority. Used for establishing TLS/SSL communication with automate.",
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	certShow := &cobra.Command{
@@ -51,6 +55,9 @@ func certCmd() *cobra.Command {
 		Short: "Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.",
 		RunE:  runCertShowCmd,
 		Args:  cobra.MaximumNArgs(2),
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	cmd.AddCommand(certShow)

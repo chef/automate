@@ -52,3 +52,5 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate cert - Chef Automate Certificate Management
+compatible_with: AutomateHA
+supported_on: Bastion

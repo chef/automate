@@ -2,7 +2,7 @@
 {{ range $data_path }}
 {{ $id := urlize .name }}
 {{ $command := strings.TrimPrefix "chef-automate " .name }}
-{{ if or (not .compatible_with) (eq .compatible_with "Automate") }}
+{{ if or (not .compatible_with) (eq .compatible_with "AutomateHA") }}
 <h3 id="{{ $id }}">
    {{ .name }}</h2>
    <p>{{ .description }}</p>
@@ -20,7 +20,7 @@ Flags</h3>
       </tr>
       {{- range .options -}}
       <tr>
-         {{ if or (not .compatible_with_options) (eq .compatible_with_options "Automate") }}
+         {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
          <td>
             <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
          </td>
@@ -29,10 +29,10 @@ Flags</h3>
          </td>
          {{ end }}
       </tr>
-      {{- end -}}
+      {{- end -}}    
       {{- range .inherited_options -}}
       <tr>
-         {{ if or (not .compatible_with_options) (eq .compatible_with_options "Automate") }}
+         {{ if or (not .compatible_with_options) (eq .compatible_with_options "AutomateHA") }}
          <td>
             <div class="cell medium-4">{{ if .shorthand }}-{{ .shorthand }}, {{ end }}--{{ .name }}</div>
          </td>
@@ -44,8 +44,10 @@ Flags</h3>
       {{- end -}}
    </table>
 </div>
+<h4>Supported On</h4>
+<p>{{ .supported_on }}</p>
 <h4 id="{{ $id }}-see-also">
-Related Commands</h3>
+Related Commands</h3>   
 <table>
    <div class="grid-x">
       <tr class="table-heading">

@@ -96,3 +96,4 @@ see_also:
 - gen-config - Generate a config file
 aliases:
 - upgrade-from-v1
+compatible_with: Automate

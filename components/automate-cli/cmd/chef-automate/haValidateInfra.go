@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/spf13/cobra"
@@ -44,6 +45,7 @@ var validateCmd = &cobra.Command{
 	Long:  "Validate existing infrastructure of automate HA",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+		docs.Compatibility:       docs.CompatiblewithHA,
 	},
 	RunE:   runValidateCmd,
 	Hidden: true,

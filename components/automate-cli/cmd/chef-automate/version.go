@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/version"
@@ -21,6 +22,7 @@ var versionCmd = &cobra.Command{
 	RunE:  runVersionCmd,
 	Annotations: map[string]string{
 		NoRequireRootAnnotation: NoRequireRootAnnotation,
+		docs.Tag:                docs.FrontEnd,
 	},
 }
 

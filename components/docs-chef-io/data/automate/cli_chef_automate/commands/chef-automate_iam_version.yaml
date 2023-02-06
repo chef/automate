@@ -18,3 +18,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate iam - Chef Automate iam commands
+supported_on: Automate

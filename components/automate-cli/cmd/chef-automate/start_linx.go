@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
@@ -14,6 +15,9 @@ var startCommand = &cobra.Command{
 	Use:   "start",
 	Short: "Start Chef Automate",
 	RunE:  runStartCmd,
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 func runStartCmd(cmd *cobra.Command, args []string) error {

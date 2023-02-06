@@ -29,3 +29,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate post-major-upgrade - Utilities for post-major-upgrade
+compatible_with: Automate

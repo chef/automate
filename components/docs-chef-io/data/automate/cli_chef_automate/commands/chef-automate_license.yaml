@@ -24,3 +24,4 @@ see_also:
 - nodeRunReport - Generates daily Infra Client Run reports for a span of time duration
 - status - Retrieve Chef Automate license status
 - uniqNodeRunReport - Generates the unique count of reported Infra Client nodes on hourly basis between the time duration
+supported_on: Automate

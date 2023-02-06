@@ -18,3 +18,4 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 - 'bundle - '
+supported_on: Bastion

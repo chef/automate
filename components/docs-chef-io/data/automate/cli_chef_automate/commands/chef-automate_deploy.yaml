@@ -12,11 +12,14 @@ options:
 - name: certificate
   usage: |
     The path to a certificate that should be used for external TLS connections (web and API).
+  compatible_with_options: Automate
 - name: channel
   usage: Release channel to deploy all services from
+  compatible_with_options: Automate
 - name: fqdn
   usage: |
     The fully-qualified domain name that Chef Automate can be accessed at. (default: hostname of this machine)
+  compatible_with_options: Automate
 - name: help
   shorthand: h
   default_value: "false"
@@ -24,15 +27,19 @@ options:
 - name: private-key
   usage: |
     The path to a private key corresponding to the TLS certificate.
+  compatible_with_options: Automate
 - name: product
   default_value: '[]'
   usage: Product to deploy
+  compatible_with_options: Automate
 - name: skip-preflight
   default_value: "false"
   usage: Deploy regardless of pre-flight conditions
+  compatible_with_options: Automate
 - name: upgrade-strategy
   default_value: at-once
   usage: Upgrade strategy to use for this deployment.
+  compatible_with_options: Automate
 - name: "yes"
   shorthand: "y"
   default_value: "false"
@@ -49,3 +56,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+supported_on: Bastion

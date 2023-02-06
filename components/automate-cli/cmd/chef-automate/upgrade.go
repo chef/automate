@@ -14,6 +14,7 @@ import (
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorv4"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
@@ -69,6 +70,9 @@ var upgradeStatusCmd = &cobra.Command{
 	Long:  "Get upgrade status of Chef Automate",
 	RunE:  statusUpgradeCmd,
 	Args:  cobra.MaximumNArgs(0),
+	Annotations: map[string]string{
+		docs.Tag: docs.FrontEnd,
+	},
 }
 
 const disableMaintenanceModeCmd = `chef-automate maintenance off`
@@ -798,32 +802,38 @@ func init() {
 		"version",
 		"",
 		"The exact Chef Automate version to install")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("version", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.upgradefrontends,
 		"upgrade-frontends",
 		false,
 		"upgrade Chef Automate HA  frontends version to install")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("upgrade-frontends", docs.Compatibility, []string{docs.CompatiblewithHA})
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.upgradebackends,
 		"upgrade-backends",
 		false,
 		"Update Chef Automate backends version to install")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("upgrade-backends", docs.Compatibility, []string{docs.CompatiblewithHA})
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.upgradeairgapbundles,
 		"upgrade-airgap-bundles",
 		false,
 		"Update Chef Automate both frontend and backend version to install")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("upgrade-airgap-bundles", docs.Compatibility, []string{docs.CompatiblewithHA})
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.skipDeploy,
 		"skip-deploy",
 		false,
 		"will only upgrade and not deploy the bundle")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("skip-deploy", docs.Compatibility, []string{docs.CompatiblewithHA})
 	upgradeRunCmd.PersistentFlags().BoolVarP(
 		&upgradeRunCmdFlags.acceptMLSA,
 		"auto-approve",
 		"y",
 		false,
 		"Do not prompt for confirmation; accept defaults and continue")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("auto-approve", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	upgradeRunCmd.PersistentFlags().StringVarP(
 		&upgradeRunCmdFlags.upgradeHAWorkspace,
@@ -831,12 +841,14 @@ func init() {
 		"w",
 		"",
 		"Do not prompt for confirmation to accept workspace upgrade")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("workspace-upgrade", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.isMajorUpgrade,
 		"major",
 		false,
 		"This flag is only needed for major version upgrades")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("major", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	upgradeRunCmd.PersistentFlags().StringVar(
 		&upgradeRunCmdFlags.versionsPath, "versions-file", "",
@@ -849,6 +861,7 @@ func init() {
 		"",
 		false,
 		"Flag for saas setup")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("saas", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	upgradeRunCmd.PersistentFlags().BoolVarP(
 		&upgradeRunCmdFlags.skipStorageCheck,
@@ -856,12 +869,14 @@ func init() {
 		"",
 		false,
 		"Flag for skipping disk space check during upgrade")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("skip-storage-check", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	upgradeRunCmd.PersistentFlags().StringVar(
 		&upgradeRunCmdFlags.osDestDataDir,
 		"os-dest-data-dir",
 		"",
 		"Flag for providing custom os destination data directory")
+	upgradeRunCmd.PersistentFlags().SetAnnotation("os-dest-data-dir", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",

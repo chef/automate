@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -15,6 +16,9 @@ func deleteNodeHACmd() *cobra.Command {
 		Short: "remove existing node in HA",
 		Long:  `remove existing node in HA`,
 		RunE:  runDeleteNodeHACmd(&addDeleteNodeHACmdFlags),
+		Annotations: map[string]string{
+			docs.Compatibility: docs.CompatiblewithHA,
+		},
 	}
 	deleteNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.automateIp, "automate", "A", "", "Automate ip addresses to be removed. Works with --onprem-mode flag")
 	deleteNodeHACmd.PersistentFlags().StringVarP(&addDeleteNodeHACmdFlags.chefServerIp, "chef-server", "C", "", "Chef-server ip addresses to be removed. Works with --onprem-mode flag")

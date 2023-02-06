@@ -14,6 +14,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1stub"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
@@ -71,12 +72,18 @@ var migrateFrom1Cmd = &cobra.Command{
 	Args:    cobra.MaximumNArgs(3),
 	RunE:    runMigrateFromV1Cmd,
 	Aliases: []string{"upgrade-from-v1"},
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
+	},
 }
 
 var migrateFrom1StatusCmd = &cobra.Command{
 	Use:   "migrate-from-v1-status",
 	Short: "Watch the status of the migration to Chef Automate 2",
 	RunE:  runMigrationFromV1StatusCmd,
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
+	},
 }
 
 var generateCfgCmd = &cobra.Command{
@@ -84,6 +91,9 @@ var generateCfgCmd = &cobra.Command{
 	Short: "Generate a config file",
 	Long:  "Generate a Chef Automate v2 configuration file from Chef Automate v1",
 	RunE:  runGenerateCfgCmd,
+	Annotations: map[string]string{
+		docs.Compatibility: docs.CompatiblewithStandalone,
+	},
 }
 
 func init() {

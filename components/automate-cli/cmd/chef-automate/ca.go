@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -22,6 +23,9 @@ func caCmd() *cobra.Command {
 		Use:   "internal-ca COMMAND",
 		Short: "Manage Chef Automate's internal certificate authority",
 		Long:  "Manage Chef Automate's internal certificate authority. Used for inter-service encryption and authentication.",
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	caInfo := &cobra.Command{
@@ -29,11 +33,17 @@ func caCmd() *cobra.Command {
 		Short: "Print information the root certificate for the internal certificate authority",
 		RunE:  runCAInfoCmd,
 		Args:  cobra.MaximumNArgs(0),
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	regen := &cobra.Command{
 		Use:   "regenerate",
 		Short: "Commands to regenerate certificates issued by the internal certificate authority",
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	regenRoot := &cobra.Command{
@@ -41,6 +51,9 @@ func caCmd() *cobra.Command {
 		Short: "Regenerate the root certificate for the internal certificate authority",
 		RunE:  runRegenRootCmd,
 		Args:  cobra.MaximumNArgs(0),
+		Annotations: map[string]string{
+			docs.Tag: docs.FrontEnd,
+		},
 	}
 
 	regen.AddCommand(regenRoot)

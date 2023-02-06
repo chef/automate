@@ -54,5 +54,7 @@ inherited_options:
   shorthand: t
   default_value: "10"
   usage: Request timeout in seconds
+  compatible_with_options: Automate
 see_also:
 - chef-automate config - Chef Automate configuration
+supported_on: FrontEnd

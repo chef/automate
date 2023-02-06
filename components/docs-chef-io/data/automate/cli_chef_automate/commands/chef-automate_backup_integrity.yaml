@@ -24,6 +24,7 @@ inherited_options:
 - name: no-progress
   default_value: "false"
   usage: Don't follow operation progress
+  compatible_with_options: Automate
 - name: request-timeout
   shorthand: r
   default_value: "20"
@@ -42,3 +43,4 @@ see_also:
 - chef-automate backup - Chef Automate backup
 - show - show the shared object integrity metadata
 - validate - validate the shared object integrity
+supported_on: Bastion

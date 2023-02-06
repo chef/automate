@@ -29,6 +29,7 @@ inherited_options:
 - name: no-progress
   default_value: "false"
   usage: Don't follow operation progress
+  compatible_with_options: Automate
 - name: request-timeout
   shorthand: r
   default_value: "20"
@@ -45,3 +46,4 @@ inherited_options:
   usage: The S3 session token when assuming an IAM role
 see_also:
 - chef-automate backup - Chef Automate backup
+supported_on: Bastion

@@ -57,3 +57,4 @@ see_also:
 - upgrade - upgrade automate to the latest version
 - version - Show CLI version
 - workspace - Set workspace env for Automate HA.
+supported_on: Bastion

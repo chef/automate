@@ -19,3 +19,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate internal-ca regenerate - Commands to regenerate certificates issued by the internal certificate authority
+supported_on: FrontEnd

@@ -11,6 +11,7 @@ options:
 - name: no-progress
   default_value: "false"
   usage: Don't follow operation progress
+  compatible_with_options: Automate
 - name: request-timeout
   shorthand: r
   default_value: "20"
@@ -45,3 +46,4 @@ see_also:
 - show - show the Chef Automate backup details
 - status - show the Chef Automate backup runner status
 - stream-status - Stream the Chef Automate backup runner status
+supported_on: Bastion
