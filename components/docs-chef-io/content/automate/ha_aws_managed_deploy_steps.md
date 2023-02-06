@@ -28,7 +28,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - we recommend to create a new vpc.
 - Setup AWS RDS Postgresql 13.5 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
 - Setup AWS OpenSearch 1.3.6 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
-- For Backup with Managed Service we have only option is `Amazon S3`.
+- For Backup with Managed Service we have only one option which is `Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#opensearch-setup) to know more.
 - Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
 - Preferred key type will be ed25519
@@ -198,7 +198,7 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 {{< note >}}
 
-- User only needs to create/setup **the bastion node** with IAM role of Admin access, and s3 bucket access attached to it.
+- User only needs to create/setup **the bastion node**, an **user** with IAM role of Admin access, and the s3 bucket access attached to it.
 
 - Following config will create s3 bucket for backup.
 

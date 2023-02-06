@@ -77,16 +77,16 @@ Configure the OpenSearch `path.repo` attribute.
     `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
     ```
 
-#### Configuration for Automate node from Provision host
+#### Configuration for Automate node from Bastion host
 
 - Mount the EFS to all the Frontend node manually. For example you mount the EFS to folder structure `/mnt/automate_backups`
-- Create an `automate.toml` file on the provisioning server using the following command:
+- Create an `automate.toml` file on the bastion host using the following command:
 
     ```bash
     touch automate.toml
     ```
 
-- Add the following configuration to `automate.toml` on the provisioning host:
+- Add the following configuration to `automate.toml` on the bastion host:
 
     ```sh
     [global.v1.external.opensearch.backup]
