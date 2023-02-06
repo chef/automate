@@ -95,9 +95,10 @@ const (
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
-	SKIP_IPS_MSG_CERT_ROTATE  = "Following %s ip/ips will skipped while cert-rotation\n %v"
-	SKIP_FRONT_END_IPS_MSG    = "Following %s ip/ips will skipped for root-ca patching \n %v"
-	SKIP_FRONT_END_IPS_MSG_CN = "Following %s ip/ips will skipped for Common name patching \n %v"
+	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "CertRotation for externally configured %s is not supported."
+	SKIP_IPS_MSG_CERT_ROTATE          = "Following %s ip/ips will skipped while cert-rotation\n %v"
+	SKIP_FRONT_END_IPS_MSG            = "Following %s ip/ips will skipped for root-ca patching \n %v"
+	SKIP_FRONT_END_IPS_MSG_CN         = "Following %s ip/ips will skipped for Common name patching \n %v"
 )
 
 type certificates struct {
@@ -196,7 +197,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
 
 		if err != nil {
-			return err
+			return errors.New("Error occured while fetching current certs.")
 		}
 
 		if flagsObj.automate || flagsObj.chefserver {
@@ -266,7 +267,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 // certRotatePG will rotate the certificates of Postgres.
 func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	if isManagedServicesOn() {
-		return errors.New("You can not rotate certs for AWS managed services")
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, CONST_POSTGRESQL)
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
@@ -312,7 +313,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 // certRotateOS will rotate the certificates of OpenSearch.
 func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	if isManagedServicesOn() {
-		return errors.New("You can not rotate certs for AWS managed services")
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, CONST_OPENSEARCH)
 	}
 	fileName := "cert-rotate-os.toml"
 	timestamp := time.Now().Format("20060102150405")
@@ -364,7 +365,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		skipMessage = SKIP_FRONT_END_IPS_MSG
 	}
 
-	c.skipMessagePrinter(remoteService,skipMessage, "", skipIpsList)
+	c.skipMessagePrinter(remoteService, skipMessage, "", skipIpsList)
 
 	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj, skipIpsList)
 	if err != nil {
