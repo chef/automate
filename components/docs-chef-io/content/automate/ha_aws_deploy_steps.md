@@ -46,6 +46,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - Have SSH Key Pair ready in AWS, so new VM's are created using that pair.
     Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrase for Private Key authentication.
+- Preferred key type will be ed25519
 
 {{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
 {{< /warning >}}
