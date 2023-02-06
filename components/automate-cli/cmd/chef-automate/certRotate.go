@@ -94,6 +94,10 @@ const (
 	sudo systemctl start hab-sup.service`
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
+
+	SKIP_IPS_MSG_CERT_ROTATE  = "Following %s ip/ips will skipped while cert-rotation\n %v"
+	SKIP_FRONT_END_IPS_MSG    = "Following %s ip/ips will skipped for root-ca patching \n %v"
+	SKIP_FRONT_END_IPS_MSG_CN = "Following %s ip/ips will skipped for Common name patching \n %v"
 )
 
 type certificates struct {
@@ -189,9 +193,9 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		sshConfig := c.getSshDetails(infra)
 		sshUtil := NewSSHUtil(sshConfig)
 		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(), sshUtil, writer)
-		currentCertsInfo,err:= certShowFlow.certShowHelper(true)
+		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
 
-		if err!=nil {
+		if err != nil {
 			return err
 		}
 
@@ -232,9 +236,8 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 		remoteService = CONST_CHEF_SERVER
 	}
 	//get ips to exclude
-	skipIpsList := c.CompareCurrentCertsWithNewCerts(remoteService, certs,flagsObj, currentCertsInfo)
-	skipMessage := "Following %s ip/ips will skipped while cert-rotation\n %v"
-	c.skipMessagePrinter(remoteService, skipMessage, flagsObj.node, skipIpsList)
+	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
+	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
 
 	// Creating and patching the required configurations.
 	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
@@ -251,10 +254,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
 	if flagsObj.automate {
 		skipIpsList := c.getFrontEndIpsForSkippingRootCAPatching(CONST_AUTOMATE, certs.rootCA, infra, currentCertsInfo)
-		skipMessage = "Follwing chef_server ip/ips will skipped while patching Automate root-ca\n %v"
-		if len(skipIpsList) != 0 {
-			writer.Skippedf(skipMessage,skipIpsList)
-		}
+		c.skipMessagePrinter(CONST_CHEF_SERVER, SKIP_FRONT_END_IPS_MSG, "", skipIpsList)
 		err = c.patchRootCAinCS(sshUtil, certs.rootCA, timestamp, infra, flagsObj, skipIpsList)
 		if err != nil {
 			return err
@@ -280,9 +280,8 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 		config = fmt.Sprintf(POSTGRES_CONFIG, certs.privateCert, certs.publicCert, certs.rootCA)
 	}
 
-	skipIpsList := c.CompareCurrentCertsWithNewCerts(remoteService, certs,flagsObj, currentCertsInfo)
-	skipMessage := "Following %s ip/ips will skipped while cert-rotation\n %v"
-	c.skipMessagePrinter(remoteService, skipMessage, flagsObj.node, skipIpsList)
+	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
+	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
 
 	//patching on PG
 	err := c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
@@ -296,11 +295,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	}
 	//get frontend ips to skip root-ca patch
 	skipIpsList = c.getFrontEndIpsForSkippingRootCAPatching(remoteService, certs.rootCA, infra, currentCertsInfo)
-	skipMessage = "Following FrontEnd ip/ips will skipped while patching Postgresql root-ca\n %v"
-
-	if len(skipIpsList) != 0 {
-		writer.Skippedf(skipMessage, skipIpsList)
-	}
+	c.skipMessagePrinter("frontend", SKIP_FRONT_END_IPS_MSG, "", skipIpsList)
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	filenameFe := "pg_fe.toml"
@@ -335,9 +330,9 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-	skipIpsList := c.CompareCurrentCertsWithNewCerts(remoteService, certs,flagsObj, currentCertsInfo)
-	skipMessage := "Following %s ip/ips will skipped while cert-rotation\n %v"
-	c.skipMessagePrinter(remoteService, skipMessage, flagsObj.node, skipIpsList)
+
+	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
+	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
 
 	// Creating and patching the required configurations.
 	var config string
@@ -346,6 +341,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	} else {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
 	}
+
 	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
 	if err != nil {
 		return err
@@ -356,14 +352,21 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
+	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, flagsObj.node, currentCertsInfo, infra)
+	skipMessage := ""
 	// Creating and patching the required configurations.
 	var configFe string
 	if flagsObj.node != "" {
 		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
+		skipMessage = SKIP_FRONT_END_IPS_MSG_CN
 	} else {
 		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
+		skipMessage = SKIP_FRONT_END_IPS_MSG
 	}
-	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj, []string{})
+
+	c.skipMessagePrinter(remoteService,skipMessage, "", skipIpsList)
+
+	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj, skipIpsList)
 	if err != nil {
 		return err
 	}
@@ -436,7 +439,6 @@ func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp stri
 	}
 
 	config := fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
-	//TODO : print some prompt before patching of node exluding....
 	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
 	if err != nil {
 		return err
@@ -534,42 +536,47 @@ func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
 	return ips
 }
 
-func (c *certRotateFlow) CompareCurrentCertsWithNewCerts(remoteService string, newCerts *certificates, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) []string {
+func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, newCerts *certificates, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
-
+	isCertsSame := true
 	if remoteService == CONST_AUTOMATE {
-		isCertsSame := strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newCerts.rootCA
-		skipIpsList = c.ComparePublicCertAndPrivateCert(newCerts, currentCertsInfo.AutomateCertsByIP, isCertsSame, flagsObj)
+		if flagsObj.node == "" {
+			isCertsSame = strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newCerts.rootCA
+		}
+		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.AutomateCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
 
 	if remoteService == CONST_CHEF_SERVER {
-		skipIpsList = c.ComparePublicCertAndPrivateCert(newCerts, currentCertsInfo.ChefServerCertsByIP, true, flagsObj)
+		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.ChefServerCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
 
 	if remoteService == CONST_OPENSEARCH {
-		isCertsSame := strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
-		isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert) && isCertsSame
-		isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminKey) == newCerts.adminKey) && isCertsSame
-		skipIpsList = c.ComparePublicCertAndPrivateCert(newCerts, currentCertsInfo.OpensearchCertsByIP, isCertsSame, flagsObj)
+		if flagsObj.node == "" {
+			isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
+			isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert && isCertsSame
+			isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchAdminKey) == newCerts.adminKey && isCertsSame
+		}
+		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.OpensearchCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
 
 	if remoteService == CONST_POSTGRESQL {
-		isCertsSame := strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newCerts.rootCA
-		skipIpsList = c.ComparePublicCertAndPrivateCert(newCerts, currentCertsInfo.PostgresqlCertsByIP, isCertsSame, flagsObj)
+		if flagsObj.node == "" {
+			isCertsSame = strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newCerts.rootCA
+		}
+		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.PostgresqlCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
-
 	return skipIpsList
 }
 
-func (c *certRotateFlow) ComparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
+func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
 	skipIpsList := []string{}
 	for _, currentCerts := range certByIpList {
 		isCertsSameTemp := false
-		if (strings.TrimSpace(currentCerts.PublicKey) == newCerts.publicCert) && (strings.TrimSpace(currentCerts.PrivateKey) == newCerts.privateCert) && isCertsSame {
+		if strings.TrimSpace(currentCerts.PublicKey) == newCerts.publicCert && strings.TrimSpace(currentCerts.PrivateKey) == newCerts.privateCert && isCertsSame {
 			isCertsSameTemp = true
 		}
 
@@ -587,14 +594,12 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 	skipIpsList := []string{}
 
 	if remoteService == CONST_POSTGRESQL {
-		//patch root-ca FE
 		if strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newRootCA {
 			skipIpsList = append(skipIpsList, c.getIps("frontend", infra)...)
 		}
 	}
 
 	if remoteService == CONST_AUTOMATE {
-		//patch root-ca in CS
 		if strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newRootCA {
 			skipIpsList = append(skipIpsList, c.getIps(CONST_CHEF_SERVER, infra)...)
 		}
@@ -603,14 +608,41 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 	return skipIpsList
 }
 
-func (c *certRotateFlow) skipMessagePrinter(remoteService, skipMessage, nodeFlag string, skipIpsList []string) {
-	if len(skipIpsList) != 0 && nodeFlag==""{
-		writer.Skippedf(skipMessage, remoteService, skipIpsList)
+func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomteHAInfraDetails) []string {
+	isRootCaSame := false
+
+	if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
+		isRootCaSame = true
+	}
+
+	isCnSame := true
+	for _, currentCerts := range currentCertsInfo.OpensearchCertsByIP {
+		nodesDn, _ := getDistinguishedNameFromKey(currentCerts.PublicKey)
+		oldCn := nodesDn.CommonName
+		if oldCn != newCn {
+			isCnSame = false
+			break
+		}
+	}
+
+	if node == "" && isRootCaSame && isCnSame {
+		return c.getIps("frontend", infra)
+	}
+
+	if node != "" && isCnSame {
+		return c.getIps("frontend", infra)
+	}
+
+	return []string{}
+}
+func (c *certRotateFlow) skipMessagePrinter(remoteService, skipIpsMsg, nodeFlag string, skipIpsList []string) {
+	if len(skipIpsList) != 0 && nodeFlag == "" {
+		writer.Skippedf(skipIpsMsg, remoteService, skipIpsList)
 	}
 
 	if len(skipIpsList) != 0 && nodeFlag != "" {
 		if stringutils.SliceContains(skipIpsList, nodeFlag) {
-			writer.Skippedf(skipMessage, remoteService, skipIpsList)
+			writer.Skippedf(skipIpsMsg, remoteService, skipIpsList)
 		}
 	}
 }

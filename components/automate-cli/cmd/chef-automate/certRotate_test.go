@@ -442,7 +442,7 @@ func TestGetCerts(t *testing.T) {
 }
 
 func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
-	c, infra := getCertRotateFlowAndInfra()
+	c, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
 		testCaseDescription string
 		remoteService       string
@@ -454,7 +454,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "running for check Automate current certs and new certs : equalcerts",
+			testCaseDescription: "Automate new certs are equal | No node flag",
 			remoteService:       CONST_AUTOMATE,
 			newCerts: &certificates{
 				publicCert:  FileContent,
@@ -480,12 +480,12 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: infra.Outputs.AutomatePrivateIps.Value,
 		},
 		{
-			testCaseDescription: "running for check Automate current certs and new certs : diffcerts",
+			testCaseDescription: "Automate new certs are different | No node flag",
 			remoteService:       CONST_AUTOMATE,
 			newCerts: &certificates{
-				publicCert:  FileContent,
+				publicCert:  FileContent + "a",
 				privateCert: FileContent,
-				rootCA:      FileContent + "a",
+				rootCA:      FileContent,
 			},
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
@@ -506,12 +506,11 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "running for check Automate current certs and new certs : diffcerts",
+			testCaseDescription: "Automate new certs are eqaul | Node flag",
 			remoteService:       CONST_AUTOMATE,
 			newCerts: &certificates{
 				publicCert:  FileContent,
 				privateCert: FileContent,
-				rootCA:      FileContent,
 			},
 			flagsObj: &certRotateFlags{
 				node: ValidIP1,
@@ -534,7 +533,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: []string{ValidIP1},
 		},
 		{
-			testCaseDescription: "running for check ChefServer current certs and new certs : equalcerts",
+			testCaseDescription: "Chef-server new certs are equal | No node flag",
 			remoteService:       CONST_CHEF_SERVER,
 			newCerts: &certificates{
 				publicCert:  FileContent,
@@ -558,7 +557,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: infra.Outputs.ChefServerPrivateIps.Value,
 		},
 		{
-			testCaseDescription: "running for check ChefServer current certs and new certs : diffcerts",
+			testCaseDescription: "Chef-server new certs are different | No node flag",
 			remoteService:       CONST_CHEF_SERVER,
 			newCerts: &certificates{
 				publicCert:  FileContent + "a",
@@ -582,7 +581,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "running for check opensearch current certs and new certs : equalcerts",
+			testCaseDescription: "Opensearch new certs are equals | No node flag",
 			remoteService:       CONST_OPENSEARCH,
 			newCerts: &certificates{
 				publicCert:  FileContent,
@@ -617,7 +616,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: infra.Outputs.OpensearchPrivateIps.Value,
 		},
 		{
-			testCaseDescription: "running for check opensearch current certs and new certs : diffcerts",
+			testCaseDescription: "Opensearch new certs are different | No node flag",
 			remoteService:       CONST_OPENSEARCH,
 			newCerts: &certificates{
 				publicCert:  FileContent + "a",
@@ -652,7 +651,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "running for check postgresql current certs and new certs : equalcerts",
+			testCaseDescription: "Postgresql new certs are eqaul | No node flag",
 			remoteService:       CONST_POSTGRESQL,
 			newCerts: &certificates{
 				publicCert:  FileContent,
@@ -683,7 +682,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			skipIpsList: infra.Outputs.PostgresqlPrivateIps.Value,
 		},
 		{
-			testCaseDescription: "running for check postgresql current certs and new certs : diffcerts",
+			testCaseDescription: "Postgresql new certs are different | No node flag",
 			remoteService:       CONST_POSTGRESQL,
 			newCerts: &certificates{
 				publicCert:  FileContent,
@@ -717,14 +716,14 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.CompareCurrentCertsWithNewCerts(testCase.remoteService, testCase.newCerts, testCase.flagsObj, testCase.currentCertsInfo)
+			skipIpsListGot := c.compareCurrentCertsWithNewCerts(testCase.remoteService, testCase.newCerts, testCase.flagsObj, testCase.currentCertsInfo)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 		})
 	}
 }
 
 func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
-	c, infra := getCertRotateFlowAndInfra()
+	c, infra := getMockCertRotateFlowAndInfra()
 	type testCaseInfo struct {
 		testCaseDescription string
 		remoteService       string
@@ -735,7 +734,7 @@ func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Automate root-ca patching in Chef-server",
+			testCaseDescription: "Automate root-ca patching in chef-server | same root-ca",
 			remoteService:       CONST_AUTOMATE,
 			newRootCA:           FileContent,
 			currentCertsInfo: &certShowCertificates{
@@ -744,7 +743,7 @@ func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
 			skipIpsList: c.getIps(CONST_CHEF_SERVER, infra),
 		},
 		{
-			testCaseDescription: "Automate root-ca patching in Chef-server | new root-ca",
+			testCaseDescription: "Automate root-ca patching in chef-server | different root-ca",
 			remoteService:       CONST_AUTOMATE,
 			newRootCA:           FileContent + "a",
 			currentCertsInfo: &certShowCertificates{
@@ -753,7 +752,7 @@ func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
 			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "Postgresql root-ca patching in FrontEnd",
+			testCaseDescription: "Postgresql root-ca patching in frontend | same root-ca",
 			remoteService:       CONST_POSTGRESQL,
 			newRootCA:           FileContent,
 			currentCertsInfo: &certShowCertificates{
@@ -762,7 +761,7 @@ func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
 			skipIpsList: c.getIps("frontend", infra),
 		},
 		{
-			testCaseDescription: "Postgresql root-ca patching in FrontEnd | new root-ca",
+			testCaseDescription: "Postgresql root-ca patching in frontEnd | different root-ca",
 			remoteService:       CONST_POSTGRESQL,
 			newRootCA:           FileContent + "a",
 			currentCertsInfo: &certShowCertificates{
@@ -780,6 +779,175 @@ func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
 	}
 }
 
+func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
+	c, infra := getMockCertRotateFlowAndInfra()
+	nodesDn, _ := getDistinguishedNameFromKey(FileContent)
+	newCn := nodesDn.CommonName
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		newRootCA           string
+		newCn               string
+		node                string
+		currentCertsInfo    *certShowCertificates
+		infra               *AutomteHAInfraDetails
+		skipIpsList         []string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching",
+			newRootCA:           FileContent,
+			newCn:               newCn,
+			currentCertsInfo: &certShowCertificates{
+				OpensearchRootCert: FileContent,
+				OpensearchCertsByIP: []CertByIP{
+					{
+						IP:         ValidIP4,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP5,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP6,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+				},
+			},
+			infra:       infra,
+			skipIpsList: c.getIps("frontend", infra),
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching",
+			newRootCA:           FileContent,
+			newCn:               newCn + "n",
+			currentCertsInfo: &certShowCertificates{
+				OpensearchRootCert: FileContent,
+				OpensearchCertsByIP: []CertByIP{
+					{
+						IP:         ValidIP4,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP5,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP6,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+				},
+			},
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching",
+			newCn:               newCn,
+			node:                ValidIP4,
+			currentCertsInfo: &certShowCertificates{
+				OpensearchCertsByIP: []CertByIP{
+					{
+						IP:         ValidIP4,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP5,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP6,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+				},
+			},
+			infra:       infra,
+			skipIpsList: c.getIps("frontend", infra),
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching",
+			newCn:               newCn + "n",
+			node:                ValidIP4,
+			currentCertsInfo: &certShowCertificates{
+				OpensearchCertsByIP: []CertByIP{
+					{
+						IP:         ValidIP4,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP5,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP6,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+				},
+			},
+			infra:       infra,
+			skipIpsList: []string{},
+		},
+		{
+			testCaseDescription: "Opensearch root-ca and cn patching 100",
+			newRootCA:           FileContent+"a",
+			newCn:               newCn,
+			currentCertsInfo: &certShowCertificates{
+				OpensearchRootCert: FileContent,
+				OpensearchCertsByIP: []CertByIP{
+					{
+						IP:         ValidIP4,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP5,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+					{
+						IP:         ValidIP6,
+						PublicKey:  FileContent,
+						PrivateKey: FileContent,
+					},
+				},
+			},
+			infra:       infra,
+			skipIpsList: []string{},
+		},	
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescription, func(t *testing.T) {
+			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.node, testCase.currentCertsInfo, infra)
+			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+		})
+	}
+}
+
+func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomteHAInfraDetails) {
+	c := certRotateFlow{FileUtils: mockFS()}
+	infra := &AutomteHAInfraDetails{}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+	return c, infra
+}
+
 func mockFS() *fileutils.MockFileSystemUtils {
 	return &fileutils.MockFileSystemUtils{
 		ReadFileFunc: func(filename string) ([]byte, error) {
@@ -794,14 +962,4 @@ func mockFS() *fileutils.MockFileSystemUtils {
 			}
 		},
 	}
-}
-
-func getCertRotateFlowAndInfra() (certRotateFlow, *AutomteHAInfraDetails) {
-	c := certRotateFlow{FileUtils: mockFS()}
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	return c, infra
 }
