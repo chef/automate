@@ -63,80 +63,15 @@ AWS limits the size of each VPC; a user cannot change the size once the VPC is c
 
 Classless interdomain routing (CIDR) IPv4 and IPv6 blocks defines VPC IP address ranges. You can add primary and secondary CIDR blocks to your VPC if the secondary CIDR block comes from the same address range as the primary block.
 
-### Copying an Existing VPC
+### Create VPC with Wizard
 
-1. Navigate to the **AWS Management Console**.
+- Choose IPV4 CIDR Block
+- Number of AZ, preferable 3
+- Number of Public subnet, preferable 3, 1 for each AZ
+- Number of Private subnet,preferable 3, 1 for each AZ
+- NAT GateWays, preferable 1 per AZ
+- VPC Endpoints, S3 Gateway
 
-1. Select your **AWS Region** from the top toolbar.
+{{< figure src="/images/automate/create-vpc-wizard.png" alt="Create VPC with Wizard">}}
 
-1. From the navigation pane, select **VPC Dashboard** in the upper-left corner.
-
-1. Select **Your VPCs**.
-
-1. Copy any available **VPC ID** from the **Your VPCs** screen.
-
-{{< figure src="/images/automate/ha_aws_vpc_existing.png" alt="Using Existing VPC">}}
-
-#### Adding a Private Subnet to the Available VPC
-
-1. From the navigation pane, select **Subnets**.
-
-1. Search your **VPC ID** in the *Subnets* screen.
-
-1. Copy the corresponding **IPv4 CIDR** value.
-
-{{< figure src="/images/automate/ha_aws_vpc_existing_subnet.png" alt="Using Existing VPC Subnet Value">}}
-
-### Creating a VPC
-
-1. Navigate to the **AWS Management Console**.
-
-1. Select your **AWS Region** from the top toolbar.
-
-1. From the navigation pane, select **VPC Dashboard** in the upper-left corner.
-
-1. Select **Your VPCs**.
-
-1. Select **Create VPC** from the left.
-
-1. For **IPv4 CIDR** block, enter the CIDR block for the VPC. We recommend using a CIDR block from the private (non-publicly routable) IP address ranges. For example, 10.0.0.0/16. For more information, refer [VPC and Subnet Sizing for IPv4 page](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv4).
-
-1. For **IPv6 CIDR** block, keep No IPv6 CIDR Block.
-
-1. For the  VPC name, enter a **tag name**.
-
-1. Select **Create VPC**. After the VPC is created, choose **OK**.
-
-{{< figure src="/images/automate/ha_aws_vpc.png" alt="VPC Creation">}}
-
-#### Adding a Private Subnet
-
-1. From the navigation pane, select **Subnets**.
-
-1. Select **Create Subnet**.
-
-1. Select your **VPC ID** from the drop-down.
-
-1. Enter **Subnet name** for the private subnet (for example, WorkSpaces Private Subnet 2).
-
-1. To make an appropriate selection for **Availability Zone**, see Availability Zones for Amazon WorkSpaces.
-
-1. Enter the CIDR block for the subnet in the **IPv4 CIDR block**. For example, 10.0.2.0/24. Ensure you provide a unique value.
-
-1. Select **Create Subnet**.
-
-{{< figure src="/images/automate/ha_aws_subnet.png" alt="VPC Subnets">}}
-
-{{< note >}}
-
-Refer [select correct CIDR block](https://www.calculator.net/ip-subnet-calculator.html?cclass=a&csubnet=20&cip=172.31.0.0&ctype=ipv4&printit=0&x=82&y=36) page for selecting unique CIDR value for your VPC ID to make it unique.
-
-{{< /note >}}
-
-### Example config.toml file with VPC and CIDR Values
-
-```ruby
-region = "ap-south-1"
-aws_vpc_id  = "vpc-8d1390e5"
-aws_cidr_block_addr  = "172.31.128.0"
-```
+Please refer more on [vpc creation](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-getting-started.html)
