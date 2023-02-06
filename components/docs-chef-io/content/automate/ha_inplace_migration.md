@@ -94,7 +94,7 @@ Follow Automate HA installation documentation. Click [here](/automate/ha_onprim_
 **provide** the same IPs and backup config in config.toml as in the  `a2ha.rb` file.
 
 ## EFS backup configuration
-In case the backup configuration was skipped in the deployment config.toml, the User needs to configure EFS backup manually in Automate HA please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
+In case of if the backup configuration was skipped in the deployment config.toml, the User needs to configure EFS backup manually in Automate HA please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 
 {{<note>}}
 While configuring the backup configuration provide the path of **Elasticsearch** instead of **Opensearch** as A2HA backup was in Elasticsearch directory 
@@ -126,7 +126,7 @@ AND
     path = "/mnt/automate_backups/elasticsearch"
 ```
 
-To restore, use the below command:
+To restore, use the below command from same automate node, Make sure to **stop all other frontend nodes using `chef-automate stop`**:
 
 ```cmd
 sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
