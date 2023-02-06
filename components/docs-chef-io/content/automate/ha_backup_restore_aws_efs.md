@@ -31,9 +31,8 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 - Create an EFS file system, please refer sample steps [here](https://docs.aws.amazon.com/efs/latest/ug/gs-step-two-create-efs-resources.html)
 
-- We have to mount EFS to all the vm's manually. To do that please refer [this](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-helper-ec2-linux.html) 
+- Let's create a folder structure `/mnt/automate_backups/` on all the Frontend and backend nodes, then we have to mount EFS to all the vm's manually. To do that please refer [this](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-helper-ec2-linux.html)
 
-- Let's create a folder structure `/mnt/automate_backups/` on all the Frontend and backend nodes.
 
 #### Configuration in OpenSearch Node
 
@@ -112,7 +111,7 @@ Configure the OpenSearch `path.repo` attribute.
 
 ### Backup
 
-- To create the backup, by running the backup command from bastion. The backup command is as shown below:
+- Run the backup command from bastion as shown below to create a backup:
 
     ```cmd
     chef-automate backup create

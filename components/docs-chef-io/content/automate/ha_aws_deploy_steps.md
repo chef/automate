@@ -25,7 +25,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC we have to create public and private subnet, If subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We recommended that to create a new vpc.
+- we recommend to create a new vpc.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
     Set these in `~/.aws/credentials` in Bastion Host:
 
@@ -58,7 +58,7 @@ Run the following steps on Bastion Host Machine:
 
 - Make sure that bastion machine is in the same vpc, as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
-- If you choose `backup_config` as `s3` then provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
+- If you choose `backup_config` as `s3` then provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
 - If you choose `backup_config` as `efs` then we will create the EFS and mount on all frontend and backend node.
 - If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
 
