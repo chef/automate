@@ -396,7 +396,7 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
 
 	if backend.Conf.EnableEnhancedReporting {
-		return updateDayLatestToFalseForEnhancedCompliance(ctx, backend, boolQueryDayLatestThisNodeNotThisReport, index, mapping, useSummaryIndex, script)
+		return errors.Wrap(updateDayLatestToFalseForEnhancedCompliance(ctx, backend, boolQueryDayLatestThisNodeNotThisReport, index, mapping, useSummaryIndex, script), "setDayLatestToFalseEnhancedReporting")
 	}
 
 	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
