@@ -58,7 +58,7 @@ Run the following steps on Bastion Host Machine:
 
 - Make sure that bastion machine is in the same vpc, as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict. If we use CIDR block, will fail if an consecutive cidr block are not available.
-- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
+- If you choose `backup_config` as `s3` then provide the bucket name to field `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
 - If you choose `backup_config` as `efs` then we will create the EFS and mount on all frontend and backend node.
 - If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
 
@@ -359,32 +359,6 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 {{< /note >}}
 
-
 {{< warning >}}
   Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
 {{< /warning >}}
-
-
-{{< danger >}}
-Below section will destroy the infrastructure
-{{< /danger >}}
-
-### Uninstall chef automate HA
-
-{{< danger >}}
-
-- Running clean up command will remove all AWS resources created by `provision-infra` command
-- Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
-{{< /danger >}}
-
-To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
-
-```bash
-    chef-automate cleanup --aws-deployment --force
-```
-
-OR
-
-```bash
-    chef-automate cleanup --aws-deployment
-```

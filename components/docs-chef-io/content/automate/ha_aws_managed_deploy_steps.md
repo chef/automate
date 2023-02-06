@@ -57,7 +57,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
   - `os_snapshot_user_access_key_secret`
-- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly use for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
+- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly used for backup configuration and if it doesn't exist then deployment code will create `s3_bucketName`.
 - We recommended that to use `backup_config` to be set to `s3` at the time of deployment.
 
 {{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
@@ -306,3 +306,20 @@ X-Project = ""
 - Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`
 - Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
+
+### How to Add more nodes In AWS Deployment, post deployment
+
+The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
+For example,
+
+- if you want to add 2 nodes to automate, you have to run the:
+
+    ```sh
+    chef-automate node add --automate-count 2
+    ```
+
+- If you want to add 3 nodes to chef-server, you have to run the:
+
+```sh
+    chef-automate node add --chef-server-count 3
+```
