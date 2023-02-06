@@ -126,6 +126,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status
+   "
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
@@ -289,6 +290,7 @@ Continue with the deployment after updating the config:
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status
+   "
 ```
 
 ### Sample config to setup On-Premise Deployment with AWS Managed Services
@@ -371,6 +373,7 @@ Continue with the deployment after updating the config:
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
    chef-automate status
+   "
 ```
 
 ### Sample config to setup On-Premise Deployment with Self Managed Services
@@ -482,6 +485,8 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 {{< warning >}}
 
 - We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+
+- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 
 - Below process can be done for `chef-server` and `automate`.
 

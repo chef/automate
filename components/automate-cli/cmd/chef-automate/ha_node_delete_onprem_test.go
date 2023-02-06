@@ -81,7 +81,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
 		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
-Unable to remove node. Chef Server instance count cannot be less than 1. Final count -1 not allowed.
+Unable to remove node. Chef-Server instance count cannot be less than 1. Final count -1 not allowed.
 Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
 Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.`)
 }
@@ -205,7 +205,7 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unable to remove node. Chef Server instance count cannot be less than 1. Final count 0 not allowed.")
+	assert.Contains(t, err.Error(), "Unable to remove node. Chef-Server instance count cannot be less than 1. Final count 0 not allowed.")
 	// even though validation will fail still we check if modify config is working as expected or not
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
@@ -318,6 +318,7 @@ Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 Nodes to be deleted:
 ================================================
 Automate => 192.0.2.0
+Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
@@ -369,6 +370,7 @@ Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 Nodes to be deleted:
 ================================================
 OpenSearch => 192.0.2.3
+Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodedelete.runDeploy()
 	assert.NoError(t, err)
@@ -454,6 +456,7 @@ Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 Nodes to be deleted:
 ================================================
 OpenSearch => 192.0.2.3
+Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodedelete.runDeploy()
 	assert.Error(t, err)
@@ -521,6 +524,7 @@ Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 Nodes to be deleted:
 ================================================
 OpenSearch => 192.0.2.6
+Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
@@ -577,6 +581,7 @@ Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 Nodes to be deleted:
 ================================================
 OpenSearch => 192.0.2.6
+Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)

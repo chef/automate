@@ -143,7 +143,7 @@ Run the following steps on Bastion Host Machine:
 
    #Check Chef Automate HA deployment information, using the following command
    chef-automate info
-      "
+   "
    ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
@@ -361,5 +361,76 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 {{< /note >}}
 
 {{< warning >}}
-  Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
+  Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes. 
 {{< /warning >}}
+
+### How to Delete single node In AWS Deployment, post deployment.
+
+{{< warning >}}
+
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+
+- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
+
+- Below process can be done for `chef-server` and `automate`.
+
+{{< /warning >}}
+
+The commands require some arguments so that it can determine which types of nodes you want to remove to your HA setup from your bastion host. It needs the ip address of the node you want to remove as as argument when you run the command.
+For example,
+
+- if you want to remove node of automate, you have to run the:
+
+    ```sh
+    chef-automate node remove --automate-ip "<automate-ip-address>"
+    ```
+
+- If you want to remove node of chef-server, you have to run the:
+
+    ```sh
+    chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
+    ```
+
+- If you want to remove node of OpenSearch, you have to run the:
+
+    ```sh
+    chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
+    ```
+
+- If you want to remove node of PostgreSQL you have to run:
+
+    ```sh
+    chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
+    ```
+
+You can mix and match different services if you want to add nodes across various services.
+
+- If you want to remove node of automate and PostgreSQL, you have to run:
+
+    ```sh
+    chef-automate node remove --automate-ip "<automate-ip-address>" --postgresql-ip "<postgresql-ip-address>"
+    ```
+
+- If you want to remove node of automate, chef-server, PostgreSQL and OpenSearch you have to run:
+
+    ```sh
+    chef-automate node add --automate-ip "<automate-ip-address>" --postgresql-ip "<postgresql-ip-address>" --chef-server-ip "<chef-server-ip-address>" --opensearch-ip "<opensearch-ip-address>"
+    ```
+
+Once the command executes, it will remove nodes to your HA setup
+
+### Uninstall chef automate HA
+
+{{< danger >}}
+- Running clean up command will remove all AWS resources created by `provision-infra` command
+- Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
+{{< /danger >}}
+
+To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+```bash
+    chef-automate cleanup --aws-deployment --force
+```
+or
+```bash
+    chef-automate cleanup --aws-deployment
+```

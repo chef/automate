@@ -47,12 +47,17 @@ type MockNodeUtilsImpl struct {
 	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
 	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
 	getModeOfDeploymentFunc                   func() string
+	executeShellCommandFunc                   func() error
 	moveAWSAutoTfvarsFileFunc                 func(path string) error
 	modifyTfArchFileFunc                      func(path string) error
+	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	return mnu.executeAutomateClusterCtlCommandAsyncfunc(command, args, helpDocs)
+}
+func (mnu *MockNodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
+	return mnu.getAWSConfigIpFunc()
 }
 func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()
@@ -63,6 +68,7 @@ func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data inter
 func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
 	return mnu.taintTerraformFunc(path)
 }
+
 func (mnu *MockNodeUtilsImpl) isA2HARBFileExist() bool {
 	return mnu.isA2HARBFileExistFunc()
 }
@@ -90,6 +96,10 @@ func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, er
 func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
 	return mnu.getModeOfDeploymentFunc()
 }
+func (mnu *MockNodeUtilsImpl) executeShellCommand(command, path string) error {
+	return mnu.executeShellCommandFunc()
+}
+
 func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
 	return mnu.moveAWSAutoTfvarsFileFunc(path)
 }
@@ -115,14 +125,29 @@ type NodeOpUtils interface {
 	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
 	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
 	getModeOfDeployment() string
+	executeShellCommand(command string, path string) error
 	moveAWSAutoTfvarsFile(string) error
 	modifyTfArchFile(string) error
+	getAWSConfigIp() (*AWSConfigIp, error)
 }
 
 type NodeUtilsImpl struct{}
 
 func NewNodeUtils() NodeOpUtils {
 	return &NodeUtilsImpl{}
+}
+
+func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
+	outputDetails, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return nil, err
+	}
+	return &AWSConfigIp{
+		configAutomateIpList:   outputDetails.Outputs.AutomatePrivateIps.Value,
+		configChefServerIpList: outputDetails.Outputs.ChefServerPrivateIps.Value,
+		configOpensearchIpList: outputDetails.Outputs.OpensearchPrivateIps.Value,
+		configPostgresqlIpList: outputDetails.Outputs.PostgresqlPrivateIps.Value,
+	}, nil
 }
 
 func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
@@ -277,6 +302,12 @@ func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 func (nu *NodeUtilsImpl) getModeOfDeployment() string {
 	return getModeOfDeployment()
 }
+func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
+	return executeShellCommand("/bin/sh", []string{
+		"-c",
+		command,
+	}, path)
+}
 
 func trimSliceSpace(slc []string) []string {
 	for i := range slc {
@@ -324,6 +355,18 @@ func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]stri
 			*certsIp = findAndDelete(*certsIp, ip)
 		}
 	}
+	return nil
+}
+
+func modifyConfigForDeleteNodeForAWS(instanceCount *string, newIps []string) error {
+	if len(newIps) == 0 {
+		return nil
+	}
+	inc, err := modifyInstanceCount(*instanceCount, -len(newIps))
+	if err != nil {
+		return err
+	}
+	*instanceCount = inc
 	return nil
 }
 
