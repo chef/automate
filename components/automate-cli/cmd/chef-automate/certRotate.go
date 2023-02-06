@@ -402,12 +402,7 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 	}
 
 	//collect ips on which need to perform action/cert-rotation
-	filteredIps := []string{}
-	for _, ip := range ips {
-		if stringutils.SliceContains(skipIpsList, ip) == false {
-			filteredIps = append(filteredIps, ip)
-		}
-	}
+	filteredIps :=c.getFilteredIps(ips,skipIpsList)
 
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
@@ -537,6 +532,18 @@ func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
 	return ips
 }
 
+//getFilteredIps will return ips on which cert-rotation need to perform.
+func (c *certRotateFlow) getFilteredIps(serviceIps,skipIpsList []string) []string {
+	filteredIps := []string{}
+	for _, ip := range serviceIps {
+		if stringutils.SliceContains(skipIpsList, ip) == false {
+			filteredIps = append(filteredIps, ip)
+		}
+	}
+	return filteredIps
+}
+
+//compareCurrentCertsWithNewCerts compare current certs and new certs and returns ips to skip cert-rotation.
 func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, newCerts *certificates, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 	isCertsSame := true
@@ -573,6 +580,7 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 	return skipIpsList
 }
 
+//comparePublicCertAndPrivateCert compare new public-cert and private cert with current public-cert and private-cert and returns ips to skip cert-rotation.
 func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
 	skipIpsList := []string{}
 	for _, currentCerts := range certByIpList {
@@ -591,6 +599,7 @@ func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates,
 	return skipIpsList
 }
 
+//getFrontEndIpsForSkippingRootCAPatching compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
 func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService string, newRootCA string, infra *AutomteHAInfraDetails, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 
@@ -609,6 +618,7 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 	return skipIpsList
 }
 
+//getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
 func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomteHAInfraDetails) []string {
 	isRootCaSame := false
 
@@ -636,6 +646,8 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA,
 
 	return []string{}
 }
+
+// skipMessagePrinter print the skip message 
 func (c *certRotateFlow) skipMessagePrinter(remoteService, skipIpsMsg, nodeFlag string, skipIpsList []string) {
 	if len(skipIpsList) != 0 && nodeFlag == "" {
 		writer.Skippedf(skipIpsMsg, remoteService, skipIpsList)

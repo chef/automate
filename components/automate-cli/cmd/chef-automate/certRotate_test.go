@@ -516,7 +516,6 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 				node: ValidIP1,
 			},
 			currentCertsInfo: &certShowCertificates{
-				AutomateRootCert: FileContent,
 				AutomateCertsByIP: []CertByIP{
 					{
 						IP:         ValidIP,
@@ -796,7 +795,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 
 	testCases := []testCaseInfo{
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching",
+			testCaseDescription: "Opensearch root-ca and cn patching | same cn and root-ca",
 			newRootCA:           FileContent,
 			newCn:               newCn,
 			currentCertsInfo: &certShowCertificates{
@@ -823,7 +822,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			skipIpsList: c.getIps("frontend", infra),
 		},
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching",
+			testCaseDescription: "Opensearch root-ca and cn patching | same root-ca different cn",
 			newRootCA:           FileContent,
 			newCn:               newCn + "n",
 			currentCertsInfo: &certShowCertificates{
@@ -850,7 +849,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching",
+			testCaseDescription: "Opensearch root-ca and cn patching | same cn and node flag",
 			newCn:               newCn,
 			node:                ValidIP4,
 			currentCertsInfo: &certShowCertificates{
@@ -876,7 +875,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			skipIpsList: c.getIps("frontend", infra),
 		},
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching",
+			testCaseDescription: "Opensearch root-ca and cn patching | different cn and node flag",
 			newCn:               newCn + "n",
 			node:                ValidIP4,
 			currentCertsInfo: &certShowCertificates{
@@ -902,8 +901,8 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			skipIpsList: []string{},
 		},
 		{
-			testCaseDescription: "Opensearch root-ca and cn patching 100",
-			newRootCA:           FileContent+"a",
+			testCaseDescription: "Opensearch root-ca and cn patching | different root-ca",
+			newRootCA:           FileContent + "a",
 			newCn:               newCn,
 			currentCertsInfo: &certShowCertificates{
 				OpensearchRootCert: FileContent,
@@ -927,13 +926,48 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 			},
 			infra:       infra,
 			skipIpsList: []string{},
-		},	
+		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.node, testCase.currentCertsInfo, infra)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
+		})
+	}
+}
+
+func TestGetFilteredIps(t *testing.T) {
+	c, infra := getMockCertRotateFlowAndInfra()
+
+	type testCaseInfo struct {
+		serviceIps          []string
+		skipIpsList         []string
+		filteredIpsExpected []string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			serviceIps:          infra.Outputs.OpensearchPrivateIps.Value,
+			skipIpsList:         []string{ValidIP5},
+			filteredIpsExpected: []string{ValidIP4, ValidIP6},
+		},
+		{
+			serviceIps:          infra.Outputs.OpensearchPrivateIps.Value,
+			skipIpsList:         []string{},
+			filteredIpsExpected: infra.Outputs.OpensearchPrivateIps.Value,
+		},
+		{
+			serviceIps:          infra.Outputs.OpensearchPrivateIps.Value,
+			skipIpsList:         infra.Outputs.OpensearchPrivateIps.Value,
+			filteredIpsExpected: []string{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run("TestingGetFilteredIps", func(t *testing.T) {
+			filteredIpsGot := c.getFilteredIps(testCase.serviceIps, testCase.skipIpsList)
+			assert.Equal(t, testCase.filteredIpsExpected, filteredIpsGot)
 		})
 	}
 }
