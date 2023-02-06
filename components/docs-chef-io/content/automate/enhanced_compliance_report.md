@@ -1,7 +1,7 @@
 +++
 title = "Enhanced Compliance Report Ingestion"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 [menu]
