@@ -43,6 +43,11 @@ type SSHUtilImpl struct {
 }
 
 func NewSSHUtil(sshconfig *SSHConfig) SSHUtil {
+	// Set timeout. Default is 150 seconds.
+	if sshconfig.timeout == 0 {
+		sshconfig.timeout = 150
+	}
+
 	return &SSHUtilImpl{
 		SshConfig: sshconfig,
 	}
@@ -156,12 +161,6 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	logrus.Debug("Executing command ......")
 	logrus.Debug(remoteCommands)
 
-	// Set timeout. Default is 1 hour
-	timeout := 3600
-	if s.SshConfig.timeout > 0 {
-		timeout = s.SshConfig.timeout
-	}
-
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -192,7 +191,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	}()
 
 	select {
-	case <-time.After(time.Duration(timeout) * time.Second):
+	case <-time.After(time.Duration(s.SshConfig.timeout) * time.Second):
 		return "", errors.New("command timed out")
 	case err := <-errCh:
 		if err != nil {
