@@ -22,7 +22,7 @@ func TestPGSidecar(t *testing.T) {
 	defer cancel()
 
 	pgs, err := client.NewClient(
-		client.WithHost("localhost"),
+		client.WithHost("127.0.0.1"),
 		client.WithPort(10100),
 		client.WithTLSCertPath("/hab/svc/pg-sidecar-service/config/service.crt"),
 		client.WithTLSKeyPath("/hab/svc/pg-sidecar-service/config/service.key"),
