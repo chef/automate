@@ -509,7 +509,7 @@ func newPgHelper() (*pgHelper, error) {
 	pgh := &pgHelper{
 		conInfo: &pg.A2ConnInfo{
 			User: "automate",
-			Host: "localhost",
+			Host: "127.0.0.1",
 			Port: 5432,
 			Certs: pg.TLSCertPaths{
 				Cert:     "/hab/svc/automate-postgresql/config/server.crt",
