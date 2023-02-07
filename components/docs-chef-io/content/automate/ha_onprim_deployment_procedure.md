@@ -466,6 +466,8 @@ You can mix and match different services if you want to add nodes across various
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
 
+- Make sure to update your loadbalancer configuration with the ip address of the new node. For reference check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
+
 {{< note >}}
 
 - If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
@@ -535,6 +537,8 @@ You can mix and match different services to remove nodes across various services
     ```
 
 Once the command executes, it will remove the supplied nodes from your automate setup. The changes might take a while.
+
+- Make sure to remove the ip address of the deleted node from your loadbalancer configuration. For reference check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
 {{< note >}}
 

@@ -20,6 +20,14 @@ const (
 	OPENSEARCH_MIN_INSTANCE_COUNT  = 3
 )
 
+type SvcDetailOnPrem struct {
+	ipList         []string
+	configKey      string
+	minCount       int
+	instanceCount  string
+	existingIplist []string
+}
+
 type DeleteNodeOnPremImpl struct {
 	config                  ExistingInfraConfigToml
 	copyConfigForUserPrompt ExistingInfraConfigToml
@@ -189,19 +197,16 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 
 func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
 	errorList := list.New()
-	var validations = []struct {
-		ipList         []string
-		configKey      string
-		minCount       int
-		instanceCount  string
-		existingIplist []string
-	}{
+	var validations = []SvcDetailOnPrem{
 		{dni.automateIpList, "Automate", AUTOMATE_MIN_INSTANCE_COUNT, dni.config.Automate.Config.InstanceCount, dni.config.ExistingInfra.Config.AutomatePrivateIps},
 		{dni.chefServerIpList, "Chef-Server", CHEF_SERVER_MIN_INSTANCE_COUNT, dni.config.ChefServer.Config.InstanceCount, dni.config.ExistingInfra.Config.ChefServerPrivateIps},
-		{dni.opensearchIpList, "OpenSearch", OPENSEARCH_MIN_INSTANCE_COUNT, dni.config.Opensearch.Config.InstanceCount, dni.config.ExistingInfra.Config.OpensearchPrivateIps},
-		{dni.postgresqlIp, "Postgresql", POSTGRESQL_MIN_INSTANCE_COUNT, dni.config.Postgresql.Config.InstanceCount, dni.config.ExistingInfra.Config.PostgresqlPrivateIps},
 	}
-
+	if !dni.nodeUtils.isManagedServicesOn() {
+		validations = append(validations, []SvcDetailOnPrem{
+			{dni.opensearchIpList, "OpenSearch", OPENSEARCH_MIN_INSTANCE_COUNT, dni.config.Opensearch.Config.InstanceCount, dni.config.ExistingInfra.Config.OpensearchPrivateIps},
+			{dni.postgresqlIp, "Postgresql", POSTGRESQL_MIN_INSTANCE_COUNT, dni.config.Postgresql.Config.InstanceCount, dni.config.ExistingInfra.Config.PostgresqlPrivateIps},
+		}...)
+	}
 	for _, v := range validations {
 		if len(v.ipList) == 0 {
 			continue

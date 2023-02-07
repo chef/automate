@@ -13,6 +13,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type SvcDetails struct {
+	ipList         []string
+	configIpList   []string
+	instanceCount  string
+	minInstanceCnt int
+	name           string
+}
 type DeleteNodeAWSImpl struct {
 	config           AwsConfigToml
 	automateIpList   []string
@@ -260,22 +267,20 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 
 func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 	errorList := list.New()
-	services := []struct {
-		ipList         []string
-		configIpList   []string
-		instanceCount  string
-		minInstanceCnt int
-		name           string
-	}{
+	services := []SvcDetails{
 		{dna.automateIpList, dna.configAutomateIpList, dna.config.Automate.Config.InstanceCount, AUTOMATE_MIN_INSTANCE_COUNT, "Automate"},
 		{dna.chefServerIpList, dna.configChefServerIpList, dna.config.ChefServer.Config.InstanceCount, CHEF_SERVER_MIN_INSTANCE_COUNT, "Chef-Server"},
-		{dna.opensearchIpList, dna.configOpensearchIpList, dna.config.Opensearch.Config.InstanceCount, OPENSEARCH_MIN_INSTANCE_COUNT, "OpenSearch"},
-		{dna.postgresqlIpList, dna.configPostgresqlIpList, dna.config.Postgresql.Config.InstanceCount, POSTGRESQL_MIN_INSTANCE_COUNT, "Postgresql"},
+	}
+	if !dna.nodeUtils.isManagedServicesOn() {
+		services = append(services, []SvcDetails{
+			{dna.opensearchIpList, dna.configOpensearchIpList, dna.config.Opensearch.Config.InstanceCount, OPENSEARCH_MIN_INSTANCE_COUNT, "OpenSearch"},
+			{dna.postgresqlIpList, dna.configPostgresqlIpList, dna.config.Postgresql.Config.InstanceCount, POSTGRESQL_MIN_INSTANCE_COUNT, "Postgresql"},
+		}...)
 	}
 	for _, service := range services {
 		if len(service.ipList) > 1 {
 			errorList.PushBack(fmt.Sprintf("Only one %s is allowed to delete for AWS deployment type", service.name))
-		} else {
+		} else if len(service.ipList) == 1 {
 			allowed, finalCount, err := isFinalInstanceCountAllowed(service.instanceCount, -len(service.ipList), service.minInstanceCnt)
 			if err != nil {
 				errorList.PushBack(fmt.Sprintf("Error occurred in calculating %s final instance count", service.name))
