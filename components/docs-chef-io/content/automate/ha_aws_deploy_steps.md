@@ -403,20 +403,6 @@ For example,
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
-You can mix and match different services if you want to add nodes across various services.
-
-- If you want to remove node of automate and PostgreSQL, you have to run:
-
-    ```sh
-    chef-automate node remove --automate-ip "<automate-ip-address>" --postgresql-ip "<postgresql-ip-address>"
-    ```
-
-- If you want to remove node of automate, chef-server, PostgreSQL and OpenSearch you have to run:
-
-    ```sh
-    chef-automate node add --automate-ip "<automate-ip-address>" --postgresql-ip "<postgresql-ip-address>" --chef-server-ip "<chef-server-ip-address>" --opensearch-ip "<opensearch-ip-address>"
-    ```
-
 Once the command executes, it will remove nodes to your HA setup
 
 ### Uninstall chef automate HA
