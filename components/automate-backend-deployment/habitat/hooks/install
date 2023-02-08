@@ -68,16 +68,12 @@ if [ -L /hab/a2_deploy_workspace ]; then
   fi
   echo "Copying old workspace terraform/destroy/aws/*" >> $LOGGER
   if [[ -f $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate ]]; then
-    cp $OLD_WORKSPACE/terraform/destroy/aws/a2ha_habitat.auto.tfvars $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE/terraform/destroy/aws/a2ha_habitat.auto.tfvars" >> $LOGGER
-    cp $OLD_WORKSPACE/terraform/destroy/aws/aws.auto.tfvars $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/aws.auto.tfvars" >> $LOGGER
-    cp $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/terraform.tfstate" >> $LOGGER
-    cp $OLD_WORKSPACE/terraform/destroy/aws/variables_common.tf $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/variables_common.tf" >> $LOGGER
-    cp $OLD_WORKSPACE/terraform/destroy/aws/variables.tf $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/variables.tf" >> $LOGGER
+    find $OLD_WORKSPACE/terraform/destroy/aws -name \*.tfvars -exec cp {} $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied tfvars to new workspace" >> $LOGGER
+    find $OLD_WORKSPACE/terraform/destroy/aws -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied tfstate to new workspace" >> $LOGGER
+    find $OLD_WORKSPACE/terraform/destroy/aws -name \*.tf -exec cp {} $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied tf to new workspace" >> $LOGGER
   fi
   echo " copy .abb files from old workspace if any exist" >> $LOGGER
   # copy .abb files from old workspace if any exist
