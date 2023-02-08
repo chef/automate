@@ -466,6 +466,8 @@ You can mix and match different services if you want to add nodes across various
 
 Once the command executes, it will add the supplied nodes to your automate setup. The changes might take a while.
 
+- Make sure to update your loadbalancer configuration with the ip address of the new node. For reference check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
+
 {{< note >}}
 
 - If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
@@ -499,25 +501,25 @@ For example,
 - if you want to remove nodes with IP 10.1.2.23 to automate, you have to run the:
 
     ```sh
-    chef-automate node remove --automate 10.1.2.23
+    chef-automate node remove --automate-ip 10.1.2.23
     ```
 
 - If you want to remove nodes with IP 10.1.2.23 and 10.0.1.42 to chef-server you have to run the:
 
     ```sh
-    chef-automate node remove --chef-server 10.1.2.23,10.0.1.42
+    chef-automate node remove --chef-server-ip 10.1.2.23,10.0.1.42
     ```
 
 - If you want to remove nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, you have to run:
 
     ```sh
-    chef-automate node remove --opensearch 10.1.2.23,10.0.1.42
+    chef-automate node remove --opensearch-ip 10.1.2.23,10.0.1.42
     ```
 
   - If you want to remove nodes with IP 10.1.2.23, 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
 
     ```sh
-    chef-automate node remove --postgresql 10.1.2.23,10.0.1.42,10.0.1.54
+    chef-automate node remove --postgresql-ip 10.1.2.23,10.0.1.42,10.0.1.54
     ```
 
 You can mix and match different services to remove nodes across various services.
@@ -525,16 +527,18 @@ You can mix and match different services to remove nodes across various services
 - If you want to remove nodes with IP 10.1.2.23 to automate and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL, you have to run:
 
     ```sh
-    chef-automate node remove --automate 10.1.2.23 --postgresql 10.0.1.42,10.0.1.54
+    chef-automate node remove --automate-ip 10.1.2.23 --postgresql-ip 10.0.1.42,10.0.1.54
     ```
 
 - If you want to remove nodes with IP 10.1.2.23 to automate, nodes with IP 10.1.0.36 and 10.0.1.233 to chef-server, and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
 
     ```sh
-    chef-automate node remove --automate 10.1.2.23 --chef-server 10.1.0.36,10.0.1.233  --postgresql 10.0.1.42,10.0.1.54
+    chef-automate node remove --automate-ip 10.1.2.23 --chef-server-ip 10.1.0.36,10.0.1.233  --postgresql-ip 10.0.1.42,10.0.1.54
     ```
 
 Once the command executes, it will remove the supplied nodes from your automate setup. The changes might take a while.
+
+- Make sure to remove the ip address of the deleted node from your loadbalancer configuration. For reference check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
 {{< note >}}
 
