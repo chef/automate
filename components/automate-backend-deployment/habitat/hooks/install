@@ -68,16 +68,16 @@ if [ -L /hab/a2_deploy_workspace ]; then
   fi
   echo "Copying old workspace terraform/destroy/aws/*" >> $LOGGER
   if [[ -f $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate ]]; then
-    cp -r $OLD_WORKSPACE/terraform/destroy/aws/a2ha_habitat.auto.tfvars $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace /terraform/destroy/aws/a2ha_habitat.auto.tfvars" >> $LOGGER
-    cp -r $OLD_WORKSPACE/terraform/destroy/aws/aws.auto.tfvars $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace /terraform/destroy/aws/aws.auto.tfvars" >> $LOGGER
-    cp -r $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace /terraform/destroy/aws/terraform.tfstate" >> $LOGGER
-    cp -r $OLD_WORKSPACE/terraform/destroy/aws/variables_common.tf $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace /terraform/destroy/aws/variables_common.tf" >> $LOGGER
-    cp -r $OLD_WORKSPACE/terraform/destroy/aws/variables.tf $NEW_WORKSPACE/terraform/destroy/aws/ \;
-    echo "Copied old workspace /terraform/destroy/aws/variables.tf" >> $LOGGER
+    cp $OLD_WORKSPACE/terraform/destroy/aws/a2ha_habitat.auto.tfvars $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE/terraform/destroy/aws/a2ha_habitat.auto.tfvars" >> $LOGGER
+    cp $OLD_WORKSPACE/terraform/destroy/aws/aws.auto.tfvars $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/aws.auto.tfvars" >> $LOGGER
+    cp $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/terraform.tfstate" >> $LOGGER
+    cp $OLD_WORKSPACE/terraform/destroy/aws/variables_common.tf $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/variables_common.tf" >> $LOGGER
+    cp $OLD_WORKSPACE/terraform/destroy/aws/variables.tf $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied old workspace $OLD_WORKSPACE $NEW_WORKSPACE /terraform/destroy/aws/variables.tf" >> $LOGGER
   fi
   echo " copy .abb files from old workspace if any exist" >> $LOGGER
   # copy .abb files from old workspace if any exist
