@@ -40,14 +40,18 @@ EOHELP
 }
 
 # renames old workspace using the version info from its symlink destination for easy access
+sudo mkdir -p /temp_logs
+echo 'This file is initiated' >> /temp_logs/my_logs.logs
 if [ -L /hab/a2_deploy_workspace ]; then
+  echo 'Readlink...'  >> /temp_logs/my_logs.logs
   OLD_WORKSPACE=`readlink -f /hab/a2_deploy_workspace`
 
-  if [ $NEW_WORKSPACE == $OLD_WORKSPACE ]; then
+  if [[ $NEW_WORKSPACE == $OLD_WORKSPACE ]]; then
+    echo 'Same workspace...'  >> /temp_logs/my_logs.logs
     echo "/hab/a2_deploy_workspace is up to date." && exit 0
   fi
 
-  echo "Copying files from previous workspace"
+  echo "Copying files from previous workspace" >> /temp_logs/my_logs.logs
 
   NEW_SYMLINK=/hab/`readlink -f /hab/a2_deploy_workspace | awk -F "/" '{ print $(NF) "_" $(NF-2) "-" $(NF-1) }'`
   ln -s $OLD_WORKSPACE $NEW_SYMLINK
