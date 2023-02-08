@@ -40,28 +40,41 @@ EOHELP
 }
 
 # renames old workspace using the version info from its symlink destination for easy access
+sudo mkdir -p /temp_logs
+echo 'This file is initiated' >> /temp_logs/my_logs.logs
 if [ -L /hab/a2_deploy_workspace ]; then
+  echo 'Readlink...'  >> /temp_logs/my_logs.logs
   OLD_WORKSPACE=`readlink -f /hab/a2_deploy_workspace`
 
-  if [ $NEW_WORKSPACE == $OLD_WORKSPACE ]; then
+  if [[ $NEW_WORKSPACE == $OLD_WORKSPACE ]]; then
+    echo 'Same workspace...'  >> /temp_logs/my_logs.logs
     echo "/hab/a2_deploy_workspace is up to date." && exit 0
   fi
 
-  echo "Copying files from previous workspace"
+  echo "Copying files from previous workspace" >> /temp_logs/my_logs.logs
 
   NEW_SYMLINK=/hab/`readlink -f /hab/a2_deploy_workspace | awk -F "/" '{ print $(NF) "_" $(NF-2) "-" $(NF-1) }'`
+  echo '$NEW_SYMLINK' >> /temp_logs/my_logs.logs
+  echo $NEW_SYMLINK >> /temp_logs/my_logs.logs
   ln -s $OLD_WORKSPACE $NEW_SYMLINK
   rm /hab/a2_deploy_workspace
   # copy over tfvars from old workspace if any exist
   find $OLD_WORKSPACE/terraform -name \*.tfvars -exec cp {} $NEW_WORKSPACE/terraform \;
+  echo "======OLD_WORKSPACE find result =======" >> /temp_logs/my_logs.logs
+  echo "$OLD_WORKSPACE/terraform -name \*.tfvars" >> /temp_logs/my_logs.logs
   # copy over tfstate from old workspace if any exist
   # find $OLD_WORKSPACE/terraform -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform \;
   if [[ -f $OLD_WORKSPACE/terraform/terraform.tfstate ]]; then
+    echo 'find $OLD_WORKSPACE/terraform' >> /temp_logs/my_logs.logs
     cp $OLD_WORKSPACE/terraform/*.tfstate $NEW_WORKSPACE/terraform \;
+  else
+    echo '$OLD_WORKSPACE/terraform is not found' >> /temp_logs/my_logs.logs
   fi
   if [[ -f $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate ]]; then
+    echo 'Copying tfstate from destroy folders'
     cp -r $OLD_WORKSPACE/terraform/destroy/aws/* $NEW_WORKSPACE/terraform/destroy/aws/ \;
   fi
+    echo 'Finished Copying tfstate from destroy folders'
   # copy .abb files from old workspace if any exist
   find $OLD_WORKSPACE/terraform -name \*.abb -exec cp {} $NEW_WORKSPACE/terraform \;
   # copy over configs from old workspace if any exist
