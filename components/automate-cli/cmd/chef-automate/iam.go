@@ -33,7 +33,7 @@ func newIAMCommand() *cobra.Command {
 		Use:   "iam COMMAND",
 		Short: "Chef Automate iam commands",
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 }
@@ -43,7 +43,7 @@ func newIAMAdminAccessCommand() *cobra.Command {
 		Use:   "admin-access COMMAND",
 		Short: "Manage and restore default admin access",
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 }
@@ -53,7 +53,7 @@ func newIAMTokensCommand() *cobra.Command {
 		Use:   "token COMMAND",
 		Short: "Manage tokens",
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 }
@@ -65,7 +65,7 @@ func newIAMCreateTokenCommand() *cobra.Command {
 		RunE:  runCreateTokenCmd,
 		Args:  cobra.ExactArgs(1),
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 	cmd.PersistentFlags().BoolVar(
@@ -90,7 +90,7 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 		RunE: runRestoreDefaultAdminAccessAdminCmd,
 		Args: cobra.ExactArgs(1),
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 	cmd.PersistentFlags().BoolVar(
@@ -108,7 +108,7 @@ func newIAMVersionCmd() *cobra.Command {
 		RunE:  runIAMVersionCmd,
 		Args:  cobra.ExactArgs(0),
 		Annotations: map[string]string{
-			docs.Tag: docs.Automate,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 }

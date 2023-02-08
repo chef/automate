@@ -103,13 +103,21 @@ func init() {
 
 	// config set flags
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Set toml configuration to the automate node")
+	setConfigCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.automate, "a2", false, "Set toml configuration to the automate node[DUPLICATE]")
+	setConfigCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.chef_server, "chef_server", "c", false, "Set toml configuration to the chef_server node")
+	setConfigCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.chef_server, "cs", false, "Set toml configuration to the chef_server node[DUPLICATE]")
+	setConfigCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.opensearch, "opensearch", "o", false, "Set toml configuration to the opensearch node")
+	setConfigCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.opensearch, "os", false, "Set toml configuration to the opensearch node[DUPLICATE]")
+	setConfigCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.postgresql, "postgresql", "p", false, "Set toml configuration to the postgresql node")
+	setConfigCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 	setConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Set toml configuration to the postgresql node[DUPLICATE]")
+	setConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
@@ -129,6 +137,9 @@ var showConfigCmd = &cobra.Command{
 	Long:  "Show the Chef Automate configuration. When given a filepath, the output will be written to the file instead of printed to STDOUT",
 	RunE:  runShowCmd,
 	Args:  cobra.RangeArgs(0, 2),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
 }
 
 var patchConfigCmd = &cobra.Command{
@@ -136,6 +147,9 @@ var patchConfigCmd = &cobra.Command{
 	Short: "patch the Chef Automate configuration", Long: "Apply a partial Chef Automate configuration to the deployment. It will take the partial configuration, merge it with the existing configuration, and apply and required changes.",
 	RunE: runPatchCommand,
 	Args: cobra.ExactArgs(1),
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
 }
 
 var setConfigCmd = &cobra.Command{
@@ -145,7 +159,7 @@ var setConfigCmd = &cobra.Command{
 	RunE:  runSetCommand,
 	Args:  cobra.ExactArgs(1),
 	Annotations: map[string]string{
-		docs.Tag: docs.FrontEnd,
+		docs.Tag: docs.BastionHost,
 	},
 }
 
@@ -156,7 +170,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		if isManagedServicesOn() {
 			err := errorOnSelfManaged(configCmdFlags.postgresql, configCmdFlags.opensearch)
 			if err != nil {
-				return status.Annotate(err,  status.InvalidCommandArgsError)
+				return status.Annotate(err, status.InvalidCommandArgsError)
 			}
 		}
 
@@ -459,7 +473,7 @@ func patchConfigForPostgresqlNodes(args []string, remoteService string, sshUtil 
 // patchConfigForOpensearch patches the config for open-search nodes in Automate HA
 func patchConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError,  ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
 	}
 
 	if len(infra.Outputs.OpensearchPrivateIps.Value) == 0 {
