@@ -19,7 +19,7 @@ gh_repo = "automate"
 
 {{< note >}}
 
--   If the user chooses `backup_config` as `object_storage` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
+- If the user chooses `backup_config` as `object_storage` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
@@ -33,11 +33,11 @@ This section provides the pre-backup configuration required to back up the data 
 
 1. Log in to all the OpenSearch nodes and follow the steps on all the OpenSearch nodes.
 
--   `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
--   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
--   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
--   `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
--   `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+- `export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
+- `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
+- `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
+- `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+- `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
 The final output after running the curl command on all nodes is given below:
 
@@ -63,17 +63,17 @@ The final output after running the curl command on all nodes is given below:
 }
 ```
 
-#### Configuration for Automate Node from Provision Host
+#### Configuration for Opensearch Node from Provision Host
 
 1. To override the existing default endpoint:
 
--   Create an `.toml` file on **the provisioning server** using the following command:
+- Create an `.toml` file on **the provisioning server** using the following command:
 
     ```bash
     touch os_config.toml
     ```
 
--   Add the following settings at the end of the `os_config.toml` file.
+- Add the following settings at the end of the `os_config.toml` file.
 
     ```sh
     [s3]
@@ -86,7 +86,7 @@ The final output after running the curl command on all nodes is given below:
         endpoint = ""
     ```
 
--   Run the following command to apply the updated `os_config.toml` changes. Run this command only once. (_This will trigger a restart of the OpenSearch services on each server_)
+- Run the following command to apply the updated `os_config.toml` changes. Run this command only once. (_This will trigger a restart of the OpenSearch services on each server_)
 
     ```sh
     chef-automate config patch --opensearch os_config.toml
@@ -96,7 +96,7 @@ This will update the configuration in Opensearch node.
 
 #### Healthcheck commands
 
--   Following command can be run in the OpenSearch node
+- Following command can be run in the OpenSearch node
 
     ```sh
     hab svc status (check whether OpenSearch service is up or not)
@@ -193,7 +193,7 @@ Once done with the OpenSearch setup, add the following `automate.toml` file and 
 
 ### Backup
 
--   To create the backup, by running the backup command from bastion. The backup command is as shown below:
+- To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -214,17 +214,24 @@ The restore operation restores all the data while the backup is going on. The re
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
 
--   Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
+- Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
 
--   Execute the restore command from bastion`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- Execute the restore command from bastion`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
--   In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --skip-preflight --airgap-bundle </path/to/bundle>`.
+- In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --skip-preflight --airgap-bundle </path/to/bundle>`.
+
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a diffrent bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
+
+{{< /note >}}
 
 ## Troubleshooting
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+- Check the chef-automate status in Automate node by running `chef-automate status`.
+- Also check the hab svc status in automate node by running `hab svc status`.
+- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+- Now, check the status of Automate node and then try running the restore command from bastion.

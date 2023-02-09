@@ -19,11 +19,11 @@ gh_repo = "automate"
 
 {{< note >}}
 
--   If the user chooses `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
+- If the user chooses `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
-### Overview
+## Overview
 
 To Communicate with Amazon S3 we need an IAM Role with the required [policy](/automate/backup/#aws-s3-permissions).
 
@@ -51,11 +51,11 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 {{< /note >}}
 
-#### Configuration in Provision host
+### Configuration in Provision host
 
 1. Create a .toml say, `automate.toml`.
 
--   Refer to the content for the `automate.toml` file below:
+- Refer to the content for the `automate.toml` file below:
 
     ```sh
     [global.v1]
@@ -119,7 +119,7 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
         secret_key = "<Your Seecret Key>"
     ```
 
--   Execute the command given below to trigger the deployment.
+- Execute the command given below to trigger the deployment.
 
     ```sh
     chef-automate config patch --frontend automate.toml
@@ -131,7 +131,7 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 ### Backup
 
--   To create the backup, by running the backup command from bastion. The backup command is as shown below:
+- To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -141,57 +141,63 @@ In case of if you are using the Managed AWS Service you need to create a [snapsh
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External AWS S3, follow the steps given below:
 
--   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
+- Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
+- Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
--   Log in to the same instance of Chef Automate front-end node from which backup is taken.
+- Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
 
--   Execute the restore command from bastion `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key"`.
+- In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --airgap-bundle </path/to/bundle> --skip-preflight`.
 
--   In case of Airgapped Environment, Execute this restore command from bastion `chef-automate backup restore <object-storage-bucket-path>/backups/BACKUP_ID --airgap-bundle </path/to/bundle> --skip-preflight`.
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a diffrent bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
+
+{{< /note >}}
 
 ## Troubleshooting
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+- Check the chef-automate status in Automate node by running `chef-automate status`.
+- Also check the hab svc status in automate node by running `hab svc status`.
+- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+- Now, check the status of Automate node and then try running the restore command from bastion.
 
 For **Disaster Recovery or AMI upgarde**, while running the restore in secondary cluster which is in different region follow the steps given below.
 
--  Make a curl request in any opensearch node`curl -XGET https://localhost:9200/_snapshot?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k`
--  check the curl request response if the region is not matching with the primary cluster follow the below steps:
+- Make a curl request in any opensearch node`curl -XGET https://localhost:9200/_snapshot?pretty --cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem --key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem --cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem -k`
+- Check the curl request response if the region is not matching with the primary cluster follow the below steps:
+
 1. Modify the region in FrontEnd nodes by patching the below configs with command, `chef-automate config patch <file-name>.toml --fe`
 
-```cmd
-[global.v1.external.opensearch.backup.s3.settings]
-              region = "<FIRST-CLUSTER-REGION>"
-```
+    ```cmd
+    [global.v1.external.opensearch.backup.s3.settings]
+                  region = "<FIRST-CLUSTER-REGION>"
+    ```
 
 2. Make a PUT request in an Opensearch node by running this script:
 
-```cmd
-indices=(
-chef-automate-es6-automate-cs-oc-erchef
-chef-automate-es6-compliance-service
-chef-automate-es6-event-feed-service
-chef-automate-es6-ingest-service
-)
-for index in ${indices[@]}; do
-curl -XPUT -k -H 'Content-Type: application/json' https://<IP>:9200/_snapshot/$index --data-binary @- << EOF
-{
-  "type" : "s3",
-    "settings" : {
-      "bucket" : "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
-      "base_path" : "elasticsearch/automate-elasticsearch-data/$index",
-      "region" : "<YOUR-PRIMARY-CLUSTER-REGION>",
-      "role_arn" : " ",
-      "compress" : "false"
+    ```cmd
+    indices=(
+    chef-automate-es6-automate-cs-oc-erchef
+    chef-automate-es6-compliance-service
+    chef-automate-es6-event-feed-service
+    chef-automate-es6-ingest-service
+    )
+    for index in ${indices[@]}; do
+    curl -XPUT -k -H 'Content-Type: application/json' https://<IP>:9200/_snapshot/$index --data-binary @- << EOF
+    {
+      "type" : "s3",
+        "settings" : {
+          "bucket" : "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
+          "base_path" : "elasticsearch/automate-elasticsearch-data/$index",
+          "region" : "<YOUR-PRIMARY-CLUSTER-REGION>",
+          "role_arn" : " ",
+          "compress" : "false"
+        }
     }
-}
-EOF
-done
-
-```
+    EOF
+    done
+    ```

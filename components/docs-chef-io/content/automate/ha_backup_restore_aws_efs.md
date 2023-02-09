@@ -33,7 +33,6 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
 
 - Let's create a folder structure `/mnt/automate_backups/` on all the Frontend and backend nodes, then we have to mount EFS to all the vm's manually. To do that please refer [this](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-helper-ec2-linux.html)
 
-
 #### Configuration in OpenSearch Node
 
 - Mount the EFS on all OpenSearch Node. For example you mount the EFS to folder structure `/mnt/automate_backups/`
@@ -44,7 +43,7 @@ A shared file system is always required to create **OpenSearch** snapshots. To r
     sudo mkdir -p /mnt/automate_backups/opensearch
     sudo chown hab:hab /mnt/automate_backups/opensearch/
     ```
-   
+
 #### Configuration for OpenSearch Node from Provision host
 
 Configure the OpenSearch `path.repo` attribute.
@@ -124,6 +123,12 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 - Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
 - Execute the restore command from bastion`chef-automate backup restore <BACKUP-ID> -b /mnt/automate_backups/backups --airgap-bundle </path/to/bundle>`.
+
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+
+{{< /note >}}
 
 ## Troubleshooting
 

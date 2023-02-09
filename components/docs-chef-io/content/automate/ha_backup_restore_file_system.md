@@ -138,6 +138,12 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - Execute the restore command from bastion`chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --airgap-bundle </path/to/bundle>`.
 
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+
+{{< /note >}}
+
 ## Troubleshooting
 
 While running the restore command, If it prompts any error follow the steps given below.
