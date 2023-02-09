@@ -26,7 +26,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC we have to create public and private subnet, If subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
-- we recommend to create a new vpc.
+- We recommend to create a new vpc. And Bastion should be in the same VPC.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
     Set these in `~/.aws/credentials` in Bastion Host:
 
@@ -65,6 +65,7 @@ Run the following steps on Bastion Host Machine:
 - If you choose `backup_config` as `" "` (empty), then you have to manually to do the backup configuration, after the deployment complete. But we recommended that to use `backup_config` to be set to `s3` or `efs` at the time of deployment.
 
 {{< /note >}}
+
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
@@ -86,7 +87,7 @@ Run the following steps on Bastion Host Machine:
 
    {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
-1. Update Config with relevant data. Click [here](/automate/ha_aws_deploy_steps/#sample-config) for sample config
+2. Update Config with relevant data. Click [here](#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -125,7 +126,7 @@ Run the following steps on Bastion Host Machine:
 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
 
-1. Continue with the deployment after updating config:
+3. Continue with the deployment after updating config:
 
    ```bash
    #Run commands as sudo.
@@ -147,7 +148,7 @@ Run the following steps on Bastion Host Machine:
    "
    ```
 
-1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
+4. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
   If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
 - create a file `a2.fqdn.toml`
@@ -309,7 +310,8 @@ X-Project = ""
 - Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
 
-### How to Add more nodes In AWS Deployment, post deployment.
+### Add more nodes In AWS Deployment post deployment
+
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
 For example,
 
@@ -362,14 +364,14 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 {{< /note >}}
 
 {{< warning >}}
-  Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes. 
+  Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
 {{< /warning >}}
 
-### How to Delete single node In AWS Deployment, post deployment.
+### Delete single node In AWS Deployment post deployment
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
 
 - Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 
@@ -409,15 +411,19 @@ Once the command executes, it will remove nodes to your HA setup
 ### Uninstall chef automate HA
 
 {{< danger >}}
+
 - Running clean up command will remove all AWS resources created by `provision-infra` command
 - Adding `--force` flag will remove storage (Object Storage/ NFS) if it is created by`provision-infra`
 {{< /danger >}}
 
 To uninstall chef automate HA instances after unsuccessfull deployment, run below command in your bastion host.
+
 ```bash
     chef-automate cleanup --aws-deployment --force
 ```
+
 or
+
 ```bash
     chef-automate cleanup --aws-deployment
 ```

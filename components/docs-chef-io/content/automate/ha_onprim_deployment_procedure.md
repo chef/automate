@@ -57,40 +57,42 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
-   ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Download Chef Automate CLI.
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
-   | gunzip - > chef-automate && chmod +x chef-automate
-   | cp -f chef-automate /usr/bin/chef-automate
+    ```bash
+    #Run commands as sudo.
+    sudo -- sh -c "
+    #Download Chef Automate CLI.
+    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
+    | gunzip - > chef-automate && chmod +x chef-automate
+    | cp -f chef-automate /usr/bin/chef-automate
 
-   #Download the latest Airgapped Bundle.
-   #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
-   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
+    #Download the latest Airgapped Bundle.
+    #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
+    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
 
-   #Generate init config and then generate init config for existing infrastructure
-   chef-automate init-config-ha existing_infra
-   "
-   ```
+    #Generate init config and then generate init config for existing infrastructure
+    chef-automate init-config-ha existing_infra
+    "
+    ```
 
-  {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
+    {{< note >}}
+    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
+    {{< /note >}}
 
-   Note: If the Airgapped Bastion machine is different, transfer the Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using the `scp` command.
-   After transferring, in Airgapped Bastion, run the below commands:
+    Note: If the Airgapped Bastion machine is different, transfer the Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using the `scp` command.
+    After transferring, in Airgapped Bastion, run the below commands:
 
-   ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Move the Chef Automate CLI to `/usr/bin`.
-   cp -f chef-automate /usr/bin/chef-automate
+    ```bash
+    #Run commands as sudo.
+    sudo -- sh -c "
+    #Move the Chef Automate CLI to `/usr/bin`.
+    cp -f chef-automate /usr/bin/chef-automate
 
-   #Generate init config and then generate init config for existing infrastructure
-   chef-automate init-config-ha existing_infra
-   "
-   ```
+    #Generate init config and then generate init config for existing infrastructure
+    chef-automate init-config-ha existing_infra
+    "
+    ```
 
-1. Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) for sample config
+2. Update Config with relevant data. Click [here](#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -113,7 +115,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
 
-1. Continue with the deployment after updating the config:
+3. Continue with the deployment after updating the config:
 
    ```bash
    #Run commands as sudo.
@@ -246,15 +248,15 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - `chef_server_private_ips` Eg: ["192.0.1.1"]
 - `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 - `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
-- *Optional - In case of adding a backup configuration, make sure to fill in the following format in the sample. 
-    - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - in are `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`. 
-    - For **File System** - `backup_config = "file_system"`.
+- Optional - In case of adding a backup configuration, make sure to fill in the following format in the sample.
+  - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - in are `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`.
+  - For **File System** - `backup_config = "file_system"`.
 
 ## On-Premise Setup with AWS Managed Services
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites) to know more.
+- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites) to know more.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
 - Set up AWS RDS Postgresql 13.5. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
 - Set up AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
@@ -262,9 +264,9 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
 
-See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for sample config of AWS Managed Services.
+Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for sample config of AWS Managed Services.
 
 - Set AWS Config Details:
 
@@ -342,12 +344,12 @@ os_snapshot_user_access_key_secret = ""
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#prerequisites).
+- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites).
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 
-See the steps [here](https://docs.chef.io/automate/ha_onprim_deployment_procedure/#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
+See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
+Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
 
 - Set Self-Managed Config Details:
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
@@ -421,7 +423,7 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-### How To Add More Nodes to the OnPrem Deployment
+### Add More Nodes to the OnPrem Deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
 For example,
@@ -482,11 +484,11 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-### How To Remove Any Nodes From Frontend Cluster OnPrem Deployment
+### Remove Any Nodes From Frontend Cluster OnPrem Deployment
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster) for the reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for the reference.
 
 - Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 
@@ -549,12 +551,12 @@ Once the command executes, it will remove the supplied nodes from your automate 
 - Postgresql instance count cannot be less than 3.
  {{< /note >}}
 
-### How to Replace Node in Automate HA Cluster
+### Replace Node in Automate HA Cluster
 
-- First Add a New Node follow [this](#How-To-Add-More-Nodes-to-the-OnPrem-Deployment).
+- First Add a New Node follow [this](#add-more-nodes-to-the-onprem-deployment).
 - Stop the Habitat Supervisior on the node .i.e going to be removed, use `systemctl stop hab-sup` command to stop the
   habitat supervisior.
-- Remove a Existing Node follow [this](#How-To-Remove-Any-Nodes-From-Frontend-Cluster-OnPrem-Deployment).
+- Remove a Existing Node follow [this](#remove-any-nodes-from-frontend-cluster-onprem-deployment).
 
 ### Uninstall chef automate HA
 
