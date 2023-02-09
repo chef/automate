@@ -239,7 +239,7 @@ opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
 postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ```
 
-### Minimum changes to be made for On-Premise Deployment
+#### Minimum changes to be made for On-Premise Deployment
 
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
@@ -423,7 +423,7 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-### Add More Nodes to the OnPrem Deployment
+## Add More Nodes to the OnPrem Deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the IP addresses of the nodes you want to add as comma-separate values with no spaces in between.
 For example,
@@ -484,7 +484,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-### Remove Any Nodes From Frontend Cluster OnPrem Deployment
+## Remove Any Nodes From Frontend Cluster OnPrem Deployment
 
 {{< warning >}}
 
@@ -551,20 +551,20 @@ Once the command executes, it will remove the supplied nodes from your automate 
 - Postgresql instance count cannot be less than 3.
  {{< /note >}}
 
-### Replace Node in Automate HA Cluster
+## Replace Node in Automate HA Cluster
 
 - First Add a New Node follow [this](#add-more-nodes-to-the-onprem-deployment).
 - Stop the Habitat Supervisior on the node .i.e going to be removed, use `systemctl stop hab-sup` command to stop the
   habitat supervisior.
 - Remove a Existing Node follow [this](#remove-any-nodes-from-frontend-cluster-onprem-deployment).
 
-### Uninstall chef automate HA
+## Uninstall chef automate HA
 
 {{< danger >}}
 The below section will uninstall the chef automate HA
 {{< /danger >}}
 
-#### To uninstall On-Premise
+### To uninstall On-Premise
 
 To uninstall chef automate HA instances after unsuccessful deployment, run the below command in your bastion host.
 
@@ -572,9 +572,9 @@ To uninstall chef automate HA instances after unsuccessful deployment, run the b
     chef-automate cleanup --onprem-deployment
 ```
 
-### Troubleshooting
+## Troubleshooting
 
-#### Failure to replacing nodes
+### Failure to replacing nodes
 
   ```bash
   Error: Upload failed: scp: /var/automate-ha: Permission denied

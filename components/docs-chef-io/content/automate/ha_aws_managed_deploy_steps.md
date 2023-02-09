@@ -190,7 +190,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-#### Sample config
+### Sample config
 
 {{< note >}}
 
@@ -294,7 +294,7 @@ X-Dept = ""
 X-Project = ""
 ```
 
-##### Minimum Changes required in sample config
+#### Minimum Changes required in sample config
 
 - Provide `ssh_user` which has access to all the machines. Eg: `ec2-user`
 - Provide `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
@@ -308,7 +308,7 @@ X-Project = ""
 - Provide `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
 
-### Add more nodes In AWS Deployment post deployment
+## Add more nodes In AWS Deployment post deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
 For example,
