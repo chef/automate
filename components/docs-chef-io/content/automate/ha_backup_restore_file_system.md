@@ -19,7 +19,7 @@ gh_repo = "automate"
 
 {{< note >}}
 
--   If the user chooses `backup_config` as `file_system` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
+- If the user chooses `backup_config` as `file_system` in `config.toml` backup is already configured during the deployment, and in that case **the below steps are not required**. If `backup_config` is left blank, then the configuration needs to be configured manually.
 
 {{< /note >}}
 
@@ -58,13 +58,14 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 - Create a .toml (say os_config.toml) file in **the Bastion host** and copy the following template with the path to the repo.
 
-```sh
+    ```sh
       [path]
       # Replace /mnt/automate_backups with the backup_mount config found on the Bastion host in /hab/a2_deploy_workspace/a2ha.rb
       repo = "/mnt/automate_backups/opensearch"
     ```
 
 - Following command will add the configuration to the OpenSearch node.
+
     ```sh
       chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>
     ```
@@ -113,7 +114,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
     path = "/mnt/automate_backups/backups"
     ```
 
--   Patch the `automate.toml` config to trigger the deployment from the provision host.
+- Patch the `automate.toml` config to trigger the deployment from the provision host.
 
     ```sh
     chef-automate config patch --fe automate.toml
@@ -123,7 +124,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 ### Backup
 
--   To create the backup, by running the backup command from bastion. The backup command is as shown below:
+- To create the backup, by running the backup command from bastion. The backup command is as shown below:
 
     ```cmd
     chef-automate backup create
@@ -133,15 +134,21 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
--   Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
+- Check the status of Automate HA Cluster from the bastion nodes by executing the `chef-automate status` command.
 
--   Execute the restore command from bastion`chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --airgap-bundle </path/to/bundle>`.
+- Execute the restore command from bastion`chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --airgap-bundle </path/to/bundle>`.
+
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+
+{{< /note >}}
 
 ## Troubleshooting
 
 While running the restore command, If it prompts any error follow the steps given below.
 
--  check the chef-automate status in Automate node by running `chef-automate status`.
--  Also check the hab svc status in automate node by running `hab svc status`.
--  If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
--  Now, check the status of Automate node and then try running the restore command from bastion.
+- Check the chef-automate status in Automate node by running `chef-automate status`.
+- Also check the hab svc status in automate node by running `hab svc status`.
+- If the deployment services is not healthy then reload it using `hab svc load chef/deployment-service`.
+- Now, check the status of Automate node and then try running the restore command from bastion.
