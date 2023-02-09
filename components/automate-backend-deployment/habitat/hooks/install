@@ -42,44 +42,65 @@ EOHELP
 # renames old workspace using the version info from its symlink destination for easy access
 if [ -L /hab/a2_deploy_workspace ]; then
   OLD_WORKSPACE=`readlink -f /hab/a2_deploy_workspace`
+  touch $OLD_WORKSPACE/terraform/workspace-logs.txt
+  LOGGER=$OLD_WORKSPACE/terraform/workspace-logs.txt
 
   if [ $NEW_WORKSPACE == $OLD_WORKSPACE ]; then
+    echo "/hab/a2_deploy_workspace is up to date." >> $LOGGER
     echo "/hab/a2_deploy_workspace is up to date." && exit 0
   fi
 
+  echo "Copying files from previous workspace" >> $LOGGER
   echo "Copying files from previous workspace"
 
   NEW_SYMLINK=/hab/`readlink -f /hab/a2_deploy_workspace | awk -F "/" '{ print $(NF) "_" $(NF-2) "-" $(NF-1) }'`
+  echo "New Sym-Link location is {{$NEW_SYMLINK}}" >> $LOGGER
   ln -s $OLD_WORKSPACE $NEW_SYMLINK
   rm /hab/a2_deploy_workspace
   # copy over tfvars from old workspace if any exist
   find $OLD_WORKSPACE/terraform -name \*.tfvars -exec cp {} $NEW_WORKSPACE/terraform \;
   # copy over tfstate from old workspace if any exist
   # find $OLD_WORKSPACE/terraform -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform \;
+  echo "Copying old workspace terraform/terraform.tfstate" >> $LOGGER
   if [[ -f $OLD_WORKSPACE/terraform/terraform.tfstate ]]; then
     cp $OLD_WORKSPACE/terraform/*.tfstate $NEW_WORKSPACE/terraform \;
+    echo "Copied old workspace terraform/terraform.tfstate" >> $LOGGER
   fi
+  echo "Copying old workspace terraform/destroy/aws/*" >> $LOGGER
   if [[ -f $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate ]]; then
-    cp -r $OLD_WORKSPACE/terraform/destroy/aws/* $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    find $OLD_WORKSPACE/terraform/destroy/aws -name \*.tfvars -exec cp {} $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied tfvars to new workspace" >> $LOGGER
+    find $OLD_WORKSPACE/terraform/destroy/aws -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied tfstate to new workspace" >> $LOGGER
+    find $OLD_WORKSPACE/terraform/destroy/aws -name \*.tf -exec cp {} $NEW_WORKSPACE/terraform/destroy/aws/ \;
+    echo "Copied tf to new workspace" >> $LOGGER
   fi
+  echo " copy .abb files from old workspace if any exist" >> $LOGGER
   # copy .abb files from old workspace if any exist
   find $OLD_WORKSPACE/terraform -name \*.abb -exec cp {} $NEW_WORKSPACE/terraform \;
+  
+  echo "copy over configs from old workspace if any exist" >> $LOGGER
   # copy over configs from old workspace if any exist
   mkdir -p $NEW_WORKSPACE/configs
   find $OLD_WORKSPACE/configs -name \* -exec cp {} $NEW_WORKSPACE/configs \;
 
+  echo "move the old aib files to the new location" >> $LOGGER
   # move the old aib files to the new location
   mkdir -p $NEW_WORKSPACE/terraform/transfer_files
   find $OLD_WORKSPACE/terraform/transfer_files -name \*.aib\* -exec mv {} $NEW_WORKSPACE/terraform/transfer_files/ \;
 
   if [[ -f $OLD_WORKSPACE/terraform/.tf_arch ]]; then
+    echo "old .tf_arch file present" >> $LOGGER
     TF_ARCH=$(cat $OLD_WORKSPACE/terraform/.tf_arch)
     TF_ARCH_DIR="$NEW_WORKSPACE/terraform/reference_architectures/$TF_ARCH"
     if [[ -d $TF_ARCH_DIR ]]; then
+      echo "{{$TF_ARCH_DIR}} file present" >> $LOGGER
       # copy all files including the hidden .tf_arch
       cp -r $TF_ARCH_DIR/. $NEW_WORKSPACE/terraform/
+      echo "copied {{$TF_ARCH_DIR}} file" >> $LOGGER
     else
       echo "No TF_ARCH_DIR found"
+      echo "No TF_ARCH_DIR found" >> $LOGGER
     fi
   fi
 
@@ -116,17 +137,24 @@ EOF
 
   if [[ -f $OLD_WORKSPACE/config.toml ]]; then
     echo "Copying previous 'automate-cluster-ctl' config to new workspace"
+    echo "Copying previous 'automate-cluster-ctl' config to new workspace" >> $LOGGER
     cp $OLD_WORKSPACE/config.toml $NEW_WORKSPACE/config.toml
+    echo "Copied previous 'automate-cluster-ctl' config to new workspace" >> $LOGGER
   fi
 
   if [[ -f $OLD_WORKSPACE/a2ha.rb ]]; then
     echo "Copying previous 'automate-cluster-ctl' config and secrets to new workspace"
+    echo "Copying previous 'automate-cluster-ctl' config and secrets to new workspace" >> $LOGGER
     cp $OLD_WORKSPACE/a2ha.rb $NEW_WORKSPACE/a2ha.rb
+    echo "Copied a2ha.rb file" >> $LOGGER
     cp $OLD_WORKSPACE/secrets.json $NEW_WORKSPACE/secrets.json
+    echo "Copied secrets.json file" >> $LOGGER
     cp $OLD_WORKSPACE/secrets.key $NEW_WORKSPACE/secrets.key
+    echo "Copied secrets.key file" >> $LOGGER
   else
     display_upgrade_help $(cat $OLD_WORKSPACE/terraform/.tf_arch)
   fi
 fi
+echo "creating new symlink for new workspace" >> $LOGGER
 # shellcheck disable=SC1083
 ln -nsf $NEW_WORKSPACE /hab/a2_deploy_workspace
