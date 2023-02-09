@@ -156,7 +156,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 4. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
   If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
-- create a file `a2.fqdn.toml`
+- Create a file `a2.fqdn.toml`
 
   ```toml
   [global]
@@ -170,7 +170,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    chef-automate config patch a2.fqdn.toml --automate
   ```
 
-- create a file `cs.fqdn.toml`
+- Create a file `cs.fqdn.toml`
   
   ```toml
   [global]
@@ -207,7 +207,6 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 {{< /note >}}
 
 ```config
- 
 [architecture.aws]
 ssh_user = "ec2-user"
 ssh_port = "22"
@@ -297,8 +296,8 @@ X-Project = ""
 
 ##### Minimum Changes required in sample config
 
-- Give `ssh_user` which has access to all the machines. Eg: `ec2-user`
-- Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
+- Provide `ssh_user` which has access to all the machines. Eg: `ec2-user`
+- Provide `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
 - Provide `region` Eg: `ap-southeast-2`
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`
 - Provide `private_custom_subnets` and `public_custom_subnets`
@@ -306,7 +305,7 @@ X-Project = ""
 - Provide `setup_managed_services` Eg: `true`
 - Provide `managed_opensearch_domain_name`,`managed_opensearch_domain_url`,`managed_opensearch_username`,`managed_opensearch_user_password`
 - Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`
-- Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
+- Provide `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
 
 ### How to Add more nodes In AWS Deployment, post deployment
@@ -322,6 +321,6 @@ For example,
 
 - If you want to add 3 nodes to chef-server, you have to run the:
 
-```sh
-    chef-automate node add --chef-server-count 3
-```
+    ```sh
+        chef-automate node add --chef-server-count 3
+    ```
