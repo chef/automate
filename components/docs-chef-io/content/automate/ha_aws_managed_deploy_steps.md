@@ -89,7 +89,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
 
-1. Update Config with relevant data
+2. Update Config with relevant data
 
    ```bash
    vi config.toml
@@ -113,7 +113,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. The default value is `false`, which should be changed.
         - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
         - Set `managed_opensearch_domain_url` as the URL without Port No. For example: `["vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"]`.
-        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#prerequisites) to know more.
+        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#opensearch-setup) to know more.
         - Set `managed_rds_instance_url` as the URL with Port No. For example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
         - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
       - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.
@@ -127,11 +127,11 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-{{< warning >}}
-{{% automate/char-warn %}}
-{{< /warning >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
-1. Continue with the deployment after updating config:
+3. Continue with the deployment after updating config:
 
    ```bash
    #Run commands as sudo.
@@ -153,7 +153,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    "
    ```
 
-1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
+4. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
   If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
 - create a file `a2.fqdn.toml`
