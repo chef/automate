@@ -127,9 +127,9 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-    {{< warning >}}
+    {{< warning spaces=4 >}}
     {{% automate/char-warn %}}
-    {{< /warning spaces=4 >}}
+    {{< /warning >}}
 
 3. Continue with the deployment after updating config:
 
