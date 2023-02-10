@@ -129,7 +129,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
     {{< warning >}}
     {{% automate/char-warn %}}
-    {{< /warning >}}
+    {{< /warning spaces=4 >}}
 
 3. Continue with the deployment after updating config:
 
