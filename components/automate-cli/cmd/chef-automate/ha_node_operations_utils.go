@@ -18,11 +18,11 @@ import (
 
 const (
 	TAINT_TERRAFORM        = "for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done"
-	REMOVE_TERRAFORM_STATE = `S3_STATE=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate | grep "module.s3[0].aws_s3_bucket.createS3bucket");
-if [ $S3_STATE == "module.s3[0].aws_s3_bucket.createS3bucket" ]; then 
+	REMOVE_TERRAFORM_STATE = `S3_STATE=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate | grep ".aws_s3_bucket.createS3bucket");
+if [ "$S3_STATE" == "module.s3[0].aws_s3_bucket.createS3bucket" ]; then
 terraform state rm $S3_STATE
-fi
-done`
+fi`
+
 	AWS_AUTO_TFVARS    = "aws.auto.tfvars"
 	DESTROY_AWS_FOLDER = "destroy/aws/"
 	TF_ARCH_FILE       = ".tf_arch"
