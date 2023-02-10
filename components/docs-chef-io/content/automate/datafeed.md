@@ -284,7 +284,8 @@ To modify Data Feed behavior with the available configuration settings:
 * Include one or more configuration settings and their updated value(s) in your configuration patch `.toml` file to reflect the desired global Data Feed behavior:
   * Use the `feed_interval` setting to change the interval for the Data Feed collection. The default value is four hours
   * Use the `node_batch_size` setting to change the number of sets of node data sent in each batch to your endpoint. The default value is 50 nodes
-  * Use the `updated_nodes_only` setting to determine what data to include in each export if only one kind data (either client run **or** inspec scan) is recieved in a given period of time. The default setting for this is `true`. To determine if the client run and scan report that was recieved in automate belongs to the same node or not, we use the `ipaddress` field in the reports. If the client run and scan report both contain same `ipaddress` then we consider them belonging to same node. The explanation for the two possible scanarios where this setting is useful is explained below:
+  * If automate receives only one kind of data (either client run **or** inspec scan) in a given period of time then we use the `updated_nodes_only` setting to determine what data to include in each export. The default setting for this is `true`. 
+  To determine if the client run and scan report that was recieved in automate belongs to the same node or not, we use the `ipaddress` field in the reports. If the client run and scan report both contain same `ipaddress` field then we consider them belonging to same node. The explanation for the two possible scanarios where this setting is useful has been explained below:
     * When in a given period for a particular node, only **client run was recieved** but **compliance scan not recieved**:
       * If `updated_nodes_only` is true:
         * Only the client run for that node will be sent to external integrations
