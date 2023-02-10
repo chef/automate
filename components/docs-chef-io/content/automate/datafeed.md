@@ -291,7 +291,7 @@ To modify Data Feed behavior with the available configuration settings:
         * Only the client run for that node will be sent to external integrations
       * If `updated_nodes_only` is false:
         * The client run that was ingested + get the most recent compliance report for this node(queried by ip address) if there is any will be sent to external integrations
-    * When in a given period for a particular node, only **client run was not recieved** but **compliance scan was recieved**:
+    * When in a given period for a particular node, **client run was not recieved** but only **compliance scan was recieved**:
       * If `updated_nodes_only` is true:
         * The compliance scan report + basic node details like *macaddress, hostname, ipaddress, fqdn* (queried by ip address) will be sent to external integrations
       * If `updated_nodes_only` is false:
