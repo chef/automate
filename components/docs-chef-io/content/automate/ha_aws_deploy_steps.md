@@ -49,7 +49,9 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - We do not support passphrase for Private Key authentication.
 - Preferred key type will be ed25519
 
-{{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+{{< warning >}} 
+- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+- We currently don't support AD managed users in nodes. We only support local linux users.
 {{< /warning >}}
 
 ### Deployment

@@ -60,7 +60,9 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 - If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly used for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
 - We recommended to use `backup_config` to be set to `s3` at the time of deployment.
 
-{{< warning >}} PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+{{< warning >}} 
+- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+- We currently don't support AD managed users in nodes. We only support local linux users.
 {{< /warning >}}
 
 ### Run these steps on Bastion Host Machine
