@@ -95,8 +95,8 @@ const (
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
-	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certficate rotation for externally configured %s is not supported."
-	SKIP_IPS_MSG_CERT_ROTATE          = "Following %s ip/ips will skipped while cert-rotation\n %s"
+	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certificate rotation for externally configured %s is not supported."
+	SKIP_IPS_MSG_CERT_ROTATE          = "Following %s ip/ips will skipped while certificate rotation\n %s"
 	SKIP_FRONT_END_IPS_MSG            = "Following %s ip/ips will skipped for root-ca patching\n %s"
 	SKIP_FRONT_END_IPS_MSG_CN         = "Following %s ip/ips will skipped for common name patching\n %s"
 )
