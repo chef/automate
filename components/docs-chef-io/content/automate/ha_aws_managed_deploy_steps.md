@@ -30,7 +30,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - Setup AWS RDS Postgresql 13.5 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
 - Setup AWS OpenSearch 1.3.6 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup with Managed Service we have only one option which is `Amazon S3`.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#opensearch-setup) to know more.
+- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-openSearch-backup-restore) to know more.
 - Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
 - Preferred key type will be ed25519
 Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
@@ -51,12 +51,12 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 - We do not support passphrase for Private Key authentication.
 - Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 - Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
-- If below attribute are not provided in `config.toml`, in that case terrafrom code will create and use it.
+- Create the below attributes by following [this document.](/automate/managed_services/#enabling-openSearch-backup-restore)
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
   - `os_snapshot_user_access_key_secret`
-    
-  If you want to create the above attributes yourselves then please follow [this document.](/automate/managed_services/#opensearch-setup)
+  
+  Add this to your `config.toml`
 - If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly used for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
 - We recommended to use `backup_config` to be set to `s3` at the time of deployment.
 
@@ -114,7 +114,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. The default value is `false`, which should be changed.
         - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
         - Set `managed_opensearch_domain_url` as the URL without Port No. For example: `["vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"]`.
-        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#opensearch-setup) to know more.
+        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`.  [Refer this document](/automate/managed_services/#enabling-openSearch-backup-restore) to create them and get their values.
         - Set `managed_rds_instance_url` as the URL with Port No. For example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
         - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
       - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.

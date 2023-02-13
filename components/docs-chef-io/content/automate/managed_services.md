@@ -69,12 +69,14 @@ To create the domain, follow the steps given below:
 
 - Select **Configure Domain Level Access Policy** under the `Access policy` section and modify the `Effect` from *Deny* to *Allow*.
 
-The steps to backup and restore the OpenSearch S3 is:
+- Copy the `domain arn` of the newly created OpenSearch, example: `arn:aws:es:region:123456789012:domain/domain-name`
+
+#### Enabling OpenSearch Backup restore
+The steps to enable backup and restore in OpenSearch S3 is:
 
 - Create an IAM role with the Permission listed below. The rest of the document refers to the role as `TheSnapshotRole`.
   - AmazonS3FullAccess
-- Save the new Role
-- Edit the trust relationship of `TheSnapshotRole` to specify the OpenSearch Service in the Principal statement as shown in the following example:
+- In Select trusted entities of `TheSnapshotRole` to specify the OpenSearch Service in the Principal statement as shown in the following example:
 
   ```json
   {
@@ -90,8 +92,9 @@ The steps to backup and restore the OpenSearch S3 is:
     ]
   }
   ```
-- Create a policy with the json as given below:
-  - Replace the **iam:PassRole** resource with your snapshot role arn created above and replace the **es:ESHttpPut** resource with your opensearch domain arn value with `/*` in the end:
+- Copy the `arn` value of `TheSnapshotRole`, example: `arn:aws:iam::123456789012:role/TheSnapshotRole`
+- Create a IAM policy with the json as given below:
+  - Replace the **iam:PassRole** resource with the snapshot role arn we copied previously and replace the **es:ESHttpPut** resource with your opensearch domain arn value which we had copied along with `/*` in the end:
 
     ```json
     {
@@ -111,7 +114,7 @@ The steps to backup and restore the OpenSearch S3 is:
     }
     ```
 - Now edit your snapshot role `TheSnapshotRole` and attach this newly created policy.
-- Create an IAM user and attach the above permission policy, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore.
+- Create an IAM user and attach the above permission policy, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore. Also save the IAM user arn to be used on OpenSearch Dashboard.
 - Map the snapshot role in OpenSearch Dashboards.
 
   1. Navigate to the OpenSearch Dashboards url from the OpenSearch Service console.
