@@ -69,6 +69,8 @@ For Centos or Redhat :
       # here we have taken example DNS: chefautomate.example.com
       server_name chefautomate.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
+      # If you want to use letsencript certificates, you can use the certBot
+      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       ssl_certificate /etc/letsencrypt/live/chefautomate.example.com/cert.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefautomate.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -87,7 +89,7 @@ For Centos or Redhat :
    }
    ```
 
-2. Create new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
+1. Create new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
 
    ```bash
    upstream chef-infra-servers {
@@ -104,6 +106,8 @@ For Centos or Redhat :
       # here we have taken example DNS: chefinfraserver.example.com
       server_name chefinfraserver.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
+      # If you want to use letsencript certificates, you can use the certBot
+      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       ssl_certificate /etc/letsencrypt/live/chefinfraserver.example.com/cert.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -122,20 +126,20 @@ For Centos or Redhat :
    }
    ```
 
-3. Enable Sites for Chef Automate and Chef Infra Server
+1. Enable Sites for Chef Automate and Chef Infra Server
 
    ```bash
    sudo ln -s /etc/nginx/sites-available/chef-automate-lb.conf /etc/nginx/sites-enabled/
    sudo ln -s /etc/nginx/sites-available/chef-infra-server-lb.conf /etc/nginx/sites-enabled/
    ```
 
-4. Test Nginx Config
+1. Test Nginx Config
 
    ```bash
    sudo nginx -t
    ```
 
-5. Restart Nginx
+1. Restart Nginx
 
    ```bash
    sudo systemctl restart nginx
@@ -182,7 +186,7 @@ For Centos or Redhat :
          | sudo tee /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
       ```
 
-2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
+1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
 
    ```bash
    # The below section is used for http call
@@ -197,6 +201,8 @@ For Centos or Redhat :
       # You need to get your own automate DNS,
       # here we have taken example DNS: chefautomate.example.com and chefinfraserver.example.com
       # Generate SSL certificates and give the path of the certificate and key file.
+      # If you want to use letsencript certificates, you can use the certBot
+      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       bind *:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
       use_backend automate_server if { ssl_fc_sni chefautomate.example.com }
       use_backend chef_infra_server if { ssl_fc_sni chefinfraserver.example.com }
@@ -216,13 +222,13 @@ For Centos or Redhat :
       server infra3 10.1.0.103:443 check ssl verify none
    ```
 
-3. Test HA Proxy Config
+1. Test HA Proxy Config
 
    ```bash
    sudo haproxy -c -f /etc/haproxy/haproxy.cfg
    ```
 
-4. Restart HA Proxy
+1. Restart HA Proxy
 
    ```bash
    sudo systemctl restart haproxy

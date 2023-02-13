@@ -89,7 +89,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
    {{< /note >}}
 
-2. Update Config with relevant data
+1. Update Config with relevant data
 
    ```bash
    vi config.toml
@@ -131,7 +131,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
     {{% automate/char-warn %}}
     {{< /warning >}}
 
-3. Continue with the deployment after updating config:
+1. Continue with the deployment after updating config:
 
    ```bash
    #Run commands as sudo.

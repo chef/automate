@@ -92,7 +92,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     "
     ```
 
-2. Update Config with relevant data. Click [here](#sample-config) for sample config
+1. Update Config with relevant data. Click [here](#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -115,7 +115,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
 
-3. Continue with the deployment after updating the config:
+1. Continue with the deployment after updating the config:
 
    ```bash
    #Run commands as sudo.

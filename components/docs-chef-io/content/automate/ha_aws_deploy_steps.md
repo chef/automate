@@ -87,7 +87,7 @@ Run the following steps on Bastion Host Machine:
 
    {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
-2. Update Config with relevant data. Click [here](#sample-config) for sample config
+1. Update Config with relevant data. Click [here](#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -126,7 +126,7 @@ Run the following steps on Bastion Host Machine:
 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
 
-3. Continue with the deployment after updating config:
+1. Continue with the deployment after updating config:
 
    ```bash
    #Run commands as sudo.
