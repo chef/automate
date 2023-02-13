@@ -24,6 +24,7 @@ To run the terraform scripts, you need an IAM user with the following permission
 - AdministratorAccess
 - AmazonAPIGatewayAdministrator
 - AmazonS3FullAccess
+- IAMFullAccess
 
 These permissions can be directly added to the user or via IAM Group.
 
@@ -64,6 +65,8 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 
 1. Set the user permissions.
 1. Search for **AdministratorAccess** and select the policy.
+1. Search for **AmazonAPIGatewayAdministrator** and select the policy.
+1. Search for **AmazonS3FullAccess** and select the policy.
 1. Select **Next: Tags**.
 1. Provide key name and value as tagging for the user been created.
 1. Select **Next: Review**.
@@ -71,6 +74,12 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 {{< figure src="/images/automate/ha_aws_iam_user_review.png" alt="AWS IAM User Review with permissions">}}
 
 1. Select **Create user**.
+1. After user is created go to the **Security Credentials** tab
+{{< figure src="/images/automate/ha_aws_iam_security_cred.png" alt="AWS IAM User - Security Credentials">}}
+1. Select **Create Access key**
+{{< figure src="/images/automate/ha_aws_iam_create_key.png" alt="AWS IAM User - Create Access Key">}}
+1. Select **other** on the list
+{{< figure src="/images/automate/ha_aws_iam_key_type.png" alt="AWS IAM User - Access Key Type">}}
 1. Select **show** to reveal the secret access key.
 1. Download and save the **Secret access key**.
 
