@@ -51,7 +51,8 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
     This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
 1.  Select **Next: Permissions**.
 1.  Select **Attach existing policies directly**.
-1.  Filter the policies by keyword, `IAM`. For this user, select `IAMFullAccess` from the list of available policies. The `IAMFullAccess` policy enables this user to create and manage user permissions in AWS.
+1.  Filter the policies by keyword, `IAM`. For this user, select `IAMFullAccess` from the list of available policies.\
+    The `IAMFullAccess` policy enables this user to create and manage user permissions in AWS.
     {{< figure src="/images/automate/ha_aws_iam_policy.png" alt="AWS IAM User Policy">}}
 1.  Set the user permissions.
 1.  Search for **AdministratorAccess** and select the policy.
@@ -59,14 +60,14 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 1.  Search for **AmazonS3FullAccess** and select the policy.
 1.  Select **Next: Tags**.
 1.  Provide key name and value as tagging for the user been created.
-1.  Select **Next: Review**.
+1.  Select **Next: Review**.\
     {{< figure src="/images/automate/ha_aws_iam_user_review.png" alt="AWS IAM User Review with permissions">}}
-1.  Select **Create user**.
+1.  Select **Create user**.\
 1.  After user is created go to the **Security Credentials** tab
     {{< figure src="/images/automate/ha_aws_iam_security_cred.png" alt="AWS IAM User - Security Credentials">}}
-1.  Select **Create Access key**
+1.  Select **Create Access key**\
     {{< figure src="/images/automate/ha_aws_iam_create_key.png" alt="AWS IAM User - Create Access Key">}}
-1.  Select **other** on the list
+1.  Select **other** on the list\
     {{< figure src="/images/automate/ha_aws_iam_key_type.png" alt="AWS IAM User - Access Key Type">}}
 1.  Select **show** to reveal the secret access key.
 1.  Download and save the **Secret access key**.
