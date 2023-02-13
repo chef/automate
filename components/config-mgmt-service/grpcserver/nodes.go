@@ -48,8 +48,10 @@ func (s *CfgMgmtServer) GetRuns(
 	page, pageSize := request.GetPagination().GetParameters()
 
 	// Date Range
-	if !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
-		return runs, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) {
+		if !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
+			return runs, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
+		}
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
