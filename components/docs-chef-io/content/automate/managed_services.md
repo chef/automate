@@ -117,15 +117,15 @@ The steps to backup and restore the OpenSearch S3 is:
   1. Navigate to the OpenSearch Dashboards url from the OpenSearch Service console.
   1. From the OpenSearch Dashboards, navigate to *Security* in the main menu and choose *Roles*, and then select the `manage_snapshots` role.
   1. Choose Mapped users, and select Manage mapping.
-  1. Add the domain ARN of the user and role that has permissions to pass the newly created `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
+  1. Add the domain ARN of the user and role that has permissions to pass the newly created `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.\
       ```bash
       arn:aws:iam::123456789123:user/user-name
       ```
       ```bash
       arn:aws:iam::123456789123:role/role-name
       ```
-    {{< figure src="/images/automate/managed_services_os_dashboard.png" alt="Managed Service OS Dashboard">}}
-  1. Select Map and confirm the user and role showing up under Mapped users.
+     Select Map and confirm the user and role showing up under Mapped users.
+     {{< figure src="/images/automate/managed_services_os_dashboard.png" alt="Managed Service OS Dashboard">}}
 
 {{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
 
