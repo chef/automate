@@ -25,8 +25,8 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC, then you have to create Public and Private Subnet, if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- we recommend to create a new vpc.
 - We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
+- We recommend to create a new VPC. And Bastion should be in the same VPC.
 - Setup AWS RDS Postgresql 13.5 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
 - Setup AWS OpenSearch 1.3.6 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup with Managed Service we have only one option which is `Amazon S3`.
@@ -113,7 +113,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. The default value is `false`, which should be changed.
         - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.
         - Set `managed_opensearch_domain_url` as the URL without Port No. For example: `["vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"]`.
-        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#prerequisites) to know more.
+        - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`. Click [here](/automate/managed_services/#opensearch-setup) to know more.
         - Set `managed_rds_instance_url` as the URL with Port No. For example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
         - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
       - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.
@@ -127,9 +127,9 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-{{< warning >}}
-{{% automate/char-warn %}}
-{{< /warning >}}
+    {{< warning spaces=4 >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Continue with the deployment after updating config:
 
@@ -156,7 +156,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
   If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
   
-- create a file `a2.fqdn.toml`
+- Create a file `a2.fqdn.toml`
 
   ```toml
   [global]
@@ -170,7 +170,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    chef-automate config patch a2.fqdn.toml --automate
   ```
 
-- create a file `cs.fqdn.toml`
+- Create a file `cs.fqdn.toml`
   
   ```toml
   [global]
@@ -190,7 +190,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-#### Sample config
+### Sample config
 
 {{< note >}}
 
@@ -207,7 +207,6 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 {{< /note >}}
 
 ```config
- 
 [architecture.aws]
 ssh_user = "ec2-user"
 ssh_port = "22"
@@ -295,10 +294,10 @@ X-Dept = ""
 X-Project = ""
 ```
 
-##### Minimum Changes required in sample config
+#### Minimum Changes required in sample config
 
-- Give `ssh_user` which has access to all the machines. Eg: `ec2-user`
-- Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
+- Provide `ssh_user` which has access to all the machines. Eg: `ec2-user`
+- Provide `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/user-key.pem`
 - Provide `region` Eg: `ap-southeast-2`
 - Provide `aws_vpc_id` Eg: `vpc-0a12*****`
 - Provide `private_custom_subnets` and `public_custom_subnets`
@@ -306,10 +305,10 @@ X-Project = ""
 - Provide `setup_managed_services` Eg: `true`
 - Provide `managed_opensearch_domain_name`,`managed_opensearch_domain_url`,`managed_opensearch_username`,`managed_opensearch_user_password`
 - Provide `managed_rds_instance_url`,`managed_rds_superuser_username`,`managed_rds_superuser_password`,`managed_rds_dbuser_username`,`managed_rds_dbuser_password`
-- Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
+- Provide `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
 - Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectively.
 
-### How to Add more nodes In AWS Deployment, post deployment
+## Add more nodes In AWS Deployment post deployment
 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
 For example,
@@ -322,6 +321,6 @@ For example,
 
 - If you want to add 3 nodes to chef-server, you have to run the:
 
-```sh
-    chef-automate node add --chef-server-count 3
-```
+    ```sh
+        chef-automate node add --chef-server-count 3
+    ```
