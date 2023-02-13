@@ -62,7 +62,7 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 1.  Provide key name and value as tagging for the user been created.
 1.  Select **Next: Review**.\
     {{< figure src="/images/automate/ha_aws_iam_user_review.png" alt="AWS IAM User Review with permissions">}}
-1.  Select **Create user**.\
+1.  Select **Create user**.
 1.  After user is created go to the **Security Credentials** tab
     {{< figure src="/images/automate/ha_aws_iam_security_cred.png" alt="AWS IAM User - Security Credentials">}}
 1.  Select **Create Access key**\
