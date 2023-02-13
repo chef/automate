@@ -118,11 +118,9 @@ The steps to backup and restore the OpenSearch S3 is:
   1. From the OpenSearch Dashboards, navigate to *Security* in the main menu and choose *Roles*, and then select the `manage_snapshots` role.
   1. Choose Mapped users, and select Manage mapping.
   1. Add the domain ARN of the user and role that has permissions to pass the newly created `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
-
       ```bash
       arn:aws:iam::123456789123:user/user-name
       ```
-
       ```bash
       arn:aws:iam::123456789123:role/role-name
       ```
