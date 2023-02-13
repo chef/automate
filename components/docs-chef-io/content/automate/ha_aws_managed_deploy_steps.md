@@ -46,9 +46,6 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
   echo "region=<AWS-REGION>" >> ~/.aws/credentials
   ```
-
-- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
-  Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
 - Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrase for Private Key authentication.
@@ -186,7 +183,11 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    chef-automate config patch cs.fqdn.toml --chef_server
   ```
 
-{{< note >}} DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command. {{< /note >}}
+{{< note >}} 
+  - Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
+  Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/).
+  - DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command
+{{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 

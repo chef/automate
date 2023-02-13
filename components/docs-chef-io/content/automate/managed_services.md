@@ -71,28 +71,9 @@ To create the domain, follow the steps given below:
 
 The steps to backup and restore the OpenSearch S3 is:
 
-- Create an IAM role with a couple of Permission Policies listed below. The rest of the document refers to the role as `TheSnapshotRole`.
+- Create an IAM role with the Permission listed below. The rest of the document refers to the role as `TheSnapshotRole`.
   - AmazonS3FullAccess
-  - To register the snapshot repository, pass the `TheSnapshotRole` to OpenSearch Service. Access the **es:ESHttpPut** action. To grant these permissions, attach the following policy to the IAM user or role whose credentials are being used to sign the request, as shown below example:
-
-  ```json
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": "iam:PassRole",
-        "Resource": "arn:aws:iam::123456789012:role/TheSnapshotRole" // ARN of IAM role i.e. TheSnapshotRole
-      },
-      {
-        "Effect": "Allow",
-        "Action": "es:ESHttpPut",
-        "Resource": "arn:aws:es:region:123456789012:domain/domain-name/*" // ARN of opensearch domain
-      }
-    ]
-  }
-  ```
-
+- Save the new Role
 - Edit the trust relationship of `TheSnapshotRole` to specify the OpenSearch Service in the Principal statement as shown in the following example:
 
   ```json
@@ -109,25 +90,42 @@ The steps to backup and restore the OpenSearch S3 is:
     ]
   }
   ```
+- Create a policy with the json as given below:
+  - Replace the **iam:PassRole** resource with your snapshot role arn created above and replace the **es:ESHttpPut** resource with your opensearch domain arn value with `/*` in the end:
 
-- Create an IAM user and attach the above permission policies, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore.
-- Map the snapshot role in OpenSearch Dashboards. \
-  Fine-grained access control introduces an additional step when registering a repository. Even if you use HTTP basic authentication for other purposes, map the `manage_snapshots` role to your IAM user or role with `iam:PassRole` permissions to pass `TheSnapshotRole`.
+    ```json
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": "iam:PassRole",
+          "Resource": "arn:aws:iam::123456789012:role/TheSnapshotRole" // ARN of IAM role i.e. TheSnapshotRole
+        },
+        {
+          "Effect": "Allow",
+          "Action": "es:ESHttpPut",
+          "Resource": "arn:aws:es:region:123456789012:domain/domain-name/*" // ARN of opensearch domain
+        }
+      ]
+    }
+    ```
+- Now edit your snapshot role `TheSnapshotRole` and attach this newly created policy.
+- Create an IAM user and attach the above permission policy, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore.
+- Map the snapshot role in OpenSearch Dashboards.
 
-  1. Navigate to the OpenSearch Dashboards plugin for your OpenSearch Service domain. You can find the Dashboards endpoint on your domain dashboard on the OpenSearch Service console.
-  1. From the main menu, choose *Security*, *Roles*, and select the `manage_snapshots` role.
-  1. Choose Mapped users, and Manage mapping.
-  1. Add the domain ARN of the user and role that has permissions to pass `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
-
+  1. Navigate to the OpenSearch Dashboards url from the OpenSearch Service console.
+  1. From the OpenSearch Dashboards, navigate to *Security* in the main menu and choose *Roles*, and then select the `manage_snapshots` role.
+  1. Choose Mapped users, and select Manage mapping.
+  1. Add the domain ARN of the user and role that has permissions to pass the newly created `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
       ```bash
       arn:aws:iam::123456789123:user/user-name
       ```
-
       ```bash
       arn:aws:iam::123456789123:role/role-name
       ```
-
-  1. Select Map and confirm the user and role showing up under Mapped users.
+     Select Map and confirm the user and role showing up under Mapped users.
+     {{< figure src="/images/automate/managed_services_os_dashboard.png" alt="Managed Service OS Dashboard">}}
 
 {{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
 
