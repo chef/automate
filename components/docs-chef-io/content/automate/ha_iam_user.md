@@ -46,9 +46,9 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 1.  Enter the user name for the new user and other necessary details.
     {{< figure src="/images/automate/ha_aws_iam_user.png" alt="AWS IAM User Creation">}}
 1.  Check the **Access key - Programmatic access** option under the **Select AWS access type** section.
-    {{< figure src="/images/automate/ha_aws_iam_paccess.png" alt="AWS IAM User - Programmetic Access">}}/
     This is the sign-in name for AWS. If you want to add multiple users, choose to Add another user for each additional user and specify their user names. You can add up to 10 users at one time.
     This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
+    {{< figure src="/images/automate/ha_aws_iam_paccess.png" alt="AWS IAM User - Programmetic Access">}}
 1.  Select **Next: Permissions**.
 1.  Select **Attach existing policies directly**.
 1.  Filter the policies by keyword, `IAM`. For this user, select `IAMFullAccess` from the list of available policies.\
