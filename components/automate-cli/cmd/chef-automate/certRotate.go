@@ -96,9 +96,11 @@ const (
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
 	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certificate rotation for externally configured %s is not supported."
-	SKIP_IPS_MSG_CERT_ROTATE          = "Following %s ip/ips will skipped while certificate rotation\n %s"
-	SKIP_FRONT_END_IPS_MSG            = "Following %s ip/ips will skipped for root-ca patching\n %s"
-	SKIP_FRONT_END_IPS_MSG_CN         = "Following %s ip/ips will skipped for common name patching\n %s"
+	SKIP_IPS_MSG_CERT_ROTATE          = "The following %s %s will skip while certificate rotation as the following %s have the same certificates as currently provided certificates.\n %s"
+	SKIP_FRONT_END_IPS_MSG_A2         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided automate root-ca.\n %s"
+	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided postgres root-ca.\n %s"
+	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip while root-ca and common name patching as the following %s have same root-ca and common name as currently provided opensearch root-ca and common name.\n %s"
+	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip while common name patching as the following %s have same common name as currently provided.\n %s"
 )
 
 type certificates struct {
@@ -255,7 +257,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
 	if flagsObj.automate {
 		skipIpsList := c.getFrontEndIpsForSkippingRootCAPatching(CONST_AUTOMATE, certs.rootCA, infra, currentCertsInfo)
-		c.skipMessagePrinter(CONST_CHEF_SERVER, SKIP_FRONT_END_IPS_MSG, "", skipIpsList)
+		c.skipMessagePrinter(CONST_CHEF_SERVER, SKIP_FRONT_END_IPS_MSG_A2, "", skipIpsList)
 		err = c.patchRootCAinCS(sshUtil, certs.rootCA, timestamp, infra, flagsObj, skipIpsList)
 		if err != nil {
 			return err
@@ -296,7 +298,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	}
 	//get frontend ips to skip root-ca patch
 	skipIpsList = c.getFrontEndIpsForSkippingRootCAPatching(remoteService, certs.rootCA, infra, currentCertsInfo)
-	c.skipMessagePrinter("frontend", SKIP_FRONT_END_IPS_MSG, "", skipIpsList)
+	c.skipMessagePrinter("frontend", SKIP_FRONT_END_IPS_MSG_PG, "", skipIpsList)
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	filenameFe := "pg_fe.toml"
@@ -362,7 +364,7 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		skipMessage = SKIP_FRONT_END_IPS_MSG_CN
 	} else {
 		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
-		skipMessage = SKIP_FRONT_END_IPS_MSG
+		skipMessage = SKIP_FRONT_END_IPS_MSG_OS
 	}
 
 	c.skipMessagePrinter(remoteService, skipMessage, "", skipIpsList)
@@ -402,7 +404,7 @@ func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestam
 	}
 
 	//collect ips on which need to perform action/cert-rotation
-	filteredIps :=c.getFilteredIps(ips,skipIpsList)
+	filteredIps := c.getFilteredIps(ips, skipIpsList)
 
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
@@ -533,7 +535,7 @@ func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
 }
 
 //getFilteredIps will return ips on which cert-rotation need to perform.
-func (c *certRotateFlow) getFilteredIps(serviceIps,skipIpsList []string) []string {
+func (c *certRotateFlow) getFilteredIps(serviceIps, skipIpsList []string) []string {
 	filteredIps := []string{}
 	for _, ip := range serviceIps {
 		if stringutils.SliceContains(skipIpsList, ip) == false {
@@ -647,15 +649,21 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA,
 	return []string{}
 }
 
-// skipMessagePrinter print the skip message 
+// skipMessagePrinter print the skip message
 func (c *certRotateFlow) skipMessagePrinter(remoteService, skipIpsMsg, nodeFlag string, skipIpsList []string) {
+	nodeString := "node"
+
+	if len(skipIpsList) > 1 {
+		nodeString = "nodes"
+	}
+
 	if len(skipIpsList) != 0 && nodeFlag == "" {
-		writer.Skippedf(skipIpsMsg, remoteService,strings.Join(skipIpsList,", "))
+		writer.Skippedf(skipIpsMsg, remoteService, nodeString, nodeString, strings.Join(skipIpsList, ", "))
 	}
 
 	if len(skipIpsList) != 0 && nodeFlag != "" {
 		if stringutils.SliceContains(skipIpsList, nodeFlag) {
-			writer.Skippedf(skipIpsMsg, remoteService,strings.Join(skipIpsList,", "))
+			writer.Skippedf(skipIpsMsg, remoteService, nodeString, nodeString, strings.Join(skipIpsList, ", "))
 		}
 	}
 }
