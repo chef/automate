@@ -1,5 +1,7 @@
 package inspec
 
+import "github.com/sirupsen/logrus"
+
 const (
 	ResultStatusPassed        string = "passed"
 	ResultStatusSkipped       string = "skipped"
@@ -18,15 +20,21 @@ const (
 // "waived": "no" / "no_expired" / "yes" / "yes_run"
 
 // Status calculates the overall status of a control based on all results
-func (control *Control) Status() (status string) {
+func (control *Control) Status(waived string) (status string) {
 	status = ResultStatusPassed
 	for _, result := range control.Results {
+		// logrus.Infof("************************** CONTROL STATUS *******************************: %+v", result.Status)
+		// logrus.Infof("************************** CONTROL WaiverData *******************************: %+v", control.WaiverData)
 		if result.Status == ResultStatusFailed {
 			status = ResultStatusFailed
 			break
 		} else if result.Status == ResultStatusSkipped {
 			status = ResultStatusSkipped
 		}
+	}
+	if waived == "yes_run" || waived == "yes" {
+		logrus.Infof("************************** CONTROL WaiverData *******************************: %+v", control.WaiverData)
+		status = ResultStatusWaived
 	}
 	return status
 }

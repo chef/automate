@@ -47,7 +47,7 @@ func ProfileControlSummary(profile *inspec_api.Profile) *reportingTypes.NodeCont
 			// Expired waived controls are not waived. This way, we can use the actual status of the executed control
 			summary.Waived.Total++
 		} else {
-			switch control.Status() {
+			switch control.Status(WaivedStr(control.WaiverData)) {
 			case inspec.ResultStatusPassed:
 				summary.Passed.Total++
 			case inspec.ResultStatusSkipped:
@@ -175,11 +175,13 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 			}
 
 			controlWaivedStr := WaivedStr(control.WaiverData)
+			logrus.Infof("The current status: %+v", control.Status(controlWaivedStr))
+
 			minControls[i] = relaxting.ESInSpecReportControl{
 				ID:         control.Id,
 				Title:      control.Title,
 				Impact:     control.Impact,
-				Status:     control.Status(),
+				Status:     control.Status(controlWaivedStr),
 				Results:    minResults,
 				StringTags: stringTags,
 				Refs:       refs,
