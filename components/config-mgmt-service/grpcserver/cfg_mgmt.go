@@ -271,11 +271,8 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 		return runsCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
-	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) {
-		if !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
-			return runsCounts, status.Errorf(codes.InvalidArgument,
-				"Invalid start/end time. (format: YYYY-MM-DD)")
-		}
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) && !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
+		return runsCounts, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
