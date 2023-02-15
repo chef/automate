@@ -178,7 +178,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   // react on events for date elector, pass event to parent component
   dateSelected(selected: string) {
     const dateString = HistorySelection.startingTimestamp(selected);
-    if(selected === "Last 24 hours"){
+    if (selected === 'Last 24 hours') {
       this.nodeHistoryStore.addFilter('startDate', moment.utc(dateString).format());
     } else {
       this.nodeHistoryStore.addFilter('startDate', this.formatDate(dateString));
