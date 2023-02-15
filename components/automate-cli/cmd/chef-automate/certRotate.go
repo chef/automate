@@ -96,11 +96,11 @@ const (
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
 	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certificate rotation for externally configured %s is not supported."
-	SKIP_IPS_MSG_CERT_ROTATE          = "The following %s %s will skip while certificate rotation as the following %s have the same certificates as currently provided certificates.\n %s"
-	SKIP_FRONT_END_IPS_MSG_A2         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided automate root-ca.\n %s"
-	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided postgres root-ca.\n %s"
-	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip while root-ca and common name patching as the following %s have same root-ca and common name as currently provided opensearch root-ca and common name.\n %s"
-	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip while common name patching as the following %s have same common name as currently provided.\n %s"
+	SKIP_IPS_MSG_CERT_ROTATE          = "The following %s %s will skip while certificate rotation as the following %s have the same certificates as currently provided certificates.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_A2         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided automate root-ca.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided postgres root-ca.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip while root-ca and common name patching as the following %s have same root-ca and common name as currently provided opensearch root-ca and common name.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip while common name patching as the following %s have same common name as currently provided.\n\t %s"
 )
 
 type certificates struct {
@@ -131,6 +131,17 @@ type certRotateFlags struct {
 
 type certRotateFlow struct {
 	FileUtils fileutils.FileUtils
+}
+
+type patchFnParameters struct {
+	sshUtil       SSHUtil
+	config        string
+	fileName      string
+	timestamp     string
+	remoteService string
+	infra         *AutomteHAInfraDetails
+	flagsObj      *certRotateFlags
+	skipIpsList   []string
 }
 
 func init() {
@@ -244,7 +255,19 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 
 	// Creating and patching the required configurations.
 	config := fmt.Sprintf(FRONTEND_CONFIG, certs.publicCert, certs.privateCert, certs.publicCert, certs.privateCert)
-	err := c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
+
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        config,
+		fileName:      fileName,
+		timestamp:     timestamp,
+		remoteService: remoteService,
+		infra:         infra,
+		flagsObj:      flagsObj,
+		skipIpsList:   skipIpsList,
+	}
+
+	err := c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -286,8 +309,19 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
 	c.skipMessagePrinter(remoteService, SKIP_IPS_MSG_CERT_ROTATE, flagsObj.node, skipIpsList)
 
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        config,
+		fileName:      fileName,
+		timestamp:     timestamp,
+		remoteService: remoteService,
+		infra:         infra,
+		flagsObj:      flagsObj,
+		skipIpsList:   skipIpsList,
+	}
+
 	//patching on PG
-	err := c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
+	err := c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -305,7 +339,13 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 	remoteService = "frontend"
 	// Creating and patching the required configurations.
 	configFe := fmt.Sprintf(POSTGRES_FRONTEND_CONFIG, certs.rootCA)
-	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj, skipIpsList)
+
+	patchFnParam.config = configFe
+	patchFnParam.fileName = filenameFe
+	patchFnParam.remoteService = remoteService
+	patchFnParam.skipIpsList = skipIpsList
+
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -345,7 +385,18 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
 	}
 
-	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        config,
+		fileName:      fileName,
+		timestamp:     timestamp,
+		remoteService: remoteService,
+		infra:         infra,
+		flagsObj:      flagsObj,
+		skipIpsList:   skipIpsList,
+	}
+
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -366,10 +417,14 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
 		skipMessage = SKIP_FRONT_END_IPS_MSG_OS
 	}
-
 	c.skipMessagePrinter(remoteService, skipMessage, "", skipIpsList)
 
-	err = c.patchConfig(sshUtil, configFe, filenameFe, timestamp, remoteService, infra, flagsObj, skipIpsList)
+	patchFnParam.config = configFe
+	patchFnParam.fileName = filenameFe
+	patchFnParam.remoteService = remoteService
+	patchFnParam.skipIpsList = skipIpsList
+
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
@@ -377,43 +432,43 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 }
 
 // patchConfig will patch the configurations to required nodes.
-func (c *certRotateFlow) patchConfig(sshUtil SSHUtil, config, filename, timestamp, remoteService string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, skipIpsList []string) error {
+func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 
-	f, err := os.Create(filename)
+	f, err := os.Create(param.fileName)
 	if err != nil {
 		return err
 	}
-	_, err = f.Write([]byte(config))
+	_, err = f.Write([]byte(param.config))
 	if err != nil {
 		return err
 	}
 	f.Close()
 
 	var ips []string
-	if flagsObj.node != "" && remoteService != "frontend" {
-		isValid := c.validateEachIp(remoteService, infra, flagsObj)
+	if param.flagsObj.node != "" && param.remoteService != "frontend" {
+		isValid := c.validateEachIp(param.remoteService, param.infra, param.flagsObj)
 		if !isValid {
-			return errors.New(fmt.Sprintf("Please Enter Valid %s IP", remoteService))
+			return errors.New(fmt.Sprintf("Please Enter Valid %s IP", param.remoteService))
 		}
-		ips = append(ips, flagsObj.node)
+		ips = append(ips, param.flagsObj.node)
 	} else {
-		ips = c.getIps(remoteService, infra)
+		ips = c.getIps(param.remoteService, param.infra)
 	}
 	if len(ips) == 0 {
-		return errors.New(fmt.Sprintf("No %s IPs are found", remoteService))
+		return errors.New(fmt.Sprintf("No %s IPs are found", param.remoteService))
 	}
 
 	//collect ips on which need to perform action/cert-rotation
-	filteredIps := c.getFilteredIps(ips, skipIpsList)
+	filteredIps := c.getFilteredIps(ips, param.skipIpsList)
 
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
-	if remoteService == CONST_AUTOMATE || remoteService == CONST_CHEF_SERVER || remoteService == "frontend" {
-		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, remoteService+timestamp, dateFormat)
-	} else if remoteService == CONST_POSTGRESQL || remoteService == CONST_OPENSEARCH {
-		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, remoteService+timestamp, remoteService)
+	if param.remoteService == CONST_AUTOMATE || param.remoteService == CONST_CHEF_SERVER || param.remoteService == "frontend" {
+		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH ,param.remoteService+param.timestamp, dateFormat)
+	} else if param.remoteService == CONST_POSTGRESQL || param.remoteService == CONST_OPENSEARCH {
+		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
-	err = c.copyAndExecute(filteredIps, sshUtil, timestamp, remoteService, filename, scriptCommands, flagsObj)
+	err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
 	if err != nil {
 		return err
 	}
@@ -437,7 +492,19 @@ func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp stri
 	}
 
 	config := fmt.Sprintf(CHEFSERVER_ROOTCA_CONFIG, strings.TrimSpace(string(fqdn)), rootCA)
-	err = c.patchConfig(sshUtil, config, fileName, timestamp, remoteService, infra, flagsObj, skipIpsList)
+
+	patchFnParam := &patchFnParameters{
+		sshUtil:       sshUtil,
+		config:        config,
+		fileName:      fileName,
+		timestamp:     timestamp,
+		remoteService: remoteService,
+		infra:         infra,
+		flagsObj:      flagsObj,
+		skipIpsList:   skipIpsList,
+	}
+
+	err = c.patchConfig(patchFnParam)
 	if err != nil {
 		return err
 	}
