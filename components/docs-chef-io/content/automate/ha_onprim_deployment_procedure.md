@@ -145,7 +145,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 {{< /note >}}
 
 ```config
-# This is a Chef Automate AWS HA mode configuration file. You can run
+# This is a Chef Automate on-prem HA mode configuration file. You can run
 # 'chef-automate deploy' with this config file, and it should
 # successfully create a new Chef Automate HA instance with default settings.
 [architecture.existing_infra]

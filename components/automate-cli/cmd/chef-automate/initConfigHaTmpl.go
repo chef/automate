@@ -299,7 +299,7 @@ X-Project = ""
 `
 
 const haExistingNodesConfigTemplate = `
-# This is a Chef Automate AWS HA mode configuration file. You can run
+# This is a Chef Automate on-prem HA mode configuration file. You can run
 # 'chef-automate deploy' with this config file and it should
 # successfully create a new Chef Automate HA instances with default settings.
 
