@@ -145,16 +145,15 @@ Restart your splunk forwarder using the following command:
 
 The above step will let you view the `automate.log` file in your splunk forwarder. Click [here](https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html) to know about the Splunk Forwarder.
 
-<br>
-
 ## Frequently Asked Questions
 
-### The setting of `redirect_log_file_path` is the directory where the log files will be stored, or the full path of the actual log file?
-- `redirect_log_file_path` is actually a directory where automate.log file will be created.
+### Is the setting of `redirect_log_file_path` directory where the log files will be stored or the full path of the actual log file?
 
+- `redirect_log_file_path` is a directory where the automate.log file will be created.
 
-### Patching the log config. If we want to patch the whole cluster from bastion host, do we just run one command?
-- We will have to run multiple commands eg:<br>
-  -  To setup logrotate on opensearch `sudo chef-automate config patch <patch_conf.toml> --os` <br>
-  -  To setup logrotate on postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
-                                                                                                      
+### Patching the log config. Should we run one command to patch the whole cluster from the bastion host?
+
+- Run multiple commands, e.g.:
+
+  - To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
+  - To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
