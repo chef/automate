@@ -97,8 +97,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/poy/onpar v0.0.0-20190519213022-ee068f8ea4d1 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021 // indirect
-	github.com/prometheus/client_golang v1.5.1
-	github.com/prometheus/procfs v0.0.11 // indirect
+	github.com/prometheus/client_golang v1.11.1
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/russellhaering/goxmldsig v1.1.0 // indirect
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
