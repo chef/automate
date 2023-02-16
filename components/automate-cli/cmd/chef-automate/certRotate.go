@@ -96,11 +96,11 @@ const (
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
 	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certificate rotation for externally configured %s is not supported."
-	SKIP_IPS_MSG_CERT_ROTATE          = "The following %s %s will skip while certificate rotation as the following %s have the same certificates as currently provided certificates.\n\t %s"
-	SKIP_FRONT_END_IPS_MSG_A2         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided automate root-ca.\n\t %s"
-	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip while root-ca patching as the following %s have same root-ca as currently provided postgres root-ca.\n\t %s"
-	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip while root-ca and common name patching as the following %s have same root-ca and common name as currently provided opensearch root-ca and common name.\n\t %s"
-	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip while common name patching as the following %s have same common name as currently provided.\n\t %s"
+	SKIP_IPS_MSG_CERT_ROTATE          = "The following %s %s will skip during certificate rotation as the following %s have the same certificates as currently provided certificates.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_A2         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided Automate root-ca.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided Postgres root-ca.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip during root-ca and common name patching as the following %s have same root-ca and common name as currently provided Opensearch root-ca and common name.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip during common name patching as the following %s have same common name as currently provided Opensearch common name.\n\t %s"
 )
 
 type certificates struct {
