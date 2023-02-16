@@ -81,7 +81,6 @@
     "@types/jasminewd2": "^2.0.8",
     "@types/lodash": "^4.14.168",
     "ajv": "^7.2.1",
-    "angular2-template-loader": "^0.6.2",
     "axe-webdriverjs": "^2.3.0",
     "codelyzer": "^6.0.0",
     "faker": "^5.4.0",
