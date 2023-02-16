@@ -30,7 +30,7 @@ export class ClientRunsRequests {
     private httpClient: HttpClient
   ) {}
 
-  public downloadNodes(type: string, filters: NodeFilter): Observable<string> {
+  public downloadNodes(type: string, filters: NodeFilter): Observable<Blob> {
     const url = `${CONFIG_MGMT_URL}/nodes/export`;
 
     const body = {
@@ -51,7 +51,7 @@ export class ClientRunsRequests {
       }
     }
 
-    return this.httpClient.post(url, body, {responseType: 'text'});
+    return this.httpClient.post(url, body, {responseType: 'blob'});
   }
 
   public deleteNodes(nodeIds: string[]): Observable<boolean> {
