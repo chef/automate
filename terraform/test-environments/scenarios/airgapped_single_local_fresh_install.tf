@@ -3,7 +3,7 @@
 #
 
 module "airgapped_single_local_fresh_install" {
-  source = "github.com/chef/es-terraform//modules/cd_instance_v2?ref=shaik/name_change"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=shaik/name_change"
 
   # DNS components ( a2-airgapped-local-fresh-install-{{channel}}.cd.chef.co )
   subdomain        = "a2-airgapped-local-fresh-install"
