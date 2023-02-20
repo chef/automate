@@ -4,7 +4,7 @@
 # This S3-hosted website is a quick dashboard that can be used to quickly see the available instances.
 
 module "dashboard" {
-  source    = "github.com/chef/es-terraform//modules/cd_s3_website"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_s3_website?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
   subdomain = "a2-${var.dns_suffix}"
 
   # Metadata
@@ -50,7 +50,7 @@ module "ui_library_website" {
 # Use to host code coverage reports for master
 
 module "a2_code_coverage_website" {
-  source    = "github.com/chef/es-terraform//modules/cd_s3_website"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_s3_website?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
   subdomain = "a2-code-coverage"
 
   # Metadata
