@@ -3,7 +3,7 @@
 #
 
 module "inspec_target_rhel7" {
-  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
 
   # DNS components ( inspec-target-rhel7-{{channel}}.cd.chef.co )
   subdomain        = "inspec-target-rhel7"

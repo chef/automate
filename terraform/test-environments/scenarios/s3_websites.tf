@@ -32,7 +32,8 @@ resource "null_resource" "dashboard_deploy" {
 # Use to host the chef-ui-library documentation
 
 module "ui_library_website" {
-  source    = "github.com/chef/es-terraform//modules/cd_s3_website"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_s3_website?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
+
   subdomain = "ui-library"
 
   # Metadata

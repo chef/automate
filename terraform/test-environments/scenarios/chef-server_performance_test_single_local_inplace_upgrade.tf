@@ -3,7 +3,7 @@
 #
 
 module "chef_server_performance_test_single_local_inplace_upgrade" {
-  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
 
   # DNS components ( a2-cs-single-local-inplace-upgrade-{{channel}}.cd.chef.co )
   subdomain        = "a2-cs-single-local-inplace-upgrade"
@@ -116,7 +116,7 @@ locals {
 }
 
 module "chef_server_performance_test_chef_load" {
-  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
 
   instance_count = "${local.chef_server_performance_test_chef_load_count}"
 
