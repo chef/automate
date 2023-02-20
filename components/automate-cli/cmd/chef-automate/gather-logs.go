@@ -120,7 +120,7 @@ var gatherLogsCmdFlags = struct {
 
 func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		return executeAutomateClusterCtlCommandAsync("gather-logs", args, gatherLogsHelpDoc)
+		return executeAutomateClusterCtlCommandAsync("gather-logs", args, gatherLogsHelpDoc, false)
 	}
 	// Ensure we can write to any user given log locations
 	overridePath := ""
