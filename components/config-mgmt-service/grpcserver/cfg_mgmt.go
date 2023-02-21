@@ -270,9 +270,9 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 	if err != nil {
 		return runsCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
-	if !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
-		return runsCounts, status.Errorf(codes.InvalidArgument,
-			"Invalid start/end time. (format: YYYY-MM-DD)")
+
+	if !params.ValidateDateTimeRange(request.GetStart(), request.GetEnd()) && !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
+		return runsCounts, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
