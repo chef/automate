@@ -147,13 +147,14 @@ The above step will let you view the `automate.log` file in your splunk forwarde
 
 ## Log File
 
-Create the centralizing log file, i.e., **automate.log** in the `redirect_log_file_path` directory.
+**NOTE:** `redirect_log_file_path` is a directory where **automate.log** file gets created.
 
 ## Frequently Asked Questions
 
 ### How can Automate HA be set up and configured to write the logs of all the nodes to a centralized log file?
 
 This requires Automate HA to do the following steps to set up the log location and configure it.
+
 - Mount and NFS or network-attached storage to all the nodes. Create a log location using the following steps:
   - Create an EFS.
   - Mount the EFS in all the Frontend and Backend nodes of Automate HA.
