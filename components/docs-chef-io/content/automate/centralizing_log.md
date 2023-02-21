@@ -151,18 +151,15 @@ Create the centralizing log file, i.e., **automate.log** in the `redirect_log_fi
 
 ## Frequently Asked Questions
 
-### Patching the log config. Should we run one command to patch the whole cluster from the bastion host?
+### How can Automate HA be set up and configured to write the logs of all the nodes to a centralized log file?
 
-Run multiple commands, e.g.:
-
-- Mount and NFS or network-attached storage to all the nodes. Create a log location using following steps:
+This requires Automate HA to do the following steps to set up the log location and configure it.
+- Mount and NFS or network-attached storage to all the nodes. Create a log location using the following steps:
   - Create an EFS.
-  - Create couple of EC2 instances.
-  - Mount the EFS in both the EC2 instances.
-  - Install Automate in both the instances.
-  - Configure Automate to redirect the journal logs for both the EC2 instances to the same file inside the mounted location.
-  - Check if both the node logs are shown in the log.
-- To set up `logrotate` on Automate `sudo chef-automate config patch <patch_conf.toml> --a`
-- To set up `logrotate` on Chef Server `sudo chef-automate config patch <patch_conf.toml> --cs`
-- To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
-- To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
+  - Mount the EFS in all the Frontend and Backend nodes of Automate HA.
+- Configure Automate HA nodes to redirect the journal logs to the same file inside the mounted location.
+  - To set up `logrotate` on Automate `sudo chef-automate config patch <patch_conf.toml> --a`
+  - To set up `logrotate` on Chef Server `sudo chef-automate config patch <patch_conf.toml> --cs`
+  - To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
+  - To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
+- Check if all the node logs are shown in a single log file.
