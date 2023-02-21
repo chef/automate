@@ -145,15 +145,24 @@ Restart your splunk forwarder using the following command:
 
 The above step will let you view the `automate.log` file in your splunk forwarder. Click [here](https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html) to know about the Splunk Forwarder.
 
+## Log File
+
+Create the centralizing log file, i.e., **automate.log** in the `redirect_log_file_path` directory.
+
 ## Frequently Asked Questions
-
-### Is the setting of `redirect_log_file_path` directory where the log files will be stored or the full path of the actual log file?
-
-- `redirect_log_file_path` is a directory where the automate.log file will be created.
 
 ### Patching the log config. Should we run one command to patch the whole cluster from the bastion host?
 
-- Run multiple commands, e.g.:
+Run multiple commands, e.g.:
 
-  - To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
-  - To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
+- Mount and NFS or network-attached storage to all the nodes. Create a log location using following steps:
+  - Create an EFS.
+  - Create couple of EC2 instances.
+  - Mount the EFS in both the EC2 instances.
+  - Install Automate in both the instances.
+  - Configure Automate to redirect the journal logs for both the EC2 instances to the same file inside the mounted location.
+  - Check if both the node logs are shown in the log.
+- To set up `logrotate` on Automate `sudo chef-automate config patch <patch_conf.toml> --a`
+- To set up `logrotate` on Chef Server `sudo chef-automate config patch <patch_conf.toml> --cs`
+- To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
+- To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
