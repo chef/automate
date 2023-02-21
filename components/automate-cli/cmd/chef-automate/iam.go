@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -30,8 +31,9 @@ var iamCmdFlags = struct {
 
 func newIAMCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "iam COMMAND",
-		Short: "Chef Automate iam commands",
+		Use:               "iam COMMAND",
+		Short:             "Chef Automate iam commands",
+		PersistentPreRunE: preIAMCmd,
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
@@ -147,151 +149,155 @@ func display(v *iam_common.Version) string {
 }
 
 func runIAMVersionCmd(cmd *cobra.Command, args []string) error {
-	if isA2HARBFileExist() {
-		return RunCmdOnSingleAutomateNode(cmd, args)
-	} else {
-		ctx := context.Background()
-		apiClient, err := apiclient.OpenConnection(ctx)
-		if err != nil {
-			return status.Wrap(err, status.APIUnreachableError,
-				"Failed to create a connection to the API")
-		}
-
-		resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
-		if err != nil {
-			return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
-		}
-		writer.Printf("IAM %s\n", display(resp.Version))
-		return nil
+	ctx := context.Background()
+	apiClient, err := apiclient.OpenConnection(ctx)
+	if err != nil {
+		return status.Wrap(err, status.APIUnreachableError,
+			"Failed to create a connection to the API")
 	}
+
+	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
+	if err != nil {
+		return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
+	}
+	writer.Printf("IAM %s\n", display(resp.Version))
+	return nil
 }
 
 func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) error {
-	if isA2HARBFileExist() {
-		return RunCmdOnSingleAutomateNode(cmd, args)
+	if iamCmdFlags.dryRun {
+		writer.Title("Dry run: showing all actions needed to restore default admin access without performing any changes\n")
 	} else {
-		if iamCmdFlags.dryRun {
-			writer.Title("Dry run: showing all actions needed to restore default admin access without performing any changes\n")
-		} else {
-			writer.Title("Restoring all factory defaults for admin access\n")
-		}
-		newAdminPassword := args[0]
-		ctx := context.Background()
-
-		apiClient, err := apiclient.OpenConnection(ctx)
-		if err != nil {
-			return status.Wrap(err, status.APIUnreachableError, "Failed to create a connection to the API")
-		}
-
-		// restore admin user and team if needed
-		membershipID, adminUserFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx,
-			apiClient, newAdminPassword, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if adminUserFound {
-			writer.Success("Updated existing admin user's password")
-		} else {
-			writer.Success("Created new admin user with specified password")
-		}
-
-		adminsTeamFound, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if adminsTeamFound {
-			writer.Skipped("Found admins team")
-		} else {
-			writer.Success("Recreated admins team")
-		}
-
-		// In dry-run mode, we might be missing some IDs that would have been created.
-		// We'll only hit this condition in dry-run mode.
-		if iamCmdFlags.dryRun && (membershipID == "" || !adminsTeamFound) {
-			writer.Success("Added admin user to admins team")
-		} else { // non-dry-run mode or dry-run mode where user and team already existed.
-			userAdded, err := adminmgmt.AddAdminUserToTeam(ctx,
-				apiClient, adminsID, membershipID, iamCmdFlags.dryRun)
-			if err != nil {
-				return err
-			}
-
-			if userAdded {
-				writer.Success("Added admin user to admins team")
-			} else {
-				writer.Skipped("Admin user already existed in admins team")
-			}
-		}
-
-		foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx,
-			apiClient, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if !foundAdminsTeaminV2AdminPolicy {
-			writer.Success("Added local 'admins' team to Chef-managed 'Administrator' policy")
-		}
-
-		writer.Skipped("Found local 'admins' team in Chef-managed 'Administrator' policy")
-
-		if err := apiClient.CloseConnection(); err != nil {
-			return status.Wrap(err, status.APIUnreachableError, "Failed to close connection to the API")
-		}
-
-		return nil
+		writer.Title("Restoring all factory defaults for admin access\n")
 	}
+	newAdminPassword := args[0]
+	ctx := context.Background()
+
+	apiClient, err := apiclient.OpenConnection(ctx)
+	if err != nil {
+		return status.Wrap(err, status.APIUnreachableError, "Failed to create a connection to the API")
+	}
+
+	// restore admin user and team if needed
+	membershipID, adminUserFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx,
+		apiClient, newAdminPassword, iamCmdFlags.dryRun)
+	if err != nil {
+		return err
+	}
+
+	if adminUserFound {
+		writer.Success("Updated existing admin user's password")
+	} else {
+		writer.Success("Created new admin user with specified password")
+	}
+
+	adminsTeamFound, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, iamCmdFlags.dryRun)
+	if err != nil {
+		return err
+	}
+
+	if adminsTeamFound {
+		writer.Skipped("Found admins team")
+	} else {
+		writer.Success("Recreated admins team")
+	}
+
+	// In dry-run mode, we might be missing some IDs that would have been created.
+	// We'll only hit this condition in dry-run mode.
+	if iamCmdFlags.dryRun && (membershipID == "" || !adminsTeamFound) {
+		writer.Success("Added admin user to admins team")
+	} else { // non-dry-run mode or dry-run mode where user and team already existed.
+		userAdded, err := adminmgmt.AddAdminUserToTeam(ctx,
+			apiClient, adminsID, membershipID, iamCmdFlags.dryRun)
+		if err != nil {
+			return err
+		}
+
+		if userAdded {
+			writer.Success("Added admin user to admins team")
+		} else {
+			writer.Skipped("Admin user already existed in admins team")
+		}
+	}
+
+	foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx,
+		apiClient, iamCmdFlags.dryRun)
+	if err != nil {
+		return err
+	}
+
+	if !foundAdminsTeaminV2AdminPolicy {
+		writer.Success("Added local 'admins' team to Chef-managed 'Administrator' policy")
+	}
+
+	writer.Skipped("Found local 'admins' team in Chef-managed 'Administrator' policy")
+
+	if err := apiClient.CloseConnection(); err != nil {
+		return status.Wrap(err, status.APIUnreachableError, "Failed to close connection to the API")
+	}
+
+	return nil
 }
 
 func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
-	if isA2HARBFileExist() {
-		return RunCmdOnSingleAutomateNode(cmd, args)
+	name := args[0]
+
+	ctx := context.Background()
+	apiClient, err := apiclient.OpenConnection(ctx)
+	if err != nil {
+		return status.Wrap(err, status.APIUnreachableError,
+			"Failed to create a connection to the API.")
+	}
+
+	var id string
+	if iamCmdFlags.tokenID == "" {
+		re := regexp.MustCompile(`[^a-z0-9]`)
+		id = strings.ToLower(name)
+		id = re.ReplaceAllString(id, "-")
 	} else {
-		name := args[0]
+		id = iamCmdFlags.tokenID
+	}
 
-		ctx := context.Background()
-		apiClient, err := apiclient.OpenConnection(ctx)
-		if err != nil {
-			return status.Wrap(err, status.APIUnreachableError,
-				"Failed to create a connection to the API.")
-		}
+	tokenResp, err := apiClient.TokensClient().CreateToken(ctx, &iam_req.CreateTokenReq{
+		Id:     id,
+		Name:   name,
+		Active: &wrappers.BoolValue{Value: true},
+		// TODO (tc): Might want to let them specify a --projects list somehow eventually.
+		Projects: []string{},
+	})
+	if err != nil {
+		return status.Wrap(err, status.APIError, "Failed to generate new token.")
+	}
 
-		var id string
-		if iamCmdFlags.tokenID == "" {
-			re := regexp.MustCompile(`[^a-z0-9]`)
-			id = strings.ToLower(name)
-			id = re.ReplaceAllString(id, "-")
-		} else {
-			id = iamCmdFlags.tokenID
-		}
-
-		tokenResp, err := apiClient.TokensClient().CreateToken(ctx, &iam_req.CreateTokenReq{
-			Id:     id,
-			Name:   name,
-			Active: &wrappers.BoolValue{Value: true},
-			// TODO (tc): Might want to let them specify a --projects list somehow eventually.
-			Projects: []string{},
+	if iamCmdFlags.adminToken {
+		member := fmt.Sprintf("token:%s", tokenResp.Token.Id)
+		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
+			Id:      v2_constants.AdminPolicyID,
+			Members: []string{member},
 		})
 		if err != nil {
-			return status.Wrap(err, status.APIError, "Failed to generate new token.")
+			return status.Wrap(err, status.APIError, "Failed to add token as a member of chef-managed Admin policy.")
 		}
-
-		if iamCmdFlags.adminToken {
-			member := fmt.Sprintf("token:%s", tokenResp.Token.Id)
-			_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
-				Id:      v2_constants.AdminPolicyID,
-				Members: []string{member},
-			})
-			if err != nil {
-				return status.Wrap(err, status.APIError, "Failed to add token as a member of chef-managed Admin policy.")
-			}
-		}
-		status.GlobalResult = struct {
-			Token string `json:"token"`
-		}{Token: tokenResp.Token.Value}
-		writer.Println(tokenResp.Token.Value)
-		return nil
 	}
+	status.GlobalResult = struct {
+		Token string `json:"token"`
+	}{Token: tokenResp.Token.Value}
+	writer.Println(tokenResp.Token.Value)
+	return nil
+}
+
+func preIAMCmd(cmd *cobra.Command, args []string) error {
+	err := commandPrePersistent(cmd)
+	if err != nil {
+		return status.Wrap(err, status.BackupError, "unable to set command parent settings")
+	}
+	if isA2HARBFileExist() {
+		err = RunCmdOnSingleAutomateNode(cmd, args)
+		if err != nil {
+			return err
+		}
+		// NOTE: used os.exit as need to stop next lifecycle method to execute
+		os.Exit(1)
+	}
+	return nil
 }
