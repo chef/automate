@@ -144,3 +144,23 @@ Restart your splunk forwarder using the following command:
 ```
 
 The above step will let you view the `automate.log` file in your splunk forwarder. Click [here](https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html) to know about the Splunk Forwarder.
+
+## Log File
+
+**NOTE:** `redirect_log_file_path` is a directory where **automate.log** file gets created.
+
+## Frequently Asked Questions
+
+### How can Automate HA be set up and configured to write the logs of all the nodes to a centralized log file?
+
+This requires Automate HA to do the following steps to set up the log location and configure it.
+
+- Mount and NFS or network-attached storage to all the nodes. Create a log location using the following steps:
+  - Create an EFS.
+  - Mount the EFS in all the Frontend and Backend nodes of Automate HA.
+- Configure Automate HA nodes to redirect the journal logs to the same file inside the mounted location.
+  - To set up `logrotate` on Automate `sudo chef-automate config patch <patch_conf.toml> --a`
+  - To set up `logrotate` on Chef Server `sudo chef-automate config patch <patch_conf.toml> --cs`
+  - To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
+  - To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
+- Check if all the node logs are shown in a single log file.
