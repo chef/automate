@@ -98,9 +98,13 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed to stream configuration events")
 	}
 
+	isOSEnabled, err := isOpenSearchEnable(timeout)
+	if err != nil {
+		return err
+	}
 	if config.Global != nil && config.Global.String() != "" {
 		if config.Global.V1 != nil && config.Global.V1.Backups != nil && config.Global.V1.Backups.Filesystem != nil {
-			if config.Global.V1.Backups.Filesystem.Path.Value != "" {
+			if config.Global.V1.Backups.Filesystem.Path.Value != "" && !isOSEnabled {
 				fmt.Println("Waiting till all the services comes in healthy state...")
 				backupScript := fmt.Sprintf(backupPathFix, strings.TrimSuffix(config.Global.V1.Backups.Filesystem.Path.Value, "/"))
 				_, err := exec.Command("/bin/sh", "-c", backupScript).Output()
@@ -112,6 +116,14 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 	}
 
 	return nil
+}
+
+func isOpenSearchEnable(timeout int64) (bool, error) {
+	res, err := GetAutomateConfig(timeout)
+	if err != nil {
+		return false, status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to get Chef Automate configuration from the deployment-service")
+	}
+	return res.GetConfig().GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue(), nil
 }
 
 func validateS3Url(config *dc.AutomateConfig) bool {
