@@ -118,8 +118,9 @@ export class DataFeedCreateComponent {
   set testErrorSetter(val: boolean) {
     let errorString: string;
     if (this.integTitle === StorageIntegrationTypes.MINIO) {
-      errorString =
-        'Unable to connect: check endpoint, bucket name, access key and secret key.';
+      errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
+    } else if(this.integTitle===StorageIntegrationTypes.AMAZON_S3){
+      errorString = 'Unable to connect : check region, bucket name, access key and secret key.';
     } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
       errorString = 'Unable to connect: check URL, username and password.';
     } else if (this.authSelected === AuthTypes.ACCESSTOKEN) {
