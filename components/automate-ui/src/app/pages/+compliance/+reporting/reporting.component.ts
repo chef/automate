@@ -297,8 +297,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const reportQuery = this.reportQuery.getReportQuery();
     const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${format}`;
 
-    let fileSize: number = 0;
-    const maxFileSizeElement: number = 1000000000;
+    let fileSize = 0;
+    const maxFileSizeElement = 1000000000;
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
@@ -315,7 +315,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
         const type = types[format];
         const blob = new Blob([data], { type });
         fileSize = blob.size;
-        var fileUrl = URL.createObjectURL(blob);
+        const fileUrl = URL.createObjectURL(blob);
         saveAs(fileUrl, filename);
       }
       this.hideDownloadStatus();
@@ -331,8 +331,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.statsService.downloadReport(format, reportQuery).pipe(
       finalize(onComplete))
       .subscribe((event: any) => {
-        onNext(event)
-        onError('')
+        onNext(event);
+        onError('');
       });
   }
 
