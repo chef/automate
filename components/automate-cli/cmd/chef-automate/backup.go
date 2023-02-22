@@ -420,7 +420,7 @@ func runStreamBackupStatus(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.BackupError, "Streaming backup events failed")
 	}
 
-	if lastEvent != nil && lastEvent.GetBackup() != nil {
+	if lastEvent != nil && lastEvent.GetBackup() != nil && lastEvent.GetBackup().Description != nil {
 		status.GlobalResult = createBackupResult{
 			BackupId: backupTaskId,
 			SHA256:   lastEvent.GetBackup().Description.Sha256,
@@ -1291,9 +1291,11 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 				backupState := getBackupStateFromList(backupList, cmdRes)
 				writer.Println(backupState)
 			}
-			streamRes, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup stream-status "+restoreId, false)
-			if err != nil {
-				writer.Errorf("error in getting backup stream status %s \n%s\n", err.Error(), streamRes)
+			if restoreId != "" {
+				streamRes, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup stream-status "+restoreId, false)
+				if err != nil {
+					writer.Errorf("error in getting backup stream status %s \n%s\n", err.Error(), streamRes)
+				}
 			}
 			writer.Printf("\nBackup %s execution completed \n", subCommand)
 			break
