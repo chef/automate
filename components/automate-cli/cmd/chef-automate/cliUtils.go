@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// CommandBuilder builds the original command from the cobra command and args
-func CommandBuilder(cmd *cobra.Command, args []string) string {
+// GenerateOriginalAutomateCLICommand builds the original command from the cobra command and args
+func GenerateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) string {
 	fullCommand := cmd.CommandPath()
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
 		if flag.Changed {
@@ -26,7 +26,7 @@ func CommandBuilder(cmd *cobra.Command, args []string) string {
 
 // RunCmdOnSingleAutomateNode runs the command on a single automate node
 func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
-	script := CommandBuilder(cmd, args)
+	script := GenerateOriginalAutomateCLICommand(cmd, args)
 
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {

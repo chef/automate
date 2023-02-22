@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCommandBuilder(t *testing.T) {
+func TestGenerateOriginalAutomateCLICommand(t *testing.T) {
 	// Define a Cobra command for testing purposes
 	cmd := &cobra.Command{
 		Use:   "my-command",
@@ -26,14 +26,14 @@ func TestCommandBuilder(t *testing.T) {
 	cmd.Flags().Set("string-flag", "string-value")
 	cmd.Flags().Set("int-flag", "42")
 
-	// Call the CommandBuilder function with the defined Cobra command and arguments
-	fullCommand := CommandBuilder(cmd, []string{"arg1", "arg2"})
+	// Call the GenerateOriginalAutomateCLICommand function with the defined Cobra command and arguments
+	fullCommand := GenerateOriginalAutomateCLICommand(cmd, []string{"arg1", "arg2"})
 	expectedCommand := "sudo my-command --int-flag 42 --string-flag string-value arg1 arg2"
 	assert.Equal(t, fullCommand, expectedCommand)
 
-	// Set the bool flag to true and test the CommandBuilder function again
+	// Set the bool flag to true and test the GenerateOriginalAutomateCLICommand function again
 	cmd.Flag("bool-flag").Changed = true
-	fullCommand = CommandBuilder(cmd, []string{"arg1", "arg2"})
+	fullCommand = GenerateOriginalAutomateCLICommand(cmd, []string{"arg1", "arg2"})
 	expectedCommand = "sudo my-command --bool-flag --int-flag 42 --string-flag string-value arg1 arg2"
 	assert.Equal(t, fullCommand, expectedCommand)
 }
