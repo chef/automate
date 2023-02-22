@@ -24,6 +24,7 @@ type SSHConfig struct {
 	sshPort    string
 	sshKeyFile string
 	hostIP     string
+	timeout    int
 }
 
 type SSHUtil interface {
@@ -42,6 +43,11 @@ type SSHUtilImpl struct {
 }
 
 func NewSSHUtil(sshconfig *SSHConfig) SSHUtil {
+	// Set timeout. Default is 150 seconds.
+	if sshconfig.timeout == 0 {
+		sshconfig.timeout = 150
+	}
+
 	return &SSHUtilImpl{
 		SshConfig: sshconfig,
 	}
@@ -154,6 +160,7 @@ func addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, spinner bool) (string, error) {
 	logrus.Debug("Executing command ......")
 	logrus.Debug(remoteCommands)
+
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -166,23 +173,39 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 		writer.Errorf("session failed:%v\n", err)
 		return "", err
 	}
+	defer session.Close()
 
 	if spinner {
 		writer.StartSpinner()
 	}
-	output, err := session.CombinedOutput(remoteCommands)
-	if err != nil {
-		return "", err
+
+	var output []byte
+	errCh := make(chan error)
+	go func() {
+		output, err = session.CombinedOutput(remoteCommands)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		errCh <- nil
+	}()
+
+	select {
+	case <-time.After(time.Duration(s.SshConfig.timeout) * time.Second):
+		return "", errors.New("command timed out")
+	case err := <-errCh:
+		if err != nil {
+			if spinner {
+				writer.StopSpinner()
+			}
+			return "", err
+		}
 	}
 
 	if spinner {
 		writer.StopSpinner()
 	}
-	if err != nil {
-		writer.Errorf("Run failed: %v\n", err)
-		return "", err
-	}
-	defer session.Close()
+
 	logrus.Debug("Execution of command done......")
 	return string(output), nil
 }
