@@ -289,7 +289,7 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 func preIAMCmd(cmd *cobra.Command, args []string) error {
 	err := commandPrePersistent(cmd)
 	if err != nil {
-		return status.Wrap(err, status.BackupError, "unable to set command parent settings")
+		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 	}
 	if isA2HARBFileExist() {
 		err = RunCmdOnSingleAutomateNode(cmd, args)
