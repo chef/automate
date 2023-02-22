@@ -21,4 +21,4 @@ see_also:
 - admin-access - Manage and restore default admin access
 - token - Manage tokens
 - version - Retrieve IAM version in use
-supported_on: Automate
+supported_on: Bastion

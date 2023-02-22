@@ -19,4 +19,4 @@ inherited_options:
 see_also:
 - chef-automate iam - Chef Automate iam commands
 - create - Generate a token
-supported_on: Automate
+supported_on: Bastion

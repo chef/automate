@@ -19,4 +19,4 @@ inherited_options:
 see_also:
 - chef-automate iam - Chef Automate iam commands
 - restore - Restore the factory default admin user, team, and access
-supported_on: Automate
+supported_on: Bastion
