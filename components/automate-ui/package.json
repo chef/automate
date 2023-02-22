@@ -57,7 +57,7 @@
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "minimist": "^1.2.7",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "ngx-cookie": "^5.0.2",
     "ngx-infinite-scroll": "^10.0.1",
     "path": "^0.12.7",
