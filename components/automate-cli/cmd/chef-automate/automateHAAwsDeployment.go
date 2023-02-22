@@ -72,7 +72,7 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	args = args[1:]
 	args = append(args, "-y")
 	if isA2HARBFileExist() {
-		return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs)
+		return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs, true)
 	}
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }

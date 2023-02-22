@@ -227,7 +227,7 @@ func (nu *NodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error
 	return readConfig(path)
 }
 func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
-	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs)
+	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs, true)
 }
 
 func (nu *NodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {

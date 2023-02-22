@@ -65,7 +65,7 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	return err
 }
 
-func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
+func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string, checkTerraformApply bool) error {
 	var logFilePath = filepath.Join(AUTOMATE_HA_RUN_LOG_DIR, "/a2ha-run.log")
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
@@ -98,7 +98,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	go tailFile(logFilePath, executed)
 	x, err := c.Process.Wait()
 	logString, err := fileutils.ReadFile(logFilePath)
-	if strings.Contains(string(logString), "Apply complete!") {
+	if strings.Contains(string(logString), "Apply complete!") || !checkTerraformApply {
 		isSuccess = true
 	}
 	if x.ExitCode() != 0 || !isSuccess || err != nil {

@@ -19,7 +19,7 @@ func executeDeployment(args []string) error {
 	args = append(args[:indexOfConfig], args[indexOfConfig+1:]...)
 	args = append(args, "-y")
 	if isA2HARBFileExist() {
-		return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs)
+		return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs, true)
 	}
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }

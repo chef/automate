@@ -493,7 +493,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			args = append(args, "--skip-deploy")
 		} */
 	}
-	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc)
+	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc, true)
 }
 
 func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
