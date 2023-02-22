@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/preflight"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/user"
 	flag "github.com/spf13/pflag"
 )
@@ -1247,8 +1248,8 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	if pooling {
 		cmdRes, err := sshUtil.connectAndExecuteCommandOnRemote(commandString, true)
 		if err != nil {
-			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n", subCommand, automateIps[0], err.Error())
-			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s", automateIps[0])
+			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n%s\n", subCommand, automateIps[0], err.Error(), cmdRes)
+			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup commands on Automate node %s\n%s", automateIps[0], cmdRes)
 		}
 		writer.Printf("Triggered backup %s commands on Automate node %s \n %s \n", subCommand, automateIps[0], cmdRes)
 		writer.StartSpinner()
@@ -1259,21 +1260,26 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 		}
 		return nil
 	} else {
-		_, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
+		res, err := sshUtil.connectAndExecuteCommandOnRemoteSteamOutput(commandString)
 		if err != nil {
-			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n", subCommand, automateIps[0], err.Error())
-			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup %s commands on Automate node %s", subCommand, automateIps[0])
+			writer.Errorf("error in executing backup %s commands on Automate node %s,  %s \n%s\n", subCommand, automateIps[0], err.Error(), res)
+			return status.Wrapf(err, status.BackupRestoreError, "error in executing backup %s commands on Automate node %s\n%s", subCommand, automateIps[0], res)
 		}
 		return nil
 	}
 }
 
 func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand string) error {
+	restoreId := ""
 	for {
 		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status", false)
 		if err != nil {
 			writer.Errorf("error in polling backup status %s \n", err.Error())
 			return err
+		}
+		restoreOutput := strings.Split(statusResponse, " ")
+		if strings.Contains(statusResponse, "Restoring backup") && stringutils.IsNumeric(restoreOutput[len(restoreOutput)-1]) && restoreId == "" {
+			restoreId = strings.TrimSpace(restoreOutput[len(restoreOutput)-1])
 		}
 		if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
 			if backupState {
@@ -1285,7 +1291,11 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 				backupState := getBackupStateFromList(backupList, cmdRes)
 				writer.Println(backupState)
 			}
-			writer.Printf("\nBackup %s operation completed \n", subCommand)
+			streamRes, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup stream-status "+restoreId, false)
+			if err != nil {
+				writer.Errorf("error in getting backup stream status %s \n%s\n", err.Error(), streamRes)
+			}
+			writer.Printf("\nBackup %s execution completed \n", subCommand)
 			break
 		}
 		time.Sleep(5 * time.Second)

@@ -1,6 +1,7 @@
 package stringutils
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -18,4 +19,8 @@ func TitleSplit(s string, sep string) string {
 		split[i] = Title(v)
 	}
 	return strings.Join(split, " ")
+}
+
+func IsNumeric(word string) bool {
+	return regexp.MustCompile(`\d`).MatchString(word)
 }
