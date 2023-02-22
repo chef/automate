@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -35,8 +35,7 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 
 	ips := infra.Outputs.AutomatePrivateIps.Value
 	if len(ips) == 0 {
-		writer.Fail("No automate IPs are found")
-		os.Exit(1)
+		return errors.New("No automate IPs are found")
 	}
 
 	sshConfig := &SSHConfig{
