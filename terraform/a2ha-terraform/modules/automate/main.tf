@@ -3,7 +3,7 @@ locals {
 
   automate_connector_toml = [
     for n in range(var.automate_instance_count) : templatefile("${path.module}/templates/connector.toml.tpl", {
-      automate_fqdn                      = var.automate_fqdn,
+      automate_fqdn                      = length(trimspace(var.automate_fqdn)) > 0 ? var.automate_fqdn : var.automate_lb_fqdn,
       automate_admin_email               = var.automate_admin_email,
       automate_admin_username            = var.automate_admin_username,
       automate_admin_password            = var.automate_admin_password,

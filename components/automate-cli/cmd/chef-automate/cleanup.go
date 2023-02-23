@@ -19,7 +19,7 @@ var (
 `
 
 	DEPLOYMENT_CLEANUP = `hab pkg uninstall chef/automate-ha-deployment`
-	DESTROY_S3_BUCKET  = `HAB_LICENSE=accept-no-persist sudo hab pkg exec core/aws-cli aws s3 rm s3://%s --recursive; sudo hab pkg exec core/aws-cli aws s3 rb s3://%s`
+	DESTROY_S3_BUCKET  = `HAB_LICENSE=accept-no-persist hab pkg exec core/aws-cli aws s3 rm s3://%s --recursive; hab pkg exec core/aws-cli aws s3 rb s3://%s`
 )
 
 var cleanupFlags = struct {
