@@ -30,6 +30,11 @@ deploy() {
     if [[ "${airgapped}" == "true" ]]; then
         deploy_options="$deploy_options --airgap-bundle /tmp/automate.aib"
     fi
+    echo "centos shaik-log"
+    echo rpm --query centos-release + "centos shaik-log111"
+    if [rpm --query centos-release | grep "centos"]; then
+      echo "centos shaik-log"
+    fi
     chef-automate deploy $deploy_options
     if [[ "${airgapped}" == "true" ]]; then
         rm -f /tmp/automate.aib
@@ -41,11 +46,6 @@ redeploy() {
     mkdir -p /etc/chef-automate
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
-    echo "centos shaik-log"
-    echo rpm --query centos-release + "centos shaik-log111"
-    if [rpm --query centos-release | grep "centos"]; then
-      echo "centos shaik-log"
-    fi
     chef-automate deploy /etc/chef-automate/config.toml --accept-terms-and-mlsa --skip-preflight
     configure_retention
 }
