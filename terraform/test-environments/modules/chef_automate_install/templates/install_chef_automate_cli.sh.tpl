@@ -24,17 +24,17 @@ deploy() {
     mkdir -p /etc/chef-automate
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
+    # Enable selinux
+    if grep -wq "centos" /etc/os-release; then
+      echo "shaik-logs if else"
+      setenforce 1
+      sed -i 's/^SELINUX=.*/SELINUX=enforcing/g' /etc/selinux/config
+    fi
     deploy_options="/etc/chef-automate/config.toml"
     deploy_options="$deploy_options --accept-terms-and-mlsa"
     deploy_options="$deploy_options --admin-password ${admin_password}"
     if [[ "${airgapped}" == "true" ]]; then
         deploy_options="$deploy_options --airgap-bundle /tmp/automate.aib"
-    fi
-    echo "centos shaik-log"
-    cat /etc/centos-release
-    # echo rpm --query centos-release + "centos shaik-log111"
-    if [cat /etc/centos-release | grep "centos"]; then
-      echo "in centos shaik-log"
     fi
     chef-automate deploy $deploy_options
     if [[ "${airgapped}" == "true" ]]; then
