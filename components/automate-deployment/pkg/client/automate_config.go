@@ -123,7 +123,7 @@ func isOpenSearchEnable(timeout int64) (bool, error) {
 	if err != nil {
 		return false, status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to get Chef Automate configuration from the deployment-service")
 	}
-	return res.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue(), nil
+	return res.GetConfig().GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue(), nil
 }
 
 func validateS3Url(config *dc.AutomateConfig) bool {
