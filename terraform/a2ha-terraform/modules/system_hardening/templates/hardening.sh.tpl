@@ -17,8 +17,8 @@ if grep /tmp /proc/mounts >/dev/null 2>&1; then
 fi
 
 # Enable selinux
-setenforce 1
-sed -i 's/^SELINUX=.*/SELINUX=enforcing/g' /etc/selinux/config
+# setenforce 1
+# sed -i 's/^SELINUX=.*/SELINUX=enforcing/g' /etc/selinux/config
 
 # whitelist our commands
 cat << EOF > /etc/sudoers.d/automate
