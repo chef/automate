@@ -1270,7 +1270,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 }
 
 func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand string) error {
-	restoreId := ""
+	backupRestoreId := ""
 	for {
 		statusResponse, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup status", false)
 		if err != nil {
@@ -1278,8 +1278,8 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 			return err
 		}
 		restoreOutput := strings.Split(statusResponse, " ")
-		if strings.Contains(statusResponse, "Restoring backup") && stringutils.IsNumeric(restoreOutput[len(restoreOutput)-1]) && restoreId == "" {
-			restoreId = strings.TrimSpace(restoreOutput[len(restoreOutput)-1])
+		if (strings.Contains(statusResponse, "Restoring backup") || strings.Contains(statusResponse, "Creating backup")) && stringutils.IsNumeric(restoreOutput[len(restoreOutput)-1]) && backupRestoreId == "" {
+			backupRestoreId = strings.TrimSpace(restoreOutput[len(restoreOutput)-1])
 		}
 		if strings.EqualFold(strings.ToLower(strings.TrimSpace(statusResponse)), "Idle") {
 			if backupState {
@@ -1291,8 +1291,8 @@ func poolStatus(sshUtil SSHUtil, cmdRes string, backupState bool, subCommand str
 				backupState := getBackupStateFromList(backupList, cmdRes)
 				writer.Println(backupState)
 			}
-			if restoreId != "" {
-				streamRes, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup stream-status "+restoreId, false)
+			if backupRestoreId != "" {
+				streamRes, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate backup stream-status "+backupRestoreId, false)
 				if err != nil {
 					writer.Errorf("error in getting backup stream status %s \n%s\n", err.Error(), streamRes)
 				}

@@ -22,5 +22,5 @@ func TitleSplit(s string, sep string) string {
 }
 
 func IsNumeric(word string) bool {
-	return regexp.MustCompile(`\d`).MatchString(word)
+	return regexp.MustCompile(`^[0-9]+$`).MatchString(word)
 }
