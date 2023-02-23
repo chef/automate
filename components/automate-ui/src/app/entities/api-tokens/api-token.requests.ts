@@ -41,7 +41,7 @@ export class ApiTokenRequests {
   // of flipping it.
   public toggleActive(id: string, name: string, active: boolean, projects: string[]): Observable<TokenPayloadResponse> {
     return this.http.put<TokenPayloadResponse>(`${env.iam_url}/tokens/${id}`,
-      { name, active: !active,projects: projects});
+      { name, active: !active, projects: projects });
   }
 
   public delete(id: string): Observable<Object> {
