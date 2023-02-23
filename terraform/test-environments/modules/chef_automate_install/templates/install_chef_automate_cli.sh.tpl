@@ -24,10 +24,6 @@ deploy() {
     mkdir -p /etc/chef-automate
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
-    echo "centos shaik-log"
-    if [rpm --query centos-release | grep "centos"]; then
-      echo "centos shaik-log"
-    fi
     deploy_options="/etc/chef-automate/config.toml"
     deploy_options="$deploy_options --accept-terms-and-mlsa"
     deploy_options="$deploy_options --admin-password ${admin_password}"
@@ -45,6 +41,11 @@ redeploy() {
     mkdir -p /etc/chef-automate
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
+    echo "centos shaik-log"
+    echo rpm --query centos-release + "centos shaik-log111"
+    if [rpm --query centos-release | grep "centos"]; then
+      echo "centos shaik-log"
+    fi
     chef-automate deploy /etc/chef-automate/config.toml --accept-terms-and-mlsa --skip-preflight
     configure_retention
 }
