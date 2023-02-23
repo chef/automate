@@ -198,10 +198,9 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 			if spinner {
 				writer.StopSpinner()
 			}
-			return "", err
+			return string(output), err
 		}
 	}
-
 	if spinner {
 		writer.StopSpinner()
 	}
