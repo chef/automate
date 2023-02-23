@@ -238,7 +238,7 @@ EOF
 # Kernel parameters required by A2 preflight check
 vm.max_map_count=262144
 vm.dirty_expire_centisecs=20000
-sudo setenforce 1
+sudo setenforce 0
 EOF
   }
 
