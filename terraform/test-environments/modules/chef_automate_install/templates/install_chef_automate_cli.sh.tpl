@@ -24,6 +24,9 @@ deploy() {
     mkdir -p /etc/chef-automate
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
+    if [rpm --query centos-release | grep "centos"]; then
+      echo "centos"
+    fi
     deploy_options="/etc/chef-automate/config.toml"
     deploy_options="$deploy_options --accept-terms-and-mlsa"
     deploy_options="$deploy_options --admin-password ${admin_password}"
