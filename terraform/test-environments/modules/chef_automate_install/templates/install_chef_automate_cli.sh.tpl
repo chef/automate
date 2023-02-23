@@ -25,7 +25,7 @@ deploy() {
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
     if [rpm --query centos-release | grep "centos"]; then
-      echo "centos"
+      echo "centos shaik-log"
     fi
     deploy_options="/etc/chef-automate/config.toml"
     deploy_options="$deploy_options --accept-terms-and-mlsa"
