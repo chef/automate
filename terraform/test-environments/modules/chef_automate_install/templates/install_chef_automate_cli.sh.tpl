@@ -31,11 +31,11 @@ deploy() {
         deploy_options="$deploy_options --airgap-bundle /tmp/automate.aib"
     fi
     echo "centos shaik-log"
-    hostnamectl
+    cat /etc/centos-release
     # echo rpm --query centos-release + "centos shaik-log111"
-    # if [rpm --query centos-release | grep "centos"]; then
-    #   echo "centos shaik-log"
-    # fi
+    if [cat /etc/centos-release | grep "centos"]; then
+      echo "in centos shaik-log"
+    fi
     chef-automate deploy $deploy_options
     if [[ "${airgapped}" == "true" ]]; then
         rm -f /tmp/automate.aib
