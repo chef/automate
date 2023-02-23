@@ -24,6 +24,7 @@ deploy() {
     mkdir -p /etc/chef-automate
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
+    echo "centos shaik-log"
     if [rpm --query centos-release | grep "centos"]; then
       echo "centos shaik-log"
     fi
