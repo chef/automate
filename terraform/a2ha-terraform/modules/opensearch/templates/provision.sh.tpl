@@ -61,7 +61,7 @@ if [ -e /hab/sup/default/specs/"$OS_PKG_NAME".spec ]; then
      #appliedConfigFile="config.$RANDOM.toml"
      #automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > $appliedConfigFile
 
-     bash -c 'sysctl -w vm.max_map_count=262144'
+     bash -c 'hab pkg exec core/procps-ng sysctl -w vm.max_map_count=262144 "$LOGCMD"'
      hab svc unload "$OS_ORIGIN_NAME/$OS_PKG_NAME"
      sleep 10
      bash -c 'eval hab svc load ${opensearch_pkg_ident} ${opensearch_svc_load_args} "$LOGCMD"'
@@ -79,7 +79,7 @@ if [ -e /hab/sup/default/specs/"$OS_PKG_NAME".spec ]; then
      #fi
   fi
 else
-  bash -c 'sysctl -w vm.max_map_count=262144'
+  bash -c 'hab pkg exec core/procps-ng sysctl -w vm.max_map_count=262144 "$LOGCMD"'
   bash -c 'eval hab svc load ${opensearch_pkg_ident} ${opensearch_svc_load_args} "$LOGCMD"'
 fi
 
