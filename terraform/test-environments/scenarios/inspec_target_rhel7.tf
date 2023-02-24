@@ -33,7 +33,7 @@ module "inspec_target_rhel7" {
 }
 
 module "inspec_target_rhel7_cd_base" {
-  source = "github.com/chef/es-terraform//modules/cd_base"
+  source = "git::https://github.com/chef/es-terraform//modules/cd_base?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
 
   instance_id   = "${module.inspec_target_rhel7.instance_id}"
   instance_fqdn = "${module.inspec_target_rhel7.fqdn}"

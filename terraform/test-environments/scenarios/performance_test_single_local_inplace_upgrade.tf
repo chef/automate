@@ -64,7 +64,7 @@ resource "aws_ebs_volume" "habitat_volume" {
 }
 
 module "attach_habitat_volume" {
-  source = "github.com/chef/es-terraform//modules/attach_ebs_volume"
+  source = "git::https://github.com/chef/es-terraform//modules/attach_ebs_volume?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
 
   actual_device_name = "/dev/nvme1n1"
   ec2_device_name    = "/dev/xvdh"
