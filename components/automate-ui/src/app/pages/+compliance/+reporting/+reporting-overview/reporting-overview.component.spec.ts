@@ -109,7 +109,6 @@ describe('ReportingOverviewComponent', () => {
       it('gets node status data', () => {
         spyOn(component, 'getNodeStatusData');
         component.selectedButtonTab = 'Node Status';
-        localStorage.setItem('current-url', 'reporting/controls');
         component.getData(reportQuery);
         expect(component.getNodeStatusData).toHaveBeenCalledWith(reportQuery);
       });
@@ -119,7 +118,6 @@ describe('ReportingOverviewComponent', () => {
       it('gets profile status data', () => {
         spyOn(component, 'getProfileStatusData');
         component.selectedButtonTab = 'Profile Status';
-        localStorage.setItem('current-url', 'reporting/controls');
         component.getData(reportQuery);
         expect(component.getProfileStatusData).toHaveBeenCalledWith(reportQuery);
       });
@@ -128,14 +126,12 @@ describe('ReportingOverviewComponent', () => {
     describe('getNodeStatusData()', () => {
       it('gets node status failure data', () => {
         spyOn(component, 'getNodeStatusFailures');
-        localStorage.setItem('current-url', 'reporting/controls');
         component.getNodeStatusData(reportQuery);
         expect(component.getNodeStatusFailures).toHaveBeenCalledWith(reportQuery);
       });
 
       it('gets node status summary data', () => {
         spyOn(component, 'getNodeSummary');
-        localStorage.setItem('current-url', 'reporting/controls');
         component.getNodeStatusData(reportQuery);
         expect(component.getNodeSummary).toHaveBeenCalledWith(reportQuery);
       });
@@ -150,7 +146,6 @@ describe('ReportingOverviewComponent', () => {
     describe('getProfileStatusData()', () => {
       it('gets profile status failure data', () => {
         spyOn(component, 'getProfileStatusFailures');
-        localStorage.setItem('current-url', 'reporting/controls');
         component.getProfileStatusData(reportQuery);
         expect(component.getProfileStatusFailures).toHaveBeenCalledWith(reportQuery);
       });
@@ -286,7 +281,6 @@ describe('ReportingOverviewComponent', () => {
     });
 
     describe('getControlsTrend()', () => {
-      localStorage.setItem('current-url', 'reporting/controls');
       beforeEach(() => {
         spyOn(statsService, 'getControlsTrend').and.returnValue(observableOf([
           {
@@ -439,7 +433,6 @@ describe('ReportingOverviewComponent', () => {
       }
     ];
 
-    localStorage.setItem('current-url', 'reporting/controls');
 
     beforeEach(() => {
       spyOn(statsService, 'getNodeTrend').and.returnValue(observableOf(data));
@@ -464,7 +457,6 @@ describe('ReportingOverviewComponent', () => {
       filters: [ {type: { name: 'node'}, value: { id: '1231'}}],
       last24h: false
     };
-    localStorage.setItem('current-url', 'reporting/controls');
     const data = [
       {
         'report_time': dateRange.end,
