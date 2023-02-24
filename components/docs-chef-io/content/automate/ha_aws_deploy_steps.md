@@ -128,27 +128,33 @@ Run the following steps on Bastion Host Machine:
 
    {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
 
-1. Continue with the deployment after updating config:
+1. Continue with the provisioning the infra after updating config:
 
-   ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Print data in the config
-   cat config.toml
+    ```bash
+    #Run commands as sudo.
+    sudo -- sh -c "
+    #Print data in the config
+    cat config.toml
 
-   #Run provision command to deploy `automate.aib` with set `config.toml`
-   chef-automate provision-infra config.toml --airgap-bundle automate.aib
+    #Run provision command to deploy `automate.aib` with set `config.toml`
+    chef-automate provision-infra config.toml --airgap-bundle automate.aib
+    "
+    ```
 
-   #Run deploy command to deploy `automate.aib` with set `config.toml`
-   chef-automate deploy config.toml --airgap-bundle automate.aib
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN to you DNS from DNS Provider**. After that continue with the deployment process with following.
 
-   #After Deployment is done successfully. Check status of Chef Automate HA services
-   chef-automate status
+    ```bash
+    sudo -- sh -c "
+    #Run deploy command to deploy `automate.aib` with set `config.toml`
+    chef-automate deploy config.toml --airgap-bundle automate.aib
 
-   #Check Chef Automate HA deployment information, using the following command
-   chef-automate info
-   "
-   ```
+    #After Deployment is done successfully. Check status of Chef Automate HA services
+    chef-automate status
+
+    #Check Chef Automate HA deployment information, using the following command
+    chef-automate info
+    "
+    ```
 
 1. After the deployment successfully completed. To view the automate UI, run the command `chef-automate info`, you will get the `automate_url`.
   If we want to change the FQDN URL from the loadbalancer URL to some other FQDN URL, then use below template
