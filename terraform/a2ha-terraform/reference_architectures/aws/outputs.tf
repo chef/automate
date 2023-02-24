@@ -50,6 +50,6 @@ output "backup_config_s3" {
   value = var.backup_config_s3
 }
 
-output "automate_loadbalance_fqdn" {
+output "automate_loadbalancer_fqdn" {
   value = module.aws.automate_fqdn
 }
