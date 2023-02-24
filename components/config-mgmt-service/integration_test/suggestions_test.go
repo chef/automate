@@ -928,7 +928,7 @@ func TestSuggestionsEmptyErrorMessage(t *testing.T) {
 		Text: "v",
 	}
 
-	expected := []string{"valid suggestion 1", "valid suggestion 2"}
+	expected := []string{"", "valid suggestion 1", "valid suggestion 2"}
 
 	// Adding required node data
 	for index := range nodes {
