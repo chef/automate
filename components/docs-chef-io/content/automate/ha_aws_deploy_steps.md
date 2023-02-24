@@ -141,7 +141,7 @@ Run the following steps on Bastion Host Machine:
     "
     ```
 
-1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN to you DNS from DNS Provider**. After that continue with the deployment process with following.
+1. Once the provisioning is successful, **if you have added custom DNS to your configuration file (`fqdn`), make sure to map the load-balancer FQDN from the output of previous command to your DNS from DNS Provider**. After that continue with the deployment process with following.
 
     ```bash
     sudo -- sh -c "
