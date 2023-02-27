@@ -43,10 +43,8 @@ type SSHUtilImpl struct {
 }
 
 func NewSSHUtil(sshconfig *SSHConfig) SSHUtil {
-	// Set timeout. Default is 150 seconds.
-	if sshconfig.timeout == 0 {
-		sshconfig.timeout = 150
-	}
+	// Check if timeout is set, if not set it to default value.
+	checkTimeout(sshconfig)
 
 	return &SSHUtilImpl{
 		SshConfig: sshconfig,
@@ -58,7 +56,16 @@ func (s *SSHUtilImpl) getSSHConfig() *SSHConfig {
 }
 
 func (s *SSHUtilImpl) setSSHConfig(sshConfig *SSHConfig) {
+	// Check if timeout is set, if not set it to default value.
+	checkTimeout(sshConfig)
 	s.SshConfig = sshConfig
+}
+
+// Set timeout. Default is 150 seconds.
+func checkTimeout(sshConfig *SSHConfig) {
+	if sshConfig.timeout == 0 {
+		sshConfig.timeout = 150
+	}
 }
 
 func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
@@ -201,6 +208,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 			return string(output), err
 		}
 	}
+
 	if spinner {
 		writer.StopSpinner()
 	}
