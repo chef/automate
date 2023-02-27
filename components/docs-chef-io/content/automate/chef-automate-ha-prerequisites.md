@@ -17,7 +17,7 @@ Before installing Chef automate HA, ensure you have taken a quick tour of this p
 The Automate HA supports three types of deployment:
 
 * On-Premise Deployment
-* AWS Deployment Deployment
+* AWS Deployment
 * AWS Managed Services Deployment
 
 The below requirements are elaborated according to the above three deployments.
@@ -53,6 +53,24 @@ HA cluster requires multiple ports for the front and backend servers to operate 
 
 Automate HA supports custom SSH port but the same port should be used accors all the machines.
 
+### Certificates
+
+A security certificate is a small data file used as an Internet security technique through which the identity, authenticity, and reliability of a website or web application are established. To ensure optimal security, rotate the certificates periodically.
+
+Install an OpenSSL utility to create a self-signed key and certificate pair. Click [here](/automate/ha_cert_selfsign/) to know more.
+
 ### Chef Application Minimum Version
 
+THe minimum version for the chef applications are as follows:
 
+* Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
+* Chef Habitat: **core/hab/1.6.521/20220603154827**
+* Chef Automate: **chef/deployment-service/0.1.0/20230213182348**
+* Infra Client:
+* Chef Manage & Supermarket:
+
+### Backup and Restore
+
+On-premise deployment can take place using **Filesystem** and **Object Storage**. If you choose `backup_config` as filesystem or object storage in your `config.toml` file, the backup is already configured during the deployment. Whereas, if the `backup_config` is left black, then the configuration needs to be done manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
+
+### Migration
