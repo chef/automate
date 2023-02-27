@@ -121,13 +121,19 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   }
 
   public saveNotification(): void {
+    let notification: NotificationRule;
     this.saveSuccessful = false;
     this.saveInProgress = true;
     this.notification.name = this.updateForm.controls['name'].value.trim();
     this.notification.targetUrl = this.updateForm.controls['targetUrl'].value.trim();
+
+      notification = (this.notification instanceof NotificationRule) ? this.notification :
+      NotificationRule.assignNotificationRuleType(this.notification);
+
     this.store.dispatch(new UpdateNotification({
-      notification: this.notification
+      notification: notification
     }));
+
     this.targetTypeValue = this.notification.targetType;
     this.ruleTypeValue = this.notification.ruleType;
     this.telemetryService.track('Settings_Notifications_Details_Save');

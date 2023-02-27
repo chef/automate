@@ -75,6 +75,17 @@ export class NotificationRule implements RuleInterface {
       ruleTargetInfo.criticalControlsOnly);
   }
 
+  // assign notification rule type to rule object
+  public static assignNotificationRuleType(rule: Object): NotificationRule {
+    const notificationObj =  new NotificationRule(
+      rule['id'], rule['name'], rule['ruleType'], rule['targetUrl'], rule['targetType'],
+      rule['targetSecretId'], rule['criticalControlsOnly']
+    );
+    notificationObj['AlertTypeLabels'] = rule['AlertTypeLabels'];
+    notificationObj['TargetTypeLabels'] = rule['TargetTypeLabels'];
+    return notificationObj;
+  }
+
   private static extractTargetInfo(rule: Object): {targetType: ServiceActionType,
       targetUrl: string, targetSecretId: string, criticalControlsOnly: boolean} {
     const slack_action = rule[ServiceActionType.SLACK];
