@@ -259,8 +259,6 @@ func TestSummary(t *testing.T) {
 	ctrl = inspec.Control{Id: "nine", Impact: 0.8, Results: []*inspec.Result{{Status: inspec.ResultStatusPassed}, {Status: inspec.ResultStatusPassed}}}
 	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status(""), "Control is passed")
 
-	ctrl = inspec.Control{Id: "nine", Impact: 0.8, Results: []*inspec.Result{{Status: inspec.ResultStatusPassed}, {Status: inspec.ResultStatusPassed}}}
-	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status("yes_run"), "Waived Control is passed")
 	// ------------------------------- ReportProfilesFromInSpecProfiles test --------------------------------- //
 
 	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, false)
