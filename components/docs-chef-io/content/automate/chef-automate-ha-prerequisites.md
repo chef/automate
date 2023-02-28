@@ -133,7 +133,7 @@ The requirement to setup a recovery point objective is:
 - Network accessible storage (NAS), object store (S3), available in both data centers/regions
 - Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
-Click [here](/automate/ha_disaster_recovery_setup/) to know more on tje disaster recovery cluster for om-premise deployment.
+Click [here](/automate/ha_disaster_recovery_setup/) to know more on the disaster recovery cluster for om-premise deployment.
 
 ### Certificates
 
@@ -147,7 +147,7 @@ The Chef Automate HA user gets the privilege to access the habitat directory. Th
 
 ### Chef Application Minimum Version
 
-THe minimum version for the chef applications are as follows:
+The minimum version for the chef applications are as follows:
 
 - Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
 - Chef Habitat: **core/hab/1.6.521/20220603154827**
@@ -163,8 +163,31 @@ On-premise deployment can take place using **Filesystem** and **Object Storage**
 
 The on-Premise deployment supports four types of migration:
 
-- Existing A2HA to Automate HA
-- In-Place A2HA to Automate HA
-- Chef Backend to Automate HA
-- Automate to Automate HA
+- **Existing A2HA to Automate HA**
 
+    {{< note >}} A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246). {{< /note >}}
+
+    To migrate your existing A2HA data to the newly deployed Chef Automate HA, firstly:
+
+    - Your machine should have the ability to mount the file system, which was mounted to A2HA cluster for backup purposes, to Automate HA.
+    - Configure the A2HA to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
+
+Click [here](/automate/ha_existing_a2ha_to_automate_ha/) to know more about the process of migration.
+
+- **In-Place A2HA to Automate HA**
+
+    To migrate your in-place A2HA to Automate HA, firstly you should have:
+
+    - A healthy state of the A2HA cluster to take fresh backup.
+    - A2HA is configured to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
+    - Availability of 60% of space.
+
+Click [here](/automate/ha_inplace_migration/) to know more about the process of migration.
+
+- **Chef Backend to Automate HA**
+
+Click here to know more.
+
+- **Automate to Automate HA**
+
+Click here to know more.
