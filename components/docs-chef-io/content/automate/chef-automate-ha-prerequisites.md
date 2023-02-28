@@ -183,6 +183,8 @@ Click [here](/automate/ha_inplace_migration/) to know more about the process of 
 
 - **Chef Backend to Automate HA**
 
+    The pre-requisites to migrate from Chef Backend to Automate HA are:
+
     - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
     - Automate HA do not support the super market authentication with chef-server users credentials.
     - Post Migration Customer can not login with chef-server users to Supermarket.
@@ -190,6 +192,8 @@ Click [here](/automate/ha_inplace_migration/) to know more about the process of 
 Click [here](/automate/ha_chef_backend_to_automate_ha/) to know more about the process of migration.
 
 - **Automate to Automate HA**
+
+    The pre-requisites to migrate from Automate to Automate HA are:
 
     - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
