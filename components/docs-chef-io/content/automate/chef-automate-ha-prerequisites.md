@@ -1,14 +1,14 @@
 +++
-title = "Pre-Requisites"
+title = "On-Premise Pre-Requisite"
 
 draft = false
 
-gh_repo = "Pre-Requisites"
+gh_repo = "On-Premise Pre-Requisite"
 [menu]
   [menu.automate]
-    title = "Pre-Requisites"
+    title = "On-Premise Pre-Requisite"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/settings/chef-automate-ha-prerequisites.md Pre-Requisites"
+    identifier = "automate/settings/chef-automate-ha-prerequisites.md On-Premise Pre-Requisite"
     weight = 12
 +++
 
@@ -16,11 +16,7 @@ gh_repo = "Pre-Requisites"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-Before installing Chef automate HA, ensure you have taken a quick tour of this pre-requisite page.
-
-## Platform Support
-
-This section lists the recommended requirements for operating systems, virtual machine instances, and VPC for implementing the Chef Automate High Availability (HA) in your network infrastructure.
+Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
 
 ## Software Requirements
 
@@ -67,15 +63,7 @@ The machine requirements based on the above assumptions are listed below:
 - Chef Automate bundle comes with chef-server version 14.15.10
 {{< /note >}}
 
-The Automate HA supports three types of deployment:
-
-- On-Premise Deployment
-- AWS Deployment
-- AWS Managed Services Deployment
-
-The below requirements are elaborated according to the above three deployments.
-
-## On-Premise Deployment Pre-Requisite
+## On-Premise Deployment Specific Pre-Requisite
 
 The on-premise deployment specific pre-requisites are given below:
 
@@ -118,9 +106,30 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
 ### Security Checks
 
-HA cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Click [here](/automate/ha_security_firewall/#ports-required-for-all-machines) for the breakdown of those ports and what needs to be open for each set of servers.
+The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
 
-Automate HA supports custom SSH port but the same port should be used accors all the machines.
+**Ports required for all Machines**
+
+| Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      |
+|----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------|
+| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              |
+| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 |
+
+{{< note >}} Custom SSH port is supported, but same port should be used accross all the machines. {{< /note >}}
+
+**Port usage definitions**
+
+| Protocol | Port Number | Usage                                                                                            |
+|----------|-------------|--------------------------------------------------------------------------------------------------|
+| TCP      | 22          | SSH to configure services                                                                        |
+| TCP      | 9631        | Habitat HTTP API                                                        |
+| TCP      | 443         | Allow Users to reach UI / API                                                                    |
+| TCP      | 80          | Optional, Allows users to redirect to 443                                                        |
+| TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
+| TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
+| TCP/UDP  | 9638        | Habitat gossip (UDP) |
+| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
+| TCP      | 6432        | Re-elect Postgresql Leader, if Postgresql leader is down |
 
 ### Disaster Recovery
 
