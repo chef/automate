@@ -32,10 +32,7 @@ This section lists the recommended requirements for operating systems, virtual m
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server 12 SP5      | 12                        |
 
-{{< note >}}
-
-[Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) use this to check how much hardware you will need for your use-case.
-{{< /note >}}
+{{< note >}} [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) use this to check how much hardware you will need for your use-case. {{< /note >}}
 
 ## Hardware Requirements
 
@@ -177,7 +174,7 @@ Click [here](/automate/ha_existing_a2ha_to_automate_ha/) to know more about the 
 - **In-Place A2HA to Automate HA**
 
     To migrate your in-place A2HA to Automate HA, firstly you should have:
-P
+
     - A healthy state of the A2HA cluster to take fresh backup.
     - A2HA is configured to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
     - Availability of 60% of space.
