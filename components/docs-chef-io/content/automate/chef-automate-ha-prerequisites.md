@@ -12,46 +12,128 @@ gh_repo = "Pre-Requisites"
     weight = 12
 +++
 
+{{< warning >}}
+{{% automate/ha-warn %}}
+{{< /warning >}}
+
 Before installing Chef automate HA, ensure you have taken a quick tour of this pre-requisite page.
+
+## Platform Support
+
+This section lists the recommended requirements for operating systems, virtual machine instances, and VPC for implementing the Chef Automate High Availability (HA) in your network infrastructure.
+
+## Software Requirements
+
+| Operating Systems                        | Supported Version         |
+| :--------------------------------------  | :-----------------------  |
+| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
+| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
+| Centos (64 Bit OS)                       | 7                         |
+| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
+| SUSE Linux Enterprise Server 12 SP5      | 12                        |
+
+{{< note >}}
+
+[Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) use this to check how much hardware you will need for your use-case.
+{{< /note >}}
+
+## Hardware Requirements
+
+The hardware configuration is according to the performance benchmarking tests based on the assumptions listed below:
+
+| Assumption                            | Value | Unit     |
+|---------------------------------------|-------|----------|
+| Number of Nodes sending data          | 5000  |          |
+| Frequency of Compliance Scan          | 1     | Per Hour |
+| Frequency of Client runs (Infra runs) | 1     | Per Hour |
+| Frequency of Event Feed               | 1     | Per Hour |
+| Data Retention policy                 | 1     | Days     |
+| Compliance scan report size           | 400   | KB       |
+| Client Run (Infra run) size           | 300   | KB       |
+| Event Feed update size                | 2     | KB       |
+| No. of Shards in OpenSearch Index     | 2     |
+
+The machine requirements based on the above assumptions are listed below:
+
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space |
+|-------------------|-------|------|-----|------------------- |------------------|------------------|
+| Chef Automate     | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
+| Chef Infra Server | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
+| Postgresql DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+| Opensearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
+| Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+
+{{< note >}}
+
+- For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
+- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
+- Chef Automate bundle comes with chef-server version 14.15.10
+{{< /note >}}
 
 The Automate HA supports three types of deployment:
 
-* On-Premise Deployment
-* AWS Deployment
-* AWS Managed Services Deployment
+- On-Premise Deployment
+- AWS Deployment
+- AWS Managed Services Deployment
 
 The below requirements are elaborated according to the above three deployments.
 
 ## On-Premise Deployment Pre-Requisite
 
-### Hardware Requirements
+The on-premise deployment specific pre-requisites are given below:
 
-For the on-premise deployment, all the virtual machines should be up and running. The operating system root volume must be at least 40 GB with the TMP space of 5 GB. The number of nodes sending data should be of 5000 and the frequency of compliance scan, client runs and event feeds should be 1/hour each.
+- All VMs or Machines are up and running.
+- OS Root Volume (/) must be at least 40 GB
+- TMP space (/var/tmp) must be at least 5GB
+- Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
+- A Common user has access to all machines.
+- This common user should have sudo privileges.
+- This common user uses the same SSH Private Key file to access all machines.
+- Key-based SSH for the provisioning user for all the machines for HA-Deployment.
+- We do not support passphrases for Private Key authentication.
+- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
+- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
+- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
+- Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
+- If DNS is not used, add the records to `/etc/hosts` in all the machines, including Bastion:
 
-The separate Hab volume (/hab) provisioned should be at least 100 GB for OpenSearch node /hab volume will be more based on the data retention policy. Click [here](/automate/ha_platform_support/#hardware-requirements) to know about the hardware requirements and click [here](automate/ha_onprim_deployment_procedure/#prerequisites) to know more about the specifics of on-premise deployment pre-requisites.
+    ```bash
+    sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
+    ```
 
-Use the [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use-case.
+- If the instance is **RedHat**, set SElinux config `enforcing` to `permissive` in all the nodes. SSH to each node, then run:
+
+    ```bash
+    sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+    ```
+
+Click [here](/automate/ha_onprim_deployment_procedure/) to know more.
 
 ### Load Balancer
 
 LoadBalancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
 
-You can setup your load balancer using:
+You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
-* [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
-* [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
-
-### Software Requirements
-
-The mandatory operating system for the om-premise deployment are Red Hat Enterprise Linux (64 Bit OS), Ubuntu (64 Bit OS), Centos (64 Bit OS), Amazon Linux 2 (64 Bit OS) and SUSE Linux Enterprise Server 12 SPS. Click [here](/automate/ha_platform_support/#software-requirements) to get the supported versions of the mentioned operating system.
-
-While using any of the above operating system, the common user should have the sudo privileges and uses the same SSH Private Key file to access all machines. On_Premise deployment in Automate HA do not dupport passphrases for Private Key authentication.. Click [here](automate/ha_onprim_deployment_procedure/#prerequisites) to know more about the specifics of on-premise deployment pre-requisites.
+- [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
+- [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
 
 ### Security Checks
 
 HA cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Click [here](/automate/ha_security_firewall/#ports-required-for-all-machines) for the breakdown of those ports and what needs to be open for each set of servers.
 
 Automate HA supports custom SSH port but the same port should be used accors all the machines.
+
+### Disaster Recovery
+
+The requirement to setup a recovery point objective is:
+
+- Two identical clusters located in different data centers or cloud provider regions.
+- Network accessible storage (NAS), object store (S3), available in both data centers/regions
+- Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
+
+Click [here](/automate/ha_disaster_recovery_setup/) to know more on tje disaster recovery cluster for om-premise deployment.
 
 ### Certificates
 
@@ -67,11 +149,11 @@ The Chef Automate HA user gets the privilege to access the habitat directory. Th
 
 THe minimum version for the chef applications are as follows:
 
-* Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
-* Chef Habitat: **core/hab/1.6.521/20220603154827**
-* Chef Automate: **chef/deployment-service/0.1.0/20230213182348**
-* Infra Client:
-* Chef Manage & Supermarket:
+- Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
+- Chef Habitat: **core/hab/1.6.521/20220603154827**
+- Chef Automate: **chef/deployment-service/0.1.0/20230213182348**
+- Infra Client:
+- Chef Manage & Supermarket:
 
 ### Backup and Restore
 
@@ -81,8 +163,8 @@ On-premise deployment can take place using **Filesystem** and **Object Storage**
 
 The on-Premise deployment supports four types of migration:
 
-* Existing A2HA to Automate HA
-* In-Place A2HA to Automate HA
-* Chef Backend to Automate HA
-* Automate to Automate HA
+- Existing A2HA to Automate HA
+- In-Place A2HA to Automate HA
+- Chef Backend to Automate HA
+- Automate to Automate HA
 
