@@ -494,7 +494,6 @@ describe('StatsService', () => {
         last24h: false
       };
 
-      localStorage.setItem('current-url', 'reporting/controls');
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
       const expectedResponse = [{
         'time': '2017-03-05T00:00:00+0000',
@@ -529,7 +528,6 @@ describe('StatsService', () => {
         filters: filters,
         last24h: false
       };
-      localStorage.setItem('current-url', 'test');
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
       const expectedResponse = [{
