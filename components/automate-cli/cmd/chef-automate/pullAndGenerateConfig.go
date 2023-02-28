@@ -457,6 +457,9 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 		sharedConfigToml.ObjectStorage.Config.Endpoint = objectStorageConfig.endpoint
 	}
 
+	storageType := getStorageType(a2ConfigMap)
+	sharedConfigToml.Architecture.ConfigInitials.BackupConfig = storageType
+
 	return sharedConfigToml, nil
 }
 
@@ -1073,6 +1076,32 @@ func getModeOfDeployment() string {
 		return AWS_MODE
 	}
 	return AWS_MODE
+}
+
+func getStorageType(config map[string]*dc.AutomateConfig) string {
+	for _, ele := range config {
+		writer.Bodyf("Storage: %v \n", ele.Global.V1.External.Opensearch)
+		if ele.Global != nil && ele.Global.V1 != nil && ele.Global.V1.External != nil && ele.Global.V1.External.Opensearch.Backup != nil && len(strings.TrimSpace(ele.Global.V1.External.Opensearch.Backup.Location.Value)) > 0 {
+			writer.Bodyf("Storage: %v \n", ele.Global.V1.External.Opensearch.Backup.Location.Value)
+			deploymentType := getModeOfDeployment()
+			if deploymentType == EXISTING_INFRA_MODE {
+				return getInfraBackupType(ele.Global.V1.External.Opensearch.Backup.Location.Value)
+			}
+			return ele.Global.V1.External.Opensearch.Backup.Location.Value
+		}
+	}
+	return ""
+}
+
+func getInfraBackupType(backupLocation string) string {
+	switch backupLocation {
+	case "s3":
+		return "object_storage"
+	case "filesystem", "fs":
+		return "file_system"
+	default:
+		return "file_system"
+	}
 }
 
 func getS3BackConfig(config map[string]*dc.AutomateConfig) *ObjectStorageConfig {
