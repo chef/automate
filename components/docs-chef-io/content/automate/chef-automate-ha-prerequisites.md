@@ -1,14 +1,14 @@
 +++
-title = "On-Premise Pre-Requisite"
+title = "On-Premise Pre-Requisites"
 
 draft = false
 
-gh_repo = "On-Premise Pre-Requisite"
+gh_repo = "On-Premise Pre-Requisites"
 [menu]
   [menu.automate]
-    title = "On-Premise Pre-Requisite"
+    title = "On-Premise Pre-Requisites"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/settings/chef-automate-ha-prerequisites.md On-Premise Pre-Requisite"
+    identifier = "automate/settings/chef-automate-ha-prerequisites.md On-Premise Pre-Requisites"
     weight = 12
 +++
 
