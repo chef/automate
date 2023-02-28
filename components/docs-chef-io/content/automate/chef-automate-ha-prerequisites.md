@@ -177,7 +177,7 @@ Click [here](/automate/ha_existing_a2ha_to_automate_ha/) to know more about the 
 - **In-Place A2HA to Automate HA**
 
     To migrate your in-place A2HA to Automate HA, firstly you should have:
-
+P
     - A healthy state of the A2HA cluster to take fresh backup.
     - A2HA is configured to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
     - Availability of 60% of space.
@@ -186,8 +186,16 @@ Click [here](/automate/ha_inplace_migration/) to know more about the process of 
 
 - **Chef Backend to Automate HA**
 
-Click here to know more.
+    - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+    - Automate HA do not support the super market authentication with chef-server users credentials.
+    - Post Migration Customer can not login with chef-server users to Supermarket.
+
+Click [here](/automate/ha_chef_backend_to_automate_ha/) to know more about the process of migration.
 
 - **Automate to Automate HA**
 
-Click here to know more.
+    - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+
+    - Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA.
+
+Click [here](/automate/ha_automate_to_automate_ha/) to know more about the process of migration.
