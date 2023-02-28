@@ -352,6 +352,7 @@ module "bootstrap_automate" {
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
+  automate_lb_fqdn                   = var.automate_lb_fqdn
   automate_instance_count            = 1
   automate_role                      = "bootstrap_automate"
   backend_aib_dest_file              = var.backend_aib_dest_file
@@ -421,6 +422,7 @@ module "automate" {
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
+  automate_lb_fqdn                   = var.automate_lb_fqdn
   automate_instance_count            = var.automate_instance_count - 1
   automate_role                      = "automate"
   backend_aib_dest_file              = var.backend_aib_dest_file
@@ -494,6 +496,7 @@ module "chef_server" {
   opensearch_custom_certs_enabled    = var.opensearch_custom_certs_enabled
   automate_dc_token                  = var.automate_dc_token
   automate_fqdn                      = var.automate_fqdn
+  automate_lb_fqdn                   = var.automate_lb_fqdn
   automate_instance_count            = var.chef_server_instance_count
   automate_role                      = "chef_api"
   backend_aib_dest_file              = var.backend_aib_dest_file
