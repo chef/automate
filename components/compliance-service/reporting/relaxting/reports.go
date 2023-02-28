@@ -271,7 +271,6 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 		return nil, 0, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
-	logrus.Infof("GetReports Fetching from %+v", queryInfo)
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).

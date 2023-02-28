@@ -1,7 +1,5 @@
 package inspec
 
-import "github.com/sirupsen/logrus"
-
 const (
 	ResultStatusPassed        string = "passed"
 	ResultStatusSkipped       string = "skipped"
@@ -23,8 +21,6 @@ const (
 func (control *Control) Status(waived string) (status string) {
 	status = ResultStatusPassed
 	for _, result := range control.Results {
-		// logrus.Infof("************************** CONTROL STATUS *******************************: %+v", result.Status)
-		// logrus.Infof("************************** CONTROL WaiverData *******************************: %+v", control.WaiverData)
 		if result.Status == ResultStatusFailed {
 			status = ResultStatusFailed
 			break
@@ -33,7 +29,6 @@ func (control *Control) Status(waived string) (status string) {
 		}
 	}
 	if waived == "yes_run" || waived == "yes" {
-		logrus.Infof("************************** CONTROL WaiverData *******************************: %+v", control.WaiverData)
 		status = ResultStatusWaived
 	}
 	return status
