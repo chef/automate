@@ -225,40 +225,42 @@ func TestSummary(t *testing.T) {
 	// ------------------------------- Control Status and ImpactName tests --------------------------------- //
 
 	ctrl := inspec.Control{Id: "one", Impact: 0}
-	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status(), "Control with no results is passed")
+	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status(""), "Control with no results is passed")
 	assert.Equal(t, inspec.ControlImpactMinor, ctrl.ImpactName(), "Control is minor")
 
 	ctrl = inspec.Control{Id: "two", Impact: 0.1234, Results: []*inspec.Result{{Status: inspec.ResultStatusSkipped}, {Status: inspec.ResultStatusSkipped}}}
-	assert.Equal(t, inspec.ResultStatusSkipped, ctrl.Status(), "Control is skipped")
+	assert.Equal(t, inspec.ResultStatusSkipped, ctrl.Status(""), "Control is skipped")
 	assert.Equal(t, inspec.ControlImpactMinor, ctrl.ImpactName(), "Control is minor")
 
 	ctrl = inspec.Control{Id: "three", Impact: 0.4, Results: []*inspec.Result{{Status: inspec.ResultStatusPassed}, {Status: inspec.ResultStatusSkipped}}}
-	assert.Equal(t, inspec.ResultStatusSkipped, ctrl.Status(), "Control is skipped")
+	assert.Equal(t, inspec.ResultStatusSkipped, ctrl.Status(""), "Control is skipped")
 	assert.Equal(t, inspec.ControlImpactMajor, ctrl.ImpactName(), "Control is major")
 
 	ctrl = inspec.Control{Id: "four", Impact: 0.6999, Results: []*inspec.Result{{Status: inspec.ResultStatusSkipped}, {Status: inspec.ResultStatusPassed}}}
-	assert.Equal(t, inspec.ResultStatusSkipped, ctrl.Status(), "Control is skipped")
+	assert.Equal(t, inspec.ResultStatusSkipped, ctrl.Status(""), "Control is skipped")
 	assert.Equal(t, inspec.ControlImpactMajor, ctrl.ImpactName(), "Control is major")
 
 	ctrl = inspec.Control{Id: "five", Impact: 0.7, Results: []*inspec.Result{{Status: inspec.ResultStatusFailed}, {Status: inspec.ResultStatusPassed}}}
-	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(), "Control is failed")
+	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(""), "Control is failed")
 	assert.Equal(t, inspec.ControlImpactCritical, ctrl.ImpactName(), "Control is critical")
 
 	ctrl = inspec.Control{Id: "six", Impact: 1.0, Results: []*inspec.Result{{Status: inspec.ResultStatusPassed}, {Status: inspec.ResultStatusFailed}}}
-	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(), "Control is failed")
+	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(""), "Control is failed")
 	assert.Equal(t, inspec.ControlImpactCritical, ctrl.ImpactName(), "Control is critical")
 
 	ctrl = inspec.Control{Id: "seven", Impact: 1, Results: []*inspec.Result{{Status: inspec.ResultStatusSkipped}, {Status: inspec.ResultStatusFailed}}}
-	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(), "Control is failed")
+	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(""), "Control is failed")
 	assert.Equal(t, inspec.ControlImpactCritical, ctrl.ImpactName(), "Control is critical")
 
 	ctrl = inspec.Control{Id: "eight", Impact: 8, Results: []*inspec.Result{{Status: inspec.ResultStatusFailed}, {Status: inspec.ResultStatusSkipped}}}
-	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(), "Control is failed")
+	assert.Equal(t, inspec.ResultStatusFailed, ctrl.Status(""), "Control is failed")
 	assert.Equal(t, inspec.ControlImpactCritical, ctrl.ImpactName(), "Control is critical")
 
 	ctrl = inspec.Control{Id: "nine", Impact: 0.8, Results: []*inspec.Result{{Status: inspec.ResultStatusPassed}, {Status: inspec.ResultStatusPassed}}}
-	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status(), "Control is passed")
+	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status(""), "Control is passed")
 
+	ctrl = inspec.Control{Id: "nine", Impact: 0.8, Results: []*inspec.Result{{Status: inspec.ResultStatusPassed}, {Status: inspec.ResultStatusPassed}}}
+	assert.Equal(t, inspec.ResultStatusPassed, ctrl.Status("yes_run"), "Waived Control is passed")
 	// ------------------------------- ReportProfilesFromInSpecProfiles test --------------------------------- //
 
 	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, false)
