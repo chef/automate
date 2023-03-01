@@ -1053,7 +1053,6 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 	fsc := elastic.NewFetchSourceContext(true)
 
 	logrus.Debugf("GetNodeControlListItems for reportid=%s, filters=%+v", reportID, filters)
-	
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
 		Query(queryInfo.filtQuery).

@@ -243,7 +243,7 @@ func (srv *Server) ListControlInfo(ctx context.Context, in *reporting.Query) (*r
 	}
 
 	nodeControls, err = srv.es.GetNodeControlListItems(ctx, formattedFilters, in.Id)
-	if err != nil { 
+	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return nodeControls, nil
