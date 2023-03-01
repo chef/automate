@@ -243,8 +243,7 @@ func (srv *Server) ListControlInfo(ctx context.Context, in *reporting.Query) (*r
 	}
 
 	nodeControls, err = srv.es.GetNodeControlListItems(ctx, formattedFilters, in.Id)
-	if err != nil {
-		logrus.Errorf("******* ERROR: %+v", err)
+	if err != nil { 
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return nodeControls, nil

@@ -28,7 +28,7 @@ func (control *Control) Status(waived string) (status string) {
 			status = ResultStatusSkipped
 		}
 	}
-	if waived == "yes_run" || waived == "yes" {
+	if waived == ControlWaivedStrYesRun || waived == ControlWaivedStrYes {
 		status = ResultStatusWaived
 	}
 	return status

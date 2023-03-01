@@ -271,6 +271,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 		return nil, 0, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
+
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
@@ -1052,6 +1053,7 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 	fsc := elastic.NewFetchSourceContext(true)
 
 	logrus.Debugf("GetNodeControlListItems for reportid=%s, filters=%+v", reportID, filters)
+	
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
 		Query(queryInfo.filtQuery).
