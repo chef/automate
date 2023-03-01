@@ -1057,9 +1057,6 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 		Query(queryInfo.filtQuery).
 		Size(1)
 
-	sec, _ := queryInfo.filtQuery.Source()
-	logrus.Infof("searchSource info: %+v", sec)
-
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
