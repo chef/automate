@@ -3,7 +3,7 @@
 #
 
 module "airgapped_single_local_inplace_upgrade" {
-  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   # DNS components ( a2-airgapped-local-inplace-upgrade-{{channel}}.cd.chef.co )
   subdomain        = "a2-airgapped-local-inplace-upgrade"

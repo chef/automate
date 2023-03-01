@@ -51,7 +51,7 @@ data "template_file" "hab_sup_exec_start_conf" {
 }
 
 module "chef_load_cd_base" {
-    source = "git::https://github.com/chef/es-terraform//modules/cd_base?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
+    source = "github.com/chef/es-terraform//modules/cd_base"
 
   instance_count = "${var.instance_count}"
   instance_id    = "${var.instance_id}"

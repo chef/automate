@@ -4,7 +4,7 @@
 #
 
 module "cd_infrastructure" {
-  source = "git::https://github.com/chef/es-terraform//modules/cd_common_infrastructure?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines" 
+  source = "github.com/chef/es-terraform//modules/cd_common_infrastructure" 
   environment = "${var.environment}"
 }
 

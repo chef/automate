@@ -3,7 +3,7 @@
 #
 
 module "inspec_target_rhel7" {
-  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   # DNS components ( inspec-target-rhel7-{{channel}}.cd.chef.co )
   subdomain        = "inspec-target-rhel7"
@@ -33,7 +33,7 @@ module "inspec_target_rhel7" {
 }
 
 module "inspec_target_rhel7_cd_base" {
-  source = "git::https://github.com/chef/es-terraform//modules/cd_base?ref=SHIELD-182-fix-dev-and-acceptance-deployment-pipelines"
+  source = "github.com/chef/es-terraform//modules/cd_base"
 
   instance_id   = "${module.inspec_target_rhel7.instance_id}"
   instance_fqdn = "${module.inspec_target_rhel7.fqdn}"
