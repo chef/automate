@@ -34,6 +34,7 @@ This section will discuss the steps to deploy Chef Automate HA on-premise machin
 - We do not support passphrases for Private Key authentication.
 - LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
+- Make sure your linux has `sysctl` utility available.
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
 - Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
