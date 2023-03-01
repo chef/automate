@@ -16,10 +16,6 @@ if grep /tmp /proc/mounts >/dev/null 2>&1; then
   mount -o remount,nodev,nosuid,noexec -t /tmp
 fi
 
-# Enable selinux
-# setenforce 1
-# sed -i 's/^SELINUX=.*/SELINUX=enforcing/g' /etc/selinux/config
-
 # whitelist our commands
 cat << EOF > /etc/sudoers.d/automate
 ${ssh_user} ALL=(ALL) ${tmp_path}/install_hab.sh
