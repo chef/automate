@@ -182,7 +182,7 @@ terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 
 ### Issue: Deployment or Upgrade Fails as UnknownError
 
-While trying to deploy or upgrade Chef Automate HA, if the Command did not exit gracefully
+While trying to deploy or upgrade Chef Automate HA, if the command did not exit gracefully
 
 The possible error looks like as shown below:
 
@@ -198,7 +198,5 @@ UnknownError: Unable to determine error cause: Command did not exit gracefully
 #### Solution
 
 - In logs check for which module it prompted an error.
-
 - ssh into the node and check if the `sysctl` utility is available by running `sysctl -a`.
-
 - If `Command 'sysctl' not found` , try installing the pkg. 
