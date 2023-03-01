@@ -31,6 +31,7 @@ The certificate rotation is also required when the key for a node, client, or CA
 
 - Below `cert-rotate` commands can only be executed from `bastion host`.
 - If you want to use certificates stored in another node of the HA cluster, you can provide the remote path to the certificates using the `<IP_ADDRESS_OF_NODE>:<ABSOLUTE_PATH_TO_THE_CERT_FILE>` format instead of the local path.
+- `--wait-timeout` This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process.
 
 {{< /note >}}
 
