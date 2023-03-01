@@ -175,7 +175,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminKeyPath, "admin-key", "", "Admin Private certificate")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.node, "node", "", "Node Ip address")
-	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout,"timeout",DEFAULT_OPERATION_TIMEOUT_ON_EACH_NODE,"Operation timeout on each individual node")
+	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout,"wait-timeout",DEFAULT_OPERATION_TIMEOUT_ON_EACH_NODE,"Operation timeout on each individual node")
 
 	RootCmd.AddCommand(certRotateCmd)
 }
