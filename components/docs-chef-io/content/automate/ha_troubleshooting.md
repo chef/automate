@@ -191,12 +191,12 @@ The possible error looks like as shown below:
 UnknownError: Unable to determine error cause: Command did not exit gracefully
 ```
 
-- Examine the logs from bastion(/hab/a2_deploy_workspace/logs/a2ha-run.log) or from frontend/backend nodes in svc-load.log (or) automate-ctl.log in /hab/var/automate-ha/
-- if you found that `sysctl: command not found`
+- Examine the logs from bastion (/hab/a2_deploy_workspace/logs/a2ha-run.log) or from frontend/backend nodes in svc-load.log (or) automate-ctl.log in /hab/var/automate-ha/
+- If you found that `sysctl: command not found`
 - Follow the below steps
 
 #### Solution
 
 - In logs check for which module it prompted an error.
-- ssh into the node and check if the `sysctl` utility is available by running `sysctl -a`.
+- SSH into the node and check if the `sysctl` utility is available by running `sysctl -a`.
 - If `Command 'sysctl' not found` , try installing the pkg. 
