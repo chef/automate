@@ -101,6 +101,7 @@ const (
 	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided Postgresql root-ca.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip during root-ca and common name patching as the following %s have same root-ca and common name as currently provided OpenSearch root-ca and common name.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip during common name patching as the following %s have same common name as currently provided OpenSearch common name.\n\t %s"
+	DEFAULT_OPERATION_TIMEOUT_ON_EACH_NODE = 180
 )
 
 type certificates struct {
@@ -127,6 +128,7 @@ type certRotateFlags struct {
 
 	// Node
 	node string
+	timeout int
 }
 
 type certRotateFlow struct {
@@ -173,6 +175,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminKeyPath, "admin-key", "", "Admin Private certificate")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.node, "node", "", "Node Ip address")
+	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout,"timeout",DEFAULT_OPERATION_TIMEOUT_ON_EACH_NODE,"Operation timeout on each individual node")
 
 	RootCmd.AddCommand(certRotateCmd)
 }
@@ -212,6 +215,13 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		if err != nil {
 			return errors.New("Error occured while fetching current certs.")
 		}
+
+		if flagsObj.timeout < DEFAULT_OPERATION_TIMEOUT_ON_EACH_NODE {
+			return errors.Errorf("Operation timeout on each individual node should be more than %v sec.",DEFAULT_OPERATION_TIMEOUT_ON_EACH_NODE)
+		}
+
+		sshConfig.timeout = flagsObj.timeout
+		sshUtil.setSSHConfig(sshConfig)
 
 		if flagsObj.automate || flagsObj.chefserver {
 			err := c.certRotateFrontend(sshUtil, certs, infra, flagsObj, currentCertsInfo)
