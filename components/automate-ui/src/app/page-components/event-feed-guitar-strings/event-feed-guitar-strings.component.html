@@ -8,12 +8,12 @@
           [attr.x]="zoomButtonPosition(i)"
           y="0"
           tabindex="0"
-          [attr.aria-label]="date | datetime: DateTime.EVENT_GRAPH_DATE_LABEL"
+          [attr.aria-label]="date | date: DateTime.EVENT_GRAPH_DATE_LABEL"
           (click)="dateSelected(date, i)"
           (keydown.enter)="dateSelected(date, i)"/>
         <text class="guitar-string-zoom-date"
           [attr.x]="zoomTextPosition(i)" y="18">
-            {{date | datetime: DateTime.EVENT_GRAPH_DATE_LABEL}}
+            {{date | date: DateTime.EVENT_GRAPH_DATE_LABEL}}
         </text>
       </ng-container>
       <rect class="slider-overlay start" x="0" y="0" width="0" height="100%"/>
@@ -73,7 +73,7 @@
       [width]="graphicProportions.sectionWidth"
       [index]="i"
       *ngFor="let date of guitarStringDataContainer.sectionDates; let i = index">
-      {{date | datetime: DateTime.EVENT_GRAPH_DATE_LABEL}}
+      {{date | date: DateTime.EVENT_GRAPH_DATE_LABEL}}
     </svg:g>
 
   </chef-guitar-string-collection>
