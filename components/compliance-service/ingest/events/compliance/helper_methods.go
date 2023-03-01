@@ -175,7 +175,6 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 			}
 
 			controlWaivedStr := WaivedStr(control.WaiverData)
-			logrus.Infof("The current status: %+v", control.Status(controlWaivedStr))
 
 			minControls[i] = relaxting.ESInSpecReportControl{
 				ID:         control.Id,
