@@ -185,7 +185,7 @@ terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 While trying to deploy or upgrade Chef Automate HA, if the command did not exit gracefully, the possible error looks like as shown below:
 
 ```bash
-      ┬ Exiting as execution process completed
+      Exiting as execution process completed
 UnknownError: Unable to determine error cause: Command did not exit gracefully
 ```
 
