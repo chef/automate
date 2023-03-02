@@ -1,12 +1,12 @@
 +++
-title = "Chef Backend to Automate HA"
+title = "Chef Infra Server/Chef Backend to Automate HA"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Chef Backend to Automate HA"
+    title = "Che Infra Server/Chef Backend to Automate HA"
     parent = "automate/deploy_high_availability/migration"
     identifier = "automate/deploy_high_availability/migration/ha_chef_backend_to_automate_ha.md Chef Backend to Automate HA"
     weight = 210
@@ -17,14 +17,14 @@ gh_repo = "automate"
 {{< /warning >}}
 
 {{< warning >}}
-- Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+- Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Automate HA do not support the super market authentication with chef-server users credentials. 
 - Post Migration Customer can not login with chef-server users to Supermarket. 
 {{< /warning >}}
 
-This page explains the procedure to migrate the existing Chef Backend data to the newly deployed Chef Automate HA. This migration involves two steps:
+This page explains the procedure to migrate the existing Standalone Chef Infra Server or Chef Backend data to the newly deployed Chef Automate HA. This migration involves two steps:
 
--   Back up the data from an existing Chef Backend via `knife-ec-backup`.
+-   Back up the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
 -   Restore the backed-up data to the newly deployed Chef Automate HA environment via `knife-ec-restore`.
 
 Take backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data-bags, policies, and organizations.
@@ -38,7 +38,7 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
 
 {{< /note >}}
 
-## Backup the Existing Chef Backend Data
+## Backup the Existing Chef Infra Server or Chef Backend Data
 
 1.   Execute below command to install Habitat:
 
