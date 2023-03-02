@@ -183,7 +183,6 @@ terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 ### Issue: Deployment or Upgrade Fails as UnknownError
 
 While trying to deploy or upgrade Chef Automate HA, if the command did not exit gracefully
-
 The possible error looks like as shown below:
 
 ```bash
@@ -192,11 +191,10 @@ UnknownError: Unable to determine error cause: Command did not exit gracefully
 ```
 
 - Examine the logs from bastion (/hab/a2_deploy_workspace/logs/a2ha-run.log) or from frontend/backend nodes in svc-load.log (or) automate-ctl.log in /hab/var/automate-ha/
-- If you found that `sysctl: command not found`
-- Follow the below steps
+- If you found that `sysctl: command not found`, follow the below steps
 
 #### Solution
 
 - In logs check for which module it prompted an error.
 - SSH into the node and check if the `sysctl` utility is available by running `sysctl -a`.
-- If `Command 'sysctl' not found` , try installing the pkg. 
+- If `Command 'sysctl' not found`, try installing the pkg. 
