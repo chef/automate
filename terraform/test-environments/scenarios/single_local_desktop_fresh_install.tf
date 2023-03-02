@@ -4,7 +4,7 @@
 #
 
 module "single_local_desktop_fresh_install" {
-  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=test-branch"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   # DNS components ( a2-local-desktop-fresh-install-{{channel}}.cd.chef.co )
   subdomain        = "a2-local-desktop-fresh-install"

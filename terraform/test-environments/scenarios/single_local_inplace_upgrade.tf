@@ -3,7 +3,7 @@
 #
 
 module "single_local_inplace_upgrade" {
-  source = "git::https://github.com/chef/es-terraform//modules/cd_instance_v2?ref=test-branch"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   # DNS components ( a2-local-inplace-upgrade-{{channel}}.cd.chef.co )
   subdomain        = "a2-local-inplace-upgrade"
