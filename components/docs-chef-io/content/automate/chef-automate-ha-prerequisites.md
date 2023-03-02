@@ -18,18 +18,6 @@ gh_repo = "On-Premise Prerequisites"
 
 Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
 
-## Software Requirements
-
-| Operating Systems                        | Supported Version         |
-| :--------------------------------------  | :-----------------------  |
-| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
-| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
-| Centos (64 Bit OS)                       | 7                         |
-| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
-| SUSE Linux Enterprise Server 12 SP5      | 12                        |
-
-{{< note >}} [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) use this to check how much hardware you will need for your use-case. {{< /note >}}
-
 ## Hardware Requirements
 
 The hardware configuration is according to the performance benchmarking tests based on the assumptions listed below:
@@ -63,13 +51,45 @@ The machine requirements based on the above assumptions are listed below:
 - Chef Automate bundle comes with chef-server version 14.15.10
 {{< /note >}}
 
-## On-Premise Deployment Specific Pre-Requisite
+{{< note >}} [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx); use this to check how much hardware you will need for your use case. {{< /note >}}
 
-The on-premise deployment specific pre-requisites are given below:
+### Load Balancer
 
-- All VMs or Machines are up and running.
-- OS Root Volume (/) must be at least 40 GB
-- TMP space (/var/tmp) must be at least 5GB
+LoadBalancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
+
+You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
+
+- [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
+- [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
+
+{{< note >}} [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx); use this to check how much hardware you will need for your use case. {{< /note >}}
+
+## Software Requirements
+
+| Operating Systems                        | Supported Version         |
+| :--------------------------------------  | :-----------------------  |
+| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
+| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
+| Centos (64 Bit OS)                       | 7                         |
+| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
+| SUSE Linux Enterprise Server 12 SP5      | 12                        |
+
+### Chef Application Minimum Version
+
+The minimum version for the chef applications are as follows:
+
+- Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
+- Chef Habitat: **core/hab/1.6.521/20220603154827**
+- Infra Client:
+- Chef Manage & Supermarket:
+
+## Deployment Specific Pre-requisites
+
+The on-premise deployment specific pre-requisites are as follows:
+
+- All Virtual Machines or Machines are up and running.
+- OS Root Volume (/) must be at least 40 GB.
+- TMP space (/var/tmp) must be at least 5GB.
 - Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
 - A Common user has access to all machines.
 - This common user should have sudo privileges.
@@ -93,20 +113,13 @@ The on-premise deployment specific pre-requisites are given below:
     sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     ```
 
+- The Chef Automate HA user gets the privilege to access the habitat directory. The Linux user should have a `/hab` and `/temp` directory.
+
 Click [here](/automate/ha_onprim_deployment_procedure/) to know more.
 
-### Load Balancer
+### Firewall Checks
 
-LoadBalancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
-
-You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
-
-- [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
-- [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
-
-### Security Checks
-
-The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
+The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be opened for each set of servers.
 
 **Ports required for all Machines**
 
@@ -115,7 +128,7 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              |
 | Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 |
 
-{{< note >}} Custom SSH port is supported, but same port should be used accross all the machines. {{< /note >}}
+{{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
 
 **Port usage definitions**
 
@@ -129,83 +142,87 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
 | TCP/UDP  | 9638        | Habitat gossip (UDP) |
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
-| TCP      | 6432        | Re-elect Postgresql Leader, if Postgresql leader is down |
+| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
 
 ### Disaster Recovery
 
-The requirement to setup a recovery point objective is:
+The requirement to set up a recovery point objective is:
 
 - Two identical clusters located in different data centers or cloud provider regions.
-- Network accessible storage (NAS), object store (S3), available in both data centers/regions
+- Network accessible storage (NAS) and object store (S3), available in both data centers/regions
 - Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
 
-Click [here](/automate/ha_disaster_recovery_setup/) to know more on the disaster recovery cluster for om-premise deployment.
+Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the on-premise deployment disaster recovery cluster.
 
 ### Certificates
 
-A security certificate is a small data file used as an Internet security technique through which the identity, authenticity, and reliability of a website or web application are established. To ensure optimal security, rotate the certificates periodically.
+A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
 
-Install an OpenSSL utility to create a self-signed key and certificate pair. The certificates used for SSL is **PKCS 8**. Click [here](/automate/ha_cert_selfsign/) to know more.
-
-### Privileges
-
-The Chef Automate HA user gets the privilege to access the habitat directory. The linux user should have a `/hab` and `/temp` directory.
-
-### Chef Application Minimum Version
-
-The minimum version for the chef applications are as follows:
-
-- Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
-- Chef Habitat: **core/hab/1.6.521/20220603154827**
-- Chef Automate: **chef/deployment-service/0.1.0/20230213182348**
-- Infra Client:
-- Chef Manage & Supermarket:
+Install an OpenSSL utility to create a self-signed key and certificate pair. The certificate used for SSL is **PKCS 8**. Click [here](/automate/ha_cert_selfsign/) to know more.
 
 ### Backup and Restore
 
-On-premise deployment can take place using **Filesystem** and **Object Storage**. If you choose `backup_config` as filesystem or object storage in your `config.toml` file, the backup is already configured during the deployment. Whereas, if the `backup_config` is left black, then the configuration needs to be done manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
+On-premise deployment can use **Filesystem** and **Object Storage**. If you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
+
+### Upgrade
+
+Things to keep in mind while upgrading are:
+
+- BackEnd upgrades will restart the backend service, which takes time for the cluster to be in a healthy state.
+- Upgrade command currently only supports minor upgrades.
+- A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
+
+### Config Updates
+
+Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the frontend.
+
+**For example:**
 
 ### Migration
 
 The on-Premise deployment supports four types of migration:
 
+If you are an existing Automate user and want to migrate to Automate HA, follow the pointers given below:
+
 - **Existing A2HA to Automate HA**
 
-    {{< note >}} A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246). {{< /note >}}
+    To migrate your existing A2HA data to the newly deployed Chef Automate HA, first:
 
-    To migrate your existing A2HA data to the newly deployed Chef Automate HA, firstly:
-
-    - Your machine should have the ability to mount the file system, which was mounted to A2HA cluster for backup purposes, to Automate HA.
+    - A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246).
+    - Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA.
     - Configure the A2HA to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
 
-Click [here](/automate/ha_existing_a2ha_to_automate_ha/) to know more about the process of migration.
+Click [here](/automate/ha_existing_a2ha_to_automate_ha/) to know more about the migration process.
 
 - **In-Place A2HA to Automate HA**
 
-    To migrate your in-place A2HA to Automate HA, firstly you should have:
+    To migrate your in-place A2HA to Automate HA, firstly, you should have the following:
 
+    - In-Place A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246).
     - A healthy state of the A2HA cluster to take fresh backup.
     - A2HA is configured to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
     - Availability of 60% of space.
 
-Click [here](/automate/ha_inplace_migration/) to know more about the process of migration.
+Click [here](/automate/ha_inplace_migration/) to learn more about migration.
 
-- **Chef Backend to Automate HA**
+- **Chef Backend/Infra Server to Automate HA**
 
-    The pre-requisites to migrate from Chef Backend to Automate HA are:
+    The pre-requisites to migrate from Chef Backend or Infra Server to Automate HA are:
 
-    - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
-    - Automate HA do not support the super market authentication with chef-server users credentials.
-    - Post Migration Customer can not login with chef-server users to Supermarket.
+    - The migration procedure is tested on **Chef Server version 14+**.
+    - The migration procedure is possible above **Chef Backend version 2.1.0**.
+    - Customers using only **Chef Backend** are advised to follow the migration guidance in the link given below. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+    - Automate HA does not support supermarket authentication with chef-server user credentials.
+    - Post Migration Customer cannot log in with chef-server users to Supermarket.
 
-Click [here](/automate/ha_chef_backend_to_automate_ha/) to know more about the process of migration.
+Click [here](/automate/ha_chef_backend_to_automate_ha/) to know more about the migration process.
 
 - **Automate to Automate HA**
 
     The pre-requisites to migrate from Automate to Automate HA are:
 
-    - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+    - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with the minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
-    - Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA.
+    - Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA.
 
-Click [here](/automate/ha_automate_to_automate_ha/) to know more about the process of migration.
+Click [here](/automate/ha_automate_to_automate_ha/) to know more about the migration process.
