@@ -101,7 +101,7 @@ const (
 	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided Postgresql root-ca.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip during root-ca and common name patching as the following %s have same root-ca and common name as currently provided OpenSearch root-ca and common name.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip during common name patching as the following %s have same common name as currently provided OpenSearch common name.\n\t %s"
-	DEFAULT_TIMEOUT = 180
+	DEFAULT_TIMEOUT                   = 180
 )
 
 type certificates struct {
@@ -127,7 +127,7 @@ type certRotateFlags struct {
 	adminKeyPath    string
 
 	// Node
-	node string
+	node    string
 	timeout int
 }
 
@@ -175,7 +175,7 @@ func init() {
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.adminKeyPath, "admin-key", "", "Admin Private certificate")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.node, "node", "", "Node Ip address")
-	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout,"wait-timeout",DEFAULT_TIMEOUT,"This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process")
+	certRotateCmd.PersistentFlags().IntVar(&flagsObj.timeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process")
 
 	RootCmd.AddCommand(certRotateCmd)
 }
@@ -217,7 +217,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 		}
 
 		if flagsObj.timeout < DEFAULT_TIMEOUT {
-			return errors.Errorf("The operation timeout duration for each individual node during the certificate rotation process should be set to a value greater than %v seconds.",DEFAULT_TIMEOUT)
+			return errors.Errorf("The operation timeout duration for each individual node during the certificate rotation process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
 		}
 
 		sshConfig.timeout = flagsObj.timeout
@@ -474,7 +474,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
 	if param.remoteService == CONST_AUTOMATE || param.remoteService == CONST_CHEF_SERVER || param.remoteService == "frontend" {
-		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH ,param.remoteService+param.timestamp, dateFormat)
+		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, dateFormat)
 	} else if param.remoteService == CONST_POSTGRESQL || param.remoteService == CONST_OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
