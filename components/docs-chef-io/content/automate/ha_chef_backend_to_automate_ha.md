@@ -18,6 +18,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 - Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+- Also for the customers using standalone Chef Infra Server, cookbooks should be in the database but not in the file system.
 - Automate HA do not support the super market authentication with chef-server users credentials. 
 - Post Migration Customer can not login with chef-server users to Supermarket. 
 {{< /warning >}}
@@ -121,7 +122,7 @@ This will require downtime, so plan accordingly. A reduced performance should be
 
 {{< note >}}
 
-- Need to setup your workstation based on newly created Autoamte-HA's chef-server. Only needed if you have setup the workstation earlier. 
+- Need to setup your workstation based on newly created Automate-HA's chef-server. Only needed if you have setup the workstation earlier. 
 - This inplace migration works only when cookbook are stored at database. This do not support use-case, where cookbooks are stored at filesystem. 
 - Take the backup of the system to avoid the data loss.
 {{< /note >}}
@@ -162,7 +163,7 @@ https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_li
 
 8. Edit `config.toml` and add the following:
 
-- Update the `intance_count`  
+- Update the `instance_count`  
 - fqdn : load balance url, which points to frondend node.
 - keys : ssh username and private keys
 - Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
@@ -218,10 +219,10 @@ postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
 11. [Doc: Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 
 
-## Using Autoamte HA for Chef-Backend user
+## Using Automate HA for Chef-Backend user
 
 1. Download and Install chef-workstation 
-    From Bashtion machine or local machine install chef-workstation
+    From Bastion machine or local machine install chef-workstation
     https://www.chef.io/downloads/tools/workstation
     
 2. Set up workstation
