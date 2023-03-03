@@ -16,11 +16,19 @@ gh_repo = "On-Premise Prerequisites"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
+{{< warning >}}
+The below pre-requisites are according to our organizational standard. If you are using any specified version not mentioned here or a third party extensions or software you can reach out to the CAMs and our Customer Support Team.
+{{< /warning >}}
+
 Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
 
 ## Hardware Requirements
 
-The hardware configuration is according to the performance benchmarking tests based on the assumptions listed below:
+{{< note >}} Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case. {{< /note >}}
+
+To give you an apt hardware configuration, we have some sample values based on the performance benchmarking tests. You can refer to the below table to populate things in the **Hardware Calculator** according to your requirement. The below table is just based on the tested **assumptions** and does not has any exact value.
+
+You can use the below assumptions in the calculator to drive in to your hardware requirement:
 
 | Assumption                            | Value | Unit     |
 |---------------------------------------|-------|----------|
@@ -48,10 +56,7 @@ The machine requirements based on the above assumptions are listed below:
 
 - For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
 - For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
-- Chef Automate bundle comes with chef-server version 14.15.10
 {{< /note >}}
-
-{{< note >}} [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx); use this to check how much hardware you will need for your use case. {{< /note >}}
 
 ### Load Balancer
 
@@ -61,8 +66,6 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
 - [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
 - [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
-
-{{< note >}} [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx); use this to check how much hardware you will need for your use case. {{< /note >}}
 
 ## Software Requirements
 
@@ -74,9 +77,11 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server 12 SP5      | 12                        |
 
+{{< note >}} Chef Automate HA comes with bundled Infra Server and it is recommended not to use any external server in Automate HA. Using external server will loose the Automate HA functionalities and things may not work as expected. {{< note >}}
+
 ### Chef Application Minimum Version
 
-The minimum version for the chef applications are as follows:
+You can migrate to Chef Automate HA if your existing chef applications are on below versions:
 
 - Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
 - Chef Habitat: **core/hab/1.6.521/20220603154827**
