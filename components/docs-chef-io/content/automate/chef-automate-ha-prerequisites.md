@@ -192,7 +192,7 @@ Things to keep in mind while upgrading are:
 
 Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the frontend.
 
-**For example:**
+Click [here](/automate/ha_config/#patch-configuration/) to know more on how to patch the configs.
 
 ### Migration
 

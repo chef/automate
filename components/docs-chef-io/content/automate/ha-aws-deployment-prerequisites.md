@@ -20,7 +20,7 @@ gh_repo = "AWS Deployment Prerequisites"
 The below pre-requisites are according to our organizational standard. If you are using any specified version not mentioned here or a third party extensions or software you can reach out to the CAMs and our Customer Support Team.
 {{< /warning >}}
 
-Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
+Before installing Chef automate HA on AWS deployment, ensure you have taken a quick tour of this pre-requisite page.
 
 ## Hardware Requirements
 
@@ -60,7 +60,7 @@ The machine requirements based on the above assumptions are listed below:
 
 ### Load Balancer
 
-LoadBalancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
+LoadBalancers in AWS deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
 
 You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
@@ -155,7 +155,7 @@ The requirement to set up a recovery point objective is:
 - Network accessible storage (NAS) and object store (S3), available in both data centers/regions
 - Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using **cron** or a similar tool like **anacron**.
 
-Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the on-premise deployment disaster recovery cluster.
+Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the AWS deployment disaster recovery cluster.
 
 ### Custom Certificates
 
