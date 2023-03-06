@@ -122,7 +122,7 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 **Ports required for all Machines**
 
 | Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      | Load Balancer |
-|----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------|
+|----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------| ---------- |
 | Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              | TCP 443, 80 |
 | Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 | TCP 443, 80 |
 
@@ -186,6 +186,8 @@ Things to keep in mind while upgrading are:
 Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the frontend.
 
 **For example:**
+
+### Migration
 
 | Existing System | Minimum Eligible System Version | Pre-requisite Before Migration | Notes | Not Supported Use Cases |
 |-----------------|---------------------------------|--------------------------------| ----- | ----------------------- |
