@@ -195,7 +195,7 @@ Click [here](/automate/ha_config/#patch-configuration/) to know more on how to p
 ### Migration
 
 | Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
-|-----------------|---------------------------------|--------------------------------| ----- | ----------------------- |
+|-----------------|---------------------------------|-------|------------------------------| ----- | ----------------------- |
 | Chef Automate | Automate 2020XXXXXX |    |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
 | Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
 | Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
