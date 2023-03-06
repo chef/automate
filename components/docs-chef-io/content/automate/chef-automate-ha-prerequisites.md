@@ -113,6 +113,13 @@ The on-premise deployment specific pre-requisites are as follows:
 
 - The Chef Automate HA user gets the privilege to access the habitat directory. The Linux user should have a `/hab` and `/temp` directory.
 
+{{< warning >}}
+
+- PLEASE DO NOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+- We currently don't support AD managed users in nodes. We only support local linux users.
+
+{{< /warning >}}
+
 Click [here](/automate/ha_onprim_deployment_procedure/) to know more.
 
 ### Firewall Checks
@@ -123,7 +130,7 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 
 | Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      | Load Balancer |
 |----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------| ---------- |
-| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              | TCP 443, 80 |
+| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
 | Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 | TCP 443, 80 |
 
 {{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
@@ -178,7 +185,7 @@ To make sure restore happens successfully we need to:
 Things to keep in mind while upgrading are:
 
 - BackEnd upgrades will restart the backend service, which takes time for the cluster to be in a healthy state.
-- Upgrade command currently only supports minor upgrades.
+- Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
 
 ### Config Updates
@@ -189,10 +196,10 @@ Patching something in the application might result in downtime of the whole appl
 
 ### Migration
 
-| Existing System | Minimum Eligible System Version | Pre-requisite Before Migration | Notes | Not Supported Use Cases |
+| Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
 |-----------------|---------------------------------|--------------------------------| ----- | ----------------------- |
-| Chef Automate | Automate 2020xxsdas |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
-| Chef Backend | Backend 2.x and Infra Server 14.x |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
-| Chef Infra Server | Infra server 14.xxx |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
-| A2HA | Chef Automate version 20201230192246. | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
-| In-Place A2HA | Chef Automate version 20201230192246. | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
+| Chef Automate | Automate 2020XXXXXX |    |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
+| Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
+| Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
+| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
+| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
