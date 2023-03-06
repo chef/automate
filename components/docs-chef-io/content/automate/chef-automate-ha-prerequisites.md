@@ -17,7 +17,7 @@ gh_repo = "On-Premise Prerequisites"
 {{< /warning >}}
 
 {{< warning >}}
-The below pre-requisites are according to our organizational standard. If you are using any specified version not mentioned here or a third party extensions or software you can reach out to the CAMs and our Customer Support Team.
+The below pre-requisites are according to our organizational standard. If you are using any specified version not mentioned here or a third party extensions or software you can reach out to the CAMs and our Customer Support Team. deployme
 {{< /warning >}}
 
 Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
@@ -79,15 +79,6 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
 {{< note >}} Chef Automate HA comes with bundled Infra Server and it is recommended not to use any external server in Automate HA. Using external server will loose the Automate HA functionalities and things may not work as expected. {{< note >}}
 
-### Chef Application Minimum Version
-
-You can migrate to Chef Automate HA if your existing chef applications are on below versions:
-
-- Chef Server: **chef/automate-cs-oc-erchef/15.4.0/20230130152857**
-- Chef Habitat: **core/hab/1.6.521/20220603154827**
-- Infra Client:
-- Chef Manage & Supermarket:
-
 ## Deployment Specific Pre-requisites
 
 The on-premise deployment specific pre-requisites are as follows:
@@ -99,8 +90,10 @@ The on-premise deployment specific pre-requisites are as follows:
 - A Common user has access to all machines.
 - This common user should have sudo privileges.
 - This common user uses the same SSH Private Key file to access all machines.
-- Key-based SSH for the provisioning user for all the machines for HA-Deployment.
-- We do not support passphrases for Private Key authentication.
+- We only support local linux user and local linux groups.
+- We need to have private key authentications for all the VMs and the private keys should be generated without any passphrases.
+- We need local hab user and local hab group to complete the deployment process successfully. If they are not available, the common user should have a privileges to create local users and groups, so that the deployment process can create the required local users and groups.
+- Key-based SSH for the provisioning user for all the machines for HA-Deployment. Chef recommends you to use SSH key of size 2048 bits.
 - LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
@@ -128,10 +121,10 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 
 **Ports required for all Machines**
 
-| Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      |
+| Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      | Load Balancer |
 |----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------|
-| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              |
-| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 |
+| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              | TCP 443, 80 |
+| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 | TCP 443, 80 |
 
 {{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
 
@@ -155,15 +148,15 @@ The requirement to set up a recovery point objective is:
 
 - Two identical clusters located in different data centers or cloud provider regions.
 - Network accessible storage (NAS) and object store (S3), available in both data centers/regions
-- Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
+- Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using **cron** or a similar tool like **anacron**.
 
 Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the on-premise deployment disaster recovery cluster.
 
-### Certificates
+### Custom Certificates
 
 A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
 
-Install an OpenSSL utility to create a self-signed key and certificate pair. The certificate used for SSL is **PKCS 8**. Click [here](/automate/ha_cert_selfsign/) to know more.
+Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
 
 ### Backup and Restore
 
@@ -183,7 +176,7 @@ Patching something in the application might result in downtime of the whole appl
 
 **For example:**
 
-### Migration
+### Chef Application Migration
 
 The on-Premise deployment supports four types of migration:
 
@@ -231,3 +224,11 @@ Click [here](/automate/ha_chef_backend_to_automate_ha/) to know more about the m
     - Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA.
 
 Click [here](/automate/ha_automate_to_automate_ha/) to know more about the migration process.
+
+| Existing System | Minimum Eligible System Version | Pre-requisite Before Migration | Notes | Not Supported Use Cases |
+|-----------------|---------------------------------|--------------------------------| ----- | ----------------------- |
+| Chef Automate | Automate 2020xxsdas |   | For additional setup or call abt downtime | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
+| Chef Backend | Backend 2.x and Infra Server 14.x |    |    |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
+| Chef Infra Server | Infra server 14.xxx |    |    |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
+| A2HA | Chef Automate version 20201230192246. | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). |   |    |
+| In-Place A2HA | Chef Automate version 20201230192246. | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Expect downtime |    |
