@@ -162,6 +162,17 @@ Install an OpenSSL utility to create a self-signed key and certificate pair. Aut
 
 On-premise deployment can use **Filesystem** and **Object Storage**. If you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
 
+For backup restore from standalone to HA, there are two conditions:
+
+1. The os snapshot should be registered to the same path in HA as it was in standalone
+1. The s3 repository configured for backup in HA should be same as standalone
+
+To make sure restore happens successfully we need to:
+
+1. Delete the snapshots from the HA setup if its different from standalone
+1. Make sure same s3 repository is configured in HA
+1. In the --patch-config which we pass in restore command make sure that config has the same basepath under external.os section and backup section as its there in standalone
+
 ### Upgrade
 
 Things to keep in mind while upgrading are:
@@ -176,59 +187,10 @@ Patching something in the application might result in downtime of the whole appl
 
 **For example:**
 
-### Chef Application Migration
-
-The on-Premise deployment supports four types of migration:
-
-If you are an existing Automate user and want to migrate to Automate HA, follow the pointers given below:
-
-- **Existing A2HA to Automate HA**
-
-    To migrate your existing A2HA data to the newly deployed Chef Automate HA, first:
-
-    - A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246).
-    - Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA.
-    - Configure the A2HA to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
-
-Click [here](/automate/ha_existing_a2ha_to_automate_ha/) to know more about the migration process.
-
-- **In-Place A2HA to Automate HA**
-
-    To migrate your in-place A2HA to Automate HA, firstly, you should have the following:
-
-    - In-Place A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246).
-    - A healthy state of the A2HA cluster to take fresh backup.
-    - A2HA is configured to take backup on a mounted network drive (location example: `/mnt/automate_backup`).
-    - Availability of 60% of space.
-
-Click [here](/automate/ha_inplace_migration/) to learn more about migration.
-
-- **Chef Backend/Infra Server to Automate HA**
-
-    The pre-requisites to migrate from Chef Backend or Infra Server to Automate HA are:
-
-    - The migration procedure is tested on **Chef Server version 14+**.
-    - The migration procedure is possible above **Chef Backend version 2.1.0**.
-    - Customers using only **Chef Backend** are advised to follow the migration guidance in the link given below. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
-    - Automate HA does not support supermarket authentication with chef-server user credentials.
-    - Post Migration Customer cannot log in with chef-server users to Supermarket.
-
-Click [here](/automate/ha_chef_backend_to_automate_ha/) to know more about the migration process.
-
-- **Automate to Automate HA**
-
-    The pre-requisites to migrate from Automate to Automate HA are:
-
-    - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with the minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
-
-    - Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA.
-
-Click [here](/automate/ha_automate_to_automate_ha/) to know more about the migration process.
-
 | Existing System | Minimum Eligible System Version | Pre-requisite Before Migration | Notes | Not Supported Use Cases |
 |-----------------|---------------------------------|--------------------------------| ----- | ----------------------- |
-| Chef Automate | Automate 2020xxsdas |   | For additional setup or call abt downtime | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
-| Chef Backend | Backend 2.x and Infra Server 14.x |    |    |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
-| Chef Infra Server | Infra server 14.xxx |    |    |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
-| A2HA | Chef Automate version 20201230192246. | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). |   |    |
-| In-Place A2HA | Chef Automate version 20201230192246. | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Expect downtime |    |
+| Chef Automate | Automate 2020xxsdas |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
+| Chef Backend | Backend 2.x and Infra Server 14.x |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
+| Chef Infra Server | Infra server 14.xxx |    | Irrespective of whether you use automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
+| A2HA | Chef Automate version 20201230192246. | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
+| In-Place A2HA | Chef Automate version 20201230192246. | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
