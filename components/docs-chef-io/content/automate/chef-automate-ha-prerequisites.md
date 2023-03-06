@@ -17,7 +17,7 @@ gh_repo = "On-Premise Prerequisites"
 {{< /warning >}}
 
 {{< warning >}}
-The below pre-requisites are according to our organizational standard. If you are using any specified version not mentioned here or a third party extensions or software you can reach out to the CAMs and our Customer Support Team. deployme
+The below pre-requisites are according to our organizational standard. If you are using any specified version not mentioned here or a third party extensions or software you can reach out to the CAMs and our Customer Support Team.
 {{< /warning >}}
 
 Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
@@ -77,7 +77,7 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server 12 SP5      | 12                        |
 
-{{< note >}} Chef Automate HA comes with bundled Infra Server and it is recommended not to use any external server in Automate HA. Using external server will loose the Automate HA functionalities and things may not work as expected. {{< note >}}
+{{< note >}} Chef Automate HA comes with bundled Infra Server and it is recommended not to use any external server in Automate HA. Using external server will loose the Automate HA functionalities and things may not work as expected. {{< /note >}}
 
 ## Deployment Specific Pre-requisites
 
