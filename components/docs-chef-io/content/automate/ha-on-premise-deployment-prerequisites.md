@@ -128,7 +128,7 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 
 | Incoming | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      | Load Balancer |
 |----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------| ---------- |
-| Chef Automate |    | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
+| Chef Automate |    |     | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
 | Infra Server | TCP 22, 9631, 443, 80 |      | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
 | PostgreSQL | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
 | OpenSearch | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 9631, 9200, 9300, 9638 <br/>UDP 9638 | TCP 22       | TCP 443, 80 |
