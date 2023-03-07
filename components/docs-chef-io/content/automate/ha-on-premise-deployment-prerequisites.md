@@ -83,12 +83,48 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
 The on-premise deployment specific pre-requisites are as follows:
 
+### Access
+
+- All Virtual Machines or Machines should be up and running.
+- We need a local user `hab` and local group `hab` linked together to complete the deployment process successfully.
+- If they are unavailable, the SSH user should have privileges to create local users and groups so that the deployment process can create the required local user `hab` and local group `hab`.
+
+### Storage Space
+
+- Operating System Root Volume (`/`) must be at least 40 GB. Temporary space (`/var/tmp`) must be at least 5GB.
+- Separate Hab volume should be provisioned and mounted at `/hab` with at least 100GB free space for all nodes except OpenSearch.
+- For OpenSearch nodes, hab volume should be calculated based on data retension policy and [hardware calculator](/calculator/automate_ha_hardware_calculator.xlsx) can be used for estimation.
+
+### SSH User
+
+- SSH user should use key based SSH login without passphrase.
+- The user's SSH key should be generated using algorithm `ed25519` and `RSA(2048)`without passphrase.
+- This SSH user should be local Linux user on all the machines.
+- This SSH user should have sudo privileges on all the machines.
+- The SSH user should use same SSH private key to access all machines.
+
+### Cluster setup
+
+- LoadBalancers should be setup according to [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/).
+- Network ports should be opened as per [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/).
+- DNS is configured to redirect chefautomate.example.com to the Primary Load Balancer.
+- DNS is configured to redirect chefinfraserver.example.com to the Primary Load Balancer.
+- Certificates are created and added for chefautomate.example.com, and chefinfraserver.example.com in the Load Balancers.
+
+
+
+
+
+
+
+The on-premise deployment specific pre-requisites are as follows:
+
 - All Virtual Machines or Machines are up and running.
 - OS Root Volume (/) must be at least 40 GB.
 - TMP space (/var/tmp) must be at least 5GB.
 - Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
-- A Common user has access to all machines.
-- This common user should have sudo privileges.
+- Create a common SSH user that has access to all the machines with sudo privileges.
+- The above SSH user should have the write access to `/hab` and `/temp` directory.
 - This common user uses the same SSH Private Key file to access all machines.
 - We only support local Linux users and local Linux groups.
 - We need to have private key authentications for all the VMs, and the private keys should be generated without any passphrases.
@@ -105,13 +141,7 @@ The on-premise deployment specific pre-requisites are as follows:
     sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
     ```
 
-- If the instance is **RedHat**, set SElinux config `enforcing` to `permissive` in all the nodes. SSH to each node, then run:
-
-    ```bash
-    sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
-    ```
-
-- The Chef Automate HA user gets the privilege to access the habitat directory. The Linux user should have a `/hab` and `/temp` directory.
+- The SElinux config should either be disabled or permissive.
 
 {{< warning >}}
 
