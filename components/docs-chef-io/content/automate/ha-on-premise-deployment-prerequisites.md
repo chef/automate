@@ -165,6 +165,15 @@ A security certificate is a small data file used as an Internet security techniq
 
 Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
 
+### Minimum Supported Chef Tool Versions
+
+- Infra Server
+- Habitat
+- Automate
+- Infra Client Supported
+- Chef Manage
+- Supermarket
+
 ### Backup and Restore
 
 On-premise deployment can use **Filesystem** and **Object Storage**. If you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
