@@ -100,7 +100,7 @@ require (
 	github.com/prometheus/client_golang v1.5.1
 	github.com/prometheus/procfs v0.0.11 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
-	github.com/russellhaering/goxmldsig v1.1.0 // indirect
+	github.com/russellhaering/goxmldsig v1.1.1 // indirect
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
 	github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c // indirect
 	github.com/sirupsen/logrus v1.8.1
