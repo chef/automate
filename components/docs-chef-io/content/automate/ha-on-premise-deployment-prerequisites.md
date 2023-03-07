@@ -17,10 +17,64 @@ gh_repo = "On-Premise Prerequisites"
 {{< /warning >}}
 
 {{< warning >}}
-The below prerequisites are according to our organizational standard. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the CAMs and our Customer Support Team.
+The below prerequisites are according to our organizational standard. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the customer success manager or account manager.
 {{< /warning >}}
 
 Before installing Chef automate HA in On-premise deployment mode, ensure you have taken a quick tour of this pre-requisite page.
+
+## Chef Automate Architecture
+
+We recommend using 11 node cluster for standard Automate HA on-premise deployment as detailed in the table below:
+
+| Service Type      | Count |
+|-------------------|-------|
+| Chef Automate     | 2     |
+| Chef Infra Server | 2     |
+| Postgresql DB     | 3     |
+| Opensearch DB     | 3     |
+| Bastion Machine   | 1     |
+
+Additionally, this topology requires 2 load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
+
+We recommend using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server. External Standalone Infra Server will violate this high availability requirement.
+
+## Software Requirements
+
+The software requirements of the nodes in the cluster and the other external Chef and non Chef tools will he discussed below:
+
+### Node Software Requirements
+
+The operating system and the supported version for different nodes in on-premise deployment of Automate HA is mentioned below:
+
+| Operating Systems                        | Supported Version         |
+| :--------------------------------------  | :-----------------------  |
+| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
+| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
+| Centos (64 Bit OS)                       | 7                         |
+| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
+| SUSE Linux Enterprise Server 12 SP5      | 12                        |
+
+{{< note >}} Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected. {{< /note >}}
+
+### Minimum Supported Chef Tool Versions
+
+Current Automate HA supports integration with following Chef tools:
+
+- Chef Infra Server version: 14.0.58+
+- Chef Inspec version: 4.3.2+
+- Chef Infra Client: 17.0.242+
+- Chef Habitat: 0.81+
+
+We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
+
+### External Supported Softwares
+
+Current Automate HA works with following non Chef tools:
+
+- PostgreSQL: 13.5
+- OpenSearch: 1.3.7
+- NGINX: 1.21.3
+- HA Proxy: 2.2.18
 
 ## Hardware Requirements
 
@@ -53,9 +107,7 @@ The machine requirements based on the above assumptions are listed below:
 | Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
 
 {{< note >}}
-
-- For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
-- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
+For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 {{< /note >}}
 
 ### Load Balancer
@@ -67,18 +119,6 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 - [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
 - [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
 
-## Software Requirements
-
-| Operating Systems                        | Supported Version         |
-| :--------------------------------------  | :-----------------------  |
-| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
-| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
-| Centos (64 Bit OS)                       | 7                         |
-| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
-| SUSE Linux Enterprise Server 12 SP5      | 12                        |
-
-{{< note >}} Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected. {{< /note >}}
-
 ## Deployment Specific Pre-requisites
 
 The on-premise deployment specific pre-requisites are as follows:
@@ -88,6 +128,8 @@ The on-premise deployment specific pre-requisites are as follows:
 - All Virtual Machines or Machines should be up and running.
 - We need a local user `hab` and local group `hab` linked together to complete the deployment process successfully.
 - If they are unavailable, the SSH user should have privileges to create local users and groups so that the deployment process can create the required local user `hab` and local group `hab`.
+<!-- We currently don't support AD managed users in nodes. We only support local Linux users. -->
+- The SElinux config should either be disabled or permissive.
 
 ### Storage Space
 
@@ -107,46 +149,13 @@ The on-premise deployment specific pre-requisites are as follows:
 
 - LoadBalancers should be setup according to [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/).
 - Network ports should be opened as per [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/).
-- DNS is configured to redirect chefautomate.example.com to the Primary Load Balancer.
-- DNS is configured to redirect chefinfraserver.example.com to the Primary Load Balancer.
-- Certificates are created and added for chefautomate.example.com, and chefinfraserver.example.com in the Load Balancers.
-
-
-
-
-
-
-
-The on-premise deployment specific pre-requisites are as follows:
-
-- All Virtual Machines or Machines are up and running.
-- OS Root Volume (/) must be at least 40 GB.
-- TMP space (/var/tmp) must be at least 5GB.
-- Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
-- Create a common SSH user that has access to all the machines with sudo privileges.
-- The above SSH user should have the write access to `/hab` and `/temp` directory.
-- This common user uses the same SSH Private Key file to access all machines.
-- We only support local Linux users and local Linux groups.
-- We need to have private key authentications for all the VMs, and the private keys should be generated without any passphrases.
-- We need a local hab user and local hab group to complete the deployment process successfully. If they are unavailable, the common user should have privileges to create local users and groups so that the deployment process can create the required local users and groups.
-- The provisioning users should use Key-based SSH on all the machines for HA-Deployment. Chef recommends you use an SSH key of size 2048 bits.
-- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
-- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
-- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
-- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
-- Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
-- If DNS is not used, add the records to `/etc/hosts` in all the machines, including Bastion:
-
-    ```bash
-    sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
-    ```
-
-- The SElinux config should either be disabled or permissive.
+- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
+- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
+- Domain Certificates should be created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
 
 {{< warning >}}
 
 - PLEASE DO NOT MODIFY THE WORKSPACE PATH. It should always be "/hab/a2_deploy_workspace"
-- We currently don't support AD managed users in nodes. We only support local Linux users.
 
 {{< /warning >}}
 
@@ -195,15 +204,6 @@ Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the on-p
 A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
 
 Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
-
-### Minimum Supported Chef Tool Versions
-
-- Chef Infra Server version: 14.0.58+
-- Chef Inspec version: 4.3.2+
-- Chef Infra Client: 17.0.242+
-- Chef Habitat: 0.81+
-
-We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
 
 ### Backup and Restore
 
