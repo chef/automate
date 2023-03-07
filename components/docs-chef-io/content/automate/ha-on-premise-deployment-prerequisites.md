@@ -116,8 +116,8 @@ LoadBalancers in on-premise deployment are set up according to [Chef Automate HA
 
 You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
-- [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
-- [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
+- [NGINX 1.21.3](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
+- [HA Proxy 2.2.18](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
 
 ## Deployment Specific Pre-requisites
 
@@ -145,7 +145,7 @@ The on-premise deployment specific pre-requisites are as follows:
 - This SSH user should have sudo privileges on all the machines.
 - The SSH user should use same SSH private key to access all machines.
 
-### Cluster setup
+### Cluster Setup
 
 - LoadBalancers should be setup according to [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/).
 - Network ports should be opened as per [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/).
@@ -161,7 +161,7 @@ The on-premise deployment specific pre-requisites are as follows:
 
 Click [here](/automate/ha_onprim_deployment_procedure/) to know more.
 
-### Firewall Checks
+## Firewall Checks
 
 The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be opened for each set of servers.
 
@@ -188,7 +188,7 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
 | TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
 
-### Disaster Recovery
+## Disaster Recovery
 
 The requirement to set up a recovery point objective is:
 
@@ -199,13 +199,13 @@ The requirement to set up a recovery point objective is:
 
 Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the on-premise deployment disaster recovery cluster.
 
-### Custom Certificates
+## Custom Certificates
 
 A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
 
 Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
 
-### Backup and Restore
+## Backup and Restore
 
 On-premise deployment can use **Filesystem** and **Object Storage** and if you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
 
@@ -220,7 +220,7 @@ To make sure the restore happens successfully, we need to:
 1. Make sure the same s3 repository is configured in HA.
 1. In the `--patch-config`, which we pass in the restore command, ensure that the config has the same basepath under `external.os` section and the `backup` section as its there in standalone
 
-### Upgrade
+## Upgrade
 
 Things to keep in mind while upgrading are:
 
@@ -228,20 +228,20 @@ Things to keep in mind while upgrading are:
 - Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
 
-### Config Updates
+## Config Updates
 
 Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
 
 Click [here](/automate/ha_config/#patch-configuration/) to learn how to patch the configs.
 
-### External Managed Databases
+## External Managed Databases
 
 | External Managed Database | PostgreSQL | OpenSearch |
 | ----- | ----- | ------ |
 | AWS Managed | AWS RDS Postgresql 13.5 | AWS OpenSearch 1.3 |
 | Customer Managed | Postgresql 13.5 | OpenSearch 1.3.7 |
 
-### Migration
+## Migration
 
 | Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
 |-----------------|---------------------------------|-----------|------------------------------| ----- | ----------------------- |
