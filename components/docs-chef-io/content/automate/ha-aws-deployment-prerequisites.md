@@ -154,6 +154,7 @@ The requirement to set up a recovery point objective is:
 - Two identical clusters located in different data centers or cloud provider regions.
 - Network accessible storage (NAS) and object store (S3), available in both data centers/regions
 - Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using **cron** or a tool like **anacron**.
+- The Primary cluster will be active and Disaster cluster will be in passive mode.
 
 Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the AWS deployment disaster recovery cluster.
 
