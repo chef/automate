@@ -118,6 +118,7 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
 - [NGINX 1.21.3](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
 - [HA Proxy 2.2.18](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
+- [AWS Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/)
 
 ## Firewall Checks
 
@@ -146,9 +147,13 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
 | TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
 
-## Custom Certificates
+## Certificates
 
-A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
+Certificate should be generated using recommended tools and supported algorithms and versions mentioned below:
+
+- OpenSSL: 1.0.2zb-fips
+- OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
+- Certificate Format: PKCS 8
 
 Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
 
