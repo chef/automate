@@ -119,6 +119,33 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 - [NGINX 1.21.3](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
 - [HA Proxy 2.2.18](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
 
+## Firewall Checks
+
+The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be opened for each set of servers.
+
+**Ports required for all Machines**
+
+| Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      | Load Balancer |
+|----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------| ---------- |
+| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
+| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 | TCP 443, 80 |
+
+{{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
+
+**Port usage definitions**
+
+| Protocol | Port Number | Usage                                                                                            |
+|----------|-------------|--------------------------------------------------------------------------------------------------|
+| TCP      | 22          | SSH to configure services                                                                        |
+| TCP      | 9631        | Habitat HTTP API                                                        |
+| TCP      | 443         | Allow Users to reach UI / API                                                                    |
+| TCP      | 80          | Optional, Allows users to redirect to 443                                                        |
+| TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
+| TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
+| TCP/UDP  | 9638        | Habitat gossip (UDP) |
+| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
+| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
+
 ## Deployment Specific Pre-requisites
 
 The on-premise deployment specific pre-requisites are as follows:
@@ -181,33 +208,6 @@ Things to keep in mind while upgrading are:
 Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
 
 Click [here](/automate/ha_config/#patch-configuration/) to learn how to patch the configs.
-
-## Firewall Checks
-
-The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be opened for each set of servers.
-
-**Ports required for all Machines**
-
-| Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      | Load Balancer |
-|----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------| ---------- |
-| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22       | TCP 443, 80 |
-| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 | TCP 443, 80 |
-
-{{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
-
-**Port usage definitions**
-
-| Protocol | Port Number | Usage                                                                                            |
-|----------|-------------|--------------------------------------------------------------------------------------------------|
-| TCP      | 22          | SSH to configure services                                                                        |
-| TCP      | 9631        | Habitat HTTP API                                                        |
-| TCP      | 443         | Allow Users to reach UI / API                                                                    |
-| TCP      | 80          | Optional, Allows users to redirect to 443                                                        |
-| TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
-| TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
-| TCP/UDP  | 9638        | Habitat gossip (UDP) |
-| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
-| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
 
 ## Disaster Recovery
 
