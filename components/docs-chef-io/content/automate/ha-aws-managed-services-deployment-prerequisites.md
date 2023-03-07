@@ -20,7 +20,7 @@ gh_repo = "AWS Managed Services Deployment Prerequisites"
 The below prerequisites are according to our organizational standard. If you use any specified version not mentioned here or a third-party extension or software, you can contact the CAMs and our Customer Support Team.
 {{< /warning >}}
 
-Before installing Chef automate HA on AWS managed services deployment, ensure you have taken a quick tour of this pre-requisite page.
+Before installing Chef automate HA in AWS managed services deployment mode, ensure you have taken a quick tour of this pre-requisite page.
 
 ## Hardware Requirements
 
@@ -88,8 +88,7 @@ The AWS Managed Services deployment specific pre-requisites are as follows:
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support dedicated subnets for each AZ.
 - We recommend creating a new VPC. And Bastion should be in the same VPC.
 - Set up AWS RDS Postgresql 13.5 in the same VPC where we have the basion and automate ha node to be created. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
-- Please refer to the [table](/automate/chef-automate-ha-prerequisites/#migration/) to identify the correct OpenSearch version to be installed.
-- Set up AWS OpenSearch with the identified version in the same VPC where we have the basion and automate ha node to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
+- Set up AWS OpenSearch of version 1.3 in the same VPC where we have the basion and automate ha node to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 - For Backup with Managed Service, we have only one option: ' Amazon S3`.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
@@ -175,11 +174,20 @@ A security certificate is a small data file used as an Internet security techniq
 
 Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
 
+### Minimum Supported Chef Tool Versions
+
+- Chef Infra Server version: 14.0.58+
+- Chef Inspec version: 4.3.2+
+- Chef Infra Client: 17.0.242+
+- Chef Habitat: 0.81+
+
+We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
+
 ### Backup and Restore
 
-AWS managed services deployment can use  **S3**. If you choose `backup_config` as the S3 in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_aws_s3/) to know more.
+AWS managed services deployment can use  **S3** and if you choose `backup_config` as the S3 in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_aws_s3/) to know more.
 
-For backup restoration from standalone to HA, there are two conditions:
+For backup and restore from standalone to HA, there are two conditions:
 
 1. Register the OS snapshot to the same path in HA as it was in standalone
 1. The s3 repository configured for backup in HA should be the same as standalone
@@ -194,7 +202,7 @@ To make sure the restore happens successfully, we need to:
 
 Things to keep in mind while upgrading are:
 
-- BackEnd upgrades will restart the backend service, which takes time for the cluster to be healthy.
+- Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
 

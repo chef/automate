@@ -20,7 +20,7 @@ gh_repo = "On-Premise Prerequisites"
 The below prerequisites are according to our organizational standard. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the CAMs and our Customer Support Team.
 {{< /warning >}}
 
-Before installing Chef automate HA on On-premise deployment, ensure you have taken a quick tour of this pre-requisite page.
+Before installing Chef automate HA in On-premise deployment mode, ensure you have taken a quick tour of this pre-requisite page.
 
 ## Hardware Requirements
 
@@ -168,18 +168,18 @@ Install an OpenSSL utility to create a self-signed key and certificate pair. Aut
 
 ### Minimum Supported Chef Tool Versions
 
-- Infra Server
-- Habitat
-- Automate
-- Infra Client Supported
-- Chef Manage
-- Supermarket
+- Chef Infra Server version: 14.0.58+
+- Chef Inspec version: 4.3.2+
+- Chef Infra Client: 17.0.242+
+- Chef Habitat: 0.81+
+
+We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
 
 ### Backup and Restore
 
-On-premise deployment can use **Filesystem** and **Object Storage**. If you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
+On-premise deployment can use **Filesystem** and **Object Storage** and if you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
 
-For backup restoration from standalone to HA, there are two conditions:
+For backup and restore from standalone to HA, there are two conditions:
 
 1. Register the OS snapshot to the same path in HA as in standalone.
 1. The s3 repository configured for backup in HA should be the same as the standalone.
@@ -188,13 +188,13 @@ To make sure the restore happens successfully, we need to:
 
 1. Delete the snapshots from the HA setup if it's different from the standalone.
 1. Make sure the same s3 repository is configured in HA.
-1. In the --patch-config, which we pass in the restore command, ensure that the config has the same basepath under external.os section and the backup section as its there in standalone
+1. In the `--patch-config`, which we pass in the restore command, ensure that the config has the same basepath under `external.os` section and the `backup` section as its there in standalone
 
 ### Upgrade
 
 Things to keep in mind while upgrading are:
 
-- BackEnd upgrades will restart the backend service, which takes time for the cluster to be healthy.
+- Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
 
@@ -203,6 +203,13 @@ Things to keep in mind while upgrading are:
 Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
 
 Click [here](/automate/ha_config/#patch-configuration/) to learn how to patch the configs.
+
+### External Managed Databases
+
+| External Managed Database | PostgreSQL | OpenSearch |
+| ----- | ----- | ------ |
+| AWS Managed | AWS RDS Postgresql 13.5 | AWS OpenSearch 1.3 |
+| Customer Managed | Postgresql 13.5 | OpenSearch 1.3.7 |
 
 ### Migration
 
