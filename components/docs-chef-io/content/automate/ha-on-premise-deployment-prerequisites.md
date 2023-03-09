@@ -266,4 +266,8 @@ If you have done any modification to the standard installation setup mentioned a
 
 ## Backup and Restore
 
-In On-premise deployment, we support **Network File System(NFS)** or **Object Storage(S3/MinIO)** for taking [backup](/automate/ha_backup_restore_file_system/).
+In On-premise deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_object_storage/) for taking backup.
+
+In AWS deployment of Automate HA, we support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+
+In AWS with Managed Services deployment of Automate HA, we support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
