@@ -20,7 +20,34 @@ gh_repo = "AWS Deployment Prerequisites"
 The below prerequisites are according to our organizational standard. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the CAMs and our Customer Support Team.
 {{< /warning >}}
 
-Before installing Chef automate HA in AWS deployment mode, ensure you have taken a quick tour of this pre-requisite page.
+Before installing Chef automate HA in AWS deployment mode, ensure you have taken a quick tour of this prerequisite page.
+
+## Software Requirements
+
+The software requirements of the nodes in the cluster and the other external Chef and non Chef tools will he discussed below:
+
+### Node Software Requirements
+
+The operating system and the supported version for different nodes in aws deployment of Automate HA is mentioned below:
+
+| Operating Systems                        | Supported Version         |
+| :--------------------------------------  | :-----------------------  |
+| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
+| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
+| Centos (64 Bit OS)                       | 7                         |
+| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
+| SUSE Linux Enterprise Server 12 SP5      | 12                        |
+
+{{< note >}} Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected. {{< /note >}}
+
+### Minimum Supported Chef Tool Versions
+
+Current Automate HA supports integration with following Chef tools:
+
+- Chef Infra Server version: 14.0.58+
+- Chef Inspec version: 4.3.2+
+- Chef Infra Client: 17.0.242+
+- Chef Habitat: 0.81+
 
 ## Hardware Requirements
 
@@ -67,17 +94,40 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 - [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
 - [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
 
-## Software Requirements
+## Firewall Checks
 
-| Operating Systems                        | Supported Version         |
-| :--------------------------------------  | :-----------------------  |
-| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
-| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
-| Centos (64 Bit OS)                       | 7                         |
-| Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
-| SUSE Linux Enterprise Server 12 SP5      | 12                        |
+The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. All the port configurations will be provisioned automatically.
 
-{{< note >}} Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected. {{< /note >}}
+**Ports required for Bastion**
+
+| Machines | Bastion |
+|----------|---------|
+| Incoming | TCP 22  |
+| Outgoing | TCP All |
+
+{{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
+
+**Port usage definitions**
+
+| Protocol | Port Number | Usage                                                                                            |
+|----------|-------------|--------------------------------------------------------------------------------------------------|
+| TCP      | 22          | SSH to configure services                                                                        |
+| TCP      | 9631        | Habitat HTTP API                                                        |
+| TCP      | 443         | Allow Users to reach UI / API                                                                    |
+| TCP      | 80          | Optional, Allows users to redirect to 443                                                        |
+| TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
+| TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
+| TCP/UDP  | 9638        | Habitat gossip (UDP) |
+| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
+| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
+
+We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
+
+## Certificates
+
+A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
+
+Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
 
 ## Deployment Specific Pre-requisites
 
@@ -120,34 +170,21 @@ The AWS deployment specific pre-requisites are as follows:
 
 Click [here](/automate/ha_aws_deploy_steps/) to know more.
 
-### Firewall Checks
+## Upgrade
 
-The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. All the port configurations will be provisioned automatically.
+Things to keep in mind while upgrading are:
 
-**Ports required for Bastion**
+- Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
+- Upgrade command currently supports only minor upgrades.
+- A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
 
-| Machines | Bastion |
-|----------|---------|
-| Incoming | TCP 22  |
-| Outgoing | TCP All |
+## Config Updates
 
-{{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
+Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
 
-**Port usage definitions**
+Click [here](/automate/ha_config/#patch-configuration/) to learn more about how to patch the configs.
 
-| Protocol | Port Number | Usage                                                                                            |
-|----------|-------------|--------------------------------------------------------------------------------------------------|
-| TCP      | 22          | SSH to configure services                                                                        |
-| TCP      | 9631        | Habitat HTTP API                                                        |
-| TCP      | 443         | Allow Users to reach UI / API                                                                    |
-| TCP      | 80          | Optional, Allows users to redirect to 443                                                        |
-| TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
-| TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
-| TCP/UDP  | 9638        | Habitat gossip (UDP) |
-| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
-| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
-
-### Disaster Recovery
+## Disaster Recovery
 
 The requirement to set up a recovery point objective is:
 
@@ -158,22 +195,17 @@ The requirement to set up a recovery point objective is:
 
 Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the AWS deployment disaster recovery cluster.
 
-### Custom Certificates
+## Migration
 
-A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
+| Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
+|-----------------|---------------------------------|-------|------------------------------| ----- | ----------------------- |
+| Chef Automate | Automate 2020XXXXXX |    |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
+| Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
+| Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
+| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
+| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
 
-Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
-
-### Minimum Supported Chef Tool Versions
-
-- Chef Infra Server version: 14.0.58+
-- Chef Inspec version: 4.3.2+
-- Chef Infra Client: 17.0.242+
-- Chef Habitat: 0.81+
-
-We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
-
-### Backup and Restore
+## Backup and Restore
 
 On-premise deployment can use **Filesystem** and **Object Storage** and if you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
 
@@ -186,28 +218,4 @@ To make sure the restore happens successfully, we need to:
 
 1. Delete the snapshots from the HA setup if it's different from the standalone.
 1. Make sure the same s3 repository is configured in HA.
-1. In the `--patch-config`, which we pass in the restore command, ensure that the config has the same basepath under `external.os` section and the `backup` section as its there in standalone
-
-### Upgrade
-
-Things to keep in mind while upgrading are:
-
-- Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
-- Upgrade command currently supports only minor upgrades.
-- A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
-
-### Config Updates
-
-Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
-
-Click [here](/automate/ha_config/#patch-configuration/) to learn more about how to patch the configs.
-
-### Migration
-
-| Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
-|-----------------|---------------------------------|-------|------------------------------| ----- | ----------------------- |
-| Chef Automate | Automate 2020XXXXXX |    |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
-| Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
-| Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
-| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
-| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
+1. In the `--patch-config`, which we pass in the restore command, ensure that the config has the same basepath under `external.os` section and the `backup` section as its there in standalone.
