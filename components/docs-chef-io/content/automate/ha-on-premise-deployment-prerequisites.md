@@ -20,7 +20,7 @@ gh_repo = "On-Premise Prerequisites"
 The below prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
 {{< /warning >}}
 
-Before installing Chef automate HA in On-premise deployment mode, ensure you have taken a quick tour of this pre-requisite page.
+Before installing Chef automate HA in On-premise deployment mode, ensure you have taken a quick tour of this prerequisite page.
 
 ## Chef Automate Architecture
 
@@ -110,7 +110,7 @@ For production, OpenSearch volume size also depends on the number of nodes and f
 
 ### Load Balancer
 
-LoadBalancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
+Load Balancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/).
 
 You can set up your [load balancer](/automate/loadbalancer_configuration/) using:
 
@@ -159,7 +159,7 @@ Generate the certificates using recommended tools and supported algorithms and v
 - OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
 - Certificate Format: PKCS 8
 
-To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) Documentation.
+To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
 
 ## Deployment Specific Pre-requisites
 
@@ -179,9 +179,9 @@ The on-premise deployment specific pre-requisites are as follows:
 
 ### Storage Space
 
-- Operating System Root Volume (`/`) must be at least 40 GB. Temporary space (`/var/tmp`) must be at least 5GB.
+- Operating System Root Volume (`/`) must be at least 40GB. Temporary space (`/var/tmp`) must be at least 5GB.
 - Separate Hab volume should be provisioned and mounted at `/hab` with at least 100GB free space for all nodes except OpenSearch.
-- For OpenSearch nodes, hab volume should be calculated based on the data retention policy, and use the  [hardware calculator](/calculator/automate_ha_hardware_calculator.xlsx) for estimation.
+- For OpenSearch nodes, /hab volume should be calculated based on the data retention policy, and use the  [hardware calculator](/calculator/automate_ha_hardware_calculator.xlsx) for estimation.
 
 ### SSH User
 
@@ -201,7 +201,7 @@ The on-premise deployment specific pre-requisites are as follows:
 
 ### Config Changes
 
-- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application might result in downtime. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything.
+- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application might result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
 - [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
 
 To learn more about the above deployment, visit our [on-premise deployment](/automate/ha_onprim_deployment_procedure/) page.
