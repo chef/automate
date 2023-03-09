@@ -247,11 +247,11 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 
 ### Common Notes
 
-Migrations involve downtime depending on how much data you have and the type of setup you are running.
+- Migrations involve downtime depending on how much data you have and the type of setup you are running.
 
-Migration can only happen from one Standalone Automate, Infra Server, or Chef Backend to Automate HA cluster.
+- Migration can only happen from one Standalone Automate, Infra Server, or Chef Backend to Automate HA cluster.
 
-Automate HA will always have Chef Automate running in the cluster.
+- Automate HA will always have Chef Automate running in the cluster.
 
 | Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Not Supported Use Cases |
 |-----------------|----------------------|---------------------------------|-----------|------------------------------| ----------------------- |
