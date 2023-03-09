@@ -249,14 +249,25 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 
 Migrations involve downtime depending on how much data you have and the type of setup you are running.
 
-| Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
-|-----------------|---------------------------------|-----------|------------------------------| ----- | ----------------------- |
-| Chef Automate | Automate 2020XXXXXX |    |   | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. | Migration of 2 or more Chef Infra Servers to a single Automate HA is not supported. |
-| Chef Backend | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 |    | Irrespective of whether you use Chef Automate, Chef Automate will run in Automate HA cluster. |  Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. <br /> Migration of 2 or more Chef Backends to a single Automate HA is not supported. |
-| Chef Infra Server | Infra server 14.XXX | Chef Infra Server 15.4.0 |    | Irrespective of whether you use Chef Automate, Chef Automate will run in Automate HA cluster. |  Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br /> Migration of 2 or more Chef Infra Server to a single Automate HA is not supported. |
-| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster. |    |    |
-| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A2HA should be configured to take backup on a mounted network drive. <br />The volume having `/hab` should have more than 60% free space on each node. |    |    |
+Migration can only happen from one Standalone Automate or Infra Server  or Chef Backend to Automate HA cluster. 
+
+Automate HA will have Chef Automate running in the cluster, even if it is not required.
+
+| Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Not Supported Use Cases |
+|-----------------|----------------------|---------------------------------|-----------|------------------------------| ----------------------- |
+| Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. | Migration of 2 or more Chef Infra Servers to a single Automate HA is not supported. |
+| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. <br /> Migration of 2 or more Chef Backends to a single Automate HA is not supported. |
+| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br /> Migration of 2 or more Chef Infra Server to a single Automate HA is not supported. |
+| A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |    |
+
+{{< note >}}
+If you have done any modification to the standard installation setup mentioned above, we do not support migration to Automate HA.
+{{< /note >}}
 
 ## Backup and Restore
 
 In On-premise deployment, we support **Network File System(NFS)** or **Object Storage(S3/MinIO)** for taking [backup](/automate/ha_backup_restore_file_system/).
+
+
+
+
