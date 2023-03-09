@@ -249,9 +249,9 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 
 Migrations involve downtime depending on how much data you have and the type of setup you are running.
 
-Migration can only happen from one Standalone Automate or Infra Server  or Chef Backend to Automate HA cluster. 
+Migration can only happen from one Standalone Automate, Infra Server, or Chef Backend to Automate HA cluster.
 
-Automate HA will have Chef Automate running in the cluster, even if it is not required.
+Automate HA will always have Chef Automate running in the cluster.
 
 | Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Not Supported Use Cases |
 |-----------------|----------------------|---------------------------------|-----------|------------------------------| ----------------------- |
@@ -267,7 +267,3 @@ If you have done any modification to the standard installation setup mentioned a
 ## Backup and Restore
 
 In On-premise deployment, we support **Network File System(NFS)** or **Object Storage(S3/MinIO)** for taking [backup](/automate/ha_backup_restore_file_system/).
-
-
-
-

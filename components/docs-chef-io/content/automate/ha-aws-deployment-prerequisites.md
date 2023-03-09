@@ -17,7 +17,7 @@ gh_repo = "AWS Deployment Prerequisites"
 {{< /warning >}}
 
 {{< warning >}}
-The below prerequisites are according to our organizational standard. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the CAMs and our Customer Support Team.
+The below prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
 {{< /warning >}}
 
 Before installing Chef automate HA in AWS deployment mode, ensure you have taken a quick tour of this prerequisite page.
