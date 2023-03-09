@@ -207,15 +207,6 @@ Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the AWS 
 
 ## Backup and Restore
 
-On-premise deployment can use **Filesystem** and **Object Storage** and if you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
+In AWS deployment of Automate HA, we support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
 
-For backup and restore from standalone to HA, there are two conditions:
-
-1. Register the OS snapshot to the same path in HA as in standalone.
-1. The s3 repository configured for backup in HA should be the same as the standalone.
-
-To make sure the restore happens successfully, we need to:
-
-1. Delete the snapshots from the HA setup if it's different from the standalone.
-1. Make sure the same s3 repository is configured in HA.
-1. In the `--patch-config`, which we pass in the restore command, ensure that the config has the same basepath under `external.os` section and the `backup` section as its there in standalone.
+In AWS with Managed Services deployment of Automate HA, we support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
