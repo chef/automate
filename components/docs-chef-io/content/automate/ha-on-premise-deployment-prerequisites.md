@@ -267,4 +267,3 @@ If you have done any modification to the standard installation setup mentioned a
 ## Backup and Restore
 
 In On-premise deployment of Automate HA, we support [**Network File System (NFS)**](/automate/ha_backup_restore_file_system/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_object_storage/) for taking backup.
-
