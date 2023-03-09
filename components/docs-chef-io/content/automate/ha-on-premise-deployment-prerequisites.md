@@ -17,7 +17,7 @@ gh_repo = "On-Premise Prerequisites"
 {{< /warning >}}
 
 {{< warning >}}
-The below prerequisites are according to our organizational standard. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the customer success manager or account manager.
+The below prerequisites are according to the standard Chef Automate HA setup. If you are using any specified version not mentioned here or a third-party extension or software, you can reach out to the customer success manager or account manager.
 {{< /warning >}}
 
 Before installing Chef automate HA in On-premise deployment mode, ensure you have taken a quick tour of this pre-requisite page.
@@ -53,8 +53,6 @@ The operating system and the supported version for different nodes in on-premise
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server 12 SP5      | 12                        |
-
-{{< note >}} Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected. {{< /note >}}
 
 ### Minimum Supported Chef Tool Versions
 
@@ -126,11 +124,13 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 
 **Ports required for all Machines**
 
-| Incoming      | Chef Automate  | Chef Infra Server | Postgresql                          | OpenSearch                           | Bastion | Load Balancer |
+The first column represents the source of the connection and all the other columns represents the destination with the matrix value as port number which needs to be opened on source and destination.
+
+|               | Chef Automate  | Chef Infra Server | Postgresql                          | OpenSearch                           | Bastion | Load Balancer |
 |---------------|----------------|-------------------|-------------------------------------|--------------------------------------|---------| ------------- |
 | Chef Automate |                |                   | 7432                                | 9200                                 |         |               |
 | Infra Server  | 443            |                   | 7432                                | 9200                                 |         |               |
-| PostgreSQL    |                |                   | 9631, 7432, 5432, 9638<br/>UDP 9638 |                                      |         |               |
+| PostgreSQL    |                |                   | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |               |
 | OpenSearch    |                |                   |                                     | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |               |
 | Bastion       | 22, 9631, 9638 | 22, 9631, 9638    | 22, 9631, 9638, 7432                | 22, 9631, 9638, 9200                 |         | 22            |
 | Load Balancer | 443, 80        | 443, 80           |                                     |                                      |         |               |
@@ -165,6 +165,10 @@ To understand how to generate certificates refer the [Certificate Generation](/a
 
 The on-premise deployment specific pre-requisites are as follows:
 
+### Infra Server
+
+- Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected.
+
 ### Access
 
 - All Virtual Machines or Machines should be up and running.
@@ -182,7 +186,7 @@ The on-premise deployment specific pre-requisites are as follows:
 ### SSH User
 
 - SSH user should use key based SSH login without passphrase.
-- The user's SSH key should be generated using algorithm `ed25519` and `RSA(2048)`without passphrase.
+- The user's SSH key should be generated using algorithm `ed25519` and `RSA(2048)` without passphrase.
 - This SSH user should be local Linux user on all the machines.
 - This SSH user should have sudo privileges on all the machines.
 - The SSH user should use same SSH private key to access all machines.
@@ -195,20 +199,26 @@ The on-premise deployment specific pre-requisites are as follows:
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
 - Domain Certificates should be created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
 
-{{< warning >}}
+### Config Changes
 
-- PLEASE DO NOT MODIFY THE WORKSPACE PATH. It should always be "/hab/a2_deploy_workspace"
+- [Config Patch](/automate/ha_config/#patch-configuration/) in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything.
+- [Certificate Rotation](/automate/ha_cert_rotation/) will also change the configuration of the system which will lead to restarting the whole application.
 
-{{< /warning >}}
-
-Click [here](/automate/ha_onprim_deployment_procedure/) to know more.
+To know more about the above deployment, visit to our [on-premise deployment](/automate/ha_onprim_deployment_procedure/) page.
 
 ## External Managed Databases
 
-| External Managed Database | PostgreSQL | OpenSearch |
-| ----- | ----- | ------ |
-| AWS Managed | AWS RDS Postgresql 13.5 | AWS OpenSearch 1.3 |
-| Customer Managed | Postgresql 13.5 | OpenSearch 1.3.7 |
+The databases should be setup with password based authentication.
+
+### AWS Managed
+
+- AWS RDS PostgreSQL: 13.5
+- AWS OpenSearch: 1.3
+
+### Customer Managed
+
+- PostgreSQL: 13.5
+- OpenSearch: 1.3.7
 
 ## Upgrade
 
@@ -217,45 +227,36 @@ Things to keep in mind while upgrading are:
 - Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
-
-## Config Updates
-
-Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
-
-Click [here](/automate/ha_config/#patch-configuration/) to learn how to patch the configs.
+- Currently, rolling upgrades are not supported.
 
 ## Disaster Recovery
 
-The requirement to set up a recovery point objective is:
+Chef Automate HA supports disaster recovery in active/passive mode. The primary cluster will be in active mode and disaster recovery cluster will be in passive mode.
+
+Active/Active Disaster Recovery is not supported right now as we do not support streaming of data across clusters and automatic failover switching of clusters.
+
+The requirements for disaster recovery setup (Active/Passive) are:
 
 - Two identical clusters located in different data centers or cloud provider regions.
-- Network accessible storage (NAS) and object store (S3), available in both data centers/regions
-- Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using **cron** or a tool like **anacron**.
-- The Primary cluster will be active and Disaster cluster will be in passive mode.
+- Either Network Attached Storage (NAS) or Object Store (S3) should be available in both data centers/regions.
+- Setup scheduled jobs to run backup and restore commands on both the clusters. We recommend using **cron** to schedule the jobs.
 
-Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the on-premise deployment disaster recovery cluster.
+To know more about the on-premise deployment disaster recovery, visit to our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
 
 ## Migration
 
+### Common Notes
+
+- Migrations involve downtime depending on how much data you have and type of setup you are running.
+
 | Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
 |-----------------|---------------------------------|-----------|------------------------------| ----- | ----------------------- |
-| Chef Automate | Automate 2020XXXXXX |    |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
-| Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
-| Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
-| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
-| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
+| Chef Automate | Automate 2020XXXXXX |    |   | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should not be more than 4.3.0. | Migration of 2 or more Chef Infra Servers to single Automate HA is not supported. <br /> Migration of 2 or more Chef Infra Servers to single Automate HA is not supported. |
+| Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use Chef Automate or not, Chef Automate will be running in Automate HA cluster. |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. <br /> Migration of 2 or more Chef Backend to single Automate HA is not supported. |
+| Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use Chef Automate or not, Chef Automate will be running in Automate HA cluster. |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. <br /> Migration of 2 or more Chef Infra Server to single Automate HA is not supported. |
+| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster mounted backup file system should also be attached to Automate HA cluster. |    |    |
+| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A2HA should be configured to take backup on a mounted network drive. <br />The volume having `/hab` should have more than 60% free space on each node. |    |    |
 
 ## Backup and Restore
 
-On-premise deployment can use **Filesystem** and **Object Storage** and if you choose `backup_config` as the filesystem or object storage in your `config.toml` file, the backup gets configured during the deployment. If the `backup_config` is left black, configure it manually. Click [here](/automate/ha_backup_restore_file_system/) to know more.
-
-For backup and restore from standalone to HA, there are two conditions:
-
-1. Register the OS snapshot to the same path in HA as in standalone.
-1. The s3 repository configured for backup in HA should be the same as the standalone.
-
-To make sure the restore happens successfully, we need to:
-
-1. Delete the snapshots from the HA setup if it's different from the standalone.
-1. Make sure the same s3 repository is configured in HA.
-1. In the `--patch-config`, which we pass in the restore command, ensure that the config has the same basepath under `external.os` section and the `backup` section as its there in standalone.
+In On-premise deployment, we support **Network File System(NFS)** or **Object Storage(S3/MinIO)** for taking [backup](/automate/ha_backup_restore_file_system/).
