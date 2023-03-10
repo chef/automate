@@ -293,4 +293,5 @@ To know more about the aws deployment disaster recovery, visit our [Disaster Rec
 
 ## Backup and Restore
 
-In AWS deployment of Automate HA, we support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- For AWS deployment of Automate HA, we support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- For AWS Managed Services deployment of Automate HA, we only support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
