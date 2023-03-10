@@ -152,7 +152,7 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
 | TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
 
-## Certificates ??? DURGA
+## Certificates
 
 Generate the certificates using recommended tools and supported algorithms and versions mentioned below:
 
