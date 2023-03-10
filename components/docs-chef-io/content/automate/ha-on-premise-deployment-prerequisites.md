@@ -174,7 +174,7 @@ The on-premise deployment specific pre-requisites are as follows:
 - All Virtual Machines or Machines should be up and running.
 - We need a local user `hab` and local group `hab` linked together to complete the deployment process successfully.
 - If they are unavailable, the SSH user should have privileges to create local users and groups so that the deployment process can create the required local user `hab` and local group `hab`.
-<!-- We currently don't support AD managed users in nodes. We only support local Linux users. -->
+- We currently don't support AD managed users in nodes for Installation flow. We only support local Linux users and groups.
 - The SElinux config should either be disabled or permissive.
 
 ### Storage Space
@@ -198,6 +198,7 @@ The on-premise deployment specific pre-requisites are as follows:
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
 - Domain Certificates should be created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
+- We expect customer to have all the Cluster related items ready before deployment. Things like Load Balancer, Ports and DNS with certificates to be setup by customer experts.
 
 ### Config Changes
 
@@ -215,6 +216,8 @@ Set up the databases with password-based authentication.
 - AWS RDS PostgreSQL: 13.5
 - AWS OpenSearch: 1.3
 
+Backup should be configured with only **S3** when using AWS managed databases. 
+
 ### Customer Managed
 
 - PostgreSQL: 13.5
@@ -227,7 +230,7 @@ Things to keep in mind while upgrading are:
 - Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
-- Currently, rolling upgrades are not supported.
+- Rolling upgrades are not supported.
 
 ## Disaster Recovery
 
@@ -249,19 +252,22 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 
 - Migrations involve downtime depending on how much data you have and the type of setup you are running.
 
-- Migration can only happen from one Standalone Automate, Infra Server, or Chef Backend to Automate HA cluster.
+- Migration cannot be done from more than 1 Standalone Automate or more than 1 Standalone Infra Server, or more than 1 Chef Backend to Single Automate HA cluster.
 
-- Automate HA will always have Chef Automate running in the cluster.
+- Automate HA will always have Chef Automate and Chef Infra Server running in the cluster.
 
-| Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Not Supported Use Cases |
-|-----------------|----------------------|---------------------------------|-----------|------------------------------| ----------------------- |
-| Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. | Migration of 2 or more Chef Infra Servers to a single Automate HA is not supported. |
-| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. <br /> Migration of 2 or more Chef Backends to a single Automate HA is not supported. |
-| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br /> Migration of 2 or more Chef Infra Server to a single Automate HA is not supported. |
-| A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |    |
+- Chef Manage, or Private Chef Supermarket customers should not migrate to Automate HA.
+
+| Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | 
+|-----------------|----------------------|---------------------------------|-----------|------------------------------|
+| Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. |
+| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 |    | 
+| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. |
+| A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
 {{< note >}}
-If you have done any modification to the standard installation setup mentioned above, we do not support migration to Automate HA.
+If you have done any modification to the standard installation setup mentioned above, we do not support migration to Automate HA.<br />
+We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system level changes like ports, system users, groups may conflict with successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higer downtime or loss of existing setup.
 {{< /note >}}
 
 ## Backup and Restore
