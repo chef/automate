@@ -22,6 +22,22 @@ The below prerequisites are according to the standard Chef Automate HA setup. Yo
 
 Before installing Chef automate HA in AWS deployment mode, ensure you have taken a quick tour of this prerequisite page.
 
+## Chef Automate Architecture
+
+We recommend using 11 node cluster for standard Automate HA aws deployment, as detailed in the table below:
+
+| Service Type      | Count |
+|-------------------|-------|
+| Chef Automate     | 2     |
+| Chef Infra Server | 2     |
+| Postgresql DB     | 3     |
+| Opensearch DB     | 3     |
+| Bastion Machine   | 1     |
+
+Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
+
+We recommend using Chef Infra Server managed by Automate HA to have high availability for both Automate and Infra Server. External Standalone Infra Server will violate this high availability requirement.
+
 ## Software Requirements
 
 The software requirements of the nodes in the cluster and the other external Chef and non Chef tools will he discussed below:
@@ -38,8 +54,6 @@ The operating system and the supported version for different nodes in aws deploy
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server 12 SP5      | 12                        |
 
-{{< note >}} Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected. {{< /note >}}
-
 ### Minimum Supported Chef Tool Versions
 
 Current Automate HA supports integration with following Chef tools:
@@ -49,11 +63,13 @@ Current Automate HA supports integration with following Chef tools:
 - Chef Infra Client: 17.0.242+
 - Chef Habitat: 0.81+
 
+We do not support **Chef Manage** and **Supermarket** integration in the ongoing Automate version.
+
 ## Hardware Requirements
 
 {{< note >}} Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case. {{< /note >}}
 
-We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below is just based on the tested **assumptions** and has no exact value.
+We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below shows the tested **assumptions** and has no exact value.
 
 You can use the below assumptions in the calculator to drive into your hardware requirement:
 
@@ -79,11 +95,7 @@ The machine requirements based on the above assumptions are listed below:
 | Opensearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
 | Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
 
-{{< note >}}
-
-- For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
-- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
-{{< /note >}}
+{{< note >}} For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. {{< /note >}}
 
 ### Load Balancer
 
@@ -93,10 +105,11 @@ You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
 
 - [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
 - [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
+- [AWS Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/)
 
 ## Firewall Checks
 
-The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. All the port configurations will be provisioned automatically.
+The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic.
 
 **Ports required for Bastion**
 
@@ -121,18 +134,53 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
 | TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
 
-We do not support **Chef Manage** and **Supermarket** integration in ongoing Automate version.
+## Certificates ???
 
-## Certificates
+Generate the certificates using recommended tools and supported algorithms and versions mentioned below:
 
-A security certificate is a small data file used as an Internet security technique to establish a website or web application's identity, authenticity, and reliability. To ensure optimal security, rotate the certificates periodically.
+- OpenSSL: 1.0.2zb-fips
+- OpenSSL Algorithms: PBE-SHA1-3DES, RSA (2048), SHA-256
+- Certificate Format: PKCS 8
 
-Install an OpenSSL utility to create a self-signed key and certificate pair. Automate HA supports SSL certificates of type **PKCS 8**. Click [here](/automate/ha_cert_selfsign/#creating-a-certificate) to generate your certificate.
+To understand how to generate certificates, refer to the [Certificate Generation](/automate/ha_cert_selfsign/#creating-a-certificate) documentation.
 
-## Deployment Specific Pre-requisites
+## Deployment Specific Pre-requisites ???
 
 The AWS deployment specific pre-requisites are as follows:
 
+### Infra Server
+
+### Access
+
+- Create the Virtual Private Cloud (VPC) should with an internet gateway attached in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
+- If you want to use Default VPC, we must create public and private subnets. If the subnet is not available. Please refer [to this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
+- We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support dedicated subnets for each AZ.
+- We recommend creating a new vpc. And Bastion should be in the same VPC.
+
+### Storage Space
+
+### SSH User
+
+- Have SSH Key Pair ready in AWS, creating new VMs using that pair.
+    Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
+- We do not support passphrases for Private Key authentication.
+- Preferred key type will be ed25519.
+
+### Cluster Setup
+
+- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
+    Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
+- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
+- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
+
+### Config Changes
+
+- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application might result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
+- [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
+
+To learn more about the above deployment, visit our [on-premise deployment](/automate/ha_onprim_deployment_procedure/) page.
+
+<!--
 - Create the Virtual Private Cloud (VPC) should with an internet gateway attached in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC, we must create public and private subnets. If the subnet is not available. Please refer [to this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support dedicated subnets for each AZ.
@@ -161,6 +209,8 @@ The AWS deployment specific pre-requisites are as follows:
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
 
+-->
+
 {{< warning >}}
 
 - PLEASE DO NOT MODIFY THE WORKSPACE PATH. It should always be "/hab/a2_deploy_workspace"
@@ -168,7 +218,9 @@ The AWS deployment specific pre-requisites are as follows:
 
 {{< /warning >}}
 
-Click [here](/automate/ha_aws_deploy_steps/) to know more.
+To learn more about the above deployment, visit our [on-premise deployment](/automate/ha_onprim_deployment_procedure/) page.
+
+## External Managed Databases ???
 
 ## Upgrade
 
@@ -177,36 +229,42 @@ Things to keep in mind while upgrading are:
 - Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
 - A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
-
-## Config Updates
-
-Patching something in the application might result in downtime of the whole application. For example, if you change or update something in OpenSearch or Postgres, they will restart, resulting in restarting everything in the front end.
-
-Click [here](/automate/ha_config/#patch-configuration/) to learn more about how to patch the configs.
+- Currently, rolling upgrades are not supported. **?????**
 
 ## Disaster Recovery
 
-The requirement to set up a recovery point objective is:
+Chef Automate HA supports disaster recovery in active/passive mode. The primary cluster will be in active mode, and the disaster recovery cluster will be in passive mode.
+
+Active/Active Disaster Recovery is not supported right now as we do not support streaming of data across clusters and automatic failover switching of clusters.
+
+The requirements for disaster recovery setup (Active/Passive) are:
 
 - Two identical clusters located in different data centers or cloud provider regions.
-- Network accessible storage (NAS) and object store (S3), available in both data centers/regions
-- Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using **cron** or a tool like **anacron**.
-- The Primary cluster will be active and Disaster cluster will be in passive mode.
+- Network Attached Storage (NAS) or Object Store (S3) should be available in both data centers/regions.
+- Set up scheduled jobs to run backup and restore commands on both clusters. We recommend using **cron** to schedule the jobs.
 
-Click [here](/automate/ha_disaster_recovery_setup/) to learn more about the AWS deployment disaster recovery cluster.
+To know more about the on-premise deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
 
 ## Migration
+### Common Notes
 
-| Existing System | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Notes | Not Supported Use Cases |
-|-----------------|---------------------------------|-------|------------------------------| ----- | ----------------------- |
-| Chef Automate | Automate 2020XXXXXX |    |   | Migrations involve downtime depending on data and the setup. | Chef Automate users running Chef Infra Server in external mode should not migrate to Automate HA. |
-| Chef Backend | Backend 2.x and Infra Server 14.x |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. |
-| Chef Infra Server | Infra server 14.xxx |   |    | Irrespective of whether you use to automate or not, automate nodes will be actively running in automate HA cluster |  Chef Manage or Private Chef Supermarket with Chef Backend should not migrate with this. Automate HA does not support supermarket authentication with chef-server user credentials. |
-| A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | Your machine should be able to mount the file system, which was mounted to the A2HA cluster for backup purposes, to Automate HA. Configure the A2HA to take backup on a mounted network drive (location example: /mnt/automate_backup). | Migrations involve downtime depending on data and the setup |    |
-| In-Place A2HA | Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | A healthy state of the A2HA cluster to take fresh backup. A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup). Availability of 60% of space. | Migrations involve downtime depending on data and the setup |    |
+- Migrations involve downtime depending on how much data you have and the type of setup you are running.
+
+- Migration can only happen from one Standalone Automate, Infra Server, or Chef Backend to Automate HA cluster.
+
+- Automate HA will always have Chef Automate running in the cluster.
+
+| Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration | Not Supported Use Cases |
+|-----------------|----------------------|---------------------------------|-----------|------------------------------| ----------------------- |
+| Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. | Migration of 2 or more Chef Infra Servers to a single Automate HA is not supported. |
+| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. <br /> Migration of 2 or more Chef Backends to a single Automate HA is not supported. |
+| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br /> Migration of 2 or more Chef Infra Server to a single Automate HA is not supported. |
+| A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |    |
+
+{{< note >}}
+If you have done any modification to the standard installation setup mentioned above, we do not support migration to Automate HA.
+{{< /note >}}
 
 ## Backup and Restore
 
 In AWS deployment of Automate HA, we support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
-
-In AWS with Managed Services deployment of Automate HA, we support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
