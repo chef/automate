@@ -266,8 +266,10 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 | A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
 {{< note >}}
-Suppose you have done any modification to the standard installation setup mentioned above. In that case, we do not support migration to Automate HA.
-We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system level changes like ports, system users, and groups may conflict with the successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higher downtime or loss of existing setup.
+
+- Suppose you have done any modification to the standard installation setup mentioned above. In that case, we do not support migration to Automate HA.
+- We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system level changes like ports, system users, and groups may conflict with the successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higher downtime or loss of existing setup.
+
 {{< /note >}}
 
 ## Backup and Restore
