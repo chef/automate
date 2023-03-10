@@ -175,7 +175,7 @@ The AWS deployment specific pre-requisites are as follows:
 - Specifically for AWS Managed Services, set up [AWS RDS Postgresql](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC where we have the basion and automate ha node to be created.
 - Specifically for AWS Managed Services, set up [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC where we have the basion and automate ha node to be created.
 - Specifically for AWS Managed Services, the bastion machine should be in the same vpc as mentioned in `config.toml`, or else do [VPC peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
-- Specifically for AWS Managed Services, use a subnet-id in `config.toml` instead of CIDR block, to avoid the subnet conflict.
+- Specifically for AWS Managed Services, use a subnet-id in `config.toml` instead of a CIDR block to avoid the subnet conflict.
 
 ### Infra Server
 
@@ -199,7 +199,7 @@ The AWS deployment specific pre-requisites are as follows:
     ```
 
 - For Backup with [Managed Service](/automate/managed_services/#enabling-opensearch-backup-restore), we have only one option: `Amazon S3`.
-- Currently we only support local Linux users and groups for Installation flow. We don't support AD managed users in nodes.
+- We only support local Linux users and groups for Installation flow. We don't support AD managed users in nodes.
 - Specifically for AWS Managed Services, create the below attributes by following [this document.](/automate/managed_services/#enabling-opensearch-backup-restore)
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
@@ -287,7 +287,7 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 {{< note >}}
 
 - Suppose you have done any modification to the standard installation setup mentioned above. In that case, we do not support migration to Automate HA.
-- We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system level changes like ports, system users, and groups may conflict with the successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higher downtime or loss of existing setup.
+- We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system levels change as ports, system users, and groups may conflict with the successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higher downtime or loss of the existing setup.
 
 {{< /note >}}
 
