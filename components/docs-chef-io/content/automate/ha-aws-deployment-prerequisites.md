@@ -40,11 +40,11 @@ We recommend using Chef Infra Server managed by Automate HA to have high availab
 
 ## Software Requirements
 
-The software requirements of the nodes in the cluster and the other external Chef and non Chef tools will he discussed below:
+The software requirements of the nodes in the cluster and other external Chef and non Chef tools are discussed below:
 
 ### Node Software Requirements
 
-The operating system and the supported version for different nodes in aws deployment of Automate HA is mentioned below:
+The operating system and the supported version for different nodes in aws deployment of Automate HA are mentioned below:
 
 | Operating Systems                        | Supported Version         |
 | :--------------------------------------  | :-----------------------  |
@@ -56,7 +56,7 @@ The operating system and the supported version for different nodes in aws deploy
 
 ### Minimum Supported Chef Tool Versions
 
-Current Automate HA supports integration with following Chef tools:
+Current Automate HA supports integration with the following Chef tools:
 
 - Chef Infra Server version: 14.0.58+
 - Chef Inspec version: 4.3.2+
