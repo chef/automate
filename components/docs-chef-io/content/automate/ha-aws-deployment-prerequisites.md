@@ -224,7 +224,7 @@ The AWS deployment specific pre-requisites are as follows:
 - [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application might result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
 - [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
 
-To learn more about the above deployment, visit our [on-premise deployment](/automate/ha_aws_deploy_steps/) page.
+To learn more about the above deployment, visit our [aws deployment](/automate/ha_aws_deploy_steps/) page.
 
 ## External Managed Databases
 
@@ -263,7 +263,7 @@ The requirements for disaster recovery setup (Active/Passive) are:
 - Network Attached Storage (NAS) or Object Store (S3) should be available in both data centers/regions.
 - Set up scheduled jobs to run backup and restore commands on both clusters. We recommend using **cron** to schedule the jobs.
 
-To know more about the on-premise deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
+To know more about the aws deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
 
 ## Migration
 
@@ -282,7 +282,7 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 | Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. |
 | Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 |    |
 | Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 |    | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. |
-| A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
+| A2HA | PS Lead A2HA AWS Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
 {{< note >}}
 
