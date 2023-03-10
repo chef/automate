@@ -53,25 +53,25 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
         openssl genrsa -out admin-key-temp.pem 2048
         openssl pkcs8 -inform PEM -outform PEM -in admin-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out admin-key.pem
         openssl req -new -key admin-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin" -out admin.csr
-        openssl x509 -req -in admin.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out admin.pem -days 1095 -extfile server_cert_ext.cnf
+        openssl x509 -extfile <(printf "subjectAltName=DNS:chefadmin") -req -in admin.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out admin.pem -days 1095 -extfile server_cert_ext.cnf
 
         # Node cert 1
         openssl genrsa -out node1-key-temp.pem 2048
         openssl pkcs8 -inform PEM -outform PEM -in node1-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out node1-key.pem
         openssl req -new -key node1-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out node1.csr
-        openssl x509 -req -in node1.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node1.pem -days 1095 -extfile client_cert_ext.cnf
+        openssl x509 -extfile <(printf "subjectAltName=DNS:chefnode") -req -in node1.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node1.pem -days 1095 -extfile client_cert_ext.cnf
 
         # Node cert 2
         openssl genrsa -out node2-key-temp.pem 2048
         openssl pkcs8 -inform PEM -outform PEM -in node2-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out node2-key.pem
         openssl req -new -key node2-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out node2.csr
-        openssl x509 -req -in node2.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node2.pem -days 1095 -extfile client_cert_ext.cnf
+        openssl x509 -extfile <(printf "subjectAltName=DNS:chefnode") -req -in node2.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node2.pem -days 1095 -extfile client_cert_ext.cnf
 
         # Client cert
         openssl genrsa -out client-key-temp.pem 2048
         openssl pkcs8 -inform PEM -outform PEM -in client-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out client-key.pem
         openssl req -new -key client-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefclient" -out client.csr
-        openssl x509 -req -in client.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out client.pem -days 1095 -extfile client_cert_ext.cnf
+        openssl x509 -extfile <(printf "subjectAltName=DNS:chefclient") -req -in client.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out client.pem -days 1095 -extfile client_cert_ext.cnf
     ```
 
 1. The script generates the certificates at the newly created directory, `rotate-certs` in this case.
