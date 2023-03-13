@@ -27,19 +27,21 @@ import (
 )
 
 var licenseCmd = &cobra.Command{
-	Use:   "license COMMAND",
-	Short: "Chef Automate license management",
+	Use:               "license COMMAND",
+	Short:             "Chef Automate license management",
+	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
-		docs.Tag: docs.Automate,
+		docs.Tag: docs.BastionHost,
 	},
 }
 
 var licenseStatusCmd = &cobra.Command{
-	Use:   "status",
-	Short: "Retrieve Chef Automate license status",
-	RunE:  runLicenseStatusCmd,
+	Use:               "status",
+	Short:             "Retrieve Chef Automate license status",
+	RunE:              runLicenseStatusCmd,
+	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
-		docs.Tag: docs.Automate,
+		docs.Tag: docs.BastionHost,
 	},
 }
 
@@ -48,13 +50,14 @@ var licenseApplyLong = `Apply Chef Automate license token.
 `
 
 var licenseApplyCmd = &cobra.Command{
-	Use:   "apply LICENSE",
-	Short: "Apply Chef Automate license",
-	Long:  licenseApplyLong,
-	RunE:  runLicenseApplyCmd,
-	Args:  cobra.ExactArgs(1),
+	Use:               "apply LICENSE",
+	Short:             "Apply Chef Automate license",
+	Long:              licenseApplyLong,
+	RunE:              runLicenseApplyCmd,
+	PersistentPreRunE: preLicenseCmd,
+	Args:              cobra.ExactArgs(1),
 	Annotations: map[string]string{
-		docs.Tag: docs.Automate,
+		docs.Tag: docs.BastionHost,
 	},
 }
 
@@ -77,8 +80,9 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
+	PersistentPreRunE: preLicenseReportCmd,
 	Annotations: map[string]string{
-		docs.Compatibility: docs.CompatiblewithStandalone,
+		docs.Compatibility: docs.BastionHost,
 	},
 }
 
@@ -92,8 +96,9 @@ var nodeUsageCommand = &cobra.Command{
 		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
+	PersistentPreRunE: preLicenseReportCmd,
 	Annotations: map[string]string{
-		docs.Compatibility: docs.CompatiblewithStandalone,
+		docs.Compatibility: docs.BastionHost,
 	},
 }
 
@@ -107,8 +112,9 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
+	PersistentPreRunE: preLicenseReportCmd,
 	Annotations: map[string]string{
-		docs.Compatibility: docs.CompatiblewithStandalone,
+		docs.Compatibility: docs.BastionHost,
 	},
 }
 
@@ -122,8 +128,9 @@ var complianceResourceUsageCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
+	PersistentPreRunE: preLicenseReportCmd,
 	Annotations: map[string]string{
-		docs.Compatibility: docs.CompatiblewithStandalone,
+		docs.Compatibility: docs.BastionHost,
 	},
 }
 
@@ -451,4 +458,36 @@ func init() {
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
+}
+
+func preLicenseCmd(cmd *cobra.Command, args []string) error {
+	err := commandPrePersistent(cmd)
+	if err != nil {
+		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+	}
+	if isA2HARBFileExist() {
+		err = RunCmdOnSingleAutomateNode(cmd, args)
+		if err != nil {
+			return err
+		}
+		// NOTE: used os.exit as need to stop next lifecycle method to execute
+		os.Exit(1)
+	}
+	return nil
+}
+
+func preLicenseReportCmd(cmd *cobra.Command, args []string) error {
+	err := commandPrePersistent(cmd)
+	if err != nil {
+		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+	}
+	if isA2HARBFileExist() {
+		err = RunCmdOnSingleAutomateNodeNCopyReport(cmd, args)
+		if err != nil {
+			return err
+		}
+		// NOTE: used os.exit as need to stop next lifecycle method to execute
+		os.Exit(1)
+	}
+	return nil
 }
