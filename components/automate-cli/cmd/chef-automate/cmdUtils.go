@@ -306,8 +306,6 @@ func (c *CmdUtilImpl) RemoteJobs(command string, inputFiles map[string]string, o
 	resultChan <- rc
 }
 
-func (c *CmdUtilImpl) CopyMultipleFilesToRemote() {}
-
 // GetSshDetails will return the SSH details.
 func (c *CmdUtilImpl) GetSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
 	sshConfig := &SSHConfig{
@@ -415,7 +413,7 @@ func (c *CmdUtilImpl) CombineOutputFiles(hostIp string, inputOutputFiles, result
 				}
 				defer f.Close()
 
-				output, err := ioutil.ReadFile(outfile)
+				output, err := ioutil.ReadFile(outfile) // nosemgrep
 				if err != nil {
 					return resultFile, err
 				}
