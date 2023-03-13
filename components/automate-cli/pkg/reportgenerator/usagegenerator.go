@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	cli "github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/gocarina/gocsv"
 	elastic "github.com/olivere/elastic/v7"
 )
@@ -45,6 +46,18 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 			MinVersion:         tls.VersionTLS12,
 			InsecureSkipVerify: true,
 		},
+	}
+
+	res, err := cli.GetAutomateConfig(10)
+	if err != nil {
+		fmt.Println("Error while trying to get Automate Config", err)
+	}
+	externalOsEnabled := res.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
+
+	if externalOsEnabled {
+		url = "http://%s:%s"
+		esHostName = "localhost"
+		esPort = "10144"
 	}
 	client := &http.Client{Transport: tr}
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)

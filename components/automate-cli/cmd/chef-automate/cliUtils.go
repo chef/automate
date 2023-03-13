@@ -83,6 +83,7 @@ func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string) er
 		return err
 	}
 	fileName := strings.Split(output, ":")[1]
+	fmt.Println(fileName)
 	sshUtil.copyFileFromRemote(fileName, fileName)
 	writer.Print(output)
 
