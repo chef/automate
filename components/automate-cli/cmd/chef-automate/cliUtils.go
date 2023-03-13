@@ -54,3 +54,37 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 	writer.Print(output)
 	return nil
 }
+
+// RunCmdOnSingleAutomateNode runs the command on a single automate node
+func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string) error {
+	script := GenerateOriginalAutomateCLICommand(cmd, args)
+
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	ips := infra.Outputs.AutomatePrivateIps.Value
+	if len(ips) == 0 {
+		return errors.New("No automate IPs are found")
+	}
+
+	sshConfig := &SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		hostIP:     ips[0],
+		timeout:    10,
+	}
+	sshUtil := NewSSHUtil(sshConfig)
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
+	if err != nil {
+		return err
+	}
+	fileName := strings.Split(output, ":")[1]
+	sshUtil.copyFileFromRemote(fileName, fileName)
+	writer.Print(output)
+
+	return nil
+}
