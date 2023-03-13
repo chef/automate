@@ -126,6 +126,12 @@ AND
     path = "/mnt/automate_backups/elasticsearch"
 ```
 
+Copy the **bootstrap.abb** bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes:
+
+```cmd
+sudo chef-automate bootstrap bundle unpack bootstrap.abb
+```
+
 To restore, use the below command from same automate node, Make sure to **stop all other frontend nodes using `chef-automate stop`**:
 
 ```cmd
@@ -172,12 +178,6 @@ In case `backup_config = "file_system"` had been provided in config.toml of Auto
 {{< /note >}}
 
 Click [here](/automate/ha_backup_restore_object_storage/) to know more about the usage of S3 backup.
-
-Copy the **bootstrap.abb** bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes:
-
-```cmd
-sudo chef-automate bootstrap bundle unpack bootstrap.abb
-```
 
 {{< note >}}
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
