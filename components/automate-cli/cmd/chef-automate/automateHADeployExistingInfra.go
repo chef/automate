@@ -102,8 +102,6 @@ func (e *existingInfra) addDNTocertConfig() error {
 				} else {
 					nodes_dn = nodes_dn + fmt.Sprintf("- %v", node_dn) + "\\n  "
 				}
-				fmt.Println("Nodes DN: ", nodes_dn)
-				//e.config.Opensearch.Config.CertsByIP[i].NodesDn = fmt.Sprintf("%v", nodes_dn)
 			}
 		}
 
