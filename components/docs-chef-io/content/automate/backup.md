@@ -42,6 +42,8 @@ To configure your Chef Automate installation's backup directory to another locat
 1. Create a `backup_config.toml` file in your current directory with the following content. Replace `/path/to/backups` with the path to your backup directory:
 
     ```toml
+    [global.v1.backups]
+      location = "filesystem"
     [global.v1.backups.filesystem]
       path = "/path/to/backups"
     ```
