@@ -137,7 +137,7 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 		if err != nil {
 			return err
 		}
-		statusSummary := NewStatusSummary(writer, infra, &fileutils.FileSystemUtils{}, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
+		statusSummary := NewStatusSummary(infra, &fileutils.FileSystemUtils{}, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
 		err = statusSummary.Run()
 		if err != nil {
 			return err

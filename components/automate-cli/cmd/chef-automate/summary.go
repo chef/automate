@@ -9,11 +9,15 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/jedib0t/go-pretty/v5/table"
 	"github.com/spf13/cobra"
+)
+
+const (
+	habUrl          = "https://localhost:9631"
+	clusterOSHealth = "http://localhost:10144/_cluster/health"
 )
 
 type StatusSummary interface {
@@ -23,7 +27,6 @@ type StatusSummary interface {
 }
 
 type Summary struct {
-	writer                *cli.Writer
 	fileutils             fileutils.FileUtils
 	feStatus              FeStatus
 	beStatus              BeStatus
@@ -37,7 +40,6 @@ type A2haHabitatAutoTfvars struct {
 	HabSupHttpGatewayAuthToken string `json:"hab_sup_http_gateway_auth_token"`
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
-
 
 // Display implements StatusSummary
 func (ss *Summary) FEDisplay() {
@@ -165,8 +167,8 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 
 	return authToken, nil
 }
+
 func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceType string) (BeStatusValue, error) {
-	// curl --location --request GET 'https://localhost:9631/services/automate-ha-opensearch/default' --header 'Authorization: Bearer zeLm+WL26/S2DRpGL9z2d8G+Q8HM0Ht0Jdq5ytqg3ik=' -k
 	service := ""
 	if serviceType == "Open Search" {
 		service = "automate-ha-opensearch"
@@ -175,7 +177,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	}
 	args := []string{
 		"-s",
-		fmt.Sprintf("https://localhost:9631/services/%s/default", service),
+		fmt.Sprintf("%s/services/%s/default", habUrl, service),
 		"--header",
 		fmt.Sprintf("'Authorization: Bearer %s'", authToken),
 		"-k",
@@ -190,10 +192,9 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	servicePid := fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
 	startingTime = float64(time.Now().UTC().Unix()) - startingTime
-	// curl --location --request GET 'https://localhost:9631/services/automate-ha-opensearch/default/health' --header 'Authorization: Bearer zeLm+WL26/S2DRpGL9z2d8G+Q8HM0Ht0Jdq5ytqg3ik=' -k
 	args = []string{
 		"-s",
-		fmt.Sprintf("https://localhost:9631/services/%s/default/health", service),
+		fmt.Sprintf("%s/services/%s/default/health", habUrl, service),
 		"--header",
 		fmt.Sprintf("'Authorization: Bearer %s'", authToken),
 		"-k",
@@ -208,7 +209,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	// /census
 	args = []string{
 		"-s",
-		"https://localhost:9631/census",
+		fmt.Sprintf("%s/census", habUrl),
 		"--header",
 		fmt.Sprintf("'Authorization: Bearer %s'", authToken),
 		"-k",
@@ -246,30 +247,31 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 		role:        role,
 	}, nil
 }
+
 func (ss *Summary) getFEStatus(sshUtil SSHUtil, script string, ip string, serviceType string) FeStatusValue {
-	entry := FeStatusValue{}
 	osStatus := ss.opensearchStatusInFE(sshUtil)
 	_, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
-	entry.ipAddress = ip
-	entry.serviceName = serviceType
-	entry.ipAddress = ip
-	entry.Opensearch = osStatus
+	status := "OK"
 	if err != nil {
 		_, ok := err.(*exec.ExitError)
 		if ok {
-			entry.status = "ERROR"
+			status = "ERROR"
 		} else {
-			entry.status = "WARN"
+			status = "WARN"
 		}
-	} else {
-		entry.status = "OK"
 	}
-	return entry
+	return FeStatusValue{
+		serviceName: serviceType,
+		ipAddress:   ip,
+		status:      status,
+		Opensearch:  osStatus,
+	}
 }
+
 func (ss *Summary) opensearchStatusInFE(sshUtil SSHUtil) string {
 	arg := []string{
 		"-s",
-		"http://localhost:10144/_cluster/health",
+		clusterOSHealth,
 	}
 	curlOSStatusScript := GenerateOriginalAutomateCLICommand(
 		&cobra.Command{
@@ -397,9 +399,8 @@ func validateIPAddresses(IpsFromcmd, ips []string, errorPrefix string) ([]string
 	return ipFound, ipNotFound, errorList
 }
 
-func NewStatusSummary(writer *cli.Writer, infra *AutomteHAInfraDetails, fileutils fileutils.FileUtils, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags) StatusSummary {
+func NewStatusSummary(infra *AutomteHAInfraDetails, fileutils fileutils.FileUtils, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags) StatusSummary {
 	return &Summary{
-		writer:                writer,
 		fileutils:             fileutils,
 		feStatus:              feStatus,
 		beStatus:              beStatus,
