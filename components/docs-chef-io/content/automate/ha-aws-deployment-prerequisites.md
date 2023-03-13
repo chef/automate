@@ -83,7 +83,7 @@ Current Automate HA integrates with the following non-Chef tools:
 
 {{< note >}} Use a [Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) to check how much hardware you will need for your use case. {{< /note >}}
 
-We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below shows the tested **assumptions** and has no exact value.
+We have some sample values based on the performance benchmarking tests to give you an apt hardware configuration. Refer to the table below to populate things in the **Hardware Calculator** according to your requirement. The table below shows the tested **assumptions** and should not be used as exact recommendations.
 
 You can use the below assumptions in the calculator to drive into your hardware requirement:
 
@@ -120,6 +120,16 @@ LoadBalancers in AWS deployment are set up according to [Chef Automate HA Archit
 ## Firewall Checks
 
 The Chef Automate HA cluster requires multiple ports for the frontend and backend servers to operate effectively.
+
+**Ports for Bastion before deployment**
+| Port No. | Outgoing to | Incoming from |
+|----------|-------------|---------------|
+| 22       | Subnet      | All           |
+| 80       |             | Internet      |
+| 443      |             | Internet      |
+
+
+**Ports mapping after deployment:**
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
@@ -165,7 +175,6 @@ To understand how to generate certificates, refer to the [Certificate Generation
 The AWS deployment specific pre-requisites are as follows:
 
 ### AWS Cloud
-
 - AWS Virtual Private Cloud (VPC) with an internet gateway should be created before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - If you want to use Default VPC, create public and private subnets. If the subnet is not available. Please refer [to this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - Three private and three public subnets in a VPC (1 subnet for each AZ) are needed. As of now, only dedicated subnets for each AZ are supported.
@@ -176,11 +185,9 @@ The AWS deployment specific pre-requisites are as follows:
   - Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
 
 ### Infra Server
-
 - Chef Automate HA comes with bundled Infra Server, and it is recommended not to use any external server in Automate HA. Using an external server will lose the Automate HA functionalities, and things may not work as expected.
 
 ### Access
-
 - AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with `AmazonS3FullAccess` and `AdministratorAccess` privileges are needed.
 - **On Bastion Machine:**
   - We need a local user `hab` and local group `hab` linked together to complete the deployment process successfully.
@@ -188,19 +195,20 @@ The AWS deployment specific pre-requisites are as follows:
   - Currently we only support local Linux users and groups for Installation flow. We don't support AD managed users in nodes.
 - The SElinux config should either be disabled or permissive in the AMI Image used for deployment in config.
 
+### Storage Space for Bastion
+- Operating System Root Volume (`/`) must be at least 40GB. Temporary space (`/var/tmp`) must be at least 5GB.
+- Separate Hab volume should be provisioned and mounted at `/hab` with at least 100GB free space.
 
 ### SSH User
-
 - SSH Key Pair should be created in AWS, creating Bastion machine using that pair.
     Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - SSH users should use key-based SSH login without a passphrase.
-- The user's SSH key should be generated using algorithms `ed25519`(recommended) and `RSA(2048)` without a passphrase.
+- The user's SSH key should be generated using algorithms `ed25519` without a passphrase.
 - This SSH user should be a local Linux user on the Bastion machine.
 - This SSH user should have sudo privileges on the Bastion machine.
 - The SSH user will be used to access all machines using the same SSH private key.
 
 ### Cluster Setup
-
 - DNS certificate should be available in AWS Certificate Manager (ACM) for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
     Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
@@ -208,7 +216,6 @@ The AWS deployment specific pre-requisites are as follows:
 - During deployment the Domain Certificates from ACM will be attached to the new Load Balancers.
 
 ### Config Changes
-
 - [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application will result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
 - [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
 
@@ -276,8 +283,8 @@ To know more about the aws deployment disaster recovery, visit our [Disaster Rec
 
 ## Backup and Restore
 
-- **In AWS Deployment:** We support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
-- **In AWS Managed Services:** We only support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- **In AWS Deployment:** We support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**S3 storage)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- **In AWS Managed Services:** We only support [**S3 storage**](/automate/ha_backup_restore_aws_s3/) for taking backup.
 - **In AWS Managed Services:** Create the below attributes by following [managed services documentation](/automate/managed_services/#enabling-opensearch-backup-restore)
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
