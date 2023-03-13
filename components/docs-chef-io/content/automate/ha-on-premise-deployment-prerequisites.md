@@ -67,12 +67,11 @@ We do not support **Chef Manage** and **Supermarket** integration in the ongoing
 
 ### External Supported Softwares
 
-Current Automate HA works with the following non-Chef tools:
+Current Automate HA integrates with the following non-Chef tools:
 
-- PostgreSQL: 13.5
-- OpenSearch: 1.3.7
-- NGINX: 1.21.3
-- HA Proxy: 2.2.18
+- **SQL Database:** PostgreSQL: 13.5
+- **NoSQL Database:** OpenSearch: 1.3.7
+- **Load Balancer:** NGINX: 1.21.3 or HA Proxy: 2.2.18 or AWS Application Load Balancer
 
 ## Hardware Requirements
 
@@ -110,7 +109,7 @@ For production, OpenSearch volume size also depends on the number of nodes and f
 
 ### Load Balancer
 
-Load Balancers in on-premise deployment are set up according to [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/).
+Load Balancers in on-premise deployment need to be set up according to [Chef Automate HA Architecture](/automate/ha/#chef-automate-ha-architecture/).
 
 You can set up your [load balancer](/automate/loadbalancer_configuration/) using:
 
@@ -120,9 +119,7 @@ You can set up your [load balancer](/automate/loadbalancer_configuration/) using
 
 ## Firewall Checks
 
-The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be opened for each set of servers.
-
-**Ports required for all Machines**
+The Chef Automate HA cluster requires multiple ports for the frontend and backend servers to operate effectively.
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
@@ -202,7 +199,7 @@ The on-premise deployment specific pre-requisites are as follows:
 
 ### Config Changes
 
-- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application might result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
+- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application will result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
 - [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
 
 To learn more about the above deployment, visit our [on-premise deployment](/automate/ha_onprim_deployment_procedure/) page.
@@ -229,7 +226,7 @@ Things to keep in mind while upgrading are:
 
 - Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
-- A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
+- A downtime will occur while upgrading the **frontend**, **backend** or the **workspace**.
 - Rolling upgrades are not supported.
 
 ## Disaster Recovery

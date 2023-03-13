@@ -67,21 +67,17 @@ We do not support **Chef Manage** and **Supermarket** integration in the ongoing
 
 ### External Supported Softwares
 
-Current Automate HA works with the following non-Chef tools:
+Current Automate HA integrates with the following non-Chef tools:
 
-**In AWS**
-
-- PostgreSQL: 13.5
-- OpenSearch: 1.3.7
-- NGINX: 1.21.3
-- HA Proxy: 2.2.18
+**In AWS Deployment**
+- **SQL Database:** External not supported
+- **NoSQL Database:** External not supported
+- **Load Balancer:** External not supported
 
 **In AWS Managed Services**
-
-Current Automate HA works with the following non-Chef tools:
-
-- AWS RDS Postgresql: 13.5
-- AWS OpenSearch: 1.3
+- **SQL Database:** AWS RDS PostgreSQL: 13.5
+- **NoSQL Database:** AWS OpenSearch: 1.3
+- **Load Balancer:** External not supported
 
 ## Hardware Requirements
 
@@ -119,22 +115,24 @@ The machine requirements based on the above assumptions are listed below:
 
 LoadBalancers in AWS deployment are set up according to [Chef Automate HA Architecture](/automate/ha/).
 
-You can setup your [load balancer](/automate/loadbalancer_configuration/) using:
-
-- [NGINX](/automate/loadbalancer_configuration/#load-balancer-setup-using-nginx)
-- [HA Proxy](/automate/loadbalancer_configuration/#load-balancer-setup-using-ha-proxy)
-- [AWS Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/)
+[AWS Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/) will be setup during deployment automatically.
 
 ## Firewall Checks
 
-The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic.
+The Chef Automate HA cluster requires multiple ports for the frontend and backend servers to operate effectively.
 
-**Ports required for Bastion**
+The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
-| Machines | Bastion |
-|----------|---------|
-| Incoming | TCP 22  |
-| Outgoing | TCP All |
+|               | Chef Automate  | Chef Infra Server | Postgresql                          | OpenSearch                           | Bastion | Load Balancer |
+|---------------|----------------|-------------------|-------------------------------------|--------------------------------------|---------| ------------- |
+| Chef Automate |                |                   | 7432                                | 9200                                 |         |               |
+| Infra Server  | 443            |                   | 7432                                | 9200                                 |         |               |
+| PostgreSQL    |                |                   | 9631, 7432, 5432, 6432, 9638<br/>UDP 9638 |                                      |         |               |
+| OpenSearch    |                |                   |                                     | 9631, 9200, 9300, 9638 <br/>UDP 9638 |         |               |
+| Bastion       | 22, 9631, 9638 | 22, 9631, 9638    | 22, 9631, 9638, 7432                | 22, 9631, 9638, 9200                 |         | 22            |
+| Load Balancer | 443, 80        | 443, 80           |                                     |                                      |         |               |
+| Internet Access |     |        |  |     |   80, 443     |      |
+
 
 {{< note >}} Custom SSH port is supported, but use the same port across all the machines. {{< /note >}}
 
@@ -166,16 +164,16 @@ To understand how to generate certificates, refer to the [Certificate Generation
 
 The AWS deployment specific pre-requisites are as follows:
 
-### VPC
+### AWS Cloud
 
-- Create the Virtual Private Cloud (VPC) should with an internet gateway attached in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC, we must create public and private subnets. If the subnet is not available. Please refer [to this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We need three private and three public subnets in a vpc (1 subnet for each AZ). As of now, we support dedicated subnets for each AZ.
-- We recommend creating a new vpc. And Bastion should be in the same VPC.
-- Specifically for AWS Managed Services, set up [AWS RDS Postgresql](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC where we have the basion and automate ha node to be created.
-- Specifically for AWS Managed Services, set up [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC where we have the basion and automate ha node to be created.
-- Specifically for AWS Managed Services, the bastion machine should be in the same vpc as mentioned in `config.toml`, or else do [VPC peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
-- Specifically for AWS Managed Services, use a subnet-id in `config.toml` instead of a CIDR block to avoid the subnet conflict.
+- AWS Virtual Private Cloud (VPC) with an internet gateway should be created before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
+- If you want to use Default VPC, create public and private subnets. If the subnet is not available. Please refer [to this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
+- Three private and three public subnets in a VPC (1 subnet for each AZ) are needed. As of now, only dedicated subnets for each AZ are supported.
+- It is recomended to create new VPC.
+- Bastion must be in the same VPC for deployment.
+- **In AWS Managed Services:** 
+  - Setup [AWS RDS Postgresql](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
+  - Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
 
 ### Infra Server
 
@@ -183,52 +181,42 @@ The AWS deployment specific pre-requisites are as follows:
 
 ### Access
 
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess`, and `AdministratorAccess`. \
-    Set these in `~/.aws/credentials` in Bastion Host:
+- AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with `AmazonS3FullAccess` and `AdministratorAccess` privileges are needed.
+- **On Bastion Machine:**
+  - We need a local user `hab` and local group `hab` linked together to complete the deployment process successfully.
+  - If they are unavailable, the SSH user should have privileges to create local users and groups so that the deployment process can create the required local user `hab` and local group `hab`.
+  - Currently we only support local Linux users and groups for Installation flow. We don't support AD managed users in nodes.
+- The SElinux config should either be disabled or permissive in the AMI Image used for deployment in config.
 
-    ```bash
-    sudo su -
-    ```
-
-    ```bash
-    mkdir -p ~/.aws
-    echo "[default]" >>  ~/.aws/credentials
-    echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
-    echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
-    echo "region=<AWS-REGION>" >> ~/.aws/credentials
-    ```
-
-- For Backup with [Managed Service](/automate/managed_services/#enabling-opensearch-backup-restore), we have only one option: `Amazon S3`.
-- We only support local Linux users and groups for Installation flow. We don't support AD managed users in nodes.
-- Specifically for AWS Managed Services, create the below attributes by following [this document.](/automate/managed_services/#enabling-opensearch-backup-restore)
-  - `aws_os_snapshot_role_arn`
-  - `os_snapshot_user_access_key_id`
-  - `os_snapshot_user_access_key_secret`
 
 ### SSH User
 
-- Have SSH Key Pair ready in AWS, creating new VMs using that pair.
+- SSH Key Pair should be created in AWS, creating Bastion machine using that pair.
     Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-- We do not support passphrases for Private Key authentication.
-- Preferred key type will be ed25519.
+- SSH users should use key-based SSH login without a passphrase.
+- The user's SSH key should be generated using algorithms `ed25519`(recommended) and `RSA(2048)` without a passphrase.
+- This SSH user should be a local Linux user on the Bastion machine.
+- This SSH user should have sudo privileges on the Bastion machine.
+- The SSH user will be used to access all machines using the same SSH private key.
 
 ### Cluster Setup
 
-- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
+- DNS certificate should be available in AWS Certificate Manager (ACM) for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
     Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
+- During deployment the Domain Certificates from ACM will be attached to the new Load Balancers.
 
 ### Config Changes
 
-- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application might result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
+- [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application will result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
 - [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
 
 To learn more about the above deployment, visit our [aws deployment](/automate/ha_aws_deploy_steps/) page.
 
 ## External Managed Databases
 
-Set up the databases with password-based authentication.
+Setup the databases with password-based authentication.
 
 ### AWS Managed
 
@@ -237,18 +225,13 @@ Set up the databases with password-based authentication.
 
 Configure the backup only with **S3** when using AWS managed databases.
 
-### Customer Managed
-
-- PostgreSQL: 13.5
-- OpenSearch: 1.3.7
-
 ## Upgrade
 
 Things to keep in mind while upgrading are:
 
 - Backend upgrades will restart the backend service, which takes time for the cluster to be healthy.
 - Upgrade command currently supports only minor upgrades.
-- A downtime might occur while upgrading the **frontend**, **backend** or the **workspace**.
+- A downtime will occur while upgrading the **frontend**, **backend** or the **workspace**.
 - Rolling upgrades are not supported.
 
 ## Disaster Recovery
@@ -287,11 +270,15 @@ To know more about the aws deployment disaster recovery, visit our [Disaster Rec
 {{< note >}}
 
 - Suppose you have done any modification to the standard installation setup mentioned above. In that case, we do not support migration to Automate HA.
-- We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system levels change as ports, system users, and groups may conflict with the successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higher downtime or loss of the existing setup.
+- We don't recommend in-place migration of A2HA and Chef Backend to Automate HA as the system level changes like ports, system users, and groups may conflict with the successful installation of Automate HA. Also, no easy rollback process is available. This may lead to higher downtime or loss of the existing setup.
 
 {{< /note >}}
 
 ## Backup and Restore
 
-- For AWS deployment of Automate HA, we support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
-- For AWS Managed Services deployment of Automate HA, we only support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- **In AWS Deployment:** We support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- **In AWS Managed Services:** We only support [**Object Storage (S3/MinIO)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
+- **In AWS Managed Services:** Create the below attributes by following [managed services documentation](/automate/managed_services/#enabling-opensearch-backup-restore)
+  - `aws_os_snapshot_role_arn`
+  - `os_snapshot_user_access_key_id`
+  - `os_snapshot_user_access_key_secret`
