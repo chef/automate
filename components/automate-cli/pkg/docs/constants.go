@@ -11,4 +11,5 @@ const (
 	PostgreSQL               = "Postgresql"
 	Automate                 = "Automate"
 	FrontEnd                 = "FrontEnd"
+	AutomateConfigTimeout    = int64(10)
 )

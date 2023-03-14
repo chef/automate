@@ -77,7 +77,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
+		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
 	PersistentPreRunE: preLicenseReportCmd,
@@ -93,7 +93,7 @@ var nodeUsageCommand = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
+		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
 	PersistentPreRunE: preLicenseReportCmd,
@@ -109,7 +109,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
+		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
 	PersistentPreRunE: preLicenseReportCmd,
@@ -125,7 +125,7 @@ var complianceResourceUsageCmd = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
+		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
 	PersistentPreRunE: preLicenseReportCmd,
@@ -159,6 +159,7 @@ var hostnameES = "hostname of the OpenSource host"
 var portES = "port of the OpenSource host"
 var userNameES = "username of the OpenSource host"
 var passwordES = "password of the OpenSource host"
+var fileName = "file name for the report Ex: complianceUniqueResourceCount.csv"
 
 type usageResult struct {
 	StartTimestamp   string           `json:"start_timestamp"`
@@ -392,6 +393,7 @@ var CommandFlags = struct {
 	ESPort     string
 	ESUserID   string
 	ESPassword string
+	FileName   string
 }{}
 
 func validateArgs() {
@@ -417,6 +419,16 @@ func validateArgs() {
 		fmt.Println("End time cannot be before start time")
 		os.Exit(1)
 	}
+	if CommandFlags.FileName == "" {
+		fmt.Println("File name needs to be mentioned in .csv format")
+		os.Exit(1)
+	}
+	fileExtension := strings.Split(CommandFlags.FileName, ".")
+
+	if len(fileExtension) == 1 || fileExtension[1] != "csv" {
+		fmt.Println("File name needs to be mentioned in .csv format")
+		os.Exit(1)
+	}
 }
 
 func convertStringToTime(timeStr string) (time.Time, error) {
@@ -439,24 +451,28 @@ func init() {
 	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "os_port", "p", "10168", portES)
 	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
 	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.FileName, "fileName", "f", "", fileName)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10168", portES)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.FileName, "fileName", "f", "", fileName)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10168", portES)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.FileName, "fileName", "f", "", fileName)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10168", portES)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.FileName, "fileName", "f", "", fileName)
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
 }
 

@@ -299,8 +299,7 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 func (s *SSHUtilImpl) copyFileFromRemote(remoteFilePath string, outputFileName string) (string, error) {
 	writer.Printf("Downloading file %s from remote node %s \n", remoteFilePath, s.SshConfig.hostIP)
 	cmd := "scp"
-	ts := time.Now().Format("20060102150405")
-	destFileName := "/tmp/" + ts + "_" + outputFileName
+	destFileName := "/tmp/" + outputFileName
 	execArgs := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-o ConnectTimeout=30", "-i", s.SshConfig.sshKeyFile, "-r", s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":" + remoteFilePath, destFileName}
 	if err := exec.Command(cmd, execArgs...).Run(); err != nil {
 		writer.Printf("Failed to copy file from remote %s\n", err.Error())
