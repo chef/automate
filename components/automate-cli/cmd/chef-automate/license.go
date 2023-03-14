@@ -80,7 +80,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: preLicenseReportCmd,
+	PersistentPreRunE: getCommandWithFileName("uniqNodeRunReport"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -96,7 +96,7 @@ var nodeUsageCommand = &cobra.Command{
 		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: preLicenseReportCmd,
+	PersistentPreRunE: getCommandWithFileName("nodeRunReport"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -112,7 +112,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: preLicenseReportCmd,
+	PersistentPreRunE: getCommandWithFileName("complianceResourceRunCount"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -128,7 +128,7 @@ var complianceResourceUsageCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: preLicenseReportCmd,
+	PersistentPreRunE: getCommandWithFileName("complianceResourceRunReport"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -419,13 +419,9 @@ func validateArgs() {
 		fmt.Println("End time cannot be before start time")
 		os.Exit(1)
 	}
-	if CommandFlags.FileName == "" {
-		fmt.Println("File name needs to be mentioned in .csv format")
-		os.Exit(1)
-	}
 	fileExtension := strings.Split(CommandFlags.FileName, ".")
 
-	if len(fileExtension) == 1 || fileExtension[1] != "csv" {
+	if len(fileExtension) == 2 && fileExtension[1] != "csv" {
 		fmt.Println("File name needs to be mentioned in .csv format")
 		os.Exit(1)
 	}
@@ -507,4 +503,29 @@ func preLicenseReportCmd(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 	return nil
+}
+
+func getCommandWithFileName(commandName string) func(*cobra.Command, []string) error {
+	commandWithFileName := func(cmd *cobra.Command, args []string) error {
+		err := commandPrePersistent(cmd)
+		if err != nil {
+			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+		}
+		reportFileName := CommandFlags.FileName
+		if reportFileName == "" {
+			reportFileName = commandName + "_" + CommandFlags.StartTime + "_" + CommandFlags.EndTime + ".csv"
+			args = append(args, "-f", reportFileName)
+			CommandFlags.FileName = reportFileName
+		}
+		if isA2HARBFileExist() {
+			err = RunCmdOnSingleAutomateNodeNCopyReport(cmd, args, reportFileName)
+			if err != nil {
+				return err
+			}
+			// NOTE: used os.exit as need to stop next lifecycle method to execute
+			os.Exit(1)
+		}
+		return nil
+	}
+	return commandWithFileName
 }
