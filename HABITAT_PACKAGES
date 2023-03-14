@@ -89,4 +89,4 @@ automate-netcat components/automate-netcat
 automate-opensearch components/automate-opensearch
 report-manager-service components/report-manager-service
 automate-knife-ec-backup components/automate-knife-ec-backup
-automate-cs-oc-id components/automate-cs-oc-id
+
