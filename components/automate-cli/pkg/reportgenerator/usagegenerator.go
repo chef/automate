@@ -39,6 +39,7 @@ type ComplianceInfo interface{}
 var url = "https://%s:%s"
 var errorcsv = "Error while writing csv: "
 var errorQuery = "Error in query: "
+var osGatewayPort = 10144
 
 func elasticSearchConnection(url string, esHostName string, esPort string, esUserName string, esPassword string) *elastic.Client {
 	tr := &http.Transport{
@@ -47,9 +48,12 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 			InsecureSkipVerify: true,
 		},
 	}
-	esHostName, esPort, url = updateConnectionForExternalOs(esHostName, esPort, url)
+	elasticSearchURL, err := getElasticSearchURL(esHostName, esPort, url)
+	if err != nil {
+		fmt.Println("Failed to resolve OpenSearch connection: ", err.Error())
+		os.Exit(1)
+	}
 	client := &http.Client{Transport: tr}
-	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	esclient, err := elastic.NewClient(
 		elastic.SetHttpClient(client),
 		elastic.SetURL(elasticSearchURL),
@@ -63,19 +67,18 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 	return esclient
 }
 
-func updateConnectionForExternalOs(esHostName string, esPort string, url string) (string, string, string) {
+func getElasticSearchURL(esHostName string, esPort string, url string) (string, error) {
 	res, err := cli.GetAutomateConfig(docs.AutomateConfigTimeout)
 	if err != nil {
-		fmt.Println("Error while trying to get Automate Config", err)
+		return "", fmt.Errorf("error while trying to get Automate Config: %s", err.Error())
 	}
 	externalOsEnabled := res.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
 
+	// If OpenSearch is deployed externally, connect to the os-gateway instead of OpenSearch directly
 	if externalOsEnabled {
-		url = "http://%s:%s"
-		esHostName = "localhost"
-		esPort = "10144"
+		return fmt.Sprintf("http://localhost:%d", osGatewayPort), nil
 	}
-	return esHostName, esPort, url
+	return fmt.Sprintf(url, esHostName, esPort), nil
 }
 
 func GenerateNodeCount(esHostName string, esPort string, esUserName string, esPassword string, startTime time.Time, endTime time.Time, fileName string) {

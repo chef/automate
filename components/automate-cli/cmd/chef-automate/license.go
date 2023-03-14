@@ -411,7 +411,7 @@ func validateArgs() {
 	}
 	e, err := convertStringToTime(CommandFlags.EndTime)
 	if err != nil {
-		fmt.Println("The start time has to be in yyyy-mm-dd format")
+		fmt.Println("The end time has to be in yyyy-mm-dd format")
 		os.Exit(1)
 	}
 
