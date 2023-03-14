@@ -1,0 +1,26 @@
+{
+  "name": "chef/automate-cs-oc-id",
+  "bootstrap": [
+    {
+      "type": "file",
+      "path": "data/pivotal.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/pivotal.pub.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/webui_priv.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/webui_pub.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/dark_launch_features.json"
+    }
+  ],
+  "uses_platform_scaffolding": true
+}
