@@ -37,3 +37,7 @@ func TestGenerateOriginalAutomateCLICommand(t *testing.T) {
 	expectedCommand = "sudo my-command --bool-flag --int-flag 42 --string-flag string-value arg1 arg2"
 	assert.Equal(t, fullCommand, expectedCommand)
 }
+
+func TestRunCmdOnSingleAutomateNodeNCopyReport(t *testing.T) {
+
+}
