@@ -86,30 +86,30 @@ func (e *existingInfra) addDNTocertConfig() error {
 			e.config.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodes_dn)
 		}
 
-		nodes_dn := ""
+		NodesDn := ""
 
 		//Set the admin_dn and nodes_dn in the config for all IP addresses
 		for i := 0; i < len(e.config.Opensearch.Config.CertsByIP); i++ {
-			//If PublicKey is given then get the nodes_dn from the cert
+			//If PublicKey is given then get the node_dn from the cert
 			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
 			if len(strings.TrimSpace(publicKey)) > 0 {
 				node_dn, err := getDistinguishedNameFromKey(publicKey)
 				if err != nil {
 					return err
 				}
-				if nodes_dn == "" {
-					nodes_dn = nodes_dn + fmt.Sprintf("%v", node_dn) + "\\n  "
+				if NodesDn == "" {
+					NodesDn = NodesDn + fmt.Sprintf("%v", node_dn) + "\\n  "
 				} else {
-					nodes_dn = nodes_dn + fmt.Sprintf("- %v", node_dn) + "\\n  "
+					NodesDn = NodesDn + fmt.Sprintf("- %v", node_dn) + "\\n  "
 				}
 			}
 		}
 
 		for i := 0; i < len(e.config.Opensearch.Config.CertsByIP); i++ {
-			//If PublicKey is given then get the nodes_dn from the cert
+			//If PublicKey is given then set the nodes_dn from the cert
 			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
 			if len(strings.TrimSpace(publicKey)) > 0 {
-				e.config.Opensearch.Config.CertsByIP[i].NodesDn = strings.TrimSpace(nodes_dn)
+				e.config.Opensearch.Config.CertsByIP[i].NodesDn = strings.TrimSpace(NodesDn)
 			}
 		}
 	}
