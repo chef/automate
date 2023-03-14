@@ -129,7 +129,7 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 | 443      |             | Internet      |
 
 
-**Ports mapping after deployment:**
+**Port mappings required before deployment:**
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
