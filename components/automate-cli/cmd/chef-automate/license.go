@@ -498,7 +498,8 @@ func preLicenseReportCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
 	}
 	if isA2HARBFileExist() {
-		err = RunCmdOnSingleAutomateNodeNCopyReport(cmd, args)
+		reportFileName := CommandFlags.FileName
+		err = RunCmdOnSingleAutomateNodeNCopyReport(cmd, args, reportFileName)
 		if err != nil {
 			return err
 		}
