@@ -50,7 +50,7 @@ class AutomateClusterSetup < AutomateCluster::Command
     terraform_destroy if tf_destroy? && !prompt.no?("Are you sure you want to run `terraform destroy`? This cannot be undone")
 
     wait_while 'Checking terraform state' do |spinner|
-      opts = command_opts({ returns: [0,2], environment: terraform_secret_envs })
+      opts = command_opts({ returns: [0,2], environment: new_terraform_secret_envs })
       plan = terraform_run("plan -detailed-exitcode -input=false -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate", opts)
 
       if plan.error?
@@ -78,8 +78,17 @@ class AutomateClusterSetup < AutomateCluster::Command
 
   end
 
-  def terraform_secret_envs
-    secrets.inject({}) do |col, item|
+  # def terraform_secret_envs
+  #   secrets.inject({}) do |col, item|
+  #     col["TF_VAR_#{item[0]}"] = item[1]
+  #     col
+  #   end
+  # end
+
+  # Made changes to the above method to get the sudo_password from the env variable
+  def new_terraform_secret_envs
+    new_secrets = { 'sudo_password' => ENV['sudo_password'] }
+    new_secrets.inject({}) do |col, item|
       col["TF_VAR_#{item[0]}"] = item[1]
       col
     end
@@ -96,7 +105,7 @@ class AutomateClusterSetup < AutomateCluster::Command
   def terraform_destroy
     opts = command_opts({
       live_stdout: STDOUT,
-      environment: { TF_LOG: ENV['TF_LOG'] }.merge(terraform_secret_envs)
+      environment: { TF_LOG: ENV['TF_LOG'] }.merge(new_terraform_secret_envs)
     })
     tfrun = terraform_run("destroy -state-out=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve", opts)
 
@@ -123,7 +132,7 @@ class AutomateClusterSetup < AutomateCluster::Command
     if run_apply
       opts = command_opts({
         live_stdout: STDOUT,
-        environment: { TF_LOG: ENV['TF_LOG'] }.merge(terraform_secret_envs)
+        environment: { TF_LOG: ENV['TF_LOG'] }.merge(new_terraform_secret_envs)
       })
 
       terraform_run("apply -parallelism=#{parallelism} -input=false -auto-approve -state-out=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate", opts)
