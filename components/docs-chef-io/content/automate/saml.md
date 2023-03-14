@@ -298,7 +298,6 @@ Remove Configuration button will only be enabled post successful setup of SSO
 
 4. In case of failure, removal request can be triggered again using `Remove Configuration`  button.
 
-
 ## Appendix for Chef SaaS SSO
 
 
