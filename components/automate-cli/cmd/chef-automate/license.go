@@ -120,7 +120,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 
 var complianceResourceUsageCmd = &cobra.Command{
 	Use:   "complianceResourceRunReport",
-	Short: "Generates daily Infra Client Run reports for a span of time duration",
+	Short: "Generates daily Compliance scan reports for a span of time duration",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
