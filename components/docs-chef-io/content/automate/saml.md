@@ -259,8 +259,8 @@ Below are the steps for SSO configuration using the Chef SaaS SSO UI.
 
     {{< note >}}
 
-    - CA certificate value should nto be modified and should be used as it is provided by the IDP
-    - Refer to this section for form validation details.
+    1. CA certificate value should nto be modified and should be used as it is provided by the IDP
+    2. Refer to this [section](https://deploy-preview-7775--chef-automate.netlify.app/automate/saml/#sso-ui-page-form-validations) for form validation details.
 
     {{< /note >}}
 
@@ -290,7 +290,7 @@ Remove Configuration button will only be enabled post successful setup of SSO
 1. On Chef SaaS SSO UI, click on the `Remove Configuration` button.
 
 2. Click on `Confirm` button of the pop-up box to re-confirm the config removal or `Cancel` to go back.
-![Remove Config Confirmation](/images/automate/sso_config_remove_popup.png)
+![Remove Config Confirmation](/components/docs-chef-io/static/images/automate/sso_config_removal_popup.png)
 
 3. On completion of the request, appropriate messages reagrding the success/failure of config removal will be displayed.
    - `SSO request is complete. Config removed Successfully` message denotes that SSO config removal is successful.
