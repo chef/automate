@@ -225,3 +225,105 @@ This means that Chef Automate also cannot support IdP-initiated SAML logins with
 - OneLogin
 - Ping
 - Tivoli Federated Identity Manager
+
+## Chef SaaS SSO setup
+
+{{< warning >}}
+
+- This section is only for Chef SaaS deployment. 
+- The Chef SaaS SSO feature supports only SAML-based IDP authentication as of now and will support IDPs as per [Automate documentation](https://docs.chef.io/automate/saml/#supported-identity-management-systems). 
+- SSO intergation UI can be accessed by Chef SaaS Admin only.
+
+Below are the steps for SSO configuration using the Chef SaaS SSO UI. 
+
+{{< /warning >}}
+
+### Introduction
+
+- SAML SSO integration can be done via the Chef SaaS SSO UI page as per the IDP configuration.
+- To access the Chef SaaS SSO UI, login into the Automate UI and open the URL `https://automate_url/sso` in a new tab.
+
+
+### Pre-requisite
+
+- To be integrated IDP must be configured with all the required information
+
+### SSO setup via Chef SaaS UI
+
+1. On Chef SaaS SSO UI, fill in the form as per the information available on the IDP configuration page.
+   - `SSO URL` - Single Sign-On URL provided by the IDP configuration. 
+   - `Email Attribute` - Name of the attribute set in the IDP config for the user email. 
+   - `Username Attribute` - Name of the attribute set in the IDP config for the username.
+   - `Entity Issuer URL`- This should be set as `https://automate_url/dex/callback`
+   - `CA Certificate`  - CA certificate provided by the IDP. This value should contain the -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- markers.
+
+    {{< note >}}
+
+    - CA certificate value should nto be modified and should be used as it is provided by the IDP
+    - Refer to this section for form validation details.
+
+    {{< /note >}}
+
+
+2. Submit button will be enabled on successful validation of all form values. Click on `Submit` to proceed with SSO config intergation. 
+
+3. On completion of the request, appropriate messages reagrding the success/failure will be displayed.
+   - `SSO Request is complete. Config applied Successfully` message denotes that SSO setup is successful.
+   - `SSO Request Failed` message implies that the SSO setup failed. It will also shown the actual error or issue with the configuration.
+
+4. In case of failure, setup configuration can be edited accordingly and submitted again.
+
+{{< note >}}
+
+In order to remove any edits on the set SSO configuration, use the `Cancel` button (avaiable next to `Submit` button) to get back to the already set SSO configuration.
+
+{{< /note >}}
+
+### SSO setup removal via Chef SaaS UI
+
+{{< note >}}
+ 
+Remove Configuration button will only be enabled post successful setup of SSO
+
+{{< /note >}}
+
+1. On Chef SaaS SSO UI, click on the `Remove Configuration` button.
+
+2. Click on `Confirm` button of the pop-up box to re-confirm the config removal or `Cancel` to go back.
+![Remove Config Confirmation](/images/automate/sso_config_remove_popup.png)
+
+3. On completion of the request, appropriate messages reagrding the success/failure of config removal will be displayed.
+   - `SSO request is complete. Config removed Successfully` message denotes that SSO config removal is successful.
+   - `SSO Request Failed` message implies that the SSO config removal failed.
+
+4. In case of failure, removal request can be triggered again using `Remove Configuration`  button.
+
+
+## Appendix for Chef SaaS SSO
+
+
+### SSO UI page form validations
+
+1. `SSO URL` * - Single Sign-On URL is provided by the IDP. Ensure that it is a valid URL.
+
+2. `Email Attribute` * - It is used to refer to the user’s email. The attribute configured in IDP for user email can be passed here.
+
+3. `Username Attribute` * - It is used to refer to a username. The attribute configured in IDP for the username can be passed here.
+
+4. `Entity Issuer URL` * - It contains the value of the Identifier (Entity ID). This should be the automate URL appended with the dex callback.
+   ```Ex- https://your_automate_url/dex/callback```
+
+5. `CA Certificate` * - This is the (Base64) Certificate provided by the IDP. Ensure that this certificate has -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- markers. This value should be used as it is and should not contain /n sequences.
+
+6. `Group Attribute` - This field is optional, but if not provided, users authenticating via SSO will not be members of any teams.
+
+7. `Allowed Groups` - This field is optional. It provides a Single sign-in for members of the listed groups and discards all user groups that are not on the list. Groups must be on the allowed_groups list to access Chef Automate.
+
+8. `Name Id Policy Format` - When provided, Chef Automate will request a name ID of the configured format in the SAML AuthnRequest. This is a mandatory field for Microsoft365 and Azure AD IDP. The default value of this field is `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`. 
+
+{{< note >}}
+
+Fields marked with * are mandatory fields.
+
+{{< /note >}}
+
