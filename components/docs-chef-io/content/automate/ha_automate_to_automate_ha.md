@@ -79,13 +79,6 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
 {{% automate/char-warn %}}
 {{< /warning >}}
 
-1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
-
-    Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
-
-    ```bash
-    chef-automate bootstrap bundle unpack bootstrap.abb
-    ```
 
 1. Restore in Chef-Automate HA using the following command:
 
@@ -93,6 +86,14 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
      
     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    ```
+
+1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
+
+    Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
+
+    ```bash
+    chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
 1. Start the Service in all the Frontend Nodes with the command shown below:
@@ -134,6 +135,7 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     sudo chef-automate config show > current_config.toml 
     ```
 
+   
     From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
     ```bash
@@ -146,13 +148,6 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
 {{% automate/char-warn %}}
 {{< /warning >}}
 
-1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
-
-1. Unpack the `bootstrap.abb` file on all the Frontend nodes. `ssh` to Each Frontend Node and run the following command:
-
-    ```bash
-    chef-automate bootstrap bundle unpack bootstrap.abb
-    ```
 
 1. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster:
 
@@ -160,6 +155,14 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
 
     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    ```
+
+1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
+
+1. Unpack the `bootstrap.abb` file on all the Frontend nodes. `ssh` to Each Frontend Node and run the following command:
+
+    ```bash
+    chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
 1. Start the Service in All the Frontend Nodes with command shown below:
