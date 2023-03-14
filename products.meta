@@ -35,6 +35,7 @@
     "chef/automate-cs-bookshelf",
     "chef/automate-cs-oc-bifrost",
     "chef/automate-cs-oc-erchef",
+    "chef/automate-cs-oc-id",
     "chef/automate-cs-nginx",
     "chef/automate-workflow-server",
     "chef/automate-workflow-nginx",
@@ -178,6 +179,7 @@
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",
         "chef/automate-cs-oc-erchef",
+        "chef/automate-cs-oc-id",
         "chef/automate-cs-nginx"
       ]
     },

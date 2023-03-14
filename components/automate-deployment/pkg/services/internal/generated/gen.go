@@ -390,6 +390,10 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-cs-oc-id",
+      "metadata": null
+    },
+    {
       "name": "chef/automate-cs-nginx",
       "metadata": {
         "name": "chef/automate-cs-nginx",
