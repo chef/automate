@@ -23,8 +23,7 @@ export class DateTime {
 
   // Format for date labels in event feed graph
   // Tue, 24 Sept
-  // We are using @angular/common DatePipe. Ref: https://angular.io/api/common/DatePipe
-  public static readonly EVENT_GRAPH_DATE_LABEL: string = 'EEE, dd LLL';
+  public static readonly EVENT_GRAPH_DATE_LABEL: string = 'ddd, DD MMM';
 
   // Format for time labels in event feed table
   // 09:59
