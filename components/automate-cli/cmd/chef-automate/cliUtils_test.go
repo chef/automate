@@ -37,3 +37,16 @@ func TestGenerateOriginalAutomateCLICommand(t *testing.T) {
 	expectedCommand = "sudo my-command --bool-flag --int-flag 42 --string-flag string-value arg1 arg2"
 	assert.Equal(t, fullCommand, expectedCommand)
 }
+
+func basicCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "example-for-test",
+		RunE:  runExampleForTestCmd,
+		Short: "just_for_testing_nothing_happens",
+		Long:  "just_for_testing_nothing_happens",
+	}
+}
+
+func runExampleForTestCmd(cmd *cobra.Command, _ []string) error {
+	return nil
+}

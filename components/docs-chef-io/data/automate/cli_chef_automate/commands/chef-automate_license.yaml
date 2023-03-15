@@ -20,8 +20,8 @@ see_also:
 - chef-automate - Chef Automate CLI
 - apply - Apply Chef Automate license
 - complianceResourceRunCount - Generates the unique count of reported Compliance scans on hourly basis between the time duration
-- complianceResourceRunReport - Generates daily Infra Client Run reports for a span of time duration
+- complianceResourceRunReport - Generates daily Compliance scan reports for a span of time duration
 - nodeRunReport - Generates daily Infra Client Run reports for a span of time duration
 - status - Retrieve Chef Automate license status
 - uniqNodeRunReport - Generates the unique count of reported Infra Client nodes on hourly basis between the time duration
-supported_on: Automate
+supported_on: Bastion

@@ -6,6 +6,9 @@ options:
 - name: end_time
   shorthand: e
   usage: end time of the report in yyyy-mm-dd format
+- name: fileName
+  shorthand: f
+  usage: 'file name for the report Ex: complianceUniqueResourceCount'
 - name: help
   shorthand: h
   default_value: "false"
@@ -41,4 +44,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate license - Chef Automate license management
-compatible_with: Automate
+supported_on: Bastion

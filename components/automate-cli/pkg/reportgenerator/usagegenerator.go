@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	cli "github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/gocarina/gocsv"
 	elastic "github.com/olivere/elastic/v7"
 )
@@ -36,8 +37,8 @@ type ComplianceInfo interface{}
 
 var url = "https://%s:%s"
 var errorcsv = "Error while writing csv: "
-var timeFormat = "2006-01-02"
 var errorQuery = "Error in query: "
+var osGatewayPort = 10144
 
 func elasticSearchConnection(url string, esHostName string, esPort string, esUserName string, esPassword string) *elastic.Client {
 	tr := &http.Transport{
@@ -46,8 +47,12 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 			InsecureSkipVerify: true,
 		},
 	}
+	elasticSearchURL, err := getElasticSearchURL(esHostName, esPort, url)
+	if err != nil {
+		fmt.Println("Failed to resolve OpenSearch connection: ", err.Error())
+		os.Exit(1)
+	}
 	client := &http.Client{Transport: tr}
-	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	esclient, err := elastic.NewClient(
 		elastic.SetHttpClient(client),
 		elastic.SetURL(elasticSearchURL),
@@ -61,19 +66,33 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 	return esclient
 }
 
-func GenerateNodeCount(esHostName string, esPort string, esUserName string, esPassword string, startTime time.Time, endTime time.Time) {
+func getElasticSearchURL(esHostName string, esPort string, url string) (string, error) {
+	var configTimeOut int64 = 10
+	res, err := cli.GetAutomateConfig(configTimeOut)
+	if err != nil {
+		return "", fmt.Errorf("error while trying to get Automate Config: %s", err.Error())
+	}
+	externalOsEnabled := res.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
+
+	// If OpenSearch is deployed externally, connect to the os-gateway instead of OpenSearch directly
+	if externalOsEnabled {
+		return fmt.Sprintf("http://localhost:%d", osGatewayPort), nil
+	}
+	return fmt.Sprintf(url, esHostName, esPort), nil
+}
+
+func GenerateNodeCount(esHostName string, esPort string, esUserName string, esPassword string, startTime time.Time, endTime time.Time, fileName string) {
 	client := elasticSearchConnection(url, esHostName, esPort, esUserName, esPassword)
-	queryElasticSearchNodeCount(client, startTime, endTime)
+	queryElasticSearchNodeCount(client, startTime, endTime, fileName)
 }
 
-func GenerateNodeRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+func GenerateNodeRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time, fileName string) {
 	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
-	queryElasticSearchNodeReport(client, startTime, endTime)
+	queryElasticSearchNodeReport(client, startTime, endTime, fileName)
 }
 
-func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("nodecount_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, endTime time.Time, fileName string) {
+	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		fmt.Println("Failed to open Node Count report")
 		os.Exit(1)
@@ -146,7 +165,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		}
 	}
 	writer.Flush()
-	fmt.Println("The node count report is available in: ", filename)
+	fmt.Println("The node count report is available in: ", fileName)
 }
 
 func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
@@ -175,9 +194,8 @@ func get(key string, s interface{}) interface{} {
 	return s.(map[string]interface{})[key]
 }
 
-func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("nodeinfo_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time, fileName string) {
+	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		fmt.Println("Failed to open Node Detail report")
 		os.Exit(1)
@@ -263,22 +281,21 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 			t = startTime
 		}
 	}
-	fmt.Println("The details of the runs can be found in : ", filename)
+	fmt.Println("The details of the runs can be found in : ", fileName)
 }
 
-func GenerateComplianceResourceRunCount(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+func GenerateComplianceResourceRunCount(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time, fileName string) {
 	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
-	queryElasticSearchComplianceResourceCount(client, startTime, endTime)
+	queryElasticSearchComplianceResourceCount(client, startTime, endTime, fileName)
 }
 
-func GenerateComplianceResourceRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+func GenerateComplianceResourceRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time, fileName string) {
 	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
-	queryElasticSearchComplianceResourceRunReport(client, startTime, endTime)
+	queryElasticSearchComplianceResourceRunReport(client, startTime, endTime, fileName)
 }
 
-func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("complianceresourcecount_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime time.Time, endTime time.Time, fileName string) {
+	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	errorMessage("Failed to open Resource Count report", err)
 
 	defer f.Close()
@@ -329,7 +346,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 		}
 	}
 	writer.Flush()
-	fmt.Println("The resource count report is available in: ", filename)
+	fmt.Println("The resource count report is available in: ", fileName)
 }
 
 func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
@@ -351,9 +368,8 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 	return metric, ok
 }
 
-func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("complianceresourceinfo_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, startTime time.Time, endTime time.Time, fileName string) {
+	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	errorMessage("Failed to open Compliance scan detail report", err)
 	defer f.Close()
 
@@ -445,7 +461,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 			t = startTime
 		}
 	}
-	fmt.Println("The details of the runs can be found in : ", filename)
+	fmt.Println("The details of the runs can be found in : ", fileName)
 }
 
 func errorMessage(message string, err error) {
