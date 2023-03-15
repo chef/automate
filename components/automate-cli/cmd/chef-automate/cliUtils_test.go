@@ -39,5 +39,40 @@ func TestGenerateOriginalAutomateCLICommand(t *testing.T) {
 }
 
 func TestRunCmdOnSingleAutomateNodeNCopyReport(t *testing.T) {
+	type args struct {
+		cmd      *cobra.Command
+		args     []string
+		fileName string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Test 1,  Want type error",
+			args: args{
+				cmd:  &cobra.Command{},
+				args: []string{"one", "two"},
+			},
+			wantErr: true,
+		},
 
+		{
+			name: "Test 2, Want type error",
+			args: args{
+				cmd:  &cobra.Command{},
+				args: []string{"zyx", "pqr"},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := RunCmdOnSingleAutomateNodeNCopyReport(tt.args.cmd, tt.args.args, tt.args.fileName); (err != nil) != tt.wantErr {
+				t.Errorf("RunCmdOnSingleAutomateNodeNCopyReport() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
