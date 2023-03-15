@@ -44,6 +44,7 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	c := exec.Command("automate-cluster-ctl", args...)
 	c.Dir = "/hab/a2_deploy_workspace"
 	c.Stdin = os.Stdin
+	c.Env = os.Environ()
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	c.Stdout = io.MultiWriter(&out)
@@ -81,6 +82,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	c := exec.Command("automate-cluster-ctl", args...)
 	c.Dir = AUTOMATE_HA_WORKSPACE_DIR
 	c.Stdin = os.Stdin
+	c.Env = os.Environ()
 	outfile, err := os.Create(logFilePath)
 	if err != nil {
 		panic(err)
