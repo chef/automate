@@ -5,9 +5,9 @@ gh_repo = "AWS Deployment Prerequisites"
 [menu]
   [menu.automate]
     title = "AWS Deployment Prerequisites"
-    parent = "automate/deploy_high_availability"
-    identifier = "automate/settings/ha-aws-deployment-prerequisites.md AWS Deployment Prerequisites"
-    weight = 13
+    parent = "automate/deploy_high_availability/ha_prerequisites"
+    identifier = "automate/deploy_high_availability/ha_prerequisites/ha-aws-deployment-prerequisites.md AWS Deployment Prerequisites"
+    weight = 10
 +++
 {{< warning >}}
 {{% automate/ha-warn %}}

@@ -7,9 +7,9 @@ gh_repo = "On-Premise Prerequisites"
 [menu]
   [menu.automate]
     title = "On-Premise Prerequisites"
-    parent = "automate/deploy_high_availability"
-    identifier = "automate/settings/ha-on-premise-deployment-prerequisites.md On-Premise Prerequisites"
-    weight = 12
+    parent = "automate/deploy_high_availability/ha_prerequisites"
+    identifier = "automate/deploy_high_availability/ha_prerequisites/ha-on-premise-deployment-prerequisites.md On-Premise Prerequisites"
+    weight = 20
 +++
 
 {{< warning >}}
