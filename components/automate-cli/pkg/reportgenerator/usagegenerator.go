@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	cli "github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/gocarina/gocsv"
 	elastic "github.com/olivere/elastic/v7"
@@ -68,7 +67,7 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 }
 
 func getElasticSearchURL(esHostName string, esPort string, url string) (string, error) {
-        var configTimeOut = 10
+	var configTimeOut int64 = 10
 	res, err := cli.GetAutomateConfig(configTimeOut)
 	if err != nil {
 		return "", fmt.Errorf("error while trying to get Automate Config: %s", err.Error())
