@@ -81,9 +81,6 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		return nil
 	},
 	PersistentPreRunE: getPreLicenseReportCmd("nodecount"),
-	Annotations: map[string]string{
-		docs.Compatibility: docs.BastionHost,
-	},
 }
 
 var nodeUsageCommand = &cobra.Command{
@@ -97,9 +94,6 @@ var nodeUsageCommand = &cobra.Command{
 		return nil
 	},
 	PersistentPreRunE: getPreLicenseReportCmd("nodeinfo"),
-	Annotations: map[string]string{
-		docs.Compatibility: docs.BastionHost,
-	},
 }
 
 var complianceUniqueResourceCounterCmd = &cobra.Command{
@@ -113,9 +107,6 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		return nil
 	},
 	PersistentPreRunE: getPreLicenseReportCmd("complianceresourcecount"),
-	Annotations: map[string]string{
-		docs.Compatibility: docs.BastionHost,
-	},
 }
 
 var complianceResourceUsageCmd = &cobra.Command{
@@ -129,7 +120,6 @@ var complianceResourceUsageCmd = &cobra.Command{
 		return nil
 	},
 	PersistentPreRunE: getPreLicenseReportCmd("complianceresourceinfo"),
-	
 }
 
 var noLicenseAppliedMsg = `
