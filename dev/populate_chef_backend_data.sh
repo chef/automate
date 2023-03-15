@@ -44,6 +44,7 @@ do
 
          echo $json_data > node.json
          knife raw -s $SERVER_URL -m POST /organizations/"org$i"/nodes -i node.json $FLAG_VALUE
+         knife node policy set "node-$l-for-env-$k-of-org-$i" 'test-policy-group' 'test-policy' --config-option chef_server_url=$SERVER_URL/organizations/"org$i"
      done
   done
 done
