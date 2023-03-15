@@ -93,14 +93,14 @@ func (e *existingInfra) addDNTocertConfig() error {
 			//If PublicKey is given then get the node_dn from the cert
 			publicKey := e.config.Opensearch.Config.CertsByIP[i].PublicKey
 			if len(strings.TrimSpace(publicKey)) > 0 {
-				node_dn, err := getDistinguishedNameFromKey(publicKey)
+				nodeDn, err := getDistinguishedNameFromKey(publicKey)
 				if err != nil {
 					return err
 				}
 				if NodesDn == "" {
-					NodesDn = NodesDn + fmt.Sprintf("%v", node_dn) + "\\n  "
+					NodesDn = NodesDn + fmt.Sprintf("%v", nodeDn) + "\\n  "
 				} else {
-					NodesDn = NodesDn + fmt.Sprintf("- %v", node_dn) + "\\n  "
+					NodesDn = NodesDn + fmt.Sprintf("- %v", nodeDn) + "\\n  "
 				}
 			}
 		}
