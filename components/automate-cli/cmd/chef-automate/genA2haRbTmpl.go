@@ -158,7 +158,7 @@ automate do
   ### Leave commented out if using AWS infrastructure
   {{ if .Automate.Config.Fqdn }} fqdn "{{ .Automate.Config.Fqdn }}" {{ else }} # fqdn "{{ .Automate.Config.Fqdn }}" {{ end }}
   #Deprecated Config - automate_setup_type is not supported
-  automate_setup_type {{ .Automate.Config.AutomateSetupType }}
+  automate_setup_type "{{ .Automate.Config.AutomateSetupType }}"
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
   {{ if .Automate.Config.TeamsPort }} teams_port "{{ .Automate.Config.TeamsPort }}" {{ else }} # teams_port "{{ .Automate.Config.TeamsPort }}" {{ end }}
