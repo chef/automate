@@ -188,7 +188,6 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	if err != nil {
 		return BeStatusValue{}, err
 	}
-	// memeber_id
 	memeber_id := defaultServiceDetails["sys"].(map[string]interface{})["member_id"]
 	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
 	servicePid := fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
@@ -208,7 +207,6 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 
 	health := fmt.Sprint(ServiceHealth["status"])
 
-	// /census
 	args = []string{
 		"-s",
 		fmt.Sprintf("%s/census", habUrl),
@@ -237,7 +235,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	t := time.Unix(int64(startingTime), 0)
 	duration := t.Sub(time.Unix(0, 0))
 
-	// Format the duration as "148h 43m 31s"
+	// Format the duration as "1d 148h 43m 31s"
 	formatted := fmt.Sprintf("%dd %dh %dm %ds", int(duration.Hours())/24, int(duration.Hours())%24, int(duration.Minutes())%60, int(duration.Seconds())%60)
 
 	return BeStatusValue{

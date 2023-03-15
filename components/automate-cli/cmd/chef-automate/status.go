@@ -41,7 +41,6 @@ type FeStatusValue struct {
 }
 
 type BeStatusValue struct {
-	// | Service    | IP Address | Health | Process        | Uptime      | Role
 	serviceName string
 	ipAddress   string
 	health      string

@@ -15,7 +15,6 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	// func TestIPValidation(t *testing.T) {
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
