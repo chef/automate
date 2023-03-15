@@ -52,6 +52,7 @@ const (
 	patching                        = "Config Patch"
 	setting                         = "Config Set"
 	DEFAULT_TIMEOUT                 = 180
+	waitTimeout                     = "wait-timeout"
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -80,8 +81,8 @@ func init() {
 	showConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.opensearch, "os", false, "Shows configurations from OpenSearch node[DUPLICATE]")
 	showConfigCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
-	showConfigCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config show process")
-	showConfigCmd.PersistentFlags().SetAnnotation("wait-timeout", docs.Compatibility, []string{docs.CompatiblewithHA})
+	showConfigCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, waitTimeout, DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config show process")
+	showConfigCmd.PersistentFlags().SetAnnotation(waitTimeout, docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	// config patch flags
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Patch toml configuration to the all frontend nodes")
@@ -104,8 +105,8 @@ func init() {
 	patchConfigCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Patch toml configuration to the postgresql node[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
-	patchConfigCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config patch process")
-	patchConfigCmd.PersistentFlags().SetAnnotation("wait-timeout", docs.Compatibility, []string{docs.CompatiblewithHA})
+	patchConfigCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, waitTimeout, DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config patch process")
+	patchConfigCmd.PersistentFlags().SetAnnotation(waitTimeout, docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	// config set flags
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Set toml configuration to the automate node")

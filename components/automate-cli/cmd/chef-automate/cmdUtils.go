@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
@@ -141,15 +142,19 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 			hostIP:     hostIP,
 			timeout:    timeout,
 		}
-		newSSHUtil := NewSSHUtil(newSSHConfig)
+		sshUtil := NewSSHUtil(newSSHConfig)
 
 		printConnectionMessage(remoteService, hostIP, cliWriter)
 
-		go c.executeCmdOnNode(command, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput, newSSHUtil, resultChan)
+		go c.executeCmdOnNode(command, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput, sshUtil, resultChan)
 	}
+
+	ouputJsonResult := map[string]*CmdResult{}
 
 	for i := 0; i < len(nodeIps); i++ {
 		result := <-resultChan
+
+		ouputJsonResult[result.HostIP] = &result
 
 		if i == 0 {
 			writer.StopSpinner()
@@ -163,17 +168,18 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 			writer.StartSpinner()
 		}
 	}
+	status.GlobalResult = ouputJsonResult
 
 	close(resultChan)
 	return nil
 }
 
 // executeCmdOnNode function will run all remote jobs on a single node
-func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool, newSSHUtil SSHUtil, resultChan chan CmdResult) {
-	rc := CmdResult{newSSHUtil.getSSHConfig().hostIP, []string{}, "", nil}
+func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool, sshUtil SSHUtil, resultChan chan CmdResult) {
+	rc := CmdResult{sshUtil.getSSHConfig().hostIP, []string{}, "", nil}
 	if len(inputFiles) != 0 {
 		for sourceFile, destinationFile := range inputFiles {
-			err := newSSHUtil.copyFileToRemote(sourceFile, destinationFile, false)
+			err := sshUtil.copyFileToRemote(sourceFile, destinationFile, false)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
@@ -182,7 +188,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 		}
 	}
 
-	output, err := newSSHUtil.connectAndExecuteCommandOnRemote(command, true)
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, true)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
@@ -191,8 +197,8 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 
 	if len(outputFiles) != 0 {
 		for _, file := range outputFiles {
-			outFile := newSSHUtil.getSSHConfig().hostIP + "_" + file
-			destFileName, err := newSSHUtil.copyFileFromRemote(file, outFile)
+			outFile := sshUtil.getSSHConfig().hostIP + "_" + file
+			destFileName, err := sshUtil.copyFileFromRemote(file, outFile)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
@@ -334,7 +340,7 @@ func getOpensearchIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]s
 	return opensearchIps, nil
 }
 
-// TODO currently we are returning first ip, in future need to introduce smartness to return any active node from given node set
+// GetSingleIp returns first ip from array of ips
 func GetSingleIp(ips []string) (string, error) {
 	if len(ips) == 0 {
 		return "", errors.New("No ips found")
