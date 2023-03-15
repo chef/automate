@@ -4,9 +4,9 @@
 // versions:
 // 	protoc-gen-go v1.27.1
 // 	protoc        v3.19.0
-// source: config/id/config_request.proto
+// source: config/ocid/config_request.proto
 
-package id
+package ocid
 
 import (
 	shared "github.com/chef/automate/api/config/shared"
@@ -606,13 +606,13 @@ func file_config_id_config_request_proto_rawDescGZIP() []byte {
 
 var file_config_id_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_config_id_config_request_proto_goTypes = []interface{}{
-	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.id.ConfigRequest
-	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.id.ConfigRequest.V1
-	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.id.ConfigRequest.V1.System
-	(*ConfigRequest_V1_Service)(nil),        // 3: chef.automate.domain.id.ConfigRequest.V1.Service
-	(*ConfigRequest_V1_System_Network)(nil), // 4: chef.automate.domain.id.ConfigRequest.V1.System.Network
-	(*ConfigRequest_V1_System_Log)(nil),     // 5: chef.automate.domain.id.ConfigRequest.V1.System.Log
-	(*ConfigRequest_V1_System_Sql)(nil),     // 6: chef.automate.domain.id.ConfigRequest.V1.System.Sql
+	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.ocid.ConfigRequest
+	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.ocid.ConfigRequest.V1
+	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.ocid.ConfigRequest.V1.System
+	(*ConfigRequest_V1_Service)(nil),        // 3: chef.automate.domain.ocid.ConfigRequest.V1.Service
+	(*ConfigRequest_V1_System_Network)(nil), // 4: chef.automate.domain.ocid.ConfigRequest.V1.System.Network
+	(*ConfigRequest_V1_System_Log)(nil),     // 5: chef.automate.domain.ocid.ConfigRequest.V1.System.Log
+	(*ConfigRequest_V1_System_Sql)(nil),     // 6: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql
 	(*shared.Mlsa)(nil),                     // 7: chef.automate.infra.config.Mlsa
 	(*shared.TLSCredentials)(nil),           // 8: chef.automate.infra.config.TLSCredentials
 	(*wrapperspb.Int32Value)(nil),           // 9: google.protobuf.Int32Value
@@ -621,27 +621,27 @@ var file_config_id_config_request_proto_goTypes = []interface{}{
 	(*wrapperspb.BoolValue)(nil),            // 12: google.protobuf.BoolValue
 }
 var file_config_id_config_request_proto_depIdxs = []int32{
-	1,  // 0: chef.automate.domain.id.ConfigRequest.v1:type_name -> chef.automate.domain.id.ConfigRequest.V1
-	2,  // 1: chef.automate.domain.id.ConfigRequest.V1.sys:type_name -> chef.automate.domain.id.ConfigRequest.V1.System
-	3,  // 2: chef.automate.domain.id.ConfigRequest.V1.svc:type_name -> chef.automate.domain.id.ConfigRequest.V1.Service
-	7,  // 3: chef.automate.domain.id.ConfigRequest.V1.System.mlsa:type_name -> chef.automate.infra.config.Mlsa
-	5,  // 4: chef.automate.domain.id.ConfigRequest.V1.System.log:type_name -> chef.automate.domain.id.ConfigRequest.V1.System.Log
-	4,  // 5: chef.automate.domain.id.ConfigRequest.V1.System.network:type_name -> chef.automate.domain.id.ConfigRequest.V1.System.Network
-	6,  // 6: chef.automate.domain.id.ConfigRequest.V1.System.sql:type_name -> chef.automate.domain.id.ConfigRequest.V1.System.Sql
-	8,  // 7: chef.automate.domain.id.ConfigRequest.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
-	9,  // 8: chef.automate.domain.id.ConfigRequest.V1.System.Network.port:type_name -> google.protobuf.Int32Value
-	10, // 9: chef.automate.domain.id.ConfigRequest.V1.System.Network.listen_ip:type_name -> google.protobuf.StringValue
-	10, // 10: chef.automate.domain.id.ConfigRequest.V1.System.Log.level:type_name -> google.protobuf.StringValue
-	11, // 11: chef.automate.domain.id.ConfigRequest.V1.System.Log.rotation_max_bytes:type_name -> google.protobuf.Int64Value
-	9,  // 12: chef.automate.domain.id.ConfigRequest.V1.System.Log.rotation_max_files:type_name -> google.protobuf.Int32Value
-	9,  // 13: chef.automate.domain.id.ConfigRequest.V1.System.Log.max_error_logs_per_second:type_name -> google.protobuf.Int32Value
-	9,  // 14: chef.automate.domain.id.ConfigRequest.V1.System.Log.rotation_max_megabytes:type_name -> google.protobuf.Int32Value
-	12, // 15: chef.automate.domain.id.ConfigRequest.V1.System.Log.extended_perf_log:type_name -> google.protobuf.BoolValue
-	9,  // 16: chef.automate.domain.id.ConfigRequest.V1.System.Sql.timeout:type_name -> google.protobuf.Int32Value
-	9,  // 17: chef.automate.domain.id.ConfigRequest.V1.System.Sql.pool_init_size:type_name -> google.protobuf.Int32Value
-	9,  // 18: chef.automate.domain.id.ConfigRequest.V1.System.Sql.pool_max_size:type_name -> google.protobuf.Int32Value
-	9,  // 19: chef.automate.domain.id.ConfigRequest.V1.System.Sql.pool_queue_max:type_name -> google.protobuf.Int32Value
-	9,  // 20: chef.automate.domain.id.ConfigRequest.V1.System.Sql.pool_queue_timeout:type_name -> google.protobuf.Int32Value
+	1,  // 0: chef.automate.domain.ocid.ConfigRequest.v1:type_name -> chef.automate.domain.ocid.ConfigRequest.V1
+	2,  // 1: chef.automate.domain.ocid.ConfigRequest.V1.sys:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System
+	3,  // 2: chef.automate.domain.ocid.ConfigRequest.V1.svc:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.Service
+	7,  // 3: chef.automate.domain.ocid.ConfigRequest.V1.System.mlsa:type_name -> chef.automate.infra.config.Mlsa
+	5,  // 4: chef.automate.domain.ocid.ConfigRequest.V1.System.log:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Log
+	4,  // 5: chef.automate.domain.ocid.ConfigRequest.V1.System.network:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Network
+	6,  // 6: chef.automate.domain.ocid.ConfigRequest.V1.System.sql:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Sql
+	8,  // 7: chef.automate.domain.ocid.ConfigRequest.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
+	9,  // 8: chef.automate.domain.ocid.ConfigRequest.V1.System.Network.port:type_name -> google.protobuf.Int32Value
+	10, // 9: chef.automate.domain.ocid.ConfigRequest.V1.System.Network.listen_ip:type_name -> google.protobuf.StringValue
+	10, // 10: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.level:type_name -> google.protobuf.StringValue
+	11, // 11: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_bytes:type_name -> google.protobuf.Int64Value
+	9,  // 12: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_files:type_name -> google.protobuf.Int32Value
+	9,  // 13: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.max_error_logs_per_second:type_name -> google.protobuf.Int32Value
+	9,  // 14: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_megabytes:type_name -> google.protobuf.Int32Value
+	12, // 15: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.extended_perf_log:type_name -> google.protobuf.BoolValue
+	9,  // 16: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.timeout:type_name -> google.protobuf.Int32Value
+	9,  // 17: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_init_size:type_name -> google.protobuf.Int32Value
+	9,  // 18: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_max_size:type_name -> google.protobuf.Int32Value
+	9,  // 19: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_queue_max:type_name -> google.protobuf.Int32Value
+	9,  // 20: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_queue_timeout:type_name -> google.protobuf.Int32Value
 	21, // [21:21] is the sub-list for method output_type
 	21, // [21:21] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name

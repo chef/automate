@@ -928,10 +928,10 @@ paths = [
   "components/automate-cs-oc-erchef/*"
 ]
 
-[automate-cs-oc-id]
-plan_path = "components/automate-cs-oc-id"
+[automate-cs-ocid]
+plan_path = "components/automate-cs-ocid"
 paths = [
-  "components/automate-cs-oc-id/*"
+  "components/automate-cs-ocid/*"
 ]
 
 [automate-cs-nginx]

@@ -9,7 +9,7 @@ import (
 	authz "github.com/chef/automate/api/config/authz"
 	backupgateway "github.com/chef/automate/api/config/backup_gateway"
 	bifrost "github.com/chef/automate/api/config/bifrost"
-	id "github.com/chef/automate/api/config/id"
+	ocid "github.com/chef/automate/api/config/ocid"
 	bookshelf "github.com/chef/automate/api/config/bookshelf"
 	builderapi "github.com/chef/automate/api/config/builder_api"
 	builderapiproxy "github.com/chef/automate/api/config/builder_api_proxy"
@@ -76,7 +76,7 @@ func NewAutomateConfig() *AutomateConfig {
 		Dex:              dex.NewConfigRequest(),
 		Elasticsearch:    elasticsearch.NewConfigRequest(),
 		Erchef:           erchef.NewConfigRequest(),
-		Id:               id.NewConfigRequest(),
+		Ocid:             ocid.NewConfigRequest(),
 		EsSidecar:        essidecar.NewConfigRequest(),
 		Esgateway:        esgateway.NewConfigRequest(),
 		EventFeedService: eventfeed.NewConfigRequest(),
@@ -131,7 +131,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		Dex:              dex.DefaultConfigRequest(),
 		Elasticsearch:    elasticsearch.DefaultConfigRequest(),
 		Erchef:           erchef.DefaultConfigRequest(),
-		Id:               id.DefaultConfigRequest(),
+		Ocid:             ocid.DefaultConfigRequest(),
 		EsSidecar:        essidecar.DefaultConfigRequest(),
 		Esgateway:        esgateway.DefaultConfigRequest(),
 		EventFeedService: eventfeed.DefaultConfigRequest(),
@@ -213,7 +213,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.Bookshelf.SetGlobalConfig(c.Global)
 	c.Bifrost.SetGlobalConfig(c.Global)
 	c.Erchef.SetGlobalConfig(c.Global)
-	c.Id.SetGlobalConfig(c.Global)
+	c.Ocid.SetGlobalConfig(c.Global)
 	c.CsNginx.SetGlobalConfig(c.Global)
 	c.Workflow.SetGlobalConfig(c.Global)
 	c.WorkflowNginx.SetGlobalConfig(c.Global)
@@ -295,8 +295,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.Bifrost, true
 	case "automate-cs-oc-erchef":
 		return c.Erchef, true
-	case "automate-cs-oc-id":
-		return c.Id, true	
+	case "automate-cs-ocid":
+		return c.Ocid, true
 	case "automate-cs-nginx":
 		return c.CsNginx, true
 	case "automate-workflow-server":

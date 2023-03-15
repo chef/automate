@@ -21,7 +21,7 @@ export OPENSSL_FIPS=1
 mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 
-pg-helper rename-if-exists oc-id "$DBNAME"
+pg-helper rename-if-exists ocid "$DBNAME"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_id"}}/schema/"

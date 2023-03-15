@@ -21,8 +21,8 @@ pool_init_size = 20
 pool_max_size = 50
 pool_queue_max = 20
 pool_queue_timeout = 2000
-user="automate-cs-oc-id"
-db_name="automate-cs-oc-id"
+user="automate-cs-ocid"
+db_name="automate-cs-ocid"
 
 
 [depsolver]

@@ -1,15 +1,15 @@
 // -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
 
-package chef.automate.domain.id;
-option go_package = "github.com/chef/automate/api/config/id";
+package chef.automate.domain.ocid;
+option go_package = "github.com/chef/automate/api/config/ocid";
 import "config/shared/global.proto";
 import "config/shared/tls.proto";
 import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
-  option (chef.automate.api.service_config) = {name: "automate-cs-oc-id"};
+  option (chef.automate.api.service_config) = {name: "automate-cs-ocid"};
 
 	V1 v1 = 1;
 

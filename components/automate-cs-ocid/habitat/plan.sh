@@ -3,8 +3,8 @@
 #shellcheck disable=SC2154
 #stable channel
 
-pkg_name="automate-cs-oc-id"
-pkg_description="Wrapper package for chef/oc_id"
+pkg_name="automate-cs-ocid"
+pkg_description="Wrapper package for chef/ocid"
 pkg_origin="chef"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="15.4.0"

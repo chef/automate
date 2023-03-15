@@ -1,4 +1,4 @@
-package id
+package ocid
 
 import (
 	ac "github.com/chef/automate/api/config/shared"

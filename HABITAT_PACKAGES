@@ -58,7 +58,7 @@ trial-license-service components/trial-license-service
 automate-cs-bookshelf components/automate-cs-bookshelf
 automate-cs-oc-bifrost components/automate-cs-oc-bifrost
 automate-cs-oc-erchef components/automate-cs-oc-erchef
-automate-cs-oc-id components/automate-cs-oc-id
+automate-cs-ocid components/automate-cs-ocid
 automate-cs-nginx components/automate-cs-nginx
 automate-workflow-nginx components/automate-workflow-nginx
 automate-workflow-web components/automate-workflow-web
