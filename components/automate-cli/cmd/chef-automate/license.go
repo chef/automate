@@ -129,9 +129,7 @@ var complianceResourceUsageCmd = &cobra.Command{
 		return nil
 	},
 	PersistentPreRunE: getPreLicenseReportCmd("complianceresourceinfo"),
-	Annotations: map[string]string{
-		docs.Compatibility: docs.BastionHost,
-	},
+	
 }
 
 var noLicenseAppliedMsg = `
