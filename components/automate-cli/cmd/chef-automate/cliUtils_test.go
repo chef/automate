@@ -38,6 +38,19 @@ func TestGenerateOriginalAutomateCLICommand(t *testing.T) {
 	assert.Equal(t, fullCommand, expectedCommand)
 }
 
+func basicCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "example-for-test",
+		RunE:  runExampleForTestCmd,
+		Short: "just_for_testing_nothing_happens",
+		Long:  "just_for_testing_nothing_happens",
+	}
+}
+
+func runExampleForTestCmd(cmd *cobra.Command, _ []string) error {
+	return nil
+}
+
 func TestRunCmdOnSingleAutomateNodeNCopyReport(t *testing.T) {
 	type args struct {
 		cmd      *cobra.Command
@@ -53,7 +66,7 @@ func TestRunCmdOnSingleAutomateNodeNCopyReport(t *testing.T) {
 		{
 			name: "Test 1,  Want type error",
 			args: args{
-				cmd:  &cobra.Command{},
+				cmd:  basicCmd(),
 				args: []string{"one", "two"},
 			},
 			wantErr: true,
@@ -62,7 +75,7 @@ func TestRunCmdOnSingleAutomateNodeNCopyReport(t *testing.T) {
 		{
 			name: "Test 2, Want type error",
 			args: args{
-				cmd:  &cobra.Command{},
+				cmd:  basicCmd(),
 				args: []string{"zyx", "pqr"},
 			},
 			wantErr: true,

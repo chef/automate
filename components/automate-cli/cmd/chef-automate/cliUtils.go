@@ -62,6 +62,7 @@ func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string, fi
 
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
+		fmt.Print(err)
 		return err
 	}
 
