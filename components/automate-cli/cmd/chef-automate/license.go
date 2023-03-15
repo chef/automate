@@ -80,7 +80,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("nodecount"),
+	PersistentPreRunE: getPreLicenseReportCmd("nodecount"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -96,7 +96,7 @@ var nodeUsageCommand = &cobra.Command{
 		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("nodeinfo"),
+	PersistentPreRunE: getPreLicenseReportCmd("nodeinfo"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -112,7 +112,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("complianceresourcecount"),
+	PersistentPreRunE: getPreLicenseReportCmd("complianceresourcecount"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -128,7 +128,7 @@ var complianceResourceUsageCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("complianceresourceinfo"),
+	PersistentPreRunE: getPreLicenseReportCmd("complianceresourceinfo"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -159,7 +159,7 @@ var hostnameES = "hostname of the OpenSource host"
 var portES = "port of the OpenSource host"
 var userNameES = "username of the OpenSource host"
 var passwordES = "password of the OpenSource host"
-var fileName = "file name for the report Ex: complianceUniqueResourceCount.csv"
+var fileName = "file name for the report Ex: complianceUniqueResourceCount"
 
 type usageResult struct {
 	StartTimestamp   string           `json:"start_timestamp"`
@@ -419,12 +419,6 @@ func validateArgs() {
 		fmt.Println("End time cannot be before start time")
 		os.Exit(1)
 	}
-	fileExtension := strings.Split(CommandFlags.FileName, ".")
-
-	if len(fileExtension) == 2 && fileExtension[1] != "csv" {
-		fmt.Println("File name needs to be mentioned in .csv format")
-		os.Exit(1)
-	}
 }
 
 func convertStringToTime(timeStr string) (time.Time, error) {
@@ -488,24 +482,7 @@ func preLicenseCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func preLicenseReportCmd(cmd *cobra.Command, args []string) error {
-	err := commandPrePersistent(cmd)
-	if err != nil {
-		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
-	}
-	if isA2HARBFileExist() {
-		reportFileName := CommandFlags.FileName
-		err = RunCmdOnSingleAutomateNodeNCopyReport(cmd, args, reportFileName)
-		if err != nil {
-			return err
-		}
-		// NOTE: used os.exit as need to stop next lifecycle method to execute
-		os.Exit(1)
-	}
-	return nil
-}
-
-func getCommandWithFileName(commandName string) func(*cobra.Command, []string) error {
+func getPreLicenseReportCmd(fileNamePrefix string) func(*cobra.Command, []string) error {
 	commandWithFileName := func(cmd *cobra.Command, args []string) error {
 		err := commandPrePersistent(cmd)
 		if err != nil {
