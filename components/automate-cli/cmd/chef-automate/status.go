@@ -4,13 +4,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -137,16 +137,22 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 		if err != nil {
 			return err
 		}
-		statusSummary := NewStatusSummary(infra, &fileutils.FileSystemUtils{}, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
-		err = statusSummary.Run()
+		statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
+		sshUtil := statusSummary.(*Summary).setSSHConfig()
+
+		err = statusSummary.Run(sshUtil)
 		if err != nil {
 			return err
 		}
 		if isManagedServicesOn() {
-			statusSummary.FEDisplay()
+			fe := statusSummary.FEDisplay()
+			fmt.Println(fe)
 		} else {
-			statusSummary.FEDisplay()
-			statusSummary.BEDisplay()
+			fe := statusSummary.FEDisplay()
+			fmt.Println(fe)
+			be := statusSummary.BEDisplay()
+			fmt.Println(be)
+
 		}
 	} else {
 		return errors.New("This command only works on HA deployment")

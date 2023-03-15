@@ -9,25 +9,25 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/jedib0t/go-pretty/v5/table"
 	"github.com/spf13/cobra"
 )
 
-const (
-	habUrl          = "https://localhost:9631"
-	clusterOSHealth = "http://localhost:10144/_cluster/health"
+var (
+	habUrl                = "https://localhost:9631"
+	clusterOSHealth       = "http://localhost:10144/_cluster/health"
+	a2haHabitatAutoTfvars = terraformPath + "/a2ha_habitat.auto.tfvars"
+	nowFunc               = time.Now
 )
 
 type StatusSummary interface {
-	Run() error
-	FEDisplay()
-	BEDisplay()
+	Run(sshUtil SSHUtil) error
+	FEDisplay() string
+	BEDisplay() string
 }
 
 type Summary struct {
-	fileutils             fileutils.FileUtils
 	feStatus              FeStatus
 	beStatus              BeStatus
 	timeout               int64
@@ -41,8 +41,8 @@ type A2haHabitatAutoTfvars struct {
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
 
-// Display implements StatusSummary
-func (ss *Summary) FEDisplay() {
+// Display Frontend Status
+func (ss *Summary) FEDisplay() string {
 	if len(ss.feStatus) != 0 {
 		fmt.Println("Frontend Services")
 		t := table.NewWriter()
@@ -52,12 +52,13 @@ func (ss *Summary) FEDisplay() {
 			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.status, status.Opensearch})
 		}
 		t.AppendHeader(table.Row{"Name", "IP Address", "Status", "Opensearch"})
-		fmt.Println(t.Render())
+		return t.Render()
 	}
+	return ""
 }
 
-// Display implements StatusSummary
-func (ss *Summary) BEDisplay() {
+// Display Backend Status
+func (ss *Summary) BEDisplay() string {
 	if len(ss.beStatus) != 0 {
 		fmt.Println("Backend Services")
 		t := table.NewWriter()
@@ -67,36 +68,37 @@ func (ss *Summary) BEDisplay() {
 			t.AppendRow(table.Row{status.serviceName, status.ipAddress, status.health, status.process, status.upTime, status.role})
 		}
 		t.AppendHeader(table.Row{"Name", "IP Address", "Health", "Process", "Uptime", "Role"})
-		fmt.Println(t.Render())
+		return t.Render()
 	}
+	return ""
 }
 
-// Run implements StatusSummary
-func (ss *Summary) Run() error {
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.CheckIPAddresses()
+// Run Status summary
+func (ss *Summary) Run(sshUtil SSHUtil) error {
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.checkIPAddresses()
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "IP address validation failed")
 	}
-	sshUtil := ss.setSSHConfig()
-	err := ss.connectToFeNode(sshUtil, automateIps, "Automate", "FE")
+	err := ss.prepareFEScript(sshUtil, automateIps, "Automate", "FE")
 	if err != nil {
 		return err
 	}
-	err = ss.connectToFeNode(sshUtil, chefServerIps, "Chef Server", "FE")
+	err = ss.prepareFEScript(sshUtil, chefServerIps, "Chef Server", "FE")
 	if err != nil {
 		return err
 	}
-	err = ss.connectToBeNode(sshUtil, opensearchIps, "Open Search", "BE")
+	err = ss.prepareBEScript(sshUtil, opensearchIps, "Open Search", "BE")
 	if err != nil {
 		return err
 	}
-	err = ss.connectToBeNode(sshUtil, postgresqlIps, "Postgresql", "BE")
+	err = ss.prepareBEScript(sshUtil, postgresqlIps, "Postgresql", "BE")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+// get sshConfig
 func (ss *Summary) setSSHConfig() SSHUtil {
 	sshconfig := &SSHConfig{}
 	sshconfig.sshUser = ss.infra.Outputs.SSHUser.Value
@@ -106,7 +108,7 @@ func (ss *Summary) setSSHConfig() SSHUtil {
 	return sshUtil
 }
 
-func (ss *Summary) connectToBeNode(sshUtil SSHUtil, serviceIps []string, serviceName, serviceType string) error {
+func (ss *Summary) prepareBEScript(sshUtil SSHUtil, serviceIps []string, serviceName, serviceType string) error {
 	script := ""
 	err := ss.executeCommandForArrayofIPs(sshUtil, serviceIps, script, serviceName, serviceType)
 	if err != nil {
@@ -116,7 +118,7 @@ func (ss *Summary) connectToBeNode(sshUtil SSHUtil, serviceIps []string, service
 	return nil
 }
 
-func (ss *Summary) connectToFeNode(sshUtil SSHUtil, serviceIps []string, serviceName, serviceType string) error {
+func (ss *Summary) prepareFEScript(sshUtil SSHUtil, serviceIps []string, serviceName, serviceType string) error {
 	script := GenerateOriginalAutomateCLICommand(
 		&cobra.Command{
 			Use: "chef-automate",
@@ -134,7 +136,7 @@ func (ss *Summary) connectToFeNode(sshUtil SSHUtil, serviceIps []string, service
 }
 
 func (ss *Summary) executeCommandForArrayofIPs(sshUtil SSHUtil, remoteIps []string, script, serviceName, serviceType string) error {
-	getConfigJsonString := convTfvarToJson(terraformPath + "/a2ha_habitat.auto.tfvars")
+	getConfigJsonString := convTfvarToJson(a2haHabitatAutoTfvars)
 	for i := 0; i < len(remoteIps); i++ {
 		sshUtil.getSSHConfig().hostIP = remoteIps[i]
 		if serviceType == "FE" {
@@ -191,7 +193,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
 	servicePid := fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
-	startingTime = float64(time.Now().UTC().Unix()) - startingTime
+	startingTime = float64(nowFunc().UTC().Unix()) - startingTime
 	args = []string{
 		"-s",
 		fmt.Sprintf("%s/services/%s/default/health", habUrl, service),
@@ -287,7 +289,7 @@ func (ss *Summary) opensearchStatusInFE(sshUtil SSHUtil) string {
 		return "Unknown"
 	}
 
-	return fmt.Sprintf("%s Active: %s", esHealthData["status"], esHealthData["active_shards_percent_as_number"])
+	return fmt.Sprintf("%s (Active: %s)", esHealthData["status"], esHealthData["active_shards_percent_as_number"])
 }
 
 func executeCmd(sshUtil SSHUtil, cmd string, args []string) (map[string]interface{}, error) {
@@ -307,8 +309,7 @@ func executeCmd(sshUtil SSHUtil, cmd string, args []string) (map[string]interfac
 	return body, nil
 }
 
-// ValidateIPAddresses implements StatusSummary
-func (ss *Summary) CheckIPAddresses() ([]string, []string, []string, []string, *list.List) {
+func (ss *Summary) checkIPAddresses() ([]string, []string, []string, []string, *list.List) {
 	errorList := list.New()
 	var automateIps, chefServerIps, opensearchIps, postgresqlIps []string
 	if ss.statusSummaryCmdFlags.automateIp != "" ||
@@ -325,7 +326,7 @@ func (ss *Summary) CheckIPAddresses() ([]string, []string, []string, []string, *
 			datafound, dataNotFound, err := validateIPAddresses(automateIpsFromcmd, ss.infra.Outputs.AutomatePrivateIps.Value, "Automate")
 			automateIps = datafound
 			if len(dataNotFound) != 0 {
-				errorList.PushBack(fmt.Sprintf("List of IpAddress not found %s", dataNotFound))
+				errorList.PushBack(fmt.Sprintf("List of automate ip address not found %s", dataNotFound))
 			}
 			if err != nil && err.Len() > 0 {
 				errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
@@ -335,7 +336,7 @@ func (ss *Summary) CheckIPAddresses() ([]string, []string, []string, []string, *
 			datafound, dataNotFound, err := validateIPAddresses(chefServerIpsFromcmd, ss.infra.Outputs.ChefServerPrivateIps.Value, "chef-server")
 			chefServerIps = datafound
 			if len(dataNotFound) != 0 {
-				errorList.PushBack(fmt.Sprintf("List of IpAddress not found %s", dataNotFound))
+				errorList.PushBack(fmt.Sprintf("List of chef server ip address not found %s", dataNotFound))
 			}
 			if err != nil && err.Len() > 0 {
 				errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
@@ -343,19 +344,19 @@ func (ss *Summary) CheckIPAddresses() ([]string, []string, []string, []string, *
 		}
 		if len(opensearchIpsFromcmd) != 0 {
 			datafound, dataNotFound, err := validateIPAddresses(opensearchIpsFromcmd, ss.infra.Outputs.OpensearchPrivateIps.Value, "open search")
-			if len(dataNotFound) != 0 {
-				errorList.PushBack(fmt.Sprintf("List of IpAddress not found %s", dataNotFound))
-			}
 			opensearchIps = datafound
+			if len(dataNotFound) != 0 {
+				errorList.PushBack(fmt.Sprintf("List of openSearch ip address not found %s", dataNotFound))
+			}
 			if err != nil && err.Len() > 0 {
 				errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
 			}
 		}
 		if len(postgresqlIpsFromcmd) != 0 {
 			datafound, dataNotFound, err := validateIPAddresses(postgresqlIpsFromcmd, ss.infra.Outputs.PostgresqlPrivateIps.Value, "postgres")
-			opensearchIps = datafound
+			postgresqlIps = datafound
 			if len(dataNotFound) != 0 {
-				errorList.PushBack(fmt.Sprintf("List of IpAddress not found %s", dataNotFound))
+				errorList.PushBack(fmt.Sprintf("List of postgresql ip address not found %s", dataNotFound))
 			}
 			if err != nil && err.Len() > 0 {
 				errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
@@ -364,13 +365,17 @@ func (ss *Summary) CheckIPAddresses() ([]string, []string, []string, []string, *
 	} else {
 		if ss.statusSummaryCmdFlags.isAutomate {
 			automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
-		} else if ss.statusSummaryCmdFlags.isChefServer {
+		}
+		if ss.statusSummaryCmdFlags.isChefServer {
 			chefServerIps = ss.infra.Outputs.ChefServerPrivateIps.Value
-		} else if ss.statusSummaryCmdFlags.isOpenSearch {
+		}
+		if ss.statusSummaryCmdFlags.isOpenSearch {
 			opensearchIps = ss.infra.Outputs.OpensearchPrivateIps.Value
-		} else if ss.statusSummaryCmdFlags.isPostgresql {
+		}
+		if ss.statusSummaryCmdFlags.isPostgresql {
 			postgresqlIps = ss.infra.Outputs.PostgresqlPrivateIps.Value
-		} else {
+		}
+		if !ss.statusSummaryCmdFlags.isAutomate && !ss.statusSummaryCmdFlags.isChefServer && !ss.statusSummaryCmdFlags.isOpenSearch && !ss.statusSummaryCmdFlags.isPostgresql {
 			automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
 			chefServerIps = ss.infra.Outputs.ChefServerPrivateIps.Value
 			opensearchIps = ss.infra.Outputs.OpensearchPrivateIps.Value
@@ -399,9 +404,12 @@ func validateIPAddresses(IpsFromcmd, ips []string, errorPrefix string) ([]string
 	return ipFound, ipNotFound, errorList
 }
 
-func NewStatusSummary(infra *AutomteHAInfraDetails, fileutils fileutils.FileUtils, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags) StatusSummary {
+func getCurrentTime() time.Time {
+	return nowFunc()
+}
+
+func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags) StatusSummary {
 	return &Summary{
-		fileutils:             fileutils,
 		feStatus:              feStatus,
 		beStatus:              beStatus,
 		timeout:               timeout,
