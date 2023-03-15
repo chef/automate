@@ -36,6 +36,8 @@ admin_dn = "- ${opensearch_admin_dn}"
 enforce_hostname_verification = false
 resolve_hostname = false
 [plugins.security]
-nodes_dn = "- ${opensearch_nodes_dn}"
+nodes_dn = """
+- ${opensearch_nodes_dn}
+"""
 EOT
 : "" }

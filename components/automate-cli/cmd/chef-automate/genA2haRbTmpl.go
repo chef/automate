@@ -67,7 +67,7 @@ opensearch do
   {{ if .Opensearch.Config.PublicKey }} public_key "{{ .Opensearch.Config.PublicKey }}" {{ else }} # public_key "{{ .Opensearch.Config.PublicKey }}" {{ end }}
   admin_dn "{{ .Opensearch.Config.AdminDn }}"
   nodes_dn "{{ .Opensearch.Config.NodesDn }}"
-  {{ if .Opensearch.Config.CertsByIP }} certs_by_ip  "{ {{ range $index, $element := .Opensearch.Config.CertsByIP}}{{if $index}} \n {{end}} \"{{$element.IP}}\" = { private_key = <<-EOT\n{{$element.PrivateKey}}\nEOT\n\n public_key = <<-EOT\n{{$element.PublicKey}}\nEOT\n\n nodes_dn = \"{{$element.NodesDn}}\" } {{end}} }" {{end}}
+  {{ if .Opensearch.Config.CertsByIP }} certs_by_ip  "{ {{ range $index, $element := .Opensearch.Config.CertsByIP}}{{if $index}} \n {{end}} \"{{$element.IP}}\" = { private_key = <<-EOT\n{{$element.PrivateKey}}\nEOT\n\n public_key = <<-EOT\n{{$element.PublicKey}}\nEOT\n\n nodes_dn = <<EOT\n{{$element.NodesDn}}EOT\n } {{end}} }" {{end}}
 end
 
 ###############################################################
