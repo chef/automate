@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -233,17 +234,7 @@ func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomteHAInfraDetails, r
 		}
 	}
 
-	if remoteService == CONST_FRONTEND {
-		nodeIps, err = getFrontendIPs(node.CmdInputs.NodeIp, infra)
-	} else if remoteService == CONST_AUTOMATE {
-		nodeIps, err = getAutomateIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
-	} else if remoteService == CONST_CHEF_SERVER {
-		nodeIps, err = getChefserverIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
-	} else if remoteService == CONST_POSTGRESQL {
-		nodeIps, err = getPostgresqlIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
-	} else if remoteService == CONST_OPENSEARCH {
-		nodeIps, err = getOpensearchIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
-	}
+	nodeIps, err = getNodeIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra, remoteService)
 
 	if err != nil {
 		return nodeIps, err
@@ -266,78 +257,30 @@ func getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
 }
 
 // getFrontendIPs will return the Frontend Node Ips.
-func getFrontendIPs(ip string, infra *AutomteHAInfraDetails) ([]string, error) {
-	frontendIps := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
-	if ip != "" {
-		if isValidIP(ip, frontendIps) {
-			return []string{ip}, nil
-		}
-		return []string{}, errors.New("Please Enter Valid frontend IP")
+func getNodeIPs(single bool, ip string, infra *AutomteHAInfraDetails, remoteService string) ([]string, error) {
+	nodeIps := []string{}
+	switch {
+	case remoteService == CONST_OPENSEARCH:
+		nodeIps = infra.Outputs.OpensearchPrivateIps.Value
+	case remoteService == CONST_POSTGRESQL:
+		nodeIps = infra.Outputs.PostgresqlPrivateIps.Value
+	case remoteService == CONST_CHEF_SERVER:
+		nodeIps = infra.Outputs.ChefServerPrivateIps.Value
+	case remoteService == CONST_AUTOMATE:
+		nodeIps = infra.Outputs.AutomatePrivateIps.Value
+	case remoteService == CONST_FRONTEND:
+		nodeIps = append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
 	}
-	return frontendIps, nil
-
-}
-
-// getAutomateIPs will return the Automate Node Ips.
-func getAutomateIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
-	automateIps := infra.Outputs.AutomatePrivateIps.Value
 	if ip != "" {
-		if isValidIP(ip, automateIps) {
+		if isValidIP(ip, nodeIps) {
 			return []string{ip}, nil
 		}
-		return []string{}, errors.New("Please Enter Valid automate IP")
+		return []string{}, errors.New("Please Enter Valid Node IP")
 	} else if single {
-		ip, err := GetSingleIp(automateIps)
+		ip, err := GetSingleIp(nodeIps)
 		return []string{ip}, err
 	}
-	return automateIps, nil
-}
-
-// getChefserverIPs will return the Chefserver Node Ips.
-func getChefserverIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
-	chefServerIps := infra.Outputs.ChefServerPrivateIps.Value
-	if ip != "" {
-		if isValidIP(ip, chefServerIps) {
-			return []string{ip}, nil
-		}
-		return []string{}, errors.New("Please Enter Valid chef-server IP")
-	} else if single {
-		ip, err := GetSingleIp(chefServerIps)
-		return []string{ip}, err
-	}
-	return chefServerIps, nil
-
-}
-
-// getPostgresqlIPs will return the Postgresql Node Ips.
-func getPostgresqlIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
-	postgresqlIps := infra.Outputs.PostgresqlPrivateIps.Value
-	if ip != "" {
-		if isValidIP(ip, postgresqlIps) {
-			return []string{ip}, nil
-		}
-		return []string{}, errors.New("Please Enter Valid postgresql IP")
-	} else if single {
-		ip, err := GetSingleIp(postgresqlIps)
-		return []string{ip}, err
-	}
-	return postgresqlIps, nil
-
-}
-
-// getOpensearchIPs will return the Opensearch Node Ips.
-func getOpensearchIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
-	opensearchIps := infra.Outputs.OpensearchPrivateIps.Value
-	if ip != "" {
-		if isValidIP(ip, opensearchIps) {
-			return []string{ip}, nil
-		}
-		return []string{}, errors.New("Please Enter Valid opensearch IP")
-	} else if single {
-		ip, err := GetSingleIp(opensearchIps)
-		return []string{ip}, err
-	}
-	return opensearchIps, nil
+	return nodeIps, nil
 }
 
 // GetSingleIp returns first ip from array of ips
@@ -350,6 +293,11 @@ func GetSingleIp(ips []string) (string, error) {
 
 // isValidIP will check whether the given ip is in the given remoteservice ips set or not.
 func isValidIP(ip string, ips []string) bool {
+	ipv4_regex := `^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4})`
+	match, _ := regexp.MatchString(ipv4_regex, ip)
+	if !match {
+		return false
+	}
 	for _, clusterIP := range ips {
 		if ip == clusterIP {
 			return true

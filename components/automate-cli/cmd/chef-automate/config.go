@@ -513,7 +513,7 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 
 		inputs.InputFiles[0] = tomlFilePath
 	} else {
-		return errors.New("No changes in existing config on database and requested config")
+		return errors.New("No changes in existing config on postgresql and provided config")
 	}
 	return nil
 }
@@ -560,7 +560,7 @@ func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *Autom
 
 		inputs.InputFiles[0] = tomlFilePath
 	} else {
-		return errors.New("No changes in existing config on database and requested config")
+		return errors.New("No changes in existing config on opensearch and provided config")
 	}
 	return nil
 }

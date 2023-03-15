@@ -238,6 +238,7 @@ func TestExecute(t *testing.T) {
 		})
 	}
 }
+
 func TestExecuteCmdOnNode(t *testing.T) {
 	timestamp := time.Now().Format("20060102150405")
 	file := file
@@ -375,277 +376,186 @@ func TestExecuteCmdOnNode(t *testing.T) {
 	}
 }
 
-func TestGetFrontendIPs(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ip1, ip2, ip3}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{ip6, ip7, ip8}
-	testCases := []struct {
-		ip             string
-		infra          *AutomteHAInfraDetails
-		expectedOutput []string
-		isError        bool
-		err            error
-	}{
-		{
-			ip:             ip2,
-			infra:          infra,
-			expectedOutput: []string{ip2},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1, ip2, ip3, ip6, ip7, ip8},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			ip:             ip4,
-			infra:          infra,
-			expectedOutput: []string{},
-			isError:        true,
-			err:            errors.New("Please Enter Valid frontend IP"),
-		},
-	}
-
-	for _, testCase := range testCases {
-		nodeIps, err := getFrontendIPs(testCase.ip, testCase.infra)
-		if testCase.isError {
-			assert.Error(t, err)
-			assert.EqualError(t, testCase.err, err.Error())
-		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, testCase.expectedOutput, nodeIps)
-		}
-	}
-}
-
-func TestGetAutomateIPs(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ip1, ip2, ip3}
-	testCases := []struct {
-		single         bool
-		ip             string
-		infra          *AutomteHAInfraDetails
-		expectedOutput []string
-		isError        bool
-		err            error
-	}{
-		{
-			single:         true,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             ip2,
-			infra:          infra,
-			expectedOutput: []string{ip2},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1, ip2, ip3},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             ip5,
-			infra:          infra,
-			expectedOutput: []string{},
-			isError:        true,
-			err:            errors.New("Please Enter Valid automate IP"),
-		},
-	}
-
-	for _, testCase := range testCases {
-		nodeIps, err := getAutomateIPs(testCase.single, testCase.ip, testCase.infra)
-		if testCase.isError {
-			assert.Error(t, err)
-			assert.EqualError(t, testCase.err, err.Error())
-		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, testCase.expectedOutput, nodeIps)
-		}
-	}
-}
-
-func TestGetChefserverIPs(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{ip1, ip2, ip3}
-	testCases := []struct {
-		single         bool
-		ip             string
-		infra          *AutomteHAInfraDetails
-		expectedOutput []string
-		isError        bool
-		err            error
-	}{
-		{
-			single:         true,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             ip2,
-			infra:          infra,
-			expectedOutput: []string{ip2},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1, ip2, ip3},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             ip5,
-			infra:          infra,
-			expectedOutput: []string{},
-			isError:        true,
-			err:            errors.New("Please Enter Valid chef-server IP"),
-		},
-	}
-
-	for _, testCase := range testCases {
-		nodeIps, err := getChefserverIPs(testCase.single, testCase.ip, testCase.infra)
-		if testCase.isError {
-			assert.Error(t, err)
-			assert.EqualError(t, testCase.err, err.Error())
-		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, testCase.expectedOutput, nodeIps)
-		}
-	}
-}
-
-func TestGetPostgresqlIPs(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ip1, ip2, ip3}
-	testCases := []struct {
-		single         bool
-		ip             string
-		infra          *AutomteHAInfraDetails
-		expectedOutput []string
-		isError        bool
-		err            error
-	}{
-		{
-			single:         true,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             ip2,
-			infra:          infra,
-			expectedOutput: []string{ip2},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1, ip2, ip3},
-			isError:        false,
-			err:            nil,
-		},
-		{
-			single:         false,
-			ip:             ip5,
-			infra:          infra,
-			expectedOutput: []string{},
-			isError:        true,
-			err:            errors.New("Please Enter Valid postgresql IP"),
-		},
-	}
-
-	for _, testCase := range testCases {
-		nodeIps, err := getPostgresqlIPs(testCase.single, testCase.ip, testCase.infra)
-		if testCase.isError {
-			assert.Error(t, err)
-			assert.EqualError(t, testCase.err, err.Error())
-		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, testCase.expectedOutput, nodeIps)
-		}
-	}
-}
-
-func TestGetOpensearchIPs(t *testing.T) {
+func TestPreCmdExecCheck(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ip1, ip2, ip3}
-	testCases := []struct {
-		single         bool
-		ip             string
-		infra          *AutomteHAInfraDetails
-		expectedOutput []string
-		isError        bool
-		err            error
+	type args struct {
+		node          *Cmd
+		sshUtil       SSHUtil
+		infra         *AutomteHAInfraDetails
+		remoteService string
+		timestamp     string
+		writer        *cli.Writer
+	}
+	tests := []struct {
+		name        string
+		args        args
+		want        []string
+		expectedErr error
+		wantErr     bool
 	}{
 		{
-			single:         true,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1},
-			isError:        false,
-			err:            nil,
+			name: "Success: single opensearch node ip",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return nil
+					},
+					CmdInputs: &CmdInputs{
+						Single: true,
+						NodeIp: "",
+					},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         infra,
+				remoteService: "opensearch",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:        []string{ip1},
+			expectedErr: nil,
+			wantErr:     false,
 		},
 		{
-			single:         false,
-			ip:             ip2,
-			infra:          infra,
-			expectedOutput: []string{ip2},
-			isError:        false,
-			err:            nil,
+			name: "Success: given opensearch node ip",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return nil
+					},
+					CmdInputs: &CmdInputs{
+						Single: false,
+						NodeIp: ip2,
+					},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         infra,
+				remoteService: "opensearch",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:    []string{ip2},
+			wantErr: false,
 		},
 		{
-			single:         false,
-			ip:             "",
-			infra:          infra,
-			expectedOutput: []string{ip1, ip2, ip3},
-			isError:        false,
-			err:            nil,
+			name: "Failed: no ips found ",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return nil
+					},
+					CmdInputs: &CmdInputs{},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         infra,
+				remoteService: "abcd",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:        []string{},
+			expectedErr: errors.New("No abcd IPs are found"),
+			wantErr:     true,
 		},
 		{
-			single:         false,
-			ip:             ip5,
-			infra:          infra,
-			expectedOutput: []string{},
-			isError:        true,
-			err:            errors.New("Please Enter Valid opensearch IP"),
+			name: "Failed: given opensearch node ip not found",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return nil
+					},
+					CmdInputs: &CmdInputs{
+						Single: false,
+						NodeIp: ip4,
+					},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         infra,
+				remoteService: "opensearch",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:        []string{},
+			expectedErr: errors.New("Please Enter Valid Node IP"),
+			wantErr:     true,
+		},
+		{
+			name: "Failed: given opensearch node ip invalid",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return nil
+					},
+					CmdInputs: &CmdInputs{
+						Single: false,
+						NodeIp: "256.255.255.255",
+					},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         infra,
+				remoteService: "opensearch",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:        []string{},
+			expectedErr: errors.New("Please Enter Valid Node IP"),
+			wantErr:     true,
+		},
+		{
+			name: "Failed: single opensearch node ip",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return nil
+					},
+					CmdInputs: &CmdInputs{
+						Single: true,
+						NodeIp: "",
+					},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         &AutomteHAInfraDetails{},
+				remoteService: "opensearch",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:        []string{},
+			expectedErr: errors.New("No ips found"),
+			wantErr:     true,
+		},
+		{
+			name: "Failed: preExec function execution",
+			args: args{
+				node: &Cmd{
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						return errors.New("PreExec function failed")
+					},
+					CmdInputs: &CmdInputs{
+						Single: false,
+						NodeIp: ip2,
+					},
+				},
+				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+				infra:         infra,
+				remoteService: "opensearch",
+				timestamp:     "20060102150405",
+				writer:        getMockWriterImpl(),
+			},
+			want:        []string{},
+			expectedErr: errors.New("PreExec function failed"),
+			wantErr:     true,
 		},
 	}
-
-	for _, testCase := range testCases {
-		nodeIps, err := getOpensearchIPs(testCase.single, testCase.ip, testCase.infra)
-		if testCase.isError {
-			assert.Error(t, err)
-			assert.EqualError(t, testCase.err, err.Error())
-		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, testCase.expectedOutput, nodeIps)
-		}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			got, err := preCmdExecCheck(testCase.args.node, testCase.args.sshUtil, testCase.args.infra, testCase.args.remoteService, testCase.args.timestamp, testCase.args.writer)
+			if testCase.wantErr {
+				assert.Error(t, err)
+				assert.EqualError(t, testCase.expectedErr, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.EqualValues(t, testCase.want, got)
+			}
+		})
 	}
 }
 
