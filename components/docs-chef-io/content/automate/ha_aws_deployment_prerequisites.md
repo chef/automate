@@ -21,7 +21,7 @@ Before installing Chef automate HA in AWS deployment mode, ensure you have taken
 
 ## Chef Automate Architecture
 
-We recommend using 11 node cluster for standard Automate HA aws deployment, as detailed in the table below:
+We recommend using 11 node cluster for standard Automate HA AWS deployment, as detailed in the table below:
 
 | Service Type      | Count |
 |-------------------|-------|
@@ -41,7 +41,7 @@ The software requirements of the nodes in the cluster and other external Chef an
 
 ### Node Software Requirements
 
-The operating system and the supported version for different nodes in aws deployment of Automate HA are mentioned below:
+The operating system and the supported version for different nodes in AWS deployment of Automate HA are mentioned below:
 
 | Operating Systems                        | Supported Version         |
 | :--------------------------------------  | :-----------------------  |
@@ -223,7 +223,7 @@ The AWS deployment specific pre-requisites are as follows:
 - [Config Patch](/automate/ha_config/#patch-configuration/) in the whole application will result in downtime. For example, if you change or update something in OpenSearch or PostgreSQL, they will restart, resulting in restarting everything.
 - [Certificate Rotation](/automate/ha_cert_rotation/) will also change the system's configuration, leading to restarting the whole application.
 
-To learn more about the above deployment, visit our [aws deployment](/automate/ha_aws_deploy_steps/) page.
+To learn more about the above deployment, visit our [AWS deployment](/automate/ha_aws_deploy_steps/) page.
 
 ## External Managed Databases
 
@@ -256,7 +256,7 @@ The requirements for disaster recovery setup (Active/Passive) are:
 - Network Attached Storage (NAS) or Object Store (S3) should be available in both data centers/regions.
 - Set up scheduled jobs to run backup and restore commands on both clusters. We recommend using **cron** to schedule the jobs.
 
-To know more about the aws deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
+To know more about the AWS deployment disaster recovery, visit our [Disaster Recovery Setup](/automate/ha_disaster_recovery_setup/) page.
 
 ## Migration
 
