@@ -289,3 +289,5 @@ To know more about the aws deployment disaster recovery, visit our [Disaster Rec
   - `aws_os_snapshot_role_arn`
   - `os_snapshot_user_access_key_id`
   - `os_snapshot_user_access_key_secret`
+
+Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
