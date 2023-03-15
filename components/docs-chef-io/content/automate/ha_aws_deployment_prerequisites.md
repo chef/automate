@@ -1,7 +1,7 @@
 +++
 title = "AWS Deployment Prerequisites"
 draft = false
-gh_repo = "AWS Deployment Prerequisites"
+automate = "AWS Deployment Prerequisites"
 [menu]
   [menu.automate]
     title = "AWS Deployment Prerequisites"

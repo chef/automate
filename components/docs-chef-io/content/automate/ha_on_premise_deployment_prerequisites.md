@@ -3,7 +3,7 @@ title = "On-Premise Prerequisites"
 
 draft = false
 
-gh_repo = "On-Premise Prerequisites"
+automate = "On-Premise Prerequisites"
 [menu]
   [menu.automate]
     title = "On-Premise Prerequisites"
