@@ -80,7 +80,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("uniqNodeRunReport"),
+	PersistentPreRunE: getCommandWithFileName("nodecount"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -96,7 +96,7 @@ var nodeUsageCommand = &cobra.Command{
 		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("nodeRunReport"),
+	PersistentPreRunE: getCommandWithFileName("nodeinfo"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -112,7 +112,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("complianceResourceRunCount"),
+	PersistentPreRunE: getCommandWithFileName("complianceresourcecount"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -128,7 +128,7 @@ var complianceResourceUsageCmd = &cobra.Command{
 		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime, CommandFlags.FileName)
 		return nil
 	},
-	PersistentPreRunE: getCommandWithFileName("complianceResourceRunReport"),
+	PersistentPreRunE: getCommandWithFileName("complianceresourceinfo"),
 	Annotations: map[string]string{
 		docs.Compatibility: docs.BastionHost,
 	},
@@ -513,7 +513,7 @@ func getCommandWithFileName(commandName string) func(*cobra.Command, []string) e
 		}
 		reportFileName := CommandFlags.FileName
 		if reportFileName == "" {
-			reportFileName = commandName + "_" + CommandFlags.StartTime + "_" + CommandFlags.EndTime + ".csv"
+			reportFileName = fmt.Sprintf("%s_%s_%s.csv", fileNamePrefix, CommandFlags.StartTime, CommandFlags.EndTime)
 			args = append(args, "-f", reportFileName)
 			CommandFlags.FileName = reportFileName
 		}

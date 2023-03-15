@@ -68,7 +68,8 @@ func elasticSearchConnection(url string, esHostName string, esPort string, esUse
 }
 
 func getElasticSearchURL(esHostName string, esPort string, url string) (string, error) {
-	res, err := cli.GetAutomateConfig(docs.AutomateConfigTimeout)
+        var configTimeOut = 10
+	res, err := cli.GetAutomateConfig(configTimeOut)
 	if err != nil {
 		return "", fmt.Errorf("error while trying to get Automate Config: %s", err.Error())
 	}
