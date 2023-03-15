@@ -172,7 +172,7 @@ The on-premise deployment specific pre-requisites are as follows:
 - All Virtual Machines or Machines should be up and running.
 - We need a local user `hab` and local group `hab` linked together to complete the deployment process successfully.
 - If they are unavailable, the SSH user should have privileges to create local users and groups so that the deployment process can create the required local user `hab` and local group `hab`.
-- Currently we only support local Linux users and groups for Installation flow. We don't support AD managed users in nodes.
+- Currently we only support local Linux users and groups for Installation flow. We don't support AD or LDAP managed users in nodes.
 - The SElinux config should either be disabled or permissive.
 
 ### Storage Space
@@ -259,8 +259,8 @@ To know more about the on-premise deployment disaster recovery, visit our [Disas
 | Existing System | Supported Setup Type | Minimum Eligible System Version | Maximum Eligible System Version |  Pre-requisite Before Migration |
 |-----------------|----------------------|---------------------------------|-----------|------------------------------|
 | Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. |
-| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 | Chef Backend using S3 or PostgreSQL storage for Cookbooks should only migrate to Automate HA. | 
-| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br />Chef Infra Server using S3 or PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
+| Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 | Chef Backend using PostgreSQL storage for Cookbooks should only migrate to Automate HA. | 
+| Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br />Chef Infra Server using PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
 | A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
 {{< note >}}
