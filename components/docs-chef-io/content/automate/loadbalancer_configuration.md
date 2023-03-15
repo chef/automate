@@ -9,8 +9,8 @@ gh_repo = "automate"
   [menu.automate]
     title = "Loadbalancer Configuration"
     parent = "automate/deploy_high_availability/ha_system_requirements"
-    identifier = "automate/deploy_high_availability/ha_system_requirements/loadbalancer_configuration.md Loadbalancer Configuration"
-    weight = 220
+    identifier = "automate/deploy_high_availability/loadbalancer_configuration.md Loadbalancer Configuration"
+    weight = 14
 +++
 
 {{< warning >}}
