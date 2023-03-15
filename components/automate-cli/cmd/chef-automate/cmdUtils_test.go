@@ -2,210 +2,245 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRunCommand(t *testing.T) {
+const (
+	ip4              = "127.0.0.4"
+	ip5              = "127.0.0.5"
+	ip6              = "127.0.0.6"
+	ip7              = "127.0.0.7"
+	ip8              = "127.0.0.8"
+	patchCommand     = "sudo chef-automate config patch new.toml"
+	showCommand      = "sudo chef-automate config show"
+	file             = "new.toml"
+	completedMessage = "config show operation completed"
+)
+
+func newTmpDir(t testing.TB) string {
+	tmpDir := t.TempDir()
+	os.MkdirAll(tmpDir, os.ModePerm)
+	return tmpDir
+}
+
+func TestExecute(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.SSHUser.Value = "ubuntu"
 	infra.Outputs.SSHKeyFile.Value = "new.pem"
 	infra.Outputs.SSHPort.Value = "22"
-	infra.Outputs.AutomatePrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
-
+	infra.Outputs.AutomatePrivateIps.Value = []string{ip1, ip2, ip3}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ip1, ip2, ip3}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ip1, ip2, ip3}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ip1, ip2, ip3}
+	type fields struct {
+		NodeMap *NodeTypeAndCmd
+		SshUtil SSHUtil
+	}
 	testCases := []struct {
-		input   *NodeTypeAndCmd
-		sshUtil SSHUtil
-		isError bool
-		err     error
+		name        string
+		fields      fields
+		expectedErr error
+		wantErr     bool
 	}{
 		{
-			input: &NodeTypeAndCmd{
-				Frontend: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:      "sudo chef-automate config show",
-						Single:   false,
-						NodeType: true,
+			name: "Successful command execution on frontend",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: &Cmd{
+						PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+							return nil
+						},
+						CmdInputs: &CmdInputs{
+							Cmd:      showCommand,
+							Single:   false,
+							NodeType: true,
+						},
 					},
+					Infra: infra,
 				},
-				Automate: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					},
-				},
-				Chef_server: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Postgresql: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Opensearch: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Infra: infra,
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			},
-			sshUtil: GetMockSSHUtil(&SSHConfig{}, nil, "config show operation completed", nil, "", nil),
-			isError: false,
-			err:     nil,
+			expectedErr: nil,
+			wantErr:     false,
 		},
 		{
-			input: &NodeTypeAndCmd{
-				Frontend: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+			name: "Successful command execution on automate",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
-				},
-				Automate: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:      "sudo chef-automate config show",
-						Single:   false,
-						NodeType: true,
+					Automate: &Cmd{
+						CmdInputs: &CmdInputs{
+							Cmd:        patchCommand,
+							InputFiles: []string{file},
+							Single:     false,
+							NodeType:   true,
+						},
 					},
+					Infra: infra,
 				},
-				Chef_server: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Postgresql: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Opensearch: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Infra: infra,
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			},
-			sshUtil: GetMockSSHUtil(&SSHConfig{}, nil, "config show operation completed", nil, "", nil),
-			isError: false,
-			err:     nil,
+			expectedErr: nil,
+			wantErr:     false,
 		},
 		{
-			input: &NodeTypeAndCmd{
-				Frontend: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+			name: "Successful command execution on chef_server",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
-				},
-				Automate: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+					Automate: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
+					ChefServer: &Cmd{
+						CmdInputs: &CmdInputs{
+							Cmd:      showCommand,
+							Single:   false,
+							NodeType: true,
+						},
+					},
+					Infra: infra,
 				},
-				Chef_server: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:      "sudo chef-automate config show",
-						Single:   false,
-						NodeType: true,
-					}},
-				Postgresql: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Opensearch: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Infra: infra,
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			},
-			sshUtil: GetMockSSHUtil(&SSHConfig{}, nil, "config show operation completed", nil, "", nil),
-			isError: false,
-			err:     nil,
+			expectedErr: nil,
+			wantErr:     false,
 		},
 		{
-			input: &NodeTypeAndCmd{
-				Frontend: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+			name: "Successful command execution on postgres",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
-				},
-				Automate: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+					Automate: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
+					ChefServer: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						}},
+					Postgresql: &Cmd{
+						CmdInputs: &CmdInputs{
+							Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "postgresql", ""),
+							Single:   false,
+							NodeType: true,
+						}},
+					Infra: infra,
 				},
-				Chef_server: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Postgresql: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "postgresql", ""),
-						Single:   false,
-						NodeType: true,
-					}},
-				Opensearch: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Infra: infra,
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			},
-			sshUtil: GetMockSSHUtil(&SSHConfig{}, nil, "config show operation completed", nil, "", nil),
-			isError: false,
-			err:     nil,
+			expectedErr: nil,
+			wantErr:     false,
 		},
 		{
-			input: &NodeTypeAndCmd{
-				Frontend: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+			name: "Successful command execution on opensearch",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
-				},
-				Automate: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
+					Automate: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
 					},
+					ChefServer: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						}},
+					Postgresql: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						}},
+					Opensearch: &Cmd{
+						CmdInputs: &CmdInputs{
+							Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "opensearch", ""),
+							Single:   false,
+							NodeType: true,
+						}},
+					Infra: infra,
 				},
-				Chef_server: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Postgresql: &Cmd{
-					CmdInputs: &CmdInputs{
-						NodeType: false,
-					}},
-				Opensearch: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "opensearch", ""),
-						Single:   false,
-						NodeType: true,
-					}},
-				Infra: infra,
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			},
-			sshUtil: GetMockSSHUtil(&SSHConfig{}, nil, "config show operation completed", nil, "", nil),
-			isError: false,
-			err:     nil,
+			expectedErr: nil,
+			wantErr:     false,
+		},
+		{
+			name: "Node type not supported",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
+					},
+					Automate: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						},
+					},
+					ChefServer: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						}},
+					Postgresql: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						}},
+					Opensearch: &Cmd{
+						CmdInputs: &CmdInputs{
+							NodeType: false,
+						}},
+					Infra: infra,
+				},
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			},
+			expectedErr: errors.New("Missing or Unsupported flag"),
+			wantErr:     true,
 		},
 	}
-
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{
-			NodeMap: testCase.input,
-			SshUtil: testCase.sshUtil,
-		}
-
-		err := new.RunCommand()
-		if testCase.isError {
-			assert.Error(t, err)
-			assert.EqualError(t, testCase.err, err.Error())
-		} else {
-			assert.NoError(t, err)
-		}
+		t.Run(testCase.name, func(t *testing.T) {
+			c := &remoteCmdExecutor{
+				NodeMap: testCase.fields.NodeMap,
+				SshUtil: testCase.fields.SshUtil,
+			}
+			err := c.Execute()
+			if testCase.wantErr {
+				assert.Error(t, err)
+				assert.EqualError(t, testCase.expectedErr, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
 }
-
-func TestRemoteJobs(t *testing.T) {
+func TestExecuteCmdOnNode(t *testing.T) {
 	timestamp := time.Now().Format("20060102150405")
-	file := "new.toml"
+	file := file
 	resultChan := make(chan CmdResult, 1)
 
 	testCases := []struct {
@@ -222,16 +257,16 @@ func TestRemoteJobs(t *testing.T) {
 	}{
 		{
 			testCaseName: "Successful Copy file to Remote and Execution of command on remote",
-			command:      "sudo chef-automate config patch new.toml",
+			command:      patchCommand,
 			inputFiles: map[string]string{
 				file: "frontend" + "_" + timestamp + "_" + file,
 			},
 			outputFiles:   []string{},
 			remoteService: "automate",
-			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: "127.0.0.3"}, nil, "config patch operation completed", nil, "", nil),
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "config patch operation completed", nil, "", nil),
 			resultChan:    resultChan,
 			expectedOutput: CmdResult{
-				HostIP: "127.0.0.3",
+				HostIP: ip1,
 				Output: "config patch operation completed",
 				Error:  nil,
 			},
@@ -241,46 +276,46 @@ func TestRemoteJobs(t *testing.T) {
 			testCaseName:  "Successful Execution of command on remote and Copy file from remote",
 			command:       "sudo chef-automate config show new.toml",
 			inputFiles:    map[string]string{},
-			outputFiles:   []string{"new.toml"},
+			outputFiles:   []string{file},
 			remoteService: "automate",
-			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: "127.0.0.3"}, nil, "config show operation completed", nil, "new.toml", nil),
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, completedMessage, nil, file, nil),
 			resultChan:    resultChan,
 			expectedOutput: CmdResult{
-				HostIP:      "127.0.0.3",
-				OutputFiles: []string{"new.toml"},
-				Output:      "config show operation completed",
+				HostIP:      ip1,
+				OutputFiles: []string{file},
+				Output:      completedMessage,
 				Error:       nil,
 			},
 			isError: false,
 		},
 		{
 			testCaseName: "Failed Copy file to Remote",
-			command:      "sudo chef-automate config patch new.toml",
+			command:      patchCommand,
 			inputFiles: map[string]string{
 				file: "frontend" + "_" + timestamp + "_" + file,
 			},
 			outputFiles:   []string{},
 			remoteService: "automate",
-			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: "127.0.0.3"}, errors.Errorf("remote copy"), "", nil, "new.toml", nil),
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, errors.Errorf("copy to remote failed"), "", nil, file, nil),
 			resultChan:    resultChan,
 			expectedOutput: CmdResult{
-				HostIP:      "127.0.0.3",
+				HostIP:      ip1,
 				OutputFiles: []string{},
 				Output:      "",
-				Error:       errors.Errorf("remote copy"),
+				Error:       errors.Errorf("copy to remote failed"),
 			},
 			isError: true,
 		},
 		{
 			testCaseName:  "Failed Execution of command on remote",
-			command:       "sudo chef-automate config show",
+			command:       showCommand,
 			inputFiles:    map[string]string{},
 			outputFiles:   []string{},
 			remoteService: "automate",
-			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: "127.0.0.3"}, nil, "", errors.Errorf("remote execution"), "", nil),
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "", errors.Errorf("remote execution"), "", nil),
 			resultChan:    resultChan,
 			expectedOutput: CmdResult{
-				HostIP:      "127.0.0.3",
+				HostIP:      ip1,
 				OutputFiles: []string{},
 				Output:      "",
 				Error:       errors.Errorf("remote execution"),
@@ -291,30 +326,30 @@ func TestRemoteJobs(t *testing.T) {
 			testCaseName:  "Failed Copy file from remote",
 			command:       "sudo chef-automate config show new.toml",
 			inputFiles:    map[string]string{},
-			outputFiles:   []string{"new.toml"},
+			outputFiles:   []string{file},
 			remoteService: "automate",
-			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: "127.0.0.3"}, nil, "", nil, "new.toml", errors.Errorf("remote copy")),
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "", nil, file, errors.Errorf("copy from remote failed")),
 			resultChan:    resultChan,
 			expectedOutput: CmdResult{
-				HostIP:      "127.0.0.3",
-				OutputFiles: []string{"new.toml"},
+				HostIP:      ip1,
+				OutputFiles: []string{file},
 				Output:      "",
-				Error:       errors.Errorf("remote copy"),
+				Error:       errors.Errorf("copy from remote failed"),
 			},
 			isError: true,
 		},
 		{
 			testCaseName: "Successful Execution of command on remote with error output",
-			command:      "sudo chef-automate config patch new.toml",
+			command:      patchCommand,
 			inputFiles: map[string]string{
 				file: "frontend" + "_" + timestamp + "_" + file,
 			},
 			outputFiles:   []string{},
 			remoteService: "automate",
-			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: "127.0.0.3"}, nil, "Error: patch failed", nil, "new.toml", nil),
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "Error: patch failed", nil, file, nil),
 			resultChan:    resultChan,
 			expectedOutput: CmdResult{
-				HostIP:      "127.0.0.3",
+				HostIP:      ip1,
 				OutputFiles: []string{},
 				Output:      "",
 				Error:       errors.Errorf("Error: patch failed"),
@@ -324,9 +359,9 @@ func TestRemoteJobs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{}
+		new := &remoteCmdExecutor{}
 
-		new.RemoteJobs(testCase.command, testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, testCase.newSSHUtil, testCase.resultChan)
+		new.executeCmdOnNode(testCase.command, testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, testCase.newSSHUtil, testCase.resultChan)
 		result := <-resultChan
 
 		if testCase.isError {
@@ -340,10 +375,10 @@ func TestRemoteJobs(t *testing.T) {
 	}
 }
 
-func TestIsFrontendIPs(t *testing.T) {
+func TestGetFrontendIPs(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{"127.0.0.6", "127.0.0.7", "127.0.0.8"}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ip1, ip2, ip3}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ip6, ip7, ip8}
 	testCases := []struct {
 		ip             string
 		infra          *AutomteHAInfraDetails
@@ -352,21 +387,21 @@ func TestIsFrontendIPs(t *testing.T) {
 		err            error
 	}{
 		{
-			ip:             "127.0.0.4",
+			ip:             ip2,
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.4"},
+			expectedOutput: []string{ip2},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3", "127.0.0.4", "127.0.0.5", "127.0.0.6", "127.0.0.7", "127.0.0.8"},
+			expectedOutput: []string{ip1, ip2, ip3, ip6, ip7, ip8},
 			isError:        false,
 			err:            nil,
 		},
 		{
-			ip:             "127.0.0.1",
+			ip:             ip4,
 			infra:          infra,
 			expectedOutput: []string{},
 			isError:        true,
@@ -375,9 +410,7 @@ func TestIsFrontendIPs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{}
-
-		nodeIps, err := new.IsFrontendIPs(testCase.ip, testCase.infra)
+		nodeIps, err := getFrontendIPs(testCase.ip, testCase.infra)
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
@@ -388,9 +421,9 @@ func TestIsFrontendIPs(t *testing.T) {
 	}
 }
 
-func TestIsAutomateIPs(t *testing.T) {
+func TestGetAutomateIPs(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ip1, ip2, ip3}
 	testCases := []struct {
 		single         bool
 		ip             string
@@ -403,15 +436,15 @@ func TestIsAutomateIPs(t *testing.T) {
 			single:         true,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3"},
+			expectedOutput: []string{ip1},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.4",
+			ip:             ip2,
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.4"},
+			expectedOutput: []string{ip2},
 			isError:        false,
 			err:            nil,
 		},
@@ -419,13 +452,13 @@ func TestIsAutomateIPs(t *testing.T) {
 			single:         false,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+			expectedOutput: []string{ip1, ip2, ip3},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.1",
+			ip:             ip5,
 			infra:          infra,
 			expectedOutput: []string{},
 			isError:        true,
@@ -434,9 +467,7 @@ func TestIsAutomateIPs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{}
-
-		nodeIps, err := new.IsAutomateIPs(testCase.single, testCase.ip, testCase.infra)
+		nodeIps, err := getAutomateIPs(testCase.single, testCase.ip, testCase.infra)
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
@@ -447,9 +478,9 @@ func TestIsAutomateIPs(t *testing.T) {
 	}
 }
 
-func TestIsChefserverIPs(t *testing.T) {
+func TestGetChefserverIPs(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ip1, ip2, ip3}
 	testCases := []struct {
 		single         bool
 		ip             string
@@ -462,15 +493,15 @@ func TestIsChefserverIPs(t *testing.T) {
 			single:         true,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3"},
+			expectedOutput: []string{ip1},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.4",
+			ip:             ip2,
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.4"},
+			expectedOutput: []string{ip2},
 			isError:        false,
 			err:            nil,
 		},
@@ -478,13 +509,13 @@ func TestIsChefserverIPs(t *testing.T) {
 			single:         false,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+			expectedOutput: []string{ip1, ip2, ip3},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.1",
+			ip:             ip5,
 			infra:          infra,
 			expectedOutput: []string{},
 			isError:        true,
@@ -493,9 +524,7 @@ func TestIsChefserverIPs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{}
-
-		nodeIps, err := new.IsChefserverIPs(testCase.single, testCase.ip, testCase.infra)
+		nodeIps, err := getChefserverIPs(testCase.single, testCase.ip, testCase.infra)
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
@@ -506,9 +535,9 @@ func TestIsChefserverIPs(t *testing.T) {
 	}
 }
 
-func TestIsPostgresqlIPs(t *testing.T) {
+func TestGetPostgresqlIPs(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ip1, ip2, ip3}
 	testCases := []struct {
 		single         bool
 		ip             string
@@ -521,15 +550,15 @@ func TestIsPostgresqlIPs(t *testing.T) {
 			single:         true,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3"},
+			expectedOutput: []string{ip1},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.4",
+			ip:             ip2,
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.4"},
+			expectedOutput: []string{ip2},
 			isError:        false,
 			err:            nil,
 		},
@@ -537,13 +566,13 @@ func TestIsPostgresqlIPs(t *testing.T) {
 			single:         false,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+			expectedOutput: []string{ip1, ip2, ip3},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.1",
+			ip:             ip5,
 			infra:          infra,
 			expectedOutput: []string{},
 			isError:        true,
@@ -552,9 +581,7 @@ func TestIsPostgresqlIPs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{}
-
-		nodeIps, err := new.IsPostgresqlIPs(testCase.single, testCase.ip, testCase.infra)
+		nodeIps, err := getPostgresqlIPs(testCase.single, testCase.ip, testCase.infra)
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
@@ -565,9 +592,9 @@ func TestIsPostgresqlIPs(t *testing.T) {
 	}
 }
 
-func TestIsOpensearchIPs(t *testing.T) {
+func TestGetOpensearchIPs(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ip1, ip2, ip3}
 	testCases := []struct {
 		single         bool
 		ip             string
@@ -580,15 +607,15 @@ func TestIsOpensearchIPs(t *testing.T) {
 			single:         true,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3"},
+			expectedOutput: []string{ip1},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.4",
+			ip:             ip2,
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.4"},
+			expectedOutput: []string{ip2},
 			isError:        false,
 			err:            nil,
 		},
@@ -596,13 +623,13 @@ func TestIsOpensearchIPs(t *testing.T) {
 			single:         false,
 			ip:             "",
 			infra:          infra,
-			expectedOutput: []string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+			expectedOutput: []string{ip1, ip2, ip3},
 			isError:        false,
 			err:            nil,
 		},
 		{
 			single:         false,
-			ip:             "127.0.0.1",
+			ip:             ip5,
 			infra:          infra,
 			expectedOutput: []string{},
 			isError:        true,
@@ -611,9 +638,7 @@ func TestIsOpensearchIPs(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &CmdUtilImpl{}
-
-		nodeIps, err := new.IsOpensearchIPs(testCase.single, testCase.ip, testCase.infra)
+		nodeIps, err := getOpensearchIPs(testCase.single, testCase.ip, testCase.infra)
 		if testCase.isError {
 			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
@@ -621,6 +646,71 @@ func TestIsOpensearchIPs(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, testCase.expectedOutput, nodeIps)
 		}
+	}
+}
+
+func TestPrintOutput(t *testing.T) {
+	tmpDir := newTmpDir(t)
+	out := filepath.Join(tmpDir, file)
+	fail := filepath.Join("2342"+tmpDir, file)
+	result := filepath.Join(tmpDir, file)
+	type args struct {
+		remoteService string
+		result        CmdResult
+		outputFiles   []string
+		cliWriter     *cli.Writer
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Print Success message and combine output files in one",
+			args: args{
+				remoteService: CONST_AUTOMATE,
+				result: CmdResult{
+					HostIP:      ip7,
+					OutputFiles: []string{out},
+					Output:      completedMessage,
+					Error:       nil,
+				},
+				outputFiles: []string{result},
+				cliWriter:   getMockWriterImpl(),
+			},
+		},
+		{
+			name: "Print Success message and file combinations failed",
+			args: args{
+				remoteService: CONST_AUTOMATE,
+				result: CmdResult{
+					HostIP:      ip7,
+					OutputFiles: []string{fail},
+					Output:      completedMessage,
+					Error:       nil,
+				},
+				outputFiles: []string{result},
+				cliWriter:   getMockWriterImpl(),
+			},
+		},
+		{
+			name: "Print Error message",
+			args: args{
+				remoteService: CONST_AUTOMATE,
+				result: CmdResult{
+					HostIP:      ip7,
+					OutputFiles: []string{},
+					Output:      "",
+					Error:       errors.New("Patch failed"),
+				},
+				outputFiles: []string{},
+				cliWriter:   getMockWriterImpl(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			printOutput(tt.args.remoteService, tt.args.result, tt.args.outputFiles, tt.args.cliWriter)
+		})
 	}
 }
 
@@ -630,6 +720,7 @@ func GetMockSSHUtil(sshConfig *SSHConfig, CopyToRemoteError error, CmdExecOutput
 			return sshConfig
 		},
 		setSSHConfigFunc: func(sshConfig *SSHConfig) {
+			// No return for this function
 		},
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return CmdExecOutput, CmdExecError

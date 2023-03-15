@@ -26,6 +26,7 @@ import (
 var configCmdFlags = struct {
 	overwriteFile bool
 	timeout       int64
+	waitTimeout   int
 	acceptMLSA    bool
 
 	automate         bool
@@ -50,6 +51,7 @@ const (
 	ERROR_SELF_MANAGED_CONFIG_SET   = "Setting the configuration for externally configured %s is not supported."
 	patching                        = "Config Patch"
 	setting                         = "Config Set"
+	DEFAULT_TIMEOUT                 = 180
 )
 
 var configValid = "Config file must be a valid %s config"
@@ -78,6 +80,8 @@ func init() {
 	showConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 	showConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.opensearch, "os", false, "Shows configurations from OpenSearch node[DUPLICATE]")
 	showConfigCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
+	showConfigCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config show process")
+	showConfigCmd.PersistentFlags().SetAnnotation("wait-timeout", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	// config patch flags
 	patchConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.frontend, "frontend", "f", false, "Patch toml configuration to the all frontend nodes")
@@ -100,6 +104,8 @@ func init() {
 	patchConfigCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 	patchConfigCmd.PersistentFlags().BoolVar(&configCmdFlags.postgresql, "pg", false, "Patch toml configuration to the postgresql node[DUPLICATE]")
 	patchConfigCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
+	patchConfigCmd.PersistentFlags().IntVar(&configCmdFlags.waitTimeout, "wait-timeout", DEFAULT_TIMEOUT, "This flag sets the operation timeout duration (in seconds) for each individual node during the config patch process")
+	patchConfigCmd.PersistentFlags().SetAnnotation("wait-timeout", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	// config set flags
 	setConfigCmd.PersistentFlags().BoolVarP(&configCmdFlags.automate, "automate", "a", false, "Set toml configuration to the automate node")
@@ -179,6 +185,10 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
+		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
+			return errors.Errorf("The operation timeout duration for each individual node during the config show process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+		}
+
 		var outFrontend string
 		var outBackend string
 		var outFiles []string
@@ -200,6 +210,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		automate := &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:         frontendCommand,
+				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
 				Outputfiles: outFiles,
@@ -207,9 +218,10 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			},
 		}
 
-		chef_server := &Cmd{
+		chefServer := &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:         frontendCommand,
+				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
 				Outputfiles: outFiles,
@@ -220,6 +232,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		postgresql := &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:         postgresqlCommand,
+				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
 				Outputfiles: outFiles,
@@ -230,6 +243,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		opensearch := &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:         opensearchCommand,
+				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
 				Outputfiles: outFiles,
@@ -238,22 +252,22 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		nodeMap := &NodeTypeAndCmd{
-			Frontend:    frontend,
-			Automate:    automate,
-			Chef_server: chef_server,
-			Postgresql:  postgresql,
-			Opensearch:  opensearch,
-			Infra:       infra,
+			Frontend:   frontend,
+			Automate:   automate,
+			ChefServer: chefServer,
+			Postgresql: postgresql,
+			Opensearch: opensearch,
+			Infra:      infra,
 		}
 
-		cmdUtil := NewCmdUtil(nodeMap)
+		cmdUtil := NewRemoteCmdExecutor(nodeMap)
 
 		if configCmdFlags.overwriteFile {
 			writer.Errorln("Overwrite flag is not supported in HA")
 		}
 
 		if configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
-			err = cmdUtil.RunCommand()
+			err = cmdUtil.Execute()
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -339,81 +353,89 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		timestamp := time.Now().Format("20060102150405")
+		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
+			return errors.Errorf("The operation timeout duration for each individual node during the config patch process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+		}
 
 		configFile := args[0]
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:        fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFile, dateFormat),
-				Single:     false,
-				Args:       args,
-				InputFiles: []string{configFile},
-				ErrorCheck: true,
-				NodeType:   configCmdFlags.frontend,
+				Cmd:                      fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFile, dateFormat),
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   false,
+				Args:                     args,
+				InputFiles:               []string{configFile},
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 configCmdFlags.frontend,
 			},
 		}
 
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:        fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFile, dateFormat),
-				Single:     false,
-				Args:       args,
-				InputFiles: []string{configFile},
-				ErrorCheck: true,
-				NodeType:   configCmdFlags.automate,
+				Cmd:                      fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFile, dateFormat),
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   false,
+				Args:                     args,
+				InputFiles:               []string{configFile},
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 configCmdFlags.automate,
 			},
 		}
 
-		chef_server := &Cmd{
+		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:        fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFile, dateFormat),
-				Single:     false,
-				Args:       args,
-				InputFiles: []string{configFile},
-				ErrorCheck: true,
-				NodeType:   configCmdFlags.chef_server,
+				Cmd:                      fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFile, dateFormat),
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   false,
+				Args:                     args,
+				InputFiles:               []string{configFile},
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 configCmdFlags.chef_server,
 			},
 		}
 
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:        fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFile),
-				Args:       args,
-				Single:     true,
-				InputFiles: []string{configFile},
-				ErrorCheck: true,
-				NodeType:   configCmdFlags.postgresql,
+				Cmd:                      fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFile),
+				Args:                     args,
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   true,
+				InputFiles:               []string{configFile},
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 configCmdFlags.postgresql,
 			},
 		}
 
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
-				Cmd:        fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFile),
-				Args:       args,
-				Single:     true,
-				InputFiles: []string{configFile},
-				ErrorCheck: true,
-				NodeType:   configCmdFlags.opensearch,
+				Cmd:                      fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFile),
+				Args:                     args,
+				WaitTimeout:              configCmdFlags.waitTimeout,
+				Single:                   true,
+				InputFiles:               []string{configFile},
+				ErrorCheckEnableInOutput: true,
+				NodeType:                 configCmdFlags.opensearch,
 			},
 		}
 
 		nodeMap := &NodeTypeAndCmd{
-			Frontend:    frontend,
-			Automate:    automate,
-			Chef_server: chef_server,
-			Postgresql:  postgresql,
-			Opensearch:  opensearch,
-			Infra:       infra,
+			Frontend:   frontend,
+			Automate:   automate,
+			ChefServer: chefServer,
+			Postgresql: postgresql,
+			Opensearch: opensearch,
+			Infra:      infra,
 		}
 
-		cmdUtil := NewCmdUtil(nodeMap)
+		cmdUtil := NewRemoteCmdExecutor(nodeMap)
 
 		if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
-			err = cmdUtil.RunCommand()
+			err = cmdUtil.Execute()
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -423,7 +445,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 
 	} else {
-
 		cfg, err := dc.LoadUserOverrideConfigFile(args[0])
 		if err != nil {
 			return status.Annotate(err, status.ConfigError)

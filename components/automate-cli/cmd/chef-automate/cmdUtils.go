@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 )
 
@@ -17,23 +17,24 @@ type Cmd struct {
 }
 
 type CmdInputs struct {
-	Cmd         string
-	Args        []string
-	Single      bool
-	NodeIp      string
-	InputFiles  []string
-	Outputfiles []string
-	ErrorCheck  bool
-	NodeType    bool
+	Cmd                      string
+	Args                     []string
+	WaitTimeout              int
+	Single                   bool
+	NodeIp                   string
+	InputFiles               []string
+	Outputfiles              []string
+	ErrorCheckEnableInOutput bool
+	NodeType                 bool
 }
 
 type NodeTypeAndCmd struct {
-	Frontend    *Cmd
-	Automate    *Cmd
-	Chef_server *Cmd
-	Postgresql  *Cmd
-	Opensearch  *Cmd
-	Infra       *AutomteHAInfraDetails
+	Frontend   *Cmd
+	Automate   *Cmd
+	ChefServer *Cmd
+	Postgresql *Cmd
+	Opensearch *Cmd
+	Infra      *AutomteHAInfraDetails
 }
 
 type CmdResult struct {
@@ -43,25 +44,23 @@ type CmdResult struct {
 	Error       error
 }
 
-type CmdUtil interface {
-	RunCommand() error
-	CmdExecOnNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error
-	RemoteJobs(command string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheck bool, newSSHUtil SSHUtil, resultChan chan CmdResult)
+type RemoteCmdExecutor interface {
+	Execute() error
 }
 
-type CmdUtilImpl struct {
+type remoteCmdExecutor struct {
 	NodeMap *NodeTypeAndCmd
 	SshUtil SSHUtil
 }
 
-func NewCmdUtil(nodeMap *NodeTypeAndCmd) CmdUtil {
-	return &CmdUtilImpl{
+func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd) RemoteCmdExecutor {
+	return &remoteCmdExecutor{
 		NodeMap: nodeMap,
 		SshUtil: NewSSHUtil(&SSHConfig{}),
 	}
 }
 
-func (c *CmdUtilImpl) RunCommand() error {
+func (c *remoteCmdExecutor) Execute() error {
 	var err error
 	timestamp := time.Now().Format("20060102150405")
 
@@ -76,7 +75,7 @@ func (c *CmdUtilImpl) RunCommand() error {
 			return err
 		}
 
-		err = c.CmdExecOnNodes(c.NodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		err = c.executeCmdOnGivenNodes(c.NodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.Automate.CmdInputs.NodeType:
 		const remoteService string = CONST_AUTOMATE
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Automate, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -84,15 +83,15 @@ func (c *CmdUtilImpl) RunCommand() error {
 			return err
 		}
 
-		err = c.CmdExecOnNodes(c.NodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
-	case c.NodeMap.Chef_server.CmdInputs.NodeType:
+		err = c.executeCmdOnGivenNodes(c.NodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
+	case c.NodeMap.ChefServer.CmdInputs.NodeType:
 		const remoteService string = CONST_CHEF_SERVER
-		nodeIps, err := preCmdExecCheck(c.NodeMap.Chef_server, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(c.NodeMap.ChefServer, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return err
 		}
 
-		err = c.CmdExecOnNodes(c.NodeMap.Chef_server.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		err = c.executeCmdOnGivenNodes(c.NodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.Postgresql.CmdInputs.NodeType:
 		const remoteService string = CONST_POSTGRESQL
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Postgresql, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -100,7 +99,7 @@ func (c *CmdUtilImpl) RunCommand() error {
 			return err
 		}
 
-		err = c.CmdExecOnNodes(c.NodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		err = c.executeCmdOnGivenNodes(c.NodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.Opensearch.CmdInputs.NodeType:
 		const remoteService string = CONST_OPENSEARCH
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Opensearch, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -108,7 +107,7 @@ func (c *CmdUtilImpl) RunCommand() error {
 			return err
 		}
 
-		err = c.CmdExecOnNodes(c.NodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		err = c.executeCmdOnGivenNodes(c.NodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	default:
 		return errors.New("Missing or Unsupported flag")
 	}
@@ -119,17 +118,19 @@ func (c *CmdUtilImpl) RunCommand() error {
 	return nil
 }
 
-func (c *CmdUtilImpl) CmdExecOnNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
+// executeCmdOnGivenNodes executes given command/commands on all given nodes concurrently.
+func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
 	resultChan := make(chan CmdResult, len(nodeIps))
 	originalSSHConfig := c.SshUtil.getSSHConfig()
 	inputFiles := input.InputFiles
 	outputFiles := input.Outputfiles
 	command := input.Cmd
+	timeout := input.WaitTimeout
 
 	inputFileToOutputFileMap := map[string]string{}
 	for _, file := range inputFiles {
-		configFile := remoteService + "_" + timestamp + "_" + file
-		inputFileToOutputFileMap[file] = configFile
+		destinationFile := remoteService + "_" + timestamp + "_" + file
+		inputFileToOutputFileMap[file] = destinationFile
 	}
 
 	for _, hostIP := range nodeIps {
@@ -138,12 +139,13 @@ func (c *CmdUtilImpl) CmdExecOnNodes(input *CmdInputs, nodeIps []string, remoteS
 			sshPort:    originalSSHConfig.sshPort,
 			sshKeyFile: originalSSHConfig.sshKeyFile,
 			hostIP:     hostIP,
+			timeout:    timeout,
 		}
 		newSSHUtil := NewSSHUtil(newSSHConfig)
 
 		printConnectionMessage(remoteService, hostIP, cliWriter)
 
-		go c.RemoteJobs(command, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheck, newSSHUtil, resultChan)
+		go c.executeCmdOnNode(command, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput, newSSHUtil, resultChan)
 	}
 
 	for i := 0; i < len(nodeIps); i++ {
@@ -166,12 +168,12 @@ func (c *CmdUtilImpl) CmdExecOnNodes(input *CmdInputs, nodeIps []string, remoteS
 	return nil
 }
 
-// RemoteJobs function will run all remote jobs.
-func (c *CmdUtilImpl) RemoteJobs(command string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheck bool, newSSHUtil SSHUtil, resultChan chan CmdResult) {
+// executeCmdOnNode function will run all remote jobs on a single node
+func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool, newSSHUtil SSHUtil, resultChan chan CmdResult) {
 	rc := CmdResult{newSSHUtil.getSSHConfig().hostIP, []string{}, "", nil}
 	if len(inputFiles) != 0 {
-		for inputFile, outputFile := range inputFiles {
-			err := newSSHUtil.copyFileToRemote(inputFile, outputFile, false)
+		for sourceFile, destinationFile := range inputFiles {
+			err := newSSHUtil.copyFileToRemote(sourceFile, destinationFile, false)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
@@ -201,20 +203,20 @@ func (c *CmdUtilImpl) RemoteJobs(command string, inputFiles map[string]string, o
 		}
 	}
 
-	if errorCheck {
+	if errorCheckEnableInOutput {
 		err = checkResultOutputForError(output)
-		if err != nil {
-			rc.Error = err
-			resultChan <- rc
-			return
-		}
+	}
+	if err != nil {
+		rc.Error = err
+		resultChan <- rc
+		return
 	}
 
 	rc.Output = output
 	resultChan <- rc
 }
 
-// preCmdExecCheck will check and execute PreExec function
+// preCmdExecCheck will check and execute PreExec function. Also returns nodeips for given remoteservice with error if any.
 func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) ([]string, error) {
 	var nodeIps []string
 	var err error
@@ -226,15 +228,15 @@ func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomteHAInfraDetails, r
 	}
 
 	if remoteService == CONST_FRONTEND {
-		nodeIps, err = isFrontendIPs(node.CmdInputs.NodeIp, infra)
+		nodeIps, err = getFrontendIPs(node.CmdInputs.NodeIp, infra)
 	} else if remoteService == CONST_AUTOMATE {
-		nodeIps, err = isAutomateIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
+		nodeIps, err = getAutomateIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
 	} else if remoteService == CONST_CHEF_SERVER {
-		nodeIps, err = isChefserverIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
+		nodeIps, err = getChefserverIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
 	} else if remoteService == CONST_POSTGRESQL {
-		nodeIps, err = isPostgresqlIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
+		nodeIps, err = getPostgresqlIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
 	} else if remoteService == CONST_OPENSEARCH {
-		nodeIps, err = isOpensearchIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
+		nodeIps, err = getOpensearchIPs(node.CmdInputs.Single, node.CmdInputs.NodeIp, infra)
 	}
 
 	if err != nil {
@@ -257,78 +259,87 @@ func getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
 	return sshConfig
 }
 
-// isFrontendIPs will return the Frontend Node Ips.
-func isFrontendIPs(ip string, infra *AutomteHAInfraDetails) ([]string, error) {
-	frontendNodes := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
+// getFrontendIPs will return the Frontend Node Ips.
+func getFrontendIPs(ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+	frontendIps := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
 	if ip != "" {
-		if isValidIP(ip, frontendNodes) {
+		if isValidIP(ip, frontendIps) {
 			return []string{ip}, nil
-		} else {
-			return []string{}, errors.New("Please Enter Valid frontend IP")
 		}
-	} else {
-		return frontendNodes, nil
+		return []string{}, errors.New("Please Enter Valid frontend IP")
 	}
+	return frontendIps, nil
+
 }
 
-// IsAutomateIPs will return the Automate Node Ips.
-func isAutomateIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+// getAutomateIPs will return the Automate Node Ips.
+func getAutomateIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+	automateIps := infra.Outputs.AutomatePrivateIps.Value
 	if ip != "" {
-		if isValidIP(ip, infra.Outputs.AutomatePrivateIps.Value) {
+		if isValidIP(ip, automateIps) {
 			return []string{ip}, nil
-		} else {
-			return []string{}, errors.New("Please Enter Valid automate IP")
 		}
+		return []string{}, errors.New("Please Enter Valid automate IP")
 	} else if single {
-		return []string{infra.Outputs.AutomatePrivateIps.Value[0]}, nil
-	} else {
-		return infra.Outputs.AutomatePrivateIps.Value, nil
+		ip, err := GetSingleIp(automateIps)
+		return []string{ip}, err
 	}
+	return automateIps, nil
 }
 
-// IsChefserverIPs will return the Chefserver Node Ips.
-func isChefserverIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+// getChefserverIPs will return the Chefserver Node Ips.
+func getChefserverIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+	chefServerIps := infra.Outputs.ChefServerPrivateIps.Value
 	if ip != "" {
-		if isValidIP(ip, infra.Outputs.ChefServerPrivateIps.Value) {
+		if isValidIP(ip, chefServerIps) {
 			return []string{ip}, nil
-		} else {
-			return []string{}, errors.New("Please Enter Valid chef-server IP")
 		}
+		return []string{}, errors.New("Please Enter Valid chef-server IP")
 	} else if single {
-		return []string{infra.Outputs.ChefServerPrivateIps.Value[0]}, nil
-	} else {
-		return infra.Outputs.ChefServerPrivateIps.Value, nil
+		ip, err := GetSingleIp(chefServerIps)
+		return []string{ip}, err
 	}
+	return chefServerIps, nil
+
 }
 
-// IsPostgresqlIPs will return the Postgresql Node Ips.
-func isPostgresqlIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+// getPostgresqlIPs will return the Postgresql Node Ips.
+func getPostgresqlIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+	postgresqlIps := infra.Outputs.PostgresqlPrivateIps.Value
 	if ip != "" {
-		if isValidIP(ip, infra.Outputs.PostgresqlPrivateIps.Value) {
+		if isValidIP(ip, postgresqlIps) {
 			return []string{ip}, nil
-		} else {
-			return []string{}, errors.New("Please Enter Valid postgresql IP")
 		}
+		return []string{}, errors.New("Please Enter Valid postgresql IP")
 	} else if single {
-		return []string{infra.Outputs.PostgresqlPrivateIps.Value[0]}, nil
-	} else {
-		return infra.Outputs.PostgresqlPrivateIps.Value, nil
+		ip, err := GetSingleIp(postgresqlIps)
+		return []string{ip}, err
 	}
+	return postgresqlIps, nil
+
 }
 
-// IsOpensearchIPs will return the Opensearch Node Ips.
-func isOpensearchIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+// getOpensearchIPs will return the Opensearch Node Ips.
+func getOpensearchIPs(single bool, ip string, infra *AutomteHAInfraDetails) ([]string, error) {
+	opensearchIps := infra.Outputs.OpensearchPrivateIps.Value
 	if ip != "" {
-		if isValidIP(ip, infra.Outputs.OpensearchPrivateIps.Value) {
+		if isValidIP(ip, opensearchIps) {
 			return []string{ip}, nil
-		} else {
-			return []string{}, errors.New("Please Enter Valid opensearch IP")
 		}
+		return []string{}, errors.New("Please Enter Valid opensearch IP")
 	} else if single {
-		return []string{infra.Outputs.OpensearchPrivateIps.Value[0]}, nil
-	} else {
-		return infra.Outputs.OpensearchPrivateIps.Value, nil
+		ip, err := GetSingleIp(opensearchIps)
+		return []string{ip}, err
 	}
+	return opensearchIps, nil
+}
+
+// TODO currently we are returning first ip, in future need to introduce smartness to return any active node from given node set
+func GetSingleIp(ips []string) (string, error) {
+	if len(ips) == 0 {
+		return "", errors.New("No ips found")
+	}
+	return ips[0], nil
 }
 
 // isValidIP will check whether the given ip is in the given remoteservice ips set or not.
@@ -402,7 +413,8 @@ func appendChildFileToParentFile(hostIp, parent, child string) (string, error) {
 	}
 	defer f.Close()
 
-	output, err := ioutil.ReadFile(child) // nosemgrep
+	fileUtils := &fileutils.FileSystemUtils{}
+	output, err := fileUtils.ReadFile(child)
 	if err != nil {
 		return "", err
 	}
