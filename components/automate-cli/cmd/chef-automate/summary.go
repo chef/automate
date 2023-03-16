@@ -189,7 +189,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	if err != nil {
 		return BeStatusValue{}, err
 	}
-	memeber_id := defaultServiceDetails["sys"].(map[string]interface{})["member_id"]
+	memeberId := defaultServiceDetails["sys"].(map[string]interface{})["member_id"]
 	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
 	servicePid := fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
@@ -220,7 +220,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 		return BeStatusValue{}, err
 	}
 
-	populationData := censusData["census_groups"].(map[string]interface{})[service+".default"].(map[string]interface{})["population"].(map[string]interface{})[fmt.Sprintf("%s", memeber_id)]
+	populationData := censusData["census_groups"].(map[string]interface{})[service+".default"].(map[string]interface{})["population"].(map[string]interface{})[fmt.Sprintf("%s", memeberId)]
 	getrole, ok := populationData.(map[string]interface{})
 	role := "Unknown"
 	if ok {
