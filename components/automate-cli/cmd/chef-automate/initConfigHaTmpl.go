@@ -343,7 +343,7 @@ region = ""
 ## === INPUT NEEDED ===
 
 # Password for Automate UI for 'admin' user.
-# admin_password = ""
+admin_password = ""
 
 
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
