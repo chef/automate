@@ -3,6 +3,7 @@ syntax = "proto3";
 
 package chef.automate.domain.ocid;
 option go_package = "github.com/chef/automate/api/config/ocid";
+
 import "config/shared/global.proto";
 import "config/shared/tls.proto";
 import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
@@ -22,10 +23,11 @@ message ConfigRequest {
 			Log log = 2;
 			Network network = 3;
 			Sql sql = 4;
-			chef.automate.infra.config.TLSCredentials tls = 5;
+			Ocid ocid = 5;
+			chef.automate.infra.config.TLSCredentials tls = 6;
 
 			message Network {
-				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 9090, protocol: "https" } ];
+				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10201, protocol: "https" } ];
 				google.protobuf.StringValue listen_ip = 2 [deprecated=true]; // The listen host is no longer setable(localhost only)
 			}
 
@@ -34,11 +36,6 @@ message ConfigRequest {
 				google.protobuf.Int64Value rotation_max_bytes = 2;
 				google.protobuf.Int32Value rotation_max_files = 3;
 				google.protobuf.Int32Value max_error_logs_per_second = 4;
-				// TODO(ssd) 2018-07-24: Different log
-				// rotation configurables require
-				// different units.
-				google.protobuf.Int32Value rotation_max_megabytes = 5;
-				google.protobuf.BoolValue extended_perf_log = 6;
 			}
 
 			message Sql {
@@ -48,10 +45,16 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_max = 4;
 				google.protobuf.Int32Value pool_queue_timeout = 5;
 			}
-		}
 
+			message Ocid {
+				google.protobuf.Int32Value sql_retry_count = 1;
+				google.protobuf.Int32Value sql_retry_delay = 2;
+				google.protobuf.Int32Value abandoned_upload_cleanup_interval = 3;
+				google.protobuf.Int32Value deleted_data_cleanup_interval = 4;
+				google.protobuf.BoolValue stream_download = 5;
+			}
 
+          }
 		message Service {}
-
 	}
 }

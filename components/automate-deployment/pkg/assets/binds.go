@@ -32,6 +32,8 @@ automate-cs-oc-bifrost BINDING_MODE strict
 automate-cs-oc-erchef REQUIRED automate-cs-bookshelf automate-cs-oc-bifrost automate-es-gateway automate-pg-gateway pg-sidecar-service
 automate-cs-oc-erchef OPTIONAL automate-gateway
 automate-cs-oc-erchef BINDING_MODE relaxed
+automate-cs-ocid REQUIRED automate-pg-gateway pg-sidecar-service
+automate-cs-ocid BINDING_MODE strict
 deployment-service BINDING_MODE strict
 automate-dex REQUIRED automate-pg-gateway pg-sidecar-service
 automate-dex BINDING_MODE strict

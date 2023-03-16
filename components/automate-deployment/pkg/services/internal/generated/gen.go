@@ -338,62 +338,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-cs-oc-bifrost",
-      "metadata": {
-        "name": "chef/automate-cs-oc-bifrost",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": [
-          {
-            "type": "secret",
-            "optional": false,
-            "secret_spec": "oc_bifrost.superuser_id"
-          }
-        ]
-      }
-    },
-    {
-      "name": "chef/automate-cs-oc-erchef",
-      "metadata": {
-        "name": "chef/automate-cs-oc-erchef",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": [
-          {
-            "type": "file",
-            "path": "data/pivotal.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/pivotal.pub.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/webui_priv.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/webui_pub.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/dark_launch_features.json",
-            "optional": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "chef/automate-cs-ocid",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-cs-nginx",
       "metadata": {
         "name": "chef/automate-cs-nginx",
@@ -425,6 +369,58 @@ var ProductMetadataJSON = `
     {
       "name": "chef/automate-load-balancer",
       "metadata": null
+    },
+    {
+      "name": "chef/automate-cs-oc-bifrost",
+      "metadata": {
+        "name": "chef/automate-cs-oc-bifrost",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "oc_bifrost.superuser_id"
+          }
+        ]
+      }
+    },
+    {
+      "name": "chef/automate-cs-ocid",
+      "metadata": {
+        "name": "chef/automate-cs-ocid",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "file",
+            "path": "data/pivotal.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/pivotal.pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_priv.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/dark_launch_features.json",
+            "optional": false
+          }
+        ]
+      }
     },
     {
       "name": "chef/automate-prometheus",
@@ -665,8 +661,8 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",
-        "chef/automate-cs-oc-erchef",
-        "chef/automate-cs-nginx"
+        "chef/automate-cs-nginx",
+        "chef/automate-cs-ocid"
       ],
       "packages": null,
       "dependencies": [
