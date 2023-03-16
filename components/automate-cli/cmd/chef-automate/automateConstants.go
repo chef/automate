@@ -55,7 +55,12 @@ const (
 	automate-backend-ctl show --svc=automate-ha-%s | tail -n +2
 	`
 
-	GET_FRONTEND_CONFIG = `sudo chef-automate config show`
+	GET_BACKEND_CONFIG = `
+	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
+	automate-backend-ctl show --svc=automate-ha-%s | tail -n +2 %s
+	`
+
+	GET_FRONTEND_CONFIG = `echo "y" | sudo chef-automate config show %s`
 
 	GET_APPLIED_CONFIG = `
 	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
