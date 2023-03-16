@@ -67,8 +67,8 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     #Run commands as sudo.
     sudo -- sh -c "
     #Download Chef Automate CLI.
-    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
-    | gunzip - > chef-automate && chmod +x chef-automate
+    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
+    | gunzip - > chef-automate && chmod +x chef-automate \
     | cp -f chef-automate /usr/bin/chef-automate
 
     #Download the latest Airgapped Bundle.
