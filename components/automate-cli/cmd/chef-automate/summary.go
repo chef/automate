@@ -155,10 +155,7 @@ func (ss *Summary) executeCommandForArrayofIPs(sshUtil SSHUtil, remoteIps []stri
 			if err != nil {
 				return err
 			}
-			status, err := ss.getBEStatus(sshUtil, remoteIps[i], authToken, serviceName)
-			if err != nil {
-				return err
-			}
+			status := ss.getBEStatus(sshUtil, remoteIps[i], authToken, serviceName)
 			ss.beStatus = append(ss.beStatus, status)
 		}
 
@@ -177,13 +174,28 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 	return authToken, nil
 }
 
-func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceType string) (BeStatusValue, error) {
-	service := ""
+func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceType string) BeStatusValue {
+	var service, role, health, formatted, serviceState, servicePid string
+	serviceState = "down"
+	servicePid = ""
+	health = "ERROR"
+	formatted = "0d 0h 0m 0s"
 	if serviceType == "OpenSearch" {
 		service = "automate-ha-opensearch"
+		role = "Node"
 	} else if serviceType == "Postgresql" {
 		service = "automate-ha-postgresql"
+		role = "Unknown"
 	}
+	defaultBeStatusValue := BeStatusValue{
+		serviceName: serviceType,
+		ipAddress:   ip,
+		health:      health,
+		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
+		upTime:      formatted,
+		role:        role,
+	}
+
 	args := []string{
 		"-s",
 		fmt.Sprintf("%s/services/%s/default", habUrl, service),
@@ -193,11 +205,11 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	}
 	defaultServiceDetails, err := executeCmd(sshUtil, "curl", args)
 	if err != nil {
-		return BeStatusValue{}, err
+		return defaultBeStatusValue
 	}
 	memeberId := defaultServiceDetails["sys"].(map[string]interface{})["member_id"]
-	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
-	servicePid := fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
+	serviceState = defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
+	servicePid = fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
 	startingTime = float64(nowFunc().UTC().Unix()) - startingTime
 	args = []string{
@@ -209,10 +221,10 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	}
 	ServiceHealth, err := executeCmd(sshUtil, "curl", args)
 	if err != nil {
-		return BeStatusValue{}, err
+		return defaultBeStatusValue
 	}
 
-	health := fmt.Sprint(ServiceHealth["status"])
+	health = fmt.Sprint(ServiceHealth["status"])
 
 	args = []string{
 		"-s",
@@ -223,12 +235,11 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	}
 	censusData, err := executeCmd(sshUtil, "curl", args)
 	if err != nil {
-		return BeStatusValue{}, err
+		return defaultBeStatusValue
 	}
 
 	populationData := censusData["census_groups"].(map[string]interface{})[service+".default"].(map[string]interface{})["population"].(map[string]interface{})[fmt.Sprintf("%s", memeberId)]
 	getrole, ok := populationData.(map[string]interface{})
-	role := "Unknown"
 	if ok {
 		isleader, _ := strconv.ParseBool(fmt.Sprint(getrole["leader"]))
 		isfollower, _ := strconv.ParseBool(fmt.Sprint(getrole["follower"]))
@@ -243,7 +254,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	duration := t.Sub(time.Unix(0, 0))
 
 	// Format the duration as "1d 148h 43m 31s"
-	formatted := fmt.Sprintf("%dd %dh %dm %ds", int(duration.Hours())/24, int(duration.Hours())%24, int(duration.Minutes())%60, int(duration.Seconds())%60)
+	formatted = fmt.Sprintf("%dd %dh %dm %ds", int(duration.Hours())/24, int(duration.Hours())%24, int(duration.Minutes())%60, int(duration.Seconds())%60)
 
 	return BeStatusValue{
 		serviceName: serviceType,
@@ -252,7 +263,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
 		upTime:      formatted,
 		role:        role,
-	}, nil
+	}
 }
 
 func (ss *Summary) getFEStatus(sshUtil SSHUtil, script string, ip string, serviceType string) FeStatusValue {
@@ -267,6 +278,7 @@ func (ss *Summary) getFEStatus(sshUtil SSHUtil, script string, ip string, servic
 			status = "WARN"
 		}
 	}
+
 	return FeStatusValue{
 		serviceName: serviceType,
 		ipAddress:   ip,
@@ -284,12 +296,15 @@ func (ss *Summary) opensearchStatusInFE(sshUtil SSHUtil) string {
 		&cobra.Command{
 			Use: "curl",
 		}, arg)
-	osStatusJson, _ := sshUtil.connectAndExecuteCommandOnRemote(curlOSStatusScript, true)
+	osStatusJson, err := sshUtil.connectAndExecuteCommandOnRemote(curlOSStatusScript, true)
+	if err != nil {
+		return "Unknown"
+	}
 
 	body := []byte(osStatusJson)
 	esHealthData := make(map[string]json.RawMessage)
 
-	err := json.Unmarshal(body, &esHealthData)
+	err = json.Unmarshal(body, &esHealthData)
 	if err != nil {
 		return "Unknown"
 	}
@@ -298,18 +313,18 @@ func (ss *Summary) opensearchStatusInFE(sshUtil SSHUtil) string {
 }
 
 func executeCmd(sshUtil SSHUtil, cmd string, args []string) (map[string]interface{}, error) {
+	var body map[string]interface{}
 	script := GenerateOriginalAutomateCLICommand(&cobra.Command{
 		Use: "curl",
 	}, args)
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
-		return nil, err
+		return body, err
 	}
 
-	var body map[string]interface{}
 	err = json.Unmarshal([]byte(output), &body)
 	if err != nil {
-		return nil, err
+		return body, err
 	}
 	return body, nil
 }
