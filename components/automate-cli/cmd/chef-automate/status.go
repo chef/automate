@@ -23,10 +23,7 @@ var statusCmdFlags = struct {
 }{}
 
 type StatusSummaryCmdFlags struct {
-	automateIp   string
-	chefServerIp string
-	opensearchIp string
-	postgresqlIp string
+	node         string
 	isAutomate   bool
 	isChefServer bool
 	isOpenSearch bool
@@ -86,14 +83,12 @@ func newStatusSummaryCmd() *cobra.Command {
 		Long:  "Retrieve Chef Automate status node summary for HA deployment",
 		RunE:  runStatusSummaryCmdFunc(&statusSummaryCmdFlags),
 	}
-	statusSummaryCmd.PersistentFlags().StringVarP(&statusSummaryCmdFlags.automateIp, "automate-ips", "A", "", "Get automate Status by ip addresses")
-	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isAutomate, "automate", "a2", false, "Get only automate Status")
-	statusSummaryCmd.PersistentFlags().StringVarP(&statusSummaryCmdFlags.chefServerIp, "chef-server-ips", "C", "", "Get chef server Status by ip addresses")
-	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isChefServer, "chef-server", "cs", false, "Get only chef server Status")
-	statusSummaryCmd.PersistentFlags().StringVarP(&statusSummaryCmdFlags.opensearchIp, "opensearch-ips", "O", "", "Get opensearch Status by ip addresses")
-	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isOpenSearch, "opensearch", "os", false, "Get only opensearch Status")
-	statusSummaryCmd.PersistentFlags().StringVarP(&statusSummaryCmdFlags.postgresqlIp, "postgresql-ips", "P", "", "Get postgresql Status by ip addresses")
-	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isPostgresql, "postgresql", "pg", false, "Get only postgresql Status")
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isAutomate, "automate", "a", false, "Get only automate Status")
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isChefServer, "chef-server", "c", false, "Get only chef server Status")
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isOpenSearch, "opensearch", "o", false, "Get only opensearch Status")
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isPostgresql, "postgresql", "p", false, "Get only postgresql Status")
+	statusSummaryCmd.PersistentFlags().StringVar(&statusSummaryCmdFlags.node, "node", "", "Node Ip address")
+
 	return statusSummaryCmd
 }
 
@@ -144,12 +139,12 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 			return err
 		}
 		if isManagedServicesOn() {
-			fe := statusSummary.FEDisplay()
+			fe := statusSummary.ShowFEStatus()
 			fmt.Println(fe)
 		} else {
-			fe := statusSummary.FEDisplay()
+			fe := statusSummary.ShowFEStatus()
 			fmt.Println(fe)
-			be := statusSummary.BEDisplay()
+			be := statusSummary.ShowBEStatus()
 			fmt.Println(be)
 
 		}
