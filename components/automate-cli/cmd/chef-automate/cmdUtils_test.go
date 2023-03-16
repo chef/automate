@@ -558,7 +558,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			args: args{
 				node: &Cmd{
 					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
-						return errors.New("PreExec function failed")
+						return errors.New(errorForPreExec)
 					},
 					CmdInputs: &CmdInputs{
 						Single: false,
@@ -572,7 +572,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{},
-			expectedErr: errors.New("PreExec function failed"),
+			expectedErr: errors.New(errorForPreExec),
 			wantErr:     true,
 		},
 	}
