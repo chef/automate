@@ -144,7 +144,7 @@ func TestRunFENode(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
 	sshUtilsImpl := getMockSSHUtil(&SSHConfig{}, nil, "", nil)
-	err := ss.Run(sshUtilsImpl)
+	err := ss.Prepare(sshUtilsImpl)
 	assert.NoError(t, err)
 }
 
@@ -155,7 +155,7 @@ func TestRunFENodeDiaplay(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
 	sshUtilsImpl := getMockSSHUtil(&SSHConfig{}, nil, "", nil)
-	err := ss.Run(sshUtilsImpl)
+	err := ss.Prepare(sshUtilsImpl)
 	assert.NoError(t, err)
 	fe := ss.ShowFEStatus()
 	assert.Equal(t, fe, "+-------------+--------------+--------+------------+\n| NAME        | IP ADDRESS   | STATUS | OPENSEARCH |\n+-------------+--------------+--------+------------+\n| Automate    | 198.51.100.0 | OK     | Unknown    |\n| Automate    | 198.51.100.1 | OK     | Unknown    |\n| Chef Server | 198.51.100.2 | OK     | Unknown    |\n| Chef Server | 198.51.100.3 | OK     | Unknown    |\n+-------------+--------------+--------+------------+")
@@ -168,7 +168,7 @@ func TestRunBENod(t *testing.T) {
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
 	sshUtilsImpl := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
-	err := ss.Run(sshUtilsImpl)
+	err := ss.Prepare(sshUtilsImpl)
 	assert.NoError(t, err)
 }
 func TestRunBENodeDiaplay(t *testing.T) {
@@ -181,7 +181,7 @@ func TestRunBENodeDiaplay(t *testing.T) {
 	// Mock the time to a specific time
 	mockTime := time.Date(2023, 3, 15, 12, 0, 0, 0, time.UTC)
 	nowFunc = func() time.Time { return mockTime }
-	err := ss.Run(sshUtilsImpl)
+	err := ss.Prepare(sshUtilsImpl)
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
 	assert.Contains(t, be, "+-------------+--------------+--------+----------------+------------------+---------+\n| NAME        | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+-------------+--------------+--------+----------------+------------------+---------+\n| Open Search | 198.51.100.4 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| Open Search | 198.51.100.5 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| Open Search | 198.51.100.6 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| Postgresql  | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql  | 198.51.100.8 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql  | 198.51.100.9 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+-------------+--------------+--------+----------------+------------------+---------+")

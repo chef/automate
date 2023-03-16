@@ -29,7 +29,7 @@ const (
 )
 
 type StatusSummary interface {
-	Run(sshUtil SSHUtil) error
+	Prepare(sshUtil SSHUtil) error
 	ShowFEStatus() string
 	ShowBEStatus() string
 }
@@ -81,7 +81,7 @@ func (ss *Summary) ShowBEStatus() string {
 }
 
 // Run Status summary
-func (ss *Summary) Run(sshUtil SSHUtil) error {
+func (ss *Summary) Prepare(sshUtil SSHUtil) error {
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.checkIPAddresses()
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, ipAddressError)
@@ -106,7 +106,7 @@ func (ss *Summary) Run(sshUtil SSHUtil) error {
 }
 
 // get sshConfig
-func (ss *Summary) setSSHConfig() SSHUtil {
+func (ss *Summary) getSSHConfig() SSHUtil {
 	sshconfig := &SSHConfig{}
 	sshconfig.sshUser = ss.infra.Outputs.SSHUser.Value
 	sshconfig.sshKeyFile = ss.infra.Outputs.SSHKeyFile.Value
