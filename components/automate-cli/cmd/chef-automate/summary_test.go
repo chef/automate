@@ -19,7 +19,6 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
 	assert.Equal(t, errList.Len(), 0)
-	fmt.Println(automateIps, chefServerIps, opensearchIps, postgresqlIps, errList)
 	assert.Equal(t, automateIps, []string{ValidIP, ValidIP1})
 	assert.Equal(t, chefServerIps, []string{ValidIP2, ValidIP3})
 	assert.Equal(t, opensearchIps, []string{ValidIP4, ValidIP5, ValidIP6})
@@ -102,14 +101,16 @@ func TestCheckIPAddressesError(t *testing.T) {
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
 
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
-		node:       fmt.Sprintf("%s", "127.0.0.1"),
+		node:       fmt.Sprintf("%s,%s", "127.0.0.1", "127.0.0.2"),
 		isAutomate: true,
+		isChefServer: true,
+		isOpenSearch: true,
+		isPostgresql: true,
 	})
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
-	fmt.Println(automateIps, chefServerIps, opensearchIps, postgresqlIps, errList)
+	_, _, _, _, errList := ss.(*Summary).checkIPAddresses()
 	assert.Equal(t, errList.Len(), 1)
-	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nList of automate ip address not found [127.0.0.1]")
+	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nList of  ip address not found [127.0.0.1 127.0.0.2]")
 }
 
 func TestCheckIPAddressesValidation(t *testing.T) {
@@ -180,9 +181,6 @@ func TestRunBENodeDiaplay(t *testing.T) {
 	// Mock the time to a specific time
 	mockTime := time.Date(2023, 3, 15, 12, 0, 0, 0, time.UTC)
 	nowFunc = func() time.Time { return mockTime }
-	// Get the mocked time
-	now := getCurrentTime()
-	fmt.Println("Mocked time:", now)
 	err := ss.Run(sshUtilsImpl)
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
