@@ -48,4 +48,18 @@ do
      done
   done
 done
+
+cd /home/ubuntu/cookbook
+
+#Find all files in the directory and loop through them
+# loop through and create the directories
+for i in $(seq 1 $NUM_ORGS)
+do
+  for file in *; 
+  do
+    # Extract the contents of the tar file
+    knife upload file -s $SERVER_URL/"org$i" --config-option cookbook_path=/home/ubuntu/cookbook
+  done
+done
+
 echo "Done"
