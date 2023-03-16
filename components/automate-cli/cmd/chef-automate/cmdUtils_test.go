@@ -22,6 +22,7 @@ const (
 	showCommand      = "sudo chef-automate config show"
 	file             = "new.toml"
 	completedMessage = "config show operation completed"
+	errorForPreExec  = "PreExec function failed"
 )
 
 func newTmpDir(t testing.TB) string {
@@ -39,6 +40,20 @@ func TestExecute(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ip1, ip2, ip3}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ip1, ip2, ip3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ip1, ip2, ip3}
+
+	nodeFlagFalse := &Cmd{
+		CmdInputs: &CmdInputs{
+			NodeType: false,
+		},
+	}
+	preExecFailed := &Cmd{
+		PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+			return errors.New(errorForPreExec)
+		},
+		CmdInputs: &CmdInputs{
+			NodeType: true,
+		},
+	}
 	type fields struct {
 		NodeMap *NodeTypeAndCmd
 		SshUtil SSHUtil
@@ -74,11 +89,7 @@ func TestExecute(t *testing.T) {
 			name: "Successful command execution on automate",
 			fields: fields{
 				NodeMap: &NodeTypeAndCmd{
-					Frontend: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
+					Frontend: nodeFlagFalse,
 					Automate: &Cmd{
 						CmdInputs: &CmdInputs{
 							Cmd:        patchCommand,
@@ -98,16 +109,8 @@ func TestExecute(t *testing.T) {
 			name: "Successful command execution on chef_server",
 			fields: fields{
 				NodeMap: &NodeTypeAndCmd{
-					Frontend: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					Automate: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
+					Frontend: nodeFlagFalse,
+					Automate: nodeFlagFalse,
 					ChefServer: &Cmd{
 						CmdInputs: &CmdInputs{
 							Cmd:      showCommand,
@@ -126,20 +129,9 @@ func TestExecute(t *testing.T) {
 			name: "Successful command execution on postgres",
 			fields: fields{
 				NodeMap: &NodeTypeAndCmd{
-					Frontend: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					Automate: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					ChefServer: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						}},
+					Frontend:   nodeFlagFalse,
+					Automate:   nodeFlagFalse,
+					ChefServer: nodeFlagFalse,
 					Postgresql: &Cmd{
 						CmdInputs: &CmdInputs{
 							Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "postgresql", ""),
@@ -157,24 +149,10 @@ func TestExecute(t *testing.T) {
 			name: "Successful command execution on opensearch",
 			fields: fields{
 				NodeMap: &NodeTypeAndCmd{
-					Frontend: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					Automate: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					ChefServer: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						}},
-					Postgresql: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						}},
+					Frontend:   nodeFlagFalse,
+					Automate:   nodeFlagFalse,
+					ChefServer: nodeFlagFalse,
+					Postgresql: nodeFlagFalse,
 					Opensearch: &Cmd{
 						CmdInputs: &CmdInputs{
 							Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "opensearch", ""),
@@ -192,33 +170,86 @@ func TestExecute(t *testing.T) {
 			name: "Node type not supported",
 			fields: fields{
 				NodeMap: &NodeTypeAndCmd{
-					Frontend: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					Automate: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						},
-					},
-					ChefServer: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						}},
-					Postgresql: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						}},
-					Opensearch: &Cmd{
-						CmdInputs: &CmdInputs{
-							NodeType: false,
-						}},
-					Infra: infra,
+					Frontend:   nodeFlagFalse,
+					Automate:   nodeFlagFalse,
+					ChefServer: nodeFlagFalse,
+					Postgresql: nodeFlagFalse,
+					Opensearch: nodeFlagFalse,
+					Infra:      infra,
 				},
 				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 			},
 			expectedErr: errors.New("Missing or Unsupported flag"),
+			wantErr:     true,
+		},
+		{
+			name: "Failed command execution on frontend as preExec Function failed",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: preExecFailed,
+					Infra:    infra,
+				},
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			},
+			expectedErr: errors.New(errorForPreExec),
+			wantErr:     true,
+		},
+		{
+			name: "Failed command execution on automate as preExec Function failed",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend: nodeFlagFalse,
+					Automate: preExecFailed,
+					Infra:    infra,
+				},
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			},
+			expectedErr: errors.New(errorForPreExec),
+			wantErr:     true,
+		},
+		{
+			name: "Failed command execution on chef_server as preExec Function failed",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend:   nodeFlagFalse,
+					Automate:   nodeFlagFalse,
+					ChefServer: preExecFailed,
+					Infra:      infra,
+				},
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			},
+			expectedErr: errors.New(errorForPreExec),
+			wantErr:     true,
+		},
+		{
+			name: "Failed command execution on postgres as preExec Function failed",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend:   nodeFlagFalse,
+					Automate:   nodeFlagFalse,
+					ChefServer: nodeFlagFalse,
+					Postgresql: preExecFailed,
+					Infra:      infra,
+				},
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			},
+			expectedErr: errors.New(errorForPreExec),
+			wantErr:     true,
+		},
+		{
+			name: "Failed command execution on opensearch as preExec Function failed",
+			fields: fields{
+				NodeMap: &NodeTypeAndCmd{
+					Frontend:   nodeFlagFalse,
+					Automate:   nodeFlagFalse,
+					ChefServer: nodeFlagFalse,
+					Postgresql: nodeFlagFalse,
+					Opensearch: preExecFailed,
+					Infra:      infra,
+				},
+				SshUtil: GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
+			},
+			expectedErr: errors.New(errorForPreExec),
 			wantErr:     true,
 		},
 	}

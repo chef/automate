@@ -63,7 +63,6 @@ func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd) RemoteCmdExecutor {
 }
 
 func (c *remoteCmdExecutor) Execute() error {
-	var err error
 	timestamp := time.Now().Format("20060102150405")
 
 	sshConfig := getSshDetails(c.NodeMap.Infra)
@@ -77,7 +76,7 @@ func (c *remoteCmdExecutor) Execute() error {
 			return err
 		}
 
-		err = c.executeCmdOnGivenNodes(c.NodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		c.executeCmdOnGivenNodes(c.NodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.Automate.CmdInputs.NodeType:
 		const remoteService string = CONST_AUTOMATE
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Automate, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -85,7 +84,7 @@ func (c *remoteCmdExecutor) Execute() error {
 			return err
 		}
 
-		err = c.executeCmdOnGivenNodes(c.NodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		c.executeCmdOnGivenNodes(c.NodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.ChefServer.CmdInputs.NodeType:
 		const remoteService string = CONST_CHEF_SERVER
 		nodeIps, err := preCmdExecCheck(c.NodeMap.ChefServer, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -93,7 +92,7 @@ func (c *remoteCmdExecutor) Execute() error {
 			return err
 		}
 
-		err = c.executeCmdOnGivenNodes(c.NodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		c.executeCmdOnGivenNodes(c.NodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.Postgresql.CmdInputs.NodeType:
 		const remoteService string = CONST_POSTGRESQL
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Postgresql, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -101,7 +100,7 @@ func (c *remoteCmdExecutor) Execute() error {
 			return err
 		}
 
-		err = c.executeCmdOnGivenNodes(c.NodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		c.executeCmdOnGivenNodes(c.NodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	case c.NodeMap.Opensearch.CmdInputs.NodeType:
 		const remoteService string = CONST_OPENSEARCH
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Opensearch, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
@@ -109,19 +108,16 @@ func (c *remoteCmdExecutor) Execute() error {
 			return err
 		}
 
-		err = c.executeCmdOnGivenNodes(c.NodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		c.executeCmdOnGivenNodes(c.NodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
 	default:
 		return errors.New("Missing or Unsupported flag")
-	}
-	if err != nil {
-		return err
 	}
 
 	return nil
 }
 
 // executeCmdOnGivenNodes executes given command/commands on all given nodes concurrently.
-func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
+func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) {
 	resultChan := make(chan CmdResult, len(nodeIps))
 	originalSSHConfig := c.SshUtil.getSSHConfig()
 	inputFiles := input.InputFiles
@@ -172,7 +168,6 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 	status.GlobalResult = ouputJsonResult
 
 	close(resultChan)
-	return nil
 }
 
 // executeCmdOnNode function will run all remote jobs on a single node
@@ -293,8 +288,8 @@ func GetSingleIp(ips []string) (string, error) {
 
 // isValidIP will check whether the given ip is in the given remoteservice ips set or not.
 func isValidIP(ip string, ips []string) bool {
-	ipv4_regex := `^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4})`
-	match, _ := regexp.MatchString(ipv4_regex, ip)
+	ipv4Regex := `^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4})`
+	match, _ := regexp.MatchString(ipv4Regex, ip)
 	if !match {
 		return false
 	}

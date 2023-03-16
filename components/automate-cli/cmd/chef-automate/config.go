@@ -51,7 +51,6 @@ const (
 	ERROR_SELF_MANAGED_CONFIG_SET   = "Setting the configuration for externally configured %s is not supported."
 	patching                        = "Config Patch"
 	setting                         = "Config Set"
-	DEFAULT_TIMEOUT                 = 180
 	waitTimeout                     = "wait-timeout"
 )
 
