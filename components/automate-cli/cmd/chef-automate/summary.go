@@ -51,7 +51,7 @@ type A2haHabitatAutoTfvars struct {
 // Display Frontend Status
 func (ss *Summary) ShowFEStatus() string {
 	if len(ss.feStatus) != 0 {
-		fmt.Println("Frontend Services")
+		writer.Println("Frontend Services")
 		t := table.NewWriter()
 		tTemp := table.Table{}
 		tTemp.Render()
@@ -67,7 +67,7 @@ func (ss *Summary) ShowFEStatus() string {
 // Display Backend Status
 func (ss *Summary) ShowBEStatus() string {
 	if len(ss.beStatus) != 0 {
-		fmt.Println("Backend Services")
+		writer.Println("Backend Services")
 		t := table.NewWriter()
 		tTemp := table.Table{}
 		tTemp.Render()
@@ -94,7 +94,7 @@ func (ss *Summary) Prepare(sshUtil SSHUtil) error {
 	if err != nil {
 		return err
 	}
-	err = ss.prepareBEScript(sshUtil, opensearchIps, "Open Search", "BE")
+	err = ss.prepareBEScript(sshUtil, opensearchIps, "OpenSearch", "BE")
 	if err != nil {
 		return err
 	}
@@ -179,7 +179,7 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 
 func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceType string) (BeStatusValue, error) {
 	service := ""
-	if serviceType == "Open Search" {
+	if serviceType == "OpenSearch" {
 		service = "automate-ha-opensearch"
 	} else if serviceType == "Postgresql" {
 		service = "automate-ha-postgresql"
@@ -360,7 +360,7 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 				automateIps = datafound
 				nodes = dataNotFound
 				if err != nil && err.Len() > 0 {
-					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+					errorList.PushBack(getSingleErrorFromList(err).Error() + ipAddressError)
 				}
 			}
 			if ss.statusSummaryCmdFlags.isChefServer {
@@ -368,16 +368,16 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 				chefServerIps = datafound
 				nodes = dataNotFound
 				if err != nil && err.Len() > 0 {
-					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+					errorList.PushBack(getSingleErrorFromList(err).Error() + ipAddressError)
 				}
 			}
 			if ss.statusSummaryCmdFlags.isOpenSearch {
-				datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.OpensearchPrivateIps.Value, "open search")
+				datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.OpensearchPrivateIps.Value, "OpenSearch")
 				opensearchIps = datafound
 				nodes = dataNotFound
 
 				if err != nil && err.Len() > 0 {
-					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+					errorList.PushBack(getSingleErrorFromList(err).Error() + ipAddressError)
 				}
 			}
 			if ss.statusSummaryCmdFlags.isPostgresql {
@@ -385,7 +385,7 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 				postgresqlIps = datafound
 				nodes = dataNotFound
 				if err != nil && err.Len() > 0 {
-					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+					errorList.PushBack(getSingleErrorFromList(err).Error() + ipAddressError)
 				}
 			}
 
@@ -414,7 +414,7 @@ func validateIPAddresses(IpsFromcmd, ips []string, errorPrefix string) ([]string
 	for _, ip := range IpsFromcmd {
 		err := checkIPAddress(ip)
 		if err != nil {
-			errorList.PushBack(fmt.Sprintf("Incorrect %s IP address format for ip %s", errorPrefix, ip))
+			errorList.PushBack("Incorrect " + errorPrefix + " IP address format for ip " + ip)
 
 		}
 		if stringutils.SliceContains(ips, ip) {
