@@ -22,6 +22,12 @@ var (
 	nowFunc               = time.Now
 )
 
+const (
+	ipAddressError    = "IP address validation failed"
+	curlHeaderFlag    = "--header"
+	curlAuthorization = "'Authorization: Bearer %s'"
+)
+
 type StatusSummary interface {
 	Run(sshUtil SSHUtil) error
 	ShowFEStatus() string
@@ -78,7 +84,7 @@ func (ss *Summary) ShowBEStatus() string {
 func (ss *Summary) Run(sshUtil SSHUtil) error {
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.checkIPAddresses()
 	if errList != nil && errList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "IP address validation failed")
+		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, ipAddressError)
 	}
 	err := ss.prepareFEScript(sshUtil, automateIps, "Automate", "FE")
 	if err != nil {
@@ -181,8 +187,8 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	args := []string{
 		"-s",
 		fmt.Sprintf("%s/services/%s/default", habUrl, service),
-		"--header",
-		fmt.Sprintf("'Authorization: Bearer %s'", authToken),
+		curlHeaderFlag,
+		fmt.Sprintf(curlAuthorization, authToken),
 		"-k",
 	}
 	defaultServiceDetails, err := executeCmd(sshUtil, "curl", args)
@@ -197,8 +203,8 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	args = []string{
 		"-s",
 		fmt.Sprintf("%s/services/%s/default/health", habUrl, service),
-		"--header",
-		fmt.Sprintf("'Authorization: Bearer %s'", authToken),
+		curlHeaderFlag,
+		fmt.Sprintf(curlAuthorization, authToken),
 		"-k",
 	}
 	ServiceHealth, err := executeCmd(sshUtil, "curl", args)
@@ -211,8 +217,8 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceTyp
 	args = []string{
 		"-s",
 		fmt.Sprintf("%s/census", habUrl),
-		"--header",
-		fmt.Sprintf("'Authorization: Bearer %s'", authToken),
+		curlHeaderFlag,
+		fmt.Sprintf(curlAuthorization, authToken),
 		"-k",
 	}
 	censusData, err := executeCmd(sshUtil, "curl", args)
@@ -310,58 +316,9 @@ func executeCmd(sshUtil SSHUtil, cmd string, args []string) (map[string]interfac
 
 func (ss *Summary) checkIPAddresses() ([]string, []string, []string, []string, *list.List) {
 	errorList := list.New()
-	var automateIps, chefServerIps, opensearchIps, postgresqlIps, nodes []string
+	var automateIps, chefServerIps, opensearchIps, postgresqlIps []string
 	if ss.statusSummaryCmdFlags.node != "" {
-		if ss.statusSummaryCmdFlags.isAutomate ||
-			ss.statusSummaryCmdFlags.isChefServer ||
-			ss.statusSummaryCmdFlags.isOpenSearch ||
-			ss.statusSummaryCmdFlags.isPostgresql {
-			nodes = ss.splitIP(
-				ss.statusSummaryCmdFlags.node,
-			)
-			if len(nodes) != 0 {
-				if ss.statusSummaryCmdFlags.isAutomate {
-					datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.AutomatePrivateIps.Value, "Automate")
-					automateIps = datafound
-					nodes = dataNotFound
-					if err != nil && err.Len() > 0 {
-						errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
-					}
-				}
-				if ss.statusSummaryCmdFlags.isChefServer {
-					datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.ChefServerPrivateIps.Value, "chef-server")
-					chefServerIps = datafound
-					nodes = dataNotFound
-					if err != nil && err.Len() > 0 {
-						errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
-					}
-				}
-				if ss.statusSummaryCmdFlags.isOpenSearch {
-					datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.OpensearchPrivateIps.Value, "open search")
-					opensearchIps = datafound
-					nodes = dataNotFound
-
-					if err != nil && err.Len() > 0 {
-						errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
-					}
-				}
-				if ss.statusSummaryCmdFlags.isPostgresql {
-					datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.PostgresqlPrivateIps.Value, "postgres")
-					postgresqlIps = datafound
-					nodes = dataNotFound
-					if err != nil && err.Len() > 0 {
-						errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), "IP address validation failed"))
-					}
-				}
-
-				if len(nodes) != 0 {
-					errorList.PushBack(fmt.Sprintf("List of  ip address not found %s", nodes))
-				}
-			}
-
-		} else {
-			errorList.PushBack("Please Provide service flag")
-		}
+		automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList = ss.getIpAddressesFromFlag(errorList)
 	} else {
 		if ss.statusSummaryCmdFlags.isAutomate {
 			automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
@@ -386,6 +343,62 @@ func (ss *Summary) checkIPAddresses() ([]string, []string, []string, []string, *
 		}
 	}
 	return automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList
+}
+
+func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []string, []string, []string, *list.List) {
+	var automateIps, chefServerIps, opensearchIps, postgresqlIps, nodes []string
+	if ss.statusSummaryCmdFlags.isAutomate ||
+		ss.statusSummaryCmdFlags.isChefServer ||
+		ss.statusSummaryCmdFlags.isOpenSearch ||
+		ss.statusSummaryCmdFlags.isPostgresql {
+		nodes = ss.splitIP(
+			ss.statusSummaryCmdFlags.node,
+		)
+		if len(nodes) != 0 {
+			if ss.statusSummaryCmdFlags.isAutomate {
+				datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.AutomatePrivateIps.Value, "Automate")
+				automateIps = datafound
+				nodes = dataNotFound
+				if err != nil && err.Len() > 0 {
+					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+				}
+			}
+			if ss.statusSummaryCmdFlags.isChefServer {
+				datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.ChefServerPrivateIps.Value, "chef-server")
+				chefServerIps = datafound
+				nodes = dataNotFound
+				if err != nil && err.Len() > 0 {
+					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+				}
+			}
+			if ss.statusSummaryCmdFlags.isOpenSearch {
+				datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.OpensearchPrivateIps.Value, "open search")
+				opensearchIps = datafound
+				nodes = dataNotFound
+
+				if err != nil && err.Len() > 0 {
+					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+				}
+			}
+			if ss.statusSummaryCmdFlags.isPostgresql {
+				datafound, dataNotFound, err := validateIPAddresses(nodes, ss.infra.Outputs.PostgresqlPrivateIps.Value, "postgres")
+				postgresqlIps = datafound
+				nodes = dataNotFound
+				if err != nil && err.Len() > 0 {
+					errorList.PushBack(fmt.Sprintf(getSingleErrorFromList(err).Error(), ipAddressError))
+				}
+			}
+
+			if len(nodes) != 0 {
+				errorList.PushBack(fmt.Sprintf("List of  ip address not found %s", nodes))
+			}
+		}
+
+	} else {
+		errorList.PushBack("Please Provide service flag")
+	}
+	return automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList
+
 }
 
 func (ss *Summary) splitIP(node string) (nodes []string) {
