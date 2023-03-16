@@ -20,6 +20,7 @@ gh_repo = "automate"
 {{< note >}}
 
 - If the user chooses `backup_config` as `s3` in `config.toml,` backup is already configured during deployment, **the below steps are not required**. If we have kept the `backup_config` blank, then the configuration needs to be configured manually.
+- Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
 
 {{< /note >}}
 
