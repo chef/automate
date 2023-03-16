@@ -18,9 +18,6 @@ ssh_port = ""
 # Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
 
-# Provide Password if needed to run sudo commands.
-# sudo_password = ""
-
 # Eg.: backup_config = "efs" or "s3"
 backup_config = ""
 
@@ -315,10 +312,6 @@ ssh_key_file = ""
 # custome ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"
 ssh_port = ""
-
-# Provide Password if needed to run sudo commands.
-sudo_password = ""
-## === ===
 
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
