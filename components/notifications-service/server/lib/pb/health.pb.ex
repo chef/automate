@@ -1,19 +1,13 @@
 defmodule Notifications.VersionRequest do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 end
 
 defmodule Notifications.VersionResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          version: String.t()
-        }
-  defstruct [:version]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :version, 1, type: :string
 end

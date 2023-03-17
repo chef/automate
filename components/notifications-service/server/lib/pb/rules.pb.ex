@@ -1,8 +1,7 @@
 defmodule Notifications.Rule.Event do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :CCRFailure | :CCRSuccess | :ComplianceFailure | :ComplianceSuccess
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :CCRFailure, 0
   field :CCRSuccess, 1
@@ -12,9 +11,8 @@ end
 
 defmodule Notifications.URLValidationResponse.Code do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :OK | :ERROR | :INVALID_URL | :NOTIFICATIONS_UNAVAIALBLE | :INTERNAL_ERROR
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :OK, 0
   field :ERROR, 1
@@ -25,9 +23,8 @@ end
 
 defmodule Notifications.RuleUpdateResponse.Code do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :OK | :DUPLICATE_NAME | :NOT_FOUND | :VALIDATION_ERROR | :INTERNAL_ERROR
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :OK, 0
   field :DUPLICATE_NAME, 1
@@ -38,9 +35,8 @@ end
 
 defmodule Notifications.RuleDeleteResponse.Code do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :DELETED | :NOT_FOUND | :INTERNAL_ERROR
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :DELETED, 0
   field :NOT_FOUND, 2
@@ -49,16 +45,8 @@ end
 
 defmodule Notifications.RuleAddResponse.Code do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t ::
-          integer
-          | :ADDED
-          | :DUPLICATE_NAME
-          | :NOT_FOUND
-          | :INVALID_ACTION_CONFIG
-          | :VALIDATION_ERROR
-          | :INTERNAL_ERROR
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :ADDED, 0
   field :DUPLICATE_NAME, 1
@@ -70,9 +58,8 @@ end
 
 defmodule Notifications.RuleGetResponse.Code do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :OK | :NOT_FOUND | :INTERNAL_ERROR
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :OK, 0
   field :NOT_FOUND, 2
@@ -81,9 +68,8 @@ end
 
 defmodule Notifications.RuleListResponse.Code do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :OK | :INTERNAL_ERROR
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :OK, 0
   field :INTERNAL_ERROR, 99
@@ -91,46 +77,30 @@ end
 
 defmodule Notifications.Empty do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 end
 
 defmodule Notifications.SlackAlert do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          url: String.t()
-        }
-  defstruct [:url]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :url, 1, type: :string
 end
 
 defmodule Notifications.WebhookAlert do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          url: String.t()
-        }
-  defstruct [:url]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :url, 1, type: :string
 end
 
 defmodule Notifications.ServiceNowAlert do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          url: String.t(),
-          secret_id: String.t(),
-          critical_controls_only: boolean
-        }
-  defstruct [:url, :secret_id, :critical_controls_only]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :url, 1, type: :string
   field :secret_id, 2, type: :string, json_name: "secretId"
@@ -139,15 +109,8 @@ end
 
 defmodule Notifications.Rule do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          action: {atom, any},
-          id: String.t(),
-          name: String.t(),
-          event: Notifications.Rule.Event.t()
-        }
-  defstruct [:action, :id, :name, :event]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   oneof :action, 0
 
@@ -161,13 +124,8 @@ end
 
 defmodule Notifications.UsernamePassword do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          username: String.t(),
-          password: String.t()
-        }
-  defstruct [:username, :password]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :username, 1, type: :string
   field :password, 2, type: :string
@@ -175,25 +133,16 @@ end
 
 defmodule Notifications.SecretId do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t()
-        }
-  defstruct [:id]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
 end
 
 defmodule Notifications.URLValidationRequest do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          credentials: {atom, any},
-          url: String.t()
-        }
-  defstruct [:credentials, :url]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   oneof :credentials, 0
 
@@ -210,13 +159,8 @@ end
 
 defmodule Notifications.URLValidationResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          code: Notifications.URLValidationResponse.Code.t(),
-          messages: [String.t()]
-        }
-  defstruct [:code, :messages]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :code, 1, type: Notifications.URLValidationResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -224,25 +168,16 @@ end
 
 defmodule Notifications.RuleIdentifier do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t()
-        }
-  defstruct [:id]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
 end
 
 defmodule Notifications.RuleUpdateResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          code: Notifications.RuleUpdateResponse.Code.t(),
-          messages: [String.t()]
-        }
-  defstruct [:code, :messages]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleUpdateResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -250,13 +185,8 @@ end
 
 defmodule Notifications.RuleDeleteResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          code: Notifications.RuleDeleteResponse.Code.t(),
-          messages: [String.t()]
-        }
-  defstruct [:code, :messages]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleDeleteResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -264,15 +194,8 @@ end
 
 defmodule Notifications.RuleAddResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          code: Notifications.RuleAddResponse.Code.t(),
-          messages: [String.t()],
-          id: String.t(),
-          rule: Notifications.Rule.t() | nil
-        }
-  defstruct [:code, :messages, :id, :rule]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleAddResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -282,14 +205,8 @@ end
 
 defmodule Notifications.RuleGetResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          code: Notifications.RuleGetResponse.Code.t(),
-          messages: [String.t()],
-          rule: Notifications.Rule.t() | nil
-        }
-  defstruct [:code, :messages, :rule]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleGetResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
@@ -298,14 +215,8 @@ end
 
 defmodule Notifications.RuleListResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          code: Notifications.RuleListResponse.Code.t(),
-          messages: [String.t()],
-          rules: [Notifications.Rule.t()]
-        }
-  defstruct [:code, :messages, :rules]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :code, 1, type: Notifications.RuleListResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string

@@ -16,6 +16,7 @@ pkg_deps=(
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 )
 pkg_build_deps=(
+  core/coreutils
   core/git
 
   # Node(kallol) 2022-01-28:
@@ -23,14 +24,14 @@ pkg_build_deps=(
   # We have seen failures with notification service http request
   # with external services. This is because the erlang version was bumped to
   # v23.2. Hence pinning the version till we have a fix.
-  core/erlang
+  core/erlang25
 
   # NOTE(ssd) 2019-07-03: PIN PIN PIN
   #
   # elixir 1.9.0 shipped with a number of changes to how releases
   # work. This appears to have broken the build. Pinning until we can
   # sort out the required changes.
-  core/elixir
+  vivekshankar1/elixir/1.14.0
   core/glibc
 )
 
@@ -83,9 +84,11 @@ do_prepare() {
   mix local.hex --force
   mix local.rebar --force
   fix_interpreter "${MIX_HOME}/*" core/coreutils bin/env
+
 }
 
 do_build() {
+  ln -sf /bin/env /usr/bin/env
   pushd "${CACHE_PATH}/server" > /dev/null
     git config --global url."https://github.com/".insteadOf git://github.com/
     MIX_ENV=habitat mix do deps.get, release

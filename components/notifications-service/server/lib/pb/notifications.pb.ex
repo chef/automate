@@ -1,14 +1,7 @@
 defmodule Notifications.ExceptionInfo do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          class: String.t(),
-          title: String.t(),
-          msg: String.t(),
-          backtrace: [String.t()]
-        }
-  defstruct [:class, :title, :msg, :backtrace]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :class, 1, type: :string
   field :title, 2, type: :string
@@ -18,13 +11,8 @@ end
 
 defmodule Notifications.TimeInfo do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          start_time: String.t(),
-          end_time: String.t()
-        }
-  defstruct [:start_time, :end_time]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :start_time, 1, type: :string, json_name: "startTime"
   field :end_time, 2, type: :string, json_name: "endTime"
@@ -32,17 +20,8 @@ end
 
 defmodule Notifications.Profile.Control.Result do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          status: String.t(),
-          code_desc: String.t(),
-          run_time: float | :infinity | :negative_infinity | :nan,
-          start_time: String.t(),
-          message: String.t(),
-          skip_message: String.t()
-        }
-  defstruct [:status, :code_desc, :run_time, :start_time, :message, :skip_message]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :status, 1, type: :string
   field :code_desc, 2, type: :string, json_name: "codeDesc"
@@ -54,15 +33,8 @@ end
 
 defmodule Notifications.Profile.Control.ResultTotals do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          num_tests: integer,
-          num_failed_tests: integer,
-          num_skipped_tests: integer,
-          num_passed_tests: integer
-        }
-  defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :num_tests, 1, type: :int32, json_name: "numTests"
   field :num_failed_tests, 2, type: :int32, json_name: "numFailedTests"
@@ -72,20 +44,8 @@ end
 
 defmodule Notifications.Profile.Control do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t(),
-          impact: float | :infinity | :negative_infinity | :nan,
-          title: String.t(),
-          code: String.t(),
-          desc: String.t(),
-          source_location: Notifications.SourceLocation.t() | nil,
-          refs: [Notifications.Refs.t()],
-          failed_results: [Notifications.Profile.Control.Result.t()],
-          stats: Notifications.Profile.Control.ResultTotals.t() | nil
-        }
-  defstruct [:id, :impact, :title, :code, :desc, :source_location, :refs, :failed_results, :stats]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :impact, 2, type: :float
@@ -105,25 +65,16 @@ end
 
 defmodule Notifications.Profile.Attribute.Options do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          description: String.t()
-        }
-  defstruct [:description]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :description, 1, type: :string
 end
 
 defmodule Notifications.Profile.Attribute do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          name: String.t(),
-          options: Notifications.Profile.Attribute.Options.t() | nil
-        }
-  defstruct [:name, :options]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string
   field :options, 2, type: Notifications.Profile.Attribute.Options
@@ -131,15 +82,8 @@ end
 
 defmodule Notifications.Profile.ControlTotals do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          num_tests: integer,
-          num_failed_tests: integer,
-          num_skipped_tests: integer,
-          num_passed_tests: integer
-        }
-  defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :num_tests, 1, type: :int32, json_name: "numTests"
   field :num_failed_tests, 2, type: :int32, json_name: "numFailedTests"
@@ -149,38 +93,8 @@ end
 
 defmodule Notifications.Profile do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          name: String.t(),
-          title: String.t(),
-          version: String.t(),
-          summary: String.t(),
-          maintainer: String.t(),
-          license: String.t(),
-          copyright: String.t(),
-          copyright_email: String.t(),
-          sha256: String.t(),
-          supports: [Notifications.PlatformSupport.t()],
-          attributes: [Notifications.Profile.Attribute.t()],
-          failed_controls: [Notifications.Profile.Control.t()],
-          stats: Notifications.Profile.ControlTotals.t() | nil
-        }
-  defstruct [
-    :name,
-    :title,
-    :version,
-    :summary,
-    :maintainer,
-    :license,
-    :copyright,
-    :copyright_email,
-    :sha256,
-    :supports,
-    :attributes,
-    :failed_controls,
-    :stats
-  ]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string
   field :title, 2, type: :string
@@ -204,13 +118,8 @@ end
 
 defmodule Notifications.SourceLocation do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          ref: String.t(),
-          line: integer
-        }
-  defstruct [:ref, :line]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :ref, 1, type: :string
   field :line, 2, type: :int32
@@ -218,13 +127,8 @@ end
 
 defmodule Notifications.Refs do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          uri: String.t(),
-          url: String.t()
-        }
-  defstruct [:uri, :url]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :uri, 2, type: :string
   field :url, 3, type: :string
@@ -232,15 +136,8 @@ end
 
 defmodule Notifications.PlatformSupport do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          inspec: String.t(),
-          os_name: String.t(),
-          os_family: String.t(),
-          release: String.t()
-        }
-  defstruct [:inspec, :os_name, :os_family, :release]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :inspec, 1, type: :string
   field :os_name, 2, type: :string, json_name: "osName"
@@ -250,17 +147,8 @@ end
 
 defmodule Notifications.ComplianceSuccess do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t(),
-          compliance_url: String.t(),
-          node_name: String.t(),
-          node_id: String.t(),
-          end_time: String.t(),
-          timestamp: String.t()
-        }
-  defstruct [:id, :compliance_url, :node_name, :node_id, :end_time, :timestamp]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :compliance_url, 2, type: :string, json_name: "complianceUrl"
@@ -272,16 +160,8 @@ end
 
 defmodule Notifications.ComplianceFailure.ControlTotals do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          skipped: integer,
-          passed: integer,
-          failed: integer,
-          critical: integer,
-          critical_failed: integer
-        }
-  defstruct [:skipped, :passed, :failed, :critical, :critical_failed]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :skipped, 1, type: :int32
   field :passed, 2, type: :int32
@@ -292,30 +172,8 @@ end
 
 defmodule Notifications.ComplianceFailure do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t(),
-          compliance_url: String.t(),
-          node_name: String.t(),
-          node_id: String.t(),
-          inspec_version: String.t(),
-          test_totals: Notifications.ComplianceFailure.ControlTotals.t() | nil,
-          failed_profiles: [Notifications.Profile.t()],
-          end_time: String.t(),
-          timestamp: String.t()
-        }
-  defstruct [
-    :id,
-    :compliance_url,
-    :node_name,
-    :node_id,
-    :inspec_version,
-    :test_totals,
-    :failed_profiles,
-    :end_time,
-    :timestamp
-  ]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :compliance_url, 2, type: :string, json_name: "complianceUrl"
@@ -338,30 +196,8 @@ end
 
 defmodule Notifications.CCRFailure do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          run_id: String.t(),
-          node_name: String.t(),
-          node_url: String.t(),
-          run_url: String.t(),
-          cookbook: String.t(),
-          recipe: String.t(),
-          time: Notifications.TimeInfo.t() | nil,
-          exception: Notifications.ExceptionInfo.t() | nil,
-          timestamp: String.t()
-        }
-  defstruct [
-    :run_id,
-    :node_name,
-    :node_url,
-    :run_url,
-    :cookbook,
-    :recipe,
-    :time,
-    :exception,
-    :timestamp
-  ]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :run_id, 1, type: :string, json_name: "runId"
   field :node_name, 2, type: :string, json_name: "nodeName"
@@ -376,17 +212,8 @@ end
 
 defmodule Notifications.CCRSuccess do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          run_id: String.t(),
-          node_name: String.t(),
-          run_url: String.t(),
-          time: Notifications.TimeInfo.t() | nil,
-          updated_resource_count: integer,
-          timestamp: String.t()
-        }
-  defstruct [:run_id, :node_name, :run_url, :time, :updated_resource_count, :timestamp]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :run_id, 1, type: :string, json_name: "runId"
   field :node_name, 2, type: :string, json_name: "nodeName"
@@ -398,21 +225,14 @@ end
 
 defmodule Notifications.Response do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 end
 
 defmodule Notifications.Event do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          event: {atom, any},
-          id: String.t()
-        }
-  defstruct [:event, :id]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   oneof :event, 0
 

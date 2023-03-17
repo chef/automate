@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 # Note that notifications run-time application configuration is defined in
 # Notifications.Config.  All configuration is managed via environment variaables; a
@@ -22,8 +22,6 @@ config :logger, :console,
   handle_otp_reports: true,
   utc_log: true,
   level: log_level
-
-config :grpc, start_server: true
 
 # Stop lager redirecting :error_logger messages
 config :lager, :error_logger_redirect, false
