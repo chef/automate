@@ -49,6 +49,11 @@ options:
   default_value: "false"
   usage: Shows configurations from PostgresQL node
   compatible_with_options: AutomateHA
+- name: wait-timeout
+  default_value: "180"
+  usage: |
+    This flag sets the operation timeout duration (in seconds) for each individual node during the config show process
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: auto-approve
   shorthand: "y"
