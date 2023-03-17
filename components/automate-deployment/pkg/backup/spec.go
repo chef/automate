@@ -417,6 +417,10 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			},
 		},
 		{
+			Name:          "automate-cs-ocid",
+			WriteMetadata: false
+		},
+		{
 			Name:          "automate-cs-oc-erchef",
 			WriteMetadata: true,
 			SyncDbsV2: []DatabaseDumpOperationV2{

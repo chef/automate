@@ -24,7 +24,7 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
-	c.V1.Sys.Network.Port = w.Int32(10201)
+	c.V1.Sys.Network.Port = w.Int32(9090)
 	c.V1.Sys.Network.ListenIp = w.String("127.0.0.1")
 
 	c.V1.Sys.Log.Level = w.String("info")
@@ -59,7 +59,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	c.V1.Sys.Mlsa = g.V1.Mlsa
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
-		c.V1.Sys.Log.Level.Value = logLevel
+		c.V1.Sys.Log.Level.Value = ac.GlobalLogLevelToZapLevel(logLevel)
 	}
 }
 

@@ -11,6 +11,7 @@ import "config/backup_gateway/config_request.proto";
 import "config/bifrost/config_request.proto";
 import "config/bookshelf/config_request.proto";
 import "config/erchef/config_request.proto";
+import "config/ocid/config_request.proto";
 import "config/event/config_request.proto";
 import "config/cfgmgmt/config_request.proto";
 import "config/compliance/config_request.proto";
