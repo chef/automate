@@ -494,7 +494,7 @@ steps:
     expeditor:
       executor:
         docker:
-          image: "elixir:1.8"
+          image: "elixir:1.14"
           environment:
             - EXTERNAL_FQDN=http://localhost
             - MEX_ENV=test mix do compile, credo
