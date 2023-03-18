@@ -148,10 +148,10 @@ function notifications_update_component() {
 function elixir_install() {
   log_line "installing elixir if needed"
   install_if_missing core/git git
-  install_if_missing core/elixir mix
-  install_if_missing core/elixir elixir
-  install_if_missing core/erlang escript
-  install_if_missing core/erlang erl
+  install_if_missing vivekshankar1/elixir/1.14.0 mix
+  install_if_missing vivekshankar1/elixir/1.14.0 elixir
+  install_if_missing core/erlang25 escript
+  install_if_missing core/erlang25 erl
   install_if_missing core/coreutils env
   local HAB_BINLINK_DIR
   mkdir -p /usr/bin
