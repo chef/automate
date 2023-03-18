@@ -49,19 +49,41 @@ defmodule Notifications.Formatters.Utils do
     to_map(:ignore, value)
   end
 
+  # Notes on the internals:
+  #    Elixir map comprehension returns a list, not a map. The Enum.map
+  #    function accepts maps, but also returns a list.  We'll dip down into
+  #    erlang's "map" module: map:map constructs a new map;
+  #    and for consistency we'll use the erlang list module for handling lists.
   defp to_map(:ignore, value) when is_map(value) do
-    :maps.foldl(%{}, value, fn {k, v}, acc ->
-      Map.put(acc, k, to_map(v))
-    end)
+    value
+    |> Enum.map(fn {key, val} -> {key, to_map(val)} end)
+    |> Map.new()
   end
 
   defp to_map(:ignore, value) when is_list(value) do
-    Enum.map(value, &to_map(&1))
+    value
+    |> Enum.map(&to_map(:ignore, &1))
   end
 
   defp to_map(:ignore, %_struct{} = struct) do
-    to_map(:ignore, Map.from_struct(struct))
+    Map.from_struct(struct)
+    |> Map.to_list()
+    |> Enum.map(fn {key, val} -> {key, to_map(val)} end)
+    |> Map.new()
   end
 
-  defp to_map(:ignore, other), do: other
+  defp to_map(:ignore, %{} = map) do
+    map
+    |> Map.to_list()
+    |> Enum.map(fn {key, val} -> {key, to_map(val)} end)
+    |> Map.new()
+  end
+
+  defp to_map(_field_name, value) when is_map(value) do
+    value
+    |> Enum.map(fn {key, val} -> {key, to_map(key, val)} end)
+    |> Map.new()
+  end
+
+  defp to_map(_field_name, value), do: value
 end
