@@ -43,15 +43,19 @@ defmodule Notifications.Formatters.Utils do
 
   Elixir provides Map.from_struct, but it will not make the conversion recursively.
   """
+
   def to_map(%{} = value), do: to_map(:ignore, value)
+  def to_map(value) when is_list(value), do: to_map(:ignore, value)
 
-  def to_map(value) when is_list(value) do
-    to_map(:ignore, value)
-  end
-
+  # Notes on the internals:
+  #    Elixir map comprehension returns a list, not a map. The Enum.map
+  #    function accepts maps, but also returns a list.  We'll dip down into
+  #    erlang's "map" module: map:map constructs a new map;
+  #    and for consistency we'll use the erlang list module for handling lists.
   defp to_map(_, []), do: []
   defp to_map(_, list) when is_list(list), do: :lists.map(&to_map(:ignore, &1), list)
-  defp to_map(_, %_struct{} = struct), do: to_map(:ignore, Map.from_struct(struct))
-  defp to_map(_, %{} = map), do: Map.new(map |> Map.to_list() |> Enum.map(fn {k, v} -> {to_map(k), to_map(v)} end))
+  defp to_map(_, %_struct{} = struct), do:  to_map(:ignore, Map.from_struct(struct))
+  defp to_map(_, %{} = map), do: :maps.map(&to_map(&1, &2), map)
+  defp to_map(_, :__unknown_fields__), do: nil
   defp to_map(_, other), do: other
 end
