@@ -49,22 +49,19 @@ defmodule Notifications.Formatters.Utils do
     to_map(:ignore, value)
   end
 
-  defp to_map(_ignore, []), do: []
-  defp to_map(ignore, list) when is_list(list) do
-    :lists.map(&to_map(ignore, &1), list)
-  end
-
-  defp to_map(ignore, %_struct{} = struct) do
-    to_map(ignore, Map.from_struct(struct))
-  end
-
-  defp to_map(ignore, %{} = map) do
-    map
-    |> Enum.reduce(%{}, fn {key, value}, acc ->
-      Map.put(acc, key, to_map(ignore, value))
+  defp to_map(:ignore, value) when is_map(value) do
+    :maps.foldl(%{}, value, fn {k, v}, acc ->
+      Map.put(acc, k, to_map(v))
     end)
   end
 
-  defp to_map(:ignore, value), do: value
-  defp to_map(ignore, other), do: other |> Map.from_struct() |> to_map(ignore)
+  defp to_map(:ignore, value) when is_list(value) do
+    Enum.map(value, &to_map(&1))
+  end
+
+  defp to_map(:ignore, %_struct{} = struct) do
+    to_map(:ignore, Map.from_struct(struct))
+  end
+
+  defp to_map(:ignore, other), do: other
 end
