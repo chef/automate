@@ -31,7 +31,7 @@ pkg_build_deps=(
   # elixir 1.9.0 shipped with a number of changes to how releases
   # work. This appears to have broken the build. Pinning until we can
   # sort out the required changes.
-  vivekshankar1/elixir/1.14.0
+  chef/elixir
   core/glibc
 )
 
