@@ -16,7 +16,6 @@ pkg_deps=(
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 )
 pkg_build_deps=(
-  core/coreutils
   core/git
 
   # Node(kallol) 2022-01-28:
