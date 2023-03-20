@@ -94,7 +94,7 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
         ```
 
     - In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
-        - Create a .toml (say os_config.toml) file from **provision host** and copy the following template with the path to the repo.
+        - Create a toml (say os_config.toml) file from **provision host** and copy the following template with the path to the repo. Update the repo path, what you have created at the time of deployment `</mnt/automate_backups/elasticsearch>`.
 
         ```sh
         [path]
