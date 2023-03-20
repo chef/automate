@@ -161,7 +161,7 @@ func TestRunFENodeDiaplay(t *testing.T) {
 	assert.Equal(t, fe, "+-------------+--------------+--------+------------+\n| NAME        | IP ADDRESS   | STATUS | OPENSEARCH |\n+-------------+--------------+--------+------------+\n| Automate    | 198.51.100.0 | OK     | Unknown    |\n| Automate    | 198.51.100.1 | OK     | Unknown    |\n| Chef Server | 198.51.100.2 | OK     | Unknown    |\n| Chef Server | 198.51.100.3 | OK     | Unknown    |\n+-------------+--------------+--------+------------+")
 }
 
-func TestRunBENod(t *testing.T) {
+func TestRunBENode(t *testing.T) {
 	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
@@ -184,7 +184,7 @@ func TestRunBENodeDiaplay(t *testing.T) {
 	err := ss.Prepare(sshUtilsImpl)
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
-	assert.Contains(t, be, "+------------+--------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+--------------+--------+----------------+------------------+---------+\n| OpenSearch | 198.51.100.4 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Os Node |\n| OpenSearch | 198.51.100.5 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Os Node |\n| OpenSearch | 198.51.100.6 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Os Node |\n| Postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.8 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.9 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+--------------+--------+----------------+------------------+---------+")
+	assert.Contains(t, be, "+------------+--------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+--------------+--------+----------------+------------------+---------+\n| OpenSearch | 198.51.100.4 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| OpenSearch | 198.51.100.5 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| OpenSearch | 198.51.100.6 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| Postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.8 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.9 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+--------------+--------+----------------+------------------+---------+")
 }
 
 func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError error) *MockSSHUtilsImpl {

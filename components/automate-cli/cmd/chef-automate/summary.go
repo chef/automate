@@ -23,9 +23,14 @@ var (
 )
 
 const (
-	ipAddressError    = "IP address validation failed"
-	curlHeaderFlag    = "--header"
-	curlAuthorization = "'Authorization: Bearer %s'"
+	ipAddressError           = "IP address validation failed"
+	curlHeaderFlag           = "--header"
+	curlAuthorization        = "'Authorization: Bearer %s'"
+	initialServiceState      = "down"
+	initialServicePid        = ""
+	initialHealth            = "ERROR"
+	initialFormattedDuration = "0d 0h 0m 0s"
+	initialRole              = "Unknown"
 )
 
 type StatusSummary interface {
@@ -225,27 +230,45 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 }
 
 func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceName string) BeStatusValue {
-	var service, role, health, formatted, serviceState, servicePid string
-	serviceState = "down"
-	servicePid = ""
-	health = "ERROR"
-	formatted = "0d 0h 0m 0s"
+	var service, memeberId, role string
 	if serviceName == "OpenSearch" {
+		role = "OS node"
 		service = "automate-ha-opensearch"
-		role = "Os Node"
 	} else if serviceName == "Postgresql" {
 		service = "automate-ha-postgresql"
-		role = "Unknown"
 	}
 	defaultBeStatusValue := BeStatusValue{
 		serviceName: serviceName,
 		ipAddress:   ip,
+		health:      initialHealth,
+		process:     fmt.Sprintf("%s (pid: %s)", initialServiceState, initialServicePid),
+		upTime:      initialFormattedDuration,
+		role:        initialRole,
+	}
+	memeberId, serviceState, servicePid, formattedDuration, err := ss.getBEDefaultServiceDetails(sshUtil, authToken, service)
+	if err != nil {
+		return defaultBeStatusValue
+	}
+	health, err := ss.getBEServiceHealth(sshUtil, authToken, service)
+	if err != nil {
+		return defaultBeStatusValue
+	}
+	role, err = ss.getBECensus(sshUtil, authToken, service, memeberId, serviceName)
+	if err != nil {
+		defaultBeStatusValue.role = role
+		return defaultBeStatusValue
+	}
+	return BeStatusValue{
+		serviceName: serviceName,
+		ipAddress:   ip,
 		health:      health,
 		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
-		upTime:      formatted,
+		upTime:      formattedDuration,
 		role:        role,
 	}
+}
 
+func (ss *Summary) getBEDefaultServiceDetails(sshUtil SSHUtil, authToken, service string) (string, string, string, string, error) {
 	args := []string{
 		"-s",
 		fmt.Sprintf("%s/services/%s/default", habUrl, service),
@@ -253,16 +276,28 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceNam
 		fmt.Sprintf(curlAuthorization, authToken),
 		"-k",
 	}
+
 	defaultServiceDetails, err := executeCmd(sshUtil, "curl", args)
 	if err != nil {
-		return defaultBeStatusValue
+		return "", initialServiceState, initialServicePid, initialFormattedDuration, err
 	}
-	memeberId := defaultServiceDetails["sys"].(map[string]interface{})["member_id"]
-	serviceState = defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
-	servicePid = fmt.Sprint(defaultServiceDetails["process"].(map[string]interface{})["pid"])
+	memeberId := defaultServiceDetails["sys"].(map[string]interface{})["member_id"].(string)
+	serviceState := defaultServiceDetails["process"].(map[string]interface{})["state"].(string)
+	servicePid := fmt.Sprintf("%d", int(defaultServiceDetails["process"].(map[string]interface{})["pid"].(float64)))
 	startingTime := defaultServiceDetails["process"].(map[string]interface{})["state_entered"].(float64)
 	startingTime = float64(nowFunc().UTC().Unix()) - startingTime
-	args = []string{
+
+	t := time.Unix(int64(startingTime), 0)
+	duration := t.Sub(time.Unix(0, 0))
+
+	// Format the duration as "1d 148h 43m 31s"
+	formattedDuration := fmt.Sprintf("%dd %dh %dm %ds", int(duration.Hours())/24, int(duration.Hours())%24, int(duration.Minutes())%60, int(duration.Seconds())%60)
+
+	return memeberId, serviceState, servicePid, formattedDuration, nil
+}
+
+func (ss *Summary) getBEServiceHealth(sshUtil SSHUtil, authToken, service string) (string, error) {
+	args := []string{
 		"-s",
 		fmt.Sprintf("%s/services/%s/default/health", habUrl, service),
 		curlHeaderFlag,
@@ -271,12 +306,16 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceNam
 	}
 	ServiceHealth, err := executeCmd(sshUtil, "curl", args)
 	if err != nil {
-		return defaultBeStatusValue
+		return initialHealth, err
 	}
 
-	health = fmt.Sprint(ServiceHealth["status"])
+	health := fmt.Sprint(ServiceHealth["status"])
+	return health, nil
+}
 
-	args = []string{
+func (ss *Summary) getBECensus(sshUtil SSHUtil, authToken, service, memeberId, serviceName string) (string, error) {
+	role := initialRole
+	args := []string{
 		"-s",
 		fmt.Sprintf("%s/census", habUrl),
 		curlHeaderFlag,
@@ -285,7 +324,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceNam
 	}
 	censusData, err := executeCmd(sshUtil, "curl", args)
 	if err != nil {
-		return defaultBeStatusValue
+		return "Unknown", err
 	}
 
 	populationData := censusData["census_groups"].(map[string]interface{})[service+".default"].(map[string]interface{})["population"].(map[string]interface{})[fmt.Sprintf("%s", memeberId)]
@@ -299,21 +338,7 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceNam
 			role = "Follower"
 		}
 	}
-
-	t := time.Unix(int64(startingTime), 0)
-	duration := t.Sub(time.Unix(0, 0))
-
-	// Format the duration as "1d 148h 43m 31s"
-	formatted = fmt.Sprintf("%dd %dh %dm %ds", int(duration.Hours())/24, int(duration.Hours())%24, int(duration.Minutes())%60, int(duration.Seconds())%60)
-
-	return BeStatusValue{
-		serviceName: serviceName,
-		ipAddress:   ip,
-		health:      health,
-		process:     fmt.Sprintf("%s (pid: %s)", serviceState, servicePid),
-		upTime:      formatted,
-		role:        role,
-	}
+	return role, nil
 }
 
 func (ss *Summary) getFEStatus(sshUtil SSHUtil, script string, ip string, serviceType string) FeStatusValue {
