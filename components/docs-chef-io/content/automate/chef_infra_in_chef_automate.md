@@ -40,7 +40,7 @@ The list of parameters are as follows:
 | opscode_erchef['db_pool_queue_max']             | 40                                        | 20                                  | ```[erchef.v1.sys.sql]```<br>```pool_queue_max=40```              |
 | opscode_erchef['ibrowse_max_pipeline_size']     | 1                                         | 1                                   | ```[erchef.v1.sys.ibrowse]```<br>```ibrowse_max_pipeline_size=1```       |
 | opscode_erchef['ibrowse_max_sessions']          | 256                                       | 256                                 | ```[erchef.v1.sys.ibrowse]```<br>```ibrowse_max_sessions=256```            |
-| opscode_erchef['max_request_size']              | 2000000                                   | 2000000                             | ```[erchef.v1.sys.api]```<br>```max_request_size=2000000```          |
+| opscode_erchef['max_request_size']              | 4000000                                   | 4000000                             | ```[erchef.v1.sys.api]```<br>```max_request_size=4000000```          |
 | opscode_erchef['keygen_cache_size']             | 1000                                      | 10                                  | ```[erchef.v1.sys.keygen]```<br>```cache_size=1000```               |
 | opscode_erchef['reindex_batch_size']            | 10                                        | 10                                  | ```[erchef.v1.sys.index]```<br>```reindex_batch_size=10```        |
 | opscode_erchef['reindex_sleep_min_ms']          | 500                                       | 500                                 | ```[erchef.v1.sys.index]```<br>```reindex_sleep_min_ms=500```      |
