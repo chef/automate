@@ -128,20 +128,25 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
+2. Stop the Service in all the frontend nodes with the below command.
 
-2. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
+    ``` bash
+    sudo chef-automate stop
+    ```
+
+3. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
 
     ```cmd
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-3. After successfully executing the restore, you will see the below message:
+4. After successfully executing the restore, you will see the below message:
 
     ```bash
     Success: Restored backup 20210622065515
     ```
 
-4. Start the Service in all the frontend nodes with the below command.
+5. Start the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate start
