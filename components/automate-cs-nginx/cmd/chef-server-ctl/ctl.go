@@ -34,6 +34,8 @@ const (
 	erchefReindexScript = "hab pkg exec chef/oc_erchef reindex-opc-organization"
 	erchefDBURI         = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-erchef?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"  // nolint: lll
 	bifrostDBURI        = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-bifrost?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
+	ocidDBURI        = "postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
+	bifrostURL          = "https://127.0.0.1:9090"
 	bifrostURL          = "https://127.0.0.1:10202"
 	lbURL               = "https://127.0.0.1:10200"
 	tlsCrt              = "/hab/svc/automate-cs-nginx/config/service.crt"
@@ -41,6 +43,8 @@ const (
 	tlsCA               = "/hab/svc/automate-cs-nginx/config/root_ca.crt"
 	erchefSvcName       = "automate-cs-oc-erchef"
 	erchefDBName        = "automate-cs-oc-erchef"
+	ocidSvcName       = "automate-cs-ocid"
+	ocidDBName        = "automate-cs-ocid"
 	bifrostSvcName      = "automate-cs-oc-bifrost"
 	bifrostDBName       = "automate-cs-oc-bifrost"
 	automateSvcPath     = "/hab/svc/"
@@ -191,12 +195,24 @@ func (c passthrough) Run(args []string) error {
 		bifrostDB = bifrostDBURI
 	}
 
+	ocidDB, err := platform_config.PGURIFromEnvironmentWithParams(ocidDBName, ocidSvcName, svcPath+ocidSvcName, "")
+	if err != nil {
+		logrus.WithError(err).Error("could not create pg connection url for OCID")
+	}
+	if ocidDB == "" {
+		ocidDB = ocidDBURI
+	}
+
 	// incase user wants to overide the uri
 	if erchefDBEnv := os.Getenv("CSC_ERCHEF_DB_URI"); erchefDBEnv != "" {
 		erchefDB = erchefDBEnv
 	}
 	if bifrostDBEnv := os.Getenv("CSC_BIFROST_DB_URI"); bifrostDBEnv != "" {
 		bifrostDB = bifrostDBEnv
+	}
+
+	if ocidDBEnv := os.Getenv("CSC_OCID_DB_URI"); ocidDBEnv != "" {
+		ocidDB = ocidDBEnv
 	}
 
 	// chef-server-ctl has been modified to take all necessary
@@ -208,6 +224,7 @@ func (c passthrough) Run(args []string) error {
 		fmt.Sprintf("CSC_BIFROST_SUPERUSER_ID=%s", bifrostSuperuserID),
 		fmt.Sprintf("CSC_BIFROST_URL=%s", bifrostURL),
 		fmt.Sprintf("CSC_BIFROST_DB_URI=%s", bifrostDB),
+		fmt.Sprintf("CSC_OCID_DB_URI=%s", ocidDB),
 		fmt.Sprintf("CSC_ERCHEF_DB_URI=%s", erchefDB),
 		fmt.Sprintf("CSC_ERCHEF_REINDEX_SCRIPT=%s", erchefReindexScript),
 		fmt.Sprintf("CSC_KNIFE_CONFIG_FILE=%s", knifeConfigFile),

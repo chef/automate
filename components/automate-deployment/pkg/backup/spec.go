@@ -418,7 +418,7 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		},
 		{
 			Name:          "automate-cs-ocid",
-			WriteMetadata: false
+			WriteMetadata: false,
 		},
 		{
 			Name:          "automate-cs-oc-erchef",
