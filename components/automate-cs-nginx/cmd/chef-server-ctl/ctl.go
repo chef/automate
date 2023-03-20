@@ -33,18 +33,18 @@ const (
 	knifeConfigFile     = "/hab/svc/automate-cs-nginx/config/knife_superuser.rb"
 	erchefReindexScript = "hab pkg exec chef/oc_erchef reindex-opc-organization"
 	erchefDBURI         = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-erchef?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"  // nolint: lll
-	bifrostDBURI        = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-bifrost?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
-	ocidDBURI        = "postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
-	bifrostURL          = "https://127.0.0.1:9090"
+	bifrostDBURI        = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-bifrost?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll	
 	bifrostURL          = "https://127.0.0.1:10202"
+	ocidDBURI           = "postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
+	ocidURL             = "https://127.0.0.1:9090"
 	lbURL               = "https://127.0.0.1:10200"
 	tlsCrt              = "/hab/svc/automate-cs-nginx/config/service.crt"
 	tlsKey              = "/hab/svc/automate-cs-nginx/config/service.key"
 	tlsCA               = "/hab/svc/automate-cs-nginx/config/root_ca.crt"
 	erchefSvcName       = "automate-cs-oc-erchef"
 	erchefDBName        = "automate-cs-oc-erchef"
-	ocidSvcName       = "automate-cs-ocid"
-	ocidDBName        = "automate-cs-ocid"
+	ocidSvcName         = "automate-cs-ocid"
+	ocidDBName          = "automate-cs-ocid"
 	bifrostSvcName      = "automate-cs-oc-bifrost"
 	bifrostDBName       = "automate-cs-oc-bifrost"
 	automateSvcPath     = "/hab/svc/"
@@ -224,6 +224,7 @@ func (c passthrough) Run(args []string) error {
 		fmt.Sprintf("CSC_BIFROST_SUPERUSER_ID=%s", bifrostSuperuserID),
 		fmt.Sprintf("CSC_BIFROST_URL=%s", bifrostURL),
 		fmt.Sprintf("CSC_BIFROST_DB_URI=%s", bifrostDB),
+		fmt.Sprintf("CSC_OCID_URL=%s", ocidURL),
 		fmt.Sprintf("CSC_OCID_DB_URI=%s", ocidDB),
 		fmt.Sprintf("CSC_ERCHEF_DB_URI=%s", erchefDB),
 		fmt.Sprintf("CSC_ERCHEF_REINDEX_SCRIPT=%s", erchefReindexScript),
