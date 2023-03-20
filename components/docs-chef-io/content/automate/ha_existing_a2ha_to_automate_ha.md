@@ -43,22 +43,13 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     - The second command will create the bootstrap bundle, which is needed to copy all the frontend nodes of Automate HA cluster.
     - Once the backup is completed successfully, save the backup Id. For example: `20210622065515`.
 
-    ```cmd
-    sudo chef-automate backup create
-    sudo chef-automate bootstrap bundle create bootstrap.abb
-    ```
-
-    - The first command will take the backup at the mount file system. You can get the mount path from the file `/hab/a2_deploy_workspace/a2ha.rb` on the bastion node.
-    - The second command will create the bootstrap bundle, which we need to copy all the frontend nodes of Automate HA cluster.
-    - Once the backup is completed successfully, please save the backup Id. For example: `20210622065515`.
     - If you want to use the backup created previously, run the command on Automate node to get the backup id
       `chef-automate backup list`
 
     ```sh
     Backup             State       Age
-    20180508201548    completed  8 minutes old
     20180508201643    completed  8 minutes old
-    20180508201952    completed  4 minutes old
+    20210622065515    completed  4 minutes old
     ```
 
 1. Detach the File system from the old A2HA cluster.
@@ -69,7 +60,7 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
 1. Stop all the services at frontend nodes in Automate HA Cluster.
 
-1. Get the Autopreviously created number from the location `/var/tmp/` in Automate instance. Example: `frontend-4.x.y.aib`.
+1. Get the Automate version from the location `/var/tmp/` in Automate instance. Example: `frontend-4.x.y.aib`.
 
 1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config:
 
@@ -103,7 +94,7 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
         ```
 
     - In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
-        - Create a .toml (say os_config.toml) file from **provision host** and copy the following template with the path to the repo.
+        - Create a toml (say os_config.toml) file from **provision host** and copy the following template with the path to the repo. Update the repo path, what you have created at the time of deployment `</mnt/automate_backups/elasticsearch>`.
 
         ```sh
         [path]
@@ -132,25 +123,30 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
     secret_key = "<YOUR AWS SECRET KEY>"
 ```
 
-1. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
+1. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
+
+    ```cmd
+    sudo chef-automate bootstrap bundle unpack bootstrap.abb
+    ```
+2. Stop the Service in all the frontend nodes with the below command.
+
+    ``` bash
+    sudo chef-automate stop
+    ```
+
+3. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
 
     ```cmd
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-2. After successfully executing the restore, you will see the below message:
+4. After successfully executing the restore, you will see the below message:
 
     ```bash
     Success: Restored backup 20210622065515
     ```
 
-3. Copy the `bootstrap.abb` bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes.
-
-    ```cmd
-    sudo chef-automate bootstrap bundle unpack bootstrap.abb
-    ```
-
-4. Start the Service in all the frontend nodes with the below command.
+5. Start the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate start
