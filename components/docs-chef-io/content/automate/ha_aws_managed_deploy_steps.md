@@ -62,9 +62,12 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 - If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly used for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
 - We recommended to use `backup_config` to be set to `s3` at the time of deployment.
 
-{{< warning >}} 
+{{< warning >}}
+
 - PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
 - We currently don't support AD managed users in nodes. We only support local linux users.
+- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Click [here](https://www.petefreitag.com/item/877.cfm) to know more.
+
 {{< /warning >}}
 
 ### Run these steps on Bastion Host Machine
