@@ -17,7 +17,7 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
 	assert.Equal(t, automateIps, []string{ValidIP, ValidIP1})
 	assert.Equal(t, chefServerIps, []string{ValidIP2, ValidIP3})
@@ -40,7 +40,7 @@ func TestCheckIPAddressesFromCmd(t *testing.T) {
 		isPostgresql: true,
 	})
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
 	assert.Equal(t, automateIps, []string{ValidIP})
 	assert.Equal(t, chefServerIps, []string{ValidIP3})
@@ -56,14 +56,14 @@ func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
 
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
-		node:        fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8),
+		node:         fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8),
 		isAutomate:   true,
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
 	})
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
 	assert.Equal(t, automateIps, []string{ValidIP})
 	assert.Equal(t, chefServerIps, []string{ValidIP3})
@@ -85,7 +85,7 @@ func TestCheckIPAddressesOnlyByServices(t *testing.T) {
 		isPostgresql: true,
 	})
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
 	assert.Equal(t, automateIps, []string{ValidIP, ValidIP1})
 	assert.Equal(t, chefServerIps, []string{ValidIP2, ValidIP3})
@@ -108,7 +108,7 @@ func TestCheckIPAddressesError(t *testing.T) {
 		isPostgresql: true,
 	})
 
-	_, _, _, _, errList := ss.(*Summary).checkIPAddresses()
+	_, _, _, _, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 1)
 	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nList of  ip address not found [127.0.0.1 127.0.0.2]")
 }
@@ -128,13 +128,13 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 		isPostgresql: true,
 	})
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).checkIPAddresses()
-	assert.Equal(t, errList.Len(), 5)
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
+	assert.Equal(t, errList.Len(), 17)
 	assert.Equal(t, automateIps, []string(nil))
 	assert.Equal(t, chefServerIps, []string(nil))
 	assert.Equal(t, opensearchIps, []string(nil))
 	assert.Equal(t, postgresqlIps, []string(nil))
-	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\n\nIncorrect Automate IP address format for ip 127.0.0\nIncorrect Automate IP address format for ip 127.0.1\nIncorrect Automate IP address format for ip 127.0.2\nIncorrect Automate IP address format for ip 127.0.3IP address validation failed\n\nIncorrect chef-server IP address format for ip 127.0.0\nIncorrect chef-server IP address format for ip 127.0.1\nIncorrect chef-server IP address format for ip 127.0.2\nIncorrect chef-server IP address format for ip 127.0.3IP address validation failed\n\nIncorrect OpenSearch IP address format for ip 127.0.0\nIncorrect OpenSearch IP address format for ip 127.0.1\nIncorrect OpenSearch IP address format for ip 127.0.2\nIncorrect OpenSearch IP address format for ip 127.0.3IP address validation failed\n\nIncorrect postgres IP address format for ip 127.0.0\nIncorrect postgres IP address format for ip 127.0.1\nIncorrect postgres IP address format for ip 127.0.2\nIncorrect postgres IP address format for ip 127.0.3IP address validation failed\nList of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]")
+	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nIncorrect Automate IP address format for ip 127.0.0IP address validation failed\nIncorrect Automate IP address format for ip 127.0.1IP address validation failed\nIncorrect Automate IP address format for ip 127.0.2IP address validation failed\nIncorrect Automate IP address format for ip 127.0.3IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.0IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.1IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.2IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.3IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.0IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.1IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.2IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.3IP address validation failed\nIncorrect postgres IP address format for ip 127.0.0IP address validation failed\nIncorrect postgres IP address format for ip 127.0.1IP address validation failed\nIncorrect postgres IP address format for ip 127.0.2IP address validation failed\nIncorrect postgres IP address format for ip 127.0.3IP address validation failed\nList of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]")
 }
 
 func TestRunFENode(t *testing.T) {
@@ -184,7 +184,7 @@ func TestRunBENodeDiaplay(t *testing.T) {
 	err := ss.Prepare(sshUtilsImpl)
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
-	assert.Contains(t, be, "+------------+--------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+--------------+--------+----------------+------------------+---------+\n| OpenSearch | 198.51.100.4 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| OpenSearch | 198.51.100.5 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| OpenSearch | 198.51.100.6 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| Postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.8 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.9 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+--------------+--------+----------------+------------------+---------+")
+	assert.Contains(t, be, "+------------+--------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+--------------+--------+----------------+------------------+---------+\n| OpenSearch | 198.51.100.4 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Os Node |\n| OpenSearch | 198.51.100.5 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Os Node |\n| OpenSearch | 198.51.100.6 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Os Node |\n| Postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.8 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.9 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+--------------+--------+----------------+------------------+---------+")
 }
 
 func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError error) *MockSSHUtilsImpl {

@@ -126,30 +126,29 @@ func runStatusSummaryCmdFunc(statusSummaryCmdFlags *StatusSummaryCmdFlags) func(
 }
 
 func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFlags *StatusSummaryCmdFlags) error {
-	if isA2HARBFileExist() {
-		infra, err := getAutomateHAInfraDetails()
-		if err != nil {
-			return err
-		}
-		statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
-		sshUtil := statusSummary.(*Summary).getSSHConfig()
 
-		err = statusSummary.Prepare(sshUtil)
-		if err != nil {
-			return err
-		}
-		if isManagedServicesOn() {
-			fe := statusSummary.ShowFEStatus()
-			fmt.Println(fe)
-		} else {
-			fe := statusSummary.ShowFEStatus()
-			fmt.Println(fe)
-			be := statusSummary.ShowBEStatus()
-			fmt.Println(be)
-
-		}
-	} else {
+	if !isA2HARBFileExist() {
 		return errors.New("This command only works on HA deployment")
+	}
+
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
+	sshUtil := statusSummary.(*Summary).getSSHConfig()
+
+	err = statusSummary.Prepare(sshUtil)
+	if err != nil {
+		return err
+	}
+
+	// Display Status summary
+	fe := statusSummary.ShowFEStatus()
+	fmt.Println(fe)
+	if !isManagedServicesOn() {
+		be := statusSummary.ShowBEStatus()
+		fmt.Println(be)
 	}
 	return nil
 }
