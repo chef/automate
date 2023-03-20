@@ -4,6 +4,7 @@ syntax = "proto3";
 package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/config/deployment";
 
+import "config/ocid/config_request.proto";
 import "config/applications/config_request.proto";
 import "config/authn/config_request.proto";
 import "config/authz/config_request.proto";
@@ -109,4 +110,5 @@ message AutomateConfig {
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
 	chef.automate.infra.opensearch.ConfigRequest opensearch = 49;
 	chef.automate.domain.report_manager.ConfigRequest report_manager = 50;
+        chef.automate.domain.ocid.ConfigRequest ocid = 51;
 }

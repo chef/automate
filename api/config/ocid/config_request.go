@@ -13,7 +13,7 @@ func NewConfigRequest() *ConfigRequest {
 				Log:       &ConfigRequest_V1_System_Log{},
 				Network:   &ConfigRequest_V1_System_Network{},
 				Sql:       &ConfigRequest_V1_System_Sql{},
-				ocid: &ConfigRequest_V1_System_Ocid{},
+				Ocid: &ConfigRequest_V1_System_Ocid{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},

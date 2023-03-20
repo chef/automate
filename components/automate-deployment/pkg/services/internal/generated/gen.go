@@ -5,16 +5,6 @@ var ProductMetadataJSON = `
 {
   "packages": [
     {
-      "name": "chef/backup-gateway",
-      "metadata": {
-        "name": "chef/backup-gateway",
-        "data_service": true,
-        "binlinks": null,
-        "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/automate-postgresql",
       "metadata": {
         "name": "chef/automate-postgresql",
@@ -27,6 +17,63 @@ var ProductMetadataJSON = `
     {
       "name": "chef/automate-pg-gateway",
       "metadata": null
+    },
+    {
+      "name": "chef/pg-sidecar-service",
+      "metadata": {
+        "name": "chef/pg-sidecar-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/automate-cs-bookshelf",
+      "metadata": {
+        "name": "chef/automate-cs-bookshelf",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "bookshelf.access_key_id"
+          },
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "bookshelf.secret_access_key"
+          }
+        ]
+      }
+    },
+    {
+      "name": "chef/automate-cs-oc-bifrost",
+      "metadata": {
+        "name": "chef/automate-cs-oc-bifrost",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "oc_bifrost.superuser_id"
+          }
+        ]
+      }
+    },
+    {
+      "name": "chef/backup-gateway",
+      "metadata": {
+        "name": "chef/backup-gateway",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-opensearch",
@@ -43,30 +90,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-minio",
-      "metadata": {
-        "name": "chef/automate-minio",
-        "data_service": true,
-        "binlinks": null,
-        "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/automate-ui",
-      "metadata": null
-    },
-    {
-      "name": "chef/pg-sidecar-service",
-      "metadata": {
-        "name": "chef/pg-sidecar-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/cereal-service",
       "metadata": {
         "name": "chef/cereal-service",
@@ -81,9 +104,9 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/authz-service",
+      "name": "chef/applications-service",
       "metadata": {
-        "name": "chef/authz-service",
+        "name": "chef/applications-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -91,13 +114,9 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/es-sidecar-service",
-      "metadata": null
-    },
-    {
-      "name": "chef/event-feed-service",
+      "name": "chef/authz-service",
       "metadata": {
-        "name": "chef/event-feed-service",
+        "name": "chef/authz-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -115,9 +134,9 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/teams-service",
+      "name": "chef/session-service",
       "metadata": {
-        "name": "chef/teams-service",
+        "name": "chef/session-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -125,9 +144,9 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/session-service",
+      "name": "chef/teams-service",
       "metadata": {
-        "name": "chef/session-service",
+        "name": "chef/teams-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -161,14 +180,18 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/applications-service",
+      "name": "chef/nodemanager-service",
       "metadata": {
-        "name": "chef/applications-service",
+        "name": "chef/nodemanager-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
         "bootstrap": null
       }
+    },
+    {
+      "name": "chef/es-sidecar-service",
+      "metadata": null
     },
     {
       "name": "chef/notifications-service",
@@ -181,9 +204,9 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/nodemanager-service",
+      "name": "chef/compliance-service",
       "metadata": {
-        "name": "chef/nodemanager-service",
+        "name": "chef/compliance-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -191,9 +214,59 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/compliance-service",
+      "name": "chef/automate-cds",
       "metadata": {
-        "name": "chef/compliance-service",
+        "name": "chef/automate-cds",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/config-mgmt-service",
+      "metadata": {
+        "name": "chef/config-mgmt-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/data-feed-service",
+      "metadata": {
+        "name": "chef/data-feed-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/event-feed-service",
+      "metadata": {
+        "name": "chef/event-feed-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/infra-proxy-service",
+      "metadata": {
+        "name": "chef/infra-proxy-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/ingest-service",
+      "metadata": {
+        "name": "chef/ingest-service",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -212,60 +285,6 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/local-user-service",
-      "metadata": null
-    },
-    {
-      "name": "chef/config-mgmt-service",
-      "metadata": {
-        "name": "chef/config-mgmt-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/ingest-service",
-      "metadata": {
-        "name": "chef/ingest-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/infra-proxy-service",
-      "metadata": {
-        "name": "chef/infra-proxy-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/automate-cds",
-      "metadata": {
-        "name": "chef/automate-cds",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/data-feed-service",
-      "metadata": {
-        "name": "chef/data-feed-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/event-gateway",
       "metadata": null
     },
     {
@@ -293,6 +312,60 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-cs-oc-erchef",
+      "metadata": {
+        "name": "chef/automate-cs-oc-erchef",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "file",
+            "path": "data/pivotal.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/pivotal.pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_priv.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/dark_launch_features.json",
+            "optional": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "chef/automate-minio",
+      "metadata": {
+        "name": "chef/automate-minio",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/automate-ui",
+      "metadata": null
+    },
+    {
+      "name": "chef/event-gateway",
+      "metadata": null
+    },
+    {
       "name": "chef/automate-builder-memcached",
       "metadata": {
         "name": "chef/automate-builder-memcached",
@@ -315,27 +388,6 @@ var ProductMetadataJSON = `
     {
       "name": "chef/automate-builder-api-proxy",
       "metadata": null
-    },
-    {
-      "name": "chef/automate-cs-bookshelf",
-      "metadata": {
-        "name": "chef/automate-cs-bookshelf",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": [
-          {
-            "type": "secret",
-            "optional": false,
-            "secret_spec": "bookshelf.access_key_id"
-          },
-          {
-            "type": "secret",
-            "optional": false,
-            "secret_spec": "bookshelf.secret_access_key"
-          }
-        ]
-      }
     },
     {
       "name": "chef/automate-cs-nginx",
@@ -369,22 +421,6 @@ var ProductMetadataJSON = `
     {
       "name": "chef/automate-load-balancer",
       "metadata": null
-    },
-    {
-      "name": "chef/automate-cs-oc-bifrost",
-      "metadata": {
-        "name": "chef/automate-cs-oc-bifrost",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": [
-          {
-            "type": "secret",
-            "optional": false,
-            "secret_spec": "oc_bifrost.superuser_id"
-          }
-        ]
-      }
     },
     {
       "name": "chef/automate-cs-ocid",
@@ -661,6 +697,7 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",
+        "chef/automate-cs-oc-erchef",
         "chef/automate-cs-nginx",
         "chef/automate-cs-ocid"
       ],
