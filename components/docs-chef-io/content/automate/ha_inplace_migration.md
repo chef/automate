@@ -108,10 +108,10 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
 
 ## Installing the Latest Automate HA
 
-Follow Automate HA installation documentation. Click [here](/automate/ha_onprim_deployment_procedure/) to know more about `config.toml`, 
+Follow Automate HA installation documentation. Click [here](/automate/ha_onprim_deployment_procedure/) to know more about `config.toml`,
 **provide** the same IPs and backup config in config.toml as in the  `a2ha.rb` file.
 
-## EFS backup configuration
+## File System backup configuration
 In case the backup configuration was skipped in the deployment config.toml, the User needs to configure EFS backup manually in Automate HA please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 
 {{<note>}}
