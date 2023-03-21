@@ -2,24 +2,8 @@
   "name": "chef/automate-cs-ocid",
   "bootstrap": [
     {
-      "type": "file",
-      "path": "data/pivotal.pem"
-    },
-    {
-      "type": "file",
-      "path": "data/pivotal.pub.pem"
-    },
-    {
-      "type": "file",
-      "path": "data/webui_priv.pem"
-    },
-    {
-      "type": "file",
-      "path": "data/webui_pub.pem"
-    },
-    {
-      "type": "file",
-      "path": "data/dark_launch_features.json"
+      "type": "secret",
+      "secret_spec": "ocid.superuser_id"
     }
   ],
   "uses_platform_scaffolding": true
