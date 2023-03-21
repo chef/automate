@@ -148,8 +148,8 @@ function notifications_update_component() {
 function elixir_install() {
   log_line "installing elixir if needed"
   install_if_missing core/git git
-  install_if_missing chef/elixir mix
-  install_if_missing chef/elixir elixir
+  install_if_missing core/elixir mix
+  install_if_missing core/elixir elixir
   install_if_missing core/erlang25 escript
   install_if_missing core/erlang25 erl
   install_if_missing core/coreutils env
