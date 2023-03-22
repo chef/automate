@@ -2,6 +2,7 @@
 # configuration as changing them would break everything.
 fips_enabled = false
 ip_mode = "ipv4"
+rails_env="production"
 
 [network]
 port=9090

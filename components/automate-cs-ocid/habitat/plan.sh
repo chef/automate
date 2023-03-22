@@ -34,14 +34,17 @@ pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_download() {
+  echo "Download hook called *******"
   return 0
 }
 
 do_build() {
+  echo "Build hook called *******"
   return 0
 }
 
 do_install() {
+  echo "Install hook called *******"
   return 0
 }
 

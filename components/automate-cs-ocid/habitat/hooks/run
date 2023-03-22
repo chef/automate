@@ -1,5 +1,9 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash -e
 
+echo "RUN HOOK CALLED ************"
+echo "UPDATED RUN HOOK CALLED ************"
+
+
 exec 2>&1
 
 # Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
@@ -9,7 +13,17 @@ export GODEBUG=x509ignoreCN=0
 
 mkdir -p {{pkg.svc_var_path}}/logs
 
-export HOME={{pkg.svc_var_path}}
+export RAILS_ENV={{cfg.rails_env}}
+export HOME={{pkg.svc_files_path}}
+export TEMPHOME="${pkg_prefix}/oc_id"
+
+export LD_RUN_PATH=$(hab pkg path "core/gcc-libs")/lib:$LD_RUN_PATH
+export VERSION=`ls -1 {{pkg.svc_files_path}}/db/migrate | tail -n 1 | $(hab pkg path "core/sed")/bin/sed -e "s/_.*//g"`
+export LD_LIBRARY_PATH=$LD_RUN_PATH
+export PATH=$HOME/bin:$PATH
+export CHEF_SECRETS_DATA=$(cat {{pkg.svc_config_path}}/veil-secrets.json)
+
+# export HOME={{pkg.svc_var_path}}
 export RUNNER_LOG_DIR="{{pkg.svc_var_path}}/logs"
 export RELX_CONFIG_PATH="{{pkg.svc_config_path}}/sys.config"
 export VMARGS_PATH="{{pkg.svc_config_path}}/vm.args"
@@ -24,9 +38,26 @@ render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 pg-helper rename-if-exists ocid "$DBNAME"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_id"}}/schema/"
 pg-helper fix-permissions "$DBNAME"
 
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
 
-exec secrets-helper exec --secret oc_id.superuser_id -- oc_id foreground
+echo "exec run called ************"
+# exec secrets-helper exec --secret oc_id.superuser_id -- oc_id foreground
+
+echo "skipped run priting ***********HOME"
+echo $HOME
+
+echo ")))))))))hab pkg path"
+echo hab pkg path
+
+echo ")))))))))pkg_prefix neww"
+echo $TEMPHOME
+
+cd $HOME
+echo "DB VERSION: $VERSION"
+# Habitat Todo
+# move assets compile into the build phase
+$(hab pkg path "core/bundler")/bin/bundle exec bin/rake assets:precompile
+$(hab pkg path "core/bundler")/bin/bundle exec bin/rake db:migrate
+$(hab pkg path "core/bundler")/bin/bundle exec bin/rails server -p {{cfg.port}} -b 0.0.0.0
