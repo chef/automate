@@ -15,7 +15,6 @@ mkdir -p {{pkg.svc_var_path}}/logs
 
 export RAILS_ENV={{cfg.rails_env}}
 export HOME={{pkg.svc_files_path}}
-export TEMPHOME="${pkg_prefix}/oc_id"
 
 export LD_RUN_PATH=$(hab pkg path "core/gcc-libs")/lib:$LD_RUN_PATH
 export VERSION=`ls -1 {{pkg.svc_files_path}}/db/migrate | tail -n 1 | $(hab pkg path "core/sed")/bin/sed -e "s/_.*//g"`
@@ -48,16 +47,57 @@ echo "exec run called ************"
 echo "skipped run priting ***********HOME"
 echo $HOME
 
-echo ")))))))))hab pkg path"
-echo hab pkg path
+echo "*********CD to custom path"
+cd /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
+pwd
 
-echo ")))))))))pkg_prefix neww"
-echo $TEMPHOME
 
-cd $HOME
-echo "DB VERSION: $VERSION"
+echo "(((((((Check what it prints"
+echo $(hab pkg path "core/bundler")
 # Habitat Todo
+
+echo "*********Running rails bootstrap"
 # move assets compile into the build phase
-$(hab pkg path "core/bundler")/bin/bundle exec bin/rake assets:precompile
-$(hab pkg path "core/bundler")/bin/bundle exec bin/rake db:migrate
-$(hab pkg path "core/bundler")/bin/bundle exec bin/rails server -p {{cfg.port}} -b 0.0.0.0
+# $(hab pkg path "core/bundler")/bin/bundle exec bin/rake assets:precompile
+# $(hab pkg path "core/bundler")/bin/bundle exec bin/rake db:migrate
+# $(hab pkg path "core/bundler")/bin/bundle exec bin/rails server -p {{cfg.port}} -b 0.0.0.0
+# bin/bundle exec bin/rake assets:precompile
+# bin/bundle exec bin/rake db:migrate
+# bin/bundle exec bin/rails server -p {{cfg.port}} -b 0.0.0.0
+
+#!/bin/bash -e
+#
+# Copyright 2012-2015 Chef Software, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+export SVWAIT=30
+
+pkg_prefix=/hab/pkgs/chef/oc_id/15.4.0/20230105061030
+cd "$pkg_prefix/oc_id"
+
+RUBY_BIN_DIR=/hab/pkgs/core/ruby27/2.7.5/20220312100031/bin
+
+echo "@@@@@@@@@@"
+echo pkg_prefix
+echo pwd
+
+export PATH=$PATH:$RUBY_BIN_DIR
+export GEM_PATH="$pkg_prefix/oc_id/vendor/bundle"
+# CHEF_SECRETS_DATA=$(cat /hab/svc/chef-server-ctl/config/hab-secrets-config.json)
+# export CHEF_SECRETS_DATA
+# export CSC_KNIFE_CONFIG_FILE=/hab/svc/chef-server-ctl/config/pivotal.rb
+# export CSC_KNIFE_BIN="${RUBY_BIN_DIR}/bundle exec ${pkg_prefix}/chef/bin/knife"
+
+# bundle exec binstubs/chef-server-ctl "$@"
+bin/bundle exec bin/rake assets:precompile
