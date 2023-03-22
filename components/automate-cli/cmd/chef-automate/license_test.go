@@ -3,6 +3,8 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -145,4 +147,42 @@ func TestRunLicenseStatusCmd(t *testing.T) {
 
 		})
 	}
+}
+
+func TestLicenseStatusCmd(t *testing.T) {
+	// Create a new Cobra command
+	cmd := &cobra.Command{
+		Use:               "test",
+		Short:             "Test command",
+		RunE:              func(cmd *cobra.Command, args []string) error { return nil },
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error { return nil },
+	}
+
+	// Add the licenseStatusCmd as a subcommand to the test command
+	cmd.AddCommand(licenseStatusCmd)
+
+	// Redirect stdout to a buffer so we can capture the command's output
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+
+	// Call the license status command
+	_, err := executeComd(cmd, "status")
+	fmt.Printf("err******: %v\n", err)
+	// Assert that the command returned no errors
+	assert.NoError(t, err)
+
+	// Assert that the command output matches the expected output
+	expectedOutput := "License status: active\n"
+	assert.Equal(t, expectedOutput, buf.String())
+}
+
+func executeComd(cmd *cobra.Command, args ...string) (string, error) {
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+	cmd.SetArgs(args)
+	err := cmd.Execute()
+	if err != nil {
+		fmt.Printf("Error executing command: %s\n", err)
+	}
+	return buf.String(), err
 }
