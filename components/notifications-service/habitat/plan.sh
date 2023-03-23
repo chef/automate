@@ -88,7 +88,7 @@ do_prepare() {
 }
 
 do_build() {
-  ln -sf $(pkg_path_for core/bash)/bin/env /usr/bin/env
+  ln -sf $(pkg_path_for core/busybox-static)/bin/env /usr/bin/env
   pushd "${CACHE_PATH}/server" > /dev/null
     git config --global url."https://github.com/".insteadOf git://github.com/
     MIX_ENV=habitat mix do deps.get, release
