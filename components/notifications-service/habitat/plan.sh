@@ -14,6 +14,7 @@ pkg_deps=(
   core/bash
   chef/mlsa
   ${local_platform_tools_origin:-chef}/automate-platform-tools
+  core/busybox-static
 )
 pkg_build_deps=(
   core/git
@@ -87,9 +88,7 @@ do_prepare() {
 }
 
 do_build() {
-  ls -l /bin/env
-  which env
-  ln -sf /bin/env /usr/bin/env
+  ln -sf $(pkg_path_for core/bash)/bin/env /usr/bin/env
   pushd "${CACHE_PATH}/server" > /dev/null
     git config --global url."https://github.com/".insteadOf git://github.com/
     MIX_ENV=habitat mix do deps.get, release
