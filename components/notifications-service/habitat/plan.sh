@@ -87,6 +87,8 @@ do_prepare() {
 }
 
 do_build() {
+  ls -l /bin/env
+  which env
   ln -sf /bin/env /usr/bin/env
   pushd "${CACHE_PATH}/server" > /dev/null
     git config --global url."https://github.com/".insteadOf git://github.com/
