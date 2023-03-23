@@ -11,7 +11,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_deps=(
   chef/mlsa
-  chef/automate-platform-tools
+  aazeez/automate-platform-tools
 )
 pkg_exports=(
   [port]=service.port
@@ -22,7 +22,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
 )
 pkg_exposes=(port)
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

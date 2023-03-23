@@ -33,7 +33,7 @@ pkg_binds_optional=(
 inspec_release="chef/inspec/4.56.22/20220517052126"
 pkg_deps=(
   core/coreutils
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "${local_platform_tools_origin:-aazeez}/automate-platform-tools"
   "${inspec_release}"
   chef/mlsa
   core/grpcurl              # Used in habitat/hooks/health_check
@@ -51,7 +51,7 @@ else
   )
 fi
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

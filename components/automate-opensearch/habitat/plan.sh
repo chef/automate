@@ -23,7 +23,7 @@ pkg_deps=(
   chef/mlsa
   core/curl # health_check
   chef/automate-openjdk
-  chef/automate-platform-tools
+  aazeez/automate-platform-tools
 )
 pkg_bin_dirs=(os/bin)
 pkg_lib_dirs=(lib)

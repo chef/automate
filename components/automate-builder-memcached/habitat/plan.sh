@@ -28,7 +28,7 @@ pkg_exports=(
 )
 pkg_exposes=(port)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding"
 
 do_build() {
   ./configure \

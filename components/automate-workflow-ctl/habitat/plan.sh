@@ -15,7 +15,7 @@ pkg_deps=(
   # make sure that this package always gets built whenever
   # automate-workflow-server gets built so we have to share all
   # in-repo dependencies.
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
+  ${local_platform_tools_origin:-aazeez}/automate-platform-tools
 )
 pkg_build_deps=(
   core/gcc/9.1.0/20200305180723
