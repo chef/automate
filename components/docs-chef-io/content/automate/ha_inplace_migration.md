@@ -38,10 +38,12 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
 
     The output looks like as shown below:
 
+    ```cmd
     Backup             State       Age
     20180508201548    completed  8 minutes old
     20180508201643    completed  8 minutes old
     20180508201952    completed  4 minutes old
+    ```
 
 1. Create a bootstrap bundle from one of automate node using the following command:
 
