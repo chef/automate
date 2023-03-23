@@ -1,3 +1,4 @@
+<div>
 <chef-loading-spinner *ngIf="loading" size='50' fixed></chef-loading-spinner>
 <app-deletable-node-control #deletable_control
 [deletableNodes]="deletableNodes"
@@ -190,5 +191,4 @@
   [page]="currentPage"
   (pageChanged)="onPageChange($event)">
 </app-page-picker>
-
-<chef-scroll-top></chef-scroll-top>
+</div>
