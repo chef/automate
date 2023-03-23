@@ -1,13 +1,7 @@
 defmodule Slack.Message.Attachment.Field do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          short: boolean,
-          title: String.t(),
-          value: String.t()
-        }
-  defstruct [:short, :title, :value]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :short, 1, type: :bool
   field :title, 2, type: :string
@@ -16,17 +10,8 @@ end
 
 defmodule Slack.Message.Attachment do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          color: String.t(),
-          fallback: String.t(),
-          pretext: String.t(),
-          text: String.t(),
-          mrkdwn_in: String.t(),
-          fields: [Slack.Message.Attachment.Field.t()]
-        }
-  defstruct [:color, :fallback, :pretext, :text, :mrkdwn_in, :fields]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :color, 1, type: :string
   field :fallback, 2, type: :string
@@ -38,15 +23,8 @@ end
 
 defmodule Slack.Message do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          icon_url: String.t(),
-          text: String.t(),
-          username: String.t(),
-          attachments: [Slack.Message.Attachment.t()]
-        }
-  defstruct [:icon_url, :text, :username, :attachments]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :icon_url, 1, type: :string, json_name: "iconUrl"
   field :text, 2, type: :string

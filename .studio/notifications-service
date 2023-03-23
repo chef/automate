@@ -150,8 +150,8 @@ function elixir_install() {
   install_if_missing core/git git
   install_if_missing core/elixir mix
   install_if_missing core/elixir elixir
-  install_if_missing core/erlang escript
-  install_if_missing core/erlang erl
+  install_if_missing core/erlang25 escript
+  install_if_missing core/erlang25 erl
   install_if_missing core/coreutils env
   local HAB_BINLINK_DIR
   mkdir -p /usr/bin

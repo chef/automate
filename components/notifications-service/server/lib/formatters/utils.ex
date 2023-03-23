@@ -56,6 +56,6 @@ defmodule Notifications.Formatters.Utils do
   defp to_map(_, []), do: []
   defp to_map(_, list) when is_list(list), do: :lists.map(&to_map(:ignore, &1), list)
   defp to_map(_, %_struct{} = struct), do:  to_map(:ignore, Map.from_struct(struct))
-  defp to_map(_, %{} = map), do: :maps.map(&to_map(&1, &2), map)
+  defp to_map(_, %{} = map), do: :maps.map(&to_map(&1, &2), Map.delete(map, :__unknown_fields__))
   defp to_map(_, other), do: other
 end

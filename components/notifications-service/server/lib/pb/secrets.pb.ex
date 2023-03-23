@@ -1,8 +1,7 @@
 defmodule Chef.Automate.Api.Secrets.Query.OrderType do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
 
-  @type t :: integer | :ASC | :DESC
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :ASC, 0
   field :DESC, 1
@@ -10,44 +9,28 @@ end
 
 defmodule Chef.Automate.Api.Secrets.UpdateResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 end
 
 defmodule Chef.Automate.Api.Secrets.DeleteResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 end
 
 defmodule Chef.Automate.Api.Secrets.Id do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t()
-        }
-  defstruct [:id]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
 end
 
 defmodule Chef.Automate.Api.Secrets.Query do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          filters: [Chef.Automate.Api.Common.Query.Filter.t()],
-          order: Chef.Automate.Api.Secrets.Query.OrderType.t(),
-          sort: String.t(),
-          page: integer,
-          per_page: integer
-        }
-  defstruct [:filters, :order, :sort, :page, :per_page]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :filters, 20, repeated: true, type: Chef.Automate.Api.Common.Query.Filter
   field :order, 21, type: Chef.Automate.Api.Secrets.Query.OrderType, enum: true
@@ -58,17 +41,8 @@ end
 
 defmodule Chef.Automate.Api.Secrets.Secret do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          id: String.t(),
-          name: String.t(),
-          type: String.t(),
-          last_modified: Google.Protobuf.Timestamp.t() | nil,
-          tags: [Chef.Automate.Api.Common.Query.Kv.t()],
-          data: [Chef.Automate.Api.Common.Query.Kv.t()]
-        }
-  defstruct [:id, :name, :type, :last_modified, :tags, :data]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :id, 1, type: :string
   field :name, 2, type: :string
@@ -80,13 +54,8 @@ end
 
 defmodule Chef.Automate.Api.Secrets.Secrets do
   @moduledoc false
-  use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{
-          secrets: [Chef.Automate.Api.Secrets.Secret.t()],
-          total: integer
-        }
-  defstruct [:secrets, :total]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :secrets, 1, repeated: true, type: Chef.Automate.Api.Secrets.Secret
   field :total, 20, type: :int32
@@ -94,16 +63,24 @@ end
 
 defmodule Chef.Automate.Api.Secrets.SecretsService.Service do
   @moduledoc false
-  use GRPC.Service, name: "chef.automate.api.secrets.SecretsService"
+
+  use GRPC.Service,
+    name: "chef.automate.api.secrets.SecretsService",
+    protoc_gen_elixir_version: "0.11.0"
 
   rpc :Create, Chef.Automate.Api.Secrets.Secret, Chef.Automate.Api.Secrets.Id
+
   rpc :Read, Chef.Automate.Api.Secrets.Id, Chef.Automate.Api.Secrets.Secret
+
   rpc :Update, Chef.Automate.Api.Secrets.Secret, Chef.Automate.Api.Secrets.UpdateResponse
+
   rpc :Delete, Chef.Automate.Api.Secrets.Id, Chef.Automate.Api.Secrets.DeleteResponse
+
   rpc :List, Chef.Automate.Api.Secrets.Query, Chef.Automate.Api.Secrets.Secrets
 end
 
 defmodule Chef.Automate.Api.Secrets.SecretsService.Stub do
   @moduledoc false
+
   use GRPC.Stub, service: Chef.Automate.Api.Secrets.SecretsService.Service
 end

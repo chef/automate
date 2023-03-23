@@ -27,8 +27,7 @@ defmodule Notifications.Application do
     secrets_channel = create_secrets_channel()
     {:ok, localhost} = :inet.parse_address('127.0.0.1')
     children = [
-      supervisor(GRPC.Server.Supervisor,
-                 [{Notifications.Service, port, cred: cred, ip: localhost}]),
+      {GRPC.Server.Supervisor, endpoint: Notifications.Service, port: port, start_server: true, cred: cred, ip: localhost},
       worker(Notifications.Dispatcher, [{Notifications.Dispatcher, []}]),
       worker(Notifications.WebhookSender, [{Notifications.WebhookSender, []}]),
       worker(Notifications.Data.TimedCache, [{Notifications.Data.TimedCache, []}]),
