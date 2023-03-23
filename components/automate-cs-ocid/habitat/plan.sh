@@ -33,6 +33,13 @@ pkg_exposes=(http-port)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
+do_prepare() {
+  echo "Do prepare hook called *********"
+  build_line "Setting link for /usr/bin/env to 'coreutils'"
+  [[ ! -f /usr/bin/env ]] && ln -s "$(pkg_path_for coreutils)/bin/env" /usr/bin/env
+  return 0
+}
+
 do_download() {
   echo "Download hook called *******"
   return 0
