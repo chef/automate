@@ -8,4 +8,5 @@ const (
 	CONST_OPENSEARCH  = "opensearch"
 	SET               = "set"
 	PATCH             = "patch"
+	SUDO_PASSWORD     = "sudo_password"
 )
