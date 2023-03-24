@@ -64,7 +64,7 @@ pkg_srcs=(
   # TODO: VERSION should be in this list
 )
 
-pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
   mkdir -p "${CACHE_PATH}/server"

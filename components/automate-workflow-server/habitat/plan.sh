@@ -58,7 +58,7 @@ pkg_exports=(
 
 pkg_exposes=(port git_ssh_port)
 
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="$${local_scaffolding_origin:-chef}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_download() {

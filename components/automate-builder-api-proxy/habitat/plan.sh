@@ -37,7 +37,7 @@ pkg_exposes=(port)
 
 pkg_bin_dirs=(bin)
 
-pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
     return 0

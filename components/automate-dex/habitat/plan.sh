@@ -29,7 +29,7 @@ pkg_deps=(
 
 pkg_build_deps=(core/go19 core/git core/gcc)
 
-pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_before() {
   GOPATH=$HAB_CACHE_SRC_PATH/$pkg_dirname
