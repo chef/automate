@@ -16,7 +16,7 @@ pkg_deps=(
   core/coreutils
   core/bash
   chef/mlsa
-  "${local_platform_tools_origin:-aazeez}/automate-platform-tools"
+  "aazeez/automate-platform-tools"
   # We need to pin here to get a build from unstable
   habitat/builder-api-proxy
 )
@@ -37,7 +37,7 @@ pkg_exposes=(port)
 
 pkg_bin_dirs=(bin)
 
-pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding"
+pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
     return 0

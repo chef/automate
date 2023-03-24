@@ -22,14 +22,14 @@ pkg_bin_dirs=(bin)
 pkg_deps=(
   core/glibc
   chef/mlsa
-  ${local_platform_tools_origin:-aazeez}/automate-platform-tools
+  aazeez/automate-platform-tools
   core/bash
   core/curl # health_check hook
 )
 
 pkg_build_deps=(core/go19 core/git core/gcc)
 
-pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding"
+pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_before() {
   GOPATH=$HAB_CACHE_SRC_PATH/$pkg_dirname

@@ -8,7 +8,7 @@ pkg_license=('Apache-2.0')
 pkg_deps=(
   core/minio
   core/cacerts
-  chef/automate-platform-tools
+  aazeez/automate-platform-tools
 )
 
 pkg_exports=(

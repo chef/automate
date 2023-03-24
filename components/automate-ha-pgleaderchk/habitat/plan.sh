@@ -28,7 +28,7 @@ pkg_binds_optional=(
 )
 pkg_exposes=(port)
 pkg_bin_dirs=(bin)
-pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding-go"
+pkg_scaffolding="aazeez/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

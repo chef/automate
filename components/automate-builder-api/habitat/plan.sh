@@ -14,7 +14,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   core/bash
-  "${local_platform_tools_origin:-aazeez}/automate-platform-tools"
+  "aazeez/automate-platform-tools"
   # We need to pin here to get a build from unstable
   habitat/builder-api
 )
@@ -35,7 +35,7 @@ pkg_exposes=(http-port)
 
 pkg_bin_dirs=(bin)
 
-pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding"
+pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
     return 0

@@ -11,7 +11,7 @@ pkg_version="1.0.0"
 pkg_upstream_url="http://github.com/chef/automate/components/nodemanager"
 pkg_deps=(
   chef/mlsa
-  "${local_platform_tools_origin:-aazeez}/automate-platform-tools"
+  "aazeez/automate-platform-tools"
   core/bash
 )
 pkg_bin_dirs=(bin)
@@ -29,7 +29,7 @@ pkg_binds=(
   [authz-service]="port"
 )
 pkg_bin_dirs=(bin)
-pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding-go"
+pkg_scaffolding="aazeez/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

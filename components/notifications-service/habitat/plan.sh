@@ -13,7 +13,7 @@ pkg_deps=(
   # bash is required by distillery
   core/bash
   chef/mlsa
-  ${local_platform_tools_origin:-aazeez}/automate-platform-tools
+  aazeez/automate-platform-tools
   core/busybox-static
 )
 pkg_build_deps=(
@@ -64,7 +64,7 @@ pkg_srcs=(
   # TODO: VERSION should be in this list
 )
 
-pkg_scaffolding="${local_scaffolding_origin:-aazeez}/automate-scaffolding"
+pkg_scaffolding="{local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
   mkdir -p "${CACHE_PATH}/server"
