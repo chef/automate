@@ -36,9 +36,9 @@ var licenseCmd = &cobra.Command{
 }
 
 var licenseStatusCmd = &cobra.Command{
-	Use:               "status",
-	Short:             "Retrieve Chef Automate license status",
-	RunE:              runLicenseStatusCmd,
+	Use:   "status",
+	Short: "Retrieve Chef Automate license status",
+	// RunE:              runLicenseStatusCmd,
 	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
@@ -165,11 +165,11 @@ type scanNode struct {
 	LastSeen  string `json:"last_seen"`
 }
 
-func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return nil
-	}
+func runLicenseStatusCmd(cmd *cobra.Command, args []string, connection *client.DSClient) error {
+	// connection, err := client.Connection(client.DefaultClientTimeout)
+	// if err != nil {
+	// 	return nil
+	// }
 
 	response, err := connection.LicenseStatus(context.Background(), &api.LicenseStatusRequest{})
 	if err != nil {
@@ -500,3 +500,34 @@ func getPreLicenseReportCmd(fileNamePrefix string) func(*cobra.Command, []string
 	}
 	return commandWithFileName
 }
+
+// func getPreLicenseReportCmd(fileNamePrefix string, flags *CommandFlags.FileName, isA2HARBFileExistFunc func() bool, getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error), runCmdOnSingleAutomateNodeNCopyReportFunc func(cmd *cobra.Command, args []string, reportFileName string, infra *AutomateHAInfraDetails) error, exitFunc func(int)) func(cmd *cobra.Command, args []string) error {
+// 	commandWithFileName := func(cmd *cobra.Command, args []string) error {
+// 		err := commandPrePersistent(cmd)
+// 		if err != nil {
+// 			return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+// 		}
+// 		reportFileName := flags.FileName
+// 		if reportFileName == "" {
+// 			reportFileName = fmt.Sprintf("%s_%s_%s.csv", fileNamePrefix, flags.StartTime, flags.EndTime)
+// 			args = append(args, "-f", reportFileName)
+// 			flags.FileName = reportFileName
+// 		}
+// 		if isA2HARBFileExistFunc() {
+// 			infra, err := getAutomateHAInfraDetailsFunc()
+// 			if err != nil {
+// 				fmt.Print(err)
+// 				return err
+// 			}
+
+// 			err = runCmdOnSingleAutomateNodeNCopyReportFunc(cmd, args, reportFileName, infra)
+// 			if err != nil {
+// 				return err
+// 			}
+// 			// NOTE: used exitFunc as need to stop next lifecycle method to execute
+// 			exitFunc(1)
+// 		}
+// 		return nil
+// 	}
+// 	return commandWithFileName
+// }
