@@ -52,6 +52,19 @@ do_build() {
 
 do_install() {
   echo "Install hook called *******"
+  # chmod 777 -R /hab/pkgs/core/ruby27/2.7.5/20220312100031/lib/ruby/gems/2.7.0
+  # chmod 777 -R /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
+
+  export RUBY_BIN_DIR="/hab/pkgs/core/ruby27/2.7.5/20220312100031/bin"
+  export PATH=$PATH:$RUBY_BIN_DIR
+  echo "********RUBYFILE PATH"
+  echo $PATH
+
+  cd /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
+  echo "gem 'tzinfo-data'" >> Gemfile
+  bundle package --no-install
+  bundle install --path=vendor/bundle
+  # chmod 777 -R .bundle
   return 0
 }
 
