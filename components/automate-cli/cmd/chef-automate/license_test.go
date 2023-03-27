@@ -5,11 +5,13 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/mock"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/golang/mock/gomock"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +26,7 @@ func NewClientWithPara(dcs deployment.DeployClientStreamer, ca deployment.Certif
 }
 
 func Test_runLicenseStatusCmd(t *testing.T) {
-	fmt.Println("Test 1")
+	fmt.Println("Test 1. PASSED ")
 	// Create mock implementations of the embedded interfaces
 	deployMock := &mock.MockDeployClientStreamer{}
 	caMock := &mock.MockCertificateAuthorityServiceClient{}
@@ -36,7 +38,7 @@ func Test_runLicenseStatusCmd(t *testing.T) {
 	err := runLicenseStatusCmdImp(nil, nil, client)
 	require.NoError(t, err)
 
-	fmt.Println("Test 2")
+	fmt.Println("Test 2, failed")
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
@@ -104,19 +106,36 @@ func TestMaybeFromFile(t *testing.T) {
 		}
 	})
 
-	// t.Run("Reading token data from file failed", func(t *testing.T) {
-	// 	// Call the function with a file path that exists but cannot be read
-	// 	result, err := maybeFromFile("/dev/null")
+	t.Run("Reading token data from file failed", func(t *testing.T) {
+		// Call the function with a file path that exists but cannot be read
+		result, err := maybeFromFile("/dev/null")
 
-	// 	fmt.Printf("*******: %v**", err)
-	// 	expectedErr := errors.New("Reading token data from file failed")
-	// 	if err.Error() != expectedErr.Error() {
-	// 		t.Errorf("maybeFromFile(%q) failed with error %q, want %q", "/dev/null", err, expectedErr)
-	// 	}
+		fmt.Printf("*******: %v**", err)
+		expectedErr := errors.New("Reading token data from file failed")
+		if err.Error() != expectedErr.Error() {
+			t.Errorf("maybeFromFile(%q) failed with error %q, want %q", "/dev/null", err, expectedErr)
+		}
 
-	// 	// Check if the returned result matches the expected output
-	// 	if result != "" {
-	// 		t.Errorf("maybeFromFile(%q) = %q, want %q", "/dev/null", result, "")
-	// 	}
-	// })
+		// Check if the returned result matches the expected output
+		if result != "" {
+			t.Errorf("maybeFromFile(%q) = %q, want %q", "/dev/null", result, "")
+		}
+	})
+}
+
+func Test_getConfigMgmtUsageNodesImp(t *testing.T) {
+	fmt.Println("Test 1")
+	// Create mock implementations of the embedded interfaces
+	deployMock := &mock.MockDeployClientStreamer{}
+	caMock := &mock.MockCertificateAuthorityServiceClient{}
+
+	client := NewClientWithPara(deployMock, caMock)
+	require.NotNil(t, client)
+	require.NotEmpty(t, client)
+
+	hourAgo := &tspb.Timestamp{Seconds: time.Now().Unix() - 3600}
+
+	depNU, err := getConfigMgmtUsageNodesImp(hourAgo, client)
+	require.NoError(t, err)
+	require.NotEmpty(t, depNU)
 }

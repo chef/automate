@@ -1024,15 +1024,22 @@ func (mr *MockDeployClientStreamerMockRecorder) UpgradeStatus(arg0, arg1 interfa
 
 // Usage mocks base method.
 func (m *MockDeployClientStreamer) Usage(arg0 context.Context, arg1 *deployment.UsageRequest, arg2 ...grpc.CallOption) (*deployment.UsageResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
+	if m.returnError {
+		return nil, errors.New("some error message")
+	} else {
+		return &deployment.UsageResponse{
+			Nodes: []*deployment.NodeUsage{
+				{
+				
+					Id        :   "false", 
+					LastSeen :"false", 
+					LastCcrReceived   :   "false", 
+					CheckinType    : "false", 
+					Metadata : map[string]string{}, 
+				},
+			},
+		}, nil
 	}
-	ret := m.ctrl.Call(m, "Usage", varargs...)
-	ret0, _ := ret[0].(*deployment.UsageResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
 }
 
 // Usage indicates an expected call of Usage.
@@ -1044,15 +1051,21 @@ func (mr *MockDeployClientStreamerMockRecorder) Usage(arg0, arg1 interface{}, ar
 
 // ValidateBackupIntegrity mocks base method.
 func (m *MockDeployClientStreamer) ValidateBackupIntegrity(arg0 context.Context, arg1 *deployment.ValidateBackupIntegrityRequest, arg2 ...grpc.CallOption) (*deployment.ValidateBackupIntegrityResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
+	if m.returnError {
+		return nil, errors.New("some error message")
+	} else {
+		return &deployment.ValidateBackupIntegrityResponse{
+			Snapshots: []*deployment.SnapshotIntegrity{
+				{
+				
+					Id           :timestamppb.New(time.Now()),
+					LastVerified :timestamppb.New(time.Now()),
+					Missing      :[]string{"hello"},
+					Corrupted    : false, 
+				},
+			},
+		}, nil
 	}
-	ret := m.ctrl.Call(m, "ValidateBackupIntegrity", varargs...)
-	ret0, _ := ret[0].(*deployment.ValidateBackupIntegrityResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
 }
 
 // ValidateBackupIntegrity indicates an expected call of ValidateBackupIntegrity.

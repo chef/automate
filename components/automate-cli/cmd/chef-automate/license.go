@@ -329,12 +329,7 @@ func maybeFromFile(maybeToken string) (string, error) {
 	return maybeToken, nil
 }
 
-func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) {
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return nil, err
-	}
-
+func getConfigMgmtUsageNodesImp(hourAgo *tspb.Timestamp, connection *client.DSClient) ([]*api.NodeUsage, error) {
 	usageInfo, err := connection.Usage(context.Background(), &api.UsageRequest{StartTime: hourAgo})
 	if err != nil {
 		return nil, status.Wrap(
@@ -345,6 +340,15 @@ func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) 
 	}
 
 	return usageInfo.Nodes, nil
+}
+
+func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	return getConfigMgmtUsageNodesImp(hourAgo, connection)
 }
 
 func getScanInfo(hourAgo *tspb.Timestamp) ([]*scanNode, error) {
