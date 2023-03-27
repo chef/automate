@@ -3,17 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/mock"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/golang/mock/gomock"
-	"google.golang.org/grpc"
-
-	// components/automate-cli/cmd/chef-automate/mock/mock_deployclientstreamer.go
-
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 )
 
 func NewClientWithPara(dcs deployment.DeployClientStreamer, ca deployment.CertificateAuthorityServiceClient) *client.DSClient {
@@ -65,12 +65,68 @@ func Test_runLicenseStatusCmd(t *testing.T) {
 	connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
 
 	err = runLicenseStatusCmdImp(nil, nil, connection)
-	if err == nil {
-		t.Errorf("Expected an error, but got nil")
-	}
+	require.Error(t, err)
 
 	err = runLicenseStatusCmdImp(nil, nil, connection)
-	if err == nil {
-		t.Errorf("Expected no error, but got %v", err)
-	}
+	require.Error(t, err)
+}
+
+func TestMaybeFromFile(t *testing.T) {
+	t.Run("Reading token data from file", func(t *testing.T) {
+		// Create a temporary file and write some data to it
+		content := "this is a test file"
+		tmpfile, err := ioutil.TempFile("", "example")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(tmpfile.Name()) // clean up
+
+		if _, err := tmpfile.Write([]byte(content)); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := tmpfile.Close(); err != nil {
+			t.Fatal(err)
+		}
+
+		// Call the function with the file path
+		result, err := maybeFromFile(tmpfile.Name())
+		if err != nil {
+			t.Errorf("maybeFromFile(%q) failed with error %q", tmpfile.Name(), err)
+		}
+
+		// Check if the returned result matches the expected output
+		if result != content {
+			t.Errorf("maybeFromFile(%q) = %q, want %q", tmpfile.Name(), result, content)
+		}
+	})
+
+	t.Run("No such file appears on disk", func(t *testing.T) {
+		// Call the function with a non-existent file path
+		result, err := maybeFromFile("non-existent-file.txt")
+		if err != nil {
+			t.Errorf("maybeFromFile(%q) failed with error %q", "non-existent-file.txt", err)
+		}
+
+		// Check if the returned result matches the expected output
+		if result != "non-existent-file.txt" {
+			t.Errorf("maybeFromFile(%q) = %q, want %q", "non-existent-file.txt", result, "non-existent-file.txt")
+		}
+	})
+
+	t.Run("Reading token data from file failed", func(t *testing.T) {
+		// Call the function with a file path that exists but cannot be read
+		result, err := maybeFromFile("/dev/null")
+
+		fmt.Printf("*******: %v**", err)
+		expectedErr := errors.New("Reading token data from file failed")
+		if err.Error() != expectedErr.Error() {
+			t.Errorf("maybeFromFile(%q) failed with error %q, want %q", "/dev/null", err, expectedErr)
+		}
+
+		// Check if the returned result matches the expected output
+		if result != "" {
+			t.Errorf("maybeFromFile(%q) = %q, want %q", "/dev/null", result, "")
+		}
+	})
 }

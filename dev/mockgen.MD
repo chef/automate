@@ -1,4 +1,4 @@
-package mock
+# To generate mock code
 
 // mockgen -destination=components/automate-cli/cmd/chef-automate/mock/mock.go github.com/chef/automate/components/automate-deployment/pkg/client Connection
 // mockgen -destination=components/automate-cli/cmd/chef-automate/mock/mock.go github.com/chef/automate/api/interservice/deployment Connection
