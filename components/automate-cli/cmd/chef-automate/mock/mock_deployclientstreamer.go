@@ -7,12 +7,16 @@ package mock
 import (
 	context "context"
 	"errors"
+	// "fmt"
 	reflect "reflect"
-// "fmt"
+	"time"
+
+	// "fmt"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // MockDeployClientStreamer is a mock of DeployClientStreamer interface.
@@ -547,13 +551,19 @@ func (m *MockDeployClientStreamer) LicenseStatus(arg0 context.Context, arg1 *dep
 	} else {
 		return &deployment.LicenseStatusResponse{
 			Set: true,
+			ExpirationDate: timestamppb.New(time.Now().Add(time.Hour+24)),
 		}, nil
 	}
 }
+// func (mr *MockDeployClientStreamerMockRecorder) LicenseStatus(ctx, req, opts interface{}) *gomock.Call {
+// 	mr.mock.returnError = true
+// 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LicenseStatus", reflect.TypeOf((*MockDeployClientStreamer)(nil).LicenseStatus), ctx, req, opts)
+// }
 
 // LicenseStatus indicates an expected call of LicenseStatus.
 func (mr *MockDeployClientStreamerMockRecorder) LicenseStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	// mr.mock.ctrl.T.Helper()
+	mr.mock.returnError = true
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LicenseStatus", reflect.TypeOf((*MockDeployClientStreamer)(nil).LicenseStatus), varargs...)
 }
