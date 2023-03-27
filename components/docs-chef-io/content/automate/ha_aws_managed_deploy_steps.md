@@ -48,6 +48,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
   echo "region=<AWS-REGION>" >> ~/.aws/credentials
   ```
+
 - Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 - We do not support passphrase for Private Key authentication.
@@ -66,7 +67,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
 
 - PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
 - We currently don't support AD managed users in nodes. We only support local linux users.
-- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Click [here](https://www.petefreitag.com/item/877.cfm) to know more.
+- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges.
 
 {{< /warning >}}
 
@@ -192,10 +193,12 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    chef-automate config patch cs.fqdn.toml --chef_server
   ```
 
-{{< note >}} 
-  - Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
+{{< note >}}
+
+- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
   Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/).
-  - DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command
+- DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command
+
 {{< /note >}}
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
