@@ -165,7 +165,7 @@ type scanNode struct {
 	LastSeen  string `json:"last_seen"`
 }
 
-func NewFun(cmd *cobra.Command, args []string, connection *client.DSClient) error {
+func runLicenseStatusCmdImp(cmd *cobra.Command, args []string, connection *client.DSClient) error {
 	response, err := connection.LicenseStatus(context.Background(), &api.LicenseStatusRequest{})
 	if err != nil {
 		return status.Wrap(
@@ -207,7 +207,7 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	// Information if license is not set
-	return NewFun(cmd, args, connection)
+	return runLicenseStatusCmdImp(cmd, args, connection)
 }
 
 var licenseCmdFlags = struct {

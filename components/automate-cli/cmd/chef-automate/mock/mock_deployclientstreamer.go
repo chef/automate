@@ -8,7 +8,7 @@ import (
 	context "context"
 	"errors"
 	reflect "reflect"
-
+// "fmt"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
@@ -18,6 +18,8 @@ import (
 // MockDeployClientStreamer is a mock of DeployClientStreamer interface.
 type MockDeployClientStreamer struct {
 	ctrl     *gomock.Controller
+	returnError bool
+	licenseStatusFunc func(arg0 context.Context, arg1 *deployment.LicenseStatusRequest, arg2 ...grpc.CallOption) (*deployment.LicenseStatusResponse, error)
 	recorder *MockDeployClientStreamerMockRecorder
 }
 
@@ -37,6 +39,12 @@ func NewMockDeployClientStreamer(ctrl *gomock.Controller) *MockDeployClientStrea
 func (m *MockDeployClientStreamer) EXPECT() *MockDeployClientStreamerMockRecorder {
 	return m.recorder
 }
+
+// SetReturnError sets the value to be returned by LicenseStatus to an error.
+func (m *MockDeployClientStreamer) SetReturnError(returnError bool) {
+	m.returnError = returnError
+}
+
 
 // A1UpgradeStatus mocks base method.
 func (m *MockDeployClientStreamer) A1UpgradeStatus(arg0 context.Context, arg1 *deployment.A1UpgradeStatusRequest, arg2 ...grpc.CallOption) (deployment.Deployment_A1UpgradeStatusClient, error) {
@@ -534,21 +542,18 @@ func (mr *MockDeployClientStreamerMockRecorder) LicenseApply(arg0, arg1 interfac
 
 // LicenseStatus mocks base method.
 func (m *MockDeployClientStreamer) LicenseStatus(arg0 context.Context, arg1 *deployment.LicenseStatusRequest, arg2 ...grpc.CallOption) (*deployment.LicenseStatusResponse, error) {
-	// m.ctrl.T.Helper()
-	// varargs := []interface{}{arg0, arg1}
-	// for _, a := range arg2 {
-	// 	varargs = append(varargs, a)
-	// }
-	// ret := m.ctrl.Call(m, "LicenseStatus", varargs...)
-	// ret0, _ := ret[0].(*deployment.LicenseStatusResponse)
-	// ret1, _ := ret[1].(error)
-	// return ret0, ret1
-	return nil, errors.New("new error")
+	if m.returnError {
+		return nil, errors.New("some error message")
+	} else {
+		return &deployment.LicenseStatusResponse{
+			Set: true,
+		}, nil
+	}
 }
 
 // LicenseStatus indicates an expected call of LicenseStatus.
 func (mr *MockDeployClientStreamerMockRecorder) LicenseStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
+	// mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LicenseStatus", reflect.TypeOf((*MockDeployClientStreamer)(nil).LicenseStatus), varargs...)
 }
