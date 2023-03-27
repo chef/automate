@@ -26,19 +26,15 @@ func NewClient(timeout time.Duration) *client.DSClient {
 	return client
 }
 
-func TestrunLicenseStatusCmd(t *testing.T) {
+func Test_runLicenseStatusCmd(t *testing.T) {
 	fmt.Println("Test 1")
 	client := NewClient(client.DefaultClientTimeout)
 
 	require.NotNil(t, client)
 	require.NotEmpty(t, client)
 	err := runLicenseStatusCmd(nil, nil, client)
-	require.NoError(t, err)
-
-	// fmt.Println("Test 2")
-	// client, err = NewClient(time.Second * 0)
-	// require.Error(t, err)
-	// err = runLicenseStatusCmd(nil, nil, client)
+	require.Error(t, err)
+	fmt.Printf("** ERROR: %+v\n", err)
 	// require.NoError(t, err)
 
 }

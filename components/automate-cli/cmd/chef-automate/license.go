@@ -36,9 +36,9 @@ var licenseCmd = &cobra.Command{
 }
 
 var licenseStatusCmd = &cobra.Command{
-	Use:   "status",
-	Short: "Retrieve Chef Automate license status",
-	// RunE:              runLicenseStatusCmd,
+	Use:               "status",
+	Short:             "Retrieve Chef Automate license status",
+	RunE:              runLicenseStatusCmd,
 	PersistentPreRunE: preLicenseCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.BastionHost,
@@ -165,12 +165,7 @@ type scanNode struct {
 	LastSeen  string `json:"last_seen"`
 }
 
-func runLicenseStatusCmd(cmd *cobra.Command, args []string, connection *client.DSClient) error {
-	// connection, err := client.Connection(client.DefaultClientTimeout)
-	// if err != nil {
-	// 	return nil
-	// }
-
+func NewFun(cmd *cobra.Command, args []string, connection *client.DSClient) error {
 	response, err := connection.LicenseStatus(context.Background(), &api.LicenseStatusRequest{})
 	if err != nil {
 		return status.Wrap(
@@ -203,6 +198,16 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string, connection *client.D
 	// Information if license is not set
 	writer.Print(noLicenseAppliedMsg)
 	return nil
+}
+
+func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return nil
+	}
+
+	// Information if license is not set
+	return NewFun(cmd, args, connection)
 }
 
 var licenseCmdFlags = struct {
