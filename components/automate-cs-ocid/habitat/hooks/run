@@ -14,8 +14,8 @@ export RACK_ENV="production"
 export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-echo "******DATABASE URL VALUE"
-echo $DATABASE_URL
+# echo "******DATABASE URL VALUE"
+# echo $DATABASE_URL
 echo {{cfg.database_url}}
 
 echo "******Check if Ruby is present"
@@ -31,11 +31,7 @@ pwd
 # echo "I am checking DB*****"
 # bin/rails runner 'puts ActiveRecord::Base.connections'
 
-echo "******Creating Database"
-bundle exec bin/rake db:create
 
-echo "******Running Migrations"
-bundle exec bin/rake db:migrate
 
 echo "******Starting Server"
 bundle exec bin/rails server -p 9090
