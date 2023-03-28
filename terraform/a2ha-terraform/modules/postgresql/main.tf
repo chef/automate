@@ -87,7 +87,7 @@ resource "null_resource" "postgresql" {
   provisioner "remote-exec" {
     inline = [
       "chmod 0700 ${var.tmp_path}/pre_mount.sh",
-      "${var.tmp_path}/pre_mount.sh",
+      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/pre_mount.sh",
     ]
   }
 

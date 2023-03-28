@@ -66,4 +66,6 @@ const (
 	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
 	automate-backend-ctl applied --svc=automate-ha-%s
 	`
+
+	SUDO_PASSWORD_CMD = `echo "%s" | sudo -S bash -c "`
 )

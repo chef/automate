@@ -28,7 +28,7 @@ resource "null_resource" "system_hardening" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo -E /bin/bash -x ${var.tmp_path}/hardening.sh",
+      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S bash -ex ${var.tmp_path}/hardening.sh",
     ]
   }
 }

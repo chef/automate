@@ -48,7 +48,6 @@ module AutomateCluster
     default :ssh_user, 'centos'
     default :ssh_port, '22'
     default(:ssh_key_file, '~/.ssh/id_rsa').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
-    default :sudo_password, ''
     default(:workspace_path, '/hab/a2_deploy_workspace').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
     default(:secrets_key_file, '/etc/chef-automate/secrets.key').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
     default(:secrets_store_file, 'secrets.json').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }

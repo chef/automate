@@ -35,7 +35,6 @@ type AwsConfigToml struct {
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
 			SSHPort                     string `toml:"ssh_port"`
-			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`
 			ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip"`
@@ -173,7 +172,6 @@ type ExistingInfraConfigToml struct {
 			SSHUser                     string `toml:"ssh_user,omitempty"`
 			SSHKeyFile                  string `toml:"ssh_key_file,omitempty"`
 			SSHPort                     string `toml:"ssh_port,omitempty"`
-			SudoPassword                string `toml:"sudo_password,omitempty"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management,omitempty"`
 			NewElk                      string `toml:"new_elk,omitempty"`
 			ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip,omitempty"`

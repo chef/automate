@@ -207,6 +207,9 @@ class AutomateClusterSetup < AutomateCluster::Command
     changes_found = true
     plan_output = nil
 
+    # store the terraform secret envs so we can pass them to the deploy command
+    store_secret_envs
+
     # TODO: this feels akward to have a skip-deploy for the deploy command.
     #       we should probably have the above logic live in an `airgap update` command instead.
     return if skip_deploy?
@@ -247,6 +250,14 @@ class AutomateClusterSetup < AutomateCluster::Command
       col["TF_VAR_#{item[0]}"] = item[1]
       col
     end
+  end
+
+  # store the sudo_password from the env variable in the secrets hash
+  def store_secret_envs
+    # Set a new secret
+    secrets.set('sudo_password',  ENV['sudo_password'])
+    # Save the updated secrets store to disk
+    secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
   end
 
   def ask_for_action

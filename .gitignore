@@ -1,5 +1,6 @@
 .tmp
 /nodes/
+test/vendor/
 
 # Habitat
 .secrets
@@ -12,6 +13,9 @@ src
 
 # InSpec
 inspec.lock
+
+# Ruby
+Gemfile.lock
 
 # Terraform
 terraform/.terraform/

@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 	"unicode"
@@ -168,6 +169,9 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	logrus.Debug("Executing command ......")
 	logrus.Debug(remoteCommands)
 
+	// Add sudo password if required
+	remoteCommands = AddSudoPassword(remoteCommands)
+
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -186,10 +190,20 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 		writer.StartSpinner()
 	}
 
-	var output []byte
+	var output string
 	errCh := make(chan error)
 	go func() {
-		output, err = session.CombinedOutput(remoteCommands)
+		outputByte, err := session.CombinedOutput(remoteCommands)
+		output = string(outputByte)
+		if isSudoPasswordEnabled() {
+			if strings.Contains(output, "Sorry, try again.") || strings.Contains(output, "sudo: a password is required") {
+				errCh <- errors.New("sudo password is incorrect")
+				return
+			}
+			// if sudo password is correct then replace password prompt with empty string from output
+			pattern := regexp.MustCompile(`^\[sudo\] password for .+: `)
+			output = pattern.ReplaceAllString(output, "")
+		}
 		if err != nil {
 			errCh <- err
 			return
@@ -205,7 +219,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 			if spinner {
 				writer.StopSpinner()
 			}
-			return string(output), err
+			return output, err
 		}
 	}
 
@@ -214,12 +228,16 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	}
 
 	logrus.Debug("Execution of command done......")
-	return string(output), nil
+	return output, nil
 }
 
 func (s *SSHUtilImpl) connectAndExecuteCommandOnRemoteSteamOutput(remoteCommands string) (string, error) {
 	logrus.Debug("Executing command ......")
 	logrus.Debug(remoteCommands)
+
+	// Add sudo password if required
+	remoteCommands = AddSudoPassword(remoteCommands)
+
 	conn, err := s.getConnection()
 	if err != nil {
 		return "", err
@@ -369,4 +387,23 @@ func showSpinner(ch chan string) {
 			writer.StopSpinner()
 		}
 	}
+}
+
+// AddSudoPassword will add sudo password to the remote commands
+func AddSudoPassword(remoteCommands string) string {
+	if isSudoPasswordEnabled() {
+		remoteCommands = fmt.Sprintf(SUDO_PASSWORD_CMD, getSudoPassword()) + remoteCommands + `"`
+	}
+	return remoteCommands
+}
+
+// isSudoPasswordEnabled will check if sudo password is enabled
+func isSudoPasswordEnabled() bool {
+	return len(getSudoPassword()) > 0
+}
+
+// getSudoPassword will return sudo password from env variable
+func getSudoPassword() string {
+	sudoPassword := os.Getenv(SUDO_PASSWORD)
+	return sudoPassword
 }
