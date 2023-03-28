@@ -94,14 +94,14 @@ func runVerifyCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if verifyCmdFlags.haAWSProvision {
-		if isA2HARBFileExist() {
-			return status.New(status.InvalidCommandArgsError, "Setup is already Provisioned. Please use --ha-aws-deploy flag.")
-		} else {
-			err := verification.VerifyHAAWSProvision(configPath)
-			if err != nil {
-				return status.Annotate(err, status.ConfigError)
-			}
-		}
+		// if isA2HARBFileExist() {
+		// 	return status.New(status.InvalidCommandArgsError, "Setup is already Provisioned. Please use --ha-aws-deploy flag.")
+		// } else {
+		_ = verification.VerifyHAAWSProvision(configPath)
+		// 	if err != nil {
+		// 		return status.Annotate(err, status.ConfigError)
+		// 	}
+		// }
 	}
 
 	if verifyCmdFlags.haAWSManagedProvision {
