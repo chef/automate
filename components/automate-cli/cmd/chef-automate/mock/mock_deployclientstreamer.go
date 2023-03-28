@@ -11,7 +11,7 @@ import (
 	"time"
 
 	deployment "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/automate-cli/pkg/status"
+	grpc_status "google.golang.org/grpc/status"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -528,11 +528,14 @@ func (mr *MockDeployClientStreamerMockRecorder) IsValidUpgrade(arg0, arg1 interf
 
 // LicenseApply mocks base method.
 func (m *MockDeployClientStreamer) LicenseApply(arg0 context.Context, arg1 *deployment.LicenseApplyRequest, arg2 ...grpc.CallOption) (*deployment.LicenseApplyResponse, error) {
+	
 	if m.returnError && m.errorMock !=nil{
 		if m.errorMock.Error() == "data_loss"{
-			return nil,  status.Errorf(int(codes.DataLoss),"")
+			return nil,  grpc_status.Error(codes.DataLoss, "Data loss error occurred")
 		}
-		
+		if m.errorMock.Error() == "Unauthenticated"{
+			return nil,  grpc_status.Error(codes.Unauthenticated, "Unauthenticated error occurred")
+		}
 		return &deployment.LicenseApplyResponse{
 			Updated: true,
 			Message: "dup",

@@ -204,6 +204,25 @@ func Test_runLicenseApplyCmdImp(t *testing.T) {
 
 		err := runLicenseApplyCmdImp(nil, []string{"file1.txt"}, connection)
 		require.Error(t, err)
-		require.Equal(t, err.Error(), "The license does not appear to be complete. Please check and try again.")
+		require.Equal(t, err.Error(), "The license does not appear to be complete. Please check and try again.: rpc error: code = DataLoss desc = Data loss error occurred")
+	})
+
+	t.Run("Test 3. The license cannot be verified by Chef Automate", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
+		mockDeployClientStreamer.SetReturnError(true, errors.New("Unauthenticated"))
+
+		mockDeployClientStreamer.EXPECT().
+			LicenseApply(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
+
+		caaMock := &mock.MockCertificateAuthorityServiceClient{}
+		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
+
+		err := runLicenseApplyCmdImp(nil, []string{"file1.txt"}, connection)
+		require.Error(t, err)
+		require.Equal(t, err.Error(), "The license cannot be verified by Chef Automate. Please contact support@chef.io for assistance.: rpc error: code = Unauthenticated desc = Unauthenticated error occurred")
+
 	})
 }
