@@ -226,3 +226,37 @@ func Test_runLicenseApplyCmdImp(t *testing.T) {
 
 	})
 }
+
+func TestConvertStringToTime(t *testing.T) {
+	testCases := []struct {
+		name    string
+		input   string
+		want    time.Time
+		wantErr bool
+	}{
+		{
+			name:    "valid date",
+			input:   "2022-06-30",
+			want:    time.Date(2022, 6, 30, 0, 0, 0, 0, time.UTC),
+			wantErr: false,
+		},
+		{
+			name:    "invalid date",
+			input:   "not a date",
+			want:    time.Time{},
+			wantErr: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := convertStringToTime(tc.input)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if !got.Equal(tc.want) {
+				t.Errorf("got %v want %v", got, tc.want)
+			}
+		})
+	}
+}
