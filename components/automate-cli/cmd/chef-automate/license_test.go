@@ -188,4 +188,22 @@ func Test_runLicenseApplyCmdImp(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, err.Error(), "Request to apply license failed: error occurred!")
 	})
+
+	t.Run("Test 3. The license does not appear to be complete", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
+		mockDeployClientStreamer.SetReturnError(true, errors.New("data_loss"))
+
+		mockDeployClientStreamer.EXPECT().
+			LicenseApply(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
+
+		caaMock := &mock.MockCertificateAuthorityServiceClient{}
+		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
+
+		err := runLicenseApplyCmdImp(nil, []string{"file1.txt"}, connection)
+		require.Error(t, err)
+		require.Equal(t, err.Error(), "The license does not appear to be complete. Please check and try again.")
+	})
 }

@@ -11,8 +11,10 @@ import (
 	"time"
 
 	deployment "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -527,6 +529,10 @@ func (mr *MockDeployClientStreamerMockRecorder) IsValidUpgrade(arg0, arg1 interf
 // LicenseApply mocks base method.
 func (m *MockDeployClientStreamer) LicenseApply(arg0 context.Context, arg1 *deployment.LicenseApplyRequest, arg2 ...grpc.CallOption) (*deployment.LicenseApplyResponse, error) {
 	if m.returnError && m.errorMock !=nil{
+		if m.errorMock.Error() == "data_loss"{
+			return nil,  status.Errorf(int(codes.DataLoss),"")
+		}
+		
 		return &deployment.LicenseApplyResponse{
 			Updated: true,
 			Message: "dup",
