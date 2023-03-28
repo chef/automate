@@ -214,16 +214,16 @@ var licenseCmdFlags = struct {
 	forceSet bool
 }{}
 
-func runLicenseApplyCmd(cmd *cobra.Command, args []string) error {
+func runLicenseApplyCmdImp(cmd *cobra.Command, args []string, connection *client.DSClient) error {
 	licenseToken, err := maybeFromFile(args[0])
 	if err != nil {
 		return err
 	}
 
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return err
-	}
+	// connection, err := client.Connection(client.DefaultClientTimeout)
+	// if err != nil {
+	// 	return err
+	// }
 
 	req := &api.LicenseApplyRequest{License: licenseToken, Force: licenseCmdFlags.forceSet}
 	response, err := connection.LicenseApply(context.Background(), req)
@@ -263,6 +263,15 @@ func runLicenseApplyCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func runLicenseApplyCmd(cmd *cobra.Command, args []string) error {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return err
+	}
+
+	return runLicenseApplyCmdImp(cmd, args, connection)
 }
 
 func runLicenseUsageCmd(cmd *cobra.Command, args []string) error {
@@ -315,13 +324,13 @@ func maybeFromFile(maybeToken string) (string, error) {
 	if err == nil {
 		writer.Printf("Reading token data from file: %s\n", maybeToken)
 		data, err := ioutil.ReadFile(maybeToken)
-			if err != nil {
-				return "", status.Wrap(
-					err,
-					status.FileAccessError,
-					"Reading token data from file failed",
-				)
-			}
+		if err != nil {
+			return "", status.Wrap(
+				err,
+				status.FileAccessError,
+				"Reading token data from file failed",
+			)
+		}
 		strippedData := strings.TrimSpace(string(data))
 		return strippedData, nil
 	}

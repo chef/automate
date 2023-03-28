@@ -173,3 +173,7 @@ func Test_getConfigMgmtUsageNodesImp(t *testing.T) {
 	})
 
 }
+
+func Test_runLicenseApplyCmdImp(t *testing.T) {
+
+}
