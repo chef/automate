@@ -1,6 +1,9 @@
 package verification
 
-import sc "github.com/chef/automate/api/config/deployment"
+import (
+	sc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/lib/reporting"
+)
 
 func validateAWSProvisionConfig(config *HAAwsConfigToml) {
 
@@ -68,8 +71,15 @@ func validateNodeReachability(username string, keyfile string, ipaddress string)
 
 }
 
-func validateCertificateExpiry(certContents string) {
-
+func validateCertificateExpiry(certContents string) reporting.Info {
+	return reporting.Info{
+		Hostip:    "172.02.0.01",
+		Parameter: "Certificate",
+		Status:    "Success",
+		StatusMessage: &reporting.StatusMessage{
+			MainMessage: "Certificate A validated successfully",
+		},
+	}
 	/* Write the checks to validate the expiry date of the certificate */
 
 }
