@@ -5,31 +5,25 @@ usage()
 cat << EOF
 usage: $0 options
 
-This script gets the count of the chef server objects.
+This script gets the count of the chef server objects using the knife commands(via chef API). The chef server objects are:
+1. Organisations
+2. Users
+3. Nodes
+4. Environemnts
+5. Cookbooks
+6. Roles
+7. Policy
+8. Policy Groups
+9. Clients
+
+All the counts are saved in a toml file for validation.
 
 OPTIONS:
    -h      Shows the help message
-   -S      Chef Server url (Eg: https://chef-server.example.com)
+   -S      Chef Server url (Eg: https://chef-server.example.com).
    -K      Path to the pivotal user key
-   -F      Output file path
+   -F      Output file path.
 EOF
-}
-
-check_binary_install_jq() {
-  if ! which "$1" > /dev/null; then
-    # Using a subshell to redirect output to stderr. It's cleaner this way and will play nice with other redirects.
-    echo "jq is required to execute the script. Intalling it on this machine now.."
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        sudo apt-get install jq
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        brew install jq
-    else
-        # Exit with a nonzero code so that the caller knows the script failed.
-        echo "Cann't installed jq. Please install it manually."
-        exit 1
-    fi
-  fi
-  
 }
 
 check_binary() {
@@ -90,7 +84,16 @@ EOF
 )"
 
 #Checking if binary exists for jq otherwise installing it on the machine
-check_binary_install_jq "jq"
+check_binary "jq" "You will need jq to run this script.
+Install it using your package manager. 
+For homebrew:
+brew install jq
+For linux/Ubuntu:
+sudo apt-get install jq
+For Debian:
+sudo apt install jq -y
+EOF
+)"
 
 FLAG_VALUE="--key $key_path -u pivotal --config-option ssl_verify_mode=verify_none --config-option verify_api_cert=false"
 
