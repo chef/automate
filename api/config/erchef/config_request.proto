@@ -69,6 +69,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value s3_url_ttl = 9;
 				google.protobuf.StringValue s3_bucket_name = 10;
 				google.protobuf.BoolValue s3_enabled = 11;
+				google.protobuf.StringValue s3_external_url = 12;
 			}
 
 			message Indexing {
