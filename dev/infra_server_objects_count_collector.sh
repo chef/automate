@@ -58,9 +58,6 @@ check_binary() {
     esac
   done
 
-if [ -z "$chef_server_url" ]; then
-  chef_server_url="https://localhost:10200/"  
-fi
 
 if [ -z "$key_path" ]; then
   echo "Missing Pivotal Key Path " >&2
@@ -94,14 +91,20 @@ sudo apt install jq -y
 EOF
 )"
 
+if [ -z "$chef_server_url" ]; then
 FLAG_VALUE="--key $key_path -u pivotal --config-option ssl_verify_mode=verify_none --config-option verify_api_cert=false"
+else 
+ FLAG_VALUE="--key $key_path -u pivotal --config-option ssl_verify_mode=verify_none --config-option verify_api_cert=false -s $chef_server_url"
+fi
 
+
+#### Flow if the url is needed ####
 echo "Getting count of the organizations"
-orgs=($(knife raw -s $chef_server_url -m GET /organizations/ $FLAG_VALUE | jq --sort-keys | jq -r 'keys_unsorted[]'))
+orgs=($(knife raw -m GET /organizations/ $FLAG_VALUE | jq --sort-keys | jq -r 'keys_unsorted[]'))
 total_orgs=${#orgs[@]}
 
 echo "Getting count of the users"
-total_users=($(knife raw -s $chef_server_url -m GET /users/ $FLAG_VALUE | jq length))
+total_users=($(knife raw -m GET /users/ $FLAG_VALUE | jq length))
 
 cat << EOF > "$file_name"
 total_orgs_count=$total_orgs
@@ -119,7 +122,7 @@ do
   do
      REQ_URL="/organizations/${org}/$field/"
      echo "Fetching the count of $field"
-     count=($(knife raw -s $chef_server_url -m GET $REQ_URL $FLAG_VALUE | jq length))
+     count=($(knife raw -m GET $REQ_URL $FLAG_VALUE | jq length))
      key=$field"_count"
      echo "$key"="$count" >> "$file_name"
    done
