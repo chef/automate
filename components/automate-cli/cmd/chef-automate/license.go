@@ -315,13 +315,13 @@ func maybeFromFile(maybeToken string) (string, error) {
 	if err == nil {
 		writer.Printf("Reading token data from file: %s\n", maybeToken)
 		data, err := ioutil.ReadFile(maybeToken)
-		if err != nil {
-			return "", status.Wrap(
-				err,
-				status.FileAccessError,
-				"Reading token data from file failed",
-			)
-		}
+			if err != nil {
+				return "", status.Wrap(
+					err,
+					status.FileAccessError,
+					"Reading token data from file failed",
+				)
+			}
 		strippedData := strings.TrimSpace(string(data))
 		return strippedData, nil
 	}

@@ -555,10 +555,6 @@ func (m *MockDeployClientStreamer) LicenseStatus(arg0 context.Context, arg1 *dep
 		}, nil
 	}
 }
-// func (mr *MockDeployClientStreamerMockRecorder) LicenseStatus(ctx, req, opts interface{}) *gomock.Call {
-// 	mr.mock.returnError = true
-// 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LicenseStatus", reflect.TypeOf((*MockDeployClientStreamer)(nil).LicenseStatus), ctx, req, opts)
-// }
 
 // LicenseStatus indicates an expected call of LicenseStatus.
 func (mr *MockDeployClientStreamerMockRecorder) LicenseStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
@@ -1044,7 +1040,7 @@ func (m *MockDeployClientStreamer) Usage(arg0 context.Context, arg1 *deployment.
 
 // Usage indicates an expected call of Usage.
 func (mr *MockDeployClientStreamerMockRecorder) Usage(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
+	// mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Usage", reflect.TypeOf((*MockDeployClientStreamer)(nil).Usage), varargs...)
 }
