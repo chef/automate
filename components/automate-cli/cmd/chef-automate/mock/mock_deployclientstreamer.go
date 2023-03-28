@@ -526,15 +526,23 @@ func (mr *MockDeployClientStreamerMockRecorder) IsValidUpgrade(arg0, arg1 interf
 
 // LicenseApply mocks base method.
 func (m *MockDeployClientStreamer) LicenseApply(arg0 context.Context, arg1 *deployment.LicenseApplyRequest, arg2 ...grpc.CallOption) (*deployment.LicenseApplyResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
+	if m.returnError && m.errorMock !=nil{
+		return &deployment.LicenseApplyResponse{
+			Updated: true,
+			Message: "dup",
+			Duplicate: true,
+		}, nil
+	} 
+	
+	if m.returnError && m.errorMock == nil{
+		return nil, errors.New("error occurred!") 
 	}
-	ret := m.ctrl.Call(m, "LicenseApply", varargs...)
-	ret0, _ := ret[0].(*deployment.LicenseApplyResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+
+	return &deployment.LicenseApplyResponse{
+		Updated: true,
+			Message: "dup",
+			Duplicate: true,
+	}, nil
 }
 
 // LicenseApply indicates an expected call of LicenseApply.

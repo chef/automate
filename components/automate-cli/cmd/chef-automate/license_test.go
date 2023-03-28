@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -27,8 +26,6 @@ func NewClientWithPara(dcs deployment.DeployClientStreamer, ca deployment.Certif
 
 func Test_runLicenseStatusCmd(t *testing.T) {
 	t.Run("Test 1. PASSED", func(t *testing.T) {
-		fmt.Println("")
-		// Create mock implementations of the embedded interfaces
 		deployMock := &mock.MockDeployClientStreamer{}
 		caMock := &mock.MockCertificateAuthorityServiceClient{}
 
@@ -45,7 +42,6 @@ func Test_runLicenseStatusCmd(t *testing.T) {
 		defer ctrl.Finish()
 		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
 
-		// First call to LicenseStatus should return an error.
 		mockDeployClientStreamer.EXPECT().
 			LicenseStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
 
@@ -62,7 +58,6 @@ func Test_runLicenseStatusCmd(t *testing.T) {
 		defer ctrl.Finish()
 		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
 
-		// First call to LicenseStatus should return an error.
 		mockDeployClientStreamer.EXPECT().
 			LicenseStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
 
@@ -83,33 +78,24 @@ func TestMaybeFromFile(t *testing.T) {
 		// Create a temporary file and write some data to it
 		content := "this is a test file"
 		tmpfile, err := ioutil.TempFile("", "example")
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		defer os.Remove(tmpfile.Name()) // clean up
 
-		if _, err := tmpfile.Write([]byte(content)); err != nil {
-			t.Fatal(err)
-		}
+		n, err := tmpfile.Write([]byte(content))
+		require.NoError(t, err)
+		require.NotZero(t, n)
 
-		if err := tmpfile.Close(); err != nil {
-			t.Fatal(err)
-		}
+		err = tmpfile.Close()
+		require.NoError(t, err)
 
 		// Call the function with the file path
 		result, err := maybeFromFile(tmpfile.Name())
-		if err != nil {
-			t.Errorf("maybeFromFile(%q) failed with error %q", tmpfile.Name(), err)
-		}
-
-		// Check if the returned result matches the expected output
-		if result != content {
-			t.Errorf("maybeFromFile(%q) = %q, want %q", tmpfile.Name(), result, content)
-		}
+		require.NoError(t, err)
+		require.Equal(t, content, result)
 	})
 
 	t.Run("No such file appears on disk", func(t *testing.T) {
-		// Call the function with a non-existent file path
 		result, err := maybeFromFile("non-existent-file.txt")
 		if err != nil {
 			t.Errorf("maybeFromFile(%q) failed with error %q", "non-existent-file.txt", err)
@@ -160,7 +146,6 @@ func Test_getConfigMgmtUsageNodesImp(t *testing.T) {
 		defer ctrl.Finish()
 		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
 		mockDeployClientStreamer.SetReturnError(true, nil)
-		// First call to LicenseStatus should return an error.
 		mockDeployClientStreamer.EXPECT().
 			Usage(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
 
@@ -175,5 +160,32 @@ func Test_getConfigMgmtUsageNodesImp(t *testing.T) {
 }
 
 func Test_runLicenseApplyCmdImp(t *testing.T) {
+	t.Run("Test 1. pass scenario", func(t *testing.T) {
+		mockDeployClientStreamer := &mock.MockDeployClientStreamer{}
 
+		caaMock := &mock.MockCertificateAuthorityServiceClient{}
+
+		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
+
+		err := runLicenseApplyCmdImp(nil, []string{"file1.txt"}, connection)
+		require.NoError(t, err)
+	})
+
+	t.Run("Test 2. Request to apply license failed", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
+		mockDeployClientStreamer.SetReturnError(true, nil)
+
+		mockDeployClientStreamer.EXPECT().
+			LicenseApply(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
+
+		caaMock := &mock.MockCertificateAuthorityServiceClient{}
+		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
+
+		err := runLicenseApplyCmdImp(nil, []string{"file1.txt"}, connection)
+		require.Error(t, err)
+		require.Equal(t, err.Error(), "Request to apply license failed: error occurred!")
+	})
 }
