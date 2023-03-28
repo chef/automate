@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,11 +15,15 @@ import (
 
 func TestMiddleware(t *testing.T) {
 
-	reportChan := make(chan reporting.VerfictionReport)
+	reportChan := make(chan reporting.VerfictionReport, 10)
 	var nodeInfoMap = make(map[string][]reporting.Info)
-	wg := &sync.WaitGroup{}
+	doneProducer1 := make(chan bool, 1)
+	doneProducer2 := make(chan bool, 1)
+	doneProducer3 := make(chan bool, 1)
 
-	wg.Add(2)
+	done := make(chan bool, 1)
+
+	//wg.Add(2)
 	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 	tb := make(map[string]*reporting.Table)
 	tb["AutomateStatusTable"] = &reporting.Table{
@@ -58,18 +61,22 @@ func TestMiddleware(t *testing.T) {
 
 	report := reporting.NewReportingModule(wr, time.Second, tb)
 
-	go chefserver(reportChan, wg)
-	go automate(reportChan, wg)
+	go reporting.VerfictionReports(reportChan, report, nodeInfoMap, done)
 
-	go reporting.VerfictionReports(reportChan, report, nodeInfoMap)
-	wg.Wait()
+	go chefserver(reportChan, doneProducer1)
+	go automate(reportChan, doneProducer2)
+	go opensearch(reportChan, doneProducer3)
 
-	//close(reportChan)
-	reporting.PrintStatusTable(report, nodeInfoMap)
+	<-doneProducer1
+	<-doneProducer2
+	<-doneProducer3
+	close(reportChan)
+	if <-done {
+		fmt.Println("Main Done")
+	}
 }
 
-func automate(reportChan chan reporting.VerfictionReport, wg *sync.WaitGroup) {
-	defer wg.Done()
+func automate(reportChan chan reporting.VerfictionReport, done chan bool) {
 
 	// Read JSON file
 	data, err := ioutil.ReadFile("data.json")
@@ -93,10 +100,36 @@ func automate(reportChan chan reporting.VerfictionReport, wg *sync.WaitGroup) {
 		}
 		reportChan <- myReport
 	}
+	done <- true
 }
 
-func chefserver(reportChan chan reporting.VerfictionReport, wg *sync.WaitGroup) {
-	defer wg.Done()
+func opensearch(reportChan chan reporting.VerfictionReport, done chan bool) {
+
+	// Read JSON file
+	data, err := ioutil.ReadFile("data.json")
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+
+	var dataStruct []reporting.Info
+
+	err = json.Unmarshal(data, &dataStruct)
+	if err != nil {
+		fmt.Println("Error unmarshaling JSON:", err)
+		return
+	}
+	for _, value := range dataStruct {
+		myReport := reporting.VerfictionReport{
+			TableKey:     "OpenSearch",
+			Report:       value,
+			TotalReports: 4,
+		}
+		reportChan <- myReport
+	}
+	done <- true
+}
+func chefserver(reportChan chan reporting.VerfictionReport, done chan bool) {
 	// Read JSON file
 	data, err := ioutil.ReadFile("data.json")
 	if err != nil {
@@ -119,7 +152,7 @@ func chefserver(reportChan chan reporting.VerfictionReport, wg *sync.WaitGroup) 
 		}
 		reportChan <- myReport
 	}
-
+	done <- true
 }
 
 // package main
@@ -226,4 +259,15 @@ func chefserver(reportChan chan reporting.VerfictionReport, wg *sync.WaitGroup) 
 // 		ColConfig: tb.ColConfig,
 // 	}
 // 	report.SetTables(table)
+// }
+// var nodeinfo []Info
+// if _, ok := nodeInfoMap[node]; ok {
+// 	nodeinfo := nodeInfoMap[node]
+// 	nodeinfo = append(nodeinfo, info)
+// 	nodeInfoMap[node] = nodeinfo
+// 	createTables(reporting, nodeInfoMap)
+// } else {
+// 	nodeinfo = append(nodeinfo, info)
+// 	nodeInfoMap[node] = nodeinfo
+// 	createTables(reporting, nodeInfoMap)
 // }
