@@ -4,7 +4,6 @@ usage()
 {
 cat << EOF
 usage: $0 options
-
 This script gets the count of the chef server objects using the knife commands(via chef API). The chef server objects are:
 1. Organisations
 2. Users
@@ -15,9 +14,7 @@ This script gets the count of the chef server objects using the knife commands(v
 7. Policy
 8. Policy Groups
 9. Clients
-
 All the counts are saved in a toml file for validation.
-
 OPTIONS:
    -h | --help    Shows the help message
    -S             Chef Server url (Eg: https://chef-server.example.com).
@@ -100,11 +97,11 @@ fi
 
 #### Flow if the url is needed ####
 echo "Getting count of the organizations"
-orgs=($(knife raw -m GET /organizations/ $FLAG_VALUE | jq --sort-keys | jq -r 'keys_unsorted[]'))
+orgs=($(knife raw -m GET /organizations/ $FLAG_VALUE 2>&1 | grep -v "WARNING: No knife configuration file found." | jq --sort-keys | jq -r 'keys_unsorted[]'))
 total_orgs=${#orgs[@]}
 
 echo "Getting count of the users"
-total_users=($(knife raw -m GET /users/ $FLAG_VALUE | jq length))
+total_users=($(knife raw -m GET /users/ $FLAG_VALUE 2>&1 | grep -v "WARNING: No knife configuration file found." | jq length))
 
 cat << EOF > "$file_name"
 total_orgs_count=$total_orgs
@@ -122,7 +119,7 @@ do
   do
      REQ_URL="/organizations/${org}/$field/"
      echo "Fetching the count of $field"
-     count=($(knife raw -m GET $REQ_URL $FLAG_VALUE | jq length))
+     count=($(knife raw -m GET $REQ_URL $FLAG_VALUE 2>&1 | grep -v "WARNING: No knife configuration file found." | jq length))
      key=$field"_count"
      echo "$key"="$count" >> "$file_name"
    done
