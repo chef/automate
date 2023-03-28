@@ -15,8 +15,7 @@ type Reporting interface {
 	SetTable(key string, tables *Table)
 	AppendSpecialCharater(int, string) string
 	ChangeColour(fgColor string, msg string) string
-	GenerateTableOutput(tb *Table) string
-	PrintTableOutput(tb string)
+	GenerateTableOutputAndPrint(tb *Table)
 	StartSpinnerForService()
 	StopSpinnerForService(symbol string, service string)
 }
@@ -88,17 +87,12 @@ func (r *ReportingModule) ChangeColour(fgColor string, msg string) string {
 	}
 }
 
-func (r *ReportingModule) GenerateTableOutput(tb *Table) string {
+func (r *ReportingModule) GenerateTableOutputAndPrint(tb *Table) {
 	tbWriter := table.NewWriter()
 	tbWriter.SetColumnConfigs(tb.ColConfig)
 	tbWriter.AppendHeader(tb.Header)
 	tbWriter.AppendRows(tb.Rows)
-	tbWriter.AppendFooter(tb.Footer)
-	return tbWriter.Render()
-}
-
-func (r *ReportingModule) PrintTableOutput(tb string) {
-	r.writer.Println(tb)
+	r.writer.Println(tbWriter.Render())
 }
 
 func (r *ReportingModule) StartSpinnerForService() {

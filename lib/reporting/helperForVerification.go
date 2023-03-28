@@ -3,7 +3,9 @@ package reporting
 import (
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/jedib0t/go-pretty/table"
 )
 
@@ -12,8 +14,6 @@ type VerfictionReport struct {
 	Report       Info
 	TotalReports int
 }
-
-var NodeInfoMap = make(map[string][]Info)
 
 type Info struct {
 	Hostip        string         `json:"hostip,omitempty"`
@@ -28,24 +28,75 @@ type StatusMessage struct {
 	ToResolve   []string `json:"toResolve,omitempty"`
 }
 
-var SummaryMap map[string]SummaryInfo
-
 type SummaryInfo struct {
 	SuccessfulCount int
 	FailedCount     int
 	ToResolve       []string
 }
 
-func VerfictionReports(reportChan chan VerfictionReport, reporting Reporting, nodeInfoMap map[string][]Info) {
+type NodesInTable struct {
+	automate   bool
+	chefServer bool
+	postgres   bool
+	opensearch bool
+}
 
-	//var report VerfictionReport
+func ConstructTable(wr *cli.Writer, nodes NodesInTable) (Reporting, map[string][]Info) {
+	var nodeInfoMap = make(map[string][]Info)
+	// wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+	tb := make(map[string]*Table)
+	if nodes.automate {
+		tb["AutomateStatusTable"] = &Table{
+			Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+			ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+		}
+		tb["AutomateSummaryTable"] = &Table{
+			Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+			ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+		}
+	}
+	if nodes.chefServer {
+		tb["ChefServerStatusTable"] = &Table{
+			Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+			ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+		}
+		tb["ChefServerSummaryTable"] = &Table{
+			Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+			ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+		}
+	}
+	if nodes.postgres {
+		tb["PostgresStatusTable"] = &Table{
+			Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+			ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+		}
+		tb["PostgresSummaryTable"] = &Table{
+			Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+			ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+		}
+	}
+	if nodes.opensearch {
+		tb["OpensearchStatusTable"] = &Table{
+			Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+			ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+		}
+		tb["OpensearchSummaryTable"] = &Table{
+			Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+			ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+		}
+	}
+	report := NewReportingModule(wr, time.Second, tb)
+	return report, nodeInfoMap
+}
+
+func VerfictionReports(reportChan chan VerfictionReport, reporting Reporting, nodeInfoMap map[string][]Info, done chan bool) {
 	for n := range reportChan {
 		report := n
 		info := report.Report
 		//total := report.TotalReports
 		node := report.TableKey
+
 		var nodeinfo []Info
-		fmt.Println("Line 46:", info)
 		if _, ok := nodeInfoMap[node]; ok {
 			nodeinfo := nodeInfoMap[node]
 			nodeinfo = append(nodeinfo, info)
@@ -56,18 +107,27 @@ func VerfictionReports(reportChan chan VerfictionReport, reporting Reporting, no
 			nodeInfoMap[node] = nodeinfo
 			createTables(reporting, nodeInfoMap)
 		}
-		PrintStatusTable(reporting, nodeInfoMap)
 	}
 
+	PrintStatusTable(reporting, nodeInfoMap)
+	done <- true
 }
 
 func PrintStatusTable(reporting Reporting, nodeInfo map[string][]Info) {
+	var summaryTables = make(map[string]*Table)
 	for key, _ := range nodeInfo {
 		fmt.Println(key)
 		tb := reporting.GetTable(key + "StatusTable")
 		tb1 := reporting.GetTable(key + "SummaryTable")
-		fmt.Println(reporting.GenerateTableOutput(tb))
-		fmt.Println(reporting.GenerateTableOutput(tb1))
+		summaryTables[key] = tb1
+		reporting.GenerateTableOutputAndPrint(tb)
+		fmt.Print("\n")
+	}
+
+	for key, value := range summaryTables {
+		fmt.Println("SUMMARY : ", key)
+		reporting.GenerateTableOutputAndPrint(value)
+		fmt.Print("\n")
 	}
 }
 func createTables(reporting Reporting, nodeInfo map[string][]Info) {
