@@ -59,8 +59,13 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
     sudo chef-automate stop
     ```
 
-    Rename /hab dir to something else like /hab-old.
-    Remove /bin/chef-automate.
+    Rename `/hab` dir to something else like `/hab-old`.
+ 
+    Remove the following files 
+    * `/bin/chef-automate`
+    * `/bin/hab`
+    * `/bin/hab-launch`
+    * `/bin/hab-sup`
 
 1. Unload services from each of the Postgresql Nodes:
 
@@ -188,7 +193,7 @@ sudo chef-automate bootstrap bundle unpack bootstrap.abb
 
 ## Troubleshoot
 
-1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA cli `chef-automate cleanup --onprem-deployment` and then remove /bin/chef-automate from all frontend nodes, now try the installation again.
+1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA cli `chef-automate cleanup --onprem-deployment` and then remove `/bin/chef-automate` from all frontend nodes, now try the installation again.
 
 1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
 2. While restoring the backup if an error related to backup directory occurs like 
