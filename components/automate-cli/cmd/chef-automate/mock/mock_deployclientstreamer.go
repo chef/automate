@@ -7,11 +7,9 @@ package mock
 import (
 	context "context"
 	"errors"
-	// "fmt"
 	reflect "reflect"
 	"time"
 
-	// "fmt"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
@@ -23,6 +21,7 @@ import (
 type MockDeployClientStreamer struct {
 	ctrl     *gomock.Controller
 	returnError bool
+	errorMock error
 	licenseStatusFunc func(arg0 context.Context, arg1 *deployment.LicenseStatusRequest, arg2 ...grpc.CallOption) (*deployment.LicenseStatusResponse, error)
 	recorder *MockDeployClientStreamerMockRecorder
 }
@@ -45,8 +44,9 @@ func (m *MockDeployClientStreamer) EXPECT() *MockDeployClientStreamerMockRecorde
 }
 
 // SetReturnError sets the value to be returned by LicenseStatus to an error.
-func (m *MockDeployClientStreamer) SetReturnError(returnError bool) {
+func (m *MockDeployClientStreamer) SetReturnError(returnError bool, err error) {
 	m.returnError = returnError
+	m.errorMock = err
 }
 
 
@@ -546,14 +546,21 @@ func (mr *MockDeployClientStreamerMockRecorder) LicenseApply(arg0, arg1 interfac
 
 // LicenseStatus mocks base method.
 func (m *MockDeployClientStreamer) LicenseStatus(arg0 context.Context, arg1 *deployment.LicenseStatusRequest, arg2 ...grpc.CallOption) (*deployment.LicenseStatusResponse, error) {
-	if m.returnError {
-		return nil, errors.New("some error message")
-	} else {
+	if m.returnError && m.errorMock !=nil{
 		return &deployment.LicenseStatusResponse{
 			Set: true,
-			ExpirationDate: timestamppb.New(time.Now().Add(time.Hour+24)),
+			ExpirationDate: timestamppb.New(time.Now().Add(-24 * time.Hour)),
 		}, nil
+	} 
+	
+	if m.returnError && m.errorMock == nil{
+		return nil, errors.New("error occurred!") 
 	}
+
+	return &deployment.LicenseStatusResponse{
+		Set: true,
+		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour+24)),
+	}, nil
 }
 
 // LicenseStatus indicates an expected call of LicenseStatus.

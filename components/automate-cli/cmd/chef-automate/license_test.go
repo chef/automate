@@ -26,41 +26,56 @@ func NewClientWithPara(dcs deployment.DeployClientStreamer, ca deployment.Certif
 }
 
 func Test_runLicenseStatusCmd(t *testing.T) {
-	fmt.Println("Test 1. PASSED ")
-	// Create mock implementations of the embedded interfaces
-	deployMock := &mock.MockDeployClientStreamer{}
-	caMock := &mock.MockCertificateAuthorityServiceClient{}
+	t.Run("Test 1. PASSED", func(t *testing.T) {
+		fmt.Println("")
+		// Create mock implementations of the embedded interfaces
+		deployMock := &mock.MockDeployClientStreamer{}
+		caMock := &mock.MockCertificateAuthorityServiceClient{}
 
-	client := NewClientWithPara(deployMock, caMock)
+		client := NewClientWithPara(deployMock, caMock)
 
-	require.NotNil(t, client)
-	require.NotEmpty(t, client)
-	err := runLicenseStatusCmdImp(nil, nil, client)
-	require.NoError(t, err)
+		require.NotNil(t, client)
+		require.NotEmpty(t, client)
+		err := runLicenseStatusCmdImp(nil, nil, client)
+		require.NoError(t, err)
+	})
 
-	fmt.Println("Test 2, failed")
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
+	t.Run("Test 2, failed", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
 
-	// First call to LicenseStatus should return an error.
-	mockDeployClientStreamer.EXPECT().
-		LicenseStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenatio")).AnyTimes()
+		// First call to LicenseStatus should return an error.
+		mockDeployClientStreamer.EXPECT().
+			LicenseStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
 
-	// Second call to LicenseStatus should return an error.
-	mockDeployClientStreamer.EXPECT().
-		LicenseStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
+		caaMock := &mock.MockCertificateAuthorityServiceClient{}
+		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
 
-	caaMock := &mock.MockCertificateAuthorityServiceClient{}
-	connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
+		err := runLicenseStatusCmdImp(nil, nil, connection)
+		require.Error(t, err)
+		require.Equal(t, err.Error(), "Request to get license status failed: error occurred!")
+	})
 
-	err = runLicenseStatusCmdImp(nil, nil, connection)
-	require.Error(t, err)
+	t.Run("Test 2, expired license", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
 
-	err = runLicenseStatusCmdImp(nil, nil, connection)
-	fmt.Printf("Error: %v\n", err)
-	require.Error(t, err)
-	require.Equal(t, err.Error(), "Request to get license status failed: some error message")
+		// First call to LicenseStatus should return an error.
+		mockDeployClientStreamer.EXPECT().
+			LicenseStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
+
+		mockDeployClientStreamer.SetReturnError(true, errors.New("expired license"))
+
+		caaMock := &mock.MockCertificateAuthorityServiceClient{}
+		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
+
+		err := runLicenseStatusCmdImp(nil, nil, connection)
+		require.Error(t, err)
+		require.Equal(t, err.Error(), "This license has expired. Please contact sales@chef.io to renew your Chef Automate license.")
+	})
+
 }
 
 func TestMaybeFromFile(t *testing.T) {
@@ -144,10 +159,10 @@ func Test_getConfigMgmtUsageNodesImp(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockDeployClientStreamer := mock.NewMockDeployClientStreamer(ctrl)
-
+		mockDeployClientStreamer.SetReturnError(true, nil)
 		// First call to LicenseStatus should return an error.
 		mockDeployClientStreamer.EXPECT().
-			Usage(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenatio"))
+			Usage(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("new error for a failed scenario")).AnyTimes()
 
 		caaMock := &mock.MockCertificateAuthorityServiceClient{}
 		connection := NewClientWithPara(mockDeployClientStreamer, caaMock)
