@@ -67,6 +67,8 @@ message ConfigRequest {
 				google.protobuf.BoolValue cbv_cache_enabled = 7;
 				google.protobuf.Int32Value cbv_cache_item_ttl = 8;
 				google.protobuf.Int32Value s3_url_ttl = 9;
+				google.protobuf.StringValue s3_bucket_name = 10;
+				google.protobuf.BoolValue s3_enabled = 11;
 			}
 
 			message Indexing {
