@@ -19,10 +19,10 @@ This script gets the count of the chef server objects using the knife commands(v
 All the counts are saved in a toml file for validation.
 
 OPTIONS:
-   -h | --help               Shows the help message
-   -S | --chef_server_url     Chef Server url (Eg: https://chef-server.example.com).
-   -K | --key                 Path to the pivotal user key
-   -F | --file_name    Output file path.
+   -h | --help    Shows the help message
+   -S             Chef Server url (Eg: https://chef-server.example.com).
+   -K             Path to the pivotal user key
+   -F             Output file path.
 EOF
 }
 
@@ -36,9 +36,9 @@ check_binary() {
 
 
 
- while getopts ":hS:K:F:" opt; do
+ while getopts ":hS:K:F:-help" opt; do
     case $opt in
-      h) usage
+      h|help) usage
         exit 1
       ;;
       S) chef_server_url="$OPTARG"
@@ -59,7 +59,7 @@ check_binary() {
   done
 
 if [ -z "$chef_server_url" ]; then
-  chef_server_url="https://localhost:10200/"
+  chef_server_url="https://localhost:10200/"  
 fi
 
 if [ -z "$key_path" ]; then
@@ -82,7 +82,8 @@ EOF
 )"
 
 #Checking if binary exists for jq otherwise installing it on the machine
-check_binary "jq" "You will need jq to run this script.
+check_binary "jq" "$(cat <<EOF 
+You will need jq to run this script.
 Install it using your package manager. 
 For homebrew:
 brew install jq
