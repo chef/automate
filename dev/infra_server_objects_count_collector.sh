@@ -19,10 +19,10 @@ This script gets the count of the chef server objects using the knife commands(v
 All the counts are saved in a toml file for validation.
 
 OPTIONS:
-   -h      Shows the help message
-   -S      Chef Server url (Eg: https://chef-server.example.com).
-   -K      Path to the pivotal user key
-   -F      Output file path.
+   -h | --help               Shows the help message
+   -S | --chef_server_url     Chef Server url (Eg: https://chef-server.example.com).
+   -K | --key                 Path to the pivotal user key
+   -F | --file_name    Output file path.
 EOF
 }
 
@@ -59,9 +59,7 @@ check_binary() {
   done
 
 if [ -z "$chef_server_url" ]; then
-  echo "Missing Chef Server URL " >&2
-  usage
-  exit 1
+  chef_server_url="https://localhost:10200/"
 fi
 
 if [ -z "$key_path" ]; then
