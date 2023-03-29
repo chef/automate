@@ -133,6 +133,25 @@ AND
     path = "/mnt/automate_backups/elasticsearch"
 ```
 
+{{< note >}}
+
+In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
+
+- Create a `.toml` (say os_config.toml) file from **Provision host** and copy the following template with the path to the repo.
+
+    ```sh
+      [path]
+      repo = "/mnt/automate_backups/elasticsearch"
+    ```
+
+- Following command will add the configuration to the OpenSearch node.
+
+    ```sh
+      chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>
+    ```
+
+{{< /note >}}
+
 To restore, use the below command from same automate node, Make sure to **stop all other frontend nodes using `chef-automate stop`**:
 
 ```cmd
@@ -159,24 +178,6 @@ chef-automate config set applied_config.toml
 
 {{< /note >}}
 
-{{< note >}}
-
-In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
-
-- Create a `.toml` (say os_config.toml) file from **Provision host** and copy the following template with the path to the repo.
-
-    ```sh
-      [path]
-      repo = "/mnt/automate_backups/elasticsearch"
-    ```
-
-- Following command will add the configuration to the OpenSearch node.
-
-    ```sh
-      chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>
-    ```
-
-{{< /note >}}
 
 Click [here](/automate/ha_backup_restore_object_storage/) to know more about the usage of S3 backup.
 
