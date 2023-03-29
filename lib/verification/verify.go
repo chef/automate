@@ -3,6 +3,7 @@ package verification
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -24,31 +25,15 @@ type verifySetup interface {
 
 var reportChan = make(chan reporting.VerfictionReport)
 var nodeInfoMap = make(map[string][]reporting.Info)
+var doneChan = make(chan bool, 1)
 
 func VerifyHAAWSProvision(configFile string) error {
-	// config, err := parseAWSAutomateConfig(configFile)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// validateAWSProvisionConfig(config)
-	// return nil
-	report := validateCertificateExpiry("abc")
-
-	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-	tb := make(map[string]*reporting.Table)
-	tb["AutomateStatusTable"] = &reporting.Table{
-		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
-		ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+	config, err := parseAWSAutomateConfig(configFile)
+	if err != nil {
+		return err
 	}
-	tb["AutomateSummaryTable"] = &reporting.Table{
-		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
-		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
-	}
-	rp := reporting.NewReportingModule(wr, time.Second, tb)
-	go reporting.VerfictionReports(reportChan, rp, nodeInfoMap)
-	go chanWriter(reportChan, "Automate", report)
-	time.Sleep(time.Second * 3)
+
+	validateAWSProvisionConfig(config)
 	return nil
 }
 
@@ -80,11 +65,35 @@ func VerifyHAAWSManagedDeployment(configFile string) error {
 }
 
 func VerifyOnPremDeployment(configFile string) error {
-	config, err := parseOnPremConfig(configFile)
-	if err != nil {
-		return err
+	// config, err := parseOnPremConfig(configFile)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// AutomateIP := config.ExistingInfra.Config.AutomatePrivateIps
+
+	// validateOnPremConfig(config)
+
+	startReportModule()
+
+	var wg sync.WaitGroup
+
+	for i := 1; i <= 2; i++ {
+		wg.Add(1)
+		ip := fmt.Sprintf("%v", i)
+		go func() {
+
+			defer wg.Done()
+			validateNodeReachability(ip, reportChan)
+		}()
 	}
-	validateOnPremConfig(config)
+	wg.Wait()
+
+	close(reportChan)
+	if <-doneChan {
+		fmt.Println("done!!")
+	}
+
 	return nil
 }
 
@@ -116,8 +125,49 @@ func VerifyStandaloneDeployment(configFile string) error {
 }
 
 func VerifyCertificates(certContents string) error {
-	report := validateCertificateExpiry(certContents)
 
+	startReportModule()
+
+	producerChan := make(chan bool, 1)
+	go runchecksForCertificates(producerChan)
+
+	<-producerChan
+	close(reportChan)
+	if <-doneChan {
+		fmt.Println("done!!")
+	}
+
+	//time.Sleep(time.Second * 3)
+	return nil
+}
+
+func runchecksForCertificates(doneChan chan bool) {
+	result := validateCertificateFormat("abc")
+	if !result.Valid {
+		chanWriter(reportChan, "Automate", result.Report)
+	} else {
+		result = validateCertificateExpiry("abc")
+		if !result.Valid {
+			chanWriter(reportChan, "Automate", result.Report)
+		} else {
+			chanWriter(reportChan, "Automate", getSuccessReport("172.1.1.1", "Certificates", "Cerificate validation successful"))
+		}
+	}
+	doneChan <- true
+}
+
+func getSuccessReport(ipaddress string, parameter string, message string) reporting.Info {
+	return reporting.Info{
+		Hostip:    ipaddress,
+		Parameter: parameter,
+		Status:    "Success",
+		StatusMessage: &reporting.StatusMessage{
+			MainMessage: message,
+		},
+	}
+}
+
+func startReportModule() {
 	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 	tb := make(map[string]*reporting.Table)
 	tb["AutomateStatusTable"] = &reporting.Table{
@@ -129,12 +179,8 @@ func VerifyCertificates(certContents string) error {
 		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
 	}
 	rp := reporting.NewReportingModule(wr, time.Second, tb)
-	go reporting.VerfictionReports(reportChan, rp, nodeInfoMap)
-	go chanWriter(reportChan, "Automate", report)
-	time.Sleep(time.Second * 3)
-	fmt.Println(rp.GetTable("AutomateStatusTable"))
+	go reporting.VerfictionReports(reportChan, rp, nodeInfoMap, doneChan)
 
-	return nil
 }
 
 func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, report reporting.Info) {
