@@ -135,7 +135,7 @@ AND
 
 {{< note >}}
 
-In case `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, then please patch the below OpenSearch config from bastion before starting the restore.
+If `backup_config = "file_system"` had been provided in config.toml of Automate HA deployment, patch the below OpenSearch config from bastion before starting the restore.
 
 - Create a `.toml` (say os_config.toml) file from **Provision host** and copy the following template with the path to the repo.
 
