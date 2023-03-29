@@ -172,6 +172,13 @@ func getSuccessReport(ipaddress string, parameter string, message string) report
 
 func startReportModule() {
 	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+	tb := createTables()
+	rp := reporting.NewReportingModule(wr, time.Second, tb)
+	go reporting.VerfictionReports(reportChan, rp, nodeInfoMap, doneChan)
+
+}
+
+func createTables() map[string]*reporting.Table {
 	tb := make(map[string]*reporting.Table)
 	tb["AutomateStatusTable"] = &reporting.Table{
 		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
@@ -181,9 +188,31 @@ func startReportModule() {
 		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
 		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
 	}
-	rp := reporting.NewReportingModule(wr, time.Second, tb)
-	go reporting.VerfictionReports(reportChan, rp, nodeInfoMap, doneChan)
-
+	tb["ChefServerStatusTable"] = &reporting.Table{
+		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+		ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+	}
+	tb["ChefServerSummaryTable"] = &reporting.Table{
+		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+	}
+	tb["PostgresStatusTable"] = &reporting.Table{
+		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+		ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+	}
+	tb["PostgresSummaryTable"] = &reporting.Table{
+		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+	}
+	tb["OpenSearchStatusTable"] = &reporting.Table{
+		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+		ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+	}
+	tb["OpenSearchSummaryTable"] = &reporting.Table{
+		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+	}
+	return tb
 }
 
 func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, report reporting.Info) {
