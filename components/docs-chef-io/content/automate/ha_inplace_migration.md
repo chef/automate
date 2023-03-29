@@ -118,7 +118,7 @@ Login to one of automate nodes, and take **current_config.toml** file as shown b
 sudo chef-automate config show > current_config.toml
 ```
 
-Add the following config to the **current_config.toml** file.
+Find the following config in the **current_config.toml** file and update it to look like the following:
 
 ```cmd
 [global.v1.external.opensearch.auth.basic_auth]
