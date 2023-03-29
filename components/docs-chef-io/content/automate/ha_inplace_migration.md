@@ -12,6 +12,15 @@ identifier = "automate/deploy_high_availability/migration/ha_inplace_migration.m
 weight = 200
 +++
 
+{{< warning >}}
+{{% automate/ha-warn %}}
+{{< /warning >}}
+
+{{< warning >}}
+
+- A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246).
+
+
 This page explains the In-Place migration of A2HA to Automate HA. This migration involves the following steps:
 
 ## Prerequisites
