@@ -11,6 +11,11 @@ database_url="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=veri
 port=9090
 listen_ip="0.0.0.0"
 
+[tls]
+root_cert_contents = ""
+cert_contents = ""
+key_contents = ""
+
 [log]
 level = "info"
 rotation_max_bytes = 104857600
