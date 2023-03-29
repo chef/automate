@@ -87,12 +87,12 @@ func validateNodeReachability(ipaddress string, nodeType string, channel chan re
 
 }
 
-func validateCertificateExpiry(certContents string) Result {
+func validateCertificateExpiry(ipaddress string, certContents string) Result {
 
 	return Result{
 		Valid: true,
 		Report: reporting.Info{
-			Hostip:    "172.02.0.01",
+			Hostip:    ipaddress,
 			Parameter: "Certificates",
 			Status:    "Success",
 			StatusMessage: &reporting.StatusMessage{
@@ -101,30 +101,16 @@ func validateCertificateExpiry(certContents string) Result {
 		},
 	}
 
-	// return Result{
-	// 	Valid: false,
-	// 	Report: reporting.Info{
-	// 		Hostip:    "172.02.0.01",
-	// 		Parameter: "Certificates",
-	// 		Status:    "Failed",
-	// 		StatusMessage: &reporting.StatusMessage{
-	// 			MainMessage: "Certificate B validation failed",
-	// 			SubMessage:  []string{"Certificate is not valid"},
-	// 			ToResolve:   []string{"1. Renew the expired certificates"},
-	// 		},
-	// 	},
-	// }
-
 	/* Write the checks to validate the expiry date of the certificate */
 
 }
 
-func validateCertificateFormat(certContents string) Result {
+func validateCertificateFormat(ipaddress string, certContents string) Result {
 
 	return Result{
 		Valid: true,
 		Report: reporting.Info{
-			Hostip:    "172.02.20.01",
+			Hostip:    ipaddress,
 			Parameter: "Certificates",
 			Status:    "Failed",
 			StatusMessage: &reporting.StatusMessage{
@@ -139,7 +125,39 @@ func validateCertificateFormat(certContents string) Result {
 
 }
 
-func validateFreeDisk(ipaddress string) Result {
+func validateFreeDisk(ipaddress string, nodeType string) Result {
+
+	if nodeType == "OpenSearch" {
+		return Result{
+			Valid: false,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "System Resources",
+				Status:    "Failed",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "System Resources as per the requirement",
+					SubMessage:  []string{"/hab volume is not of 100 GB"},
+					ToResolve:   []string{"1. Re-mount the hab volume with 100 GB"},
+				},
+			},
+		}
+	} else {
+		return Result{
+			Valid: true,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "System Resources",
+				Status:    "Success",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "System Resources as per the requirement",
+				},
+			},
+		}
+	}
+
+}
+
+func validateCPU(ipaddress string, nodeType string) Result {
 
 	return Result{
 		Valid: false,
@@ -148,52 +166,63 @@ func validateFreeDisk(ipaddress string) Result {
 			Parameter: "System Resources",
 			Status:    "Failed",
 			StatusMessage: &reporting.StatusMessage{
-				MainMessage: "Disk space is not as per the requirements",
-				SubMessage:  []string{"/hab is not of 100 GB"},
-				ToResolve:   []string{"1. Re-mount the hab volume with 100 GB"},
+				MainMessage: "System Resources check failed",
+				SubMessage:  []string{"CPU count is not as per the requirement"},
+				ToResolve:   []string{"1. Increase the CPU of the machine. Machine should have 4 CPUs"},
 			},
 		},
 	}
 
 }
 
-func validateCPU(ipaddress string) Result {
+func validateOSVersion(ipaddress string, nodeType string) Result {
 
-	return Result{
-		Valid: false,
-		Report: reporting.Info{
-			Hostip:    ipaddress,
-			Parameter: "System Resources",
-			Status:    "Failed",
-			StatusMessage: &reporting.StatusMessage{
-				MainMessage: "CPU is not as per the requirements",
-				SubMessage:  []string{"Machine has lesser number of CPUs"},
-				ToResolve:   []string{"1. Increase the CPU of the machine"},
+	if nodeType == "Automate" {
+		return Result{
+			Valid: false,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "Software Versions",
+				Status:    "Failed",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "Software Versions check Failed",
+					SubMessage:  []string{"OS version is not Ubuntu 20.04"},
+					ToResolve:   []string{"1. Setup the machine with Ubuntu 20.04"},
+				},
 			},
-		},
+		}
+	} else {
+		return Result{
+			Valid: true,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "Software Versions",
+				Status:    "Success",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "Software Versions check Passed",
+				},
+			},
+		}
 	}
-
 }
 
-func validateOSVersion(ipaddress string) Result {
+func validateLinuxCommands(ipaddress string, nodeType string) Result {
 
-	return Result{
-		Valid: false,
-		Report: reporting.Info{
-			Hostip:    ipaddress,
-			Parameter: "Software Versions",
-			Status:    "Failed",
-			StatusMessage: &reporting.StatusMessage{
-				MainMessage: "Software Versions check Failed",
-				SubMessage:  []string{"OS version is not Ubuntu 20.04"},
-				ToResolve:   []string{"1. Setup the machine with Ubuntu 20.04"},
+	if nodeType == "OpenSearch" {
+		return Result{
+			Valid: true,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "Software Versions",
+				Status:    "Success",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "Software Versions check Failed",
+					SubMessage:  []string{"make command failed"},
+					ToResolve:   []string{"1. Add the required paths in the PATH folder"},
+				},
 			},
-		},
+		}
 	}
-
-}
-
-func validateLinuxCommands(ipaddress string) Result {
 
 	return Result{
 		Valid: true,
