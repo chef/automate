@@ -23,6 +23,20 @@ type verifySetup interface {
 	VerifyCertificates(string)
 }
 
+type failedReport struct {
+	ipaddress   string
+	parameter   string
+	message     string
+	errors      []string
+	resolutions []string
+}
+
+type successReport struct {
+	ipaddress string
+	parameter string
+	message   string
+}
+
 var reportChan = make(chan reporting.VerfictionReport)
 var nodeInfoMap = make(map[string][]reporting.Info)
 var doneChan = make(chan bool, 1)
@@ -75,12 +89,20 @@ func VerifyOnPremDeployment(configFile string) error {
 	chefServerIps := config.ExistingInfra.Config.ChefServerPrivateIps
 	opensearchIps := config.ExistingInfra.Config.OpensearchPrivateIps
 	postgresIps := config.ExistingInfra.Config.PostgresqlPrivateIps
+	// validateOnPremConfig(config)
+	//fmt.Println(postgresIps);
+
+	//mapChannel := make(chan bool)
+	constructMap(automateIps, "Automate", &ipsMap)
+	constructMap(chefServerIps, "ChefServer", &ipsMap)
+	constructMap(postgresIps, "Postgres", &ipsMap)
+	constructMap(opensearchIps, "OpenSearch", &ipsMap)
 
 	dataMap := map[string][]string{
-		"Automate": automateIps,
+		"Automate":   automateIps,
 		"ChefServer": chefServerIps,
 		"OpenSearch": opensearchIps,
-		"Postgres": postgresIps,
+		"Postgres":   postgresIps,
 	}
 
 	for nodeType, nodeIps := range dataMap {
@@ -94,12 +116,22 @@ func VerifyOnPremDeployment(configFile string) error {
 	var wg sync.WaitGroup
 
 	for k, v := range ipsMap {
-		wg.Add(1)
+		wg.Add(3)
 		ip := fmt.Sprintf("%v", k)
 		nodeType := fmt.Sprintf("%v", v)
 		go func() {
 			defer wg.Done()
 			validateNodeReachability(ip, nodeType, reportChan)
+		}()
+		go func() {
+
+			defer wg.Done()
+			runchecksForSystemResources(ip, nodeType)
+		}()
+		go func() {
+
+			defer wg.Done()
+			runchecksForSoftwareVersions(ip, nodeType)
 		}()
 	}
 	wg.Wait()
@@ -114,8 +146,8 @@ func VerifyOnPremDeployment(configFile string) error {
 
 func constructMap(nodeIps []string, nodeType string, m *map[string]string) {
 	for _, val := range nodeIps {
-        (*m)[val] = nodeType
-    }
+		(*m)[val] = nodeType
+	}
 }
 
 func VerifyOnPremAWSManagedDeployment(configFile string) error {
@@ -171,23 +203,114 @@ func runchecksForCertificates(doneChan chan bool) {
 		if !result.Valid {
 			chanWriter(reportChan, "Automate", result.Report)
 		} else {
-			chanWriter(reportChan, "Automate", getSuccessReport("172.1.1.1", "Certificates", "Cerificate validation successful"))
+			report := successReport{
+				ipaddress: "172.1.1.1",
+				parameter: "Certificates",
+				message:   "Cerificate validation successful",
+			}
+			chanWriter(reportChan, "Automate", getSuccessReport(report))
 		}
 	}
 	doneChan <- true
 }
 
-func getSuccessReport(ipaddress string, parameter string, message string) reporting.Info {
+func runchecksForSystemResources(ipaddress string, nodeType string) {
+
+	var errors []string
+	var resolutions []string
+
+	result := validateFreeDisk(ipaddress)
+	if !result.Valid {
+		errors = append(errors, result.Report.StatusMessage.SubMessage...)
+		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+	}
+	result = validateCPU(ipaddress)
+	if !result.Valid {
+		errors = append(errors, result.Report.StatusMessage.SubMessage...)
+		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+	}
+
+	if errors != nil && resolutions != nil {
+
+		report := failedReport{
+			ipaddress:   ipaddress,
+			parameter:   "System Resources",
+			message:     "System Resource Check failed",
+			errors:      errors,
+			resolutions: resolutions,
+		}
+		chanWriter(reportChan, nodeType, getErrorReport(report))
+
+	} else {
+		report := successReport{
+			ipaddress: ipaddress,
+			parameter: "System Resources",
+			message:   "All System Resources are as per the requirement",
+		}
+		chanWriter(reportChan, nodeType, getSuccessReport(report))
+	}
+}
+
+func runchecksForSoftwareVersions(ipaddress string, nodeType string) {
+
+	var errors []string
+	var resolutions []string
+
+	result := validateOSVersion(ipaddress)
+	if !result.Valid {
+		errors = append(errors, result.Report.StatusMessage.SubMessage...)
+		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+	}
+	result = validateLinuxCommands(ipaddress)
+	if !result.Valid {
+		errors = append(errors, result.Report.StatusMessage.SubMessage...)
+		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+	}
+
+	if errors != nil && resolutions != nil {
+
+		report := failedReport{
+			ipaddress:   ipaddress,
+			parameter:   result.Report.Parameter,
+			message:     result.Report.StatusMessage.MainMessage,
+			errors:      errors,
+			resolutions: resolutions,
+		}
+		chanWriter(reportChan, nodeType, getErrorReport(report))
+
+	} else {
+		report := successReport{
+			ipaddress: ipaddress,
+			parameter: result.Report.Parameter,
+			message:   result.Report.StatusMessage.MainMessage,
+		}
+		chanWriter(reportChan, nodeType, getSuccessReport(report))
+	}
+}
+
+func getSuccessReport(report successReport) reporting.Info {
 	return reporting.Info{
-		Hostip:    ipaddress,
-		Parameter: parameter,
+		Hostip:    report.ipaddress,
+		Parameter: report.parameter,
 		Status:    "Success",
 		StatusMessage: &reporting.StatusMessage{
-			MainMessage: message,
+			MainMessage: report.message,
 		},
 	}
 }
 
+func getErrorReport(report failedReport) reporting.Info {
+	return reporting.Info{
+		Hostip:    report.ipaddress,
+		Parameter: report.parameter,
+		Status:    "Failed",
+		StatusMessage: &reporting.StatusMessage{
+			MainMessage: report.message,
+			SubMessage:  report.errors,
+			ToResolve:   report.resolutions,
+		},
+	}
+}
 func startReportModule() {
 	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 	tb := createTables()

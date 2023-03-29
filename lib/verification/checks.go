@@ -79,7 +79,7 @@ func validateNodeReachability(ipaddress string, nodeType string, channel chan re
 		Parameter: "Node Reachabilility",
 		Status:    "Success",
 		StatusMessage: &reporting.StatusMessage{
-			MainMessage: "Node "+ ipaddress + " is reachable",
+			MainMessage: "Node " + ipaddress + " is reachable",
 		},
 	}
 
@@ -136,5 +136,75 @@ func validateCertificateFormat(certContents string) Result {
 	}
 
 	/* Write the checks to validate the expiry date of the certificate */
+
+}
+
+func validateFreeDisk(ipaddress string) Result {
+
+	return Result{
+		Valid: false,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: "System Resources",
+			Status:    "Failed",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "Disk space is not as per the requirements",
+				SubMessage:  []string{"/hab is not of 100 GB"},
+				ToResolve:   []string{"1. Re-mount the hab volume with 100 GB"},
+			},
+		},
+	}
+
+}
+
+func validateCPU(ipaddress string) Result {
+
+	return Result{
+		Valid: false,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: "System Resources",
+			Status:    "Failed",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "CPU is not as per the requirements",
+				SubMessage:  []string{"Machine has lesser number of CPUs"},
+				ToResolve:   []string{"1. Increase the CPU of the machine"},
+			},
+		},
+	}
+
+}
+
+func validateOSVersion(ipaddress string) Result {
+
+	return Result{
+		Valid: false,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: "Software Versions",
+			Status:    "Failed",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "Software Versions check Failed",
+				SubMessage:  []string{"OS version is not Ubuntu 20.04"},
+				ToResolve:   []string{"1. Setup the machine with Ubuntu 20.04"},
+			},
+		},
+	}
+
+}
+
+func validateLinuxCommands(ipaddress string) Result {
+
+	return Result{
+		Valid: true,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: "Software Versions",
+			Status:    "Success",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "Software Versions check Passed",
+			},
+		},
+	}
 
 }
