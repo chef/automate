@@ -65,13 +65,16 @@ func VerifyHAAWSManagedDeployment(configFile string) error {
 }
 
 func VerifyOnPremDeployment(configFile string) error {
-	// config, err := parseOnPremConfig(configFile)
-	// if err != nil {
-	// 	return err
-	// }
 
-	// AutomateIP := config.ExistingInfra.Config.AutomatePrivateIps
+	fmt.Println(configFile)
 
+	config, err := parseOnPremConfig(configFile)
+	if err != nil {
+		return err
+	}
+
+	AutomateIP := config.ExistingInfra.Config.AutomatePrivateIps
+	fmt.Println(AutomateIP)
 	// validateOnPremConfig(config)
 
 	startReportModule()

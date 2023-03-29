@@ -21,7 +21,8 @@ func TestRun(t *testing.T) {
 	// }
 	// wg.Wait()
 	// close(reportChan)
-	verification.VerifyCertificates("abc")
+	//verification.VerifyCertificates("abc")
+	verification.VerifyOnPremDeployment("../../config.toml")
 }
 
 func automateData(reportChan chan reporting.VerfictionReport, wg *sync.WaitGroup) {
