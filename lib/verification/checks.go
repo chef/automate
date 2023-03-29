@@ -70,7 +70,7 @@ func validateStandaloneDeploymentConfig(config *sc.AutomateConfig) {
 
 }
 
-func validateNodeReachability(ipaddress string, channel chan reporting.VerfictionReport) {
+func validateNodeReachability(ipaddress string, nodeType string, channel chan reporting.VerfictionReport) {
 
 	/* Write the checks to validate if the nodes are reachable */
 
@@ -79,11 +79,11 @@ func validateNodeReachability(ipaddress string, channel chan reporting.Verfictio
 		Parameter: "Node Reachabilility",
 		Status:    "Success",
 		StatusMessage: &reporting.StatusMessage{
-			MainMessage: "Node A is reachable",
+			MainMessage: "Node "+ ipaddress + " is reachable",
 		},
 	}
 
-	chanWriter(channel, "Automate", result)
+	chanWriter(channel, nodeType, result)
 
 }
 

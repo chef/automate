@@ -66,28 +66,36 @@ func VerifyHAAWSManagedDeployment(configFile string) error {
 
 func VerifyOnPremDeployment(configFile string) error {
 
-	fmt.Println(configFile)
-
 	config, err := parseOnPremConfig(configFile)
 	if err != nil {
 		return err
 	}
-
-	AutomateIP := config.ExistingInfra.Config.AutomatePrivateIps
-	fmt.Println(AutomateIP)
+	var ipsMap = make(map[string]string)
+	automateIps := config.ExistingInfra.Config.AutomatePrivateIps
+	chefServerIps := config.ExistingInfra.Config.ChefServerPrivateIps
+	opensearchIps := config.ExistingInfra.Config.OpensearchPrivateIps
+	postgresIps := config.ExistingInfra.Config.PostgresqlPrivateIps
 	// validateOnPremConfig(config)
+	//fmt.Println(postgresIps);
+	
+	//mapChannel := make(chan bool)
+	constructMap(automateIps, "Automate", &ipsMap)
+	constructMap(chefServerIps, "ChefServer", &ipsMap)
+	constructMap(postgresIps, "Postgres", &ipsMap)
+	constructMap(opensearchIps, "OpenSearch", &ipsMap)
 
+	fmt.Println(ipsMap)
 	startReportModule()
 
 	var wg sync.WaitGroup
 
-	for i := 1; i <= 2; i++ {
+	for k, v := range ipsMap {
 		wg.Add(1)
-		ip := fmt.Sprintf("%v", i)
+		ip := fmt.Sprintf("%v", k)
+		nodeType := fmt.Sprintf("%v", v)
 		go func() {
-
 			defer wg.Done()
-			validateNodeReachability(ip, reportChan)
+			validateNodeReachability(ip, nodeType, reportChan)
 		}()
 	}
 	wg.Wait()
@@ -98,6 +106,12 @@ func VerifyOnPremDeployment(configFile string) error {
 	}
 
 	return nil
+}
+
+func constructMap(nodeIps []string, nodeType string, m *map[string]string) {
+	for _, val := range nodeIps {
+        (*m)[val] = nodeType
+    }
 }
 
 func VerifyOnPremAWSManagedDeployment(configFile string) error {
