@@ -184,8 +184,12 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 Copy the **bootstrap.abb** bundle to all the Frontend nodes of the Chef Automate HA cluster. Unpack the bundle using the below command on all the Frontend nodes:
 
 ```cmd
+sudo chef-automate start
+# wait for services to complete startup
 sudo chef-automate bootstrap bundle unpack bootstrap.abb
 ```
+
+
 
 {{< note >}}
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
