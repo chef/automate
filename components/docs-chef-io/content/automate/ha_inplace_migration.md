@@ -20,6 +20,8 @@ weight = 200
 
 - A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246).
 
+{{< /warning >}}
+
 
 This page explains the In-Place migration of A2HA to Automate HA. This migration involves the following steps:
 
