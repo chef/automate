@@ -75,15 +75,19 @@ func VerifyOnPremDeployment(configFile string) error {
 	chefServerIps := config.ExistingInfra.Config.ChefServerPrivateIps
 	opensearchIps := config.ExistingInfra.Config.OpensearchPrivateIps
 	postgresIps := config.ExistingInfra.Config.PostgresqlPrivateIps
-	// validateOnPremConfig(config)
-	//fmt.Println(postgresIps);
-	
-	//mapChannel := make(chan bool)
-	constructMap(automateIps, "Automate", &ipsMap)
-	constructMap(chefServerIps, "ChefServer", &ipsMap)
-	constructMap(postgresIps, "Postgres", &ipsMap)
-	constructMap(opensearchIps, "OpenSearch", &ipsMap)
 
+	dataMap := map[string][]string{
+		"Automate": automateIps,
+		"ChefServer": chefServerIps,
+		"OpenSearch": opensearchIps,
+		"Postgres": postgresIps,
+	}
+
+	for nodeType, nodeIps := range dataMap {
+		constructMap(nodeIps, nodeType, &ipsMap)
+	}
+
+	// validateOnPremConfig(config)
 	fmt.Println(ipsMap)
 	startReportModule()
 
