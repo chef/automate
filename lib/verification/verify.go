@@ -128,11 +128,6 @@ func VerifyOnPremDeployment(configFile string) error {
 	opensearchIps := config.ExistingInfra.Config.OpensearchPrivateIps
 	postgresIps := config.ExistingInfra.Config.PostgresqlPrivateIps
 
-	constructMap(automateIps, "Automate", &ipsMap)
-	constructMap(chefServerIps, "ChefServer", &ipsMap)
-	constructMap(postgresIps, "Postgres", &ipsMap)
-	constructMap(opensearchIps, "OpenSearch", &ipsMap)
-
 	dataMap := map[string][]string{
 		"Automate":   automateIps,
 		"ChefServer": chefServerIps,
