@@ -94,14 +94,14 @@ func runVerifyCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if verifyCmdFlags.haAWSProvision {
-		// if isA2HARBFileExist() {
-		// 	return status.New(status.InvalidCommandArgsError, "Setup is already Provisioned. Please use --ha-aws-deploy flag.")
-		// } else {
-		_ = verification.VerifyHAAWSProvision(configPath)
-		// 	if err != nil {
-		// 		return status.Annotate(err, status.ConfigError)
-		// 	}
-		// }
+		if isA2HARBFileExist() {
+			return status.New(status.InvalidCommandArgsError, "Setup is already Provisioned. Please use --ha-aws-deploy flag.")
+		} else {
+			err := verification.VerifyHAAWSProvision(configPath)
+			if err != nil {
+				return status.Annotate(err, status.ConfigError)
+			}
+		}
 	}
 
 	if verifyCmdFlags.haAWSManagedProvision {
@@ -150,6 +150,31 @@ func runVerifyCmd(cmd *cobra.Command, args []string) error {
 				return status.Annotate(err, status.ConfigError)
 			}
 		}
+	}
+
+	if verifyCmdFlags.haOnpremDeploy {
+		err := verification.VerifyOnPremDeployment(configPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+	}
+
+	if verifyCmdFlags.haOnPremAWSManagedDeploy {
+		err := verification.VerifyOnPremAWSManagedDeployment(configPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+	}
+
+	if verifyCmdFlags.haOnPremCustManagedDeploy {
+		err := verification.VerifyOnPremCustManagedDeployment(configPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+	}
+
+	if verifyCmdFlags.certificates {
+		verification.VerifyCertificates("")
 	}
 
 	return nil
