@@ -1,11 +1,18 @@
+@import "../styles/variables";
+@import "@carbon/layout/scss/layout";
+
 #app-container {
   height: 100vh;
 }
 
 #app-header-wrapper {
+  position: fixed;
+  z-index: 100;
+  width: 100%;
+
   app-navbar {
     display: block;
-    height: 70px;
+    height: $navigation-height;
   }
 }
 
@@ -19,14 +26,27 @@
     height: calc(100vh - 110px);
   }
 
-  & > #app-sidebar { order: 1; }
+  #app-sidebar {
+    order: 1;
+    position: fixed;
+    height: 100%;
+    top: $sidebar-top;
+  }
 
   & > #main-content-wrapper {
     flex: 2 0px;
     order: 2;
     height: 100%;
-    overflow-x: scroll;
-    position: relative;
+    left: $sidebar-width;
+    top: $navigation-height;
+    width: calc(100% - 200px);
+
+    @include carbon--breakpoint-down(lg) {
+      width: calc(100% - 70px);
+      left: 70px;
+    }
+
+    position: absolute;
   }
 }
 
