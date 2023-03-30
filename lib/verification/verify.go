@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/reporting"
@@ -24,11 +23,20 @@ type verifySetup interface {
 }
 
 type report struct {
-	ipaddress   string
-	parameter   string
-	message     string
-	errors      []string
-	resolutions []string
+	ipaddress             string
+	parameter             string
+	message               string
+	errors                []string
+	resolutions           []string
+	successfulChecksCount int
+	failedChecksCount     int
+}
+
+type numberOfNodes struct {
+	numberOfAutomateNodes    int
+	numberOfChefServerNodes  int
+	numberOfPostgresSQLNodes int
+	numberOfOpenSearchNodes  int
 }
 
 var reportChan = make(chan reporting.VerfictionReport)
@@ -101,18 +109,6 @@ func VerifyStandaloneDeployment(configFile string) error {
 
 func VerifyCertificates(certContents string) error {
 
-	startReportModule()
-
-	producerChan := make(chan bool, 1)
-	go runchecksForCertificates("172.168.1.1", "Automate", producerChan)
-
-	<-producerChan
-	close(reportChan)
-	if <-doneChan {
-		fmt.Println("done!!")
-	}
-
-	//time.Sleep(time.Second * 3)
 	return nil
 }
 
@@ -129,17 +125,24 @@ func VerifyOnPremDeployment(configFile string) error {
 	postgresIps := config.ExistingInfra.Config.PostgresqlPrivateIps
 
 	dataMap := map[string][]string{
-		"Automate":   automateIps,
-		"ChefServer": chefServerIps,
-		"OpenSearch": opensearchIps,
-		"Postgres":   postgresIps,
+		"Automate":    automateIps,
+		"ChefServer":  chefServerIps,
+		"OpenSearch":  opensearchIps,
+		"PostgresSQL": postgresIps,
 	}
 
 	for nodeType, nodeIps := range dataMap {
 		constructMap(nodeIps, nodeType, &ipsMap)
 	}
 
-	startReportModule()
+	numberOfNodes := &numberOfNodes{
+		numberOfAutomateNodes:    len(automateIps),
+		numberOfChefServerNodes:  len(chefServerIps),
+		numberOfPostgresSQLNodes: len(postgresIps),
+		numberOfOpenSearchNodes:  len(opensearchIps),
+	}
+
+	startReportModule(numberOfNodes)
 
 	//validateOnPremConfig(config)
 
@@ -160,7 +163,7 @@ func runTests(ipsMap map[string]string) {
 	for k, v := range ipsMap {
 		ip := fmt.Sprintf("%v", k)
 		nodeType := fmt.Sprintf("%v", v)
-		if nodeType == "OpenSearch" || nodeType == "Postgres" {
+		if nodeType == "OpenSearch" || nodeType == "PostgresSQL" {
 			wg.Add(4)
 			go func() {
 				defer wg.Done()
@@ -175,12 +178,10 @@ func runTests(ipsMap map[string]string) {
 			validateNodeReachability(ip, nodeType, reportChan)
 		}()
 		go func() {
-
 			defer wg.Done()
 			runchecksForSystemResources(ip, nodeType)
 		}()
 		go func() {
-
 			defer wg.Done()
 			runchecksForSoftwareVersions(ip, nodeType)
 		}()
@@ -193,18 +194,25 @@ func runTests(ipsMap map[string]string) {
 }
 
 func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan bool) {
+	var successCount, failedCount int
 	result := validateCertificateFormat(ipaddress, "abc")
 	if !result.Valid {
+		failedCount++
+		result.Report.SummaryInfo.FailedCount = failedCount
 		chanWriter(reportChan, nodeType, result.Report)
 	} else {
 		result = validateCertificateExpiry(ipaddress, "abc")
 		if !result.Valid {
+			failedCount++
+			result.Report.SummaryInfo.FailedCount = failedCount
 			chanWriter(reportChan, nodeType, result.Report)
 		} else {
+			successCount++
 			report := report{
-				ipaddress: ipaddress,
-				parameter: "Certificates",
-				message:   "Cerificate validation successful",
+				ipaddress:             ipaddress,
+				parameter:             "Certificates",
+				message:               "Cerificate validation successful",
+				successfulChecksCount: successCount,
 			}
 			chanWriter(reportChan, nodeType, getReport(report, "Success"))
 		}
@@ -213,7 +221,7 @@ func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan b
 }
 
 func runchecksForSystemResources(ipaddress string, nodeType string) {
-
+	var successCount, failedCount int
 	var errors []string
 	var resolutions []string
 	failed := false
@@ -221,47 +229,59 @@ func runchecksForSystemResources(ipaddress string, nodeType string) {
 	result := validateFreeDisk(ipaddress, nodeType)
 	if !result.Valid {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
 		failed = true
+		failedCount++
 	} else if result.Valid && result.Report.StatusMessage.SubMessage != nil {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
+		successCount++
+	} else if result.Valid {
+		successCount++
 	}
 
 	result = validateCPU(ipaddress, nodeType)
 	if !result.Valid {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
 		failed = true
+		failedCount++
 	} else if result.Valid && result.Report.StatusMessage.SubMessage != nil {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
+		successCount++
+	} else if result.Valid {
+		successCount++
 	}
 
 	if failed {
 		report := report{
-			ipaddress:   ipaddress,
-			parameter:   "System Resources",
-			message:     "System Resource Check failed",
-			errors:      errors,
-			resolutions: resolutions,
+			ipaddress:             ipaddress,
+			parameter:             "System Resources",
+			message:               "System Resource Check failed",
+			errors:                errors,
+			resolutions:           resolutions,
+			failedChecksCount:     failedCount,
+			successfulChecksCount: successCount,
 		}
 		chanWriter(reportChan, nodeType, getReport(report, "Failed"))
 
 	} else {
 		report := report{
-			ipaddress:   ipaddress,
-			parameter:   "System Resources",
-			message:     "All System Resources are as per the requirement",
-			errors:      errors,
-			resolutions: resolutions,
+			ipaddress:             ipaddress,
+			parameter:             "System Resources",
+			message:               "All System Resources are as per the requirement",
+			errors:                errors,
+			resolutions:           resolutions,
+			failedChecksCount:     failedCount,
+			successfulChecksCount: successCount,
 		}
 		chanWriter(reportChan, nodeType, getReport(report, "Success"))
 	}
 }
 
 func runchecksForSoftwareVersions(ipaddress string, nodeType string) {
-
+	var successCount, failedCount int
 	var errors []string
 	var resolutions []string
 	failed := false
@@ -269,40 +289,52 @@ func runchecksForSoftwareVersions(ipaddress string, nodeType string) {
 	result := validateOSVersion(ipaddress, nodeType)
 	if !result.Valid {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
 		failed = true
+		failedCount++
 	} else if result.Valid && result.Report.StatusMessage.SubMessage != nil {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
+		successCount++
+	} else if result.Valid {
+		successCount++
 	}
 
 	result = validateLinuxCommands(ipaddress, nodeType)
 	if !result.Valid {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
 		failed = true
+		failedCount++
 	} else if result.Valid && result.Report.StatusMessage.SubMessage != nil {
 		errors = append(errors, result.Report.StatusMessage.SubMessage...)
-		resolutions = append(resolutions, result.Report.StatusMessage.ToResolve...)
+		resolutions = append(resolutions, result.Report.SummaryInfo.ToResolve...)
+		successCount++
+	} else if result.Valid {
+		successCount++
 	}
 
 	if failed {
 		report := report{
-			ipaddress:   ipaddress,
-			parameter:   result.Report.Parameter,
-			message:     result.Report.StatusMessage.MainMessage,
-			errors:      errors,
-			resolutions: resolutions,
+			ipaddress:             ipaddress,
+			parameter:             result.Report.Parameter,
+			message:               result.Report.StatusMessage.MainMessage,
+			errors:                errors,
+			resolutions:           resolutions,
+			failedChecksCount:     failedCount,
+			successfulChecksCount: successCount,
 		}
 		chanWriter(reportChan, nodeType, getReport(report, "Failed"))
 
 	} else {
 		report := report{
-			ipaddress:   ipaddress,
-			parameter:   result.Report.Parameter,
-			message:     result.Report.StatusMessage.MainMessage,
-			errors:      errors,
-			resolutions: resolutions,
+			ipaddress:             ipaddress,
+			parameter:             result.Report.Parameter,
+			message:               result.Report.StatusMessage.MainMessage,
+			errors:                errors,
+			resolutions:           resolutions,
+			failedChecksCount:     failedCount,
+			successfulChecksCount: successCount,
 		}
 		chanWriter(reportChan, nodeType, getReport(report, "Success"))
 	}
@@ -316,50 +348,64 @@ func getReport(testReport report, status string) reporting.Info {
 		StatusMessage: &reporting.StatusMessage{
 			MainMessage: testReport.message,
 			SubMessage:  testReport.errors,
-			ToResolve:   testReport.resolutions,
+		},
+		SummaryInfo: &reporting.SummaryInfo{
+			ToResolve:       testReport.resolutions,
+			SuccessfulCount: testReport.successfulChecksCount,
+			FailedCount:     testReport.failedChecksCount,
 		},
 	}
 }
 
-func startReportModule() {
+func startReportModule(nodeNumbers *numberOfNodes) {
 	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-	tb := createTables()
-	rp := reporting.NewReportingModule(wr, time.Second, tb)
-	go reporting.VerfictionReports(reportChan, rp, nodeInfoMap, doneChan)
+	tb := createTables(nodeNumbers)
+	rp := reporting.NewReportingModule(wr, tb)
+	go reporting.VerificationReports(reportChan, rp, nodeInfoMap, doneChan)
 }
 
-func createTables() map[string]*reporting.Table {
+func createTables(nodeNumbers *numberOfNodes) map[string]*reporting.Table {
+	automateSummaryTableTitle := fmt.Sprintf("Summary: Automate Nodes- %d", nodeNumbers.numberOfAutomateNodes)
+	chefServerSummaryTableTitle := fmt.Sprintf("Summary: Chef Infra Server Nodes- %d", nodeNumbers.numberOfChefServerNodes)
+	postgresSQLSummaryTableTitle := fmt.Sprintf("Summary: PostgresSQL Nodes- %d", nodeNumbers.numberOfPostgresSQLNodes)
+	openSearchSummaryTableTitle := fmt.Sprintf("Summary: Opensearch Nodes- %d", nodeNumbers.numberOfOpenSearchNodes)
 	tb := make(map[string]*reporting.Table)
-	tb["AutomateStatusTable"] = getStatusTable()
-	tb["AutomateSummaryTable"] = getSummaryTable()
-	tb["ChefServerStatusTable"] = getStatusTable()
-	tb["ChefServerSummaryTable"] = getSummaryTable()
-	tb["PostgresStatusTable"] = getStatusTable()
-	tb["PostgresSummaryTable"] = getSummaryTable()
-	tb["OpenSearchStatusTable"] = getStatusTable()
-	tb["OpenSearchSummaryTable"] = getSummaryTable()
+	tb["AutomateStatusTable"] = getStatusTable("Automate")
+	tb["AutomateSummaryTable"] = getSummaryTable(automateSummaryTableTitle)
+	tb["ChefServerStatusTable"] = getStatusTable("Chef Infra Server")
+	tb["ChefServerSummaryTable"] = getSummaryTable(chefServerSummaryTableTitle)
+	tb["PostgresSQLStatusTable"] = getStatusTable("PostgresSQL")
+	tb["PostgresSQLSummaryTable"] = getSummaryTable(postgresSQLSummaryTableTitle)
+	tb["OpenSearchStatusTable"] = getStatusTable("OpenSearch")
+	tb["OpenSearchSummaryTable"] = getSummaryTable(openSearchSummaryTableTitle)
 	return tb
 }
 
-func getStatusTable() *reporting.Table {
+func getStatusTable(title string) *reporting.Table {
 	return &reporting.Table{
+		Title:     title,
 		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
-		ColConfig: []table.ColumnConfig{},
+		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 5, WidthMin: 5}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 25, WidthMin: 25}, {Number: 4, WidthMax: 15, WidthMin: 15}, {Number: 5, WidthMax: 60, WidthMin: 60}},
 	}
 }
 
-func getSummaryTable() *reporting.Table {
+func getSummaryTable(title string) *reporting.Table {
 	return &reporting.Table{
+		Title:     title,
 		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
-		ColConfig: []table.ColumnConfig{},
+		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 30, WidthMin: 30}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 15, WidthMin: 15}, {Number: 4, WidthMax: 60, WidthMin: 60}},
 	}
 }
 
 func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, report reporting.Info) {
+	total := 3
+	if nodeType == "OpenSearch" || nodeType == "PostgresSQL" {
+		total = 12
+	}
 	msg := reporting.VerfictionReport{
 		TableKey:     nodeType,
 		Report:       report,
-		TotalReports: 10,
+		TotalReports: total,
 	}
 	reportChan <- msg
 }

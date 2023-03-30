@@ -81,6 +81,9 @@ func validateNodeReachability(ipaddress string, nodeType string, channel chan re
 		StatusMessage: &reporting.StatusMessage{
 			MainMessage: "Node " + ipaddress + " is reachable",
 		},
+		SummaryInfo: &reporting.SummaryInfo{
+			SuccessfulCount: 1,
+		},
 	}
 
 	chanWriter(channel, nodeType, result)
@@ -116,7 +119,9 @@ func validateCertificateFormat(ipaddress string, certContents string) Result {
 			StatusMessage: &reporting.StatusMessage{
 				MainMessage: "Certificate B validation failed",
 				SubMessage:  []string{"Certificate is not formatted properly"},
-				ToResolve:   []string{"1. Add the start and end certificate markers"},
+			},
+			SummaryInfo: &reporting.SummaryInfo{
+				ToResolve: []string{"Add the start and end certificate markers"},
 			},
 		},
 	}
@@ -137,7 +142,9 @@ func validateFreeDisk(ipaddress string, nodeType string) Result {
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "System Resources as per the requirement",
 					SubMessage:  []string{"/hab volume is not of 100 GB"},
-					ToResolve:   []string{"1. Re-mount the hab volume with 100 GB"},
+				},
+				SummaryInfo: &reporting.SummaryInfo{
+					ToResolve: []string{"Re-mount the hab volume with 100 GB"},
 				},
 			},
 		}
@@ -159,18 +166,34 @@ func validateFreeDisk(ipaddress string, nodeType string) Result {
 
 func validateCPU(ipaddress string, nodeType string) Result {
 
-	return Result{
-		Valid: false,
-		Report: reporting.Info{
-			Hostip:    ipaddress,
-			Parameter: "System Resources",
-			Status:    "Failed",
-			StatusMessage: &reporting.StatusMessage{
-				MainMessage: "System Resources check failed",
-				SubMessage:  []string{"CPU count is not as per the requirement"},
-				ToResolve:   []string{"1. Increase the CPU of the machine. Machine should have 4 CPUs"},
+	if nodeType == "ChefServer" {
+		return Result{
+			Valid: true,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "System Resources",
+				Status:    "Success",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "System Resources as per the requirement",
+				},
 			},
-		},
+		}
+	} else {
+		return Result{
+			Valid: false,
+			Report: reporting.Info{
+				Hostip:    ipaddress,
+				Parameter: "System Resources",
+				Status:    "Failed",
+				StatusMessage: &reporting.StatusMessage{
+					MainMessage: "System Resources check failed",
+					SubMessage:  []string{"CPU count is not as per the requirement"},
+				},
+				SummaryInfo: &reporting.SummaryInfo{
+					ToResolve: []string{"Increase the CPU of the machine. Machine should have 4 CPUs"},
+				},
+			},
+		}
 	}
 
 }
@@ -187,7 +210,9 @@ func validateOSVersion(ipaddress string, nodeType string) Result {
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "Software Versions check Failed",
 					SubMessage:  []string{"OS version is not Ubuntu 20.04"},
-					ToResolve:   []string{"1. Setup the machine with Ubuntu 20.04"},
+				},
+				SummaryInfo: &reporting.SummaryInfo{
+					ToResolve: []string{"Setup the machine with Ubuntu 20.04"},
 				},
 			},
 		}
@@ -218,7 +243,9 @@ func validateLinuxCommands(ipaddress string, nodeType string) Result {
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "Software Versions check Failed",
 					SubMessage:  []string{"make command failed"},
-					ToResolve:   []string{"1. Add the required paths in the PATH folder"},
+				},
+				SummaryInfo: &reporting.SummaryInfo{
+					ToResolve: []string{"Add the required paths in the PATH folder"},
 				},
 			},
 		}
