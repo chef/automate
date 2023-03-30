@@ -344,14 +344,14 @@ func createTables() map[string]*reporting.Table {
 func getStatusTable() *reporting.Table {
 	return &reporting.Table{
 		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
-		ColConfig: []table.ColumnConfig{{Number: 5, WidthMax: 50}},
+		ColConfig: []table.ColumnConfig{},
 	}
 }
 
 func getSummaryTable() *reporting.Table {
 	return &reporting.Table{
 		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
-		ColConfig: []table.ColumnConfig{{Number: 4, WidthMax: 50}},
+		ColConfig: []table.ColumnConfig{},
 	}
 }
 
