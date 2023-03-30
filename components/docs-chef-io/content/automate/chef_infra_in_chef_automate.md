@@ -50,6 +50,7 @@ The list of parameters are as follows:
 | opscode_erchef['search_queue_mode']             | batch                                     | batch                               | ```[erchef.v1.sys.index]```<br>```search_queue_mode="batch"```         |
 | opscode_erchef['s3_enabled']             | FALSE                                     | FALSE                               | ```[erchef.v1.sys.api]```<br>```s3_enabled="true"```         |
 | opscode_erchef['s3_bucket_name']             | Bookshelf                                     | Bookshelf                               | ```[erchef.v1.sys.api]```<br>```s3_bucket_name="name"```         |
+| opscode_erchef['s3_external_url']             |                                      |                                | ```[erchef.v1.sys.api]```<br>```s3_external_url="url"```         |
 | oc_chef_authz['http_queue_max']                 | 200                                       | 200                                 | ```[erchef.v1.sys.authz]```<br>```pool_queue_max=200```            |
 | oc_chef_authz['http_max_count']                 | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_max_size=100```             |
 | oc_chef_authz['http_init_count']                | 100                                       | 100                                 | ```[erchef.v1.sys.authz]```<br>```pool_init_size=100```            |
