@@ -14,6 +14,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   chef/mlsa
+  core/openssl
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_id/15.4.0/20230105061030"
@@ -62,6 +63,12 @@ do_install() {
 
   cd /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
   echo "gem 'tzinfo-data'" >> Gemfile
+  ########
+  echo "gem 'thin'" >> Gemfile
+  mkdir -p .ssl
+  rm -rf .ssl/*
+  openssl req -new -newkey rsa:2048 -sha1 -days 365 -nodes -x509 -keyout .ssl/localhost.key -out .ssl/localhost.crt
+  ########
   bundle package --no-install
   bundle install --path=vendor/bundle
 

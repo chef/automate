@@ -34,7 +34,10 @@ pwd
 
 
 echo "******Starting Server"
-bundle exec bin/rails server -p 9090
+# bundle exec bin/rails server -p 9090 -b 0.0.0.0
+# bundle exec bin/unicorn -p 9090
+
+RAILS_ENV="production" bundle exec bin/thin start -p 9090 --ssl --ssl-key-file .ssl/service.key --ssl-cert-file .ssl/service.crt
 
 
 # pg-helper rename-if-exists ocid "$DBNAME"
