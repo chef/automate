@@ -34,6 +34,7 @@ pkg_binds=(
   [automate-cs-bookshelf]="http-port"
   [automate-cs-oc-erchef]="http-port"
   [automate-es-gateway]="http-port"
+  [automate-cs-ocid]="http-port"
 )
 pkg_binds_optional=(
   [automate-gateway]="port"
