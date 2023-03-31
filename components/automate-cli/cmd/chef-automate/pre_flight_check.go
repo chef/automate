@@ -19,13 +19,13 @@ import (
 )
 
 var preflightCmdFlags = struct {
-	airgap     bool
-	waitTimeout   int
-	configPath string
+	airgap             bool
+	waitTimeout        int
+	configPath         string
 	haDeploymentConfig bool
-	automate         bool
-	chef_server      bool
-	frontend         bool
+	automate           bool
+	chef_server        bool
+	frontend           bool
 }{}
 
 type InfraKeyValues struct {
@@ -97,26 +97,34 @@ func loadMergedConfigForPreflight() (*deployment.AutomateConfig, error) {
 
 func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 	if preflightCmdFlags.haDeploymentConfig {
-	var configPath = ""
+		var configPath = ""
 		if len(args) == 0 {
 			return errors.Errorf("Config file should be passed with ha-deployment-config flag")
 		}
-		configPath = args[0];
-		deploymentType, err := getModeFromConfig(configPath)
-		if err != nil {
-			return errors.Errorf("%v", err)
-		}
 		var infra *AutomteHAInfraDetails
-		if deploymentType == EXISTING_INFRA_MODE {
-			config, err := getExistingInfraConfig(configPath)
+		var err error
+		var deploymentType string
+		if isA2HARBFileExist() {
+			infra, err = getAutomateHAInfraDetails()
+		} else {
+			configPath = args[0]
+			deploymentType, err = getModeFromConfig(configPath)
 			if err != nil {
 				return errors.Errorf("%v", err)
 			}
-			infra = populateInfraDetails(*config)
-		}
-		if deploymentType == AWS {
-			infra, err = getAutomateHAInfraDetails()
-			fmt.Println("infra for AWS", infra.Outputs)
+			if deploymentType == EXISTING_INFRA_MODE {
+				config, err := getExistingInfraConfig(configPath)
+				if err != nil {
+					return errors.Errorf("%v", err)
+				}
+				infra = populateInfraDetails(*config)
+			}
+			if deploymentType == AWS {
+				infra, err = getAutomateHAInfraDetails()
+				if err != nil {
+					return errors.Errorf("%v", err)
+				}
+			}
 		}
 		frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
 		if preflightCmdFlags.airgap {
@@ -125,37 +133,37 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 
 		frontend := &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:         frontendCommand,
-				WaitTimeout: preflightCmdFlags.waitTimeout,
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
-				Single:      false,
-				InputFiles:  []string{"/usr/bin/chef-automate"},
-				Outputfiles: []string{},
-				NodeType: preflightCmdFlags.frontend,
+				Single:                   false,
+				InputFiles:               []string{"/usr/bin/chef-automate"},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.frontend,
 			},
 		}
 
 		automate := &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:         frontendCommand,
-				WaitTimeout: preflightCmdFlags.waitTimeout,
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
-				Single:      false,
-				InputFiles:  []string{"/usr/bin/chef-automate"},
-				Outputfiles: []string{},
-				NodeType:    preflightCmdFlags.automate,
+				Single:                   false,
+				InputFiles:               []string{"/usr/bin/chef-automate"},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.automate,
 			},
 		}
 
 		chefServer := &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:         frontendCommand,
-				WaitTimeout: preflightCmdFlags.waitTimeout,
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
-				Single:      false,
-				InputFiles:  []string{"/usr/bin/chef-automate"},
-				Outputfiles: []string{},
-				NodeType:    preflightCmdFlags.chef_server,
+				Single:                   false,
+				InputFiles:               []string{"/usr/bin/chef-automate"},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.chef_server,
 			},
 		}
 
@@ -463,13 +471,13 @@ func runChefServerChecks(u *a1upgrade.A1Upgrade) error {
 func populateInfraDetails(config ExistingInfraConfigToml) *AutomteHAInfraDetails {
 
 	var infra AutomteHAInfraDetails
-	infra.Outputs.SSHKeyFile = InfraKeyValue {
+	infra.Outputs.SSHKeyFile = InfraKeyValue{
 		Value: config.Architecture.ConfigInitials.SSHKeyFile,
 	}
-	infra.Outputs.SSHPort = InfraKeyValue {
+	infra.Outputs.SSHPort = InfraKeyValue{
 		Value: config.Architecture.ConfigInitials.SSHPort,
 	}
-	infra.Outputs.SSHUser = InfraKeyValue {
+	infra.Outputs.SSHUser = InfraKeyValue{
 		Value: config.Architecture.ConfigInitials.SSHUser,
 	}
 	infra.Outputs.AutomatePrivateIps = InfraKeyValues{
