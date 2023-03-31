@@ -185,7 +185,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 	}
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, true)
-	if err != nil {
+	if err != nil && len(output) == 0  {
 		rc.Error = err
 		resultChan <- rc
 		return
@@ -208,7 +208,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 	if errorCheckEnableInOutput {
 		err = checkResultOutputForError(output)
 	}
-	if err != nil {
+	if err != nil && len(output) == 0 {
 		rc.Error = err
 		resultChan <- rc
 		return

@@ -62,6 +62,9 @@ const (
 
 	GET_FRONTEND_CONFIG = `echo "y" | sudo chef-automate config show %s`
 
+	PRE_FLIGHT_CHECK = `cd /tmp;
+	echo "y" | sudo ./chef-automate preflight-check`
+
 	GET_APPLIED_CONFIG = `
 	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
 	automate-backend-ctl applied --svc=automate-ha-%s
