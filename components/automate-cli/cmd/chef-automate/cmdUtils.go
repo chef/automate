@@ -128,6 +128,11 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 	inputFileToOutputFileMap := map[string]string{}
 	for _, file := range inputFiles {
 		destinationFile := remoteService + "_" + timestamp + "_" + file
+		if strings.Contains(file, "/") {
+			filePath := strings.Split(file, "/")
+			lastFileidx := len(filePath) - 1
+			destinationFile = filePath[lastFileidx]
+		}
 		inputFileToOutputFileMap[file] = destinationFile
 	}
 
@@ -185,7 +190,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 	}
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, true)
-	if err != nil && len(output) == 0  {
+	if err != nil && len(output) == 0 {
 		rc.Error = err
 		resultChan <- rc
 		return
