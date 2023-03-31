@@ -34,7 +34,8 @@ pwd
 
 
 echo "******Starting Server"
-bundle exec bin/rails server -p 9090
+# bundle exec bin/unicorn_rails server -p 9090
+bundle exec bin/thin start -p 9090 --ssl --ssl-key-file /hab/svc/automate-cs-ocid/config/service.key --ssl-cert-file /hab/svc/automate-cs-ocid/config/service.crt
 
 
 # pg-helper rename-if-exists ocid "$DBNAME"
