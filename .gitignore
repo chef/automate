@@ -114,3 +114,4 @@ tools/bldr-config-gen/bldr-config-gen
 
 # default output file written when running `chef-automate debug profile $service_name`
 profile.out
+.local

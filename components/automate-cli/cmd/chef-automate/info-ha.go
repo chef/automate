@@ -27,7 +27,7 @@ var infoCmd = &cobra.Command{
 
 func runInfoConfigCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		return executeAutomateClusterCtlCommand("info", args, infoHelpDocs)
+		return execInfo("info", args, infoHelpDocs)
 	}
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }

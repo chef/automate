@@ -34,6 +34,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func execInfo(command string, args []string, helpDocs string) error {
+	if len(command) < 1 {
+		return errors.New("Invalid or empty command")
+	}
+
+	automate, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	printInfo(automate)
+
+	return nil
+}
+
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
@@ -586,4 +600,64 @@ func writeHAConfigFiles(templateName string, data interface{}) error {
 	}
 
 	return fileutils.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600)
+}
+
+func printInfo(automate *AutomteHAInfraDetails) {
+	// fmt.Printf("%-50s %s\n", "automate_admin_password:", automate.Outputs.AutomateAdminPassword.Value)
+	fmt.Printf("%-50s %s\n", "automate_admin_user:", automate.Outputs.AutomateAdminUser.Value)
+	fmt.Printf("%-50s %s\n", "automate_data_collector_token:", automate.Outputs.AutomateDataCollectorToken.Value)
+
+	fmt.Printf("%-50s %s\n", "automate_private_ips:", automate.Outputs.AutomatePrivateIps.Value[0])
+	for _, ip := range automate.Outputs.AutomatePrivateIps.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "automate_ssh:", automate.Outputs.AutomateSSH.Value[0])
+	for _, ip := range automate.Outputs.AutomateSSH.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "automate_url:", automate.Outputs.AutomateURL.Value)
+	fmt.Printf("%-50s %v\n", "backup_config_efs:", automate.Outputs.BackupConfigEFS.Value)
+	fmt.Printf("%-50s %v\n", "backup_config_s3:", automate.Outputs.BackupConfigS3.Value)
+
+	fmt.Printf("%-50s %s\n", "chef_server_private_ips:", automate.Outputs.ChefServerPrivateIps.Value[0])
+	for _, ip := range automate.Outputs.ChefServerPrivateIps.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "chef_server_ssh:", automate.Outputs.ChefServerSSH.Value[0])
+	for _, ip := range automate.Outputs.ChefServerSSH.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "opensearch_private_ips:", automate.Outputs.OpensearchPrivateIps.Value[0])
+	for _, ip := range automate.Outputs.OpensearchPrivateIps.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "opensearch_public_ips:", automate.Outputs.OpensearchPublicIps.Value[0])
+	for _, ip := range automate.Outputs.OpensearchPublicIps.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "opensearch_ssh:", automate.Outputs.OpensearchSSH.Value[0])
+	for _, ip := range automate.Outputs.OpensearchSSH.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "postgresql_private_ips:", automate.Outputs.PostgresqlPrivateIps.Value[0])
+	for _, ip := range automate.Outputs.PostgresqlPrivateIps.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "postgresql_ssh:", automate.Outputs.PostgresqlSSH.Value[0])
+	for _, ip := range automate.Outputs.PostgresqlSSH.Value[1:] {
+		fmt.Printf("%50s %s\n", "", ip)
+	}
+
+	fmt.Printf("%-50s %s\n", "ssh_key_file:", automate.Outputs.SSHKeyFile)
+	fmt.Printf("%-50s %s\n", "ssh_port", automate.Outputs.SSHPort.Value)
+	fmt.Printf("%-50s %s\n", "ssh_user", automate.Outputs.SSHUser.Value)
+
 }
