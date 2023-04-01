@@ -483,7 +483,7 @@ func getPreLicenseReportCmd(fileNamePrefix string) func(*cobra.Command, []string
 			CommandFlags.FileName = reportFileName
 		}
 		if isA2HARBFileExist() {
-			infra, err := getAutomateHAInfraDetails()
+			infra, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
 			if err != nil {
 				fmt.Print(err)
 				return err

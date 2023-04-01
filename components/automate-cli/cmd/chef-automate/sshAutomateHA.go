@@ -215,7 +215,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	if !isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	infra, err := getAutomateHAInfraDetails()
+	infra, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
 	if err != nil {
 		return err
 	}
@@ -239,35 +239,49 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
-func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
-	if checkIfFileExist(automateHATerraformOutputFile) {
-		automateHAInfraDetails := &AutomteHAInfraDetails{}
-		contents, err := ioutil.ReadFile(automateHATerraformOutputFile)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(contents, automateHAInfraDetails)
-		if err != nil {
-			return nil, err
-		}
-		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-		return automateHAInfraDetails, nil
-	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
-		automateHAInfraDetails := &AutomteHAInfraDetails{}
-		contents, err := ioutil.ReadFile(automateHATerraformDestroyOutputFile)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(contents, automateHAInfraDetails)
-		if err != nil {
-			return nil, err
-		}
-		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-		return automateHAInfraDetails, nil
-	} else {
-		writer.Error("Automate Ha infra confile file not exits.")
-		return nil, nil
+// func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
+// 	if checkIfFileExist(automateHATerraformOutputFile) {
+// 		automateHAInfraDetails := &AutomteHAInfraDetails{}
+// 		contents, err := ioutil.ReadFile(automateHATerraformOutputFile)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		err = json.Unmarshal(contents, automateHAInfraDetails)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+// 		return automateHAInfraDetails, nil
+// 	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
+// 		automateHAInfraDetails := &AutomteHAInfraDetails{}
+// 		contents, err := ioutil.ReadFile(automateHATerraformDestroyOutputFile)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		err = json.Unmarshal(contents, automateHAInfraDetails)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+// 		return automateHAInfraDetails, nil
+// 	} else {
+// 		writer.Error("Automate Ha infra confile file not exits.")
+// 		return nil, nil
+// 	}
+// }
+
+func getAutomateHAInfraDetails(filePath string) (*AutomteHAInfraDetails, error) {
+	automateHAInfraDetails := &AutomteHAInfraDetails{}
+	contents, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
 	}
+	err = json.Unmarshal(contents, automateHAInfraDetails)
+	if err != nil {
+		return nil, err
+	}
+	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+	return automateHAInfraDetails, nil
 }
 
 func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomteHAInfraDetails) {

@@ -276,7 +276,7 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 		allPassedFlags = ""
 		cmd.Flags().Visit(checkFlags)
 		commandString := prepareCommandString(cmd, args, allPassedFlags)
-		infra, err := getAutomateHAInfraDetails()
+		infra, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
 		if err != nil {
 			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
 			return err
