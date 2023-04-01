@@ -39,7 +39,7 @@ func execInfo(command string, args []string, helpDocs string) error {
 		return errors.New("Invalid or empty command")
 	}
 
-	automate, err := getAutomateHAInfraDetails()
+	automate, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
 	if err != nil {
 		return err
 	}
