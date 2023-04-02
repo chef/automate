@@ -228,7 +228,7 @@ func validateOSVersion(ipaddress string, nodeType string) Result {
 			Valid: true,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "Software Versions",
+				Parameter: softwareVersions,
 				Status:    "Success",
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "Software Versions check Passed",
@@ -245,7 +245,7 @@ func validateLinuxCommands(ipaddress string, nodeType string) Result {
 			Valid: true,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "Software Versions",
+				Parameter: softwareVersions,
 				Status:    "Success",
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "Software Versions check Failed",
@@ -262,7 +262,7 @@ func validateLinuxCommands(ipaddress string, nodeType string) Result {
 		Valid: true,
 		Report: reporting.Info{
 			Hostip:    ipaddress,
-			Parameter: "Software Versions",
+			Parameter: softwareVersions,
 			Status:    "Success",
 			StatusMessage: &reporting.StatusMessage{
 				MainMessage: "Software Versions check Passed",

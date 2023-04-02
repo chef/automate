@@ -10,8 +10,10 @@ import (
 )
 
 const (
-	automate    = "Automate"
-	certificate = "Certificates"
+	automate     = "Automate"
+	certificate  = "Certificates"
+	toResolveMsg = "1. Add the start and end certificate markers"
+	summaryTable = "AutomateSummaryTable"
 )
 
 var tbMap = map[string]*Table{
@@ -20,7 +22,7 @@ var tbMap = map[string]*Table{
 		Header:    table.Row{"No.", "Identifier", "Parameter", "Status", "Message"},
 		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 5, WidthMin: 5}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 25, WidthMin: 25}, {Number: 4, WidthMax: 15, WidthMin: 15}, {Number: 5, WidthMax: 60, WidthMin: 60}},
 	},
-	"AutomateSummaryTable": {
+	summaryTable: {
 		Title:     "SUMMARY : Automate",
 		Header:    table.Row{"Parameter", "Successful", "Failed", "How to resolve it"},
 		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 30, WidthMin: 30}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 15, WidthMin: 15}, {Number: 4, WidthMax: 65, WidthMin: 65}},
@@ -123,14 +125,14 @@ func TestCreateStatusTableRows(t *testing.T) {
 					Parameter: certificate,
 					Status:    failedStr,
 					StatusMessage: &StatusMessage{
-						MainMessage: "Certificate B validation failed",
+						MainMessage: "Certificate validation failed",
 						SubMessage:  []string{"Certificate is not formatted properly"},
 					},
 					SummaryInfo: &SummaryInfo{},
 				},
 				reporting: getMockReportingModule(getMockWriterImpl().CliWriter),
 			},
-			want: []table.Row{{1, color.New(color.FgRed).Sprint("172.01.254.02"), color.New(color.FgRed).Sprint(certificate), color.New(color.FgRed).Sprint("✖ Failed"), color.New(color.FgRed).Sprint("Certificate B validation failed")}, {"", "", "", "", color.New(color.FgRed).Sprint("✖ [ Failed ] Certificate is not formatted properly")}},
+			want: []table.Row{{1, color.New(color.FgRed).Sprint("172.01.254.02"), color.New(color.FgRed).Sprint(certificate), color.New(color.FgRed).Sprint("✖ Failed"), color.New(color.FgRed).Sprint("Certificate validation failed")}, {"", "", "", "", color.New(color.FgRed).Sprint("✖ [ Failed ] Certificate is not formatted properly")}},
 		},
 	}
 	for _, tt := range tests {
@@ -156,9 +158,9 @@ func TestCreateSummaryTableRowData(t *testing.T) {
 			args: args{
 				summary: map[string]SummaryInfo{},
 				rowData: &Info{
-					Hostip:    "172.16.192.01",
+					Hostip:    "172.16.192.03",
 					Parameter: certificate,
-					Status:    "Failed",
+					Status:    failedStr,
 					StatusMessage: &StatusMessage{
 						MainMessage: "Certificate B validation failed",
 						SubMessage:  []string{"Certificate is not formatted properly"},
@@ -173,7 +175,7 @@ func TestCreateSummaryTableRowData(t *testing.T) {
 				certificate: {
 					SuccessfulCount: 0,
 					FailedCount:     1,
-					ToResolve:       []string{"172.16.192.01:", "1. Add the start and end certificate markers"},
+					ToResolve:       []string{"172.16.192.03:", toResolveMsg},
 				},
 			},
 		},
@@ -203,12 +205,12 @@ func TestCreateSummaryTableRows(t *testing.T) {
 					certificate: {
 						SuccessfulCount: 0,
 						FailedCount:     1,
-						ToResolve:       []string{"172.16.192.01:", "1. Add the start and end certificate markers"},
+						ToResolve:       []string{"172.16.192.05:", toResolveMsg},
 					},
 				},
 				reporting: getMockReportingModule(getMockWriterImpl().CliWriter),
 			},
-			want: []table.Row{{"Certificates", color.New(color.FgGreen).Sprint("0"), color.New(color.FgRed).Sprint("1"), "172.16.192.01:"}, {"", "", "", "1. Add the start and end certificate markers"}},
+			want: []table.Row{{"Certificates", color.New(color.FgGreen).Sprint("0"), color.New(color.FgRed).Sprint("1"), "172.16.192.05:"}, {"", "", "", toResolveMsg}},
 		},
 		{
 			name: "ToResolve steps are not present",
@@ -279,14 +281,14 @@ func TestUpdateTableTitle(t *testing.T) {
 				nodeInfo: map[string][]Info{
 					automate: {
 						{
-							Hostip:    "172.16.192.01",
+							Hostip:    "172.16.192.09",
 							Parameter: certificate,
-							Status:    "Failed",
+							Status:    failedStr,
 						},
 					},
 				},
 				keyMap: map[string][]string{
-					automate: {"Automate", "AutomateSummaryTable"},
+					automate: {automate, summaryTable},
 				},
 			},
 			want: color.New(color.FgRed).Sprint("✖ Automate"),
@@ -298,14 +300,14 @@ func TestUpdateTableTitle(t *testing.T) {
 				nodeInfo: map[string][]Info{
 					automate: {
 						{
-							Hostip:    "172.16.192.01",
+							Hostip:    "172.16.192.11",
 							Parameter: certificate,
-							Status:    "Success",
+							Status:    successStr,
 						},
 					},
 				},
 				keyMap: map[string][]string{
-					automate: {"Automate", "AutomateSummaryTable"},
+					automate: {automate, summaryTable},
 				},
 			},
 			want: color.New(color.FgGreen).Sprint("✔ Automate"),

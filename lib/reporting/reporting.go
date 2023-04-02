@@ -52,10 +52,12 @@ func NewReportingModule(wr *cli.Writer, tables map[string]*Table) Reporting {
 	return newReportingModule
 }
 
+// GetTable returns table present in tables map for given key.
 func (r *ReportingModule) GetTable(key string) *Table {
 	return r.tables[key]
 }
 
+// GetAllTableKeys returns all keys present in tables map
 func (r *ReportingModule) GetAllTableKeys() []string {
 	keys := make([]string, len(r.tables))
 	i := 0
@@ -67,14 +69,18 @@ func (r *ReportingModule) GetAllTableKeys() []string {
 	return keys
 }
 
+// GetAllTables returns tables map
 func (r *ReportingModule) GetAllTables() map[string]*Table {
 	return r.tables
 }
 
-func (r *ReportingModule) SetTable(key string, tables *Table) {
-	r.tables[key] = tables
+// SetTable sets the value of tables[key] in tables map to table provided in argument
+func (r *ReportingModule) SetTable(key string, table *Table) {
+	r.tables[key] = table
 }
 
+// AppendSpecialCharater returns a string.
+// Function appends a special char at the start of the str provided in arguments and returns that string
 func (r *ReportingModule) AppendSpecialCharater(symbol int, str string) string {
 	failedSymbol := "✖ "
 	successSymbol := "✔ "
@@ -98,6 +104,8 @@ func (r *ReportingModule) AppendSpecialCharater(symbol int, str string) string {
 	return str
 }
 
+// ChangeColour returns a string.
+// Function changes the color of the msg provided in arguments to the color given
 func (r *ReportingModule) ChangeColour(fgColor int, msg string) string {
 	switch fgColor {
 	case Red:
@@ -111,6 +119,7 @@ func (r *ReportingModule) ChangeColour(fgColor int, msg string) string {
 	}
 }
 
+// GenerateTableOutputAndPrint prints table provided as argument
 func (r *ReportingModule) GenerateTableOutputAndPrint(tb *Table) {
 	tbWriter := table.NewWriter()
 	tbWriter.SetColumnConfigs(tb.ColConfig)
