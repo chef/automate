@@ -45,7 +45,7 @@ func VerificationReports(reportChan chan VerfictionReport, reporting Reporting, 
 	tableKeys := reporting.GetAllTableKeys()
 	oldProgresslen := 0
 	for n := range reportChan {
-		time.Sleep(time.Second * 2)
+		time.Sleep(time.Second * 1)
 		report := n
 		info := report.Report
 		total := report.TotalReports
@@ -63,7 +63,7 @@ func VerificationReports(reportChan chan VerfictionReport, reporting Reporting, 
 		} else {
 			nodeinfo = append(nodeinfo, info)
 			nodeInfoMap[node] = nodeinfo
-			keyMap[node] = findKeysContainingSubStrings(node, tableKeys)
+			keyMap[node] = matchNodeNameWithRespectiveTablesName(node, tableKeys)
 			tableProgress[node] = progress{
 				currentCount: 1,
 				totalCount:   total,
@@ -106,13 +106,13 @@ func printSingleTable(reporting Reporting, table *Table) {
 func updateTablesWithData(reporting Reporting, nodeInfo map[string][]Info, keyMap map[string][]string) {
 	for key, value := range nodeInfo {
 		summaryMap := make(map[string]SummaryInfo)
-		statusTableRows, summaryTableRows := createSingleNodeTables(key, value, reporting, summaryMap)
+		statusTableRows, summaryTableRows := createSingleNodeRowsForBothTables(key, value, reporting, summaryMap)
 		reporting.GetTable(keyMap[key][0]).Rows = statusTableRows
 		reporting.GetTable(keyMap[key][1]).Rows = summaryTableRows
 	}
 }
 
-func createSingleNodeTables(title string, nodeInfo []Info, reporting Reporting, summaryMap map[string]SummaryInfo) ([]table.Row, []table.Row) {
+func createSingleNodeRowsForBothTables(title string, nodeInfo []Info, reporting Reporting, summaryMap map[string]SummaryInfo) ([]table.Row, []table.Row) {
 	var statusTableRows []table.Row
 	var summaryTableRows []table.Row
 	for idx, value := range nodeInfo {
@@ -179,7 +179,7 @@ func subMessageRow(subMsg string, rowData *Info, reporting Reporting) table.Row 
 
 func createSummaryTableRowData(summary map[string]SummaryInfo, rowData *Info) map[string]SummaryInfo {
 	var toResolve []string
-	if rowData.SummaryInfo.ToResolve != nil {
+	if rowData.SummaryInfo.ToResolve != nil && len(rowData.SummaryInfo.ToResolve) > 0 {
 		toResolve = []string{fmt.Sprintf("%s:", rowData.Hostip)}
 		rowData.SummaryInfo.ToResolve = createIndexForToResolve(rowData.SummaryInfo.ToResolve)
 		toResolve = append(toResolve, rowData.SummaryInfo.ToResolve...)
@@ -206,8 +206,10 @@ func createSummaryTableRowData(summary map[string]SummaryInfo, rowData *Info) ma
 func createSummaryTableRows(rowData map[string]SummaryInfo, reporting Reporting) []table.Row {
 	var rows []table.Row
 	for key, value := range rowData {
-		singleParameterRow := createSingleParameterRows(key, value, reporting)
-		rows = append(rows, singleParameterRow...)
+		if key != "" {
+			singleParameterRow := createSingleParameterRows(key, value, reporting)
+			rows = append(rows, singleParameterRow...)
+		}
 	}
 	return rows
 }
@@ -259,6 +261,9 @@ func updateTableTitle(reporting Reporting, nodeInfo map[string][]Info, keyMap ma
 	var failed bool
 	for key, value := range nodeInfo {
 		title := reporting.GetTable(keyMap[key][0]).Title
+		if checkStatusNotEmpty(value) {
+			return
+		}
 		failed = checkFailedStatus(value)
 		if failed {
 			updatedTile := reporting.ChangeColour(Red, reporting.AppendSpecialCharater(Failed, title))
@@ -270,6 +275,15 @@ func updateTableTitle(reporting Reporting, nodeInfo map[string][]Info, keyMap ma
 	}
 }
 
+func checkStatusNotEmpty(info []Info) bool {
+	for _, v := range info {
+		if v.Status == "" {
+			return true
+		}
+	}
+	return false
+}
+
 func checkFailedStatus(info []Info) bool {
 	for _, v := range info {
 		if v.Status == "Failed" {
@@ -279,7 +293,7 @@ func checkFailedStatus(info []Info) bool {
 	return false
 }
 
-func findKeysContainingSubStrings(substring string, keys []string) []string {
+func matchNodeNameWithRespectiveTablesName(substring string, keys []string) []string {
 	var matchingKeys []string
 	for _, key := range keys {
 		if strings.Contains(key, substring) {

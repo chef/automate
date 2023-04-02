@@ -365,10 +365,10 @@ func startReportModule(nodeNumbers *numberOfNodes) {
 }
 
 func createTables(nodeNumbers *numberOfNodes) map[string]*reporting.Table {
-	automateSummaryTableTitle := fmt.Sprintf("Summary: Automate Nodes- %d", nodeNumbers.numberOfAutomateNodes)
-	chefServerSummaryTableTitle := fmt.Sprintf("Summary: Chef Infra Server Nodes- %d", nodeNumbers.numberOfChefServerNodes)
-	postgresSQLSummaryTableTitle := fmt.Sprintf("Summary: PostgresSQL Nodes- %d", nodeNumbers.numberOfPostgresSQLNodes)
-	openSearchSummaryTableTitle := fmt.Sprintf("Summary: Opensearch Nodes- %d", nodeNumbers.numberOfOpenSearchNodes)
+	automateSummaryTableTitle := fmt.Sprintf("Summary: Automate <Nodes> - %d", nodeNumbers.numberOfAutomateNodes)
+	chefServerSummaryTableTitle := fmt.Sprintf("Summary: Chef Infra Server <Nodes> - %d", nodeNumbers.numberOfChefServerNodes)
+	postgresSQLSummaryTableTitle := fmt.Sprintf("Summary: PostgresSQL <Nodes> - %d", nodeNumbers.numberOfPostgresSQLNodes)
+	openSearchSummaryTableTitle := fmt.Sprintf("Summary: Opensearch <Nodes> - %d", nodeNumbers.numberOfOpenSearchNodes)
 	tb := make(map[string]*reporting.Table)
 	tb["AutomateStatusTable"] = getStatusTable("Automate")
 	tb["AutomateSummaryTable"] = getSummaryTable(automateSummaryTableTitle)

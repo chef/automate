@@ -1,10 +1,9 @@
 package verification
 
 import (
-	"io/ioutil"
-
 	sc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/lib/io/fileutils"
 	ptoml "github.com/pelletier/go-toml"
 )
 
@@ -14,7 +13,8 @@ func parseAWSAutomateConfig(configFile string) (*HAAwsConfigToml, error) {
 	   On successful parse, it will return the config structure. This is applicable for both
 	   AWS Provision and Deployment configuration both with Chef Managed and AWS Managed resources. */
 
-	templateBytes, err := ioutil.ReadFile(configFile)
+	fileUtils := &fileutils.FileSystemUtils{}
+	templateBytes, err := fileUtils.ReadFile(configFile)
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
@@ -32,7 +32,8 @@ func parseOnPremConfig(configFile string) (*HAOnPremConfigToml, error) {
 	   On successful parse, it will return the config structure. This is applicable for Chef Managed,
 	   AWS Managed and Customer Managed resources*/
 
-	templateBytes, err := ioutil.ReadFile(configFile)
+	fileUtils := &fileutils.FileSystemUtils{}
+	templateBytes, err := fileUtils.ReadFile(configFile)
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
