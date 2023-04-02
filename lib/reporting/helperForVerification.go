@@ -81,7 +81,7 @@ func printTables(reporting Reporting, nodeInfo map[string][]Info, keyMap map[str
 	var summaryTables []*Table
 	keys := make([]string, len(nodeInfo))
 	i := 0
-	for key, _ := range nodeInfo {
+	for key := range nodeInfo {
 		keys[i] = key
 		i++
 	}
@@ -238,7 +238,7 @@ func showProgress(tableProgess map[string]progress, lines int) int {
 	clearPrintedProgressMsg(lines)
 	keys := make([]string, len(tableProgess))
 	i := 0
-	for key, _ := range tableProgess {
+	for key := range tableProgess {
 		keys[i] = key
 		i++
 	}

@@ -59,7 +59,7 @@ func (r *ReportingModule) GetTable(key string) *Table {
 func (r *ReportingModule) GetAllTableKeys() []string {
 	keys := make([]string, len(r.tables))
 	i := 0
-	for key, _ := range r.tables {
+	for key := range r.tables {
 		keys[i] = key
 		i++
 	}

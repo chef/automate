@@ -1,4 +1,4 @@
-package verification
+package config_parser
 
 type CertByIP struct {
 	IP         string `toml:"ip"`

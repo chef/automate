@@ -2,7 +2,13 @@ package verification
 
 import (
 	sc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/lib/config_parser"
 	"github.com/chef/automate/lib/reporting"
+)
+
+const (
+	systemResources  = "System Resources"
+	softwareVersions = "Software Versions"
 )
 
 type Result struct {
@@ -10,53 +16,54 @@ type Result struct {
 	Report reporting.Info
 }
 
-func validateAWSProvisionConfig(config *HAAwsConfigToml) {
+func validateAWSProvisionConfig(config *config_parser.HAAwsConfigToml) {
 
 	/* Write the checks to validate if all the required fields for AWS Infra Provision without Managed Services
 	are filled in the parsed config */
 
 	if config.Aws.Config.SetupManagedServices {
-
+		/* Write the checks to validate if all the required fields for AWS Infra Provision with Managed Services
+		are filled in the parsed config */
 	}
 
 }
 
-func validateAWSManagedProvisionConfig(config *HAAwsConfigToml) {
+func validateAWSManagedProvisionConfig(config *config_parser.HAAwsConfigToml) {
 
 	/* Write the checks to validate if all the required fields for AWS Infra Provision with Managed Services
 	are filled in the parsed config */
 
 }
 
-func validateAWSDeploymentConfig(config *HAAwsConfigToml) {
+func validateAWSDeploymentConfig(config *config_parser.HAAwsConfigToml) {
 
 	/* Write the checks to validate if all the required fields for AWS Deployment without Managed Services
 	are filled in the parsed config */
 
 }
 
-func validateAWSManagedDeploymentConfig(config *HAAwsConfigToml) {
+func validateAWSManagedDeploymentConfig(config *config_parser.HAAwsConfigToml) {
 
 	/* Write the checks to validate if all the required fields for AWS Deployment with Managed Services
 	are filled in the parsed config */
 
 }
 
-func validateOnPremConfig(config *HAOnPremConfigToml) {
+func validateOnPremConfig(config *config_parser.HAOnPremConfigToml) {
 
 	/* Write the checks to validate if all the required fields for On-Prem Deployment with Chef Managed Services
 	are filled in the parsed config */
 
 }
 
-func validateOnPremAWSConfig(config *HAOnPremConfigToml) {
+func validateOnPremAWSConfig(config *config_parser.HAOnPremConfigToml) {
 
 	/* Write the checks to validate if all the required fields for On-Prem Deployment with AWS Managed Services
 	are filled in the parsed config */
 
 }
 
-func validateOnPremCustomerConfig(config *HAOnPremConfigToml) {
+func validateOnPremCustomerConfig(config *config_parser.HAOnPremConfigToml) {
 
 	/* Write the checks to validate if all the required fields for On-Prem Deployment with Customer Managed Services
 	are filled in the parsed config */
@@ -137,10 +144,10 @@ func validateFreeDisk(ipaddress string, nodeType string) Result {
 			Valid: false,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "System Resources",
+				Parameter: systemResources,
 				Status:    "Failed",
 				StatusMessage: &reporting.StatusMessage{
-					MainMessage: "System Resources as per the requirement",
+					MainMessage: "System Resources check failed",
 					SubMessage:  []string{"/hab volume is not of 100 GB"},
 				},
 				SummaryInfo: &reporting.SummaryInfo{
@@ -153,7 +160,7 @@ func validateFreeDisk(ipaddress string, nodeType string) Result {
 			Valid: true,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "System Resources",
+				Parameter: systemResources,
 				Status:    "Success",
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "System Resources as per the requirement",
@@ -171,7 +178,7 @@ func validateCPU(ipaddress string, nodeType string) Result {
 			Valid: true,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "System Resources",
+				Parameter: systemResources,
 				Status:    "Success",
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "System Resources as per the requirement",
@@ -183,7 +190,7 @@ func validateCPU(ipaddress string, nodeType string) Result {
 			Valid: false,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "System Resources",
+				Parameter: systemResources,
 				Status:    "Failed",
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "System Resources check failed",
@@ -205,7 +212,7 @@ func validateOSVersion(ipaddress string, nodeType string) Result {
 			Valid: false,
 			Report: reporting.Info{
 				Hostip:    ipaddress,
-				Parameter: "Software Versions",
+				Parameter: softwareVersions,
 				Status:    "Failed",
 				StatusMessage: &reporting.StatusMessage{
 					MainMessage: "Software Versions check Failed",

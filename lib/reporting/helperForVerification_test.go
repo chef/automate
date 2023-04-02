@@ -1,9 +1,6 @@
 package reporting
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -16,42 +13,6 @@ const (
 	automate    = "Automate"
 	certificate = "Certificates"
 )
-
-type MockReportingModule struct {
-	GetTableFunc                    func(key string) *Table
-	SetTableFunc                    func(key string, table *Table)
-	GetAllTableKeysFunc             func() []string
-	GetAllTablesFunc                func() map[string]*Table
-	AppendSpecialCharaterFunc       func(count int, char string) string
-	ChangeColourFunc                func(fgColor int, msg string) string
-	GenerateTableOutputAndPrintFunc func(table *Table)
-}
-
-func (mrm *MockReportingModule) GetTable(key string) *Table {
-	return mrm.GetTableFunc(key)
-}
-
-func (mrm *MockReportingModule) SetTable(key string, table *Table) {
-}
-
-func (mrm *MockReportingModule) GetAllTableKeys() []string {
-	return mrm.GetAllTableKeysFunc()
-}
-
-func (mrm *MockReportingModule) GetAllTables() map[string]*Table {
-	return mrm.GetAllTablesFunc()
-}
-func (mrm *MockReportingModule) AppendSpecialCharater(count int, char string) string {
-	return mrm.AppendSpecialCharaterFunc(count, char)
-}
-
-func (mrm *MockReportingModule) ChangeColour(fgColor int, msg string) string {
-	return mrm.ChangeColourFunc(fgColor, msg)
-}
-
-func (mrm *MockReportingModule) GenerateTableOutputAndPrint(table *Table) {
-	mrm.GenerateTableOutputAndPrintFunc(table)
-}
 
 var tbMap = map[string]*Table{
 	automate: {
@@ -442,31 +403,4 @@ func TestCreateIndexForToResolve(t *testing.T) {
 	got := createIndexForToResolve(test.args.data)
 	assert.Equal(t, test.want, got)
 
-}
-
-func pushDataInReportChannel(reportChan chan VerfictionReport, done chan bool) {
-
-	// Read JSON file
-	data, err := ioutil.ReadFile("data.json")
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return
-	}
-
-	var dataStruct []Info
-
-	err = json.Unmarshal(data, &dataStruct)
-	if err != nil {
-		fmt.Println("Error unmarshaling JSON:", err)
-		return
-	}
-	for _, value := range dataStruct {
-		myReport := VerfictionReport{
-			TableKey:     automate,
-			Report:       value,
-			TotalReports: 5,
-		}
-		reportChan <- myReport
-	}
-	done <- true
 }

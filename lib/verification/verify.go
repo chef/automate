@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/config_parser"
 	"github.com/chef/automate/lib/reporting"
 	"github.com/jedib0t/go-pretty/table"
 )
@@ -44,7 +45,8 @@ var nodeInfoMap = make(map[string][]reporting.Info)
 var doneChan = make(chan bool, 1)
 
 func VerifyHAAWSProvision(configFile string) error {
-	config, err := parseAWSAutomateConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -54,7 +56,8 @@ func VerifyHAAWSProvision(configFile string) error {
 }
 
 func VerifyHAAWSManagedProvision(configFile string) error {
-	config, err := parseAWSAutomateConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -63,7 +66,8 @@ func VerifyHAAWSManagedProvision(configFile string) error {
 }
 
 func VerifyHAAWSDeployment(configFile string) error {
-	config, err := parseAWSAutomateConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -72,7 +76,8 @@ func VerifyHAAWSDeployment(configFile string) error {
 }
 
 func VerifyHAAWSManagedDeployment(configFile string) error {
-	config, err := parseAWSAutomateConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -81,7 +86,8 @@ func VerifyHAAWSManagedDeployment(configFile string) error {
 }
 
 func VerifyOnPremAWSManagedDeployment(configFile string) error {
-	config, err := parseOnPremConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -90,7 +96,8 @@ func VerifyOnPremAWSManagedDeployment(configFile string) error {
 }
 
 func VerifyOnPremCustManagedDeployment(configFile string) error {
-	config, err := parseOnPremConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -99,7 +106,8 @@ func VerifyOnPremCustManagedDeployment(configFile string) error {
 }
 
 func VerifyStandaloneDeployment(configFile string) error {
-	config, err := parseStandaloneConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseStandaloneConfig(configFile)
 	if err != nil {
 		return err
 	}
@@ -114,7 +122,8 @@ func VerifyCertificates(certContents string) error {
 
 func VerifyOnPremDeployment(configFile string) error {
 
-	config, err := parseOnPremConfig(configFile)
+	configParser := &config_parser.ConfigParserImpl{}
+	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
 		return err
 	}
