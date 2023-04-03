@@ -118,70 +118,12 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return errors.Errorf("%v", err)
 			}
-			if deploymentType == EXISTING_INFRA_MODE {
-				config, err := getExistingInfraConfig(configPath)
-				if err != nil {
-					return errors.Errorf("%v", err)
-				}
-				infra = populateInfraDetails(*config)
-			}
-			if deploymentType == AWS {
-				infra, err = getAutomateHAInfraDetails()
-				if err != nil {
-					return errors.Errorf("%v", err)
-				}
+			infra, err = getInfraDetailsForDeploymentType(deploymentType, configPath)
+			if err != nil {
+				return errors.Errorf("%v", err)
 			}
 		}
-		frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
-		if preflightCmdFlags.airgap {
-			frontendCommand = frontendCommand + " --airgap"
-		}
-
-		frontend := &Cmd{
-			CmdInputs: &CmdInputs{
-				Cmd:                      frontendCommand,
-				WaitTimeout:              preflightCmdFlags.waitTimeout,
-				ErrorCheckEnableInOutput: true,
-				Single:                   false,
-				NodeIp:                   preflightCmdFlags.node,
-				InputFiles:               []string{"/usr/bin/chef-automate"},
-				Outputfiles:              []string{},
-				NodeType:                 preflightCmdFlags.frontend,
-			},
-		}
-
-		automate := &Cmd{
-			CmdInputs: &CmdInputs{
-				Cmd:                      frontendCommand,
-				WaitTimeout:              preflightCmdFlags.waitTimeout,
-				ErrorCheckEnableInOutput: true,
-				Single:                   false,
-				NodeIp:                   preflightCmdFlags.node,
-				InputFiles:               []string{"/usr/bin/chef-automate"},
-				Outputfiles:              []string{},
-				NodeType:                 preflightCmdFlags.automate,
-			},
-		}
-
-		chefServer := &Cmd{
-			CmdInputs: &CmdInputs{
-				Cmd:                      frontendCommand,
-				WaitTimeout:              preflightCmdFlags.waitTimeout,
-				ErrorCheckEnableInOutput: true,
-				Single:                   false,
-				NodeIp:                   preflightCmdFlags.node,
-				InputFiles:               []string{"/usr/bin/chef-automate"},
-				Outputfiles:              []string{},
-				NodeType:                 preflightCmdFlags.chef_server,
-			},
-		}
-
-		nodeMap := &NodeTypeAndCmd{
-			Frontend:   frontend,
-			Automate:   automate,
-			ChefServer: chefServer,
-			Infra:      infra,
-		}
+		nodeMap := constructAndGetNodeMap(infra)
 		cmdUtil := NewRemoteCmdExecutor(nodeMap)
 
 		if preflightCmdFlags.automate || preflightCmdFlags.chef_server || preflightCmdFlags.frontend {
@@ -496,4 +438,77 @@ func populateInfraDetails(config ExistingInfraConfigToml) *AutomteHAInfraDetails
 		Value: config.ExistingInfra.Config.ChefServerPrivateIps,
 	}
 	return &infra
+}
+
+func getInfraDetailsForDeploymentType(deploymentType string, configPath string) (*AutomteHAInfraDetails, error) {
+	var infra *AutomteHAInfraDetails
+	var err error
+
+	if deploymentType == EXISTING_INFRA_MODE {
+		config, err := getExistingInfraConfig(configPath)
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+		infra = populateInfraDetails(*config)
+	}
+	if deploymentType == AWS {
+		infra, err = getAutomateHAInfraDetails()
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+	}
+	return infra, nil
+}
+
+func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
+	frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
+	if preflightCmdFlags.airgap {
+		frontendCommand = frontendCommand + " --airgap"
+	}
+	frontend := &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      frontendCommand,
+			WaitTimeout:              preflightCmdFlags.waitTimeout,
+			ErrorCheckEnableInOutput: true,
+			Single:                   false,
+			NodeIp:                   preflightCmdFlags.node,
+			InputFiles:               []string{"/usr/bin/chef-automate"},
+			Outputfiles:              []string{},
+			NodeType:                 preflightCmdFlags.frontend,
+		},
+	}
+
+	automate := &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      frontendCommand,
+			WaitTimeout:              preflightCmdFlags.waitTimeout,
+			ErrorCheckEnableInOutput: true,
+			Single:                   false,
+			NodeIp:                   preflightCmdFlags.node,
+			InputFiles:               []string{"/usr/bin/chef-automate"},
+			Outputfiles:              []string{},
+			NodeType:                 preflightCmdFlags.automate,
+		},
+	}
+
+	chefServer := &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      frontendCommand,
+			WaitTimeout:              preflightCmdFlags.waitTimeout,
+			ErrorCheckEnableInOutput: true,
+			Single:                   false,
+			NodeIp:                   preflightCmdFlags.node,
+			InputFiles:               []string{"/usr/bin/chef-automate"},
+			Outputfiles:              []string{},
+			NodeType:                 preflightCmdFlags.chef_server,
+		},
+	}
+
+	nodeMap := &NodeTypeAndCmd{
+		Frontend:   frontend,
+		Automate:   automate,
+		ChefServer: chefServer,
+		Infra:      infra,
+	}
+	return nodeMap
 }
