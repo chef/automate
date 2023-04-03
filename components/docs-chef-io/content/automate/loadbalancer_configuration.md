@@ -493,8 +493,8 @@ For Centos or Redhat :
       bind *:80
       redirect scheme https code 301 if !{ ssl_fc }
 
-   # You need to get your own automate DNS,
-   # here we have taken example DNS: chefautomate.example.com and chefinfraserver.example.com
+   # You need to get your own Chef Server DNS,
+   # here we have taken example DNS: chefinfraserver.example.com
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
    # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
