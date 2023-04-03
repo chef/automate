@@ -252,9 +252,9 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
-// func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
+// func getAutomateHAInfraDetailss() (*AutomateHAInfraDetails, error) {
 // 	if checkIfFileExist(automateHATerraformOutputFile) {
-// 		automateHAInfraDetails := &AutomteHAInfraDetails{}
+// 		automateHAInfraDetails := &AutomateHAInfraDetails{}
 // 		contents, err := ioutil.ReadFile(automateHATerraformOutputFile)
 // 		if err != nil {
 // 			return nil, err
@@ -266,7 +266,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 // 		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 // 		return automateHAInfraDetails, nil
 // 	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
-// 		automateHAInfraDetails := &AutomteHAInfraDetails{}
+// 		automateHAInfraDetails := &AutomateHAInfraDetails{}
 // 		contents, err := ioutil.ReadFile(automateHATerraformDestroyOutputFile)
 // 		if err != nil {
 // 			return nil, err
@@ -285,7 +285,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 
 func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error) {
 	automateHAInfraDetails := &AutomateHAInfraDetails{}
-	contents, err := os.ReadFile(filePath)
+	contents, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
