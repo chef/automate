@@ -28,7 +28,7 @@ func GenerateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) strin
 func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 	script := GenerateOriginalAutomateCLICommand(cmd, args)
 
-	infra, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
+	infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 
 // RunCmdOnSingleAutomateNode runs the command on a single automate node
 //fileName is the name of the file in Automate - after the command execution, the file will be copied to /tmp path in bastion
-func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string, fileName string, infra *AutomteHAInfraDetails) error {
+func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string, fileName string, infra *AutomateHAInfraDetails) error {
 	script := GenerateOriginalAutomateCLICommand(cmd, args)
 
 	ips := infra.Outputs.AutomatePrivateIps.Value

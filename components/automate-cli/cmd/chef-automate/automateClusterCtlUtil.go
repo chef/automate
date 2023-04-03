@@ -39,7 +39,7 @@ func execInfo(command string, args []string, helpDocs string) error {
 		return errors.New("Invalid or empty command")
 	}
 
-	automate, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
+	automate, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
 	if err != nil {
 		return err
 	}
@@ -602,7 +602,7 @@ func writeHAConfigFiles(templateName string, data interface{}) error {
 	return fileutils.WriteFile(AUTOMATE_HA_WORKSPACE_CONFIG_FILE, config, 0600)
 }
 
-func printInfo(automate *AutomteHAInfraDetails) {
+func printInfo(automate *AutomateHAInfraDetails) {
 	// fmt.Printf("%-50s %s\n", "automate_admin_password:", automate.Outputs.AutomateAdminPassword.Value)
 	fmt.Printf("%-50s %s\n", "automate_admin_user:", automate.Outputs.AutomateAdminUser.Value)
 	fmt.Printf("%-50s %s\n", "automate_data_collector_token:", automate.Outputs.AutomateDataCollectorToken.Value)

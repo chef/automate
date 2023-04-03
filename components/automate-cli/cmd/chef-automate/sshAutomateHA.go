@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -18,11 +19,23 @@ import (
 const automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
 const automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
 
+func FileContainingAutomateHAInfraDetails() string {
+	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
+		return automateHATerraformOutputFile
+	}
+
+	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
+		return automateHATerraformDestroyOutputFile
+	}
+
+	return ""
+}
+
 var sshFlags = struct {
 	hostname string
 }{}
 
-type AutomteHAInfraDetails struct {
+type AutomateHAInfraDetails struct {
 	Version          int    `json:"version"`
 	TerraformVersion string `json:"terraform_version"`
 	Serial           int    `json:"serial"`
@@ -215,7 +228,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	if !isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	infra, err := getAutomateHAInfraDetails(automateHATerraformOutputFile)
+	infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
 	if err != nil {
 		return err
 	}
@@ -270,9 +283,9 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 // 	}
 // }
 
-func getAutomateHAInfraDetails(filePath string) (*AutomteHAInfraDetails, error) {
-	automateHAInfraDetails := &AutomteHAInfraDetails{}
-	contents, err := ioutil.ReadFile(filePath)
+func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error) {
+	automateHAInfraDetails := &AutomateHAInfraDetails{}
+	contents, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -284,7 +297,7 @@ func getAutomateHAInfraDetails(filePath string) (*AutomteHAInfraDetails, error) 
 	return automateHAInfraDetails, nil
 }
 
-func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomteHAInfraDetails) {
+func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {
 	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
 		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
 		lastspaceIndex := strings.LastIndex(automateSSH, " ")
@@ -303,7 +316,7 @@ func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *Automte
 	}
 }
 
-func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]string, error) {
+func getIPOfRequestedServers(servername string, d *AutomateHAInfraDetails) ([]string, error) {
 	isManagedServices := isManagedServicesOn()
 	switch strings.ToLower(servername) {
 	case "automate", "a2":

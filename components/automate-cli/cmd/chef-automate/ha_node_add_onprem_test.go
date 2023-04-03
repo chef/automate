@@ -56,7 +56,7 @@ func TestAddnodeValidateError(t *testing.T) {
 		automateIp: "10.2.1.67,ewewedw",
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -85,7 +85,7 @@ func TestAddnodeValidateErrorMultiple(t *testing.T) {
 		opensearchIp: "10.2.1.61,ewewedw",
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -117,7 +117,7 @@ func TestAddnodeReadfileError(t *testing.T) {
 		automateIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -145,7 +145,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		postgresqlIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -178,7 +178,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		automateIp:   TEST_IP_2,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -210,7 +210,7 @@ func TestAddnodeModifyAutomate(t *testing.T) {
 		automateIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -241,7 +241,7 @@ func TestAddnodeModifyInfra(t *testing.T) {
 		chefServerIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -272,7 +272,7 @@ func TestAddnodeModifyPostgresql(t *testing.T) {
 		postgresqlIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -303,7 +303,7 @@ func TestAddnodeModifyOpensearch(t *testing.T) {
 		opensearchIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -334,7 +334,7 @@ func TestAddnodePrompt(t *testing.T) {
 		automateIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -377,7 +377,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 	}
 	var filewritten, deployed bool
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -431,7 +431,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		opensearchIp: TEST_IP_1,
 	}
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -483,7 +483,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 	}
 	var filewritten, deployed bool
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -549,7 +549,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 	}
 	var filewritten, deployed bool
 	nodeAdd := NewAddNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
