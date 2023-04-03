@@ -11,8 +11,6 @@ ssh_port = "22"
 # Private SSH key file path, which has access to all the instances.
 # Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = "/home/ec2-user/XYZ.pem"
-# Provide Password if needed to run sudo commands.
-#sudo_password = "chefautomate"
 # Eg.: backup_config = "efs" or "s3"
 backup_config = "s3"
 # If s3 is selected for backup_config,

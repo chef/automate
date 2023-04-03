@@ -14,9 +14,6 @@ ssh_key_file = "/home/ec2-user/A2HA.pem"
 # custome ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"
 ssh_port = "22"
-
-# Provide Password if needed to run sudo commands.
-sudo_password = ""
 ## === ===
 
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"

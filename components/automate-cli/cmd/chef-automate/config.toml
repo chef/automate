@@ -12,7 +12,6 @@ workspace_path = "/hab/a2_deploy_workspace"
 ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
-# sudo_password = ""
 # logging_monitoring_management = ""
 # new_elk = ""
 # existing_elk_instance_ip ""

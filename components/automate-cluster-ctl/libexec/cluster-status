@@ -17,6 +17,10 @@ class AutomateClusterStatus < AutomateCluster::Command
   def execute
     be_service_data = []
     fe_service_data = []
+
+    # store the secret envs so we can pass them to the command
+    store_secret_envs
+    
     if AutomateCluster::Config.aws.setup_managed_services == true
       wait_while 'Fetching service status' do
         fe_service_data += fe_status('automate') if name.nil? || name == 'automate'
@@ -52,6 +56,14 @@ class AutomateClusterStatus < AutomateCluster::Command
 
   def fe_sudo_password
     @fe_sudo_password ||= AutomateCluster.secrets['fe_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  # store the sudo_password from the env variable in the secrets hash
+  def store_secret_envs
+    # Set a new secret
+    secrets.set('sudo_password',  ENV['sudo_password'])
+    # Save the updated secrets store to disk
+    secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
   end
 
   def fe_status(service)

@@ -33,6 +33,9 @@ class AutomateClusterTest < AutomateCluster::Command
   def execute
     results = []
 
+    # store the secret envs so we can pass them to the command
+    store_secret_envs
+
     INSPEC_PROFILES.each do |name, profiles|
       next unless service_name.nil? || name == service_name.to_sym
 
@@ -64,6 +67,14 @@ class AutomateClusterTest < AutomateCluster::Command
 
   def backend?(name)
     [:elasticsearch, :postgresql].include?(name)
+  end
+
+  # store the sudo_password from the env variable in the secrets hash
+  def store_secret_envs
+    # Set a new secret
+    secrets.set('sudo_password',  ENV['sudo_password'])
+    # Save the updated secrets store to disk
+    secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
   end
 
   # def default_sudo_password
