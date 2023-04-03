@@ -105,7 +105,6 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`.
    - Give `ssh_port` if your AMI runs on custom **ssh port**. The default value is 22.
    - Give `ssh_key_file` path, downloaded from **AWS SSH Key Pair**, which you want to use to create all the VMs. This will let you access all the VMs.
-   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
    - We support only private key authentication.
    - Set `backup_config` to `"s3"`. If `backup_config` is `s3`, set `s3_bucketName`.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
@@ -224,7 +223,6 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 ssh_user = "ec2-user"
 ssh_port = "22"
 ssh_key_file = "~/.ssh/my-key.pem"
-# sudo_password = ""
 backup_config = "s3"
 s3_bucketName = "My-Bucket-Name"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"

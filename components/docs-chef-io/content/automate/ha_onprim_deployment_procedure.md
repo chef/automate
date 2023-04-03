@@ -112,7 +112,6 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs.
-   - `sudo_password` is only meant to switch to sudo user. If you have configured a password for the sudo user, please provide it here.
    - We support only private key authentication.
    - Provide `backup_config` based on the type of backup storage you have. This field can be optionally left empty during deployment and can be patched at later point. Allowed values are `object_storage` and `file_system`.
    - If `backup_config` is `object_storage`, make sure to fill values under `[object_storage.config]`
