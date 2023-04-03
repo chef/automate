@@ -136,9 +136,9 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 		return err
 	}
 	statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags)
-	sshUtil := statusSummary.(*Summary).getSSHConfig()
+	// sshUtil := statusSummary.(*Summary).getSSHConfig()
 
-	err = statusSummary.Prepare(sshUtil)
+	err = statusSummary.Prepare()
 	if err != nil {
 		return err
 	}
@@ -150,6 +150,8 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 		be := statusSummary.ShowBEStatus()
 		fmt.Println(be)
 	}
+	writer.BufferWriter().Flush()
+
 	return nil
 }
 

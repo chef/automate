@@ -34,7 +34,7 @@ const (
 )
 
 type StatusSummary interface {
-	Prepare(sshUtil SSHUtil) error
+	Prepare() error
 	ShowFEStatus() string
 	ShowBEStatus() string
 }
@@ -64,37 +64,106 @@ func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus 
 	}
 }
 
-// get sshConfig
-func (ss *Summary) getSSHConfig() SSHUtil {
-	sshconfig := &SSHConfig{}
-	sshconfig.sshUser = ss.infra.Outputs.SSHUser.Value
-	sshconfig.sshKeyFile = ss.infra.Outputs.SSHKeyFile.Value
-	sshconfig.sshPort = ss.infra.Outputs.SSHPort.Value
-	sshUtil := NewSSHUtil(sshconfig)
-	return sshUtil
-}
-
 // Run Status summary
-func (ss *Summary) Prepare(sshUtil SSHUtil) error {
+func (ss *Summary) Prepare() error {
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.getIPAddressesFromFlagOrInfra()
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, ipAddressError)
 	}
-	err := ss.prepareFEScript(sshUtil, automateIps, "Automate", "FE")
-	if err != nil {
-		return err
+
+	if len(automateIps) != 0 {
+		automateNodeMap := &NodeTypeAndCmd{
+			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Automate: &Cmd{
+				CmdInputs: &CmdInputs{
+					Cmd:                      "",
+					NodeIps:                  automateIps,
+					Single:                   false,
+					NodeType:                 true,
+					PrintOutput:              false,
+					HideSSHConnectionMessage: true,
+				},
+			},
+			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Infra:      ss.infra,
+		}
+		err := ss.prepareFEScript(automateIps, automateNodeMap, "automate", "FE")
+		if err != nil {
+			return err
+		}
 	}
-	err = ss.prepareFEScript(sshUtil, chefServerIps, "Chef Server", "FE")
-	if err != nil {
-		return err
+
+	if len(chefServerIps) != 0 {
+		chefServerNodeMap := &NodeTypeAndCmd{
+			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Automate: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			ChefServer: &Cmd{
+				CmdInputs: &CmdInputs{
+					Cmd:                      "",
+					NodeIps:                  chefServerIps,
+					Single:                   false,
+					NodeType:                 true,
+					PrintOutput:              false,
+					HideSSHConnectionMessage: true,
+				},
+			},
+			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Infra:      ss.infra,
+		}
+		err := ss.prepareFEScript(chefServerIps, chefServerNodeMap, "chef-server", "FE")
+		if err != nil {
+			return err
+		}
 	}
-	err = ss.prepareBEScript(sshUtil, opensearchIps, "OpenSearch", "BE")
-	if err != nil {
-		return err
+
+	if len(opensearchIps) != 0 {
+		openSearchNodeMap := &NodeTypeAndCmd{
+			Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Automate:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Opensearch: &Cmd{
+				CmdInputs: &CmdInputs{
+					Cmd:                      "",
+					NodeIps:                  opensearchIps,
+					Single:                   false,
+					NodeType:                 true,
+					PrintOutput:              false,
+					HideSSHConnectionMessage: true,
+				},
+			},
+			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Infra:      ss.infra,
+		}
+		err := ss.prepareBEScript(opensearchIps, openSearchNodeMap, "opensearch", "BE")
+		if err != nil {
+			return err
+		}
 	}
-	err = ss.prepareBEScript(sshUtil, postgresqlIps, "Postgresql", "BE")
-	if err != nil {
-		return err
+
+	if len(postgresqlIps) != 0 {
+		postgresqlNodeMap := &NodeTypeAndCmd{
+			Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Automate:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+			Postgresql: &Cmd{
+				CmdInputs: &CmdInputs{
+					Cmd:                      "",
+					NodeIps:                  postgresqlIps,
+					Single:                   false,
+					NodeType:                 true,
+					PrintOutput:              false,
+					HideSSHConnectionMessage: true,
+				},
+			},
+			Infra: ss.infra,
+		}
+		err := ss.prepareBEScript(postgresqlIps, postgresqlNodeMap, "postgresql", "BE")
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -144,45 +213,107 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 
 func (ss *Summary) getIpAddressesFromInfra(errorList *list.List) ([]string, []string, []string, []string, *list.List) {
 	var automateIps, chefServerIps, opensearchIps, postgresqlIps []string
-	if ss.statusSummaryCmdFlags.node != "" {
-		automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList = ss.getIpAddressesFromFlag(errorList)
-	} else {
-		if ss.statusSummaryCmdFlags.isAutomate {
-			automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
-		}
-		if ss.statusSummaryCmdFlags.isChefServer {
-			chefServerIps = ss.infra.Outputs.ChefServerPrivateIps.Value
-		}
-		if ss.statusSummaryCmdFlags.isOpenSearch {
-			opensearchIps = ss.infra.Outputs.OpensearchPrivateIps.Value
-		}
-		if ss.statusSummaryCmdFlags.isPostgresql {
-			postgresqlIps = ss.infra.Outputs.PostgresqlPrivateIps.Value
-		}
-		if !ss.statusSummaryCmdFlags.isAutomate &&
-			!ss.statusSummaryCmdFlags.isChefServer &&
-			!ss.statusSummaryCmdFlags.isOpenSearch &&
-			!ss.statusSummaryCmdFlags.isPostgresql {
-			automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
-			chefServerIps = ss.infra.Outputs.ChefServerPrivateIps.Value
-			opensearchIps = ss.infra.Outputs.OpensearchPrivateIps.Value
-			postgresqlIps = ss.infra.Outputs.PostgresqlPrivateIps.Value
-		}
+
+	if ss.statusSummaryCmdFlags.isAutomate {
+		automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
+	}
+	if ss.statusSummaryCmdFlags.isChefServer {
+		chefServerIps = ss.infra.Outputs.ChefServerPrivateIps.Value
+	}
+	if ss.statusSummaryCmdFlags.isOpenSearch {
+		opensearchIps = ss.infra.Outputs.OpensearchPrivateIps.Value
+	}
+	if ss.statusSummaryCmdFlags.isPostgresql {
+		postgresqlIps = ss.infra.Outputs.PostgresqlPrivateIps.Value
+	}
+	if !ss.statusSummaryCmdFlags.isAutomate &&
+		!ss.statusSummaryCmdFlags.isChefServer &&
+		!ss.statusSummaryCmdFlags.isOpenSearch &&
+		!ss.statusSummaryCmdFlags.isPostgresql {
+		automateIps = ss.infra.Outputs.AutomatePrivateIps.Value
+		chefServerIps = ss.infra.Outputs.ChefServerPrivateIps.Value
+		opensearchIps = ss.infra.Outputs.OpensearchPrivateIps.Value
+		postgresqlIps = ss.infra.Outputs.PostgresqlPrivateIps.Value
 	}
 	return automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList
 }
 
-func (ss *Summary) prepareBEScript(sshUtil SSHUtil, serviceIps []string, serviceName, serviceType string) error {
-	err := ss.executeCommandForArrayofIPs(sshUtil, serviceIps, "", serviceName, serviceType)
+func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd, serviceName, serviceType string) error {
+	getConfigJsonString := convTfvarToJson(a2haHabitatAutoTfvars)
+	authToken, err := ss.readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString)
 	if err != nil {
 		return err
+	}
+
+	// default service details
+	defaultServiceDetails := GenerateOriginalAutomateCLICommand(
+		&cobra.Command{
+			Use: "curl",
+		}, []string{
+			"-s",
+			fmt.Sprintf("%s/services/automate-ha-%s/default", habUrl, serviceName),
+			curlHeaderFlag,
+			fmt.Sprintf(curlAuthorization, authToken),
+			"-k",
+		})
+
+	// default service health details
+	defaultServiceHealthDetails := GenerateOriginalAutomateCLICommand(
+		&cobra.Command{
+			Use: "curl",
+		}, []string{
+			"-s",
+			fmt.Sprintf("%s/services/automate-ha-%s/default/health", habUrl, serviceName),
+			curlHeaderFlag,
+			fmt.Sprintf(curlAuthorization, authToken),
+			"-k",
+		})
+
+	// census details
+	censusDetails := GenerateOriginalAutomateCLICommand(
+		&cobra.Command{
+			Use: "curl",
+		}, []string{
+			"-s",
+			fmt.Sprintf("%s/census", habUrl),
+			curlHeaderFlag,
+			fmt.Sprintf(curlAuthorization, authToken),
+			"-k",
+		})
+
+	script := map[string]string{
+		"DefaultServiceDetails":       defaultServiceDetails,
+		"DefaultServiceHealthDetails": defaultServiceHealthDetails,
+		"CensusDetails":               censusDetails,
+	}
+
+	if serviceName == "opensearch" {
+		nodeMap.Opensearch.CmdInputs.MutipleCmdWithArgs = script
+	}
+
+	if serviceName == "postgresql" {
+		nodeMap.Postgresql.CmdInputs.MutipleCmdWithArgs = script
+	}
+
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, writer)
+	beOutput, err := cmdUtil.Execute()
+	if err != nil {
+		return err
+	}
+
+	for ip, res := range beOutput {
+		status := ss.getBEStatus(res, ip, authToken, serviceName)
+		ss.beStatus = append(ss.beStatus, status)
 	}
 
 	return nil
 }
 
-func (ss *Summary) prepareFEScript(sshUtil SSHUtil, serviceIps []string, serviceName, serviceType string) error {
-	script := GenerateOriginalAutomateCLICommand(
+func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd, serviceName, serviceType string) error {
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, writer)
+
+	// Status Script
+	status := GenerateOriginalAutomateCLICommand(
 		&cobra.Command{
 			Use: "chef-automate",
 		}, []string{
@@ -191,30 +322,38 @@ func (ss *Summary) prepareFEScript(sshUtil SSHUtil, serviceIps []string, service
 			"150",
 		})
 
-	err := ss.executeCommandForArrayofIPs(sshUtil, serviceIps, script, serviceName, serviceType)
+	// OsStatus Script
+	osStatus := GenerateOriginalAutomateCLICommand(
+		&cobra.Command{
+			Use: "curl",
+		}, []string{
+			"-s",
+			clusterOSHealth,
+		})
+
+	script := map[string]string{
+		"Status":   status,
+		"OsStatus": osStatus,
+	}
+
+	if serviceName == "automate" {
+		nodeMap.Automate.CmdInputs.MutipleCmdWithArgs = script
+	}
+
+	if serviceName == "chef-server" {
+		nodeMap.ChefServer.CmdInputs.MutipleCmdWithArgs = script
+	}
+
+	feOutput, err := cmdUtil.Execute()
 	if err != nil {
 		return err
 	}
-	return nil
-}
 
-func (ss *Summary) executeCommandForArrayofIPs(sshUtil SSHUtil, remoteIps []string, script, serviceName, serviceType string) error {
-	getConfigJsonString := convTfvarToJson(a2haHabitatAutoTfvars)
-	for i := 0; i < len(remoteIps); i++ {
-		sshUtil.getSSHConfig().hostIP = remoteIps[i]
-		switch serviceType {
-		case "FE":
-			status := ss.getFEStatus(sshUtil, script, remoteIps[i], serviceName)
-			ss.feStatus = append(ss.feStatus, status)
-		case "BE":
-			authToken, err := ss.readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString)
-			if err != nil {
-				return err
-			}
-			status := ss.getBEStatus(sshUtil, remoteIps[i], authToken, serviceName)
-			ss.beStatus = append(ss.beStatus, status)
-		}
+	for ip, res := range feOutput {
+		data := ss.getFEStatus(ip, res, serviceName)
+		ss.feStatus = append(ss.feStatus, data)
 	}
+
 	return nil
 }
 
@@ -229,14 +368,13 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 	return authToken, nil
 }
 
-func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceName string) BeStatusValue {
-	var service, memeberId, role string
-	if serviceName == "OpenSearch" {
-		role = "OS node"
-		service = "automate-ha-opensearch"
-	} else if serviceName == "Postgresql" {
-		service = "automate-ha-postgresql"
-	}
+func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, serviceName string) BeStatusValue {
+	var memeberId, role string
+	var err error
+	serviceState := initialServiceState
+	servicePid := initialServicePid
+	formattedDuration := initialFormattedDuration
+	health := initialHealth
 	defaultBeStatusValue := BeStatusValue{
 		serviceName: serviceName,
 		ipAddress:   ip,
@@ -245,18 +383,25 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceNam
 		upTime:      initialFormattedDuration,
 		role:        initialRole,
 	}
-	memeberId, serviceState, servicePid, formattedDuration, err := ss.getBEDefaultServiceDetails(sshUtil, authToken, service)
-	if err != nil {
-		return defaultBeStatusValue
-	}
-	health, err := ss.getBEServiceHealth(sshUtil, authToken, service)
-	if err != nil {
-		return defaultBeStatusValue
-	}
-	role, err = ss.getBECensus(sshUtil, authToken, service, memeberId, serviceName)
-	if err != nil {
-		defaultBeStatusValue.role = role
-		return defaultBeStatusValue
+	for _, output := range outputs {
+		switch output.ScriptName {
+		case "DefaultServiceDetails":
+			memeberId, serviceState, servicePid, formattedDuration, err = ss.getBEDefaultServiceDetails(output.Output)
+			if output.Error != nil || err != nil {
+				return defaultBeStatusValue
+			}
+		case "DefaultServiceHealthDetails":
+			health, err = ss.getBEServiceHealth(output.Output)
+			if output.Error != nil || err != nil {
+				return defaultBeStatusValue
+			}
+		case "CensusDetails":
+			role, err = ss.getBECensus(output.Output, serviceName, memeberId)
+			if output.Error != nil || err != nil {
+				defaultBeStatusValue.role = role
+				return defaultBeStatusValue
+			}
+		}
 	}
 	return BeStatusValue{
 		serviceName: serviceName,
@@ -268,16 +413,8 @@ func (ss *Summary) getBEStatus(sshUtil SSHUtil, ip string, authToken, serviceNam
 	}
 }
 
-func (ss *Summary) getBEDefaultServiceDetails(sshUtil SSHUtil, authToken, service string) (string, string, string, string, error) {
-	args := []string{
-		"-s",
-		fmt.Sprintf("%s/services/%s/default", habUrl, service),
-		curlHeaderFlag,
-		fmt.Sprintf(curlAuthorization, authToken),
-		"-k",
-	}
-
-	defaultServiceDetails, err := executeCmd(sshUtil, "curl", args)
+func (ss *Summary) getBEDefaultServiceDetails(output string) (string, string, string, string, error) {
+	defaultServiceDetails, err := parseStringInToMapStringInterface(output)
 	if err != nil {
 		return "", initialServiceState, initialServicePid, initialFormattedDuration, err
 	}
@@ -296,61 +433,56 @@ func (ss *Summary) getBEDefaultServiceDetails(sshUtil SSHUtil, authToken, servic
 	return memeberId, serviceState, servicePid, formattedDuration, nil
 }
 
-func (ss *Summary) getBEServiceHealth(sshUtil SSHUtil, authToken, service string) (string, error) {
-	args := []string{
-		"-s",
-		fmt.Sprintf("%s/services/%s/default/health", habUrl, service),
-		curlHeaderFlag,
-		fmt.Sprintf(curlAuthorization, authToken),
-		"-k",
-	}
-	ServiceHealth, err := executeCmd(sshUtil, "curl", args)
+func (ss *Summary) getBEServiceHealth(output string) (string, error) {
+	ServiceHealth, err := parseStringInToMapStringInterface(output)
 	if err != nil {
 		return initialHealth, err
 	}
-
 	health := fmt.Sprint(ServiceHealth["status"])
 	return health, nil
 }
 
-func (ss *Summary) getBECensus(sshUtil SSHUtil, authToken, service, memeberId, serviceName string) (string, error) {
+func (ss *Summary) getBECensus(output, service, memeberId string) (string, error) {
 	role := initialRole
-	args := []string{
-		"-s",
-		fmt.Sprintf("%s/census", habUrl),
-		curlHeaderFlag,
-		fmt.Sprintf(curlAuthorization, authToken),
-		"-k",
+	if service == "opensearch" {
+		role = "OS node"
 	}
-	censusData, err := executeCmd(sshUtil, "curl", args)
+
+	censusData, err := parseStringInToMapStringInterface(output)
 	if err != nil {
 		return "Unknown", err
 	}
 
-	populationData := censusData["census_groups"].(map[string]interface{})[service+".default"].(map[string]interface{})["population"].(map[string]interface{})[fmt.Sprintf("%s", memeberId)]
+	populationData := censusData["census_groups"].(map[string]interface{})["automate-ha-"+service+".default"].(map[string]interface{})["population"].(map[string]interface{})[memeberId]
 	getrole, ok := populationData.(map[string]interface{})
 	if ok {
 		isleader, _ := strconv.ParseBool(fmt.Sprint(getrole["leader"]))
 		isfollower, _ := strconv.ParseBool(fmt.Sprint(getrole["follower"]))
 		if isleader {
 			role = "Leader"
-		} else if isfollower {
+		}
+		if isfollower {
 			role = "Follower"
 		}
 	}
 	return role, nil
 }
 
-func (ss *Summary) getFEStatus(sshUtil SSHUtil, script string, ip string, serviceType string) FeStatusValue {
-	osStatus := ss.opensearchStatusInFE(sshUtil)
-	_, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
-	status := "OK"
-	if err != nil {
-		_, ok := err.(*exec.ExitError)
-		if ok {
-			status = "ERROR"
-		} else {
-			status = "WARN"
+func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
+	osStatus := "Unknown"
+	status := "ERROR"
+	for _, output := range outputs {
+		switch output.ScriptName {
+		case "OsStatus":
+			osStatus = ss.opensearchStatusInFE(output)
+		case "Status":
+			status = "OK"
+			if output.Error != nil {
+				_, ok := output.Error.(*exec.ExitError)
+				if !ok {
+					status = "WARN"
+				}
+			}
 		}
 	}
 
@@ -362,24 +494,16 @@ func (ss *Summary) getFEStatus(sshUtil SSHUtil, script string, ip string, servic
 	}
 }
 
-func (ss *Summary) opensearchStatusInFE(sshUtil SSHUtil) string {
-	arg := []string{
-		"-s",
-		clusterOSHealth,
-	}
-	curlOSStatusScript := GenerateOriginalAutomateCLICommand(
-		&cobra.Command{
-			Use: "curl",
-		}, arg)
-	osStatusJson, err := sshUtil.connectAndExecuteCommandOnRemote(curlOSStatusScript, true)
-	if err != nil {
+func (ss *Summary) opensearchStatusInFE(osStatusOutput *CmdResult) string {
+
+	if osStatusOutput.Error != nil {
 		return "Unknown"
 	}
 
-	body := []byte(osStatusJson)
+	body := []byte(osStatusOutput.Output)
 	esHealthData := make(map[string]json.RawMessage)
 
-	err = json.Unmarshal(body, &esHealthData)
+	err := json.Unmarshal(body, &esHealthData)
 	if err != nil {
 		return "Unknown"
 	}
@@ -387,17 +511,9 @@ func (ss *Summary) opensearchStatusInFE(sshUtil SSHUtil) string {
 	return fmt.Sprintf("%s (Active: %s)", esHealthData["status"], esHealthData["active_shards_percent_as_number"])
 }
 
-func executeCmd(sshUtil SSHUtil, cmd string, args []string) (map[string]interface{}, error) {
+func parseStringInToMapStringInterface(output string) (map[string]interface{}, error) {
 	var body map[string]interface{}
-	script := GenerateOriginalAutomateCLICommand(&cobra.Command{
-		Use: "curl",
-	}, args)
-	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
-	if err != nil {
-		return body, err
-	}
-
-	err = json.Unmarshal([]byte(output), &body)
+	err := json.Unmarshal([]byte(output), &body)
 	if err != nil {
 		return body, err
 	}
