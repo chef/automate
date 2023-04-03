@@ -216,22 +216,23 @@ For Centos or Redhat :
       bind *:80
       redirect scheme https code 301 if !{ ssl_fc }
 
-   # You need to get your own automate DNS,
+   # You need to get your own Automate DNS and Chef Server,
    # here we have taken example DNS: chefautomate.example.com and chefinfraserver.example.com
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
    # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
-   frontend chef-infra-servers
-      # Add the private IP thats connected to Chef Server DNS, like 10.1.1.67:443 
-      bind <PRIVATE-IP-CHEF-SERVER>:443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
-      mode tcp
-      default_backend chef-infra-servers
 
    frontend chef-automate-servers
       # Add the private IP thats connected to Automate DNS, like 10.1.1.194:443 
       bind <PRIVATE-IP-AUTOMATE>:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
       mode tcp
       default_backend chef-automate-servers
+
+   frontend chef-infra-servers
+      # Add the private IP thats connected to Chef Server DNS, like 10.1.1.67:443 
+      bind <PRIVATE-IP-CHEF-SERVER>:443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
+      mode tcp
+      default_backend chef-infra-servers
 
    backend automate_server
       balance roundrobin
