@@ -138,7 +138,7 @@ func TestValidateNode(t *testing.T) {
 
 func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 	return &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeOfDeploymentFunc: func() string {

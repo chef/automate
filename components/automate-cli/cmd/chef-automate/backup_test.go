@@ -14,7 +14,7 @@ func TestIsBastionHost(t *testing.T) {
 
 func TestExecuteAndPoolStatusWithInvalidConfig(t *testing.T) {
 	impl := NewBackupFromBashtion()
-	err := impl.executeOnRemoteAndPoolStatus("chef-automate backup create", &AutomteHAInfraDetails{}, false, false, false, "create")
+	err := impl.executeOnRemoteAndPoolStatus("chef-automate backup create", &AutomateHAInfraDetails{}, false, false, false, "create")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Invalid deployment config")
 }

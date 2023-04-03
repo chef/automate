@@ -16,7 +16,7 @@ func TestAddnodeAWSValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{automateCount: 0}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -40,7 +40,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -64,7 +64,7 @@ func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -90,7 +90,7 @@ func TestAddnodeModifyAws(t *testing.T) {
 		chefServerCount: 1,
 	}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -115,7 +115,7 @@ func TestAddAwsnodePrompt(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{automateCount: 1}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -159,7 +159,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	var filewritten, deployed, autoFileMoved, tfArchModified bool
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -242,7 +242,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	var filewritten, autoFileMoved, tfArchModified bool
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -304,7 +304,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	var filewritten, deployed, autoFileMoved, tfArchModified bool
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {

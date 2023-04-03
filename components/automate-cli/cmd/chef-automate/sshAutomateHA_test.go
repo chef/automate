@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetAutomateHAInfraDetails(t *testing.T) {
-	expectedInfraDetails := &AutomteHAInfraDetails{} // Define your expected infrastructure details here
+	expectedInfraDetails := &AutomateHAInfraDetails{} // Define your expected infrastructure details here
 
 	tmpfile, err := ioutil.TempFile("", "test-output.json")
 	require.NoError(t, err)

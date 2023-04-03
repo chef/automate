@@ -218,7 +218,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			infra := &AutomteHAInfraDetails{}
+			infra := &AutomateHAInfraDetails{}
 			infra.Outputs.AutomatePrivateIps.Value = tc.clusterIPs
 			remoteFilePathRes, fileNameRes, hostIPRes, err := c.GetRemoteFileDetails(tc.input, infra)
 			if tc.isError {
@@ -237,7 +237,7 @@ func TestGetRemoteFileDetails(t *testing.T) {
 func TestGetCerts(t *testing.T) {
 	c := certRotateFlow{FileUtils: mockFS()}
 
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -789,7 +789,7 @@ func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
 		newCn               string
 		node                string
 		currentCertsInfo    *certShowCertificates
-		infra               *AutomteHAInfraDetails
+		infra               *AutomateHAInfraDetails
 		skipIpsList         []string
 	}
 
@@ -972,9 +972,9 @@ func TestGetFilteredIps(t *testing.T) {
 	}
 }
 
-func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomteHAInfraDetails) {
+func getMockCertRotateFlowAndInfra() (certRotateFlow, *AutomateHAInfraDetails) {
 	c := certRotateFlow{FileUtils: mockFS()}
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
