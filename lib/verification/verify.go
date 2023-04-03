@@ -155,7 +155,7 @@ func VerifyOnPremDeployment(configFile string) error {
 
 	//validateOnPremConfig(config)
 
-	runTests(ipsMap)
+	runTests(ipsMap, numberOfNodes)
 
 	return nil
 }
@@ -166,7 +166,7 @@ func constructMap(nodeIps []string, nodeType string, m *map[string]string) {
 	}
 }
 
-func runTests(ipsMap map[string]string) {
+func runTests(ipsMap map[string]string, numberOfNodes *numberOfNodes) {
 	var wg sync.WaitGroup
 
 	for k, v := range ipsMap {
@@ -177,22 +177,22 @@ func runTests(ipsMap map[string]string) {
 			go func() {
 				defer wg.Done()
 				producerChan := make(chan bool, 1)
-				runchecksForCertificates(ip, nodeType, producerChan)
+				runchecksForCertificates(ip, nodeType, producerChan, numberOfNodes)
 			}()
 		} else {
 			wg.Add(3)
 		}
 		go func() {
 			defer wg.Done()
-			validateNodeReachability(ip, nodeType, reportChan)
+			validateNodeReachability(ip, nodeType, reportChan, numberOfNodes)
 		}()
 		go func() {
 			defer wg.Done()
-			runchecksForSystemResources(ip, nodeType)
+			runchecksForSystemResources(ip, nodeType, numberOfNodes)
 		}()
 		go func() {
 			defer wg.Done()
-			runchecksForSoftwareVersions(ip, nodeType)
+			runchecksForSoftwareVersions(ip, nodeType, numberOfNodes)
 		}()
 	}
 	wg.Wait()
@@ -202,19 +202,19 @@ func runTests(ipsMap map[string]string) {
 	}
 }
 
-func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan bool) {
+func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan bool, numberOfNodes *numberOfNodes) {
 	var successCount, failedCount int
 	result := validateCertificateFormat(ipaddress, "abc")
 	if !result.Valid {
 		failedCount++
 		result.Report.SummaryInfo.FailedCount = failedCount
-		chanWriter(reportChan, nodeType, result.Report)
+		chanWriter(reportChan, nodeType, result.Report, numberOfNodes)
 	} else {
 		result = validateCertificateExpiry(ipaddress, "abc")
 		if !result.Valid {
 			failedCount++
 			result.Report.SummaryInfo.FailedCount = failedCount
-			chanWriter(reportChan, nodeType, result.Report)
+			chanWriter(reportChan, nodeType, result.Report, numberOfNodes)
 		} else {
 			successCount++
 			report := report{
@@ -223,13 +223,13 @@ func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan b
 				message:               "Cerificate validation successful",
 				successfulChecksCount: successCount,
 			}
-			chanWriter(reportChan, nodeType, getReport(report, "Success"))
+			chanWriter(reportChan, nodeType, getReport(report, "Success"), numberOfNodes)
 		}
 	}
 	doneChan <- true
 }
 
-func runchecksForSystemResources(ipaddress string, nodeType string) {
+func runchecksForSystemResources(ipaddress string, nodeType string, numberOfNodes *numberOfNodes) {
 	var successCount, failedCount int
 	var errors []string
 	var resolutions []string
@@ -273,7 +273,7 @@ func runchecksForSystemResources(ipaddress string, nodeType string) {
 			failedChecksCount:     failedCount,
 			successfulChecksCount: successCount,
 		}
-		chanWriter(reportChan, nodeType, getReport(report, "Failed"))
+		chanWriter(reportChan, nodeType, getReport(report, "Failed"), numberOfNodes)
 
 	} else {
 		report := report{
@@ -285,11 +285,11 @@ func runchecksForSystemResources(ipaddress string, nodeType string) {
 			failedChecksCount:     failedCount,
 			successfulChecksCount: successCount,
 		}
-		chanWriter(reportChan, nodeType, getReport(report, "Success"))
+		chanWriter(reportChan, nodeType, getReport(report, "Success"), numberOfNodes)
 	}
 }
 
-func runchecksForSoftwareVersions(ipaddress string, nodeType string) {
+func runchecksForSoftwareVersions(ipaddress string, nodeType string, numberOfNodes *numberOfNodes) {
 	var successCount, failedCount int
 	var errors []string
 	var resolutions []string
@@ -333,7 +333,7 @@ func runchecksForSoftwareVersions(ipaddress string, nodeType string) {
 			failedChecksCount:     failedCount,
 			successfulChecksCount: successCount,
 		}
-		chanWriter(reportChan, nodeType, getReport(report, "Failed"))
+		chanWriter(reportChan, nodeType, getReport(report, "Failed"), numberOfNodes)
 
 	} else {
 		report := report{
@@ -345,7 +345,7 @@ func runchecksForSoftwareVersions(ipaddress string, nodeType string) {
 			failedChecksCount:     failedCount,
 			successfulChecksCount: successCount,
 		}
-		chanWriter(reportChan, nodeType, getReport(report, "Success"))
+		chanWriter(reportChan, nodeType, getReport(report, "Success"), numberOfNodes)
 	}
 }
 
@@ -406,10 +406,14 @@ func getSummaryTable(title string) *reporting.Table {
 	}
 }
 
-func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, report reporting.Info) {
-	total := 3
-	if nodeType == "OpenSearch" || nodeType == "PostgresSQL" {
-		total = 12
+func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, report reporting.Info, nodeNumbers *numberOfNodes) {
+	total := 3 * nodeNumbers.numberOfAutomateNodes
+	if nodeType == "ChefServer" {
+		total = 3 * nodeNumbers.numberOfChefServerNodes
+	} else if nodeType == "OpenSearch" {
+		total = 4 * nodeNumbers.numberOfOpenSearchNodes
+	} else if nodeType == "PostgresSQL" {
+		total = 4 * nodeNumbers.numberOfPostgresSQLNodes
 	}
 	msg := reporting.VerfictionReport{
 		TableKey:     nodeType,
