@@ -1,8 +1,6 @@
 +++
 title = "Chef Infra External Cookbooks In Chef Automate"
-
 draft = false
-
 gh_repo = "automate"
 [menu]
   [menu.automate]
@@ -12,26 +10,26 @@ gh_repo = "automate"
     weight = 90
 +++
 
-The Chef Infra Server stores cookbooks, the policies that are applied to nodes, and the metadata that describes each registered node that is under management by Chef Infra Client.
+The Chef Infra Server stores cookbooks, the policies that are applied to nodes, and the metadata that describes each registered node under Chef Infra Client's management. This page will tell you how you can configure your Infra Server to use S3 storage type of cookbooks.
 
 ## Adding configuration
 
-You can configure the chef automate infra server to use S3 storage type for cookbooks. Add below configurations in a toml file. 
+You can configure the Chef Automate Infra Server to use the S3 storage type for cookbooks by adding the following configurations into a `.toml` file.
 
-```
+```bash
 [erchef.v1.sys.api]
-s3_enabled=true  ## false in case you want to disbale this config
+s3_enabled=true  ## false in case you want to disable this config
 s3_bucket_name="<name of your bucket>"
 s3_external_url="<s3_url>"
-
-
 [bookshelf.v1.sys.bookshelf]
 aws_access_id="<aws-access-id>"
 aws_secret_key="<aws-secret-token>"
 ```
 
-Patch the above configuration using:
-```
-chef-automate config patch </path/to/your-file.toml>.toml
+Patch the above configuration using the following:
 
+```bash
+chef-automate config patch </path/to/your-file.toml>.toml
 ```
+
+Refer to the [External Cookbooks](https://docs.chef.io/server/#external-cookbooks) section to learn about the cookbooks shored in Chef Infra Server.
