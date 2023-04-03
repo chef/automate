@@ -26,6 +26,7 @@ var preflightCmdFlags = struct {
 	automate           bool
 	chef_server        bool
 	frontend           bool
+	node               string
 }{}
 
 type InfraKeyValues struct {
@@ -66,6 +67,11 @@ func init() {
 		"c",
 		false,
 		"Pass this flag to run pre-flight check on chef-server node(HA)")
+	preflightCheckCmd.PersistentFlags().StringVar(
+		&preflightCmdFlags.node,
+		"node",
+		"",
+		"Pass this flag to run pre-flight check on a perticular node node(HA)")
 	preflightCheckCmd.PersistentFlags().StringVar(
 		&preflightCmdFlags.configPath,
 		"config",
@@ -137,6 +143,7 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
 				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
 				InputFiles:               []string{"/usr/bin/chef-automate"},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.frontend,
@@ -149,6 +156,7 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
 				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
 				InputFiles:               []string{"/usr/bin/chef-automate"},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.automate,
@@ -161,6 +169,7 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
 				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
 				InputFiles:               []string{"/usr/bin/chef-automate"},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.chef_server,
