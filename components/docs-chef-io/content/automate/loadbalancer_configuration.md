@@ -17,40 +17,40 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-This guide details how to set up the load balancer configuration for Chef Automate and Chef Infra Server.
+This guide will show you how to configure a load balancer for Chef Automate and Chef Infra Server. Below are some examples of load balancer setups.
 
-## Listed below are some examples for setting up load balancer
+## Load Balancer Setup Examples
 
 - Using NGINX
 - Using HA Proxy
 
 ## Load Balancer Prerequisites
 
--  Configure DNSs for Automate and Chef Server.
-  
-   In the following examples we have assumed that you have DNSs configured with these domain names:
+-  Before proceeding with the load balancer setup, you will need to configure DNS for Automate and Chef Server. In this guide, we assume that you have already set up DNS with the following domain names:
 
    - Chef Automate: chefautomate.example.com
    - Chef Infra Server: chefinfraserver.example.com
 
 ## Load Balancer architecture
 
-Following are the recommended architecture for Load Balancer setup in Automate. You can choose either one of them based on your feasibility.
+There are two recommended load balancer setups for Automate, depending on your feasibility:
 
-- 2 Load Balancers with 2 private ips each (each LB is shared between Automate and Chef Server)
-   - In this setup we need two indentical Load Balancer nodes to ensure High Availablity.
-   - Each node requires two private ips( one for Automate and another for Chef Server ).
-   - Automate DNS (chefautomate.example.com) should be pointed to the Private IP 1 of both the nodes and Chef Server DNS (chefinfraserver.example.com) should be pointed to the Private IP 2 of both the node.
-- 4 Load Balancers, separate for Automate and separate for Chef Server (single private IP required on each node unlike the above example)
-   - In this setup we need 2 Load Balancers for Automate and 2 for Chef Server to ensure High Availability.
-   - Automate DNS (chefautomate.example.com) should be pointed to the Automate nodes and Chef Server DNS (chefinfraserver.example.com) should be pointed to the Chef Server nodes.
+- Option 1: 2 Load Balancers with 2 Private IPs Each
+   - This setup requires two identical load balancer nodes to ensure high availability.
+   - Each node needs two private IPs, one for Automate and another for Chef Server.
+   - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to Private IP 1 of both nodes, and the Chef Server DNS (chefinfraserver.example.com) to Private IP 2 of both nodes.
+- Option 2: 4 Load Balancers, Separate for Automate and separate for Chef Server
+   - This setup requires two load balancers for Automate and two for Chef Server to ensure high availability.
+   - Each node only requires one private IP.
+   - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to the Automate nodes, and the Chef Server DNS (chefinfraserver.example.com) to the Chef Server nodes.
 
+With these load balancer setups, you can ensure high availability for Chef Automate and Chef Infra Server.
 
 ## 2 Load Balancer Setup with 2 private ips each
 
 ### Load Balancer setup using NGINX
 
-### Install Nginx on all Load Balancers
+#### Install Nginx on all Load Balancers
 
 For Debian / Ubuntu :
 
@@ -166,7 +166,7 @@ For Centos or Redhat :
 
 ### Load Balancer setup using HA Proxy
 
-### Install HA Proxy on all Load Balancers
+#### Install HA Proxy on all Load Balancers
 
 For Debian / Ubuntu :
 
@@ -266,7 +266,7 @@ For Centos or Redhat :
 
 ### Load Balancer setup using NGINX
 
-### Install Nginx on all the Load Balancers
+#### Install Nginx on all the Load Balancers
 
 For Debian / Ubuntu :
 
@@ -399,7 +399,7 @@ For Centos or Redhat :
 
 ### Load Balancer setup using HA Proxy
 
-### Install HA Proxy on all Load Balancers
+#### Install HA Proxy on all Load Balancers
 
 For Debian / Ubuntu :
 
