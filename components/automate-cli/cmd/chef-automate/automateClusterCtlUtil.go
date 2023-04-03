@@ -656,7 +656,7 @@ func printInfo(automate *AutomateHAInfraDetails) {
 		fmt.Printf("%50s %s\n", "", ip)
 	}
 
-	fmt.Printf("%-50s %s\n", "ssh_key_file:", automate.Outputs.SSHKeyFile)
+	fmt.Printf("%-50s %s\n", "ssh_key_file:", automate.Outputs.SSHKeyFile.Value)
 	fmt.Printf("%-50s %s\n", "ssh_port", automate.Outputs.SSHPort.Value)
 	fmt.Printf("%-50s %s\n", "ssh_user", automate.Outputs.SSHUser.Value)
 
