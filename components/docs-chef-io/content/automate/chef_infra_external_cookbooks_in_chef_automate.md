@@ -12,3 +12,4 @@ gh_repo = "automate"
     weight = 90
 +++
 
+The Chef Infra Server stores cookbooks, the policies that are applied to nodes, and the metadata that describes each registered node that is under management by Chef Infra Client.
