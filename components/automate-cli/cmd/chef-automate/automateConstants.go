@@ -63,7 +63,8 @@ const (
 	GET_FRONTEND_CONFIG = `echo "y" | sudo chef-automate config show %s`
 
 	PRE_FLIGHT_CHECK = `cd /tmp;
-	echo "y" | sudo ./chef-automate preflight-check`
+	chmod +x chef-automate;
+	sudo ./chef-automate preflight-check`
 
 	GET_APPLIED_CONFIG = `
 	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);

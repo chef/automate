@@ -213,7 +213,14 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 	if errorCheckEnableInOutput {
 		err = checkResultOutputForError(output)
 	}
-	if err != nil && len(output) == 0 {
+
+	if err != nil {
+		rc.Error = err
+		resultChan <- rc
+		return
+	}
+
+	if err != nil {
 		rc.Error = err
 		resultChan <- rc
 		return
@@ -387,7 +394,7 @@ func appendChildFileToParentFile(hostIp, parent, child string) (string, error) {
 
 // checkResultOutputForError checks If the output contains the word "error" then return error
 func checkResultOutputForError(output string) error {
-	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
+	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") && !strings.Contains(strings.ToUpper(strings.TrimSpace(output)), strings.ToUpper("PreflightError: One or more preflight checks failed")){
 		return errors.New(output)
 	}
 	return nil
