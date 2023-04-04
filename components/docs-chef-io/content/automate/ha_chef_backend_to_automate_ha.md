@@ -222,7 +222,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
     ```
 
-9. Deploy using
+9. Deploy using the following command:
 
 ```cmd
 ./chef-automate deploy config.toml <airgapped bundle name>
@@ -238,7 +238,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     From Bastion machine or local machine install chef-workstation
     https://www.chef.io/downloads/tools/workstation
 
-2. Set up the workstation
+2. Set up the workstation using the following commands:
 
     ```bash
     chef generate repo chef-repo
