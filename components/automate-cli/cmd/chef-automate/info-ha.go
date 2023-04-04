@@ -106,11 +106,11 @@ func execInfo() error {
 func printInfo(automate *AutomateHAInfraDetails) error {
 	tmpl, err := template.New("output").Parse(INFO_COMMAND_TEMP)
 	if err != nil {
-		logrus.Errorf("Error: ", err)
+		logrus.Errorf("Error: %v", err)
 		return err
 	}
 	if err := tmpl.Execute(os.Stdout, automate); err != nil {
-		logrus.Errorf("Error: ", err)
+		logrus.Errorf("Error: %v", err)
 		return err
 	}
 	fmt.Println()
