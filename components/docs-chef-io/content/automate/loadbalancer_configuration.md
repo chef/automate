@@ -234,7 +234,7 @@ For Centos or Redhat :
       mode http
       default_backend chef-infra-servers
 
-   backend automate_server
+   backend chef-automate-servers
       mode http
       balance roundrobin
       # Add a list of automate machine ip addresses.
@@ -242,7 +242,7 @@ For Centos or Redhat :
       server automate2 10.1.0.102:443 check ssl verify none
       server automate3 10.1.0.103:443 check ssl verify none
 
-   backend chef_infra_server
+   backend chef-infra-servers
       mode http
       balance roundrobin
       # Add a list of infra server machine ip addresses.
@@ -451,7 +451,7 @@ For Centos or Redhat :
       mode http
       default_backend chef-automate-servers
 
-   backend automate_server
+   backend chef-automate-servers
       mode http
       balance roundrobin
       # Add a list of automate machine ip addresses.
@@ -506,7 +506,7 @@ For Centos or Redhat :
       mode http
       default_backend chef-infra-servers
 
-   backend chef_infra_server
+   backend chef-infra-servers
       mode http
       balance roundrobin
       # Add a list of infra server machine ip addresses.
