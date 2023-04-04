@@ -39,14 +39,14 @@ There are two recommended load balancer setups for Automate, depending on your f
    - This setup requires two identical load balancer nodes to ensure high availability.
    - Each node needs two private IPs, one for Automate and another for Chef Server.
    - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to Private IP 1 of both nodes, and the Chef Server DNS (chefinfraserver.example.com) to Private IP 2 of both nodes.
-- Option 2: 4 Load Balancers, Separate for Automate and separate for Chef Server
+- Option 2: 4 Load Balancers, separate for Automate and separate for Chef Server
    - This setup requires two load balancers for Automate and two for Chef Server to ensure high availability.
    - Each node only requires one private IP.
    - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to the Automate nodes, and the Chef Server DNS (chefinfraserver.example.com) to the Chef Server nodes.
 
 With these load balancer setups, you can ensure high availability for Chef Automate and Chef Infra Server.
 
-## 2 Load Balancer Setup with 2 private ips each
+## Option 1: 2 Load Balancer Setup with 2 private ips each
 
 ### Load Balancer setup using NGINX
 
@@ -225,26 +225,26 @@ For Centos or Redhat :
    frontend chef-automate-servers
       # Add the private IP thats connected to Automate DNS, like 10.1.1.194:443 
       bind <PRIVATE-IP-AUTOMATE>:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
-      mode tcp
+      mode http
       default_backend chef-automate-servers
 
    frontend chef-infra-servers
       # Add the private IP thats connected to Chef Server DNS, like 10.1.1.67:443 
       bind <PRIVATE-IP-CHEF-SERVER>:443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
-      mode tcp
+      mode http
       default_backend chef-infra-servers
 
    backend automate_server
+      mode http
       balance roundrobin
-      http-request set-header Host chefautomate.example.com
       # Add a list of automate machine ip addresses.
       server automate1 10.1.0.101:443 check ssl verify none
       server automate2 10.1.0.102:443 check ssl verify none
       server automate3 10.1.0.103:443 check ssl verify none
 
    backend chef_infra_server
+      mode http
       balance roundrobin
-      http-request set-header Host chefinfraserver.example.com
       # Add a list of infra server machine ip addresses.
       server infra1 10.1.0.101:443 check ssl verify none
       server infra2 10.1.0.102:443 check ssl verify none
@@ -263,7 +263,7 @@ For Centos or Redhat :
    sudo systemctl restart haproxy
    ```
 
-## 4 Load Balancers Setup, separate for Automate and separate for Chef Server 
+## Option 2: 4 Load Balancers Setup, separate for Automate and separate for Chef Server 
 
 ### Load Balancer setup using NGINX
 
@@ -445,14 +445,15 @@ For Centos or Redhat :
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
    # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+
    frontend chef-automate-servers
       bind *:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
-      mode tcp
+      mode http
       default_backend chef-automate-servers
 
    backend automate_server
+      mode http
       balance roundrobin
-      http-request set-header Host chefautomate.example.com
       # Add a list of automate machine ip addresses.
       server automate1 10.1.0.101:443 check ssl verify none
       server automate2 10.1.0.102:443 check ssl verify none
@@ -499,14 +500,15 @@ For Centos or Redhat :
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
    # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+
    frontend chef-infra-servers
       bind *:443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
-      mode tcp
+      mode http
       default_backend chef-infra-servers
 
    backend chef_infra_server
+      mode http
       balance roundrobin
-      http-request set-header Host chefinfraserver.example.com
       # Add a list of infra server machine ip addresses.
       server infra1 10.1.0.101:443 check ssl verify none
       server infra2 10.1.0.102:443 check ssl verify none
