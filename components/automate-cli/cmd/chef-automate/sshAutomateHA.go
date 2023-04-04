@@ -19,16 +19,17 @@ import (
 const automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
 const automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
 
-func FileContainingAutomateHAInfraDetails() string {
+// TODO: return string and error
+func FileContainingAutomateHAInfraDetails() (string, error) {
 	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
-		return automateHATerraformOutputFile
+		return automateHATerraformOutputFile, nil
 	}
 
 	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
-		return automateHATerraformDestroyOutputFile
+		return automateHATerraformDestroyOutputFile, nil
 	}
 
-	return ""
+	return "", errors.New("no file found")
 }
 
 var sshFlags = struct {
@@ -228,7 +229,12 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	if !isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+	outputFile, err := FileContainingAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	infra, err := getAutomateHAInfraDetails(outputFile)
 	if err != nil {
 		return err
 	}
@@ -293,10 +299,12 @@ func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error)
 	if err != nil {
 		return nil, err
 	}
+	// TODO: check extractPortAndSshUserFromAutomateSSHCommand
 	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 	return automateHAInfraDetails, nil
 }
 
+// TODO: restructure
 func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {
 	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
 		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]

@@ -65,7 +65,12 @@ const (
 )
 
 func runCleanupCmd(cmd *cobra.Command, args []string) error {
-	infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+	outputFile, err := FileContainingAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	infra, err := getAutomateHAInfraDetails(outputFile)
 	if err != nil {
 		return err
 	}
