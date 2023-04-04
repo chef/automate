@@ -21,7 +21,7 @@ gh_repo = "automate"
 - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  
 minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
-- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA. 
+- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA.
 
 {{< /warning >}}
 
@@ -66,7 +66,6 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     sudo chef-automate config show > current_config.toml 
     ```
 
-    
     From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
     ```bash
@@ -75,18 +74,9 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     password = "admin"
     ```
 
-{{< warning >}}
-{{% automate/char-warn %}}
-{{< /warning >}}
-
-
-1. Restore in Chef-Automate HA using the following command:
-
-    ```bash
-    automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
-     
-    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
-    ```
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
 
@@ -94,6 +84,14 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
 
     ```bash
     chef-automate bootstrap bundle unpack bootstrap.abb
+    ```
+
+1. Restore in Chef-Automate HA using the following command:
+
+    ```bash
+    automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
+     
+    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ```
 
 1. Start the Service in all the Frontend Nodes with the command shown below:
@@ -135,7 +133,6 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     sudo chef-automate config show > current_config.toml 
     ```
 
-   
     From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
     ```bash
@@ -144,18 +141,9 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     password = "admin"
     ```
 
-{{< warning >}}
-{{% automate/char-warn %}}
-{{< /warning >}}
-
-
-1. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster:
-
-    ```bash
-    automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
-
-    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
-    ```
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
@@ -163,6 +151,14 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
 
     ```bash
     chef-automate bootstrap bundle unpack bootstrap.abb
+    ```
+
+1. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster:
+
+    ```bash
+    automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
+
+    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ```
 
 1. Start the Service in All the Frontend Nodes with command shown below:
