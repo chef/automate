@@ -10,35 +10,7 @@ import (
 )
 
 func TestGetAutomateHAInfraDetails(t *testing.T) {
-	t.Run("Cannot read the file", func(t *testing.T) {
-		actualInfraDetails, err := getAutomateHAInfraDetails("nonexistentfile.json")
-		require.Error(t, err)
-		require.Nil(t, actualInfraDetails)
-	})
-
-	t.Run("Cannot unmarshal", func(t *testing.T) {
-		fileContent := `
-       {
-           "ssh_command": "ssh -p 22 user@host",
-           "db_host": "localhost",
-           "db_port": 3306,
-           "db_user": "user",
-           "db_password": "password",
-       }
-       `
-		file, err := ioutil.TempFile("", "testfile*.json")
-		require.NoError(t, err)
-
-		defer os.Remove(file.Name())
-
-		n, err := file.Write([]byte(fileContent))
-		require.NoError(t, err)
-		require.NotZero(t, n)
-
-		_, err = getAutomateHAInfraDetails(file.Name())
-		require.Error(t, err)
-	})
-
+	// Valid json
 	t.Run("passed all cases", func(t *testing.T) {
 
 		fileContent := `
@@ -68,8 +40,8 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
              },
              "automate_ssh": {
                "value": [
-                 "ssh -i path/secret.pem -p 22 user@hostname",
-                 "ssh -i path/secret.pem -p 22 user@hostname"
+                 "ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1",
+                 "ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"
                ],
                "type": [
                  "list",
@@ -108,6 +80,48 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 
 		err = os.Remove(tmpfile.Name())
 		require.NoError(t, err)
+	})
+
+	// Test case 2: Invalid JSON file
+	t.Run("Invalid JSON file", func(t *testing.T) {
+		fileContent := `
+               {
+                   "ssh_command": "ssh -p 22 user@host",
+                   "db_host": "localhost",
+                   "db_port": 3306,
+                   "db_user": "user",
+                   "db_password": "password",
+               }
+               `
+		file, err := ioutil.TempFile("", "testfile*.json")
+		require.NoError(t, err)
+
+		defer os.Remove(file.Name())
+
+		n, err := file.Write([]byte(fileContent))
+		require.NoError(t, err)
+		require.NotZero(t, n)
+
+		_, err = getAutomateHAInfraDetails(file.Name())
+		require.Error(t, err)
+	})
+
+	// Test case 3: File not found
+	t.Run("File not found", func(t *testing.T) {
+
+		filePath := "testdata/notfound.json"
+		_, err := getAutomateHAInfraDetails(filePath)
+		require.Error(t, err)
+	})
+
+	// Test case 4: Empty file
+	t.Run("Empty file", func(t *testing.T) {
+		file, err := ioutil.TempFile("", "testfile*.json")
+		require.NoError(t, err)
+
+		_, err = getAutomateHAInfraDetails(file.Name())
+		require.Error(t, err)
+		require.Equal(t, err.Error(), "the file is empty")
 	})
 }
 
