@@ -41,7 +41,7 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
 
 ## Prerequisites
 
-Check the [Prerequisites] page before proceeding with migration. (/automate/ha_aws_deployment_prerequisites/#migration)
+Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) page before proceeding with migration.
 
 ## Backup the Existing Chef Infra Server or Chef Backend Data
 
@@ -239,7 +239,7 @@ postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
 
 10. Clean up the old packages from chef-backend (like Elasticsearch and postgres)
 
-11. [Doc: Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
+11. [Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 
 
 ## Using Automate HA for Chef-Backend user
