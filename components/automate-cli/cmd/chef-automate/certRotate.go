@@ -190,7 +190,12 @@ func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args 
 // certRotate will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj *certRotateFlags) error {
 	if isA2HARBFileExist() {
-		infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+		outputFile, err := FileContainingAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+
+		infra, err := getAutomateHAInfraDetails(outputFile)
 		if err != nil {
 			return err
 		}

@@ -28,7 +28,12 @@ func GenerateOriginalAutomateCLICommand(cmd *cobra.Command, args []string) strin
 func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 	script := GenerateOriginalAutomateCLICommand(cmd, args)
 
-	infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+	outputFile, err := FileContainingAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	infra, err := getAutomateHAInfraDetails(outputFile)
 	if err != nil {
 		return err
 	}

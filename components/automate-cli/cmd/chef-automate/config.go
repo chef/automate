@@ -180,7 +180,12 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+		outputFile, err := FileContainingAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+
+		infra, err := getAutomateHAInfraDetails(outputFile)
 		if err != nil {
 			return err
 		}
@@ -347,8 +352,12 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 
 	if isA2HARBFileExist() {
+		outputFile, err := FileContainingAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
 
-		infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+		infra, err := getAutomateHAInfraDetails(outputFile)
 		if err != nil {
 			return err
 		}
@@ -566,9 +575,14 @@ func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *Autom
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-
 		var err error
-		infra, err := getAutomateHAInfraDetails(FileContainingAutomateHAInfraDetails())
+
+		outputFile, opErr := FileContainingAutomateHAInfraDetails()
+		if opErr != nil {
+			return err
+		}
+
+		infra, err := getAutomateHAInfraDetails(outputFile)
 		if err != nil {
 			return err
 		}
