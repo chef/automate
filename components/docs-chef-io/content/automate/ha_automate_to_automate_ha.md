@@ -21,7 +21,7 @@ gh_repo = "automate"
 - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  
 minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
-- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA. 
+- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA.
 
 {{< /warning >}}
 
@@ -74,9 +74,9 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     password = "admin"
     ```
 
-{{< warning >}}
-{{% automate/char-warn %}}
-{{< /warning >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
 
@@ -141,9 +141,9 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     password = "admin"
     ```
 
-{{< warning >}}
-{{% automate/char-warn %}}
-{{< /warning >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
