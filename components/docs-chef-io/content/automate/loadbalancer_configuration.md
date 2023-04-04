@@ -26,7 +26,7 @@ This guide will show you how to configure a load balancer for Chef Automate and 
 
 ## Load Balancer Prerequisites
 
--  Before proceeding with the load balancer setup, you will need to configure DNS for Automate and Chef Server. In this guide, we assume that you have already set up DNS with the following domain names:
+-  Before proceeding with the load balancer setup, you must configure DNS for Automate and Chef Server. In this guide, we assume that you have already set up DNS with the following domain names:
 
    - Chef Automate: chefautomate.example.com
    - Chef Infra Server: chefinfraserver.example.com
@@ -39,14 +39,15 @@ There are two recommended load balancer setups for Automate, depending on your f
    - This setup requires two identical load balancer nodes to ensure high availability.
    - Each node needs two private IPs, one for Automate and another for Chef Server.
    - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to Private IP 1 of both nodes, and the Chef Server DNS (chefinfraserver.example.com) to Private IP 2 of both nodes.
+
 - Option 2: 4 Load Balancers, separate for Automate and separate for Chef Server
    - This setup requires two load balancers for Automate and two for Chef Server to ensure high availability.
    - Each node only requires one private IP.
-   - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to the Automate nodes, and the Chef Server DNS (chefinfraserver.example.com) to the Chef Server nodes.
+   - To set up DNS, point the Chef Automate DNS (chefautomate.example.com) to the Automate nodes and the Chef Server DNS (chefinfraserver.example.com) to the Chef Server nodes.
 
 With these load balancer setups, you can ensure high availability for Chef Automate and Chef Infra Server.
 
-## Option 1: 2 Load Balancer Setup with 2 private ips each
+## 2 Load Balancer Setup with two private IPs each
 
 ### Load Balancer setup using NGINX
 
@@ -69,26 +70,26 @@ For Centos or Redhat :
 
 #### Configure
 
-1. Create new file `/etc/nginx/sites-available/chef-automate-lb.conf`
+1. Create a new file `/etc/nginx/sites-available/chef-automate-lb.conf`
 
    ```bash
    upstream chef-automate-servers {
-      # Add a list of automate machine ip addresses.
+      # Add a list of automate machine IP addresses.
       server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
    }
 
-   # The below section is used for https call
+   # The below section is used for HTTPS call
    server {
-      # Add the private IP thats connected to Automate DNS, like 10.1.1.194:443 
+      # Add the private IP that's connected to Automate DNS, like 10.1.1.194:443 
       listen <PRIVATE-IP-AUTOMATE>:443 ssl;
       # You need to get your own automate DNS,
-      # here we have taken example DNS: chefautomate.example.com
+      # Here, we have taken an example DNS: chefautomate.example.com
       server_name chefautomate.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
       # If you want to use letsencript certificates, you can use the certBot
-      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       ssl_certificate /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefautomate.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -99,7 +100,7 @@ For Centos or Redhat :
       }
    }
 
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    server {
       listen 80;
       server_name chefautomate.example.com;
@@ -107,26 +108,26 @@ For Centos or Redhat :
    }
    ```
 
-1. Create new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
+1. Create a new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
 
    ```bash
    upstream chef-infra-servers {
-      # Add a list of infra server machine api addresses.
+      # Add a list of infra server machine API addresses.
       server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
    }
 
-   # The below section is used for https call
+   # The below section is used for HTTPS call
    server {
-      # Add the private IP thats connected to Chef Server DNS, like 10.1.1.67:443 
+      # Add the private IP that's connected to Chef Server DNS, like 10.1.1.67:443 
       listen <PRIVATE-IP-CHEF-SERVER>:443 ssl;
-      # You need to get your own infra server DNS,
-      # here we have taken example DNS: chefinfraserver.example.com
+      # You need to get your infra server DNS,
+      # Here, we have taken an example DNS: chefinfraserver.example.com
       server_name chefinfraserver.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
       # If you want to use letsencript certificates, you can use the certBot
-      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       ssl_certificate /etc/letsencrypt/live/chefinfraserver.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -137,7 +138,7 @@ For Centos or Redhat :
       }
    }
 
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    server {
       listen 80;
       server_name chefinfraserver.example.com;
@@ -185,7 +186,7 @@ For Centos or Redhat :
 
 #### Configure
 
-1. HAProxy needs an ssl-certificate to be one file, in a certain format. To do that, we create a new directory where the SSL certificate for automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for the Chef Automate and Infra Server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
    - For Chef Automate:
 
@@ -207,17 +208,17 @@ For Centos or Redhat :
          | sudo tee /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
       ```
 
-1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
+1. Once HA Proxy is installed, add the following to the configuration file at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
 
    ```bash
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    frontend fe_a2ha_http
       mode http
       bind *:80
       redirect scheme https code 301 if !{ ssl_fc }
 
    # You need to get your own Automate DNS and Chef Server,
-   # here we have taken example DNS: chefautomate.example.com and chefinfraserver.example.com
+   # Here, we have taken example DNS: chefautomate.example.com and chefinfraserver.example.com
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
    # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
@@ -263,7 +264,7 @@ For Centos or Redhat :
    sudo systemctl restart haproxy
    ```
 
-## Option 2: 4 Load Balancers Setup, separate for Automate and separate for Chef Server 
+## 4 Load Balancers Setup, separate for Automate and separate for Chef Server 
 
 ### Load Balancer setup using NGINX
 
@@ -286,25 +287,25 @@ For Centos or Redhat :
 
 #### Configure these on Automate Load Balancers
 
-1. Create new file `/etc/nginx/sites-available/chef-automate-lb.conf`
+1. Create a new file `/etc/nginx/sites-available/chef-automate-lb.conf`
 
    ```bash
    upstream chef-automate-servers {
-      # Add a list of automate machine ip addresses.
+      # Add a list of automate machine IP addresses.
       server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
    }
 
-   # The below section is used for https call
+   # The below section is used for HTTPS calls
    server {
       listen 443 ssl;
       # You need to get your own automate DNS,
-      # here we have taken example DNS: chefautomate.example.com
+      # Here, we have taken an example DNS: chefautomate.example.com
       server_name chefautomate.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
       # If you want to use letsencript certificates, you can use the certBot
-      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       ssl_certificate /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefautomate.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -315,7 +316,7 @@ For Centos or Redhat :
       }
    }
 
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    server {
       listen 80;
       server_name chefautomate.example.com;
@@ -343,25 +344,25 @@ For Centos or Redhat :
 
 #### Configure these on Chef Server Load Balancers
 
-1. Create new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
+1. Create a new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
 
    ```bash
    upstream chef-infra-servers {
-      # Add a list of infra server machine api addresses.
+      # Add a list of infra server machine IP addresses.
       server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
       server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
    }
 
-   # The below section is used for https call
+   # The below section is used for HTTPS calls
    server {
       listen 443 ssl;
       # You need to get your own infra server DNS,
-      # here we have taken example DNS: chefinfraserver.example.com
+      # Here, we have taken an example DNS: chefinfraserver.example.com
       server_name chefinfraserver.example.com;
       # Generate SSL certificates and give the path of the certificate and key file.
       # If you want to use letsencript certificates, you can use the certBot
-      # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+      # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
       ssl_certificate /etc/letsencrypt/live/chefinfraserver.example.com/fullchain.pem;
       ssl_certificate_key /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem;
       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -372,7 +373,7 @@ For Centos or Redhat :
       }
    }
 
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    server {
       listen 80;
       server_name chefinfraserver.example.com;
@@ -419,7 +420,7 @@ For Centos or Redhat :
 
 #### Configure on Automate Load Balancers
 
-1. HAProxy needs an ssl-certificate to be one file, in a certain format. To do that, we create a new directory where the SSL certificate for automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for the automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
    - For Chef Automate:
 
@@ -434,17 +435,17 @@ For Centos or Redhat :
 1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
 
    ```bash
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    frontend fe_a2ha_http
       mode http
       bind *:80
       redirect scheme https code 301 if !{ ssl_fc }
 
    # You need to get your own automate DNS,
-   # here we have taken example DNS: chefautomate.example.com
+   # Here we have taken an example DNS: chefautomate.example.com
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
-   # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+   # This URL is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
 
    frontend chef-automate-servers
       bind *:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
@@ -474,7 +475,7 @@ For Centos or Redhat :
 
 #### Configure on Chef Server Load Balancers
 
-1. HAProxy needs an ssl-certificate to be one file, in a certain format. To do that, we create a new directory where the SSL certificate for automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for the automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
    - For Chef Infra Server:
 
@@ -489,14 +490,14 @@ For Centos or Redhat :
 1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
 
    ```bash
-   # The below section is used for http call
+   # The below section is used for HTTP calls
    frontend fe_a2ha_http
       mode http
       bind *:80
       redirect scheme https code 301 if !{ ssl_fc }
 
    # You need to get your own Chef Server DNS,
-   # here we have taken example DNS: chefinfraserver.example.com
+   # Here we have taken an example DNS: chefinfraserver.example.com
    # Generate SSL certificates and give the path of the certificate and key file.
    # If you want to use letsencript certificates, you can use the certBot
    # This url is an example for ubuntu machine reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
