@@ -41,7 +41,7 @@ Take a backup using the `knife-ec-backup` utility and move the backup folder to 
 
 ## Prerequisites
 
-Check the [Prerequisites] page before proceeding with migration. (/automate/ha_aws_deployment_prerequisites/#migration)
+Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) page before proceeding with migration.
 
 ## Backup the Existing Chef Infra Server or Chef Backend Data
 
