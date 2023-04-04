@@ -252,3 +252,12 @@ done 
 - Run this query: GET _snapshot/_all to get all the snapshots.  
 - Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>   
   For example: DELETE _snapshot/ chef-automate-es6-event-feed-service 
+
+### Issue : knife ssl cert while setting up workstation during migration
+In case of HA setup, while doing `knife ssl fetch` , if the certificate fetched is for the domain *.chefdemo.net, then follow below steps when you run `knife ssl check`. 
+
+#### Solution 
+- Go to route 53 chefdemo.net  
+- Create record as recordname.eng.chefdemo.net  
+- CNAME with value HA url: ec2-3-108-254-0.ap-south-1.compute.amazonaws.com  
+- Provide https://<record-name> while running knife ssl check. Eg: `knife ssl check https://<record-name>`
