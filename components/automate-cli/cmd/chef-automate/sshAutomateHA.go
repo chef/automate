@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -290,15 +291,26 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 
 func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error) {
 	automateHAInfraDetails := &AutomateHAInfraDetails{}
-	contents, err := ioutil.ReadFile(filePath)
+
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(contents, automateHAInfraDetails)
+	defer file.Close()
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(file)
+
+	content := buf.String()
+	if content == "" {
+		return nil, errors.New("the file is empty")
+	}
+
+	err = json.Unmarshal([]byte(content), automateHAInfraDetails)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: check extractPortAndSshUserFromAutomateSSHCommand
+
 	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
 	return automateHAInfraDetails, nil
 }
