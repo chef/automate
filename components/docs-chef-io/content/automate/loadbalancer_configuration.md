@@ -186,7 +186,7 @@ For Centos or Redhat :
 
 #### Configure
 
-1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for the Chef Automate and Infra Server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for Chef Automate and Infra Server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
    - For Chef Automate:
 
@@ -208,7 +208,7 @@ For Centos or Redhat :
          | sudo tee /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
       ```
 
-1. Once HA Proxy is installed, add the following to the configuration file at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
+1. Once HA Proxy is installed, add the following to the configuration file at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for Chef Automate and Chef Infra Server.
 
    ```bash
    # The below section is used for HTTP calls
@@ -420,7 +420,7 @@ For Centos or Redhat :
 
 #### Configure on Automate Load Balancers
 
-1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for the automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for Automate that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
    - For Chef Automate:
 
@@ -432,7 +432,7 @@ For Centos or Redhat :
          | sudo tee /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
       ```
 
-1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
+1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for Chef Automate.
 
    ```bash
    # The below section is used for HTTP calls
@@ -475,7 +475,7 @@ For Centos or Redhat :
 
 #### Configure on Chef Server Load Balancers
 
-1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for the automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an SSL certificate to be one file in a specific format. To do that, we create a new directory with the SSL certificate for Infra Server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
    - For Chef Infra Server:
 
@@ -487,7 +487,7 @@ For Centos or Redhat :
          | sudo tee /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
       ```
 
-1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
+1. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for Chef Infra Server.
 
    ```bash
    # The below section is used for HTTP calls
