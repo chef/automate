@@ -297,7 +297,7 @@ func (p *PullConfigsImpl) pullAutomateConfigs() (map[string]*dc.AutomateConfig, 
 			continue
 		}
 		p.sshUtil.getSSHConfig().hostIP = ip
-		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_FRONTEND_CONFIG, true)
+		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(fmt.Sprintf(GET_FRONTEND_CONFIG, ""), true)
 		if err != nil {
 			return nil, err
 		}
@@ -318,7 +318,7 @@ func (p *PullConfigsImpl) pullChefServerConfigs() (map[string]*dc.AutomateConfig
 			continue
 		}
 		p.sshUtil.getSSHConfig().hostIP = ip
-		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(GET_FRONTEND_CONFIG, true)
+		rawOutput, err := p.sshUtil.connectAndExecuteCommandOnRemote(fmt.Sprintf(GET_FRONTEND_CONFIG, ""), true)
 		if err != nil {
 			return nil, err
 		}
