@@ -197,3 +197,58 @@ UnknownError: Unable to determine error cause: Command did not exit gracefully
 - In logs check for which module it prompted an error.
 - SSH into the node and check if the `sysctl` utility is available by running `sysctl -a`.
 - If `Command 'sysctl' not found`, try installing the pkg. 
+
+### Issue : knife-ec-restore during migration : Failed to restore synchronous operations
+
+- While running the restore command, If you are getting this error in logs: Failed to restore synchronous operations,  follow either of the methods given below.
+
+#### Solution 1 
+
+Go to any Automate Node in HA:   
+
+- Run the following command to get all the snapshots:    
+```cmd
+curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty  
+```
+- One by One delete all the snapshots using the below command:   
+```cmd
+curl -k -X DELETE -s http://localhost:10144/_snapshot/<snapshot_name>  
+```
+Example:    
+```cmd
+curl -k -X DELETE -s http://localhost:10144/_snapshot/chef-automate-es6-event-feed-service   
+```
+ 
+
+Alternately, You can delete all the snapshots at once by using below script, by updating the indices:  
+
+  
+```bash
+indices=(  
+chef-automate-es6-automate-cs-oc-erchef  
+chef-automate-es6-compliance-service  
+chef-automate-es6-event-feed-service  
+chef-automate-es6-ingest-service  
+)  
+for index in ${indices[@]}; do  
+curl -XDELETE -k -H 'Content-Type: application/json' http://localhost:10144/_snapshot/$index --data-binary @- << EOF  
+{  
+  "type" : "s3",  
+    "settings" : {  
+      "bucket" : "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",  
+      "base_path" : "elasticsearch/automate-elasticsearch-data/$index",  
+      "region" : "<YOUR-PRIMARY-CLUSTER-REGION>",  
+      "role_arn" : " ",  
+      "compress" : "false"  
+    }  
+}  
+EOF  
+done  
+```
+
+#### Solution 2
+
+- Log in to the Opensearch dashboard  
+- Run this query: GET _snapshot/_all to get all the snapshots.  
+- Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>   
+  For example: DELETE _snapshot/ chef-automate-es6-event-feed-service 
