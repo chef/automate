@@ -41,7 +41,7 @@ Take a backup using the `knife-ec-backup` utility and move the backup folder to 
 
 ## Prerequisites
 
-Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) page before migrating.
+Check the [Prerequisites] page before proceeding with migration. (/automate/ha_aws_deployment_prerequisites/#migration)
 
 ## Backup the Existing Chef Infra Server or Chef Backend Data
 
@@ -89,6 +89,7 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
     ```
 
     - Execute the below command to clean unused data from reports. This is an optional step
+-  Execute the below command to clean unused data from reports. This is an optional step
 
     ```bash
         hab pkg exec chef/knife-ec-backup knife tidy server clean --backup-path /path/to/an-ec-backup
@@ -100,8 +101,7 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
         scp -i /path/to/key backup\_$(date '+%Y%m%d%H%M%s') user@host:/home/user
     ```
 
-    If your HA Chef Server is in a private subnet, scp backup file to bastion and then to Chef Server.
-
+Incase if your HA Chef Server is in private subnet, scp backup file to bastion and then to Chef Server.
 ## Restore Backed Up Data to Chef Automate HA
 
 - Execute the below command to install the habitat package for `knife-ec-backup`
@@ -130,9 +130,27 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
 - `-F` is the path to store the output file
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
-    ```cmd
-        diff old_server_file new_server_file
-    ```
+```cmd
+    hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
+```
+
+## Steps to validate if Migration is successful
+
+-   Execute the below command from the old server where knife is installed and from the new server where knife is installed :
+
+```cmd
+    bash infra_server_objects_count_collector.sh -S test -K Key -F Filename 
+```
+
+-   `-S` is the Chef Server URL
+-   `-K` is the path of pivotal.pem file
+-   `-F` is the path to store the output file
+
+-   Now run the below command to check the differences between the old and new data. Ideally, there shouldn't be any differences if the migration was done successfully.
+
+```cmd
+    diff old_server_file new_server_file 
+```
 
 ## In-place Migration (Chef Backend to Automate HA)
 
