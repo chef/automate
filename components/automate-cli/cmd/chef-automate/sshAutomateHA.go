@@ -19,7 +19,6 @@ import (
 const automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
 const automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
 
-// TODO: return string and error
 func FileContainingAutomateHAInfraDetails() (string, error) {
 	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
 		return automateHATerraformOutputFile, nil
@@ -305,23 +304,50 @@ func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error)
 }
 
 // TODO: restructure
+// func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {
+// 	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
+// 		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
+// 		lastspaceIndex := strings.LastIndex(automateSSH, " ")
+// 		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) < 1 {
+// 			if strings.Contains(automateSSH, "-p") {
+// 				port := strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastspaceIndex])
+// 				automateHAInfraDetails.Outputs.SSHPort.Value = port
+// 			} else {
+// 				automateHAInfraDetails.Outputs.SSHPort.Value = "22"
+// 			}
+// 		}
+// 		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) < 1 {
+// 			sshUser := strings.TrimSpace(automateSSH[lastspaceIndex:strings.LastIndex(automateSSH, "@")])
+// 			automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
+// 		}
+// 	}
+// }
+
 func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {
-	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
-		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
-		lastspaceIndex := strings.LastIndex(automateSSH, " ")
-		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) < 1 {
-			if strings.Contains(automateSSH, "-p") {
-				port := strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastspaceIndex])
-				automateHAInfraDetails.Outputs.SSHPort.Value = port
-			} else {
-				automateHAInfraDetails.Outputs.SSHPort.Value = "22"
-			}
-		}
-		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) < 1 {
-			sshUser := strings.TrimSpace(automateSSH[lastspaceIndex:strings.LastIndex(automateSSH, "@")])
-			automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
-		}
+	if automateHAInfraDetails == nil || len(automateHAInfraDetails.Outputs.AutomateSSH.Value) == 0 {
+		return
 	}
+
+	automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
+	lastspaceIndex := strings.LastIndex(automateSSH, " ")
+
+	if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) > 0 {
+		return
+	}
+
+	if strings.Contains(automateSSH, "-p") {
+		port := strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastspaceIndex])
+		automateHAInfraDetails.Outputs.SSHPort.Value = port
+	} else {
+		automateHAInfraDetails.Outputs.SSHPort.Value = "22"
+	}
+
+	if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) > 0 {
+		return
+	}
+
+	sshUser := strings.TrimSpace(automateSSH[lastspaceIndex:strings.LastIndex(automateSSH, "@")])
+	automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
 }
 
 func getIPOfRequestedServers(servername string, d *AutomateHAInfraDetails) ([]string, error) {
