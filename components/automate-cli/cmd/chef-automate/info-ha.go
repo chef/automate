@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	INFO_COMMAND_TEMP = `AUTOMATION DETAILS:{{- "\n"}}
+var (
+	infoCommandTemp = `AUTOMATION DETAILS:{{- "\n"}}
 	{{- "\t"}}{{- "Automate Admin User:"}} {{"\t\t"}} {{.Outputs.AutomateAdminUser.Value}}{{- "\n"}}
 	{{- "\t"}}{{- "Automate Data Collector Token:"}} {{"\t"}} {{.Outputs.AutomateDataCollectorToken.Value }}{{- "\n"}}
 	
@@ -98,21 +98,24 @@ func execInfo() error {
 		return err
 
 	}
-	printInfo(automate)
+	_, err = printInfo(automate)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func printInfo(automate *AutomateHAInfraDetails) error {
-	tmpl, err := template.New("output").Parse(INFO_COMMAND_TEMP)
+func printInfo(automate *AutomateHAInfraDetails) (*template.Template, error) {
+	tmpl, err := template.New("output").Parse(infoCommandTemp)
 	if err != nil {
 		logrus.Errorf("Error: %v", err)
-		return err
+		return nil, err
 	}
 	if err := tmpl.Execute(os.Stdout, automate); err != nil {
 		logrus.Errorf("Error: %v", err)
-		return err
+		return nil, err
 	}
 	fmt.Println()
-	return nil
+	return tmpl, nil
 }
