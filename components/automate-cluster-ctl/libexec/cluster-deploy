@@ -258,7 +258,7 @@ class AutomateClusterSetup < AutomateCluster::Command
     # If the sudo_password is set, store it in the secrets hash
     if sudo_password
       # Set a new secret
-      secrets.set('sudo_password',  sudo_password)
+      secrets.set('sudo_password', sudo_password)
       # Save the updated secrets store to disk
       secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
     end
