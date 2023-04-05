@@ -70,10 +70,14 @@ class AutomateClusterGatherlogs < AutomateCluster::Command
 
   # store the sudo_password from the env variable in the secrets hash
   def store_secret_envs
-    # Set a new secret
-    secrets.set('sudo_password',  ENV['sudo_password'])
-    # Save the updated secrets store to disk
-    secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
+    sudo_password = ENV['sudo_password']
+    # If the sudo_password is set, store it in the secrets hash
+    if sudo_password
+      # Set a new secret
+      secrets.set('sudo_password', sudo_password)
+      # Save the updated secrets store to disk
+      secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
+    end
   end
 
   def sudo_cmd(backend)
