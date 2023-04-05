@@ -14,6 +14,8 @@ const (
 	certificate  = "Certificates"
 	toResolveMsg = "1. Add the start and end certificate markers"
 	summaryTable = "AutomateSummaryTable"
+	ip           = "127.0.0.4"
+	ipResult     = "127.0.0.4:"
 )
 
 var tbMap = map[string]*Table{
@@ -103,7 +105,7 @@ func TestCreateStatusTableRows(t *testing.T) {
 			args: args{
 				index: 1,
 				rowData: &Info{
-					Hostip:    "172.01.254.01",
+					Hostip:    ip,
 					Parameter: certificate,
 					Status:    successStr,
 					StatusMessage: &StatusMessage{
@@ -114,14 +116,14 @@ func TestCreateStatusTableRows(t *testing.T) {
 				},
 				reporting: getMockReportingModule(getMockWriterImpl().CliWriter),
 			},
-			want: []table.Row{{1, "172.01.254.01", certificate, color.New(color.FgGreen).Sprint("✔ Success"), "Cerificate validation successful"}, {"", "", "", "", color.New(color.FgYellow).Sprint("! [ Warning ] ") + "Certificate about to expire <Date>"}},
+			want: []table.Row{{1, ip, certificate, color.New(color.FgGreen).Sprint("✔ Success"), "Cerificate validation successful"}, {"", "", "", "", color.New(color.FgYellow).Sprint("! [ Warning ] ") + "Certificate about to expire <Date>"}},
 		},
 		{
 			name: "Status is Failed",
 			args: args{
 				index: 1,
 				rowData: &Info{
-					Hostip:    "172.01.254.02",
+					Hostip:    ip,
 					Parameter: certificate,
 					Status:    failedStr,
 					StatusMessage: &StatusMessage{
@@ -132,7 +134,7 @@ func TestCreateStatusTableRows(t *testing.T) {
 				},
 				reporting: getMockReportingModule(getMockWriterImpl().CliWriter),
 			},
-			want: []table.Row{{1, color.New(color.FgRed).Sprint("172.01.254.02"), color.New(color.FgRed).Sprint(certificate), color.New(color.FgRed).Sprint("✖ Failed"), color.New(color.FgRed).Sprint("Certificate validation failed")}, {"", "", "", "", color.New(color.FgRed).Sprint("✖ [ Failed ] Certificate is not formatted properly")}},
+			want: []table.Row{{1, color.New(color.FgRed).Sprint(ip), color.New(color.FgRed).Sprint(certificate), color.New(color.FgRed).Sprint("✖ Failed"), color.New(color.FgRed).Sprint("Certificate validation failed")}, {"", "", "", "", color.New(color.FgRed).Sprint("✖ [ Failed ] Certificate is not formatted properly")}},
 		},
 	}
 	for _, tt := range tests {
@@ -158,7 +160,7 @@ func TestCreateSummaryTableRowData(t *testing.T) {
 			args: args{
 				summary: map[string]SummaryInfo{},
 				rowData: &Info{
-					Hostip:    "172.16.192.03",
+					Hostip:    ip,
 					Parameter: certificate,
 					Status:    failedStr,
 					StatusMessage: &StatusMessage{
@@ -175,7 +177,7 @@ func TestCreateSummaryTableRowData(t *testing.T) {
 				certificate: {
 					SuccessfulCount: 0,
 					FailedCount:     1,
-					ToResolve:       []string{"172.16.192.03:", toResolveMsg},
+					ToResolve:       []string{ipResult, toResolveMsg},
 				},
 			},
 		},
@@ -205,12 +207,12 @@ func TestCreateSummaryTableRows(t *testing.T) {
 					certificate: {
 						SuccessfulCount: 0,
 						FailedCount:     1,
-						ToResolve:       []string{"172.16.192.05:", toResolveMsg},
+						ToResolve:       []string{ipResult, toResolveMsg},
 					},
 				},
 				reporting: getMockReportingModule(getMockWriterImpl().CliWriter),
 			},
-			want: []table.Row{{"Certificates", color.New(color.FgGreen).Sprint("0"), color.New(color.FgRed).Sprint("1"), "172.16.192.05:"}, {"", "", "", toResolveMsg}},
+			want: []table.Row{{"Certificates", color.New(color.FgGreen).Sprint("0"), color.New(color.FgRed).Sprint("1"), ipResult}, {"", "", "", toResolveMsg}},
 		},
 		{
 			name: "ToResolve steps are not present",
@@ -281,7 +283,7 @@ func TestUpdateTableTitle(t *testing.T) {
 				nodeInfo: map[string][]Info{
 					automate: {
 						{
-							Hostip:    "172.16.192.09",
+							Hostip:    ip,
 							Parameter: certificate,
 							Status:    failedStr,
 						},
@@ -300,7 +302,7 @@ func TestUpdateTableTitle(t *testing.T) {
 				nodeInfo: map[string][]Info{
 					automate: {
 						{
-							Hostip:    "172.16.192.11",
+							Hostip:    ip,
 							Parameter: certificate,
 							Status:    successStr,
 						},
