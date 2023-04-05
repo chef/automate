@@ -17,8 +17,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
-const automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
+var automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
+var automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
 
 func FileContainingAutomateHAInfraDetails() (string, error) {
 	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
