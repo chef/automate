@@ -169,3 +169,40 @@ func TestExtractPortAndSshUserFromAutomateSSHCommand(t *testing.T) {
 	assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
 	assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
 }
+
+func TestFileContainingAutomateHAInfraDetails(t *testing.T) {
+	t.Run("Failed", func(t *testing.T) {
+		automateHATerraformOutputFile = "nonsxisting1.tfstate"
+		automateHATerraformDestroyOutputFile = "nonsxisting2.tfstate"
+
+		str, err := FileContainingAutomateHAInfraDetails()
+		require.Error(t, err)
+		require.Empty(t, str)
+	})
+
+	t.Run("return first file", func(t *testing.T) {
+		file, err := ioutil.TempFile("", "testfile*.json")
+		require.NoError(t, err)
+
+		defer os.Remove(file.Name())
+		automateHATerraformOutputFile = file.Name()
+		automateHATerraformDestroyOutputFile = "nonsxisting2.tfstate"
+
+		str, err := FileContainingAutomateHAInfraDetails()
+		require.NoError(t, err)
+		require.Equal(t, str, file.Name())
+	})
+
+	t.Run("return second file", func(t *testing.T) {
+		file, err := ioutil.TempFile("", "testfile*.json")
+		require.NoError(t, err)
+
+		defer os.Remove(file.Name())
+		automateHATerraformOutputFile = "nonsxisting2.tfstate"
+		automateHATerraformDestroyOutputFile = file.Name()
+
+		str, err := FileContainingAutomateHAInfraDetails()
+		require.NoError(t, err)
+		require.Equal(t, str, file.Name())
+	})
+}
