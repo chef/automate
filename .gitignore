@@ -114,3 +114,19 @@ tools/bldr-config-gen/bldr-config-gen
 
 # default output file written when running `chef-automate debug profile $service_name`
 profile.out
+
+# Automate-ha packages dependancy
+test/vendor
+test/Gemfile.lock
+components/automate-backend-elasticsearch/*.key
+components/automate-backend-elasticsearch/*.pem
+components/automate-backend-elasticsearch/*.csr
+components/automate-backend-elasticsearch/*.srl
+integration/services/ha_backend/certificates/*.key
+integration/services/ha_backend/certificates/*.pem
+integration/services/ha_backend/certificates/*.csr
+integration/services/ha_backend/certificates/*.srl
+components/automate-backend-postgresql/*.key
+components/automate-backend-postgresql/*.pem
+components/automate-backend-postgresql/*.csr
+components/automate-backend-postgresql/*.srl
