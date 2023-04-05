@@ -60,10 +60,10 @@ type remoteCmdExecutor struct {
 	Output  *cli.Writer
 }
 
-func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, writer *cli.Writer) RemoteCmdExecutor {
+func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) RemoteCmdExecutor {
 	return &remoteCmdExecutor{
 		NodeMap: nodeMap,
-		SshUtil: NewSSHUtil(&SSHConfig{}),
+		SshUtil: sshUtil,
 		Output:  writer,
 	}
 }
@@ -161,17 +161,17 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 			hostIP:     hostIP,
 			timeout:    timeout,
 		}
-		sshUtil := NewSSHUtil(newSSHConfig)
+
 		if !input.HideSSHConnectionMessage {
 			printConnectionMessage(remoteService, hostIP, cliWriter)
 		}
 		for scriptName, cmdScript := range command {
-			go c.executeCmdOnNode(cmdScript, scriptName, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput, sshUtil, resultChan)
+			go c.executeCmdOnNode(cmdScript, scriptName, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput, newSSHConfig, resultChan)
 		}
 	}
 
 	for i := 0; i < len(nodeIps); i++ {
-		for i := 0; i < len(command); i++ {
+		for j := 0; j < len(command); j++ {
 			result := <-resultChan
 			ouputJsonResult[result.HostIP] = append(ouputJsonResult[result.HostIP], &result)
 
@@ -193,7 +193,7 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 
 	status.GlobalResult = ouputJsonResult
 
-	defer close(resultChan)
+	close(resultChan)
 
 	if !input.PrintOutput {
 		return ouputJsonResult
@@ -202,13 +202,13 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 
 }
 
-// , wg *sync.WaitGroup
 // executeCmdOnNode function will run all remote jobs on a single node
-func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool, sshUtil SSHUtil, resultChan chan CmdResult) {
-	rc := CmdResult{scriptName, sshUtil.getSSHConfig().hostIP, []string{}, "", nil}
+func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool,newSSHConfig *SSHConfig, resultChan chan CmdResult) {
+	c.SshUtil.setSSHConfig(newSSHConfig)
+	rc := CmdResult{scriptName, c.SshUtil.getSSHConfig().hostIP, []string{}, "", nil}
 	if len(inputFiles) != 0 {
 		for sourceFile, destinationFile := range inputFiles {
-			err := sshUtil.copyFileToRemote(sourceFile, destinationFile, false)
+			err := c.SshUtil.copyFileToRemote(sourceFile, destinationFile, false)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
@@ -217,7 +217,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 		}
 	}
 
-	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, true)
+	output, err := c.SshUtil.connectAndExecuteCommandOnRemote(command, true)
 	if err != nil && len(output) == 0 {
 		rc.Error = err
 		resultChan <- rc
@@ -226,8 +226,8 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 
 	if len(outputFiles) != 0 {
 		for _, file := range outputFiles {
-			outFile := sshUtil.getSSHConfig().hostIP + "_" + file
-			destFileName, err := sshUtil.copyFileFromRemote(file, outFile)
+			outFile := c.SshUtil.getSSHConfig().hostIP + "_" + file
+			destFileName, err := c.SshUtil.copyFileFromRemote(file, outFile)
 			if err != nil {
 				rc.Error = err
 				resultChan <- rc
@@ -275,6 +275,13 @@ func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomteHAInfraDetails, r
 		}
 		nodeIps = append(nodeIps, nodeIp...)
 	}
+	if len(node.CmdInputs.NodeIps) == 0 {
+		nodeIps, err = getNodeIPs(node.CmdInputs.Single, "", infra, remoteService)
+		if err != nil {
+			return nodeIps, err
+		}
+	}
+
 	if len(nodeIps) == 0 {
 		errMsg := fmt.Sprintf("No %s IPs are found", remoteService)
 		return nodeIps, errors.New(errMsg)

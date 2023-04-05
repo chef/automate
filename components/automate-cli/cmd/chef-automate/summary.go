@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -46,6 +45,7 @@ type Summary struct {
 	spinnerTimeout        time.Duration
 	infra                 *AutomteHAInfraDetails
 	statusSummaryCmdFlags *StatusSummaryCmdFlags
+	sshUtil               SSHUtil
 }
 
 type A2haHabitatAutoTfvars struct {
@@ -53,7 +53,7 @@ type A2haHabitatAutoTfvars struct {
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
 
-func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags) StatusSummary {
+func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil) StatusSummary {
 	return &Summary{
 		feStatus:              feStatus,
 		beStatus:              beStatus,
@@ -61,6 +61,7 @@ func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus 
 		spinnerTimeout:        spinnerTimeout,
 		infra:                 infra,
 		statusSummaryCmdFlags: flags,
+		sshUtil:               sshUtil,
 	}
 }
 
@@ -295,7 +296,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		nodeMap.Postgresql.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, writer)
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, ss.sshUtil, writer)
 	beOutput, err := cmdUtil.Execute()
 	if err != nil {
 		return err
@@ -310,7 +311,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 }
 
 func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd, serviceName, serviceType string) error {
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, writer)
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, ss.sshUtil, writer)
 
 	// Status Script
 	status := GenerateOriginalAutomateCLICommand(
@@ -469,8 +470,8 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 }
 
 func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
-	osStatus := "Unknown"
-	status := "ERROR"
+	var osStatus, status string
+
 	for _, output := range outputs {
 		switch output.ScriptName {
 		case "OsStatus":
@@ -478,9 +479,10 @@ func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType stri
 		case "Status":
 			status = "OK"
 			if output.Error != nil {
-				_, ok := output.Error.(*exec.ExitError)
-				if !ok {
+				if strings.Contains(output.Error.Error(), "97") {
 					status = "WARN"
+				} else {
+					status = "ERROR"
 				}
 			}
 		}

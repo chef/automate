@@ -394,9 +394,11 @@ func TestExecuteCmdOnNode(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &remoteCmdExecutor{}
-		// wg.Add(1)
-		new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, testCase.newSSHUtil, testCase.resultChan)
+		new := &remoteCmdExecutor{
+			SshUtil: testCase.newSSHUtil,
+		}
+
+		new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, &SSHConfig{}, testCase.resultChan)
 		result := <-resultChan
 
 		if testCase.isError {

@@ -259,8 +259,8 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			Opensearch: opensearch,
 			Infra:      infra,
 		}
-
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, writer)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if configCmdFlags.overwriteFile {
 			writer.Errorln("Overwrite flag is not supported in HA")
@@ -434,8 +434,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			Opensearch: opensearch,
 			Infra:      infra,
 		}
-
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, writer)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
 			_, err := cmdUtil.Execute()

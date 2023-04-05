@@ -15,7 +15,7 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -38,7 +38,7 @@ func TestCheckIPAddressesFromCmd(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	})
+	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -61,7 +61,7 @@ func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	})
+	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -83,7 +83,7 @@ func TestCheckIPAddressesOnlyByServices(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	})
+	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 0)
@@ -106,7 +106,7 @@ func TestCheckIPAddressesError(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	})
+	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	_, _, _, _, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 1)
@@ -126,7 +126,7 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 		isChefServer: true,
 		isOpenSearch: true,
 		isPostgresql: true,
-	})
+	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 17)
@@ -136,29 +136,17 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 	assert.Equal(t, postgresqlIps, []string(nil))
 	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nIncorrect Automate IP address format for ip 127.0.0IP address validation failed\nIncorrect Automate IP address format for ip 127.0.1IP address validation failed\nIncorrect Automate IP address format for ip 127.0.2IP address validation failed\nIncorrect Automate IP address format for ip 127.0.3IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.0IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.1IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.2IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.3IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.0IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.1IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.2IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.3IP address validation failed\nIncorrect postgres IP address format for ip 127.0.0IP address validation failed\nIncorrect postgres IP address format for ip 127.0.1IP address validation failed\nIncorrect postgres IP address format for ip 127.0.2IP address validation failed\nIncorrect postgres IP address format for ip 127.0.3IP address validation failed\nList of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]")
 }
-
-func TestRunFENode(t *testing.T) {
-	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
-	sshUtilsImpl := getMockSSHUtil(&SSHConfig{}, nil, "", nil)
-	err := ss.Prepare(sshUtilsImpl)
-	assert.NoError(t, err)
-}
-
 func TestRunFENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
-	sshUtilsImpl := getMockSSHUtil(&SSHConfig{}, nil, "", nil)
-	err := ss.Prepare(sshUtilsImpl)
+	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil)
+	err := ss.Prepare()
 	assert.NoError(t, err)
 	fe := ss.ShowFEStatus()
-	assert.Equal(t, fe, "+-------------+--------------+--------+------------+\n| NAME        | IP ADDRESS   | STATUS | OPENSEARCH |\n+-------------+--------------+--------+------------+\n| Automate    | 198.51.100.0 | OK     | Unknown    |\n| Automate    | 198.51.100.1 | OK     | Unknown    |\n| Chef Server | 198.51.100.2 | OK     | Unknown    |\n| Chef Server | 198.51.100.3 | OK     | Unknown    |\n+-------------+--------------+--------+------------+")
+	assert.Equal(t, fe, "+-------------+------------+--------+-------------------------+\n| NAME        | IP ADDRESS | STATUS | OPENSEARCH              |\n+-------------+------------+--------+-------------------------+\n| automate    |            | OK     | \"green\" (Active: 100.0) |\n| chef-server |            | OK     | \"green\" (Active: 100.0) |\n+-------------+------------+--------+-------------------------+")
 }
 
 func TestRunBENode(t *testing.T) {
@@ -166,9 +154,8 @@ func TestRunBENode(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
-	sshUtilsImpl := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
-	err := ss.Prepare(sshUtilsImpl)
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	err := ss.Prepare()
 	assert.NoError(t, err)
 }
 func TestRunBENodeDiaplay(t *testing.T) {
@@ -176,15 +163,15 @@ func TestRunBENodeDiaplay(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{})
-	sshUtilsImpl := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 	// Mock the time to a specific time
 	mockTime := time.Date(2023, 3, 15, 12, 0, 0, 0, time.UTC)
 	nowFunc = func() time.Time { return mockTime }
-	err := ss.Prepare(sshUtilsImpl)
+	// c.Execute()
+	err := ss.Prepare()
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
-	assert.Contains(t, be, "+------------+--------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+--------------+--------+----------------+------------------+---------+\n| OpenSearch | 198.51.100.4 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| OpenSearch | 198.51.100.5 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| OpenSearch | 198.51.100.6 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Unknown |\n| Postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.8 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n| Postgresql | 198.51.100.9 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+--------------+--------+----------------+------------------+---------+")
+	assert.Equal(t, be, "+------------+------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+------------+--------+----------------+------------------+---------+\n| opensearch |            | OK     | up (pid: 4173) | 19431d 12h 0m 0s | OS node |\n| postgresql |            | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+------------+--------+----------------+------------------+---------+")
 }
 
 func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError error) *MockSSHUtilsImpl {
@@ -193,6 +180,7 @@ func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError
 			return sshConfig
 		},
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			fmt.Println(remoteCommands, "remoteCommands")
 			if strings.Contains(remoteCommands, "/default/health --header") {
 				return `{"status":"OK","stdout":"","stderr":""}`, CSECORError
 			}
@@ -252,6 +240,26 @@ func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError
 							}
 						}
 					}
+				}`, CSECORError
+			}
+			if strings.Contains(remoteCommands, "/_cluster/health") {
+				return `{
+					"cluster_name": "opensearch",
+					"status": "green",
+					"timed_out": false,
+					"number_of_nodes": 3,
+					"number_of_data_nodes": 3,
+					"discovered_master": true,
+					"active_primary_shards": 50,
+					"active_shards": 104,
+					"relocating_shards": 0,
+					"initializing_shards": 0,
+					"unassigned_shards": 0,
+					"delayed_unassigned_shards": 0,
+					"number_of_pending_tasks": 0,
+					"number_of_in_flight_fetch": 0,
+					"task_max_waiting_in_queue_millis": 0,
+					"active_shards_percent_as_number": 100.0
 				}`, CSECORError
 			}
 			return "", CSECORError
