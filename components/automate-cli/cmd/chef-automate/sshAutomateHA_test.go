@@ -1,12 +1,11 @@
 package main
 
 import (
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGetAutomateHAInfraDetails(t *testing.T) {
@@ -126,48 +125,76 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 }
 
 func TestExtractPortAndSshUserFromAutomateSSHCommand(t *testing.T) {
-	// Test Case 1: nil automateHAInfraDetails
-	automateHAInfraDetails := &AutomateHAInfraDetails{}
-	extractPortAndSshUserFromAutomateSSHCommand(nil)
-	assert.Empty(t, automateHAInfraDetails.Outputs.SSHPort.Value)
-	assert.Empty(t, automateHAInfraDetails.Outputs.SSHUser.Value)
+	t.Run("AutomateInfraDetails is nil", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		extractPortAndSshUserFromAutomateSSHCommand(nil)
+		assert.Empty(t, automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Empty(t, automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 
-	// Test Case 2: empty AutomateSSH
-	automateHAInfraDetails = &AutomateHAInfraDetails{}
-	automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
-	automateHAInfraDetails.Outputs.SSHPort.Value = ""
-	automateHAInfraDetails.Outputs.SSHUser.Value = ""
+	t.Run("SSH details available", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
+		automateHAInfraDetails.Outputs.SSHPort.Value = "443"
+		automateHAInfraDetails.Outputs.SSHUser.Value = "ubuntu1234"
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "443", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "ubuntu1234", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 
-	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-	assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
-	assert.Equal(t, "ubuntu", automateHAInfraDetails.Outputs.SSHUser.Value)
+	t.Run("Empty SSH user", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
+		automateHAInfraDetails.Outputs.SSHPort.Value = "443"
+		automateHAInfraDetails.Outputs.SSHUser.Value = ""
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "443", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "ubuntu", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 
-	// Test Case 3: no port or user specified
-	automateHAInfraDetails = &AutomateHAInfraDetails{}
-	automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem user@hostname"}
-	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-	assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
-	assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	t.Run("Empty SSH port", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
+		automateHAInfraDetails.Outputs.SSHPort.Value = ""
+		automateHAInfraDetails.Outputs.SSHUser.Value = "user234"
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "user234", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 
-	// Test Case 4: port specified
-	automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem -p 2222 user@hostname"}
-	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-	assert.NotEqual(t, "2222", automateHAInfraDetails.Outputs.SSHPort.Value)
-	assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	t.Run("No SSH port in SSH details", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem user@hostname"}
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 
-	// Test Case 5: user specified with port
-	automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem -p 2222 user@hostname"}
-	automateHAInfraDetails.Outputs.SSHPort.Value = ""
-	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-	assert.Equal(t, "2222", automateHAInfraDetails.Outputs.SSHPort.Value)
-	assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	t.Run("SSH port in SSH details", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem -p 23 user@hostname"}
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "23", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 
-	// Test Case 6: user specified without port
-	automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem user@hostname"}
-	automateHAInfraDetails.Outputs.SSHPort.Value = ""
-	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-	assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
-	assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	t.Run("SSH port in SSH details", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem -p 2222 user@hostname"}
+		automateHAInfraDetails.Outputs.SSHPort.Value = "2345"
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "2345", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
+
+	t.Run("Default SSH port", func(t *testing.T) {
+		automateHAInfraDetails := &AutomateHAInfraDetails{}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i /path/to/key.pem user@hostname"}
+		automateHAInfraDetails.Outputs.SSHPort.Value = ""
+		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+		assert.Equal(t, "22", automateHAInfraDetails.Outputs.SSHPort.Value)
+		assert.Equal(t, "user", automateHAInfraDetails.Outputs.SSHUser.Value)
+	})
 }
 
 func TestFileContainingAutomateHAInfraDetails(t *testing.T) {
