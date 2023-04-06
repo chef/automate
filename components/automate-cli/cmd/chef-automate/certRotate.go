@@ -74,7 +74,7 @@ const (
 		ssl_cert = """%v"""
 		ssl_key = """%v"""
 	[plugins.security]
-		nodes_dn = '- %v'`
+		nodes_dn = """- %v"""`
 
 	OPENSEARCH_FRONTEND_CONFIG = `
 	[global.v1.external.opensearch.ssl]
@@ -85,6 +85,11 @@ const (
 	[global.v1.external.opensearch.ssl]
 		server_name = "%v"`
 
+	OPENSEARCH_DN_CONFIG_FOR_PEERS = `
+	[plugins]
+	[plugins.security]
+		nodes_dn = """- %v"""`
+
 	GET_USER_CONFIG = `
 	sudo cat /hab/user/automate-ha-%s/config/user.toml`
 
@@ -92,6 +97,12 @@ const (
 	sudo systemctl stop hab-sup.service
 	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
 	sudo systemctl start hab-sup.service`
+
+	ROTATE_CERT_ON_OS = `
+	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-opensearch/config/user.toml
+	export TIMESTAMP=$(date +"%s");
+	echo "yes" | sudo hab config apply automate-ha-opemsearch.default  $(date '+%s') /tmp/%s;
+	`
 
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
@@ -144,6 +155,13 @@ type patchFnParameters struct {
 	infra         *AutomteHAInfraDetails
 	flagsObj      *certRotateFlags
 	skipIpsList   []string
+}
+
+type osCertByIP struct {
+	IP         string `json:"IP"`
+	PrivateKey string `json:"PrivateKey"`
+	PublicKey  string `json:"PublicKey"`
+	NodesDn    string `json:"NodesDn,omitempty"`
 }
 
 func init() {
@@ -379,9 +397,26 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 			return err
 		}
 	}
-	nodesDn, err := getDistinguishedNameFromKey(certs.publicCert)
+	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
 		return err
+	}
+
+	nodesCertList := currentCertsInfo.OpensearchCertsByIP
+	nodesDn := ""
+	nodesCn := ""
+
+	if flagsObj.node != "" {
+		for _, oscert := range nodesCertList {
+			fmt.Println("Checking the OS cert array ", oscert.NodesDn)
+			if oscert.IP != flagsObj.node {
+				nodesDn = nodesDn + fmt.Sprintf("%v", oscert.NodesDn) + "\n  - "
+			}
+		}
+		nodesDn = nodesDn + fmt.Sprintf("%v", nodeDn) + "\n"
+	} else {
+		nodesDn = fmt.Sprintf("%v", nodeDn) + nodesDn
+		nodesCn = nodeDn.CommonName
 	}
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
@@ -389,8 +424,10 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	// Creating and patching the required configurations.
 	var config string
+	var peerconfig string
 	if flagsObj.node != "" {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", nodesDn))
+		peerconfig = fmt.Sprintf(OPENSEARCH_DN_CONFIG_FOR_PEERS, fmt.Sprintf("%v", nodesDn))
 	} else {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
 	}
@@ -411,8 +448,27 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		return err
 	}
 
+	if flagsObj.node != "" {
+
+		nodeVal := flagsObj.node
+		flagsObj.node = ""
+
+		patchFnParam.fileName = "cert-rotate-os-peer.toml"
+		patchFnParam.config = peerconfig
+		patchFnParam.timestamp = time.Now().Format("20060102150405")
+		patchFnParam.skipIpsList = []string{flagsObj.node}
+
+		err = c.patchConfig(patchFnParam)
+		if err != nil {
+			return err
+		}
+
+		flagsObj.node = nodeVal
+
+	}
+
 	// Patching root-ca to frontend-nodes for maintaining the connection.
-	cn := nodesDn.CommonName
+	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
@@ -478,6 +534,9 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	} else if param.remoteService == CONST_POSTGRESQL || param.remoteService == CONST_OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
+	fmt.Println("IPS: ", filteredIps)
+	fmt.Println("File: ", param.fileName)
+	fmt.Println("flags :", param.flagsObj)
 	err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
 	if err != nil {
 		return err
@@ -533,6 +592,8 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 			if err != nil {
 				return err
 			}
+			fmt.Println("Final File Path: ", tomlFilePath)
+			fmt.Println("Final File Path + TS: ", remoteService+timestamp)
 			// Copying the new toml file which includes both old and new configurations (for backend nodes).
 			err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
 		} else {
@@ -545,6 +606,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 		}
 
 		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
+		fmt.Println("Script CMD: ", scriptCommands)
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
 			writer.Errorf("%v", err)
