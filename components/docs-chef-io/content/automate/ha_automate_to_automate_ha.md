@@ -32,7 +32,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- The below steps won't work for Automate HA with AWS Managed.
+The below steps won't work for Automate HA with AWS Managed.
 
 {{< /warning >}}
 
@@ -44,7 +44,7 @@ gh_repo = "automate"
     ```
 
     - The first command will create the backup to the `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file.
-    - The second command will create the `bootstrap.abb` this bundle captures any local credentials or secrets that aren’t persisted in the database.
+    - The second command will create the `bootstrap.abb` bundle, this bundle captures any local credentials or secrets that aren’t persisted in the database.
     - Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
 1. Go to `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file and create **Bundle** using the following command:
@@ -58,7 +58,6 @@ gh_repo = "automate"
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
 1. Go to Bastion 
-    
     - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes. 
     ```bash
     [path] 
@@ -67,7 +66,6 @@ gh_repo = "automate"
     
     Following command will patch the configuration in all the OpenSearch nodes. 
     `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
-
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
     ```bash
     [global.v1.external.opensearch.backup]
