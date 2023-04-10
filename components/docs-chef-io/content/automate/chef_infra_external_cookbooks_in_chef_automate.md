@@ -12,6 +12,13 @@ gh_repo = "automate"
 
 The Chef Infra Server stores cookbooks, the policies that are applied to nodes, and the metadata that describes each registered node under Chef Infra Client's management. This page will tell you how you can configure your Infra Server to use S3 storage type of cookbooks.
 
+{{< note >}}
+
+- If you are swtiching for exsiting cookbooks,there will be some data loss. You will not be able to download or upload the exisiting cookbooks after adding config.
+- This is stictly recommended to add the config at the time of setting up infra server.
+
+{{< /note >}}
+
 ## Adding configuration
 
 You can configure the Chef Automate Infra Server to use the S3 storage type for cookbooks by adding the following configurations into a `.toml` file.
