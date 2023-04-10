@@ -143,7 +143,6 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 - Set up your workstation based on the newly created Automate-HA's chef-server. It is only needed if you have set up the workstation earlier.
 - This in-place migration works only when cookbooks are stored in a database. This does not support use-case, where cookbooks are stored in the filesystem.
-- Take the backup of the system to avoid data loss
 
 {{< /note >}}
  
