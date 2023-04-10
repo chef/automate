@@ -67,16 +67,8 @@ We do not support **Chef Manage** and **Supermarket** integration in the ongoing
 
 Current Automate HA integrates with the following non-Chef tools:
 
-**In AWS Deployment**
-
 - **SQL Database:** External not supported
 - **NoSQL Database:** External not supported
-- **Load Balancer:** External not supported
-
-**In AWS Managed Services**
-
-- **SQL Database:** AWS RDS PostgreSQL: 13.5
-- **NoSQL Database:** AWS OpenSearch: 1.3
 - **Load Balancer:** External not supported
 
 ## Hardware Requirements
@@ -178,9 +170,6 @@ The AWS deployment specific pre-requisites are as follows:
 - Three private and three public subnets in a VPC (1 subnet for each AZ) are needed. As of now, only dedicated subnets for each AZ are supported.
 - It is recommended to create a new VPC.
 - Bastion must be in the same VPC for deployment.
-- **In AWS Managed Services:**
-  - Setup [AWS RDS Postgresql](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
-  - Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
 
 ### Infra Server
 
@@ -235,8 +224,6 @@ Setup the following databases with password-based authentication.
 - AWS RDS PostgreSQL: 13.5
 - AWS OpenSearch: 1.3
 
-Configure the backup only with **S3** when using AWS managed databases.
-
 ## Upgrade
 
 Things to keep in mind while upgrading are:
@@ -284,11 +271,4 @@ To know more about the AWS deployment disaster recovery, visit our [Disaster Rec
 
 ## Backup and Restore
 
-- **In AWS Deployment:** We support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**S3 storage)**](/automate/ha_backup_restore_aws_s3/) for taking backup.
-- **In AWS Managed Services:** We only support [**S3 storage**](/automate/ha_backup_restore_aws_s3/) for taking backup.
-- **In AWS Managed Services:** Create the below attributes by following [managed services documentation](/automate/managed_services/#enabling-opensearch-backup-restore)
-  - `aws_os_snapshot_role_arn`
-  - `os_snapshot_user_access_key_id`
-  - `os_snapshot_user_access_key_secret`
-
-Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).
+We support [**Elastic File System (EFS)**](/automate/ha_backup_restore_aws_efs/) or [**S3 storage)**](/automate/ha_backup_restore_aws_s3/) for taking backup. Encrypted S3 bucket are supported with only Amazon S3 managed keys (SSE-S3).

@@ -21,42 +21,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 ## Install Chef Automate HA on AWS
 
-### Prerequisites
-
-- Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC we have to create public and private subnet, If subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
-- We recommend to create a new vpc. And Bastion should be in the same VPC.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. \
-    Set these in `~/.aws/credentials` in Bastion Host:
-
-    ```bash
-    sudo su -
-    ```
-
-    ```bash
-    mkdir -p ~/.aws
-    echo "[default]" >>  ~/.aws/credentials
-    echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
-    echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
-    echo "region=<AWS-REGION>" >> ~/.aws/credentials
-    ```
-
-- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
-    Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
-- Have SSH Key Pair ready in AWS, so new VM's are created using that pair.
-    Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-- We do not support passphrase for Private Key authentication.
-- Preferred key type will be ed25519
-- Make sure your linux has `sysctl` utility available in all nodes.
-
-{{< warning >}}
-
-- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
-- We currently don't support AD managed users in nodes. We only support local linux users.
-- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges.
-
-{{< /warning >}}
+Before installation, check our [Prerequisites](/automate/ha_aws_deployment_prerequisites) page for AWS Deployment of Chef Automate HA.
 
 ### Deployment
 

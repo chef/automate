@@ -21,55 +21,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 ## Install Chef Automate HA on AWS with Managed AWS Services
 
-### Prerequisites
-
-- Virtual Private Cloud (VPC) should be created in AWS before starting. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- If you want to use Default VPC, then you have to create Public and Private Subnet, if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
-- We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
-- We recommend to create a new VPC. And Bastion should be in the same VPC.
-- Setup AWS RDS Postgresql 13.5 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
-- Setup AWS OpenSearch 1.3.7 in the same VPC where we have the basion and automate ha node going to be created. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
-- For Backup with Managed Service we have only one option which is `Amazon S3`.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
-- Preferred key type will be ed25519
-- Make sure your linux has `sysctl` utility available in all nodes.
-
-Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
-
-  ```bash
-  sudo su -
-  ```
-
-  ```bash
-  mkdir -p ~/.aws
-  echo "[default]" >>  ~/.aws/credentials
-  echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
-  echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
-  echo "region=<AWS-REGION>" >> ~/.aws/credentials
-  ```
-
-- Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
-  Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-- We do not support passphrase for Private Key authentication.
-- Make sure that bastion machine should be in the same vpc as mention in `config.toml`, otherwise we need to do [vpc peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
-- Use subnet-id instead of CIDR block in `config.toml`, to avoid the subnet conflict.
-- Create the below attributes by following [this document.](/automate/managed_services/#enabling-opensearch-backup-restore)
-  - `aws_os_snapshot_role_arn`
-  - `os_snapshot_user_access_key_id`
-  - `os_snapshot_user_access_key_secret`
-  
-  Add this to your `config.toml`
-- If you choose `backup_config` as `s3` then provide the bucket name to feild `s3_bucketName`. If `s3_bucketName` exist it is directly used for backup configuration and if it doesn't exist then deployment process will create `s3_bucketName`.
-- We recommended to use `backup_config` to be set to `s3` at the time of deployment.
-
-{{< warning >}}
-
-- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
-- We currently don't support AD managed users in nodes. We only support local linux users.
-- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges.
-
-{{< /warning >}}
+Before installation, check our [Prerequisites](/automate/ha_aws_managedservices_deployment_prerequisites) page for AWS Managed Services Deployment of Chef Automate HA.
 
 ### Run these steps on Bastion Host Machine
 
