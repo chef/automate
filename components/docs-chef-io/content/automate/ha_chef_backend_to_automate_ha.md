@@ -143,31 +143,30 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 - Set up your workstation based on the newly created Automate-HA's chef-server. It is only needed if you have set up the workstation earlier.
 - This in-place migration works only when cookbooks are stored in a database. This does not support use-case, where cookbooks are stored in the filesystem.
-- Take the backup of the system to avoid data loss.
+- Take the backup of the system to avoid data loss
 
 {{< /note >}}
-
-1. ssh to all the backend nodes of chef-backend and run
+ 
+1. [Backup the existing chef server data ](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
+2. ssh to all the backend nodes of chef-backend and run
 
     ```cmd
         chef-backend-ctl stop
     ```
 
-2. ssh to all frontend nodes of chef-backend and run
+3. ssh to all frontend nodes of chef-backend and run
 
     ```cmd
         chef-server-ctl stop
     ```
 
-3. Create one bastion machine under the same network space.
+4. Create one bastion machine under the same network space.
 
-4. ssh to bastion machine and download chef-automate cli
+5. ssh to bastion machine and download chef-automate cli and extract the downloaded zip file
 
     ```cmd
-        https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
+        https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
     ```
-
-5. Extract the downloaded zip file
 
 6. Create an airgap bundle using the command
 
@@ -202,6 +201,21 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     sudo_password = ""
     # DON'T MODIFY THE BELOW LINE (backup_mount)
     backup_mount = "/mnt/automate_backups"
+    # Eg.: backup_config = "object_storage" or "file_system"
+    backup_config = "file_system"
+    # If backup_config = "object_storage" fill out [object_storage.config] as well
+    ## Object storage similar to AWS S3 Bucket
+    [object_storage.config]
+    bucket_name = ""    
+    access_key = ""
+    secret_key = ""
+    # For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
+    # Include protocol to the enpoint value. Eg: https://customdns1.com or http://customdns2.com
+    endpoint = ""
+    # [Optional] Mention object_storage region if applicable
+    # Eg: region = "us-west-1"
+    region = ""
+    ## === ===
     [automate.config]
     # admin_password = ""
     # automate load balancer fqdn IP or path
@@ -225,7 +239,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 9. Deploy using the following command:
 
 ```cmd
-./chef-automate deploy config.toml <airgapped bundle name>
+./chef-automate deploy config.toml --airgap-bundle <airgapped bundle name>
 ```
 
 10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
