@@ -66,7 +66,7 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
     
     Following command will patch the configuration in all the OpenSearch nodes. 
-    `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
+    `chef-automate config patch --opensearch <path to os_config.toml>`
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
 
     ```bash
@@ -80,7 +80,7 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
     Following command will patch the configuration in all the Frontend nodes: 
-    `chef-automate config patch --fe <PATH TO automate.toml>`
+    `chef-automate config patch --fe <Path to automate.toml>`
 
 1. Go the Chef Automate HA, where we copied the `tar` file. Unzip the bundle using:
 
@@ -148,7 +148,9 @@ The below steps won't work for Automate HA with AWS Managed.
     - In automate we are mounting that EFS volume at `/var/opt/chef-automate/backups` location unless you specify the location in `config.toml` file. 
 
     - In HA we are mounting that volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
-        - Make sure that it should have permission for hab user.
+    {{< warning >}}
+    Make sure that it should have permission for hab user.
+    {{< /warning >}}
 
 1. Go to Bastion 
     - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes.
@@ -159,7 +161,7 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
     
     Following command will patch the configuration in all the OpenSearch nodes. 
-    `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
+    `chef-automate config patch --opensearch <Path to os_config.toml>`
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
 
     ```bash
@@ -173,7 +175,7 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
     Following command will patch the configuration in all the Frontend nodes: 
-    `chef-automate config patch --fe <PATH TO automate.toml>`
+    `chef-automate config patch --fe <Path to automate.toml>`
 
 1. Create *Backup* of Chef Automate Standalone using the following command:
 
