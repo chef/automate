@@ -7,9 +7,9 @@ automate = "On-Premises Prerequisites"
 [menu]
   [menu.automate]
     title = "On-Premises Prerequisites"
-    parent = "automate/deploy_high_availability/ha_prerequisites"
-    identifier = "automate/deploy_high_availability/ha_prerequisites/ha-on-premises-deployment-prerequisites.md On-Premises Prerequisites"
-    weight = 20
+    parent = "automate/deploy_high_availability/deployment"
+    identifier = "automate/deploy_high_availability/deployment/ha_on_premises_deployment_prerequisites.md On-Premises Prerequisites"
+    weight = 200
 +++
 
 {{< warning >}}

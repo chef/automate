@@ -10,11 +10,15 @@ gh_repo = "automate"
     title = "On-Premise Deployment"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-Premise Deployment"
-    weight = 200
+    weight = 205
 +++
 
 {{< warning >}}
 {{% automate/ha-warn %}}
+{{< /warning >}}
+
+{{< warning >}}
+The below prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
 {{< /warning >}}
 
 This section will discuss the steps to deploy Chef Automate HA on-premise machines or on existing VMs. The steps are as follows:
