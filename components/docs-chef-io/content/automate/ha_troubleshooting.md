@@ -20,14 +20,10 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ### Post Automate HA deployment if the chef-server service is in a critical state
 
-<<<<<<< HEAD
 - Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate` 
 
 - If getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint.
 - ssh to the Automate HA Chef Infra Server and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.
-=======
-- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate` if getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint ssh to the Automate HA Chef Infra Server, and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.
->>>>>>> 669aa4deb (fixed and updated the formatting)
 
 ```cmd
   export endpoint="AUTOMATE LB URL"
@@ -171,11 +167,7 @@ terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 While trying to deploy or upgrade Chef Automate HA, if the command did not exit gracefully, the possible error looks like as shown below:
 
 ```bash
-<<<<<<< HEAD
       Exiting as execution process completed
-=======
-      Exiting as the execution process completed
->>>>>>> 669aa4deb (fixed and updated the formatting)
 UnknownError: Unable to determine error cause: Command did not exit gracefully.
 ```
 
@@ -190,13 +182,9 @@ UnknownError: Unable to determine error cause: Command did not exit gracefully.
 
 ### Issue: knife-ec-restore during migration: Failed to restore synchronous operations
 
-<<<<<<< HEAD
 - While running the restore command, if you are getting this error in logs: 
 `Failed to restore synchronous operations`
 follow either of the methods below.
-=======
-- While running the restore command, If you are getting this error in logs: Failed to restore synchronous operations,  follow either of the methods below.
->>>>>>> 669aa4deb (fixed and updated the formatting)
 
 #### Solution 1
 
@@ -205,11 +193,7 @@ Go to any Automate Node in HA:
 - Run the following command to get all the snapshots:
 
 ```cmd
-<<<<<<< HEAD
 curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty
-=======
-curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty 
->>>>>>> 669aa4deb (fixed and updated the formatting)
 ```
 
 - One by One, delete all the snapshots using the below command:
@@ -236,7 +220,6 @@ chef-automate-es6-ingest-service
 for index in ${indices[@]}; do
 curl -XDELETE -k -H 'Content-Type: application/json' http://localhost:10144/_snapshot/$index --data-binary @- << EOF
 {
-<<<<<<< HEAD
 "type": "s3",
 	"settings": {
 	 "bucket": "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
@@ -245,16 +228,6 @@ curl -XDELETE -k -H 'Content-Type: application/json' http://localhost:10144/_sna
 	 "role_arn": "",
 	 "compress": "false"
  	}
-=======
-  "type": "s3",
-    "settings": {
-      "bucket": "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
-      "base_path": "elasticsearch/automate-elasticsearch-data/$index",
-      "region": "<YOUR-PRIMARY-CLUSTER-REGION>",
-      "role_arn": " ",
-      "compress": "false"
-    }
->>>>>>> 669aa4deb (fixed and updated the formatting)
 }
 EOF
 done
@@ -262,8 +235,6 @@ done
 
 #### Solution 2
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 - Log in to the OpenSearch dashboard
 - Run this query: GET _snapshot/_all to get all the snapshots.
 - Delete all the snapshots using this query: DELETE _snapshot/\<snapshot name>
@@ -280,35 +251,8 @@ In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetch
 - Create record as recordname.eng.chefdemo.net
 - CNAME with value HA URL: ec2-url.region.compute.amazonaws.com
 - Provide `https://<record-name>` while running knife ssl check. E.g., `knife ssl check https://<record-name>`.
-=======
-- Log in to the Opensearch dashboard  
-- Run this query: GET _snapshot/_all to get all the snapshots.  
-- Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>   
-  For example: DELETE _snapshot/ chef-automate-es6-event-feed-service 
-=======
-- Log in to the OpenSearch dashboard
+
+- Log in to the Opensearch dashboard
 - Run this query: GET _snapshot/_all to get all the snapshots.
 - Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>
->>>>>>> 669aa4deb (fixed and updated the formatting)
-
   For example: DELETE _snapshot/ chef-automate-es6-event-feed-service
-
-<<<<<<< HEAD
-#### Solution 
-- Go to route 53 chefdemo.net  
-- Create record as recordname.eng.chefdemo.net  
-- CNAME with value HA url: ec2-3-108-254-0.ap-south-1.compute.amazonaws.com  
-- Provide https://<record-name> while running knife ssl check. Eg: `knife ssl check https://<record-name>`
->>>>>>> 17dc12fc1 (Updated migration document for chef-backend to HA)
-=======
-### Issue: knife SSL cert while setting up workstation during migration
-
-In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetched is for the domain *.chefdemo.net, follow the below steps when you run `knife ssl check`.
-
-#### Solution
-
-- Go to route 53 chefdemo.net
-- Create record as recordname.eng.chefdemo.net
-- CNAME with value HA URL: ec2-3-108-254-0.ap-south-1.compute.amazonaws.com
-- Provide https://<record-name> while running knife ssl check. E.g., `knife ssl check https://<record-name>`
->>>>>>> 669aa4deb (fixed and updated the formatting)
