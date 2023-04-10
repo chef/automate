@@ -10,7 +10,7 @@ import (
 var verifyCmd = &cobra.Command{
 	Use:   "verify",
 	Short: "Verify Chef Automate setup",
-	Long:  "Verify Chef Automate config files and Infrastructre",
+	Long:  "Verify Chef Automate config files and Infrastructure",
 	Annotations: map[string]string{
 		docs.Compatibility: docs.Compatibility,
 	},
@@ -31,53 +31,55 @@ var verifyCmdFlags = struct {
 	certificates              bool
 }{}
 
+var A2HARBFileExist bool
+
 func init() {
 	// flags for Verify Command
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haAWSProvision,
 		"ha-aws-provision",
 		false,
-		"Verifies the AWS Provision config")
+		"Use this flag to verify the AWS Provision config")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haAWSManagedProvision,
 		"ha-aws-managed-provision",
 		false,
-		"Verifies the AWS provision config with Managed services")
+		"Use this flag to verify the AWS Provision config with Managed services")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haOnpremDeploy,
 		"ha-onprem-deploy",
 		false,
-		"Verifies the On-Premise setup and config with Chef Managed services")
+		"Use this flag to verify the On-Premise setup and config with Chef Managed services")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haOnPremAWSManagedDeploy,
 		"ha-onprem-aws-deploy",
 		false,
-		"Verifies the On-Premise setup and config with AWS Managed services")
+		"Use this flag to verify the On-Premise setup and config with AWS Managed services")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haOnPremCustManagedDeploy,
 		"ha-onprem-customer-deploy",
 		false,
-		"Verifies the On-Premise setup and config with Customer Managed services")
+		"Use this flag to verify the On-Premise setup and config with Customer Managed services")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haAWSDeploy,
 		"ha-aws-deploy",
 		false,
-		"Verifies the AWS Deployment setup and config")
+		"Use this flag to verify the AWS Deployment setup and config")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.haAWSManagedDeploy,
 		"ha-aws-managed-deploy",
 		false,
-		"Verifies the AWS Deployement setup and config with Managed Services")
+		"Use this flag to verify the AWS Deployment setup and config with Managed Services")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.standaloneDeploy,
 		"standalone-deploy",
 		false,
-		"Verifies the Automate standalone setup and config")
+		"Use this flag to verify the Automate standalone setup and config")
 	verifyCmd.PersistentFlags().BoolVar(
 		&verifyCmdFlags.certificates,
 		"certificates",
 		false,
-		"Verifies the certificates provided in the file")
+		"Use this flag to verify the certificates provided in the file")
 	verifyCmd.PersistentFlags().StringVar(
 		&verifyCmdFlags.file,
 		"file",
@@ -94,39 +96,24 @@ func runVerifyCmd(cmd *cobra.Command, args []string) error {
 		configPath = args[0]
 	}
 
+	A2HARBFileExist = isA2HARBFileExist()
 	if verifyCmdFlags.haAWSProvision {
 		err = verifyHaAWSProvision(configPath)
-	}
-
-	if verifyCmdFlags.haAWSManagedProvision {
+	} else if verifyCmdFlags.haAWSManagedProvision {
 		err = verifyHaAWSManagedProvision(configPath)
-	}
-
-	if verifyCmdFlags.haAWSDeploy {
+	} else if verifyCmdFlags.haAWSDeploy {
 		err = verifyHaAWSDeploy(configPath)
-	}
-
-	if verifyCmdFlags.haAWSManagedDeploy {
+	} else if verifyCmdFlags.haAWSManagedDeploy {
 		err = verifyHaAWSManagedDeploy(configPath)
-	}
-
-	if verifyCmdFlags.standaloneDeploy {
+	} else if verifyCmdFlags.standaloneDeploy {
 		err = verifyStandaloneDeploy(configPath)
-	}
-
-	if verifyCmdFlags.haOnpremDeploy {
+	} else if verifyCmdFlags.haOnpremDeploy {
 		err = verifyHaOnpremDeploy(configPath)
-	}
-
-	if verifyCmdFlags.haOnPremAWSManagedDeploy {
+	} else if verifyCmdFlags.haOnPremAWSManagedDeploy {
 		err = verifyHaOnPremAWSManagedDeploy(configPath)
-	}
-
-	if verifyCmdFlags.haOnPremCustManagedDeploy {
+	} else if verifyCmdFlags.haOnPremCustManagedDeploy {
 		err = verifyHaOnPremCustManagedDeploy(configPath)
-	}
-
-	if verifyCmdFlags.certificates {
+	} else if verifyCmdFlags.certificates {
 		err = verification.VerifyCertificates("")
 	}
 
@@ -138,66 +125,66 @@ func runVerifyCmd(cmd *cobra.Command, args []string) error {
 }
 
 func verifyHaAWSProvision(configPath string) error {
-	if isA2HARBFileExist() {
+	if A2HARBFileExist {
 		return status.New(status.InvalidCommandArgsError, "Setup is already Provisioned. Please use --ha-aws-deploy flag.")
-	} else {
-		err := verification.VerifyHAAWSProvision(configPath)
-		if err != nil {
-			return status.Annotate(err, status.ConfigError)
-		}
 	}
+	err := verification.VerifyHAAWSProvision(configPath)
+	if err != nil {
+		return status.Annotate(err, status.ConfigError)
+	}
+
 	return nil
 }
 
 func verifyHaAWSManagedProvision(configPath string) error {
-	if isA2HARBFileExist() {
+	if A2HARBFileExist {
 		return status.New(status.InvalidCommandArgsError, "Setup is already Provisioned. Please use --ha-aws-managed-deploy flag.")
-	} else {
-		err := verification.VerifyHAAWSProvision(configPath)
-		if err != nil {
-			return status.Annotate(err, status.ConfigError)
-		}
 	}
+	err := verification.VerifyHAAWSManagedProvision(configPath)
+	if err != nil {
+		return status.Annotate(err, status.ConfigError)
+	}
+
 	return nil
 }
 
 func verifyHaAWSDeploy(configPath string) error {
-	if !isManagedServicesOn() && isA2HARBFileExist() {
-		err := verification.VerifyHAAWSDeployment(configPath)
-		if err != nil {
-			return status.Annotate(err, status.ConfigError)
+	if !isManagedServicesOn() {
+		if A2HARBFileExist {
+			err := verification.VerifyHAAWSDeployment(configPath)
+			if err != nil {
+				return status.Annotate(err, status.ConfigError)
+			}
+			return nil
 		}
-	} else if !isA2HARBFileExist() {
 		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
-	} else {
-		return status.New(status.InvalidCommandArgsError, "This flag will not verify the Managed Services Setup. Please use the --ha-aws-managed-deploy flag.")
 	}
-	return nil
+	return status.New(status.InvalidCommandArgsError, "This flag will not verify the Managed Services Setup. Please use the --ha-aws-managed-deploy flag.")
 }
 
 func verifyHaAWSManagedDeploy(configPath string) error {
-	if isManagedServicesOn() && isA2HARBFileExist() {
-		err := verification.VerifyHAAWSManagedDeployment(configPath)
-		if err != nil {
-			return status.Annotate(err, status.ConfigError)
+	if isManagedServicesOn() {
+		if A2HARBFileExist {
+			err := verification.VerifyHAAWSManagedDeployment(configPath)
+			if err != nil {
+				return status.Annotate(err, status.ConfigError)
+			}
+			return nil
 		}
-	} else if !isA2HARBFileExist() {
 		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
-	} else {
-		return status.New(status.InvalidCommandArgsError, "Managed Services flag is not set. Cannot verify the config.")
 	}
-	return nil
+	return status.New(status.InvalidCommandArgsError, "Managed Services flag is not set. Cannot verify the config.")
 }
 
 func verifyStandaloneDeploy(configPath string) error {
-	if isA2HARBFileExist() {
+	if A2HARBFileExist {
 		return status.New(status.InvalidCommandArgsError, "Deployment type does not match with the requested flag.")
-	} else if !isA2HARBFileExist() {
-		err := verification.VerifyStandaloneDeployment(configPath)
-		if err != nil {
-			return status.Annotate(err, status.ConfigError)
-		}
 	}
+	err := verification.VerifyStandaloneDeployment(configPath)
+	if err != nil {
+		return status.Annotate(err, status.ConfigError)
+	}
+
 	return nil
 }
 

@@ -77,7 +77,7 @@ func validateStandaloneDeploymentConfig(config *sc.AutomateConfig) {
 
 }
 
-func validateNodeReachability(ipaddress string, nodeType string, channel chan reporting.VerfictionReport, numberOfNodes *numberOfNodes) {
+func validateNodeReachability(ipaddress string, nodeType string, channel chan reporting.VerificationReport, numberOfNodes *numberOfNodes) {
 
 	/* Write the checks to validate if the nodes are reachable */
 
@@ -155,18 +155,17 @@ func validateFreeDisk(ipaddress string, nodeType string) Result {
 				},
 			},
 		}
-	} else {
-		return Result{
-			Valid: true,
-			Report: reporting.Info{
-				Hostip:    ipaddress,
-				Parameter: systemResources,
-				Status:    "Success",
-				StatusMessage: &reporting.StatusMessage{
-					MainMessage: "System Resources as per the requirement",
-				},
+	}
+	return Result{
+		Valid: true,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: systemResources,
+			Status:    "Success",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "System Resources as per the requirement",
 			},
-		}
+		},
 	}
 
 }
@@ -185,22 +184,21 @@ func validateCPU(ipaddress string, nodeType string) Result {
 				},
 			},
 		}
-	} else {
-		return Result{
-			Valid: false,
-			Report: reporting.Info{
-				Hostip:    ipaddress,
-				Parameter: systemResources,
-				Status:    "Failed",
-				StatusMessage: &reporting.StatusMessage{
-					MainMessage: "System Resources check failed",
-					SubMessage:  []string{"CPU count is not as per the requirement"},
-				},
-				SummaryInfo: &reporting.SummaryInfo{
-					ToResolve: []string{"Increase the CPU of the machine. Machine should have 4 CPUs"},
-				},
+	}
+	return Result{
+		Valid: false,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: systemResources,
+			Status:    "Failed",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "System Resources check failed",
+				SubMessage:  []string{"CPU count is not as per the requirement"},
 			},
-		}
+			SummaryInfo: &reporting.SummaryInfo{
+				ToResolve: []string{"Increase the CPU of the machine. Machine should have 4 CPUs"},
+			},
+		},
 	}
 
 }
@@ -223,19 +221,19 @@ func validateOSVersion(ipaddress string, nodeType string) Result {
 				},
 			},
 		}
-	} else {
-		return Result{
-			Valid: true,
-			Report: reporting.Info{
-				Hostip:    ipaddress,
-				Parameter: softwareVersions,
-				Status:    "Success",
-				StatusMessage: &reporting.StatusMessage{
-					MainMessage: "Software Versions check Passed",
-				},
-			},
-		}
 	}
+	return Result{
+		Valid: true,
+		Report: reporting.Info{
+			Hostip:    ipaddress,
+			Parameter: softwareVersions,
+			Status:    "Success",
+			StatusMessage: &reporting.StatusMessage{
+				MainMessage: "Software Versions check Passed",
+			},
+		},
+	}
+
 }
 
 func validateLinuxCommands(ipaddress string, nodeType string) Result {

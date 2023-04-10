@@ -38,14 +38,14 @@ func getMockReportingModule(wr *cli.Writer) Reporting {
 	}
 }
 
-var reportChan = make(chan VerfictionReport, 10)
+var reportChan = make(chan VerificationReport, 10)
 var nodeInfoMap = make(map[string][]Info)
 var done = make(chan bool, 1)
 
 func TestVerificationReports(t *testing.T) {
 	cw := getMockWriterImpl()
 	type args struct {
-		reportChan  chan VerfictionReport
+		reportChan  chan VerificationReport
 		reporting   Reporting
 		nodeInfoMap map[string][]Info
 		done        chan bool
@@ -66,7 +66,7 @@ func TestVerificationReports(t *testing.T) {
 		want: "Automate\n+-------+-----------------+---------------------------+-----------------+--------------------------------------------------------------+\n|   NO. |      IDENTIFIER |                 PARAMETER |          STATUS |                                                      MESSAGE |\n+-------+-----------------+---------------------------+-----------------+--------------------------------------------------------------+\n+-------+-----------------+---------------------------+-----------------+--------------------------------------------------------------+\nSUMMARY : Automate\n+--------------------------------+-----------------+-----------------+-------------------------------------------------------------------+\n|                      PARAMETER |      SUCCESSFUL |          FAILED |                                                 HOW TO RESOLVE IT |\n+--------------------------------+-----------------+-----------------+-------------------------------------------------------------------+\n+--------------------------------+-----------------+-----------------+-------------------------------------------------------------------+\n",
 	}
 
-	report := VerfictionReport{
+	report := VerificationReport{
 		TableKey: "",
 		Report: Info{
 			Hostip:        "",

@@ -9,7 +9,7 @@ import (
 	"github.com/jedib0t/go-pretty/table"
 )
 
-type VerfictionReport struct {
+type VerificationReport struct {
 	TableKey     string
 	Report       Info
 	TotalReports int
@@ -39,7 +39,7 @@ type progress struct {
 	totalCount   int
 }
 
-func VerificationReports(reportChan chan VerfictionReport, reporting Reporting, nodeInfoMap map[string][]Info, done chan bool) {
+func VerificationReports(reportChan chan VerificationReport, reporting Reporting, nodeInfoMap map[string][]Info, done chan bool) {
 	tableProgress := make(map[string]progress)
 	keyMap := make(map[string][]string)
 	tableKeys := reporting.GetAllTableKeys()

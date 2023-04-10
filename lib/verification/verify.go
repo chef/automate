@@ -40,7 +40,7 @@ type numberOfNodes struct {
 	numberOfOpenSearchNodes  int
 }
 
-var reportChan = make(chan reporting.VerfictionReport)
+var reportChan = make(chan reporting.VerificationReport)
 var nodeInfoMap = make(map[string][]reporting.Info)
 var doneChan = make(chan bool, 1)
 
@@ -170,17 +170,16 @@ func runTests(ipsMap map[string]string, numberOfNodes *numberOfNodes) {
 	var wg sync.WaitGroup
 
 	for k, v := range ipsMap {
+		wg.Add(3)
 		ip := fmt.Sprintf("%v", k)
 		nodeType := fmt.Sprintf("%v", v)
 		if nodeType == "OpenSearch" || nodeType == "PostgresSQL" {
-			wg.Add(4)
+			wg.Add(1)
 			go func() {
 				defer wg.Done()
 				producerChan := make(chan bool, 1)
-				runchecksForCertificates(ip, nodeType, producerChan, numberOfNodes)
+				runChecksForCertificates(ip, nodeType, producerChan, numberOfNodes)
 			}()
-		} else {
-			wg.Add(3)
 		}
 		go func() {
 			defer wg.Done()
@@ -188,11 +187,11 @@ func runTests(ipsMap map[string]string, numberOfNodes *numberOfNodes) {
 		}()
 		go func() {
 			defer wg.Done()
-			runchecksForSystemResources(ip, nodeType, numberOfNodes)
+			runChecksForSystemResources(ip, nodeType, numberOfNodes)
 		}()
 		go func() {
 			defer wg.Done()
-			runchecksForSoftwareVersions(ip, nodeType, numberOfNodes)
+			runChecksForSoftwareVersions(ip, nodeType, numberOfNodes)
 		}()
 	}
 	wg.Wait()
@@ -202,7 +201,7 @@ func runTests(ipsMap map[string]string, numberOfNodes *numberOfNodes) {
 	}
 }
 
-func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan bool, numberOfNodes *numberOfNodes) {
+func runChecksForCertificates(ipaddress string, nodeType string, doneChan chan bool, numberOfNodes *numberOfNodes) {
 	var successCount, failedCount int
 	result := validateCertificateFormat(ipaddress, "abc")
 	if !result.Valid {
@@ -220,7 +219,7 @@ func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan b
 			report := report{
 				ipaddress:             ipaddress,
 				parameter:             "Certificates",
-				message:               "Cerificate validation successful",
+				message:               "Certificate validation successful",
 				successfulChecksCount: successCount,
 			}
 			chanWriter(reportChan, nodeType, getReport(report, "Success"), numberOfNodes)
@@ -229,7 +228,7 @@ func runchecksForCertificates(ipaddress string, nodeType string, doneChan chan b
 	doneChan <- true
 }
 
-func runchecksForSystemResources(ipaddress string, nodeType string, numberOfNodes *numberOfNodes) {
+func runChecksForSystemResources(ipaddress string, nodeType string, numberOfNodes *numberOfNodes) {
 	var successCount, failedCount int
 	var errors []string
 	var resolutions []string
@@ -289,7 +288,7 @@ func runchecksForSystemResources(ipaddress string, nodeType string, numberOfNode
 	}
 }
 
-func runchecksForSoftwareVersions(ipaddress string, nodeType string, numberOfNodes *numberOfNodes) {
+func runChecksForSoftwareVersions(ipaddress string, nodeType string, numberOfNodes *numberOfNodes) {
 	var successCount, failedCount int
 	var errors []string
 	var resolutions []string
@@ -393,7 +392,7 @@ func createTables(nodeNumbers *numberOfNodes) map[string]*reporting.Table {
 func getStatusTable(title string) *reporting.Table {
 	return &reporting.Table{
 		Title:     title,
-		Header:    table.Row{"No.", "Identifier", "Paramter", "Status", "Message"},
+		Header:    table.Row{"No.", "Identifier", "Parameter", "Status", "Message"},
 		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 5, WidthMin: 5}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 25, WidthMin: 25}, {Number: 4, WidthMax: 15, WidthMin: 15}, {Number: 5, WidthMax: 60, WidthMin: 60}},
 	}
 }
@@ -401,12 +400,12 @@ func getStatusTable(title string) *reporting.Table {
 func getSummaryTable(title string) *reporting.Table {
 	return &reporting.Table{
 		Title:     title,
-		Header:    table.Row{"Paramter", "Successful", "Failed", "How to resolve it"},
+		Header:    table.Row{"Parameter", "Successful", "Failed", "How to resolve it"},
 		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 30, WidthMin: 30}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 15, WidthMin: 15}, {Number: 4, WidthMax: 60, WidthMin: 60}},
 	}
 }
 
-func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, report reporting.Info, nodeNumbers *numberOfNodes) {
+func chanWriter(reportChan chan reporting.VerificationReport, nodeType string, report reporting.Info, nodeNumbers *numberOfNodes) {
 	total := 3 * nodeNumbers.numberOfAutomateNodes
 	if nodeType == "ChefServer" {
 		total = 3 * nodeNumbers.numberOfChefServerNodes
@@ -415,7 +414,7 @@ func chanWriter(reportChan chan reporting.VerfictionReport, nodeType string, rep
 	} else if nodeType == "PostgresSQL" {
 		total = 4 * nodeNumbers.numberOfPostgresSQLNodes
 	}
-	msg := reporting.VerfictionReport{
+	msg := reporting.VerificationReport{
 		TableKey:     nodeType,
 		Report:       report,
 		TotalReports: total,
