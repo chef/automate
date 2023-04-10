@@ -18,14 +18,23 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  
-minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+- Minimum version of Automate from which migration can be performed is 4.x
 
-- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA.
+- Customers in 2022xxxx or 3.x version needs to update to 4.x version.
+
+- Automate HA with AWS managed needs to use OpenSearch version <1.3.2
+
+- The OpenSearch version in Automate should be of same version as of Automate HA.
 
 {{< /warning >}}
 
 ## Upgrade with FileSystem Backup Locally
+
+{{< warning >}}
+
+- The below steps won't work for Automate HA AWS Managed.
+
+{{< /warning >}}
 
 1. Create Backup of Chef Automate Standalone using the following command:
 
@@ -35,29 +44,52 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     ```
 
     - The first command will create the backup to the `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file.
-    - The second command will create the `bootstrap.abb`.
+    - The second command will create the `bootstrap.abb` this bundle captures any local credentials or secrets that aren’t persisted in the database.
     - Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
-1. Create **Bundle** using the following command:
+1. Go to `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file and create **Bundle** using the following command:
 
     ```bash
-    tar -cvf backup.tar.gz path/to/backup/<backup_id>/ /path/to/backup/automatebackup-elasticsearch/ /path/to/backup/.tmp/
+    tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
     ```
 
 1. Transfer the `tar` bundle to one of the Chef Automate HA Frontend Nodes.
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
+1. Go to Bastion 
+    
+    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following content with the path to the repo and then patch this file in all the OpenSearch nodes. 
+
+    ```bash
+    [path] 
+      # Replace /mnt/automate_backups with the backup_mount config found on the Bastion host in /hab/a2_deploy_workspace/a2ha.rb 
+      repo = "/mnt/automate_backups" 
+    ```
+    
+    Following command will patch the configuration in all the OpenSearch nodes. 
+    `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
+
+    - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
+
+    ```bash
+    [global.v1.external.opensearch.backup]
+        enable = true 
+        location = "fs" 
+    [global.v1.external.opensearch.backup.fs] 
+        # The `path.repo` setting you've configured on your OpenSearch nodes must be a parent directory of the setting you configure here: 
+        path = "/mnt/automate_backups" 
+    [global.v1.backups.filesystem]
+        path = "/mnt/automate_backups" 
+    ```
+
+    Following command will patch the configuration in all the Frontend nodes: 
+    `chef-automate config patch --fe <PATH TO automate.toml>`
+
 1. Go the Chef Automate HA, where we copied the `tar` file. Unzip the bundle using:
 
     ```bash
     tar -xf backup.tar.gz -C /mnt/automate_backups
-    ```
-
-1. Stop all the services at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
-
-    ``` bash
-    sudo chef-automate stop
     ```
 
 1. Run the following command at Chef-Automate node of Automate HA cluster to get the applied `config`:
@@ -78,6 +110,12 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     {{% automate/char-warn %}}
     {{< /warning >}}
 
+1. Stop all the services at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+
+    ``` bash
+    sudo chef-automate stop
+    ```
+
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
 
     Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
@@ -91,7 +129,7 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     ```bash
     automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
      
-    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ```
 
 1. Start the Service in all the Frontend Nodes with the command shown below:
