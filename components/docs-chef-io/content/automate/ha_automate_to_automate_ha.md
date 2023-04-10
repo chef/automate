@@ -136,6 +136,39 @@ The below steps won't work for Automate HA with AWS Managed.
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
+1. Make EFS volume and attach that volume to existing automate setup and Automate HA nodes. 
+
+1. Mount EFS Volume:
+    - In automate we are mounting that EFS volume at `/var/opt/chef-automate/backups` location unless you specify the location in `config.toml` file. 
+
+    - In HA we are mounting that volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
+        - Make sure that it should have permission for hab user.
+
+1. Go to Bastion 
+    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes.
+    
+    ```bash
+    [path] 
+      repo = "/mnt/automate_backups" 
+    ```
+    
+    Following command will patch the configuration in all the OpenSearch nodes. 
+    `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
+    - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
+
+    ```bash
+    [global.v1.external.opensearch.backup]
+        enable = true 
+        location = "fs" 
+    [global.v1.external.opensearch.backup.fs] 
+        path = "/mnt/automate_backups" 
+    [global.v1.backups.filesystem]
+        path = "/mnt/automate_backups" 
+    ```
+
+    Following command will patch the configuration in all the Frontend nodes: 
+    `chef-automate config patch --fe <PATH TO automate.toml>`
+
 1. Create *Backup* of Chef Automate Standalone using the following command:
 
     ```bash
@@ -144,22 +177,8 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
     - The first command will create the backup at the file mount location mentioned in the `config.toml` file.
-    - The second command will create the `bootstrap.abb`.
-    - Once the backup is completed, save the backup Id. For example: `20210622065515`
-
-1. Detach the File system from Standalone Chef-Automate.
-
-1. Attach and Mount the same file system to the Automate-HA all the nodes:
-
-    - Make sure that it should have permission for hab user
-
-1. Stop all the services at frontend nodes in Automate HA Cluster. Run the below command to all the Automate and Chef Infra Server nodes
-
-    ``` bash
-    sudo chef-automate stop
-    ```
-
-1. Get the Automate HA version number from the location `/var/tmp/` in Automate instance. For example : `frontend-4.x.y.aib`
+    - The second command will create the `bootstrap.abb` bundle, this bundle captures any local credentials or secrets that aren’t persisted in the database.
+    - Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
 1. Run the command at Chef-Automate node of Automate HA cluster to get the applied config:
 
@@ -178,6 +197,12 @@ The below steps won't work for Automate HA with AWS Managed.
     {{< warning >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
+
+1. Stop all the services at frontend nodes in Automate HA Cluster. Run the below command to all the Automate and Chef Infra Server nodes
+
+    ``` bash
+    sudo chef-automate stop
+    ```
 
 1. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
