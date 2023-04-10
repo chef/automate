@@ -58,7 +58,8 @@ The below steps won't work for Automate HA with AWS Managed.
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
 1. Go to Bastion 
-    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes. 
+    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes.
+    
     ```bash
     [path] 
       repo = "/mnt/automate_backups" 
@@ -67,6 +68,7 @@ The below steps won't work for Automate HA with AWS Managed.
     Following command will patch the configuration in all the OpenSearch nodes. 
     `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
+
     ```bash
     [global.v1.external.opensearch.backup]
         enable = true 
