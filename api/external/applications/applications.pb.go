@@ -115,12 +115,14 @@ type ServicesReq struct {
 	// * `group`: the suffix of the service group name
 	//
 	// `status` filters refine service results by a service's
-	//  current state or most recent healthcheck result.
-	//  Disconnected services keep their last healthcheck result
-	//  until their reports are removed by Chef Automate.
-	//  When you apply a healthcheck filter, the report includes
-	//  all recently disconnected services.
-	//  Valid status filter parameters are:
+	//
+	//	current state or most recent healthcheck result.
+	//	Disconnected services keep their last healthcheck result
+	//	until their reports are removed by Chef Automate.
+	//	When you apply a healthcheck filter, the report includes
+	//	all recently disconnected services.
+	//	Valid status filter parameters are:
+	//
 	// * `status:disconnected`: returns services in a disconnected state
 	// * `status:critical`: returns services with a "critical" healthcheck result
 	// * `status:unknown`: returns services with an "unknown" healthcheck result
@@ -1543,9 +1545,11 @@ type ServiceGroupsReq struct {
 	// * `group`: the suffix of the service group name
 	//
 	// `status` filters refine the service group results by a service's
-	//  most recent connected/disconnected state or healthcheck result.
 	//
-	//  Valid status filter parameters are:
+	//	most recent connected/disconnected state or healthcheck result.
+	//
+	//	Valid status filter parameters are:
+	//
 	// * `status:disconnected`: returns service groups with at least one service in a disconnected state
 	// * `status:critical`: returns service groups with a with at least one service in a "critical" healthcheck result
 	// * `status:unknown`: returns service groups with at least one service with an "unknown" healthcheck result
@@ -3427,233 +3431,231 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationsServiceClient interface {
+	// List Service Groups
 	//
-	//List Service Groups
+	// Lists service groups with name, health information, and application, environment, package, release metadata.
+	// Accepts pagination, sorting, search, and status filters.
 	//
-	//Lists service groups with name, health information, and application, environment, package, release metadata.
-	//Accepts pagination, sorting, search, and status filters.
+	// Example:
+	// ```
+	// applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
+	// ```
 	//
-	//Example:
-	//```
-	//applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServiceGroups(ctx context.Context, in *ServiceGroupsReq, opts ...grpc.CallOption) (*ServiceGroups, error)
+	// List Service Groups Health Counts
 	//
-	//List Service Groups Health Counts
+	// Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
 	//
-	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServiceGroupsHealthCounts(ctx context.Context, in *ServiceGroupsHealthCountsReq, opts ...grpc.CallOption) (*HealthCounts, error)
+	// List Services
 	//
-	//List Services
+	// Lists service health status and service metadata for services.
+	// Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
 	//
-	//Lists service health status and service metadata for services.
-	//Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServices(ctx context.Context, in *ServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	// Find Services
 	//
-	//Find Services
+	// Lists service health status and service metadata for services matching the given criteria. All matching services are returned via a stream response.
 	//
-	//Lists service health status and service metadata for services matching the given criteria. All matching services are returned via a stream response.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	FindServices(ctx context.Context, in *ServicesReq, opts ...grpc.CallOption) (ApplicationsService_FindServicesClient, error)
+	// List Filter Values
 	//
-	//List Filter Values
+	// Lists all of the possible filter values for a given valid field.
+	// Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
+	// Supports wildcard (* and ?)
 	//
-	//Lists all of the possible filter values for a given valid field.
-	//Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
-	//Supports wildcard (* and ?)
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServicesDistinctValues(ctx context.Context, in *ServicesDistinctValuesReq, opts ...grpc.CallOption) (*ServicesDistinctValuesRes, error)
+	// List Services for a Service Group
 	//
-	//List Services for a Service Group
+	// List the services for a service group with health status and service metadata.
+	// Uses the service group ID generated by Chef Automate instead of the Chef Habitat- provided ID.
+	// Supports pagination and filtering.
 	//
-	//List the services for a service group with health status and service metadata.
-	//Uses the service group ID generated by Chef Automate instead of the Chef Habitat- provided ID.
-	//Supports pagination and filtering.
+	// Example:
+	// ```
+	// applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
+	// ```
 	//
-	//Example:
-	//```
-	//applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServicesBySG(ctx context.Context, in *ServicesBySGReq, opts ...grpc.CallOption) (*ServicesBySGRes, error)
+	// Show Summary
 	//
-	//Show Summary
+	// Shows a summary of service-groups, services, deployments, and supervisors.
+	// Used for telemetry.
+	// Does not support filtering.
 	//
-	//Shows a summary of service-groups, services, deployments, and supervisors.
-	//Used for telemetry.
-	//Does not support filtering.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServicesStats(ctx context.Context, in *ServicesStatsReq, opts ...grpc.CallOption) (*ServicesStatsRes, error)
+	// Mark Services as Disconnected
 	//
-	//Mark Services as Disconnected
+	// Marks services as disconnected based on the `threshold_seconds` setting.
+	// This function is not used by the API or CLI and is here for testing purposes.
+	// The functionality is currently covered by a periodically running job that can be configured
+	// by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
 	//
-	//Marks services as disconnected based on the `threshold_seconds` setting.
-	//This function is not used by the API or CLI and is here for testing purposes.
-	//The functionality is currently covered by a periodically running job that can be configured
-	//by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetDisconnectedServices(ctx context.Context, in *DisconnectedServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	// Remove Disconnected Services
 	//
-	//Remove Disconnected Services
+	// Removes services marked as disconnected based on the `threshold_seconds` setting.
+	// This function is not used by the API or CLI and is here for testing purposes.
+	// The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
 	//
-	//Removes services marked as disconnected based on the `threshold_seconds` setting.
-	//This function is not used by the API or CLI and is here for testing purposes.
-	//The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:delete
-	//```
 	DeleteDisconnectedServices(ctx context.Context, in *DisconnectedServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	// Delete the services with the given IDs
 	//
-	//Delete the services with the given IDs
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:delete
-	//```
 	DeleteServicesByID(ctx context.Context, in *DeleteServicesByIDReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	// Show Version
 	//
-	//Show Version
+	// # Displays the current version of the applications-service
 	//
-	//Displays the current version of the applications-service
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//system:serviceVersion:get
-	//```
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
+	// Show 'Disconnected Services' configuration
 	//
-	//Show 'Disconnected Services' configuration
+	// Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
+	// This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 	//
-	//Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
-	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:get
-	//```
 	GetDisconnectedServicesConfig(ctx context.Context, in *GetDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicMandatoryJobConfig, error)
+	// Change 'Disconnected Services' Configuration
 	//
-	//Change 'Disconnected Services' Configuration
+	// Changes the configuration for the task that marks services as disconnected.
 	//
-	//Changes the configuration for the task that marks services as disconnected.
+	// The periodic task to check for disconnected services can be enabled or
+	// disabled by setting the 'running' setting to `true` or `false`, respectively.
+	// When disabled, no services will be marked disconnected, regardless of the
+	// time that has elapsed since the last health check. It is not recommened to
+	// disable the job.
 	//
-	//The periodic task to check for disconnected services can be enabled or
-	//disabled by setting the 'running' setting to `true` or `false`, respectively.
-	//When disabled, no services will be marked disconnected, regardless of the
-	//time that has elapsed since the last health check. It is not recommened to
-	//disable the job.
+	// The frequency of the job's execution can be modified by changing the
+	// 'recurrence'. This setting is a string
+	// [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	// By default, the task runs every 60 seconds. It is not recommended to change
+	// the recurrence.
 	//
-	//The frequency of the job's execution can be modified by changing the
-	//'recurrence'. This setting is a string
-	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
-	//By default, the task runs every 60 seconds. It is not recommended to change
-	//the recurrence.
+	// When enabled, services are marked disconnected when the time elapsed since
+	// Automate last received a health check exceeds 'threshold'. Threshold is a
+	// string that follows Elasticsearch's date math expressions.
 	//
-	//When enabled, services are marked disconnected when the time elapsed since
-	//Automate last received a health check exceeds 'threshold'. Threshold is a
-	//string that follows Elasticsearch's date math expressions.
+	// Example:
+	// ```
+	// /retention/service_groups/disconnected_services/config
+	// '{
+	// "threshold": "15m",
+	// "running": true,
+	// "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
+	// }'
+	// ```
 	//
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Example:
-	//```
-	///retention/service_groups/disconnected_services/config
-	//'{
-	//"threshold": "15m",
-	//"running": true,
-	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
-	//}'
-	//```
-	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:update
-	//```
 	UpdateDisconnectedServicesConfig(ctx context.Context, in *PeriodicMandatoryJobConfig, opts ...grpc.CallOption) (*UpdateDisconnectedServicesConfigRes, error)
+	// Runs the job to mark services as disconnected immediately.
 	//
-	//Runs the job to mark services as disconnected immediately.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:update
-	//```
 	RunDisconnectedServicesJob(ctx context.Context, in *RunDisconnectedServicesJobReq, opts ...grpc.CallOption) (*RunDisconnectedServicesJobResponse, error)
+	// Show 'Remove Disconnected Services' Configuration
 	//
-	//Show 'Remove Disconnected Services' Configuration
+	// Displays configuration for the task that deletes services marked as disconnected
+	// after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
+	// This job is disabled if running is set to false.
 	//
-	//Displays configuration for the task that deletes services marked as disconnected
-	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
-	//This job is disabled if running is set to false.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:get
-	//```
 	GetDeleteDisconnectedServicesConfig(ctx context.Context, in *GetDeleteDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicJobConfig, error)
+	// Change 'Remove Disconnected Services' Configuration
 	//
-	//Change 'Remove Disconnected Services' Configuration
+	// Updates configuration information for the task that deletes services marked as disconnected
+	// after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
+	// This job can be disabled by setting `"running": false`.
 	//
-	//Updates configuration information for the task that deletes services marked as disconnected
-	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
-	//This job can be disabled by setting `"running": false`.
+	// The frequency of the job's execution can be modified by changing the
+	// 'recurrence'. This setting is a string
+	// [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	// By default, the task runs every 60 seconds. It is not recommended to change
+	// the recurrence.
 	//
-	//The frequency of the job's execution can be modified by changing the
-	//'recurrence'. This setting is a string
-	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
-	//By default, the task runs every 60 seconds. It is not recommended to change
-	//the recurrence.
+	// Example:
+	// ```
+	// service_groups/delete_disconnected_services/config" -d
+	// '{
+	// "threshold": "1d",
+	// "running":true,
+	// "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
+	// }'
+	// ```
 	//
-	//Example:
-	//```
-	//service_groups/delete_disconnected_services/config" -d
-	//'{
-	//"threshold": "1d",
-	//"running":true,
-	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
-	//}'
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:update
-	//```
 	UpdateDeleteDisconnectedServicesConfig(ctx context.Context, in *PeriodicJobConfig, opts ...grpc.CallOption) (*UpdateDeleteDisconnectedServicesConfigRes, error)
 	RunDeleteDisconnectedServicesJob(ctx context.Context, in *RunDeleteDisconnectedServicesJobReq, opts ...grpc.CallOption) (*RunDeleteDisconnectedServicesJobResponse, error)
 	UpdateTelemetryReported(ctx context.Context, in *UpdateTelemetryReportedRequest, opts ...grpc.CallOption) (*UpdateTelemetryReportedResponse, error)
@@ -3864,233 +3866,231 @@ func (c *applicationsServiceClient) GetServicesUsageCount(ctx context.Context, i
 
 // ApplicationsServiceServer is the server API for ApplicationsService service.
 type ApplicationsServiceServer interface {
+	// List Service Groups
 	//
-	//List Service Groups
+	// Lists service groups with name, health information, and application, environment, package, release metadata.
+	// Accepts pagination, sorting, search, and status filters.
 	//
-	//Lists service groups with name, health information, and application, environment, package, release metadata.
-	//Accepts pagination, sorting, search, and status filters.
+	// Example:
+	// ```
+	// applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
+	// ```
 	//
-	//Example:
-	//```
-	//applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServiceGroups(context.Context, *ServiceGroupsReq) (*ServiceGroups, error)
+	// List Service Groups Health Counts
 	//
-	//List Service Groups Health Counts
+	// Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
 	//
-	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServiceGroupsHealthCounts(context.Context, *ServiceGroupsHealthCountsReq) (*HealthCounts, error)
+	// List Services
 	//
-	//List Services
+	// Lists service health status and service metadata for services.
+	// Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
 	//
-	//Lists service health status and service metadata for services.
-	//Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServices(context.Context, *ServicesReq) (*ServicesRes, error)
+	// Find Services
 	//
-	//Find Services
+	// Lists service health status and service metadata for services matching the given criteria. All matching services are returned via a stream response.
 	//
-	//Lists service health status and service metadata for services matching the given criteria. All matching services are returned via a stream response.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	FindServices(*ServicesReq, ApplicationsService_FindServicesServer) error
+	// List Filter Values
 	//
-	//List Filter Values
+	// Lists all of the possible filter values for a given valid field.
+	// Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
+	// Supports wildcard (* and ?)
 	//
-	//Lists all of the possible filter values for a given valid field.
-	//Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
-	//Supports wildcard (* and ?)
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServicesDistinctValues(context.Context, *ServicesDistinctValuesReq) (*ServicesDistinctValuesRes, error)
+	// List Services for a Service Group
 	//
-	//List Services for a Service Group
+	// List the services for a service group with health status and service metadata.
+	// Uses the service group ID generated by Chef Automate instead of the Chef Habitat- provided ID.
+	// Supports pagination and filtering.
 	//
-	//List the services for a service group with health status and service metadata.
-	//Uses the service group ID generated by Chef Automate instead of the Chef Habitat- provided ID.
-	//Supports pagination and filtering.
+	// Example:
+	// ```
+	// applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
+	// ```
 	//
-	//Example:
-	//```
-	//applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServicesBySG(context.Context, *ServicesBySGReq) (*ServicesBySGRes, error)
+	// Show Summary
 	//
-	//Show Summary
+	// Shows a summary of service-groups, services, deployments, and supervisors.
+	// Used for telemetry.
+	// Does not support filtering.
 	//
-	//Shows a summary of service-groups, services, deployments, and supervisors.
-	//Used for telemetry.
-	//Does not support filtering.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetServicesStats(context.Context, *ServicesStatsReq) (*ServicesStatsRes, error)
+	// Mark Services as Disconnected
 	//
-	//Mark Services as Disconnected
+	// Marks services as disconnected based on the `threshold_seconds` setting.
+	// This function is not used by the API or CLI and is here for testing purposes.
+	// The functionality is currently covered by a periodically running job that can be configured
+	// by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
 	//
-	//Marks services as disconnected based on the `threshold_seconds` setting.
-	//This function is not used by the API or CLI and is here for testing purposes.
-	//The functionality is currently covered by a periodically running job that can be configured
-	//by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:list
-	//```
 	GetDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
+	// Remove Disconnected Services
 	//
-	//Remove Disconnected Services
+	// Removes services marked as disconnected based on the `threshold_seconds` setting.
+	// This function is not used by the API or CLI and is here for testing purposes.
+	// The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
 	//
-	//Removes services marked as disconnected based on the `threshold_seconds` setting.
-	//This function is not used by the API or CLI and is here for testing purposes.
-	//The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:delete
-	//```
 	DeleteDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
+	// Delete the services with the given IDs
 	//
-	//Delete the services with the given IDs
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//applications:serviceGroups:delete
-	//```
 	DeleteServicesByID(context.Context, *DeleteServicesByIDReq) (*ServicesRes, error)
+	// Show Version
 	//
-	//Show Version
+	// # Displays the current version of the applications-service
 	//
-	//Displays the current version of the applications-service
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//system:serviceVersion:get
-	//```
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
+	// Show 'Disconnected Services' configuration
 	//
-	//Show 'Disconnected Services' configuration
+	// Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
+	// This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 	//
-	//Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
-	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:get
-	//```
 	GetDisconnectedServicesConfig(context.Context, *GetDisconnectedServicesConfigReq) (*PeriodicMandatoryJobConfig, error)
+	// Change 'Disconnected Services' Configuration
 	//
-	//Change 'Disconnected Services' Configuration
+	// Changes the configuration for the task that marks services as disconnected.
 	//
-	//Changes the configuration for the task that marks services as disconnected.
+	// The periodic task to check for disconnected services can be enabled or
+	// disabled by setting the 'running' setting to `true` or `false`, respectively.
+	// When disabled, no services will be marked disconnected, regardless of the
+	// time that has elapsed since the last health check. It is not recommened to
+	// disable the job.
 	//
-	//The periodic task to check for disconnected services can be enabled or
-	//disabled by setting the 'running' setting to `true` or `false`, respectively.
-	//When disabled, no services will be marked disconnected, regardless of the
-	//time that has elapsed since the last health check. It is not recommened to
-	//disable the job.
+	// The frequency of the job's execution can be modified by changing the
+	// 'recurrence'. This setting is a string
+	// [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	// By default, the task runs every 60 seconds. It is not recommended to change
+	// the recurrence.
 	//
-	//The frequency of the job's execution can be modified by changing the
-	//'recurrence'. This setting is a string
-	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
-	//By default, the task runs every 60 seconds. It is not recommended to change
-	//the recurrence.
+	// When enabled, services are marked disconnected when the time elapsed since
+	// Automate last received a health check exceeds 'threshold'. Threshold is a
+	// string that follows Elasticsearch's date math expressions.
 	//
-	//When enabled, services are marked disconnected when the time elapsed since
-	//Automate last received a health check exceeds 'threshold'. Threshold is a
-	//string that follows Elasticsearch's date math expressions.
+	// Example:
+	// ```
+	// /retention/service_groups/disconnected_services/config
+	// '{
+	// "threshold": "15m",
+	// "running": true,
+	// "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
+	// }'
+	// ```
 	//
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Example:
-	//```
-	///retention/service_groups/disconnected_services/config
-	//'{
-	//"threshold": "15m",
-	//"running": true,
-	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
-	//}'
-	//```
-	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:update
-	//```
 	UpdateDisconnectedServicesConfig(context.Context, *PeriodicMandatoryJobConfig) (*UpdateDisconnectedServicesConfigRes, error)
+	// Runs the job to mark services as disconnected immediately.
 	//
-	//Runs the job to mark services as disconnected immediately.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:update
-	//```
 	RunDisconnectedServicesJob(context.Context, *RunDisconnectedServicesJobReq) (*RunDisconnectedServicesJobResponse, error)
+	// Show 'Remove Disconnected Services' Configuration
 	//
-	//Show 'Remove Disconnected Services' Configuration
+	// Displays configuration for the task that deletes services marked as disconnected
+	// after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
+	// This job is disabled if running is set to false.
 	//
-	//Displays configuration for the task that deletes services marked as disconnected
-	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
-	//This job is disabled if running is set to false.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:get
-	//```
 	GetDeleteDisconnectedServicesConfig(context.Context, *GetDeleteDisconnectedServicesConfigReq) (*PeriodicJobConfig, error)
+	// Change 'Remove Disconnected Services' Configuration
 	//
-	//Change 'Remove Disconnected Services' Configuration
+	// Updates configuration information for the task that deletes services marked as disconnected
+	// after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
+	// This job can be disabled by setting `"running": false`.
 	//
-	//Updates configuration information for the task that deletes services marked as disconnected
-	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
-	//This job can be disabled by setting `"running": false`.
+	// The frequency of the job's execution can be modified by changing the
+	// 'recurrence'. This setting is a string
+	// [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+	// By default, the task runs every 60 seconds. It is not recommended to change
+	// the recurrence.
 	//
-	//The frequency of the job's execution can be modified by changing the
-	//'recurrence'. This setting is a string
-	//[as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
-	//By default, the task runs every 60 seconds. It is not recommended to change
-	//the recurrence.
+	// Example:
+	// ```
+	// service_groups/delete_disconnected_services/config" -d
+	// '{
+	// "threshold": "1d",
+	// "running":true,
+	// "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
+	// }'
+	// ```
 	//
-	//Example:
-	//```
-	//service_groups/delete_disconnected_services/config" -d
-	//'{
-	//"threshold": "1d",
-	//"running":true,
-	//"recurrence": "FREQ=SECONDLY;DTSTART=20200612T182166Z;INTERVAL=60"
-	//}'
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//retention:serviceGroups:update
-	//```
 	UpdateDeleteDisconnectedServicesConfig(context.Context, *PeriodicJobConfig) (*UpdateDeleteDisconnectedServicesConfigRes, error)
 	RunDeleteDisconnectedServicesJob(context.Context, *RunDeleteDisconnectedServicesJobReq) (*RunDeleteDisconnectedServicesJobResponse, error)
 	UpdateTelemetryReported(context.Context, *UpdateTelemetryReportedRequest) (*UpdateTelemetryReportedResponse, error)

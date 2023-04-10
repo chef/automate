@@ -146,7 +146,6 @@ func (c *Client) ServiceHealth(ctx context.Context, serviceName string, serviceG
 // ServiceInfo returns information about a service running under the Habitat supervisor.
 //
 // Uses the /service/SERVICE_NAME/SERVICE_GROUP endpoint
-//
 func (c *Client) ServiceInfo(ctx context.Context, serviceName string, serviceGroup string) (ServiceInfo, error) {
 	var info ServiceInfo
 	path := fmt.Sprintf("/services/%s/%s", serviceName, serviceGroup)

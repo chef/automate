@@ -41,8 +41,7 @@ const samlDetectedMsg = `
           https://automate.chef.io/docs/configuration/#saml
 
       Alternatively, you may ignore this warning and continue this upgrade by entering 'y' below.
-      You may set up SAML for Chef Automate v2 anytime after upgrading.
-`
+      You may set up SAML for Chef Automate v2 anytime after upgrading.`
 
 const noBackupConfiguredMsg = `
     * FAILURE: No backup settings are configured for your Chef Automate v1 installation.

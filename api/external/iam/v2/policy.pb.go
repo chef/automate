@@ -545,256 +545,256 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type PoliciesClient interface {
+	// Creates a custom policy
 	//
-	//Creates a custom policy
+	// Creates a custom IAM policy used to control permissions in Automate.
+	// A policy is composed of one or more statements that grant permissions to a set of members.
+	// Each statement contains a role as well as a list of projects.
 	//
-	//Creates a custom IAM policy used to control permissions in Automate.
-	//A policy is composed of one or more statements that grant permissions to a set of members.
-	//Each statement contains a role as well as a list of projects.
+	// The role defines a set of actions that the statement is scoped to.
+	// The project list defines the set of resources that the statement is scoped to.
+	// Pass `"projects": ["*"]` to scope a statement to every project.
 	//
-	//The role defines a set of actions that the statement is scoped to.
-	//The project list defines the set of resources that the statement is scoped to.
-	//Pass `"projects": ["*"]` to scope a statement to every project.
+	// A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
+	// whereas the *statement-level* projects list defines which projects the statement applies to.
 	//
-	//A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
-	//whereas the *statement-level* projects list defines which projects the statement applies to.
+	// The example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
+	// on a few projects for all LDAP teams and a custom role `qa` on a specific project.
 	//
-	//The example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
-	//on a few projects for all LDAP teams and a custom role `qa` on a specific project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:create
-	//```
 	CreatePolicy(ctx context.Context, in *request.CreatePolicyReq, opts ...grpc.CallOption) (*response.CreatePolicyResp, error)
+	// Gets a policy
 	//
-	//Gets a policy
+	// Returns the details for a policy.
 	//
-	//Returns the details for a policy.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:get
-	//```
 	GetPolicy(ctx context.Context, in *request.GetPolicyReq, opts ...grpc.CallOption) (*response.GetPolicyResp, error)
+	// Lists all policies
 	//
-	//Lists all policies
+	// Lists all policies.
 	//
-	//Lists all policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:list
-	//```
 	ListPolicies(ctx context.Context, in *request.ListPoliciesReq, opts ...grpc.CallOption) (*response.ListPoliciesResp, error)
+	// Deletes a custom policy
 	//
-	//Deletes a custom policy
+	// Deletes a specified custom policy. You cannot delete Chef-managed policies.
 	//
-	//Deletes a specified custom policy. You cannot delete Chef-managed policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:delete
-	//```
 	DeletePolicy(ctx context.Context, in *request.DeletePolicyReq, opts ...grpc.CallOption) (*response.DeletePolicyResp, error)
+	// Updates a custom policy
 	//
-	//Updates a custom policy
+	// This operation overwrites all fields excepting ID,
+	// including those omitted from the request, so be sure to specify all properties.
+	// Properties that you do not include are reset to empty values.
+	// The only exception is the policy ID, which is immutable; it can only be set at creation time.
 	//
-	//This operation overwrites all fields excepting ID,
-	//including those omitted from the request, so be sure to specify all properties.
-	//Properties that you do not include are reset to empty values.
-	//The only exception is the policy ID, which is immutable; it can only be set at creation time.
+	// While you can use this endpoint to update members on a policy, if that is the only
+	// property you wish to modify you might find it more convenient to use one of these endpoints instead:
+	// Add policy members, Remove policy members, or Replace policy members.
 	//
-	//While you can use this endpoint to update members on a policy, if that is the only
-	//property you wish to modify you might find it more convenient to use one of these endpoints instead:
-	//Add policy members, Remove policy members, or Replace policy members.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:update
-	//```
 	UpdatePolicy(ctx context.Context, in *request.UpdatePolicyReq, opts ...grpc.CallOption) (*response.UpdatePolicyResp, error)
+	// Gets IAM version
 	//
-	//Gets IAM version
+	// Returns the major and minor version of IAM that your automate installation is running.
 	//
-	//Returns the major and minor version of IAM that your automate installation is running.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:get
-	//```
 	GetPolicyVersion(ctx context.Context, in *request.GetPolicyVersionReq, opts ...grpc.CallOption) (*response.GetPolicyVersionResp, error)
+	// Lists policy members
 	//
-	//Lists policy members
+	// Lists all members of a specific policy.
 	//
-	//Lists all members of a specific policy.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:get
-	//```
 	ListPolicyMembers(ctx context.Context, in *request.ListPolicyMembersReq, opts ...grpc.CallOption) (*response.ListPolicyMembersResp, error)
+	// Replaces policy members
 	//
-	//Replaces policy members
+	// Replaces the entire member list of a specific policy with a new list.
+	// You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
-	//Replaces the entire member list of a specific policy with a new list.
-	//You may use this endpoint to update members of either Custom or Chef-managed policies.
+	// Ensure each element of the members array is in the correct
+	// [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 	//
-	//Ensure each element of the members array is in the correct
-	//[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:update
-	//```
 	ReplacePolicyMembers(ctx context.Context, in *request.ReplacePolicyMembersReq, opts ...grpc.CallOption) (*response.ReplacePolicyMembersResp, error)
+	// Removes policy members
 	//
-	//Removes policy members
+	// Removes members from the member list of a specific policy. Silently ignores
+	// members that are not already part of the member list.
+	// You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
-	//Removes members from the member list of a specific policy. Silently ignores
-	//members that are not already part of the member list.
-	//You may use this endpoint to update members of either Custom or Chef-managed policies.
+	// Ensure each element of the members array is in the correct
+	// [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 	//
-	//Ensure each element of the members array is in the correct
-	//[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+	// The removed members will still exist within Chef Automate, but are no longer associated with this policy.
 	//
-	//The removed members will still exist within Chef Automate, but are no longer associated with this policy.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:delete
-	//```
 	RemovePolicyMembers(ctx context.Context, in *request.RemovePolicyMembersReq, opts ...grpc.CallOption) (*response.RemovePolicyMembersResp, error)
+	// Adds policy members
 	//
-	//Adds policy members
+	// Adds members to the member list of a specific policy.
+	// You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
-	//Adds members to the member list of a specific policy.
-	//You may use this endpoint to update members of either Custom or Chef-managed policies.
+	// Ensure each element of the members array is in the correct
+	// [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 	//
-	//Ensure each element of the members array is in the correct
-	//[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:create
-	//```
 	AddPolicyMembers(ctx context.Context, in *request.AddPolicyMembersReq, opts ...grpc.CallOption) (*response.AddPolicyMembersResp, error)
+	// Creates a custom role
 	//
-	//Creates a custom role
+	// Creates a new role to be used in the policies that control permissions in Automate.
 	//
-	//Creates a new role to be used in the policies that control permissions in Automate.
+	// A role defines the scope of actions in a policy statement.
 	//
-	//A role defines the scope of actions in a policy statement.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:create
-	//```
 	CreateRole(ctx context.Context, in *request.CreateRoleReq, opts ...grpc.CallOption) (*response.CreateRoleResp, error)
+	// Lists all roles
 	//
-	//Lists all roles
+	// Lists all *Chef-managed* and *Custom* roles.
 	//
-	//Lists all *Chef-managed* and *Custom* roles.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:list
-	//```
 	ListRoles(ctx context.Context, in *request.ListRolesReq, opts ...grpc.CallOption) (*response.ListRolesResp, error)
+	// Gets a role
 	//
-	//Gets a role
+	// Returns the details for a role.
 	//
-	//Returns the details for a role.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:get
-	//```
 	GetRole(ctx context.Context, in *request.GetRoleReq, opts ...grpc.CallOption) (*response.GetRoleResp, error)
+	// Deletes a custom role
 	//
-	//Deletes a custom role
+	// Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
+	// If such a statement has no other associated actions, the statement is deleted as well.
+	// Similarly, if that statement removal results in a policy with no other statements,
+	// that policy is removed as well.
 	//
-	//Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
-	//If such a statement has no other associated actions, the statement is deleted as well.
-	//Similarly, if that statement removal results in a policy with no other statements,
-	//that policy is removed as well.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:delete
-	//```
 	DeleteRole(ctx context.Context, in *request.DeleteRoleReq, opts ...grpc.CallOption) (*response.DeleteRoleResp, error)
+	// Updates a custom role
 	//
-	//Updates a custom role
+	// This operation overwrites all fields excepting ID,
+	// including those omitted from the request, so be sure to specify all properties.
+	// Properties that you do not include are reset to empty values.
 	//
-	//This operation overwrites all fields excepting ID,
-	//including those omitted from the request, so be sure to specify all properties.
-	//Properties that you do not include are reset to empty values.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:update
-	//```
 	UpdateRole(ctx context.Context, in *request.UpdateRoleReq, opts ...grpc.CallOption) (*response.UpdateRoleResp, error)
+	// Creates a project
 	//
-	//Creates a project
+	// Creates a new project to be used in the policies that control permissions in Automate.
 	//
-	//Creates a new project to be used in the policies that control permissions in Automate.
+	// A project defines the scope of resources in a policy statement. Resources can be in more than one project.
 	//
-	//A project defines the scope of resources in a policy statement. Resources can be in more than one project.
+	// When a project is created, the system also creates three policies associated with the new project,
+	// one for each of the following roles: editor, viewer, and project owner.
+	// You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
 	//
-	//When a project is created, the system also creates three policies associated with the new project,
-	//one for each of the following roles: editor, viewer, and project owner.
-	//You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:create
-	//```
 	CreateProject(ctx context.Context, in *request.CreateProjectReq, opts ...grpc.CallOption) (*response.CreateProjectResp, error)
+	// Updates a project
 	//
-	//Updates a project
+	// Updates the name of an existing project.
 	//
-	//Updates the name of an existing project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	UpdateProject(ctx context.Context, in *request.UpdateProjectReq, opts ...grpc.CallOption) (*response.UpdateProjectResp, error)
+	// Gets a project
 	//
-	//Gets a project
+	// Returns the details for a project.
 	//
-	//Returns the details for a project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:get
-	//```
 	GetProject(ctx context.Context, in *request.GetProjectReq, opts ...grpc.CallOption) (*response.GetProjectResp, error)
+	// Lists all projects
 	//
-	//Lists all projects
+	// Lists all projects.
 	//
-	//Lists all projects.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:list
-	//```
 	ListProjects(ctx context.Context, in *request.ListProjectsReq, opts ...grpc.CallOption) (*response.ListProjectsResp, error)
+	// Deletes a project
 	//
-	//Deletes a project
+	// Deletes a project from any resources tagged with it.
 	//
-	//Deletes a project from any resources tagged with it.
+	// Also deletes this project from any project list in any policy statements.
+	// If the resulting project list for a given statement is empty, it is deleted.
+	// If the resulting policy has no statements, it is also deleted.
 	//
-	//Also deletes this project from any project list in any policy statements.
-	//If the resulting project list for a given statement is empty, it is deleted.
-	//If the resulting policy has no statements, it is also deleted.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:delete
-	//```
 	DeleteProject(ctx context.Context, in *request.DeleteProjectReq, opts ...grpc.CallOption) (*response.DeleteProjectResp, error)
 	IntrospectAllProjects(ctx context.Context, in *request.ListProjectsReq, opts ...grpc.CallOption) (*response.ListProjectsResp, error)
 }
@@ -998,256 +998,256 @@ func (c *policiesClient) IntrospectAllProjects(ctx context.Context, in *request.
 
 // PoliciesServer is the server API for Policies service.
 type PoliciesServer interface {
+	// Creates a custom policy
 	//
-	//Creates a custom policy
+	// Creates a custom IAM policy used to control permissions in Automate.
+	// A policy is composed of one or more statements that grant permissions to a set of members.
+	// Each statement contains a role as well as a list of projects.
 	//
-	//Creates a custom IAM policy used to control permissions in Automate.
-	//A policy is composed of one or more statements that grant permissions to a set of members.
-	//Each statement contains a role as well as a list of projects.
+	// The role defines a set of actions that the statement is scoped to.
+	// The project list defines the set of resources that the statement is scoped to.
+	// Pass `"projects": ["*"]` to scope a statement to every project.
 	//
-	//The role defines a set of actions that the statement is scoped to.
-	//The project list defines the set of resources that the statement is scoped to.
-	//Pass `"projects": ["*"]` to scope a statement to every project.
+	// A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
+	// whereas the *statement-level* projects list defines which projects the statement applies to.
 	//
-	//A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
-	//whereas the *statement-level* projects list defines which projects the statement applies to.
+	// The example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
+	// on a few projects for all LDAP teams and a custom role `qa` on a specific project.
 	//
-	//The example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
-	//on a few projects for all LDAP teams and a custom role `qa` on a specific project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:create
-	//```
 	CreatePolicy(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
+	// Gets a policy
 	//
-	//Gets a policy
+	// Returns the details for a policy.
 	//
-	//Returns the details for a policy.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:get
-	//```
 	GetPolicy(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
+	// Lists all policies
 	//
-	//Lists all policies
+	// Lists all policies.
 	//
-	//Lists all policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:list
-	//```
 	ListPolicies(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
+	// Deletes a custom policy
 	//
-	//Deletes a custom policy
+	// Deletes a specified custom policy. You cannot delete Chef-managed policies.
 	//
-	//Deletes a specified custom policy. You cannot delete Chef-managed policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:delete
-	//```
 	DeletePolicy(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
+	// Updates a custom policy
 	//
-	//Updates a custom policy
+	// This operation overwrites all fields excepting ID,
+	// including those omitted from the request, so be sure to specify all properties.
+	// Properties that you do not include are reset to empty values.
+	// The only exception is the policy ID, which is immutable; it can only be set at creation time.
 	//
-	//This operation overwrites all fields excepting ID,
-	//including those omitted from the request, so be sure to specify all properties.
-	//Properties that you do not include are reset to empty values.
-	//The only exception is the policy ID, which is immutable; it can only be set at creation time.
+	// While you can use this endpoint to update members on a policy, if that is the only
+	// property you wish to modify you might find it more convenient to use one of these endpoints instead:
+	// Add policy members, Remove policy members, or Replace policy members.
 	//
-	//While you can use this endpoint to update members on a policy, if that is the only
-	//property you wish to modify you might find it more convenient to use one of these endpoints instead:
-	//Add policy members, Remove policy members, or Replace policy members.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:update
-	//```
 	UpdatePolicy(context.Context, *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error)
+	// Gets IAM version
 	//
-	//Gets IAM version
+	// Returns the major and minor version of IAM that your automate installation is running.
 	//
-	//Returns the major and minor version of IAM that your automate installation is running.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policies:get
-	//```
 	GetPolicyVersion(context.Context, *request.GetPolicyVersionReq) (*response.GetPolicyVersionResp, error)
+	// Lists policy members
 	//
-	//Lists policy members
+	// Lists all members of a specific policy.
 	//
-	//Lists all members of a specific policy.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:get
-	//```
 	ListPolicyMembers(context.Context, *request.ListPolicyMembersReq) (*response.ListPolicyMembersResp, error)
+	// Replaces policy members
 	//
-	//Replaces policy members
+	// Replaces the entire member list of a specific policy with a new list.
+	// You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
-	//Replaces the entire member list of a specific policy with a new list.
-	//You may use this endpoint to update members of either Custom or Chef-managed policies.
+	// Ensure each element of the members array is in the correct
+	// [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 	//
-	//Ensure each element of the members array is in the correct
-	//[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:update
-	//```
 	ReplacePolicyMembers(context.Context, *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error)
+	// Removes policy members
 	//
-	//Removes policy members
+	// Removes members from the member list of a specific policy. Silently ignores
+	// members that are not already part of the member list.
+	// You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
-	//Removes members from the member list of a specific policy. Silently ignores
-	//members that are not already part of the member list.
-	//You may use this endpoint to update members of either Custom or Chef-managed policies.
+	// Ensure each element of the members array is in the correct
+	// [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 	//
-	//Ensure each element of the members array is in the correct
-	//[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+	// The removed members will still exist within Chef Automate, but are no longer associated with this policy.
 	//
-	//The removed members will still exist within Chef Automate, but are no longer associated with this policy.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:delete
-	//```
 	RemovePolicyMembers(context.Context, *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error)
+	// Adds policy members
 	//
-	//Adds policy members
+	// Adds members to the member list of a specific policy.
+	// You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
-	//Adds members to the member list of a specific policy.
-	//You may use this endpoint to update members of either Custom or Chef-managed policies.
+	// Ensure each element of the members array is in the correct
+	// [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 	//
-	//Ensure each element of the members array is in the correct
-	//[Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:policyMembers:create
-	//```
 	AddPolicyMembers(context.Context, *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error)
+	// Creates a custom role
 	//
-	//Creates a custom role
+	// Creates a new role to be used in the policies that control permissions in Automate.
 	//
-	//Creates a new role to be used in the policies that control permissions in Automate.
+	// A role defines the scope of actions in a policy statement.
 	//
-	//A role defines the scope of actions in a policy statement.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:create
-	//```
 	CreateRole(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
+	// Lists all roles
 	//
-	//Lists all roles
+	// Lists all *Chef-managed* and *Custom* roles.
 	//
-	//Lists all *Chef-managed* and *Custom* roles.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:list
-	//```
 	ListRoles(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
+	// Gets a role
 	//
-	//Gets a role
+	// Returns the details for a role.
 	//
-	//Returns the details for a role.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:get
-	//```
 	GetRole(context.Context, *request.GetRoleReq) (*response.GetRoleResp, error)
+	// Deletes a custom role
 	//
-	//Deletes a custom role
+	// Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
+	// If such a statement has no other associated actions, the statement is deleted as well.
+	// Similarly, if that statement removal results in a policy with no other statements,
+	// that policy is removed as well.
 	//
-	//Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
-	//If such a statement has no other associated actions, the statement is deleted as well.
-	//Similarly, if that statement removal results in a policy with no other statements,
-	//that policy is removed as well.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:delete
-	//```
 	DeleteRole(context.Context, *request.DeleteRoleReq) (*response.DeleteRoleResp, error)
+	// Updates a custom role
 	//
-	//Updates a custom role
+	// This operation overwrites all fields excepting ID,
+	// including those omitted from the request, so be sure to specify all properties.
+	// Properties that you do not include are reset to empty values.
 	//
-	//This operation overwrites all fields excepting ID,
-	//including those omitted from the request, so be sure to specify all properties.
-	//Properties that you do not include are reset to empty values.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:roles:update
-	//```
 	UpdateRole(context.Context, *request.UpdateRoleReq) (*response.UpdateRoleResp, error)
+	// Creates a project
 	//
-	//Creates a project
+	// Creates a new project to be used in the policies that control permissions in Automate.
 	//
-	//Creates a new project to be used in the policies that control permissions in Automate.
+	// A project defines the scope of resources in a policy statement. Resources can be in more than one project.
 	//
-	//A project defines the scope of resources in a policy statement. Resources can be in more than one project.
+	// When a project is created, the system also creates three policies associated with the new project,
+	// one for each of the following roles: editor, viewer, and project owner.
+	// You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
 	//
-	//When a project is created, the system also creates three policies associated with the new project,
-	//one for each of the following roles: editor, viewer, and project owner.
-	//You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:create
-	//```
 	CreateProject(context.Context, *request.CreateProjectReq) (*response.CreateProjectResp, error)
+	// Updates a project
 	//
-	//Updates a project
+	// Updates the name of an existing project.
 	//
-	//Updates the name of an existing project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	UpdateProject(context.Context, *request.UpdateProjectReq) (*response.UpdateProjectResp, error)
+	// Gets a project
 	//
-	//Gets a project
+	// Returns the details for a project.
 	//
-	//Returns the details for a project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:get
-	//```
 	GetProject(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
+	// Lists all projects
 	//
-	//Lists all projects
+	// Lists all projects.
 	//
-	//Lists all projects.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:list
-	//```
 	ListProjects(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
+	// Deletes a project
 	//
-	//Deletes a project
+	// Deletes a project from any resources tagged with it.
 	//
-	//Deletes a project from any resources tagged with it.
+	// Also deletes this project from any project list in any policy statements.
+	// If the resulting project list for a given statement is empty, it is deleted.
+	// If the resulting policy has no statements, it is also deleted.
 	//
-	//Also deletes this project from any project list in any policy statements.
-	//If the resulting project list for a given statement is empty, it is deleted.
-	//If the resulting policy has no statements, it is also deleted.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:delete
-	//```
 	DeleteProject(context.Context, *request.DeleteProjectReq) (*response.DeleteProjectResp, error)
 	IntrospectAllProjects(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 }

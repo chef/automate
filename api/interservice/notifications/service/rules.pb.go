@@ -384,9 +384,9 @@ func (RuleListResponse_Code) EnumDescriptor() ([]byte, []int) {
 	return file_interservice_notifications_service_rules_proto_rawDescGZIP(), []int{14, 0}
 }
 
-////
+// //
 // Rules management messages and responses
-////
+// //
 type Empty struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -591,6 +591,7 @@ type Rule struct {
 	Name  string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	Event Rule_Event `protobuf:"varint,3,opt,name=event,proto3,enum=chef.automate.domain.notifications.service.Rule_Event" json:"event,omitempty" toml:"event,omitempty" mapstructure:"event,omitempty"`
 	// Types that are assignable to Action:
+	//
 	//	*Rule_SlackAlert
 	//	*Rule_WebhookAlert
 	//	*Rule_ServiceNowAlert
@@ -809,6 +810,7 @@ type URLValidationRequest struct {
 
 	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty" toml:"url,omitempty" mapstructure:"url,omitempty"`
 	// Types that are assignable to Credentials:
+	//
 	//	*URLValidationRequest_UsernamePassword
 	//	*URLValidationRequest_SecretId
 	//	*URLValidationRequest_None

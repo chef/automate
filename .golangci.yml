@@ -14,11 +14,14 @@ linters-settings:
       - NOCOMMIT
   govet:
     disable:
+      - assign
+      - atomic
       - copylocks
 
 linters:
   enable-all: true
   disable:
+    - bodyclose
     - dogsled
     - dupl
     - funlen
@@ -28,6 +31,7 @@ linters:
     - goerr113
     - goimports
     - gomnd
+    - goprintffuncname
     - maligned
     - megacheck
     - nestif
