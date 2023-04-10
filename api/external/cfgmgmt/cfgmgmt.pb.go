@@ -570,350 +570,350 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ConfigMgmtClient interface {
+	// List Checked-in Nodes
 	//
-	//List Checked-in Nodes
+	// Returns a list of infra nodes that have checked in to Automate.
+	// Adding a filter makes a list of all nodes that meet the filter criteria.
+	// Filters for the same field are ORd together, while filters across different fields are ANDed together.
+	// Supports pagination, filtering (with wildcard support), and sorting.
+	// Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
-	//Returns a list of infra nodes that have checked in to Automate.
-	//Adding a filter makes a list of all nodes that meet the filter criteria.
-	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
-	//Supports pagination, filtering (with wildcard support), and sorting.
-	//Max return payload size is 4MB, use pagination to fetch remaining data.
+	// Example:
+	// ```
+	// cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*structpb.ListValue, error)
+	// List Run Details
 	//
-	//List Run Details
+	// Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
+	// Supports pagination.
+	// Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	//
-	//Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
-	//Supports pagination.
-	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRuns(ctx context.Context, in *request.Runs, opts ...grpc.CallOption) (*structpb.ListValue, error)
+	// List Node Status Counts
 	//
-	//List Node Status Counts
+	// Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
+	// Supports filtering.
 	//
-	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
-	//Supports filtering.
+	// Example:
+	// ```
+	// cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodesCounts(ctx context.Context, in *request.NodesCounts, opts ...grpc.CallOption) (*response.NodesCounts, error)
+	// List Run Status Totals
 	//
-	//List Run Status Totals
+	// Returns totals for failed and successful runs given a `node_id`.
 	//
-	//Returns totals for failed and successful runs given a `node_id`.
+	// Example:
+	// ```
+	// cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRunsCounts(ctx context.Context, in *request.RunsCounts, opts ...grpc.CallOption) (*response.RunsCounts, error)
+	// List Node Checkins
 	//
-	//List Node Checkins
+	// Returns a daily time series of unique node check-ins for the number of days requested.
+	// If `days ago` value is empty, API will return the default 1 day ago results.
 	//
-	//Returns a daily time series of unique node check-ins for the number of days requested.
-	//If `days ago` value is empty, API will return the default 1 day ago results.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetCheckInCountsTimeSeries(ctx context.Context, in *request.CheckInCountsTimeSeries, opts ...grpc.CallOption) (*response.CheckInCountsTimeSeries, error)
+	// List Missing Nodes Count
 	//
-	//List Missing Nodes Count
+	// Returns a count of missing nodes for the provided durations.
 	//
-	//Returns a count of missing nodes for the provided durations.
+	// Example:
+	// ```
+	// cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetMissingNodeDurationCounts(ctx context.Context, in *request.MissingNodeDurationCounts, opts ...grpc.CallOption) (*response.MissingNodeDurationCounts, error)
+	// Show Node Run
 	//
-	//Show Node Run
+	// Returns the infra run report for the provided node ID and run ID.
 	//
-	//Returns the infra run report for the provided node ID and run ID.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:get
-	//```
 	GetNodeRun(ctx context.Context, in *request.NodeRun, opts ...grpc.CallOption) (*response.Run, error)
+	// List Filter Suggestions
 	//
-	//List Filter Suggestions
+	// Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
+	// Supports wildcard (* and ?).
 	//
-	//Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
-	//Supports wildcard (* and ?).
+	// Example:
+	// ```
+	// cfgmgmt/suggestions?type=environment&text=_d
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/suggestions?type=environment&text=_d
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetSuggestions(ctx context.Context, in *query.Suggestion, opts ...grpc.CallOption) (*structpb.ListValue, error)
+	// List Organizations
 	//
-	//List Organizations
+	// Returns a list of all organizations associated with nodes that have checked in to Automate.
 	//
-	//Returns a list of all organizations associated with nodes that have checked in to Automate.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetOrganizations(ctx context.Context, in *request.Organizations, opts ...grpc.CallOption) (*structpb.ListValue, error)
+	// List Associated Chef Infra Servers
 	//
-	//List Associated Chef Infra Servers
+	// Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 	//
-	//Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetSourceFqdns(ctx context.Context, in *request.SourceFqdns, opts ...grpc.CallOption) (*structpb.ListValue, error)
+	// Show Attributes
 	//
-	//Show Attributes
+	// Returns the latest reported attributes for the provided node ID.
 	//
-	//Returns the latest reported attributes for the provided node ID.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:get
-	//```
 	GetAttributes(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.NodeAttribute, error)
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
+	// List Policy Cookbooks
 	//
-	//List Policy Cookbooks
+	// Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
+	// Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	//
-	//Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
-	//Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetPolicyCookbooks(ctx context.Context, in *request.PolicyRevision, opts ...grpc.CallOption) (*response.PolicyCookbooks, error)
+	// List Errors
 	//
-	//List Errors
+	// Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 	//
-	//Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetErrors(ctx context.Context, in *request.Errors, opts ...grpc.CallOption) (*response.Errors, error)
 	NodeExport(ctx context.Context, in *request.NodeExport, opts ...grpc.CallOption) (ConfigMgmt_NodeExportClient, error)
 	ReportExport(ctx context.Context, in *request.ReportExport, opts ...grpc.CallOption) (ConfigMgmt_ReportExportClient, error)
+	// GetNodeMetadataCounts
 	//
-	//GetNodeMetadataCounts
+	// For each type of field requested this returns distinct values the amount of each. For example,
+	// if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned.
+	// The number next to each represents the number of nodes with that type of platform.
 	//
-	//For each type of field requested this returns distinct values the amount of each. For example,
-	//if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned.
-	//The number next to each represents the number of nodes with that type of platform.
+	// Example:
+	// request
+	// ```
+	// cfgmgmt/node_metadata_counts?type=platform&type=status
+	// ```
+	// response
+	// ```
+	// {
+	// "types": [
+	// {
+	// "values": [
+	// {
+	// "value": "mac_os_x 10.11.5",
+	// "count": 28
+	// },
+	// {
+	// "value": "linux 8.9",
+	// "count": 1
+	// },
+	// {
+	// "value": "macos 8.9",
+	// "count": 1
+	// },
+	// {
+	// "value": "windows 8.9",
+	// "count": 1
+	// }
+	// ],
+	// "type": "platform"
+	// },
+	// {
+	// "value": [
+	// {
+	// "value": "missing",
+	// "count": 29
+	// },
+	// {
+	// "value": "failure",
+	// "count": 2
+	// }
+	// ],
+	// "type": "status"
+	// }
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//request
-	//```
-	//cfgmgmt/node_metadata_counts?type=platform&type=status
-	//```
-	//response
-	//```
-	//{
-	//"types": [
-	//{
-	//"values": [
-	//{
-	//"value": "mac_os_x 10.11.5",
-	//"count": 28
-	//},
-	//{
-	//"value": "linux 8.9",
-	//"count": 1
-	//},
-	//{
-	//"value": "macos 8.9",
-	//"count": 1
-	//},
-	//{
-	//"value": "windows 8.9",
-	//"count": 1
-	//}
-	//],
-	//"type": "platform"
-	//},
-	//{
-	//"value": [
-	//{
-	//"value": "missing",
-	//"count": 29
-	//},
-	//{
-	//"value": "failure",
-	//"count": 2
-	//}
-	//],
-	//"type": "status"
-	//}
-	//]
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodeMetadataCounts(ctx context.Context, in *request.NodeMetadataCounts, opts ...grpc.CallOption) (*response.NodeMetadataCounts, error)
+	// GetNodeRunsDailyStatusTimeSeries
 	//
-	//GetNodeRunsDailyStatusTimeSeries
+	// Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration,
+	// the most recent failed run will be returned. If there are no failed runs the most recent successful
+	// run will be returned. If no runs are found in the 24-hour duration, the status will be "missing"
+	// and no run information will be returned.
 	//
-	//Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration,
-	//the most recent failed run will be returned. If there are no failed runs the most recent successful
-	//run will be returned. If no runs are found in the 24-hour duration, the status will be "missing"
-	//and no run information will be returned.
+	// Example:
+	// request
+	// ```
+	// cfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961&days_ago=3
+	// ```
+	// response
+	// ```
+	// {
+	// "durations": [
+	// {
+	// "start": "2020-04-25T19:00:00Z",
+	// "end": "2020-04-26T18:59:59Z",
+	// "status": "missing",
+	// "run_id": ""
+	// },
+	// {
+	// "start": "2020-04-26T19:00:00Z",
+	// "end": "2020-04-27T18:59:59Z",
+	// "status": "missing",
+	// "run_id": ""
+	// },
+	// {
+	// "start": "2020-04-27T19:00:00Z",
+	// "end": "2020-04-28T18:59:59Z",
+	// "status": "failure",
+	// "run_id": "b7904f41-68b5-44ec-9da6-cf2481ff8600"
+	// }
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//request
-	//```
-	//cfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961&days_ago=3
-	//```
-	//response
-	//```
-	//{
-	//"durations": [
-	//{
-	//"start": "2020-04-25T19:00:00Z",
-	//"end": "2020-04-26T18:59:59Z",
-	//"status": "missing",
-	//"run_id": ""
-	//},
-	//{
-	//"start": "2020-04-26T19:00:00Z",
-	//"end": "2020-04-27T18:59:59Z",
-	//"status": "missing",
-	//"run_id": ""
-	//},
-	//{
-	//"start": "2020-04-27T19:00:00Z",
-	//"end": "2020-04-28T18:59:59Z",
-	//"status": "failure",
-	//"run_id": "b7904f41-68b5-44ec-9da6-cf2481ff8600"
-	//}
-	//]
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodeRunsDailyStatusTimeSeries(ctx context.Context, in *request.NodeRunsDailyStatusTimeSeries, opts ...grpc.CallOption) (*response.NodeRunsDailyStatusTimeSeries, error)
+	// CreateRollout
 	//
-	//CreateRollout
+	// Creates a Rollout record. A rollout represents the process of nodes acquiring
+	// the latest policy revision pushed to a policy group.
 	//
-	//Creates a Rollout record. A rollout represents the process of nodes acquiring
-	//the latest policy revision pushed to a policy group.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//ingest:unifiedEvents:create
-	//```
 	CreateRollout(ctx context.Context, in *request.CreateRollout, opts ...grpc.CallOption) (*response.Rollout, error)
+	// CreateRolloutTest
 	//
-	//CreateRolloutTest
+	// CreateRolloutTest is a no-op endpoint that has the same auth requirements as
+	// CreateRollout. It can be used to verify end-to-end config/connectivity for
+	// clients
 	//
-	//CreateRolloutTest is a no-op endpoint that has the same auth requirements as
-	//CreateRollout. It can be used to verify end-to-end config/connectivity for
-	//clients
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//ingest:unifiedEvents:create
-	//```
 	CreateRolloutTest(ctx context.Context, in *request.CreateRolloutTest, opts ...grpc.CallOption) (*response.CreateRolloutTest, error)
+	// GetRollouts
 	//
-	//GetRollouts
+	// # Gives a list of rollouts
 	//
-	//Gives a list of rollouts
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRollouts(ctx context.Context, in *request.Rollouts, opts ...grpc.CallOption) (*response.Rollouts, error)
+	// GetRolloutById
 	//
-	//GetRolloutById
+	// # Returns the rollout with the given Id
 	//
-	//Returns the rollout with the given Id
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRolloutById(ctx context.Context, in *request.RolloutById, opts ...grpc.CallOption) (*response.Rollout, error)
+	// GetRolloutForChefRun
 	//
-	//GetRolloutForChefRun
+	// Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision
 	//
-	//Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRolloutForChefRun(ctx context.Context, in *request.RolloutForChefRun, opts ...grpc.CallOption) (*response.Rollout, error)
 	ListNodeSegmentsWithRolloutProgress(ctx context.Context, in *request.ListNodeSegmentsWithRolloutProgress, opts ...grpc.CallOption) (*response.NodeSegmentsWithRolloutProgress, error)
+	// UpdateTelemetryReported
+	// Acknowledge API  to updates the last client run telemetry reported date in postgres
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//UpdateTelemetryReported
-	//Acknowledge API  to updates the last client run telemetry reported date in postgres
-	//Authorization Action:
-	//```
 	//iam:introspect:getAll
-	//```
 	UpdateTelemetryReported(ctx context.Context, in *request.UpdateTelemetryReportedRequest, opts ...grpc.CallOption) (*response.UpdateTelemetryReportedResponse, error)
+	// GetNodesUsageCount
 	//
-	//GetNodesUsageCount
+	// Returns the count of unique nodes with lastRun in a given time.
+	// The time duration can be between the last time Telemetry data sent and the day before the current date.
+	// If the duration < 15 days --> 15 days
+	// duration > 15 days --> duration
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Returns the count of unique nodes with lastRun in a given time.
-	//The time duration can be between the last time Telemetry data sent and the day before the current date.
-	//If the duration < 15 days --> 15 days
-	//duration > 15 days --> duration
-	//Authorization Action:
-	//```
 	//iam:introspect:getAll
-	//```
 	GetNodesUsageCount(ctx context.Context, in *request.GetNodesUsageCountRequest, opts ...grpc.CallOption) (*response.GetNodesUsageCountResponse, error)
 }
 
@@ -1207,350 +1207,350 @@ func (c *configMgmtClient) GetNodesUsageCount(ctx context.Context, in *request.G
 
 // ConfigMgmtServer is the server API for ConfigMgmt service.
 type ConfigMgmtServer interface {
+	// List Checked-in Nodes
 	//
-	//List Checked-in Nodes
+	// Returns a list of infra nodes that have checked in to Automate.
+	// Adding a filter makes a list of all nodes that meet the filter criteria.
+	// Filters for the same field are ORd together, while filters across different fields are ANDed together.
+	// Supports pagination, filtering (with wildcard support), and sorting.
+	// Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
-	//Returns a list of infra nodes that have checked in to Automate.
-	//Adding a filter makes a list of all nodes that meet the filter criteria.
-	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
-	//Supports pagination, filtering (with wildcard support), and sorting.
-	//Max return payload size is 4MB, use pagination to fetch remaining data.
+	// Example:
+	// ```
+	// cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodes(context.Context, *request.Nodes) (*structpb.ListValue, error)
+	// List Run Details
 	//
-	//List Run Details
+	// Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
+	// Supports pagination.
+	// Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	//
-	//Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
-	//Supports pagination.
-	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRuns(context.Context, *request.Runs) (*structpb.ListValue, error)
+	// List Node Status Counts
 	//
-	//List Node Status Counts
+	// Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
+	// Supports filtering.
 	//
-	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
-	//Supports filtering.
+	// Example:
+	// ```
+	// cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodesCounts(context.Context, *request.NodesCounts) (*response.NodesCounts, error)
+	// List Run Status Totals
 	//
-	//List Run Status Totals
+	// Returns totals for failed and successful runs given a `node_id`.
 	//
-	//Returns totals for failed and successful runs given a `node_id`.
+	// Example:
+	// ```
+	// cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRunsCounts(context.Context, *request.RunsCounts) (*response.RunsCounts, error)
+	// List Node Checkins
 	//
-	//List Node Checkins
+	// Returns a daily time series of unique node check-ins for the number of days requested.
+	// If `days ago` value is empty, API will return the default 1 day ago results.
 	//
-	//Returns a daily time series of unique node check-ins for the number of days requested.
-	//If `days ago` value is empty, API will return the default 1 day ago results.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetCheckInCountsTimeSeries(context.Context, *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error)
+	// List Missing Nodes Count
 	//
-	//List Missing Nodes Count
+	// Returns a count of missing nodes for the provided durations.
 	//
-	//Returns a count of missing nodes for the provided durations.
+	// Example:
+	// ```
+	// cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/stats/missing_node_duration_counts?durations=3d&durations=1w&durations=2w&durations=1M&durations=3M
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetMissingNodeDurationCounts(context.Context, *request.MissingNodeDurationCounts) (*response.MissingNodeDurationCounts, error)
+	// Show Node Run
 	//
-	//Show Node Run
+	// Returns the infra run report for the provided node ID and run ID.
 	//
-	//Returns the infra run report for the provided node ID and run ID.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:get
-	//```
 	GetNodeRun(context.Context, *request.NodeRun) (*response.Run, error)
+	// List Filter Suggestions
 	//
-	//List Filter Suggestions
+	// Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
+	// Supports wildcard (* and ?).
 	//
-	//Returns possible filter values given a valid `type` parameter. All values returned until two or more characters are provided for the `text` parameter.
-	//Supports wildcard (* and ?).
+	// Example:
+	// ```
+	// cfgmgmt/suggestions?type=environment&text=_d
+	// ```
 	//
-	//Example:
-	//```
-	//cfgmgmt/suggestions?type=environment&text=_d
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetSuggestions(context.Context, *query.Suggestion) (*structpb.ListValue, error)
+	// List Organizations
 	//
-	//List Organizations
+	// Returns a list of all organizations associated with nodes that have checked in to Automate.
 	//
-	//Returns a list of all organizations associated with nodes that have checked in to Automate.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetOrganizations(context.Context, *request.Organizations) (*structpb.ListValue, error)
+	// List Associated Chef Infra Servers
 	//
-	//List Associated Chef Infra Servers
+	// Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
 	//
-	//Returns a list of all Chef Infra Servers associated with nodes that have checked in to Automate.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetSourceFqdns(context.Context, *request.SourceFqdns) (*structpb.ListValue, error)
+	// Show Attributes
 	//
-	//Show Attributes
+	// Returns the latest reported attributes for the provided node ID.
 	//
-	//Returns the latest reported attributes for the provided node ID.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:get
-	//```
 	GetAttributes(context.Context, *request.Node) (*response.NodeAttribute, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
+	// List Policy Cookbooks
 	//
-	//List Policy Cookbooks
+	// Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
+	// Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	//
-	//Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
-	//Policy revision IDs are sent with an infra run report and identifies which instance of a policy the node used for this run.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetPolicyCookbooks(context.Context, *request.PolicyRevision) (*response.PolicyCookbooks, error)
+	// List Errors
 	//
-	//List Errors
+	// Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
 	//
-	//Returns a list of the most common errors reported for infra nodes' most recent Chef Infra Client runs.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetErrors(context.Context, *request.Errors) (*response.Errors, error)
 	NodeExport(*request.NodeExport, ConfigMgmt_NodeExportServer) error
 	ReportExport(*request.ReportExport, ConfigMgmt_ReportExportServer) error
+	// GetNodeMetadataCounts
 	//
-	//GetNodeMetadataCounts
+	// For each type of field requested this returns distinct values the amount of each. For example,
+	// if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned.
+	// The number next to each represents the number of nodes with that type of platform.
 	//
-	//For each type of field requested this returns distinct values the amount of each. For example,
-	//if the 'platform' field is requested 'windows' 10, 'redhat' 5, and 'ubuntu' 8 could be returned.
-	//The number next to each represents the number of nodes with that type of platform.
+	// Example:
+	// request
+	// ```
+	// cfgmgmt/node_metadata_counts?type=platform&type=status
+	// ```
+	// response
+	// ```
+	// {
+	// "types": [
+	// {
+	// "values": [
+	// {
+	// "value": "mac_os_x 10.11.5",
+	// "count": 28
+	// },
+	// {
+	// "value": "linux 8.9",
+	// "count": 1
+	// },
+	// {
+	// "value": "macos 8.9",
+	// "count": 1
+	// },
+	// {
+	// "value": "windows 8.9",
+	// "count": 1
+	// }
+	// ],
+	// "type": "platform"
+	// },
+	// {
+	// "value": [
+	// {
+	// "value": "missing",
+	// "count": 29
+	// },
+	// {
+	// "value": "failure",
+	// "count": 2
+	// }
+	// ],
+	// "type": "status"
+	// }
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//request
-	//```
-	//cfgmgmt/node_metadata_counts?type=platform&type=status
-	//```
-	//response
-	//```
-	//{
-	//"types": [
-	//{
-	//"values": [
-	//{
-	//"value": "mac_os_x 10.11.5",
-	//"count": 28
-	//},
-	//{
-	//"value": "linux 8.9",
-	//"count": 1
-	//},
-	//{
-	//"value": "macos 8.9",
-	//"count": 1
-	//},
-	//{
-	//"value": "windows 8.9",
-	//"count": 1
-	//}
-	//],
-	//"type": "platform"
-	//},
-	//{
-	//"value": [
-	//{
-	//"value": "missing",
-	//"count": 29
-	//},
-	//{
-	//"value": "failure",
-	//"count": 2
-	//}
-	//],
-	//"type": "status"
-	//}
-	//]
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodeMetadataCounts(context.Context, *request.NodeMetadataCounts) (*response.NodeMetadataCounts, error)
+	// GetNodeRunsDailyStatusTimeSeries
 	//
-	//GetNodeRunsDailyStatusTimeSeries
+	// Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration,
+	// the most recent failed run will be returned. If there are no failed runs the most recent successful
+	// run will be returned. If no runs are found in the 24-hour duration, the status will be "missing"
+	// and no run information will be returned.
 	//
-	//Provides the status of runs for each 24-hour duration. For multiple runs in one 24-hour duration,
-	//the most recent failed run will be returned. If there are no failed runs the most recent successful
-	//run will be returned. If no runs are found in the 24-hour duration, the status will be "missing"
-	//and no run information will be returned.
+	// Example:
+	// request
+	// ```
+	// cfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961&days_ago=3
+	// ```
+	// response
+	// ```
+	// {
+	// "durations": [
+	// {
+	// "start": "2020-04-25T19:00:00Z",
+	// "end": "2020-04-26T18:59:59Z",
+	// "status": "missing",
+	// "run_id": ""
+	// },
+	// {
+	// "start": "2020-04-26T19:00:00Z",
+	// "end": "2020-04-27T18:59:59Z",
+	// "status": "missing",
+	// "run_id": ""
+	// },
+	// {
+	// "start": "2020-04-27T19:00:00Z",
+	// "end": "2020-04-28T18:59:59Z",
+	// "status": "failure",
+	// "run_id": "b7904f41-68b5-44ec-9da6-cf2481ff8600"
+	// }
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//request
-	//```
-	//cfgmgmt/node_runs_daily_status_time_series?node_id=507bd518-5c18-4c2d-a445-60fe7dde9961&days_ago=3
-	//```
-	//response
-	//```
-	//{
-	//"durations": [
-	//{
-	//"start": "2020-04-25T19:00:00Z",
-	//"end": "2020-04-26T18:59:59Z",
-	//"status": "missing",
-	//"run_id": ""
-	//},
-	//{
-	//"start": "2020-04-26T19:00:00Z",
-	//"end": "2020-04-27T18:59:59Z",
-	//"status": "missing",
-	//"run_id": ""
-	//},
-	//{
-	//"start": "2020-04-27T19:00:00Z",
-	//"end": "2020-04-28T18:59:59Z",
-	//"status": "failure",
-	//"run_id": "b7904f41-68b5-44ec-9da6-cf2481ff8600"
-	//}
-	//]
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetNodeRunsDailyStatusTimeSeries(context.Context, *request.NodeRunsDailyStatusTimeSeries) (*response.NodeRunsDailyStatusTimeSeries, error)
+	// CreateRollout
 	//
-	//CreateRollout
+	// Creates a Rollout record. A rollout represents the process of nodes acquiring
+	// the latest policy revision pushed to a policy group.
 	//
-	//Creates a Rollout record. A rollout represents the process of nodes acquiring
-	//the latest policy revision pushed to a policy group.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//ingest:unifiedEvents:create
-	//```
 	CreateRollout(context.Context, *request.CreateRollout) (*response.Rollout, error)
+	// CreateRolloutTest
 	//
-	//CreateRolloutTest
+	// CreateRolloutTest is a no-op endpoint that has the same auth requirements as
+	// CreateRollout. It can be used to verify end-to-end config/connectivity for
+	// clients
 	//
-	//CreateRolloutTest is a no-op endpoint that has the same auth requirements as
-	//CreateRollout. It can be used to verify end-to-end config/connectivity for
-	//clients
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//ingest:unifiedEvents:create
-	//```
 	CreateRolloutTest(context.Context, *request.CreateRolloutTest) (*response.CreateRolloutTest, error)
+	// GetRollouts
 	//
-	//GetRollouts
+	// # Gives a list of rollouts
 	//
-	//Gives a list of rollouts
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRollouts(context.Context, *request.Rollouts) (*response.Rollouts, error)
+	// GetRolloutById
 	//
-	//GetRolloutById
+	// # Returns the rollout with the given Id
 	//
-	//Returns the rollout with the given Id
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRolloutById(context.Context, *request.RolloutById) (*response.Rollout, error)
+	// GetRolloutForChefRun
 	//
-	//GetRolloutForChefRun
+	// Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision
 	//
-	//Returns the rollout for the given Chef Server/org, policy group, policy name, and policy revision
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//infra:nodes:list
-	//```
 	GetRolloutForChefRun(context.Context, *request.RolloutForChefRun) (*response.Rollout, error)
 	ListNodeSegmentsWithRolloutProgress(context.Context, *request.ListNodeSegmentsWithRolloutProgress) (*response.NodeSegmentsWithRolloutProgress, error)
+	// UpdateTelemetryReported
+	// Acknowledge API  to updates the last client run telemetry reported date in postgres
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//UpdateTelemetryReported
-	//Acknowledge API  to updates the last client run telemetry reported date in postgres
-	//Authorization Action:
-	//```
 	//iam:introspect:getAll
-	//```
 	UpdateTelemetryReported(context.Context, *request.UpdateTelemetryReportedRequest) (*response.UpdateTelemetryReportedResponse, error)
+	// GetNodesUsageCount
 	//
-	//GetNodesUsageCount
+	// Returns the count of unique nodes with lastRun in a given time.
+	// The time duration can be between the last time Telemetry data sent and the day before the current date.
+	// If the duration < 15 days --> 15 days
+	// duration > 15 days --> duration
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Returns the count of unique nodes with lastRun in a given time.
-	//The time duration can be between the last time Telemetry data sent and the day before the current date.
-	//If the duration < 15 days --> 15 days
-	//duration > 15 days --> duration
-	//Authorization Action:
-	//```
 	//iam:introspect:getAll
-	//```
 	GetNodesUsageCount(context.Context, *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error)
 }
 

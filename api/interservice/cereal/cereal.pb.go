@@ -411,6 +411,7 @@ type DequeueWorkflowRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Cmd:
+	//
 	//	*DequeueWorkflowRequest_Dequeue_
 	//	*DequeueWorkflowRequest_Continue_
 	//	*DequeueWorkflowRequest_Done_
@@ -519,6 +520,7 @@ type DequeueWorkflowChunkRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Cmd:
+	//
 	//	*DequeueWorkflowChunkRequest_Dequeue_
 	//	*DequeueWorkflowChunkRequest_Continue_
 	//	*DequeueWorkflowChunkRequest_Done_
@@ -627,6 +629,7 @@ type DequeueWorkflowResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Cmd:
+	//
 	//	*DequeueWorkflowResponse_Dequeue_
 	//	*DequeueWorkflowResponse_Status_
 	//	*DequeueWorkflowResponse_Committed_
@@ -1079,6 +1082,7 @@ type DequeueTaskRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Cmd:
+	//
 	//	*DequeueTaskRequest_Dequeue_
 	//	*DequeueTaskRequest_Succeed_
 	//	*DequeueTaskRequest_Fail_
@@ -1173,6 +1177,7 @@ type DequeueTaskResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Cmd:
+	//
 	//	*DequeueTaskResponse_Dequeue_
 	//	*DequeueTaskResponse_Cancel_
 	//	*DequeueTaskResponse_Committed_

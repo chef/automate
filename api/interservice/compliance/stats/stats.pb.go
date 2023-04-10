@@ -497,9 +497,9 @@ type Stats struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//int64 types render into string types when serialized to satisfy all browsers
-	//we don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now
-	//we are therefore deprecating nodes and favor nodesCnt
+	// int64 types render into string types when serialized to satisfy all browsers
+	// we don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now
+	// we are therefore deprecating nodes and favor nodesCnt
 	//
 	// Deprecated: Do not use.
 	Nodes        int64 `protobuf:"varint,1,opt,name=nodes,proto3" json:"nodes,omitempty" toml:"nodes,omitempty" mapstructure:"nodes,omitempty"`

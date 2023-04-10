@@ -303,10 +303,9 @@ support@chef.io for assistance.
 // checkExpectedDataPaths checks the source and destination paths for
 // the transfers.
 //
-// - Source Path must exist unless the migration has been completed.
-// - Destination Path must not exist or be an empty directory (or
-//   symlink to an empty directory)
-//
+//   - Source Path must exist unless the migration has been completed.
+//   - Destination Path must not exist or be an empty directory (or
+//     symlink to an empty directory)
 func (p *PreflightRunner) checkExpectedDataPaths() {
 	if p.err != nil {
 		return

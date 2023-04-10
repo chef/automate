@@ -2,12 +2,13 @@ package server
 
 import (
 	"context"
-	pb "github.com/golang/protobuf/ptypes/empty"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"os"
 	"strconv"
 	"time"
+
+	pb "github.com/golang/protobuf/ptypes/empty"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 
 	"github.com/pkg/errors"
 
@@ -25,9 +26,9 @@ import (
 // call. It attempts to detect if an upgrade is running.
 //
 // KNOWN ISSUES:
-//  - Doesn't handle supplementary packages (not actually upgraded right now!)
-//  - Returns an incomplete response if the deployment service itself hasn't been upgraded.
-//  - Duplicates a lot of behavior in our main converge loop
+//   - Doesn't handle supplementary packages (not actually upgraded right now!)
+//   - Returns an incomplete response if the deployment service itself hasn't been upgraded.
+//   - Duplicates a lot of behavior in our main converge loop
 //
 // I think this should get a lot more simple as we integrate the
 // converger. In that world we can potentially have a function that

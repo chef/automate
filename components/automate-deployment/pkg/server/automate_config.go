@@ -257,9 +257,9 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 	return nil
 }
 
-//setConfigForRedirectLogs Add the config for rsyslog and logrotate
-//if the req has redirect_sys_log as true and existing has redirect_sys_log as false it will add the configurations
-//if the req has redirect_sys_log as false and existing has redirect_sys_log as true it will remove the configurations
+// setConfigForRedirectLogs Add the config for rsyslog and logrotate
+// if the req has redirect_sys_log as true and existing has redirect_sys_log as false it will add the configurations
+// if the req has redirect_sys_log as false and existing has redirect_sys_log as true it will remove the configurations
 func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy *deployment.AutomateConfig) error {
 
 	//Set the config if already not set
@@ -343,7 +343,7 @@ func setConfigForRedirectLogs(req *api.PatchAutomateConfigRequest, existingCopy 
 	return nil
 }
 
-//restartSyslogService restarts the rsyslog service for the supported platforms
+// restartSyslogService restarts the rsyslog service for the supported platforms
 func restartSyslogService() error {
 	_, err := exec.Command("bash", "-c", "systemctl restart rsyslog.service").Output()
 	if err != nil {
@@ -353,7 +353,7 @@ func restartSyslogService() error {
 	return nil
 }
 
-//createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
+// createConfigFileForAutomateSysLog created a config file as /etc/rsyslog.d/automate.conf
 // which redirects the logs to the specified location
 func createConfigFileForAutomateSysLog(pathForLog string) error {
 	os.Remove(rsyslogConfigFile)
@@ -375,7 +375,7 @@ func createConfigFileForAutomateSysLog(pathForLog string) error {
 
 }
 
-//removeConfigFileForAutomateSyslog Deletes the file /etc/rsyslog.d/automate.conf, to disable redirecting logs
+// removeConfigFileForAutomateSyslog Deletes the file /etc/rsyslog.d/automate.conf, to disable redirecting logs
 func removeConfigFileForAutomateSyslog() error {
 	//Checking If the file exist
 	if _, err := os.Stat(rsyslogConfigFile); errors.Is(err, nil) {
@@ -403,8 +403,8 @@ func runLogrotateConfig(req *api.PatchAutomateConfigRequest) error {
 	return nil
 }
 
-//logrotateConfChecks Checks if the supported platform has logrotate pre-installed or not
-//if not, it returns and error which depicts to install the logrotate
+// logrotateConfChecks Checks if the supported platform has logrotate pre-installed or not
+// if not, it returns and error which depicts to install the logrotate
 func logrotateConfChecks() error {
 	_, err := exec.Command("logrotate").Output()
 	if strings.Contains(err.Error(), "executable file not found") {

@@ -48,7 +48,7 @@ const (
 	//
 	// See
 	//
-	//    A2ROOT/.expeditor/promote-services.sh
+	//	A2ROOT/.expeditor/promote-services.sh
 	//
 	// for the current upgrade process.
 	// PROMOTING = 3;
@@ -2683,6 +2683,7 @@ type DeployEvent struct {
 	DeploymentId string                 `protobuf:"bytes,2,opt,name=deployment_id,json=deploymentId,proto3" json:"deployment_id,omitempty" toml:"deployment_id,omitempty" mapstructure:"deployment_id,omitempty"`
 	Time         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty" toml:"time,omitempty" mapstructure:"time,omitempty"`
 	// Types that are assignable to Event:
+	//
 	//	*DeployEvent_Deploy_
 	//	*DeployEvent_Phase_
 	//	*DeployEvent_PhaseStep_

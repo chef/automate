@@ -35,10 +35,12 @@ var typeString = map[ErrorType]string{
 //
 // Example: When there is an invalid `filter` parameter
 // ```
-//  errors.New(
-//    errors.InvalidParameter,
-//    fmt.Sprintf("Invalid filter '%s' (format: key:value)", filter),
-//  )
+//
+//	errors.New(
+//	  errors.InvalidParameter,
+//	  fmt.Sprintf("Invalid filter '%s' (format: key:value)", filter),
+//	)
+//
 // ```
 type StandardError struct {
 	Type    ErrorType `json:"-"` // Avoid displaying the type to the user

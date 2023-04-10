@@ -64,6 +64,7 @@ control 'config-mgmt-action-1' do
 
       it 'should ingest the data successfully' do
         expect(api_request.http_status).to eq 200
+        puts "ErrorResponseA #{api_request}"
       end
     end
   end
@@ -145,6 +146,7 @@ control 'config-mgmt-action-2' do
     shared_examples "string requests tests" do
       it 'should return 3 strings and the correct number of buckets' do
         expect(api_request.http_status).to eq 200
+        puts "ErrorResponseAz #{api_request}"
 
         expect(api_request.parsed_response_body[:strings].length).to eq 3
 

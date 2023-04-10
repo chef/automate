@@ -19,8 +19,7 @@ func (ms *Status) migrateA1ToCurrent() error {
 	ms.calculateA1Tasks()
 
 	ms.update("Starting Stage 1")
-	err := ms.stage1()
-	if err != nil {
+	if err := ms.stage1(); err != nil {
 		return err
 	}
 

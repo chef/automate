@@ -1,0 +1,5 @@
+[dex.v1.sys]
+  [dex.v1.sys.invalid_login_attempts]
+      enable_invalid_login_attempts = false
+      blocked_duration_in_minutes = 30
+      max_invalid_login_attempts_allowed = 5

@@ -269,124 +269,124 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type RulesClient interface {
+	// Create a project rule
 	//
-	//Create a project rule
+	// Creates a new project rule to move ingested resources into projects.
 	//
-	//Creates a new project rule to move ingested resources into projects.
+	// A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
 	//
-	//A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
+	// Each condition specifies one or more values to match for a particular attribute on an ingested resource.
 	//
-	//Each condition specifies one or more values to match for a particular attribute on an ingested resource.
+	// The choice of attributes depends on the rule type.
+	// For NODE type, specify any of the available attributes.
+	// For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
 	//
-	//The choice of attributes depends on the rule type.
-	//For NODE type, specify any of the available attributes.
-	//For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
+	// The choice of operator depends on how many values you provide.
+	// If you wish to match one among a group of values, set the operator to MEMBER_OF.
+	// For a single value, use EQUALS.
 	//
-	//The choice of operator depends on how many values you provide.
-	//If you wish to match one among a group of values, set the operator to MEMBER_OF.
-	//For a single value, use EQUALS.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	CreateRule(ctx context.Context, in *request.CreateRuleReq, opts ...grpc.CallOption) (*response.CreateRuleResp, error)
+	// Update a project rule
 	//
-	//Update a project rule
+	// Updates the name and conditions of an existing project rule.
+	// New conditions can be added. Existing conditions can be updated or removed.
 	//
-	//Updates the name and conditions of an existing project rule.
-	//New conditions can be added. Existing conditions can be updated or removed.
+	// This operation overwrites all fields excluding ID and Type,
+	// including those omitted from the request, so be sure to specify all properties.
+	// Properties that you do not include are reset to empty values.
 	//
-	//This operation overwrites all fields excluding ID and Type,
-	//including those omitted from the request, so be sure to specify all properties.
-	//Properties that you do not include are reset to empty values.
+	// The resulting change to the project's resources does not take effect immediately.
+	// Updates to project rules must be applied to ingested resources by a project update.
 	//
-	//The resulting change to the project's resources does not take effect immediately.
-	//Updates to project rules must be applied to ingested resources by a project update.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	UpdateRule(ctx context.Context, in *request.UpdateRuleReq, opts ...grpc.CallOption) (*response.UpdateRuleResp, error)
+	// Get a project rule
 	//
-	//Get a project rule
+	// Returns the details for a project rule.
 	//
-	//Returns the details for a project rule.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:get
-	//```
 	GetRule(ctx context.Context, in *request.GetRuleReq, opts ...grpc.CallOption) (*response.GetRuleResp, error)
+	// List a project's rules
 	//
-	//List a project's rules
+	// Lists all of the project rules of a specific project.
 	//
-	//Lists all of the project rules of a specific project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:get
-	//```
 	ListRulesForProject(ctx context.Context, in *request.ListRulesForProjectReq, opts ...grpc.CallOption) (*response.ListRulesForProjectResp, error)
+	// Delete a project rule
 	//
-	//Delete a project rule
+	// The resulting change to the project's resources does not take effect immediately.
+	// Updates to project rules must be applied to ingested resources by a project update.
 	//
-	//The resulting change to the project's resources does not take effect immediately.
-	//Updates to project rules must be applied to ingested resources by a project update.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	DeleteRule(ctx context.Context, in *request.DeleteRuleReq, opts ...grpc.CallOption) (*response.DeleteRuleResp, error)
+	// Start project update
 	//
-	//Start project update
+	// Any changes to a project's rules are staged first. They do not take effect until
+	// all projects are updated.
 	//
-	//Any changes to a project's rules are staged first. They do not take effect until
-	//all projects are updated.
+	// Updating all projects begins an operation that applies all pending rule edits
+	// and then moves ingested resources into the correct projects according to those latest changes.
 	//
-	//Updating all projects begins an operation that applies all pending rule edits
-	//and then moves ingested resources into the correct projects according to those latest changes.
+	// With a large amount of historical compliance data, rule application can take a considerable amount of time.
+	// It’s best to batch up rule changes and apply them all at once.
 	//
-	//With a large amount of historical compliance data, rule application can take a considerable amount of time.
-	//It’s best to batch up rule changes and apply them all at once.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:rules:apply
-	//```
 	ApplyRulesStart(ctx context.Context, in *request.ApplyRulesStartReq, opts ...grpc.CallOption) (*response.ApplyRulesStartResp, error)
+	// Cancel project update
 	//
-	//Cancel project update
+	// Cancels an ongoing project update.
 	//
-	//Cancels an ongoing project update.
+	// Warning! This action leaves the system in an unknown state that only another
+	// successful project update can rectify.
 	//
-	//Warning! This action leaves the system in an unknown state that only another
-	//successful project update can rectify.
+	// This command exists really just for one scenario: you started a project update
+	// but shortly thereafter discovered that you had one more change to include in the
+	// batch of updates to be done.
 	//
-	//This command exists really just for one scenario: you started a project update
-	//but shortly thereafter discovered that you had one more change to include in the
-	//batch of updates to be done.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:rules:cancel
-	//```
 	ApplyRulesCancel(ctx context.Context, in *request.ApplyRulesCancelReq, opts ...grpc.CallOption) (*response.ApplyRulesCancelResp, error)
+	// Get the status of a project update
 	//
-	//Get the status of a project update
+	// Returns details about a project update operation.
 	//
-	//Returns details about a project update operation.
+	// You can poll this endpoint during a project update to monitor progress.
+	// Querying this endpoint when there is no update in progress will return details
+	// about the completion status of the most recent update.
 	//
-	//You can poll this endpoint during a project update to monitor progress.
-	//Querying this endpoint when there is no update in progress will return details
-	//about the completion status of the most recent update.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:rules:status
-	//```
 	ApplyRulesStatus(ctx context.Context, in *request.ApplyRulesStatusReq, opts ...grpc.CallOption) (*response.ApplyRulesStatusResp, error)
 }
 
@@ -472,124 +472,124 @@ func (c *rulesClient) ApplyRulesStatus(ctx context.Context, in *request.ApplyRul
 
 // RulesServer is the server API for Rules service.
 type RulesServer interface {
+	// Create a project rule
 	//
-	//Create a project rule
+	// Creates a new project rule to move ingested resources into projects.
 	//
-	//Creates a new project rule to move ingested resources into projects.
+	// A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
 	//
-	//A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
+	// Each condition specifies one or more values to match for a particular attribute on an ingested resource.
 	//
-	//Each condition specifies one or more values to match for a particular attribute on an ingested resource.
+	// The choice of attributes depends on the rule type.
+	// For NODE type, specify any of the available attributes.
+	// For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
 	//
-	//The choice of attributes depends on the rule type.
-	//For NODE type, specify any of the available attributes.
-	//For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
+	// The choice of operator depends on how many values you provide.
+	// If you wish to match one among a group of values, set the operator to MEMBER_OF.
+	// For a single value, use EQUALS.
 	//
-	//The choice of operator depends on how many values you provide.
-	//If you wish to match one among a group of values, set the operator to MEMBER_OF.
-	//For a single value, use EQUALS.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	CreateRule(context.Context, *request.CreateRuleReq) (*response.CreateRuleResp, error)
+	// Update a project rule
 	//
-	//Update a project rule
+	// Updates the name and conditions of an existing project rule.
+	// New conditions can be added. Existing conditions can be updated or removed.
 	//
-	//Updates the name and conditions of an existing project rule.
-	//New conditions can be added. Existing conditions can be updated or removed.
+	// This operation overwrites all fields excluding ID and Type,
+	// including those omitted from the request, so be sure to specify all properties.
+	// Properties that you do not include are reset to empty values.
 	//
-	//This operation overwrites all fields excluding ID and Type,
-	//including those omitted from the request, so be sure to specify all properties.
-	//Properties that you do not include are reset to empty values.
+	// The resulting change to the project's resources does not take effect immediately.
+	// Updates to project rules must be applied to ingested resources by a project update.
 	//
-	//The resulting change to the project's resources does not take effect immediately.
-	//Updates to project rules must be applied to ingested resources by a project update.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	UpdateRule(context.Context, *request.UpdateRuleReq) (*response.UpdateRuleResp, error)
+	// Get a project rule
 	//
-	//Get a project rule
+	// Returns the details for a project rule.
 	//
-	//Returns the details for a project rule.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:get
-	//```
 	GetRule(context.Context, *request.GetRuleReq) (*response.GetRuleResp, error)
+	// List a project's rules
 	//
-	//List a project's rules
+	// Lists all of the project rules of a specific project.
 	//
-	//Lists all of the project rules of a specific project.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:get
-	//```
 	ListRulesForProject(context.Context, *request.ListRulesForProjectReq) (*response.ListRulesForProjectResp, error)
+	// Delete a project rule
 	//
-	//Delete a project rule
+	// The resulting change to the project's resources does not take effect immediately.
+	// Updates to project rules must be applied to ingested resources by a project update.
 	//
-	//The resulting change to the project's resources does not take effect immediately.
-	//Updates to project rules must be applied to ingested resources by a project update.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:projects:update
-	//```
 	DeleteRule(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
+	// Start project update
 	//
-	//Start project update
+	// Any changes to a project's rules are staged first. They do not take effect until
+	// all projects are updated.
 	//
-	//Any changes to a project's rules are staged first. They do not take effect until
-	//all projects are updated.
+	// Updating all projects begins an operation that applies all pending rule edits
+	// and then moves ingested resources into the correct projects according to those latest changes.
 	//
-	//Updating all projects begins an operation that applies all pending rule edits
-	//and then moves ingested resources into the correct projects according to those latest changes.
+	// With a large amount of historical compliance data, rule application can take a considerable amount of time.
+	// It’s best to batch up rule changes and apply them all at once.
 	//
-	//With a large amount of historical compliance data, rule application can take a considerable amount of time.
-	//It’s best to batch up rule changes and apply them all at once.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:rules:apply
-	//```
 	ApplyRulesStart(context.Context, *request.ApplyRulesStartReq) (*response.ApplyRulesStartResp, error)
+	// Cancel project update
 	//
-	//Cancel project update
+	// Cancels an ongoing project update.
 	//
-	//Cancels an ongoing project update.
+	// Warning! This action leaves the system in an unknown state that only another
+	// successful project update can rectify.
 	//
-	//Warning! This action leaves the system in an unknown state that only another
-	//successful project update can rectify.
+	// This command exists really just for one scenario: you started a project update
+	// but shortly thereafter discovered that you had one more change to include in the
+	// batch of updates to be done.
 	//
-	//This command exists really just for one scenario: you started a project update
-	//but shortly thereafter discovered that you had one more change to include in the
-	//batch of updates to be done.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:rules:cancel
-	//```
 	ApplyRulesCancel(context.Context, *request.ApplyRulesCancelReq) (*response.ApplyRulesCancelResp, error)
+	// Get the status of a project update
 	//
-	//Get the status of a project update
+	// Returns details about a project update operation.
 	//
-	//Returns details about a project update operation.
+	// You can poll this endpoint during a project update to monitor progress.
+	// Querying this endpoint when there is no update in progress will return details
+	// about the completion status of the most recent update.
 	//
-	//You can poll this endpoint during a project update to monitor progress.
-	//Querying this endpoint when there is no update in progress will return details
-	//about the completion status of the most recent update.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//iam:rules:status
-	//```
 	ApplyRulesStatus(context.Context, *request.ApplyRulesStatusReq) (*response.ApplyRulesStatusResp, error)
 }
 

@@ -1229,7 +1229,7 @@ func (s *server) shouldFetchManifest() bool {
 	return s.deployment.CurrentReleaseManifest == nil || s.deployment.Config.Deployment.GetV1().GetSvc().GetUpgradeStrategy().GetValue() != "none"
 }
 
-//isCompatibleForConverge checks the converge from v1 to v2 is possible or not
+// isCompatibleForConverge checks the converge from v1 to v2 is possible or not
 func (s *server) isCompatibleForConverge(v1, v2 string) bool {
 	if v1 == v2 {
 		return true
@@ -1373,16 +1373,15 @@ func (s *server) convergeDeployment() error {
 // and handle any errors that occur in the converge loop. It returns a task
 // that can be used to subscribe to converge events.
 //
-//  operation: Is a function that takes a pointer to the server and
-//   performs any pre-converge tasks that manipulate state. If this
-//   operation fails it should return a gRPC status.Status
-//   with the proper fields configured.
-//  sender: Is the event sender that is used to publish events.
-//  sink: converge event "sink" which acts as a filter and publisher
-//   to the sender.
-//  errHandler: Is a callback function used to handle any errors that
-//    may occur in the converge routine.
-//
+//	operation: Is a function that takes a pointer to the server and
+//	 performs any pre-converge tasks that manipulate state. If this
+//	 operation fails it should return a gRPC status.Status
+//	 with the proper fields configured.
+//	sender: Is the event sender that is used to publish events.
+//	sink: converge event "sink" which acts as a filter and publisher
+//	 to the sender.
+//	errHandler: Is a callback function used to handle any errors that
+//	  may occur in the converge routine.
 func (s *server) doConverge(
 	operation convergeOperation,
 	sender events.EventSender,
@@ -2065,7 +2064,7 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 	}, nil
 }
 
-//isDegrade return true, if the v2 is previous version of v1
+// isDegrade return true, if the v2 is previous version of v1
 func isDegrade(v1, v2 string) bool {
 	_, isV1Sem := manifest.IsSemVersionFmt(v1)
 	_, isV2Sem := manifest.IsSemVersionFmt(v2)
@@ -2099,7 +2098,7 @@ func isMajorUpgrade(v1, v2 string) bool {
 	return false
 }
 
-//isCompatibleForAirgap will return true if the current version is greater than or equal to min compatible version
+// isCompatibleForAirgap will return true if the current version is greater than or equal to min compatible version
 func isCompatibleForAirgap(current, minCompatibleVer string) bool {
 	_, isCurrentSem := manifest.IsSemVersionFmt(current)
 	_, isMinCompSem := manifest.IsSemVersionFmt(minCompatibleVer)

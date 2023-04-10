@@ -10,10 +10,12 @@ import "fmt"
 //
 // Example:
 // ```
-//  statusResult, found := searchResult.Aggregations.Terms("status_counts")
-//  if !found {
-//    return errors.NewBackendError("Aggregation term 'status_counts' not found")
-//  }
+//
+//	statusResult, found := searchResult.Aggregations.Terms("status_counts")
+//	if !found {
+//	  return errors.NewBackendError("Aggregation term 'status_counts' not found")
+//	}
+//
 // ```
 type BackendError struct {
 	*StandardError
