@@ -108,7 +108,7 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
     - `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone's access.
 
     ```cmd
-        hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server
+        hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server url>
     ```
 
     For example:
@@ -158,7 +158,7 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
 - Execute the below command to restore the backup.
 
     ```cmd
-        hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
+        hab pkg exec chef/knife-ec-backup knife ec restore <path/to/directory/backup_file> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
     ```
 
 ## Steps to validate if Migration is successful
@@ -166,6 +166,7 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
 - Execute the below command from the old server where a knife is installed and from the new server where the knife is installed :
 
     ```cmd
+        curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
         bash infra_server_objects_count_collector.sh -S test -K Key -F Filename
     ```
 
