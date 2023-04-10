@@ -9,6 +9,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	testFile            = "testfile*.json"
+	nonsxistingtfstate2 = "nonsxisting2.tfstate"
+)
+
 func TestGetAutomateHAInfraDetails(t *testing.T) {
 	// Valid json
 	t.Run("passed all cases", func(t *testing.T) {
@@ -93,7 +98,7 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
                    "db_password": "password",
                }
                `
-		file, err := ioutil.TempFile("", "testfile*.json")
+		file, err := ioutil.TempFile("", testFile)
 		require.NoError(t, err)
 
 		defer os.Remove(file.Name())
@@ -116,7 +121,7 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 
 	// Test case 4: Empty file
 	t.Run("Empty file", func(t *testing.T) {
-		file, err := ioutil.TempFile("", "testfile*.json")
+		file, err := ioutil.TempFile("", testFile)
 		require.NoError(t, err)
 
 		_, err = getAutomateHAInfraDetails(file.Name())
@@ -173,7 +178,7 @@ func TestExtractPortAndSshUserFromAutomateSSHCommand(t *testing.T) {
 func TestFileContainingAutomateHAInfraDetails(t *testing.T) {
 	t.Run("Failed", func(t *testing.T) {
 		automateHATerraformOutputFile = "nonsxisting1.tfstate"
-		automateHATerraformDestroyOutputFile = "nonsxisting2.tfstate"
+		automateHATerraformDestroyOutputFile = nonsxistingtfstate2
 
 		str, err := FileContainingAutomateHAInfraDetails()
 		require.Error(t, err)
@@ -181,12 +186,12 @@ func TestFileContainingAutomateHAInfraDetails(t *testing.T) {
 	})
 
 	t.Run("return first file", func(t *testing.T) {
-		file, err := ioutil.TempFile("", "testfile*.json")
+		file, err := ioutil.TempFile("", testFile)
 		require.NoError(t, err)
 
 		defer os.Remove(file.Name())
 		automateHATerraformOutputFile = file.Name()
-		automateHATerraformDestroyOutputFile = "nonsxisting2.tfstate"
+		automateHATerraformDestroyOutputFile = nonsxistingtfstate2
 
 		str, err := FileContainingAutomateHAInfraDetails()
 		require.NoError(t, err)
@@ -194,11 +199,11 @@ func TestFileContainingAutomateHAInfraDetails(t *testing.T) {
 	})
 
 	t.Run("return second file", func(t *testing.T) {
-		file, err := ioutil.TempFile("", "testfile*.json")
+		file, err := ioutil.TempFile("", testFile)
 		require.NoError(t, err)
 
 		defer os.Remove(file.Name())
-		automateHATerraformOutputFile = "nonsxisting2.tfstate"
+		automateHATerraformOutputFile = nonsxistingtfstate2
 		automateHATerraformDestroyOutputFile = file.Name()
 
 		str, err := FileContainingAutomateHAInfraDetails()

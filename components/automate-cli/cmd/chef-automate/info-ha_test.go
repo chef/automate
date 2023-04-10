@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_execInfo(t *testing.T) {
+func TestExecInfo(t *testing.T) {
 	t.Run("FAIL: No file containg automate details ", func(t *testing.T) {
 		automateHATerraformOutputFile = "file_not_found1.json"
 		automateHATerraformDestroyOutputFile = "file_not_found1.json"
@@ -68,7 +68,7 @@ func Test_execInfo(t *testing.T) {
 
 }
 
-func Test_printInfo(t *testing.T) {
+func TestPrintInfo(t *testing.T) {
 	t.Run("Passed ", func(t *testing.T) {
 		automate := &AutomateHAInfraDetails{}
 		tmpl, err := printInfo(automate)
