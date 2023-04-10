@@ -43,6 +43,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Bookshelf.AbandonedUploadCleanupInterval = w.Int32(1140000)
 	c.V1.Sys.Bookshelf.DeletedDataCleanupInterval = w.Int32(420000)
 	c.V1.Sys.Bookshelf.StreamDownload = w.Bool(true)
+	c.V1.Sys.Bookshelf.AwsAccessId = w.String("")
+	c.V1.Sys.Bookshelf.AwsSecretKey = w.String("")
 
 	return c
 }

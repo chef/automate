@@ -4,6 +4,8 @@ exec 2>&1
 
 # Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
 export GODEBUG=x509ignoreCN=0
+export CURRENT_ACCESS_KEY="{{cfg.bookshelf.aws_access_id}}"
+export CURRENT_SECRET_KEY="{{cfg.bookshelf.aws_secret_key}}"
 
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
@@ -24,7 +26,13 @@ pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/bookshelf"}}/schema"
 pg-helper fix-permissions "$DBNAME"
 
-secrets-helper generate bookshelf.access_key_id 16 --if-not-exists
-secrets-helper generate bookshelf.secret_access_key 16 --if-not-exists
+if [[ -z "${CURRENT_SECRET_KEY}" ]]; then
+  secrets-helper generate bookshelf.access_key_id 64 --if-not-exists
+  secrets-helper generate bookshelf.secret_access_key 64 --if-not-exists
+else
+  echo -n "${CURRENT_ACCESS_KEY}" | secrets-helper insert bookshelf.access_key_id
+  echo -n "${CURRENT_SECRET_KEY}" | secrets-helper insert bookshelf.secret_access_key
+fi
+
 
 exec secrets-helper exec --secret bookshelf.access_key_id --secret bookshelf.secret_access_key -- bookshelf foreground

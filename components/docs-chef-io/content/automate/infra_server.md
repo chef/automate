@@ -301,7 +301,7 @@ On the workstation:
     ```
 
     For airgapped installations, [create a bootstrap
-    template]({{< relref "install_chef_air_gap.md#create-a-bootstrap-template" >}}) and [add it]({{< relref "install_chef_air_gap.md#configure-knife" >}}) to your `config.rb`.
+    template]({{< relref "install_chef_air_gap.md#create-a-bootstrap-template" >}}) and [add it]({{< relref "install_chef_air_gap.md#configure-knife" >}}) to your `config.rb`. You can also configure the Chef Automate Infra Server to use the [S3 storage type](/automate/chef_infra_external_cookbooks_in_chef_automate).
 
 1. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
 
