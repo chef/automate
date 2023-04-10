@@ -136,6 +136,12 @@ The below steps won't work for Automate HA with AWS Managed.
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
+{{< warning >}}
+
+The below steps won't work for Automate HA with AWS Managed.
+
+{{< /warning >}}
+
 1. Make EFS volume and attach that volume to existing automate setup and Automate HA nodes. 
 
 1. Mount EFS Volume:
