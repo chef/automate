@@ -462,9 +462,6 @@ func getInfraDetailsForDeploymentType(deploymentType string, configPath string) 
 
 func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 	frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
-	if preflightCmdFlags.airgap {
-		frontendCommand = frontendCommand + " --airgap"
-	}
 	frontend := &Cmd{
 		CmdInputs: &CmdInputs{
 			Cmd:                      frontendCommand,

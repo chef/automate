@@ -64,7 +64,7 @@ const (
 
 	PRE_FLIGHT_CHECK = `cd /tmp;
 	chmod +x chef-automate;
-	sudo ./chef-automate preflight-check`
+	sudo ./chef-automate preflight-check --airgap`
 
 	GET_APPLIED_CONFIG = `
 	source <(sudo cat /hab/sup/default/SystemdEnvironmentFile.sh);
