@@ -62,28 +62,32 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 		sshUtil := NewSSHUtil(sshConfig)
 		if startCmdFlags.automate {
 			frontendIps := infra.Outputs.AutomatePrivateIps.Value
+			if len(frontendIps) == 0 {
+				writer.Error("No automate IPs are found")
+				os.Exit(1)
+			}
 			err = startFrontEndNodes(args, sshUtil, frontendIps, "automate", timestamp, writer)
 		}
 		if startCmdFlags.chef_server {
 			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
+			if len(frontendIps) == 0 {
+				writer.Error("No chef-server IPs are found")
+				os.Exit(1)
+			}
 			err = startFrontEndNodes(args, sshUtil, frontendIps, "chef-server", timestamp, writer)
 		}
 		if startCmdFlags.opensearch {
 			Ips := infra.Outputs.OpensearchPrivateIps.Value
-			err = startBackEndNodes(args, sshUtil, Ips, "opensearch", timestamp, writer)
+			err = checkNodes(args, sshUtil, Ips, "opensearch", writer)
 		}
 		if startCmdFlags.postgresql {
 			Ips := infra.Outputs.PostgresqlPrivateIps.Value
-			err = startBackEndNodes(args, sshUtil, Ips, "postgresql", timestamp, writer)
+			err = checkNodes(args, sshUtil, Ips, "postgresql", writer)
 		}
 	}
 	return nil
 }
 func startFrontEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
-	if len(Ips) == 0 {
-		writer.Errorf("No %s IPs are found", remoteService)
-		os.Exit(1)
-	}
 	resultChan := make(chan ResultConfigSet, len(Ips))
 	originalSSHConfig := sshUtil.getSSHConfig()
 
@@ -100,7 +104,6 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteServ
 
 		go func(args []string, remoteService string, scriptCommands string, newSSHUtil SSHUtil, resultChan chan ResultConfigSet) {
 			rc := ResultConfigSet{newSSHUtil.getSSHConfig().hostIP, "", nil}
-			printStartConnectionMessage(remoteService, rc.HostIP, cliWriter)
 			output, err := newSSHUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 			if err != nil {
 				rc.Error = err
@@ -143,7 +146,8 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteServ
 	return nil
 }
 
-func startBackEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
+func checkNodes(args []string, sshUtil SSHUtil, Ips []string, remoteService string, cliWriter *cli.Writer) error {
+	var err error
 	if len(Ips) == 0 {
 		writer.Errorf("No %s IPs are found", remoteService)
 		os.Exit(1)
@@ -151,84 +155,54 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteServi
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_START, remoteService)
 	}
-
-	resultChan := make(chan ResultConfigSet, len(Ips))
-	originalSSHConfig := sshUtil.getSSHConfig()
-
-	scriptCommands := "sudo systemctl start hab-sup"
-
-	for _, hostIP := range Ips {
-		newSSHConfig := &SSHConfig{
-			sshUser:    originalSSHConfig.sshUser,
-			sshPort:    originalSSHConfig.sshPort,
-			sshKeyFile: originalSSHConfig.sshKeyFile,
-			hostIP:     hostIP,
-		}
-		newSSHUtil := NewSSHUtil(newSSHConfig)
-
-		go func(args []string, remoteService string, scriptCommands string, newSSHUtil SSHUtil, resultChan chan ResultConfigSet) {
-			rc := ResultConfigSet{newSSHUtil.getSSHConfig().hostIP, "", nil}
-			_, err := newSSHUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
-			if err != nil {
-				rc.Error = err
-				resultChan <- rc
-				return
-			}
-			output, err := newSSHUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-			if err != nil {
-				rc.Error = err
-				resultChan <- rc
-				return
-			}
-
-			err = checkOutputForError(output)
-			if err != nil {
-				rc.Error = err
-				resultChan <- rc
-				return
-			}
-
-			rc.Output = output
-			resultChan <- rc
-		}(args, remoteService, scriptCommands, newSSHUtil, resultChan)
-	}
-
 	for i := 0; i < len(Ips); i++ {
-		result := <-resultChan
-
-		if i == 0 {
-			writer.StopSpinner()
-		}
-		printStartConnectionMessage(remoteService, result.HostIP, cliWriter)
-		if result.Error != nil {
-			printStartErrorMessage(remoteService, result.HostIP, cliWriter, result.Error)
-		} else {
-			cliWriter.Printf("Output for Host IP %s : %s", result.HostIP, result.Output+"\n")
-			printStartSuccessMessage(remoteService, result.HostIP, cliWriter)
-		}
-
-		if i < len(Ips)-1 {
-			writer.StartSpinner()
-		}
+		err = startBackEndNodes(args, sshUtil, Ips[i], remoteService, cliWriter)
 	}
 
-	close(resultChan)
+	return err
+}
+func startBackEndNodes(args []string, sshUtil SSHUtil, Ips string, remoteService string, cliWriter *cli.Writer) error {
+	sshUtil.getSSHConfig().hostIP = Ips
+	scriptCommands := "sudo systemctl start hab-sup"
+	printStartConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP, writer)
+	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
+	if err != nil {
+		printStartErrorMessage(remoteService, Ips, cliWriter, err)
+		return err
+	}
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+	if err != nil {
+		cliWriter.Errorf("%v\n", err)
+		return err
+	}
+
+	err = checkOutputForError(output)
+	if err != nil {
+		cliWriter.Errorf("%v\n", err)
+		return err
+	}
+
+	if err != nil {
+		printStartErrorMessage(remoteService, Ips, cliWriter, err)
+	} else {
+		cliWriter.Printf("Output for Host IP %s : %s", Ips, output+"\n")
+		printStartSuccessMessage(remoteService, Ips, cliWriter)
+	}
+
 	return nil
 }
 
-// printConnectionMessage prints the connection message
 func printStartConnectionMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
 	cliWriter.Println("Connecting to the " + remoteService + node + hostIP)
 	cliWriter.BufferWriter().Flush()
 }
 
-// printConfigErrorMessage prints the config error message
 func printStartErrorMessage(remoteService string, hostIP string, cliWriter *cli.Writer, err error) {
-	cliWriter.Failf("Start Command failed on "+remoteService+node+hostIP+" with error:\n %v \n", err)
+	cliWriter.Failf("Start Command failed on "+remoteService+node+hostIP+" with error:\n%v \n", err)
 	cliWriter.BufferWriter().Flush()
 }
 
-// printConfigSuccessMessage prints the config success message
 func printStartSuccessMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
 	cliWriter.Success("Start Command is completed on " + remoteService + node + hostIP + "\n")
 	cliWriter.BufferWriter().Flush()

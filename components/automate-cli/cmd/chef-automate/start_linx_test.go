@@ -60,7 +60,7 @@ func TestStartForBackEndNodes(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		err := startBackEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp, getMockWriterImpl())
+		err := checkNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
 		if testCase.isError {
 			fmt.Println(err)
 			assert.Error(t, err)
