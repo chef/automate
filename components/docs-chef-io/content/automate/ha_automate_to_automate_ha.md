@@ -32,7 +32,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- The below steps won't work for Automate HA AWS Managed.
+- The below steps won't work for Automate HA with AWS Managed.
 
 {{< /warning >}}
 
@@ -59,11 +59,9 @@ gh_repo = "automate"
 
 1. Go to Bastion 
     
-    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following content with the path to the repo and then patch this file in all the OpenSearch nodes. 
-
+    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes. 
     ```bash
     [path] 
-      # Replace /mnt/automate_backups with the backup_mount config found on the Bastion host in /hab/a2_deploy_workspace/a2ha.rb 
       repo = "/mnt/automate_backups" 
     ```
     
@@ -71,13 +69,11 @@ gh_repo = "automate"
     `chef-automate config patch --opensearch <PATH TO OS_CONFIG.TOML>`
 
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
-
     ```bash
     [global.v1.external.opensearch.backup]
         enable = true 
         location = "fs" 
     [global.v1.external.opensearch.backup.fs] 
-        # The `path.repo` setting you've configured on your OpenSearch nodes must be a parent directory of the setting you configure here: 
         path = "/mnt/automate_backups" 
     [global.v1.backups.filesystem]
         path = "/mnt/automate_backups" 
