@@ -17,53 +17,13 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-{{< warning >}}
-The below prerequisites are according to the standard Chef Automate HA setup. You can contact the customer success manager or account manager if you use any specified version not mentioned here or a third-party extension or software.
-{{< /warning >}}
-
 This section will discuss the steps to deploy Chef Automate HA on-premise machines or on existing VMs. The steps are as follows:
 
 ## Install Chef Automate HA
 
-### Prerequisites
+Before installation, check our [Prerequisites](/automate/ha_on_premises_deployment_prerequisites) page for On-Premise Deployment of Chef Automate HA.
 
-- All VMs or Machines are up and running.
-- OS Root Volume (/) must be at least 40 GB
-- TMP space (/var/tmp) must be at least 5GB
-- Separate Hab volume (/hab) provisioned at least 100 GB for OpenSearch node `/hab` volume will be more based on the data retention policy.
-- A Common user has access to all machines.
-- This common user should have sudo privileges.
-- This common user uses the same SSH Private Key file to access all machines.
-- Key-based SSH for the provisioning user for all the machines for HA-Deployment.
-- We do not support passphrases for Private Key authentication.
-- LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
-- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
-- Make sure your linux has `sysctl` utility available in all Machines.
-- DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
-- DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
-- Certificates are created and added for `chefautomate.example.com`, and `chefinfraserver.example.com` in the Load Balancers.
-- If DNS is not used, add the records to `/etc/hosts` in all the machines, including Bastion:
-
-```bash
-sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
-```
-
-- If the instance is **RedHat**, set SElinux config `enforcing` to `permissive` in all the nodes.\
-  SSH to each node, then run:
-
-```bash
-sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
-```
-
-{{< warning >}}
-
-- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
-- We currently don't support AD managed users in nodes. We only support local linux users.
-- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges.
-
-{{< /warning >}}
-
-### Run these steps on Bastion Host Machine
+### Run the steps on Bastion Host Machine
 
 1. Run the below commands to download the latest Automate CLI and Airgapped Bundle:
 
