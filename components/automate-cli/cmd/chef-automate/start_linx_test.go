@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,26 +13,30 @@ func TestStartForFrontEndNodes(t *testing.T) {
 		sshUtil       SSHUtil
 		frontendIps   []string
 		remoteService string
-		timestamp     string
 		isError       bool
 		err           error
 	}{
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "Start Command is completed", nil),
-			[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"},
 			"automate",
-			"20060102150405",
 			false,
 			nil,
+		},
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			argsEmpty,
+			"chef-server",
+			true,
+			status.Errorf(1, "No chef-server IPs are found"),
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := startFrontEndNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, testCase.timestamp, getMockWriterImpl())
+		err := checkNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
 		if testCase.isError {
-			fmt.Println(err)
-			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
 		}
 	}
@@ -44,26 +48,30 @@ func TestStartForBackEndNodes(t *testing.T) {
 		sshUtil       SSHUtil
 		frontendIps   []string
 		remoteService string
-		timestamp     string
 		isError       bool
 		err           error
 	}{
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "Start Command is completed", nil),
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
 			[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
 			"opensearch",
-			"20060102150405",
 			false,
 			nil,
+		},
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			[]string{},
+			"postgresql",
+			true,
+			status.Errorf(1, "No postgresql IPs are found"),
 		},
 	}
 
 	for _, testCase := range testCases {
 		err := checkNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
 		if testCase.isError {
-			fmt.Println(err)
-			assert.Error(t, err)
 			assert.EqualError(t, testCase.err, err.Error())
 		}
 	}

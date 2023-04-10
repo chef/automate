@@ -1,9 +1,6 @@
 package main
 
 import (
-	"os"
-	"time"
-
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
@@ -58,23 +55,15 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 			sshKeyFile: sskKeyFile,
 			sshPort:    sshPort,
 		}
-		timestamp := time.Now().Format("20060102150405")
+
 		sshUtil := NewSSHUtil(sshConfig)
 		if startCmdFlags.automate {
 			frontendIps := infra.Outputs.AutomatePrivateIps.Value
-			if len(frontendIps) == 0 {
-				writer.Error("No automate IPs are found")
-				os.Exit(1)
-			}
-			err = startFrontEndNodes(args, sshUtil, frontendIps, "automate", timestamp, writer)
+			err = checkNodes(args, sshUtil, frontendIps, "automate", writer)
 		}
 		if startCmdFlags.chef_server {
 			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
-			if len(frontendIps) == 0 {
-				writer.Error("No chef-server IPs are found")
-				os.Exit(1)
-			}
-			err = startFrontEndNodes(args, sshUtil, frontendIps, "chef-server", timestamp, writer)
+			err = checkNodes(args, sshUtil, frontendIps, "chef-server", writer)
 		}
 		if startCmdFlags.opensearch {
 			Ips := infra.Outputs.OpensearchPrivateIps.Value
@@ -87,7 +76,8 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 	}
 	return nil
 }
-func startFrontEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
+
+func startFrontEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteService string, cliWriter *cli.Writer) error {
 	resultChan := make(chan ResultConfigSet, len(Ips))
 	originalSSHConfig := sshUtil.getSSHConfig()
 
@@ -147,20 +137,24 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, Ips []string, remoteServ
 }
 
 func checkNodes(args []string, sshUtil SSHUtil, Ips []string, remoteService string, cliWriter *cli.Writer) error {
-	var err error
 	if len(Ips) == 0 {
 		writer.Errorf("No %s IPs are found", remoteService)
-		os.Exit(1)
+		return status.Errorf(1, "No %s IPs are found", remoteService)
 	}
+	var err error
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_START, remoteService)
 	}
-	for i := 0; i < len(Ips); i++ {
-		err = startBackEndNodes(args, sshUtil, Ips[i], remoteService, cliWriter)
+	if remoteService == "opensearch" || remoteService == "postgresql" {
+		for i := 0; i < len(Ips); i++ {
+			err = startBackEndNodes(args, sshUtil, Ips[i], remoteService, cliWriter)
+		}
+	} else {
+		err = startFrontEndNodes(args, sshUtil, Ips, remoteService, cliWriter)
 	}
-
 	return err
 }
+
 func startBackEndNodes(args []string, sshUtil SSHUtil, Ips string, remoteService string, cliWriter *cli.Writer) error {
 	sshUtil.getSSHConfig().hostIP = Ips
 	scriptCommands := "sudo systemctl start hab-sup"
