@@ -243,38 +243,38 @@ The below steps won't work for Automate HA with AWS Managed.
 
 1. Patch the following configuration in Standalone Chef Automate for creating the backup in S3 bucket. 
 
-```bash
-[global.v1.backups] 
-  location = "s3" 
-[global.v1.backups.s3.bucket] 
-  # name (required): The name of the bucket 
-  name = "<bucket name>" 
+    ```bash
+    [global.v1.backups] 
+    location = "s3" 
+    [global.v1.backups.s3.bucket] 
+    # name (required): The name of the bucket 
+    name = "<bucket name>" 
 
-  # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y 
-  # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com 
-  endpoint = "https://s3.amazonaws.com" 
+    # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y 
+    # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com 
+    endpoint = "https://s3.amazonaws.com" 
 
-  # base_path (optional):  The path within the bucket where backups should be stored 
-  # If base_path is not set, backups will be stored at the root of the bucket. 
-  base_path = "" 
+    # base_path (optional):  The path within the bucket where backups should be stored 
+    # If base_path is not set, backups will be stored at the root of the bucket. 
+    base_path = "" 
 
-[global.v1.backups.s3.credentials] 
-  # Optionally, AWS credentials may be provided. If these are not provided, IAM instance 
-  # credentials will be used. It's also possible for these to be read through the standard 
-  # AWS environment variables or through the shared AWS config files. 
-  access_key = "<access_key>" 
-  secret_key = "<secret_key>" 
-  session_key = "<session_key>" 
+    [global.v1.backups.s3.credentials] 
+    # Optionally, AWS credentials may be provided. If these are not provided, IAM instance 
+    # credentials will be used. It's also possible for these to be read through the standard 
+    # AWS environment variables or through the shared AWS config files. 
+    access_key = "<access_key>" 
+    secret_key = "<secret_key>" 
+    session_key = "<session_key>" 
 
-[global.v1.backups.s3.ssl] 
-  # root_cert (optional): The root certificate used for SSL validation. 
-  # For S3 compatible APIs, you can set the SSL root cert if needed 
-  root_cert = """ 
-  -----BEGIN CERTIFICATE----- 
-  ... 
-  -----END CERTIFICATE----- 
-  """
-```
+    [global.v1.backups.s3.ssl] 
+    # root_cert (optional): The root certificate used for SSL validation. 
+    # For S3 compatible APIs, you can set the SSL root cert if needed 
+    root_cert = """ 
+    -----BEGIN CERTIFICATE----- 
+    ... 
+    -----END CERTIFICATE----- 
+    """
+    ```
 
 1. Create Backup of Chef Automate Standalone using the following command:
 
@@ -288,6 +288,7 @@ The below steps won't work for Automate HA with AWS Managed.
     - Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
 1.  Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
+
     `scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user`
 
 1. Go to Bastion:
