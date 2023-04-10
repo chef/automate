@@ -24,7 +24,7 @@ pkg_deps=(
   chef/mlsa
   core/curl # health_check
   chef/automate-openjdk
-  chef/automate-platform-tools
+  aazeez/automate-platform-tools
   core/ruby30
 )
 pkg_interpreters=(bin/ruby)

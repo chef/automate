@@ -51,7 +51,7 @@ pkg_deps=(
   chef/mlsa
   core/bash
   core/curl # health_check
-  chef/automate-platform-tools
+  aazeez/automate-platform-tools
 )
 
 pkg_build_deps=(

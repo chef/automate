@@ -11,7 +11,7 @@ pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/secrets-service"
 pkg_deps=(
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools" # pg-helper
+  "aazeez/automate-platform-tools" # pg-helper
 )
 pkg_exports=(
   [port]=service.port
@@ -23,7 +23,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
 )
 pkg_bin_dirs=(bin)
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+pkg_scaffolding="aazeez/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"

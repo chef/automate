@@ -80,7 +80,7 @@ func TestSecureConnFactory(t *testing.T) {
 
 		s, ok := status.FromError(err)
 		require.True(t, ok)
-		assert.Regexp(t, "authentication handshake failed: x509.*valid for root-a-service, not root-foo-service", s.Message())
+		assert.Regexp(t, "authentication handshake failed: x509.*valid for root-a-service, root-a-service, not root-foo-service", s.Message())
 	})
 
 	t.Run("Test incorrectly signed client cert and correct server name", func(t *testing.T) {

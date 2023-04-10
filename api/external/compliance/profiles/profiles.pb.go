@@ -2602,86 +2602,82 @@ type ProfilesServiceClient interface {
 	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410
 	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
 	Create(ctx context.Context, opts ...grpc.CallOption) (ProfilesService_CreateClient, error)
+	// Show an installed profile
 	//
-	//Show an installed profile
+	// Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
 	//
-	//Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:get
-	//```
 	Read(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*Profile, error)
+	// Show an available profile
 	//
-	//Show an available profile
+	// Show the details of an un-installed profile using the profile name and version.
+	// in the UI, these are the profiles under the "Available" tab.
+	// These profiles are created and maintained by Chef, shipped with Chef Automate.
 	//
-	//Show the details of an un-installed profile using the profile name and version.
-	//in the UI, these are the profiles under the "Available" tab.
-	//These profiles are created and maintained by Chef, shipped with Chef Automate.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:marketProfiles:get
-	//```
 	ReadFromMarket(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*Profile, error)
 	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
 	// so we do not auto-generate the route for profile download; we instead custom handle with mux
 	ReadTar(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (ProfilesService_ReadTarClient, error)
+	// Delete an installed profile
 	//
-	//Delete an installed profile
+	// Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	// Note: this action "uninstalls" the profile. This has no impact on the market profiles.
 	//
-	//Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
-	//Note: this action "uninstalls" the profile. This has no impact on the market profiles.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:delete
-	//```
 	Delete(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// List all available profiles
 	//
-	//List all available profiles
+	// Lists all profiles available for the Automate instance.
+	// Empty params return all "market" profiles.
+	// Specifying the `owner` field returns all profiles installed for the specified user.
 	//
-	//Lists all profiles available for the Automate instance.
-	//Empty params return all "market" profiles.
-	//Specifying the `owner` field returns all profiles installed for the specified user.
+	// Supports pagination, sorting, and filtering (wildcard supported).
 	//
-	//Supports pagination, sorting, and filtering (wildcard supported).
+	// Supported sort fields: title, name (default: title)
+	// Supported filter fields: name, version, title
 	//
-	//Supported sort fields: title, name (default: title)
-	//Supported filter fields: name, version, title
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"type": "title", "values": [ "Dev*"]}
+	// ],
+	// "page": 1,
+	// "per_page": 3,
+	// "owner": "admin"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"type": "title", "values": [ "Dev*"]}
-	//],
-	//"page": 1,
-	//"per_page": 3,
-	//"owner": "admin"
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:list
-	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profiles, error)
+	// Check if one or multiple profiles exist in the metadata database.
 	//
-	//Check if one or multiple profiles exist in the metadata database.
+	// The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
+	// doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
+	// This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
 	//
-	//The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
-	//doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
-	//This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:list
-	//```
 	MetaSearch(ctx context.Context, in *Sha256, opts ...grpc.CallOption) (*Missing, error)
 }
 
@@ -2809,86 +2805,82 @@ type ProfilesServiceServer interface {
 	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410
 	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
 	Create(ProfilesService_CreateServer) error
+	// Show an installed profile
 	//
-	//Show an installed profile
+	// Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
 	//
-	//Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:get
-	//```
 	Read(context.Context, *ProfileDetails) (*Profile, error)
+	// Show an available profile
 	//
-	//Show an available profile
+	// Show the details of an un-installed profile using the profile name and version.
+	// in the UI, these are the profiles under the "Available" tab.
+	// These profiles are created and maintained by Chef, shipped with Chef Automate.
 	//
-	//Show the details of an un-installed profile using the profile name and version.
-	//in the UI, these are the profiles under the "Available" tab.
-	//These profiles are created and maintained by Chef, shipped with Chef Automate.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:marketProfiles:get
-	//```
 	ReadFromMarket(context.Context, *ProfileDetails) (*Profile, error)
 	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
 	// so we do not auto-generate the route for profile download; we instead custom handle with mux
 	ReadTar(*ProfileDetails, ProfilesService_ReadTarServer) error
+	// Delete an installed profile
 	//
-	//Delete an installed profile
+	// Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	// Note: this action "uninstalls" the profile. This has no impact on the market profiles.
 	//
-	//Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
-	//Note: this action "uninstalls" the profile. This has no impact on the market profiles.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:delete
-	//```
 	Delete(context.Context, *ProfileDetails) (*emptypb.Empty, error)
+	// List all available profiles
 	//
-	//List all available profiles
+	// Lists all profiles available for the Automate instance.
+	// Empty params return all "market" profiles.
+	// Specifying the `owner` field returns all profiles installed for the specified user.
 	//
-	//Lists all profiles available for the Automate instance.
-	//Empty params return all "market" profiles.
-	//Specifying the `owner` field returns all profiles installed for the specified user.
+	// Supports pagination, sorting, and filtering (wildcard supported).
 	//
-	//Supports pagination, sorting, and filtering (wildcard supported).
+	// Supported sort fields: title, name (default: title)
+	// Supported filter fields: name, version, title
 	//
-	//Supported sort fields: title, name (default: title)
-	//Supported filter fields: name, version, title
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"type": "title", "values": [ "Dev*"]}
+	// ],
+	// "page": 1,
+	// "per_page": 3,
+	// "owner": "admin"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"type": "title", "values": [ "Dev*"]}
-	//],
-	//"page": 1,
-	//"per_page": 3,
-	//"owner": "admin"
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:list
-	//```
 	List(context.Context, *Query) (*Profiles, error)
+	// Check if one or multiple profiles exist in the metadata database.
 	//
-	//Check if one or multiple profiles exist in the metadata database.
+	// The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
+	// doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
+	// This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
 	//
-	//The endpoint takes an array of compliance profile sha256 IDs and returns the ones that the backend
-	//doesn't have metadata (profile title, copyright, controls title, code, tags, etc) for.
-	//This is useful when deciding if a compliance report can be sent for ingestion without the associated profile metadata.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:profiles:list
-	//```
 	MetaSearch(context.Context, *Sha256) (*Missing, error)
 }
 

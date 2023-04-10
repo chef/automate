@@ -916,7 +916,7 @@ func (x *ControlSummary) GetWaived() *Total {
 	return nil
 }
 
-//ReportsSummaryLevelOne used for ListReports call
+// ReportsSummaryLevelOne used for ListReports call
 type ReportsSummaryLevelOne struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3899,11 +3899,11 @@ type AssetSummary struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Total number of total assets
+	// Total number of total assets
 	TotalAssets int32 `protobuf:"varint,1,opt,name=total_assets,json=totalAssets,proto3" json:"total_assets,omitempty"`
-	//Accessing the collected from Collected Message
+	// Accessing the collected from Collected Message
 	Collected *Collected `protobuf:"bytes,2,opt,name=collected,proto3" json:"collected,omitempty"`
-	//Total number of not collected assests
+	// Total number of not collected assests
 	Uncollected *Uncollected `protobuf:"bytes,3,opt,name=uncollected,proto3" json:"uncollected,omitempty"` //Total number of unreported assets
 }
 
@@ -4087,9 +4087,9 @@ type Uncollected struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Total count of unreachable assets
+	// Total count of unreachable assets
 	Unreachable int32 `protobuf:"varint,1,opt,name=unreachable,proto3" json:"unreachable,omitempty"`
-	//Total count of unreported assets
+	// Total count of unreported assets
 	Unreported int32 `protobuf:"varint,2,opt,name=unreported,proto3" json:"unreported,omitempty"`
 }
 
@@ -4144,15 +4144,15 @@ type AssetListRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//List of the filters to be applied
+	// List of the filters to be applied
 	Filters []*ListFilter `protobuf:"bytes,1,rep,name=filters,proto3" json:"filters,omitempty"`
-	//Size of the asset list
+	// Size of the asset list
 	Size int32 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	//The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	From int32 `protobuf:"varint,3,opt,name=from,proto3" json:"from,omitempty"`
-	//Sort required from the which field
+	// Sort required from the which field
 	Sort string `protobuf:"bytes,4,opt,name=sort,proto3" json:"sort,omitempty"`
-	//Asset Type as collected, unreported, unreachable, uncollected
+	// Asset Type as collected, unreported, unreachable, uncollected
 	AssetsType string `protobuf:"bytes,5,opt,name=assets_type,json=assetsType,proto3" json:"assets_type,omitempty"`
 }
 
@@ -4228,13 +4228,13 @@ type Assets struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Node UUid for the asset
+	// Node UUid for the asset
 	NodeUuid string `protobuf:"bytes,1,opt,name=node_uuid,json=nodeUuid,proto3" json:"node_uuid,omitempty"`
-	//Status of the last run of the asset
+	// Status of the last run of the asset
 	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	//First Run details of asset
+	// First Run details of asset
 	FirstRun string `protobuf:"bytes,3,opt,name=first_run,json=firstRun,proto3" json:"first_run,omitempty"`
-	//Last run details of asset
+	// Last run details of asset
 	LastRun string `protobuf:"bytes,4,opt,name=last_run,json=lastRun,proto3" json:"last_run,omitempty"`
 }
 
@@ -4303,7 +4303,7 @@ type AssetListResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Assets list as per the filters applied
+	// Assets list as per the filters applied
 	Assets []*Assets `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
 }
 
@@ -4352,7 +4352,7 @@ type ComplianceConfigRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//No of days for the config
+	// No of days for the config
 	Value int32 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -4401,9 +4401,9 @@ type ComplianceConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Policy name to get from config
+	// Policy name to get from config
 	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
-	//No of days to get for config
+	// No of days to get for config
 	Value int32 `protobuf:"varint,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -6370,298 +6370,297 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ReportingServiceClient interface {
+	// List Reports
 	//
-	//List Reports
+	// Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+	// Supports pagination, filtering, and sorting.
+	// Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
-	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
-	//Supports pagination, filtering, and sorting.
-	//Max return payload size is 4MB, use pagination to fetch remaining data.
+	// Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
-	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
+	// Example:
+	// ```
+	// {"filters":
+	// [
+	// {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	// ],
+	// "page":1, "per_page": 3,
+	// "sort": "latest_report.status", "order": "ASC"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters":
-	//[
-	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-	//],
-	//"page":1, "per_page": 3,
-	//"sort": "latest_report.status", "order": "ASC"
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	ListReports(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportsSummaryLevelOne, error)
+	// List Report IDs
 	//
-	//List Report IDs
+	// List all IDs for the latest report for each node, with optional filtering.
+	// Supports filtering, but not pagination or sorting.
+	// Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	// Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	// Max return payload size is 4MB.
 	//
-	//List all IDs for the latest report for each node, with optional filtering.
-	//Supports filtering, but not pagination or sorting.
-	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
-	//Max return payload size is 4MB.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportids:list
-	//```
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
+	// List Controls
 	//
-	//List Controls
+	// Lists controls from the last run, with optional filtering.
+	// Supports filtering,pagination but not sorting.
+	// Limited to 100 results by default.
 	//
-	//Lists controls from the last run, with optional filtering.
-	//Supports filtering,pagination but not sorting.
-	//Limited to 100 results by default.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:controlItems:list
-	//```
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
+	// List Control Info
 	//
-	//List Control Info
-	//
-	//Lists controls from the last run, with optional filtering.
-	//Supports filtering and pagination. Maximum 100 search can be
-	//made when specifying the pagination from and size. Sum of from+size
-	//should be less that 100. By default 10 results will be returned.
-	//Authorization Action:
-	//```
-	//compliance:ControlElements:list
-	//```
+	// Lists controls from the last run, with optional filtering.
+	// Supports filtering and pagination. Maximum 100 search can be
+	// made when specifying the pagination from and size. Sum of from+size
+	// should be less that 100. By default 10 results will be returned.
+	// Authorization Action:
+	// ```
+	// compliance:ControlElements:list
+	// ```
 	ListControlInfo(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ControlElements, error)
+	// Show Report by ID
 	//
-	//Show Report by ID
+	// Show a specific report by ID. Supports filtering, but not pagination or sorting.
+	// Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	// Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
-	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
-	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:get
-	//```
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
+	// Show Node Header Info From Report ID
 	//
-	//Show Node Header Info From Report ID
+	// Show specific details about node, report and metadate provided the report ID.
+	// Supports filtering, but not pagination or sorting.
 	//
-	//Show specific details about node, report and metadate provided the report ID.
-	//Supports filtering, but not pagination or sorting.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:nodeheader:get
-	//```
 	ReadNodeHeader(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeHeaderInfo, error)
+	// List Reporting Suggestions
 	//
-	//List Reporting Suggestions
+	// Get suggestions for compliance reporting resources based on matching text substrings.
+	// Supports filtering, but not pagination or sorting.
+	// `type` parameter is required. It must be one of the parameters from the following table.
 	//
-	//Get suggestions for compliance reporting resources based on matching text substrings.
-	//Supports filtering, but not pagination or sorting.
-	//`type` parameter is required. It must be one of the parameters from the following table.
+	// | Suggestion type parameter | Suggestion type value |
+	// | --- | --- |
+	// | chef_server | source_fqdn |
+	// | chef_tags | chef_tags |
+	// | control | profiles.controls.title |
+	// | control_tag_key | profiles.controls.string_tags.key |
+	// | control_tag_value | profiles.controls.string_tags.values |
+	// | environment | environment |
+	// | inspec_version | version |
+	// | node | node_name |
+	// | organization | organization_name |
+	// | platform | platform.name |
+	// | platform_with_version | platform.full |
+	// | policy_group | policy_group |
+	// | policy_name | policy_name |
+	// | profile | profiles.title |
+	// | profile_with_version | profiles.full |
+	// | recipe | recipes |
+	// | role | roles |
 	//
-	//| Suggestion type parameter | Suggestion type value |
-	//| --- | --- |
-	//| chef_server | source_fqdn |
-	//| chef_tags | chef_tags |
-	//| control | profiles.controls.title |
-	//| control_tag_key | profiles.controls.string_tags.key |
-	//| control_tag_value | profiles.controls.string_tags.values |
-	//| environment | environment |
-	//| inspec_version | version |
-	//| node | node_name |
-	//| organization | organization_name |
-	//| platform | platform.name |
-	//| platform_with_version | platform.full |
-	//| policy_group | policy_group |
-	//| policy_name | policy_name |
-	//| profile | profiles.title |
-	//| profile_with_version | profiles.full |
-	//| recipe | recipes |
-	//| role | roles |
+	// Example:
+	// ```
+	// {
+	// "type":"environment",
+	// "text":"aws*",
+	// "filters":[
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"type":"environment",
-	//"text":"aws*",
-	//"filters":[
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportSuggestions:list
-	//```
 	ListSuggestions(ctx context.Context, in *SuggestionRequest, opts ...grpc.CallOption) (*Suggestions, error)
+	// List Profiles
 	//
-	//List Profiles
+	// List all profiles in use, with optional filtering.
+	// Supports pagination, filtering, and sorting.
+	// Valid sort fields: name, title
 	//
-	//List all profiles in use, with optional filtering.
-	//Supports pagination, filtering, and sorting.
-	//Valid sort fields: name, title
+	// The API supports date range filters when `end_time` is the current time
+	// and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	// date other than the current date, the API would return data only for the `end_time`.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
+	// Example:
+	// ```
+	// {"filters":
+	// [
+	// {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	// ],
+	// "page":1, "per_page": 3,
+	// }
+	// ```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters":
-	//[
-	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-	//],
-	//"page":1, "per_page": 3,
-	//}
-	//```
-	//Authorization Action:
-	//```
 	//compliance:reportProfiles:list
-	//```
 	ListProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ProfileMins, error)
 	Export(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportClient, error)
 	ExportNode(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportNodeClient, error)
+	// Export reports
 	//
-	//Export reports
+	// Export multiple reports.
+	// Supports filtering by profile or control. API returns an acknowledgement ID.
 	//
-	//Export multiple reports.
-	//Supports filtering by profile or control. API returns an acknowledgement ID.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	ExportReportManager(ctx context.Context, in *Query, opts ...grpc.CallOption) (*CustomReportResponse, error)
+	// Show Node by ID
 	//
-	//Show Node by ID
+	// Show a specific node by ID.
+	// Supports filtering by profile or control.
+	// Does not support pagination or sorting.
 	//
-	//Show a specific node by ID.
-	//Supports filtering by profile or control.
-	//Does not support pagination or sorting.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportNodes:get
-	//```
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
+	// List Nodes
 	//
-	//List Nodes
+	// List all nodes, with optional filtering, pagination, and sorting.
+	// Max return payload size is 4MB, use pagination to fetch remaining data.
+	// | Sort parameter | Sort value |
+	// | --- | --- |
+	// | environment | environment.lower |
+	// | latest_report.controls.failed.critical | controls_sums.failed.critical |
+	// | latest_report.controls.failed.total | controls_sums.failed.total |
+	// | latest_report.end_time (default) | end_time |
+	// | latest_report.status | status |
+	// | name | node_name.lower |
+	// | platform | platform.full |
+	// | status | status |
 	//
-	//List all nodes, with optional filtering, pagination, and sorting.
-	//Max return payload size is 4MB, use pagination to fetch remaining data.
-	//| Sort parameter | Sort value |
-	//| --- | --- |
-	//| environment | environment.lower |
-	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	//| latest_report.controls.failed.total | controls_sums.failed.total |
-	//| latest_report.end_time (default) | end_time |
-	//| latest_report.status | status |
-	//| name | node_name.lower |
-	//| platform | platform.full |
-	//| status | status |
+	// The API supports date range filters when `end_time` is the current time
+	// and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	// date other than the current date, the API would return data only for the `end_time`.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ],
+	// "page":1,"per_page":100,
+	// "sort":"environment","order":"ASC"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//],
-	//"page":1,"per_page":100,
-	//"sort":"environment","order":"ASC"
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportNodes:list
-	//```
 	ListNodes(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	GetVersion(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*version.VersionInfo, error)
 	LicenseUsageNodes(ctx context.Context, in *TimeQuery, opts ...grpc.CallOption) (*Reports, error)
+	// Assets Count
 	//
-	//Assets Count
+	// Count the compliance assets based on different filter options.
+	// The API returns the response based on reported and unreported assets
 	//
-	//Count the compliance assets based on different filter options.
-	//The API returns the response based on reported and unreported assets
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	AssetCount(ctx context.Context, in *ListFilters, opts ...grpc.CallOption) (*AssetSummary, error)
+	// List Assets
 	//
-	//List Assets
+	// Lists the compliance assets based on different filter options.
+	// The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
 	//
-	//Lists the compliance assets based on different filter options.
-	//The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	ListAsset(ctx context.Context, in *AssetListRequest, opts ...grpc.CallOption) (*AssetListResponse, error)
+	// Set Unreachable Assets Config
 	//
-	//Set Unreachable Assets Config
+	// SetAssetConfig sets the compliance config with the parameters of no of days
+	// And API returns the policy name and no of the days which will set in the compliance data base
 	//
-	//SetAssetConfig sets the compliance config with the parameters of no of days
-	//And API returns the policy name and no of the days which will set in the compliance data base
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:update
-	//```
 	SetAssetConfig(ctx context.Context, in *ComplianceConfigRequest, opts ...grpc.CallOption) (*ComplianceConfigResponse, error)
+	// Get Assets Config
 	//
-	//Get Assets Config
+	// GetAssetConfig gets the config details from the compliance data base
+	// and API return the policy name and no of days
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//GetAssetConfig gets the config details from the compliance data base
-	//and API return the policy name and no of days
-	//Authorization Action:
-	//```
 	//compliance:reports:get
-	//```
 	GetAssetConfig(ctx context.Context, in *GetAssetConfigRequest, opts ...grpc.CallOption) (*ComplianceConfigResponse, error)
+	// List Controls Search
 	//
-	//List Controls Search
+	// Lists controls from the last run, with optional filtering.
+	// Supports filtering,pagination but not sorting.
+	// Limited to 100 results by default.
+	// Gets the summary of each control.
 	//
-	//Lists controls from the last run, with optional filtering.
-	//Supports filtering,pagination but not sorting.
-	//Limited to 100 results by default.
-	//Gets the summary of each control.
+	// The API supports date range filters when `end_time` is the current time
+	// and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	// date other than the current date, the API would return data only for the `end_time`.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
+	// Example:
+	// ```
+	// {"filters":
+	// [
+	// {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	// ],
+	// "page_number":1, "size": 3,
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters":
-	//[
-	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-	//],
-	//"page_number":1, "size": 3,
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:controlItems:list
-	//```
 	ListControlItemsRange(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 }
 
@@ -6901,298 +6900,297 @@ func (c *reportingServiceClient) ListControlItemsRange(ctx context.Context, in *
 
 // ReportingServiceServer is the server API for ReportingService service.
 type ReportingServiceServer interface {
+	// List Reports
 	//
-	//List Reports
+	// Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+	// Supports pagination, filtering, and sorting.
+	// Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
-	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
-	//Supports pagination, filtering, and sorting.
-	//Max return payload size is 4MB, use pagination to fetch remaining data.
+	// Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
-	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
+	// Example:
+	// ```
+	// {"filters":
+	// [
+	// {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	// ],
+	// "page":1, "per_page": 3,
+	// "sort": "latest_report.status", "order": "ASC"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters":
-	//[
-	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-	//],
-	//"page":1, "per_page": 3,
-	//"sort": "latest_report.status", "order": "ASC"
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	ListReports(context.Context, *Query) (*ReportsSummaryLevelOne, error)
+	// List Report IDs
 	//
-	//List Report IDs
+	// List all IDs for the latest report for each node, with optional filtering.
+	// Supports filtering, but not pagination or sorting.
+	// Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	// Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	// Max return payload size is 4MB.
 	//
-	//List all IDs for the latest report for each node, with optional filtering.
-	//Supports filtering, but not pagination or sorting.
-	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
-	//Max return payload size is 4MB.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportids:list
-	//```
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
+	// List Controls
 	//
-	//List Controls
+	// Lists controls from the last run, with optional filtering.
+	// Supports filtering,pagination but not sorting.
+	// Limited to 100 results by default.
 	//
-	//Lists controls from the last run, with optional filtering.
-	//Supports filtering,pagination but not sorting.
-	//Limited to 100 results by default.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:controlItems:list
-	//```
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
+	// List Control Info
 	//
-	//List Control Info
-	//
-	//Lists controls from the last run, with optional filtering.
-	//Supports filtering and pagination. Maximum 100 search can be
-	//made when specifying the pagination from and size. Sum of from+size
-	//should be less that 100. By default 10 results will be returned.
-	//Authorization Action:
-	//```
-	//compliance:ControlElements:list
-	//```
+	// Lists controls from the last run, with optional filtering.
+	// Supports filtering and pagination. Maximum 100 search can be
+	// made when specifying the pagination from and size. Sum of from+size
+	// should be less that 100. By default 10 results will be returned.
+	// Authorization Action:
+	// ```
+	// compliance:ControlElements:list
+	// ```
 	ListControlInfo(context.Context, *Query) (*ControlElements, error)
+	// Show Report by ID
 	//
-	//Show Report by ID
+	// Show a specific report by ID. Supports filtering, but not pagination or sorting.
+	// Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	// Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
-	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
-	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:get
-	//```
 	ReadReport(context.Context, *Query) (*Report, error)
+	// Show Node Header Info From Report ID
 	//
-	//Show Node Header Info From Report ID
+	// Show specific details about node, report and metadate provided the report ID.
+	// Supports filtering, but not pagination or sorting.
 	//
-	//Show specific details about node, report and metadate provided the report ID.
-	//Supports filtering, but not pagination or sorting.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:nodeheader:get
-	//```
 	ReadNodeHeader(context.Context, *Query) (*NodeHeaderInfo, error)
+	// List Reporting Suggestions
 	//
-	//List Reporting Suggestions
+	// Get suggestions for compliance reporting resources based on matching text substrings.
+	// Supports filtering, but not pagination or sorting.
+	// `type` parameter is required. It must be one of the parameters from the following table.
 	//
-	//Get suggestions for compliance reporting resources based on matching text substrings.
-	//Supports filtering, but not pagination or sorting.
-	//`type` parameter is required. It must be one of the parameters from the following table.
+	// | Suggestion type parameter | Suggestion type value |
+	// | --- | --- |
+	// | chef_server | source_fqdn |
+	// | chef_tags | chef_tags |
+	// | control | profiles.controls.title |
+	// | control_tag_key | profiles.controls.string_tags.key |
+	// | control_tag_value | profiles.controls.string_tags.values |
+	// | environment | environment |
+	// | inspec_version | version |
+	// | node | node_name |
+	// | organization | organization_name |
+	// | platform | platform.name |
+	// | platform_with_version | platform.full |
+	// | policy_group | policy_group |
+	// | policy_name | policy_name |
+	// | profile | profiles.title |
+	// | profile_with_version | profiles.full |
+	// | recipe | recipes |
+	// | role | roles |
 	//
-	//| Suggestion type parameter | Suggestion type value |
-	//| --- | --- |
-	//| chef_server | source_fqdn |
-	//| chef_tags | chef_tags |
-	//| control | profiles.controls.title |
-	//| control_tag_key | profiles.controls.string_tags.key |
-	//| control_tag_value | profiles.controls.string_tags.values |
-	//| environment | environment |
-	//| inspec_version | version |
-	//| node | node_name |
-	//| organization | organization_name |
-	//| platform | platform.name |
-	//| platform_with_version | platform.full |
-	//| policy_group | policy_group |
-	//| policy_name | policy_name |
-	//| profile | profiles.title |
-	//| profile_with_version | profiles.full |
-	//| recipe | recipes |
-	//| role | roles |
+	// Example:
+	// ```
+	// {
+	// "type":"environment",
+	// "text":"aws*",
+	// "filters":[
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ]
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"type":"environment",
-	//"text":"aws*",
-	//"filters":[
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//]
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportSuggestions:list
-	//```
 	ListSuggestions(context.Context, *SuggestionRequest) (*Suggestions, error)
+	// List Profiles
 	//
-	//List Profiles
+	// List all profiles in use, with optional filtering.
+	// Supports pagination, filtering, and sorting.
+	// Valid sort fields: name, title
 	//
-	//List all profiles in use, with optional filtering.
-	//Supports pagination, filtering, and sorting.
-	//Valid sort fields: name, title
+	// The API supports date range filters when `end_time` is the current time
+	// and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	// date other than the current date, the API would return data only for the `end_time`.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
+	// Example:
+	// ```
+	// {"filters":
+	// [
+	// {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	// ],
+	// "page":1, "per_page": 3,
+	// }
+	// ```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters":
-	//[
-	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-	//],
-	//"page":1, "per_page": 3,
-	//}
-	//```
-	//Authorization Action:
-	//```
 	//compliance:reportProfiles:list
-	//```
 	ListProfiles(context.Context, *Query) (*ProfileMins, error)
 	Export(*Query, ReportingService_ExportServer) error
 	ExportNode(*Query, ReportingService_ExportNodeServer) error
+	// Export reports
 	//
-	//Export reports
+	// Export multiple reports.
+	// Supports filtering by profile or control. API returns an acknowledgement ID.
 	//
-	//Export multiple reports.
-	//Supports filtering by profile or control. API returns an acknowledgement ID.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	ExportReportManager(context.Context, *Query) (*CustomReportResponse, error)
+	// Show Node by ID
 	//
-	//Show Node by ID
+	// Show a specific node by ID.
+	// Supports filtering by profile or control.
+	// Does not support pagination or sorting.
 	//
-	//Show a specific node by ID.
-	//Supports filtering by profile or control.
-	//Does not support pagination or sorting.
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportNodes:get
-	//```
 	ReadNode(context.Context, *Id) (*Node, error)
+	// List Nodes
 	//
-	//List Nodes
+	// List all nodes, with optional filtering, pagination, and sorting.
+	// Max return payload size is 4MB, use pagination to fetch remaining data.
+	// | Sort parameter | Sort value |
+	// | --- | --- |
+	// | environment | environment.lower |
+	// | latest_report.controls.failed.critical | controls_sums.failed.critical |
+	// | latest_report.controls.failed.total | controls_sums.failed.total |
+	// | latest_report.end_time (default) | end_time |
+	// | latest_report.status | status |
+	// | name | node_name.lower |
+	// | platform | platform.full |
+	// | status | status |
 	//
-	//List all nodes, with optional filtering, pagination, and sorting.
-	//Max return payload size is 4MB, use pagination to fetch remaining data.
-	//| Sort parameter | Sort value |
-	//| --- | --- |
-	//| environment | environment.lower |
-	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	//| latest_report.controls.failed.total | controls_sums.failed.total |
-	//| latest_report.end_time (default) | end_time |
-	//| latest_report.status | status |
-	//| name | node_name.lower |
-	//| platform | platform.full |
-	//| status | status |
+	// The API supports date range filters when `end_time` is the current time
+	// and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	// date other than the current date, the API would return data only for the `end_time`.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
+	// Example:
+	// ```
+	// {
+	// "filters":[
+	// {"type":"environment","values":["dev*"]},
+	// {"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	// ],
+	// "page":1,"per_page":100,
+	// "sort":"environment","order":"ASC"
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{
-	//"filters":[
-	//{"type":"environment","values":["dev*"]},
-	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
-	//],
-	//"page":1,"per_page":100,
-	//"sort":"environment","order":"ASC"
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reportNodes:list
-	//```
 	ListNodes(context.Context, *Query) (*Nodes, error)
 	GetVersion(context.Context, *emptypb.Empty) (*version.VersionInfo, error)
 	LicenseUsageNodes(context.Context, *TimeQuery) (*Reports, error)
+	// Assets Count
 	//
-	//Assets Count
+	// Count the compliance assets based on different filter options.
+	// The API returns the response based on reported and unreported assets
 	//
-	//Count the compliance assets based on different filter options.
-	//The API returns the response based on reported and unreported assets
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	AssetCount(context.Context, *ListFilters) (*AssetSummary, error)
+	// List Assets
 	//
-	//List Assets
+	// Lists the compliance assets based on different filter options.
+	// The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
 	//
-	//Lists the compliance assets based on different filter options.
-	//The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:list
-	//```
 	ListAsset(context.Context, *AssetListRequest) (*AssetListResponse, error)
+	// Set Unreachable Assets Config
 	//
-	//Set Unreachable Assets Config
+	// SetAssetConfig sets the compliance config with the parameters of no of days
+	// And API returns the policy name and no of the days which will set in the compliance data base
 	//
-	//SetAssetConfig sets the compliance config with the parameters of no of days
-	//And API returns the policy name and no of the days which will set in the compliance data base
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:reports:update
-	//```
 	SetAssetConfig(context.Context, *ComplianceConfigRequest) (*ComplianceConfigResponse, error)
+	// Get Assets Config
 	//
-	//Get Assets Config
+	// GetAssetConfig gets the config details from the compliance data base
+	// and API return the policy name and no of days
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//GetAssetConfig gets the config details from the compliance data base
-	//and API return the policy name and no of days
-	//Authorization Action:
-	//```
 	//compliance:reports:get
-	//```
 	GetAssetConfig(context.Context, *GetAssetConfigRequest) (*ComplianceConfigResponse, error)
+	// List Controls Search
 	//
-	//List Controls Search
+	// Lists controls from the last run, with optional filtering.
+	// Supports filtering,pagination but not sorting.
+	// Limited to 100 results by default.
+	// Gets the summary of each control.
 	//
-	//Lists controls from the last run, with optional filtering.
-	//Supports filtering,pagination but not sorting.
-	//Limited to 100 results by default.
-	//Gets the summary of each control.
+	// The API supports date range filters when `end_time` is the current time
+	// and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	// date other than the current date, the API would return data only for the `end_time`.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
+	// Example:
+	// ```
+	// {"filters":
+	// [
+	// {"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	// {"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	// ],
+	// "page_number":1, "size": 3,
+	// }
+	// ```
 	//
-	//Example:
-	//```
-	//{"filters":
-	//[
-	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-	//],
-	//"page_number":1, "size": 3,
-	//}
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//compliance:controlItems:list
-	//```
 	ListControlItemsRange(context.Context, *ControlItemRequest) (*ControlItems, error)
 }
 

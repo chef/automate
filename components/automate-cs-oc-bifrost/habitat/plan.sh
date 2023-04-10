@@ -14,7 +14,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "aazeez/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/oc_bifrost/15.4.0/20230105061154"
 )

@@ -238,7 +238,7 @@ func Spawn(opts *serveropts.Opts) error {
 		purge.WithServerEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {
-		logrus.WithError(err).Fatal("could not start start purge server")
+		logrus.WithError(err).Fatal("could not start purge server")
 		return err
 	}
 

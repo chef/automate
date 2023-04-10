@@ -11,7 +11,7 @@ pkg_deps=(
   core/curl
   core/cacerts
   core/coreutils
-  chef/automate-platform-tools
+  aazeez/automate-platform-tools
 )
 
 pkg_exports=(

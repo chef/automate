@@ -16,7 +16,7 @@ pkg_deps=(
   core/coreutils
   core/bash
   chef/mlsa
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "aazeez/automate-platform-tools"
   # We need to pin here to get a build from unstable
   habitat/builder-api-proxy
 )

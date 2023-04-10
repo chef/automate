@@ -4,7 +4,6 @@
 // variable WITH_PRINTF=1. Enable app logs with WITH_LOGS=1.
 //
 // Add printf debug with helper debu(fmt, args).
-//
 package events
 
 import (
