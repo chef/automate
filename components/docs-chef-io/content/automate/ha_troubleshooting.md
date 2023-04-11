@@ -193,7 +193,7 @@ Go to any Automate Node in HA:
 - Run the following command to get all the snapshots:
 
 ```cmd
-curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty 
+curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty
 ```
 
 - One by One, delete all the snapshots using the below command:
@@ -220,14 +220,14 @@ chef-automate-es6-ingest-service
 for index in ${indices[@]}; do
 curl -XDELETE -k -H 'Content-Type: application/json' http://localhost:10144/_snapshot/$index --data-binary @- << EOF
 {
-  "type": "s3",
-    "settings": {
-      "bucket": "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
-      "base_path": "elasticsearch/automate-elasticsearch-data/$index",
-      "region": "<YOUR-PRIMARY-CLUSTER-REGION>",
-      "role_arn": " ",
-      "compress": "false"
-    }
+"type": "s3",
+	"settings": {
+	 "bucket": "<YOUR-PRIMARY-CLUSTER-BUCKET-NAME>",
+	 "base_path": "elasticsearch/automate-elasticsearch-data/$index",
+	 "region": "<YOUR-PRIMARY-CLUSTER-REGION>",
+	 "role_arn": "",
+	 "compress": "false"
+ 	}
 }
 EOF
 done
@@ -243,7 +243,7 @@ done
 
 ### Issue: knife SSL cert while setting up workstation during migration
 
-In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetched is for the domain `\*.chefdemo.net`, follow the below steps when you run `knife ssl check`.
+In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetched is for the domain `\*.chefdemo.net`, follow the below steps when you run `knife ssl check`.
 
 #### Solution
 
