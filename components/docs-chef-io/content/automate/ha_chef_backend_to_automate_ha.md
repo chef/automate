@@ -101,13 +101,26 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
     ```cmd
         scp -i /path/to/key backup\_$(date '+%Y%m%d%H%M%s') user@host:/home/user
     ```
-5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
-
-    ```cmd
-        scp -i /path/to/key backup\_$(date '+%Y%m%d%H%M%s') user@host:/home/user
-    ```
 
     If your HA Chef Server is in a private subnet, scp backup file to bastion and then to Chef Server.
+
+
+## Adding S3 Configurations for cookbook storage
+
+Before restoring the backup on the Automate HA Chef Server, If S3 storage is required for cookbooks. Please [Configure S3](automate/chef_infra_external_cookbooks_in_chef_automate/)
+
+
+{{< note >}}
+
+- If using same bucket for Automate HA , new files will be uploaded for cookbooks. There will not be any impact on the old files.
+- If using the a new bucket fot Auomate HA, new files will be uplaoded for cookbooks
+
+{{< /note >}}
+
+The migration flow has been tested on following scenaiors 
+
+- If the cookbooks were not stored in s3, at time of migration it can be resorted in S3.
+- If the cookbooks were stored in s3, at time of migration it can either be restored in s3 or postgres.
 
 ## Restore Backed Up Data to Chef Automate HA
 
