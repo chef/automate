@@ -139,7 +139,7 @@ The migration flow is tested on the following scenarios
 
     ```cmd
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
-        bash infra_server_objects_count_collector.sh -S test -K Key -F Filename
+        bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
     ```
 
 - `-S` is the Chef Server URL
