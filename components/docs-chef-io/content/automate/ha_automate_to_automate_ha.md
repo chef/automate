@@ -43,11 +43,11 @@ The below steps won't work for Automate HA with AWS Managed.
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    - The first command will create the backup to the `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file.
+    - The first command will create the backup to the `/var/opt/chef-automate/backups` location unless you specify the location in `config.toml` file.
     - The second command will create the `bootstrap.abb` bundle, this bundle captures any local credentials or secrets that aren’t persisted in the database.
     - Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
-1. Go to `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file and create **Bundle** using the following command:
+1. Go to `/var/opt/chef-automate/backups` location unless you specify the location in `config.toml` file and create **Bundle** using the following command:
 
     ```bash
     tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
@@ -306,7 +306,7 @@ The below steps won't work for Automate HA with AWS Managed.
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    - The first command will create the backup to the `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml` file.
+    - The first command will create the backup in s3 bucket.
     - The second command will create the `bootstrap.abb` bundle, this bundle captures any local credentials or secrets that aren’t persisted in the database.
     - Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
@@ -432,7 +432,7 @@ The below steps won't work for Automate HA with AWS Managed.
 
 {{< warning >}}
 
-In case of external chef server, you need to perform the below steps on standalone chef server.
+In case of external chef server, you need to perform the below steps.
 
 {{< /warning >}}
 
@@ -455,9 +455,9 @@ In case of external chef server, you need to perform the below steps on standalo
     ```
 
 1. Execute the below command to generate a knife tidy server report to examine the stale node, data etc. In this command: 
-    - pivotal is the name of the user 
-    - path of pivotal is the path where the user’s pem file is stored. 
-    - node-threshold NUM_DAYS is the maximum number of days since the last checking before a node is considered stale. 
+    - `pivotal` is the name of the user 
+    - `path of pivotal` is the path where the user’s pem file is stored. 
+    - `node-threshold NUM_DAYS` is the maximum number of days since the last checking before a node is considered stale. 
     
     ```bash
     hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
