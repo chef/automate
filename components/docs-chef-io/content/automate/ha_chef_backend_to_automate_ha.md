@@ -99,7 +99,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
 
     ```cmd
-        scp -i /path/to/key <backup-file> user@host:/home/user
+        scp -i /path/to/key /path/to/backup-file user@host:/home/user
     ```
 
     If your HA Chef Server is in a private subnet, scp backup file to bastion and then to Chef Server.
@@ -112,15 +112,15 @@ Before restoring the backup on the Automate HA Chef Server, If S3 storage is req
 
 {{< note >}}
 
-- If using same bucket for Automate HA , new files will be uploaded for cookbooks. There will not be any impact on the old files.
-- If using the a new bucket fot Auomate HA, new files will be uplaoded for cookbooks
+- If using same bucket for Automate HA, new files will be uploaded for cookbooks. There will not be any impact on the old files.
+- If using a new bucket for Automate HA, new files will be uploaded for cookbooks
 
 {{< /note >}}
 
 The migration flow has been tested on following scenaiors 
 
-- If the cookbooks were not stored in s3, at time of migration it can be resorted in S3.
-- If the cookbooks were stored in s3, at time of migration it can either be restored in s3 or postgres.
+- If the cookbooks were not stored in s3,post migration it can be resorted in S3.
+- If the cookbooks were stored in s3,post migration it can either be restored in s3 or postgres.
 
 ## Restore Backed Up Data to Chef Automate HA
 
@@ -149,7 +149,7 @@ The migration flow has been tested on following scenaiors
 - `-K` is the path of pivotal.pem file
 - `-F` is the path to store the output file
 
-- Repeat the above commands on the new server where the knife is installed 
+- Repeat the above commands for the new server
 
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
