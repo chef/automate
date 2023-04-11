@@ -53,15 +53,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
     ```
 
 2. Execute the below command to install the habitat package for `knife-ec-backup`
-    ```cmd
-        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-    ```
 
-2. Execute the below command to install the habitat package for `knife-ec-backup`
-
-    ```cmd
-        hab pkg install chef/knife-ec-backup
-    ```
     ```cmd
         hab pkg install chef/knife-ec-backup
     ```
@@ -151,7 +143,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
     ```cmd
         diff old_server_file new_server_file
     ```
-    
+
 ## In-place Migration (Chef Backend to Automate HA)
 
 As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the chef backend infrastructure.
