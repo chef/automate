@@ -54,10 +54,16 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
 1. Transfer the `tar` bundle to one of the Chef Automate HA Frontend Nodes using the following command:
-    `scp -i <path to your .pem file> <path to backup.tar.gz> ec2-user@<IP>:/home/ec2-user`
+    
+    ```bash
+    scp -i <path to your .pem file> <path to backup.tar.gz> ec2-user@<IP>:/home/ec2-user
+    ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
-    `scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user`
+    
+    ```bash
+    scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user
+    ```
 
 1. Go to Bastion 
     - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents and then patch this file in all the OpenSearch nodes.
@@ -67,8 +73,12 @@ The below steps won't work for Automate HA with AWS Managed.
       repo = "/mnt/automate_backups" 
     ```
     
-    Following command will patch the configuration in all the OpenSearch nodes. 
-    `chef-automate config patch --opensearch <path to os_config.toml>`
+    Following command will patch the configuration in all the OpenSearch nodes.
+
+    ```bash
+    chef-automate config patch --opensearch <path to os_config.toml>
+    ```
+
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
 
     ```bash
@@ -82,7 +92,10 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
     Following command will patch the configuration in all the Frontend nodes: 
-    `chef-automate config patch --fe <Path to automate.toml>`
+    
+    ```bash
+    chef-automate config patch --fe <Path to automate.toml>
+    ```
 
 1. Go the Chef Automate HA, where we copied the `tar` file. Unzip the bundle using:
 
@@ -163,7 +176,11 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
     
     Following command will patch the configuration in all the OpenSearch nodes. 
-    `chef-automate config patch --opensearch <Path to os_config.toml>`
+    
+    ```bash
+    chef-automate config patch --opensearch <Path to os_config.toml>
+    ```
+
     - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
 
     ```bash
@@ -177,7 +194,10 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
     Following command will patch the configuration in all the Frontend nodes: 
-    `chef-automate config patch --fe <Path to automate.toml>`
+    
+    ```bash
+    chef-automate config patch --fe <Path to automate.toml>
+    ```
 
 1. Create *Backup* of Chef Automate Standalone using the following command:
 
@@ -215,7 +235,10 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
-    `scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user`
+    
+    ```bash
+    scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user
+    ```
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
 
@@ -354,7 +377,10 @@ The below steps won't work for Automate HA with AWS Managed.
     ```
 
     Following command will patch the configuration in all the Frontend nodes: 
-    `chef-automate config patch --frontend automate.toml`
+    
+    ```bash
+    chef-automate config patch --frontend automate.toml
+    ```
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
 
@@ -384,7 +410,7 @@ The below steps won't work for Automate HA with AWS Managed.
 
 1. Stop all the services at frontend nodes in Automate HA Cluster. Run the below command to all the Automate and Chef Infra Server nodes
 
-    ``` bash
+    ```bash
     sudo chef-automate stop
     ```
 
@@ -398,6 +424,6 @@ The below steps won't work for Automate HA with AWS Managed.
 
 1. Start the Service in All the Frontend Nodes with command shown below:
 
-    ``` bash
+    ```bash
     sudo chef-automate start
     ```
