@@ -119,7 +119,7 @@ The migration flow is tested on the following scenarios
 - If the cookbooks were not stored in s3 post-migration, they can revert to S3.
 - If the cookbooks were stored in s3 post-migration, they can be restored to s3 or Postgres.
 
-## Restore Backed Up Data to Chef Automate HA
+## Restore the Backed Up Data to Chef Automate HA
 
 - Execute the below command to install the habitat package for `knife-ec-backup`
 
@@ -273,7 +273,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     ```
 
 10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
-11. [Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
+11. Once done, [restore the backed up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 12. [Validating the data using](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 
 ## Using Automate HA for Chef-Backend user
