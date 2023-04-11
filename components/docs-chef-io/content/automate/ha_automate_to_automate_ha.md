@@ -544,3 +544,42 @@ Steps:
 1. Update the `chef_server_url` with the chef server LB fqdn. 
 
 1. Now do node bootstrapping, it will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
+
+## Troubleshoot
+
+1. While running the restore command, If you are getting this error in logs: `Failed to restore synchronous operations`, follow the steps given below:
+
+    Steps:
+
+    1. Go to any Automate Node in HA.
+    
+    1. Run the below command to get all the snapshots.
+
+    ```bash
+    curl -k -X GET -s http://localhost:10144/_snapshot/_all?pretty
+    ```
+    1. One by One delete all the snapshots using the below command.
+
+    ```bash
+    curl -k -X DELETE -s http://localhost:10144/_snapshot/<snapshot_name> 
+    ```
+
+    Example: 
+
+    ```bash
+    curl -k -X DELETE -s http://localhost:10144/_snapshot/chef-automate-es6-event-feed-service  
+    ```
+
+1. While running the restore command, If you are getting this error in logs: `Path is not accessible on master node`, then follow the steps given below: 
+
+    1. Go to any Automate HA Opensearch Node, Run the below command: 
+
+    ```bash
+    chmod 777 -R /mnt/automate_backups/
+    ```
+
+1. If you are getting `The hab user doesn't have read/write/exec permission on the backup repository` error, then follow the steps given below:
+
+    ```bash
+    sudo chown hab:hab /mnt/automate_backups
+    ```
