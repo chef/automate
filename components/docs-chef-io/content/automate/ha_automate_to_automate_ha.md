@@ -427,3 +427,82 @@ The below steps won't work for Automate HA with AWS Managed.
     ```bash
     sudo chef-automate start
     ```
+
+## Migrating External Chef Server
+
+{{< warning >}}
+
+In case of external chef server, you need to perform the below steps on standalone chef server.
+
+{{< /warning >}}
+
+1. Execute below command in Standalone Chef Server to install Habitat:
+
+    ```bash
+    curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+    ```
+
+1. Execute the below command in Standalone Chef Server to install the habitat package for knife-ec-backup:
+
+    ```bash
+    hab pkg install chef/knife-ec-backup
+    ```
+
+1. Create config.rb file in ~/.chef folder and add the following content:
+
+    ```bash
+    ssl_verify_mode :verify_none
+    ```
+
+1. Execute the below command to generate a knife tidy server report to examine the stale node, data etc. In this command: 
+    - pivotal is the name of the user 
+    - path of pivotal is the path where the user’s pem file is stored. 
+    - node-threshold NUM_DAYS is the maximum number of days since the last checking before a node is considered stale. 
+    
+    ```bash
+    hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
+    ```
+
+    For Example:
+    ```bash
+    hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
+    ```
+
+1. Execute the below command to initiate a backup of your Chef Server data. In this command: 
+    - --with-user-sql is required to handle user passwords and ensure user-specific association groups that are not duplicate. 
+    - --with-key-sql is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone’s access.
+
+    ```bash
+    hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server url>
+    ```
+
+    For Example:
+    ```bash
+    hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s https://chef.io
+    ```
+
+    Execute the below command to clean unused data from reports. This is an optional step
+
+    ```bash
+    hab pkg exec chef/knife-ec-backup knife tidy server clean --backup-path /path/to/an-ec-backup
+    ```
+
+1. Execute the below command to copy the backup directory to the Automate HA Chef Server:
+
+    ```bash
+    scp -r -i <path to your .pem file> <path/to/backup> ec2-user@IP:/home/ec2-user
+    ```
+
+### Restore Backed Up Data to Chef Automate HA
+
+1. In Chef-Server Node of Automate HA, Execute the below command to install the habitat package for knife-ec-backup:
+
+    ```bash
+    hab pkg install chef/knife-ec-backup
+    ```
+
+1. In Chef-Server Node of Automate HA, Execute the below command to restore the backup:
+
+    ```bash
+    hab pkg exec chef/knife-ec-backup knife ec restore <path/to/backup> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
+    ```
