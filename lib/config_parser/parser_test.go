@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConfigParserImpl_ParseAWSAutomateConfig(t *testing.T) {
+func TestParseAWSAutomateConfig(t *testing.T) {
 	type args struct {
 		configFile string
 	}
@@ -203,7 +203,7 @@ func TestParseOnPremConfig(t *testing.T) {
 	}
 }
 
-func TestConfigParserImpl_ParseStandaloneConfig(t *testing.T) {
+func TestParseStandaloneConfig(t *testing.T) {
 	Cfg := sc.NewAutomateConfig()
 	Cfg.Global.V1.Fqdn = w.String("Public_DNS_name")
 	type args struct {

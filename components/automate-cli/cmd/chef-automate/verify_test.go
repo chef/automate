@@ -9,6 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	configFileName       = "config.toml"
+	parseConfigFileError = "Unable to parse config file"
+)
+
 func TestVerifyCmdFunc(t *testing.T) {
 	type args struct {
 		flagsObj *verifyCmdFlags
@@ -172,7 +177,7 @@ func TestRunVerifyCmd(t *testing.T) {
 			name: "Test VerifyHaOnPremCustManagedDeploy",
 			args: args{
 				cmd:  &cobra.Command{},
-				args: []string{"config.toml"},
+				args: []string{configFileName},
 				flagsObj: &verifyCmdFlags{
 					file:                      "",
 					haAWSProvision:            false,
@@ -350,7 +355,7 @@ func TestVerifyHaAWSProvision(t *testing.T) {
 				A2HARBFileExist:   true,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New("Setup is already Provisioned. Please use --ha-aws-deploy flag."),
 		},
@@ -359,15 +364,15 @@ func TestVerifyHaAWSProvision(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyHAAWSProvisionFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 		{
 			name: "Test VerifyHaAWSProvision: verification successful",
@@ -380,7 +385,7 @@ func TestVerifyHaAWSProvision(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 	}
@@ -429,7 +434,7 @@ func TestVerifyHaAWSManagedProvision(t *testing.T) {
 				A2HARBFileExist:   true,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New("Setup is already Provisioned. Please use --ha-aws-managed-deploy flag."),
 		},
@@ -438,15 +443,15 @@ func TestVerifyHaAWSManagedProvision(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyHAAWSManagedProvisionFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 		{
 			name: "Test VerifyHaAWSManagedProvision: verification successful",
@@ -459,7 +464,7 @@ func TestVerifyHaAWSManagedProvision(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 	}
@@ -507,7 +512,7 @@ func TestVerifyHaAWSDeploy(t *testing.T) {
 				A2HARBFileExist:   true,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 		{
@@ -515,15 +520,15 @@ func TestVerifyHaAWSDeploy(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyHAAWSDeploymentFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   true,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 		{
 			name: "Test VerifyHaAWSDeploy: a2ha.rb file not present",
@@ -536,7 +541,7 @@ func TestVerifyHaAWSDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New(errProvisonInfra),
 		},
@@ -551,7 +556,7 @@ func TestVerifyHaAWSDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: true,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New("This flag will not verify the Managed Services Setup. Please use the --ha-aws-managed-deploy flag."),
 		},
@@ -600,7 +605,7 @@ func TestVerifyHaAWSManagedDeploy(t *testing.T) {
 				A2HARBFileExist:   true,
 				ManagedServicesOn: true,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 		{
@@ -608,15 +613,15 @@ func TestVerifyHaAWSManagedDeploy(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   true,
 				ManagedServicesOn: true,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 		{
 			name: "Test VerifyHaAWSManagedDeploy: a2ha.rb file not present",
@@ -629,7 +634,7 @@ func TestVerifyHaAWSManagedDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: true,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New(errProvisonInfra),
 		},
@@ -644,7 +649,7 @@ func TestVerifyHaAWSManagedDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New("Managed Services flag is not set. Cannot verify the config."),
 		},
@@ -693,7 +698,7 @@ func TestVerifyStandaloneDeploy(t *testing.T) {
 				A2HARBFileExist:   true,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
 			err:     errors.New("Deployment type does not match with the requested flag."),
 		},
@@ -702,15 +707,15 @@ func TestVerifyStandaloneDeploy(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyStandaloneDeploymentFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 		{
 			name: "Test VerifyStandaloneDeploy: verification successful",
@@ -723,7 +728,7 @@ func TestVerifyStandaloneDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 	}
@@ -771,7 +776,7 @@ func TestVerifyHaOnpremDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 		{
@@ -779,15 +784,15 @@ func TestVerifyHaOnpremDeploy(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyOnPremDeploymentFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 	}
 	for _, tt := range tests {
@@ -834,7 +839,7 @@ func TestVerifyHaOnPremAWSManagedDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 		{
@@ -842,15 +847,15 @@ func TestVerifyHaOnPremAWSManagedDeploy(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyOnPremAWSManagedDeploymentFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 	}
 	for _, tt := range tests {
@@ -897,7 +902,7 @@ func TestVerifyHaOnPremCustManagedDeploy(t *testing.T) {
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: false,
 		},
 		{
@@ -905,15 +910,15 @@ func TestVerifyHaOnPremCustManagedDeploy(t *testing.T) {
 			fields: fields{
 				Verification: &verification.VerificationMock{
 					VerifyOnPremCustManagedDeploymentFunc: func(configFile string) error {
-						return errors.New("Unable to parse config file")
+						return errors.New(parseConfigFileError)
 					},
 				},
 				A2HARBFileExist:   false,
 				ManagedServicesOn: false,
 			},
-			args:    args{configPath: "config.toml"},
+			args:    args{configPath: configFileName},
 			wantErr: true,
-			err:     errors.New("Unable to parse config file"),
+			err:     errors.New(parseConfigFileError),
 		},
 	}
 	for _, tt := range tests {
