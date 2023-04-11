@@ -237,7 +237,7 @@ done
 
 - Log in to the OpenSearch dashboard
 - Run this query: GET _snapshot/_all to get all the snapshots.
-- Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>
+- Delete all the snapshots using this query: DELETE _snapshot/\<snapshot name>
 
   For example: DELETE _snapshot/chef-automate-es6-event-feed-service
 
