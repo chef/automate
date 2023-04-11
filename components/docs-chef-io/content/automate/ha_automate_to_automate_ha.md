@@ -519,7 +519,7 @@ In case of external chef server, you need to perform the below steps.
 1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
     Example: `chef_server_url          "https://<automate-LB-fqdn>/organizations/new_org"`
 
-1. Now run `knife user list` or `knife node list`. It will give you valid output.
+1. Now run `knife user list`, `knife node list` or `knife cookbook list`. It will give you valid output.
 
 ## Changes/Steps to make the nodes connect to the new setup:
 
@@ -527,7 +527,7 @@ In case of external chef server, you need to perform the below steps.
 1. ssh into node and open the `/etc/chef/client.rb` file.
     **NOTE:** On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems the default location for this file is `/etc/chef/client.rb`.
 
-1. update the chef-server url with chefserver-LB fqdn.
+1. update the chef-server url with chef server LB fqdn.
 
 1. Run `chef-client` command, it will connect with new setup, perform the scan and generate the report in chef-automate.
 
@@ -537,10 +537,10 @@ In case of external chef server, you need to perform the below steps.
 
 Steps: 
 
-1. Update the chef_server_url in workstation 
+1. Update the `chef_server_url` in workstation 
 
-1. Go to your workstation and open ~/.chef/config.rb file. 
+1. Go to your workstation and open `~/.chef/config.rb` file. 
 
-1. Update the chef_server_url with the chef server LB fqdn. 
+1. Update the `chef_server_url` with the chef server LB fqdn. 
 
-1. Now do node bootstrapping, it will update the chef_server_url on that node. 
+1. Now do node bootstrapping, it will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
