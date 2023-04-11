@@ -243,7 +243,7 @@ done
 
 ### Issue: knife SSL cert while setting up workstation during migration
 
-In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetched is for the domain *.chefdemo.net, follow the below steps when you run `knife ssl check`.
+In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetched is for the domain `\*.chefdemo.net`, follow the below steps when you run `knife ssl check`.
 
 #### Solution
 
