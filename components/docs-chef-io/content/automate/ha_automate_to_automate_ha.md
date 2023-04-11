@@ -140,18 +140,18 @@ gh_repo = "automate"
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
-{{< notes >}} The below steps won't work for Automate HA with AWS Managed. {{< /notes >}}
+{{< note >}} The below steps won't work for Automate HA with AWS Managed. {{< /note >}}
 
 1. Make EFS volume and attach that volume to the existing automate setup and Automate HA nodes.
 1. Mount EFS Volume:
     - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file. 
     - In HA, we are mounting that volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
 
-    {{< notes >}}
+    {{< note >}}
 
     Make sure that it should have permission for the hab user.
 
-    {{< /notes >}}
+    {{< /note >}}
 
 1. Go to Bastion
     - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents, and then patch this file in all the OpenSearch nodes.
@@ -406,7 +406,7 @@ gh_repo = "automate"
 
 ## Migrating External Chef Server
 
-{{< notes >}} For an external chef server, you need to perform the steps below. {{< /notes >}}
+{{< note >}} For an external chef server, you need to perform the steps below. {{< /note >}}
 
 1. Execute the below command in Standalone Chef Server to install Habitat:
 
