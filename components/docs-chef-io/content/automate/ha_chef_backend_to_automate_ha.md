@@ -16,6 +16,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 
+
 - Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Also, for the customers using a standalone Chef Infra Server, cookbooks should be in the database but not in either the file system or S3.
 - Automate HA does not support supermarket authentication with chef-server user credentials.
@@ -27,6 +28,8 @@ This page explains the procedure to migrate the existing Standalone Chef Infra S
 
 - Back up the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
 - Restore the backed-up data to the newly deployed Chef Automate HA environment via `knife-ec-restore`.
+- Back up the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
+- Restore the backed-up data to the newly deployed Chef Automate HA environment via `knife-ec-restore`.
 
 Take a backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data-bags, policies, and organizations.
 
@@ -35,6 +38,7 @@ Take a backup using the `knife-ec-backup` utility and move the backup folder to 
 {{< note >}}
 
 - The migration procedure is tested on Chef Server versions 14+ and 15+.
+- The migration procedure is tested and is possible on the Chef Backend version above 3.1.1.
 - The migration procedure is tested and is possible on the Chef Backend version above 3.1.1.
 
 {{< /note >}}
@@ -46,7 +50,13 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
 ## Backup the Existing Chef Infra Server or Chef Backend Data
 
 1. Execute the below command to install Habitat:
+1. Execute the below command to install Habitat:
 
+    ```cmd
+        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+    ```
+
+2. Execute the below command to install the habitat package for `knife-ec-backup`
     ```cmd
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
     ```
@@ -56,7 +66,15 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
     ```cmd
         hab pkg install chef/knife-ec-backup
     ```
+    ```cmd
+        hab pkg install chef/knife-ec-backup
+    ```
 
+3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc. In this command:
+
+    - `pivotal` is the name of the user
+    - `path of pivotal` is where the user's pem file is stored.
+    - `node-threshold NUM_DAYS` is the maximum number of days since the last checking before a node is considered stale.
 3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc. In this command:
 
     - `pivotal` is the name of the user
@@ -68,13 +86,24 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
     ```
 
     For Example:
+    ```cmd
+        hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
+    ```
 
+    For Example:
+
+    ```cmd
+        hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
+    ```
     ```cmd
         hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
     ```
 
 4. Execute the below command to initiate a backup of your Chef Server data. In this command:
+4. Execute the below command to initiate a backup of your Chef Server data. In this command:
 
+    - `with-user-sql` is required to handle user passwords and ensure user-specific association groups are not duplicated.
+    - `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone's access.
     - `with-user-sql` is required to handle user passwords and ensure user-specific association groups are not duplicated.
     - `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone's access.
 
@@ -83,7 +112,11 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
     ```
 
     For example:
+    For example:
 
+    ```cmd
+        hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s https://chef.io`.
+    ```
     ```cmd
         hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s https://chef.io`.
     ```
@@ -93,7 +126,15 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
     ```bash
         hab pkg exec chef/knife-ec-backup knife tidy server clean --backup-path /path/to/an-ec-backup
     ```
+    ```bash
+        hab pkg exec chef/knife-ec-backup knife tidy server clean --backup-path /path/to/an-ec-backup
+    ```
 
+5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
+
+    ```cmd
+        scp -i /path/to/key backup\_$(date '+%Y%m%d%H%M%s') user@host:/home/user
+    ```
 5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
 
     ```cmd
@@ -105,7 +146,11 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
 ## Restore Backed Up Data to Chef Automate HA
 
 - Execute the below command to install the habitat package for `knife-ec-backup`
+- Execute the below command to install the habitat package for `knife-ec-backup`
 
+    ```cmd
+        hab pkg install chef/knife-ec-backup
+    ```
     ```cmd
         hab pkg install chef/knife-ec-backup
     ```
@@ -134,6 +179,9 @@ Check the [Prerequisites](/automate/ha_aws_deployment_prerequisites/#migration) 
         diff old_server_file new_server_file
     ```
 
+## In-place Migration (Chef Backend to Automate HA)
+
+As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the chef backend infrastructure.
 ## In-place Migration (Chef Backend to Automate HA)
 
 As part of this scenario, the customer will migrate from the chef-backend (5 machines) to Automate HA in place, i.e., Automate HA will be deployed in those five machines only where Chef-backend is running. One extra bastion node will be required to manage the deployment of Automate HA on the chef backend infrastructure.
