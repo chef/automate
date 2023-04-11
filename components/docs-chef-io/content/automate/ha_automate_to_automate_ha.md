@@ -469,8 +469,8 @@ In case of external chef server, you need to perform the below steps on standalo
     ```
 
 1. Execute the below command to initiate a backup of your Chef Server data. In this command: 
-    - --with-user-sql is required to handle user passwords and ensure user-specific association groups that are not duplicate. 
-    - --with-key-sql is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone’s access.
+    - `--with-user-sql` is required to handle user passwords and ensure user-specific association groups that are not duplicate. 
+    - `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone’s access.
 
     ```bash
     hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server url>
@@ -490,7 +490,7 @@ In case of external chef server, you need to perform the below steps on standalo
 1. Execute the below command to copy the backup directory to the Automate HA Chef Server:
 
     ```bash
-    scp -r -i <path to your .pem file> <path/to/backup> ec2-user@IP:/home/ec2-user
+    scp -r -i <path to your .pem file> <path/to/backup> ec2-user@<IP>:/home/ec2-user
     ```
 
 ### Restore Backed Up Data to Chef Automate HA
