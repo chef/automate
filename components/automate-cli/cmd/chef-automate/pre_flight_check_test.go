@@ -114,3 +114,9 @@ func TestConstructAndGetNodeMap(t *testing.T) {
 		})
 	}
 }
+
+func TestShouldReturnErrorWhenHaDeploymentConfigFlagDonotHaveConfig(t *testing.T) {
+	preflightCmdFlags.haDeploymentConfig = true
+	err := runPreflightCheckCmd(nil, nil)
+	assert.Equal(t, err.Error(), "Config file should be passed with ha-deployment-config flag")
+}
