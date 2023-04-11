@@ -99,7 +99,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
 
     ```cmd
-        scp -i /path/to/key backup\_$(date '+%Y%m%d%H%M%s') user@host:/home/user
+        scp -i /path/to/key <backup-file> user@host:/home/user
     ```
 
     If your HA Chef Server is in a private subnet, scp backup file to bastion and then to Chef Server.
@@ -285,7 +285,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 11. [Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 
 12. [Validating the data using](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
-   
+
 
 ## Using Automate HA for Chef-Backend user
 
