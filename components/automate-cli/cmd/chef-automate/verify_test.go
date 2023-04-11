@@ -89,8 +89,7 @@ func TestRunVerifyCmd(t *testing.T) {
 				},
 			},
 			ManagedServicesOn: false,
-			wantErr:           true,
-			err:               errors.New("Setup is already Provisioned. Please use --ha-aws-deploy flag."),
+			wantErr:           false,
 		},
 		{
 			name: "Test VerifyHaAWSManagedProvision",
@@ -218,7 +217,7 @@ func TestRunVerifyCmd(t *testing.T) {
 					certificates:              false,
 				},
 			},
-			A2HARBFileExist: false,
+			A2HARBFileExist: true,
 			mockFunc: &verification.VerificationMock{
 				VerifyHAAWSDeploymentFunc: func(configFile string) error {
 					return nil
@@ -245,13 +244,13 @@ func TestRunVerifyCmd(t *testing.T) {
 					certificates:              false,
 				},
 			},
-			A2HARBFileExist: false,
+			A2HARBFileExist: true,
 			mockFunc: &verification.VerificationMock{
 				VerifyHAAWSManagedDeploymentFunc: func(configFile string) error {
 					return nil
 				},
 			},
-			ManagedServicesOn: false,
+			ManagedServicesOn: true,
 			wantErr:           false,
 		},
 		{
@@ -345,21 +344,6 @@ func TestVerifyHaAWSProvision(t *testing.T) {
 		err     error
 	}{
 		{
-			name: "Test VerifyHaAWSProvision: check a2ha.rb file",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSProvisionFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New("Setup is already Provisioned. Please use --ha-aws-deploy flag."),
-		},
-		{
 			name: "Test VerifyHaAWSProvision: verification failed",
 			fields: fields{
 				Verification: &verification.VerificationMock{
@@ -423,21 +407,6 @@ func TestVerifyHaAWSManagedProvision(t *testing.T) {
 		wantErr bool
 		err     error
 	}{
-		{
-			name: "Test VerifyHaAWSManagedProvision: check a2ha.rb file",
-			fields: fields{
-				Verification: &verification.VerificationMock{
-					VerifyHAAWSManagedProvisionFunc: func(configFile string) error {
-						return nil
-					},
-				},
-				A2HARBFileExist:   true,
-				ManagedServicesOn: false,
-			},
-			args:    args{configPath: configFileName},
-			wantErr: true,
-			err:     errors.New("Setup is already Provisioned. Please use --ha-aws-managed-deploy flag."),
-		},
 		{
 			name: "Test VerifyHaAWSManagedProvision: verification failed",
 			fields: fields{

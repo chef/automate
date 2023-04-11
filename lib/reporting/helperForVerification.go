@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/v5/table"
 )
 
 type VerificationReport struct {

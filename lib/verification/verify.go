@@ -8,7 +8,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/config_parser"
 	"github.com/chef/automate/lib/reporting"
-	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/v5/table"
 )
 
 type Verification interface {
