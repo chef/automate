@@ -250,5 +250,4 @@ In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetch
 - Go to route 53 chefdemo.net
 - Create record as recordname.eng.chefdemo.net
 - CNAME with value HA URL: ec2-url.region.compute.amazonaws.com
-- Provide https://<record-name> while running knife ssl check. E.g., `knife ssl check https://<record-name>`
-x
+- Provide `https://<record-name>` while running knife ssl check. E.g., `knife ssl check https://<record-name>`.
