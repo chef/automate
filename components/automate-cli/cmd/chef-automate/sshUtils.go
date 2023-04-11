@@ -205,6 +205,10 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 			output = pattern.ReplaceAllString(output, "")
 		}
 		if err != nil {
+			if strings.Contains(output, "sudo: no tty present and no askpass program specified") {
+				errCh <- errors.New("The sudo password is missing. Make sure to provide sudo_password as enviroment variable and pass -E option while running command.")
+				return
+			}
 			errCh <- err
 			return
 		}
