@@ -506,3 +506,41 @@ In case of external chef server, you need to perform the below steps.
     ```bash
     hab pkg exec chef/knife-ec-backup knife ec restore <path/to/backup> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
     ```
+
+## Steps to Validate migration is successful
+
+1. Check the Automate UI of Automate HA, that the data you have pushed in standalone is there or not in HA. 
+1. Log in to the Chef-server HA node, run the following commands: 
+    - `knife user list`: It will give the user list which you have created in standalone automate.
+    - `knife opc org list`: It will give the organization list which you have created in standalone automate. 
+
+## Changes/Steps to make Workstation connect to the new setup
+
+1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
+    Example: `chef_server_url          "https://<automate-LB-fqdn>/organizations/new_org"`
+
+1. Now run `knife user list` or `knife node list`. It will give you valid output.
+
+## Changes/Steps to make the nodes connect to the new setup:
+
+### Updating on nodes itself
+1. ssh into node and open the `/etc/chef/client.rb` file.
+    **NOTE:** On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems the default location for this file is `/etc/chef/client.rb`.
+
+1. update the chef-server url with chefserver-LB fqdn.
+
+1. Run `chef-client` command, it will connect with new setup, perform the scan and generate the report in chef-automate.
+
+### Updating through workstation
+
+1. We can also update the chef_server_url of nodes by doing the node bootstrapping. 
+
+Steps: 
+
+1. Update the chef_server_url in workstation 
+
+1. Go to your workstation and open ~/.chef/config.rb file. 
+
+1. Update the chef_server_url with the chef server LB fqdn. 
+
+1. Now do node bootstrapping, it will update the chef_server_url on that node. 
