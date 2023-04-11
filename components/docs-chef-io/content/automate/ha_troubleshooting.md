@@ -20,7 +20,10 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ### Post Automate HA deployment if the chef-server service is in a critical state
 
-- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate` if getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint ssh to the Automate HA Chef Infra Server, and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.
+- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate` 
+
+- If getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint.
+- ssh to the Automate HA Chef Infra Server and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.
 
 ```cmd
   export endpoint="AUTOMATE LB URL"
@@ -164,7 +167,7 @@ terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 While trying to deploy or upgrade Chef Automate HA, if the command did not exit gracefully, the possible error looks like as shown below:
 
 ```bash
-      Exiting as the execution process completed
+      Exiting as execution process completed
 UnknownError: Unable to determine error cause: Command did not exit gracefully.
 ```
 
@@ -179,7 +182,9 @@ UnknownError: Unable to determine error cause: Command did not exit gracefully.
 
 ### Issue: knife-ec-restore during migration: Failed to restore synchronous operations
 
-- While running the restore command, If you are getting this error in logs: Failed to restore synchronous operations,  follow either of the methods below.
+- While running the restore command, if you are getting this error in logs: 
+`Failed to restore synchronous operations`
+follow either of the methods below.
 
 #### Solution 1
 
@@ -234,7 +239,7 @@ done
 - Run this query: GET _snapshot/_all to get all the snapshots.
 - Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>
 
-  For example: DELETE _snapshot/ chef-automate-es6-event-feed-service
+  For example: DELETE _snapshot/chef-automate-es6-event-feed-service
 
 ### Issue: knife SSL cert while setting up workstation during migration
 
