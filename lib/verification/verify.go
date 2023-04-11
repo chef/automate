@@ -11,17 +11,19 @@ import (
 	"github.com/jedib0t/go-pretty/table"
 )
 
-type verifySetup interface {
-	VerifyHAAWSProvision(string)
-	VerifyHAAWSManagedProvision(string)
-	VerifyHAAWSDeployment(string)
-	VerifyHAAWSManagedDeployment(string)
-	VerifyOnPremDeployment(string)
-	VerifyOnPremAWSManagedDeployment(string)
-	VerifyOnPremCustManagedDeployment(string)
-	VerifyStandaloneDeployment(string)
-	VerifyCertificates(string)
+type Verification interface {
+	VerifyHAAWSProvision(configFile string) error
+	VerifyHAAWSManagedProvision(configFile string) error
+	VerifyHAAWSDeployment(configFile string) error
+	VerifyHAAWSManagedDeployment(configFile string) error
+	VerifyOnPremDeployment(configFile string) error
+	VerifyOnPremAWSManagedDeployment(configFile string) error
+	VerifyOnPremCustManagedDeployment(configFile string) error
+	VerifyStandaloneDeployment(configFile string) error
+	VerifyCertificates(configFile string) error
 }
+
+type VerificationModule struct{}
 
 type report struct {
 	ipaddress             string
@@ -44,7 +46,7 @@ var reportChan = make(chan reporting.VerificationReport)
 var nodeInfoMap = make(map[string][]reporting.Info)
 var doneChan = make(chan bool, 1)
 
-func VerifyHAAWSProvision(configFile string) error {
+func (v *VerificationModule) VerifyHAAWSProvision(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
@@ -55,7 +57,7 @@ func VerifyHAAWSProvision(configFile string) error {
 	return nil
 }
 
-func VerifyHAAWSManagedProvision(configFile string) error {
+func (v *VerificationModule) VerifyHAAWSManagedProvision(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
@@ -65,7 +67,7 @@ func VerifyHAAWSManagedProvision(configFile string) error {
 	return nil
 }
 
-func VerifyHAAWSDeployment(configFile string) error {
+func (v *VerificationModule) VerifyHAAWSDeployment(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
@@ -75,7 +77,7 @@ func VerifyHAAWSDeployment(configFile string) error {
 	return nil
 }
 
-func VerifyHAAWSManagedDeployment(configFile string) error {
+func (v *VerificationModule) VerifyHAAWSManagedDeployment(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseAWSAutomateConfig(configFile)
 	if err != nil {
@@ -85,7 +87,7 @@ func VerifyHAAWSManagedDeployment(configFile string) error {
 	return nil
 }
 
-func VerifyOnPremAWSManagedDeployment(configFile string) error {
+func (v *VerificationModule) VerifyOnPremAWSManagedDeployment(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
@@ -95,7 +97,7 @@ func VerifyOnPremAWSManagedDeployment(configFile string) error {
 	return nil
 }
 
-func VerifyOnPremCustManagedDeployment(configFile string) error {
+func (v *VerificationModule) VerifyOnPremCustManagedDeployment(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
@@ -105,7 +107,7 @@ func VerifyOnPremCustManagedDeployment(configFile string) error {
 	return nil
 }
 
-func VerifyStandaloneDeployment(configFile string) error {
+func (v *VerificationModule) VerifyStandaloneDeployment(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseStandaloneConfig(configFile)
 	if err != nil {
@@ -115,12 +117,12 @@ func VerifyStandaloneDeployment(configFile string) error {
 	return nil
 }
 
-func VerifyCertificates(certContents string) error {
+func (v *VerificationModule) VerifyCertificates(certContents string) error {
 
 	return nil
 }
 
-func VerifyOnPremDeployment(configFile string) error {
+func (v *VerificationModule) VerifyOnPremDeployment(configFile string) error {
 
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseOnPremConfig(configFile)
