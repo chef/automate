@@ -230,7 +230,7 @@ The below steps won't work for Automate HA with AWS Managed.
     ```bash
     automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
 
-    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ```
 
 1. Start the Service in All the Frontend Nodes with command shown below:
@@ -289,7 +289,9 @@ The below steps won't work for Automate HA with AWS Managed.
 
 1.  Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
-    `scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user`
+    ```bash
+    scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user
+    ```
 
 1. Go to Bastion:
     {{< warning >}}
@@ -391,7 +393,7 @@ The below steps won't work for Automate HA with AWS Managed.
     ```bash
     automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
 
-    chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    sudo chef-automate backup restore s3://<s3-bucket-name>/<path-to-backup>/<backup-id>/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
     ```
 
 1. Start the Service in All the Frontend Nodes with command shown below:
