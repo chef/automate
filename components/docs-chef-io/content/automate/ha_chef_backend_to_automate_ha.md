@@ -16,7 +16,6 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-
 - Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Also, for the customers using a standalone Chef Infra Server, cookbooks should be in the database but not in either the file system or S3.
 - Automate HA does not support supermarket authentication with chef-server user credentials.
@@ -29,9 +28,7 @@ This page explains the procedure to migrate the existing Standalone Chef Infra S
 - Back up the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
 - Restore the backed-up data to the newly deployed Chef Automate HA environment via `knife-ec-restore`.
 
-Take a backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data-bags, policies, and organizations.
-
-`knife-ec-backup` utility backups and restores the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download, uploads commands, and uses the same underlying libraries. It includes workarounds for unsupported objects by the tools and various Server API deficiencies. The goal is to improve knife download, knife upload, and the Chef Infra Server API to deprecate the tool.
+Take a backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data-bags, policies, and organizations. `knife-ec-backup` utility backups and restores the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download, uploads commands, and uses the same underlying libraries. It includes workarounds for unsupported objects by the tools and various Server API deficiencies. The goal is to improve knife download, knife upload, and the Chef Infra Server API to deprecate the tool.
 
 {{< note >}}
 
@@ -63,12 +60,12 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
     ```cmd
         hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
     ```
-    Where 
+
+    Where
 
     - `pivotal` is the name of the user
     - `path of pivotal` is where the user's pem file is stored.
     - `node-threshold NUM_DAYS` is the maximum number of days since the last checking before a node is considered stale.
-
     For Example:
 
     ```cmd
@@ -80,12 +77,14 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
     ```cmd
         hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server url>
     ```
+
     In this command:
 
     - `--with-user-sql` is required to handle user passwords and ensure user-specific association groups are not duplicated.
     - `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone's access.
 
     For example:
+
     ```cmd
         hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s https://chef.io`.
     ```
@@ -104,23 +103,21 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
     If your HA Chef Server is in a private subnet, scp backup file to bastion and then to Chef Server.
 
-
 ## Adding S3 Configurations for cookbook storage
 
-Before restoring the backup on the Automate HA Chef Server, If S3 storage is required for cookbooks. Please [Configure S3](/automate/chef_infra_external_cookbooks_in_chef_automate/)
-
+Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks.
 
 {{< note >}}
 
-- If using same bucket for Automate HA, new files will be uploaded for cookbooks. There will not be any impact on the old files.
-- If using a new bucket for Automate HA, new files will be uploaded for cookbooks
+- If you use the same bucket for Automate HA, the old files won't be affected even if the new files for cookbooks are uploaded.
+- When you use the new bucket for Automate HA, new files for cookbooks are uploaded.
 
 {{< /note >}}
 
-The migration flow has been tested on following scenaiors 
+The migration flow is tested on the following scenarios
 
-- If the cookbooks were not stored in s3,post migration it can be resorted in S3.
-- If the cookbooks were stored in s3,post migration it can either be restored in s3 or postgres.
+- If the cookbooks were not stored in s3 post-migration, they can revert to S3.
+- If the cookbooks were stored in s3 post-migration, they can be restored to s3 or Postgres.
 
 ## Restore Backed Up Data to Chef Automate HA
 
@@ -148,9 +145,7 @@ The migration flow has been tested on following scenaiors
 - `-S` is the Chef Server URL
 - `-K` is the path of pivotal.pem file
 - `-F` is the path to store the output file
-
 - Repeat the above commands for the new server
-
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
     ```cmd
@@ -167,12 +162,11 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 - Set up your workstation based on the newly created Automate-HA's chef-server. It is only needed if you have set up the workstation earlier.
 - This in-place migration works only when cookbooks are stored in a database. This does not support use-case, where cookbooks are stored in the filesystem.
-
 {{< /note >}}
 
 {{< note >}}
 
-- In order to validate the In-place migration, please run the validation script before starting backup and restore and then once the below steps from 1 to 11 are done successfully, run it again.  
+- To validate the In-place migration, please run the validation script before starting the backup and restore and then once the below steps from 1 to 11 are done successfully, rerun it.  
 
 ```cmd
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
@@ -184,8 +178,8 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 - `-F` is the path to store the output file
 
 {{< /note >}}
- 
-1. [Backup the existing chef server data ](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
+
+1. [Backup the existing chef server data](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
 2. ssh to all the backend nodes of chef-backend and run
 
     ```cmd
@@ -199,7 +193,6 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     ```
 
 4. Create one bastion machine under the same network space.
-
 5. ssh to bastion machine and download chef-automate cli and extract the downloaded zip file
 
     ```cmd
@@ -219,7 +212,6 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     ```
 
 8. Edit `config.toml` and add the following:
-
     - Update the `instance_count`
     - fqdn : load balance URL, which points to the frontend node.
     - keys : ssh username and private keys
@@ -244,11 +236,11 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     # If backup_config = "object_storage" fill out [object_storage.config] as well
     ## Object storage similar to AWS S3 Bucket
     [object_storage.config]
-    bucket_name = ""    
+    bucket_name = ""
     access_key = ""
     secret_key = ""
-    # For S3 bucket, default endpoint value is "https://s3.amazonaws.com"
-    # Include protocol to the enpoint value. Eg: https://customdns1.com or http://customdns2.com
+    # For the S3 bucket, the default endpoint value is "https://s3.amazonaws.com"
+    # Include protocol to the endpoint value. Eg: https://customdns1.com or http://customdns2.com
     endpoint = ""
     # [Optional] Mention object_storage region if applicable
     # Eg: region = "us-west-1"
@@ -276,21 +268,17 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 9. Deploy using the following command:
 
-```cmd
-./chef-automate deploy config.toml --airgap-bundle <airgapped bundle name>
-```
+    ```cmd
+    ./chef-automate deploy config.toml --airgap-bundle <airgapped bundle name>
+    ```
 
 10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
-
 11. [Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
-
 12. [Validating the data using](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
-
 
 ## Using Automate HA for Chef-Backend user
 
-1. Download and Install chef-workstation
-    From Bastion machine or local machine install chef-workstation
+1. Download and Install chef-workstation from Bastion machine or local machine install chef-workstation
     https://www.chef.io/downloads/tools/workstation
 
 2. Set up the workstation using the following commands:
@@ -308,7 +296,6 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     ```
 
     Provide chef-server FQDN of Automate HA Chef-Server.
-
     Example: https://demo-chef-server.com/organizations/demo-org
 
     ```bash
