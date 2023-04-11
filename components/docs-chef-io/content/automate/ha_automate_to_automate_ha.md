@@ -517,7 +517,8 @@ In case of external chef server, you need to perform the below steps.
 ## Changes/Steps to make Workstation connect to the new setup
 
 1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
-    Example: `chef_server_url          "https://<automate-LB-fqdn>/organizations/new_org"`
+    
+    Example: `chef_server_url          "https://<chef-server-LB-fqdn>/organizations/new_org"`
 
 1. Now run `knife user list`, `knife node list` or `knife cookbook list`. It will give you valid output.
 
@@ -572,7 +573,7 @@ Steps:
 
 1. While running the restore command, If you are getting this error in logs: `Path is not accessible on master node`, then follow the steps given below: 
 
-    1. Go to any Automate HA Opensearch Node, Run the below command: 
+    1. Go to any Automate HA Opensearch Node, and run the below command: 
 
         ```bash
         chmod 777 -R /mnt/automate_backups/
