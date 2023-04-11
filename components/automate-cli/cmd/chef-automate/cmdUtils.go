@@ -220,12 +220,6 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command string, inputFiles map[stri
 		return
 	}
 
-	if err != nil {
-		rc.Error = err
-		resultChan <- rc
-		return
-	}
-
 	rc.Output = output
 	resultChan <- rc
 }

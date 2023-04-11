@@ -107,21 +107,10 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			return errors.Errorf("Config file should be passed with ha-deployment-config flag")
 		}
-		var infra *AutomteHAInfraDetails
-		var err error
-		var deploymentType string
-		if isA2HARBFileExist() {
-			infra, err = getAutomateHAInfraDetails()
-		} else {
-			configPath = args[0]
-			deploymentType, err = getModeFromConfig(configPath)
-			if err != nil {
-				return errors.Errorf("%v", err)
-			}
-			infra, err = getInfraDetailsForDeploymentType(deploymentType, configPath)
-			if err != nil {
-				return errors.Errorf("%v", err)
-			}
+		configPath = args[0]
+		infra, err := getInfraDetails(configPath)
+		if err != nil {
+			return err
 		}
 		nodeMap := constructAndGetNodeMap(infra)
 		cmdUtil := NewRemoteCmdExecutor(nodeMap)
@@ -141,6 +130,25 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	return nil
+}
+
+func getInfraDetails(configPath string) (*AutomteHAInfraDetails, error) {
+	var infra *AutomteHAInfraDetails
+	var err error
+	var deploymentType string
+	if isA2HARBFileExist() {
+		infra, err = getAutomateHAInfraDetails()
+	} else {
+		deploymentType, err = getModeFromConfig(configPath)
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+		infra, err = getInfraDetailsForDeploymentType(deploymentType, configPath)
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+	}
+	return infra, err
 }
 
 var migratePreflightCmdFlags = migrateCmdFlagSet{}
@@ -443,7 +451,6 @@ func populateInfraDetails(config ExistingInfraConfigToml) *AutomteHAInfraDetails
 func getInfraDetailsForDeploymentType(deploymentType string, configPath string) (*AutomteHAInfraDetails, error) {
 	var infra *AutomteHAInfraDetails
 	var err error
-
 	if deploymentType == EXISTING_INFRA_MODE {
 		config, err := getExistingInfraConfig(configPath)
 		if err != nil {
@@ -451,7 +458,8 @@ func getInfraDetailsForDeploymentType(deploymentType string, configPath string) 
 		}
 		infra = populateInfraDetails(*config)
 	}
-	if deploymentType == AWS {
+
+	if deploymentType == AWS_MODE {
 		infra, err = getAutomateHAInfraDetails()
 		if err != nil {
 			return nil, errors.Errorf("%v", err)
@@ -462,6 +470,7 @@ func getInfraDetailsForDeploymentType(deploymentType string, configPath string) 
 
 func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 	frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
+	inputFilePath := "/usr/bin/chef-automate"
 	frontend := &Cmd{
 		CmdInputs: &CmdInputs{
 			Cmd:                      frontendCommand,
@@ -469,7 +478,7 @@ func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 			ErrorCheckEnableInOutput: true,
 			Single:                   false,
 			NodeIp:                   preflightCmdFlags.node,
-			InputFiles:               []string{"/usr/bin/chef-automate"},
+			InputFiles:               []string{inputFilePath},
 			Outputfiles:              []string{},
 			NodeType:                 preflightCmdFlags.frontend,
 		},
@@ -482,7 +491,7 @@ func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 			ErrorCheckEnableInOutput: true,
 			Single:                   false,
 			NodeIp:                   preflightCmdFlags.node,
-			InputFiles:               []string{"/usr/bin/chef-automate"},
+			InputFiles:               []string{inputFilePath},
 			Outputfiles:              []string{},
 			NodeType:                 preflightCmdFlags.automate,
 		},
@@ -495,7 +504,7 @@ func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 			ErrorCheckEnableInOutput: true,
 			Single:                   false,
 			NodeIp:                   preflightCmdFlags.node,
-			InputFiles:               []string{"/usr/bin/chef-automate"},
+			InputFiles:               []string{inputFilePath},
 			Outputfiles:              []string{},
 			NodeType:                 preflightCmdFlags.chef_server,
 		},

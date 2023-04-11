@@ -6,15 +6,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetInfraDetailsForDeploymentType(t *testing.T) {
-	type ExpectedOutput struct {
-		SSHKeyFile           string
-		SSHPort              string
-		SSHUser              string
-		AutomatePrivateIps   []string
-		ChefServerPrivateIps []string
-	}
+type ExpectedOutput struct {
+	SSHKeyFile           string
+	SSHPort              string
+	SSHUser              string
+	AutomatePrivateIps   []string
+	ChefServerPrivateIps []string
+}
 
+func TestGetInfraDetailsForDeploymentType(t *testing.T) {
 	type testCaseInfo struct {
 		testCaseDescription string
 		deploymentType      string
@@ -119,4 +119,33 @@ func TestShouldReturnErrorWhenHaDeploymentConfigFlagDonotHaveConfig(t *testing.T
 	preflightCmdFlags.haDeploymentConfig = true
 	err := runPreflightCheckCmd(nil, nil)
 	assert.Equal(t, err.Error(), "Config file should be passed with ha-deployment-config flag")
+}
+
+func TestShouldGetInfraDetails(t *testing.T) {
+	type testCaseInfo struct {
+		testCaseDescription string
+		configPath          string
+		expectedOutput      ExpectedOutput
+		expectedError       bool
+	}
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "should fetch infra details",
+			configPath:          "../../pkg/testfiles/onprem/config.toml",
+			expectedOutput:      ExpectedOutput{SSHKeyFile: "/home/ec2-user/A2HA.pem", SSHPort: "22", SSHUser: "ec2-user", AutomatePrivateIps: []string{"192.0.2.0", "192.0.2.1"}, ChefServerPrivateIps: []string{"192.0.2.2"}},
+			expectedError:       false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			infra, err := getInfraDetails(tc.configPath)
+			assert.EqualValues(t, infra.Outputs.ChefServerPrivateIps.Value, tc.expectedOutput.ChefServerPrivateIps)
+			assert.EqualValues(t, infra.Outputs.AutomatePrivateIps.Value, tc.expectedOutput.AutomatePrivateIps)
+			assert.EqualValues(t, infra.Outputs.SSHKeyFile.Value, tc.expectedOutput.SSHKeyFile)
+			assert.EqualValues(t, infra.Outputs.SSHPort.Value, tc.expectedOutput.SSHPort)
+			assert.EqualValues(t, infra.Outputs.SSHUser.Value, tc.expectedOutput.SSHUser)
+			assert.Equal(t, err, nil)
+		})
+	}
 }
