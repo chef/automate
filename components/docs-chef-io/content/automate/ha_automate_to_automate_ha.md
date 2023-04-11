@@ -78,6 +78,13 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     {{% automate/char-warn %}}
     {{< /warning >}}
 
+    Update the backup paths to match the elasticsearch snapshot location from the A2HA:
+
+    ```bash
+    [global.v1.external.opensearch.backup.fs]
+    path = "/mnt/automate_backups/elasticsearch"
+    ```
+
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
 
     Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
