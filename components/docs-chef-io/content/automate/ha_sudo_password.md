@@ -7,7 +7,7 @@ gh_repo = "automate"
     title = "Sudo Password"
     parent = "automate/deploy_high_availability/reference"
     identifier = "automate/deploy_high_availability/reference/ha_sudo_password.md Sudo Password"
-    weight = 250
+    weight = 210
 +++
 
 {{< warning >}}
