@@ -170,7 +170,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 - To validate the In-place migration, please run the validation script before starting the backup and restore.
 
 ```cmd
-        curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
+    curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
 ```
 
 where,
