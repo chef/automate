@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -69,26 +70,33 @@ func TestExecInfo(t *testing.T) {
 }
 
 func TestPrintInfo(t *testing.T) {
+
 	t.Run("Passed ", func(t *testing.T) {
 		automate := &AutomateHAInfraDetails{}
-		tmpl, err := printInfo(automate)
+		var b bytes.Buffer
+		infoCommandTemp = `AUTOMATION DETAILS:\n\tAutomate Admin User: \t\t \n\tAutomate Data Collector Token: \t \n\tAutomate Private IPs: \t\t\n\tAutomate SSH: \t\t\t\n\tAutomate URL: \t\t\t \nx\tBackup Config EFS: \t\t \n\tBackup Config S3: \t\t \n\tChef Server Private IPs: \t\n\tChef Server SSH: \t\t\n\tOpensearch Private IPs: \t\n\tOpensearch Public IPs: \t\t\n\tOpensearch SSH: \t\t\n\tPostgresql Private IPs: \t\n\tPostgresql SSH: \t\t\n\tSSH Key File: \t\t\t \n\tSSH Port: \t\t\t \n\tSSH User: \t\t\t \n\n\n`
+		err := printInfo(infoCommandTemp, automate, &b)
 		require.NoError(t, err)
-		require.NotNil(t, tmpl)
+		expected_string := `AUTOMATION DETAILS:\n\tAutomate Admin User: \t\t \n\tAutomate Data Collector Token: \t \n\tAutomate Private IPs: \t\t\n\tAutomate SSH: \t\t\t\n\tAutomate URL: \t\t\t \nx\tBackup Config EFS: \t\t \n\tBackup Config S3: \t\t \n\tChef Server Private IPs: \t\n\tChef Server SSH: \t\t\n\tOpensearch Private IPs: \t\n\tOpensearch Public IPs: \t\t\n\tOpensearch SSH: \t\t\n\tPostgresql Private IPs: \t\n\tPostgresql SSH: \t\t\n\tSSH Key File: \t\t\t \n\tSSH Port: \t\t\t \n\tSSH User: \t\t\t \n\n\n`
+		require.Equal(t, expected_string, b.String())
 	})
 
 	t.Run("Failed to parse", func(t *testing.T) {
 		automate := &AutomateHAInfraDetails{}
+		var b bytes.Buffer
 		infoCommandTemp = "Hello, {{Name}}"
-		tmpl, err := printInfo(automate)
+		err := printInfo(infoCommandTemp, automate, &b)
 		require.Error(t, err)
-		require.Nil(t, tmpl)
+		require.Equal(t, "", b.String())
+
 	})
 
 	t.Run("Failed to execute tmpl", func(t *testing.T) {
 		automate := &AutomateHAInfraDetails{}
 		infoCommandTemp = "Hello, {{.Name}}"
-		tmpl, err := printInfo(automate)
+		var b bytes.Buffer
+		err := printInfo(infoCommandTemp, automate, &b)
 		require.Error(t, err)
-		require.Nil(t, tmpl)
+		require.Equal(t, "Hello, ", b.String())
 	})
 }

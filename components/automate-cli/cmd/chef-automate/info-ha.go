@@ -3,9 +3,9 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"os"
 	"text/template"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
@@ -26,8 +26,7 @@ var (
 	{{- end}}
 	{{- "\n"}}
 
-	{{- "\t"}}{{- "Automate URL:"}} {{"\t\t\t"}} {{.Outputs.AutomateURL.Value }}{{- "\n"}}
-	{{- "\t"}}{{- "Automate URL:"}} {{"\t\t\t"}} {{.Outputs.AutomateURL.Value }}{{- "\n"}}
+	{{- "\t"}}{{- "Automate URL:"}} {{"\t\t\t"}} {{.Outputs.AutomateURL.Value }}{{- "\n"}}x
 	{{- "\t"}}{{- "Backup Config EFS:"}} {{"\t\t"}} {{.Outputs.BackupConfigEFS.Value }}{{- "\n"}}
 	{{- "\t"}}{{- "Backup Config S3:"}} {{"\t\t"}} {{.Outputs.BackupConfigS3.Value }}{{- "\n"}}
 	
@@ -89,33 +88,43 @@ func runInfoConfigCmd(cmd *cobra.Command, args []string) error {
 }
 
 func execInfo() error {
-	fileName, err := FileContainingAutomateHAInfraDetails()
-	if err != nil {
-		return err
-	}
-	automate, err := getAutomateHAInfraDetails(fileName)
+
+	automate, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return err
 
 	}
-	_, err = printInfo(automate)
+	var b bytes.Buffer
+	err = printInfo(infoCommandTemp, automate, &b)
 	if err != nil {
 		return err
 	}
-
+	fmt.Print(b.String())
 	return nil
 }
 
-func printInfo(automate *AutomateHAInfraDetails) (*template.Template, error) {
+func printInfo(infoCommandTemplate string, automate *AutomateHAInfraDetails, writer *bytes.Buffer) error {
+	tmpl, err := template.New("output").Parse(infoCommandTemplate)
+	if err != nil {
+		logrus.Errorf("Error: %v", err)
+		return err
+	}
+	if err := tmpl.Execute(writer, automate); err != nil {
+		logrus.Errorf("Error: %v", err)
+		return err
+	}
+	return nil
+}
+
+func printInfoTest(automate *AutomateHAInfraDetails, writer *bytes.Buffer) error {
 	tmpl, err := template.New("output").Parse(infoCommandTemp)
 	if err != nil {
 		logrus.Errorf("Error: %v", err)
-		return nil, err
+		return err
 	}
-	if err := tmpl.Execute(os.Stdout, automate); err != nil {
+	if err := tmpl.Execute(writer, automate); err != nil {
 		logrus.Errorf("Error: %v", err)
-		return nil, err
+		return err
 	}
-	fmt.Println()
-	return tmpl, nil
+	return nil
 }

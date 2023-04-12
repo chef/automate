@@ -180,12 +180,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		outputFile, err := FileContainingAutomateHAInfraDetails()
-		if err != nil {
-			return err
-		}
-
-		infra, err := getAutomateHAInfraDetails(outputFile)
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
@@ -352,12 +347,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 
 	if isA2HARBFileExist() {
-		outputFile, err := FileContainingAutomateHAInfraDetails()
-		if err != nil {
-			return err
-		}
-
-		infra, err := getAutomateHAInfraDetails(outputFile)
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
@@ -577,12 +567,7 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		var err error
 
-		outputFile, opErr := FileContainingAutomateHAInfraDetails()
-		if opErr != nil {
-			return err
-		}
-
-		infra, err := getAutomateHAInfraDetails(outputFile)
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}

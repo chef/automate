@@ -400,12 +400,8 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 	modeOfDeployment := getModeOfDeployment()
 	if modeOfDeployment == EXISTING_INFRA_MODE {
-		outputFile, err := FileContainingAutomateHAInfraDetails()
-		if err != nil {
-			return err
-		}
 
-		infra, err := getAutomateHAInfraDetails(outputFile)
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
@@ -424,12 +420,8 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	} else if modeOfDeployment == AWS_MODE {
-		outputFile, err := FileContainingAutomateHAInfraDetails()
-		if err != nil {
-			return err
-		}
 
-		infra, err := getAutomateHAInfraDetails(outputFile)
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}

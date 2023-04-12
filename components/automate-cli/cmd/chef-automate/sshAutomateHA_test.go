@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -13,7 +14,7 @@ var (
 	nonsxistingtfstate2 = "nonsxisting2.tfstate"
 )
 
-func TestGetAutomateHAInfraDetails(t *testing.T) {
+func TestGetAutomateHAInfraDetailsHelper(t *testing.T) {
 	// Valid json
 	t.Run("passed all cases", func(t *testing.T) {
 
@@ -77,7 +78,7 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 		err = tmpfile.Close()
 		require.NoError(t, err)
 
-		actualInfraDetails, err := getAutomateHAInfraDetails(tmpfile.Name())
+		actualInfraDetails, err := getAutomateHAInfraDetailHelper(tmpfile.Name())
 		require.NoError(t, err)
 		require.NotNil(t, actualInfraDetails)
 		require.Equal(t, actualInfraDetails.Outputs.AutomateAdminUser.Value, "admin")
@@ -106,7 +107,7 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 		require.NoError(t, err)
 		require.NotZero(t, n)
 
-		_, err = getAutomateHAInfraDetails(file.Name())
+		_, err = getAutomateHAInfraDetailHelper(file.Name())
 		require.Error(t, err)
 	})
 
@@ -114,7 +115,7 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 	t.Run("File not found", func(t *testing.T) {
 
 		filePath := "testdata/notfound.json"
-		_, err := getAutomateHAInfraDetails(filePath)
+		_, err := getAutomateHAInfraDetailHelper(filePath)
 		require.Error(t, err)
 	})
 
@@ -123,7 +124,7 @@ func TestGetAutomateHAInfraDetails(t *testing.T) {
 		file, err := ioutil.TempFile("", testFile)
 		require.NoError(t, err)
 
-		_, err = getAutomateHAInfraDetails(file.Name())
+		_, err = getAutomateHAInfraDetailHelper(file.Name())
 		require.Error(t, err)
 		require.Equal(t, err.Error(), "the file is empty")
 	})
