@@ -135,17 +135,23 @@ The migration flow is tested on the following scenarios
 
 ## Steps to validate if Migration is successful
 
-- Execute the below commands from the old server where the knife is installed :
+- Download the validation script using below
 
     ```cmd
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
-        bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
+
+        where , 
+        `-S` is the Chef Server URL
+        '-K` is the path of pivotal.pem file
+        '-F` is the path to store the output file
     ```
 
-- `-S` is the Chef Server URL
-- `-K` is the path of pivotal.pem file
-- `-F` is the path to store the output file
-- Repeat the above commands for the new server
+
+- Execute the below command to get the counts of objects
+  ```cmd
+      bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
+      ```
+- Repeat the above commands for the new server for getting the counts
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
     ```cmd
@@ -170,13 +176,14 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 ```cmd
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
-        bash infra_server_objects_count_collector.sh -S test -K Key -F Filename
+        
+       where,
+         `-S` is the Chef Server URL
+         `-K` is the path of pivotal.pem file
+         `-F` is the path to store the output file
+
+    bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
 ```
-
-- `-S` is the Chef Server URL
-- `-K` is the path of pivotal.pem file
-- `-F` is the path to store the output file
-
 {{< /note >}}
 
 1. [Backup the existing chef server data](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
