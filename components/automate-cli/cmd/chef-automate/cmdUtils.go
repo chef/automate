@@ -29,7 +29,7 @@ type CmdInputs struct {
 	Outputfiles              []string
 	ErrorCheckEnableInOutput bool
 	NodeType                 bool
-	PrintOutput              bool
+	SkipPrintOutput              bool
 	HideSSHConnectionMessage bool
 	MutipleCmdWithArgs       map[string]string
 }
@@ -169,7 +169,7 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 				ouputJsonResultMapMutex.Lock()
 				ouputJsonResult[result.HostIP] = append(ouputJsonResult[result.HostIP], result)
 				ouputJsonResultMapMutex.Unlock()
-				if input.PrintOutput {
+				if !input.SkipPrintOutput {
 					cliWriter.Println("=====================================================")
 					printOutput(remoteService, result, outputFiles, c.Output)
 					cliWriter.Println("=====================================================")

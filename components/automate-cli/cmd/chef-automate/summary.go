@@ -70,7 +70,7 @@ func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus 
 func (ss *Summary) Prepare() error {
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.getIPAddressesFromFlagOrInfra()
 	if errList != nil && errList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, ipAddressError)
+		return status.Wrap(getSingleErrorFromList(errList), status.InvalidCommandArgsError, ipAddressError)
 	}
 
 	if len(automateIps) != 0 {
@@ -82,7 +82,7 @@ func (ss *Summary) Prepare() error {
 					NodeIps:                  automateIps,
 					Single:                   false,
 					NodeType:                 true,
-					PrintOutput:              false,
+					SkipPrintOutput:          true,
 					HideSSHConnectionMessage: true,
 				},
 			},
@@ -106,7 +106,7 @@ func (ss *Summary) Prepare() error {
 					NodeIps:                  chefServerIps,
 					Single:                   false,
 					NodeType:                 true,
-					PrintOutput:              false,
+					SkipPrintOutput:          true,
 					HideSSHConnectionMessage: true,
 				},
 			},
@@ -131,7 +131,7 @@ func (ss *Summary) Prepare() error {
 					NodeIps:                  opensearchIps,
 					Single:                   false,
 					NodeType:                 true,
-					PrintOutput:              false,
+					SkipPrintOutput:          true,
 					HideSSHConnectionMessage: true,
 				},
 			},
@@ -156,7 +156,7 @@ func (ss *Summary) Prepare() error {
 					NodeIps:                  postgresqlIps,
 					Single:                   false,
 					NodeType:                 true,
-					PrintOutput:              false,
+					SkipPrintOutput:          true,
 					HideSSHConnectionMessage: true,
 				},
 			},
