@@ -29,18 +29,17 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
 
     1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
-    ```bash
-    chef-automate backup create
-    ```
+        ```bash
+        chef-automate backup create
+        ```
 
-    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+        Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
     1. Run the below command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
-    ```bash
-    chef-automate bootstrap bundle create bootstrap.abb
-    ```
-
+        ```bash
+        chef-automate bootstrap bundle create bootstrap.abb
+        ```
 
 1. If you haven't specified the location in the `config.toml` file, go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
 
@@ -188,17 +187,17 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
 
     1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
-    ```bash
-    chef-automate backup create
-    ```
+        ```bash
+        chef-automate backup create
+        ```
 
-    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+        Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
     1. Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
-    ```bash
-    chef-automate bootstrap bundle create bootstrap.abb
-    ```
+        ```bash
+        chef-automate bootstrap bundle create bootstrap.abb
+        ```
 
 1. Run the following command at the Chef-Automate node of Automate HA cluster to get the applied config:
 
