@@ -105,7 +105,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
 ## Adding S3 Configurations for cookbook storage
 
-Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks.
+Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in Chef server can be stored in S3 or Postgres in Automate HA.
 
 {{< note >}}
 
@@ -113,11 +113,6 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 - When you use the new bucket for Automate HA, new files for cookbooks are uploaded.
 
 {{< /note >}}
-
-The migration flow is tested on the following scenarios
-
-- The cookbooks stored in S3 in Chef server can be stored in S3 or Postgres in Automate HA
-- The cookbooks not stored in S3 in Chef server can be stored in S3 or Postgres in Automate HA
 
 ## Restore the Backed Up Data to Chef Automate HA
 
@@ -141,10 +136,11 @@ The migration flow is tested on the following scenarios
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
     ```
 
-    where 
-        `-S` is the Chef Server URL
-        '-K` is the path of pivotal.pem file
-        '-F` is the path to store the output file
+    where:
+
+    - `-S` is the Chef Server URL
+    - '-K` is the path of pivotal.pem file
+    - '-F` is the path to store the output file
 
 
 - Execute the below command to get the counts of objects
@@ -184,6 +180,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
     bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
 ```
+
 {{< /note >}}
 
 1. [Backup the existing chef server data](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
