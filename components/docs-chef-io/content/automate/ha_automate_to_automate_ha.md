@@ -415,29 +415,18 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
 
 ## Steps to Validate migration is successful
 
-1. Check the Automate UI of Automate HA, whether the data you have pushed in standalone exists or not in HA.
-1. Log in to the Chef-server HA node, and run the following commands:
-    - `knife user list` will give the user list you created in standalone automate.
+1. Check the Automate UI of Automate HA. Check whether the data is present in Automate UI for HA.
+1. If you are using the embedded chef server, log in to the Chef-server HA node, and run the following commands:
+    - `knife user list`: will give the user list you created in standalone automate.
     - `knife opc org list`: It will give the organization list you created in standalone automate.
 
-You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful) using one of the other ways.
-
-### Updating through workstation
-
-We can also update the chef_server_url of nodes by doing the node bootstrapping.
-
-Steps:
-
-1. Update the `chef_server_url` in the workstation
-1. Go to your workstation and open the `~/.chef/config.rb` file.
-1. Update the `chef_server_url` with the chef server LB fqdn.
-1. Now do node bootstrapping. It will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
+You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful) using one of the other ways. You can check out the steps to  connect to the new setup.
 
 ## Troubleshoot
 
-1. While running the restore command, If you are getting this error in logs: `Failed to restore synchronous operations`, follow the steps given below:
-    Steps:
-    1. Go to any Automate Node in HA.
+1. While running the restore command, If you are getting this error: `Failed to restore synchronous operations`, follow the steps given below:
+
+    1. Log in to any Automate Node in HA.
     1. Run the below command to get all the snapshots.
 
         ```bash
@@ -456,14 +445,14 @@ Steps:
         curl -k -X DELETE -s http://localhost:10144/_snapshot/chef-automate-es6-event-feed-service 
         ```
 
-1. While running the restore command, If you are getting this error in logs: `Path is not accessible on master node`, follow the steps given below:
-    1. Go to any Automate HA Opensearch Node, and run the below command:
+1. While running the restore command, If you are getting this error: `Path is not accessible on master node`, follow the steps given below:
+    1. Log in to any Automate HA Opensearch Node, and run the below command:
 
         ```bash
         chmod 777 -R /mnt/automate_backups/
         ```
 
-1. If you are getting `The hab user doesn't have read/write/exec permission on the backup repository` error, follow the steps given below:
+1. If you are getting `The hab user doesn't have read/write/exec permission on the backup repository` error, run the below command:
 
     ```bash
     sudo chown hab:hab /mnt/automate_backups
