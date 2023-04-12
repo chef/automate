@@ -16,14 +16,13 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with 
-minimum version of Chef Automate: [2020xxxxxxxx](https://docs.chef.io/release_notes_automate/)
+- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with the minimum version of Chef Automate: [2020xxxxxxxx](https://docs.chef.io/release_notes_automate/)
 
 {{< /warning >}}
 
 ## Migration with FileSystem Backup Locally
 
-Follow the below steps, when you are migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
+Follow the steps below when migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
@@ -47,7 +46,7 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
     tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
     ```
 
-1. Transfer the `tar` bundle to one of the Chef-Automate node of Automate HA using the following command:
+1. Transfer the `tar` bundle to one of the Chef-Automate nodes of Automate HA using the following command:
 
     ```bash
         scp -i /path/to/key /path/to/backup-file user@host:/home/user
@@ -115,7 +114,7 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
     {{% automate/char-warn %}}
     {{< /warning >}}
 
-1. On every Frontend Node copy the `bootstrap.abb` file and unpack the file using the following command:
+1. On every Frontend Node, copy the `bootstrap.abb` file and unpack the file using the following command:
 
     ```bash
     chef-automate bootstrap bundle unpack bootstrap.abb
@@ -142,14 +141,14 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
 
 ## Migration with FileSystem Backup via Volume Mount
 
-Follow the below steps, when you are migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
+Follow the steps below when migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
 
 1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:
     - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
     - In HA, we are mounting that EFS volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
 
-    Make sure that the location have permission for the hab user.
+    Make sure that the location has permission for the hab user.
 
 1. Go to Bastion and:
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
@@ -183,7 +182,7 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Create a Backup of Chef Automate Standalone using the following command: 
+1. Create a Backup of Chef Automate Standalone using the following command:
 
     1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
@@ -193,7 +192,7 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
 
         Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
-    1. Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+    1. Run the below command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
         ```bash
         chef-automate bootstrap bundle create bootstrap.abb
@@ -252,7 +251,7 @@ Follow the below steps, when you are migrating to On-Premises or AWS HA deployme
 
 ## Migration with S3
 
-For AWS managed services, map the snapshot role to OpenSearch dashboard. It is necessary to [enable backup and restore in OpenSearch](automate/managed_services/#enabling-opensearch-backup-restore).
+For AWS managed services, map the snapshot role to the OpenSearch dashboard. It is necessary to [enable backup and restore in OpenSearch](automate/managed_services/#enabling-opensearch-backup-restore).
 
 1. Patch the following configuration in Standalone Chef Automate for creating the backup in the S3.
 
@@ -295,7 +294,7 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
 
     Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
-    1. Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+    1. Run the below command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
     ```bash
     chef-automate bootstrap bundle create bootstrap.abb
@@ -309,7 +308,7 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
 
 1. Go to Bastion:
 
-    {{< note >}} Use the same bucket for restore which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /note >}}
+    {{< note >}} Use the same bucket for restore, which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /note >}}
 
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
@@ -388,7 +387,7 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
     {{% automate/char-warn %}}
     {{< /warning >}}
 
-1. On every Frontend Node copy the `bootstrap.abb` file and unpack the file using the following command:
+1. On every Frontend Node, copy the `bootstrap.abb` file and unpack the file using the following command:
 
     ```bash
     chef-automate bootstrap bundle unpack bootstrap.abb
@@ -420,7 +419,7 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
     - `knife user list`: will give the user list you created in standalone automate.
     - `knife opc org list`: It will give the organization list you created in standalone automate.
 
-You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful) using one of the other ways. You can check out the steps to  connect to the new setup.
+You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful) using one of the other ways. You can check out [more steps to connect](/automate/ha_chef_backend_to_automate_ha/#connect-workstationnodes-to-automate-ha) to the new setup.
 
 ## Troubleshoot
 
