@@ -27,6 +27,10 @@ To enable the `sudo password` for the Chef Automate HA deployment, follow the st
 
 1. Create a `sudo_password` environment variable. Example: `export sudo_password=1234`.
 2. Pass the `sudo_password` environment variable to the `chef-automate` CLI commands. Example: `sudo -E chef-automate iam version`.
+
    a. To pass all your environment variables including the `sudo_password` to the `chef-automate` CLI commands, you can use the `-E` or `--preserve-env` option. Example: `sudo -E chef-automate iam version` or `sudo --preserve-env chef-automate iam version`.
+
    b. To just pass `sudo_password` environment variable to the `chef-automate` CLI commands, you can supply environment variable name to the `--preserve-env` argument. Example: `sudo --preserve-env=sudo_password chef-automate iam version`.
 3. You can also set environment variables directly in the sudo command. Example: `sudo sudo_password=1234 chef-automate iam version`.
+
+Make sure to pass the `sudo_password` environment variable to all the `chef-automate` CLI commands.
