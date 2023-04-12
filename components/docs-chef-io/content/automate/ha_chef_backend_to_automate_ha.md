@@ -17,7 +17,7 @@ gh_repo = "automate"
 {{< warning >}}
 
 - Customers using only **Standalone Chef Infra Server** or **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
-- Also, for the customers using a standalone Chef Infra Server, cookbooks should be in the database but not in either the file system or S3.
+- Also, for the customers using a standalone Chef Infra Server, cookbooks should be in the database or S3 but not in the file system.
 - Automate HA does not support supermarket authentication with chef-server user credentials.
 - Post Migration Customer can not log in with chef-server users to Supermarket.
 
@@ -116,8 +116,8 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 The migration flow is tested on the following scenarios
 
-- If the cookbooks were not stored in s3 post-migration, they can revert to S3.
-- If the cookbooks were stored in s3 post-migration, they can be restored to s3 or Postgres.
+- The cookbooks stored in S3 in Chef server can be stored in S3 or Postgres in Automate HA
+- The cookbooks not stored in S3 in Chef server can be stored in S3 or Postgres in Automate HA
 
 ## Restore the Backed Up Data to Chef Automate HA
 
@@ -274,7 +274,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 
 10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
 11. Once done, [restore the backed up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
-12. [Validating the data using](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
+12. [Validate the data](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 
 ## Using Automate HA for Chef-Backend user
 
