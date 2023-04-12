@@ -494,6 +494,7 @@ func TestGetOsCertsByIp(t *testing.T) {
 		osConfigMap         map[string]*ConfigKeys
 		ExpectedCertsByIp   []CertByIP
 	}
+	const nodesDnList = "CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode2,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode3,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n"
 	mockInfra := &AutomteHAInfraDetails{}
 	mockInfra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP, ValidIP1, ValidIP2}
 	p := NewPullConfigs(mockInfra, &SSHUtilImpl{})
@@ -525,21 +526,20 @@ func TestGetOsCertsByIp(t *testing.T) {
 					ValidIP,
 					PrivateKeyContents,
 					publicKey1,
-					"CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode2,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode3,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n",
+					nodesDnList,
 				},
 
 				{
 					ValidIP1,
 					PrivateKeyContents,
 					publicKey2,
-					"CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode2,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode3,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n",
+					nodesDnList,
 				},
-
 				{
 					ValidIP2,
 					PrivateKeyContents,
 					publicKey3,
-					"CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode2,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode3,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n",
+					nodesDnList,
 				},
 			},
 		},
