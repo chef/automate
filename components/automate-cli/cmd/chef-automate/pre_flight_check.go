@@ -50,28 +50,52 @@ func init() {
 		"ha-deployment-config",
 		false,
 		"Pass this flag to run pre-flight check on automate-HA")
+	showConfigCmd.PersistentFlags().SetAnnotation("ha-deployment-config", docs.Compatibility, []string{docs.CompatiblewithHA})
 	preflightCheckCmd.PersistentFlags().BoolVar(
 		&preflightCmdFlags.frontend,
 		"fe",
 		false,
 		"Pass this flag to run pre-flight check on all Frontend nodes")
+	showConfigCmd.PersistentFlags().SetAnnotation("fe", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVarP(
+		&preflightCmdFlags.frontend,
+		"frontend",
+		"f",
+		false,
+		"Pass this flag to run pre-flight check on all Frontend nodes")
+	showConfigCmd.PersistentFlags().SetAnnotation("frontend", docs.Compatibility, []string{docs.CompatiblewithHA})
 	preflightCheckCmd.PersistentFlags().BoolVarP(
 		&preflightCmdFlags.automate,
 		"automate",
 		"a",
 		false,
 		"Pass this flag to run pre-flight check on automate node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVar(
+		&preflightCmdFlags.automate,
+		"a2",
+		false,
+		"Pass this flag to run pre-flight check on automate node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
 	preflightCheckCmd.PersistentFlags().BoolVarP(
 		&preflightCmdFlags.chef_server,
 		"chef_server",
 		"c",
 		false,
 		"Pass this flag to run pre-flight check on chef-server node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVar(
+		&preflightCmdFlags.chef_server,
+		"cs",
+		false,
+		"Pass this flag to run pre-flight check on chef-server node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
 	preflightCheckCmd.PersistentFlags().StringVar(
 		&preflightCmdFlags.node,
 		"node",
 		"",
 		"Pass this flag to run pre-flight check on a perticular node node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	preflightCheckCmd.PersistentFlags().StringVar(
 		&preflightCmdFlags.configPath,
 		"config",
