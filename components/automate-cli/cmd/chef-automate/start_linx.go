@@ -207,7 +207,7 @@ func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService stri
 		return err
 	}
 	if errorList != nil && errorList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errorList), status.ServiceStartError, "No able to start")
+		return status.Wrap(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes")
 	}
 	return nil
 }

@@ -78,11 +78,11 @@ func TestStartForBackEndNodes(t *testing.T) {
 		},
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("error")),
-			[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("Process exited with status 1")),
+			[]string{"127.0.0.3"},
 			"postgresql",
-			false,
-			nil,
+			true,
+			errors.New("Not able to start one or more nodes: \nProcess exited with status 1"),
 		},
 	}
 
