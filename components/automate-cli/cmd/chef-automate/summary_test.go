@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
+const (
 	invalidIpAddress = `
 Incorrect Automate IP address format for ip 127.0.0IP address validation failed
 Incorrect Automate IP address format for ip 127.0.1IP address validation failed
@@ -39,7 +39,7 @@ List of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]`
 | automate    |            | OK     | "green" (Active: 100.0) |
 | chef-server |            | OK     | "green" (Active: 100.0) |
 +-------------+------------+--------+-------------------------+`
-mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
+	mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 )
 
 func TestCheckIPAddressesFromInfra(t *testing.T) {
