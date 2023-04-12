@@ -40,7 +40,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. If you haven't specified the location in the `config.toml` file, go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
+1. If you haven't specified the location in the `config.toml` file, go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
 
     ```bash
     tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
@@ -59,7 +59,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     ```
 
 1. Go to Bastion and:
-    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
+    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [path]
@@ -72,7 +72,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     chef-automate config patch --opensearch <path to os_config.toml>
     ```
 
-    - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
+    - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
 
     ```bash
     [global.v1.external.opensearch.backup]
@@ -145,13 +145,13 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 
 1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:
-    - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
     - In HA, we are mounting that EFS volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
 
     Make sure that the location has permission for the hab user.
 
 1. Go to Bastion and:
-    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
+    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [path]
@@ -164,7 +164,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     chef-automate config patch --opensearch <Path to os_config.toml>
     ```
 
-    - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
+    - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
 
     ```bash
     [global.v1.external.opensearch.backup]
@@ -310,7 +310,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 
     {{< note >}} Use the same bucket for restore, which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /note >}}
 
-    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
+    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [global.v1]
@@ -441,7 +441,7 @@ You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#
         Example:
 
         ```bash
-        curl -k -X DELETE -s http://localhost:10144/_snapshot/chef-automate-es6-event-feed-service 
+        curl -k -X DELETE -s http://localhost:10144/_snapshot/chef-automate-es6-event-feed-service
         ```
 
 1. While running the restore command, If you are getting this error: `Path is not accessible on master node`, follow the steps given below:
