@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -369,7 +370,9 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 	return authToken, nil
 }
 
-func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, serviceName string) BeStatusValue {
+func (ss *Summary) getBEStatus(outputs []CmdResult, ip string, authToken, serviceName string) BeStatusValue {
+	order := []string{"DefaultServiceDetails", "DefaultServiceHealthDetails", "CensusDetails"}
+
 	var memeberId, role string
 	var err error
 	serviceState := initialServiceState
@@ -384,25 +387,25 @@ func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, servi
 		upTime:      initialFormattedDuration,
 		role:        initialRole,
 	}
-	for _, output := range outputs {
-		switch output.ScriptName {
-		case "DefaultServiceDetails":
-			memeberId, serviceState, servicePid, formattedDuration, err = ss.getBEDefaultServiceDetails(output.Output)
-			if output.Error != nil || err != nil {
-				return defaultBeStatusValue
-			}
-		case "DefaultServiceHealthDetails":
-			health, err = ss.getBEServiceHealth(output.Output)
-			if output.Error != nil || err != nil {
-				return defaultBeStatusValue
-			}
-		case "CensusDetails":
-			role, err = ss.getBECensus(output.Output, serviceName, memeberId)
-			if output.Error != nil || err != nil {
-				defaultBeStatusValue.role = role
-				return defaultBeStatusValue
-			}
-		}
+
+	sort.Slice(outputs, func(i int, j int) bool {
+		return getIndexOf(outputs[i], order) < getIndexOf(outputs[j], order)
+	})
+
+	memeberId, serviceState, servicePid, formattedDuration, err = ss.getBEDefaultServiceDetails(outputs[0].Output)
+
+	if outputs[0].Error != nil || err != nil {
+		return defaultBeStatusValue
+	}
+	health, err = ss.getBEServiceHealth(outputs[1].Output)
+	if outputs[1].Error != nil || err != nil {
+		return defaultBeStatusValue
+	}
+
+	role, err = ss.getBECensus(outputs[2].Output, serviceName, memeberId)
+	if outputs[2].Error != nil || err != nil {
+		defaultBeStatusValue.role = role
+		return defaultBeStatusValue
 	}
 	return BeStatusValue{
 		serviceName: serviceName,
@@ -469,7 +472,7 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 	return role, nil
 }
 
-func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
+func (ss *Summary) getFEStatus(ip string, outputs []CmdResult, serviceType string) FeStatusValue {
 	var osStatus, status string
 
 	for _, output := range outputs {
@@ -496,7 +499,7 @@ func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType stri
 	}
 }
 
-func (ss *Summary) opensearchStatusInFE(osStatusOutput *CmdResult) string {
+func (ss *Summary) opensearchStatusInFE(osStatusOutput CmdResult) string {
 
 	if osStatusOutput.Error != nil {
 		return "Unknown"
@@ -575,4 +578,13 @@ func (ss *Summary) ShowBEStatus() string {
 		return t.Render()
 	}
 	return ""
+}
+
+func getIndexOf(value CmdResult, order []string) int {
+	for i := 0; i < len(order); i++ {
+		if value.ScriptName == order[i] {
+			return i
+		}
+	}
+	return -1
 }

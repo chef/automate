@@ -275,7 +275,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 
 	timestamp := time.Now().Format("20060102150405")
 	file := file
-	resultChan := make(chan CmdResult, 1)
 
 	testCases := []struct {
 		testCaseName   string
@@ -285,7 +284,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 		configFile     string
 		remoteService  string
 		newSSHUtil     SSHUtil
-		resultChan     chan CmdResult
 		expectedOutput CmdResult
 		isError        bool
 	}{
@@ -298,7 +296,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "config patch operation completed", nil, "", nil),
-			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP: ip1,
 				Output: "config patch operation completed",
@@ -313,7 +310,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{file},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, completedMessage, nil, file, nil),
-			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{file},
@@ -331,7 +327,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, errors.Errorf("copy to remote failed"), "", nil, file, nil),
-			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{},
@@ -347,7 +342,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "", errors.Errorf("remote execution"), "", nil),
-			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{},
@@ -363,7 +357,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{file},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "", nil, file, errors.Errorf("copy from remote failed")),
-			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{file},
@@ -381,7 +374,6 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "Error: patch failed", nil, file, nil),
-			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				ScriptName:  "",
 				HostIP:      ip1,
@@ -398,8 +390,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			SshUtil: testCase.newSSHUtil,
 		}
 
-		new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, &SSHConfig{}, testCase.resultChan)
-		result := <-resultChan
+		result := new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, &SSHConfig{})
 
 		if testCase.isError {
 			assert.Error(t, result.Error)

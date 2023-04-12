@@ -152,26 +152,27 @@ func TestRunFENodeDiaplay(t *testing.T) {
 func TestRunBENode(t *testing.T) {
 	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4}
+	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{hostIP: ValidIP4}, nil, nil)
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil)
 	err := ss.Prepare()
 	assert.NoError(t, err)
 }
 func TestRunBENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
+	// infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7}
+	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{hostIP: ValidIP7}, nil, nil)
+
+	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil)
 	// Mock the time to a specific time
 	mockTime := time.Date(2023, 3, 15, 12, 0, 0, 0, time.UTC)
 	nowFunc = func() time.Time { return mockTime }
-	// c.Execute()
 	err := ss.Prepare()
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
-	assert.Equal(t, be, "+------------+------------+--------+----------------+------------------+---------+\n| NAME       | IP ADDRESS | HEALTH | PROCESS        | UPTIME           | ROLE    |\n+------------+------------+--------+----------------+------------------+---------+\n| opensearch |            | OK     | up (pid: 4173) | 19431d 12h 0m 0s | OS node |\n| postgresql |            | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader  |\n+------------+------------+--------+----------------+------------------+---------+")
+	assert.Equal(t, be, "+------------+--------------+--------+----------------+------------------+--------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE   |\n+------------+--------------+--------+----------------+------------------+--------+\n| postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader |\n+------------+--------------+--------+----------------+------------------+--------+")
 }
 
 func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError error) *MockSSHUtilsImpl {
@@ -180,7 +181,6 @@ func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError
 			return sshConfig
 		},
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-			fmt.Println(remoteCommands, "remoteCommands")
 			if strings.Contains(remoteCommands, "/default/health --header") {
 				return `{"status":"OK","stdout":"","stderr":""}`, CSECORError
 			}
@@ -263,6 +263,9 @@ func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError
 				}`, CSECORError
 			}
 			return "", CSECORError
+		},
+		setSSHConfigFunc: func(sshConfig *SSHConfig) {
+			// No return for this function
 		},
 	}
 }
