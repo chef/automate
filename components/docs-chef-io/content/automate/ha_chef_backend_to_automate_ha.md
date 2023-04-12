@@ -139,18 +139,18 @@ The migration flow is tested on the following scenarios
 
     ```cmd
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
+    ```
 
-        where , 
+    where 
         `-S` is the Chef Server URL
         '-K` is the path of pivotal.pem file
         '-F` is the path to store the output file
-    ```
 
 
 - Execute the below command to get the counts of objects
   ```cmd
       bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
-      ```
+  ```
 - Repeat the above commands for the new server for getting the counts
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
