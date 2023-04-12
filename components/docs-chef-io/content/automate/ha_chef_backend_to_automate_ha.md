@@ -28,7 +28,7 @@ This page explains the procedure to migrate the existing Standalone Chef Infra S
 - Back up the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
 - Restore the backed-up data to the newly deployed Chef Automate HA environment via `knife-ec-restore`.
 
-Take a backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data-bags, policies, and organizations. `knife-ec-backup` utility backups and restores the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download, uploads commands, and uses the same underlying libraries. It includes workarounds for unsupported objects by the tools and various Server API deficiencies. The goal is to improve knife download, knife upload, and the Chef Infra Server API to deprecate the tool.
+Take a backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data bags, policies, and organizations. `knife-ec-backup` utility backups and restores the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download, uploads commands, and uses the same underlying libraries. It includes workarounds for unsupported objects by the tools and various Server API deficiencies. The goal is to improve knife download, knife upload, and the Chef Infra Server API to deprecate the tool.
 
 {{< note >}}
 
@@ -103,9 +103,9 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
 
     If your HA Chef Server is in a private subnet, scp backup file to bastion and then to Chef Server.
 
-## Adding S3 Configurations for cookbook storage
+## Add S3 Configurations for Cookbook Storage
 
-Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in Chef server can be stored in S3 or Postgres in Automate HA.
+Before restoring the backup on the Automate HA Chef Server, configure [S3 storage](/automate/chef_infra_external_cookbooks_in_chef_automate/) for cookbooks. The cookbooks stored in S3 in the Chef server can be stored in S3 or Postgres in Automate HA.
 
 {{< note >}}
 
@@ -136,7 +136,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
     ```
 
-    where:
+    Where:
 
     - `-S` is the Chef Server URL
     - `-K` is the path of pivotal.pem file
@@ -148,7 +148,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
       bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
   ```
 
-- Repeat the above commands for the new server for getting the counts
+- Repeat the above commands for the new server to get the counts
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
     ```cmd
@@ -164,7 +164,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 {{< note >}}
 
 - Set up your workstation based on the newly created Automate-HA's chef-server. It is only needed if you have set up the workstation earlier.
-- This in-place migration works when cookbooks are stored in database or s3. This does not support use-case, where cookbooks are stored in the filesystem.
+- This in-place migration works when cookbooks are stored in a database or s3. This does not support use-case, where cookbooks are stored in the filesystem.
 {{< /note >}}
 
 - To validate the In-place migration, please run the validation script before starting the backup and restore.
@@ -173,7 +173,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
 ```
 
-where:
+Where:
 
 - `-S` is the Chef Server URL
 - `-K` is the path of pivotal.pem file
@@ -284,7 +284,7 @@ where:
 
 ## Connect Workstation/Nodes to Automate HA
 
-1. In your workstation, open `~/.chef/config.rb` file and update the `chef_server_url` with the Automate fqdn.
+1. Open the `~/.chef/config.rb` file in your workstation and update the `chef_server_url` with the Automate fqdn.
 
     Example: `chef_server_url          "https://<automate-fqdn>/organizations/new_org"`
 
@@ -300,14 +300,14 @@ where:
 
 Bootstrap the nodes to update the `chef_server_url` using the following steps:
 
-1. In your workstation, open `~/.chef/config.rb` file and update the `chef_server_url` with the Automate fqdn.
+1. Open the `~/.chef/config.rb` file in your workstation and update the `chef_server_url` with the Automate fqdn.
 1. Go to your workstation and open the `~/.chef/config.rb` file.
 1. Update the `chef_server_url` with the chef server LB fqdn.
 1. Now do node bootstrapping. It will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
 
 ## Using Automate HA for Chef-Backend user
 
-1. Download and Install chef-workstation from Bastion machine or local machine install chef-workstation
+1. Download and Install the Chef Workstation from the Bastion machine or local machine install chef-workstation
     https://www.chef.io/downloads/tools/workstation
 
 2. Set up the workstation using the following commands:
