@@ -402,18 +402,12 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		return err
 	}
 
-	nodesCertList := currentCertsInfo.OpensearchCertsByIP
+	existingNodesDN := currentCertsInfo.OpensearchCertsByIP[0].NodesDn
 	nodesDn := ""
 	nodesCn := ""
 
 	if flagsObj.node != "" {
-		for _, oscert := range nodesCertList {
-			fmt.Println("Checking the OS cert array ", oscert.NodesDn)
-			if oscert.IP != flagsObj.node {
-				nodesDn = nodesDn + fmt.Sprintf("%v", oscert.NodesDn) + "\n  - "
-			}
-		}
-		nodesDn = nodesDn + fmt.Sprintf("%v", nodeDn) + "\n"
+		nodesDn = nodesDn + fmt.Sprintf("%v", existingNodesDN) + "\n  - " + fmt.Sprintf("%v", nodeDn) + "\n"
 	} else {
 		nodesDn = fmt.Sprintf("%v", nodeDn) + nodesDn
 		nodesCn = nodeDn.CommonName
@@ -534,9 +528,6 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 	} else if param.remoteService == CONST_POSTGRESQL || param.remoteService == CONST_OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
-	fmt.Println("IPS: ", filteredIps)
-	fmt.Println("File: ", param.fileName)
-	fmt.Println("flags :", param.flagsObj)
 	err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
 	if err != nil {
 		return err
@@ -592,8 +583,6 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 			if err != nil {
 				return err
 			}
-			fmt.Println("Final File Path: ", tomlFilePath)
-			fmt.Println("Final File Path + TS: ", remoteService+timestamp)
 			// Copying the new toml file which includes both old and new configurations (for backend nodes).
 			err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
 		} else {
@@ -606,7 +595,6 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 		}
 
 		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
-		fmt.Println("Script CMD: ", scriptCommands)
 		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
 		if err != nil {
 			writer.Errorf("%v", err)
