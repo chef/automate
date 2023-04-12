@@ -495,50 +495,44 @@ func getInfraDetailsForDeploymentType(deploymentType string, configPath string) 
 func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 	frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
 	inputFilePath := "/usr/bin/chef-automate"
-	frontend := &Cmd{
-		CmdInputs: &CmdInputs{
-			Cmd:                      frontendCommand,
-			WaitTimeout:              preflightCmdFlags.waitTimeout,
-			ErrorCheckEnableInOutput: true,
-			Single:                   false,
-			NodeIp:                   preflightCmdFlags.node,
-			InputFiles:               []string{inputFilePath},
-			Outputfiles:              []string{},
-			NodeType:                 preflightCmdFlags.frontend,
-		},
-	}
-
-	automate := &Cmd{
-		CmdInputs: &CmdInputs{
-			Cmd:                      frontendCommand,
-			WaitTimeout:              preflightCmdFlags.waitTimeout,
-			ErrorCheckEnableInOutput: true,
-			Single:                   false,
-			NodeIp:                   preflightCmdFlags.node,
-			InputFiles:               []string{inputFilePath},
-			Outputfiles:              []string{},
-			NodeType:                 preflightCmdFlags.automate,
-		},
-	}
-
-	chefServer := &Cmd{
-		CmdInputs: &CmdInputs{
-			Cmd:                      frontendCommand,
-			WaitTimeout:              preflightCmdFlags.waitTimeout,
-			ErrorCheckEnableInOutput: true,
-			Single:                   false,
-			NodeIp:                   preflightCmdFlags.node,
-			InputFiles:               []string{inputFilePath},
-			Outputfiles:              []string{},
-			NodeType:                 preflightCmdFlags.chef_server,
-		},
-	}
-
 	nodeMap := &NodeTypeAndCmd{
-		Frontend:   frontend,
-		Automate:   automate,
-		ChefServer: chefServer,
-		Infra:      infra,
+		Frontend: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
+				InputFiles:               []string{inputFilePath},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.frontend,
+			},
+		},
+		Automate: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
+				InputFiles:               []string{inputFilePath},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.automate,
+			},
+		},
+		ChefServer: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
+				InputFiles:               []string{inputFilePath},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.chef_server,
+			},
+		},
+		Infra: infra,
 	}
 	return nodeMap
 }

@@ -299,7 +299,10 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		writer.Printf("Failed to copy config file to remote %s\n", err.Error())
+		writer.Printf("\n"+"Failed to copy file %s to remote %s\n", srcFilePath, err.Error())
+		if srcFilePath == "/usr/bin/chef-automate" {
+			writer.Printf("Please copy your chef-automate binary to /usr/bin" + "\n")
+		}
 		return err
 	}
 	if removeFile {
