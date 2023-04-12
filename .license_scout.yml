@@ -329,6 +329,9 @@ fallbacks:
     - name: github.com/apparentlymart/go-textseg
       license_id: Unlicense
       license_content: https://github.com/apparentlymart/go-textseg/blob/master/LICENSE
+    - name: github.com/globalsign/mgo
+      license_id: Unlicense
+      license_content: https://github.com/globalsign/mgo/blob/master/LICENSE
 
   habitat:
     - name: chef/mlsa

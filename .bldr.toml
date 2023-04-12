@@ -440,6 +440,7 @@ paths = [
   "components/local-user-service/*",
   "lib/cereal/*",
   "lib/config/*",
+  "lib/config_parser/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/httputils/*",
@@ -452,12 +453,14 @@ paths = [
   "lib/proc/*",
   "lib/product/*",
   "lib/proxy/*",
+  "lib/reporting/*",
   "lib/secrets/*",
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
   "lib/uuid4/*",
+  "lib/verification/*",
   "lib/version/*"
 ]
 
