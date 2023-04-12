@@ -31,16 +31,21 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
+    Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+
     ```bash
     chef-automate backup create
+    ```
+
+    Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+
+    ```bash
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    - The first command will create the backup to the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
-    - The second command will create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
-    - Once the backup is completed, save the backup Id. For example: `20210622065515`.
+    Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
-1. Go to the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file and create **Bundle** using the following command:
+1. If you haven't specified the location in the `config.toml` file, go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
 
     ```bash
     tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
