@@ -114,7 +114,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 
 {{< /note >}}
 
-## Restore the Backed Up Data to Chef Automate HA
+## Restore Data to Chef Automate HA
 
 - Execute the below command to install the habitat package for `knife-ec-backup`
 
@@ -139,8 +139,8 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
     where:
 
     - `-S` is the Chef Server URL
-    - '-K` is the path of pivotal.pem file
-    - '-F` is the path to store the output file
+    - `-K` is the path of pivotal.pem file
+    - `-F` is the path to store the output file
 
 - Execute the below command to get the counts of objects
 
@@ -173,14 +173,17 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
     curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
 ```
 
-where,
-    - `-S` is the Chef Server URL
-    - `-K` is the path of pivotal.pem file
-    - `-F` is the path to store the output file
+where:
+
+- `-S` is the Chef Server URL
+- `-K` is the path of pivotal.pem file
+- `-F` is the path to store the output file
 
 ```bash
     bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
 ```
+
+## Steps for In-place Migration
 
 1. [Backup the existing chef server data](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
 2. ssh to all the backend nodes of chef-backend and run
@@ -276,18 +279,16 @@ where,
     ```
 
 10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
-11. Once done, [restore the backed up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
+11. Once done, [restore Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 12. [Validate the data](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 
-## Changes/Steps to make Workstation connect to the new setup
+## Connect Workstation/Nodes to the New Setup
 
 1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
 
     Example: `chef_server_url          "https://<chef-server-LB-fqdn>/organizations/new_org"`
 
 1. Now run `knife user list`, `knife node list`, or `knife cookbook list`. It will give you valid output.
-
-## Changes/Steps to make the nodes connect to the new setup
 
 ### Updating on nodes itself
 
@@ -300,9 +301,7 @@ where,
 
 ### Updating through workstation
 
-We can also update the chef_server_url of nodes by doing the node bootstrapping.
-
-Steps:
+We can also update the chef_server_url of nodes by doing the node bootstrapping:
 
 1. Update the `chef_server_url` in the workstation
 1. Go to your workstation and open the `~/.chef/config.rb` file.
