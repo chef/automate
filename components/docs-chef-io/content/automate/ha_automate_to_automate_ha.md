@@ -16,32 +16,31 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- The Minimum version of Automate to perform migration is 4.x.
-- Customers in 2022xxxx or 3.x version needs to update to 4.x version.
-- Automate HA with AWS managed needs to use OpenSearch version <1.3.2
-- The OpenSearch version in Automate should be the same version as Automate HA.
+- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with 
+minimum version of Chef Automate: [2020xxxxxxxx](https://docs.chef.io/release_notes_automate/)
 
 {{< /warning >}}
 
-## Upgrade with FileSystem Backup Locally
+## Migration with FileSystem Backup Locally
 
-Follow the below steps for Automate HA when you are upgrading with On-Premises and AWS deployment (but not for AWS managed services).
+Follow the below steps, when you are migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
-    Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
     ```bash
     chef-automate backup create
     ```
 
-    Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+
+    1. Run the below command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
     ```bash
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
 1. If you haven't specified the location in the `config.toml` file, go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
 
@@ -49,7 +48,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
     ```
 
-1. Transfer the `tar` bundle to one of the Chef Automate HA Frontend Nodes using the following command:
+1. Transfer the `tar` bundle to one of the Chef-Automate node of Automate HA using the following command:
 
     ```bash
         scp -i /path/to/key /path/to/backup-file user@host:/home/user
@@ -93,7 +92,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Go to the Chef Automate HA, where we copied the `tar` file. Unzip the bundle using the following:
+1. Go to the Chef-Automate node of Automate HA cluster, where we copied the `tar` file. Unzip the bundle using the following:
 
     ```bash
     tar -xf backup.tar.gz -C /mnt/automate_backups
@@ -142,9 +141,9 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     sudo chef-automate start
     ```
 
-## Upgrade with FileSystem Backup via Volume Mount
+## Migration with FileSystem Backup via Volume Mount
 
-Follow the below steps for Automate HA when you are upgrading with On-Premises and AWS deployment (but not for AWS managed services).
+Follow the below steps, when you are migrating to On-Premises or AWS HA deployment (but not for AWS with managed services).
 
 1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:
@@ -185,21 +184,23 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+1. Create a Backup of Chef Automate Standalone using the following command: 
+
+    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
     ```bash
     chef-automate backup create
     ```
 
-    Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+
+    1. Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
     ```bash
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    Once the backup is completed, save the backup Id. For example: `20210622065515`.
-
-1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config:
+1. Run the following command at the Chef-Automate node of Automate HA cluster to get the applied config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -231,7 +232,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
         chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the instances except where you saved the `.tar` file at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend instances except where you saved the `current_config.toml` file at automate nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
@@ -250,7 +251,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     sudo chef-automate start
     ```
 
-## Upgrade with S3
+## Migration with S3
 
 For AWS managed services, map the snapshot role to OpenSearch dashboard. It is necessary to [enable backup and restore in OpenSearch](automate/managed_services/#enabling-opensearch-backup-restore).
 
@@ -287,19 +288,19 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
-    Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
     ```bash
     chef-automate backup create
     ```
 
-    Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+
+    1. Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
     ```bash
     chef-automate bootstrap bundle create bootstrap.abb
     ```
-
-    Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
@@ -394,13 +395,13 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the instances except where you saved the `.tar` file at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend instances except where you saved the `current_config.toml` file at automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
     ```
 
-1. Run the restore command in one of the Chef Automate nodes in the Chef-Automate HA cluster:
+1. Restore in Chef-Automate HA using the following command:
 
     ```bash
     sudo chef-automate backup restore s3://<s3-bucket-name>/<path-to-backup>/<backup-id>/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
