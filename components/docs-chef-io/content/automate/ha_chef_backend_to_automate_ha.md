@@ -292,7 +292,7 @@ Where:
 
 ### Updating on Nodes
 
-1. ssh into every node and open the `/etc/chef/client.rb` file. On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
+1. ssh into every node and open the `/etc/chef/client.rb` file. On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
 1. Update the chef-server URL with Automate fqdn.
 1. Run the `chef-client` command. It will connect with the new setup, perform the scan and generate the report in chef-automate.
 
