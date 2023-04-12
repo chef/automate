@@ -9,6 +9,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	invalidIpAddress = `
+Incorrect Automate IP address format for ip 127.0.0IP address validation failed
+Incorrect Automate IP address format for ip 127.0.1IP address validation failed
+Incorrect Automate IP address format for ip 127.0.2IP address validation failed
+Incorrect Automate IP address format for ip 127.0.3IP address validation failed
+Incorrect chef-server IP address format for ip 127.0.0IP address validation failed
+Incorrect chef-server IP address format for ip 127.0.1IP address validation failed
+Incorrect chef-server IP address format for ip 127.0.2IP address validation failed
+Incorrect chef-server IP address format for ip 127.0.3IP address validation failed
+Incorrect OpenSearch IP address format for ip 127.0.0IP address validation failed
+Incorrect OpenSearch IP address format for ip 127.0.1IP address validation failed
+Incorrect OpenSearch IP address format for ip 127.0.2IP address validation failed
+Incorrect OpenSearch IP address format for ip 127.0.3IP address validation failed
+Incorrect postgres IP address format for ip 127.0.0IP address validation failed
+Incorrect postgres IP address format for ip 127.0.1IP address validation failed
+Incorrect postgres IP address format for ip 127.0.2IP address validation failed
+Incorrect postgres IP address format for ip 127.0.3IP address validation failed
+List of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]`
+	displayBE = `+------------+--------------+--------+----------------+------------------+--------+
+| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE   |
++------------+--------------+--------+----------------+------------------+--------+
+| postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader |
++------------+--------------+--------+----------------+------------------+--------+`
+	displayFE = `+-------------+------------+--------+-------------------------+
+| NAME        | IP ADDRESS | STATUS | OPENSEARCH              |
++-------------+------------+--------+-------------------------+
+| automate    |            | OK     | "green" (Active: 100.0) |
+| chef-server |            | OK     | "green" (Active: 100.0) |
++-------------+------------+--------+-------------------------+`
+mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
+)
+
 func TestCheckIPAddressesFromInfra(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
@@ -134,10 +167,10 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 	assert.Equal(t, chefServerIps, []string(nil))
 	assert.Equal(t, opensearchIps, []string(nil))
 	assert.Equal(t, postgresqlIps, []string(nil))
-	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nIncorrect Automate IP address format for ip 127.0.0IP address validation failed\nIncorrect Automate IP address format for ip 127.0.1IP address validation failed\nIncorrect Automate IP address format for ip 127.0.2IP address validation failed\nIncorrect Automate IP address format for ip 127.0.3IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.0IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.1IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.2IP address validation failed\nIncorrect chef-server IP address format for ip 127.0.3IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.0IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.1IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.2IP address validation failed\nIncorrect OpenSearch IP address format for ip 127.0.3IP address validation failed\nIncorrect postgres IP address format for ip 127.0.0IP address validation failed\nIncorrect postgres IP address format for ip 127.0.1IP address validation failed\nIncorrect postgres IP address format for ip 127.0.2IP address validation failed\nIncorrect postgres IP address format for ip 127.0.3IP address validation failed\nList of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]")
+	assert.Contains(t, getSingleErrorFromList(errList).Error(), invalidIpAddress)
 }
 func TestRunFENodeDiaplay(t *testing.T) {
-	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
+	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
@@ -146,11 +179,11 @@ func TestRunFENodeDiaplay(t *testing.T) {
 	err := ss.Prepare()
 	assert.NoError(t, err)
 	fe := ss.ShowFEStatus()
-	assert.Equal(t, fe, "+-------------+------------+--------+-------------------------+\n| NAME        | IP ADDRESS | STATUS | OPENSEARCH              |\n+-------------+------------+--------+-------------------------+\n| automate    |            | OK     | \"green\" (Active: 100.0) |\n| chef-server |            | OK     | \"green\" (Active: 100.0) |\n+-------------+------------+--------+-------------------------+")
+	assert.Equal(t, fe, displayFE)
 }
 
 func TestRunBENode(t *testing.T) {
-	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
+	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4}
 	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{hostIP: ValidIP4}, nil, nil)
@@ -159,7 +192,7 @@ func TestRunBENode(t *testing.T) {
 	assert.NoError(t, err)
 }
 func TestRunBENodeDiaplay(t *testing.T) {
-	a2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
+	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
 	infra := &AutomteHAInfraDetails{}
 	// infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7}
@@ -172,7 +205,7 @@ func TestRunBENodeDiaplay(t *testing.T) {
 	err := ss.Prepare()
 	assert.NoError(t, err)
 	be := ss.ShowBEStatus()
-	assert.Equal(t, be, "+------------+--------------+--------+----------------+------------------+--------+\n| NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE   |\n+------------+--------------+--------+----------------+------------------+--------+\n| postgresql | 198.51.100.7 | OK     | up (pid: 4173) | 19431d 12h 0m 0s | Leader |\n+------------+--------------+--------+----------------+------------------+--------+")
+	assert.Equal(t, be, displayBE)
 }
 
 func getMockSSHUtilRunSummary(sshConfig *SSHConfig, CFTRError error, CSECORError error) *MockSSHUtilsImpl {
