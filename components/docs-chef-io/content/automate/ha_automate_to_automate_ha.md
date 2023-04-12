@@ -27,8 +27,6 @@ gh_repo = "automate"
 
 Follow the below steps for Automate HA when you are upgrading with On-Premises and AWS deployment (but not for AWS managed services).
 
-{{< warning >}} The below steps won't work for Automate HA with AWS Managed. {{< /warning >}}
-
 1. Create a Backup of Chef Automate Standalone using the following command:
 
     Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
@@ -54,17 +52,17 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
 1. Transfer the `tar` bundle to one of the Chef Automate HA Frontend Nodes using the following command:
 
     ```bash
-    scp -i <path to your .pem file> <path to backup.tar.gz> ec2-user@<IP>:/home/ec2-user
+        scp -i /path/to/key /path/to/backup-file user@host:/home/user
     ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-    scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user
+        scp -i /path/to/key /path/to/bootstrap.abb user@host:/home/user
     ```
 
-1. Go to Bastion
-    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents, and then patch this file in all the OpenSearch nodes.
+1. Go to Bastion and:
+    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [path]
@@ -77,7 +75,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     chef-automate config patch --opensearch <path to os_config.toml>
     ```
 
-    - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
+    - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
 
     ```bash
     [global.v1.external.opensearch.backup]
@@ -107,7 +105,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     sudo chef-automate config show > current_config.toml
     ```
 
-    From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
+    From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the `config`. Add the OpenSearch password to the generated config above. For example:
 
     ```bash
     [global.v1.external.opensearch.auth.basic_auth]
@@ -119,27 +117,26 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     {{% automate/char-warn %}}
     {{< /warning >}}
 
-1. Stop all the services at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
-
-    ``` bash
-    sudo chef-automate stop
-    ```
-
-1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
-    Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
+1. On every Frontend Node copy the `bootstrap.abb` file and unpack the file using the following command:
 
     ```bash
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
+1. Stop all the instances except where you saved the `.tar` file at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+
+    ``` bash
+    sudo chef-automate stop
+    ```
+
 1. Restore in Chef-Automate HA using the following command:
 
     ```bash
-    automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
     chef-automate backup restore /mnt/automate_backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+    ## Refer to the `/var/tmp/frontend-4.x.y.aib` file name for the exact version number.
     ```
 
-1. Start the Service in all the Frontend Nodes with the command shown below:
+1. Start the Service in all the Frontend Nodes using the following command:
 
     ```bash
     sudo chef-automate start
@@ -147,21 +144,17 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
-{{< note >}} The below steps won't work for Automate HA with AWS Managed. {{< /note >}}
+Follow the below steps for Automate HA when you are upgrading with On-Premises and AWS deployment (but not for AWS managed services).
 
-1. Make EFS volume and attach that volume to the existing automate setup and Automate HA nodes.
+1. Make EFS volume and attach that volume to the existing automate and Automate HA nodes.
 1. Mount EFS Volume:
-    - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file. 
-    - In HA, we are mounting that volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
+    - In Automate, we are mounting that EFS volume at the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    - In HA, we are mounting that EFS volume at `/mnt/automate_backups`. (You need to mount this volume in all the HA nodes).
 
-    {{< note >}}
+    Make sure that the location have permission for the hab user.
 
-    Make sure that it should have permission for the hab user.
-
-    {{< /note >}}
-
-1. Go to Bastion
-    - Create a .toml (say os_config.toml) file in the Bastion host, copy the following contents, and then patch this file in all the OpenSearch nodes.
+1. Go to Bastion and:
+    - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
     ```bash
     [path]
@@ -174,7 +167,7 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     chef-automate config patch --opensearch <Path to os_config.toml>
     ```
 
-    - Create a .toml (say automate.toml) file in the Bastion host, copy the following content and then patch this file in all the Frontend nodes.
+    - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
 
     ```bash
     [global.v1.external.opensearch.backup]
@@ -192,16 +185,20 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Create *Backup* of Chef Automate Standalone using the following command:
+1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
 
     ```bash
     chef-automate backup create
+    ```
+
+    Run the below command command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
+
+    ```bash
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    - The first command will create the backup at the file mount location mentioned in the `config.toml` file.
-    - The second command will create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
-    - Once the backup is completed, save the backup Id. For example: `20210622065515`.
+    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+
 1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config:
 
     ```bash
@@ -219,16 +216,11 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     {{< warning >}}
     {{% automate/char-warn %}}
     {{< /warning >}}
-1. Stop all the services at frontend nodes in Automate HA Cluster. Run the below command to all the Automate and Chef Infra Server nodes
-
-    ``` bash
-    sudo chef-automate stop
-    ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-    scp -i <path to your .pem file> <path to bootstrap.abb> ec2-user@<IP>:/home/ec2-user
+        scp -i /path/to/key /path/to/backup-file user@host:/home/user
     ```
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
@@ -236,7 +228,13 @@ Follow the below steps for Automate HA when you are upgrading with On-Premises a
     Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
 
     ```bash
-    chef-automate bootstrap bundle unpack bootstrap.abb
+        scp -i /path/to/key /path/to/bootstrap.abb user@host:/home/user
+    ```
+
+1. Stop all the instances except where you saved the `.tar` file at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+
+    ``` bash
+    sudo chef-automate stop
     ```
 
 1. Run the restore command in one of the Chef Automate nodes in the Chef-Automate HA cluster:
