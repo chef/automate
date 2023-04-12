@@ -20,18 +20,6 @@ import (
 var automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
 var automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
 
-func FileContainingAutomateHAInfraDetails() (string, error) {
-	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
-		return automateHATerraformOutputFile, nil
-	}
-
-	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
-		return automateHATerraformDestroyOutputFile, nil
-	}
-
-	return "", errors.New("no file found")
-}
-
 var sshFlags = struct {
 	hostname string
 }{}
@@ -229,12 +217,8 @@ func runSshCommand(_ *cobra.Command, _ []string) error {
 	if !isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
-	outputFile, err := FileContainingAutomateHAInfraDetails()
-	if err != nil {
-		return err
-	}
 
-	infra, err := getAutomateHAInfraDetails(outputFile)
+	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return err
 	}
@@ -258,10 +242,20 @@ func runSshCommand(_ *cobra.Command, _ []string) error {
 	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
-func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error) {
+func getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+
+	infraConfigFile, err := FileContainingAutomateHAInfraDetails()
+	if err != nil {
+		return nil, err
+	}
+
+	return getAutomateHAInfraDetailHelper(infraConfigFile)
+}
+
+func getAutomateHAInfraDetailHelper(infraConfigFilePath string) (*AutomateHAInfraDetails, error) {
 	automateHAInfraDetails := &AutomateHAInfraDetails{}
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(infraConfigFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -287,6 +281,18 @@ func getAutomateHAInfraDetails(filePath string) (*AutomateHAInfraDetails, error)
 	return automateHAInfraDetails, nil
 }
 
+func FileContainingAutomateHAInfraDetails() (string, error) {
+	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
+		return automateHATerraformOutputFile, nil
+	}
+
+	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
+		return automateHATerraformDestroyOutputFile, nil
+	}
+
+	return "", errors.New("Automate Ha infra confile file not exist")
+}
+
 func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {
 	if automateHAInfraDetails == nil || len(automateHAInfraDetails.Outputs.AutomateSSH.Value) == 0 {
 		return
@@ -304,6 +310,7 @@ func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *Automat
 		sshUser := strings.TrimSpace(automateSSH[lastSpaceIndex:strings.LastIndex(automateSSH, "@")])
 		automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
 	}
+
 }
 
 func getSSHPortFromAutomateSSH(automateSSH string, lastSpaceIndex int) string {

@@ -143,12 +143,7 @@ func NewNodeUtils() NodeOpUtils {
 }
 
 func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
-	outputFile, err := FileContainingAutomateHAInfraDetails()
-	if err != nil {
-		return nil, err
-	}
-
-	outputDetails, err := getAutomateHAInfraDetails(outputFile)
+	outputDetails, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return nil, err
 	}
@@ -295,12 +290,8 @@ func (nu *NodeUtilsImpl) modifyTfArchFile(terraformPath string) error {
 }
 
 func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
-	outputFile, err := FileContainingAutomateHAInfraDetails()
-	if err != nil {
-		return nil, nil, err
-	}
 
-	infra, err := getAutomateHAInfraDetails(outputFile)
+	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return nil, nil, err
 	}
