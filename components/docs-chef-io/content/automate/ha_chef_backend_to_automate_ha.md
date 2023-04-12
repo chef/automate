@@ -361,7 +361,6 @@ Bootstrap the nodes to update the `chef_server_url` using the following steps:
 
     ```bash
     knife supermarket download line
-    knife supermarket download apache2
     ```
 
 7. Upload the cookbook
@@ -380,5 +379,4 @@ Bootstrap the nodes to update the `chef_server_url` using the following steps:
 
     ```bash
         knife bootstrap 15.207.98.155 -i  ~/.ssh/ssh-key.pem -U ubuntu -N node1 --sudo
-        knife bootstrap 3.110.103.65 -i ~/.ssh/ssh-key.pem -U ubuntu -N node2 --sudo
     ```
