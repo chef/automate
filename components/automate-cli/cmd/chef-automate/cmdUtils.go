@@ -150,8 +150,11 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 	}
 	ouputJsonResult := make(map[string][]CmdResult)
 	var wg sync.WaitGroup
-	for scriptName, cmdScript := range command {
+	if !input.HideSSHConnectionMessage {
+		writer.StartSpinner()
+	}
 
+	for scriptName, cmdScript := range command {
 		wg.Add(1)
 		go func(originalSSHConfig *SSHConfig, timeout int, cmdScript string, scriptName string, inputFileToOutputFileMap map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool) {
 			defer wg.Done()
@@ -171,15 +174,16 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 				ouputJsonResult[result.HostIP] = append(ouputJsonResult[result.HostIP], result)
 				ouputJsonResultMapMutex.Unlock()
 				if !input.SkipPrintOutput {
-					cliWriter.Println("=====================================================")
 					printOutput(remoteService, result, outputFiles, c.Output)
-					cliWriter.Println("=====================================================")
 				}
 			}
 		}(originalSSHConfig, timeout, cmdScript, scriptName, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput)
 	}
 
 	wg.Wait()
+	if !input.HideSSHConnectionMessage {
+		writer.StopSpinner()
+	}
 	status.GlobalResult = ouputJsonResult
 	return ouputJsonResult
 }
@@ -331,6 +335,7 @@ func isValidIP(ip string, ips []string) bool {
 func printOutput(remoteService string, result CmdResult, outputFiles []string, cliWriter *cli.Writer) {
 	var resultFiles []string
 	var err error
+	cliWriter.Println("=====================================================")
 	if result.Error != nil {
 		printErrorMessage(remoteService, result.HostIP, cliWriter, result.Error.Error())
 	} else {
@@ -347,6 +352,7 @@ func printOutput(remoteService string, result CmdResult, outputFiles []string, c
 			cliWriter.Printf("Output file: %s", file+"\n")
 		}
 	}
+	cliWriter.Println("=====================================================")
 }
 
 // printErrorMessage prints the config error message

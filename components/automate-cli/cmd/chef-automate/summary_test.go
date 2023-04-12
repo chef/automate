@@ -11,23 +11,22 @@ import (
 
 const (
 	invalidIpAddress = `
-Incorrect Automate IP address format for ip 127.0.0IP address validation failed
-Incorrect Automate IP address format for ip 127.0.1IP address validation failed
-Incorrect Automate IP address format for ip 127.0.2IP address validation failed
-Incorrect Automate IP address format for ip 127.0.3IP address validation failed
-Incorrect chef-server IP address format for ip 127.0.0IP address validation failed
-Incorrect chef-server IP address format for ip 127.0.1IP address validation failed
-Incorrect chef-server IP address format for ip 127.0.2IP address validation failed
-Incorrect chef-server IP address format for ip 127.0.3IP address validation failed
-Incorrect OpenSearch IP address format for ip 127.0.0IP address validation failed
-Incorrect OpenSearch IP address format for ip 127.0.1IP address validation failed
-Incorrect OpenSearch IP address format for ip 127.0.2IP address validation failed
-Incorrect OpenSearch IP address format for ip 127.0.3IP address validation failed
-Incorrect postgres IP address format for ip 127.0.0IP address validation failed
-Incorrect postgres IP address format for ip 127.0.1IP address validation failed
-Incorrect postgres IP address format for ip 127.0.2IP address validation failed
-Incorrect postgres IP address format for ip 127.0.3IP address validation failed
-List of  ip address not found [127.0.0 127.0.1 127.0.2 127.0.3]`
+Incorrect Automate-ip, 127.0.0 IP address validation failed
+Incorrect Automate-ip, 127.0.1 IP address validation failed
+Incorrect Automate-ip, 127.0.2 IP address validation failed
+Incorrect Automate-ip, 127.0.3 IP address validation failed
+Incorrect chef-server-ip, 127.0.0 IP address validation failed
+Incorrect chef-server-ip, 127.0.1 IP address validation failed
+Incorrect chef-server-ip, 127.0.2 IP address validation failed
+Incorrect chef-server-ip, 127.0.3 IP address validation failed
+Incorrect OpenSearch-ip, 127.0.0 IP address validation failed
+Incorrect OpenSearch-ip, 127.0.1 IP address validation failed
+Incorrect OpenSearch-ip, 127.0.2 IP address validation failed
+Incorrect OpenSearch-ip, 127.0.3 IP address validation failed
+Incorrect postgresql-ip, 127.0.0 IP address validation failed
+Incorrect postgresql-ip, 127.0.1 IP address validation failed
+Incorrect postgresql-ip, 127.0.2 IP address validation failed
+Incorrect postgresql-ip, 127.0.3 IP address validation failed`
 	displayBE = `+------------+--------------+--------+----------------+------------------+--------+
 | NAME       | IP ADDRESS   | HEALTH | PROCESS        | UPTIME           | ROLE   |
 +------------+--------------+--------+----------------+------------------+--------+
@@ -143,7 +142,7 @@ func TestCheckIPAddressesError(t *testing.T) {
 
 	_, _, _, _, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 1)
-	assert.Contains(t, getSingleErrorFromList(errList).Error(), "\nList of  ip address not found [127.0.0.1 127.0.0.2]")
+	assert.Contains(t, getSingleErrorFromList(errList).Error(), "List of  ip address not found [127.0.0.1 127.0.0.2] does not match any node for Automate, PostgreSQL or ChefServer services")
 }
 
 func TestCheckIPAddressesValidation(t *testing.T) {
@@ -162,7 +161,7 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
 
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
-	assert.Equal(t, errList.Len(), 17)
+	assert.Equal(t, errList.Len(), 16)
 	assert.Equal(t, automateIps, []string(nil))
 	assert.Equal(t, chefServerIps, []string(nil))
 	assert.Equal(t, opensearchIps, []string(nil))

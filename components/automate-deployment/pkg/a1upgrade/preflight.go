@@ -33,7 +33,7 @@ const (
 	// allowed Automate v1 version that we will upgrade from.
 	A1RequiredMinorVersion = 8
 	// A1RequiredPatchVersion is patch component of the minimum
-	// allowed Autoxmate v1 version that we will upgrade from.
+	// allowed Automate v1 version that we will upgrade from.
 	A1RequiredPatchVersion = 38
 )
 

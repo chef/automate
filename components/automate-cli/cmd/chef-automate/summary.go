@@ -23,7 +23,7 @@ var (
 )
 
 const (
-	ipAddressError           = "IP address validation failed"
+	ipAddressError           = " IP address validation failed"
 	curlHeaderFlag           = "--header"
 	curlAuthorization        = "'Authorization: Bearer %s'"
 	initialServiceState      = "down"
@@ -74,22 +74,7 @@ func (ss *Summary) Prepare() error {
 	}
 
 	if len(automateIps) != 0 {
-		automateNodeMap := &NodeTypeAndCmd{
-			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Automate: &Cmd{
-				CmdInputs: &CmdInputs{
-					Cmd:                      "",
-					NodeIps:                  automateIps,
-					Single:                   false,
-					NodeType:                 true,
-					SkipPrintOutput:          true,
-					HideSSHConnectionMessage: true,
-				},
-			},
-			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Infra:      ss.infra,
-		}
+		automateNodeMap := ss.automateNodeMap(automateIps)
 		err := ss.prepareFEScript(automateIps, automateNodeMap, "automate", "FE")
 		if err != nil {
 			return err
@@ -97,23 +82,7 @@ func (ss *Summary) Prepare() error {
 	}
 
 	if len(chefServerIps) != 0 {
-		chefServerNodeMap := &NodeTypeAndCmd{
-			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Automate: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			ChefServer: &Cmd{
-				CmdInputs: &CmdInputs{
-					Cmd:                      "",
-					NodeIps:                  chefServerIps,
-					Single:                   false,
-					NodeType:                 true,
-					SkipPrintOutput:          true,
-					HideSSHConnectionMessage: true,
-				},
-			},
-			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Infra:      ss.infra,
-		}
+		chefServerNodeMap := ss.chefServerNodeMap(chefServerIps)
 		err := ss.prepareFEScript(chefServerIps, chefServerNodeMap, "chef-server", "FE")
 		if err != nil {
 			return err
@@ -121,23 +90,7 @@ func (ss *Summary) Prepare() error {
 	}
 
 	if len(opensearchIps) != 0 {
-		openSearchNodeMap := &NodeTypeAndCmd{
-			Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Automate:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Opensearch: &Cmd{
-				CmdInputs: &CmdInputs{
-					Cmd:                      "",
-					NodeIps:                  opensearchIps,
-					Single:                   false,
-					NodeType:                 true,
-					SkipPrintOutput:          true,
-					HideSSHConnectionMessage: true,
-				},
-			},
-			Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Infra:      ss.infra,
-		}
+		openSearchNodeMap := ss.openSearchNodeMap(opensearchIps)
 		err := ss.prepareBEScript(opensearchIps, openSearchNodeMap, "opensearch", "BE")
 		if err != nil {
 			return err
@@ -145,29 +98,96 @@ func (ss *Summary) Prepare() error {
 	}
 
 	if len(postgresqlIps) != 0 {
-		postgresqlNodeMap := &NodeTypeAndCmd{
-			Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Automate:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-			Postgresql: &Cmd{
-				CmdInputs: &CmdInputs{
-					Cmd:                      "",
-					NodeIps:                  postgresqlIps,
-					Single:                   false,
-					NodeType:                 true,
-					SkipPrintOutput:          true,
-					HideSSHConnectionMessage: true,
-				},
-			},
-			Infra: ss.infra,
-		}
+		postgresqlNodeMap := ss.postgresqlNodeMap(postgresqlIps)
 		err := ss.prepareBEScript(postgresqlIps, postgresqlNodeMap, "postgresql", "BE")
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (ss *Summary) postgresqlNodeMap(postgresqlIps []string) *NodeTypeAndCmd {
+	postgresqlNodeMap := &NodeTypeAndCmd{
+		Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      "",
+				NodeIps:                  postgresqlIps,
+				Single:                   false,
+				NodeType:                 true,
+				SkipPrintOutput:          true,
+				HideSSHConnectionMessage: true,
+			},
+		},
+		Infra: ss.infra,
+	}
+	return postgresqlNodeMap
+}
+
+func (ss *Summary) openSearchNodeMap(opensearchIps []string) *NodeTypeAndCmd {
+	openSearchNodeMap := &NodeTypeAndCmd{
+		Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Opensearch: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      "",
+				NodeIps:                  opensearchIps,
+				Single:                   false,
+				NodeType:                 true,
+				SkipPrintOutput:          true,
+				HideSSHConnectionMessage: true,
+			},
+		},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      ss.infra,
+	}
+	return openSearchNodeMap
+}
+
+func (ss *Summary) chefServerNodeMap(chefServerIps []string) *NodeTypeAndCmd {
+	chefServerNodeMap := &NodeTypeAndCmd{
+		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		ChefServer: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      "",
+				NodeIps:                  chefServerIps,
+				Single:                   false,
+				NodeType:                 true,
+				SkipPrintOutput:          true,
+				HideSSHConnectionMessage: true,
+			},
+		},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      ss.infra,
+	}
+	return chefServerNodeMap
+}
+
+func (ss *Summary) automateNodeMap(automateIps []string) *NodeTypeAndCmd {
+	automateNodeMap := &NodeTypeAndCmd{
+		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      "",
+				NodeIps:                  automateIps,
+				Single:                   false,
+				NodeType:                 true,
+				SkipPrintOutput:          true,
+				HideSSHConnectionMessage: true,
+			},
+		},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      ss.infra,
+	}
+	return automateNodeMap
 }
 
 func (ss *Summary) getIPAddressesFromFlagOrInfra() ([]string, []string, []string, []string, *list.List) {
@@ -201,8 +221,8 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 			if ss.statusSummaryCmdFlags.isPostgresql {
 				postgresqlIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "postgresql", ipAddressError)
 			}
-			if len(nodes) != 0 {
-				errorList.PushBack(fmt.Sprintf("List of  ip address not found %s", nodes))
+			if len(nodes) != 0 && errorList.Len() == 0 {
+				errorList.PushBack(fmt.Sprintf("List of  ip address not found %s does not match any node for Automate, PostgreSQL or ChefServer services", nodes))
 			}
 		}
 		return automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList
@@ -538,7 +558,7 @@ func (ss *Summary) validateIPAddresses(errorList *list.List, IpsFromcmd []string
 	for _, ip := range IpsFromcmd {
 		err := checkIPAddress(ip)
 		if err != nil {
-			errorList.PushBack("Incorrect " + nodeType + " IP address format for ip " + ip + errorMessage)
+			errorList.PushBack("Incorrect " + nodeType + "-ip, " + ip + errorMessage)
 		}
 		if stringutils.SliceContains(ips, ip) {
 			ipFound = append(ipFound, ip)
