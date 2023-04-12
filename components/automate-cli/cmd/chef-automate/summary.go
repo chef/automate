@@ -190,16 +190,16 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 		)
 		if len(nodes) != 0 {
 			if ss.statusSummaryCmdFlags.isAutomate {
-				automateIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, ss.infra.Outputs.AutomatePrivateIps.Value, "Automate", ipAddressError)
+				automateIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "Automate", ipAddressError)
 			}
 			if ss.statusSummaryCmdFlags.isChefServer {
-				chefServerIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, ss.infra.Outputs.ChefServerPrivateIps.Value, "chef-server", ipAddressError)
+				chefServerIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "chef-server", ipAddressError)
 			}
 			if ss.statusSummaryCmdFlags.isOpenSearch {
-				opensearchIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, ss.infra.Outputs.OpensearchPrivateIps.Value, "OpenSearch", ipAddressError)
+				opensearchIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "OpenSearch", ipAddressError)
 			}
 			if ss.statusSummaryCmdFlags.isPostgresql {
-				postgresqlIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, ss.infra.Outputs.PostgresqlPrivateIps.Value, "postgres", ipAddressError)
+				postgresqlIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "postgresql", ipAddressError)
 			}
 			if len(nodes) != 0 {
 				errorList.PushBack(fmt.Sprintf("List of  ip address not found %s", nodes))
@@ -531,13 +531,14 @@ func (ss *Summary) splitIP(node string) (nodes []string) {
 	return
 }
 
-func (ss *Summary) validateIPAddresses(errorList *list.List, IpsFromcmd, ips []string, errorPrefix, errorMessage string) ([]string, []string, *list.List) {
+func (ss *Summary) validateIPAddresses(errorList *list.List, IpsFromcmd []string, nodeType, errorMessage string) ([]string, []string, *list.List) {
+	ips := ss.getNodeIPs(nodeType)
 	var ipFound, ipNotFound []string
 
 	for _, ip := range IpsFromcmd {
 		err := checkIPAddress(ip)
 		if err != nil {
-			errorList.PushBack("Incorrect " + errorPrefix + " IP address format for ip " + ip + errorMessage)
+			errorList.PushBack("Incorrect " + nodeType + " IP address format for ip " + ip + errorMessage)
 		}
 		if stringutils.SliceContains(ips, ip) {
 			ipFound = append(ipFound, ip)
@@ -546,6 +547,19 @@ func (ss *Summary) validateIPAddresses(errorList *list.List, IpsFromcmd, ips []s
 		}
 	}
 	return ipFound, ipNotFound, errorList
+}
+func (ss *Summary) getNodeIPs(NodeType string) []string {
+	switch NodeType {
+	case "Automate":
+		return ss.infra.Outputs.AutomatePrivateIps.Value
+	case "chef-server":
+		return ss.infra.Outputs.ChefServerPrivateIps.Value
+	case "OpenSearch":
+		return ss.infra.Outputs.OpensearchPrivateIps.Value
+	case "postgresql":
+		return ss.infra.Outputs.PostgresqlPrivateIps.Value
+	}
+	return []string{}
 }
 
 // Display Frontend Status
