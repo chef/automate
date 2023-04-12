@@ -4,15 +4,44 @@ usage: chef-automate preflight-check [flags]
 description: |
   Perform preflight check to verify host meets installation criteria.
 options:
+- name: a2
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on automate node(HA)
 - name: airgap
   default_value: "false"
   usage: Pass this flag when the environment is airgapped
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on automate node(HA)
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: |
+    Pass this flag to run pre-flight check on chef-server node(HA)
 - name: config
   usage: Optional config file to use
+- name: cs
+  default_value: "false"
+  usage: |
+    Pass this flag to run pre-flight check on chef-server node(HA)
+- name: fe
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on all Frontend nodes
+- name: frontend
+  shorthand: f
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on all Frontend nodes
+- name: ha-deployment-config
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on automate-HA
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for preflight-check
+- name: node
+  usage: |
+    Pass this flag to run pre-flight check on a perticular node node(HA)
 inherited_options:
 - name: debug
   shorthand: d
