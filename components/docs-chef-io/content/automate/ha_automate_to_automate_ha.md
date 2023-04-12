@@ -25,6 +25,8 @@ gh_repo = "automate"
 
 ## Upgrade with FileSystem Backup Locally
 
+Follow the below steps for Automate HA when you are upgrading with On-Premises and AWS deployment (but not for AWS managed services).
+
 {{< warning >}} The below steps won't work for Automate HA with AWS Managed. {{< /warning >}}
 
 1. Create a Backup of Chef Automate Standalone using the following command:
@@ -389,8 +391,8 @@ gh_repo = "automate"
 
     ```bash
     sudo chef-automate stop
-
     ```
+
 1. Run the restore command in one of the Chef Automate nodes in the Chef-Automate HA cluster:
 
     ```bash
@@ -411,24 +413,7 @@ gh_repo = "automate"
     - `knife user list` will give the user list you created in standalone automate.
     - `knife opc org list`: It will give the organization list you created in standalone automate.
 
-## Changes/Steps to make Workstation connect to the new setup
-
-1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
-
-    Example: `chef_server_url          "https://<chef-server-LB-fqdn>/organizations/new_org"`
-
-1. Now run `knife user list`, `knife node list`, or `knife cookbook list`. It will give you valid output.
-
-## Changes/Steps to make the nodes connect to the new setup
-
-### Updating on nodes itself
-
-1. ssh into the node and open the `/etc/chef/client.rb` file.
-
-    **NOTE:** On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
-
-1. update the chef-server URL with chef-server LB fqdn.
-1. Run the `chef-client` command. It will connect with the new setup, perform the scan and generate the report in chef-automate.
+You can also [validate the migration](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful) using one of the other ways.
 
 ### Updating through workstation
 
