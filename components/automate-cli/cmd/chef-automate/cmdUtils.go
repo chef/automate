@@ -29,7 +29,7 @@ type CmdInputs struct {
 	Outputfiles              []string
 	ErrorCheckEnableInOutput bool
 	NodeType                 bool
-	SkipPrintOutput              bool
+	SkipPrintOutput          bool
 	HideSSHConnectionMessage bool
 	MutipleCmdWithArgs       map[string]string
 }
@@ -71,6 +71,7 @@ func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.
 
 func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 	timestamp := time.Now().Format("20060102150405")
+	cmdResult := map[string][]CmdResult{}
 
 	sshConfig := getSshDetails(c.NodeMap.Infra)
 	c.SshUtil.setSSHConfig(sshConfig)
@@ -80,7 +81,7 @@ func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 		const remoteService string = CONST_FRONTEND
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Frontend, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
-			return map[string][]CmdResult{}, err
+			return cmdResult, err
 		}
 		output := c.executeCmdOnGivenNodes(c.NodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
@@ -88,7 +89,7 @@ func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 		const remoteService string = CONST_AUTOMATE
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Automate, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
-			return map[string][]CmdResult{}, err
+			return cmdResult, err
 		}
 
 		output := c.executeCmdOnGivenNodes(c.NodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
@@ -97,7 +98,7 @@ func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 		const remoteService string = CONST_CHEF_SERVER
 		nodeIps, err := preCmdExecCheck(c.NodeMap.ChefServer, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
-			return map[string][]CmdResult{}, err
+			return cmdResult, err
 		}
 
 		output := c.executeCmdOnGivenNodes(c.NodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
@@ -106,7 +107,7 @@ func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 		const remoteService string = CONST_POSTGRESQL
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Postgresql, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
-			return map[string][]CmdResult{}, err
+			return cmdResult, err
 		}
 
 		output := c.executeCmdOnGivenNodes(c.NodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
@@ -115,13 +116,13 @@ func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 		const remoteService string = CONST_OPENSEARCH
 		nodeIps, err := preCmdExecCheck(c.NodeMap.Opensearch, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
-			return map[string][]CmdResult{}, err
+			return cmdResult, err
 		}
 
 		output := c.executeCmdOnGivenNodes(c.NodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
 	default:
-		return map[string][]CmdResult{}, errors.New("Missing or Unsupported flag")
+		return cmdResult, errors.New("Missing or Unsupported flag")
 	}
 }
 
