@@ -186,9 +186,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	}
 	defer session.Close()
 
-	if spinner {
-		writer.StartSpinner()
-	}
+	startSpinnerIfRequired(spinner)
 
 	var output string
 	errCh := make(chan error)
@@ -205,6 +203,10 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 			output = pattern.ReplaceAllString(output, "")
 		}
 		if err != nil {
+			if strings.Contains(output, "sudo: no tty present and no askpass program specified") {
+				errCh <- errors.New("The sudo password is missing. Make sure to provide sudo_password as enviroment variable and pass -E option while running command.")
+				return
+			}
 			errCh <- err
 			return
 		}
@@ -216,16 +218,12 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 		return "", errors.New("command timed out")
 	case err := <-errCh:
 		if err != nil {
-			if spinner {
-				writer.StopSpinner()
-			}
+			stopSpinnerIfRequired(spinner)
 			return output, err
 		}
 	}
 
-	if spinner {
-		writer.StopSpinner()
-	}
+	stopSpinnerIfRequired(spinner)
 
 	logrus.Debug("Execution of command done......")
 	return output, nil
@@ -409,4 +407,16 @@ func isSudoPasswordEnabled() bool {
 func getSudoPassword() string {
 	sudoPassword := os.Getenv(SUDO_PASSWORD)
 	return sudoPassword
+}
+
+func startSpinnerIfRequired(spinner bool) {
+	if spinner {
+		writer.StartSpinner()
+	}
+}
+
+func stopSpinnerIfRequired(spinner bool) {
+	if spinner {
+		writer.StopSpinner()
+	}
 }
