@@ -309,7 +309,7 @@ For AWS managed services, map the snapshot role to OpenSearch dashboard. It is n
 
 1. Go to Bastion:
 
-    {{< notes >}} Use the same bucket for restore which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /notes >}}
+    {{< note >}} Use the same bucket for restore which was used in the standalone automate while creating the backup. Configure the same basepath in Automate HA you gave in Standalone Automate. {{< /note >}}
 
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
