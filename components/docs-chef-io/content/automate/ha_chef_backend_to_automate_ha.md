@@ -279,6 +279,36 @@ where,
 11. Once done, [restore the backed up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 12. [Validate the data](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 
+## Changes/Steps to make Workstation connect to the new setup
+
+1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
+
+    Example: `chef_server_url          "https://<chef-server-LB-fqdn>/organizations/new_org"`
+
+1. Now run `knife user list`, `knife node list`, or `knife cookbook list`. It will give you valid output.
+
+## Changes/Steps to make the nodes connect to the new setup
+
+### Updating on nodes itself
+
+1. ssh into the node and open the `/etc/chef/client.rb` file.
+
+    **NOTE:** On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
+
+1. update the chef-server URL with chef-server LB fqdn.
+1. Run the `chef-client` command. It will connect with the new setup, perform the scan and generate the report in chef-automate.
+
+### Updating through workstation
+
+We can also update the chef_server_url of nodes by doing the node bootstrapping.
+
+Steps:
+
+1. Update the `chef_server_url` in the workstation
+1. Go to your workstation and open the `~/.chef/config.rb` file.
+1. Update the `chef_server_url` with the chef server LB fqdn.
+1. Now do node bootstrapping. It will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
+
 ## Using Automate HA for Chef-Backend user
 
 1. Download and Install chef-workstation from Bastion machine or local machine install chef-workstation
