@@ -55,7 +55,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
         hab pkg install chef/knife-ec-backup
     ```
 
-3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc. 
+3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc.
 
     ```cmd
         hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
@@ -72,7 +72,7 @@ Check the [AWS Deployment Prerequisites](/automate/ha_aws_deployment_prerequisit
         hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
     ```
 
-4. Execute the below command to initiate a backup of your Chef Server data. 
+4. Execute the below command to initiate a backup of your Chef Server data.
 
     ```cmd
         hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server url>
@@ -279,31 +279,28 @@ where:
     ```
 
 10. Clean up the old packages from the chef-backend (like Elasticsearch and Postgres)
-11. Once done, [restore Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
+11. Once done, [restore data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-data-to-chef-automate-ha)
 12. [Validate the data](/automate/ha_chef_backend_to_automate_ha/#steps-to-validate-if-migration-is-successful)
 
-## Connect Workstation/Nodes to the New Setup
+## Connect Workstation/Nodes to Automate HA
 
-1. Go to your workstation and open`~/.chef/config.rb` file. Update the `chef_server_url` with the chef server LB fqdn.
+1. In your workstation, open `~/.chef/config.rb` file and update the `chef_server_url` with the Automate fqdn.
 
-    Example: `chef_server_url          "https://<chef-server-LB-fqdn>/organizations/new_org"`
+    Example: `chef_server_url          "https://<automate-fqdn>/organizations/new_org"`
 
 1. Now run `knife user list`, `knife node list`, or `knife cookbook list`. It will give you valid output.
 
-### Updating on nodes itself
+### Updating on Nodes
 
-1. ssh into the node and open the `/etc/chef/client.rb` file.
-
-    **NOTE:** On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
-
-1. update the chef-server URL with chef-server LB fqdn.
+1. ssh into every node and open the `/etc/chef/client.rb` file. On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
+1. Update the chef-server URL with Automate fqdn.
 1. Run the `chef-client` command. It will connect with the new setup, perform the scan and generate the report in chef-automate.
 
-### Updating through workstation
+### Updating Nodes via Workstation
 
-We can also update the chef_server_url of nodes by doing the node bootstrapping:
+Bootstrap the nodes to update the `chef_server_url` using the following steps:
 
-1. Update the `chef_server_url` in the workstation
+1. In your workstation, open `~/.chef/config.rb` file and update the `chef_server_url` with the Automate fqdn.
 1. Go to your workstation and open the `~/.chef/config.rb` file.
 1. Update the `chef_server_url` with the chef server LB fqdn.
 1. Now do node bootstrapping. It will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
