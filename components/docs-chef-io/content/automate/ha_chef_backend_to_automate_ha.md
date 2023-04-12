@@ -142,11 +142,12 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
     - '-K` is the path of pivotal.pem file
     - '-F` is the path to store the output file
 
-
 - Execute the below command to get the counts of objects
+
   ```cmd
       bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
   ```
+
 - Repeat the above commands for the new server for getting the counts
 - Now run the below command to check the differences between the old and new data. Ideally, there should be no differences if the migration was done successfully.
 
@@ -166,22 +167,20 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 - This in-place migration works only when cookbooks are stored in a database. This does not support use-case, where cookbooks are stored in the filesystem.
 {{< /note >}}
 
-{{< note >}}
-
-- To validate the In-place migration, please run the validation script before starting the backup and restore and then once the below steps from 1 to 11 are done successfully, rerun it.  
+- To validate the In-place migration, please run the validation script before starting the backup and restore.
 
 ```cmd
         curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
-        
-       where,
-         `-S` is the Chef Server URL
-         `-K` is the path of pivotal.pem file
-         `-F` is the path to store the output file
-
-    bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
 ```
 
-{{< /note >}}
+where,
+    - `-S` is the Chef Server URL
+    - `-K` is the path of pivotal.pem file
+    - `-F` is the path to store the output file
+
+```bash
+    bash infra_server_objects_count_collector.sh -S <chef-serve-url> -K /path/to/key -F Filename
+```
 
 1. [Backup the existing chef server data](/automate/ha_chef_backend_to_automate_ha/##backup-the-existing-chef-infra-server-or-chef-backend-data)
 2. ssh to all the backend nodes of chef-backend and run
