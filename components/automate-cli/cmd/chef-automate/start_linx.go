@@ -55,10 +55,10 @@ func init() {
 }
 
 func runStartCmd(cmd *cobra.Command, args []string) error {
-	if !startCmdFlags.automate && !startCmdFlags.chef_server && !startCmdFlags.opensearch && !startCmdFlags.postgresql {
-		writer.Println(cmd.UsageString())
-	}
 	if isA2HARBFileExist() {
+		if !startCmdFlags.automate && !startCmdFlags.chef_server && !startCmdFlags.opensearch && !startCmdFlags.postgresql {
+			writer.Println(cmd.UsageString())
+		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -231,7 +231,7 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 	errorList := list.New()
 	for _, hostIP := range ips {
 		sshUtil.getSSHConfig().hostIP = hostIP
-		printStartConnectionMessage(remoteService, hostIP, cliWriter)
+
 		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan)
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)

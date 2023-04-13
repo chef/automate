@@ -44,7 +44,7 @@ func TestStartForFrontEndNodes(t *testing.T) {
 		{
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("Process exited with status 1")),
-			[]string{"127.0.0.3"},
+			[]string{"127.1.0.3"},
 			"chef-server",
 			true,
 			errors.New("Not able to start one or more nodes in chef-server: \nProcess exited with status 1"),
@@ -87,7 +87,7 @@ func TestStartForBackEndNodes(t *testing.T) {
 		{
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("Process exited with status 1")),
-			[]string{"127.0.0.3"},
+			[]string{"127.0.1.3"},
 			"postgresql",
 			true,
 			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
@@ -103,6 +103,7 @@ func TestStartForBackEndNodes(t *testing.T) {
 }
 
 func TestForRunCommand(t *testing.T) {
+	scriptCommand := "sudo chef-automate start"
 	testCases := []struct {
 		args           []string
 		sshUtil        SSHUtil
@@ -114,7 +115,7 @@ func TestForRunCommand(t *testing.T) {
 		{
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "Error", nil),
-			"sudo chef-automate start",
+			scriptCommand,
 			"Error",
 			true,
 			errors.New("Error"),
@@ -122,7 +123,7 @@ func TestForRunCommand(t *testing.T) {
 		{
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("error")),
-			"sudo chef-automate start",
+			scriptCommand,
 			"",
 			true,
 			errors.New("error"),
@@ -130,7 +131,7 @@ func TestForRunCommand(t *testing.T) {
 		{
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "Starting Chef-automate", nil),
-			"sudo chef-automate start",
+			scriptCommand,
 			"Starting Chef-automate",
 			false,
 			nil,
@@ -151,7 +152,7 @@ func getMockInfra() *AutomteHAInfraDetails {
 	infra.Outputs.AutomatePrivateIps.Value = []string{"127.0.0.0"}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{"127.0.0.1"}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{"127.0.0.2"}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{"127..0.0.3"}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{"127.0.0.4"}
 	return infra
 }
 
