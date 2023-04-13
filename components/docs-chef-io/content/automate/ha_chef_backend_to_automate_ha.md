@@ -166,7 +166,7 @@ As part of this scenario, the customer will migrate from the chef-backend (5 mac
 - This in-place migration works when cookbooks are stored in a database or s3. This does not support use-case, where cookbooks are stored in the filesystem.
 {{< /note >}}
 
-- To validate the In-place migration, please run the validation script before starting the backup and restore.
+- To validate the In-place migration, run the validation script before starting the backup and restore.
 
 ```cmd
     curl https://raw.githubusercontent.com/chef/automate/main/dev/infra_server_objects_count_collector.sh -o infra_server_objects_count_collector.sh
