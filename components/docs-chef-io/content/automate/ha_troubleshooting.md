@@ -20,7 +20,7 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ### Post Automate HA deployment if the chef-server service is in a critical state
 
-- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate` 
+- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
 
 - If getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint.
 - ssh to the Automate HA Chef Infra Server and get the token and automate-lb-url from the config. Run `chef-automate config show` to get the config.
@@ -235,7 +235,6 @@ done
 
 #### Solution 2
 
-<<<<<<< HEAD
 - Log in to the OpenSearch dashboard
 - Run this query: GET _snapshot/_all to get all the snapshots.
 - Delete all the snapshots using this query: DELETE _snapshot/\<snapshot name>
@@ -257,18 +256,3 @@ In the case of HA setup, while doing `knife ssl fetch`, if the certificate fetch
 - Run this query: GET _snapshot/_all to get all the snapshots.
 - Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>
   For example: DELETE _snapshot/ chef-automate-es6-event-feed-service
-=======
-- Log in to the Opensearch dashboard  
-- Run this query: GET _snapshot/_all to get all the snapshots.  
-- Delete all the snapshots using this query: DELETE _snapshot/<snapshot name>   
-  For example: DELETE _snapshot/ chef-automate-es6-event-feed-service 
-
-### Issue : knife ssl cert while setting up workstation during migration
-In case of HA setup, while doing `knife ssl fetch` , if the certificate fetched is for the domain *.chefdemo.net, then follow below steps when you run `knife ssl check`. 
-
-#### Solution 
-- Go to route 53 chefdemo.net  
-- Create record as recordname.eng.chefdemo.net  
-- CNAME with value HA url: ec2-3-108-254-0.ap-south-1.compute.amazonaws.com  
-- Provide https://<record-name> while running knife ssl check. Eg: `knife ssl check https://<record-name>`
->>>>>>> a91545494 (Updated migration document for chef-backend to HA)

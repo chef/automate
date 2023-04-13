@@ -225,7 +225,6 @@ Where:
     - Ensure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
     - Sample configuration; please modify according to your needs.
 
-<<<<<<< HEAD
     ```cmd
     [architecture.existing_infra]
     secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
@@ -271,78 +270,6 @@ Where:
     chef_server_private_ips = ["10.0.1.0","10.0.2.0"]
     opensearch_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
     postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
-=======
-- Update the `instance_count`  
-- fqdn : load balance url, which points to frondend node.
-- keys : ssh username and private keys
-- Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
-- Make sure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
-- Sample configuration, please modify according to your needs.
-
-```cmd
-[architecture.existing_infra]
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-architecture = "existing_nodes"
-workspace_path = "/hab/a2_deploy_workspace"
-ssh_user = "myusername"
-ssh_port = "22"
-ssh_key_file = "~/.ssh/mykey.pem"
-
-# DON'T MODIFY THE BELOW LINE (backup_mount)
-backup_mount = "/mnt/automate_backups"
-
-[automate.config]
-# admin_password = ""
-# automate load balancer fqdn IP or path
-fqdn = "chef.example.com"
-instance_count = "2"
-# teams_port = ""
-config_file = "configs/automate.toml"
-
-[chef_server.config]
-instance_count = "2"
-
-[opensearch.config]
-instance_count = "3"
-
-[postgresql.config]
-instance_count = "3"
-
-[existing_infra.config]
-automate_private_ips = ["10.0.1.0","10.0.2.0"]
-chef_server_private_ips = ["10.0.1.0","10.0.2.0"]
-opensearch_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
-postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
-```
-
-9. Deploy using
-
-```cmd
-./chef-automate deploy config.toml <airgapped bundle name>
-```
-
-10. Clean up the old packages from chef-backend (like Elasticsearch and postgres)
-
-11. [Doc: Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
-
-
-## Using Automate HA for Chef-Backend user
-
-1. Download and Install chef-workstation 
-    From Bastion machine or local machine install chef-workstation
-    https://www.chef.io/downloads/tools/workstation
-    
-2. Set up workstation
-    ```bash 
-    chef generate repo chef-repo 
-    ```
-    ```bash 
-    cd  chef-repo 
-    ```
-    ```bash 
-    knife configure 
->>>>>>> main
     ```
 
 9. Deploy using the following command:
