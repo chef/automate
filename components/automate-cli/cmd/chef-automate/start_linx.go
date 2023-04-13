@@ -15,9 +15,9 @@ import (
 
 const node = " node :"
 const (
-	ERROR_ON_MANAGED_SERVICES_START = "Starting the service for externally configured %s is not supported"
-	opensearch_service              = "opensearch"
-	postgresql_service              = "postgresql"
+	errorOnManagedServicesStart = "Starting the service for externally configured %s is not supported"
+	opensearchService           = "opensearch"
+	postgresqlService           = "postgresql"
 )
 
 type Result struct {
@@ -27,10 +27,10 @@ type Result struct {
 }
 
 var startCmdFlags = struct {
-	automate    bool
-	chef_server bool
-	opensearch  bool
-	postgresql  bool
+	automate   bool
+	chefServer bool
+	opensearch bool
+	postgresql bool
 }{}
 
 var startCommand = &cobra.Command{
@@ -45,8 +45,8 @@ var startCommand = &cobra.Command{
 func init() {
 	startCommand.PersistentFlags().BoolVarP(&startCmdFlags.automate, "automate", "a", false, "start chef automate service on automate nodes")
 	startCommand.PersistentFlags().BoolVar(&startCmdFlags.automate, "a2", false, "start chef automate service on automate nodes[DUPLICATE]")
-	startCommand.PersistentFlags().BoolVarP(&startCmdFlags.chef_server, "chef_server", "c", false, "start chef automate service on chef-server nodes")
-	startCommand.PersistentFlags().BoolVar(&startCmdFlags.chef_server, "cs", false, "start chef automate service on chef-server nodes[DUPLICATE]")
+	startCommand.PersistentFlags().BoolVarP(&startCmdFlags.chefServer, "chef_server", "c", false, "start chef automate service on chef-server nodes")
+	startCommand.PersistentFlags().BoolVar(&startCmdFlags.chefServer, "cs", false, "start chef automate service on chef-server nodes[DUPLICATE]")
 	startCommand.PersistentFlags().BoolVarP(&startCmdFlags.opensearch, "opensearch", "o", false, "start hab-sup service on opensearch nodes")
 	startCommand.PersistentFlags().BoolVar(&startCmdFlags.opensearch, "os", false, "start hab-sup service on opensearch nodes[DUPLICATE]")
 	startCommand.PersistentFlags().BoolVarP(&startCmdFlags.postgresql, "postgresql", "p", false, "start hab-sup service on postgresql nodes")
@@ -56,7 +56,7 @@ func init() {
 
 func runStartCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if !startCmdFlags.automate && !startCmdFlags.chef_server && !startCmdFlags.opensearch && !startCmdFlags.postgresql {
+		if !startCmdFlags.automate && !startCmdFlags.chefServer && !startCmdFlags.opensearch && !startCmdFlags.postgresql {
 			writer.Println(cmd.UsageString())
 		}
 		infra, err := getAutomateHAInfraDetails()
@@ -79,7 +79,7 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
+func runStartCommandHA(infra *AutomateHAInfraDetails, args []string) error {
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
@@ -95,7 +95,7 @@ func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
 			errorList.PushBack(err.Error())
 		}
 	}
-	if startCmdFlags.chef_server {
+	if startCmdFlags.chefServer {
 		frontendIps := infra.Outputs.ChefServerPrivateIps.Value
 		err = checkNodes(args, sshUtil, frontendIps, "chef-server", writer)
 		if err != nil {
@@ -104,20 +104,20 @@ func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
 	}
 	if startCmdFlags.opensearch {
 		if isManagedServicesOn() {
-			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES_START, "OpenSearch")
+			return status.Errorf(status.InvalidCommandArgsError, errorOnManagedServicesStart, "OpenSearch")
 		}
 		backendIps := infra.Outputs.OpensearchPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, opensearch_service, writer)
+		err = checkNodes(args, sshUtil, backendIps, opensearchService, writer)
 		if err != nil {
 			errorList.PushBack(err.Error())
 		}
 	}
 	if startCmdFlags.postgresql {
 		if isManagedServicesOn() {
-			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES_START, "Postgresql")
+			return status.Errorf(status.InvalidCommandArgsError, errorOnManagedServicesStart, "Postgresql")
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, postgresql_service, writer)
+		err = checkNodes(args, sshUtil, backendIps, postgresqlService, writer)
 		if err != nil {
 			errorList.PushBack(err.Error())
 		}
@@ -176,7 +176,7 @@ func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService stri
 		writer.Errorf("No %s IPs are found", remoteService)
 		return status.Errorf(1, "No %s IPs are found", remoteService)
 	}
-	if remoteService == opensearch_service || remoteService == postgresql_service {
+	if remoteService == opensearchService || remoteService == postgresqlService {
 		return startBackEndNodes(args, sshUtil, ips, remoteService, cliWriter)
 	}
 	err := startFrontEndNodes(args, sshUtil, ips, remoteService, cliWriter)

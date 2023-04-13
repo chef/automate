@@ -147,8 +147,8 @@ func TestForRunCommand(t *testing.T) {
 	}
 }
 
-func getMockInfra() *AutomteHAInfraDetails {
-	infra := &AutomteHAInfraDetails{}
+func getMockInfra() *AutomateHAInfraDetails {
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{"127.0.0.0"}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{"127.0.0.1"}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{"127.0.0.2"}
@@ -157,7 +157,7 @@ func getMockInfra() *AutomteHAInfraDetails {
 }
 
 func TestFunc(t *testing.T) {
-	startCmdFlags.chef_server = true
+	startCmdFlags.chefServer = true
 	startCmdFlags.automate = false
 	startCmdFlags.opensearch = false
 	startCmdFlags.postgresql = false
@@ -167,7 +167,7 @@ func TestFunc(t *testing.T) {
 }
 
 func TestFuncAutomate(t *testing.T) {
-	startCmdFlags.chef_server = false
+	startCmdFlags.chefServer = false
 	startCmdFlags.automate = true
 	startCmdFlags.opensearch = false
 	startCmdFlags.postgresql = false
@@ -177,7 +177,7 @@ func TestFuncAutomate(t *testing.T) {
 }
 
 func TestFuncOs(t *testing.T) {
-	startCmdFlags.chef_server = false
+	startCmdFlags.chefServer = false
 	startCmdFlags.automate = false
 	startCmdFlags.opensearch = true
 	startCmdFlags.postgresql = false
@@ -186,7 +186,7 @@ func TestFuncOs(t *testing.T) {
 	assert.EqualError(t, err, "\nNot able to start one or more nodes in opensearch: \nopen : no such file or directory")
 }
 func TestFuncPg(t *testing.T) {
-	startCmdFlags.chef_server = false
+	startCmdFlags.chefServer = false
 	startCmdFlags.automate = false
 	startCmdFlags.opensearch = false
 	startCmdFlags.postgresql = true
