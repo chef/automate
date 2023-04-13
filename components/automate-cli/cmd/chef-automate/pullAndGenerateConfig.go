@@ -45,6 +45,7 @@ type HAAwsAutoTfvars struct {
 	AwsSshKeyFile                      string      `json:"ssh_key_file"`
 	SshPort                            string      `json:"ssh_port"`
 	SshUser                            string      `json:"ssh_user"`
+	SSHGroupName                       string      `json:"ssh_group_name"`
 	HabitatUidGid                      string      `json:"habitat_uid_gid"`
 	PostgresqlArchiveDiskFsPath        string      `json:"postgresql_archive_disk_fs_path"`
 	PostgresqlInstanceCount            int         `json:"postgresql_instance_count"`
@@ -137,6 +138,7 @@ type HATfvars struct {
 	SshKeyFile                      string      `json:"ssh_key_file"`
 	SshPort                         string      `json:"ssh_port"`
 	SshUser                         string      `json:"ssh_user"`
+	SSHGroupName                    string      `json:"ssh_group_name"`
 	HabitatUidGid                   string      `json:"habitat_uid_gid"`
 	PostgresqlArchiveDiskFsPath     string      `json:"postgresql_archive_disk_fs_path"`
 	PostgresqlInstanceCount         int         `json:"postgresql_instance_count"`
@@ -735,6 +737,7 @@ func getExistingHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigT
 	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(tfvarConfig.SshKeyFile)
 	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(tfvarConfig.SshPort)
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(tfvarConfig.SshUser)
+	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(tfvarConfig.SSHGroupName)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
 	sharedConfigToml.Automate.Config.Fqdn = strings.TrimSpace(tfvarConfig.AutomateFqdn)
 	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(tfvarConfig.AutomateInstanceCount)
@@ -819,6 +822,7 @@ func getAwsHAConfigFromTFVars(tfvarConfig *HATfvars, awsAutoTfvarConfig *HAAwsAu
 	sharedConfigToml.Architecture.ConfigInitials.SSHKeyFile = strings.TrimSpace(awsAutoTfvarConfig.AwsSshKeyFile)
 	sharedConfigToml.Architecture.ConfigInitials.SSHPort = strings.TrimSpace(awsAutoTfvarConfig.SshPort)
 	sharedConfigToml.Architecture.ConfigInitials.SSHUser = strings.TrimSpace(awsAutoTfvarConfig.SshUser)
+	sharedConfigToml.Architecture.ConfigInitials.SSHGroupName = strings.TrimSpace(awsAutoTfvarConfig.SSHGroupName)
 	sharedConfigToml.Architecture.ConfigInitials.WorkspacePath = AUTOMATE_HA_WORKSPACE_DIR
 	sharedConfigToml.Automate.Config.InstanceCount = strconv.Itoa(awsAutoTfvarConfig.AutomateInstanceCount)
 	sharedConfigToml.Automate.Config.ConfigFile = strings.TrimSpace(awsAutoTfvarConfig.AutomateConfigFile)

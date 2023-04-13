@@ -161,6 +161,9 @@ variable "ssh_port" {
 variable "ssh_user" {
 }
 
+variable "ssh_group_name" {
+}
+
 variable "sudo_cmd" {
   default = "sudo"
 }

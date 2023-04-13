@@ -46,6 +46,7 @@ module AutomateCluster
     default :architecture
 
     default :ssh_user, 'centos'
+    default :ssh_group_name, 'centos'
     default :ssh_port, '22'
     default(:ssh_key_file, '~/.ssh/id_rsa').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
     default(:workspace_path, '/hab/a2_deploy_workspace').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }

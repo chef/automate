@@ -33,6 +33,7 @@ type AwsConfigToml struct {
 			Architecture                string `toml:"architecture"`
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
+			SSHGroupName                string `toml:"ssh_group_name"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
 			SSHPort                     string `toml:"ssh_port"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
@@ -170,6 +171,7 @@ type ExistingInfraConfigToml struct {
 			Architecture                string `toml:"architecture,omitempty"`
 			WorkspacePath               string `toml:"workspace_path,omitempty"`
 			SSHUser                     string `toml:"ssh_user,omitempty"`
+			SSHGroupName                string `toml:"ssh_group_name,omitempty"`
 			SSHKeyFile                  string `toml:"ssh_key_file,omitempty"`
 			SSHPort                     string `toml:"ssh_port,omitempty"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management,omitempty"`

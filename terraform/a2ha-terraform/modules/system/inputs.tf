@@ -29,6 +29,9 @@ variable "ssh_user" {
   default = "centos"
 }
 
+variable "ssh_group_name" {
+}
+
 variable "ssh_user_sudo_password" {
 }
 

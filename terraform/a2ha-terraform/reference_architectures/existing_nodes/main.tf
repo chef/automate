@@ -18,6 +18,7 @@ module "system-tuning-frontend" {
   private_ips                     = local.frontend_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_group_name                  = var.ssh_group_name
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
@@ -33,6 +34,7 @@ module "system-tuning-backend" {
   private_ips                     = local.backend_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_group_name                  = var.ssh_group_name
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd

@@ -11,6 +11,7 @@ module "system-tuning-automate" {
   private_ips                     = var.automate_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_group_name                  = var.ssh_group_name
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
@@ -25,6 +26,7 @@ module "system-tuning-chef_server" {
   private_ips                     = var.chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_group_name                  = var.ssh_group_name
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
@@ -40,6 +42,7 @@ module "system-tuning-opensearch" {
   private_ips                     = var.opensearch_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_group_name                  = var.ssh_group_name
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
@@ -55,6 +58,7 @@ module "system-tuning-postgresql" {
   private_ips                     = var.postgresql_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_group_name                  = var.ssh_group_name
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd

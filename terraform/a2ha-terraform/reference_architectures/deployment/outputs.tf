@@ -10,6 +10,10 @@ output "ssh_user" {
   value = var.ssh_user
 }
 
+output "ssh_group_name" {
+  value = var.ssh_group_name
+}
+
 output "ssh_port" {
   value = var.ssh_port
 }
