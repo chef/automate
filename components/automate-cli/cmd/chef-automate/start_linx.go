@@ -188,8 +188,7 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 	errorList := list.New()
 	scriptCommands := `sudo chef-automate start`
 	for _, hostIP := range ips {
-		sshUtil.getSSHConfig().hostIP = hostIP
-		go commandExecuteFrontEnd(scriptCommands, sshUtil, resultChan)
+		go commandExecuteFrontEnd(scriptCommands, sshUtil, resultChan, hostIP)
 
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
@@ -200,7 +199,8 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 	return nil
 }
 
-func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, hostIP string) {
+	sshUtil.getSSHConfig().hostIP = hostIP
 	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
 	output, err := runCommand(scriptCommands, sshUtil)
 	if err != nil {
@@ -230,9 +230,7 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 	scriptCommands := "sudo systemctl start hab-sup"
 	errorList := list.New()
 	for _, hostIP := range ips {
-		sshUtil.getSSHConfig().hostIP = hostIP
-
-		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan)
+		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan, hostIP)
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
 	close(resultChan)
@@ -242,7 +240,8 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 	return nil
 }
 
-func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, hostIp string) {
+	sshUtil.getSSHConfig().hostIP = hostIp
 	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
 	// Running the 'hab svc status' command to check if hab is present
 	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
