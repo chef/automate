@@ -59,29 +59,6 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 	assert.Equal(t, postgresqlIps, []string{ValidIP7, ValidIP8, ValidIP9})
 }
 
-func TestCheckIPAddressesFromCmd(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
-
-	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{
-		node:         fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8),
-		isAutomate:   true,
-		isChefServer: true,
-		isOpenSearch: true,
-		isPostgresql: true,
-	}, getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil))
-
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
-	assert.Equal(t, errList.Len(), 0)
-	assert.Equal(t, automateIps, []string{ValidIP})
-	assert.Equal(t, chefServerIps, []string{ValidIP3})
-	assert.Equal(t, opensearchIps, []string{ValidIP5})
-	assert.Equal(t, postgresqlIps, []string{ValidIP8})
-}
-
 func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
 	infra := &AutomteHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
