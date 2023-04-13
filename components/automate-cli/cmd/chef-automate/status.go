@@ -157,6 +157,8 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 	if !isManagedServicesOn() {
 		be := statusSummary.ShowBEStatus()
 		fmt.Println(be)
+	} else {
+		writer.Warn("Your using managed services\n")
 	}
 	writer.BufferWriter().Flush()
 
