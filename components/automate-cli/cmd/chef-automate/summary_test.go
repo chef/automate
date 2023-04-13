@@ -11,22 +11,22 @@ import (
 
 const (
 	invalidIpAddress = `
-Incorrect Automate-ip, 127.0.0 IP address validation failed
-Incorrect Automate-ip, 127.0.1 IP address validation failed
-Incorrect Automate-ip, 127.0.2 IP address validation failed
-Incorrect Automate-ip, 127.0.3 IP address validation failed
-Incorrect chef-server-ip, 127.0.0 IP address validation failed
-Incorrect chef-server-ip, 127.0.1 IP address validation failed
-Incorrect chef-server-ip, 127.0.2 IP address validation failed
-Incorrect chef-server-ip, 127.0.3 IP address validation failed
-Incorrect OpenSearch-ip, 127.0.0 IP address validation failed
-Incorrect OpenSearch-ip, 127.0.1 IP address validation failed
-Incorrect OpenSearch-ip, 127.0.2 IP address validation failed
-Incorrect OpenSearch-ip, 127.0.3 IP address validation failed
-Incorrect postgresql-ip, 127.0.0 IP address validation failed
-Incorrect postgresql-ip, 127.0.1 IP address validation failed
-Incorrect postgresql-ip, 127.0.2 IP address validation failed
-Incorrect postgresql-ip, 127.0.3 IP address validation failed`
+Incorrect Automate IP, 127.0.0 IP address validation failed
+Incorrect Automate IP, 127.0.1 IP address validation failed
+Incorrect Automate IP, 127.0.2 IP address validation failed
+Incorrect Automate IP, 127.0.3 IP address validation failed
+Incorrect chef-server IP, 127.0.0 IP address validation failed
+Incorrect chef-server IP, 127.0.1 IP address validation failed
+Incorrect chef-server IP, 127.0.2 IP address validation failed
+Incorrect chef-server IP, 127.0.3 IP address validation failed
+Incorrect OpenSearch IP, 127.0.0 IP address validation failed
+Incorrect OpenSearch IP, 127.0.1 IP address validation failed
+Incorrect OpenSearch IP, 127.0.2 IP address validation failed
+Incorrect OpenSearch IP, 127.0.3 IP address validation failed
+Incorrect postgresql IP, 127.0.0 IP address validation failed
+Incorrect postgresql IP, 127.0.1 IP address validation failed
+Incorrect postgresql IP, 127.0.2 IP address validation failed
+Incorrect postgresql IP, 127.0.3 IP address validation failed`
 displayBE = `+------------+--------------+--------+--------------+-------------+---------+
 | NAME       | IP ADDRESS   | HEALTH | PROCESS      | UPTIME      | ROLE    |
 +------------+--------------+--------+--------------+-------------+---------+

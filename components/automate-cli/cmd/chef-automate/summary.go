@@ -558,7 +558,7 @@ func (ss *Summary) validateIPAddresses(errorList *list.List, IpsFromcmd []string
 	for _, ip := range IpsFromcmd {
 		err := checkIPAddress(ip)
 		if err != nil {
-			errorList.PushBack("Incorrect " + nodeType + "-ip, " + ip + errorMessage)
+			errorList.PushBack("Incorrect " + nodeType + " IP, " + ip + errorMessage)
 		}
 		if stringutils.SliceContains(ips, ip) {
 			ipFound = append(ipFound, ip)
