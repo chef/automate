@@ -124,36 +124,3 @@ func TestForRunCommand(t *testing.T) {
 		}
 	}
 }
-
-func TestErrorOnManaged(t *testing.T) {
-	testCases := []struct {
-		isPostgresql bool
-		isOpenSearch bool
-		errorWant    error
-	}{
-		{
-			true,
-			false,
-			errors.Errorf("Start services in %s for externally configured is not supported", "Postgresql"),
-		},
-		{
-			false,
-			true,
-			errors.Errorf("Start services in %s for externally configured is not supported", "OpenSearch"),
-		},
-		{
-			false,
-			false,
-			nil,
-		},
-	}
-
-	for _, testCase := range testCases {
-		errGot := errorOnManaged(testCase.isPostgresql, testCase.isOpenSearch)
-		if errGot == nil {
-			assert.Equal(t, testCase.errorWant, errGot)
-		} else {
-			assert.EqualError(t, testCase.errorWant, errGot.Error())
-		}
-	}
-}

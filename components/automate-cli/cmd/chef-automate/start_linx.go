@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
@@ -15,6 +14,11 @@ import (
 )
 
 const node = " node :"
+const (
+	ERROR_ON_MANAGED_SERVICES_START = "Starting the service for externally configured %s is not supported"
+	opensearch_service              = "opensearch"
+	postgresql_service              = "postgresql"
+)
 
 type Result struct {
 	HostIP string
@@ -52,12 +56,6 @@ func init() {
 
 func runStartCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if isManagedServicesOn() {
-			err := errorOnManaged(startCmdFlags.postgresql, startCmdFlags.opensearch)
-			if err != nil {
-				return status.Annotate(err, status.InvalidCommandArgsError)
-			}
-		}
 		if len(args) == 0 {
 			writer.Println(cmd.UsageString())
 		}
@@ -65,27 +63,27 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		err = runStartCommandHA(infra, args)
-		if err != nil {
+		if err = runStartCommandHA(infra, args); err != nil {
 			return err
 		}
-		return nil
-	}
-	err := runStartStandalone()
-	if err != nil {
-		return err
+	} else if isDevMode() {
+		if err := runStartDevMode(); err != nil {
+			return err
+		}
+
+	} else {
+		if err := runStartStandalone(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
-	sshUser := infra.Outputs.SSHUser.Value
-	sskKeyFile := infra.Outputs.SSHKeyFile.Value
-	sshPort := infra.Outputs.SSHPort.Value
 	sshConfig := &SSHConfig{
-		sshUser:    sshUser,
-		sshKeyFile: sskKeyFile,
-		sshPort:    sshPort,
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
 	}
 	sshUtil := NewSSHUtil(sshConfig)
 	errorList := list.New()
@@ -105,15 +103,21 @@ func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
 		}
 	}
 	if startCmdFlags.opensearch {
+		if isManagedServicesOn() {
+			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES_START, "OpenSearch")
+		}
 		backendIps := infra.Outputs.OpensearchPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, "opensearch", writer)
+		err = checkNodes(args, sshUtil, backendIps, opensearch_service, writer)
 		if err != nil {
 			errorList.PushBack(err.Error())
 		}
 	}
 	if startCmdFlags.postgresql {
+		if isManagedServicesOn() {
+			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES_START, "Postgresql")
+		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, "postgresql", writer)
+		err = checkNodes(args, sshUtil, backendIps, postgresql_service, writer)
 		return err
 	}
 	if errorList.Len() > 0 {
@@ -124,13 +128,6 @@ func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
 
 func runStartStandalone() error {
 	writer.Title("Starting Chef Automate")
-	if isDevMode() {
-		err := runStartDevMode()
-		if err != nil {
-			return err
-		}
-		return nil
-	}
 	systemctlCmd := exec.Command("systemctl", "start", "chef-automate.service")
 	systemctlCmd.Stdout = os.Stdout
 	systemctlCmd.Stderr = os.Stderr
@@ -141,6 +138,7 @@ func runStartStandalone() error {
 }
 
 func runStartDevMode() error {
+	writer.Title("Starting Chef Automate")
 	if err := exec.Command("hab", "sup", "status").Run(); err == nil {
 		return nil
 	}
@@ -176,9 +174,8 @@ func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService stri
 		writer.Errorf("No %s IPs are found", remoteService)
 		return status.Errorf(1, "No %s IPs are found", remoteService)
 	}
-	if remoteService == "opensearch" || remoteService == "postgresql" {
-		err := startBackEndNodes(args, sshUtil, ips, remoteService, cliWriter)
-		return err
+	if remoteService == opensearch_service || remoteService == postgresql_service {
+		return startBackEndNodes(args, sshUtil, ips, remoteService, cliWriter)
 	}
 	err := startFrontEndNodes(args, sshUtil, ips, remoteService, cliWriter)
 	return err
@@ -189,18 +186,8 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 	scriptCommands := `sudo chef-automate start`
 	for _, hostIP := range ips {
 		sshUtil.getSSHConfig().hostIP = hostIP
-		go func(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
-			rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
-			output, err := runCommand(scriptCommands, sshUtil)
+		go commandExecuteOnFrontEnd(scriptCommands, sshUtil, resultChan)
 
-			if err != nil {
-				rc.Error = err
-				resultChan <- rc
-			}
-
-			rc.Output = output
-			resultChan <- rc
-		}(scriptCommands, sshUtil, resultChan)
 	}
 	errorList := list.New()
 	for i := 0; i < len(ips); i++ {
@@ -221,17 +208,30 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 	return nil
 }
 
+func commandExecuteOnFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
+	output, err := runCommand(scriptCommands, sshUtil)
+	if err != nil {
+		rc.Error = err
+		resultChan <- rc
+	}
+	rc.Output = output
+	resultChan <- rc
+}
+
 func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
 	scriptCommands := "sudo systemctl start hab-sup"
 	errorList := list.New()
 	for _, hostIP := range ips {
 		sshUtil.getSSHConfig().hostIP = hostIP
 		printStartConnectionMessage(remoteService, hostIP, cliWriter)
+		// Running the 'hab svc status' command to check if hab is present
 		_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
 		if err != nil {
 			printStartErrorMessage(remoteService, hostIP, cliWriter, err)
 			errorList.PushBack(err.Error())
 		}
+		// if hab is present, executing systemctl command for starting hab-sup
 		output, err := runCommand(scriptCommands, sshUtil)
 		if err != nil {
 			printStartErrorMessage(remoteService, hostIP, cliWriter, err)
@@ -240,6 +240,7 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 			cliWriter.Printf("Output for Host IP %s : %s", hostIP, output+"\n")
 			printStartSuccessMessage(remoteService, hostIP, cliWriter)
 		}
+
 	}
 	if errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
@@ -272,15 +273,4 @@ func printStartErrorMessage(remoteService string, hostIP string, cliWriter *cli.
 func printStartSuccessMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
 	cliWriter.Success("Start Command is completed on " + remoteService + node + hostIP + "\n")
 	cliWriter.BufferWriter().Flush()
-}
-
-func errorOnManaged(isPostgresql, isOpenSearch bool) error {
-
-	if isPostgresql {
-		return errors.Errorf("Start services in %s for externally configured is not supported", "Postgresql")
-	}
-	if isOpenSearch {
-		return errors.Errorf("Start services in %s for externally configured is not supported", "OpenSearch")
-	}
-	return nil
 }
