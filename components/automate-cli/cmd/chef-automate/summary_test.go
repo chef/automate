@@ -11,18 +11,18 @@ import (
 
 const (
 	invalidIpAddress = `
-Incorrect Automate IP, 127.0.0 IP address validation failed
-Incorrect Automate IP, 127.0.1 IP address validation failed
-Incorrect Automate IP, 127.0.2 IP address validation failed
-Incorrect Automate IP, 127.0.3 IP address validation failed
+Incorrect automate IP, 127.0.0 IP address validation failed
+Incorrect automate IP, 127.0.1 IP address validation failed
+Incorrect automate IP, 127.0.2 IP address validation failed
+Incorrect automate IP, 127.0.3 IP address validation failed
 Incorrect chef-server IP, 127.0.0 IP address validation failed
 Incorrect chef-server IP, 127.0.1 IP address validation failed
 Incorrect chef-server IP, 127.0.2 IP address validation failed
 Incorrect chef-server IP, 127.0.3 IP address validation failed
-Incorrect OpenSearch IP, 127.0.0 IP address validation failed
-Incorrect OpenSearch IP, 127.0.1 IP address validation failed
-Incorrect OpenSearch IP, 127.0.2 IP address validation failed
-Incorrect OpenSearch IP, 127.0.3 IP address validation failed
+Incorrect opensearch IP, 127.0.0 IP address validation failed
+Incorrect opensearch IP, 127.0.1 IP address validation failed
+Incorrect opensearch IP, 127.0.2 IP address validation failed
+Incorrect opensearch IP, 127.0.3 IP address validation failed
 Incorrect postgresql IP, 127.0.0 IP address validation failed
 Incorrect postgresql IP, 127.0.1 IP address validation failed
 Incorrect postgresql IP, 127.0.2 IP address validation failed
