@@ -40,22 +40,22 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. If you haven't specified the location in the `config.toml` file, go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
+1. Go to the backup location mentioned in Automate config, but if you haven't specified the location go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
 
     ```bash
     tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
     ```
 
-1. Transfer the `tar` bundle to one of the Chef-Automate nodes of Automate HA using the following command:
+1. Transfer the `tar` bundle to one of the Chef Automate nodes of Automate HA using the following command:
 
     ```bash
-        scp -i /path/to/key /path/to/backup-file user@host:/home/user
+        scp -i </path/to/key> </path/to/backup-file> <user>@<host>:/home/<user>
     ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-        scp -i /path/to/key /path/to/bootstrap.abb user@host:/home/user
+        scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
     ```
 
 1. Go to Bastion and:
@@ -90,13 +90,13 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     chef-automate config patch --fe <Path to automate.toml>
     ```
 
-1. Go to the Chef-Automate node of Automate HA cluster, where we copied the `tar` file. Unzip the bundle using the following:
+1. Go to the Chef Automate node of Automate HA cluster, where we copied the `tar` file. Unzip the bundle using the following:
 
     ```bash
     tar -xf backup.tar.gz -C /mnt/automate_backups
     ```
 
-1. Run the following command at the Chef-Automate node of Automate HA cluster to get the applied `config`:
+1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -120,7 +120,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the instances except where you saved the `.tar` file at frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the instances except where you saved the `.tar` file on frontend nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
@@ -198,7 +198,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         chef-automate bootstrap bundle create bootstrap.abb
         ```
 
-1. Run the following command at the Chef-Automate node of Automate HA cluster to get the applied config:
+1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -219,7 +219,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-        scp -i /path/to/key /path/to/bootstrap.abb user@host:/home/user
+        scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
     ```
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
@@ -230,7 +230,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the frontend instances except where you saved the `current_config.toml` file at automate nodes in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend instances except where you saved the `current_config.toml` file on Chef Automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
@@ -286,7 +286,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
-    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the `config.toml` file.
+    1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the Standalone Automate config.
 
     ```bash
     chef-automate backup create
@@ -303,7 +303,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-    scp -i /path/to/key /path/to/bootstrap.abb user@host:/home/user
+    scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
     ```
 
 1. Go to Bastion:
@@ -369,7 +369,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     chef-automate config patch --frontend automate.toml
     ```
 
-1. Run the following command at the Chef-Automate node of Automate HA cluster to get the applied `config`:
+1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
 
     ```bash
     sudo chef-automate config show > current_config.toml
@@ -393,7 +393,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-1. Stop all the frontend instances except where you saved the `current_config.toml` file at automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
+1. Stop all the frontend instances except where you saved the `current_config.toml` file on Chef Automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
 
     ``` bash
     sudo chef-automate stop
@@ -415,7 +415,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 ## Steps to Validate migration is successful
 
 1. Check the Automate UI of Automate HA. Check whether the data is present in Automate UI for HA.
-1. If you are using the embedded chef server, log in to the Chef-server HA node, and run the following commands:
+1. If you are using the embedded chef server, log in to the Chef Server HA node, and run the following commands:
     - `knife user list`: will give the user list you created in standalone automate.
     - `knife opc org list`: It will give the organization list you created in standalone automate.
 
