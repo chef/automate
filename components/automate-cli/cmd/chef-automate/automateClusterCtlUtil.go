@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -184,10 +185,16 @@ func doBootstrapEnv(airgapBundlePath string, saas bool) error {
 		return status.Annotate(err, status.DeployError)
 	}
 	if offlineMode {
+		log.Println("creating backend bundle error...")
+		packages := backendBundles(airgapMetadata)
+		log.Printf("Packages.... %s", packages)
+		createBackendBundleTar(packages)
+		log.Println("errors....")
 		err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, airgapBundlePath)
 		if err != nil {
 			return status.Annotate(err, status.DeployError)
 		}
+
 	}
 	return nil
 }
@@ -338,6 +345,69 @@ func generateBackendBundles(bundleName string, airgapPath string) error {
 		return err
 	}
 	return nil
+}
+func backendBundles(airgapMetadata airgap.UnpackMetadata) []string {
+	log.Println("entry 32")
+	var requiredBackendPackages []string
+	log.Println("entry 33")
+	log.Printf("...metadata...: %s\n", airgapMetadata)
+	for _, p := range airgapMetadata.HartifactPaths {
+		log.Printf("p: %s", p)
+
+		log.Println("entry 34")
+		if strings.Contains(p, AUTOMATE_HA_CTL) {
+			log.Println("entry 35")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 1 : %s", requiredBackendPackages)
+		}
+
+		log.Println("entry 36")
+		if strings.Contains(p, AUTOMATE_HA_DEPLOYMENT) {
+			log.Println("entry 37")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 2 : %s", requiredBackendPackages)
+		}
+
+		log.Println("entry 38")
+		if strings.Contains(p, AUTOMATE_HA_ES_CAR) {
+			log.Println("entry 39")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 3 : %s", requiredBackendPackages)
+		}
+
+		log.Println("entry 40")
+		if strings.Contains(p, AUTOMATE_HA_PKG_HA_PROXY) {
+			log.Println("error41")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 4 : %s", requiredBackendPackages)
+		}
+
+		log.Println("entry 42")
+		if strings.Contains(p, AUTOMATE_HA_OS) {
+			log.Println("entry 43")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 5 : %s", requiredBackendPackages)
+		}
+
+		log.Println("entry 44")
+		if strings.Contains(p, AUTOMATE_HA_PKG_PG_LDR_CHK) {
+			log.Println("entry 45")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 6 : %s", requiredBackendPackages)
+		}
+
+		log.Println("entry 46")
+		if strings.Contains(p, AUTOMATE_HA_PKG_PG) {
+			log.Println("entry 47")
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+			log.Printf("required backend packages 7 : %s", requiredBackendPackages)
+		}
+
+		log.Printf("....error 48 req backend packages... : %s", requiredBackendPackages)
+	}
+	log.Printf(".....req backend packages... : %s ", requiredBackendPackages)
+	return requiredBackendPackages
+
 }
 
 func getBytesFromTempalte(templateName string, templateContent string, placeholders map[string]interface{}) []byte {
