@@ -158,8 +158,8 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func getInfraDetails(configPath string) (*AutomteHAInfraDetails, error) {
-	var infra *AutomteHAInfraDetails
+func getInfraDetails(configPath string) (*AutomateHAInfraDetails, error) {
+	var infra *AutomateHAInfraDetails
 	var err error
 	var deploymentType string
 	if isA2HARBFileExist() {
@@ -453,9 +453,9 @@ func runChefServerChecks(u *a1upgrade.A1Upgrade) error {
 	return nil
 }
 
-func populateInfraDetails(config ExistingInfraConfigToml) *AutomteHAInfraDetails {
+func populateInfraDetails(config ExistingInfraConfigToml) *AutomateHAInfraDetails {
 
-	var infra AutomteHAInfraDetails
+	var infra AutomateHAInfraDetails
 	infra.Outputs.SSHKeyFile = InfraKeyValue{
 		Value: config.Architecture.ConfigInitials.SSHKeyFile,
 	}
@@ -474,8 +474,8 @@ func populateInfraDetails(config ExistingInfraConfigToml) *AutomteHAInfraDetails
 	return &infra
 }
 
-func getInfraDetailsForDeploymentType(deploymentType string, configPath string) (*AutomteHAInfraDetails, error) {
-	var infra *AutomteHAInfraDetails
+func getInfraDetailsForDeploymentType(deploymentType string, configPath string) (*AutomateHAInfraDetails, error) {
+	var infra *AutomateHAInfraDetails
 	var err error
 	if deploymentType == EXISTING_INFRA_MODE {
 		config, err := getExistingInfraConfig(configPath)
@@ -494,7 +494,7 @@ func getInfraDetailsForDeploymentType(deploymentType string, configPath string) 
 	return infra, nil
 }
 
-func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
+func constructAndGetNodeMap(infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 	frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
 	inputFilePath := "/usr/bin/chef-automate"
 	nodeMap := &NodeTypeAndCmd{

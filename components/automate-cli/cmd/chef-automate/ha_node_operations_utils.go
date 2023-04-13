@@ -39,7 +39,7 @@ type HAModifyAndDeploy interface {
 
 type MockNodeUtilsImpl struct {
 	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
-	getHaInfraDetailsfunc                     func() (*AutomteHAInfraDetails, *SSHConfig, error)
+	getHaInfraDetailsfunc                     func() (*AutomateHAInfraDetails, *SSHConfig, error)
 	writeHAConfigFilesFunc                    func(templateName string, data interface{}) error
 	taintTerraformFunc                        func(path string) error
 	isA2HARBFileExistFunc                     func() bool
@@ -64,7 +64,7 @@ func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command stri
 func (mnu *MockNodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	return mnu.getAWSConfigIpFunc()
 }
-func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {
+func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
 	return mnu.getHaInfraDetailsfunc()
 }
 func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
@@ -117,7 +117,7 @@ func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exception
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
-	getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error)
+	getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error)
 	writeHAConfigFiles(templateName string, data interface{}) error
 	taintTerraform(path string) error
 	isA2HARBFileExist() bool
@@ -289,7 +289,8 @@ func (nu *NodeUtilsImpl) modifyTfArchFile(terraformPath string) error {
 	return nil
 }
 
-func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomteHAInfraDetails, *SSHConfig, error) {
+func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
+
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return nil, nil, err

@@ -51,7 +51,7 @@ const (
 
 type BackupFromBashtion interface {
 	isBastionHost() bool
-	executeOnRemoteAndPoolStatus(command string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool, subCommand string) error
+	executeOnRemoteAndPoolStatus(command string, infra *AutomateHAInfraDetails, pooling bool, stopFrontends bool, backupState bool, subCommand string) error
 }
 
 type BackupFromBashtionImp struct{}
@@ -276,6 +276,7 @@ func preBackupCmd(cmd *cobra.Command, args []string) error {
 		allPassedFlags = ""
 		cmd.Flags().Visit(checkFlags)
 		commandString := prepareCommandString(cmd, args, allPassedFlags)
+
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			writer.Errorf("error in getting infra details of HA, %s\n", err.Error())
@@ -307,7 +308,7 @@ func prepareCommandString(cmd *cobra.Command, args []string, allFlags string) st
 	return commandString
 }
 
-func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomteHAInfraDetails, subCommand string) error {
+func handleBackupCommands(cmd *cobra.Command, args []string, commandString string, infra *AutomateHAInfraDetails, subCommand string) error {
 	if strings.Contains(cmd.CommandPath(), "create") {
 		err := NewBackupFromBashtion().executeOnRemoteAndPoolStatus(commandString, infra, true, false, true, subCommand)
 		if err != nil {
@@ -1188,7 +1189,7 @@ func (ins *BackupFromBashtionImp) isBastionHost() bool {
 	return isA2HARBFileExist()
 }
 
-func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomteHAInfraDetails, pooling bool, stopFrontends bool, backupState bool, subCommand string) error {
+func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString string, infra *AutomateHAInfraDetails, pooling bool, stopFrontends bool, backupState bool, subCommand string) error {
 	sshconfig := &SSHConfig{}
 	sshconfig.sshUser = infra.Outputs.SSHUser.Value
 	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value

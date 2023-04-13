@@ -14,7 +14,7 @@ import (
 )
 
 type Cmd struct {
-	PreExec   func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error
+	PreExec   func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error
 	CmdInputs *CmdInputs
 }
 
@@ -39,7 +39,7 @@ type NodeTypeAndCmd struct {
 	ChefServer *Cmd
 	Postgresql *Cmd
 	Opensearch *Cmd
-	Infra      *AutomteHAInfraDetails
+	Infra      *AutomateHAInfraDetails
 }
 
 type CmdResult struct {
@@ -251,7 +251,7 @@ func checkIfErrorPresentInOutput(errorCheckEnableInOutput bool, output string) e
 }
 
 // preCmdExecCheck will check and execute PreExec function. Also returns nodeips for given remoteservice with error if any.
-func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) ([]string, error) {
+func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) ([]string, error) {
 	var nodeIps []string
 	var err error
 	if (node.PreExec) != nil {
@@ -283,7 +283,7 @@ func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomteHAInfraDetails, r
 }
 
 // getSshDetails will return the SSH details.
-func getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
+func getSshDetails(infra *AutomateHAInfraDetails) *SSHConfig {
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshPort:    infra.Outputs.SSHPort.Value,
@@ -293,7 +293,7 @@ func getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
 }
 
 // getFrontendIPs will return the Frontend Node Ips.
-func getNodeIPs(single bool, ip string, infra *AutomteHAInfraDetails, remoteService string) ([]string, error) {
+func getNodeIPs(single bool, ip string, infra *AutomateHAInfraDetails, remoteService string) ([]string, error) {
 	nodeIps := []string{}
 	switch {
 	case remoteService == CONST_OPENSEARCH:

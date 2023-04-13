@@ -347,7 +347,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 
 	if isA2HARBFileExist() {
-
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -462,7 +461,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 }
 
 // prePatchCheckForFrontendNodes patches the configuration for front end nodes in Automate HA
-func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
 	srcPath, err := parseAndRemoveRestrictedKeysFromSrcFile(inputs.Args[0])
 	if err != nil {
 		return err
@@ -474,7 +473,7 @@ func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Au
 }
 
 // prePatchCheckForPostgresqlNodes patches the config for postgresql nodes in Automate HA
-func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "Postgresql")
 	}
@@ -521,7 +520,7 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 }
 
 // prePatchCheckForOpensearch patches the config for open-search nodes in Automate HA
-func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomteHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
 	}
@@ -569,8 +568,8 @@ func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *Autom
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-
 		var err error
+
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -709,7 +708,7 @@ func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []str
 }
 
 // setConfigForPostgresqlNodes set the configuration for postgresql nodes in Automate HA
-func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string, writer *cli.Writer) error {
+func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, timestamp string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_SET, "Postgresql")
 	}
@@ -743,7 +742,7 @@ func setConfigForPostgresqlNodes(args []string, remoteService string, sshUtil SS
 }
 
 // setConfigForOpensearch set the configuration for opensearch nodes in Automate HA
-func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomteHAInfraDetails, timestamp string, writer *cli.Writer) error {
+func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil, infra *AutomateHAInfraDetails, timestamp string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_SET, "OpenSearch")
 	}
@@ -852,7 +851,7 @@ func getMergedPostgresqlInterface(rawOutput string, pemFilePath string, remoteSe
 	return dest, nil
 }
 
-func getRemoteType(flag string, infra *AutomteHAInfraDetails) (string, string) {
+func getRemoteType(flag string, infra *AutomateHAInfraDetails) (string, string) {
 	switch strings.ToLower(flag) {
 	case "opensearch", "os", "o":
 		return infra.Outputs.OpensearchPrivateIps.Value[0], "opensearch"
@@ -869,7 +868,7 @@ func cleanToml(rawData string) string {
 	return tomlOutput
 }
 
-func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp string, remoteType string, config string) (string, error) {
+func getMergerTOMLPath(args []string, infra *AutomateHAInfraDetails, timestamp string, remoteType string, config string) (string, error) {
 	sshconfig := &SSHConfig{}
 	tomlFile := args[0] + timestamp
 	sshconfig.sshUser = infra.Outputs.SSHUser.Value
@@ -920,7 +919,7 @@ func getMergerTOMLPath(args []string, infra *AutomteHAInfraDetails, timestamp st
 }
 
 // getConfigFromRemoteServer gets the config for remote server using the commands
-func getConfigFromRemoteServer(infra *AutomteHAInfraDetails, remoteType string, config string, sshUtil SSHUtil) (string, error) {
+func getConfigFromRemoteServer(infra *AutomateHAInfraDetails, remoteType string, config string, sshUtil SSHUtil) (string, error) {
 	remoteIP, remoteService := getRemoteType(remoteType, infra)
 	sshUtil.getSSHConfig().hostIP = remoteIP
 	scriptCommands := fmt.Sprintf(config, remoteService)
@@ -979,7 +978,7 @@ func isConfigChanged(src interface{}, dest interface{}) bool {
 }
 
 // getExistingAndRequestedConfigForPostgres get requested and existing config for postgresql
-func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInfraDetails, config string, sshUtil SSHUtil) (PostgresqlConfig, PostgresqlConfig, error) {
+func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomateHAInfraDetails, config string, sshUtil SSHUtil) (PostgresqlConfig, PostgresqlConfig, error) {
 	//Getting Existing config from server
 	var existingConfig PostgresqlConfig
 	var reqConfig PostgresqlConfig
@@ -1004,7 +1003,7 @@ func getExistingAndRequestedConfigForPostgres(args []string, infra *AutomteHAInf
 }
 
 // getExistingAndRequestedConfigForOpenSearch gets existed and requested config for opensearch
-func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomteHAInfraDetails, config string, sshUtil SSHUtil) (OpensearchConfig, OpensearchConfig, error) {
+func getExistingAndRequestedConfigForOpenSearch(args []string, infra *AutomateHAInfraDetails, config string, sshUtil SSHUtil) (OpensearchConfig, OpensearchConfig, error) {
 	//Getting Existing config from server
 	var existingConfig OpensearchConfig
 	var reqConfig OpensearchConfig

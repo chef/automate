@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,14 +17,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
-const automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
+var automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
+var automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
 
 var sshFlags = struct {
 	hostname string
 }{}
 
-type AutomteHAInfraDetails struct {
+type AutomateHAInfraDetails struct {
 	Version          int    `json:"version"`
 	TerraformVersion string `json:"terraform_version"`
 	Serial           int    `json:"serial"`
@@ -211,10 +213,11 @@ var sshCommand = &cobra.Command{
 	RunE: runSshCommand,
 }
 
-func runSshCommand(cmd *cobra.Command, args []string) error {
+func runSshCommand(_ *cobra.Command, _ []string) error {
 	if !isA2HARBFileExist() {
 		return errors.New(AUTOMATE_HA_INVALID_BASTION)
 	}
+
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return err
@@ -239,57 +242,86 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
-func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
-	if checkIfFileExist(automateHATerraformOutputFile) {
-		automateHAInfraDetails := &AutomteHAInfraDetails{}
-		contents, err := ioutil.ReadFile(automateHATerraformOutputFile)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(contents, automateHAInfraDetails)
-		if err != nil {
-			return nil, err
-		}
-		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-		return automateHAInfraDetails, nil
-	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
-		automateHAInfraDetails := &AutomteHAInfraDetails{}
-		contents, err := ioutil.ReadFile(automateHATerraformDestroyOutputFile)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(contents, automateHAInfraDetails)
-		if err != nil {
-			return nil, err
-		}
-		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
-		return automateHAInfraDetails, nil
-	} else {
-		writer.Error("Automate Ha infra confile file not exits.")
-		return nil, nil
+func getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+
+	infraConfigFile, err := FileContainingAutomateHAInfraDetails()
+	if err != nil {
+		return nil, err
 	}
+
+	return getAutomateHAInfraDetailHelper(infraConfigFile)
 }
 
-func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomteHAInfraDetails) {
-	if automateHAInfraDetails != nil && len(automateHAInfraDetails.Outputs.AutomateSSH.Value) > 0 {
-		automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
-		lastspaceIndex := strings.LastIndex(automateSSH, " ")
-		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) < 1 {
-			if strings.Contains(automateSSH, "-p") {
-				port := strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastspaceIndex])
-				automateHAInfraDetails.Outputs.SSHPort.Value = port
-			} else {
-				automateHAInfraDetails.Outputs.SSHPort.Value = "22"
-			}
-		}
-		if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) < 1 {
-			sshUser := strings.TrimSpace(automateSSH[lastspaceIndex:strings.LastIndex(automateSSH, "@")])
-			automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
-		}
+func getAutomateHAInfraDetailHelper(infraConfigFilePath string) (*AutomateHAInfraDetails, error) {
+	automateHAInfraDetails := &AutomateHAInfraDetails{}
+
+	file, err := os.Open(infraConfigFilePath)
+	if err != nil {
+		return nil, err
 	}
+	defer file.Close()
+
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(file)
+	if err != nil {
+		return nil, err
+	}
+
+	content := buf.String()
+	if content == "" {
+		return nil, errors.New("the file is empty")
+	}
+
+	err = json.Unmarshal([]byte(content), automateHAInfraDetails)
+	if err != nil {
+		return nil, err
+	}
+
+	extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
+	return automateHAInfraDetails, nil
 }
 
-func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]string, error) {
+func FileContainingAutomateHAInfraDetails() (string, error) {
+	if _, err := os.Stat(automateHATerraformOutputFile); errors.Is(err, nil) {
+		return automateHATerraformOutputFile, nil
+	}
+
+	if _, err := os.Stat(automateHATerraformDestroyOutputFile); errors.Is(err, nil) {
+		return automateHATerraformDestroyOutputFile, nil
+	}
+
+	return "", errors.New("Automate Ha infra confile file not exist")
+}
+
+func extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails *AutomateHAInfraDetails) {
+	if automateHAInfraDetails == nil || len(automateHAInfraDetails.Outputs.AutomateSSH.Value) == 0 {
+		return
+	}
+
+	automateSSH := automateHAInfraDetails.Outputs.AutomateSSH.Value[0]
+	lastSpaceIndex := strings.LastIndex(automateSSH, " ")
+
+	if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHPort.Value)) == 0 {
+		port := getSSHPortFromAutomateSSH(automateSSH, lastSpaceIndex)
+		automateHAInfraDetails.Outputs.SSHPort.Value = port
+	}
+
+	if len(strings.TrimSpace(automateHAInfraDetails.Outputs.SSHUser.Value)) == 0 {
+		sshUser := strings.TrimSpace(automateSSH[lastSpaceIndex:strings.LastIndex(automateSSH, "@")])
+		automateHAInfraDetails.Outputs.SSHUser.Value = sshUser
+	}
+
+}
+
+func getSSHPortFromAutomateSSH(automateSSH string, lastSpaceIndex int) string {
+	port := "22"
+	if strings.Contains(automateSSH, "-p") {
+		port = strings.TrimSpace(automateSSH[strings.LastIndex(automateSSH, "-p")+2 : lastSpaceIndex])
+	}
+	return port
+}
+
+func getIPOfRequestedServers(servername string, d *AutomateHAInfraDetails) ([]string, error) {
 	isManagedServices := isManagedServicesOn()
 	switch strings.ToLower(servername) {
 	case "automate", "a2":

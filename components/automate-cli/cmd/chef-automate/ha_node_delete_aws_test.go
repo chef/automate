@@ -42,7 +42,7 @@ func TestDeletenodeAWSValidateIsManagedServicesOnError(t *testing.T) {
 					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
 				}, nil
 			},
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -97,7 +97,7 @@ func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
 				}, nil
 			},
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -150,7 +150,7 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
 				}, nil
 			},
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -200,7 +200,7 @@ func TestDeletenodeAWSModify(t *testing.T) {
 					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
 				}, nil
 			},
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -253,7 +253,7 @@ func TestDeleteAwsnodePrompt(t *testing.T) {
 					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
 				}, nil
 			},
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -312,7 +312,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 		w.CliWriter,
 		flags,
 		&MockNodeUtilsImpl{
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -423,7 +423,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 		w.CliWriter,
 		flags,
 		&MockNodeUtilsImpl{
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -496,7 +496,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		w.CliWriter,
 		flags,
 		&MockNodeUtilsImpl{
-			getHaInfraDetailsfunc: func() (*AutomteHAInfraDetails, *SSHConfig, error) {
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 				return nil, &SSHConfig{}, nil
 			},
 			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {

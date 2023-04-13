@@ -141,7 +141,7 @@ type patchFnParameters struct {
 	fileName      string
 	timestamp     string
 	remoteService string
-	infra         *AutomteHAInfraDetails
+	infra         *AutomateHAInfraDetails
 	flagsObj      *certRotateFlags
 	skipIpsList   []string
 }
@@ -190,6 +190,7 @@ func certRotateCmdFunc(flagsObj *certRotateFlags) func(cmd *cobra.Command, args 
 // certRotate will rotate the certificates of Automate, Chef Infra Server, Postgres and Opensearch.
 func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj *certRotateFlags) error {
 	if isA2HARBFileExist() {
+
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -249,7 +250,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 }
 
 // certRotateFrontend will rotate the certificates of Automate and Chef Infra Server.
-func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
+func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	fileName := "cert-rotate-fe.toml"
 	timestamp := time.Now().Format("20060102150405")
 	var remoteService string
@@ -300,7 +301,7 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 }
 
 // certRotatePG will rotate the certificates of Postgres.
-func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
+func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, CONST_POSTGRESQL)
 	}
@@ -363,7 +364,7 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 }
 
 // certRotateOS will rotate the certificates of OpenSearch.
-func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
+func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, CONST_OPENSEARCH)
 	}
@@ -486,7 +487,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 }
 
 // patchRootCAinCS will rotate the root-ca in the ChefServer to maintain the connection.
-func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags, skipIpsList []string) error {
+func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, skipIpsList []string) error {
 
 	fileName := "rotate-root_CA.toml"
 	remoteService := CONST_CHEF_SERVER
@@ -556,7 +557,7 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 }
 
 // validateEachIp validate given ip with the remoteService cluster.
-func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) bool {
+func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags) bool {
 	ips := c.getIps(remoteService, infra)
 	for i := 0; i < len(ips); i++ {
 		if ips[i] == flagsObj.node {
@@ -567,7 +568,7 @@ func (c *certRotateFlow) validateEachIp(remoteService string, infra *AutomteHAIn
 }
 
 // getSshDetails will return the SSH details.
-func (c *certRotateFlow) getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig {
+func (c *certRotateFlow) getSshDetails(infra *AutomateHAInfraDetails) *SSHConfig {
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshPort:    infra.Outputs.SSHPort.Value,
@@ -577,7 +578,7 @@ func (c *certRotateFlow) getSshDetails(infra *AutomteHAInfraDetails) *SSHConfig 
 }
 
 // getIps will return the Ips based on the given remote service.
-func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetails) []string {
+func (c *certRotateFlow) getIps(remoteService string, infra *AutomateHAInfraDetails) []string {
 	if remoteService == CONST_AUTOMATE {
 		return infra.Outputs.AutomatePrivateIps.Value
 	} else if remoteService == CONST_CHEF_SERVER {
@@ -593,7 +594,7 @@ func (c *certRotateFlow) getIps(remoteService string, infra *AutomteHAInfraDetai
 }
 
 // isIPInCluster will check whether the given ip is in the cluster or not.
-func (c *certRotateFlow) isIPInCluster(ip string, infra *AutomteHAInfraDetails) bool {
+func (c *certRotateFlow) isIPInCluster(ip string, infra *AutomateHAInfraDetails) bool {
 	cluster := c.getAllIPs(infra)
 	for _, clusterIP := range cluster {
 		if ip == clusterIP {
@@ -604,7 +605,7 @@ func (c *certRotateFlow) isIPInCluster(ip string, infra *AutomteHAInfraDetails) 
 }
 
 // getAllIps will return all the ips of the cluster.
-func (c *certRotateFlow) getAllIPs(infra *AutomteHAInfraDetails) []string {
+func (c *certRotateFlow) getAllIPs(infra *AutomateHAInfraDetails) []string {
 	ips := append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
 	ips = append(ips, infra.Outputs.PostgresqlPrivateIps.Value...)
 	ips = append(ips, infra.Outputs.OpensearchPrivateIps.Value...)
@@ -679,7 +680,7 @@ func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates,
 }
 
 //getFrontEndIpsForSkippingRootCAPatching compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
-func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService string, newRootCA string, infra *AutomteHAInfraDetails, currentCertsInfo *certShowCertificates) []string {
+func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService string, newRootCA string, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 
 	if remoteService == CONST_POSTGRESQL {
@@ -698,7 +699,7 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 }
 
 //getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
-func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomteHAInfraDetails) []string {
+func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
 	isRootCaSame := false
 
 	if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
@@ -746,7 +747,7 @@ func (c *certRotateFlow) skipMessagePrinter(remoteService, skipIpsMsg, nodeFlag 
 }
 
 // getCerts will read the certificate paths, and then return the required certificates.
-func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *certRotateFlags) (*certificates, error) {
+func (c *certRotateFlow) getCerts(infra *AutomateHAInfraDetails, flagsObj *certRotateFlags) (*certificates, error) {
 	privateCertPath := flagsObj.privateCertPath
 	publicCertPath := flagsObj.publicCertPath
 	rootCaPath := flagsObj.rootCAPath
@@ -854,7 +855,7 @@ func (c *certRotateFlow) getCerts(infra *AutomteHAInfraDetails, flagsObj *certRo
 }
 
 // getCertFromFile will read the certificate from the given path (local or remote).
-func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraDetails) ([]byte, error) {
+func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomateHAInfraDetails) ([]byte, error) {
 	certPath = strings.TrimSpace(certPath)
 	// Checking if the given path is remote or local.
 	if c.IsRemotePath(certPath) {
@@ -877,7 +878,7 @@ func (c *certRotateFlow) getCertFromFile(certPath string, infra *AutomteHAInfraD
 }
 
 // GetRemoteFileDetails returns the remote file details from the remotePath.
-func (c *certRotateFlow) GetRemoteFileDetails(remotePath string, infra *AutomteHAInfraDetails) (string, string, string, error) {
+func (c *certRotateFlow) GetRemoteFileDetails(remotePath string, infra *AutomateHAInfraDetails) (string, string, string, error) {
 	// Get Host IP from the given path and validate it.
 	hostIP := c.GetIPV4(remotePath)
 	if net.ParseIP(hostIP).To4() == nil {

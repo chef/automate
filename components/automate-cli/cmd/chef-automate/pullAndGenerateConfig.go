@@ -218,12 +218,12 @@ type PullConfigs interface {
 }
 
 type PullConfigsImpl struct {
-	infra        *AutomteHAInfraDetails
+	infra        *AutomateHAInfraDetails
 	sshUtil      SSHUtil
 	exceptionIps []string
 }
 
-func NewPullConfigs(infra *AutomteHAInfraDetails, sshUtil SSHUtil) PullConfigs {
+func NewPullConfigs(infra *AutomateHAInfraDetails, sshUtil SSHUtil) PullConfigs {
 	return &PullConfigsImpl{
 		infra:   infra,
 		sshUtil: sshUtil,
