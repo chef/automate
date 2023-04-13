@@ -14,53 +14,27 @@ import (
 )
 
 var (
-	infoCommandTemp = `AUTOMATION DETAILS:{{- "\n"}}
-	{{- "\t"}}{{- "Automate Admin User:"}} {{"\t\t"}} {{.Outputs.AutomateAdminUser.Value}}{{- "\n"}}
-	{{- "\t"}}{{- "Automate Data Collector Token:"}} {{"\t"}} {{.Outputs.AutomateDataCollectorToken.Value }}{{- "\n"}}
+	infoCommandTemp = `AUTOMATE DETAILS:{{- "\n"}}
+	{{- printf "%50s" "Automate Admin User: "}}{{.Outputs.AutomateAdminUser.Value}}{{- "\n"}}
+	{{- printf "%50s" "Automate Data Collector Token: "}}{{.Outputs.AutomateDataCollectorToken.Value }}{{- "\n"}}
 	
-	{{- "\t"}}{{- "Automate Private IPs:"}} {{"\t\t"}} {{- range .Outputs.AutomatePrivateIps.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
+	{{- range $index, $el := .Outputs.AutomatePrivateIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Automate Private IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.AutomateSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Automate SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
 
-	{{- "\t"}}{{- "Automate SSH:"}} {{"\t\t\t"}} {{- range .Outputs.AutomateSSH.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Automate URL:"}} {{"\t\t\t"}} {{.Outputs.AutomateURL.Value }}{{- "\n"}}x
-	{{- "\t"}}{{- "Backup Config EFS:"}} {{"\t\t"}} {{.Outputs.BackupConfigEFS.Value }}{{- "\n"}}
-	{{- "\t"}}{{- "Backup Config S3:"}} {{"\t\t"}} {{.Outputs.BackupConfigS3.Value }}{{- "\n"}}
+	{{- printf "%50s" "Automate URL: "}}{{.Outputs.AutomateURL.Value }}{{- "\n"}}
+	{{- printf "%50s" "Backup Config EFS: "}}{{.Outputs.BackupConfigEFS.Value }}{{- "\n"}}
+	{{- printf "%50s" "Backup Config S3: "}}{{.Outputs.BackupConfigS3.Value }}{{- "\n"}}
 	
-	{{- "\t"}}{{- "Chef Server Private IPs:"}} {{"\t"}} {{- range .Outputs.ChefServerPrivateIps.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Chef Server SSH:"}} {{"\t\t"}} {{- range .Outputs.ChefServerSSH.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Opensearch Private IPs:"}} {{"\t"}} {{- range .Outputs.OpensearchPrivateIps.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Opensearch Public IPs:"}} {{"\t\t"}} {{- range .Outputs.OpensearchPublicIps.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Opensearch SSH:"}} {{"\t\t"}} {{- range .Outputs.OpensearchSSH.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Postgresql Private IPs:"}} {{"\t"}} {{- range .Outputs.PostgresqlPrivateIps.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-
-	{{- "\t"}}{{- "Postgresql SSH:"}} {{"\t\t"}} {{- range .Outputs.PostgresqlSSH.Value}} {{.}}{{"\n\t\t\t\t\t"}}
-	{{- end}}
-	{{- "\n"}}
-	{{- "\t"}}{{- "SSH Key File:"}} {{"\t\t\t"}} {{.Outputs.SSHKeyFile.Value}}{{- "\n"}}
-	{{- "\t"}}{{- "SSH Port:"}} {{"\t\t\t"}} {{.Outputs.SSHPort.Value}}{{- "\n"}}
-	{{- "\t"}}{{- "SSH User:"}} {{"\t\t\t"}} {{.Outputs.SSHUser.Value}}{{- "\n"}}
-
+	{{- range $index, $el := .Outputs.ChefServerPrivateIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Chef Server Private IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.ChefServerSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Chef Server SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.OpensearchPrivateIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Opensearch Private IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.OpensearchPublicIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Opensearch Public IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.OpensearchSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Opensearch SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.PostgresqlPrivateIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Postgresql Private IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- range $index, $el := .Outputs.PostgresqlSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Postgresql SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
+	{{- printf "%50s" "SSH Key File: "}}{{.Outputs.SSHKeyFile.Value}}{{- "\n"}}
+	{{- printf "%50s" "SSH Port: "}}{{.Outputs.SSHPort.Value}}{{- "\n"}}
+	{{- printf "%50s" "SSH User: "}}{{.Outputs.SSHUser.Value}}{{- "\n"}}
 `
 )
 

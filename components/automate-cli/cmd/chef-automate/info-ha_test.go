@@ -76,13 +76,13 @@ func createInputDetails() *AutomateHAInfraDetails {
 	automate.Outputs.AutomateAdminUser.Value = "admin"
 	automate.Outputs.AutomateDataCollectorToken.Value = "token"
 	automate.Outputs.AutomateFrontendUrls.Value = "https://<front-end>"
-	automate.Outputs.AutomatePrivateIps.Value = []string{"1.2.3.4", "5.6.7.8"}
+	automate.Outputs.AutomatePrivateIps.Value = []string{"host1", "host2"}
 	automate.Outputs.AutomateSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
-	automate.Outputs.ChefServerPrivateIps.Value = []string{"1.2.3.4", "5.6.7.8"}
+	automate.Outputs.ChefServerPrivateIps.Value = []string{"host1", "host2"}
 	automate.Outputs.ChefServerSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
-	automate.Outputs.OpensearchPrivateIps.Value = []string{"1.2.3.4", "5.6.7.8", "9.10.11.12"}
+	automate.Outputs.OpensearchPrivateIps.Value = []string{"host1", "host2", "host3"}
 	automate.Outputs.OpensearchSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
-	automate.Outputs.PostgresqlPrivateIps.Value = []string{"1.2.3.4", "5.6.7.8", "9.10.11.12"}
+	automate.Outputs.PostgresqlPrivateIps.Value = []string{"host1", "host2", "host3"}
 	automate.Outputs.PostgresqlSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
 	automate.Outputs.SSHKeyFile.Value = "/path/to/key"
 	automate.Outputs.SSHPort.Value = "port"
@@ -91,6 +91,39 @@ func createInputDetails() *AutomateHAInfraDetails {
 	return automate
 
 }
+
+var expectedAutomateDetails = `AUTOMATE DETAILS:
+                             Automate Admin User: admin
+                   Automate Data Collector Token: token
+                            Automate Private IPs: host1
+                                                  host2
+                                    Automate SSH: ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                                    Automate URL: 
+                               Backup Config EFS: 
+                                Backup Config S3: 
+                         Chef Server Private IPs: host1
+                                                  host2
+                                 Chef Server SSH: ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                          Opensearch Private IPs: host1
+                                                  host2
+                                                  host3
+                                  Opensearch SSH: ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                          Postgresql Private IPs: host1
+                                                  host2
+                                                  host3
+                                  Postgresql SSH: ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                                    SSH Key File: /path/to/key
+                                        SSH Port: port
+                                        SSH User: user
+
+`
+
 func TestPrintInfo(t *testing.T) {
 
 	t.Run("Checking valid result ", func(t *testing.T) {
@@ -98,39 +131,8 @@ func TestPrintInfo(t *testing.T) {
 		var b bytes.Buffer
 		err := printInfo(infoCommandTemp, automate, &b)
 		require.NoError(t, err)
-		expected_string := `
-		
-		automate_admin_password: testpassowrd                                                                                  
-			automate_admin_user: admin                                                                                         
-  automate_data_collector_token: token                              
-		 automate_frontend_urls: https://<front-end>                        
-		   automate_private_ips: 1.2.3.4                                                                                    
-								 5.6.7.8                                                                                  
-				   automate_ssh: ssh -i file.pem -p 22 user@ip                                
-								 ssh -i file.pem -p 22 user@ip                               
-				   automate_url: https://A2-7cb3a880-automate-lb-600321473.ap-south-1.elb.amazonaws.com                        
-		chef_server_private_ips: 1.2.3.4                                                                                     
-								 5.6.7.8                                                                                    
-				chef_server_ssh: ssh -i file.pem -p 22 user@ip                                
-							     ssh -i file.pem -p 22 user@ip                              
-		 opensearch_private_ips: 1.2.3.4                                                                                    
-								 5.6.7.8                                                                                    
-								 9.10.11.12                                                                                    
-				 opensearch_ssh: ssh -i file.pem -p 22 user@ip                               
-				 				 ssh -i file.pem -p 22 user@ip                              
-								 ssh -i file.pem -p 22 user@ip                               
-		 postgresql_private_ips: 1.2.3.4                                                                                      
-								 5.6.7.8                                                                                     
-								 9.10.11.12                                                                                    
-				 postgresql_ssh: ssh -i file.pem -p 22 user@ip                                 
-				 				 ssh -i file.pem -p 22 user@ip                                
-								 ssh -i file.pem -p 22 user@ip                               
-				   ssh_key_file: /path/to/key                                                                
-					   ssh_port: port                                                                                           
-					   ssh_user: user                                                                                      
-`
 
-		require.Equal(t, expected_string, b.String())
+		require.Equal(t, expectedAutomateDetails, b.String())
 	})
 
 	t.Run("Failed to parse", func(t *testing.T) {
