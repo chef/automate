@@ -48,7 +48,7 @@ func TestGetInfraDetailsForDeploymentType(t *testing.T) {
 
 func TestConstructAndGetNodeMap(t *testing.T) {
 	preflightCmdFlags.automate = true
-	var infra AutomteHAInfraDetails
+	var infra AutomateHAInfraDetails
 
 	type ExpectedOutput struct {
 		automate    bool
