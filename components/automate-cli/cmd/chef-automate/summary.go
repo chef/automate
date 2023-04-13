@@ -33,6 +33,10 @@ const (
 	defaultServiceDetails       = "DefaultServiceDetails"
 	defaultServiceHealthDetails = "DefaultServiceHealthDetails"
 	censusDetails               = "CensusDetails"
+	opensearchName              = "opensearch"
+	automateName                = "automate"
+	chefServerName              = "chef-server"
+	postgresqlName              = "postgresql"
 )
 
 type StatusSummary interface {
@@ -77,7 +81,7 @@ func (ss *Summary) Prepare() error {
 
 	if len(automateIps) != 0 {
 		automateNodeMap := ss.automateNodeMap(automateIps)
-		err := ss.prepareFEScript(automateIps, automateNodeMap, "automate", "FE")
+		err := ss.prepareFEScript(automateIps, automateNodeMap, automateName, "FE")
 		if err != nil {
 			return err
 		}
@@ -85,7 +89,7 @@ func (ss *Summary) Prepare() error {
 
 	if len(chefServerIps) != 0 {
 		chefServerNodeMap := ss.chefServerNodeMap(chefServerIps)
-		err := ss.prepareFEScript(chefServerIps, chefServerNodeMap, "chef-server", "FE")
+		err := ss.prepareFEScript(chefServerIps, chefServerNodeMap, chefServerName, "FE")
 		if err != nil {
 			return err
 		}
@@ -93,7 +97,7 @@ func (ss *Summary) Prepare() error {
 
 	if len(opensearchIps) != 0 {
 		openSearchNodeMap := ss.openSearchNodeMap(opensearchIps)
-		err := ss.prepareBEScript(opensearchIps, openSearchNodeMap, "opensearch", "BE")
+		err := ss.prepareBEScript(opensearchIps, openSearchNodeMap, opensearchName, "BE")
 		if err != nil {
 			return err
 		}
@@ -101,7 +105,7 @@ func (ss *Summary) Prepare() error {
 
 	if len(postgresqlIps) != 0 {
 		postgresqlNodeMap := ss.postgresqlNodeMap(postgresqlIps)
-		err := ss.prepareBEScript(postgresqlIps, postgresqlNodeMap, "postgresql", "BE")
+		err := ss.prepareBEScript(postgresqlIps, postgresqlNodeMap, postgresqlName, "BE")
 		if err != nil {
 			return err
 		}
@@ -212,16 +216,16 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 		)
 		if len(nodes) != 0 {
 			if ss.statusSummaryCmdFlags.isAutomate {
-				automateIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "Automate", ipAddressError)
+				automateIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, automateName, ipAddressError)
 			}
 			if ss.statusSummaryCmdFlags.isChefServer {
-				chefServerIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "chef-server", ipAddressError)
+				chefServerIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, chefServerName, ipAddressError)
 			}
 			if ss.statusSummaryCmdFlags.isOpenSearch {
-				opensearchIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "OpenSearch", ipAddressError)
+				opensearchIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, opensearchName, ipAddressError)
 			}
 			if ss.statusSummaryCmdFlags.isPostgresql {
-				postgresqlIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, "postgresql", ipAddressError)
+				postgresqlIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, postgresqlName, ipAddressError)
 			}
 			if len(nodes) != 0 && errorList.Len() == 0 {
 				errorList.PushBack(fmt.Sprintf("List of  ip address not found %s does not match any node for Automate, PostgreSQL or ChefServer services", nodes))
@@ -311,11 +315,11 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		censusDetails:               censusDetailsCmd,
 	}
 
-	if serviceName == "opensearch" {
+	if serviceName == opensearchName {
 		nodeMap.Opensearch.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	if serviceName == "postgresql" {
+	if serviceName == postgresqlName {
 		nodeMap.Postgresql.CmdInputs.MutipleCmdWithArgs = script
 	}
 
@@ -360,11 +364,11 @@ func (ss *Summary) prepareFEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		"OsStatus": osStatus,
 	}
 
-	if serviceName == "automate" {
+	if serviceName == automateName {
 		nodeMap.Automate.CmdInputs.MutipleCmdWithArgs = script
 	}
 
-	if serviceName == "chef-server" {
+	if serviceName == chefServerName {
 		nodeMap.ChefServer.CmdInputs.MutipleCmdWithArgs = script
 	}
 
@@ -468,7 +472,7 @@ func (ss *Summary) getBEServiceHealth(output string) (string, error) {
 
 func (ss *Summary) getBECensus(output, service, memeberId string) (string, error) {
 	role := initialRole
-	if service == "opensearch" {
+	if service == opensearchName {
 		role = "OS node"
 	}
 
@@ -570,13 +574,13 @@ func (ss *Summary) validateIPAddresses(errorList *list.List, IpsFromcmd []string
 }
 func (ss *Summary) getNodeIPs(NodeType string) []string {
 	switch NodeType {
-	case "Automate":
+	case automateName:
 		return ss.infra.Outputs.AutomatePrivateIps.Value
-	case "chef-server":
+	case chefServerName:
 		return ss.infra.Outputs.ChefServerPrivateIps.Value
-	case "OpenSearch":
+	case opensearchName:
 		return ss.infra.Outputs.OpensearchPrivateIps.Value
-	case "postgresql":
+	case postgresqlName:
 		return ss.infra.Outputs.PostgresqlPrivateIps.Value
 	}
 	return []string{}
@@ -612,13 +616,4 @@ func (ss *Summary) ShowBEStatus() string {
 		return t.Render()
 	}
 	return ""
-}
-
-func getIndexOf(value CmdResult, order []string) int {
-	for i := 0; i < len(order); i++ {
-		if value.ScriptName == order[i] {
-			return i
-		}
-	}
-	return -1
 }
