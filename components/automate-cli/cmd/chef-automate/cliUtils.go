@@ -81,6 +81,12 @@ func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string, fi
 	}
 	writer.Print(output)
 	//copy file from remote to bastion
-	sshUtil.copyFileFromRemote(fileName, fileName)
+	writer.Printf("Downloading file %s from remote node %s \n", fileName, sshConfig.hostIP)
+	destFileName, err := sshUtil.copyFileFromRemote(fileName, fileName)
+	if err != nil {
+		return err
+	}
+	writer.Printf("File downloaded %s \n", destFileName)
+
 	return nil
 }

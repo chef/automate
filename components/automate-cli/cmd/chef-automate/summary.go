@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -23,14 +22,17 @@ var (
 )
 
 const (
-	ipAddressError           = " IP address validation failed"
-	curlHeaderFlag           = "--header"
-	curlAuthorization        = "'Authorization: Bearer %s'"
-	initialServiceState      = "down"
-	initialServicePid        = ""
-	initialHealth            = "ERROR"
-	initialFormattedDuration = "0d 0h 0m 0s"
-	initialRole              = "Unknown"
+	ipAddressError              = " IP address validation failed"
+	curlHeaderFlag              = "--header"
+	curlAuthorization           = "'Authorization: Bearer %s'"
+	initialServiceState         = "down"
+	initialServicePid           = ""
+	initialHealth               = "ERROR"
+	initialFormattedDuration    = "0d 0h 0m 0s"
+	initialRole                 = "Unknown"
+	defaultServiceDetails       = "DefaultServiceDetails"
+	defaultServiceHealthDetails = "DefaultServiceHealthDetails"
+	censusDetails               = "CensusDetails"
 )
 
 type StatusSummary interface {
@@ -268,7 +270,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 	}
 
 	// default service details
-	defaultServiceDetails := GenerateOriginalAutomateCLICommand(
+	defaultServiceDetailsCmd := GenerateOriginalAutomateCLICommand(
 		&cobra.Command{
 			Use: "curl",
 		}, []string{
@@ -280,7 +282,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		})
 
 	// default service health details
-	defaultServiceHealthDetails := GenerateOriginalAutomateCLICommand(
+	defaultServiceHealthDetailsCmd := GenerateOriginalAutomateCLICommand(
 		&cobra.Command{
 			Use: "curl",
 		}, []string{
@@ -292,7 +294,7 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		})
 
 	// census details
-	censusDetails := GenerateOriginalAutomateCLICommand(
+	censusDetailsCmd := GenerateOriginalAutomateCLICommand(
 		&cobra.Command{
 			Use: "curl",
 		}, []string{
@@ -304,9 +306,9 @@ func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd,
 		})
 
 	script := map[string]string{
-		"DefaultServiceDetails":       defaultServiceDetails,
-		"DefaultServiceHealthDetails": defaultServiceHealthDetails,
-		"CensusDetails":               censusDetails,
+		defaultServiceDetails:       defaultServiceDetailsCmd,
+		defaultServiceHealthDetails: defaultServiceHealthDetailsCmd,
+		censusDetails:               censusDetailsCmd,
 	}
 
 	if serviceName == "opensearch" {
@@ -390,11 +392,10 @@ func (ss *Summary) readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString string
 	return authToken, nil
 }
 
-func (ss *Summary) getBEStatus(outputs []CmdResult, ip string, authToken, serviceName string) BeStatusValue {
-	order := []string{"DefaultServiceDetails", "DefaultServiceHealthDetails", "CensusDetails"}
-
+func (ss *Summary) getBEStatus(outputs []*CmdResult, ip string, authToken, serviceName string) BeStatusValue {
 	var memeberId, role string
 	var err error
+	cmdResMap := map[string]*CmdResult{}
 	serviceState := initialServiceState
 	servicePid := initialServicePid
 	formattedDuration := initialFormattedDuration
@@ -408,25 +409,24 @@ func (ss *Summary) getBEStatus(outputs []CmdResult, ip string, authToken, servic
 		role:        initialRole,
 	}
 
-	sort.Slice(outputs, func(i int, j int) bool {
-		return getIndexOf(outputs[i], order) < getIndexOf(outputs[j], order)
-	})
-
-	memeberId, serviceState, servicePid, formattedDuration, err = ss.getBEDefaultServiceDetails(outputs[0].Output)
-
-	if outputs[0].Error != nil || err != nil {
-		return defaultBeStatusValue
-	}
-	health, err = ss.getBEServiceHealth(outputs[1].Output)
-	if outputs[1].Error != nil || err != nil {
-		return defaultBeStatusValue
+	for _, output := range outputs {
+		cmdResMap[output.ScriptName] = output
 	}
 
-	role, err = ss.getBECensus(outputs[2].Output, serviceName, memeberId)
-	if outputs[2].Error != nil || err != nil {
+	memeberId, serviceState, servicePid, formattedDuration, err = ss.getBEDefaultServiceDetails(cmdResMap[defaultServiceDetails].Output)
+	if cmdResMap[defaultServiceDetails].Error != nil || err != nil {
+		return defaultBeStatusValue
+	}
+	health, err = ss.getBEServiceHealth(cmdResMap[defaultServiceHealthDetails].Output)
+	if cmdResMap[defaultServiceHealthDetails].Error != nil || err != nil {
+		return defaultBeStatusValue
+	}
+	role, err = ss.getBECensus(cmdResMap[censusDetails].Output, serviceName, memeberId)
+	if cmdResMap[censusDetails].Error != nil || err != nil {
 		defaultBeStatusValue.role = role
 		return defaultBeStatusValue
 	}
+
 	return BeStatusValue{
 		serviceName: serviceName,
 		ipAddress:   ip,
@@ -492,7 +492,7 @@ func (ss *Summary) getBECensus(output, service, memeberId string) (string, error
 	return role, nil
 }
 
-func (ss *Summary) getFEStatus(ip string, outputs []CmdResult, serviceType string) FeStatusValue {
+func (ss *Summary) getFEStatus(ip string, outputs []*CmdResult, serviceType string) FeStatusValue {
 	var osStatus, status string
 
 	for _, output := range outputs {
@@ -519,7 +519,7 @@ func (ss *Summary) getFEStatus(ip string, outputs []CmdResult, serviceType strin
 	}
 }
 
-func (ss *Summary) opensearchStatusInFE(osStatusOutput CmdResult) string {
+func (ss *Summary) opensearchStatusInFE(osStatusOutput *CmdResult) string {
 
 	if osStatusOutput.Error != nil {
 		return "Unknown"

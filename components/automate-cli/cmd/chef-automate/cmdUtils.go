@@ -5,7 +5,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -52,7 +51,7 @@ type CmdResult struct {
 }
 
 type RemoteCmdExecutor interface {
-	Execute() (map[string][]CmdResult, error)
+	Execute() (map[string][]*CmdResult, error)
 }
 
 type remoteCmdExecutor struct {
@@ -69,9 +68,9 @@ func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.
 	}
 }
 
-func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
+func (c *remoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {
 	timestamp := time.Now().Format("20060102150405")
-	cmdResult := map[string][]CmdResult{}
+	cmdResult := map[string][]*CmdResult{}
 
 	sshConfig := getSshDetails(c.NodeMap.Infra)
 	c.SshUtil.setSSHConfig(sshConfig)
@@ -126,9 +125,11 @@ func (c *remoteCmdExecutor) Execute() (map[string][]CmdResult, error) {
 	}
 }
 
-func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) map[string][]CmdResult {
+// executeCmdOnGivenNodes executes given command/commands on all given nodes concurrently.
+func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) map[string][]*CmdResult {
 	command := make(map[string]string)
-	ouputJsonResultMapMutex := sync.RWMutex{}
+	resultChan := make(chan CmdResult, len(nodeIps))
+	ouputJsonResult := map[string][]*CmdResult{}
 	originalSSHConfig := c.SshUtil.getSSHConfig()
 	inputFiles := input.InputFiles
 	outputFiles := input.Outputfiles
@@ -148,75 +149,84 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 		}
 		inputFileToOutputFileMap[file] = destinationFile
 	}
-	ouputJsonResult := make(map[string][]CmdResult)
-	var wg sync.WaitGroup
-	if !input.HideSSHConnectionMessage {
-		writer.StartSpinner()
+
+	for _, hostIP := range nodeIps {
+
+		newSSHConfig := &SSHConfig{
+			sshUser:    originalSSHConfig.sshUser,
+			sshPort:    originalSSHConfig.sshPort,
+			sshKeyFile: originalSSHConfig.sshKeyFile,
+			hostIP:     hostIP,
+			timeout:    timeout,
+		}
+		sshUtil := NewSSHUtil(newSSHConfig)
+		if !input.HideSSHConnectionMessage {
+			printConnectionMessage(remoteService, hostIP, cliWriter)
+		}
+		for scriptName, cmdScript := range command {
+			go c.executeCmdOnNode(cmdScript, scriptName, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput, sshUtil, resultChan)
+		}
 	}
 
-	for scriptName, cmdScript := range command {
-		wg.Add(1)
-		go func(originalSSHConfig *SSHConfig, timeout int, cmdScript string, scriptName string, inputFileToOutputFileMap map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool) {
-			defer wg.Done()
-			for _, hostIP := range nodeIps {
-				sshConfig := &SSHConfig{
-					sshUser:    originalSSHConfig.sshUser,
-					sshPort:    originalSSHConfig.sshPort,
-					sshKeyFile: originalSSHConfig.sshKeyFile,
-					hostIP:     hostIP,
-					timeout:    timeout,
-				}
-				if !input.HideSSHConnectionMessage {
-					printConnectionMessage(remoteService, hostIP, cliWriter)
-				}
-				result := c.executeCmdOnNode(cmdScript, scriptName, inputFileToOutputFileMap, outputFiles, remoteService, errorCheckEnableInOutput, sshConfig)
-				ouputJsonResultMapMutex.Lock()
-				ouputJsonResult[result.HostIP] = append(ouputJsonResult[result.HostIP], result)
-				ouputJsonResultMapMutex.Unlock()
-				if !input.SkipPrintOutput {
-					printOutput(remoteService, result, outputFiles, c.Output)
-				}
+	for i := 0; i < len(nodeIps)*len(command); i++ {
+		cliWriter.StartSpinner()
+		result := <-resultChan
+		cliWriter.StopSpinner()
+		ouputJsonResult[result.HostIP] = append(ouputJsonResult[result.HostIP], &result)
+		if !input.SkipPrintOutput {
+			if i == 0 {
+				cliWriter.Println("=====================================================")
+				cliWriter.BufferWriter().Flush()
 			}
-		}(originalSSHConfig, timeout, cmdScript, scriptName, inputFileToOutputFileMap, outputFiles, remoteService, input.ErrorCheckEnableInOutput)
-	}
-
-	wg.Wait()
-	if !input.HideSSHConnectionMessage {
-		writer.StopSpinner()
-	}
-	status.GlobalResult = ouputJsonResult
-	return ouputJsonResult
-}
-
-// executeCmdOnNode function will run all remote jobs on a single node
-func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool, newSSHConfig *SSHConfig) CmdResult {
-	c.SshUtil.setSSHConfig(newSSHConfig)
-	rc := CmdResult{scriptName, c.SshUtil.getSSHConfig().hostIP, []string{}, "", nil}
-	if len(inputFiles) != 0 {
-		for sourceFile, destinationFile := range inputFiles {
-			err := c.SshUtil.copyFileToRemote(sourceFile, destinationFile, false)
-			if err != nil {
-				rc.Error = err
-				return rc
+			printOutput(remoteService, result, outputFiles, c.Output)
+			if i < len(nodeIps)-1 {
+				cliWriter.Println("=====================================================")
+				cliWriter.BufferWriter().Flush()
 			}
 		}
 	}
 
-	output, err := c.SshUtil.connectAndExecuteCommandOnRemote(command, true)
+	status.GlobalResult = ouputJsonResult
+
+	defer close(resultChan)
+
+	if input.SkipPrintOutput {
+		return ouputJsonResult
+	}
+	return map[string][]*CmdResult{}
+
+}
+
+// executeCmdOnNode function will run all remote jobs on a single node
+func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFiles map[string]string, outputFiles []string, remoteService string, errorCheckEnableInOutput bool, sshUtil SSHUtil, resultChan chan CmdResult) {
+	rc := CmdResult{scriptName, sshUtil.getSSHConfig().hostIP, []string{}, "", nil}
+	if len(inputFiles) != 0 {
+		for sourceFile, destinationFile := range inputFiles {
+			err := sshUtil.copyFileToRemote(sourceFile, destinationFile, false)
+			if err != nil {
+				rc.Error = err
+				resultChan <- rc
+				return
+			}
+		}
+	}
+
+	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, false)
 	if err != nil && len(output) == 0 {
 		rc.Error = err
-		return rc
+		resultChan <- rc
+		return
 	}
 
 	if len(outputFiles) != 0 {
 		for _, file := range outputFiles {
-			outFile := c.SshUtil.getSSHConfig().hostIP + "_" + file
-			destFileName, err := c.SshUtil.copyFileFromRemote(file, outFile)
+			outFile := sshUtil.getSSHConfig().hostIP + "_" + file
+			destFileName, err := sshUtil.copyFileFromRemote(file, outFile)
 			if err != nil {
 				rc.Error = err
-				return rc
+				resultChan <- rc
+				return
 			}
-			writer.Printf("File downloaded %s \n", destFileName)
 			rc.OutputFiles = append(rc.OutputFiles, destFileName)
 		}
 	}
@@ -225,11 +235,12 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 
 	if err != nil {
 		rc.Error = err
-		return rc
+		resultChan <- rc
+		return
 	}
 
 	rc.Output = output
-	return rc
+	resultChan <- rc
 }
 
 func checkIfErrorPresentInOutput(errorCheckEnableInOutput bool, output string) error {
@@ -335,7 +346,6 @@ func isValidIP(ip string, ips []string) bool {
 func printOutput(remoteService string, result CmdResult, outputFiles []string, cliWriter *cli.Writer) {
 	var resultFiles []string
 	var err error
-	cliWriter.Println("=====================================================")
 	if result.Error != nil {
 		printErrorMessage(remoteService, result.HostIP, cliWriter, result.Error.Error())
 	} else {
@@ -352,7 +362,6 @@ func printOutput(remoteService string, result CmdResult, outputFiles []string, c
 			cliWriter.Printf("Output file: %s", file+"\n")
 		}
 	}
-	cliWriter.Println("=====================================================")
 }
 
 // printErrorMessage prints the config error message
