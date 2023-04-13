@@ -37,4 +37,5 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+- summary - Retrieve Chef Automate status-summary
 supported_on: Bastion
