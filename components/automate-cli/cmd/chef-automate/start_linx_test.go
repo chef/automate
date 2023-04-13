@@ -41,6 +41,14 @@ func TestStartForFrontEndNodes(t *testing.T) {
 			true,
 			errors.Errorf("No automate IPs are found"),
 		},
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("Process exited with status 1")),
+			[]string{"127.0.0.3"},
+			"chef-server",
+			true,
+			errors.New("Not able to start one or more nodes in chef-server: \nProcess exited with status 1"),
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -99,6 +107,7 @@ func TestForRunCommand(t *testing.T) {
 		args           []string
 		sshUtil        SSHUtil
 		scriptCommands string
+		output         string
 		isError        bool
 		err            error
 	}{
@@ -106,6 +115,7 @@ func TestForRunCommand(t *testing.T) {
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "Error", nil),
 			"sudo chef-automate start",
+			"Error",
 			true,
 			errors.New("Error"),
 		},
@@ -113,14 +123,73 @@ func TestForRunCommand(t *testing.T) {
 			[]string{"some_args"},
 			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("error")),
 			"sudo chef-automate start",
+			"",
 			true,
 			errors.New("error"),
 		},
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "Starting Chef-automate", nil),
+			"sudo chef-automate start",
+			"Starting Chef-automate",
+			false,
+			nil,
+		},
 	}
 	for _, testCase := range testCases {
-		_, err := runCommand(testCase.scriptCommands, testCase.sshUtil)
+		output, err := runCommand(testCase.scriptCommands, testCase.sshUtil)
 		if testCase.isError {
 			assert.EqualError(t, testCase.err, err.Error())
+		} else {
+			assert.Equal(t, testCase.output, output)
 		}
 	}
+}
+
+func getMockInfra() *AutomteHAInfraDetails {
+	infra := &AutomteHAInfraDetails{}
+	infra.Outputs.AutomatePrivateIps.Value = []string{"127.0.0.0"}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{"127.0.0.1"}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{"127.0.0.2"}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{"127..0.0.3"}
+	return infra
+}
+
+func TestFunc(t *testing.T) {
+	startCmdFlags.chef_server = true
+	startCmdFlags.automate = false
+	startCmdFlags.opensearch = false
+	startCmdFlags.postgresql = false
+	infra := getMockInfra()
+	err := runStartCommandHA(infra, []string{"--cs"})
+	assert.EqualError(t, err, "\nNot able to start one or more nodes in chef-server: \nopen : no such file or directory")
+}
+
+func TestFuncAutomate(t *testing.T) {
+	startCmdFlags.chef_server = false
+	startCmdFlags.automate = true
+	startCmdFlags.opensearch = false
+	startCmdFlags.postgresql = false
+	infra := getMockInfra()
+	err := runStartCommandHA(infra, []string{"--a2"})
+	assert.EqualError(t, err, "\nNot able to start one or more nodes in automate: \nopen : no such file or directory")
+}
+
+func TestFuncOs(t *testing.T) {
+	startCmdFlags.chef_server = false
+	startCmdFlags.automate = false
+	startCmdFlags.opensearch = true
+	startCmdFlags.postgresql = false
+	infra := getMockInfra()
+	err := runStartCommandHA(infra, []string{"--os"})
+	assert.EqualError(t, err, "\nNot able to start one or more nodes in opensearch: \nopen : no such file or directory\nopen : no such file or directory")
+}
+func TestFuncPg(t *testing.T) {
+	startCmdFlags.chef_server = false
+	startCmdFlags.automate = false
+	startCmdFlags.opensearch = false
+	startCmdFlags.postgresql = true
+	infra := getMockInfra()
+	err := runStartCommandHA(infra, []string{"--pg"})
+	assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory\nopen : no such file or directory")
 }

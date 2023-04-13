@@ -55,10 +55,10 @@ func init() {
 }
 
 func runStartCmd(cmd *cobra.Command, args []string) error {
+	if !startCmdFlags.automate && !startCmdFlags.chef_server && !startCmdFlags.opensearch && !startCmdFlags.postgresql {
+		writer.Println(cmd.UsageString())
+	}
 	if isA2HARBFileExist() {
-		if len(args) == 0 {
-			writer.Println(cmd.UsageString())
-		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -118,10 +118,12 @@ func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
 		err = checkNodes(args, sshUtil, backendIps, postgresql_service, writer)
-		return err
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
 	}
 	if errorList.Len() > 0 {
-		return getSingleErrorFromList(errorList)
+		return status.New(status.ServiceStartError, getSingleErrorFromList(errorList).Error())
 	}
 	return nil
 }
@@ -202,7 +204,7 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 		}
 	}
 	close(resultChan)
-	if errorList.Len() > 0 {
+	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
 	return nil
