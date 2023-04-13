@@ -12,6 +12,7 @@ import (
 var (
 	testFile            = "testfile*.json"
 	nonsxistingtfstate2 = "nonsxisting2.tfstate"
+	testSSHCmd1         = "ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"
 )
 
 func TestGetAutomateHAInfraDetailsHelper(t *testing.T) {
@@ -140,7 +141,7 @@ func TestExtractPortAndSshUserFromAutomateSSHCommand(t *testing.T) {
 
 	t.Run("SSH details available", func(t *testing.T) {
 		automateHAInfraDetails := &AutomateHAInfraDetails{}
-		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{testSSHCmd1}
 		automateHAInfraDetails.Outputs.SSHPort.Value = "443"
 		automateHAInfraDetails.Outputs.SSHUser.Value = "ubuntu1234"
 		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
@@ -150,7 +151,7 @@ func TestExtractPortAndSshUserFromAutomateSSHCommand(t *testing.T) {
 
 	t.Run("Empty SSH user", func(t *testing.T) {
 		automateHAInfraDetails := &AutomateHAInfraDetails{}
-		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{testSSHCmd1}
 		automateHAInfraDetails.Outputs.SSHPort.Value = "443"
 		automateHAInfraDetails.Outputs.SSHUser.Value = ""
 		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)
@@ -160,7 +161,7 @@ func TestExtractPortAndSshUserFromAutomateSSHCommand(t *testing.T) {
 
 	t.Run("Empty SSH port", func(t *testing.T) {
 		automateHAInfraDetails := &AutomateHAInfraDetails{}
-		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{"ssh -i path/secret.pem -p 22 ubuntu@127.0.0.1"}
+		automateHAInfraDetails.Outputs.AutomateSSH.Value = []string{testSSHCmd1}
 		automateHAInfraDetails.Outputs.SSHPort.Value = ""
 		automateHAInfraDetails.Outputs.SSHUser.Value = "user234"
 		extractPortAndSshUserFromAutomateSSHCommand(automateHAInfraDetails)

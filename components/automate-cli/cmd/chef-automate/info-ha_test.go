@@ -11,6 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	testSSHInfoCmd = "ssh -i file.pem -p 22 user@ip"
+)
+
 func TestExecInfo(t *testing.T) {
 	t.Run("FAIL: No file containg automate details ", func(t *testing.T) {
 		automateHATerraformOutputFile = "file_not_found1.json"
@@ -77,13 +81,14 @@ func createInputDetails() *AutomateHAInfraDetails {
 	automate.Outputs.AutomateDataCollectorToken.Value = "token"
 	automate.Outputs.AutomateFrontendUrls.Value = "https://<front-end>"
 	automate.Outputs.AutomatePrivateIps.Value = []string{"host1", "host2"}
-	automate.Outputs.AutomateSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.AutomateSSH.Value = []string{testSSHInfoCmd, testSSHInfoCmd}
+	automate.Outputs.AutomateURL.Value = "https://example.com"
 	automate.Outputs.ChefServerPrivateIps.Value = []string{"host1", "host2"}
-	automate.Outputs.ChefServerSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.ChefServerSSH.Value = []string{testSSHInfoCmd, testSSHInfoCmd}
 	automate.Outputs.OpensearchPrivateIps.Value = []string{"host1", "host2", "host3"}
-	automate.Outputs.OpensearchSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.OpensearchSSH.Value = []string{testSSHInfoCmd, testSSHInfoCmd, testSSHInfoCmd}
 	automate.Outputs.PostgresqlPrivateIps.Value = []string{"host1", "host2", "host3"}
-	automate.Outputs.PostgresqlSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.PostgresqlSSH.Value = []string{testSSHInfoCmd, testSSHInfoCmd, testSSHInfoCmd}
 	automate.Outputs.SSHKeyFile.Value = "/path/to/key"
 	automate.Outputs.SSHPort.Value = "port"
 	automate.Outputs.SSHUser.Value = "user"
@@ -95,13 +100,12 @@ func createInputDetails() *AutomateHAInfraDetails {
 var expectedAutomateDetails = `AUTOMATE DETAILS:
                              Automate Admin User: admin
                    Automate Data Collector Token: token
+                           Automate Frontend URL: https://example.com
                             Automate Private IPs: host1
                                                   host2
                                     Automate SSH: ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
-                                    Automate URL: 
-                               Backup Config EFS: 
-                                Backup Config S3: 
+                                    Automate URL: https://example.com
                          Chef Server Private IPs: host1
                                                   host2
                                  Chef Server SSH: ssh -i file.pem -p 22 user@ip
@@ -118,6 +122,8 @@ var expectedAutomateDetails = `AUTOMATE DETAILS:
                                   Postgresql SSH: ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
+                               Backup Config EFS: 
+                                Backup Config S3: 
                                     SSH Key File: /path/to/key
                                         SSH Port: port
                                         SSH User: user
