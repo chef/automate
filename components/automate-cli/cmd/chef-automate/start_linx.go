@@ -185,13 +185,33 @@ func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService stri
 
 func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
 	resultChan := make(chan Result, len(ips))
+	errorList := list.New()
 	scriptCommands := `sudo chef-automate start`
 	for _, hostIP := range ips {
 		sshUtil.getSSHConfig().hostIP = hostIP
-		go commandExecuteOnFrontEnd(scriptCommands, sshUtil, resultChan)
+		go commandExecuteFrontEnd(scriptCommands, sshUtil, resultChan)
 
 	}
-	errorList := list.New()
+	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
+	close(resultChan)
+	if errorList != nil && errorList.Len() > 0 {
+		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
+	}
+	return nil
+}
+
+func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
+	output, err := runCommand(scriptCommands, sshUtil)
+	if err != nil {
+		rc.Error = err
+		resultChan <- rc
+	}
+	rc.Output = output
+	resultChan <- rc
+}
+
+func printErrorsForStartResultChan(resultChan chan Result, ips []string, remoteService string, cliWriter *cli.Writer, errorList *list.List) {
 	for i := 0; i < len(ips); i++ {
 		result := <-resultChan
 		printStartConnectionMessage(remoteService, result.HostIP, cliWriter)
@@ -203,6 +223,18 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 			printStartSuccessMessage(remoteService, result.HostIP, cliWriter)
 		}
 	}
+}
+
+func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
+	resultChan := make(chan Result, len(ips))
+	scriptCommands := "sudo systemctl start hab-sup"
+	errorList := list.New()
+	for _, hostIP := range ips {
+		sshUtil.getSSHConfig().hostIP = hostIP
+		printStartConnectionMessage(remoteService, hostIP, cliWriter)
+		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan)
+	}
+	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
 	close(resultChan)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
@@ -210,8 +242,16 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 	return nil
 }
 
-func commandExecuteOnFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
 	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
+	// Running the 'hab svc status' command to check if hab is present
+	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
+	if err != nil {
+		rc.Error = err
+		resultChan <- rc
+		return
+	}
+	// Executing the systemctl command for starting the service
 	output, err := runCommand(scriptCommands, sshUtil)
 	if err != nil {
 		rc.Error = err
@@ -219,35 +259,6 @@ func commandExecuteOnFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan
 	}
 	rc.Output = output
 	resultChan <- rc
-}
-
-func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
-	scriptCommands := "sudo systemctl start hab-sup"
-	errorList := list.New()
-	for _, hostIP := range ips {
-		sshUtil.getSSHConfig().hostIP = hostIP
-		printStartConnectionMessage(remoteService, hostIP, cliWriter)
-		// Running the 'hab svc status' command to check if hab is present
-		_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
-		if err != nil {
-			printStartErrorMessage(remoteService, hostIP, cliWriter, err)
-			errorList.PushBack(err.Error())
-		}
-		// if hab is present, executing systemctl command for starting hab-sup
-		output, err := runCommand(scriptCommands, sshUtil)
-		if err != nil {
-			printStartErrorMessage(remoteService, hostIP, cliWriter, err)
-			errorList.PushBack(err.Error())
-		} else {
-			cliWriter.Printf("Output for Host IP %s : %s", hostIP, output+"\n")
-			printStartSuccessMessage(remoteService, hostIP, cliWriter)
-		}
-
-	}
-	if errorList.Len() > 0 {
-		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
-	}
-	return nil
 }
 
 func runCommand(scriptCommands string, newSSHUtil SSHUtil) (string, error) {

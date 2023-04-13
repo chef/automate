@@ -90,7 +90,7 @@ func TestStartForBackEndNodes(t *testing.T) {
 			[]string{"127.0.0.3"},
 			"postgresql",
 			true,
-			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1\nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
 		},
 	}
 
@@ -182,7 +182,7 @@ func TestFuncOs(t *testing.T) {
 	startCmdFlags.postgresql = false
 	infra := getMockInfra()
 	err := runStartCommandHA(infra, []string{"--os"})
-	assert.EqualError(t, err, "\nNot able to start one or more nodes in opensearch: \nopen : no such file or directory\nopen : no such file or directory")
+	assert.EqualError(t, err, "\nNot able to start one or more nodes in opensearch: \nopen : no such file or directory")
 }
 func TestFuncPg(t *testing.T) {
 	startCmdFlags.chef_server = false
@@ -191,5 +191,5 @@ func TestFuncPg(t *testing.T) {
 	startCmdFlags.postgresql = true
 	infra := getMockInfra()
 	err := runStartCommandHA(infra, []string{"--pg"})
-	assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory\nopen : no such file or directory")
+	assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory")
 }
