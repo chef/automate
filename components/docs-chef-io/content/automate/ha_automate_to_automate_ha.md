@@ -61,34 +61,34 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 1. Go to Bastion and:
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
-    ```bash
-    [path]
-      repo = "/mnt/automate_backups"
-    ```
+        ```bash
+        [path]
+        repo = "/mnt/automate_backups"
+        ```
 
-    The following command will patch the configuration in all the OpenSearch nodes.
+        The following command will patch the configuration in all the OpenSearch nodes.
 
-    ```bash
-    chef-automate config patch --opensearch <path to os_config.toml>
-    ```
+        ```bash
+        chef-automate config patch --opensearch <path to os_config.toml>
+        ```
 
     - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
 
-    ```bash
-    [global.v1.external.opensearch.backup]
-        enable = true
-        location = "fs"
-    [global.v1.external.opensearch.backup.fs]
-        path = "/mnt/automate_backups"
-    [global.v1.backups.filesystem]
-        path = "/mnt/automate_backups"
-    ```
+        ```bash
+        [global.v1.external.opensearch.backup]
+            enable = true
+            location = "fs"
+        [global.v1.external.opensearch.backup.fs]
+            path = "/mnt/automate_backups"
+        [global.v1.backups.filesystem]
+            path = "/mnt/automate_backups"
+        ```
 
-    The following command will patch the configuration in all the Frontend nodes:
+        The following command will patch the configuration in all the Frontend nodes:
 
-    ```bash
-    chef-automate config patch --fe <Path to automate.toml>
-    ```
+        ```bash
+        chef-automate config patch --fe <Path to automate.toml>
+        ```
 
 1. Go to the Chef Automate node of Automate HA cluster, where we copied the `tar` file. Unzip the bundle using the following:
 
@@ -153,34 +153,34 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 1. Go to Bastion and:
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
-    ```bash
-    [path]
-      repo = "/mnt/automate_backups"
-    ```
+        ```bash
+        [path]
+        repo = "/mnt/automate_backups"
+        ```
 
-    The following command will patch the configuration in all the OpenSearch nodes.
+        The following command will patch the configuration in all the OpenSearch nodes.
 
-    ```bash
-    chef-automate config patch --opensearch <Path to os_config.toml>
-    ```
+        ```bash
+        chef-automate config patch --opensearch <Path to os_config.toml>
+        ```
 
     - Create a `.toml` (say automate.toml) file in the Bastion host. Once done, copy the following content to the `.toml` file and then patch the file in all the Frontend nodes.
 
-    ```bash
-    [global.v1.external.opensearch.backup]
-        enable = true
-        location = "fs"
-    [global.v1.external.opensearch.backup.fs]
-        path = "/mnt/automate_backups"
-    [global.v1.backups.filesystem]
-        path = "/mnt/automate_backups"
-    ```
+        ```bash
+        [global.v1.external.opensearch.backup]
+            enable = true
+            location = "fs"
+        [global.v1.external.opensearch.backup.fs]
+            path = "/mnt/automate_backups"
+        [global.v1.backups.filesystem]
+            path = "/mnt/automate_backups"
+        ```
 
-    The following command will patch the configuration in all the Frontend nodes:
+        The following command will patch the configuration in all the Frontend nodes:
 
-    ```bash
-    chef-automate config patch --fe <Path to automate.toml>
-    ```
+        ```bash
+        chef-automate config patch --fe <Path to automate.toml>
+        ```
 
 1. Create a Backup of Chef Automate Standalone using the following command:
 
@@ -312,62 +312,62 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 
     - Create a `.toml` (say os_config.toml) file in the Bastion host. Once done, copy the following contents to the `.toml` file and patch the file in all the OpenSearch nodes.
 
-    ```bash
-    [global.v1]
-        [global.v1.external.opensearch.backup]
-            enable = true
-            location = "s3"
-        [global.v1.external.opensearch.backup.s3]
-            # bucket (required): The name of the bucket
-            bucket = "bucket-name"
-            # base_path (optional):  The path within the bucket where backups should be stored
-            # If base_path is not set, backups will be stored at the root of the bucket.
-            base_path = ""
-            # name of an s3 client configuration you create in your opensearch.yml
-            # see https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-client.html
-            # for full documentation on how to configure client settings on your
-            # OpenSearch nodes
-            client = "default"
-        [global.v1.external.opensearch.backup.s3.settings]
-            ## The meaning of these settings is documented in the S3 Repository Plugin
-            ## documentation. See the following links:
-            ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
-            ## Backup repo settings
-            # compress = false
-            # server_side_encryption = false
-            # buffer_size = "100mb"
-            # canned_acl = "private"
-            # storage_class = "standard"
-            ## Snapshot settings
-            # max_snapshot_bytes_per_sec = "40mb"
-            # max_restore_bytes_per_sec = "40mb"
-            # chunk_size = "null"
-            ## S3 client settings
-            # read_timeout = "50s"
-            # max_retries = 3
-            # use_throttle_retries = true
-            # protocol = "https"
-        [global.v1.backups]
-            location = "s3"
-        [global.v1.backups.s3.bucket]
-            # name (required): The name of the bucket
-            name = "bucket-name"
-            # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
-            # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
-            endpoint = "https://s3.amazonaws.com"
-            # base_path (optional):  The path within the bucket where backups should be stored
-            # If base_path is not set, backups will be stored at the root of the bucket.
-            base_path = ""
-        [global.v1.backups.s3.credentials]
-            access_key = "<Your Access Key>"
-            secret_key = "<Your Secret Key>"
-    ```
+        ```bash
+        [global.v1]
+            [global.v1.external.opensearch.backup]
+                enable = true
+                location = "s3"
+            [global.v1.external.opensearch.backup.s3]
+                # bucket (required): The name of the bucket
+                bucket = "bucket-name"
+                # base_path (optional):  The path within the bucket where backups should be stored
+                # If base_path is not set, backups will be stored at the root of the bucket.
+                base_path = ""
+                # name of an s3 client configuration you create in your opensearch.yml
+                # see https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-client.html
+                # for full documentation on how to configure client settings on your
+                # OpenSearch nodes
+                client = "default"
+            [global.v1.external.opensearch.backup.s3.settings]
+                ## The meaning of these settings is documented in the S3 Repository Plugin
+                ## documentation. See the following links:
+                ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
+                ## Backup repo settings
+                # compress = false
+                # server_side_encryption = false
+                # buffer_size = "100mb"
+                # canned_acl = "private"
+                # storage_class = "standard"
+                ## Snapshot settings
+                # max_snapshot_bytes_per_sec = "40mb"
+                # max_restore_bytes_per_sec = "40mb"
+                # chunk_size = "null"
+                ## S3 client settings
+                # read_timeout = "50s"
+                # max_retries = 3
+                # use_throttle_retries = true
+                # protocol = "https"
+            [global.v1.backups]
+                location = "s3"
+            [global.v1.backups.s3.bucket]
+                # name (required): The name of the bucket
+                name = "bucket-name"
+                # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
+                # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
+                endpoint = "https://s3.amazonaws.com"
+                # base_path (optional):  The path within the bucket where backups should be stored
+                # If base_path is not set, backups will be stored at the root of the bucket.
+                base_path = ""
+            [global.v1.backups.s3.credentials]
+                access_key = "<Your Access Key>"
+                secret_key = "<Your Secret Key>"
+        ```
 
-    The following command will patch the configuration in all the Frontend nodes:
+        The following command will patch the configuration in all the Frontend nodes:
 
-    ```bash
-    chef-automate config patch --frontend automate.toml
-    ```
+        ```bash
+        chef-automate config patch --frontend automate.toml
+        ```
 
 1. Run the following command on the Chef Automate node of Automate HA cluster to get the current config:
 
