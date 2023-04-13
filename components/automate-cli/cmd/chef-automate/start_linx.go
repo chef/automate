@@ -58,135 +58,117 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 				return status.Annotate(err, status.InvalidCommandArgsError)
 			}
 		}
+		if len(args) == 0 {
+			writer.Println(cmd.UsageString())
+		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
-		sshUser := infra.Outputs.SSHUser.Value
-		sskKeyFile := infra.Outputs.SSHKeyFile.Value
-		sshPort := infra.Outputs.SSHPort.Value
-		sshConfig := &SSHConfig{
-			sshUser:    sshUser,
-			sshKeyFile: sskKeyFile,
-			sshPort:    sshPort,
-		}
-		sshUtil := NewSSHUtil(sshConfig)
-		errorList := list.New()
-		if startCmdFlags.automate {
-			frontendIps := infra.Outputs.AutomatePrivateIps.Value
-			err = checkNodes(args, sshUtil, frontendIps, "automate", writer)
-			if err != nil {
-				errorList.PushBack(err.Error())
-			}
-		}
-		if startCmdFlags.chef_server {
-			frontendIps := infra.Outputs.ChefServerPrivateIps.Value
-			err = checkNodes(args, sshUtil, frontendIps, "chef-server", writer)
-			if err != nil {
-				errorList.PushBack(err.Error())
-			}
-		}
-		if startCmdFlags.opensearch {
-			backendIps := infra.Outputs.OpensearchPrivateIps.Value
-			err = checkNodes(args, sshUtil, backendIps, "opensearch", writer)
-			if err != nil {
-				errorList.PushBack(err.Error())
-			}
-		}
-		if startCmdFlags.postgresql {
-			backendIps := infra.Outputs.PostgresqlPrivateIps.Value
-			err = checkNodes(args, sshUtil, backendIps, "postgresql", writer)
+		err = runStartCommandHA(infra, args)
+		if err != nil {
 			return err
 		}
-		if errorList.Len() > 0 {
-			return getSingleErrorFromList(errorList)
+		return nil
+	}
+	err := runStartStandalone()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func runStartCommandHA(infra *AutomteHAInfraDetails, args []string) error {
+	sshUser := infra.Outputs.SSHUser.Value
+	sskKeyFile := infra.Outputs.SSHKeyFile.Value
+	sshPort := infra.Outputs.SSHPort.Value
+	sshConfig := &SSHConfig{
+		sshUser:    sshUser,
+		sshKeyFile: sskKeyFile,
+		sshPort:    sshPort,
+	}
+	sshUtil := NewSSHUtil(sshConfig)
+	errorList := list.New()
+	var err error
+	if startCmdFlags.automate {
+		frontendIps := infra.Outputs.AutomatePrivateIps.Value
+		err = checkNodes(args, sshUtil, frontendIps, "automate", writer)
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
+	}
+	if startCmdFlags.chef_server {
+		frontendIps := infra.Outputs.ChefServerPrivateIps.Value
+		err = checkNodes(args, sshUtil, frontendIps, "chef-server", writer)
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
+	}
+	if startCmdFlags.opensearch {
+		backendIps := infra.Outputs.OpensearchPrivateIps.Value
+		err = checkNodes(args, sshUtil, backendIps, "opensearch", writer)
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
+	}
+	if startCmdFlags.postgresql {
+		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
+		err = checkNodes(args, sshUtil, backendIps, "postgresql", writer)
+		return err
+	}
+	if errorList.Len() > 0 {
+		return getSingleErrorFromList(errorList)
+	}
+	return nil
+}
+
+func runStartStandalone() error {
+	writer.Title("Starting Chef Automate")
+	if isDevMode() {
+		err := runStartDevMode()
+		if err != nil {
+			return err
 		}
 		return nil
-	} else {
-		writer.Title("Starting Chef Automate")
-		if isDevMode() {
-			if err := exec.Command("hab", "sup", "status").Run(); err == nil {
-				return nil
-			}
-
-			if err := os.MkdirAll("/hab/sup/default", 0755); err != nil {
-				return status.Annotate(err, status.FileAccessError)
-			}
-			writer.Title("Launching the Habitat Supervisor in the background...")
-			out, err := os.Create("/hab/sup/default/sup.log")
-			if err != nil {
-				return status.Annotate(err, status.FileAccessError)
-			}
-			startSupCmd := exec.Command("hab", "sup", "run")
-			startSupCmd.Env = os.Environ()
-			startSupCmd.Env = append(startSupCmd.Env,
-				"DS_DEV=true",
-				"CHEF_AUTOMATE_SKIP_SYSTEMD=true",
-				"HAB_LICENSE=accept-no-persist",
-			)
-			startSupCmd.Stdout = out
-			startSupCmd.Stderr = out
-			startSupCmd.SysProcAttr = &syscall.SysProcAttr{
-				Setpgid: true,
-			}
-			if err := startSupCmd.Start(); err != nil {
-				return status.Annotate(err, status.HabCommandError)
-			}
-		} else {
-			systemctlCmd := exec.Command("systemctl", "start", "chef-automate.service")
-			systemctlCmd.Stdout = os.Stdout
-			systemctlCmd.Stderr = os.Stderr
-			if err := systemctlCmd.Run(); err != nil {
-				return status.Annotate(err, status.ServiceStartError)
-			}
-		}
+	}
+	systemctlCmd := exec.Command("systemctl", "start", "chef-automate.service")
+	systemctlCmd.Stdout = os.Stdout
+	systemctlCmd.Stderr = os.Stderr
+	if err := systemctlCmd.Run(); err != nil {
+		return status.Annotate(err, status.ServiceStartError)
 	}
 	return nil
 }
 
-func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
-	resultChan := make(chan Result, len(ips))
-	scriptCommands := "sudo chef-automate start"
-	for _, hostIP := range ips {
-		sshUtil.getSSHConfig().hostIP = hostIP
-		rc := Result{hostIP, "", nil}
-		output, err := runCommand(scriptCommands, sshUtil)
-		if err != nil {
-			rc.Error = err
-			resultChan <- rc
-		}
-
-		err = checkOutputForError(output)
-		if err != nil {
-			rc.Error = err
-			resultChan <- rc
-		}
-
-		rc.Output = output
-		resultChan <- rc
+func runStartDevMode() error {
+	if err := exec.Command("hab", "sup", "status").Run(); err == nil {
+		return nil
 	}
 
-	for i := 0; i < len(ips); i++ {
-		result := <-resultChan
-
-		printStartConnectionMessage(remoteService, result.HostIP, cliWriter)
-		if result.Error != nil {
-			printStartErrorMessage(remoteService, result.HostIP, cliWriter, result.Error)
-			return result.Error
-		} else {
-			cliWriter.Printf("Output for Host IP %s : %s", result.HostIP, result.Output+"\n")
-			printStartSuccessMessage(remoteService, result.HostIP, cliWriter)
-		}
-
+	if err := os.MkdirAll("/hab/sup/default", 0755); err != nil {
+		return status.Annotate(err, status.FileAccessError)
 	}
-
-	close(resultChan)
+	writer.Title("Launching the Habitat Supervisor in the background...")
+	out, err := os.Create("/hab/sup/default/sup.log")
+	if err != nil {
+		return status.Annotate(err, status.FileAccessError)
+	}
+	startSupCmd := exec.Command("hab", "sup", "run")
+	startSupCmd.Env = os.Environ()
+	startSupCmd.Env = append(startSupCmd.Env,
+		"DS_DEV=true",
+		"CHEF_AUTOMATE_SKIP_SYSTEMD=true",
+		"HAB_LICENSE=accept-no-persist",
+	)
+	startSupCmd.Stdout = out
+	startSupCmd.Stderr = out
+	startSupCmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	if err := startSupCmd.Start(); err != nil {
+		return status.Annotate(err, status.HabCommandError)
+	}
 	return nil
-}
-
-func runCommand(scriptCommands string, newSSHUtil SSHUtil) (string, error) {
-	output, err := newSSHUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-	return output, err
 }
 
 func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
@@ -194,55 +176,87 @@ func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService stri
 		writer.Errorf("No %s IPs are found", remoteService)
 		return status.Errorf(1, "No %s IPs are found", remoteService)
 	}
-	errorList := list.New()
 	if remoteService == "opensearch" || remoteService == "postgresql" {
-		for i := 0; i < len(ips); i++ {
-			err := startBackEndNodes(args, sshUtil, ips[i], remoteService, cliWriter)
-			if err != nil {
-				errorList.PushBack(err.Error())
-			}
-		}
-	} else {
-		err := startFrontEndNodes(args, sshUtil, ips, remoteService, cliWriter)
+		err := startBackEndNodes(args, sshUtil, ips, remoteService, cliWriter)
 		return err
 	}
-	if errorList != nil && errorList.Len() > 0 {
-		return status.Wrap(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes")
+	err := startFrontEndNodes(args, sshUtil, ips, remoteService, cliWriter)
+	return err
+}
+
+func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
+	resultChan := make(chan Result, len(ips))
+	scriptCommands := `sudo chef-automate start`
+	for _, hostIP := range ips {
+		sshUtil.getSSHConfig().hostIP = hostIP
+		go func(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+			rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
+			output, err := runCommand(scriptCommands, sshUtil)
+
+			if err != nil {
+				rc.Error = err
+				resultChan <- rc
+			}
+
+			rc.Output = output
+			resultChan <- rc
+		}(scriptCommands, sshUtil, resultChan)
+	}
+	errorList := list.New()
+	for i := 0; i < len(ips); i++ {
+		result := <-resultChan
+		printStartConnectionMessage(remoteService, result.HostIP, cliWriter)
+		if result.Error != nil {
+			printStartErrorMessage(remoteService, result.HostIP, cliWriter, result.Error)
+			errorList.PushBack(result.Error.Error())
+		} else {
+			cliWriter.Printf("Output for Host IP %s : %s", result.HostIP, result.Output+"\n")
+			printStartSuccessMessage(remoteService, result.HostIP, cliWriter)
+		}
+	}
+	close(resultChan)
+	if errorList.Len() > 0 {
+		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
 	return nil
 }
 
-func startBackEndNodes(args []string, sshUtil SSHUtil, ip string, remoteService string, cliWriter *cli.Writer) error {
-	sshUtil.getSSHConfig().hostIP = ip
+func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
 	scriptCommands := "sudo systemctl start hab-sup"
-	printStartConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP, writer)
-	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
-	if err != nil {
-		printStartErrorMessage(remoteService, ip, cliWriter, err)
-		return err
+	errorList := list.New()
+	for _, hostIP := range ips {
+		sshUtil.getSSHConfig().hostIP = hostIP
+		printStartConnectionMessage(remoteService, hostIP, cliWriter)
+		_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
+		if err != nil {
+			printStartErrorMessage(remoteService, hostIP, cliWriter, err)
+			errorList.PushBack(err.Error())
+		}
+		output, err := runCommand(scriptCommands, sshUtil)
+		if err != nil {
+			printStartErrorMessage(remoteService, hostIP, cliWriter, err)
+			errorList.PushBack(err.Error())
+		} else {
+			cliWriter.Printf("Output for Host IP %s : %s", hostIP, output+"\n")
+			printStartSuccessMessage(remoteService, hostIP, cliWriter)
+		}
 	}
-
-	output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-	if err != nil {
-		cliWriter.Errorf("%v\n", err)
-		return err
+	if errorList.Len() > 0 {
+		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
+	return nil
+}
 
+func runCommand(scriptCommands string, newSSHUtil SSHUtil) (string, error) {
+	output, err := newSSHUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+	if err != nil {
+		return "", err
+	}
 	err = checkOutputForError(output)
 	if err != nil {
-		cliWriter.Errorf("%v\n", err)
-		return err
+		return "", err
 	}
-
-	if err != nil {
-		printStartErrorMessage(remoteService, ip, cliWriter, err)
-		return err
-	} else {
-		cliWriter.Printf("Output for Host IP %s : %s", ip, output+"\n")
-		printStartSuccessMessage(remoteService, ip, cliWriter)
-	}
-
-	return nil
+	return output, err
 }
 
 func printStartConnectionMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {

@@ -82,12 +82,43 @@ func TestStartForBackEndNodes(t *testing.T) {
 			[]string{"127.0.0.3"},
 			"postgresql",
 			true,
-			errors.New("Not able to start one or more nodes: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1\nProcess exited with status 1"),
 		},
 	}
 
 	for _, testCase := range testCases {
 		err := checkNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
+		if testCase.isError {
+			assert.EqualError(t, testCase.err, err.Error())
+		}
+	}
+}
+
+func TestForRunCommand(t *testing.T) {
+	testCases := []struct {
+		args           []string
+		sshUtil        SSHUtil
+		scriptCommands string
+		isError        bool
+		err            error
+	}{
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "Error", nil),
+			"sudo chef-automate start",
+			true,
+			errors.New("Error"),
+		},
+		{
+			[]string{"some_args"},
+			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("error")),
+			"sudo chef-automate start",
+			true,
+			errors.New("error"),
+		},
+	}
+	for _, testCase := range testCases {
+		_, err := runCommand(testCase.scriptCommands, testCase.sshUtil)
 		if testCase.isError {
 			assert.EqualError(t, testCase.err, err.Error())
 		}
