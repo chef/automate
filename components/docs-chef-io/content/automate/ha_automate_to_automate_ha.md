@@ -49,13 +49,13 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 1. Transfer the `tar` bundle to one of the Chef Automate nodes of Automate HA using the following command:
 
     ```bash
-        scp -i </path/to/key> </path/to/backup-file> <user>@<host>:/home/<user>
+    scp -i </path/to/key> </path/to/backup-file> <user>@<host>:/home/<user>
     ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-        scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
+    scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
     ```
 
 1. Go to Bastion and:
@@ -219,7 +219,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
     ```bash
-        scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
+    scp -i </path/to/key> </path/to/bootstrap.abb> <user>@<host>:/home/<user>
     ```
 
 1. Unpack the `bootstrap.abb` file on all the Frontend nodes:
@@ -227,7 +227,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
     Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
 
     ```bash
-        chef-automate bootstrap bundle unpack bootstrap.abb
+    chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
 1. Stop all the frontend instances except where you saved the `current_config.toml` file on Chef Automate node in Automate HA Cluster. Run the following command to all the Automate and Chef Infra Server nodes:
@@ -288,17 +288,17 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
 
     1. Run the below command to create the backup in the `/var/opt/chef-automate/backups` location unless you specify the location in the Standalone Automate config.
 
-    ```bash
-    chef-automate backup create
-    ```
+        ```bash
+        chef-automate backup create
+        ```
 
-    Once the backup is completed, save the backup Id. For example: `20210622065515`.
+        Once the backup is completed, save the backup Id. For example: `20210622065515`.
 
     1. Run the below command to create the `bootstrap.abb` bundle. This bundle captures any local credentials or secrets not persisted in the database.
 
-    ```bash
-    chef-automate bootstrap bundle create bootstrap.abb
-    ```
+        ```bash
+        chef-automate bootstrap bundle create bootstrap.abb
+        ```
 
 1. Transfer the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server) using the following command:
 
