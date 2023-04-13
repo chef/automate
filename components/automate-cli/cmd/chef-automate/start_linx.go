@@ -192,17 +192,24 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
-	close(resultChan)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
+	close(resultChan)
 	return nil
 }
 
-func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, hostIP string) {
-	sshUtil.getSSHConfig().hostIP = hostIP
-	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
-	output, err := runCommand(scriptCommands, sshUtil)
+func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, ip string) {
+	originalSSHConfig := sshUtil.getSSHConfig()
+	newSSHConfig := &SSHConfig{
+		sshUser:    originalSSHConfig.sshUser,
+		sshPort:    originalSSHConfig.sshPort,
+		sshKeyFile: originalSSHConfig.sshKeyFile,
+		hostIP:     ip,
+	}
+	newSSHUtil := NewSSHUtil(newSSHConfig)
+	rc := Result{ip, "", nil}
+	output, err := runCommand(scriptCommands, newSSHUtil)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
@@ -233,25 +240,32 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan, hostIP)
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
-	close(resultChan)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
+	close(resultChan)
 	return nil
 }
 
-func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, hostIp string) {
-	sshUtil.getSSHConfig().hostIP = hostIp
-	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
+func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, ip string) {
+	originalSSHConfig := sshUtil.getSSHConfig()
+	newSSHConfig := &SSHConfig{
+		sshUser:    originalSSHConfig.sshUser,
+		sshPort:    originalSSHConfig.sshPort,
+		sshKeyFile: originalSSHConfig.sshKeyFile,
+		hostIP:     ip,
+	}
+	newSSHUtil := NewSSHUtil(newSSHConfig)
+	rc := Result{ip, "", nil}
 	// Running the 'hab svc status' command to check if hab is present
-	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
+	_, err := newSSHUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
 		return
 	}
 	// Executing the systemctl command for starting the service
-	output, err := runCommand(scriptCommands, sshUtil)
+	output, err := runCommand(scriptCommands, newSSHUtil)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc

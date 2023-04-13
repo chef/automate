@@ -47,7 +47,7 @@ func TestStartForFrontEndNodes(t *testing.T) {
 			[]string{"127.1.0.3"},
 			"chef-server",
 			true,
-			errors.New("Not able to start one or more nodes in chef-server: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in chef-server: \nopen : no such file or directory"),
 		},
 	}
 
@@ -90,7 +90,7 @@ func TestStartForBackEndNodes(t *testing.T) {
 			[]string{"127.0.1.3"},
 			"postgresql",
 			true,
-			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in postgresql: \nopen : no such file or directory"),
 		},
 	}
 
