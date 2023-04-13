@@ -132,7 +132,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    chef-automate deploy config.toml --airgap-bundle automate.aib
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
-   chef-automate status
+   chef-automate status summary
    "
    ```
 
@@ -296,7 +296,7 @@ Continue with the deployment after updating the config:
    chef-automate deploy config.toml --airgap-bundle automate.aib
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
-   chef-automate status
+   chef-automate status summary
    "
 ```
 
@@ -379,7 +379,7 @@ Continue with the deployment after updating the config:
    chef-automate deploy config.toml --airgap-bundle automate.aib
 
    #After Deployment is done successfully. Check the status of Chef Automate HA services
-   chef-automate status
+   chef-automate status summary
    "
 ```
 

@@ -137,10 +137,12 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		nodeMap := constructAndGetNodeMap(infra)
-		cmdUtil := NewRemoteCmdExecutor(nodeMap)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if preflightCmdFlags.automate || preflightCmdFlags.chef_server || preflightCmdFlags.frontend {
-			err = cmdUtil.Execute()
+			_, err = cmdUtil.Execute()
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -502,7 +504,7 @@ func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
 				Single:                   false,
-				NodeIp:                   preflightCmdFlags.node,
+				NodeIps:                  []string{preflightCmdFlags.node},
 				InputFiles:               []string{inputFilePath},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.frontend,
@@ -514,7 +516,7 @@ func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
 				Single:                   false,
-				NodeIp:                   preflightCmdFlags.node,
+				NodeIps:                  []string{preflightCmdFlags.node},
 				InputFiles:               []string{inputFilePath},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.automate,
@@ -526,7 +528,7 @@ func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
 				WaitTimeout:              preflightCmdFlags.waitTimeout,
 				ErrorCheckEnableInOutput: true,
 				Single:                   false,
-				NodeIp:                   preflightCmdFlags.node,
+				NodeIps:                  []string{preflightCmdFlags.node},
 				InputFiles:               []string{inputFilePath},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.chef_server,

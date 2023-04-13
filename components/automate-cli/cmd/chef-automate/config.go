@@ -220,7 +220,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 
 		chefServer := &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:         frontendCommand,
+				Cmd:        frontendCommand,
 				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
@@ -259,15 +259,15 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 			Opensearch: opensearch,
 			Infra:      infra,
 		}
-
-		cmdUtil := NewRemoteCmdExecutor(nodeMap)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if configCmdFlags.overwriteFile {
 			writer.Errorln("Overwrite flag is not supported in HA")
 		}
 
 		if configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
-			err = cmdUtil.Execute()
+			_, err = cmdUtil.Execute()
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -358,10 +358,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 
 		configFile := args[0]
+		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFile, dateFormat)
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:                      fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFile, dateFormat),
+				Cmd:                      frontendCmd,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   false,
 				Args:                     args,
@@ -370,11 +371,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				NodeType:                 configCmdFlags.frontend,
 			},
 		}
-
+		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFile, dateFormat)
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:                      fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFile, dateFormat),
+				Cmd:                      automateCmd,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   false,
 				Args:                     args,
@@ -384,10 +385,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 
+		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFile, dateFormat)
 		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:                      fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFile, dateFormat),
+				Cmd:                      chefServerCmd,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   false,
 				Args:                     args,
@@ -397,10 +399,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 
+		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFile)
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
-				Cmd:                      fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFile),
+				Cmd:                      postgresqlCmd,
 				Args:                     args,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   true,
@@ -409,11 +412,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				NodeType:                 configCmdFlags.postgresql,
 			},
 		}
-
+		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFile)
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
-				Cmd:                      fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFile),
+				Cmd:                      opensearchCmd,
 				Args:                     args,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   true,
@@ -431,17 +434,17 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			Opensearch: opensearch,
 			Infra:      infra,
 		}
-
-		cmdUtil := NewRemoteCmdExecutor(nodeMap)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
-			err = cmdUtil.Execute()
+			_, err := cmdUtil.Execute()
+
+			if err != nil {
+				return err
+			}
 		} else {
 			writer.Println(cmd.UsageString())
-		}
-
-		if err != nil {
-			return err
 		}
 
 	} else {

@@ -4,15 +4,16 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
-
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var statusCmdFlags = struct {
@@ -21,13 +22,40 @@ var statusCmdFlags = struct {
 	waitRefreshInterval int64
 }{}
 
+type StatusSummaryCmdFlags struct {
+	node         string
+	isAutomate   bool
+	isChefServer bool
+	isOpenSearch bool
+	isPostgresql bool
+}
+
+type FeStatusValue struct {
+	serviceName string
+	ipAddress   string
+	status      string
+	Opensearch  string
+}
+
+type BeStatusValue struct {
+	serviceName string
+	ipAddress   string
+	health      string
+	process     string
+	upTime      string
+	role        string
+}
+type FeStatus []FeStatusValue
+type BeStatus []BeStatusValue
+
+var statusCmd = &cobra.Command{
+	Use:   "status",
+	Short: "Retrieve Chef Automate status",
+	Long:  "Retrieve Chef Automate status. Includes status of Automate services.",
+	RunE:  runStatusCmd,
+}
+
 func newStatusCmd() *cobra.Command {
-	var statusCmd = &cobra.Command{
-		Use:   "status",
-		Short: "Retrieve Chef Automate status",
-		Long:  "Retrieve Chef Automate status. Includes status of Automate services.",
-		RunE:  runStatusCmd,
-	}
 
 	statusCmd.PersistentFlags().BoolVarP(
 		&statusCmdFlags.waitForHealthy, "wait-for-healthy", "w", false,
@@ -46,6 +74,31 @@ func newStatusCmd() *cobra.Command {
 	statusCmd.PersistentFlags().SetAnnotation("wait-refresh-interval", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	return statusCmd
+}
+func newStatusSummaryCmd() *cobra.Command {
+	var statusSummaryCmdFlags = StatusSummaryCmdFlags{}
+	var statusSummaryCmd = &cobra.Command{
+		Use:   "summary",
+		Short: "Retrieve Chef Automate status-summary",
+		Long:  "Retrieve Chef Automate status node summary for HA deployment",
+		RunE:  runStatusSummaryCmdFunc(&statusSummaryCmdFlags),
+	}
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isAutomate, "automate", "a", false, "Get only automate Status")
+	statusSummaryCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
+
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isChefServer, "chef-server", "c", false, "Get only chef server Status")
+	statusSummaryCmd.PersistentFlags().SetAnnotation("chef-server", docs.Compatibility, []string{docs.CompatiblewithHA})
+
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isOpenSearch, "opensearch", "o", false, "Get only opensearch Status")
+	statusSummaryCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
+
+	statusSummaryCmd.PersistentFlags().BoolVarP(&statusSummaryCmdFlags.isPostgresql, "postgresql", "p", false, "Get only postgresql Status")
+	statusSummaryCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
+
+	statusSummaryCmd.PersistentFlags().StringVar(&statusSummaryCmdFlags.node, "node", "", "Node Ip address")
+	statusSummaryCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
+
+	return statusSummaryCmd
 }
 
 type statusResult struct {
@@ -73,6 +126,43 @@ func getStatus() (*api.StatusResponse, error) {
 	}
 
 	return res, nil
+}
+
+func runStatusSummaryCmdFunc(statusSummaryCmdFlags *StatusSummaryCmdFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		return executeStatusSummary(cmd, args, statusSummaryCmdFlags)
+	}
+}
+
+func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFlags *StatusSummaryCmdFlags) error {
+
+	if !isA2HARBFileExist() {
+		return errors.New("This command only works on HA deployment")
+	}
+
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	sshUtil := NewSSHUtil(&SSHConfig{})
+	statusSummary := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, statusSummaryCmdFlags, sshUtil)
+	err = statusSummary.Prepare()
+	if err != nil {
+		return err
+	}
+
+	// Display Status summary
+	fe := statusSummary.ShowFEStatus()
+	fmt.Println(fe)
+	if !isManagedServicesOn() {
+		be := statusSummary.ShowBEStatus()
+		fmt.Println(be)
+	} else {
+		writer.Warn("-o and -p flag is not supported for deployment with managed services\n")
+	}
+	writer.BufferWriter().Flush()
+
+	return nil
 }
 
 func runStatusCmd(cmd *cobra.Command, args []string) error {
@@ -145,5 +235,6 @@ func runStatusCmd(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
+	statusCmd.AddCommand(newStatusSummaryCmd())
 	RootCmd.AddCommand(newStatusCmd())
 }

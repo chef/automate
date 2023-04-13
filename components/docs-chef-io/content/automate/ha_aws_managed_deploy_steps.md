@@ -152,7 +152,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    chef-automate deploy config.toml --airgap-bundle automate.aib
 
    #After Deployment is done successfully. Check status of Chef Automate HA services
-   chef-automate status
+   chef-automate status summary
    
    #Check Chef Automate HA deployment information, using the following command
    chef-automate info
