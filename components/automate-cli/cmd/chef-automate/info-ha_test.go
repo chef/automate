@@ -69,15 +69,67 @@ func TestExecInfo(t *testing.T) {
 
 }
 
+func createInputDetails() *AutomateHAInfraDetails {
+
+	automate := &AutomateHAInfraDetails{}
+	automate.Outputs.AutomateAdminPassword.Value = "testpassowrd"
+	automate.Outputs.AutomateAdminUser.Value = "admin"
+	automate.Outputs.AutomateDataCollectorToken.Value = "token"
+	automate.Outputs.AutomateFrontendUrls.Value = "https://<front-end>"
+	automate.Outputs.AutomatePrivateIps.Value = []string{"1.2.3.4", "5.6.7.8"}
+	automate.Outputs.AutomateSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.ChefServerPrivateIps.Value = []string{"1.2.3.4", "5.6.7.8"}
+	automate.Outputs.ChefServerSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.OpensearchPrivateIps.Value = []string{"1.2.3.4", "5.6.7.8", "9.10.11.12"}
+	automate.Outputs.OpensearchSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.PostgresqlPrivateIps.Value = []string{"1.2.3.4", "5.6.7.8", "9.10.11.12"}
+	automate.Outputs.PostgresqlSSH.Value = []string{"ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip", "ssh -i file.pem -p 22 user@ip"}
+	automate.Outputs.SSHKeyFile.Value = "/path/to/key"
+	automate.Outputs.SSHPort.Value = "port"
+	automate.Outputs.SSHUser.Value = "user"
+
+	return automate
+
+}
 func TestPrintInfo(t *testing.T) {
 
-	t.Run("Passed ", func(t *testing.T) {
-		automate := &AutomateHAInfraDetails{}
+	t.Run("Checking valid result ", func(t *testing.T) {
+		automate := createInputDetails()
 		var b bytes.Buffer
-		infoCommandTemp = `AUTOMATION DETAILS:\n\tAutomate Admin User: \t\t \n\tAutomate Data Collector Token: \t \n\tAutomate Private IPs: \t\t\n\tAutomate SSH: \t\t\t\n\tAutomate URL: \t\t\t \nx\tBackup Config EFS: \t\t \n\tBackup Config S3: \t\t \n\tChef Server Private IPs: \t\n\tChef Server SSH: \t\t\n\tOpensearch Private IPs: \t\n\tOpensearch Public IPs: \t\t\n\tOpensearch SSH: \t\t\n\tPostgresql Private IPs: \t\n\tPostgresql SSH: \t\t\n\tSSH Key File: \t\t\t \n\tSSH Port: \t\t\t \n\tSSH User: \t\t\t \n\n\n`
 		err := printInfo(infoCommandTemp, automate, &b)
 		require.NoError(t, err)
-		expected_string := `AUTOMATION DETAILS:\n\tAutomate Admin User: \t\t \n\tAutomate Data Collector Token: \t \n\tAutomate Private IPs: \t\t\n\tAutomate SSH: \t\t\t\n\tAutomate URL: \t\t\t \nx\tBackup Config EFS: \t\t \n\tBackup Config S3: \t\t \n\tChef Server Private IPs: \t\n\tChef Server SSH: \t\t\n\tOpensearch Private IPs: \t\n\tOpensearch Public IPs: \t\t\n\tOpensearch SSH: \t\t\n\tPostgresql Private IPs: \t\n\tPostgresql SSH: \t\t\n\tSSH Key File: \t\t\t \n\tSSH Port: \t\t\t \n\tSSH User: \t\t\t \n\n\n`
+		expected_string := `
+		
+		automate_admin_password: testpassowrd                                                                                  
+			automate_admin_user: admin                                                                                         
+  automate_data_collector_token: token                              
+		 automate_frontend_urls: https://<front-end>                        
+		   automate_private_ips: 1.2.3.4                                                                                    
+								 5.6.7.8                                                                                  
+				   automate_ssh: ssh -i file.pem -p 22 user@ip                                
+								 ssh -i file.pem -p 22 user@ip                               
+				   automate_url: https://A2-7cb3a880-automate-lb-600321473.ap-south-1.elb.amazonaws.com                        
+		chef_server_private_ips: 1.2.3.4                                                                                     
+								 5.6.7.8                                                                                    
+				chef_server_ssh: ssh -i file.pem -p 22 user@ip                                
+							     ssh -i file.pem -p 22 user@ip                              
+		 opensearch_private_ips: 1.2.3.4                                                                                    
+								 5.6.7.8                                                                                    
+								 9.10.11.12                                                                                    
+				 opensearch_ssh: ssh -i file.pem -p 22 user@ip                               
+				 				 ssh -i file.pem -p 22 user@ip                              
+								 ssh -i file.pem -p 22 user@ip                               
+		 postgresql_private_ips: 1.2.3.4                                                                                      
+								 5.6.7.8                                                                                     
+								 9.10.11.12                                                                                    
+				 postgresql_ssh: ssh -i file.pem -p 22 user@ip                                 
+				 				 ssh -i file.pem -p 22 user@ip                                
+								 ssh -i file.pem -p 22 user@ip                               
+				   ssh_key_file: /path/to/key                                                                
+					   ssh_port: port                                                                                           
+					   ssh_user: user                                                                                      
+`
+
 		require.Equal(t, expected_string, b.String())
 	})
 

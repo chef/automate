@@ -115,16 +115,3 @@ func printInfo(infoCommandTemplate string, automate *AutomateHAInfraDetails, wri
 	}
 	return nil
 }
-
-func printInfoTest(automate *AutomateHAInfraDetails, writer *bytes.Buffer) error {
-	tmpl, err := template.New("output").Parse(infoCommandTemp)
-	if err != nil {
-		logrus.Errorf("Error: %v", err)
-		return err
-	}
-	if err := tmpl.Execute(writer, automate); err != nil {
-		logrus.Errorf("Error: %v", err)
-		return err
-	}
-	return nil
-}
