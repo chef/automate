@@ -24,7 +24,7 @@ gh_repo = "automate"
 
 This page explains the procedure to migrate the existing Standalone Chef Infra Server or Chef Backend data to the newly deployed Chef Automate HA. This migration involves two steps:
 
-- Back up the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
+- Backup the data from an existing Chef Infra Server or Chef Backend via `knife-ec-backup`.
 - Restore the backed-up data to the newly deployed Chef Automate HA environment via `knife-ec-restore`.
 
 Take a backup using the `knife-ec-backup` utility and move the backup folder to the newly deployed Chef Server. Later, restore using the same utility. The backup migrates all the cookbooks, users, data bags, policies, and organizations. `knife-ec-backup` utility backups and restores the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download, uploads commands, and uses the same underlying libraries. It includes workarounds for unsupported objects by the tools and various Server API deficiencies. The goal is to improve knife download, knife upload, and the Chef Infra Server API to deprecate the tool.
