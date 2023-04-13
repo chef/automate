@@ -339,6 +339,33 @@ func generateBackendBundles(bundleName string, airgapPath string) error {
 	}
 	return nil
 }
+func backendBundles(airgapMetadata airgap.UnpackMetadata) []string {
+	var requiredBackendPackages []string
+	for _, p := range airgapMetadata.HartifactPaths {
+		if strings.Contains(p, AUTOMATE_HA_PKG_PG_LDR_CHK) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+		if strings.Contains(p, AUTOMATE_HA_PKG_PG) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+		if strings.Contains(p, AUTOMATE_HA_PKG_HA_PROXY) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+		if strings.Contains(p, AUTOMATE_HA_OS) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+		if strings.Contains(p, AUTOMATE_HA_ES_CAR) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+		if strings.Contains(p, AUTOMATE_HA_CTL) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+		if strings.Contains(p, AUTOMATE_HA_DEPLOYMENT) {
+			requiredBackendPackages = append(requiredBackendPackages, getBldrSupportedPkgName(p))
+		}
+	}
+	return requiredBackendPackages
+}
 
 func getBytesFromTempalte(templateName string, templateContent string, placeholders map[string]interface{}) []byte {
 	t := template.Must(template.New(templateName).Parse(templateContent))

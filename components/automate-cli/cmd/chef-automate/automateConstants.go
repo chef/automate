@@ -34,6 +34,9 @@ const AUTOMATE_HA_PKG_HA_PROXY = "automate-ha-haproxy"
 const AUTOMATE_HA_OS = "automate-ha-opensearch"
 const AUTOMATE_HA_ES_CAR = "automate-ha-elasticsidecar"
 
+const AUTOMATE_HA_CTL = "automate-ha-ctl"
+const AUTOMATE_HA_DEPLOYMENT = "automate-ha-deployment"
+
 const ORIGIN_PATTERN = `[a-zA-z0-9]*`
 const PACKAGE_NAME_PATTERN = `-[a-zA-Z0-9]*-.*-\d+\.`
 const RELEASE_AND_VERSION_PATTERN = `.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`
