@@ -44,6 +44,7 @@ func TestExecute(t *testing.T) {
 	nodeFlagFalse := &Cmd{
 		CmdInputs: &CmdInputs{
 			NodeType: false,
+			SkipPrintOutput: true,
 		},
 	}
 	preExecFailed := &Cmd{
@@ -52,6 +53,7 @@ func TestExecute(t *testing.T) {
 		},
 		CmdInputs: &CmdInputs{
 			NodeType: true,
+			SkipPrintOutput: true,
 		},
 	}
 	type fields struct {
@@ -73,9 +75,10 @@ func TestExecute(t *testing.T) {
 							return nil
 						},
 						CmdInputs: &CmdInputs{
-							Cmd:      showCommand,
-							Single:   false,
-							NodeType: true,
+							Cmd:             showCommand,
+							Single:          false,
+							NodeType:        true,
+							SkipPrintOutput: true,
 						},
 					},
 					Infra: infra,
@@ -92,10 +95,11 @@ func TestExecute(t *testing.T) {
 					Frontend: nodeFlagFalse,
 					Automate: &Cmd{
 						CmdInputs: &CmdInputs{
-							Cmd:        patchCommand,
-							InputFiles: []string{file},
-							Single:     false,
-							NodeType:   true,
+							Cmd:             patchCommand,
+							InputFiles:      []string{file},
+							Single:          false,
+							NodeType:        true,
+							SkipPrintOutput: true,
 						},
 					},
 					Infra: infra,
@@ -113,9 +117,10 @@ func TestExecute(t *testing.T) {
 					Automate: nodeFlagFalse,
 					ChefServer: &Cmd{
 						CmdInputs: &CmdInputs{
-							Cmd:      showCommand,
-							Single:   false,
-							NodeType: true,
+							Cmd:             showCommand,
+							Single:          false,
+							NodeType:        true,
+							SkipPrintOutput: true,
 						},
 					},
 					Infra: infra,
@@ -134,9 +139,10 @@ func TestExecute(t *testing.T) {
 					ChefServer: nodeFlagFalse,
 					Postgresql: &Cmd{
 						CmdInputs: &CmdInputs{
-							Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "postgresql", ""),
-							Single:   false,
-							NodeType: true,
+							Cmd:             fmt.Sprintf(GET_BACKEND_CONFIG, "postgresql", ""),
+							Single:          false,
+							NodeType:        true,
+							SkipPrintOutput: true,
 						}},
 					Infra: infra,
 				},
@@ -155,9 +161,10 @@ func TestExecute(t *testing.T) {
 					Postgresql: nodeFlagFalse,
 					Opensearch: &Cmd{
 						CmdInputs: &CmdInputs{
-							Cmd:      fmt.Sprintf(GET_BACKEND_CONFIG, "opensearch", ""),
-							Single:   false,
-							NodeType: true,
+							Cmd:             fmt.Sprintf(GET_BACKEND_CONFIG, "opensearch", ""),
+							Single:          false,
+							NodeType:        true,
+							SkipPrintOutput: true,
 						}},
 					Infra: infra,
 				},
@@ -271,10 +278,10 @@ func TestExecute(t *testing.T) {
 }
 
 func TestExecuteCmdOnNode(t *testing.T) {
-	// var wg sync.WaitGroup
 
 	timestamp := time.Now().Format("20060102150405")
 	file := file
+	resultChan := make(chan CmdResult, 1)
 
 	testCases := []struct {
 		testCaseName   string
@@ -284,6 +291,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 		configFile     string
 		remoteService  string
 		newSSHUtil     SSHUtil
+		resultChan     chan CmdResult
 		expectedOutput CmdResult
 		isError        bool
 	}{
@@ -296,6 +304,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "config patch operation completed", nil, "", nil),
+			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP: ip1,
 				Output: "config patch operation completed",
@@ -310,6 +319,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{file},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, completedMessage, nil, file, nil),
+			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{file},
@@ -327,6 +337,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, errors.Errorf("copy to remote failed"), "", nil, file, nil),
+			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{},
@@ -342,6 +353,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "", errors.Errorf("remote execution"), "", nil),
+			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{},
@@ -357,6 +369,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{file},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "", nil, file, errors.Errorf("copy from remote failed")),
+			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				HostIP:      ip1,
 				OutputFiles: []string{file},
@@ -374,6 +387,7 @@ func TestExecuteCmdOnNode(t *testing.T) {
 			outputFiles:   []string{},
 			remoteService: "automate",
 			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "Error: patch failed", nil, file, nil),
+			resultChan:    resultChan,
 			expectedOutput: CmdResult{
 				ScriptName:  "",
 				HostIP:      ip1,
@@ -386,11 +400,9 @@ func TestExecuteCmdOnNode(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		new := &remoteCmdExecutor{
-			SshUtil: testCase.newSSHUtil,
-		}
-
-		result := new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, &SSHConfig{})
+		new := &remoteCmdExecutor{}
+		new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, testCase.newSSHUtil, testCase.resultChan)
+		result := <-resultChan
 
 		if testCase.isError {
 			assert.Error(t, result.Error)
