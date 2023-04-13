@@ -157,13 +157,6 @@ type patchFnParameters struct {
 	skipIpsList   []string
 }
 
-type osCertByIP struct {
-	IP         string `json:"IP"`
-	PrivateKey string `json:"PrivateKey"`
-	PublicKey  string `json:"PublicKey"`
-	NodesDn    string `json:"NodesDn,omitempty"`
-}
-
 func init() {
 	flagsObj := certRotateFlags{}
 
@@ -418,10 +411,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	// Creating and patching the required configurations.
 	var config string
-	var peerconfig string
 	if flagsObj.node != "" {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG_IGNORE_ADMIN_AND_ROOTCA, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", nodesDn))
-		peerconfig = fmt.Sprintf(OPENSEARCH_DN_CONFIG_FOR_PEERS, fmt.Sprintf("%v", nodesDn))
 	} else {
 		config = fmt.Sprintf(OPENSEARCH_CONFIG, certs.rootCA, certs.adminCert, certs.adminKey, certs.publicCert, certs.privateCert, fmt.Sprintf("%v", adminDn), fmt.Sprintf("%v", nodesDn))
 	}
@@ -444,20 +435,10 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	if flagsObj.node != "" {
 
-		nodeVal := flagsObj.node
-		flagsObj.node = ""
-
-		patchFnParam.fileName = "cert-rotate-os-peer.toml"
-		patchFnParam.config = peerconfig
-		patchFnParam.timestamp = time.Now().Format("20060102150405")
-		patchFnParam.skipIpsList = []string{flagsObj.node}
-
-		err = c.patchConfig(patchFnParam)
+		err := patchOSNodeDN(flagsObj, patchFnParam, c, nodesDn)
 		if err != nil {
 			return err
 		}
-
-		flagsObj.node = nodeVal
 
 	}
 
@@ -488,6 +469,27 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c *certRotateFlow, nodesDn string) error {
+
+	peerconfig := fmt.Sprintf(OPENSEARCH_DN_CONFIG_FOR_PEERS, fmt.Sprintf("%v", nodesDn))
+
+	nodeVal := flagsObj.node
+	flagsObj.node = ""
+
+	patchFnParam.fileName = "cert-rotate-os-peer.toml"
+	patchFnParam.config = peerconfig
+	patchFnParam.timestamp = time.Now().Format("20060102150405")
+	patchFnParam.skipIpsList = []string{flagsObj.node}
+
+	err := c.patchConfig(patchFnParam)
+	if err != nil {
+		return err
+	}
+
+	flagsObj.node = nodeVal
 	return nil
 }
 
