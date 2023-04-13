@@ -165,12 +165,7 @@ type scanNode struct {
 	LastSeen  string `json:"last_seen"`
 }
 
-func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return nil
-	}
-
+func runLicenseStatusCmdImp(cmd *cobra.Command, args []string, connection *client.DSClient) error {
 	response, err := connection.LicenseStatus(context.Background(), &api.LicenseStatusRequest{})
 	if err != nil {
 		return status.Wrap(
@@ -205,20 +200,30 @@ func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return nil
+	}
+
+	// Information if license is not set
+	return runLicenseStatusCmdImp(cmd, args, connection)
+}
+
 var licenseCmdFlags = struct {
 	forceSet bool
 }{}
 
-func runLicenseApplyCmd(cmd *cobra.Command, args []string) error {
+func runLicenseApplyCmdImp(cmd *cobra.Command, args []string, connection *client.DSClient) error {
 	licenseToken, err := maybeFromFile(args[0])
 	if err != nil {
 		return err
 	}
 
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return err
-	}
+	// connection, err := client.Connection(client.DefaultClientTimeout)
+	// if err != nil {
+	// 	return err
+	// }
 
 	req := &api.LicenseApplyRequest{License: licenseToken, Force: licenseCmdFlags.forceSet}
 	response, err := connection.LicenseApply(context.Background(), req)
@@ -258,6 +263,15 @@ func runLicenseApplyCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func runLicenseApplyCmd(cmd *cobra.Command, args []string) error {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return err
+	}
+
+	return runLicenseApplyCmdImp(cmd, args, connection)
 }
 
 func runLicenseUsageCmd(cmd *cobra.Command, args []string) error {
@@ -324,12 +338,7 @@ func maybeFromFile(maybeToken string) (string, error) {
 	return maybeToken, nil
 }
 
-func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) {
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return nil, err
-	}
-
+func getConfigMgmtUsageNodesImp(hourAgo *tspb.Timestamp, connection *client.DSClient) ([]*api.NodeUsage, error) {
 	usageInfo, err := connection.Usage(context.Background(), &api.UsageRequest{StartTime: hourAgo})
 	if err != nil {
 		return nil, status.Wrap(
@@ -340,6 +349,15 @@ func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) 
 	}
 
 	return usageInfo.Nodes, nil
+}
+
+func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	return getConfigMgmtUsageNodesImp(hourAgo, connection)
 }
 
 func getScanInfo(hourAgo *tspb.Timestamp) ([]*scanNode, error) {
