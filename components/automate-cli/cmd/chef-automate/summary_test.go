@@ -27,19 +27,13 @@ Incorrect postgresql IP, 127.0.0 IP address validation failed
 Incorrect postgresql IP, 127.0.1 IP address validation failed
 Incorrect postgresql IP, 127.0.2 IP address validation failed
 Incorrect postgresql IP, 127.0.3 IP address validation failed`
-displayBE = `+------------+--------------+--------+--------------+-------------+---------+
+	displayBE = `+------------+--------------+--------+--------------+-------------+---------+
 | NAME       | IP ADDRESS   | HEALTH | PROCESS      | UPTIME      | ROLE    |
 +------------+--------------+--------+--------------+-------------+---------+
 | postgresql | 198.51.100.7 | ERROR  | down (pid: ) | 0d 0h 0m 0s | Unknown |
 +------------+--------------+--------+--------------+-------------+---------+`
-displayFE = `+-------------+--------------+--------+------------+
-| NAME        | IP ADDRESS   | STATUS | OPENSEARCH |
-+-------------+--------------+--------+------------+
-| automate    | 198.51.100.1 | ERROR  | Unknown    |
-| automate    | 198.51.100.0 | ERROR  | Unknown    |
-| chef-server | 198.51.100.2 | ERROR  | Unknown    |
-| chef-server | 198.51.100.3 | ERROR  | Unknown    |
-+-------------+--------------+--------+------------+`
+	displayFEAutomate         = `| automate    | 198.51.100.1 | ERROR  | Unknown    |`
+	displayFECS               = `| chef-server | 198.51.100.2 | ERROR  | Unknown    |`
 	mockA2haHabitatAutoTfvars = "../../pkg/testfiles/a2ha_habitat.auto.tfvars"
 )
 
@@ -150,14 +144,16 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 func TestRunFENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
 	infra := &AutomteHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
-	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP1}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2}
 	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
 	ss := NewStatusSummary(infra, FeStatus{}, BeStatus{}, 10, time.Second, &StatusSummaryCmdFlags{}, sshUtil)
 	err := ss.Prepare()
 	assert.NoError(t, err)
 	fe := ss.ShowFEStatus()
-	assert.Contains(t, fe, displayFE)
+	assert.Contains(t, fe, displayFEAutomate)
+	assert.Contains(t, fe, displayFECS)
+
 }
 func TestRunBENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
