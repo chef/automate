@@ -128,7 +128,7 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
         hab pkg exec chef/knife-ec-backup knife ec restore <path/to/directory/backup_file> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
     ```
 
-## Steps to validate if Migration is successful
+## Steps to Validate if Migration is Successful
 
 - Download the validation script using below
 
@@ -303,80 +303,8 @@ Bootstrap the nodes to update the `chef_server_url` using the following steps:
 1. Open the `~/.chef/config.rb` file in your workstation and update the `chef_server_url` with the Automate fqdn.
 1. Go to your workstation and open the `~/.chef/config.rb` file.
 1. Update the `chef_server_url` with the chef server LB fqdn.
-1. Now do node bootstrapping. It will update the chef_server_url on that node. Refer: [Node Bootstrapping](/automate/ha_node_bootstraping/#bootstrap-a-node)
+1. Now do node bootstrapping. It will update the chef_server_url on that node. Refer: [Node Bootstrapping](https://docs.chef.io/install_bootstrap/)
 
-## Using Automate HA for Chef-Backend user
+## Use Automate HA for Chef-Backend User
 
-1. Download and Install the Chef Workstation from the Bastion machine or local machine install chef-workstation
-    https://www.chef.io/downloads/tools/workstation
-
-2. Set up the workstation using the following commands:
-
-    ```bash
-    chef generate repo chef-repo
-    ```
-
-    ```bash
-    cd chef-repo
-    ```
-
-    ```bash
-    knife configure
-    ```
-
-    Provide chef-server FQDN of Automate HA Chef-Server.
-    Example: https://demo-chef-server.com/organizations/demo-org
-
-    ```bash
-        knife configure
-        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://demo-chef-server.com/organizations/demo-org
-        Please enter an existing username or clientname for the API: [ubuntu] org-user
-        *****
-        You must place your client key in the:
-            /root/.chef/org-user.pem
-        Before running commands with Knife
-        *****
-        The knife configuration file is written to /root/.chef/credentials
-    ```
-
-3. Ssl fetch command
-
-    ```bash
-    knife ssl fetch
-    ```
-
-4. Ssl check command
-
-    ```bash
-    knife ssl check
-    ```
-
-5. Create a role command
-
-    ```bash
-    knife role create abc --disable-editing
-    ```
-
-6. Download the cookbook
-
-    ```bash
-    knife supermarket download line
-    ```
-
-7. Upload the cookbook
-
-    ```bash
-    knife cookbook upload line --cookbook-path cookbooks
-    ```
-
-8. Bootstrap as a node
-
-    ```bash
-        knife bootstrap <public_ip_node>  -i <key_to_connect_node> -U ubuntu -N test1 --sudo
-    ```
-
-    Example:-
-
-    ```bash
-        knife bootstrap 15.207.98.155 -i  ~/.ssh/ssh-key.pem -U ubuntu -N node1 --sudo
-    ```
+Download and Install the [Chef Workstation](https://www.chef.io/downloads/tools/workstation) from the Bastion machine or local machine install chef-workstation. You can refer to the [Workstation page](https://docs.chef.io/workstation/getting_started/#set-up-your-chef-repo) to set up your Workstation.
