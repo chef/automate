@@ -179,7 +179,6 @@ workspace_path = "/hab/a2_deploy_workspace"
 ssh_user = "myusername"
 ssh_port = "22"
 ssh_key_file = "~/.ssh/mykey.pem"
-sudo_password = ""
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"

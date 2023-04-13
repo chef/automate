@@ -40,18 +40,47 @@ options:
   usage: |
     Optionally do not check if your Chef Automate v1 installation has workflow configured (default = false)
 inherited_options:
+- name: a2
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on automate node(HA)
 - name: airgap
   default_value: "false"
   usage: Pass this flag when the environment is airgapped
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on automate node(HA)
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: |
+    Pass this flag to run pre-flight check on chef-server node(HA)
 - name: config
   usage: Optional config file to use
+- name: cs
+  default_value: "false"
+  usage: |
+    Pass this flag to run pre-flight check on chef-server node(HA)
 - name: debug
   shorthand: d
   default_value: "false"
   usage: Enable debug output
+- name: fe
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on all Frontend nodes
+- name: frontend
+  shorthand: f
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on all Frontend nodes
+- name: ha-deployment-config
+  default_value: "false"
+  usage: Pass this flag to run pre-flight check on automate-HA
 - name: no-check-version
   default_value: "false"
   usage: Disable version check
+- name: node
+  usage: |
+    Pass this flag to run pre-flight check on a perticular node node(HA)
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
