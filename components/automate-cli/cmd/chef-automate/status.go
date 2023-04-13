@@ -158,7 +158,7 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 		be := statusSummary.ShowBEStatus()
 		fmt.Println(be)
 	} else {
-		writer.Warn("Your using managed services\n")
+		writer.Warn("-o and -p flag is not supported for deployment with managed services\n")
 	}
 	writer.BufferWriter().Flush()
 
