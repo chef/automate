@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/api/config/deployment"
@@ -17,12 +18,84 @@ import (
 	"github.com/chef/automate/lib/version"
 )
 
+var preflightCmdFlags = struct {
+	airgap             bool
+	waitTimeout        int
+	configPath         string
+	haDeploymentConfig bool
+	automate           bool
+	chef_server        bool
+	frontend           bool
+	node               string
+}{}
+
+type InfraKeyValues struct {
+	Value []string `json:"value"`
+	Type  []string `json:"type"`
+}
+
+type InfraKeyValue struct {
+	Value string `json:"value"`
+	Type  string `json:"type"`
+}
+
 func init() {
 	preflightCheckCmd.PersistentFlags().BoolVar(
 		&preflightCmdFlags.airgap,
 		"airgap",
 		false,
 		"Pass this flag when the environment is airgapped")
+	preflightCheckCmd.PersistentFlags().BoolVar(
+		&preflightCmdFlags.haDeploymentConfig,
+		"ha-deployment-config",
+		false,
+		"Pass this flag to run pre-flight check on automate-HA")
+	showConfigCmd.PersistentFlags().SetAnnotation("ha-deployment-config", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVar(
+		&preflightCmdFlags.frontend,
+		"fe",
+		false,
+		"Pass this flag to run pre-flight check on all Frontend nodes")
+	showConfigCmd.PersistentFlags().SetAnnotation("fe", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVarP(
+		&preflightCmdFlags.frontend,
+		"frontend",
+		"f",
+		false,
+		"Pass this flag to run pre-flight check on all Frontend nodes")
+	showConfigCmd.PersistentFlags().SetAnnotation("frontend", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVarP(
+		&preflightCmdFlags.automate,
+		"automate",
+		"a",
+		false,
+		"Pass this flag to run pre-flight check on automate node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVar(
+		&preflightCmdFlags.automate,
+		"a2",
+		false,
+		"Pass this flag to run pre-flight check on automate node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVarP(
+		&preflightCmdFlags.chef_server,
+		"chef_server",
+		"c",
+		false,
+		"Pass this flag to run pre-flight check on chef-server node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().BoolVar(
+		&preflightCmdFlags.chef_server,
+		"cs",
+		false,
+		"Pass this flag to run pre-flight check on chef-server node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
+	preflightCheckCmd.PersistentFlags().StringVar(
+		&preflightCmdFlags.node,
+		"node",
+		"",
+		"Pass this flag to run pre-flight check on a perticular node node(HA)")
+	showConfigCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	preflightCheckCmd.PersistentFlags().StringVar(
 		&preflightCmdFlags.configPath,
 		"config",
@@ -32,11 +105,6 @@ func init() {
 
 	preflightCheckCmd.AddCommand(newMigratePreflightCmd())
 }
-
-var preflightCmdFlags = struct {
-	airgap     bool
-	configPath string
-}{}
 
 var preflightCheckCmd = &cobra.Command{
 	Use:   "preflight-check",
@@ -58,6 +126,26 @@ func loadMergedConfigForPreflight() (*deployment.AutomateConfig, error) {
 }
 
 func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
+	if preflightCmdFlags.haDeploymentConfig {
+		var configPath = ""
+		if len(args) == 0 {
+			return errors.Errorf("Config file should be passed with ha-deployment-config flag")
+		}
+		configPath = args[0]
+		infra, err := getInfraDetails(configPath)
+		if err != nil {
+			return err
+		}
+		nodeMap := constructAndGetNodeMap(infra)
+		cmdUtil := NewRemoteCmdExecutor(nodeMap)
+
+		if preflightCmdFlags.automate || preflightCmdFlags.chef_server || preflightCmdFlags.frontend {
+			err = cmdUtil.Execute()
+		} else {
+			writer.Println(cmd.UsageString())
+		}
+		return err
+	}
 	cfg, err := loadMergedConfigForPreflight()
 	if err != nil {
 		return err
@@ -65,8 +153,26 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 	if err := client.Preflight(writer, cfg, version.BuildTime, preflightCmdFlags.airgap); err != nil {
 		return err
 	}
-
 	return nil
+}
+
+func getInfraDetails(configPath string) (*AutomteHAInfraDetails, error) {
+	var infra *AutomteHAInfraDetails
+	var err error
+	var deploymentType string
+	if isA2HARBFileExist() {
+		infra, err = getAutomateHAInfraDetails()
+	} else {
+		deploymentType, err = getModeFromConfig(configPath)
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+		infra, err = getInfraDetailsForDeploymentType(deploymentType, configPath)
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+	}
+	return infra, err
 }
 
 var migratePreflightCmdFlags = migrateCmdFlagSet{}
@@ -343,4 +449,90 @@ func runChefServerChecks(u *a1upgrade.A1Upgrade) error {
 	writer.Body("Your Chef Server config passed compatibility checks.")
 
 	return nil
+}
+
+func populateInfraDetails(config ExistingInfraConfigToml) *AutomteHAInfraDetails {
+
+	var infra AutomteHAInfraDetails
+	infra.Outputs.SSHKeyFile = InfraKeyValue{
+		Value: config.Architecture.ConfigInitials.SSHKeyFile,
+	}
+	infra.Outputs.SSHPort = InfraKeyValue{
+		Value: config.Architecture.ConfigInitials.SSHPort,
+	}
+	infra.Outputs.SSHUser = InfraKeyValue{
+		Value: config.Architecture.ConfigInitials.SSHUser,
+	}
+	infra.Outputs.AutomatePrivateIps = InfraKeyValues{
+		Value: config.ExistingInfra.Config.AutomatePrivateIps,
+	}
+	infra.Outputs.ChefServerPrivateIps = InfraKeyValues{
+		Value: config.ExistingInfra.Config.ChefServerPrivateIps,
+	}
+	return &infra
+}
+
+func getInfraDetailsForDeploymentType(deploymentType string, configPath string) (*AutomteHAInfraDetails, error) {
+	var infra *AutomteHAInfraDetails
+	var err error
+	if deploymentType == EXISTING_INFRA_MODE {
+		config, err := getExistingInfraConfig(configPath)
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+		infra = populateInfraDetails(*config)
+	}
+
+	if deploymentType == AWS_MODE {
+		infra, err = getAutomateHAInfraDetails()
+		if err != nil {
+			return nil, errors.Errorf("%v", err)
+		}
+	}
+	return infra, nil
+}
+
+func constructAndGetNodeMap(infra *AutomteHAInfraDetails) *NodeTypeAndCmd {
+	frontendCommand := fmt.Sprint(PRE_FLIGHT_CHECK)
+	inputFilePath := "/usr/bin/chef-automate"
+	nodeMap := &NodeTypeAndCmd{
+		Frontend: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
+				InputFiles:               []string{inputFilePath},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.frontend,
+			},
+		},
+		Automate: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
+				InputFiles:               []string{inputFilePath},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.automate,
+			},
+		},
+		ChefServer: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      frontendCommand,
+				WaitTimeout:              preflightCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIp:                   preflightCmdFlags.node,
+				InputFiles:               []string{inputFilePath},
+				Outputfiles:              []string{},
+				NodeType:                 preflightCmdFlags.chef_server,
+			},
+		},
+		Infra: infra,
+	}
+	return nodeMap
 }

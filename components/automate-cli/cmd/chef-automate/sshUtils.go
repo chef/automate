@@ -186,9 +186,7 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 	}
 	defer session.Close()
 
-	if spinner {
-		writer.StartSpinner()
-	}
+	startSpinnerIfRequired(spinner)
 
 	var output string
 	errCh := make(chan error)
@@ -205,6 +203,10 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 			output = pattern.ReplaceAllString(output, "")
 		}
 		if err != nil {
+			if strings.Contains(output, "sudo: no tty present and no askpass program specified") {
+				errCh <- errors.New("The sudo password is missing. Make sure to provide sudo_password as enviroment variable and pass -E option while running command.")
+				return
+			}
 			errCh <- err
 			return
 		}
@@ -216,16 +218,12 @@ func (s *SSHUtilImpl) connectAndExecuteCommandOnRemote(remoteCommands string, sp
 		return "", errors.New("command timed out")
 	case err := <-errCh:
 		if err != nil {
-			if spinner {
-				writer.StopSpinner()
-			}
+			stopSpinnerIfRequired(spinner)
 			return output, err
 		}
 	}
 
-	if spinner {
-		writer.StopSpinner()
-	}
+	stopSpinnerIfRequired(spinner)
 
 	logrus.Debug("Execution of command done......")
 	return output, nil
@@ -299,7 +297,10 @@ func (s *SSHUtilImpl) copyFileToRemote(srcFilePath string, destFileName string, 
 	cmd := "scp"
 	exec_args := []string{"-P " + s.SshConfig.sshPort, "-o StrictHostKeyChecking=no", "-i", s.SshConfig.sshKeyFile, "-r", srcFilePath, s.SshConfig.sshUser + "@" + s.SshConfig.hostIP + ":/tmp/" + destFileName}
 	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
-		writer.Printf("Failed to copy config file to remote %s\n", err.Error())
+		writer.Printf("\n"+"Failed to copy file %s to remote %s\n", srcFilePath, err.Error())
+		if srcFilePath == "/usr/bin/chef-automate" {
+			writer.Printf("Please copy your chef-automate binary to /usr/bin" + "\n")
+		}
 		return err
 	}
 	if removeFile {
@@ -406,4 +407,16 @@ func isSudoPasswordEnabled() bool {
 func getSudoPassword() string {
 	sudoPassword := os.Getenv(SUDO_PASSWORD)
 	return sudoPassword
+}
+
+func startSpinnerIfRequired(spinner bool) {
+	if spinner {
+		writer.StartSpinner()
+	}
+}
+
+func stopSpinnerIfRequired(spinner bool) {
+	if spinner {
+		writer.StopSpinner()
+	}
 }

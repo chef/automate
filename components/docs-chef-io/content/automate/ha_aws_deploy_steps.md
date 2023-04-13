@@ -54,7 +54,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 - PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
 - We currently don't support AD managed users in nodes. We only support local linux users.
-- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges.
+- If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 
 {{< /warning >}}
 
@@ -102,7 +102,6 @@ Run the following steps on Bastion Host Machine:
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
-   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
    - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`
    - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
@@ -219,7 +218,6 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 ssh_user = "ec2-user"
 ssh_port = "22"
 ssh_key_file = "~/.ssh/my-key.pem"
-# sudo_password = ""
 backup_config = "s3"
 s3_bucketName = "My-Bucket-Name"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"

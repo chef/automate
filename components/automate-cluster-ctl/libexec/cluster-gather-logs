@@ -22,6 +22,9 @@ class AutomateClusterGatherlogs < AutomateCluster::Command
     ssh = AutomateCluster::SSH.new
     timestamp = Time.now.strftime('%Y%m%d%H%M%S')
 
+    # store the secret envs so we can pass them to the command
+    store_secret_envs
+
     ssh.connections do |type, conn|
       frontend = %w{automate chef_server}.include?(type)
 
@@ -62,6 +65,18 @@ class AutomateClusterGatherlogs < AutomateCluster::Command
       be_sudo_password
     else
       fe_sudo_password
+    end
+  end
+
+  # store the sudo_password from the env variable in the secrets hash
+  def store_secret_envs
+    sudo_password = ENV['sudo_password']
+    # If the sudo_password is set, store it in the secrets hash
+    if sudo_password
+      # Set a new secret
+      secrets.set('sudo_password', sudo_password)
+      # Save the updated secrets store to disk
+      secrets.save(File.expand_path(AutomateCluster::Config.secrets_store_file))
     end
   end
 
