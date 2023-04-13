@@ -65,9 +65,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         [path]
         repo = "/mnt/automate_backups"
         ```
-
         The following command will patch the configuration in all the OpenSearch nodes.
-
         ```bash
         chef-automate config patch --opensearch <path to os_config.toml>
         ```
@@ -83,9 +81,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         [global.v1.backups.filesystem]
             path = "/mnt/automate_backups"
         ```
-
         The following command will patch the configuration in all the Frontend nodes:
-
         ```bash
         chef-automate config patch --fe <Path to automate.toml>
         ```
@@ -157,9 +153,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         [path]
         repo = "/mnt/automate_backups"
         ```
-
         The following command will patch the configuration in all the OpenSearch nodes.
-
         ```bash
         chef-automate config patch --opensearch <Path to os_config.toml>
         ```
@@ -175,9 +169,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
         [global.v1.backups.filesystem]
             path = "/mnt/automate_backups"
         ```
-
         The following command will patch the configuration in all the Frontend nodes:
-
         ```bash
         chef-automate config patch --fe <Path to automate.toml>
         ```
@@ -362,9 +354,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
                 access_key = "<Your Access Key>"
                 secret_key = "<Your Secret Key>"
         ```
-
         The following command will patch the configuration in all the Frontend nodes:
-
         ```bash
         chef-automate config patch --frontend automate.toml
         ```
