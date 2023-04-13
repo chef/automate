@@ -38,7 +38,7 @@ Incorrect postgresql IP, 127.0.3 IP address validation failed`
 )
 
 func TestCheckIPAddressesFromInfra(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
@@ -54,7 +54,7 @@ func TestCheckIPAddressesFromInfra(t *testing.T) {
 }
 
 func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
@@ -77,7 +77,7 @@ func TestCheckIPAddressesByServicesAndIpFromFlag(t *testing.T) {
 }
 
 func TestCheckIPAddressesOnlyByServices(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
@@ -99,7 +99,7 @@ func TestCheckIPAddressesOnlyByServices(t *testing.T) {
 }
 
 func TestCheckIPAddressesError(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
@@ -119,7 +119,7 @@ func TestCheckIPAddressesError(t *testing.T) {
 }
 
 func TestCheckIPAddressesValidation(t *testing.T) {
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
 	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
@@ -143,7 +143,7 @@ func TestCheckIPAddressesValidation(t *testing.T) {
 }
 func TestRunFENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP1}
 	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2}
 	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{}, nil, nil)
@@ -157,7 +157,7 @@ func TestRunFENodeDiaplay(t *testing.T) {
 }
 func TestRunBENodeDiaplay(t *testing.T) {
 	a2haHabitatAutoTfvars = mockA2haHabitatAutoTfvars
-	infra := &AutomteHAInfraDetails{}
+	infra := &AutomateHAInfraDetails{}
 	// infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
 	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7}
 	sshUtil := getMockSSHUtilRunSummary(&SSHConfig{hostIP: ValidIP7}, nil, nil)

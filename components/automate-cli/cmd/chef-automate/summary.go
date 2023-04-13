@@ -50,7 +50,7 @@ type Summary struct {
 	beStatus              BeStatus
 	timeout               int64
 	spinnerTimeout        time.Duration
-	infra                 *AutomteHAInfraDetails
+	infra                 *AutomateHAInfraDetails
 	statusSummaryCmdFlags *StatusSummaryCmdFlags
 	sshUtil               SSHUtil
 }
@@ -60,7 +60,7 @@ type A2haHabitatAutoTfvars struct {
 	HabSupRingKey              string `json:"hab_sup_ring_key"`
 }
 
-func NewStatusSummary(infra *AutomteHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil) StatusSummary {
+func NewStatusSummary(infra *AutomateHAInfraDetails, feStatus FeStatus, beStatus BeStatus, timeout int64, spinnerTimeout time.Duration, flags *StatusSummaryCmdFlags, sshUtil SSHUtil) StatusSummary {
 	return &Summary{
 		feStatus:              feStatus,
 		beStatus:              beStatus,
