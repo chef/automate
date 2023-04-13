@@ -96,7 +96,7 @@ echo "Copying certs into place"
 hostname=$(hostname)
 
 # copy the certs to the correct names
-mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
+# mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
 echo "INSIDE integration/services/ha_backend/setup.sh"
 

@@ -14,9 +14,9 @@ expeditor:
         workdir: /go/src/github.com/chef/automate
 
 steps:
-  # Building hugo currently depends on a github token
-  #     https://github.com/chef/chef-hugo-theme
-  # which is currently private.
+#   # Building hugo currently depends on a github token
+#   #     https://github.com/chef/chef-hugo-theme
+#   # which is currently private.
   - label: lint hugo site
     command:
       - .expeditor/buildkite/hugo_lint.sh
@@ -816,6 +816,8 @@ steps:
     command:
       - integration/run_test integration/tests/deep_upgrade.sh
     timeout_in_minutes: 25
+    env:
+      HAB_BLDR_CHANNEL: "dev"
     expeditor:
       executor:
         linux:
@@ -884,7 +886,7 @@ steps:
   - label: "ha cluster"
     command:
       - integration/run_test integration/tests/cluster.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 50
     expeditor:
       executor:
         linux:
