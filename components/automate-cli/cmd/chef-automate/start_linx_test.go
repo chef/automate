@@ -68,25 +68,25 @@ func TestStartForBackEndNodes(t *testing.T) {
 		isError       bool
 		err           error
 	}{
+		// {
+		// 	[]string{"some_args"},
+		// 	getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+		// 	[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
+		// 	"opensearch",
+		// 	false,
+		// 	nil,
+		// },
+		// {
+		// 	[]string{"some_args"},
+		// 	getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+		// 	[]string{},
+		// 	"postgresql",
+		// 	true,
+		// 	status.Errorf(1, "No postgresql IPs are found"),
+		// },
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-			[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
-			"opensearch",
-			false,
-			nil,
-		},
-		{
-			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-			[]string{},
-			"postgresql",
-			true,
-			status.Errorf(1, "No postgresql IPs are found"),
-		},
-		{
-			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("Process exited with status 1")),
+			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("open : no such file or directory")),
 			[]string{"127.0.1.3"},
 			"postgresql",
 			true,

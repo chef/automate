@@ -87,40 +87,27 @@ func runStartCommandHA(infra *AutomateHAInfraDetails, args []string) error {
 	}
 	sshUtil := NewSSHUtil(sshConfig)
 	errorList := list.New()
-	var err error
 	if startCmdFlags.automate {
 		frontendIps := infra.Outputs.AutomatePrivateIps.Value
-		err = checkNodes(args, sshUtil, frontendIps, "automate", writer)
-		if err != nil {
-			errorList.PushBack(err.Error())
-		}
+		startCommandImplHA(args, sshUtil, frontendIps, "automate", writer, errorList)
 	}
 	if startCmdFlags.chefServer {
 		frontendIps := infra.Outputs.ChefServerPrivateIps.Value
-		err = checkNodes(args, sshUtil, frontendIps, "chef-server", writer)
-		if err != nil {
-			errorList.PushBack(err.Error())
-		}
+		startCommandImplHA(args, sshUtil, frontendIps, "chef-server", writer, errorList)
 	}
 	if startCmdFlags.opensearch {
 		if isManagedServicesOn() {
 			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, OPENSEARCH_SERVICE)
 		}
 		backendIps := infra.Outputs.OpensearchPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, OPENSEARCH_SERVICE, writer)
-		if err != nil {
-			errorList.PushBack(err.Error())
-		}
+		startCommandImplHA(args, sshUtil, backendIps, OPENSEARCH_SERVICE, writer, errorList)
 	}
 	if startCmdFlags.postgresql {
 		if isManagedServicesOn() {
-			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, "Postgresql")
+			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, POSTGRES_SERVICE)
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, POSTGRES_SERVICE, writer)
-		if err != nil {
-			errorList.PushBack(err.Error())
-		}
+		startCommandImplHA(args, sshUtil, backendIps, POSTGRES_SERVICE, writer, errorList)
 	}
 	if errorList.Len() > 0 {
 		return status.New(status.ServiceStartError, getSingleErrorFromList(errorList).Error())
@@ -169,6 +156,13 @@ func runStartDevMode() error {
 		return status.Annotate(err, status.HabCommandError)
 	}
 	return nil
+}
+
+func startCommandImplHA(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer, errorList *list.List) {
+	err := checkNodes(args, sshUtil, ips, "chef-server", writer)
+	if err != nil {
+		errorList.PushBack(err.Error())
+	}
 }
 
 func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
