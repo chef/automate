@@ -98,12 +98,6 @@ const (
 	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-%s/config/user.toml
 	sudo systemctl start hab-sup.service`
 
-	ROTATE_CERT_ON_OS = `
-	echo "y" | sudo cp /tmp/%s /hab/user/automate-ha-opensearch/config/user.toml
-	export TIMESTAMP=$(date +"%s");
-	echo "yes" | sudo hab config apply automate-ha-opemsearch.default  $(date '+%s') /tmp/%s;
-	`
-
 	IP_V4_REGEX = `(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
 
 	ERROR_SELF_MANAGED_DB_CERT_ROTATE = "Certificate rotation for externally configured %s is not supported."
