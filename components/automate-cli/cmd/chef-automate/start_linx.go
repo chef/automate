@@ -284,7 +284,7 @@ func printStartSuccessMessage(remoteService string, hostIP string, cliWriter *cl
 }
 
 func getMapSSHUtils(ipAddresses []string, config *SSHConfig) map[string]SSHUtil {
-	var sshUtilMap map[string]SSHUtil
+	sshUtilMap := make(map[string]SSHUtil)
 	for _, ipAddress := range ipAddresses {
 		newSSHConfig := &SSHConfig{
 			sshUser:    config.sshUser,
