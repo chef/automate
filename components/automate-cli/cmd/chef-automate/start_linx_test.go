@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStartForFrontEndNodes(t *testing.T) {
+func TestCheckNodes(t *testing.T) {
 	testCases := []struct {
 		testName      string
 		args          []string
@@ -55,40 +55,16 @@ func TestStartForFrontEndNodes(t *testing.T) {
 			errors.New("Not able to start one or more nodes in automate: \nProcess exited with status 1"),
 		},
 		{
-			"Only one ip is not reachable from the ips provided",
+			"Only one ip is not reachable from the ips provided for automate",
 			[]string{"some_args"},
 			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.34"}, nil, "", errors.New("Process exited with status 1"), true),
-			[]string{"127.0.1.3"},
+			[]string{"127.0.1.3", "127.0.1.34"},
 			"automate",
 			true,
 			errors.New("Not able to start one or more nodes in automate: \nProcess exited with status 1"),
 		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.testName, func(t *testing.T) {
-			err := checkNodes(testCase.args, testCase.sshUtilMap, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
-			if testCase.isError {
-				assert.EqualError(t, testCase.err, err.Error())
-			} else {
-				assert.Nil(t, err)
-			}
-		})
-	}
-}
-
-func TestStartForBackEndNodes(t *testing.T) {
-	testCases := []struct {
-		testName      string
-		args          []string
-		sshUtilMap    map[string]SSHUtil
-		frontendIps   []string
-		remoteService string
-		isError       bool
-		err           error
-	}{
 		{
-			"All th ips are rechable and service restarted",
+			"All th ips are rechable and service started for opensearch",
 			[]string{"some_args"},
 			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"}, nil, "", nil, false),
 			[]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"},
@@ -115,13 +91,31 @@ func TestStartForBackEndNodes(t *testing.T) {
 			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
 		},
 		{
+			"Providing all the ips not-rechable agrs for opensearch",
+			[]string{"some_args"},
+			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1"), false),
+			[]string{"127.0.1.3"},
+			"opensearch",
+			true,
+			errors.New("Not able to start one or more nodes in opensearch: \nProcess exited with status 1"),
+		},
+		{
 			"Only one ip is not reachable from the ips provided for postgres",
 			[]string{"some_args"},
 			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.34"}, nil, "", errors.New("Process exited with status 1"), true),
-			[]string{"127.0.1.3"},
+			[]string{"127.0.1.3", "127.0.1.34"},
 			"postgresql",
 			true,
 			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
+		},
+		{
+			"Found output error while starting the hab-sup service for postgres",
+			[]string{"some_args"},
+			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "ERROR ,Process exited with status 1", nil, false),
+			[]string{"127.0.1.3"},
+			"postgresql",
+			true,
+			errors.New("Not able to start one or more nodes in postgresql: \nERROR ,Process exited with status 1"),
 		},
 	}
 
@@ -129,8 +123,7 @@ func TestStartForBackEndNodes(t *testing.T) {
 		t.Run(testCase.testName, func(t *testing.T) {
 			err := checkNodes(testCase.args, testCase.sshUtilMap, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
 			if testCase.isError {
-
-				assert.EqualError(t, testCase.err, err.Error())
+				assert.EqualError(t, err, testCase.err.Error())
 			} else {
 				assert.Nil(t, err)
 			}
@@ -248,7 +241,7 @@ func createMockSSHUtilMap(ips []string, connectErr error, execOutput string, exe
 	sshUtilMap := make(map[string]SSHUtil)
 	start := 0
 	if isErrorRequiredForOnlyOne {
-		sshUtilMap[ips[0]] = getMockSSHUtil(&SSHConfig{}, connectErr, execOutput, execErr)
+		sshUtilMap[ips[0]] = getMockSSHUtil(&SSHConfig{}, connectErr, execOutput, nil)
 		start = 1
 	}
 	for i := start; i < len(ips); i++ {
