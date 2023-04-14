@@ -174,62 +174,119 @@ func getMockInfra() *AutomateHAInfraDetails {
 	return infra
 }
 
-func TestFunc(t *testing.T) {
-	startCmdFlags.chefServer = true
-	startCmdFlags.automate = false
-	startCmdFlags.opensearch = false
-	startCmdFlags.postgresql = false
-	infra := getMockInfra()
-	err := runStartCommandHA(infra, []string{"--cs"})
-	assert.EqualError(t, err, "\nNot able to start one or more nodes in chef-server: \nopen : no such file or directory")
-}
-
-func TestFuncAutomate(t *testing.T) {
-	startCmdFlags.chefServer = false
-	startCmdFlags.automate = true
-	startCmdFlags.opensearch = false
-	startCmdFlags.postgresql = false
-	infra := getMockInfra()
-	err := runStartCommandHA(infra, []string{"--a2"})
-	assert.EqualError(t, err, "\nNot able to start one or more nodes in automate: \nopen : no such file or directory")
-}
-
-func TestFuncOs(t *testing.T) {
-	startCmdFlags.chefServer = false
-	startCmdFlags.automate = false
-	startCmdFlags.opensearch = true
-	startCmdFlags.postgresql = false
-	infra := getMockInfra()
-	err := runStartCommandHA(infra, []string{"--os"})
-	assert.EqualError(t, err, "\nNot able to start one or more nodes in opensearch: \nopen : no such file or directory")
-}
-func TestFuncPg(t *testing.T) {
-	startCmdFlags.chefServer = false
-	startCmdFlags.automate = false
-	startCmdFlags.opensearch = false
-	startCmdFlags.postgresql = true
-	infra := getMockInfra()
-	err := runStartCommandHA(infra, []string{"--pg"})
-	assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory")
-}
-
-func TestFuncFlagsEmpty(t *testing.T) {
-	startCmdFlags.chefServer = false
-	startCmdFlags.automate = false
-	startCmdFlags.opensearch = false
-	startCmdFlags.postgresql = false
-	infra := getMockInfra()
-	err := runStartCommandHA(infra, []string{})
-	if err != nil {
-		assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory")
-	}
-	assert.Nil(t, err)
-}
-
 func createMockSSHUtilMap(ips []string, connectErr error, execOutput string, execErr error) map[string]SSHUtil {
 	sshUtilMap := make(map[string]SSHUtil)
 	for i := 0; i < len(ips); i++ {
 		sshUtilMap[ips[i]] = getMockSSHUtil(&SSHConfig{hostIP: ips[i]}, connectErr, execOutput, execErr)
 	}
 	return sshUtilMap
+}
+
+func TestStartCommandHA(t *testing.T) {
+	tests := []struct {
+		name            string
+		isForAutomate   bool
+		isForChefServer bool
+		isForPG         bool
+		isForOS         bool
+		isManaged       bool
+		arguments       []string
+		isErrorExpected bool
+		errorMessage    string
+	}{
+		{
+			name:            "test_Empty_Flags",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         false,
+			isManaged:       false,
+			arguments:       []string{},
+			isErrorExpected: false,
+			errorMessage:    "",
+		},
+		{
+			name:            "test_Automate",
+			isForAutomate:   true,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         false,
+			isManaged:       false,
+			arguments:       []string{"--a2"},
+			isErrorExpected: true,
+			errorMessage:    "\nNot able to start one or more nodes in automate: \nopen : no such file or directory",
+		},
+		{
+			name:            "test_InfraServer",
+			isForAutomate:   false,
+			isForChefServer: true,
+			isForPG:         false,
+			isForOS:         false,
+			isManaged:       false,
+			arguments:       []string{"--cs"},
+			isErrorExpected: true,
+			errorMessage:    "\nNot able to start one or more nodes in chef-server: \nopen : no such file or directory",
+		},
+		{
+			name:            "test_Postgres",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         true,
+			isForOS:         false,
+			isManaged:       false,
+			arguments:       []string{"--pg"},
+			isErrorExpected: true,
+			errorMessage:    "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory",
+		},
+		{
+			name:            "test_Postgres_with_ManagedServices",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         true,
+			isForOS:         false,
+			isManaged:       true,
+			arguments:       []string{"--pg"},
+			isErrorExpected: true,
+			errorMessage:    "Starting the service for externally configured postgresql is not supported",
+		},
+		{
+			name:            "test_OpenSearch",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         true,
+			isManaged:       false,
+			arguments:       []string{"--os"},
+			isErrorExpected: true,
+			errorMessage:    "\nNot able to start one or more nodes in opensearch: \nopen : no such file or directory",
+		},
+		{
+			name:            "test_OpenSearch_with_ManagedServices",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         true,
+			isManaged:       true,
+			arguments:       []string{"--os"},
+			isErrorExpected: true,
+			errorMessage:    "Starting the service for externally configured opensearch is not supported",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			startCmdFlags.automate = tc.isForAutomate
+			startCmdFlags.chefServer = tc.isForChefServer
+			startCmdFlags.opensearch = tc.isForOS
+			startCmdFlags.postgresql = tc.isForPG
+			infra := getMockInfra()
+			err := runStartCommandHA(infra, tc.arguments, tc.isManaged)
+			if tc.isErrorExpected {
+				assert.Error(t, err)
+				assert.EqualError(t, err, tc.errorMessage)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

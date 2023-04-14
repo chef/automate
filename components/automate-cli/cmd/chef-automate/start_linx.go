@@ -58,12 +58,13 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		if !startCmdFlags.automate && !startCmdFlags.chefServer && !startCmdFlags.opensearch && !startCmdFlags.postgresql {
 			writer.Println(cmd.UsageString())
+			return nil
 		}
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
-		if err = runStartCommandHA(infra, args); err != nil {
+		if err = runStartCommandHA(infra, args, isManagedServicesOn()); err != nil {
 			return err
 		}
 	} else if isDevMode() {
@@ -79,7 +80,7 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runStartCommandHA(infra *AutomateHAInfraDetails, args []string) error {
+func runStartCommandHA(infra *AutomateHAInfraDetails, args []string, isManagedServices bool) error {
 	sshConfig := &SSHConfig{
 		sshUser:    infra.Outputs.SSHUser.Value,
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
@@ -95,14 +96,14 @@ func runStartCommandHA(infra *AutomateHAInfraDetails, args []string) error {
 		startCommandImplHA(args, *sshConfig, frontendIps, "chef-server", writer, errorList)
 	}
 	if startCmdFlags.opensearch {
-		if isManagedServicesOn() {
+		if isManagedServices {
 			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, OPENSEARCH_SERVICE)
 		}
 		backendIps := infra.Outputs.OpensearchPrivateIps.Value
 		startCommandImplHA(args, *sshConfig, backendIps, OPENSEARCH_SERVICE, writer, errorList)
 	}
 	if startCmdFlags.postgresql {
-		if isManagedServicesOn() {
+		if isManagedServices {
 			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, POSTGRES_SERVICE)
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
