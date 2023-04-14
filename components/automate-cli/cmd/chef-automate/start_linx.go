@@ -238,13 +238,12 @@ func startBackEndNodes(args []string, sshUtilMap map[string]SSHUtil, ips []strin
 func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
 	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
 	// Running the 'hab svc status' command to check if hab is present
-	/*_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
+	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab -V`, true)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
 		return
 	}
-	*/
 	// Executing the systemctl command for starting the service
 	output, err := runCommand(scriptCommands, sshUtil)
 	if err != nil {
