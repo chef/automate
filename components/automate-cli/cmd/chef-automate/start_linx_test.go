@@ -11,7 +11,7 @@ import (
 func TestStartForFrontEndNodes(t *testing.T) {
 	testCases := []struct {
 		args          []string
-		sshUtil       SSHUtil
+		sshUtilMap    map[string]SSHUtil
 		frontendIps   []string
 		remoteService string
 		isError       bool
@@ -19,7 +19,7 @@ func TestStartForFrontEndNodes(t *testing.T) {
 	}{
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"}, nil, "", nil),
 			[]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"},
 			"automate",
 			false,
@@ -27,7 +27,7 @@ func TestStartForFrontEndNodes(t *testing.T) {
 		},
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", nil),
+			createMockSSHUtilMap(argsEmpty, nil, "", nil),
 			argsEmpty,
 			"chef-server",
 			true,
@@ -35,26 +35,20 @@ func TestStartForFrontEndNodes(t *testing.T) {
 		},
 		{
 			[]string{"some_args"},
-			NewSSHUtil(&SSHConfig{}),
-			argsEmpty,
-			"automate",
-			true,
-			errors.Errorf("No automate IPs are found"),
-		},
-		{
-			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("Process exited with status 1")),
-			[]string{"127.1.0.3"},
+			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1")),
+			[]string{"127.0.1.3"},
 			"chef-server",
 			true,
-			errors.New("Not able to start one or more nodes in chef-server: \nopen : no such file or directory"),
+			errors.New("Not able to start one or more nodes in chef-server: \nProcess exited with status 1"),
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := checkNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
+		err := checkNodes(testCase.args, testCase.sshUtilMap, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
 		if testCase.isError {
 			assert.EqualError(t, testCase.err, err.Error())
+		} else {
+			assert.Nil(t, err)
 		}
 	}
 }
@@ -62,42 +56,44 @@ func TestStartForFrontEndNodes(t *testing.T) {
 func TestStartForBackEndNodes(t *testing.T) {
 	testCases := []struct {
 		args          []string
-		sshUtil       SSHUtil
+		sshUtilMap    map[string]SSHUtil
 		frontendIps   []string
 		remoteService string
 		isError       bool
 		err           error
 	}{
-		// {
-		// 	[]string{"some_args"},
-		// 	getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-		// 	[]string{"127.0.0.3", "127.0.0.4", "127.0.0.5"},
-		// 	"opensearch",
-		// 	false,
-		// 	nil,
-		// },
-		// {
-		// 	[]string{"some_args"},
-		// 	getMockSSHUtil(&SSHConfig{}, nil, "", nil),
-		// 	[]string{},
-		// 	"postgresql",
-		// 	true,
-		// 	status.Errorf(1, "No postgresql IPs are found"),
-		// },
 		{
 			[]string{"some_args"},
-			getMockSSHUtil(&SSHConfig{}, nil, "", errors.New("open : no such file or directory")),
+			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"}, nil, "", nil),
+			[]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"},
+			"opensearch",
+			false,
+			nil,
+		},
+		{
+			[]string{"some_args"},
+			createMockSSHUtilMap([]string{}, nil, "", nil),
+			[]string{},
+			"postgresql",
+			true,
+			status.Errorf(1, "No postgresql IPs are found"),
+		},
+		{
+			[]string{"some_args"},
+			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1")),
 			[]string{"127.0.1.3"},
 			"postgresql",
 			true,
-			errors.New("Not able to start one or more nodes in postgresql: \nopen : no such file or directory"),
+			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := checkNodes(testCase.args, testCase.sshUtil, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
+		err := checkNodes(testCase.args, testCase.sshUtilMap, testCase.frontendIps, testCase.remoteService, getMockWriterImpl())
 		if testCase.isError {
 			assert.EqualError(t, testCase.err, err.Error())
+		} else {
+			assert.Nil(t, err)
 		}
 	}
 }
@@ -193,4 +189,25 @@ func TestFuncPg(t *testing.T) {
 	infra := getMockInfra()
 	err := runStartCommandHA(infra, []string{"--pg"})
 	assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory")
+}
+
+func TestFuncFlagsEmpty(t *testing.T) {
+	startCmdFlags.chefServer = false
+	startCmdFlags.automate = false
+	startCmdFlags.opensearch = false
+	startCmdFlags.postgresql = false
+	infra := getMockInfra()
+	err := runStartCommandHA(infra, []string{})
+	if err != nil {
+		assert.EqualError(t, err, "\nNot able to start one or more nodes in postgresql: \nopen : no such file or directory")
+	}
+	assert.Nil(t, err)
+}
+
+func createMockSSHUtilMap(ips []string, connectErr error, execOutput string, execErr error) map[string]SSHUtil {
+	sshUtilMap := make(map[string]SSHUtil)
+	for _, ip := range ips {
+		sshUtilMap[ip] = getMockSSHUtil(&SSHConfig{}, connectErr, execOutput, execErr)
+	}
+	return sshUtilMap
 }
