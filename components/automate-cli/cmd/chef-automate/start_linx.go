@@ -191,7 +191,6 @@ func startFrontEndNodes(args []string, sshUtilMap map[string]SSHUtil, ips []stri
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
-	close(resultChan)
 	return nil
 }
 
