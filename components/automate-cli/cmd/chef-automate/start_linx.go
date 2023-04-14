@@ -173,8 +173,7 @@ func checkNodes(args []string, sshUtilMap map[string]SSHUtil, ips []string, remo
 	if remoteService == OPENSEARCH_SERVICE || remoteService == POSTGRES_SERVICE {
 		return startBackEndNodes(args, sshUtilMap, ips, remoteService, cliWriter)
 	}
-	err := startFrontEndNodes(args, sshUtilMap, ips, remoteService, cliWriter)
-	return err
+	return startFrontEndNodes(args, sshUtilMap, ips, remoteService, cliWriter)
 }
 
 func startFrontEndNodes(args []string, sshUtilMap map[string]SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {

@@ -8,6 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	ERROR    = "Process exited with status 1"
+	TEST_IP  = "127.0.1.3"
+	TEST_IP2 = "127.0.1.4"
+	TEST_IP3 = "127.0.1.5"
+)
+
 func TestCheckNodes(t *testing.T) {
 	testCases := []struct {
 		testName      string
@@ -21,8 +28,8 @@ func TestCheckNodes(t *testing.T) {
 		{
 			"All th ips are rechable and service restarted",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"}, nil, "", nil, false),
-			[]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"},
+			createMockSSHUtilMap([]string{TEST_IP, TEST_IP2, TEST_IP3}, nil, "", nil),
+			[]string{TEST_IP, TEST_IP2, TEST_IP3},
 			"automate",
 			false,
 			nil,
@@ -30,7 +37,7 @@ func TestCheckNodes(t *testing.T) {
 		{
 			"Providing empty agrs for chef server",
 			[]string{"some_args"},
-			createMockSSHUtilMap(argsEmpty, nil, "", nil, false),
+			createMockSSHUtilMap(argsEmpty, nil, "", nil),
 			argsEmpty,
 			"chef-server",
 			true,
@@ -39,35 +46,26 @@ func TestCheckNodes(t *testing.T) {
 		{
 			"All the ips are not rechable which are provided for chef-server",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1"), false),
-			[]string{"127.0.1.3"},
+			createMockSSHUtilMap([]string{TEST_IP}, nil, "", errors.New("ERROR")),
+			[]string{TEST_IP},
 			"chef-server",
 			true,
-			errors.New("Not able to start one or more nodes in chef-server: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in chef-server: \nERROR"),
 		},
 		{
 			"All the ips are not rechable which are provided for automate",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1"), false),
-			[]string{"127.0.1.3"},
+			createMockSSHUtilMap([]string{TEST_IP}, nil, "", errors.New("ERROR")),
+			[]string{TEST_IP},
 			"automate",
 			true,
-			errors.New("Not able to start one or more nodes in automate: \nProcess exited with status 1"),
-		},
-		{
-			"Only one ip is not reachable from the ips provided for automate",
-			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.34"}, nil, "", errors.New("Process exited with status 1"), true),
-			[]string{"127.0.1.3", "127.0.1.34"},
-			"automate",
-			true,
-			errors.New("Not able to start one or more nodes in automate: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in automate: \nERROR"),
 		},
 		{
 			"All th ips are rechable and service started for opensearch",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"}, nil, "", nil, false),
-			[]string{"127.0.1.3", "127.0.1.4", "127.0.1.5"},
+			createMockSSHUtilMap([]string{TEST_IP, TEST_IP2, TEST_IP3}, nil, "", nil),
+			[]string{TEST_IP, TEST_IP2, TEST_IP3},
 			"opensearch",
 			false,
 			nil,
@@ -75,7 +73,7 @@ func TestCheckNodes(t *testing.T) {
 		{
 			"Blank Ips are provided for postgres",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{}, nil, "", nil, false),
+			createMockSSHUtilMap([]string{}, nil, "", nil),
 			[]string{},
 			"postgresql",
 			true,
@@ -84,38 +82,29 @@ func TestCheckNodes(t *testing.T) {
 		{
 			"Providing all the ips not-rechable agrs for postgres",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1"), false),
-			[]string{"127.0.1.3"},
+			createMockSSHUtilMap([]string{TEST_IP}, nil, "", errors.New("ERROR")),
+			[]string{TEST_IP},
 			"postgresql",
 			true,
-			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in postgresql: \nERROR"),
 		},
 		{
 			"Providing all the ips not-rechable agrs for opensearch",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "", errors.New("Process exited with status 1"), false),
-			[]string{"127.0.1.3"},
+			createMockSSHUtilMap([]string{TEST_IP}, nil, "", errors.New("ERROR")),
+			[]string{TEST_IP},
 			"opensearch",
 			true,
-			errors.New("Not able to start one or more nodes in opensearch: \nProcess exited with status 1"),
-		},
-		{
-			"Only one ip is not reachable from the ips provided for postgres",
-			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3", "127.0.1.34"}, nil, "", errors.New("Process exited with status 1"), true),
-			[]string{"127.0.1.3", "127.0.1.34"},
-			"postgresql",
-			true,
-			errors.New("Not able to start one or more nodes in postgresql: \nProcess exited with status 1"),
+			errors.New("Not able to start one or more nodes in opensearch: \nERROR"),
 		},
 		{
 			"Found output error while starting the hab-sup service for postgres",
 			[]string{"some_args"},
-			createMockSSHUtilMap([]string{"127.0.1.3"}, nil, "ERROR ,Process exited with status 1", nil, false),
-			[]string{"127.0.1.3"},
+			createMockSSHUtilMap([]string{TEST_IP}, nil, "ERROR ,ERROR", nil),
+			[]string{TEST_IP},
 			"postgresql",
 			true,
-			errors.New("Not able to start one or more nodes in postgresql: \nERROR ,Process exited with status 1"),
+			errors.New("Not able to start one or more nodes in postgresql: \nERROR ,ERROR"),
 		},
 	}
 
@@ -237,15 +226,10 @@ func TestFuncFlagsEmpty(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func createMockSSHUtilMap(ips []string, connectErr error, execOutput string, execErr error, isErrorRequiredForOnlyOne bool) map[string]SSHUtil {
+func createMockSSHUtilMap(ips []string, connectErr error, execOutput string, execErr error) map[string]SSHUtil {
 	sshUtilMap := make(map[string]SSHUtil)
-	start := 0
-	if isErrorRequiredForOnlyOne {
-		sshUtilMap[ips[0]] = getMockSSHUtil(&SSHConfig{}, connectErr, execOutput, nil)
-		start = 1
-	}
-	for i := start; i < len(ips); i++ {
-		sshUtilMap[ips[i]] = getMockSSHUtil(&SSHConfig{}, connectErr, execOutput, execErr)
+	for i := 0; i < len(ips); i++ {
+		sshUtilMap[ips[i]] = getMockSSHUtil(&SSHConfig{hostIP: ips[i]}, connectErr, execOutput, execErr)
 	}
 	return sshUtilMap
 }
