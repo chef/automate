@@ -85,29 +85,28 @@ func runStartCommandHA(infra *AutomateHAInfraDetails, args []string) error {
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 		sshPort:    infra.Outputs.SSHPort.Value,
 	}
-	sshUtil := NewSSHUtil(sshConfig)
 	errorList := list.New()
 	if startCmdFlags.automate {
 		frontendIps := infra.Outputs.AutomatePrivateIps.Value
-		startCommandImplHA(args, sshUtil, frontendIps, "automate", writer, errorList)
+		startCommandImplHA(args, *sshConfig, frontendIps, "automate", writer, errorList)
 	}
 	if startCmdFlags.chefServer {
 		frontendIps := infra.Outputs.ChefServerPrivateIps.Value
-		startCommandImplHA(args, sshUtil, frontendIps, "chef-server", writer, errorList)
+		startCommandImplHA(args, *sshConfig, frontendIps, "chef-server", writer, errorList)
 	}
 	if startCmdFlags.opensearch {
 		if isManagedServicesOn() {
 			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, OPENSEARCH_SERVICE)
 		}
 		backendIps := infra.Outputs.OpensearchPrivateIps.Value
-		startCommandImplHA(args, sshUtil, backendIps, OPENSEARCH_SERVICE, writer, errorList)
+		startCommandImplHA(args, *sshConfig, backendIps, OPENSEARCH_SERVICE, writer, errorList)
 	}
 	if startCmdFlags.postgresql {
 		if isManagedServicesOn() {
 			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, POSTGRES_SERVICE)
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
-		startCommandImplHA(args, sshUtil, backendIps, POSTGRES_SERVICE, writer, errorList)
+		startCommandImplHA(args, *sshConfig, backendIps, POSTGRES_SERVICE, writer, errorList)
 	}
 	if errorList.Len() > 0 {
 		return status.New(status.ServiceStartError, getSingleErrorFromList(errorList).Error())
@@ -158,31 +157,33 @@ func runStartDevMode() error {
 	return nil
 }
 
-func startCommandImplHA(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer, errorList *list.List) {
-	err := checkNodes(args, sshUtil, ips, "chef-server", writer)
+func startCommandImplHA(args []string, sshConfig SSHConfig, ips []string, remoteService string, cliWriter *cli.Writer, errorList *list.List) {
+	sshUtilMap := getMapSSHUtils(ips, &sshConfig)
+	err := checkNodes(args, sshUtilMap, ips, "chef-server", writer)
 	if err != nil {
 		errorList.PushBack(err.Error())
 	}
 }
 
-func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
+func checkNodes(args []string, sshUtilMap map[string]SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
 	if len(ips) == 0 {
 		writer.Errorf("No %s IPs are found", remoteService)
 		return status.Errorf(1, "No %s IPs are found", remoteService)
 	}
 	if remoteService == OPENSEARCH_SERVICE || remoteService == POSTGRES_SERVICE {
-		return startBackEndNodes(args, sshUtil, ips, remoteService, cliWriter)
+		return startBackEndNodes(args, sshUtilMap, ips, remoteService, cliWriter)
 	}
-	err := startFrontEndNodes(args, sshUtil, ips, remoteService, cliWriter)
+	err := startFrontEndNodes(args, sshUtilMap, ips, remoteService, cliWriter)
 	return err
 }
 
-func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
+func startFrontEndNodes(args []string, sshUtilMap map[string]SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
 	resultChan := make(chan Result, len(ips))
 	errorList := list.New()
 	scriptCommands := `sudo chef-automate start`
 	for _, hostIP := range ips {
-		go commandExecuteFrontEnd(scriptCommands, sshUtil, resultChan, hostIP)
+		sshUtil := sshUtilMap[hostIP]
+		go commandExecuteFrontEnd(scriptCommands, sshUtil, resultChan)
 
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
@@ -194,17 +195,9 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 	return nil
 }
 
-func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, ip string) {
-	originalSSHConfig := sshUtil.getSSHConfig()
-	newSSHConfig := &SSHConfig{
-		sshUser:    originalSSHConfig.sshUser,
-		sshPort:    originalSSHConfig.sshPort,
-		sshKeyFile: originalSSHConfig.sshKeyFile,
-		hostIP:     ip,
-	}
-	newSSHUtil := NewSSHUtil(newSSHConfig)
-	rc := Result{ip, "", nil}
-	output, err := runCommand(scriptCommands, newSSHUtil)
+func commandExecuteFrontEnd(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
+	output, err := runCommand(scriptCommands, sshUtil)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
@@ -227,12 +220,13 @@ func printErrorsForStartResultChan(resultChan chan Result, ips []string, remoteS
 	}
 }
 
-func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
+func startBackEndNodes(args []string, sshUtilMap map[string]SSHUtil, ips []string, remoteService string, cliWriter *cli.Writer) error {
 	resultChan := make(chan Result, len(ips))
 	scriptCommands := "sudo systemctl start hab-sup"
 	errorList := list.New()
 	for _, hostIP := range ips {
-		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan, hostIP)
+		sshUtil := sshUtilMap[hostIP]
+		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan)
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
 	close(resultChan)
@@ -243,25 +237,17 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 	return nil
 }
 
-func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result, ip string) {
-	originalSSHConfig := sshUtil.getSSHConfig()
-	newSSHConfig := &SSHConfig{
-		sshUser:    originalSSHConfig.sshUser,
-		sshPort:    originalSSHConfig.sshPort,
-		sshKeyFile: originalSSHConfig.sshKeyFile,
-		hostIP:     ip,
-	}
-	newSSHUtil := NewSSHUtil(newSSHConfig)
-	rc := Result{ip, "", nil}
+func commandExecuteBackendNode(scriptCommands string, sshUtil SSHUtil, resultChan chan Result) {
+	rc := Result{sshUtil.getSSHConfig().hostIP, "", nil}
 	// Running the 'hab svc status' command to check if hab is present
-	_, err := newSSHUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
+	_, err := sshUtil.connectAndExecuteCommandOnRemote(`sudo hab license accept; sudo hab svc status`, true)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
 		return
 	}
 	// Executing the systemctl command for starting the service
-	output, err := runCommand(scriptCommands, newSSHUtil)
+	output, err := runCommand(scriptCommands, sshUtil)
 	if err != nil {
 		rc.Error = err
 		resultChan <- rc
@@ -295,4 +281,19 @@ func printStartErrorMessage(remoteService string, hostIP string, cliWriter *cli.
 func printStartSuccessMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
 	cliWriter.Success("Start Command is completed on " + remoteService + NODE + hostIP + "\n")
 	cliWriter.BufferWriter().Flush()
+}
+
+func getMapSSHUtils(ipAddresses []string, config *SSHConfig) map[string]SSHUtil {
+	var sshUtilMap map[string]SSHUtil
+	for _, ipAddress := range ipAddresses {
+		newSSHConfig := &SSHConfig{
+			sshUser:    config.sshUser,
+			sshPort:    config.sshPort,
+			sshKeyFile: config.sshKeyFile,
+			hostIP:     ipAddress,
+		}
+		newSSHUtil := NewSSHUtil(newSSHConfig)
+		sshUtilMap[ipAddress] = newSSHUtil
+	}
+	return sshUtilMap
 }
