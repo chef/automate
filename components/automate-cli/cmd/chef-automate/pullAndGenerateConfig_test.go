@@ -495,6 +495,7 @@ func TestGetOsCertsByIp(t *testing.T) {
 		ExpectedCertsByIp   []CertByIP
 	}
 	const nodesDnList = "CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode2,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode3,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n"
+	const singleNodeDn = "CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n"
 	mockInfra := &AutomateHAInfraDetails{}
 	mockInfra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP, ValidIP1, ValidIP2}
 	p := NewPullConfigs(mockInfra, &SSHUtilImpl{})
@@ -540,6 +541,50 @@ func TestGetOsCertsByIp(t *testing.T) {
 					PrivateKeyContents,
 					publicKey3,
 					nodesDnList,
+				},
+			},
+		},
+
+		{
+			testCaseDescreption: "Three os nodes with same cert",
+			osConfigMap: map[string]*ConfigKeys{
+				ValidIP: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+
+				ValidIP1: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+
+				ValidIP2: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+			},
+			ExpectedCertsByIp: []CertByIP{
+				{
+					ValidIP,
+					PrivateKeyContents,
+					publicKey1,
+					singleNodeDn,
+				},
+
+				{
+					ValidIP1,
+					PrivateKeyContents,
+					publicKey1,
+					singleNodeDn,
+				},
+				{
+					ValidIP2,
+					PrivateKeyContents,
+					publicKey1,
+					singleNodeDn,
 				},
 			},
 		},
