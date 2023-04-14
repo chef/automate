@@ -2,10 +2,38 @@ name: chef-automate start
 synopsis: Start Chef Automate
 usage: chef-automate start [flags]
 options:
+- name: a2
+  default_value: "false"
+  usage: start chef automate service on automate nodes[DUPLICATE]
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: start chef automate service on automate nodes
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: start chef automate service on chef-server nodes
+- name: cs
+  default_value: "false"
+  usage: start chef automate service on chef-server nodes[DUPLICATE]
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for start
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: start hab-sup service on opensearch nodes
+- name: os
+  default_value: "false"
+  usage: start hab-sup service on opensearch nodes[DUPLICATE]
+- name: pg
+  default_value: "false"
+  usage: start hab-sup service on postgresql nodes[DUPLICATE]
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: start hab-sup service on postgresql nodes
 inherited_options:
 - name: debug
   shorthand: d
@@ -18,4 +46,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-supported_on: FrontEnd
+supported_on: Bastion
