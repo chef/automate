@@ -13,11 +13,11 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
 
-const node = " node :"
 const (
-	errorOnManagedServicesStart = "Starting the service for externally configured %s is not supported"
-	opensearchService           = "opensearch"
-	postgresqlService           = "postgresql"
+	ERROR_ON_MANAGED_SERVICE_START = "Starting the service for externally configured %s is not supported"
+	OPENSEARCH_SERVICE             = "opensearch"
+	POSTGRES_SERVICE               = "postgresql"
+	NODE                           = " node :"
 )
 
 type Result struct {
@@ -104,20 +104,20 @@ func runStartCommandHA(infra *AutomateHAInfraDetails, args []string) error {
 	}
 	if startCmdFlags.opensearch {
 		if isManagedServicesOn() {
-			return status.Errorf(status.InvalidCommandArgsError, errorOnManagedServicesStart, "OpenSearch")
+			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, OPENSEARCH_SERVICE)
 		}
 		backendIps := infra.Outputs.OpensearchPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, opensearchService, writer)
+		err = checkNodes(args, sshUtil, backendIps, OPENSEARCH_SERVICE, writer)
 		if err != nil {
 			errorList.PushBack(err.Error())
 		}
 	}
 	if startCmdFlags.postgresql {
 		if isManagedServicesOn() {
-			return status.Errorf(status.InvalidCommandArgsError, errorOnManagedServicesStart, "Postgresql")
+			return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICE_START, "Postgresql")
 		}
 		backendIps := infra.Outputs.PostgresqlPrivateIps.Value
-		err = checkNodes(args, sshUtil, backendIps, postgresqlService, writer)
+		err = checkNodes(args, sshUtil, backendIps, POSTGRES_SERVICE, writer)
 		if err != nil {
 			errorList.PushBack(err.Error())
 		}
@@ -176,7 +176,7 @@ func checkNodes(args []string, sshUtil SSHUtil, ips []string, remoteService stri
 		writer.Errorf("No %s IPs are found", remoteService)
 		return status.Errorf(1, "No %s IPs are found", remoteService)
 	}
-	if remoteService == opensearchService || remoteService == postgresqlService {
+	if remoteService == OPENSEARCH_SERVICE || remoteService == POSTGRES_SERVICE {
 		return startBackEndNodes(args, sshUtil, ips, remoteService, cliWriter)
 	}
 	err := startFrontEndNodes(args, sshUtil, ips, remoteService, cliWriter)
@@ -192,6 +192,7 @@ func startFrontEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServ
 
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
+	close(resultChan)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
@@ -240,10 +241,11 @@ func startBackEndNodes(args []string, sshUtil SSHUtil, ips []string, remoteServi
 		go commandExecuteBackendNode(scriptCommands, sshUtil, resultChan, hostIP)
 	}
 	printErrorsForStartResultChan(resultChan, ips, remoteService, cliWriter, errorList)
+	close(resultChan)
 	if errorList != nil && errorList.Len() > 0 {
 		return status.Wrapf(getSingleErrorFromList(errorList), status.ServiceStartError, "Not able to start one or more nodes in %s", remoteService)
 	}
-	close(resultChan)
+
 	return nil
 }
 
@@ -287,16 +289,16 @@ func runCommand(scriptCommands string, newSSHUtil SSHUtil) (string, error) {
 }
 
 func printStartConnectionMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
-	cliWriter.Println("Connecting to the " + remoteService + node + hostIP)
+	cliWriter.Println("Connecting to the " + remoteService + NODE + hostIP)
 	cliWriter.BufferWriter().Flush()
 }
 
 func printStartErrorMessage(remoteService string, hostIP string, cliWriter *cli.Writer, err error) {
-	cliWriter.Failf("Start Command failed on "+remoteService+node+hostIP+" with error:\n%v \n", err)
+	cliWriter.Failf("Start Command failed on "+remoteService+NODE+hostIP+" with error:\n%v \n", err)
 	cliWriter.BufferWriter().Flush()
 }
 
 func printStartSuccessMessage(remoteService string, hostIP string, cliWriter *cli.Writer) {
-	cliWriter.Success("Start Command is completed on " + remoteService + node + hostIP + "\n")
+	cliWriter.Success("Start Command is completed on " + remoteService + NODE + hostIP + "\n")
 	cliWriter.BufferWriter().Flush()
 }
