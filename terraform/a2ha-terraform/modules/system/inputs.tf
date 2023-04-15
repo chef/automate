@@ -18,6 +18,9 @@ variable "public_ips" {
   default = []
 }
 
+variable "ssh_group_name" {
+}
+
 variable "ssh_key_file" {
 }
 

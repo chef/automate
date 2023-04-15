@@ -10,7 +10,11 @@ const haAwsConfigTemplate = `
 # Eg.: ssh_user = "ubuntu"
 ssh_user = ""
 
-# custome ssh port no to connect instances, default will be 22
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = ""
+
+# custom ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"
 ssh_port = ""
 
@@ -304,6 +308,10 @@ const haExistingNodesConfigTemplate = `
 ## === INPUT NEEDED ===
 # Eg.: ssh_user = "ubuntu"
 ssh_user = ""
+
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = ""
 
 # private ssh key file path to access instances
 # Eg.: ssh_user = "~/.ssh/A2HA.pem"

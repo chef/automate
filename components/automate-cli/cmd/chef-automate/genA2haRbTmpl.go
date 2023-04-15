@@ -6,8 +6,10 @@ secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
 architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
+ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 {{ if .Architecture.ConfigInitials.SSHPort }} ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}" {{ else }} ssh_port "22" {{ end }}
+{{ if .Architecture.ConfigInitials.SSHGroupName }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}" {{ else }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHUser }}" {{ end }}
 
 # logging_monitoring_management "true"
 # ew_elk "false"
@@ -130,11 +132,13 @@ secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
 architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
+ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}"
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 {{ if  .Architecture.ConfigInitials.S3BucketName }} s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ else }} # s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ end }}
+{{ if .Architecture.ConfigInitials.SSHGroupName }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHGroupName }}" {{ else }} ssh_group_name "{{ .Architecture.ConfigInitials.SSHUser }}" {{ end }}
 # logging_monitoring_management "true"
 # new_elk "false"
 # existing_elk "false"

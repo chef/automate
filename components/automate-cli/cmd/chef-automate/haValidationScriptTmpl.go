@@ -29,6 +29,9 @@ SSH_KEY=$(grep -E '(^|\s)ssh_key_file($|\s)' $CONFIG | cut -c13- | sed 's/"//g' 
 #Taking and filtering ssh_user from config.toml file
 SSH_USER=$(grep -E '(^|\s)ssh_user($|\s)' $CONFIG | cut -c10- | sed 's/"//g' | sed 's/=//g')
 
+#Taking and filtering ssh_group_name from config.toml file
+SSH_GROUP_NAME=$(grep -E '(^|\s)ssh_group_name($|\s)' $CONFIG | cut -c10- | sed 's/"//g' | sed 's/=//g')
+
 #Taking and filtering ssh_port from config.toml file
 SSH_PORT=$(grep -E '(^|\s)ssh_port($|\s)' $CONFIG | cut -c10- | sed 's/"//g' | sed 's/=//g')
 

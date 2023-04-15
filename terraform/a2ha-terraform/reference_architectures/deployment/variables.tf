@@ -214,6 +214,9 @@ variable "setup_self_managed_services" {
   default = false
 }
 
+variable "ssh_group_name" {
+}
+
 variable "ssh_key_file" {
 }
 
