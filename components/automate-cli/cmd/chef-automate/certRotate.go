@@ -468,13 +468,13 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c *certRotateFlow, nodesDn string) error {
 
-	peerconfig := fmt.Sprintf(OPENSEARCH_DN_CONFIG_FOR_PEERS, fmt.Sprintf("%v", nodesDn))
+	peerConfig := fmt.Sprintf(OPENSEARCH_DN_CONFIG_FOR_PEERS, fmt.Sprintf("%v", nodesDn))
 
 	nodeVal := flagsObj.node
 	flagsObj.node = ""
 
 	patchFnParam.fileName = "cert-rotate-os-peer.toml"
-	patchFnParam.config = peerconfig
+	patchFnParam.config = peerConfig
 	patchFnParam.timestamp = time.Now().Format("20060102150405")
 	patchFnParam.skipIpsList = []string{flagsObj.node}
 
