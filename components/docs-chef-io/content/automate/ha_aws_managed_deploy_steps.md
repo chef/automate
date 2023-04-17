@@ -103,6 +103,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    ```
 
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`.
+   - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
+   - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
    - Give `ssh_port` if your AMI runs on custom **ssh port**. The default value is 22.
    - Give `ssh_key_file` path, downloaded from **AWS SSH Key Pair**, which you want to use to create all the VMs. This will let you access all the VMs.
    - We support only private key authentication.
