@@ -28,14 +28,10 @@ var (
 	{{- range $index, $el := .Outputs.ChefServerSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Chef Server SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
 
 	{{- range $index, $el := .Outputs.OpensearchPrivateIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Opensearch Private IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
-	{{- range $index, $el := .Outputs.OpensearchPublicIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Opensearch Public IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
 	{{- range $index, $el := .Outputs.OpensearchSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Opensearch SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
 	
 	{{- range $index, $el := .Outputs.PostgresqlPrivateIps.Value}}{{if eq $index  0}}{{- printf "%50s" "Postgresql Private IPs: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
 	{{- range $index, $el := .Outputs.PostgresqlSSH.Value}}{{if eq $index  0}}{{- printf "%50s" "Postgresql SSH: "}}{{ $el }}{{"\n"}}{{else}}{{- printf "%50s" ""}}{{ $el }}{{"\n"}}{{end}}{{end}}
-
-	{{- printf "%50s" "Backup Config EFS: "}}{{.Outputs.BackupConfigEFS.Value }}{{- "\n"}}
-	{{- printf "%50s" "Backup Config S3: "}}{{.Outputs.BackupConfigS3.Value }}{{- "\n"}}
 	
 	{{- printf "%50s" "SSH Key File: "}}{{.Outputs.SSHKeyFile.Value}}{{- "\n"}}
 	{{- printf "%50s" "SSH Port: "}}{{.Outputs.SSHPort.Value}}{{- "\n"}}

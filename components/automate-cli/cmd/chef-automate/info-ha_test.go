@@ -122,8 +122,6 @@ var expectedAutomateDetails = `AUTOMATE DETAILS:
                                   Postgresql SSH: ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
-                               Backup Config EFS: 
-                                Backup Config S3: 
                                     SSH Key File: /path/to/key
                                         SSH Port: port
                                         SSH User: user
