@@ -98,35 +98,33 @@ func createInputDetails() *AutomateHAInfraDetails {
 }
 
 var expectedAutomateDetails = `AUTOMATE DETAILS:
-                             Automate Admin User: admin
-                   Automate Data Collector Token: token
-                           Automate Frontend URL: https://example.com
-                            Automate Private IPs: host1
+                             automate_admin_user: admin
+                   automate_data_collector_token: token
+                          automate_frontend_urls: https://example.com
+                            automate_private_ips: host1
                                                   host2
-                                    Automate SSH: ssh -i file.pem -p 22 user@ip
+                                    automate_ssh: ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
-                                    Automate URL: https://example.com
-                         Chef Server Private IPs: host1
+                                    automate_url: https://example.com
+                         chef_server_private_ips: host1
                                                   host2
-                                 Chef Server SSH: ssh -i file.pem -p 22 user@ip
+                                 chef_server_ssh: ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
-                          Opensearch Private IPs: host1
-                                                  host2
-                                                  host3
-                                  Opensearch SSH: ssh -i file.pem -p 22 user@ip
-                                                  ssh -i file.pem -p 22 user@ip
-                                                  ssh -i file.pem -p 22 user@ip
-                          Postgresql Private IPs: host1
+                          opensearch_private_ips: host1
                                                   host2
                                                   host3
-                                  Postgresql SSH: ssh -i file.pem -p 22 user@ip
+                                  opensearch_ssh: ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
                                                   ssh -i file.pem -p 22 user@ip
-                               Backup Config EFS: 
-                                Backup Config S3: 
-                                    SSH Key File: /path/to/key
-                                        SSH Port: port
-                                        SSH User: user
+                          postgresql_private_ips: host1
+                                                  host2
+                                                  host3
+                                  postgresql_ssh: ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                                                  ssh -i file.pem -p 22 user@ip
+                                    ssh_key_file: /path/to/key
+                                        ssh_port: port
+                                        ssh_user: user
 
 `
 
