@@ -217,6 +217,7 @@ type PullConfigs interface {
 	generateAwsConfig() (*AwsConfigToml, error)
 	getExceptionIps() []string
 	setExceptionIps(ips []string)
+	getOsCertsByIp(map[string]*ConfigKeys) []CertByIP
 }
 
 type PullConfigsImpl struct {
@@ -359,20 +360,8 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 		}
 
 		// Build CertsByIP for Opensearch
-		var osCerts []CertByIP
-		for key, ele := range osConfigMap {
-			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
-			if err != nil {
-				writer.Fail(err.Error())
-			}
-			certByIP := CertByIP{
-				IP:         key,
-				PrivateKey: ele.privateKey,
-				PublicKey:  ele.publicKey,
-				NodesDn:    fmt.Sprintf("%v", nodeDn),
-			}
-			osCerts = append(osCerts, certByIP)
-		}
+		osCerts := p.getOsCertsByIp(osConfigMap)
+
 		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
 
 		if osRootCA := getOSORPGRootCA(osConfigMap); len(osRootCA) > 0 {
@@ -462,6 +451,51 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	return sharedConfigToml, nil
 }
 
+func (p *PullConfigsImpl) getOsCertsByIp(osConfigMap map[string]*ConfigKeys) []CertByIP {
+	var osCerts []CertByIP
+	nodesDnMap := make(map[string]bool)
+	allNodesDn := ""
+
+	for i := 0; i < len(p.infra.Outputs.OpensearchPrivateIps.Value); i++ {
+		currentIp := p.infra.Outputs.OpensearchPrivateIps.Value[i]
+
+		if stringutils.SliceContains(p.exceptionIps, currentIp) {
+			continue
+		}
+
+		nodeConfig, _ := osConfigMap[currentIp]
+		nodeDn, err := getDistinguishedNameFromKey(nodeConfig.publicKey)
+		if err != nil {
+			writer.Fail(err.Error())
+		}
+		certByIP := CertByIP{
+			IP:         currentIp,
+			PrivateKey: strings.TrimSpace(nodeConfig.privateKey),
+			PublicKey:  strings.TrimSpace(nodeConfig.publicKey),
+		}
+
+		nodeDnStr := fmt.Sprintf("%v", nodeDn)
+		_, isPresent := nodesDnMap[nodeDnStr]
+
+		if !isPresent {
+			if len(allNodesDn) == 0 {
+				allNodesDn = allNodesDn + fmt.Sprintf("%v", nodeDnStr) + "\\n  "
+			} else {
+				allNodesDn = allNodesDn + fmt.Sprintf("- %v", nodeDnStr) + "\\n  "
+			}
+		}
+
+		nodesDnMap[nodeDnStr] = true
+		osCerts = append(osCerts, certByIP)
+	}
+
+	for i := 0; i < len(osCerts); i++ {
+		osCerts[i].NodesDn = strings.TrimSpace(allNodesDn)
+	}
+
+	return osCerts
+}
+
 func (p *PullConfigsImpl) generateInfraConfig() (*ExistingInfraConfigToml, error) {
 	sharedConfigToml, err := p.fetchInfraConfig()
 	if err != nil {
@@ -514,20 +548,8 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		}
 
 		// Build CertsByIP for Opensearch
-		var osCerts []CertByIP
-		for key, ele := range osConfigMap {
-			nodeDn, err := getDistinguishedNameFromKey(ele.publicKey)
-			if err != nil {
-				writer.Fail(err.Error())
-			}
-			certByIP := CertByIP{
-				IP:         key,
-				PrivateKey: ele.privateKey,
-				PublicKey:  ele.publicKey,
-				NodesDn:    fmt.Sprintf("%v", nodeDn),
-			}
-			osCerts = append(osCerts, certByIP)
-		}
+		osCerts := p.getOsCertsByIp(osConfigMap)
+
 		sharedConfigToml.Opensearch.Config.CertsByIP = osCerts
 
 		if osRootCA := getOSORPGRootCA(osConfigMap); len(osRootCA) > 0 {

@@ -34,6 +34,71 @@ const (
 	RoleArn             = "Role:arn:..:123"
 	AccessKey           = "aRSHRFHIfcsjk"
 	SecretKey           = "hduysHtdKHvDrkjKnfdrYk"
+	publicKey1          = `-----BEGIN CERTIFICATE-----
+MIIDazCCAlOgAwIBAgIJALlhQd3q75U8MA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
+GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
+MjMwNDEyMDUzMDU2WhcNMjYwNDExMDUzMDU2WjBkMQswCQYDVQQGEwJVUzETMBEG
+A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
+ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMTCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBANYbOjc3nimYAPNAg8+JaHHXoBHILGRmIRsuqPNq
+7saEsHFXBAYtmVJYgJEbzgpbwPpKhPUKbFw16SGTNay6BQcaV8UA6XYIyLe4U8gp
+5CLFWFiPTdbFnSPdiEqD6wp0gHrRo4+A4e0TeMljYNGJ3jklbIVVf6nIsiJfiBu4
+WhrFteVLwTmQrQJ+y0vdd3gqW/Nlo3ptFFkBadtMZv4jhsy98rKYOw4y7NnnQVA3
+48NQImg1my+t7lO63Mw7Z56t3Kd3mGcL4I/dIYBN1oJXI00pBBI+7P651SsJXQLq
+Xfm4uqR8ke5o4SYhJLfSUxU5ViDPamL9ddnRLmdIt2uFXTkCAwEAAaMhMB8wHQYD
+VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMA0GCSqGSIb3DQEBCwUAA4IBAQB4
+YilaFYfXpxVo6cPJEmeRKR2c64qnlqlLybkVQoS7FE9c/BiXMG+pTl4t6jYZCFMt
+Z4s/dtMNcCtx6mZiq9wv1vZ5BKJnf0iarYUtwDQKDdNGCkFQuTUxaSfzsS6PkE1I
+yO6coQrBkH2ZPoCEHTOuOw3orYaZ9JK5HlrUcB4pOLQZnVF0ChphquRRF4M6G5RC
+7J4HmyG5XBE6s5mFxG4LwHLl2vM90Ew0LnWySek+Weebej7TUe0cZyFEHXGzitoG
+dXk8pICXoG062gZ4upox6aLNUKuv4nW5RoD/pWtawHJUQf5NQk3pW3Sh3j9N03JM
+Dzzcl/KEas8qYBi2m3wI
+-----END CERTIFICATE-----`
+
+	publicKey2 = `-----BEGIN CERTIFICATE-----
+MIIDazCCAlOgAwIBAgIJALlhQd3q75U9MA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
+GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
+MjMwNDEyMDUzMDU2WhcNMjYwNDExMDUzMDU2WjBkMQswCQYDVQQGEwJVUzETMBEG
+A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
+ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMjCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBAMqus9mMDEvX2f3US6kcyEq3yYO1DdKj39L/tjLI
+lwK2osOppincyIEq9RBfvAhR3xnq3UgfE//eMyPTVOW4Sa+0A7xXTe8OvEhOX0vM
+ONDBrhxFxmji+wUZXN7JN+EkkdAi0JxLyQYeT9DjDjUlCsHRM/SOvnUJQtUBc+/u
+qgdIHxbp2lafZQpGfHJdBmzs43rsHByrX3sV+N0M+JMbhuFB6TT0kFHEc36PEyWO
+xO15HK2WWyEmhBr66UWdl+9f7WRbZC59ol+7aKJGEriSv+s7o7j9fCZykoaOqho2
+pR96zikXCGOzRZS09L6QE/RTBI/8Ye38OCGXuFE6GZbXM20CAwEAAaMhMB8wHQYD
+VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMA0GCSqGSIb3DQEBCwUAA4IBAQAp
+Yrai9/zsqCUzP43rIIFaCSmnZhfMvlgY5RBFo6N/X/mXNzvL3ZwetyNKKhDuWNal
+jqpsNA4oYYUbpkKP1F5sueCrRY5ogJ/MHLbuH6P3x1g1Z+PLoJ9zfsKBlFJazlPx
+dJ1zGhF3kwqSRt9U/yAcz0Rqy3GEHUrscIrtE+p2/wTD4l5esiRe3RHvEXsqaKac
+PEMcVyiM0PmlYUTWg2OI0NLBTxe1/seKo1iG3yhARpx/zMMx3hpFnLttD7D6ipmc
+Y6T2yAVnO7g7lFhessbjm9JziT/dkCf0Osni9hssYINHK88nFmeh9cEJXalwkY+P
+CJGy+SVq+fEwXpcfo9Bf
+-----END CERTIFICATE-----`
+
+	publicKey3 = `-----BEGIN CERTIFICATE-----
+MIIDazCCAlOgAwIBAgIJALlhQd3q75U+MA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
+GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
+MjMwNDEyMDUzMDU2WhcNMjYwNDExMDUzMDU2WjBkMQswCQYDVQQGEwJVUzETMBEG
+A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
+ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALhj315O7Skf5P7xRD9U5VZ1Ce8sOB9LZWq8xLg6
+Zv/UPLdSDuDuTjBqQwUIxOAFsnNdFiGmfC7eDmnyGpCJD3mfFd14VVCEQjPZ4eiz
+zJjlTrUJKKvONrwxiY3Ri34ipw6PF5lOWNflCLL7oEteublV59uN86BLgvbLg0Aj
+wC6xL608Uxxn9EpYDM8oYdvIeFqn0fh0gy+R7mzdWeQbDMwd/qCLc6ycWxkIhORW
+HaTBTFV6EcjbD+E5HZSLXy4uFMpAi+c3yxpiGKBGwSX6z7p9riQxOM/wSnHWkby6
+M6D2hPPM2fuL8niX0UrT48RJ0l+cEPy29WqrdIJl4+iOkssCAwEAAaMhMB8wHQYD
+VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMA0GCSqGSIb3DQEBCwUAA4IBAQAs
+u/KGKc6NQniWdfJmVaX9lI9UrKzx3oJKRHeRTVgofEz4XWGyk4VzGjgifNTMvzRa
+MnZJVWgGoyYtbalKQPpSAC6ku7nHBFCj+OJOqmX/HRLuDNC9L79HmgAsYrx/jLXP
+cKilrv6xT+/8rrPFVa2YizltXgf8JvyXyZyxlPUfRMp3UtlftXDDpAaZFsw6MVNq
+jOxF7aGtuGTBSvqRsvJBi/4+eFIZW9r6HpiDFv8YRY3cYNqc8lIfzNZuigBfWAzA
+sYTz3dmBICLnvYIPoVDqdkePJuUBPZUwSBHs44r5x+Mte5W0ks+3czpBJCUfha/U
+z/kK058r9+2Rb6bwBX/Y
+-----END CERTIFICATE-----`
 )
 
 var parsedJsonFromTfVarsStubb = &HATfvars{
@@ -421,4 +486,117 @@ func Test_getAwsHAConfigFromTFVars(t *testing.T) {
 	assert.Equal(t, "test-user", params.SshUser)
 	assert.Equal(t, "A2-hello-automate-lbs-test.ap-region-1.elb.amazonaws.com", params.AutomateFqdn)
 
+}
+
+func TestGetOsCertsByIp(t *testing.T) {
+	type testCaseInfo struct {
+		testCaseDescreption string
+		osConfigMap         map[string]*ConfigKeys
+		ExpectedCertsByIp   []CertByIP
+	}
+	const nodesDnList = "CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode2,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n  - CN=chefnode3,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n"
+	const singleNodeDn = "CN=chefnode1,O=Chef Software Inc,L=Seattle,ST=Washington,C=US\\n"
+	mockInfra := &AutomateHAInfraDetails{}
+	mockInfra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP, ValidIP1, ValidIP2}
+	p := NewPullConfigs(mockInfra, &SSHUtilImpl{})
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescreption: "Three ips with different certs",
+			osConfigMap: map[string]*ConfigKeys{
+				ValidIP: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+
+				ValidIP1: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey2,
+				},
+
+				ValidIP2: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey3,
+				},
+			},
+			ExpectedCertsByIp: []CertByIP{
+				{
+					ValidIP,
+					PrivateKeyContents,
+					publicKey1,
+					nodesDnList,
+				},
+
+				{
+					ValidIP1,
+					PrivateKeyContents,
+					publicKey2,
+					nodesDnList,
+				},
+				{
+					ValidIP2,
+					PrivateKeyContents,
+					publicKey3,
+					nodesDnList,
+				},
+			},
+		},
+
+		{
+			testCaseDescreption: "Three os nodes with same cert",
+			osConfigMap: map[string]*ConfigKeys{
+				ValidIP: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+
+				ValidIP1: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+
+				ValidIP2: {
+					rootCA:     rootCACert,
+					privateKey: PrivateKeyContents,
+					publicKey:  publicKey1,
+				},
+			},
+			ExpectedCertsByIp: []CertByIP{
+				{
+					ValidIP,
+					PrivateKeyContents,
+					publicKey1,
+					singleNodeDn,
+				},
+
+				{
+					ValidIP1,
+					PrivateKeyContents,
+					publicKey1,
+					singleNodeDn,
+				},
+				{
+					ValidIP2,
+					PrivateKeyContents,
+					publicKey1,
+					singleNodeDn,
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
+			certByIpGet := p.getOsCertsByIp(testCase.osConfigMap)
+
+			for i := 0; i < len(certByIpGet); i++ {
+				assert.Equal(t, testCase.ExpectedCertsByIp[i].NodesDn, certByIpGet[i].NodesDn)
+			}
+		})
+	}
 }
