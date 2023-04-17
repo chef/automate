@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with the minimum version of Chef Automate: [2020xxxxxxxx](https://docs.chef.io/release_notes_automate/)
+- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with the minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
 {{< /warning >}}
 
@@ -43,7 +43,7 @@ Follow the steps below when migrating to On-Premises or AWS HA deployment (but n
 1. Go to the backup location mentioned in Automate config, but if you haven't specified the location go to the `/var/opt/chef-automate/backups` location and create **Bundle** using the following command:
 
     ```bash
-    tar -cvf backup.tar.gz <backup_id>/ automatebackup-elasticsearch/ .tmp/
+    tar -cvf backup.tar.gz <backup_id>/ automate-elasticsearch-data/ .tmp/
     ```
 
 1. Transfer the `tar` bundle to one of the Chef Automate nodes of Automate HA using the following command:
