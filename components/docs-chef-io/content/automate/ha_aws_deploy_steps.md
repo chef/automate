@@ -101,7 +101,6 @@ Run the following steps on Bastion Host Machine:
 
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
-   - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
    - We support only private key authentication.
