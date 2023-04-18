@@ -74,7 +74,7 @@ const (
 		ssl_cert = """%v"""
 		ssl_key = """%v"""
 	[plugins.security]
-		nodes_dn = '- %v'`
+		nodes_dn = """- %v"""`
 
 	OPENSEARCH_FRONTEND_CONFIG = `
 	[global.v1.external.opensearch.ssl]
@@ -84,6 +84,11 @@ const (
 	OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT = `
 	[global.v1.external.opensearch.ssl]
 		server_name = "%v"`
+
+	OPENSEARCH_DN_CONFIG_FOR_PEERS = `
+	[plugins]
+	[plugins.security]
+		nodes_dn = """- %v"""`
 
 	GET_USER_CONFIG = `
 	sudo cat /hab/user/automate-ha-%s/config/user.toml`
@@ -380,9 +385,20 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 			return err
 		}
 	}
-	nodesDn, err := getDistinguishedNameFromKey(certs.publicCert)
+	nodeDn, err := getDistinguishedNameFromKey(certs.publicCert)
 	if err != nil {
 		return err
+	}
+
+	existingNodesDN := currentCertsInfo.OpensearchCertsByIP[0].NodesDn
+	nodesDn := ""
+	nodesCn := ""
+
+	if flagsObj.node != "" {
+		nodesDn = nodesDn + fmt.Sprintf("%v", existingNodesDN) + "\n  - " + fmt.Sprintf("%v", nodeDn) + "\n"
+	} else {
+		nodesDn = fmt.Sprintf("%v", nodeDn) + nodesDn
+		nodesCn = nodeDn.CommonName
 	}
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
@@ -412,8 +428,17 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		return err
 	}
 
+	if flagsObj.node != "" {
+
+		err := patchOSNodeDN(flagsObj, patchFnParam, c, nodesDn)
+		if err != nil {
+			return err
+		}
+
+	}
+
 	// Patching root-ca to frontend-nodes for maintaining the connection.
-	cn := nodesDn.CommonName
+	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
@@ -439,6 +464,27 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c *certRotateFlow, nodesDn string) error {
+
+	peerConfig := fmt.Sprintf(OPENSEARCH_DN_CONFIG_FOR_PEERS, fmt.Sprintf("%v", nodesDn))
+
+	nodeVal := flagsObj.node
+	flagsObj.node = ""
+
+	patchFnParam.fileName = "cert-rotate-os-peer.toml"
+	patchFnParam.config = peerConfig
+	patchFnParam.timestamp = time.Now().Format("20060102150405")
+	patchFnParam.skipIpsList = []string{flagsObj.node}
+
+	err := c.patchConfig(patchFnParam)
+	if err != nil {
+		return err
+	}
+
+	flagsObj.node = nodeVal
 	return nil
 }
 
