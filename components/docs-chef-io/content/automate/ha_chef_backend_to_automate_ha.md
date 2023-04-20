@@ -286,14 +286,14 @@ Where:
 
 1. Open the `~/.chef/config.rb` file in your workstation and update the `chef_server_url` with the Chef-server Lb fqdn.
 
-    Example: `chef_server_url          "https://<chef-server-fqdn>/organizations/new_org"`
+    Example: `chef_server_url          "https://<chef-server-lb-fqdn>/organizations/new_org"`
 
 1. Now run `knife user list`, `knife node list`, or `knife cookbook list`. It will give you valid output.
 
 ### Updating on Nodes
 
 1. ssh into every node and open the `/etc/chef/client.rb` file. On Windows machines, the default location for this file is `C:\chef\client.rb`. On all other systems, the default location for this file is `/etc/chef/client.rb`.
-1. Update the chef-server URL with chef-server fqdn.
+1. Update the chef-server URL with chef-server-lb fqdn.
 1. Run the `chef-client` command. It will connect with the new setup, perform the scan and generate the report in chef-automate.
 
 ### Updating Nodes via Workstation
