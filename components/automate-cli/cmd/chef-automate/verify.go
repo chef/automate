@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
 )
@@ -26,6 +27,21 @@ type verifyCmdFlow struct {
 	Verification      verification.Verification
 	A2HARBFileExist   bool
 	ManagedServicesOn bool
+}
+
+type verifyServeCmdFlow struct {
+	sshUtil SSHUtil
+}
+
+var verifyServeCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "Start verify server",
+	Long:  "Start verify server for running checks",
+	Annotations: map[string]string{
+		docs.Compatibility: docs.Compatibility,
+	},
+	Args: cobra.ExactArgs(0),
+	RunE: verifyServeCmdFunc(),
 }
 
 func init() {
@@ -93,7 +109,23 @@ func init() {
 		"file",
 		"",
 		"Config file that needs to be verified")
+
+	verifyCmd.AddCommand(verifyServeCmd)
 	RootCmd.AddCommand(verifyCmd)
+}
+
+func verifyServeCmdFunc() func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		c := verifyServeCmdFlow{
+			sshUtil: NewSSHUtil(&SSHConfig{}),
+		}
+		return c.runVerifyServeCmd(cmd, args)
+	}
+}
+
+func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string) error {
+	verifyserver.Start()
+	return nil
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
