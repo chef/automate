@@ -154,8 +154,11 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 # successfully create a new Chef Automate HA instance with default settings.
 [architecture.existing_infra]
 ssh_user = ""
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = ""
 # private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
 ssh_port = "22"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"

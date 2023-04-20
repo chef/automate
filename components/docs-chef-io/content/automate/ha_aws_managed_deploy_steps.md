@@ -222,6 +222,7 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 ```config
 [architecture.aws]
 ssh_user = "ec2-user"
+ssh_group_name = "ec2-user"
 ssh_port = "22"
 ssh_key_file = "~/.ssh/my-key.pem"
 backup_config = "s3"

@@ -314,7 +314,7 @@ ssh_user = ""
 ssh_group_name = ""
 
 # private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
 
 # custome ssh port no to connect instances, default will be 22
