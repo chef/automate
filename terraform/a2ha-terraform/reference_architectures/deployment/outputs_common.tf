@@ -1,5 +1,5 @@
 output "automate_url" {
-  value = "https://${var.automate_fqdn}"
+  value = "https://${length(var.automate_fqdn) > 0 ? var.automate_fqdn : var.automate_lb_fqdn}"
 }
 
 output "automate_admin_user" {
