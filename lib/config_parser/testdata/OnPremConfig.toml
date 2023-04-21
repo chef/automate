@@ -4,7 +4,7 @@
 [architecture.existing_infra]
 ssh_user = ""
 # private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
 ssh_port = "22"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"

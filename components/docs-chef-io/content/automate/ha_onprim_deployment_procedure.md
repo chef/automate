@@ -110,6 +110,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
       - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be two machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
       - Thus, the overall minimum number of machines needed will be 5.
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
+   - Optional `ssh_group_name` make sure given group name is available in all machines, this value will be defaulted to `ssh_user`.
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs.
    - We support only private key authentication.
@@ -153,8 +154,11 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 # successfully create a new Chef Automate HA instance with default settings.
 [architecture.existing_infra]
 ssh_user = ""
+# custom ssh group name, it will be defaulted to ssh_user
+# Eg.: ssh_group_name = "ubuntu"
+ssh_group_name = ""
 # private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
 ssh_port = "22"
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
