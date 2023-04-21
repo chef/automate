@@ -255,7 +255,7 @@ In Automate HA there are equivalent command which had been used in A2HA:
 
     Compare the pre migration to post migration counts `diff pre_migration_infra_counts.log post_migration_infra_counts.log`
 
-1. Connect Chef-Workstation to the new cluster and use knife to communication with Automate HA
+1. Connect Chef-Workstation to the new cluster and use knife to communicate with Automate HA
 
     1. Open the `~/.chef/config.rb`, `~/.chef/knife.rb` or `~/.chef/credentials` file from a Chef-Workstation and update the `chef_server_url` with the Automate fqdn.
 
