@@ -115,7 +115,7 @@ func TestCheckIPAddressesError(t *testing.T) {
 
 	_, _, _, _, errList := ss.(*Summary).getIPAddressesFromFlagOrInfra()
 	assert.Equal(t, errList.Len(), 1)
-	assert.Contains(t, getSingleErrorFromList(errList).Error(), "List of  ip address not found [127.0.0.1 127.0.0.2] does not match any node for Automate, PostgreSQL or ChefServer services")
+	assert.Contains(t, getSingleErrorFromList(errList).Error(), "List of  ip address not found [127.0.0.1 127.0.0.2] does not match any node for Automate, Chef server, Opensearch, PostgreSQL service")
 }
 
 func TestCheckIPAddressesValidation(t *testing.T) {
