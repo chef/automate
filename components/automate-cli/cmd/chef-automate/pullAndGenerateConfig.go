@@ -445,6 +445,10 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	if len(objectStorageConfig.endpoint) > 0 {
 		sharedConfigToml.ObjectStorage.Config.Endpoint = objectStorageConfig.endpoint
 	}
+	a2Fqdn := getA2fqdn(a2ConfigMap)
+	if a2Fqdn != "" {
+		sharedConfigToml.Automate.Config.Fqdn = a2Fqdn
+	}
 
 	return sharedConfigToml, nil
 }
