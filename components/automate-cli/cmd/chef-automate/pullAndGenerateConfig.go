@@ -179,7 +179,6 @@ type HATfvars struct {
 	PrivateCustomSubnets            []string    `json:"private_custom_subnets"`
 	PublicCustomSubnets             []string    `json:"public_custom_subnets"`
 	SSHKeyPairName                  string      `json:"ssh_key_pair_name"`
-	ManagedRdsPostgresqlCertificate string      `json:"managed_rds_postgresql_certificate"`
 	ManagedRdsDbuserPassword        string      `json:"managed_rds_dbuser_password"`
 	ManagedRdsDbuserUsername        string      `json:"managed_rds_dbuser_username"`
 	ManagedRdsSuperuserPassword     string      `json:"managed_rds_superuser_password"`
@@ -188,7 +187,6 @@ type HATfvars struct {
 	OsSnapshotUserAccessKeySecret   string      `json:"os_snapshot_user_access_key_secret"`
 	OsSnapshotUserAccessKeyId       string      `json:"os_snapshot_user_access_key_id"`
 	AwsOsSnapshotRoleArn            string      `json:"aws_os_snapshot_role_arn"`
-	ManagedOpensearchCertificate    string      `json:"managed_opensearch_certificate"`
 	ManagedOpensearchUserPassword   string      `json:"managed_opensearch_user_password"`
 	ManagedOpensearchUsername       string      `json:"managed_opensearch_username"`
 	ManagedOpensearchDomainUrl      string      `json:"managed_opensearch_domain_url"`
@@ -785,14 +783,12 @@ func getExistingHAConfigFromTFVars(tfvarConfig *HATfvars) (*ExistingInfraConfigT
 	sharedConfigToml.ObjectStorage.Config.Region = strings.TrimSpace(tfvarConfig.Region)
 	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchInstanceURL = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainUrl)
 	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchDomainName = strings.TrimSpace(tfvarConfig.ManagedOpensearchDomainName)
-	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchCertificate = strings.TrimSpace(tfvarConfig.ManagedOpensearchCertificate)
 	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchRootCert = strings.TrimSpace(tfvarConfig.OpensearchRootCert)
 	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserName = strings.TrimSpace(tfvarConfig.ManagedOpensearchUsername)
 	sharedConfigToml.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = strings.TrimSpace(tfvarConfig.ManagedOpensearchUserPassword)
 	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = strings.TrimSpace(tfvarConfig.AwsOsSnapshotRoleArn)
 	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeyId)
 	sharedConfigToml.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = strings.TrimSpace(tfvarConfig.OsSnapshotUserAccessKeySecret)
-	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLCertificate = strings.TrimSpace(tfvarConfig.ManagedRdsPostgresqlCertificate)
 	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserUsername)
 	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = strings.TrimSpace(tfvarConfig.ManagedRdsDbuserPassword)
 	sharedConfigToml.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = strings.TrimSpace(tfvarConfig.ManagedRdsInstanceUrl)

@@ -250,14 +250,12 @@ type ExistingInfraConfigToml struct {
 				PostgreSQLSuperUserPassword string `toml:"superuser_password"`
 				PostgreSQLDBUserName        string `toml:"dbuser_username"`
 				PostgreSQLDBUserPassword    string `toml:"dbuser_password"`
-				PostgreSQLCertificate       string `toml:"postgresql_certificate"`
 				PostgreSQLRootCert          string `toml:"postgresql_root_cert"`
 			} `toml:"postgre_sql"`
 			Opensearch struct {
 				OpensearchInstanceURL       string `toml:"opensearch_domain_url"`
 				OpensearchSuperUserName     string `toml:"opensearch_username"`
 				OpensearchSuperUserPassword string `toml:"opensearch_user_password"`
-				OpensearchCertificate       string `toml:"opensearch_certificate"`
 				OpensearchRootCert          string `toml:"opensearch_root_cert"`
 				OpensearchDomainName        string `toml:"opensearch_domain_name"`
 				AWS                         struct {

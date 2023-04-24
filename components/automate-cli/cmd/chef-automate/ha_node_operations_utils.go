@@ -217,8 +217,11 @@ func (nu *NodeUtilsImpl) isA2HARBFileExist() bool {
 }
 
 func (nu *NodeUtilsImpl) taintTerraform(path string) error {
-	if err := executeShellCommand("/bin/bash", []string{"-c", REMOVE_TERRAFORM_STATE}, filepath.Join(path, "destroy", "aws")); err != nil {
-		return err
+	modeOfDeployment := getModeOfDeployment()
+	if modeOfDeployment == AWS_MODE {
+		if err := executeShellCommand("/bin/bash", []string{"-c", REMOVE_TERRAFORM_STATE}, filepath.Join(path, "destroy", "aws")); err != nil {
+			return err
+		}
 	}
 	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, path)
 }

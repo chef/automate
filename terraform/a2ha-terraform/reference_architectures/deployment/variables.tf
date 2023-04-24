@@ -43,6 +43,13 @@ variable "aws_ami_id" {
   description = "Setting this value overrides ami search features"
 }
 
+variable "aws_cidr_block_addr" {
+}
+
+variable "aws_s3_bucketName" {
+  default = "chef-automate-ha"
+}
+
 variable "aws_os_snapshot_role_arn" {
   default = ""
 }
@@ -61,6 +68,9 @@ variable "aws_ssh_key_pair_name" {
 }
 
 variable "aws_tags" {
+}
+
+variable "aws_vpc_id" {
 }
 
 variable "backup_config_efs" {
@@ -103,6 +113,10 @@ variable "delete_on_termination" {
 }
 
 variable "managed_opensearch_certificate" {
+  default = ""
+}
+
+variable "managed_opensearch_domain_name" {
   default = ""
 }
 
@@ -158,10 +172,6 @@ variable "opensearch_private_ips" {
   default = []
 }
 
-variable "opensearch_public_ips" {
-  default = []
-}
-
 variable "opensearch_root_cert" {
     default = ""
 }
@@ -200,6 +210,16 @@ variable "postgresql_root_cert" {
 
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
+}
+
+variable "private_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type    = list(string)
 }
 
 variable "s3_endpoint" {

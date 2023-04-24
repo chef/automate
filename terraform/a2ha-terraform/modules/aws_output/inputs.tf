@@ -2,7 +2,7 @@ variable "automate_fqdn" {
   default = ""
 }
 
-variable "automate_frontend_urls" {
+variable "automate_frontend_url" {
   default = ""
 }
 
@@ -23,10 +23,6 @@ variable "chef_server_private_ips" {
 }
 
 variable "opensearch_private_ips" {
-  default = []
-}
-
-variable "opensearch_public_ips" {
   default = []
 }
 

@@ -30,9 +30,6 @@ output "opensearch_private_ips" {
   value = formatlist("%s", var.opensearch_private_ips)
 }
 
-output "opensearch_public_ips" {
-  value = formatlist("%s", var.opensearch_public_ips)
-}
 
 output "postgresql_private_ips" {
   value = formatlist("%s", var.postgresql_private_ips)

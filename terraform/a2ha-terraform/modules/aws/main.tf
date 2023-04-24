@@ -207,9 +207,9 @@ resource "aws_instance" "chef_automate_postgresql" {
   )
   lifecycle {
     ignore_changes = [
-      "tags",
-      "tags_all",
-      "root_block_device"
+      tags,
+      tags_all,
+      root_block_device
     ]
   }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
@@ -243,10 +243,9 @@ resource "aws_instance" "chef_automate_opensearch" {
   )
   lifecycle {
     ignore_changes = [
-      "tags",
-      "tags_all",
-      "root_block_device"
-    ]
+      tags,
+      tags_all,
+      root_block_device    ]
   }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
@@ -281,9 +280,9 @@ resource "aws_instance" "chef_automate" {
 
   lifecycle {
     ignore_changes = [
-      "tags",
-      "tags_all",
-      "root_block_device"
+      tags,
+      tags_all,
+      root_block_device
     ]
   }
 
@@ -321,9 +320,9 @@ resource "aws_instance" "chef_server" {
 
   lifecycle {
     ignore_changes = [
-      "tags",
-      "tags_all",
-      "root_block_device"
+      tags,
+      tags_all,
+      root_block_device
     ]
   }
   

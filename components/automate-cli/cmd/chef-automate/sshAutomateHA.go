@@ -45,7 +45,7 @@ type AutomateHAInfraDetails struct {
 		AutomateFrontendUrls struct {
 			Value string `json:"value"`
 			Type  string `json:"type"`
-		} `json:"automate_frontend_urls"`
+		} `json:"automate_frontend_url"`
 		AutomatePrivateIps struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
@@ -78,10 +78,6 @@ type AutomateHAInfraDetails struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
 		} `json:"opensearch_private_ips"`
-		OpensearchPublicIps struct {
-			Value []string `json:"value"`
-			Type  []string `json:"type"`
-		} `json:"opensearch_public_ips"`
 		OpensearchSSH struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`

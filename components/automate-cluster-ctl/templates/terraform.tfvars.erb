@@ -4,9 +4,11 @@
 aws_profile = "<%= config.aws.profile %>"
 aws_region  = "<%= config.aws.region %>"
 aws_vpc_id  = "<%= config.aws.vpc_id %>"
+
 aws_cidr_block_addr  = "<%= config.aws.cidr_block_addr %>"
 private_custom_subnets = <%= config.aws.private_custom_subnets %>
-public_custom_subnets  = <%= config.aws.public_custom_subnets %>
+public_custom_subnets = <%= config.aws.public_custom_subnets %>
+
 aws_tags    = {
         <%= config.aws.tags.map { |k,v| "#{k} = \"#{v}\"" }.join("\n\t") %>
 }
@@ -42,6 +44,7 @@ managed_rds_superuser_password = "<%= config.aws.managed_rds_superuser_password 
 managed_rds_dbuser_username = "<%= config.aws.managed_rds_dbuser_username %>"
 managed_rds_dbuser_password = "<%= config.aws.managed_rds_dbuser_password %>"
 managed_rds_certificate = "<%= config.aws.managed_rds_certificate %>"
+
 <% if config.aws.ami_filter_name %>
 ami_filter_name = "<%= config.aws.ami_filter_name %>"
 <% end %>
@@ -156,7 +159,6 @@ managed_opensearch_domain_name = "<%= config.managed_aws.opensearch_domain_name 
 managed_opensearch_domain_url = "<%= config.managed_aws.opensearch_domain_url %>"
 managed_opensearch_username = "<%= config.managed_aws.opensearch_username %>"
 managed_opensearch_user_password = "<%= config.managed_aws.opensearch_user_password %>"
-managed_opensearch_certificate = "<%= config.managed_aws.opensearch_certificate %>"
 aws_os_snapshot_role_arn = "<%= config.managed_aws.aws_os_snapshot_role_arn %>"
 os_snapshot_user_access_key_id = "<%= config.managed_aws.os_snapshot_user_access_key_id %>"
 os_snapshot_user_access_key_secret = "<%= config.managed_aws.os_snapshot_user_access_key_secret %>"
@@ -165,7 +167,6 @@ managed_rds_superuser_username = "<%= config.managed_aws.superuser_username %>"
 managed_rds_superuser_password = "<%= config.managed_aws.superuser_password %>"
 managed_rds_dbuser_username = "<%= config.managed_aws.dbuser_username %>"
 managed_rds_dbuser_password = "<%= config.managed_aws.dbuser_password %>"
-managed_rds_postgresql_certificate = "<%= config.managed_aws.postgresql_certificate %>"
 
 postgresql_root_cert = <<-EOT
 <%= config.managed_aws.postgresql_root_cert %>
@@ -264,12 +265,12 @@ opensearch_custom_certs_enabled = <%= config.opensearch.enable_custom_certs %>
 
 opensearch_admin_dn = "<%= config.opensearch.admin_dn %>"
 opensearch_nodes_dn = "<%= config.opensearch.nodes_dn %>"
-
+<% if config.architecture == 'existing_nodes' %>
 automate_certs_by_ip = <%= config.automate.certs_by_ip %>
 chef_server_certs_by_ip = <%= config.chef_server.certs_by_ip %>
 postgresql_certs_by_ip = <%= config.postgresql.certs_by_ip %>
 opensearch_certs_by_ip = <%= config.opensearch.certs_by_ip %>
-
+<% end %>
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
@@ -280,10 +281,6 @@ ssh_group_name = "<%= config.ssh_group_name %>"
 ssh_port = "<%= config.ssh_port %>"
 ssh_key_file = "<%= config.ssh_key_file %>"
 
-<% %w{ contact dept project }.each do |tag| %>
-<% next unless config.aws[tag] %>
-tag_<%= tag.to_s %> = "<%= config.aws[tag] %>"
-<% end %>
 
 <% if config.automate.teams_port %>
 teams_port = <%= config.automate.teams_port.to_i %>

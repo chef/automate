@@ -18,7 +18,7 @@ output "ssh_port" {
   value = var.ssh_port
 }
 
-output "automate_frontend_urls" {
+output "automate_frontend_url" {
   value = "https://${var.automate_fqdn}"
 }
 

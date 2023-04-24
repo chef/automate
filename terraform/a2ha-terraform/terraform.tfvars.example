@@ -44,6 +44,3 @@ opensearch_instance_count = 3
 nfs_mount_path = "/mnt/automate_backups"
 postgresql_instance_count = 3
 postgresql_archive_disk_fs_path = "/mnt/automate_backups/postgresql"
-tag_contact = "youremail@example.com"
-tag_dept = "YourDept"
-tag_project = "YourProject"
