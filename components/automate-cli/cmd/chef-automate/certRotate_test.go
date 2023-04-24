@@ -768,170 +768,29 @@ func TestGetFrontEndIpsForSkippingRootCAPatching(t *testing.T) {
 			},
 			skipIpsList: []string{},
 		},
+		{
+			testCaseDescription: "Opensearch root-ca patching in frontend | same root-ca",
+			remoteService:       CONST_OPENSEARCH,
+			newRootCA:           FileContent,
+			currentCertsInfo: &certShowCertificates{
+				OpensearchRootCert: FileContent,
+			},
+			skipIpsList: c.getIps("frontend", infra),
+		},
+		{
+			testCaseDescription: "Opensearch root-ca patching in frontend | different root-ca",
+			remoteService:       CONST_OPENSEARCH,
+			newRootCA:           FileContent + "a",
+			currentCertsInfo: &certShowCertificates{
+				OpensearchRootCert: FileContent,
+			},
+			skipIpsList: []string{},
+		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			skipIpsListGot := c.getFrontEndIpsForSkippingRootCAPatching(testCase.remoteService, testCase.newRootCA, infra, testCase.currentCertsInfo)
-			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
-		})
-	}
-}
-
-func TestGetFrontEndIpsForSkippingCnAndRootCaPatching(t *testing.T) {
-	c, infra := getMockCertRotateFlowAndInfra()
-	nodesDn, _ := getDistinguishedNameFromKey(FileContent)
-	newCn := nodesDn.CommonName
-
-	type testCaseInfo struct {
-		testCaseDescription string
-		newRootCA           string
-		newCn               string
-		node                string
-		currentCertsInfo    *certShowCertificates
-		infra               *AutomateHAInfraDetails
-		skipIpsList         []string
-	}
-
-	testCases := []testCaseInfo{
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same cn and root-ca",
-			newRootCA:           FileContent,
-			newCn:               newCn,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-				OpensearchCertsByIP: []CertByIP{
-					{
-						IP:         ValidIP4,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP5,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP6,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-				},
-			},
-			infra:       infra,
-			skipIpsList: c.getIps("frontend", infra),
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same root-ca different cn",
-			newRootCA:           FileContent,
-			newCn:               newCn + "n",
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-				OpensearchCertsByIP: []CertByIP{
-					{
-						IP:         ValidIP4,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP5,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP6,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-				},
-			},
-			infra:       infra,
-			skipIpsList: []string{},
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | same cn and node flag",
-			newCn:               newCn,
-			node:                ValidIP4,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchCertsByIP: []CertByIP{
-					{
-						IP:         ValidIP4,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP5,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP6,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-				},
-			},
-			infra:       infra,
-			skipIpsList: c.getIps("frontend", infra),
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | different cn and node flag",
-			newCn:               newCn + "n",
-			node:                ValidIP4,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchCertsByIP: []CertByIP{
-					{
-						IP:         ValidIP4,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP5,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP6,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-				},
-			},
-			infra:       infra,
-			skipIpsList: []string{},
-		},
-		{
-			testCaseDescription: "Opensearch root-ca and cn patching | different root-ca",
-			newRootCA:           FileContent + "a",
-			newCn:               newCn,
-			currentCertsInfo: &certShowCertificates{
-				OpensearchRootCert: FileContent,
-				OpensearchCertsByIP: []CertByIP{
-					{
-						IP:         ValidIP4,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP5,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-					{
-						IP:         ValidIP6,
-						PublicKey:  FileContent,
-						PrivateKey: FileContent,
-					},
-				},
-			},
-			infra:       infra,
-			skipIpsList: []string{},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.testCaseDescription, func(t *testing.T) {
-			skipIpsListGot := c.getFrontEndIpsForSkippingCnAndRootCaPatching(testCase.newRootCA, testCase.newCn, testCase.node, testCase.currentCertsInfo, infra)
 			assert.Equal(t, testCase.skipIpsList, skipIpsListGot)
 		})
 	}

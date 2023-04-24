@@ -81,10 +81,6 @@ const (
 		root_cert = """%v"""
 		server_name = "%v"`
 
-	OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT = `
-	[global.v1.external.opensearch.ssl]
-		server_name = "%v"`
-
 	OPENSEARCH_DN_CONFIG_FOR_PEERS = `
 	[plugins]
 	[plugins.security]
@@ -104,8 +100,7 @@ const (
 	SKIP_IPS_MSG_CERT_ROTATE          = "The following %s %s will skip during certificate rotation as the following %s have the same certificates as currently provided certificates.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_A2         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided Automate root-ca.\n\t %s"
 	SKIP_FRONT_END_IPS_MSG_PG         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided Postgresql root-ca.\n\t %s"
-	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip during root-ca and common name patching as the following %s have same root-ca and common name as currently provided OpenSearch root-ca and common name.\n\t %s"
-	SKIP_FRONT_END_IPS_MSG_CN         = "The following %s %s will skip during common name patching as the following %s have same common name as currently provided OpenSearch common name.\n\t %s"
+	SKIP_FRONT_END_IPS_MSG_OS         = "The following %s %s will skip during root-ca patching as the following %s have same root-ca as currently provided OpenSearch root-ca.\n\t %s"
 	DEFAULT_TIMEOUT                   = 180
 )
 
@@ -392,13 +387,11 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	existingNodesDN := currentCertsInfo.OpensearchCertsByIP[0].NodesDn
 	nodesDn := ""
-	nodesCn := ""
 
 	if flagsObj.node != "" {
 		nodesDn = nodesDn + fmt.Sprintf("%v", existingNodesDN) + "\n  - " + fmt.Sprintf("%v", nodeDn) + "\n"
 	} else {
 		nodesDn = fmt.Sprintf("%v", nodeDn) + nodesDn
-		nodesCn = nodeDn.CommonName
 	}
 
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
@@ -427,33 +420,27 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-
-	if flagsObj.node != "" {
-
+	
+	if flagsObj.node != "" && (stringutils.SliceContains(skipIpsList, flagsObj.node) == false) {
 		err := patchOSNodeDN(flagsObj, patchFnParam, c, nodesDn)
 		if err != nil {
 			return err
 		}
-
 	}
 
+	if flagsObj.node != "" {
+		return nil
+	}
+
+	skipIpsList = c.getFrontEndIpsForSkippingRootCAPatching(remoteService, certs.rootCA, infra, currentCertsInfo)
+	c.skipMessagePrinter("frontend", SKIP_FRONT_END_IPS_MSG_OS, "", skipIpsList)
 	// Patching root-ca to frontend-nodes for maintaining the connection.
-	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
-	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, flagsObj.node, currentCertsInfo, infra)
-	skipMessage := ""
 	// Creating and patching the required configurations.
 	var configFe string
-	if flagsObj.node != "" {
-		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG_IGNORE_ROOT_CERT, cn)
-		skipMessage = SKIP_FRONT_END_IPS_MSG_CN
-	} else {
-		configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA, cn)
-		skipMessage = SKIP_FRONT_END_IPS_MSG_OS
-	}
-	c.skipMessagePrinter(remoteService, skipMessage, "", skipIpsList)
+	configFe = fmt.Sprintf(OPENSEARCH_FRONTEND_CONFIG, certs.rootCA,"")
 
 	patchFnParam.config = configFe
 	patchFnParam.fileName = filenameFe
@@ -741,36 +728,13 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 		}
 	}
 
-	return skipIpsList
-}
-
-//getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
-func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
-	isRootCaSame := false
-
-	if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
-		isRootCaSame = true
-	}
-
-	isCnSame := true
-	for _, currentCerts := range currentCertsInfo.OpensearchCertsByIP {
-		nodesDn, _ := getDistinguishedNameFromKey(currentCerts.PublicKey)
-		oldCn := nodesDn.CommonName
-		if oldCn != newCn {
-			isCnSame = false
-			break
+	if remoteService == CONST_OPENSEARCH {
+		if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
+			skipIpsList = append(skipIpsList, c.getIps("frontend", infra)...)
 		}
 	}
 
-	if node == "" && isRootCaSame && isCnSame {
-		return c.getIps("frontend", infra)
-	}
-
-	if node != "" && isCnSame {
-		return c.getIps("frontend", infra)
-	}
-
-	return []string{}
+	return skipIpsList
 }
 
 // skipMessagePrinter print the skip message
