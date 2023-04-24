@@ -28,10 +28,34 @@ This page explains the In-Place migration of A2HA to Automate HA. This migration
 ## Prerequisites
 
 - A healthy state of the A2HA cluster to take fresh backup.
-
 - A2HA is configured to take backup on a mounted network drive (location example: /mnt/automate_backup).
-
 - Availability of 60% of space.
+
+## Capture information about the current A2HA instance
+
+In order to verify the migration is completed successfully we'll need to capture some information about the current installation. The following script will capture counts of objects in the Chef-Infra Server that we can compare with the server after the migration has been completed.
+
+Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > pre_migration_infra_counts.log`
+
+    ```bash
+    #!/usr/bin/bash
+
+    for i in `chef-server-ctl org-list`; do
+        org=https://localhost/organizations/$i
+        echo "Orgination: ${i}"
+        echo -n "node count: "
+        knife node list -s $org | wc -l
+        echo -n "client count: "
+        knife client list -s $org | wc -l
+        echo -n "cookbook count: "
+        knife cookbook list -s $org | wc -l
+        echo -n "total objects: "
+        knife list / -R -s $org | wc -l
+        echo "----------------"
+    done
+    ```
+
+
 
 ## Taking Backup and clean up of instances
 
@@ -183,6 +207,41 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
 1. Reset the backup configuration path to Opensearch so that new backups will be stored in Opensearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 {{< /note >}}
+
+## Validate successful migration
+
+1. Check the Automate UI of Automate HA. Check whether the data is present in Automate UI for HA.
+1. If you are using the embedded chef server, log in to the Chef Server HA node, and run the following script to get a count of objects from the Chef Infra Server, this should match the counts captured at the start of the migration
+
+    Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > post_migration_infra_counts.log`
+
+    ```bash
+    #!/usr/bin/bash
+
+    for i in `chef-server-ctl org-list`; do
+        org=https://localhost/organizations/$i
+        echo "Orgination: ${i}"
+        echo -n "node count: "
+        knife node list -s $org | wc -l
+        echo -n "client count: "
+        knife client list -s $org | wc -l
+        echo -n "cookbook count: "
+        knife cookbook list -s $org | wc -l
+        echo -n "total objects: "
+        knife list / -R -s $org | wc -l
+        echo "----------------"
+    done
+    ```
+
+    Compare the pre migration to post migration counts `diff pre_migration_infra_counts.log post_migration_infra_counts.log`
+
+1. Connect Chef-Workstation to the new cluster and use knife to communicate with Automate HA
+
+    1. Open the `~/.chef/config.rb`, `~/.chef/knife.rb` or `~/.chef/credentials` file from a Chef-Workstation and update the `chef_server_url` with the Automate fqdn.
+
+        Example: `chef_server_url          "https://<automate-fqdn>/organizations/new_org"`
+
+    1. Run `knife user list`, `knife node list`, or `knife cookbook list` and verify the commands complete successfully
 
 ## Troubleshoot
 
