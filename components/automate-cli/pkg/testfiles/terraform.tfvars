@@ -20,7 +20,6 @@ managed_rds_superuser_username = ""
 managed_rds_superuser_password = ""
 managed_rds_dbuser_username = ""
 managed_rds_dbuser_password = ""
-managed_rds_postgresql_certificate = " "
 postgresql_root_cert = <<-EOT
 EOT
 opensearch_root_cert = <<-EOT

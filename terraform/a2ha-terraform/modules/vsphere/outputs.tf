@@ -1,4 +1,4 @@
-output "automate_frontend_urls" {
+output "automate_frontend_url" {
   value = "https://${element(
     vsphere_virtual_machine.chef_automate.*.default_ip_address,
     0,

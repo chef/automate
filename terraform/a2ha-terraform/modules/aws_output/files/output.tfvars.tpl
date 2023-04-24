@@ -1,10 +1,9 @@
 automate_private_ips         = [${automate_private_ips}]
 chef_server_private_ips      = [${chef_server_private_ips}]
 postgresql_private_ips       = [${postgresql_private_ips}]
-opensearch_public_ips     = [${opensearch_public_ips}]
 opensearch_private_ips    = [${opensearch_private_ips}]
 automate_lb_fqdn                = "${automate_fqdn}"
-automate_frontend_urls       = "${automate_frontend_urls}"
+automate_frontend_url       = "${automate_frontend_url}"
 bucket_name                  = "${bucket_name}"
 aws_os_snapshot_role_arn     = "${aws_os_snapshot_role_arn}"
 os_snapshot_user_access_key_id = "${os_snapshot_user_access_key_id}"

@@ -38,6 +38,11 @@ variable "automate_fqdn" {
   description = "Automate FQDN variable. Leave as an empty string for AWS"
 }
 
+variable "automate_frontend_url" {
+  default     = ""
+  description = "Automate FQDN variable. Leave as an empty string for AWS"
+}
+
 variable "automate_instance_count" {
   default = 1
 }
@@ -76,7 +81,6 @@ variable "elasticsearch_archive_disk_fs_path" {
 variable "elasticsearch_https_user" {
   default = "automate_elasticsearch"
 }
-
 variable "opensearch_instance_count" {
   default = 3
 }
@@ -304,4 +308,7 @@ variable "postgresql_custom_certs_enabled" {
 }
 variable "opensearch_custom_certs_enabled" {
   default = false
+}
+variable "tag_name" {
+  default = "A2"
 }

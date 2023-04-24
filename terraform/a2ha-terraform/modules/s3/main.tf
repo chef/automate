@@ -43,7 +43,7 @@ resource "aws_iam_role_policy_attachment" "AdministratorAccess" {
 
 
 locals {
-  log_bucket = "${var.aws_s3_bucketName}"
+  log_bucket = var.aws_s3_bucketName
 }
 
 # Creating s3 bucket using AWS-CLI (hab -> core/aws-cli)

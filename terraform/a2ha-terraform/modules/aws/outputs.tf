@@ -1,4 +1,4 @@
-output "automate_frontend_urls" {
+output "automate_frontend_url" {
   value = "https://${aws_alb.automate_lb.dns_name}"
 }
 
@@ -43,10 +43,6 @@ output "chef_server_private_ips" {
 
 output "postgresql_private_ips" {
   value = aws_instance.chef_automate_postgresql.*.private_ip
-}
-
-output "opensearch_public_ips" {
-  value = aws_instance.chef_automate_opensearch.*.public_ip
 }
 
 output "opensearch_private_ips" {
