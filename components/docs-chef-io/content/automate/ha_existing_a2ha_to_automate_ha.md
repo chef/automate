@@ -31,7 +31,7 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
 ## Capture information about the current A2HA instance
 
-In order to verify the migration is completed successfully we'll need to capture some information about the current installation. The following script will capture counts of objects in the Chef-Infra Server that we can compare with the server after the migration has been completed.
+We'll need to capture information about the current installation to verify the migration is completed successfully. The following script will capture counts of objects in the Chef-Infra Server that we can compare with the server after the migration has been completed.
 
 Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > pre_migration_infra_counts.log`
 
@@ -231,7 +231,7 @@ In Automate HA there are equivalent command which had been used in A2HA:
 ## Validate successful migration
 
 1. Check the Automate UI of Automate HA. Check whether the data is present in Automate UI for HA.
-1. If you are using the embedded chef server, log in to the Chef Server HA node, and run the following script to get a count of objects from the Chef Infra Server, this should match the counts captured at the start of the migration
+1. If you use the embedded chef server, log in to the Chef Server HA node, and run the following script to get a count of objects from the Chef Infra Server. This should match the counts captured at the start of the migration.
 
     Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > post_migration_infra_counts.log`
 
