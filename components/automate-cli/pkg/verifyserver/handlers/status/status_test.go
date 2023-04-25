@@ -26,7 +26,7 @@ func TestStatusAPI(t *testing.T) {
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			expectedBody: "{\"status\":\"ok\"",
+			expectedBody: "\"status\":\"ok\"",
 		},
 	}
 	statusEndpoint := "/status"
