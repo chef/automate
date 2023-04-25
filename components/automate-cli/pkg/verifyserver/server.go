@@ -1,17 +1,16 @@
 package verifyserver
 
 import (
-	"os"
 	"strings"
 
 	"github.com/ansrivas/fiberprometheus"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks"
 	status_handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -21,7 +20,7 @@ const (
 
 type VerifyServer struct {
 	Port string
-	Log  *logrus.Logger
+	Log  logger.ILogger
 }
 
 type IVerifyServer interface {
@@ -29,19 +28,12 @@ type IVerifyServer interface {
 }
 
 func NewVerifyServer(Port string, debug bool) IVerifyServer {
-	level := logrus.InfoLevel
-	if debug {
-		level = logrus.DebugLevel
-	}
-	return &VerifyServer{
+	log := logger.NewLogger(debug)
+	vs := &VerifyServer{
 		Port: Port,
-		Log: &logrus.Logger{
-			Out:       os.Stderr,
-			Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
-			Hooks:     make(logrus.LevelHooks),
-			Level:     level,
-		},
+		Log:  log,
 	}
+	return vs
 }
 
 func (vs *VerifyServer) Start() error {
@@ -58,7 +50,7 @@ func (vs *VerifyServer) Start() error {
 	return nil
 }
 
-func (vs *VerifyServer) setup(st *status_handler.Deps, h *checks.Checks) *fiber.App {
+func (vs *VerifyServer) setup(st status_handler.IStatusHandler, h checks.IChecks) *fiber.App {
 	app := fiber.New()
 	app.Use(cors.New())
 

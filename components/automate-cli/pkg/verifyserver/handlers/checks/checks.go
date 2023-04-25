@@ -1,11 +1,16 @@
 package checks
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+)
 
 type Checks struct {
-	Logger *logrus.Logger
+	Logger logger.ILogger
 }
 
-func NewHandler(log *logrus.Logger) *Checks {
-	return &Checks{Logger: log}
+type IChecks interface {
+}
+
+func NewHandler(Logger logger.ILogger) *Checks {
+	return &Checks{Logger: Logger}
 }

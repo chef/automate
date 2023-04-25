@@ -1,11 +1,11 @@
 package fiber_utils
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/gofiber/fiber"
-	"github.com/sirupsen/logrus"
 )
 
-func LogResgisteredRoutes(stack [][]*fiber.Route, logger *logrus.Logger) {
+func LogResgisteredRoutes(stack [][]*fiber.Route, logger logger.ILogger) {
 	// Log all registered routes
 	logger.Info("List of Routes registered:")
 	registerdRoutes := map[string]*fiber.Route{}

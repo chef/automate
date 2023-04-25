@@ -1,12 +1,16 @@
 package status_handler
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/gofiber/fiber"
-	"github.com/sirupsen/logrus"
 )
 
 type Deps struct {
-	Logger *logrus.Logger
+	Logger logger.ILogger
+}
+
+type IStatusHandler interface {
+	Status(c *fiber.Ctx)
 }
 
 type StatusServices struct {
@@ -20,7 +24,7 @@ type StatusResponse struct {
 	Services []StatusServices `json:"services"`
 }
 
-func NewStatusHandler(Logger *logrus.Logger) *Deps {
+func NewStatusHandler(Logger logger.ILogger) *Deps {
 	return &Deps{
 		Logger: Logger,
 	}
