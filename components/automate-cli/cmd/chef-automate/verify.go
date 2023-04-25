@@ -29,9 +29,7 @@ type verifyCmdFlow struct {
 	ManagedServicesOn bool
 }
 
-type verifyServeCmdFlow struct {
-	sshUtil SSHUtil
-}
+type verifyServeCmdFlow struct{}
 
 var verifyServeCmd = &cobra.Command{
 	Use:   "serve",
@@ -116,9 +114,7 @@ func init() {
 
 func verifyServeCmdFunc() func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		c := verifyServeCmdFlow{
-			sshUtil: NewSSHUtil(&SSHConfig{}),
-		}
+		c := verifyServeCmdFlow{}
 		return c.runVerifyServeCmd(cmd, args)
 	}
 }
