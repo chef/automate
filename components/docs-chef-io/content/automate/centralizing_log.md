@@ -118,7 +118,7 @@ chef-automate config patch --postgresql <file/path/to/toml>
 
 The above command will start your spunk forwarder.
 
-Now, edit the `inputs.conf` file on your Splunk Forwarder as shown below:
+Now, add a monitor for log file on your Splunk Forwarder as shown below:
 
 ```bash
 [system@ABC]# ./splunk add monitor /var/tmp/automate.log
