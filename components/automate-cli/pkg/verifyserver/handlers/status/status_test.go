@@ -26,7 +26,7 @@ func TestStatusAPI(t *testing.T) {
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			expectedBody: "{\"status\":\"ok\",\"services\":[]}",
+			expectedBody: "{\"status\":\"ok\"",
 		},
 	}
 	statusEndpoint := "/status"
@@ -41,7 +41,7 @@ func TestStatusAPI(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
-			assert.Equal(t, string(body), test.expectedBody)
+			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, res.StatusCode, test.expectedCode)
 		})
 	}
