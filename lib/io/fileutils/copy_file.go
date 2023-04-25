@@ -76,3 +76,10 @@ func copyFile(srcPath, dstPath string, opts *copyOpts) error {
 
 	return AtomicWrite(dstPath, src, WithAtomicWriteFileMode(srcInfo.Mode()))
 }
+
+func CreateDestinationAndCopy(binarySrcPath, binaryDestPath string) error {
+	if err := os.MkdirAll(filepath.Dir(binaryDestPath), 0755); err != nil {
+		return errors.Wrap(err, "Error creating destination folder")
+	}
+	return CopyFile(binarySrcPath, binaryDestPath, Overwrite())
+}

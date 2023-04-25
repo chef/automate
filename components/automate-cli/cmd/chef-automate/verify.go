@@ -2,12 +2,21 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
+	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
+	"github.com/chef/automate/lib/io/fileutils"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
+)
+
+const (
+	BINARY_DESTINATION_FOLDER = "/etc/automate-verify"
+	SYSTEMD_PATH              = "/etc/systemd/system"
 )
 
 type verifyCmdFlags struct {
@@ -33,15 +42,34 @@ type verifyServeCmdFlow struct {
 	sshUtil SSHUtil
 }
 
+type verifySystemdCreateFlow struct{}
+
 var verifyServeCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Start verify server",
-	Long:  "Start verify server for running checks",
+	Short: "Start verify server for running checks",
 	Annotations: map[string]string{
 		docs.Compatibility: docs.Compatibility,
 	},
 	Args: cobra.ExactArgs(0),
 	RunE: verifyServeCmdFunc(),
+}
+
+var verifySystemdServiceCmd = &cobra.Command{
+	Use:   "systemd-service COMMAND",
+	Short: "Systemd utilities for verify command",
+	Annotations: map[string]string{
+		docs.Compatibility: docs.Compatibility,
+	},
+}
+
+var verifySystemdServiceCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Start verify server as systemd service",
+	Annotations: map[string]string{
+		docs.Compatibility: docs.Compatibility,
+	},
+	Args: cobra.ExactArgs(0),
+	RunE: verifySystemdCreateFunc(),
 }
 
 func init() {
@@ -110,6 +138,8 @@ func init() {
 		"",
 		"Config file that needs to be verified")
 
+	verifySystemdServiceCmd.AddCommand(verifySystemdServiceCreateCmd)
+	verifyCmd.AddCommand(verifySystemdServiceCmd)
 	verifyCmd.AddCommand(verifyServeCmd)
 	RootCmd.AddCommand(verifyCmd)
 }
@@ -126,6 +156,30 @@ func verifyServeCmdFunc() func(cmd *cobra.Command, args []string) error {
 func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string) error {
 	verifyserver.Start()
 	return nil
+}
+
+func verifySystemdCreateFunc() func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		c := verifySystemdCreateFlow{}
+		return c.runVerifySystemdCreateCmd(cmd, args)
+	}
+}
+
+func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, args []string) error {
+	binaryPath, err := os.Executable()
+	if err != nil {
+		return status.Wrap(err, status.UnknownError, "Error getting executable path")
+	}
+	binaryPath, err = filepath.EvalSymlinks(binaryPath)
+	if err != nil {
+		return status.Wrap(err, status.UnknownError, "Error evaluating symlinks in binary path")
+	}
+
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(os.Executable, os.Create, fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, writer)
+	if err != nil {
+		return err
+	}
+	return createSystemdServiceWithBinary.Create(binaryPath)
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
