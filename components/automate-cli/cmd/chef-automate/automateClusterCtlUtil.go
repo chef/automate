@@ -515,18 +515,9 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	return err
 }
 
-func executeShellCommandAndGet(command string, args []string, workingDir string) error {
-	writer.Printf("\n%s command execution started \n\n\n", command)
-	c := exec.Command(command, args...)
-	c.Stdin = os.Stdin
-	if len(workingDir) > 0 {
-		c.Dir = workingDir
-	}
-	c.Stdout = io.MultiWriter(os.Stdout)
-	c.Stderr = io.MultiWriter(os.Stderr)
-	err := c.Run()
-	writer.Printf("%s command execution done, exiting\n", command)
-	return err
+func executeShellCommandMinLogs(command string) error {
+	cmd := exec.Command("bash", "-c", command)
+	return cmd.Run()
 }
 
 func extarctVersionAndRelease(filename string) (string, string) {
