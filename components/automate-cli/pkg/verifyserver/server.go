@@ -1,8 +1,6 @@
 package verifyserver
 
 import (
-	"os"
-
 	"github.com/ansrivas/fiberprometheus"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
 	"github.com/gofiber/cors"
@@ -15,22 +13,33 @@ const (
 	PORT    = "7799"
 )
 
-func Start() {
-	var log = &logrus.Logger{
-		Out:       os.Stdout,
-		Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.DebugLevel,
-	}
-	app := Setup(log)
-	err := app.Listen(":" + PORT)
-	if err != nil {
-		log.WithError(err).Error("Service could not start on port " + PORT + " as it is already in use.")
+type VerifyServer struct {
+	Port string
+	Log  *logrus.Logger
+}
+
+type IVerifyServer interface {
+	Start() error
+}
+
+func NewVerifyServer(Port string, Log *logrus.Logger) IVerifyServer {
+	return &VerifyServer{
+		Port: Port,
+		Log:  Log,
 	}
 }
 
-func Setup(log *logrus.Logger) *fiber.App {
+func (vs *VerifyServer) Start() error {
+	app := vs.setup()
+	err := app.Listen(":" + PORT)
+	if err != nil {
+		vs.Log.Error("Service could not start on port " + PORT + " as it is already in use.")
+		return err
+	}
+	return nil
+}
 
+func (vs *VerifyServer) setup() *fiber.App {
 	app := fiber.New()
 	app.Use(cors.New())
 
@@ -38,6 +47,6 @@ func Setup(log *logrus.Logger) *fiber.App {
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
-	handlers.SetupRoutes(app, log)
+	handlers.SetupRoutes(app, vs.Log)
 	return app
 }

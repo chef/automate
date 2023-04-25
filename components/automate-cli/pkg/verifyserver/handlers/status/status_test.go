@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/mock"
 	"github.com/sirupsen/logrus"
@@ -20,15 +19,12 @@ func TestStatusAPI(t *testing.T) {
 		Level:     logrus.DebugLevel,
 	}
 	tests := []struct {
-		description string
-
-		// Expected output
+		description  string
 		expectedCode int
 		expectedBody string
-		wait         time.Duration
 	}{
 		{
-			description:  "200:success keys route",
+			description:  "200:success status route",
 			expectedCode: 200,
 			expectedBody: "{\"status\":\"ok\",\"services\":[]}",
 		},

@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
 	verification "github.com/chef/automate/lib/verification"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -120,8 +122,14 @@ func verifyServeCmdFunc() func(cmd *cobra.Command, args []string) error {
 }
 
 func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string) error {
-	verifyserver.Start()
-	return nil
+	var log = &logrus.Logger{
+		Out:       os.Stdout,
+		Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
+		Hooks:     make(logrus.LevelHooks),
+		Level:     logrus.DebugLevel,
+	}
+	vs := verifyserver.NewVerifyServer("7799", log)
+	return vs.Start()
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
