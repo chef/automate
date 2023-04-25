@@ -2,13 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
 	verification "github.com/chef/automate/lib/verification"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -33,6 +31,7 @@ type verifyCmdFlow struct {
 
 type verifyServeCmdFlow struct{}
 
+var debug bool
 var verifyServeCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start verify server",
@@ -41,7 +40,7 @@ var verifyServeCmd = &cobra.Command{
 		docs.Compatibility: docs.Compatibility,
 	},
 	Args: cobra.ExactArgs(0),
-	RunE: verifyServeCmdFunc(),
+	RunE: verifyServeCmdFunc(debug),
 }
 
 func init() {
@@ -109,26 +108,25 @@ func init() {
 		"file",
 		"",
 		"Config file that needs to be verified")
-
+	verifyServeCmd.Flags().BoolVarP(
+		&debug,
+		"debug",
+		"d",
+		false,
+		"enable debugging")
 	verifyCmd.AddCommand(verifyServeCmd)
 	RootCmd.AddCommand(verifyCmd)
 }
 
-func verifyServeCmdFunc() func(cmd *cobra.Command, args []string) error {
+func verifyServeCmdFunc(debug bool) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c := verifyServeCmdFlow{}
-		return c.runVerifyServeCmd(cmd, args)
+		return c.runVerifyServeCmd(cmd, args, debug)
 	}
 }
 
-func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string) error {
-	var log = &logrus.Logger{
-		Out:       os.Stdout,
-		Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.DebugLevel,
-	}
-	vs := verifyserver.NewVerifyServer("7799", log)
+func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string, debug bool) error {
+	vs := verifyserver.NewVerifyServer(verifyserver.PORT, debug)
 	return vs.Start()
 }
 

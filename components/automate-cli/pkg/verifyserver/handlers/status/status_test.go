@@ -1,4 +1,4 @@
-package statusHandler_test
+package status_handler_test
 
 import (
 	"io"

@@ -1,4 +1,4 @@
-package statusHandler
+package status_handler
 
 import (
 	"github.com/gofiber/fiber"

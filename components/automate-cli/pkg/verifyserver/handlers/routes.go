@@ -1,27 +1,21 @@
 package handlers
 
 import (
-	statusHandler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
+	status_handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
+	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
 	"github.com/gofiber/fiber"
 	"github.com/sirupsen/logrus"
 )
 
 func SetupRoutes(app *fiber.App, logger *logrus.Logger) {
-	app.Get("/status", statusHandler.NewStatusHandler(logger).Status)
+	// Status
+	app.Get("/status", status_handler.NewStatusHandler(logger).Status)
 
-	// Log all registered routes
-	logger.Info("List of Routes registered:")
-	registerdRoutes := map[string]*fiber.Route{}
-	for _, rl := range app.Stack() {
-		for _, r := range rl {
-			key := r.Method + " " + r.Path
-			if _, ok := registerdRoutes[key]; !ok {
-				registerdRoutes[key] = r
-			}
-		}
-	}
+	// API routes
+	// apiGroup := app.Group("/api")
 
-	for r := range registerdRoutes {
-		logger.Info(r)
-	}
+	// API/V1 Routes
+	// apiV1Group := apiGroup.Group("/v1")
+
+	fiber_utils.LogResgisteredRoutes(app.Stack(), logger)
 }
