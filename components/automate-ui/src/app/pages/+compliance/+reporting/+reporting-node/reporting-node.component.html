@@ -235,7 +235,7 @@
                         <p>This control was waived.</p>
                         <dl class="waiver-details">
                           <dt>Expires:</dt>
-                          <dd>{{ control.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
+                          <dd>{{ control.waiver_data.expiration_date === "" ? "-" : (control.waiver_data.expiration_date | datetime: RFC2822) }}</dd>
                           <dt>Reason:</dt>
                           <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
