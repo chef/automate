@@ -2,12 +2,16 @@ package mock
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks"
+	status_handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
 	"github.com/gofiber/fiber"
 	"github.com/sirupsen/logrus"
 )
 
-func Setup(log *logrus.Logger) *fiber.App {
+func SetupWithDefaultHandlers(log *logrus.Logger) *fiber.App {
 	app := fiber.New()
-	handlers.SetupRoutes(app, log)
+	st := status_handler.NewStatusHandler(log)
+	h := checks.NewHandler(log)
+	handlers.SetupRoutes(app, st, h, log)
 	return app
 }

@@ -13,7 +13,7 @@ import (
 
 func TestStatusAPI(t *testing.T) {
 	var log = &logrus.Logger{
-		Out:       os.Stdout,
+		Out:       os.Stderr,
 		Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
 		Hooks:     make(logrus.LevelHooks),
 		Level:     logrus.DebugLevel,
@@ -31,7 +31,7 @@ func TestStatusAPI(t *testing.T) {
 	}
 	statusEndpoint := "/status"
 	// Setup the app as it is done in the main function
-	app := mock.Setup(log)
+	app := mock.SetupWithDefaultHandlers(log)
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {

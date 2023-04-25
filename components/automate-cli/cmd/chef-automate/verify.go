@@ -21,6 +21,7 @@ type verifyCmdFlags struct {
 	haAWSManagedDeploy        bool
 	standaloneDeploy          bool
 	certificates              bool
+	debug                     bool
 }
 
 type verifyCmdFlow struct {
@@ -30,18 +31,6 @@ type verifyCmdFlow struct {
 }
 
 type verifyServeCmdFlow struct{}
-
-var debug bool
-var verifyServeCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Start verify server",
-	Long:  "Start verify server for running checks",
-	Annotations: map[string]string{
-		docs.Compatibility: docs.Compatibility,
-	},
-	Args: cobra.ExactArgs(0),
-	RunE: verifyServeCmdFunc(debug),
-}
 
 func init() {
 	flagsObj := verifyCmdFlags{}
@@ -55,6 +44,17 @@ func init() {
 		},
 		Args: cobra.RangeArgs(0, 1),
 		RunE: verifyCmdFunc(&flagsObj),
+	}
+
+	verifyServeCmd := &cobra.Command{
+		Use:   "serve",
+		Short: "Start verify server",
+		Long:  "Start verify server for running checks",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.Compatibility,
+		},
+		Args: cobra.ExactArgs(0),
+		RunE: verifyServeCmdFunc(&flagsObj),
 	}
 
 	// flags for Verify Command
@@ -109,7 +109,7 @@ func init() {
 		"",
 		"Config file that needs to be verified")
 	verifyServeCmd.Flags().BoolVarP(
-		&debug,
+		&flagsObj.debug,
 		"debug",
 		"d",
 		false,
@@ -118,10 +118,10 @@ func init() {
 	RootCmd.AddCommand(verifyCmd)
 }
 
-func verifyServeCmdFunc(debug bool) func(cmd *cobra.Command, args []string) error {
+func verifyServeCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c := verifyServeCmdFlow{}
-		return c.runVerifyServeCmd(cmd, args, debug)
+		return c.runVerifyServeCmd(cmd, args, flagsObj.debug)
 	}
 }
 

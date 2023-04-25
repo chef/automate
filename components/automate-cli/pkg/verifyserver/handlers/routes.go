@@ -1,15 +1,16 @@
 package handlers
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks"
 	status_handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
 	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
 	"github.com/gofiber/fiber"
 	"github.com/sirupsen/logrus"
 )
 
-func SetupRoutes(app *fiber.App, logger *logrus.Logger) {
+func SetupRoutes(app *fiber.App, st *status_handler.Deps, h *checks.Checks, logger *logrus.Logger) {
 	// Status
-	app.Get("/status", status_handler.NewStatusHandler(logger).Status)
+	app.Get("/status", st.Status)
 
 	// API routes
 	// apiGroup := app.Group("/api")

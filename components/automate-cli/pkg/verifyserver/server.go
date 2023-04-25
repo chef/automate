@@ -1,10 +1,13 @@
 package verifyserver
 
 import (
+	"os"
 	"strings"
 
 	"github.com/ansrivas/fiberprometheus"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks"
+	status_handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
@@ -30,19 +33,21 @@ func NewVerifyServer(Port string, debug bool) IVerifyServer {
 	if debug {
 		level = logrus.DebugLevel
 	}
-	var log = &logrus.Logger{
-		Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
-		Hooks:     make(logrus.LevelHooks),
-		Level:     level,
-	}
 	return &VerifyServer{
 		Port: Port,
-		Log:  log,
+		Log: &logrus.Logger{
+			Out:       os.Stderr,
+			Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
+			Hooks:     make(logrus.LevelHooks),
+			Level:     level,
+		},
 	}
 }
 
 func (vs *VerifyServer) Start() error {
-	app := vs.setup()
+	st := status_handler.NewStatusHandler(vs.Log)
+	h := checks.NewHandler(vs.Log)
+	app := vs.setup(st, h)
 	err := app.Listen(":" + PORT)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
@@ -53,7 +58,7 @@ func (vs *VerifyServer) Start() error {
 	return nil
 }
 
-func (vs *VerifyServer) setup() *fiber.App {
+func (vs *VerifyServer) setup(st *status_handler.Deps, h *checks.Checks) *fiber.App {
 	app := fiber.New()
 	app.Use(cors.New())
 
@@ -66,6 +71,6 @@ func (vs *VerifyServer) setup() *fiber.App {
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
-	handlers.SetupRoutes(app, vs.Log)
+	handlers.SetupRoutes(app, st, h, vs.Log)
 	return app
 }
