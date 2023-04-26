@@ -427,6 +427,10 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
+    
+	if flagsObj.node!="" && stringutils.SliceContains(skipIpsList, flagsObj.node) {
+		return nil
+	}
 
 	if flagsObj.node != "" {
 
@@ -437,12 +441,29 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	}
 
+	//fetching server_name from automate
+	plgcng := NewPullConfigs(infra, sshUtil)
+	automatesConfig, err := plgcng.pullAutomateConfigs()
+
+	if err != nil {
+		return err
+	}
+	oldCn := ""
+	for _, config := range automatesConfig {
+		if config.Global.V1.External.Opensearch != nil && config.Global.V1.External.Opensearch.Ssl != nil {
+			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
+				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
+				break
+			}
+		}
+	}
+
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
-	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, flagsObj.node, currentCertsInfo, infra)
+	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, oldCn, flagsObj.node, currentCertsInfo, infra)
 	skipMessage := ""
 	// Creating and patching the required configurations.
 	var configFe string
@@ -745,21 +766,17 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 }
 
 //getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
-func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
+func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
 	isRootCaSame := false
 
 	if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
 		isRootCaSame = true
 	}
 
-	isCnSame := true
-	for _, currentCerts := range currentCertsInfo.OpensearchCertsByIP {
-		nodesDn, _ := getDistinguishedNameFromKey(currentCerts.PublicKey)
-		oldCn := nodesDn.CommonName
-		if oldCn != newCn {
-			isCnSame = false
-			break
-		}
+	isCnSame := false
+
+	if oldCn == newCn {
+		isCnSame = true
 	}
 
 	if node == "" && isRootCaSame && isCnSame {
