@@ -24,9 +24,9 @@ type StatusResponse struct {
 	Services []StatusServices `json:"services"`
 }
 
-func NewHandler(Logger logger.ILogger) IStatus {
+func NewHandler(logger logger.ILogger) IStatus {
 	return &Status{
-		Logger: Logger,
+		Logger: logger,
 	}
 }
 

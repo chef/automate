@@ -126,7 +126,7 @@ func verifyServeCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args 
 }
 
 func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string, debug bool) error {
-	vs := verifyserver.NewVerifyServer(verifyserver.PORT, debug)
+	vs := verifyserver.NewVerifyServer(verifyserver.DEFAULT_PORT, debug)
 	return vs.Start()
 }
 

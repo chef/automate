@@ -10,6 +10,6 @@ type Checks struct {
 
 type IChecks interface{}
 
-func NewHandler(Logger logger.ILogger) IChecks {
-	return &Checks{Logger: Logger}
+func NewHandler(logger logger.ILogger) IChecks {
+	return &Checks{Logger: logger}
 }

@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	SERVICE = "verify-server"
-	PORT    = "7799"
+	SERVICE      = "verify-server"
+	DEFAULT_PORT = "7799"
 )
 
 type VerifyServer struct {
@@ -26,22 +26,22 @@ type IVerifyServer interface {
 	Start() error
 }
 
-func NewVerifyServer(Port string, debug bool) IVerifyServer {
+func NewVerifyServer(port string, debug bool) IVerifyServer {
 	log := logger.NewLogger(debug)
 	vs := &VerifyServer{
-		Port: Port,
+		Port: port,
 		Log:  log,
 	}
 	return vs
 }
 
 func (vs *VerifyServer) Start() error {
-	h := handlers.NewHandlersGroup(vs.Log)
-	app := vs.setup(h)
-	err := app.Listen(":" + PORT)
+	handlersGroup := handlers.NewHandlersGroup(vs.Log)
+	app := vs.setup(handlersGroup)
+	err := app.Listen(":" + DEFAULT_PORT)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
-			vs.Log.Error("Service could not start on port " + PORT + " as it is already in use.")
+			vs.Log.Error("Service could not start on port " + DEFAULT_PORT + " as it is already in use.")
 		}
 		return err
 	}
