@@ -64,3 +64,11 @@ linux darwin windows:
 
 unit:
 	@go test --count 1 ./...
+
+verify-serve:
+	docker run -it --rm \
+	-w "/go/src/github.com/chef/automate/components/automate-cli" \
+	-v $$(dirname $$(dirname $$(pwd))):/go/src/github.com/chef/automate \
+	-p 7799:7799 \
+	cosmtrek/air:v1.12.0 \
+	-c /go/src/github.com/chef/automate/components/automate-cli/pkg/verifyserver/rundev/.air.toml

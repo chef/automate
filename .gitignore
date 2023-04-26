@@ -110,6 +110,7 @@ e2e/cypress/screenshots
 e2e/cypress/videos
 components/automate-grpc/protoc-gen-a2-config/protoc-gen-a2-config
 components/event-gateway/cmd/event-gateway/event-gateway
+components/automate-cli/pkg/verifyserver/tmp
 tools/bldr-config-gen/bldr-config-gen
 
 # default output file written when running `chef-automate debug profile $service_name`
