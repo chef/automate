@@ -42,8 +42,9 @@ func init() {
 		Annotations: map[string]string{
 			docs.Compatibility: docs.Compatibility,
 		},
-		Args: cobra.RangeArgs(0, 1),
-		RunE: verifyCmdFunc(&flagsObj),
+		Args:   cobra.RangeArgs(0, 1),
+		RunE:   verifyCmdFunc(&flagsObj),
+		Hidden: true,
 	}
 
 	verifyServeCmd := &cobra.Command{

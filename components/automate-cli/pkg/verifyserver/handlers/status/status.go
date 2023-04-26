@@ -2,6 +2,7 @@ package status
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/gofiber/fiber"
 )
 
@@ -32,8 +33,8 @@ func NewHandler(logger logger.ILogger) IStatus {
 
 func (s *Status) GetStatus(c *fiber.Ctx) {
 	services := []StatusServices{}
-	c.JSON(&StatusResponse{
+	c.JSON(response.BuildSuccessResponse(&StatusResponse{
 		Status:   "ok",
 		Services: services,
-	})
+	}))
 }
