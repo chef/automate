@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -427,8 +428,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-    
-	if flagsObj.node!="" && stringutils.SliceContains(skipIpsList, flagsObj.node) {
+
+	if flagsObj.node != "" && stringutils.SliceContains(skipIpsList, flagsObj.node) {
 		return nil
 	}
 
@@ -448,15 +449,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-	oldCn := ""
-	for _, config := range automatesConfig {
-		if config.Global.V1.External.Opensearch != nil && config.Global.V1.External.Opensearch.Ssl != nil {
-			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
-				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
-				break
-			}
-		}
-	}
+	
+	oldCn:=getOldCn(automatesConfig)
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	cn := nodesCn
@@ -507,6 +501,19 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 
 	flagsObj.node = nodeVal
 	return nil
+}
+
+func getOldCn(automatesConfig map[string]*deployment.AutomateConfig) string {
+	oldCn := ""
+	for _, config := range automatesConfig {
+		if config.Global.V1.External.Opensearch != nil && config.Global.V1.External.Opensearch.Ssl != nil {
+			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
+				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
+				break
+			}
+		}
+	}
+	return oldCn
 }
 
 // patchConfig will patch the configurations to required nodes.
