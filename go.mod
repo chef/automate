@@ -50,6 +50,7 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20170928100509-7099e67763c2
 	github.com/gofiber/cors v0.2.2
 	github.com/gofiber/fiber v1.14.6
+	github.com/gofiber/utils v0.0.10
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.4.4

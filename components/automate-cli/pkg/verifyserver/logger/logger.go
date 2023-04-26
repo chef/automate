@@ -9,6 +9,7 @@ import (
 type ILogger interface {
 	Info(args ...interface{})
 	Error(args ...interface{})
+	GetLevel() logrus.Level
 }
 
 type LogActions struct {
@@ -35,4 +36,8 @@ func (la *LogActions) Info(args ...interface{}) {
 
 func (la *LogActions) Error(args ...interface{}) {
 	la.log.Error()
+}
+
+func (la *LogActions) GetLevel() string {
+	return la.log.GetLevel().String()
 }

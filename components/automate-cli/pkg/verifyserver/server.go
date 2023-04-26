@@ -5,9 +5,8 @@ import (
 
 	"github.com/ansrivas/fiberprometheus"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks"
-	status_handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
@@ -37,9 +36,8 @@ func NewVerifyServer(Port string, debug bool) IVerifyServer {
 }
 
 func (vs *VerifyServer) Start() error {
-	st := status_handler.NewStatusHandler(vs.Log)
-	h := checks.NewHandler(vs.Log)
-	app := vs.setup(st, h)
+	h := handlers.NewHandlersGroup(vs.Log)
+	app := vs.setup(h)
 	err := app.Listen(":" + PORT)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
@@ -50,19 +48,21 @@ func (vs *VerifyServer) Start() error {
 	return nil
 }
 
-func (vs *VerifyServer) setup(st status_handler.IStatusHandler, h checks.IChecks) *fiber.App {
-	app := fiber.New()
+func (vs *VerifyServer) setup(h *handlers.Groups) *fiber.App {
+	fconf := &fiber.Settings{
+		ServerHeader: SERVICE,
+		ErrorHandler: fiber_utils.CustomErrorHandler,
+	}
+	app := fiber.New(fconf)
 	app.Use(cors.New())
 
 	// Define middleware to log all requests
-	app.Use(middleware.Logger(middleware.LoggerConfig{
-		TimeFormat: "2006-01-02 15:04:05.000",
-	}))
+	app.Use(middleware.Logger(fiber_utils.GetLogConfig(vs.Log)))
 
 	prometheus := fiberprometheus.New(SERVICE)
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
-	handlers.SetupRoutes(app, st, h, vs.Log)
+	SetupRoutes(app, h, vs.Log)
 	return app
 }

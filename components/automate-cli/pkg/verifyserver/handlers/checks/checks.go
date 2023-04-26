@@ -8,9 +8,8 @@ type Checks struct {
 	Logger logger.ILogger
 }
 
-type IChecks interface {
-}
+type IChecks interface{}
 
-func NewHandler(Logger logger.ILogger) *Checks {
+func NewHandler(Logger logger.ILogger) IChecks {
 	return &Checks{Logger: Logger}
 }
