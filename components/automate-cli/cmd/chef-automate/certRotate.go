@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -428,6 +429,10 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 		return err
 	}
 
+	if flagsObj.node != "" && stringutils.SliceContains(skipIpsList, flagsObj.node) {
+		return nil
+	}
+
 	if flagsObj.node != "" {
 
 		err := patchOSNodeDN(flagsObj, patchFnParam, c, nodesDn)
@@ -437,12 +442,22 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 
 	}
 
+	//fetching server_name from automate
+	plgcng := NewPullConfigs(infra, sshUtil)
+	automatesConfig, err := plgcng.pullAutomateConfigs()
+
+	if err != nil {
+		return err
+	}
+	
+	oldCn:=getOldCn(automatesConfig)
+
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	cn := nodesCn
 	filenameFe := "os_fe.toml"
 	remoteService = "frontend"
 
-	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, flagsObj.node, currentCertsInfo, infra)
+	skipIpsList = c.getFrontEndIpsForSkippingCnAndRootCaPatching(certs.rootCA, cn, oldCn, flagsObj.node, currentCertsInfo, infra)
 	skipMessage := ""
 	// Creating and patching the required configurations.
 	var configFe string
@@ -486,6 +501,19 @@ func patchOSNodeDN(flagsObj *certRotateFlags, patchFnParam *patchFnParameters, c
 
 	flagsObj.node = nodeVal
 	return nil
+}
+
+func getOldCn(automatesConfig map[string]*deployment.AutomateConfig) string {
+	oldCn := ""
+	for _, config := range automatesConfig {
+		if config.Global.V1.External.Opensearch != nil && config.Global.V1.External.Opensearch.Ssl != nil {
+			if config.Global.V1.External.Opensearch.Ssl.ServerName != nil {
+				oldCn = config.Global.V1.External.Opensearch.Ssl.ServerName.Value
+				break
+			}
+		}
+	}
+	return oldCn
 }
 
 // patchConfig will patch the configurations to required nodes.
@@ -745,21 +773,17 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 }
 
 //getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
-func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
+func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
 	isRootCaSame := false
 
 	if strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newRootCA {
 		isRootCaSame = true
 	}
 
-	isCnSame := true
-	for _, currentCerts := range currentCertsInfo.OpensearchCertsByIP {
-		nodesDn, _ := getDistinguishedNameFromKey(currentCerts.PublicKey)
-		oldCn := nodesDn.CommonName
-		if oldCn != newCn {
-			isCnSame = false
-			break
-		}
+	isCnSame := false
+
+	if oldCn == newCn {
+		isCnSame = true
 	}
 
 	if node == "" && isRootCaSame && isCnSame {
