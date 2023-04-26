@@ -47,6 +47,10 @@ variable "automate_instance_count" {
   default = 1
 }
 
+variable "automate_lb_fqdn" {
+  default = ""
+}
+
 variable "automate_license" {
   default = "Contact Chef Sales at sales@chef.io to request a license."
 }
