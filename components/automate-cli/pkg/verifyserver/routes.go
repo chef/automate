@@ -9,7 +9,7 @@ import (
 
 func SetupRoutes(app *fiber.App, h *handlers.Groups, logger logger.ILogger) {
 	// Status
-	app.Get("/status", h.Status.Status)
+	app.Get("/status", h.Status.GetStatus)
 
 	// API routes
 	// apiGroup := app.Group("/api")

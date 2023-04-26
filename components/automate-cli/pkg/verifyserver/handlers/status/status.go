@@ -5,12 +5,12 @@ import (
 	"github.com/gofiber/fiber"
 )
 
-type Deps struct {
+type Status struct {
 	Logger logger.ILogger
 }
 
-type IStatusHandler interface {
-	Status(c *fiber.Ctx)
+type IStatus interface {
+	GetStatus(c *fiber.Ctx)
 }
 
 type StatusServices struct {
@@ -24,13 +24,13 @@ type StatusResponse struct {
 	Services []StatusServices `json:"services"`
 }
 
-func NewStatusHandler(Logger logger.ILogger) IStatusHandler {
-	return &Deps{
+func NewHandler(Logger logger.ILogger) IStatus {
+	return &Status{
 		Logger: Logger,
 	}
 }
 
-func (d *Deps) Status(c *fiber.Ctx) {
+func (s *Status) GetStatus(c *fiber.Ctx) {
 	services := []StatusServices{}
 	c.JSON(&StatusResponse{
 		Status:   "ok",

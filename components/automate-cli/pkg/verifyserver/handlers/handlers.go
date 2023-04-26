@@ -7,13 +7,13 @@ import (
 )
 
 type Groups struct {
-	Status status.IStatusHandler
+	Status status.IStatus
 	Checks checks.IChecks
 }
 
 func NewHandlersGroup(logger logger.ILogger) *Groups {
 	return &Groups{
-		Status: status.NewStatusHandler(logger),
+		Status: status.NewHandler(logger),
 		Checks: checks.NewHandler(logger),
 	}
 }
