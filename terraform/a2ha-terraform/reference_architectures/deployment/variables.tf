@@ -26,10 +26,6 @@ variable "automate_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
-variable "automate_lb_fqdn" {
-  default = ""
-}
-
 variable "automate_private_ips" {
   default = []
 }
