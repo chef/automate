@@ -948,6 +948,17 @@ func TestGetOldCn(t *testing.T) {
 			},
 			OldCnExpected: "",
 		},
+		{
+			testCaseDescription: "Getting cn value server name as nil",
+			automatesConfig: &deployment.AutomateConfig{
+				Global: &shared.GlobalConfig{
+					V1: &shared.V1{
+						External: &shared.External{},
+					},
+				},
+			},
+			OldCnExpected: "",
+		},
 	}
 
 	for _, testCase := range testCases {
