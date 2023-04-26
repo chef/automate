@@ -107,7 +107,7 @@ Run the following steps on Bastion Host Machine:
    - Set `backup_config` to `"efs"` or `"s3"`
    - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
-   - Don't set `fqdn` for this AWS deployment.
+   - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
    - Set AWS Config Details:
      - Set `profile`, by default `profile` is `"default"`
