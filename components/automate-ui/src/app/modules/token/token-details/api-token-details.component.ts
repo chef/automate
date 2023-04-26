@@ -75,6 +75,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.updateForm.controls.name.setValue(this.token.name);
         this.status = this.token.active ? 'active' : 'inactive';
         this.updateForm.controls.status.setValue(this.status);
+        this.updateForm.controls.projects.setValue(this.token.projects);
         this.store.dispatch(new GetProjects());
       });
 
