@@ -103,9 +103,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         const res = this.controlDetails['profiles'][0].controls[0].results;
         const code = this.controlDetails['profiles'][0].controls[0].code;
         const desc = this.controlDetails['profiles'][0].controls[0].desc;
+        const waiver_data = this.controlDetails['profiles'][0].controls[0].waiver_data;
         this.controlList.control_elements[this.index].result = res;
         this.controlList.control_elements[this.index].code = code;
         this.controlList.control_elements[this.index].desc = desc;
+        this.controlList.control_elements[this.index].waiver_data = waiver_data;
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
         this.reportIdArray = this.reportIdArray.slice(0, -1);
@@ -225,9 +227,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
                 const res = this.controlDetails['profiles'][0].controls[0].results;
                 const code = this.controlDetails['profiles'][0].controls[0].code;
                 const desc = this.controlDetails['profiles'][0].controls[0].desc;
+                const waiver_data = this.controlDetails['profiles'][0].controls[0].waiver_data;
                 this.controlList.control_elements[this.index].result = res;
                 this.controlList.control_elements[this.index].code = code;
                 this.controlList.control_elements[this.index].desc = desc;
+                this.controlList.control_elements[this.index].waiver_data = waiver_data;
               }
             });
           });
