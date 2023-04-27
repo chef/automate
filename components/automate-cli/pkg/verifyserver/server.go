@@ -34,7 +34,7 @@ func NewVerifyServer(port string, debug bool) *VerifyServer {
 func (vs *VerifyServer) Start() error {
 	handlersGroup := handlers.NewHandlersList(vs.Log)
 	app := vs.Setup(handlersGroup)
-	err := app.Listen(":" + DEFAULT_PORT)
+	err := app.Listen(":" + vs.Port)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
 			vs.Log.Error("Service could not start on port " + DEFAULT_PORT + " as it is already in use.")
