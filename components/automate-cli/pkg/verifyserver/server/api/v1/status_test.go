@@ -23,7 +23,7 @@ func SetupMockStatusService() statusservice.IStatusService {
 				{
 					ServiceName: "automate",
 					Version:     "4.5.20",
-					Status:      "healthy",
+					Status:      "up",
 				},
 			}
 		},
