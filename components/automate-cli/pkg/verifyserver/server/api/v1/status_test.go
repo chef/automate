@@ -1,4 +1,4 @@
-package status_test
+package v1_test
 
 import (
 	"io"
@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
 	"github.com/gofiber/fiber"
+
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,9 +21,9 @@ var testLog = &logrus.Logger{
 }
 
 func SetupDefaultHandlers() *fiber.App {
-	vs := verifyserver.NewVerifyServer(verifyserver.DEFAULT_PORT, true)
-	handlersGroup := handlers.NewHandlersList(testLog)
-	return vs.Setup(handlersGroup)
+	vs := verifyserver.NewVerifyServer(verifyserver.DEFAULT_PORT, true, testLog)
+	vs.Setup()
+	return vs.App
 }
 
 func TestStatusAPI(t *testing.T) {

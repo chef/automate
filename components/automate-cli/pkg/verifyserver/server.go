@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/ansrivas/fiberprometheus"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
@@ -18,23 +18,37 @@ const (
 )
 
 type VerifyServer struct {
-	Port string
-	Log  logger.ILogger
+	Port    string
+	Log     logger.ILogger
+	App     *fiber.App
+	Handler *handler.Handler
 }
 
-func NewVerifyServer(port string, debug bool) *VerifyServer {
+func StartVerifyServer(port string, debug bool) {
 	log := logger.NewLogger(debug)
+	vs := NewVerifyServer(port, debug, log)
+	vs.Start()
+}
+
+func NewVerifyServer(port string, debug bool, log logger.ILogger) *VerifyServer {
+	fconf := &fiber.Settings{
+		ServerHeader: SERVICE,
+		ErrorHandler: fiber_utils.CustomErrorHandler,
+	}
+	app := fiber.New(fconf)
+	handler := handler.NewHandler(log)
 	vs := &VerifyServer{
-		Port: port,
-		Log:  log,
+		Port:    port,
+		Log:     log,
+		App:     app,
+		Handler: handler,
 	}
 	return vs
 }
 
 func (vs *VerifyServer) Start() error {
-	handlersGroup := handlers.NewHandlersList(vs.Log)
-	app := vs.Setup(handlersGroup)
-	err := app.Listen(":" + vs.Port)
+	vs.Setup()
+	err := vs.App.Listen(":" + vs.Port)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
 			vs.Log.Error("Service could not start on port " + DEFAULT_PORT + " as it is already in use.")
@@ -44,21 +58,15 @@ func (vs *VerifyServer) Start() error {
 	return nil
 }
 
-func (vs *VerifyServer) Setup(h *handlers.Handlers) *fiber.App {
-	fconf := &fiber.Settings{
-		ServerHeader: SERVICE,
-		ErrorHandler: fiber_utils.CustomErrorHandler,
-	}
-	app := fiber.New(fconf)
-	app.Use(cors.New())
+func (vs *VerifyServer) Setup() {
+	vs.App.Use(cors.New())
 
 	// Define middleware to log all requests
-	app.Use(middleware.Logger(fiber_utils.GetLogConfig(vs.Log)))
+	vs.App.Use(middleware.Logger(fiber_utils.GetLogConfig(vs.Log)))
 
 	prometheus := fiberprometheus.New(SERVICE)
-	prometheus.RegisterAt(app, "/metrics")
-	app.Use(prometheus.Middleware)
+	prometheus.RegisterAt(vs.App, "/metrics")
+	vs.App.Use(prometheus.Middleware)
 
-	SetupRoutes(app, h, vs.Log)
-	return app
+	vs.SetupRoutes()
 }

@@ -1,4 +1,4 @@
-package status
+package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
@@ -21,13 +21,7 @@ type StatusResponse struct {
 	Services []StatusServices `json:"services"`
 }
 
-func NewHandler(logger logger.ILogger) *Status {
-	return &Status{
-		Logger: logger,
-	}
-}
-
-func (s *Status) GetStatus(c *fiber.Ctx) {
+func (h *Handler) GetStatus(c *fiber.Ctx) {
 	services := []StatusServices{}
 	c.JSON(response.BuildSuccessResponse(&StatusResponse{
 		Status:   "ok",

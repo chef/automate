@@ -1,20 +1,17 @@
 package verifyserver
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
-	"github.com/gofiber/fiber"
 )
 
-func SetupRoutes(app *fiber.App, h *handlers.Handlers, logger logger.ILogger) {
+func (vs *VerifyServer) SetupRoutes() {
 	// Status
-	app.Get("/status", h.Status)
+	vs.App.Get("/status", vs.Handler.GetStatus)
 
-	// apiGroup := app.Group("/api")
-	// apiV1Group := apiGroup.Group("/v1")
-	// apiChecksGroup := apiV1Group.Group("/checks")
-	// apiChecksGroup.Get("/check1", h.Checks.Check1)
+	apiGroup := vs.App.Group("/api")
+	apiV1Group := apiGroup.Group("/v1")
+	apiChecksGroup := apiV1Group.Group("/checks")
+	apiChecksGroup.Get("/fqdn", vs.Handler.Run)
 
-	fiber_utils.LogResgisteredRoutes(app.Stack(), logger)
+	fiber_utils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }
