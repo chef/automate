@@ -1,19 +1,20 @@
 package handlers
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/checks/fqdn"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	"github.com/gofiber/fiber"
 )
 
-type Groups struct {
-	Status status.IStatus
-	Checks checks.IChecks
+type Handlers struct {
+	Status func(c *fiber.Ctx)
+	Fqdn   func(c *fiber.Ctx)
 }
 
-func NewHandlersGroup(logger logger.ILogger) *Groups {
-	return &Groups{
-		Status: status.NewHandler(logger),
-		Checks: checks.NewHandler(logger),
+func NewHandlersList(logger logger.ILogger) *Handlers {
+	return &Handlers{
+		Status: status.NewHandler(logger).GetStatus,
+		Fqdn:   fqdn.NewHandler(logger).Run,
 	}
 }

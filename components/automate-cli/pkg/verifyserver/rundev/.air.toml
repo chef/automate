@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = "/usr/local/go/bin/go run pkg/verifyserver/rundev/main.go"
+  bin = "/bin/sleep 2 && /usr/local/go/bin/go run pkg/verifyserver/rundev/main.go"
   cmd = "echo skipping build..."
   delay = 1000
   exclude_dir = []

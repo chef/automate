@@ -7,9 +7,9 @@ import (
 	"github.com/gofiber/fiber"
 )
 
-func SetupRoutes(app *fiber.App, h *handlers.Groups, logger logger.ILogger) {
+func SetupRoutes(app *fiber.App, h *handlers.Handlers, logger logger.ILogger) {
 	// Status
-	app.Get("/status", h.Status.GetStatus)
+	app.Get("/status", h.Status)
 
 	// apiGroup := app.Group("/api")
 	// apiV1Group := apiGroup.Group("/v1")

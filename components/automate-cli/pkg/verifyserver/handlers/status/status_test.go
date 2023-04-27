@@ -6,18 +6,27 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/mock"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
+	"github.com/gofiber/fiber"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
+var testLog = &logrus.Logger{
+	Out:       os.Stderr,
+	Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
+	Hooks:     make(logrus.LevelHooks),
+	Level:     logrus.DebugLevel,
+}
+
+func SetupDefaultHandlers() *fiber.App {
+	vs := verifyserver.NewVerifyServer(verifyserver.DEFAULT_PORT, true)
+	handlersGroup := handlers.NewHandlersList(testLog)
+	return vs.Setup(handlersGroup)
+}
+
 func TestStatusAPI(t *testing.T) {
-	var log = &logrus.Logger{
-		Out:       os.Stderr,
-		Formatter: &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true},
-		Hooks:     make(logrus.LevelHooks),
-		Level:     logrus.DebugLevel,
-	}
 	tests := []struct {
 		description  string
 		expectedCode int
@@ -31,7 +40,7 @@ func TestStatusAPI(t *testing.T) {
 	}
 	statusEndpoint := "/status"
 	// Setup the app as it is done in the main function
-	app := mock.SetupWithDefaultHandlers(log)
+	app := SetupDefaultHandlers()
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {

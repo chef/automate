@@ -1,4 +1,4 @@
-package mock
+package mockserver
 
 import (
 	"fmt"
@@ -6,11 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
-
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/handlers"
-	"github.com/gofiber/fiber"
-	"github.com/sirupsen/logrus"
 )
 
 type APIBuilder struct {
@@ -55,11 +50,4 @@ func (b *APIBuilder) HttpReqMock(endpoint string, code int, response []byte, wai
 			w.Write(response)
 		}))
 	return b
-}
-
-func SetupWithDefaultHandlers(log *logrus.Logger) *fiber.App {
-	app := fiber.New()
-	h := handlers.NewHandlersGroup(log)
-	verifyserver.SetupRoutes(app, h, log)
-	return app
 }

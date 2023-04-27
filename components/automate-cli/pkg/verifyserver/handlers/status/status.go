@@ -10,10 +10,6 @@ type Status struct {
 	Logger logger.ILogger
 }
 
-type IStatus interface {
-	GetStatus(c *fiber.Ctx)
-}
-
 type StatusServices struct {
 	ServiceName string `json:"service_name"`
 	Status      string `json:"status"`
@@ -25,7 +21,7 @@ type StatusResponse struct {
 	Services []StatusServices `json:"services"`
 }
 
-func NewHandler(logger logger.ILogger) IStatus {
+func NewHandler(logger logger.ILogger) *Status {
 	return &Status{
 		Logger: logger,
 	}

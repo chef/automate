@@ -1,4 +1,4 @@
-package mock_test
+package mockserver_test
 
 import (
 	"io"
@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/mock"
+	"github.com/chef/automate/lib/mockserver"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestKeysAPI(t *testing.T) {
+func TestMockServer(t *testing.T) {
 
 	tests := []struct {
 		description  string
@@ -31,7 +31,7 @@ func TestKeysAPI(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 
-			ts := mock.NewAPI(t).HttpReqMock(keyEndpoint, test.expectedCode, []byte(test.resBody), test.wait).Build()
+			ts := mockserver.NewAPI(t).HttpReqMock(keyEndpoint, test.expectedCode, []byte(test.resBody), test.wait).Build()
 
 			//ts.URL gives the mock server endpoint
 			resp, err := http.Get(ts.URL + keyEndpoint)

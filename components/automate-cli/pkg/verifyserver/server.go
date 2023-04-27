@@ -22,11 +22,7 @@ type VerifyServer struct {
 	Log  logger.ILogger
 }
 
-type IVerifyServer interface {
-	Start() error
-}
-
-func NewVerifyServer(port string, debug bool) IVerifyServer {
+func NewVerifyServer(port string, debug bool) *VerifyServer {
 	log := logger.NewLogger(debug)
 	vs := &VerifyServer{
 		Port: port,
@@ -36,8 +32,8 @@ func NewVerifyServer(port string, debug bool) IVerifyServer {
 }
 
 func (vs *VerifyServer) Start() error {
-	handlersGroup := handlers.NewHandlersGroup(vs.Log)
-	app := vs.setup(handlersGroup)
+	handlersGroup := handlers.NewHandlersList(vs.Log)
+	app := vs.Setup(handlersGroup)
 	err := app.Listen(":" + DEFAULT_PORT)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
@@ -48,7 +44,7 @@ func (vs *VerifyServer) Start() error {
 	return nil
 }
 
-func (vs *VerifyServer) setup(h *handlers.Groups) *fiber.App {
+func (vs *VerifyServer) Setup(h *handlers.Handlers) *fiber.App {
 	fconf := &fiber.Settings{
 		ServerHeader: SERVICE,
 		ErrorHandler: fiber_utils.CustomErrorHandler,
