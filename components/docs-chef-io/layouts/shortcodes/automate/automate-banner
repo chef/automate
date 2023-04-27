@@ -1,1 +1,1 @@
-BANNER
+The Chef Automate at the end of May, 2023 will come with **Golang Version Update**. It may impact the deployments using Custom Certificates. Get more details in our blog on [Upgrading Golang Version](https://www.chef.io/blog/upgrading-golang-version-by-the-end-of-may-23-automate-release).
