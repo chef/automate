@@ -24,10 +24,10 @@ type VerifyServer struct {
 	Handler *handler.Handler
 }
 
-func StartVerifyServer(port string, debug bool) {
+func StartVerifyServer(port string, debug bool) error {
 	log := logger.NewLogger(debug)
 	vs := NewVerifyServer(port, debug, log)
-	vs.Start()
+	return vs.Start()
 }
 
 func NewVerifyServer(port string, debug bool, log logger.ILogger) *VerifyServer {
