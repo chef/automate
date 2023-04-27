@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 The _Client Runs_ page shows all nodes connected to Chef Automate, either directly or via a Chef Infra Server proxy.

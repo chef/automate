@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 50
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 {{< note >}}
 
 - All the nodes will apply the Frontend patch/set wherever the Postgresql and OpenSearch changes will be used to only one cluster node.

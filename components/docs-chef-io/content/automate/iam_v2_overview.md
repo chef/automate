@@ -11,6 +11,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 {{< note >}}
 This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.
 {{< /note >}}

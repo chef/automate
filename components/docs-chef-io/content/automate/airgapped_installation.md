@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 An airgapped host is one that has no direct inbound or outbound internet

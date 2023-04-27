@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 40
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Chef Automate uses `systemd`. Log management is performed according to the configuration defined for the system service `journald`.
 
 ## Viewing Logs

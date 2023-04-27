@@ -13,6 +13,10 @@ aliases = "servicenow_integration_reference"
     weight = 30
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 This page details information on the topics that will aid you while installing and configuring the Chef Automate applications in the ServiceNow ecosystem.
 
 - [Integration App]({{< relref "servicenow_integration" >}})

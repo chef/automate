@@ -13,6 +13,10 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
+{{< warning >}}
 {{% automate/ha-warn %}}s
 {{< /warning >}}
 
@@ -20,37 +24,37 @@ This page includes commands that can be executed for the Chef Automate cluster p
 
 ## Automate HA Service Commands
 
-- Get the Automate HA cluster Information 
-  
+- Get the Automate HA cluster Information
+
 ```cmd
-    chef-automate info 
+    chef-automate info
 ```
 
 - Post Deployment, run the smoke test cases on Automate HA cluster and run the command from the bastion node.
-  
+
 ```cmd
-    chef-automate test --full 
+    chef-automate test --full
 ```
 
 - Validate the cluster but skip "chef-automate diagnostic run" when performing the smoke tests
-  
+
   ```cmd
-    chef-automate test  
+    chef-automate test
   ```
 
-- Run the smoke test on specific cluster 
-  
+- Run the smoke test on specific cluster
+
   ```cmd
     chef-automate test automate
     chef-automate test chef_server
     chef-automate test opensearch
-    chef-automate test postgresql 
+    chef-automate test postgresql
   ```
 
 - To get the status of the cluster, run the command from the bastion node.
-  
+
   ```cmd
-    chef-automate status 
+    chef-automate status
   ```
 
 - Check the service status on frontend nodes (Automate), ssh to the frontend node.
@@ -68,44 +72,45 @@ This page includes commands that can be executed for the Chef Automate cluster p
 ```
 
 - Check the service status on backend nodes (Postgres nodes), ssh to the backend node.
-  
+
 ```cmd
    chef-automate ssh --hostname pg
    hab svc status
 ```
 
 - Check the service status on backend nodes (Opensearch nodes), ssh to the backend node.
-  
+
 ```cmd
     chef-automate ssh --hostname os
     hab svc status
 ```
 
-
-
 - Patch a config to the Front end nodes (Automate)
   - create a config file `automate.toml`
-  
+
 ``` cmd
     chef-automate config patch automate.toml --automate
 ```
-sorthands for --automate is --a2 and -a
+
+- sorthands for --automate is --a2 and -a
 
 - Patch a config to the Front end nodes (Chef Server)
   - create a config file `chefserver.toml`
-  
+
 ``` cmd
     chef-automate config patch chefserver.toml --chef_server
 ```
-sorthands for --chef_server is --cs and -c
+
+- sorthands for --chef_server is --cs and -c
 
 - Patch a config to the all Front end nodes (Chef Server + Automate)
   - create a config file `frontend.toml`
-  
+
 ``` cmd
     chef-automate config patch frontend.toml --frontend
 ```
-sorthands for --chef_server is --fe and -f
+
+- sorthands for --chef_server is --fe and -f
 
 - Patch a config to the Back end nodes (Open Search)
   - create a config file `opensearch.toml`
@@ -113,7 +118,8 @@ sorthands for --chef_server is --fe and -f
 ``` cmd
     chef-automate config patch opensearch.toml --opensearch
 ```
-sorthands for --opensearch is --os and -o
+
+- sorthands for --opensearch is --os and -o
 
 - Patch a config to the Back end nodes (Postgresql)
   - create a config file `postgresql.toml`
@@ -121,7 +127,8 @@ sorthands for --opensearch is --os and -o
 ``` cmd
     chef-automate config patch postgresql.toml --postgresql
 ```
-sorthands for --postgresql is --pg and -p
+
+- sorthands for --postgresql is --pg and -p
 
 {{< note >}}
 
@@ -137,7 +144,7 @@ sorthands for --postgresql is --pg and -p
 
 {{< /warning >}}
 
-- Collect the Gatherlogs for Automate HA cluster, and run the command from the bastion node.  
+- Collect the Gatherlogs for Automate HA cluster, and run the command from the bastion node.
   - logs are collected at `/var/tmp`
 
 ```cmd

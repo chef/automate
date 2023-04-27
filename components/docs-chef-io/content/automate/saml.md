@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 50
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Chef Automate can integrate with existing Security Assertion Markup Language (SAML) services to authenticate users in Chef Automate, and use their existing group memberships to determine their Chef Automate permissions.
 
 ## Authentication via Existing Identity Management Systems

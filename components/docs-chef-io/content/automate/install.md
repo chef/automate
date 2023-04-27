@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Before beginning your installation, check the [System Requirements]({{< relref "system_requirements.md" >}}) for Chef Automate.
 
 See [Airgapped Installation]({{< relref "airgapped_installation.md" >}}) for installing Chef Automate to a host with no inbound or outbound internet traffic.

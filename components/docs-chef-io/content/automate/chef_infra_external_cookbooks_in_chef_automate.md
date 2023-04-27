@@ -10,6 +10,10 @@ gh_repo = "automate"
     weight = 90
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 The Chef Infra Server stores cookbooks, the policies that are applied to nodes, and the metadata that describes each registered node under Chef Infra Client's management. This page will tell you how you can configure your Infra Server to use S3 storage type of cookbooks.
 
 {{< note >}}

@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 50
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Use the beta, lega, or feat flags to turn on or off beta, legacy, or in-development features.
 
 Select anywhere on the Chef Automate interface and enter "feat", "lega", or "beta" to open the feature flags window.

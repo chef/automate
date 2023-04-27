@@ -9,6 +9,11 @@ automate = "AWS Deployment Prerequisites"
     identifier = "automate/deploy_high_availability/ha_prerequisites/ha-aws-deployment-prerequisites.md AWS Deployment Prerequisites"
     weight = 30
 +++
+
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 {{< warning >}}
 {{% automate/ha-warn %}}
 {{< /warning >}}

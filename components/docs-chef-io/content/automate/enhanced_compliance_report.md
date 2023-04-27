@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 80
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 **Enhanced Compliance Reporting** has been introduced in the Chef Automate which comes with a few new compliance APIs and modified compliance reporting APIs. The existing APIs can be used to work on a specific date. The new modification to the compliance APIs have been introduced to work on the Date Range.
 
 While specifying the date range, the end date will always be the current date whereas the start date can be any date before 90 days.

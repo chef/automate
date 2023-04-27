@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Chef Automate 2 Architecture
 
 ![Chef Automate 2 Architecture](/images/automate/a2-architecture-os.png)

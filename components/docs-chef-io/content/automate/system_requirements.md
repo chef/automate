@@ -14,6 +14,14 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Hardware
 
 Chef Automate requires a minimum of

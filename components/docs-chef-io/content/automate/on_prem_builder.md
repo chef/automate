@@ -15,6 +15,10 @@ gh_repo = "automate"
     weight = 40
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 This guide details how to install Chef Automate and deploy Chef Habitat Builder on-prem together. Enterprise customers may wish to set up an on-premises Chef Habitat Builder depot to store Chef Habitat packages for use by their own Chef Habitat Studios and Supervisors.
 
 This guide covers setting up Chef Automate and Chef Habitat Builder on-prem, and bootstrapping Chef Habitat Builder on-prem with curated core seed lists from the Chef Habitat public Builder.

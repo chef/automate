@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 70
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 A Chef Automate team is an assigned grouping of users. You can import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "ldap.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "ldap.md" >}}), or [SAML]({{< ref "saml.md" >}}). You can also create local Chef Automate teams that are independent of LDAP or SAML.

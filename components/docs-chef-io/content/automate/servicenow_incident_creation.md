@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 The Chef Automate Incident Creation App for ServiceNow is a certified app available in the [ServiceNow](https://store.servicenow.com) store. The Incident App generates incidents in the ServiceNow Incident Management environment for configuration run or compliance check failures in Chef Automate. This helps you capture the failures in your automated infrastructure and improve your incident tracking and resolution.
 
 The Incident App exposes the REST API endpoint for communication between Chef Automate and the ServiceNow instance. Chef Automate sends HTTPS JSON notifications to the Incident App in a ServiceNow instance to creates and update incident failures.

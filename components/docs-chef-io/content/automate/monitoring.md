@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 50
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Use the authenticated https endpoint `/status` to monitor your Chef Automate installation.
 
 ## Checking the Status Endpoint

@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 The Data Feed service sends node data to a 3rd party service. This can be useful when updating configuration management databases, external security dashboards, and IT service management platforms.
 The following types of information are sent:
 

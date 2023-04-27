@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 60
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 Chef Automate Identity and Access Management roles are named groups of actions used to define [policies]({{< relref "policies.md" >}}). Actions describe what is allowed by users in Automate. [IAM Actions]({{< relref "iam_actions.md" >}}) describes the associated action or actions required to access certain pages in the browser.

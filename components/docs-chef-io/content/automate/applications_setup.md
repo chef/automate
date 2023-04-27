@@ -13,6 +13,9 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
 
 <!-- ## Health Checks
 

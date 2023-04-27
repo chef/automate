@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 30
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Reference the chart on this page when creating a *Role* to know which action grants access to what page in the browser.
 
 *IAM Action* lists the associated action or actions required to access that page in the browser.

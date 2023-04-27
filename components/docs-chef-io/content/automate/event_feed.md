@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 70
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Use the _Event Feed_ for actionable insights and operational visibility.
 The _Event Feed_ shows the time of the event, its type, the object acted upon, the action, and the initiating action.
 The Guitar Strings visualization helps you drill into infrastructure and compliance automation events and quickly isolate errors.

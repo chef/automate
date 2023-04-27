@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 A scan job is the equivalent of running `inspec exec` against a given set of targets. The results of a scan job are sent to compliance reporting. Any profiles installed to the user's namespace may be used in a scan job.

@@ -15,6 +15,10 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
+{{< warning >}}
 
 Chef Automate will not deploy the Chef Manage add-on for Chef Infra Server.
 

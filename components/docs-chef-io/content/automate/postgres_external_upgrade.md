@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 This guide covers upgrading services used by Chef Automate.
 
 ## Upgrade Amazon RDS for PostgreSQL

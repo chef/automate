@@ -13,6 +13,10 @@ automate = "On-Premises Prerequisites"
 +++
 
 {{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
+{{< warning >}}
 {{% automate/ha-warn %}}
 {{< /warning >}}
 

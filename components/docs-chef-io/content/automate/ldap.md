@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 30
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Authentication via Existing Identity Management Systems
 
 Chef Automate can integrate with existing LDAP services to authenticate users in Chef Automate, and thus use their existing group memberships to determine their Chef Automate permissions.

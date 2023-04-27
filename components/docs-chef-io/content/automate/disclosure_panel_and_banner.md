@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 30
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Customize your Chef Automate installation with a **Disclosure Panel** to add critical information about your unique environment on the sign-in page and a **Banner** at the top of every page to highlight important information.
 
 ## Disclosure Panel

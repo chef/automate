@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 120
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 Chef Automate users can manage their display name, date/time format, and password. Select the user icon in the top navigation bar, and select **Profile** from the drop-down menu.

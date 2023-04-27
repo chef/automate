@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 50
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 The Chef Automate _Desktop_ dashboard displays status information about all desktops connected to Chef Automate.
 Desktop information populates this dashboard after a Chef Infra Client run has executed.
 

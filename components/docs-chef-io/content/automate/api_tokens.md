@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 40
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 API Tokens are used to access the Chef Automate API. They are the only way to authenticate against the Chef Automate API. Tokens can be added as members of policies in order to grant them permissions.

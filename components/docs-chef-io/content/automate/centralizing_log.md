@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 42
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Centralizing the log is a method to redirect your log to a separate file and save it. Centralizing the log in a file is always helpful if you want to transmit it to a third-party application like **Splunk** or **Logstash**.
 
 To check the status of the Chef Automate from deployment with channel and type, run the following command:

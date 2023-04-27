@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 50
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 Identity and Access Management policies manage the resources and actions used by identities.

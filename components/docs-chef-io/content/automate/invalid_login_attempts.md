@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 60
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 Invalid Login Attempts is available only in case of local or LDAP users.
 
 Chef Automate shows error message for invalid login attempts for local or LDAP user as shown below.

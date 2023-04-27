@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 110
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 Identity and Access Management projects allow for filtering and segregation of your data among your user base.

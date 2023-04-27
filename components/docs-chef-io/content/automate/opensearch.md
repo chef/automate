@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 You can configure Chef Automate to use OpenSearch clusters that are not deployed via Chef Automate itself.
 
 ## Configure External OpenSearch

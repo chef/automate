@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 100
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Index issues
 
 ### Indices with bad default mappings

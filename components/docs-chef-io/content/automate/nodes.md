@@ -12,7 +12,11 @@ gh_repo = "automate"
     weight = 40
 +++
 
-### Nodes
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
+## Nodes
 
 The `/nodes` endpoint in Chef Automate is something of a 'logbook' of the nodes in your infrastructure.
 
@@ -22,7 +26,7 @@ When a user adds a node integration, like aws or azure, nodes are added to the `
 
 When a Chef InSpec report or a Chef Infra Client run is ingested, a node is added to the `/nodes` endpoint. If the node already exists, its last contact time, run data, and scan data are updated. When run data and scan data are updated, the latest information is stored for the run id or report id, the status, and the penultimate status.
 
-### Node Status
+## Node Status
 
 All nodes have one of three possible statuses: 'unknown', 'reachable', and 'unreachable'. The default status is 'unknown'.
 
@@ -31,7 +35,7 @@ If the detect job is successful, the node status updates from 'unknown' to 'reac
 If the detect job is unsuccessful, meaning the node could not be reached, the node's status updates to 'unreachable'.
 The status updates every time a scan job runs on the node.
 
-### Node State
+## Node State
 
 All nodes have a state.
 Possible states are unknown(''), 'running', 'stopped', and 'terminated'. Default state: '' (unknown).
@@ -46,7 +50,7 @@ If a node is found to have a state other than 'running', the node status is then
 
 Node state is updated to 'running' on report ingestion if the end time recorded by the inspec report is less than ten minutes from the ingestion time.
 
-### Filtering Nodes
+## Filtering Nodes
 
 The `/nodes` endpoint supports filtering by:
 
@@ -71,11 +75,12 @@ The `/nodes` endpoint supports filtering by:
 
 ## Examples
 
-* Show me all nodes whose last scan had a status of failed and a penultimate status of passed
+- Show me all nodes whose last scan had a status of failed and a penultimate status of passed
 
 _or in other words, which nodes were previously passing their scans and just started failing?_
 
-sample request:
+Sample request:
+
 ```bash
 curl -s --insecure -H "api-token: $token_val"
 https://a2-dev.test/api/v0/nodes/search -d '{
@@ -86,18 +91,18 @@ https://a2-dev.test/api/v0/nodes/search -d '{
 }'
 ```
 
+Sample truncated response:
 
-sample truncated response:
-```
+```bash
 {"nodes":[{"id":"0e05fcf2-2fab-36ee-bb84-5b7d5888c33a","name":"chef-load-blue-delladonna-indigo","platform":"debian","platform_version":"8.11","last_contact":"2019-05-14T18:08:43Z","run_data":{"id":"","status":"UNKNOWN","penultimate_status":"UNKNOWN","end_time":null},"scan_data":{"id":"5640fbb7-d1ba-4c67-b0cd-9db4fcfc2598","status":"FAILED","penultimate_status":"PASSED","end_time":"2019-05-14T18:08:43Z"}}]}
 ```
 
-
-* Show me all nodes whose last ccr passed and last scan failed, that had a penultimate ccr status of failed
+- Show me all nodes whose last ccr passed and last scan failed, that had a penultimate ccr status of failed
 
 _or in other words, which nodes just started passing their ccrs but are failing their scans?_
 
-sample request:
+Sample request:
+
 ```bash
 curl -s --insecure -H "api-token: $token_val"
 https://a2-dev.test/api/v0/nodes/search -d '{
@@ -109,12 +114,12 @@ https://a2-dev.test/api/v0/nodes/search -d '{
 }'
 ```
 
-
-* Show me all nodes that had a last scan ingested sometime in the last 48 hours with a status of failed
+- Show me all nodes that had a last scan ingested sometime in the last 48 hours with a status of failed
 
 _or in other words, which nodes that were ingested in the last 48 hours failed their scans?_
 
-sample request:
+Sample request:
+
 ```bash
 curl -s --insecure -H "api-token: $token_val"
 https://a2-dev.test/api/v0/nodes/search -d '{
@@ -125,10 +130,10 @@ https://a2-dev.test/api/v0/nodes/search -d '{
 }'
 ```
 
+- Show me all nodes tagged with `deployment:staging` OR `deployment:test`. We OR between multiple values of the same key
 
-* Show me all nodes tagged with `deployment:staging` OR `deployment:test`. We OR between multiple values of the same key
+Sample request:
 
-sample request:
 ```bash
 curl -s --insecure -H "api-token: $token_val"
 https://a2-dev.test/api/v0/nodes/search -d '{
@@ -138,10 +143,10 @@ https://a2-dev.test/api/v0/nodes/search -d '{
 }'
 ```
 
+- Show me all nodes tagged with `deployment:prod` AND `org:marketing`. We AND between different tag key filters
 
-* Show me all nodes tagged with `deployment:prod` AND `org:marketing`. We AND between different tag key filters
+Sample request:
 
-sample request:
 ```bash
 curl -s --insecure -H "api-token: $token_val"
 https://a2-dev.test/api/v0/nodes/search -d '{
@@ -152,8 +157,7 @@ https://a2-dev.test/api/v0/nodes/search -d '{
 }'
 ```
 
-
-### Bulk Node Add
+## Bulk Node Add
 
  Use the `nodes/bulk-create` endpoint to add multiple nodes with the same set of tags and credentials.  Specifying a `name_prefix` for the nodes in question results in a node name of `prefix-host`.  Specified tags will be added to each node. The endpoint takes an array of node objects, allowing users to add as many nodes as needed.
 
@@ -191,7 +195,7 @@ curl -s --insecure -H "api-token: $token_val" https://a2-dev.test/api/v0/nodes/b
 }'
 ```
 
-### Bulk Node Delete
+## Bulk Node Delete
 
  The `/nodes/delete` endpoint allows users to bulk-delete nodes based on a query. To examine the outcome of this destructive action before running it, test the query first on the `api/v0/nodes/search` endpoint.
 

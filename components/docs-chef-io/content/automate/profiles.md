@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 30
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 Compliance profiles help you secure your infrastructure continuously.

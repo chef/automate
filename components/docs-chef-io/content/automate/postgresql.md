@@ -14,6 +14,10 @@ draft = false
 
 [\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/postgresql.md)
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 You can configure Chef Automate to use external PostgreSQL clusters that are not deployed via Chef Automate itself.
 
 ## Configuring an External PostgreSQL Database

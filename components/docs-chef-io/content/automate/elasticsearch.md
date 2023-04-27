@@ -10,6 +10,10 @@ draft = false
     parent = "automate/configuring_automate/elasticsearch"
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 You can configure Chef Automate to use Elasticsearch clusters that are not deployed via Chef Automate itself.
 
 ## Configure External Elasticsearch

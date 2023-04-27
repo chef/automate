@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 80
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 ## Overview
 
 Chef Automate supports three different types of users: local users, [LDAP users]({{< relref "ldap.md" >}}), and [SAML users]({{< relref "saml.md" >}}). Manage local users from the **Settings** tab.

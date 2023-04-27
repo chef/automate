@@ -13,12 +13,17 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
+{{< warning >}}
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
 Steps to upgrade the Chef Automate HA are as shown below:
 
-- Download the latest cli 
+- Download the latest cli:
+
   ```bash
    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
    ```
@@ -28,76 +33,76 @@ Steps to upgrade the Chef Automate HA are as shown below:
   ```bash
   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
   ```
-  Download specific version bundle with this:
+
+- Download specific version bundle with this:
+
   ```bash
   curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o automate-<version>.aib
   ```
 
-  {{< note >}} 
-  Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
-  {{< /note >}}
+  {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
 - If we want to only upgrade FrontEnd Services i.e. Chef Automate and Chef Infra Server.
+
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends
   ```
 
 - If we want to only upgrade BackEnd Services i.e. Postgresql and OpenSearch.
+
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends
   ```
 
-- To upgrade full Chef Automate HA System run this command from Bation Host: 
+- To upgrade full Chef Automate HA System run this command from Bation Host:
+
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib
   ```
 
-
 {{< note >}}
 
-  - BackEnd upgrades will restart the backend service, which take time for cluster to be in health state.
-  - Upgrade command, currently only supports minor upgrade.  
+- BackEnd upgrades will restart the backend service, which take time for cluster to be in health state.
+- Upgrade command, currently only supports minor upgrade.
+
 {{< /note >}}
 
 - To skip user confirmation prompt in upgrade, you can pass a flag
-  ```bash 
+
+  ```bash
     chef-automate upgrade run --airgap-bundle latest.aib --auto-approve
-    OR 
-    chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends --auto-approve
+
     OR
+
+    chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends --auto-approve
+
+    OR
+
     chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends --auto-approve
   ```
 
-Upgrade will also check for new version of bastion workspace, if new version is available, it will promt for a confirmation for workspace upgrade before upgrading the Frontend or backend nodes, 
+Upgrade will also check for new version of bastion workspace, if new version is available, it will prompt for a confirmation for workspace upgrade before upgrading the Frontend or backend nodes.
 
-In case of yes, it will do workspace upgrade and no will skip this.
-We can also pass a flag in upgade command to avoid prompt for workspace upgrade. 
+- In case of yes, it will do workspace upgrade and no will skip this.
+- We can also pass a flag in upgrade command to avoid prompt for workspace upgrade.
 
   ```bash
    chef-automate upgrade run --airgap-bundle latest.aib --auto-approve --workspace-upgrade yes
-      OR  
+      OR
    chef-automate upgrade run --airgap-bundle latest.aib --auto-approve --workspace-upgrade no
   ```
 
 {{< note >}}
 
-  AMI Upgrade is only for AWS deployment, as in On-Premise Deployment all the resources are managed by the customers themselves.  
+  AMI Upgrade is only for AWS deployment, as in On-Premise Deployment all the resources are managed by the customers themselves.
 
 {{< /note >}}
 
 ## AMI Upgrade Setup For AWS Deployment
 
-{{< note >}}
+{{< note >}} In the following section, the old cluster with older AMI Images is referred as the **Primary Cluster** and the cluster which has upgraded AMI is referred as the **New Cluster**. {{< /note >}}
 
-  In this following section, the old cluster with older AMI Images is referred as the **Primary Cluster** and the cluster which has upgraded AMI is referred as the **New Cluster**.
-
-{{< /note >}}
-
-{{< note >}}
-
-  The AWS deployment should be configured with S3, Both Primary and New cluster should be configured with same s3 bucket.
-  
-{{< /note >}}
+{{< note >}} The AWS deployment should be configured with S3, Both Primary and New cluster should be configured with same s3 bucket. {{< /note >}}
 
 ### Steps to set up the AMI Upgraded Cluster
 
@@ -120,7 +125,6 @@ We can also pass a flag in upgade command to avoid prompt for workspace upgrade.
     ```
 
     - Copy `bootstrap.abb` to all Automate and Chef Infra frontend nodes in the New cluster.
-
 
 4. On New AMI upgraded Cluster
 

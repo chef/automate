@@ -12,6 +12,9 @@ gh_repo = "automate"
     weight = 80
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
 
 This page lists the Chef Infra server keys that can be configured in Standalone Automate and Automate HA.
 

@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/automate-banner %}}
+{{< /warning >}}
+
 The `chef-automate` CLI provides commands to help you work with your existing Chef Automate configuration:
 
 * `chef-automate config show` shows your current configuration, not including default settings
