@@ -46,6 +46,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
+
 	return &response.CreateOrg{
 		Org: fromStorageOrg(org),
 	}, nil
