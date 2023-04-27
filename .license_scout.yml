@@ -332,6 +332,9 @@ fallbacks:
     - name: github.com/globalsign/mgo
       license_id: Unlicense
       license_content: https://github.com/globalsign/mgo/blob/master/LICENSE
+    - name: github.com/ansrivas/fiberprometheus
+      license_id: MIT
+      license_content: https://github.com/ansrivas/fiberprometheus/blob/master/LICENSE
 
   habitat:
     - name: chef/mlsa

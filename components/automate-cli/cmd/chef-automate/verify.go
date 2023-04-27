@@ -2,12 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
 )
+
+const VERIFY_SERVER_PORT = "VERIFY_SERVER_PORT"
 
 type verifyCmdFlags struct {
 	file                      string
@@ -20,6 +25,7 @@ type verifyCmdFlags struct {
 	haAWSManagedDeploy        bool
 	standaloneDeploy          bool
 	certificates              bool
+	debug                     bool
 }
 
 type verifyCmdFlow struct {
@@ -27,6 +33,8 @@ type verifyCmdFlow struct {
 	A2HARBFileExist   bool
 	ManagedServicesOn bool
 }
+
+type verifyServeCmdFlow struct{}
 
 func init() {
 	flagsObj := verifyCmdFlags{}
@@ -38,8 +46,20 @@ func init() {
 		Annotations: map[string]string{
 			docs.Compatibility: docs.Compatibility,
 		},
-		Args: cobra.RangeArgs(0, 1),
-		RunE: verifyCmdFunc(&flagsObj),
+		Args:   cobra.RangeArgs(0, 1),
+		RunE:   verifyCmdFunc(&flagsObj),
+		Hidden: true,
+	}
+
+	verifyServeCmd := &cobra.Command{
+		Use:   "serve",
+		Short: "Start verify server",
+		Long:  "Start verify server for running checks",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.Compatibility,
+		},
+		Args: cobra.ExactArgs(0),
+		RunE: verifyServeCmdFunc(&flagsObj),
 	}
 
 	// flags for Verify Command
@@ -93,7 +113,34 @@ func init() {
 		"file",
 		"",
 		"Config file that needs to be verified")
+	verifyServeCmd.Flags().BoolVarP(
+		&flagsObj.debug,
+		"debug",
+		"d",
+		false,
+		"enable debugging")
+	verifyCmd.AddCommand(verifyServeCmd)
 	RootCmd.AddCommand(verifyCmd)
+}
+
+func verifyServeCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		c := verifyServeCmdFlow{}
+		return c.runVerifyServeCmd(cmd, args, flagsObj.debug)
+	}
+}
+
+func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string, debug bool) error {
+	port := server.DEFAULT_PORT
+	env_port := os.Getenv(VERIFY_SERVER_PORT)
+	if env_port != "" {
+		if _, err := strconv.Atoi(env_port); err == nil {
+			port = env_port
+		}
+	}
+	writer.Println("Using port " + port)
+	vs := server.NewVerifyServer(port, debug)
+	return vs.Start()
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
