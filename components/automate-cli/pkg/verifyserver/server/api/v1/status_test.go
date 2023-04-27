@@ -1,7 +1,7 @@
 package v1_test
 
 import (
-	"io"
+	"io/ioutil"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -48,7 +48,7 @@ func TestStatusAPI(t *testing.T) {
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
-			body, err := io.ReadAll(res.Body)
+			body, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
 			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, res.StatusCode, test.expectedCode)

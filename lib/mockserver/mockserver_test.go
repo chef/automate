@@ -1,7 +1,7 @@
 package mockserver_test
 
 import (
-	"io"
+	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
@@ -43,7 +43,7 @@ func TestMockServer(t *testing.T) {
 			assert.NoError(t, err)
 
 			// Read the response body
-			body, err := io.ReadAll(resp.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 
 			// Reading the response body should work everytime, such that
 			// the err variable should be nil
