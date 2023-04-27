@@ -190,6 +190,32 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
+		t.Run("when the org required field server ID is missing or empty,  argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Id:        "infra-org-id",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			assert.Error(t, err, "must supply server ID")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Id:        "infra-org-id",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  "",
+				Projects:  []string{},
+			})
+			assert.Nil(t, resp2)
+			assert.Error(t, err, "must supply server ID")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
 		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
