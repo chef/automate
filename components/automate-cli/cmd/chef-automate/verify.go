@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -9,6 +11,8 @@ import (
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
 )
+
+const VERIFY_SERVER_PORT = "VERIFY_SERVER_PORT"
 
 type verifyCmdFlags struct {
 	file                      string
@@ -127,7 +131,15 @@ func verifyServeCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args 
 }
 
 func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string, debug bool) error {
-	vs := server.NewVerifyServer(server.DEFAULT_PORT, debug)
+	port := server.DEFAULT_PORT
+	env_port := os.Getenv(VERIFY_SERVER_PORT)
+	if env_port != "" {
+		if _, err := strconv.Atoi(env_port); err == nil {
+			port = env_port
+		}
+	}
+	writer.Println("Using port " + port)
+	vs := server.NewVerifyServer(port, debug)
 	return vs.Start()
 }
 
