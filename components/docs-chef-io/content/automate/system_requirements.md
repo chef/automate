@@ -18,10 +18,6 @@ gh_repo = "automate"
 {{% automate/automate-banner %}}
 {{< /warning >}}
 
-{{< warning >}}
-{{% automate/automate-banner %}}
-{{< /warning >}}
-
 ## Hardware
 
 Chef Automate requires a minimum of
