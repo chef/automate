@@ -5,7 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
 )
@@ -127,7 +127,8 @@ func verifyServeCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args 
 }
 
 func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string, debug bool) error {
-	return verifyserver.StartVerifyServer(verifyserver.DEFAULT_PORT, debug)
+	vs := server.NewVerifyServer(server.DEFAULT_PORT, debug)
+	return vs.Start()
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {

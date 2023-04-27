@@ -1,7 +1,7 @@
-package verifyserver
+package server
 
 import (
-	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 )
 
 func (vs *VerifyServer) SetupRoutes() {
@@ -13,5 +13,5 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup := apiV1Group.Group("/checks")
 	apiChecksGroup.Get("/fqdn", vs.Handler.Run)
 
-	fiber_utils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
+	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }

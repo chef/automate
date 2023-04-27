@@ -1,12 +1,13 @@
-package verifyserver
+package server
 
 import (
 	"strings"
 
 	"github.com/ansrivas/fiberprometheus"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
-	handler "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
-	fiber_utils "github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiber"
+	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
@@ -21,33 +22,29 @@ type VerifyServer struct {
 	Port    string
 	Log     logger.ILogger
 	App     *fiber.App
-	Handler *handler.Handler
+	Handler *v1.Handler
 }
 
-func StartVerifyServer(port string, debug bool) error {
+func NewVerifyServer(port string, debug bool) *VerifyServer {
 	log := logger.NewLogger(debug)
-	vs := NewVerifyServer(port, debug, log)
-	return vs.Start()
-}
-
-func NewVerifyServer(port string, debug bool, log logger.ILogger) *VerifyServer {
 	fconf := &fiber.Settings{
 		ServerHeader: SERVICE,
-		ErrorHandler: fiber_utils.CustomErrorHandler,
+		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
 	app := fiber.New(fconf)
-	handler := handler.NewHandler(log)
+	handler := v1.NewHandler(log).
+		AddStatusService(statusservice.NewStatusService())
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     log,
 		App:     app,
 		Handler: handler,
 	}
+	vs.Setup()
 	return vs
 }
 
 func (vs *VerifyServer) Start() error {
-	vs.Setup()
 	err := vs.App.Listen(":" + vs.Port)
 	if err != nil {
 		if strings.Contains(err.Error(), "address already in use") {
@@ -62,7 +59,7 @@ func (vs *VerifyServer) Setup() {
 	vs.App.Use(cors.New())
 
 	// Define middleware to log all requests
-	vs.App.Use(middleware.Logger(fiber_utils.GetLogConfig(vs.Log)))
+	vs.App.Use(middleware.Logger(fiberutils.GetLogConfig(vs.Log)))
 
 	prometheus := fiberprometheus.New(SERVICE)
 	prometheus.RegisterAt(vs.App, "/metrics")

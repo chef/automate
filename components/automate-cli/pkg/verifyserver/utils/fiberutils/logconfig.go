@@ -1,4 +1,4 @@
-package fiber_utils
+package fiberutils
 
 import (
 	"strings"
