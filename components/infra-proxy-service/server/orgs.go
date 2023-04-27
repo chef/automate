@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/sirupsen/logrus"
 )
 
 // CreateOrg creates a new org
@@ -45,6 +46,8 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
+
+	logrus.Info("Org created")
 
 	return &response.CreateOrg{
 		Org: fromStorageOrg(org),
