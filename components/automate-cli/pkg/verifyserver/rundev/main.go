@@ -1,7 +1,8 @@
 package main
 
-import verifyserver "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
+import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 
 func main() {
-	verifyserver.StartVerifyServer(verifyserver.DEFAULT_PORT, true)
+	vs := server.NewVerifyServer(server.DEFAULT_PORT, true)
+	vs.Start()
 }
