@@ -10,7 +10,6 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
-	"github.com/sirupsen/logrus"
 )
 
 // CreateOrg creates a new org
