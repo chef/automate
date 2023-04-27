@@ -228,7 +228,27 @@ func (ss *Summary) getIpAddressesFromFlag(errorList *list.List) ([]string, []str
 				postgresqlIps, nodes, errorList = ss.validateIPAddresses(errorList, nodes, postgresqlName, ipAddressError)
 			}
 			if len(nodes) != 0 && errorList.Len() == 0 {
-				errorList.PushBack(fmt.Sprintf("List of  ip address not found %s does not match any node for Automate, PostgreSQL or ChefServer services", nodes))
+				if ss.statusSummaryCmdFlags.isAutomate ||
+					ss.statusSummaryCmdFlags.isChefServer ||
+					ss.statusSummaryCmdFlags.isOpenSearch ||
+					ss.statusSummaryCmdFlags.isPostgresql {
+					services := []string{}
+					if ss.statusSummaryCmdFlags.isAutomate {
+						services = append(services, "Automate")
+					}
+					if ss.statusSummaryCmdFlags.isChefServer {
+						services = append(services, "Chef server")
+					}
+					if ss.statusSummaryCmdFlags.isOpenSearch {
+						services = append(services, "Opensearch")
+					}
+					if ss.statusSummaryCmdFlags.isPostgresql {
+						services = append(services, "PostgreSQL")
+					}
+					errorList.PushBack(fmt.Sprintf("List of  ip address not found %s does not match any node for %s services", nodes, strings.Join(services[:], ", ")))
+				} else {
+					errorList.PushBack(fmt.Sprintf("List of  ip address not found %s does not match any node for Automate, PostgreSQL, Opensearch and ChefServer services", nodes))
+				}
 			}
 		}
 		return automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList
