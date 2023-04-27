@@ -47,7 +47,6 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
-	logrus.Info("Org created")
 
 	return &response.CreateOrg{
 		Org: fromStorageOrg(org),
