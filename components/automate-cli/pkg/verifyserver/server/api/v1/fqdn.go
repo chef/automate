@@ -4,4 +4,4 @@ import (
 	"github.com/gofiber/fiber"
 )
 
-func (h *Handler) Run(c *fiber.Ctx) {}
+func (h *Handler) CheckFqdn(c *fiber.Ctx) {}

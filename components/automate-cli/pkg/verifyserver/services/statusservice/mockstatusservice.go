@@ -6,6 +6,6 @@ type MockStatusService struct {
 	GetServicesFunc func() []models.ServiceDetails
 }
 
-func (fsu *MockStatusService) GetServices() []models.ServiceDetails {
-	return fsu.GetServicesFunc()
+func (mss *MockStatusService) GetServices() []models.ServiceDetails {
+	return mss.GetServicesFunc()
 }
