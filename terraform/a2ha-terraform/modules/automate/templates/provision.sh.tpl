@@ -31,7 +31,7 @@ export -f truncate_with_timestamp
 
 save_space() {
   # this will truncate all but the most recent frontend .aib files
-  find ${tmp_path} -name frontend\*aib -printf "%T+\t%p\n" | sort -r | awk '{print $2}' | tail -n +2 | xargs -n1 -I{} bash -c 'truncate_with_timestamp "$@"' _ {}
+  find /var/tmp/ -name frontend\*aib -printf "%T+\t%p\n" | sort -r | awk '{print $2}' | tail -n +2 | xargs -n1 -I{} bash -c 'truncate_with_timestamp "$@"' _ {}
 }
 
 wait_for_install() {

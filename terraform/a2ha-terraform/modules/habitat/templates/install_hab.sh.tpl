@@ -31,7 +31,7 @@ export -f truncate_with_timestamp
 
 save_space() {
   # this will truncate all but the most recent backend .aib files
-  find ${tmp_path} -name backend\*aib -printf "%T+\t%p\n" | sort -r | awk '{print $2}' | tail -n +2 | xargs -n1 -I{} bash -c 'truncate_with_timestamp "$@"' _ {}
+  find /var/tmp/ -name backend\*aib -printf "%T+\t%p\n" | sort -r | awk '{print $2}' | tail -n +2 | xargs -n1 -I{} bash -c 'truncate_with_timestamp "$@"' _ {}
 }
 
 user_and_group() {
