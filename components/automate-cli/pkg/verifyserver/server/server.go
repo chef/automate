@@ -5,6 +5,7 @@ import (
 
 	"github.com/ansrivas/fiberprometheus"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
@@ -42,7 +43,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 	}
 	app := fiber.New(fconf)
 	handler := v1.NewHandler(l).
-		AddStatusService(statusservice.NewStatusService())
+		AddStatusService(statusservice.NewStatusService()).AddBatchCheckService(batchcheckservice.NewBatchCheckService())
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
