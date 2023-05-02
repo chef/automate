@@ -19,7 +19,7 @@
 - Create all models in `models` folder so that those can be used across the pkg
 - Use the same logger instance from the `Handler` struct across all apis
 - Create mock for all services so that those can be used while testing
-- For mocking http servers, use mock client instead of sharting a mock server
+- For mocking http servers, use mock client instead of starting a mock server
 - All file names and folder names should be small letters with no `_` or `-` etc. Test files should end with `_test.go`
 
 ## Start a dev server
