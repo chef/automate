@@ -17,7 +17,7 @@ failure() {
 # Creating mount path for elasticsearch backup 
 sudo mkdir -p ${nfs_mount_path}
 sudo chown hab:hab -RL ${nfs_mount_path}/
-
+ADMIN_PASSWORD_SET="admin.password.done"
 # When we truncate the file we need to preserve the file permisssions
 truncate_with_timestamp() {
   local TMPFILE=$(mktemp)
@@ -31,7 +31,7 @@ export -f truncate_with_timestamp
 
 save_space() {
   # this will truncate all but the most recent frontend .aib files
-  find ${tmp_path} -name frontend\*aib -printf "%T+\t%p\n" | sort -r | awk '{print $2}' | tail -n +2 | xargs -n1 -I{} bash -c 'truncate_with_timestamp "$@"' _ {}
+   find /var/tmp/ -name frontend\*aib -printf '%T+\t%p\n' | sort -r | awk '{print $2}' | tail -n +2 | xargs -I{} bash -c 'truncate_with_timestamp "$@"' bash {}
 }
 
 wait_for_install() {
@@ -263,7 +263,13 @@ fi
 # actions to perform only on the Automate + bootstrap node
 if [[ "${automate_role}" == "bootstrap_automate" ]]; then
   # reset the admin user password to the one specified in the TF config
-  chef-automate iam admin-access restore '${admin_password}'
+  if [ ! -f ${tmp_path}/$ADMIN_PASSWORD_SET ] && [ -n "${admin_password}" ]; then
+    echo "Applying the password for chef-automate on bootstrap node" 
+    chef-automate iam admin-access restore '${admin_password}'
+    sudo touch ${tmp_path}/$ADMIN_PASSWORD_SET
+  else
+    echo "Escaping the password reset command, this might be upgrade flow"  
+  fi  
   # generate a bootstrap bundle and make it available to scp down
   rm -f ${tmp_path}/bootstrap.abb
   chef-automate bootstrap bundle create ${tmp_path}/bootstrap.abb
