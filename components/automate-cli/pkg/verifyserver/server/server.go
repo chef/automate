@@ -7,6 +7,7 @@ import (
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/cors"
@@ -43,7 +44,13 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 	}
 	app := fiber.New(fconf)
 	handler := v1.NewHandler(l).
-		AddStatusService(statusservice.NewStatusService()).AddBatchCheckService(batchcheckservice.NewBatchCheckService())
+		AddStatusService(
+			statusservice.NewStatusService()).
+		AddBatchCheckService(
+			batchcheckservice.NewBatchCheckService().
+				AddHardwareResourceCountCheckTrigger(
+					trigger.NewHardwareResourceCountCheck(),
+				))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
