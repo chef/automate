@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
@@ -83,7 +84,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
-		AddMockServerServices(startmockserverservice.New(l))
+		AddMockServerServices(startmockserverservice.New(l)).
+		AddS3ConfigService(s3configservice.NewS3ConfigService())
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
