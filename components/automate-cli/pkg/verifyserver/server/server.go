@@ -6,8 +6,8 @@ import (
 	"github.com/ansrivas/fiberprometheus"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/cors"
@@ -47,10 +47,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddStatusService(
 			statusservice.NewStatusService()).
 		AddBatchCheckService(
-			batchcheckservice.NewBatchCheckService().
-				AddHardwareResourceCountCheckTrigger(
-					trigger.NewHardwareResourceCountCheck(),
-				))
+			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger()),
+		)
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

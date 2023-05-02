@@ -4,28 +4,24 @@ import (
 	"fmt"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 )
 
 type IBatchCheckService interface {
 	BatchCheck(checks []string, config models.Config) bool
-	AddHardwareResourceCountCheckTrigger(h trigger.IHardwareResourceCountCheckTrigger) *BatchCheckService
 }
 
 type BatchCheckService struct {
-	hardwareResourceCountCheckTrigger trigger.IHardwareResourceCountCheckTrigger
+	CheckTrigger trigger.ICheckTrigger
 }
 
-func NewBatchCheckService() IBatchCheckService {
-	return &BatchCheckService{}
+func NewBatchCheckService(trigger trigger.ICheckTrigger) IBatchCheckService {
+	return &BatchCheckService{
+		CheckTrigger: trigger,
+	}
 }
 
-func (ss *BatchCheckService) AddHardwareResourceCountCheckTrigger(h trigger.IHardwareResourceCountCheckTrigger)  *BatchCheckService {
-	ss.hardwareResourceCountCheckTrigger = h
-	return ss
-}
-
-func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) bool{
+func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) bool {
 	bastionCheckResultChan := make(chan bool, 3)
 	go ss.hardwareResourceCountCheck(config, bastionCheckResultChan)
 	go ss.sshUserAccessCheck(config, bastionCheckResultChan)
@@ -39,15 +35,61 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) b
 }
 
 func (ss *BatchCheckService) hardwareResourceCountCheck(config models.Config, resultChan chan bool) {
-	ss.hardwareResourceCountCheckTrigger.Run()
+	ss.CheckTrigger.HardwareResourceCountCheck()
 	resultChan <- true
 }
 
 func (ss *BatchCheckService) sshUserAccessCheck(config models.Config, resultChan chan bool) {
-	
+	ss.CheckTrigger.SshUserAccessCheck()
 	resultChan <- false
 }
 
 func (ss *BatchCheckService) certificateCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.CertificateCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) systemResourceCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.SystemResourceCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) externalOpensearchCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.ExternalOpensearchCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) externalPostgresCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.ExternalPostgresCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) firewallCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.FirewallCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) fqdnCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.FqdnCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) nfsBackupConfigCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.NfsBackupConfigCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) s3BackupConfigCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.S3BackupConfigCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) softwareVersionCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.SoftwareVersionCheck()
+	resultChan <- true
+}
+
+func (ss *BatchCheckService) systemUserCheck(config models.Config, resultChan chan bool) {
+	ss.CheckTrigger.SystemUserCheck()
 	resultChan <- true
 }
