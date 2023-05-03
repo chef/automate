@@ -3,6 +3,7 @@ package verifysystemdcreate
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"text/template"
 
@@ -42,7 +43,7 @@ type CreateSystemdService struct {
 	ExecutableFunc               func() (string, error)
 	CreateFileFunc               func(name string) (*os.File, error)
 	CreateDestinationAndCopyFunc func(binarySrcPath, binaryDestPath string) error
-	ExecuteShellCommandFunc      func(command string) error
+	ExecCommand                  func(name string, arg ...string) *exec.Cmd
 	BinaryDestinationFolder      string
 	SystemdLocation              string
 	Writer                       *cli.Writer
@@ -50,9 +51,9 @@ type CreateSystemdService struct {
 
 func NewCreateSystemdService(
 	executable func() (string, error),
-	CreateFile func(name string) (*os.File, error),
-	CreateDestinationAndCopy func(binarySrcPath, binaryDestPath string) error,
-	ExecuteShellCommand func(command string) error,
+	createFile func(name string) (*os.File, error),
+	createDestinationAndCopy func(binarySrcPath, binaryDestPath string) error,
+	execCommand func(name string, arg ...string) *exec.Cmd,
 	binaryDestinationFolder string,
 	systemdLocation string,
 	writer *cli.Writer) (*CreateSystemdService, error) {
@@ -64,9 +65,9 @@ func NewCreateSystemdService(
 	}
 	return &CreateSystemdService{
 		ExecutableFunc:               executable,
-		CreateFileFunc:               CreateFile,
-		CreateDestinationAndCopyFunc: CreateDestinationAndCopy,
-		ExecuteShellCommandFunc:      ExecuteShellCommand,
+		CreateFileFunc:               createFile,
+		CreateDestinationAndCopyFunc: createDestinationAndCopy,
+		ExecCommand:                  execCommand,
 		BinaryDestinationFolder:      binaryDestinationFolder,
 		SystemdLocation:              systemdLocation,
 		Writer:                       writer,
@@ -109,7 +110,7 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 // Enable and start the systemd service.
 func (css *CreateSystemdService) enableSystemdService() error {
 	systemctlCmd := fmt.Sprintf(ENABLE_SYSTEMD_SCRIPT, SERVICE_NAME)
-	err := css.ExecuteShellCommandFunc(systemctlCmd)
+	err := css.ExecCommand("bash", "-c", systemctlCmd).Run()
 	if err != nil {
 		return errors.Wrap(err, "Error enabling service")
 	}

@@ -12,7 +12,7 @@ import (
 func GetLogConfig(log logger.ILogger) (lc middleware.LoggerConfig) {
 	lc = middleware.LoggerConfig{
 		TimeFormat: time.RFC3339,
-		TimeZone:   "Asia/Kolkata",
+		TimeZone:   "UTC",
 	}
 	if log.GetLevel() <= logrus.DebugLevel {
 		lc.Format = generateLogFormat(
