@@ -35,7 +35,8 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) b
 }
 
 func (ss *BatchCheckService) hardwareResourceCountCheck(config models.Config, resultChan chan bool) {
-	ss.CheckTrigger.HardwareResourceCountCheck(config)
+	res := ss.CheckTrigger.HardwareResourceCountCheck(config)
+	fmt.Println(res)
 	resultChan <- true
 }
 
