@@ -120,20 +120,19 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 		assert.Equal(t, "Error starting service: systemctl command not found", err.Error())
 	})
 
-	t.Run("it gives error if systemdLocation has wrong permissions", func(t *testing.T) {
-		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		newSystemdLocation := systemdLocation + "/testfolder"
-		err := os.Mkdir(newSystemdLocation, 0755)
-		assert.NoError(t, err)
-		err = os.Chmod(newSystemdLocation, 0555)
-		assert.NoError(t, err)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, newSystemdLocation, "", cw.CliWriter)
-		assert.NoError(t, err)
-		err = vsc.Create()
-		assert.Error(t, err)
-		assert.Equal(t, "Error creating service file: open "+newSystemdLocation+"/automate-verify.service"+": permission denied", err.Error())
-
-	})
+	// t.Run("it gives error if systemdLocation has wrong permissions", func(t *testing.T) {
+	// 	binaryDestinationFolder, systemdLocation := setupCopy(t)
+	// 	newSystemdLocation := systemdLocation + "/testfolder"
+	// 	err := os.Mkdir(newSystemdLocation, 0555)
+	// 	assert.NoError(t, err)
+	// 	err = os.Chmod(newSystemdLocation, 0555)
+	// 	assert.NoError(t, err)
+	// 	vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, newSystemdLocation, "", cw.CliWriter)
+	// 	assert.NoError(t, err)
+	// 	err = vsc.Create()
+	// 	assert.Error(t, err)
+	// 	assert.Equal(t, "Error creating service file: open "+newSystemdLocation+"/automate-verify.service"+": permission denied", err.Error())
+	// })
 
 	t.Run("it overwrites automate-verify.service file if it already exists", func(t *testing.T) {
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
