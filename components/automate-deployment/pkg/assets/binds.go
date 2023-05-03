@@ -24,7 +24,9 @@ automate-cds REQUIRED compliance-service
 automate-cds BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict
-automate-cs-nginx REQUIRED automate-cs-bookshelf automate-cs-oc-erchef automate-es-gateway
+automate-cs-ocid REQUIRED automate-pg-gateway pg-sidecar-service
+automate-cs-ocid BINDING_MODE strict
+automate-cs-nginx REQUIRED automate-cs-bookshelf automate-cs-oc-erchef automate-es-gateway automate-cs-ocid
 automate-cs-nginx OPTIONAL automate-gateway
 automate-cs-nginx BINDING_MODE relaxed
 automate-cs-oc-bifrost REQUIRED automate-pg-gateway pg-sidecar-service
