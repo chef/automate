@@ -515,9 +515,8 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	return err
 }
 
-func executeShellCommandMinLogs(command string) error {
-	cmd := exec.Command("/bin/bash", "-c", command)
-	return cmd.Run()
+func executeShellCommandMinLogs(name string, arg []string) error {
+	return exec.Command(name, arg...).Run()
 }
 
 func extarctVersionAndRelease(filename string) (string, string) {

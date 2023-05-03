@@ -97,7 +97,6 @@ func TestCreateDestinationAndCopy(t *testing.T) {
 		srcData := []byte("src data")
 		srcPath := path.Join(d1, "src")
 		dstPath := path.Join(d2, "testpath/one/dst")
-		dstData := []byte("dst data")
 		require.NoError(t, ioutil.WriteFile(srcPath, srcData, 0755))
 		require.NoError(t, os.MkdirAll(filepath.Dir(dstPath), 0755))
 		require.NoError(t, fileutils.CreateDestinationAndCopy(srcPath, dstPath))
@@ -110,19 +109,4 @@ func TestCreateDestinationAndCopy(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, srcInfo.Mode(), destInfo.Mode())
 	})
-
-	// t.Run("it copies over existing file when overwrite is set", func(t *testing.T) {
-	// 	d1, d2 := setupCopy(t)
-
-	// 	srcData := []byte("src data")
-	// 	srcPath := path.Join(d1, "src")
-	// 	dstPath := path.Join(d2, "dst")
-	// 	dstData := []byte("dst data")
-	// 	require.NoError(t, ioutil.WriteFile(srcPath, srcData, 0700))
-	// 	require.NoError(t, ioutil.WriteFile(dstPath, dstData, 0700))
-	// 	require.NoError(t, fileutils.CopyFile(srcPath, dstPath, fileutils.Overwrite()))
-	// 	dstData, err := ioutil.ReadFile(dstPath)
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, srcData, dstData)
-	// })
 }
