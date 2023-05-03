@@ -7,8 +7,6 @@ import (
 func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	// cw := majorupgrade_utils.NewCustomWriter()
 	// tests := []struct {
-	// 	executable               func() (string, error)
-	// 	createFile               func(name string) (*os.File, error)
 	// 	createDestinationAndCopy func(binarySrcPath, binaryDestPath string) error
 	// 	executeShellCommand      func(command string) error
 	// 	binaryDestinationFolder  string
@@ -16,7 +14,9 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	// 	writer                   *cli.Writer
 	// }{
 	// 	{
-
+	// 		createDestinationAndCopy: func(binarySrcPath, binaryDestPath string) error {
+	// 			return nil
+	// 		},
 	// 	},
 	// }
 	// statusEndpoint := "/status"

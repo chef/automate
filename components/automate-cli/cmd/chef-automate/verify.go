@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 
@@ -191,7 +190,7 @@ func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, 
 		return status.Wrap(err, status.UnknownError, "Error evaluating symlinks in binary path")
 	}
 
-	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(os.Executable, os.Create, fileutils.CreateDestinationAndCopy, exec.Command, BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, writer)
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, writer)
 	if err != nil {
 		return err
 	}

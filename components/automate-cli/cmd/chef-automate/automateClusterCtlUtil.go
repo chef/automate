@@ -515,6 +515,11 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	return err
 }
 
+func executeShellCommandMinLogs(command string) error {
+	cmd := exec.Command("bash", "-c", command)
+	return cmd.Run()
+}
+
 func extarctVersionAndRelease(filename string) (string, string) {
 	r := regexp.MustCompile(RELEASE_AND_VERSION_PATTERN)
 	match := r.FindStringSubmatch(filename)

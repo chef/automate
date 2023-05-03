@@ -3,7 +3,6 @@ package verifysystemdcreate
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"text/template"
 
@@ -40,20 +39,16 @@ type systemdInput struct {
 }
 
 type CreateSystemdService struct {
-	ExecutableFunc               func() (string, error)
-	CreateFileFunc               func(name string) (*os.File, error)
 	CreateDestinationAndCopyFunc func(binarySrcPath, binaryDestPath string) error
-	ExecCommand                  func(name string, arg ...string) *exec.Cmd
+	ExecuteShellCommandFunc      func(command string) error
 	BinaryDestinationFolder      string
 	SystemdLocation              string
 	Writer                       *cli.Writer
 }
 
 func NewCreateSystemdService(
-	executable func() (string, error),
-	createFile func(name string) (*os.File, error),
 	createDestinationAndCopy func(binarySrcPath, binaryDestPath string) error,
-	execCommand func(name string, arg ...string) *exec.Cmd,
+	executeShellCommand func(command string) error,
 	binaryDestinationFolder string,
 	systemdLocation string,
 	writer *cli.Writer) (*CreateSystemdService, error) {
@@ -64,10 +59,8 @@ func NewCreateSystemdService(
 		return nil, errors.New("systemd location cannot be empty")
 	}
 	return &CreateSystemdService{
-		ExecutableFunc:               executable,
-		CreateFileFunc:               createFile,
 		CreateDestinationAndCopyFunc: createDestinationAndCopy,
-		ExecCommand:                  execCommand,
+		ExecuteShellCommandFunc:      executeShellCommand,
 		BinaryDestinationFolder:      binaryDestinationFolder,
 		SystemdLocation:              systemdLocation,
 		Writer:                       writer,
@@ -93,7 +86,7 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 
 	// Execute the template to generate the service file.
 	serviceFilePath := fmt.Sprintf(css.SystemdLocation+"/"+SYSTEMD_FILE, SERVICE_NAME)
-	serviceFile, err := css.CreateFileFunc(serviceFilePath)
+	serviceFile, err := os.Create(serviceFilePath)
 	if err != nil {
 		return errors.Wrap(err, "Error creating service file")
 	}
@@ -110,7 +103,7 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 // Enable and start the systemd service.
 func (css *CreateSystemdService) enableSystemdService() error {
 	systemctlCmd := fmt.Sprintf(ENABLE_SYSTEMD_SCRIPT, SERVICE_NAME)
-	err := css.ExecCommand("bash", "-c", systemctlCmd).Run()
+	err := css.ExecuteShellCommandFunc(systemctlCmd)
 	if err != nil {
 		return errors.Wrap(err, "Error enabling service")
 	}
