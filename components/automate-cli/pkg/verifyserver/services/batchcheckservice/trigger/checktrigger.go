@@ -1,6 +1,9 @@
 package trigger
 
-import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+)
 
 type ICheckTrigger interface {
 	HardwareResourceCountCheck(config models.Config) models.CheckTriggerResponse
@@ -19,8 +22,9 @@ type ICheckTrigger interface {
 }
 
 type CheckTrigger struct {
+	Logger logger.ILogger
 }
 
-func NewCheckTrigger() ICheckTrigger {
-	return &CheckTrigger{}
+func NewCheckTrigger(logger logger.ILogger) ICheckTrigger {
+	return &CheckTrigger{Logger: logger}
 }

@@ -11,8 +11,9 @@ type Config struct {
 		PrivateKey   string `json:"private_key"`
 		SudoPassword string `json:"sudo_password"`
 	} `json:"ssh_user"`
-	Arch   string `json:"arch"`
-	Backup struct {
+	Arch        string `json:"arch"`
+	DeployState string `json:"deploy_state"`
+	Backup      struct {
 		FileSystem struct {
 			MountLocation string `json:"mount_location"`
 		} `json:"file_system"`
@@ -57,9 +58,10 @@ type Config struct {
 }
 
 type CheckTriggerResponse struct {
-	Ip     string          `json:"ip"`
-	Passed bool            `json:"passed"`
-	Checks []CheckResponse `json:"checks"`
+	Ip       string          `json:"ip"`
+	NodeType string          `json:"node_type"`
+	Passed   bool            `json:"passed"`
+	Checks   []CheckResponse `json:"checks"`
 }
 
 type CheckResponse struct {
