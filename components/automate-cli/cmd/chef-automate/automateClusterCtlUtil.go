@@ -516,7 +516,7 @@ func executeShellCommand(command string, args []string, workingDir string) error
 }
 
 func executeShellCommandMinLogs(command string) error {
-	cmd := exec.Command("bash", "-c", command)
+	cmd := exec.Command("/bin/bash", "-c", command)
 	return cmd.Run()
 }
 

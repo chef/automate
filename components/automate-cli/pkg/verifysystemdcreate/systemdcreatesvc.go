@@ -42,6 +42,7 @@ type CreateSystemdService struct {
 	CreateDestinationAndCopyFunc func(binarySrcPath, binaryDestPath string) error
 	ExecuteShellCommandFunc      func(command string) error
 	BinaryDestinationFolder      string
+	CurrentBinaryPath            string
 	SystemdLocation              string
 	Writer                       *cli.Writer
 }
@@ -51,6 +52,7 @@ func NewCreateSystemdService(
 	executeShellCommand func(command string) error,
 	binaryDestinationFolder string,
 	systemdLocation string,
+	currentBinaryPath string,
 	writer *cli.Writer) (*CreateSystemdService, error) {
 	if binaryDestinationFolder == "" {
 		return nil, errors.New("binary destination folder cannot be empty")
@@ -62,6 +64,7 @@ func NewCreateSystemdService(
 		CreateDestinationAndCopyFunc: createDestinationAndCopy,
 		ExecuteShellCommandFunc:      executeShellCommand,
 		BinaryDestinationFolder:      binaryDestinationFolder,
+		CurrentBinaryPath:            currentBinaryPath,
 		SystemdLocation:              systemdLocation,
 		Writer:                       writer,
 	}, nil
@@ -111,10 +114,10 @@ func (css *CreateSystemdService) enableSystemdService() error {
 }
 
 // Create the systemd service.
-func (css *CreateSystemdService) Create(binaryPath string) error {
-	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, filepath.Base(binaryPath))
+func (css *CreateSystemdService) Create() error {
+	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, filepath.Base(css.CurrentBinaryPath))
 
-	err := css.CreateDestinationAndCopyFunc(binaryPath, fullBinaryDestination)
+	err := css.CreateDestinationAndCopyFunc(css.CurrentBinaryPath, fullBinaryDestination)
 	if err != nil {
 		return err
 	}

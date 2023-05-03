@@ -190,11 +190,11 @@ func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, 
 		return status.Wrap(err, status.UnknownError, "Error evaluating symlinks in binary path")
 	}
 
-	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, writer)
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, binaryPath, SYSTEMD_PATH, writer)
 	if err != nil {
 		return err
 	}
-	return createSystemdServiceWithBinary.Create(binaryPath)
+	return createSystemdServiceWithBinary.Create()
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
