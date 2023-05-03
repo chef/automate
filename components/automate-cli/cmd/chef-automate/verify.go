@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
+	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/io/fileutils"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
@@ -45,24 +46,6 @@ type verifyServeCmdFlow struct{}
 
 type verifySystemdCreateFlow struct{}
 
-var verifySystemdServiceCmd = &cobra.Command{
-	Use:   "systemd-service COMMAND",
-	Short: "Systemd utilities for verify command",
-	Annotations: map[string]string{
-		docs.Compatibility: docs.Compatibility,
-	},
-}
-
-var verifySystemdServiceCreateCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Start verify server as systemd service",
-	Annotations: map[string]string{
-		docs.Compatibility: docs.Compatibility,
-	},
-	Args: cobra.ExactArgs(0),
-	RunE: verifySystemdCreateFunc(),
-}
-
 func init() {
 	flagsObj := verifyCmdFlags{}
 
@@ -87,6 +70,24 @@ func init() {
 		},
 		Args: cobra.ExactArgs(0),
 		RunE: verifyServeCmdFunc(&flagsObj),
+	}
+
+	verifySystemdServiceCmd := &cobra.Command{
+		Use:   "systemd-service COMMAND",
+		Short: "Systemd utilities for verify command",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.Compatibility,
+		},
+	}
+
+	verifySystemdServiceCreateCmd := &cobra.Command{
+		Use:   "create",
+		Short: "Start verify server as systemd service",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.Compatibility,
+		},
+		Args: cobra.ExactArgs(0),
+		RunE: verifySystemdCreateFunc(),
 	}
 
 	// flags for Verify Command
@@ -189,8 +190,15 @@ func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, 
 	if err != nil {
 		return status.Wrap(err, status.UnknownError, "Error evaluating symlinks in binary path")
 	}
+	usingSystemd, err := target.NewLocalTarget(true).SystemdRunning()
+	if err != nil {
+		return status.Wrap(err, status.UnknownError, "Error checking systemd present or not")
+	}
+	if !usingSystemd {
+		return status.New(status.UnknownError, "Cannot create automate-verify service since systemd is not present on this machine")
+	}
 
-	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, binaryPath, SYSTEMD_PATH, writer)
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, binaryPath, writer)
 	if err != nil {
 		return err
 	}
