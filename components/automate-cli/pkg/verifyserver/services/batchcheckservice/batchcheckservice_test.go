@@ -61,7 +61,7 @@ func SetupMockCheckTrigger() trigger.ICheckTrigger {
 }
 
 func TestStatusService(t *testing.T) {
-	ss := NewBatchCheckService(trigger.NewCheckTrigger())
+	ss := NewBatchCheckService(SetupMockCheckTrigger())
 	services := ss.BatchCheck([]string{""}, models.Config{})
 	assert.Equal(t, []models.ServiceDetails{}, services)
 }
