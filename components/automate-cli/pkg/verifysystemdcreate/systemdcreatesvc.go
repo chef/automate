@@ -39,7 +39,7 @@ type systemdInput struct {
 
 type CreateSystemdService struct {
 	CreateDestinationAndCopyFunc func(binarySrcPath, binaryDestPath string) error
-	ExecuteShellCommandFunc      func(name string, arg ...string) error
+	ExecuteShellCommandFunc      func(name string, arg []string) error
 	BinaryDestinationFolder      string
 	CurrentBinaryPath            string
 	SystemdLocation              string
@@ -48,7 +48,7 @@ type CreateSystemdService struct {
 
 func NewCreateSystemdService(
 	createDestinationAndCopy func(binarySrcPath, binaryDestPath string) error,
-	executeShellCommand func(name string, arg ...string) error,
+	executeShellCommand func(name string, arg []string) error,
 	binaryDestinationFolder string,
 	systemdLocation string,
 	currentBinaryPath string,
@@ -103,15 +103,15 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 // Enable and start the systemd service.
 func (css *CreateSystemdService) enableSystemdService() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
-	err := css.ExecuteShellCommandFunc("systemctl", "daemon-reload")
+	err := css.ExecuteShellCommandFunc("systemctl", []string{"daemon-reload"})
 	if err != nil {
 		return errors.Wrap(err, "Error reloading systemd daemon")
 	}
-	err = css.ExecuteShellCommandFunc("systemctl", "enable", service)
+	err = css.ExecuteShellCommandFunc("systemctl", []string{"enable", service})
 	if err != nil {
 		return errors.Wrap(err, "Error enabling service")
 	}
-	err = css.ExecuteShellCommandFunc("systemctl", "start", service)
+	err = css.ExecuteShellCommandFunc("systemctl", []string{"start", service})
 	if err != nil {
 		return errors.Wrap(err, "Error starting service")
 	}
@@ -119,7 +119,7 @@ func (css *CreateSystemdService) enableSystemdService() error {
 }
 
 func (css *CreateSystemdService) isSystemdEnabled() error {
-	return css.ExecuteShellCommandFunc("systemctl", "is-enabled", fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME))
+	return css.ExecuteShellCommandFunc("systemctl", []string{"is-enabled", fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)})
 }
 
 // Create and start the systemd service.

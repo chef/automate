@@ -23,25 +23,25 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	createDestinationAndCopy := func(binarySrcPath, binaryDestPath string) error {
 		return nil
 	}
-	executeShellCommand := func(name string, arg ...string) error {
+	executeShellCommand := func(name string, arg []string) error {
 		if arg[0] == "is-enabled" {
 			return errors.New("Failed to get unit file state for automate-verify.service: No such file or directory")
 		}
 		return nil
 	}
 
-	executeShellCommandPassIsEnabled := func(name string, arg ...string) error {
+	executeShellCommandPassIsEnabled := func(name string, arg []string) error {
 		return nil
 	}
 
-	executeShellCommandErr := func(name string, arg ...string) error {
+	executeShellCommandErr := func(name string, arg []string) error {
 		if arg[0] == "is-enabled" {
 			return errors.New("Failed to get unit file state for automate-verify.service: No such file or directory")
 		}
 		return errors.New("systemctl command not found")
 	}
 
-	executeShellCommandStartErr := func(name string, arg ...string) error {
+	executeShellCommandStartErr := func(name string, arg []string) error {
 		if arg[0] == "is-enabled" {
 			return errors.New("Failed to get unit file state for automate-verify.service: No such file or directory")
 		} else if arg[0] == "start" {
@@ -50,7 +50,7 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 		return nil
 	}
 
-	executeShellCommandEnableErr := func(name string, arg ...string) error {
+	executeShellCommandEnableErr := func(name string, arg []string) error {
 		if arg[0] == "is-enabled" {
 			return errors.New("Failed to get unit file state for automate-verify.service: No such file or directory")
 		} else if arg[0] == "enable" {
