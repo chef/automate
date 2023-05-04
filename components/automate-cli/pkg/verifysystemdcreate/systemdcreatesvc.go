@@ -38,20 +38,16 @@ type systemdInput struct {
 }
 
 type CreateSystemdService struct {
-	CreateDestinationAndCopyFunc func(binarySrcPath, binaryDestPath string) error
-	ExecuteShellCommandFunc      func(name string, arg []string) error
-	BinaryDestinationFolder      string
-	CurrentBinaryPath            string
-	SystemdLocation              string
-	Writer                       *cli.Writer
+	SystemdCreateUtils      SystemdCreateUtils
+	BinaryDestinationFolder string
+	SystemdLocation         string
+	Writer                  *cli.Writer
 }
 
 func NewCreateSystemdService(
-	createDestinationAndCopy func(binarySrcPath, binaryDestPath string) error,
-	executeShellCommand func(name string, arg []string) error,
+	systemdCreateUtils SystemdCreateUtils,
 	binaryDestinationFolder string,
 	systemdLocation string,
-	currentBinaryPath string,
 	writer *cli.Writer) (*CreateSystemdService, error) {
 	if binaryDestinationFolder == "" {
 		return nil, errors.New("Binary destination folder cannot be empty")
@@ -60,12 +56,10 @@ func NewCreateSystemdService(
 		return nil, errors.New("Systemd location cannot be empty")
 	}
 	return &CreateSystemdService{
-		CreateDestinationAndCopyFunc: createDestinationAndCopy,
-		ExecuteShellCommandFunc:      executeShellCommand,
-		BinaryDestinationFolder:      binaryDestinationFolder,
-		CurrentBinaryPath:            currentBinaryPath,
-		SystemdLocation:              systemdLocation,
-		Writer:                       writer,
+		SystemdCreateUtils:      systemdCreateUtils,
+		BinaryDestinationFolder: binaryDestinationFolder,
+		SystemdLocation:         systemdLocation,
+		Writer:                  writer,
 	}, nil
 }
 
@@ -103,15 +97,15 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 // Enable and start the systemd service.
 func (css *CreateSystemdService) enableSystemdService() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
-	err := css.ExecuteShellCommandFunc("systemctl", []string{"daemon-reload"})
+	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
 	if err != nil {
 		return errors.Wrap(err, "Error reloading systemd daemon")
 	}
-	err = css.ExecuteShellCommandFunc("systemctl", []string{"enable", service})
+	err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"enable", service})
 	if err != nil {
 		return errors.Wrap(err, "Error enabling service")
 	}
-	err = css.ExecuteShellCommandFunc("systemctl", []string{"start", service})
+	err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"start", service})
 	if err != nil {
 		return errors.Wrap(err, "Error starting service")
 	}
@@ -119,19 +113,28 @@ func (css *CreateSystemdService) enableSystemdService() error {
 }
 
 func (css *CreateSystemdService) isSystemdEnabled() error {
-	return css.ExecuteShellCommandFunc("systemctl", []string{"is-enabled", fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)})
+	return css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"is-enabled", fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)})
 }
 
 // Create and start the systemd service.
 func (css *CreateSystemdService) Create() error {
 
-	err := css.isSystemdEnabled()
+	currentBinaryPath, err := css.SystemdCreateUtils.GetBinaryPath()
+	if err != nil {
+		return err
+	}
+	err = css.SystemdCreateUtils.SystemdRunning()
+	if err != nil {
+		return err
+	}
+
+	err = css.isSystemdEnabled()
 	if err == nil {
 		return errors.New(fmt.Sprintf("Service %[1]v already exists on this node, use systemctl start/stop/status %[1]v", SERVICE_NAME))
 	}
 
-	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, filepath.Base(css.CurrentBinaryPath))
-	err = css.CreateDestinationAndCopyFunc(css.CurrentBinaryPath, fullBinaryDestination)
+	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, filepath.Base(currentBinaryPath))
+	err = css.SystemdCreateUtils.CreateDestinationAndCopy(currentBinaryPath, fullBinaryDestination)
 	if err != nil {
 		return err
 	}

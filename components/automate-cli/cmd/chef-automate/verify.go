@@ -3,15 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strconv"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
-	"github.com/chef/automate/components/automate-deployment/pkg/target"
-	"github.com/chef/automate/lib/io/fileutils"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
 )
@@ -182,23 +179,8 @@ func verifySystemdCreateFunc() func(cmd *cobra.Command, args []string) error {
 }
 
 func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, args []string) error {
-	binaryPath, err := os.Executable()
-	if err != nil {
-		return status.Wrap(err, status.UnknownError, "Error getting executable path")
-	}
-	binaryPath, err = filepath.EvalSymlinks(binaryPath)
-	if err != nil {
-		return status.Wrap(err, status.UnknownError, "Error evaluating symlinks in binary path")
-	}
-	usingSystemd, err := target.NewLocalTarget(true).SystemdRunning()
-	if err != nil {
-		return status.Wrap(err, status.UnknownError, "Error checking systemd present or not")
-	}
-	if !usingSystemd {
-		return status.New(status.UnknownError, "Cannot create automate-verify service since systemd is not present on this machine")
-	}
 
-	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(fileutils.CreateDestinationAndCopy, executeShellCommandMinLogs, BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, binaryPath, writer)
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(verifysystemdcreate.NewSystemdCreateUtilsImpl(), BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, writer)
 	if err != nil {
 		return err
 	}

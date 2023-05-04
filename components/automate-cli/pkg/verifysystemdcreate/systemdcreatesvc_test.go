@@ -18,7 +18,7 @@ func setupCopy(t *testing.T) (string, string) {
 	return tmpDir, tmpDir2
 }
 
-func TestCreateDestinationAndCopyFunc(t *testing.T) {
+func TestSystemdServiceCreate(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	createDestinationAndCopy := func(binarySrcPath, binaryDestPath string) error {
 		return nil
@@ -59,23 +59,32 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 		return nil
 	}
 
+	setupMockUtils := func() *verifysystemdcreate.MockSystemdCreateUtils {
+		return &verifysystemdcreate.MockSystemdCreateUtils{
+			GetBinaryPathFunc:            func() (string, error) { return "", nil },
+			SystemdRunningFunc:           func() error { return nil },
+			CreateDestinationAndCopyFunc: createDestinationAndCopy,
+			ExecuteShellCommandFunc:      executeShellCommand,
+		}
+	}
+
 	t.Run("it gives error if binary destination directory is empty", func(t *testing.T) {
 		_, systemdLocation := setupCopy(t)
-		_, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, "", systemdLocation, "", cw.CliWriter)
+		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), "", systemdLocation, cw.CliWriter)
 		assert.Error(t, err)
 		assert.Equal(t, "Binary destination folder cannot be empty", err.Error())
 	})
 
 	t.Run("it gives error if systemd location is empty", func(t *testing.T) {
 		binaryDestinationFolder, _ := setupCopy(t)
-		_, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, "", "", cw.CliWriter)
+		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, "", cw.CliWriter)
 		assert.Error(t, err)
 		assert.Equal(t, "Systemd location cannot be empty", err.Error())
 	})
 
 	t.Run("it creates automate-verify.service file", func(t *testing.T) {
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)
@@ -85,8 +94,10 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	})
 
 	t.Run("it gives error if there automate-verify systemd-service is already enabled", func(t *testing.T) {
+		mockUtils := setupMockUtils()
+		mockUtils.ExecuteShellCommandFunc = executeShellCommandPassIsEnabled
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommandPassIsEnabled, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -94,8 +105,10 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	})
 
 	t.Run("it gives error if there is problem in running shell command", func(t *testing.T) {
+		mockUtils := setupMockUtils()
+		mockUtils.ExecuteShellCommandFunc = executeShellCommandErr
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommandErr, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -103,8 +116,10 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	})
 
 	t.Run("it gives error if there is problem in running systemctl enable command", func(t *testing.T) {
+		mockUtils := setupMockUtils()
+		mockUtils.ExecuteShellCommandFunc = executeShellCommandEnableErr
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommandEnableErr, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -112,34 +127,35 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	})
 
 	t.Run("it gives error if there is problem in running systemctl start command", func(t *testing.T) {
+		mockUtils := setupMockUtils()
+		mockUtils.ExecuteShellCommandFunc = executeShellCommandStartErr
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommandStartErr, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
 		assert.Equal(t, "Error starting service: systemctl command not found", err.Error())
 	})
 
-	// t.Run("it gives error if systemdLocation has wrong permissions", func(t *testing.T) {
-	// 	binaryDestinationFolder, systemdLocation := setupCopy(t)
-	// 	newSystemdLocation := systemdLocation + "/testfolder"
-	// 	err := os.Mkdir(newSystemdLocation, 0555)
-	// 	assert.NoError(t, err)
-	// 	err = os.Chmod(newSystemdLocation, 0555)
-	// 	assert.NoError(t, err)
-	// 	vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, newSystemdLocation, "", cw.CliWriter)
-	// 	assert.NoError(t, err)
-	// 	err = vsc.Create()
-	// 	assert.Error(t, err)
-	// 	assert.Equal(t, "Error creating service file: open "+newSystemdLocation+"/automate-verify.service"+": permission denied", err.Error())
-	// })
+	t.Run("it gives error if there is problem in createDestinationAndCopy", func(t *testing.T) {
+		mockUtils := setupMockUtils()
+		mockUtils.ExecuteShellCommandFunc = executeShellCommand
+		mockUtils.SystemdRunningFunc = func() error { return errors.New("Error in copying") }
+		binaryDestinationFolder, systemdLocation := setupCopy(t)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		assert.NoError(t, err)
+		err = vsc.Create()
+		assert.Error(t, err)
+		assert.Equal(t, "Error in copying", err.Error())
+	})
 
 	t.Run("it overwrites automate-verify.service file if it already exists", func(t *testing.T) {
+		mockUtils := setupMockUtils()
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
 		systemdFilePath := systemdLocation + "/automate-verify.service"
 		srcData := []byte("test data")
 		assert.NoError(t, ioutil.WriteFile(systemdFilePath, srcData, 0700))
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)
@@ -152,6 +168,7 @@ func TestCreateDestinationAndCopyFunc(t *testing.T) {
 	})
 
 	t.Run("it creates automate-verify.service file with proper content inside", func(t *testing.T) {
+		mockUtils := setupMockUtils()
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
 		systemdFilePath := systemdLocation + "/automate-verify.service"
 		expectedSystemdContents := `[Unit]
@@ -167,7 +184,7 @@ StandardError=journal
 [Install]
 WantedBy=multi-user.target
 `
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(createDestinationAndCopy, executeShellCommand, binaryDestinationFolder, systemdLocation, "", cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)
