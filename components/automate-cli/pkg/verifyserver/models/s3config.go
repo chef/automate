@@ -2,7 +2,7 @@ package models
 
 type ServiceCheck struct {
 	Title         string `json:"title"`
-	Passed        string `json:"passed"`
+	Passed        bool   `json:"passed"`
 	SuccessMsg    string `json:"success_msg"`
 	ErrorMsg      string `json:"error_msg"`
 	ResolutionMsg string `json:"resolution_msg"`
