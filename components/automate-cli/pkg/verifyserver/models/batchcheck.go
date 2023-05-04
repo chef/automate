@@ -57,6 +57,11 @@ type Config struct {
 }
 
 type CheckTriggerResponse struct {
+	Status string `json:"status"`
+	Result ApiResult `json:"result"`
+}
+
+type ApiResult struct {
 	Passed bool            `json:"passed"`
 	Checks []CheckResponse `json:"checks"`
 }
