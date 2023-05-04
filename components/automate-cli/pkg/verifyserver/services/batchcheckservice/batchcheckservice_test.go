@@ -10,8 +10,21 @@ import (
 )
 
 func TestStatusService(t *testing.T) {
-	ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck(), SetupMockSshUserAccessCheck()))
+	ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck(),
+		SetupMockSshUserAccessCheck(),
+		SetupMockCertificateCheck(),
+		SetupMockExternalOpensearchCheck(),
+		SetupMockExternalPostgresCheck(),
+		SetupMockFirewallCheck(),
+		SetupMockFqdnCheck(),
+		SetupMockNfsBackupConfigCheck(),
+		SetupMockOpensearchS3BucketAccessCheck(),
+		SetupMockS3BackupConfigCheck(),
+		SetupMockSoftwareVersionCheck(),
+		SetupMockSystemResourceCheck(),
+		SetupMockSystemUserCheck(),
+	))
 
 	services := ss.BatchCheck([]string{constants.HARDWARE_RESOURCE_COUNT, constants.SSH_USER}, models.Config{})
-	assert.Equal(t, []models.ServiceDetails{}, services)
+	assert.Equal(t, true, services)
 }
