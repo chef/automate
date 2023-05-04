@@ -52,9 +52,15 @@ message ConfigRequest {
 				google.protobuf.Int32Value abandoned_upload_cleanup_interval = 3;
 				google.protobuf.Int32Value deleted_data_cleanup_interval = 4;
 				google.protobuf.BoolValue stream_download = 5;
+				OauthApplication oauth_application = 6;
+
+				message OauthApplication {
+					google.protobuf.StringValue name = 1;
+					google.protobuf.StringValue redirect_uri = 2;
+				}
 			}
 
-          }
+    }
 		message Service {}
 	}
 }

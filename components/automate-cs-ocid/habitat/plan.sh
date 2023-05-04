@@ -51,6 +51,8 @@ do_build() {
 }
 
 do_install() {
+  cp "habitat/config/tasks/oauth_application.rake" $(hab pkg path "chef/oc_id")/oc_id/lib/tasks
+  
   cd "$(hab pkg path 'chef/oc_id')/oc_id"
 
   export BUNDLE_SILENCE_ROOT_WARNING=1 GEM_PATH

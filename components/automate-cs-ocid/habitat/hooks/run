@@ -11,6 +11,16 @@ export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
 export DATABASE_URL="{{cfg.DATABASE_URL}}"
 
+if [[ ! -z "{{cfg.ocid.oauth_application.name}}" ]]; then
+  echo "----Registering oauth_application----"
+  bundle exec bin/rake 'oauth_application:register[{{cfg.ocid.oauth_application.name}}, {{cfg.ocid.oauth_application.redirect_uri}}]'
+  echo "----[DONE] Registering oauth_application----"
+fi
+
+echo "----Dumping the registered app details in a file----"
+bundle exec bin/rake oauth_application:save_registered_app_details_to_file
+echo "----[DONE] Dumping the registered app details in a file----"
+
 bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
 bundle exec bin/thin start -p 9090 --ssl --ssl-key-file {{pkg.svc_config_path}}/service.key --ssl-cert-file {{pkg.svc_config_path}}/service.crt

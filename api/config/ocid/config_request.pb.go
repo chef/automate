@@ -464,11 +464,12 @@ type ConfigRequest_V1_System_Ocid struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SqlRetryCount                  *wrapperspb.Int32Value `protobuf:"bytes,1,opt,name=sql_retry_count,json=sqlRetryCount,proto3" json:"sql_retry_count,omitempty" toml:"sql_retry_count,omitempty" mapstructure:"sql_retry_count,omitempty"`
-	SqlRetryDelay                  *wrapperspb.Int32Value `protobuf:"bytes,2,opt,name=sql_retry_delay,json=sqlRetryDelay,proto3" json:"sql_retry_delay,omitempty" toml:"sql_retry_delay,omitempty" mapstructure:"sql_retry_delay,omitempty"`
-	AbandonedUploadCleanupInterval *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=abandoned_upload_cleanup_interval,json=abandonedUploadCleanupInterval,proto3" json:"abandoned_upload_cleanup_interval,omitempty" toml:"abandoned_upload_cleanup_interval,omitempty" mapstructure:"abandoned_upload_cleanup_interval,omitempty"`
-	DeletedDataCleanupInterval     *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=deleted_data_cleanup_interval,json=deletedDataCleanupInterval,proto3" json:"deleted_data_cleanup_interval,omitempty" toml:"deleted_data_cleanup_interval,omitempty" mapstructure:"deleted_data_cleanup_interval,omitempty"`
-	StreamDownload                 *wrapperspb.BoolValue  `protobuf:"bytes,5,opt,name=stream_download,json=streamDownload,proto3" json:"stream_download,omitempty" toml:"stream_download,omitempty" mapstructure:"stream_download,omitempty"`
+	SqlRetryCount                  *wrapperspb.Int32Value                         `protobuf:"bytes,1,opt,name=sql_retry_count,json=sqlRetryCount,proto3" json:"sql_retry_count,omitempty" toml:"sql_retry_count,omitempty" mapstructure:"sql_retry_count,omitempty"`
+	SqlRetryDelay                  *wrapperspb.Int32Value                         `protobuf:"bytes,2,opt,name=sql_retry_delay,json=sqlRetryDelay,proto3" json:"sql_retry_delay,omitempty" toml:"sql_retry_delay,omitempty" mapstructure:"sql_retry_delay,omitempty"`
+	AbandonedUploadCleanupInterval *wrapperspb.Int32Value                         `protobuf:"bytes,3,opt,name=abandoned_upload_cleanup_interval,json=abandonedUploadCleanupInterval,proto3" json:"abandoned_upload_cleanup_interval,omitempty" toml:"abandoned_upload_cleanup_interval,omitempty" mapstructure:"abandoned_upload_cleanup_interval,omitempty"`
+	DeletedDataCleanupInterval     *wrapperspb.Int32Value                         `protobuf:"bytes,4,opt,name=deleted_data_cleanup_interval,json=deletedDataCleanupInterval,proto3" json:"deleted_data_cleanup_interval,omitempty" toml:"deleted_data_cleanup_interval,omitempty" mapstructure:"deleted_data_cleanup_interval,omitempty"`
+	StreamDownload                 *wrapperspb.BoolValue                          `protobuf:"bytes,5,opt,name=stream_download,json=streamDownload,proto3" json:"stream_download,omitempty" toml:"stream_download,omitempty" mapstructure:"stream_download,omitempty"`
+	OauthApplication               *ConfigRequest_V1_System_Ocid_OauthApplication `protobuf:"bytes,6,opt,name=oauth_application,json=oauthApplication,proto3" json:"oauth_application,omitempty" toml:"oauth_application,omitempty" mapstructure:"oauth_application,omitempty"`
 }
 
 func (x *ConfigRequest_V1_System_Ocid) Reset() {
@@ -538,6 +539,68 @@ func (x *ConfigRequest_V1_System_Ocid) GetStreamDownload() *wrapperspb.BoolValue
 	return nil
 }
 
+func (x *ConfigRequest_V1_System_Ocid) GetOauthApplication() *ConfigRequest_V1_System_Ocid_OauthApplication {
+	if x != nil {
+		return x.OauthApplication
+	}
+	return nil
+}
+
+type ConfigRequest_V1_System_Ocid_OauthApplication struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name        *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	RedirectUri *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty" toml:"redirect_uri,omitempty" mapstructure:"redirect_uri,omitempty"`
+}
+
+func (x *ConfigRequest_V1_System_Ocid_OauthApplication) Reset() {
+	*x = ConfigRequest_V1_System_Ocid_OauthApplication{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_config_ocid_config_request_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConfigRequest_V1_System_Ocid_OauthApplication) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfigRequest_V1_System_Ocid_OauthApplication) ProtoMessage() {}
+
+func (x *ConfigRequest_V1_System_Ocid_OauthApplication) ProtoReflect() protoreflect.Message {
+	mi := &file_config_ocid_config_request_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfigRequest_V1_System_Ocid_OauthApplication.ProtoReflect.Descriptor instead.
+func (*ConfigRequest_V1_System_Ocid_OauthApplication) Descriptor() ([]byte, []int) {
+	return file_config_ocid_config_request_proto_rawDescGZIP(), []int{0, 0, 0, 3, 0}
+}
+
+func (x *ConfigRequest_V1_System_Ocid_OauthApplication) GetName() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+func (x *ConfigRequest_V1_System_Ocid_OauthApplication) GetRedirectUri() *wrapperspb.StringValue {
+	if x != nil {
+		return x.RedirectUri
+	}
+	return nil
+}
+
 var File_config_ocid_config_request_proto protoreflect.FileDescriptor
 
 var file_config_ocid_config_request_proto_rawDesc = []byte{
@@ -554,12 +617,12 @@ var file_config_ocid_config_request_proto_rawDesc = []byte{
 	0x66, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x62, 0x75, 0x66, 0x2f, 0x77, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x73, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x22, 0xe8, 0x0e, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65,
+	0x6f, 0x74, 0x6f, 0x22, 0xe7, 0x10, 0x0a, 0x0d, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3b, 0x0a, 0x02, 0x76, 0x31, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x2b, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
 	0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x6f, 0x63, 0x69, 0x64, 0x2e, 0x43, 0x6f,
 	0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x31, 0x52, 0x02,
-	0x76, 0x31, 0x1a, 0x81, 0x0e, 0x0a, 0x02, 0x56, 0x31, 0x12, 0x44, 0x0a, 0x03, 0x73, 0x79, 0x73,
+	0x76, 0x31, 0x1a, 0x80, 0x10, 0x0a, 0x02, 0x56, 0x31, 0x12, 0x44, 0x0a, 0x03, 0x73, 0x79, 0x73,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x32, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
 	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x6f, 0x63,
 	0x69, 0x64, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
@@ -568,7 +631,7 @@ var file_config_ocid_config_request_proto_rawDesc = []byte{
 	0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d,
 	0x61, 0x69, 0x6e, 0x2e, 0x6f, 0x63, 0x69, 0x64, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x56, 0x31, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x52, 0x03, 0x73, 0x76, 0x63, 0x1a, 0xe2, 0x0c, 0x0a, 0x06, 0x53, 0x79, 0x73, 0x74, 0x65,
+	0x65, 0x52, 0x03, 0x73, 0x76, 0x63, 0x1a, 0xe1, 0x0e, 0x0a, 0x06, 0x53, 0x79, 0x73, 0x74, 0x65,
 	0x6d, 0x12, 0x34, 0x0a, 0x04, 0x6d, 0x6c, 0x73, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x20, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e,
 	0x69, 0x6e, 0x66, 0x72, 0x61, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x4d, 0x6c, 0x73,
@@ -644,7 +707,7 @@ var file_config_ocid_config_request_proto_rawDesc = []byte{
 	0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49,
 	0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x10, 0x70, 0x6f, 0x6f, 0x6c, 0x51,
-	0x75, 0x65, 0x75, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x1a, 0x9d, 0x03, 0x0a, 0x04,
+	0x75, 0x65, 0x75, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x1a, 0x9c, 0x05, 0x0a, 0x04,
 	0x4f, 0x63, 0x69, 0x64, 0x12, 0x43, 0x0a, 0x0f, 0x73, 0x71, 0x6c, 0x5f, 0x72, 0x65, 0x74, 0x72,
 	0x79, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e,
 	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
@@ -670,13 +733,29 @@ var file_config_ocid_config_request_proto_rawDesc = []byte{
 	0x5f, 0x64, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0e, 0x73, 0x74, 0x72,
-	0x65, 0x61, 0x6d, 0x44, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x1a, 0x09, 0x0a, 0x07, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x3a, 0x16, 0xc2, 0xf3, 0x18, 0x12, 0x0a, 0x10, 0x61, 0x75,
-	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2d, 0x63, 0x73, 0x2d, 0x6f, 0x63, 0x69, 0x64, 0x42, 0x2a,
-	0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65,
-	0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63,
-	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x6f, 0x63, 0x69, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x65, 0x61, 0x6d, 0x44, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x75, 0x0a, 0x11, 0x6f,
+	0x61, 0x75, 0x74, 0x68, 0x5f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x48, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x6f, 0x63,
+	0x69, 0x64, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x2e, 0x56, 0x31, 0x2e, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x2e, 0x4f, 0x63, 0x69, 0x64, 0x2e,
+	0x4f, 0x61, 0x75, 0x74, 0x68, 0x41, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x52, 0x10, 0x6f, 0x61, 0x75, 0x74, 0x68, 0x41, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x1a, 0x85, 0x01, 0x0a, 0x10, 0x4f, 0x61, 0x75, 0x74, 0x68, 0x41, 0x70, 0x70, 0x6c,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x30, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x3f, 0x0a, 0x0c, 0x72, 0x65, 0x64,
+	0x69, 0x72, 0x65, 0x63, 0x74, 0x5f, 0x75, 0x72, 0x69, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x0b, 0x72,
+	0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x55, 0x72, 0x69, 0x1a, 0x09, 0x0a, 0x07, 0x53, 0x65,
+	0x72, 0x76, 0x69, 0x63, 0x65, 0x3a, 0x16, 0xc2, 0xf3, 0x18, 0x12, 0x0a, 0x10, 0x61, 0x75, 0x74,
+	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2d, 0x63, 0x73, 0x2d, 0x6f, 0x63, 0x69, 0x64, 0x42, 0x2a, 0x5a,
+	0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66,
+	0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x2f, 0x6f, 0x63, 0x69, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -691,54 +770,58 @@ func file_config_ocid_config_request_proto_rawDescGZIP() []byte {
 	return file_config_ocid_config_request_proto_rawDescData
 }
 
-var file_config_ocid_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_config_ocid_config_request_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_config_ocid_config_request_proto_goTypes = []interface{}{
-	(*ConfigRequest)(nil),                   // 0: chef.automate.domain.ocid.ConfigRequest
-	(*ConfigRequest_V1)(nil),                // 1: chef.automate.domain.ocid.ConfigRequest.V1
-	(*ConfigRequest_V1_System)(nil),         // 2: chef.automate.domain.ocid.ConfigRequest.V1.System
-	(*ConfigRequest_V1_Service)(nil),        // 3: chef.automate.domain.ocid.ConfigRequest.V1.Service
-	(*ConfigRequest_V1_System_Network)(nil), // 4: chef.automate.domain.ocid.ConfigRequest.V1.System.Network
-	(*ConfigRequest_V1_System_Log)(nil),     // 5: chef.automate.domain.ocid.ConfigRequest.V1.System.Log
-	(*ConfigRequest_V1_System_Sql)(nil),     // 6: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql
-	(*ConfigRequest_V1_System_Ocid)(nil),    // 7: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid
-	(*shared.Mlsa)(nil),                     // 8: chef.automate.infra.config.Mlsa
-	(*shared.TLSCredentials)(nil),           // 9: chef.automate.infra.config.TLSCredentials
-	(*wrapperspb.Int32Value)(nil),           // 10: google.protobuf.Int32Value
-	(*wrapperspb.StringValue)(nil),          // 11: google.protobuf.StringValue
-	(*wrapperspb.Int64Value)(nil),           // 12: google.protobuf.Int64Value
-	(*wrapperspb.BoolValue)(nil),            // 13: google.protobuf.BoolValue
+	(*ConfigRequest)(nil),                                 // 0: chef.automate.domain.ocid.ConfigRequest
+	(*ConfigRequest_V1)(nil),                              // 1: chef.automate.domain.ocid.ConfigRequest.V1
+	(*ConfigRequest_V1_System)(nil),                       // 2: chef.automate.domain.ocid.ConfigRequest.V1.System
+	(*ConfigRequest_V1_Service)(nil),                      // 3: chef.automate.domain.ocid.ConfigRequest.V1.Service
+	(*ConfigRequest_V1_System_Network)(nil),               // 4: chef.automate.domain.ocid.ConfigRequest.V1.System.Network
+	(*ConfigRequest_V1_System_Log)(nil),                   // 5: chef.automate.domain.ocid.ConfigRequest.V1.System.Log
+	(*ConfigRequest_V1_System_Sql)(nil),                   // 6: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql
+	(*ConfigRequest_V1_System_Ocid)(nil),                  // 7: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid
+	(*ConfigRequest_V1_System_Ocid_OauthApplication)(nil), // 8: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.OauthApplication
+	(*shared.Mlsa)(nil),                                   // 9: chef.automate.infra.config.Mlsa
+	(*shared.TLSCredentials)(nil),                         // 10: chef.automate.infra.config.TLSCredentials
+	(*wrapperspb.Int32Value)(nil),                         // 11: google.protobuf.Int32Value
+	(*wrapperspb.StringValue)(nil),                        // 12: google.protobuf.StringValue
+	(*wrapperspb.Int64Value)(nil),                         // 13: google.protobuf.Int64Value
+	(*wrapperspb.BoolValue)(nil),                          // 14: google.protobuf.BoolValue
 }
 var file_config_ocid_config_request_proto_depIdxs = []int32{
 	1,  // 0: chef.automate.domain.ocid.ConfigRequest.v1:type_name -> chef.automate.domain.ocid.ConfigRequest.V1
 	2,  // 1: chef.automate.domain.ocid.ConfigRequest.V1.sys:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System
 	3,  // 2: chef.automate.domain.ocid.ConfigRequest.V1.svc:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.Service
-	8,  // 3: chef.automate.domain.ocid.ConfigRequest.V1.System.mlsa:type_name -> chef.automate.infra.config.Mlsa
+	9,  // 3: chef.automate.domain.ocid.ConfigRequest.V1.System.mlsa:type_name -> chef.automate.infra.config.Mlsa
 	5,  // 4: chef.automate.domain.ocid.ConfigRequest.V1.System.log:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Log
 	4,  // 5: chef.automate.domain.ocid.ConfigRequest.V1.System.network:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Network
 	6,  // 6: chef.automate.domain.ocid.ConfigRequest.V1.System.sql:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Sql
 	7,  // 7: chef.automate.domain.ocid.ConfigRequest.V1.System.ocid:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid
-	9,  // 8: chef.automate.domain.ocid.ConfigRequest.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
-	10, // 9: chef.automate.domain.ocid.ConfigRequest.V1.System.Network.port:type_name -> google.protobuf.Int32Value
-	11, // 10: chef.automate.domain.ocid.ConfigRequest.V1.System.Network.listen_ip:type_name -> google.protobuf.StringValue
-	11, // 11: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.level:type_name -> google.protobuf.StringValue
-	12, // 12: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_bytes:type_name -> google.protobuf.Int64Value
-	10, // 13: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_files:type_name -> google.protobuf.Int32Value
-	10, // 14: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.max_error_logs_per_second:type_name -> google.protobuf.Int32Value
-	10, // 15: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.timeout:type_name -> google.protobuf.Int32Value
-	10, // 16: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_init_size:type_name -> google.protobuf.Int32Value
-	10, // 17: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_max_size:type_name -> google.protobuf.Int32Value
-	10, // 18: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_queue_max:type_name -> google.protobuf.Int32Value
-	10, // 19: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_queue_timeout:type_name -> google.protobuf.Int32Value
-	10, // 20: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.sql_retry_count:type_name -> google.protobuf.Int32Value
-	10, // 21: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.sql_retry_delay:type_name -> google.protobuf.Int32Value
-	10, // 22: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.abandoned_upload_cleanup_interval:type_name -> google.protobuf.Int32Value
-	10, // 23: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.deleted_data_cleanup_interval:type_name -> google.protobuf.Int32Value
-	13, // 24: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.stream_download:type_name -> google.protobuf.BoolValue
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	10, // 8: chef.automate.domain.ocid.ConfigRequest.V1.System.tls:type_name -> chef.automate.infra.config.TLSCredentials
+	11, // 9: chef.automate.domain.ocid.ConfigRequest.V1.System.Network.port:type_name -> google.protobuf.Int32Value
+	12, // 10: chef.automate.domain.ocid.ConfigRequest.V1.System.Network.listen_ip:type_name -> google.protobuf.StringValue
+	12, // 11: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.level:type_name -> google.protobuf.StringValue
+	13, // 12: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_bytes:type_name -> google.protobuf.Int64Value
+	11, // 13: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.rotation_max_files:type_name -> google.protobuf.Int32Value
+	11, // 14: chef.automate.domain.ocid.ConfigRequest.V1.System.Log.max_error_logs_per_second:type_name -> google.protobuf.Int32Value
+	11, // 15: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.timeout:type_name -> google.protobuf.Int32Value
+	11, // 16: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_init_size:type_name -> google.protobuf.Int32Value
+	11, // 17: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_max_size:type_name -> google.protobuf.Int32Value
+	11, // 18: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_queue_max:type_name -> google.protobuf.Int32Value
+	11, // 19: chef.automate.domain.ocid.ConfigRequest.V1.System.Sql.pool_queue_timeout:type_name -> google.protobuf.Int32Value
+	11, // 20: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.sql_retry_count:type_name -> google.protobuf.Int32Value
+	11, // 21: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.sql_retry_delay:type_name -> google.protobuf.Int32Value
+	11, // 22: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.abandoned_upload_cleanup_interval:type_name -> google.protobuf.Int32Value
+	11, // 23: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.deleted_data_cleanup_interval:type_name -> google.protobuf.Int32Value
+	14, // 24: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.stream_download:type_name -> google.protobuf.BoolValue
+	8,  // 25: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.oauth_application:type_name -> chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.OauthApplication
+	12, // 26: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.OauthApplication.name:type_name -> google.protobuf.StringValue
+	12, // 27: chef.automate.domain.ocid.ConfigRequest.V1.System.Ocid.OauthApplication.redirect_uri:type_name -> google.protobuf.StringValue
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_config_ocid_config_request_proto_init() }
@@ -843,6 +926,18 @@ func file_config_ocid_config_request_proto_init() {
 				return nil
 			}
 		}
+		file_config_ocid_config_request_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ConfigRequest_V1_System_Ocid_OauthApplication); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -850,7 +945,7 @@ func file_config_ocid_config_request_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_config_ocid_config_request_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
