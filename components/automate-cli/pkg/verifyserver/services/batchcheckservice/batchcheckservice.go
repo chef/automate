@@ -10,7 +10,7 @@ import (
 )
 
 type IBatchCheckService interface {
-	BatchCheck(checks []string, config models.Config) bool
+	BatchCheck(checks []string, config models.Config) models.BatchCheckResponse
 }
 
 type BatchCheckService struct {
@@ -23,13 +23,13 @@ func NewBatchCheckService(trigger trigger.CheckTrigger) IBatchCheckService {
 	}
 }
 
-func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) bool {
+func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) models.BatchCheckResponse {
+	resultMap := make(map[string][]models.CheckTriggerResponse)
 	if shouldRunChecksOnBastion(checks) {
 		bastionCheckResultChan := make(chan map[string]models.CheckTriggerResponse, len(checks))
 		for _, check := range checks {
-			go ss.RunCheck(check, config, bastionCheckResultChan)
+			go ss.RunBastionCheck(check, config, bastionCheckResultChan)
 		}
-		resultMap := make(map[string][]models.CheckTriggerResponse)
 		for i := 0; i < len(checks); i++ {
 			result := <-bastionCheckResultChan
 			for k, v := range result {
@@ -39,12 +39,23 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) b
 		fmt.Println(resultMap)
 		defer close(bastionCheckResultChan)
 	}
-	return true
+	for _, check := range checks {
+		resp := ss.RunRemoteCheck(check, config)
+		for k, v := range resp {
+			resultMap[k] = append(resultMap[k], v)
+		}
+	}
+	fmt.Println(resultMap)
+	return models.BatchCheckResponse{}
 }
 
-func (ss *BatchCheckService) RunCheck(check string, config models.Config, resultChan chan map[string]models.CheckTriggerResponse) {
+func (ss *BatchCheckService) RunBastionCheck(check string, config models.Config, resultChan chan map[string]models.CheckTriggerResponse) {
 	resp := ss.getCheckInstance(check).Run(config)
 	resultChan <- resp
+}
+
+func (ss *BatchCheckService) RunRemoteCheck(check string, config models.Config) map[string]models.CheckTriggerResponse {
+	return ss.getCheckInstance(check).Run(config)
 }
 
 func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
@@ -87,3 +98,7 @@ func shouldRunChecksOnBastion(checks []string) bool {
 	}
 	return false
 }
+
+// func constructBatchCheckResponse(map[string][]models.CheckTriggerResponse) {
+
+// }
