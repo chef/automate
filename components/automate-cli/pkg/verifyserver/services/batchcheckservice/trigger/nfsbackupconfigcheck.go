@@ -4,13 +4,13 @@ import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models
 
 type NfsBackupConfigCheck struct{}
 
-// func (hrc *CheckTrigger) NfsBackupConfigCheck(config models.Config) map[string]models.CheckTriggerResponse {
-// 	return models.CheckTriggerResponse{}
-// }
+func NewNfsBackupConfigCheck() *NfsBackupConfigCheck {
+	return &NfsBackupConfigCheck{}
+}
 
 func (ss *NfsBackupConfigCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
 	m := map[string]models.CheckTriggerResponse{
-        "f": models.CheckTriggerResponse{},
-    }
+		"f": models.CheckTriggerResponse{},
+	}
 	return m
 }
