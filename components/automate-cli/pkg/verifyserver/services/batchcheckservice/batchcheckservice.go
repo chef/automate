@@ -14,10 +14,10 @@ type IBatchCheckService interface {
 }
 
 type BatchCheckService struct {
-	CheckTrigger trigger.ICheckTrigger
+	CheckTrigger trigger.CheckTrigger
 }
 
-func NewBatchCheckService(trigger trigger.ICheckTrigger) IBatchCheckService {
+func NewBatchCheckService(trigger trigger.CheckTrigger) IBatchCheckService {
 	return &BatchCheckService{
 		CheckTrigger: trigger,
 	}
@@ -39,8 +39,8 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) b
 			for k, v := range result {
 				resultMap[k] = append(resultMap[k], v)
 			}
-			fmt.Println(result)
 		}
+		fmt.Println(resultMap)
 		defer close(bastionCheckResultChan)
 	}
 	return true
@@ -54,11 +54,11 @@ func (ss *BatchCheckService) RunCheck(check string, config models.Config, result
 func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 	switch check {
 	case constants.HARDWARE_RESOURCE_COUNT:
-		return ss.NewHardwareResourceCountCheck()
+		return ss.CheckTrigger.HardwareResourceCountCheck
 	case constants.CERTIFICATE:
 		return ss.NewCertificateCheck()
 	case constants.SSH_USER:
-		return ss.NewSshUserAccessCheck()
+		return ss.CheckTrigger.SshUserAccessCheck
 	case constants.SYSTEM_RESOURCES:
 		return ss.NewSystemResourceCheck()
 	case constants.SOFTWARE_VERSIONS:
