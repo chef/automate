@@ -57,7 +57,6 @@ type Config struct {
 }
 
 type CheckTriggerResponse struct {
-	Ip     string          `json:"ip"`
 	Passed bool            `json:"passed"`
 	Checks []CheckResponse `json:"checks"`
 }
