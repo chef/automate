@@ -7,23 +7,25 @@ import (
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/restutils"
 )
 
 //HardwareResourceCountCheck - Calls the hardware-resource-count API and collates the response
-func (hrc *CheckTrigger) HardwareResourceCountCheck(config models.Config) models.CheckTriggerResponse {
+func (hrc *CheckTrigger) HardwareResourceCountCheck(config models.Config) (models.CheckTriggerResponse, error) {
 	hrc.Logger.Info("Performing Hardware resource count check from batch Check API")
-	resp, err := post("https://localhost/api/v1/checks/hardware-resource-count", config.Hardware)
+	resp, err := restutils.Post("https://localhost/api/v1/checks/hardware-resource-count", config.Hardware)
 	if err != nil {
-		hrc.Logger.Error("Error while Performing Hardware resource count check from batch Check API")
-		return models.CheckTriggerResponse{}
+		hrc.Logger.Error("Error while Performing Hardware resource count check from batch Check API", err)
+		return models.CheckTriggerResponse{}, err
 	}
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		hrc.Logger.Error("Error while reading response of Hardware resource count check from batch Check API", err)
+		return models.CheckTriggerResponse{}, err
 	}
 	response := models.CheckTriggerResponse{}
 	json.Unmarshal(respBody, &response)
-	return response
+	return response, nil
 }
 
 func post(url string, body interface{}) (*http.Response, error) {
