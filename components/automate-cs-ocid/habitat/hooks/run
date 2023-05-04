@@ -7,9 +7,9 @@ cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
 export RAILS_ENV={{cfg.rails_env}}
 export RACK_ENV={{cfg.rack_env}}
-export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
+export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
 bundle exec bin/thin start -p 9090 --ssl --ssl-key-file {{pkg.svc_config_path}}/service.key --ssl-cert-file {{pkg.svc_config_path}}/service.crt
 
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
