@@ -56,16 +56,27 @@ type Config struct {
 	} `json:"external_postgresql"`
 }
 
+type BatchCheckResponse struct {
+	Status string             `json:"status"`
+	Result []BatchCheckResult `json:"result"`
+}
+type BatchCheckResult struct {
+	NodeType string      `json:"node_type"`
+	Ip       string      `json:"ip"`
+	Passed   bool        `json:"passed"`
+	Tests    []ApiResult `json:"tests"`
+}
+
 type CheckTriggerResponse struct {
-	Status string `json:"status"`
+	Status string    `json:"status"`
 	Result ApiResult `json:"result"`
 }
-
 type ApiResult struct {
-	Passed bool            `json:"passed"`
-	Checks []CheckResponse `json:"checks"`
+	Passed  bool            `json:"passed"`
+	Message string          `json:"msg"`
+	Check   string          `json:"check"`
+	Checks  []CheckResponse `json:"checks"`
 }
-
 type CheckResponse struct {
 	Checks struct {
 		Title         string `json:"title"`

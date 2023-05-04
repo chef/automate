@@ -20,7 +20,9 @@ func SetupMockHardwareResourceCountCheck() trigger.ICheck {
 				"1.2.3.4": {
 					Status: "Passed",
 					Result: models.ApiResult{
-						Passed: false,
+						Passed:  false,
+						Check:   "hardware-resource-count",
+						Message: "Hardware Resource Count Check",
 						Checks: []models.CheckResponse{
 							{
 								Checks: struct {
