@@ -1,6 +1,7 @@
 package fiberutils
 
 import (
+	"os"
 	"strings"
 	"time"
 
@@ -9,10 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const VERIFY_SERVER_TIMEZONE = "VERIFY_SERVER_TIMEZONE"
+
 func GetLogConfig(log logger.ILogger) (lc middleware.LoggerConfig) {
+	timeZone := "UTC"
+	envTimeZone := os.Getenv(VERIFY_SERVER_TIMEZONE)
+	if envTimeZone != "" {
+		timeZone = envTimeZone
+	}
 	lc = middleware.LoggerConfig{
 		TimeFormat: time.RFC3339,
-		TimeZone:   "UTC",
+		TimeZone:   timeZone,
 	}
 	if log.GetLevel() <= logrus.DebugLevel {
 		lc.Format = generateLogFormat(
