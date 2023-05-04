@@ -34,44 +34,41 @@ pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 automate_scaffolding_include_templates=(sqerl.config)
 
 do_prepare() {
-  echo "Do prepare hook called *********"
+  GO_LDFLAGS="-X main.RubyPath=$(hab pkg path 'core/ruby27')"
+  export GO_LDFLAGS
+
   build_line "Setting link for /usr/bin/env to 'coreutils'"
   [[ ! -f /usr/bin/env ]] && ln -s "$(pkg_path_for coreutils)/bin/env" /usr/bin/env
   return 0
 }
 
 do_download() {
-  echo "Download hook called *******"
   return 0
 }
 
 do_build() {
-  echo "Build hook called *******"
   return 0
 }
 
 do_install() {
-  echo "Install hook called *******"
-  # chmod 777 -R /hab/pkgs/core/ruby27/2.7.5/20220312100031/lib/ruby/gems/2.7.0
-  # chmod 777 -R /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
-  export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
-  export RUBY_BIN_DIR="/hab/pkgs/core/ruby27/2.7.5/20220312100031/bin"
-  export PATH=$PATH:$RUBY_BIN_DIR
-  echo "********RUBYFILE PATH"
-  echo $PATH
+  cd "$(hab pkg path 'chef/oc_id')/oc_id"
 
-  cd /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
+  export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
+
+  # TODO :: Remove following line once new ocid hab package is used
   echo "gem 'tzinfo-data'" >> Gemfile
+
+  export BUNDLE_SILENCE_ROOT_WARNING=1 GEM_PATH
+  build_line "Setting BUNDLE_SILENCE_ROOT_WARNING=$BUNDLE_SILENCE_ROOT_WARNING"
+
   bundle package --no-install
   bundle install --path=vendor/bundle
 
-  echo "******Creating Database"
   bundle exec bin/rake db:create
-
-  echo "******Running Migrations"
   bundle exec bin/rake db:migrate
+
   mkdir -p tmp
   chmod 777 -R tmp
-  # chmod 777 -R .bundle
+
   return 0
 }
