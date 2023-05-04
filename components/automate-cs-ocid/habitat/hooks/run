@@ -2,45 +2,14 @@
 
 exec 2>&1
 
-echo "******MLSA License Check Updated Changesss"
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
-echo "******CD to pkg path"
-cd /hab/pkgs/chef/oc_id/15.4.0/20230105061030/oc_id
-
-echo "******Exporing ENVs"
-export RAILS_ENV="production"
-export RACK_ENV="production"
+export RAILS_ENV={{cfg.rails_env}}
+export RACK_ENV={{cfg.rack_env}}
 export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-# echo "******DATABASE URL VALUE"
-# echo $DATABASE_URL
-echo {{cfg.database_url}}
-
-echo "******Check if Ruby is present"
-ruby -v
-
-echo "******Print current directory"
-pwd
-
-# echo "******Running Bundle Install"
-# bundle package --no-install
-# bundle install --path=vendor/bundle
-
-# echo "I am checking DB*****"
-# bin/rails runner 'puts ActiveRecord::Base.connections'
-
-
-
-echo "******Starting Server"
-# bundle exec bin/unicorn_rails server -p 9090
-bundle exec bin/thin start -p 9090 --ssl --ssl-key-file /hab/svc/automate-cs-ocid/config/service.key --ssl-cert-file /hab/svc/automate-cs-ocid/config/service.crt
-
-
-# pg-helper rename-if-exists ocid "$DBNAME"
-# pg-helper ensure-service-database "$DBNAME"
-# pg-helper create-extension "$DBNAME" "uuid-ossp"
-# pg-helper fix-permissions "$DBNAME"
+bundle exec bin/thin start -p 9090 --ssl --ssl-key-file {{pkg.svc_config_path}}/service.key --ssl-cert-file {{pkg.svc_config_path}}/service.crt
 
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
