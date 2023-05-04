@@ -5,6 +5,9 @@ import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models
 type SshUserAccessCheck struct {
 }
 
+func NewSshUserAccessCheck() *SshUserAccessCheck {
+	return &SshUserAccessCheck{}
+}
 // func (hrc *CheckTrigger) SshUserAccessCheck(config models.Config) map[string]models.CheckTriggerResponse {
 // 	return models.CheckTriggerResponse{}
 // }

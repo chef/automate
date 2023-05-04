@@ -38,7 +38,7 @@ func NewVerifyServer(port string, debug bool) *VerifyServer {
 		AddStatusService(
 			statusservice.NewStatusService()).
 		AddBatchCheckService(
-			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(trigger.NewHardwareResourceCountCheck())))
+			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(trigger.NewHardwareResourceCountCheck(), trigger.NewSshUserAccessCheck())))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     log,
