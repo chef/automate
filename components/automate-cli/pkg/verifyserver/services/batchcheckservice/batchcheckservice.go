@@ -3,8 +3,10 @@ package batchcheckservice
 import (
 	"fmt"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 type IBatchCheckService interface {
@@ -22,16 +24,47 @@ func NewBatchCheckService(trigger trigger.ICheckTrigger) IBatchCheckService {
 }
 
 func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) bool {
-	bastionCheckResultChan := make(chan bool, 3)
-	go ss.hardwareResourceCountCheck(config, bastionCheckResultChan)
-	go ss.sshUserAccessCheck(config, bastionCheckResultChan)
-	go ss.certificateCheck(config, bastionCheckResultChan)
-	for i := 0; i < 3; i++ {
-		result := <-bastionCheckResultChan
-		fmt.Println(result)
+	checksMap := ss.constructChecksMap()
+	if shouldRunChecksOnBastion(checks) {
+		bastionCheckResultChan := make(chan bool, len(checks))
+		for _, check := range checks {
+			go checksMap[check].(func(models.Config, chan bool))(config, bastionCheckResultChan)
+		}
+		for i := 0; i < 3; i++ {
+			result := <-bastionCheckResultChan
+			fmt.Println(result)
+		}
+		defer close(bastionCheckResultChan)
 	}
-	defer close(bastionCheckResultChan)
 	return true
+}
+
+func (ss *BatchCheckService) constructChecksMap() map[string]interface{} {
+	checksMap := map[string]interface{}{
+		constants.HARDWARE_RESOURCE_COUNT:         ss.hardwareResourceCountCheck,
+		constants.CERTIFICATE:                     ss.certificateCheck,
+		constants.SSH_USER:                        ss.sshUserAccessCheck,
+		constants.SYSTEM_RESOURCES:                ss.systemResourceCheck,
+		constants.SOFTWARE_VERSIONS:               ss.softwareVersionCheck,
+		constants.SYSTEM_USER:                     ss.systemUserCheck,
+		constants.S3_BACKUP_CONFIG:                ss.s3BackupConfigCheck,
+		constants.FQDN:                            ss.fqdnCheck,
+		constants.FIREWALL:                        ss.firewallCheck,
+		constants.EXTERNAL_OPENSEARCH:             ss.externalOpensearchCheck,
+		constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS: ss.opensearchS3BucketAccessCheck,
+		constants.EXTERNAL_POSTGRESQL:             ss.externalPostgresCheck,
+		constants.NFS_BACKUP_CONFIG:               ss.nfsBackupConfigCheck,
+	}
+	return checksMap
+}
+
+func shouldRunChecksOnBastion(checks []string) bool {
+	if stringutils.SliceContains(checks, constants.HARDWARE_RESOURCE_COUNT) ||
+		stringutils.SliceContains(checks, constants.CERTIFICATE) ||
+		stringutils.SliceContains(checks, constants.SSH_USER) {
+		return true
+	}
+	return false
 }
 
 func (ss *BatchCheckService) hardwareResourceCountCheck(config models.Config, resultChan chan bool) {
