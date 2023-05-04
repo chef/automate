@@ -6,7 +6,7 @@ import (
 )
 
 type ICheckTrigger interface {
-	HardwareResourceCountCheck(config models.Config) models.CheckTriggerResponse
+	HardwareResourceCountCheck(config models.Config) (models.CheckTriggerResponse, error)
 	SshUserAccessCheck(config models.Config) models.CheckTriggerResponse
 	CertificateCheck(config models.Config) models.CheckTriggerResponse
 	SystemResourceCheck(config models.Config) models.CheckTriggerResponse
