@@ -390,6 +390,42 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-cs-ocid",
+      "metadata": {
+        "name": "chef/automate-cs-ocid",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "file",
+            "path": "data/pivotal.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/pivotal.pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_priv.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/dark_launch_features.json",
+            "optional": false
+          }
+        ]
+      }
+    },
+    {
       "name": "chef/automate-cs-nginx",
       "metadata": {
         "name": "chef/automate-cs-nginx",
@@ -662,7 +698,8 @@ var ProductMetadataJSON = `
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",
         "chef/automate-cs-oc-erchef",
-        "chef/automate-cs-nginx"
+        "chef/automate-cs-nginx",
+        "chef/automate-cs-ocid"
       ],
       "packages": null,
       "dependencies": [
