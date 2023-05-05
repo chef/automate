@@ -14,6 +14,8 @@ const AWS_OPENSEARCH_S3_BUCKET_ACCESS = "aws-opensearch-s3-bucket-access"
 const EXTERNAL_POSTGRESQL = "external-postgresql"
 const NFS_BACKUP_CONFIG = "nfs-backup-config"
 
+const HARDWARE_RESOURCE_COUNT_MSG = "Hardware Resource Count Check"
+
 func GetAllChecks() [13]string {
 	var allChecks = [13]string{
 		HARDWARE_RESOURCE_COUNT,
