@@ -61,8 +61,10 @@ do_install() {
   export BUNDLE_SILENCE_ROOT_WARNING=1 GEM_PATH
   build_line "Setting BUNDLE_SILENCE_ROOT_WARNING=$BUNDLE_SILENCE_ROOT_WARNING"
 
-  bundle package --no-install
-  bundle install --path=vendor/bundle
+  bundle config path "vendor/bundle"
+
+  # TODO: Check if it works with path flag
+  bundle install
 
   bundle exec bin/rake db:create
   bundle exec bin/rake db:migrate

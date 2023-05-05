@@ -4,8 +4,6 @@ fips_enabled = false
 ip_mode = "ipv4"
 rails_env="production"
 rack_env="production"
-ruby_bin_directory="/hab/pkgs/core/ruby27/2.7.5/20220312100031/bin"
-database_url="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
 
 [network]
 port=9090
