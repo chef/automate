@@ -7,6 +7,7 @@ import (
 	"text/template"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 )
 
@@ -41,6 +42,8 @@ type CreateSystemdService struct {
 	SystemdCreateUtils      SystemdCreateUtils
 	BinaryDestinationFolder string
 	SystemdLocation         string
+	Debug                   bool
+	Logger                  logger.Logger
 	Writer                  *cli.Writer
 }
 
@@ -48,7 +51,22 @@ func NewCreateSystemdService(
 	systemdCreateUtils SystemdCreateUtils,
 	binaryDestinationFolder string,
 	systemdLocation string,
+	debug bool,
 	writer *cli.Writer) (*CreateSystemdService, error) {
+	level := "info"
+	if debug {
+		level = "debug"
+	}
+	l, err := logger.NewLoggerWithOut("text", level, writer)
+	if err != nil {
+		return nil, err
+	}
+	if systemdCreateUtils == nil {
+		return nil, errors.New("SystemdCreateUtils cannot be nil")
+	}
+	if writer == nil {
+		return nil, errors.New("Writer cannot be nil")
+	}
 	if binaryDestinationFolder == "" {
 		return nil, errors.New("Binary destination folder cannot be empty")
 	}
@@ -59,6 +77,7 @@ func NewCreateSystemdService(
 		SystemdCreateUtils:      systemdCreateUtils,
 		BinaryDestinationFolder: binaryDestinationFolder,
 		SystemdLocation:         systemdLocation,
+		Logger:                  l,
 		Writer:                  writer,
 	}, nil
 }
@@ -78,8 +97,14 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 		ServiceCommand:     css.BinaryDestinationFolder + "/" + SERVICE_COMMAND,
 	}
 
+	css.Logger.Debugf(
+		"Template data: ServiceName %s, ServiceDescription %s, ServiceCommand %s",
+		data.ServiceName, data.ServiceDescription, data.ServiceCommand,
+	)
+
 	// Execute the template to generate the service file.
 	serviceFilePath := fmt.Sprintf(css.SystemdLocation+"/"+SYSTEMD_FILE, SERVICE_NAME)
+	css.Logger.Debugf("Service file path %s", serviceFilePath)
 	serviceFile, err := os.Create(serviceFilePath)
 	if err != nil {
 		return errors.Wrap(err, "Error creating service file")
@@ -101,14 +126,17 @@ func (css *CreateSystemdService) enableSystemdService() error {
 	if err != nil {
 		return errors.Wrap(err, "Error reloading systemd daemon")
 	}
+	css.Logger.Debugln("Reloaded systemd daemon")
 	err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"enable", service})
 	if err != nil {
 		return errors.Wrap(err, "Error enabling service")
 	}
+	css.Logger.Debugln("Enabled service successfully")
 	err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"start", service})
 	if err != nil {
 		return errors.Wrap(err, "Error starting service")
 	}
+	css.Logger.Debugln("Started service successfully")
 	return nil
 }
 
@@ -120,6 +148,7 @@ func (css *CreateSystemdService) isSystemdEnabled() error {
 func (css *CreateSystemdService) Create() error {
 
 	currentBinaryPath, err := css.SystemdCreateUtils.GetBinaryPath()
+	css.Logger.Debugf("Current binary path %s", currentBinaryPath)
 	if err != nil {
 		return err
 	}
@@ -127,13 +156,16 @@ func (css *CreateSystemdService) Create() error {
 	if err != nil {
 		return err
 	}
+	css.Logger.Debugln("Systemd is found on this system")
 
 	err = css.isSystemdEnabled()
 	if err == nil {
 		return errors.New(fmt.Sprintf("Service %[1]v already exists on this node, use systemctl start/stop/status %[1]v", SERVICE_NAME))
 	}
+	css.Logger.Debugf("Service %s is not running on this system", SERVICE_NAME)
 
 	fullBinaryDestination := filepath.Join(css.BinaryDestinationFolder, filepath.Base(currentBinaryPath))
+	css.Logger.Debugf("Full binary destination path %s", fullBinaryDestination)
 	err = css.SystemdCreateUtils.CreateDestinationAndCopy(currentBinaryPath, fullBinaryDestination)
 	if err != nil {
 		return err

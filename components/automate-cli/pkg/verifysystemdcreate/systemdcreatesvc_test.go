@@ -70,34 +70,49 @@ func TestSystemdServiceCreate(t *testing.T) {
 
 	t.Run("it gives error if binary destination directory is empty", func(t *testing.T) {
 		_, systemdLocation := setupCopy(t)
-		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), "", systemdLocation, cw.CliWriter)
+		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), "", systemdLocation, false, cw.CliWriter)
 		assert.Error(t, err)
 		assert.Equal(t, "Binary destination folder cannot be empty", err.Error())
 	})
 
 	t.Run("it gives error if systemd location is empty", func(t *testing.T) {
 		binaryDestinationFolder, _ := setupCopy(t)
-		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, "", cw.CliWriter)
+		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, "", false, cw.CliWriter)
 		assert.Error(t, err)
 		assert.Equal(t, "Systemd location cannot be empty", err.Error())
 	})
 
+	t.Run("it gives error if systemd create utils is nil", func(t *testing.T) {
+		binaryDestinationFolder, _ := setupCopy(t)
+		_, err := verifysystemdcreate.NewCreateSystemdService(nil, binaryDestinationFolder, "", false, cw.CliWriter)
+		assert.Error(t, err)
+		assert.Equal(t, "SystemdCreateUtils cannot be nil", err.Error())
+	})
+
+	t.Run("it gives error if writer is nil", func(t *testing.T) {
+		binaryDestinationFolder, _ := setupCopy(t)
+		_, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, "", false, nil)
+		assert.Error(t, err)
+		assert.Equal(t, "Writer cannot be nil", err.Error())
+	})
+
 	t.Run("it creates automate-verify.service file", func(t *testing.T) {
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(setupMockUtils(), binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)
 		_, err = os.Stat(systemdLocation + "/automate-verify.service")
 		assert.NoError(t, err)
-		assert.Contains(t, cw.Output(), "Binary copied to "+binaryDestinationFolder+"\nService automate-verify created successfully\n")
+		assert.Contains(t, cw.Output(), "Binary copied to "+binaryDestinationFolder)
+		assert.Contains(t, cw.Output(), "Service automate-verify created successfully")
 	})
 
 	t.Run("it gives error if there automate-verify systemd-service is already enabled", func(t *testing.T) {
 		mockUtils := setupMockUtils()
 		mockUtils.ExecuteShellCommandFunc = executeShellCommandPassIsEnabled
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -108,7 +123,7 @@ func TestSystemdServiceCreate(t *testing.T) {
 		mockUtils := setupMockUtils()
 		mockUtils.ExecuteShellCommandFunc = executeShellCommandErr
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -119,7 +134,7 @@ func TestSystemdServiceCreate(t *testing.T) {
 		mockUtils := setupMockUtils()
 		mockUtils.ExecuteShellCommandFunc = executeShellCommandEnableErr
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -130,7 +145,7 @@ func TestSystemdServiceCreate(t *testing.T) {
 		mockUtils := setupMockUtils()
 		mockUtils.ExecuteShellCommandFunc = executeShellCommandStartErr
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -142,7 +157,7 @@ func TestSystemdServiceCreate(t *testing.T) {
 		mockUtils.ExecuteShellCommandFunc = executeShellCommand
 		mockUtils.SystemdRunningFunc = func() error { return errors.New("Error in copying") }
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.Error(t, err)
@@ -155,7 +170,7 @@ func TestSystemdServiceCreate(t *testing.T) {
 		systemdFilePath := systemdLocation + "/automate-verify.service"
 		srcData := []byte("test data")
 		assert.NoError(t, ioutil.WriteFile(systemdFilePath, srcData, 0700))
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)
@@ -184,7 +199,7 @@ StandardError=journal
 [Install]
 WantedBy=multi-user.target
 `
-		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, cw.CliWriter)
+		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)

@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/ansrivas/fiberprometheus"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
@@ -20,28 +20,35 @@ const (
 
 type VerifyServer struct {
 	Port    string
-	Log     logger.ILogger
+	Log     logger.Logger
 	App     *fiber.App
 	Handler *v1.Handler
 }
 
-func NewVerifyServer(port string, debug bool) *VerifyServer {
-	log := logger.NewLogger(debug)
+func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
+	defaultLevel := "info"
+	if debug {
+		defaultLevel = "debug"
+	}
+	l, err := logger.NewLogger("text", defaultLevel)
+	if err != nil {
+		return nil, err
+	}
 	fconf := &fiber.Settings{
 		ServerHeader: SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
 	app := fiber.New(fconf)
-	handler := v1.NewHandler(log).
+	handler := v1.NewHandler(l).
 		AddStatusService(statusservice.NewStatusService())
 	vs := &VerifyServer{
 		Port:    port,
-		Log:     log,
+		Log:     l,
 		App:     app,
 		Handler: handler,
 	}
 	vs.Setup()
-	return vs
+	return vs, nil
 }
 
 func (vs *VerifyServer) Start() error {

@@ -84,7 +84,7 @@ func init() {
 			docs.Compatibility: docs.Compatibility,
 		},
 		Args: cobra.ExactArgs(0),
-		RunE: verifySystemdCreateFunc(),
+		RunE: verifySystemdCreateFunc(&flagsObj),
 	}
 
 	// flags for Verify Command
@@ -144,6 +144,12 @@ func init() {
 		"d",
 		false,
 		"enable debugging")
+	verifySystemdServiceCreateCmd.Flags().BoolVarP(
+		&flagsObj.debug,
+		"debug",
+		"d",
+		false,
+		"enable debugging")
 
 	verifySystemdServiceCmd.AddCommand(verifySystemdServiceCreateCmd)
 	verifyCmd.AddCommand(verifySystemdServiceCmd)
@@ -167,20 +173,29 @@ func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string
 		}
 	}
 	writer.Println("Using port " + port)
-	vs := server.NewVerifyServer(port, debug)
+	vs, err := server.NewVerifyServer(port, debug)
+	if err != nil {
+		return err
+	}
 	return vs.Start()
 }
 
-func verifySystemdCreateFunc() func(cmd *cobra.Command, args []string) error {
+func verifySystemdCreateFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c := verifySystemdCreateFlow{}
-		return c.runVerifySystemdCreateCmd(cmd, args)
+		return c.runVerifySystemdCreateCmd(cmd, args, flagsObj.debug)
 	}
 }
 
-func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, args []string) error {
+func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, args []string, debug bool) error {
 
-	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(verifysystemdcreate.NewSystemdCreateUtilsImpl(), BINARY_DESTINATION_FOLDER, SYSTEMD_PATH, writer)
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(
+		verifysystemdcreate.NewSystemdCreateUtilsImpl(),
+		BINARY_DESTINATION_FOLDER,
+		SYSTEMD_PATH,
+		debug,
+		writer,
+	)
 	if err != nil {
 		return err
 	}
