@@ -12,6 +12,8 @@ import (
 )
 
 const (
+	INFO_LEVEL          = "info"
+	DEBUG_LEVEL         = "debug"
 	SERVICE_NAME        = "automate-verify"
 	SERVICE_DESCRIPTION = "Service for automating verification"
 	SERVICE_COMMAND     = "chef-automate verify serve"
@@ -53,9 +55,9 @@ func NewCreateSystemdService(
 	systemdLocation string,
 	debug bool,
 	writer *cli.Writer) (*CreateSystemdService, error) {
-	level := "info"
+	level := INFO_LEVEL
 	if debug {
-		level = "debug"
+		level = DEBUG_LEVEL
 	}
 	l, err := logger.NewLoggerWithOut("text", level, writer)
 	if err != nil {
