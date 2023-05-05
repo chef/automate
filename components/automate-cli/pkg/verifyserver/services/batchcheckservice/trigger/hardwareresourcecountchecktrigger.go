@@ -3,6 +3,7 @@ package trigger
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 
@@ -53,13 +54,13 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) map[string]model
 func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(url string, body interface{}) (*models.HardwareResourceCheckResponse, error) {
 	resp, err := Post(url, body)
 	if err != nil {
-		ss.log.Error("Error while Performing Hardware resource count check from batch Check API", err)
-		return &models.HardwareResourceCheckResponse{}, err
+		ss.log.Error("Error while Performing Hardware resource count check from batch Check API : ", err)
+		return nil, err
 	}
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		ss.log.Error("Error while reading response of Hardware resource count check from batch Check API", err)
-		return &models.HardwareResourceCheckResponse{}, err
+		ss.log.Error("Error while reading response of Hardware resource count check from batch Check API : ", err)
+		return nil, err
 	}
 	response := models.HardwareResourceCheckResponse{}
 	json.Unmarshal(respBody, &response)
@@ -82,6 +83,9 @@ func Post(url string, body interface{}) (*http.Response, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
 	}
 	return resp, nil
 }

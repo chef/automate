@@ -6,12 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -221,12 +221,8 @@ func TestCheckTrigger_TriggerHardwareResourceCountCheck(t *testing.T) {
 		// make the HTTP request to an invalid URL
 		resp, err := hrc.TriggerHardwareResourceCountCheck("invalid-url", GetRequestJson())
 
-		if err != nil && !strings.Contains(err.Error(), "unsupported protocol scheme") {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if resp != nil {
-			t.Errorf("unexpected response: %v", resp)
-		}
+		require.Error(t, err)
+		require.Nil(t, resp)
 	})
 
 	t.Run("Bad request", func(t *testing.T) {
@@ -240,13 +236,8 @@ func TestCheckTrigger_TriggerHardwareResourceCountCheck(t *testing.T) {
 		defer mockServer2.Close()
 
 		resp, err := hrc.TriggerHardwareResourceCountCheck(mockServer2.URL, GetRequestJson())
-
-		if resp != nil {
-			t.Errorf("unexpected result: %v", resp)
-		}
-		if err != nil {
-			assert.EqualError(t, err, fmt.Sprintf("error triggering the API %s: status code %d ", mockServer2.URL, http.StatusBadRequest))
-		}
+		require.Error(t, err)
+		require.Nil(t, resp)
 	})
 
 	t.Run("Invalid JSON", func(t *testing.T) {
@@ -260,12 +251,8 @@ func TestCheckTrigger_TriggerHardwareResourceCountCheck(t *testing.T) {
 
 		resp, err := hrc.TriggerHardwareResourceCountCheck(mockServer.URL, GetRequestJson())
 
-		if resp != nil {
-			t.Errorf("unexpected result: %v", resp)
-		}
-		if err != nil {
-			assert.EqualError(t, err, fmt.Sprintf("error decoding response from the API %s: invalid character 'i' looking for beginning of value ", mockServer.URL))
-		}
+		require.Error(t, err)
+		require.Nil(t, resp)
 	})
 
 	t.Run("Returns OK", func(t *testing.T) {
@@ -281,12 +268,8 @@ func TestCheckTrigger_TriggerHardwareResourceCountCheck(t *testing.T) {
 		// call the function being tested
 		resp, err := hrc.TriggerHardwareResourceCountCheck(mockServer.URL, GetRequestJson())
 
-		if resp != nil {
-			t.Logf("Success response : %v", resp)
-		}
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
+		require.Nil(t, err)
+		require.NotNil(t, resp)
 	})
 
 }
