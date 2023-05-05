@@ -14,7 +14,7 @@ import (
 func (h *Handler) BatchCheck(c *fiber.Ctx) {
 	req := new(models.BatchCheckRequest)
 	if err := c.BodyParser(req); err != nil {
-		h.Logger.Error(err.Error())
+		h.Logger.Error(fmt.Errorf("batch check request body parsing failed %v", err.Error()))
 		c.JSON(response.BuildFailedResponse(fiber.NewError(fiber.StatusBadRequest, err.Error())))
 	}
 	err := validateChecks(req.Checks)
