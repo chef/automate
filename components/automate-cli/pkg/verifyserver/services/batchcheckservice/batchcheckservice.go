@@ -1,8 +1,6 @@
 package batchcheckservice
 
 import (
-	"fmt"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
@@ -24,7 +22,7 @@ func NewBatchCheckService(trigger trigger.CheckTrigger) IBatchCheckService {
 }
 
 func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) models.BatchCheckResponse {
-	resultMap := make(map[string][]models.CheckTriggerResponse)
+	batchApisResultMap := make(map[string][]models.ApiResult)
 	if shouldRunChecksOnBastion(checks) {
 		bastionCheckResultChan := make(chan map[string]models.CheckTriggerResponse, len(checks))
 		for _, check := range checks {
@@ -33,20 +31,19 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		for i := 0; i < len(checks); i++ {
 			result := <-bastionCheckResultChan
 			for k, v := range result {
-				resultMap[k] = append(resultMap[k], v)
+				batchApisResultMap[k] = append(batchApisResultMap[k], v.Result)
 			}
 		}
-		fmt.Println(resultMap)
 		defer close(bastionCheckResultChan)
+		return constructBatchCheckResponse(batchApisResultMap, config.Hardware)
 	}
 	for _, check := range checks {
 		resp := ss.RunRemoteCheck(check, config)
 		for k, v := range resp {
-			resultMap[k] = append(resultMap[k], v)
+			batchApisResultMap[k] = append(batchApisResultMap[k], v.Result)
 		}
 	}
-	fmt.Println(resultMap)
-	return models.BatchCheckResponse{}
+	return constructBatchCheckResponse(batchApisResultMap, config.Hardware)
 }
 
 func (ss *BatchCheckService) RunBastionCheck(check string, config models.Config, resultChan chan map[string]models.CheckTriggerResponse) {
@@ -99,6 +96,33 @@ func shouldRunChecksOnBastion(checks []string) bool {
 	return false
 }
 
-// func constructBatchCheckResponse(map[string][]models.CheckTriggerResponse) {
+func constructBatchCheckResponse(batchApisResultMap map[string][]models.ApiResult, hardwareDetails models.Hardware) models.BatchCheckResponse {
+	var result = make([]models.BatchCheckResult, len(batchApisResultMap))
+	var resultIndex = 0
+	for k, v := range batchApisResultMap {
+		result[resultIndex].Ip = k
+		result[resultIndex].NodeType = getNodeTypeFromIp(k, hardwareDetails)
+		result[resultIndex].Tests = v
+		resultIndex = resultIndex + 1
+	}
+	return models.BatchCheckResponse{
+		Status: "SUCCESS",
+		Result: result,
+	}
+}
 
-// }
+func getNodeTypeFromIp(ip string, hardwareDetails models.Hardware) string {
+	if stringutils.SliceContains(hardwareDetails.AutomateNodeIps, ip) {
+		return "automate"
+	}
+	if stringutils.SliceContains(hardwareDetails.ChefInfraServerNodeIps, ip) {
+		return "chef_server"
+	}
+	if stringutils.SliceContains(hardwareDetails.PostgresqlNodeIps, ip) {
+		return "postgresql"
+	}
+	if stringutils.SliceContains(hardwareDetails.OpensearchNodeIps, ip) {
+		return "opensearch"
+	}
+	return ""
+}

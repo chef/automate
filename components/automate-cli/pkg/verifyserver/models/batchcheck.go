@@ -5,6 +5,17 @@ type BatchCheckRequest struct {
 	Config Config   `json:"config"`
 }
 
+type Hardware struct {
+	AutomateNodeCount        int      `json:"automate_node_count"`
+	AutomateNodeIps          []string `json:"automate_node_ips"`
+	ChefInfraServerNodeCount int      `json:"chef_infra_server_node_count"`
+	ChefInfraServerNodeIps   []string `json:"chef_infra_server_node_ips"`
+	PostgresqlNodeCount      int      `json:"postgresql_node_count"`
+	PostgresqlNodeIps        []string `json:"postgresql_node_ips"`
+	OpensearchNodeCount      int      `json:"opensearch_node_count"`
+	OpensearchNodeIps        []string `json:"opensearch_node_ips"`
+}
+
 type Config struct {
 	SshUser struct {
 		Username     string `json:"user_name"`
@@ -24,16 +35,7 @@ type Config struct {
 			SecretKey  string `json:"secret_key"`
 		}
 	} `json:"backup"`
-	Hardware struct {
-		AutomateNodeCount        int      `json:"automate_node_count"`
-		AutomateNodeIps          []string `json:"automate_node_ips"`
-		ChefInfraServerNodeCount int      `json:"chef_infra_server_node_count"`
-		ChefInfraServerNodeIps   []string `json:"chef_infra_server_node_ips"`
-		PostgresqlNodeCount      int      `json:"postgresql_node_count"`
-		PostgresqlNodeIps        []string `json:"postgresql_node_ips"`
-		OpensearchNodeCount      int      `json:"opensearch_node_count"`
-		OpensearchNodeIps        []string `json:"opensearch_node_ips"`
-	} `json:"hardware"`
+	Hardware    Hardware `json:"hardware"`
 	Certificate struct {
 		Fqdn     string     `json:"fqdn"`
 		RootCert string     `json:"root_cert"`
@@ -63,7 +65,6 @@ type BatchCheckResponse struct {
 type BatchCheckResult struct {
 	NodeType string      `json:"node_type"`
 	Ip       string      `json:"ip"`
-	Passed   bool        `json:"passed"`
 	Tests    []ApiResult `json:"tests"`
 }
 

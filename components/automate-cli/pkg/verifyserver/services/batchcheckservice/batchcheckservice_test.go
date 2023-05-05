@@ -25,6 +25,8 @@ func TestStatusService(t *testing.T) {
 		SetupMockSystemUserCheck(),
 	))
 
-	services := ss.BatchCheck([]string{constants.HARDWARE_RESOURCE_COUNT, constants.SSH_USER}, models.Config{})
-	assert.Equal(t, true, services)
+	resp := ss.BatchCheck([]string{constants.HARDWARE_RESOURCE_COUNT, constants.SSH_USER}, models.Config{})
+	assert.Equal(t, resp.Status, "SUCCESS")
+	assert.Equal(t, len(resp.Result), 2)
+
 }
