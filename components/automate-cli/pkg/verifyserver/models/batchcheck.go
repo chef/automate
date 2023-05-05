@@ -12,10 +12,10 @@ type Hardware struct {
 	ChefInfraServerNodeIps   []string `json:"chef_infra_server_node_ips"`
 	PostgresqlNodeCount      int      `json:"postgresql_node_count"`
 	PostgresqlNodeIps        []string `json:"postgresql_node_ips"`
-	OpensearchNodeCount      int      `json:"opensearch_node_count"`
-	OpensearchNodeIps        []string `json:"opensearch_node_ips"`
+	OpenSearchNodeCount      int      `json:"opensearch_node_count"`
+	OpenSearchNodeIps        []string `json:"opensearch_node_ips"`
 }
-type SshUser struct {
+type SSHUser struct {
 	Username     string `json:"user_name"`
 	PrivateKey   string `json:"private_key"`
 	SudoPassword string `json:"sudo_password"`
@@ -60,7 +60,7 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SshUser     SshUser     `json:"ssh_user"`
+	SSHUser     SSHUser     `json:"ssh_user"`
 	Arch        string      `json:"arch"`
 	Backup      Backup      `json:"backup"`
 	Hardware    Hardware    `json:"hardware"`

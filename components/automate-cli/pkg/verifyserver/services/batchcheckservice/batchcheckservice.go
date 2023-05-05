@@ -15,7 +15,7 @@ type BatchCheckService struct {
 	CheckTrigger trigger.CheckTrigger
 }
 
-func NewBatchCheckService(trigger trigger.CheckTrigger) IBatchCheckService {
+func NewBatchCheckService(trigger trigger.CheckTrigger) *BatchCheckService {
 	return &BatchCheckService{
 		CheckTrigger: trigger,
 	}
@@ -23,27 +23,41 @@ func NewBatchCheckService(trigger trigger.CheckTrigger) IBatchCheckService {
 
 func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) models.BatchCheckResponse {
 	batchApisResultMap := make(map[string][]models.ApiResult)
-	if shouldRunChecksOnBastion(checks) {
-		bastionCheckResultChan := make(chan map[string]models.CheckTriggerResponse, len(checks))
-		for _, check := range checks {
+	var bastionChecks = stringutils.SliceIntersection(checks, constants.GetBastionChecks())
+	var remoteChecks = stringutils.SliceIntersection(checks, constants.GetRemoteChecks())
+	if len(bastionChecks) > 0 {
+		bastionCheckResultChan := make(chan map[string]models.CheckTriggerResponse, len(bastionChecks))
+		for _, check := range bastionChecks {
 			go ss.RunBastionCheck(check, config, bastionCheckResultChan)
 		}
-		for i := 0; i < len(checks); i++ {
+		for i := 0; i < len(bastionChecks); i++ {
 			result := <-bastionCheckResultChan
 			for k, v := range result {
-				batchApisResultMap[k] = append(batchApisResultMap[k], v.Result)
+				checkIndex, _ := getIndexOfCheck(bastionChecks, v.Result.Check)
+				if checkIndex >= len(batchApisResultMap[k]) {
+					batchApisResultMap[k] = append(batchApisResultMap[k], v.Result)
+				} else {
+					batchApisResultMap[k] = append(batchApisResultMap[k], models.ApiResult{})
+					copy(batchApisResultMap[k][checkIndex+1:], batchApisResultMap[k][checkIndex:])
+					batchApisResultMap[k][checkIndex] = v.Result
+				}
 			}
 		}
 		defer close(bastionCheckResultChan)
-		return constructBatchCheckResponse(batchApisResultMap, config.Hardware)
 	}
-	for _, check := range checks {
-		resp := ss.RunRemoteCheck(check, config)
-		for k, v := range resp {
-			batchApisResultMap[k] = append(batchApisResultMap[k], v.Result)
+	if len(remoteChecks) > 0 {
+		for _, check := range remoteChecks {
+			resp := ss.RunRemoteCheck(check, config)
+			for k, v := range resp {
+				batchApisResultMap[k] = append(batchApisResultMap[k], v.Result)
+			}
 		}
 	}
 	return constructBatchCheckResponse(batchApisResultMap, config.Hardware)
+}
+
+func getIndexOfCheck(checks []string, check string) (int, error) {
+	return stringutils.IndexOf(checks, check)
 }
 
 func (ss *BatchCheckService) RunBastionCheck(check string, config models.Config, resultChan chan map[string]models.CheckTriggerResponse) {
@@ -85,15 +99,6 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 		return ss.CheckTrigger.NfsBackupConfigCheck
 	}
 	return nil
-}
-
-func shouldRunChecksOnBastion(checks []string) bool {
-	if stringutils.SliceContains(checks, constants.HARDWARE_RESOURCE_COUNT) ||
-		stringutils.SliceContains(checks, constants.CERTIFICATE) ||
-		stringutils.SliceContains(checks, constants.SSH_USER) {
-		return true
-	}
-	return false
 }
 
 func constructBatchCheckResponse(batchApisResultMap map[string][]models.ApiResult, hardwareDetails models.Hardware) models.BatchCheckResponse {

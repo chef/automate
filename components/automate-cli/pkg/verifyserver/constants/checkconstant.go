@@ -14,11 +14,17 @@ const AWS_OPENSEARCH_S3_BUCKET_ACCESS = "aws-opensearch-s3-bucket-access"
 const EXTERNAL_POSTGRESQL = "external-postgresql"
 const NFS_BACKUP_CONFIG = "nfs-backup-config"
 
-func GetAllChecks() [13]string {
-	var allChecks = [13]string{
+func GetBastionChecks() []string {
+	var checks = []string{
 		HARDWARE_RESOURCE_COUNT,
 		CERTIFICATE,
 		SSH_USER,
+	}
+	return checks
+}
+
+func GetRemoteChecks() []string {
+	var checks = []string{
 		SYSTEM_RESOURCES,
 		SOFTWARE_VERSIONS,
 		SYSTEM_USER,
@@ -30,5 +36,5 @@ func GetAllChecks() [13]string {
 		EXTERNAL_POSTGRESQL,
 		NFS_BACKUP_CONFIG,
 	}
-	return allChecks
+	return checks
 }

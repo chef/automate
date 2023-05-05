@@ -3,6 +3,7 @@ module github.com/chef/automate
 go 1.13
 
 require (
+	cloud.google.com/go v0.60.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
 	github.com/Azure/azure-sdk-for-go v57.2.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.21
@@ -42,7 +43,6 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/fatih/color v1.9.0
 	github.com/felixge/httpsnoop v1.0.0 // indirect
-	github.com/ghetzel/go-stockutil v1.11.3
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 	github.com/go-chef/chef v0.23.2-0.20201213054559-3243f736d651
 	github.com/go-delve/delve v1.3.1
@@ -53,12 +53,12 @@ require (
 	github.com/gofiber/utils v0.0.10
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
-	github.com/golang/mock v1.5.0
+	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.7
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/handlers v1.3.0 // indirect
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.7.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
@@ -76,12 +76,12 @@ require (
 	github.com/kevinburke/go-bindata v3.16.0+incompatible
 	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348
 	github.com/leanovate/gopter v0.2.4
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.8.0
 	github.com/lyft/protoc-gen-star v0.4.16-0.20200805193024-077ca8f98fb2
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/minio/minio-go/v7 v7.0.14
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
 	github.com/nats-io/go-nats v1.7.2 // indirect
@@ -123,14 +123,15 @@ require (
 	go.uber.org/multierr v1.5.0
 	go.uber.org/zap v1.15.0
 	gocloud.dev v0.19.0
-	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
-	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.3.7
+	golang.org/x/tools v0.0.0-20200806022845-90696ccdc692 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/api v0.43.0
-	google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1
-	google.golang.org/grpc v1.36.1
+	google.golang.org/api v0.29.0
+	google.golang.org/genproto v0.0.0-20200901141002-b3bf27a9dbd1
+	google.golang.org/grpc v1.36.0
 	google.golang.org/grpc/examples v0.0.0-20220413171549-7567a5d96538
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
@@ -138,7 +139,7 @@ require (
 	gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.5.1
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 // https://github.com/dexidp/dex/issues/1578

@@ -96,3 +96,17 @@ func TestGetFullProfileName(t *testing.T) {
 	fullName := stringutils.GetFullProfileName("profile", "1.2.3")
 	assert.Equal(t, "profile, v1.2.3", fullName)
 }
+
+func TestSliceDifference(t *testing.T) {
+	a := []string{"hardware-check", "abc"}
+	b := []string{"hardware-check", "ssh-user"}
+	diff := stringutils.SliceDifference(a, b)
+	assert.Equal(t, []string{"abc"}, diff)
+}
+
+func TestSliceIntersection(t *testing.T) {
+	a := []string{"hardware-check", "abc"}
+	b := []string{"hardware-check", "ssh-user"}
+	diff := stringutils.SliceIntersection(a, b)
+	assert.Equal(t, []string{"hardware-check"}, diff)
+}
