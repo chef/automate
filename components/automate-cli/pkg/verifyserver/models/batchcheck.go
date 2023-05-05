@@ -84,19 +84,18 @@ type CheckTriggerResponse struct {
 	Result ApiResult `json:"result"`
 }
 type ApiResult struct {
-	Passed  bool            `json:"passed"`
-	Message string          `json:"msg"`
-	Check   string          `json:"check"`
-	Checks  []CheckResponse `json:"checks"`
+	Passed  bool     `json:"passed"`
+	Message string   `json:"msg"`
+	Check   string   `json:"check"`
+	Checks  []Checks `json:"checks"`
 }
-type CheckResponse struct {
-	Checks struct {
-		Title         string `json:"title"`
-		Passed        bool   `json:"passed"`
-		SuccessMsg    string `json:"success_msg"`
-		ErrorMsg      string `json:"error_msg"`
-		ResolutionMsg string `json:"resolution_msg"`
-	}
+
+type Checks struct {
+	Title         string `json:"title"`
+	Passed        bool   `json:"passed"`
+	SuccessMsg    string `json:"success_msg"`
+	ErrorMsg      string `json:"error_msg"`
+	ResolutionMsg string `json:"resolution_msg"`
 }
 
 type NodeCert struct {

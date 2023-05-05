@@ -126,7 +126,7 @@ func getNodeTypeFromIp(ip string, hardwareDetails models.Hardware) string {
 	if stringutils.SliceContains(hardwareDetails.PostgresqlNodeIps, ip) {
 		return "postgresql"
 	}
-	if stringutils.SliceContains(hardwareDetails.OpensearchNodeIps, ip) {
+	if stringutils.SliceContains(hardwareDetails.OpenSearchNodeIps, ip) {
 		return "opensearch"
 	}
 	return ""

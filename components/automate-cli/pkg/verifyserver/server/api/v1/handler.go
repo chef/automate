@@ -21,7 +21,7 @@ func (h *Handler) AddStatusService(ss statusservice.IStatusService) *Handler {
 	return h
 }
 
-func (h *Handler) AddBatchCheckService(ss  batchcheckservice.IBatchCheckService) *Handler {
-	h.BatchCheckService = ss
+func (h *Handler) AddBatchCheckService(bc batchcheckservice.IBatchCheckService) *Handler {
+	h.BatchCheckService = bc
 	return h
 }

@@ -19,7 +19,8 @@ func (h *Handler) BatchCheck(c *fiber.Ctx) {
 	}
 	err := validateChecks(req.Checks)
 	if err != nil {
-		c.JSON(response.BuildFailedResponse(fiber.NewError(fiber.StatusBadRequest, err.Error())))
+		c.Status(fiber.StatusBadRequest).JSON(err.Error())
+		return
 	}
 
 	resp := h.BatchCheckService.BatchCheck(req.Checks, req.Config)

@@ -6,6 +6,14 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 )
 
+type MockBatchCheckService struct {
+	BatchCheckFunc func([]string, models.Config) models.BatchCheckResponse
+}
+
+func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Config) models.BatchCheckResponse {
+	return mss.BatchCheckFunc(checks, config)
+}
+
 type MockHardwareResourceCountCheck struct {
 	HardwareResourceCountCheckFunc func(config models.Config) map[string]models.CheckTriggerResponse
 }
@@ -24,28 +32,12 @@ func SetupMockHardwareResourceCountCheck() trigger.ICheck {
 						Passed:  false,
 						Check:   "hardware-resource-count",
 						Message: "Hardware Resource Count Check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "hardware-resource-check-1",
-								},
+								Title: "hardware-resource-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "hardware-resource-check-2",
-								},
+								Title: "hardware-resource-check-2",
 							},
 						},
 					},
@@ -56,28 +48,12 @@ func SetupMockHardwareResourceCountCheck() trigger.ICheck {
 						Passed:  true,
 						Check:   "hardware-resource-count",
 						Message: "Hardware Resource Count Check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "hardware-resource-check-1",
-								},
+								Title: "hardware-resource-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "hardware-resource-check-2",
-								},
+								Title: "hardware-resource-check-2",
 							},
 						},
 					},
@@ -106,28 +82,12 @@ func SetupMockSshUserAccessCheck() trigger.ICheck {
 						Passed:  false,
 						Check:   constants.SSH_USER,
 						Message: "ssh-user-check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "ssh-user-check-1",
-								},
+								Title: "ssh-user-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "ssh-user-check-2",
-								},
+								Title: "ssh-user-check-2",
 							},
 						},
 					},
@@ -138,28 +98,12 @@ func SetupMockSshUserAccessCheck() trigger.ICheck {
 						Passed:  true,
 						Check:   constants.SSH_USER,
 						Message: "ssh-user-check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "ssh-user-check-1",
-								},
+								Title: "ssh-user-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "ssh-user-check-2",
-								},
+								Title: "ssh-user-check-2",
 							},
 						},
 					},
@@ -239,28 +183,12 @@ func SetupMockFirewallCheck() trigger.ICheck {
 						Passed:  false,
 						Check:   constants.FIREWALL,
 						Message: "Firewall-check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Firewall-check-1",
-								},
+								Title: "Firewall-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Firewall-check-2",
-								},
+								Title: "Firewall-check-2",
 							},
 						},
 					},
@@ -271,28 +199,12 @@ func SetupMockFirewallCheck() trigger.ICheck {
 						Passed:  true,
 						Check:   constants.FIREWALL,
 						Message: "Firewall-check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Firewall-check-1",
-								},
+								Title: "Firewall-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Firewall-check-2",
-								},
+								Title: "Firewall-check-2",
 							},
 						},
 					},
@@ -321,28 +233,12 @@ func SetupMockFqdnCheck() trigger.ICheck {
 						Passed:  false,
 						Check:   constants.FQDN,
 						Message: "fqdn-check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Fqdn-check-1",
-								},
+								Title: "Fqdn-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Fqdn-check-2",
-								},
+								Title: "Fqdn-check-2",
 							},
 						},
 					},
@@ -353,28 +249,12 @@ func SetupMockFqdnCheck() trigger.ICheck {
 						Passed:  true,
 						Check:   constants.FQDN,
 						Message: "fqdn-check",
-						Checks: []models.CheckResponse{
+						Checks: []models.Checks{
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Fqdn-check-1",
-								},
+								Title: "Fqdn-check-1",
 							},
 							{
-								Checks: struct {
-									Title         string "json:\"title\""
-									Passed        bool   "json:\"passed\""
-									SuccessMsg    string "json:\"success_msg\""
-									ErrorMsg      string "json:\"error_msg\""
-									ResolutionMsg string "json:\"resolution_msg\""
-								}{
-									Title: "Fqdn-check-2",
-								},
+								Title: "Fqdn-check-2",
 							},
 						},
 					},
