@@ -33,7 +33,7 @@ This section will discuss the steps to deploy Chef Automate HA on-premise machin
 - Key-based SSH for the provisioning user for all the machines for HA-Deployment.
 - We do not support passphrases for Private Key authentication.
 - LoadBalancers are set up according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
-- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
+- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_on_premises_deployment_prerequisites/#firewall-checks)
 - Make sure your linux has `sysctl` utility available in all Machines.
 - DNS is configured to redirect `chefautomate.example.com` to the Primary Load Balancer.
 - DNS is configured to redirect `chefinfraserver.example.com` to the Primary Load Balancer.
