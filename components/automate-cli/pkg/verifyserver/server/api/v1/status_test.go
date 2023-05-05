@@ -5,12 +5,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 
 	"github.com/stretchr/testify/assert"
@@ -30,8 +30,11 @@ func SetupMockStatusService() statusservice.IStatusService {
 	}
 }
 
-func SetupDefaultHandlers(ss statusservice.IStatusService) *fiber.App {
-	log := logger.NewLogger(true)
+func SetupDefaultHandlers(ss statusservice.IStatusService) (*fiber.App, error) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		return nil, err
+	}
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
@@ -46,7 +49,7 @@ func SetupDefaultHandlers(ss statusservice.IStatusService) *fiber.App {
 		Handler: handler,
 	}
 	vs.Setup()
-	return vs.App
+	return vs.App, nil
 }
 
 func TestStatusAPI(t *testing.T) {
@@ -63,7 +66,8 @@ func TestStatusAPI(t *testing.T) {
 	}
 	statusEndpoint := "/status"
 	// Setup the app as it is done in the main function
-	app := SetupDefaultHandlers(SetupMockStatusService())
+	app, err := SetupDefaultHandlers(SetupMockStatusService())
+	assert.NoError(t, err)
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {

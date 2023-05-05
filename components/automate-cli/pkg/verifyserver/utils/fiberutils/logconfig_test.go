@@ -1,6 +1,7 @@
 package fiberutils_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
@@ -37,13 +38,15 @@ func TestSystemdCreateUtils(t *testing.T) {
 		assert.Contains(t, cw.Output(), "Using TimeZone: UTC")
 	})
 	t.Run("It should use UTC if timezone format is incorrect", func(t *testing.T) {
-		t.Setenv(fiberutils.VERIFY_SERVER_TIMEZONE, "GAMU")
+		os.Setenv(fiberutils.VERIFY_SERVER_TIMEZONE, "GAMU")
+		defer os.Unsetenv(fiberutils.VERIFY_SERVER_TIMEZONE)
 		lc := fiberutils.GetLogConfig(l)
 		assert.Contains(t, lc.TimeZone, fiberutils.DEFAULT_TIMEZONE)
 	})
 	t.Run("It should use timezone provided its correct", func(t *testing.T) {
 		testTimeZone := "America/New_York"
-		t.Setenv(fiberutils.VERIFY_SERVER_TIMEZONE, testTimeZone)
+		os.Setenv(fiberutils.VERIFY_SERVER_TIMEZONE, testTimeZone)
+		defer os.Unsetenv(fiberutils.VERIFY_SERVER_TIMEZONE)
 		lc := fiberutils.GetLogConfig(l)
 		assert.Contains(t, lc.TimeZone, testTimeZone)
 	})
