@@ -16,6 +16,8 @@ import (
 const (
 	SERVICE      = "verify-server"
 	DEFAULT_PORT = "7799"
+	INFO_LEVEL   = "info"
+	DEBUG_LEVEL  = "debug"
 )
 
 type VerifyServer struct {
@@ -26,9 +28,9 @@ type VerifyServer struct {
 }
 
 func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
-	defaultLevel := "info"
+	defaultLevel := INFO_LEVEL
 	if debug {
-		defaultLevel = "debug"
+		defaultLevel = DEBUG_LEVEL
 	}
 	l, err := logger.NewLogger("text", defaultLevel)
 	if err != nil {
