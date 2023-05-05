@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/stretchr/testify/assert"
 )
@@ -349,5 +350,13 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 		mapStruct := hrc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpensearchNodeCount
 		assert.Equal(t, totalIps, len(mapStruct))
+
+		for _, resp := range mapStruct {
+			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, resp.Result.Check)
+			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT_MSG, resp.Result.Message)
+			if resp.Error != nil {
+				assert.Empty(t, resp.Result.Checks)
+			}
+		}
 	})
 }
