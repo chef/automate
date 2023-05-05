@@ -445,6 +445,7 @@ paths = [
   "lib/grpc/*",
   "lib/httputils/*",
   "lib/io/*",
+  "lib/logger/*",
   "lib/majorupgrade_utils/*",
   "lib/platform/command/*",
   "lib/platform/config/*",
