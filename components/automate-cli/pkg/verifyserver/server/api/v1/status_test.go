@@ -48,7 +48,7 @@ func SetupDefaultHandlers(ss statusservice.IStatusService) (*fiber.App, error) {
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup()
+	vs.SetupRoutes()
 	return vs.App, nil
 }
 

@@ -6,12 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 
 	"github.com/stretchr/testify/assert"
@@ -69,8 +69,11 @@ func SetupMockBatchCheckService() batchcheckservice.IBatchCheckService {
 	}
 }
 
-func SetupHandlers(ss batchcheckservice.IBatchCheckService) *fiber.App {
-	log := logger.NewLogger(true)
+func SetupHandlers(ss batchcheckservice.IBatchCheckService) (*fiber.App, error) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		return nil, err
+	}
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
@@ -84,8 +87,8 @@ func SetupHandlers(ss batchcheckservice.IBatchCheckService) *fiber.App {
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup()
-	return vs.App
+	vs.SetupRoutes()
+	return vs.App, nil
 }
 
 func TestBatchCheckAPI(t *testing.T) {
@@ -103,7 +106,7 @@ func TestBatchCheckAPI(t *testing.T) {
 			"config":{
 				"ssh_user":{
 					"user_name": "ubuntu",
-					"private_key": "----- BEGIN PRIVATE RSA -----",
+					"private_key": "",
 					"sudo_password": ""
 					}
 				}
@@ -119,7 +122,7 @@ func TestBatchCheckAPI(t *testing.T) {
 			"config":{
 				"ssh_user":{
 					"user_name": "ubuntu",
-					"private_key": "----- BEGIN PRIVATE RSA -----",
+					"private_key": "",
 					"sudo_password": ""
 					}
 				}
@@ -130,7 +133,8 @@ func TestBatchCheckAPI(t *testing.T) {
 	}
 	batchCheckEndpoint := "/api/v1/checks/batch-checks"
 	// Setup the app as it is done in the main function
-	app := SetupHandlers(SetupMockBatchCheckService())
+	app, err := SetupHandlers(SetupMockBatchCheckService())
+	assert.NoError(t, err)
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
