@@ -8,11 +8,16 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
+	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/spf13/cobra"
 )
 
-const VERIFY_SERVER_PORT = "VERIFY_SERVER_PORT"
+const (
+	VERIFY_SERVER_PORT        = "VERIFY_SERVER_PORT"
+	BINARY_DESTINATION_FOLDER = "/etc/automate-verify"
+	SYSTEMD_PATH              = "/etc/systemd/system"
+)
 
 type verifyCmdFlags struct {
 	file                      string
@@ -35,6 +40,8 @@ type verifyCmdFlow struct {
 }
 
 type verifyServeCmdFlow struct{}
+
+type verifySystemdCreateFlow struct{}
 
 func init() {
 	flagsObj := verifyCmdFlags{}
@@ -60,6 +67,24 @@ func init() {
 		},
 		Args: cobra.ExactArgs(0),
 		RunE: verifyServeCmdFunc(&flagsObj),
+	}
+
+	verifySystemdServiceCmd := &cobra.Command{
+		Use:   "systemd-service COMMAND",
+		Short: "Systemd utilities for verify command",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.Compatibility,
+		},
+	}
+
+	verifySystemdServiceCreateCmd := &cobra.Command{
+		Use:   "create",
+		Short: "Start verify server as systemd service",
+		Annotations: map[string]string{
+			docs.Compatibility: docs.Compatibility,
+		},
+		Args: cobra.ExactArgs(0),
+		RunE: verifySystemdCreateFunc(&flagsObj),
 	}
 
 	// flags for Verify Command
@@ -119,6 +144,15 @@ func init() {
 		"d",
 		false,
 		"enable debugging")
+	verifySystemdServiceCreateCmd.Flags().BoolVarP(
+		&flagsObj.debug,
+		"debug",
+		"d",
+		false,
+		"enable debugging")
+
+	verifySystemdServiceCmd.AddCommand(verifySystemdServiceCreateCmd)
+	verifyCmd.AddCommand(verifySystemdServiceCmd)
 	verifyCmd.AddCommand(verifyServeCmd)
 	RootCmd.AddCommand(verifyCmd)
 }
@@ -139,8 +173,33 @@ func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string
 		}
 	}
 	writer.Println("Using port " + port)
-	vs := server.NewVerifyServer(port, debug)
+	vs, err := server.NewVerifyServer(port, debug)
+	if err != nil {
+		return err
+	}
 	return vs.Start()
+}
+
+func verifySystemdCreateFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		c := verifySystemdCreateFlow{}
+		return c.runVerifySystemdCreateCmd(cmd, args, flagsObj.debug)
+	}
+}
+
+func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, args []string, debug bool) error {
+
+	createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(
+		verifysystemdcreate.NewSystemdCreateUtilsImpl(),
+		BINARY_DESTINATION_FOLDER,
+		SYSTEMD_PATH,
+		debug,
+		writer,
+	)
+	if err != nil {
+		return err
+	}
+	return createSystemdServiceWithBinary.Create()
 }
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {

@@ -1,13 +1,13 @@
 package fiberutils
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/utils"
 )
 
-func LogResgisteredRoutes(stack [][]*fiber.Route, logger logger.ILogger) {
+func LogResgisteredRoutes(stack [][]*fiber.Route, logger logger.Logger) {
 	// Log all registered routes
 	logger.Info("List of Routes registered:")
 	registerdRoutes := map[string]*fiber.Route{}
