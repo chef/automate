@@ -130,6 +130,31 @@ func TestBatchCheckAPI(t *testing.T) {
 			expectedCode: 400,
 			expectedBody: "\"following checks are not supported [abc pqr]\"",
 		},
+		{
+			description: "400:failure empty checks",
+			requestBody: `
+			{
+			"checks": [],
+			"config":{
+				"ssh_user":{
+					"user_name": "ubuntu",
+					"private_key": "",
+					"sudo_password": ""
+					}
+				}
+			}`,
+			expectedCode: 400,
+			expectedBody: "\"check cannot be empty\"",
+		},
+		{
+			description: "400:failure invalid request format",
+			requestBody: `
+			{
+			"field1": [],
+			"field2":`,
+			expectedCode: 400,
+			expectedBody: "\"batch check request body parsing failed: unexpected end of JSON input\"",
+		},
 	}
 	batchCheckEndpoint := "/api/v1/checks/batch-checks"
 	// Setup the app as it is done in the main function
@@ -146,7 +171,7 @@ func TestBatchCheckAPI(t *testing.T) {
 			body, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
 			assert.Contains(t, string(body), test.expectedBody)
-			assert.Equal(t, res.StatusCode, test.expectedCode)
+			assert.Equal(t, test.expectedCode, res.StatusCode)
 		})
 	}
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/gofiber/fiber"
 )
@@ -14,8 +13,10 @@ import (
 func (h *Handler) BatchCheck(c *fiber.Ctx) {
 	req := new(models.BatchCheckRequest)
 	if err := c.BodyParser(req); err != nil {
-		h.Logger.Error(fmt.Errorf("batch check request body parsing failed %v", err.Error()))
-		c.JSON(response.BuildFailedResponse(fiber.NewError(fiber.StatusBadRequest, err.Error())))
+		errString := fmt.Sprintf("batch check request body parsing failed: %v", err.Error())
+		h.Logger.Error(fmt.Errorf(errString))
+		c.Status(fiber.StatusBadRequest).JSON(errString)
+		return
 	}
 	err := validateChecks(req.Checks)
 	if err != nil {
