@@ -28,19 +28,7 @@ func NewStatusService(executeShellCommand func(cmd string) ([]byte, error)) ISta
 }
 
 func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
-	ss.GetServicesFromHabSvcStatus()
-	return []models.ServiceDetails{}, nil
-}
-
-func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab svc status")
-	fmt.Println("Output: ", string(output))
-	fmt.Println("Error: ", err)
-	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	response, err := ss.ParseHabSvcStatus(string(output))
+	habResponse, err := ss.GetServicesFromHabSvcStatus()
 	if err != nil {
 		return nil, err
 	}
@@ -50,20 +38,33 @@ func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails,
 		return nil, err
 	}
 
-	for i, service := range response {
+	for i, service := range habResponse {
 		if automateService, ok := automateResponse[service.ServiceName]; ok {
-			response[i].Status = automateService.Status
+			habResponse[i].Status = automateService.Status
 		}
 	}
-	return response, nil
+	fmt.Println("Final Response: ", habResponse)
+	return habResponse, nil
 }
 
+// Get the services from
+func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
+	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab svc status")
+	fmt.Println("Output: ", string(output))
+	fmt.Println("Error: ", err)
+	if err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from hab svc status")
+	}
+	return ss.ParseHabSvcStatus(string(output))
+}
+
+// Parse the output of hab svc status
 func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetails, error) {
 	response := make([]models.ServiceDetails, 0)
 
 	tableStart := strings.Index(output, "package")
 	if tableStart == -1 {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "no table found in output")
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "No table found in output")
 	}
 
 	lines := strings.Split(output[tableStart:], "\n")
@@ -82,26 +83,27 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 			})
 		}
 	}
-	fmt.Println(response)
 	return response, nil
 }
 
+// Get the services from chef-automate status
 func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc("chef-automate status")
 	fmt.Println("Output: ", string(output))
 	fmt.Println("Error: ", err)
-	if err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	if err != nil && !ss.checkIfBENode(string(output)) {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from chef-automate status")
 	}
 	return ss.ParseChefAutomateStatus(string(output))
 }
 
+// Parse the output of chef-automate status
 func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]models.ServiceDetails, error) {
 	response := make(map[string]models.ServiceDetails)
 
 	tableStart := strings.Index(output, "Service Name")
 	if tableStart == -1 {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "no table found in output")
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "No table found in output")
 	}
 
 	lines := strings.Split(output[tableStart:], "\n")
@@ -119,6 +121,10 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]mode
 			}
 		}
 	}
-	fmt.Println(response)
 	return response, nil
+}
+
+// Check if it's a backend node
+func (ss *StatusService) checkIfBENode(output string) bool {
+	return strings.Contains(output, "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory")
 }
