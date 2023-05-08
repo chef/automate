@@ -227,10 +227,33 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 		for _, resp := range mapStruct {
 			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, resp.Result.Check)
 			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT_MSG, resp.Result.Message)
-			if resp.Error != nil {
-				assert.Empty(t, resp.Result.Checks)
-			}
+			assert.NotEmpty(t, resp.Result.Checks)
+			assert.Nil(t, resp.Error)
+			assert.Equal(t, resp.Result.Passed, true)
 		}
+	})
+
+	t.Run("Returns error", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`invalid JSON`))
+		}))
+		defer mockServer.Close()
+
+		hrc := HardwareResourceCountCheck{log: *logrus.New(), host: mockServer.URL}
+		request := GetRequestJson()
+		mapStruct := hrc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(mapStruct))
+
+		for _, resp := range mapStruct {
+			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, resp.Result.Check)
+			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT_MSG, resp.Result.Message)
+			assert.NotNil(t, resp.Error)
+			assert.Empty(t, resp.Result.Checks)
+			assert.Equal(t, resp.Result.Passed, false)
+		}
+
 	})
 }
 
