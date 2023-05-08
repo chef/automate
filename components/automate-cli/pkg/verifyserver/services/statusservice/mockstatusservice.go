@@ -8,6 +8,7 @@ type MockStatusService struct {
 	GetServicesFromHabSvcStatusFunc   func() ([]models.ServiceDetails, error)
 	ParseChefAutomateStatusFunc       func(output string) (map[string]models.ServiceDetails, error)
 	ParseHabSvcStatusFunc             func(output string) ([]models.ServiceDetails, error)
+	CheckIfBENodeFunc                 func(output string) bool
 }
 
 func (mss *MockStatusService) GetServices() ([]models.ServiceDetails, error) {
@@ -28,4 +29,8 @@ func (mss *MockStatusService) ParseChefAutomateStatus(output string) (map[string
 
 func (mss *MockStatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetails, error) {
 	return mss.ParseHabSvcStatusFunc(output)
+}
+
+func (mss *MockStatusService) CheckIfBENode(output string) bool {
+	return mss.CheckIfBENodeFunc(output)
 }

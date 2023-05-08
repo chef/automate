@@ -15,6 +15,7 @@ type IStatusService interface {
 	GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error)
 	ParseChefAutomateStatus(output string) (map[string]models.ServiceDetails, error)
 	ParseHabSvcStatus(output string) ([]models.ServiceDetails, error)
+	CheckIfBENode(output string) bool
 }
 
 type StatusService struct {
@@ -51,9 +52,9 @@ func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
 // Get the services from
 func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab svc status")
-	ss.Log.Debug("Output: ", string(output))
-	ss.Log.Error("Error: ", err)
+	ss.Log.Debug("Output for 'HAB_LICENSE=accept-no-persist hab svc status' command: ", string(output))
 	if err != nil {
+		ss.Log.Error("Error while running 'HAB_LICENSE=accept-no-persist hab svc status' command: ", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from hab svc status")
 	}
 	return ss.ParseHabSvcStatus(string(output))
@@ -94,11 +95,11 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 // Get the services from chef-automate status
 func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc("chef-automate status")
-	ss.Log.Debug("Output: ", string(output))
-	ss.Log.Error("Error: ", err)
+	ss.Log.Debug("Output for 'chef-automate status' command: ", string(output))
 	if err != nil {
+		ss.Log.Error("Error while running 'chef-automate status' command: ", err)
 		//If it's a backend node, return an empty map
-		if ss.checkIfBENode(string(output)) {
+		if ss.CheckIfBENode(string(output)) {
 			return make(map[string]models.ServiceDetails), nil
 		}
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from chef-automate status")
@@ -134,6 +135,6 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]mode
 }
 
 // Check if it's a backend node
-func (ss *StatusService) checkIfBENode(output string) bool {
+func (ss *StatusService) CheckIfBENode(output string) bool {
 	return strings.Contains(output, "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory")
 }
