@@ -2,6 +2,6 @@ package fiberutils
 
 import "os/exec"
 
-func ExecuteShellCommand(name string, arg []string) ([]byte, error) {
-	return exec.Command(name, arg...).CombinedOutput()
+func ExecuteShellCommand(cmd string) ([]byte, error) {
+	return exec.Command("/bin/sh", "-c", cmd).CombinedOutput()
 }

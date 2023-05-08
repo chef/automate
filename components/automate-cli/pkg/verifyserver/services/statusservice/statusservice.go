@@ -18,10 +18,10 @@ type IStatusService interface {
 }
 
 type StatusService struct {
-	ExecuteShellCommandFunc func(name string, arg []string) ([]byte, error)
+	ExecuteShellCommandFunc func(cmd string) ([]byte, error)
 }
 
-func NewStatusService(executeShellCommand func(name string, arg []string) ([]byte, error)) IStatusService {
+func NewStatusService(executeShellCommand func(cmd string) ([]byte, error)) IStatusService {
 	return &StatusService{
 		ExecuteShellCommandFunc: executeShellCommand,
 	}
@@ -33,7 +33,7 @@ func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
 }
 
 func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab", []string{"svc", "status"})
+	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab svc status")
 	fmt.Println("Output: ", string(output))
 	fmt.Println("Error: ", err)
 	if err != nil {
@@ -87,7 +87,7 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 }
 
 func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc("chef-automate", []string{"status"})
+	output, err := ss.ExecuteShellCommandFunc("chef-automate status")
 	fmt.Println("Output: ", string(output))
 	fmt.Println("Error: ", err)
 	if err != nil {

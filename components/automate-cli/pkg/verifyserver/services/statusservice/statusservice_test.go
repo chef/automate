@@ -151,7 +151,7 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 )
 
 func TestStatusService(t *testing.T) {
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 	services, _ := ss.GetServices()
@@ -161,7 +161,7 @@ func TestStatusService(t *testing.T) {
 func TestParseChefAutomateStatusOnA2(t *testing.T) {
 	output := automateStatusOutputOnA2
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -171,7 +171,7 @@ func TestParseChefAutomateStatusOnA2(t *testing.T) {
 func TestParseHabSvcStatusOnA2(t *testing.T) {
 	output := habSvcStatusWithLicenseOutputOnA2
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -181,7 +181,7 @@ func TestParseHabSvcStatusOnA2(t *testing.T) {
 func TestParseChefAutomateStatusOnCS(t *testing.T) {
 	output := automateStatusOutputOnCS
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -191,7 +191,7 @@ func TestParseChefAutomateStatusOnCS(t *testing.T) {
 func TestParseHabSvcStatusOnCS(t *testing.T) {
 	output := habSvcStatusOutputOnCS
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -201,7 +201,7 @@ func TestParseHabSvcStatusOnCS(t *testing.T) {
 func TestParseChefAutomateStatusOnPG(t *testing.T) {
 	output := automateStatusOutputOnBE
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -211,7 +211,7 @@ func TestParseChefAutomateStatusOnPG(t *testing.T) {
 func TestParseHabSvcStatusOnPG(t *testing.T) {
 	output := habSvcStatusOutputOnPG
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -221,7 +221,7 @@ func TestParseHabSvcStatusOnPG(t *testing.T) {
 func TestParseChefAutomateStatusOnOS(t *testing.T) {
 	output := ``
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
@@ -231,7 +231,7 @@ func TestParseChefAutomateStatusOnOS(t *testing.T) {
 func TestParseHabSvcStatusOnOS(t *testing.T) {
 	output := habSvcStatusOutputOnOS
 
-	ss := statusservice.NewStatusService(func(name string, arg []string) ([]byte, error) {
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
 	})
 
