@@ -65,8 +65,8 @@ do_install() {
   # This is required so that 'db:migrate' can be executed from the run hook
   chmod 766 -R "$(hab pkg path 'chef/oc_id')/oc_id/db/schema.rb"
 
-  mkdir -p tmp
-  chmod 777 -R "$(hab pkg path 'chef/oc_id')/oc_id/tmp"
+  # tmp directory is required for storage of sessions
+  mkdir -p tmp && chmod 777 -R tmp
 
   return 0
 }
