@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -42,7 +42,7 @@ func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel mod
 }
 
 func SetupS3ConfigHandlers(ss s3configservice.S3Config) *fiber.App {
-	log := logger.NewLogger(true)
+	log, _ := logger.NewLogger("text", "debug")
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,

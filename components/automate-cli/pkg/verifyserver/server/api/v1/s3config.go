@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/gofiber/fiber"
@@ -9,6 +11,8 @@ import (
 func (h *Handler) GetS3Config(c *fiber.Ctx) {
 	s3ConfigRequest := new(models.S3ConfigRequest)
 	if err := c.BodyParser(&s3ConfigRequest); err != nil {
+		errString := fmt.Sprintf("s3 config request body parsing failed: %v", err.Error())
+		h.Logger.Error(fmt.Errorf(errString))
 		c.Status(fiber.StatusBadRequest).JSON(response.BuildFailedResponse(&fiber.Error{Message: err.Error()}))
 		return
 	}

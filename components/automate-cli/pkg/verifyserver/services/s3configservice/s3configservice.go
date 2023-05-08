@@ -39,14 +39,13 @@ func NewS3ConfigService() S3Config {
 func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.ServiceCheck {
 	ss.req = req
 	sess, err := ss.AwsConnection()
-	// fmt.Println(sess, err, "res")
 	if err != nil {
-		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3ConnectionResolutionMsg, false)
+		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
 	s3Client := s3.New(sess)
 	err = ss.ListBuckets(s3Client)
 	if err != nil {
-		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3ConnectionResolutionMsg, false)
+		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
 	return ss.Response(s3ConnectionTitle, s3ConnectionSuccessMsg, "", "", true)
 }
@@ -108,7 +107,6 @@ func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
 }
 
 func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
-	// list buckets in s3 to verify secrete and access key
 	_, err := s3Client.DeleteObject(
 		&s3.DeleteObjectInput{
 			Bucket: aws.String(ss.req.BucketName),
@@ -121,7 +119,6 @@ func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
 }
 
 func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
-	// list buckets in s3 to verify secrete and access key
 	_, err := s3Client.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket: aws.String(ss.req.BucketName),
 		Prefix: aws.String(ss.req.BasePath),
@@ -133,7 +130,6 @@ func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
 }
 
 func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
-	// list buckets in s3 to verify secrete and access key
 	uploader := s3manager.NewUploader(sess)
 	_, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(ss.req.BucketName),   // Bucket to be used
