@@ -24,5 +24,5 @@
 
 ## Start a dev server
 
-- cd `components/automate-cli
-- `make verify-serve`
+- `rebuild components/automate-cli`
+- `chef-automate verify serve`
