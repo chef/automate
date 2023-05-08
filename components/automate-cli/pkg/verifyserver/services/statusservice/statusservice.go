@@ -76,9 +76,13 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 		matches := regex.FindStringSubmatch(line)
 		if len(matches) == 8 {
 			serviceName := strings.Split(matches[7], ".default")[0]
+			status := strings.ToUpper(matches[4])
+			if status == "UP" {
+				status = "OK"
+			}
 			response = append(response, models.ServiceDetails{
 				ServiceName: serviceName,
-				Status:      strings.ToUpper(matches[4]),
+				Status:      status,
 				Version:     matches[1],
 			})
 		}
