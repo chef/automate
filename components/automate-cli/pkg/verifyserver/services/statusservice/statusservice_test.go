@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
+	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -151,89 +152,99 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 )
 
 func TestStatusService(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 	services, _ := ss.GetServices()
-	assert.Equal(t, []models.ServiceDetails{}, services)
+	assert.Equal(t, []models.ServiceDetails(nil), services)
 }
 
 func TestParseChefAutomateStatusOnA2(t *testing.T) {
 	output := automateStatusOutputOnA2
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseChefAutomateStatus(output)
 }
 
 func TestParseHabSvcStatusOnA2(t *testing.T) {
 	output := habSvcStatusWithLicenseOutputOnA2
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseHabSvcStatus(output)
 }
 
 func TestParseChefAutomateStatusOnCS(t *testing.T) {
 	output := automateStatusOutputOnCS
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseChefAutomateStatus(output)
 }
 
 func TestParseHabSvcStatusOnCS(t *testing.T) {
 	output := habSvcStatusOutputOnCS
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseHabSvcStatus(output)
 }
 
 func TestParseChefAutomateStatusOnPG(t *testing.T) {
 	output := automateStatusOutputOnBE
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseChefAutomateStatus(output)
 }
 
 func TestParseHabSvcStatusOnPG(t *testing.T) {
 	output := habSvcStatusOutputOnPG
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseHabSvcStatus(output)
 }
 
 func TestParseChefAutomateStatusOnOS(t *testing.T) {
 	output := ``
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseChefAutomateStatus(output)
 }
 
 func TestParseHabSvcStatusOnOS(t *testing.T) {
 	output := habSvcStatusOutputOnOS
-
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	})
+	}, log)
 
 	ss.ParseHabSvcStatus(output)
 }

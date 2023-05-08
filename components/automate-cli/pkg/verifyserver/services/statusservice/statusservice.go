@@ -1,11 +1,11 @@
 package statusservice
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 )
 
@@ -19,11 +19,13 @@ type IStatusService interface {
 
 type StatusService struct {
 	ExecuteShellCommandFunc func(cmd string) ([]byte, error)
+	Log                     logger.Logger
 }
 
-func NewStatusService(executeShellCommand func(cmd string) ([]byte, error)) IStatusService {
+func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log logger.Logger) IStatusService {
 	return &StatusService{
 		ExecuteShellCommandFunc: executeShellCommand,
+		Log:                     log,
 	}
 }
 
@@ -43,15 +45,14 @@ func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
 			habResponse[i].Status = automateService.Status
 		}
 	}
-	fmt.Println("Final Response: ", habResponse)
 	return habResponse, nil
 }
 
 // Get the services from
 func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab svc status")
-	fmt.Println("Output: ", string(output))
-	fmt.Println("Error: ", err)
+	ss.Log.Debug("Output: ", string(output))
+	ss.Log.Error("Error: ", err)
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from hab svc status")
 	}
@@ -93,8 +94,8 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 // Get the services from chef-automate status
 func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc("chef-automate status")
-	fmt.Println("Output: ", string(output))
-	fmt.Println("Error: ", err)
+	ss.Log.Debug("Output: ", string(output))
+	ss.Log.Error("Error: ", err)
 	if err != nil {
 		//If it's a backend node, return an empty map
 		if ss.checkIfBENode(string(output)) {
