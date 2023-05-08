@@ -230,7 +230,7 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 		hrc := NewHardwareResourceCountCheck()
 		request := GetRequestJson()
 		mapStruct := hrc.Run(request)
-		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpensearchNodeCount
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(mapStruct))
 
 		for _, resp := range mapStruct {
