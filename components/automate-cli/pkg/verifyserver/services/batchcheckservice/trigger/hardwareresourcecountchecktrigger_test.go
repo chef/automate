@@ -212,8 +212,38 @@ type mockTransport struct{}
 func (m *mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return nil, fmt.Errorf("mock error")
 }
+func TestNewHardwareResourceCountCheck(t *testing.T) {
+	hrc := NewHardwareResourceCountCheck()
+	assert.NotNil(t, hrc)
+	assert.NotNil(t, hrc.log)
+}
 
-func TestCheckTrigger_TriggerHardwareResourceCountCheck(t *testing.T) {
+func TestHardwareResourceCountCheck_Run(t *testing.T) {
+
+	t.Run("Returns OK", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(hardwareCheckResp))
+		}))
+		defer mockServer.Close()
+
+		hrc := NewHardwareResourceCountCheck()
+		request := GetRequestJson()
+		mapStruct := hrc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpensearchNodeCount
+		assert.Equal(t, totalIps, len(mapStruct))
+
+		for _, resp := range mapStruct {
+			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, resp.Result.Check)
+			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT_MSG, resp.Result.Message)
+			if resp.Error != nil {
+				assert.Empty(t, resp.Result.Checks)
+			}
+		}
+	})
+}
+
+func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing.T) {
 	t.Run("cannot reach", func(t *testing.T) {
 		// create the CheckTrigger instance to be tested
 		hrc := NewHardwareResourceCountCheck()
@@ -317,29 +347,4 @@ func TestPost(t *testing.T) {
 	if string(responseBody) != expectedResponse {
 		t.Errorf("Unexpected response body. Expected %v, got %v", expectedResponse, string(responseBody))
 	}
-}
-
-func TestHardwareResourceCountCheck_Run(t *testing.T) {
-
-	t.Run("Returns OK", func(t *testing.T) {
-		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(hardwareCheckResp))
-		}))
-		defer mockServer.Close()
-
-		hrc := NewHardwareResourceCountCheck()
-		request := GetRequestJson()
-		mapStruct := hrc.Run(request)
-		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpensearchNodeCount
-		assert.Equal(t, totalIps, len(mapStruct))
-
-		for _, resp := range mapStruct {
-			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, resp.Result.Check)
-			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT_MSG, resp.Result.Message)
-			if resp.Error != nil {
-				assert.Empty(t, resp.Result.Checks)
-			}
-		}
-	})
 }
