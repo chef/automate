@@ -7,7 +7,7 @@ import (
 )
 
 func (h *Handler) GetStatus(c *fiber.Ctx) {
-	services := h.StatusService.GetServices()
+	services, _ := h.StatusService.GetServices()
 	c.JSON(response.BuildSuccessResponse(&models.StatusDetails{
 		Status:   "ok",
 		Services: services,

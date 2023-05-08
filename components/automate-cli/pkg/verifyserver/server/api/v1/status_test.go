@@ -18,14 +18,14 @@ import (
 
 func SetupMockStatusService() statusservice.IStatusService {
 	return &statusservice.MockStatusService{
-		GetServicesFunc: func() []models.ServiceDetails {
+		GetServicesFunc: func() ([]models.ServiceDetails, error) {
 			return []models.ServiceDetails{
 				{
 					ServiceName: "automate",
 					Version:     "4.5.20",
 					Status:      "up",
 				},
-			}
+			}, nil
 		},
 	}
 }
