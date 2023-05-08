@@ -110,10 +110,12 @@ type NodeCert struct {
 }
 
 type HardwareResourceCheckResponse struct {
-	Status string `json:"status"`
-	Result []struct {
-		IP       string   `json:"ip"`
-		NodeType string   `json:"node_type"`
-		Checks   []Checks `json:"checks"`
-	} `json:"result"`
+	Status string         `json:"status"`
+	Result []HRCAPIResult `json:"result"`
+}
+
+type HRCAPIResult struct {
+	IP       string   `json:"ip"`
+	NodeType string   `json:"node_type"`
+	Checks   []Checks `json:"checks"`
 }

@@ -1,4 +1,4 @@
-package trigger
+package hardwareresourcechecktrigger
 
 import (
 	"bytes"
@@ -10,17 +10,22 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
-	"github.com/sirupsen/logrus"
 )
 
 type HardwareResourceCountCheck struct {
 	host string
-	log  logrus.Logger
+	port string
+	log  logger.Logger
 }
 
-func NewHardwareResourceCountCheck() *HardwareResourceCountCheck {
-	return &HardwareResourceCountCheck{log: *logrus.New(), host: "http://localhost"}
+func NewHardwareResourceCountCheck(log logger.Logger, port string) *HardwareResourceCountCheck {
+	return &HardwareResourceCountCheck{
+		log:  log,
+		host: "http://localhost",
+		port: port,
+	}
 }
 
 func (ss *HardwareResourceCountCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
@@ -29,7 +34,7 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) map[string]model
 	//This map will hold the Response against each IP
 	finalResult := make(map[string]models.CheckTriggerResponse)
 
-	ipArray := []string{}
+	var ipArray []string
 
 	ipArray = append(ipArray, config.Hardware.AutomateNodeIps...)
 	ipArray = append(ipArray, config.Hardware.ChefInfraServerNodeIps...)
@@ -41,44 +46,45 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) map[string]model
 	//In case of error, construct the map of IP and empty response with error
 	if err != nil {
 		for _, ip := range ipArray {
-			checkResponse := models.CheckTriggerResponse{}
-			outputResult := models.ApiResult{}
-			outputResult.Check = constants.HARDWARE_RESOURCE_COUNT
-			outputResult.Message = constants.HARDWARE_RESOURCE_COUNT_MSG
-			outputResult.Passed = false
-			checkResponse.Error = fiber.NewError(fiber.StatusServiceUnavailable, err.Error())
-			checkResponse.Result = outputResult
-
-			finalResult[ip] = checkResponse
-
-		}
-
-	} else {
-		for _, result := range resp.Result {
-			checkResponse := models.CheckTriggerResponse{}
-			outputResult := models.ApiResult{}
-			outputResult.Check = constants.HARDWARE_RESOURCE_COUNT
-			outputResult.Message = constants.HARDWARE_RESOURCE_COUNT_MSG
-
-			if err != nil {
-				outputResult.Passed = false
-				checkResponse.Error = fiber.NewError(fiber.StatusServiceUnavailable, err.Error())
-
-			} else {
-				outputResult.Checks = result.Checks
-				outputResult.Passed = true
+			checkResponse := models.CheckTriggerResponse{
+				Error: fiber.NewError(fiber.StatusServiceUnavailable, err.Error()),
+				Result: models.ApiResult{
+					Passed:  false,
+					Check:   constants.HARDWARE_RESOURCE_COUNT,
+					Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
+				},
 			}
-			checkResponse.Result = outputResult
-
-			finalResult[result.IP] = checkResponse
+			finalResult[ip] = checkResponse
 		}
+		return finalResult
+	}
+	// send the success response
+	for _, result := range resp.Result {
+		outputResult := models.ApiResult{
+			Check:   constants.HARDWARE_RESOURCE_COUNT,
+			Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
+			Checks:  result.Checks,
+		}
+		isPassed := true
+		for _, check := range result.Checks {
+			if !check.Passed {
+				isPassed = false
+			}
+		}
+		outputResult.Passed = isPassed
+		checkResponse := models.CheckTriggerResponse{
+			Status: resp.Status,
+			Result: outputResult,
+		}
+		finalResult[result.IP] = checkResponse
 	}
 	return finalResult
 }
 
-//TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response
-func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body interface{}) (*models.HardwareResourceCheckResponse, error) {
-	url := fmt.Sprintf("%s%s", ss.host, constants.HARDWARE_RESOURCE_CHECK_API_PATH)
+// TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response
+func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body interface{}) (
+	*models.HardwareResourceCheckResponse, error) {
+	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.HARDWARE_RESOURCE_CHECK_API_PATH)
 	resp, err := Post(url, body)
 	if err != nil {
 		ss.log.Error("Error while Performing Hardware resource count check from batch Check API : ", err)
@@ -98,13 +104,13 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 	return &response, nil
 }
 
-//Post - This function performs HTTP Post request to the given endpoint with the provided request body
+// Post - This function performs HTTP Post request to the given endpoint with the provided request body
 func Post(url string, body interface{}) (*http.Response, error) {
 	requestBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(constants.HTTP_METHOD_POST, url, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +121,7 @@ func Post(url string, body interface{}) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode != 200 {
+	if err == nil && resp.StatusCode != 200 {
 		return nil, errors.New(resp.Status)
 	}
 	return resp, nil
