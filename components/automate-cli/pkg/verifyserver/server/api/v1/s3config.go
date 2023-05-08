@@ -9,13 +9,13 @@ import (
 func (h *Handler) GetS3Config(c *fiber.Ctx) {
 	s3ConfigRequest := new(models.S3ConfigRequest)
 	if err := c.BodyParser(&s3ConfigRequest); err != nil {
-		c.Status(503).Send(err)
+		c.Status(fiber.StatusBadRequest).JSON(response.BuildFailedResponse(&fiber.Error{Message: err.Error()}))
 		return
 	}
 	s3Connection := h.S3ConfigService.GetS3Connection(*s3ConfigRequest)
 	bucketAccess := h.S3ConfigService.GetBucketAccess(*s3ConfigRequest)
 	c.JSON(response.BuildSuccessResponse(&models.S3ConfigResponse{
-		Passed: true,
+		Passed: s3Connection.Passed && bucketAccess.Passed,
 		Checks: []models.ServiceCheck{
 			s3Connection, bucketAccess,
 		},

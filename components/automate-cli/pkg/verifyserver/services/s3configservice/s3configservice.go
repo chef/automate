@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -37,9 +38,15 @@ func NewS3ConfigService() S3Config {
 
 func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.ServiceCheck {
 	ss.req = req
-	_, err := ss.AwsConnection()
+	sess, err := ss.AwsConnection()
+	// fmt.Println(sess, err, "res")
 	if err != nil {
-		return ss.Response(s3ConnectionTitle, "", s3ConnectionErrorMsg, s3ConnectionResolutionMsg, false)
+		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3ConnectionResolutionMsg, false)
+	}
+	s3Client := s3.New(sess)
+	err = ss.ListBuckets(s3Client)
+	if err != nil {
+		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
 	return ss.Response(s3ConnectionTitle, s3ConnectionSuccessMsg, "", "", true)
 }
@@ -49,48 +56,38 @@ func (ss *S3ConfigService) GetBucketAccess(req models.S3ConfigRequest) models.Se
 
 	// S3 connection
 	sess, err := ss.AwsConnection()
+	s3Client := s3.New(sess)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", s3BucketAccessErrorMsg, s3BucketAccessResolutionMsg, false)
+		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
 
 	// upload data in s3 bucket
-	uploader := s3manager.NewUploader(sess)
-	_, err = uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(ss.req.BucketName),   // Bucket to be used
-		Key:    aws.String(ss.req.BasePath),     // Name of the file to be saved
-		Body:   strings.NewReader("my request"), // File
-	})
+	err = ss.UploadObject(sess)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", s3BucketAccessErrorMsg, s3BucketAccessResolutionMsg, false)
+		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
 
-	s3Client := s3.New(sess)
-
 	// read/list data in s3 bucket
-	_, err = s3Client.ListObjectsV2(&s3.ListObjectsV2Input{
-		Bucket: aws.String(ss.req.BucketName),
-		Prefix: aws.String(ss.req.BasePath),
-	})
+	err = ss.ListObjects(s3Client)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", s3BucketAccessErrorMsg, s3BucketAccessResolutionMsg, false)
+		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
 
 	// delete data in s3 bucket
-	_, err = s3Client.DeleteObject(
-		&s3.DeleteObjectInput{
-			Bucket: aws.String(ss.req.BucketName),
-			Key:    aws.String(ss.req.BasePath),
-		})
+	err = ss.DeleteObjects(s3Client)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", s3BucketAccessErrorMsg, s3BucketAccessResolutionMsg, false)
+		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
 	return ss.Response(s3BucketAccessTitle, s3BucketAccessSuccessMsg, "", "", true)
 }
 
 func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
 	config := aws.Config{
-		Region:      aws.String("us-east-1"),
-		Credentials: credentials.NewStaticCredentials(ss.req.AccessKey, ss.req.SecretKey, ""),
+		Endpoint:         &ss.req.Endpoint,
+		Region:           aws.String("us-east-1"),
+		DisableSSL:       aws.Bool(true),
+		S3ForcePathStyle: aws.Bool(true),
+		Credentials:      credentials.NewStaticCredentials(ss.req.AccessKey, ss.req.SecretKey, ""),
 	}
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config: config,
@@ -98,15 +95,55 @@ func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	s3Client := s3.New(sess)
-
-	// list buckets in s3 to verify secrete and access key
-	_, err = s3Client.ListBuckets(nil)
-	if err != nil {
-		return nil, err
-	}
 	return sess, nil
+}
+
+func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
+	// list buckets in s3 to verify secrete and access key
+	_, err := s3Client.ListBuckets(nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
+	// list buckets in s3 to verify secrete and access key
+	_, err := s3Client.DeleteObject(
+		&s3.DeleteObjectInput{
+			Bucket: aws.String(ss.req.BucketName),
+			Key:    aws.String(ss.req.BasePath),
+		})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
+	// list buckets in s3 to verify secrete and access key
+	_, err := s3Client.ListObjectsV2(&s3.ListObjectsV2Input{
+		Bucket: aws.String(ss.req.BucketName),
+		Prefix: aws.String(ss.req.BasePath),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
+	// list buckets in s3 to verify secrete and access key
+	uploader := s3manager.NewUploader(sess)
+	_, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(ss.req.BucketName),   // Bucket to be used
+		Key:    aws.String(ss.req.BasePath),     // Name of the file to be saved
+		Body:   strings.NewReader("my request"), // File
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) models.ServiceCheck {

@@ -1,6 +1,8 @@
 package s3configservice
 
-import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+)
 
 type MockS3Config struct {
 	GetS3ConnectionFunc func(models.S3ConfigRequest) models.ServiceCheck
