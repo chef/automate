@@ -6,12 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 	"github.com/stretchr/testify/assert"
 )
@@ -121,7 +121,7 @@ func TestS3Config(t *testing.T) {
 			expectedBody: failureMessageS3Config,
 		},
 		{
-			description:  "200:fail ss3BucketAccess",
+			description:  "200:fail s3BucketAccess",
 			expectedCode: 200,
 			mockS3ConnectionModel: models.ServiceCheck{
 				Title:         s3ConnectionTitle,
@@ -158,7 +158,6 @@ func TestS3Config(t *testing.T) {
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
-			t.Log(string(body), "body")
 			assert.NoError(t, err, test.description)
 			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, res.StatusCode, test.expectedCode)

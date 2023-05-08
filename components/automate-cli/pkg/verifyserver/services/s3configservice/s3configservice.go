@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 )
 
@@ -29,11 +30,14 @@ type S3Config interface {
 }
 
 type S3ConfigService struct {
-	req models.S3ConfigRequest
+	logger logger.Logger
+	req    models.S3ConfigRequest
 }
 
-func NewS3ConfigService() S3Config {
-	return &S3ConfigService{}
+func NewS3ConfigService(logger logger.Logger) S3Config {
+	return &S3ConfigService{
+		logger: logger,
+	}
 }
 
 func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.ServiceCheck {
@@ -92,8 +96,10 @@ func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
 		Config: config,
 	})
 	if err != nil {
+		ss.logger.Error("s3 config aws connection failed: ", err.Error())
 		return nil, err
 	}
+	ss.logger.Info("s3 config aws connection success")
 	return sess, nil
 }
 
@@ -101,8 +107,10 @@ func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
 	// list buckets in s3 to verify secrete and access key
 	_, err := s3Client.ListBuckets(nil)
 	if err != nil {
+		ss.logger.Error("s3 config list bucket failed: ", err.Error())
 		return err
 	}
+	ss.logger.Info("s3 config list object success")
 	return nil
 }
 
@@ -113,8 +121,10 @@ func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
 			Key:    aws.String(ss.req.BasePath),
 		})
 	if err != nil {
+		ss.logger.Error("s3 config delete object failed: ", err.Error())
 		return err
 	}
+	ss.logger.Info("s3 config delete object success")
 	return nil
 }
 
@@ -124,8 +134,10 @@ func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
 		Prefix: aws.String(ss.req.BasePath),
 	})
 	if err != nil {
+		ss.logger.Error("s3 config list object failed: ", err.Error())
 		return err
 	}
+	ss.logger.Info("s3 config list object success")
 	return nil
 }
 
@@ -137,8 +149,10 @@ func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
 		Body:   strings.NewReader("my request"), // File
 	})
 	if err != nil {
+		ss.logger.Error("s3 config upload object failed: ", err.Error())
 		return err
 	}
+	ss.logger.Info("s3 config upload object success")
 	return nil
 }
 

@@ -85,7 +85,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
 		AddMockServerServices(startmockserverservice.New(l)).
-		AddS3ConfigService(s3configservice.NewS3ConfigService())
+		AddS3ConfigService(s3configservice.NewS3ConfigService(l))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
