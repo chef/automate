@@ -21,9 +21,9 @@ func SetupMockStatusService() statusservice.IStatusService {
 		GetServicesFunc: func() ([]models.ServiceDetails, error) {
 			return []models.ServiceDetails{
 				{
-					ServiceName: "automate",
-					Version:     "4.5.20",
-					Status:      "up",
+					ServiceName: "deployment-service",
+					Version:     "chef/deployment-service/0.1.0/20230502070345",
+					Status:      "OK",
 				},
 			}, nil
 		},
@@ -61,7 +61,7 @@ func TestStatusAPI(t *testing.T) {
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"ok\",\"services\":[{\"service_name\":\"automate\",\"status\":\"up\",\"version\":\"4.5.20\"}]}}",
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}]}}",
 		},
 	}
 	statusEndpoint := "/status"
