@@ -38,6 +38,7 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) map[string]model
 
 	resp, err := ss.TriggerHardwareResourceCountCheck(config.Hardware)
 
+	//In case of error, construct the map of IP and empty response with error
 	if err != nil {
 		for _, ip := range ipArray {
 			checkResponse := models.CheckTriggerResponse{}
@@ -103,11 +104,11 @@ func Post(url string, body interface{}) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest(constants.HTTP_METHOD_POST, url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(constants.CONTENT_TYPE, constants.TYPE_JSON)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
