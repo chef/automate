@@ -13,7 +13,7 @@ func (h *Handler) GetStatus(c *fiber.Ctx) {
 		return
 	}
 	c.JSON(response.BuildSuccessResponse(&models.StatusDetails{
-		Status:   "ok",
+		Status:   "OK",
 		Services: services,
 	}))
 }

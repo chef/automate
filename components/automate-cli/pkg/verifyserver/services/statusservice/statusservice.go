@@ -78,7 +78,7 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 			serviceName := strings.Split(matches[7], ".default")[0]
 			response = append(response, models.ServiceDetails{
 				ServiceName: serviceName,
-				Status:      matches[4],
+				Status:      strings.ToUpper(matches[4]),
 				Version:     matches[1],
 			})
 		}
@@ -91,7 +91,11 @@ func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.Serv
 	output, err := ss.ExecuteShellCommandFunc("chef-automate status")
 	fmt.Println("Output: ", string(output))
 	fmt.Println("Error: ", err)
-	if err != nil && !ss.checkIfBENode(string(output)) {
+	if err != nil {
+		//If it's a backend node, return an empty map
+		if ss.checkIfBENode(string(output)) {
+			return make(map[string]models.ServiceDetails), nil
+		}
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from chef-automate status")
 	}
 	return ss.ParseChefAutomateStatus(string(output))
@@ -116,7 +120,7 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]mode
 		if len(matches) == 6 {
 			response[matches[1]] = models.ServiceDetails{
 				ServiceName: matches[1],
-				Status:      matches[3],
+				Status:      strings.ToUpper(matches[3]),
 				Version:     "",
 			}
 		}
