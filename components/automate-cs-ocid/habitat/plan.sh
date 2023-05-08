@@ -53,24 +53,17 @@ do_build() {
 do_install() {
   cd "$(hab pkg path 'chef/oc_id')/oc_id"
 
-  export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
-
-  # TODO :: Remove following line once new ocid hab package is used
-  echo "gem 'tzinfo-data'" >> Gemfile
-
   export BUNDLE_SILENCE_ROOT_WARNING=1 GEM_PATH
   build_line "Setting BUNDLE_SILENCE_ROOT_WARNING=$BUNDLE_SILENCE_ROOT_WARNING"
 
   bundle config path "vendor/bundle"
 
-  # TODO: Check if it works with path flag
+  # TODO :: Remove following line once new ocid hab package is used
+  echo "gem 'tzinfo-data'" >> Gemfile
   bundle install
 
-  bundle exec bin/rake db:create
-  bundle exec bin/rake db:migrate
-
-  mkdir -p tmp
-  chmod 777 -R tmp
+  # This is required so that 'db:migrate' can be executed from the run hook
+  chmod 764 -R "$(hab pkg path 'chef/oc_id')/oc_id/db/schema.rb"
 
   return 0
 }

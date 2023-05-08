@@ -5,11 +5,14 @@ exec 2>&1
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
-export RAILS_ENV={{cfg.rails_env}}
-export RACK_ENV={{cfg.rack_env}}
+export RAILS_ENV="{{cfg.rails_env}}"
+export RACK_ENV="{{cfg.rack_env}}"
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-export DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
+export DATABASE_URL="{{cfg.DATABASE_URL}}"
+
+bundle exec bin/rake db:create
+bundle exec bin/rake db:migrate
 bundle exec bin/thin start -p 9090 --ssl --ssl-key-file {{pkg.svc_config_path}}/service.key --ssl-cert-file {{pkg.svc_config_path}}/service.crt
 
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
