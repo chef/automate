@@ -396,33 +396,7 @@ var ProductMetadataJSON = `
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
-        "bootstrap": [
-          {
-            "type": "file",
-            "path": "data/pivotal.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/pivotal.pub.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/webui_priv.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/webui_pub.pem",
-            "optional": false
-          },
-          {
-            "type": "file",
-            "path": "data/dark_launch_features.json",
-            "optional": false
-          }
-        ]
+        "bootstrap": null
       }
     },
     {
