@@ -1,5 +1,7 @@
 package models
 
+import "github.com/gofiber/fiber"
+
 type BatchCheckRequest struct {
 	Checks []string `json:"checks"`
 	Config Config   `json:"config"`
@@ -80,8 +82,9 @@ type BatchCheckResult struct {
 }
 
 type CheckTriggerResponse struct {
-	Status string    `json:"status"`
-	Result ApiResult `json:"result"`
+	Status string       `json:"status"`
+	Result ApiResult    `json:"result"`
+	Error  *fiber.Error `json:"error,omitempty"`
 }
 type ApiResult struct {
 	Passed  bool     `json:"passed"`
@@ -104,4 +107,15 @@ type NodeCert struct {
 	Key       string `json:"key"`
 	AdminKey  string `json:"admin_key"`
 	AdminCert string `json:"admin_cert"`
+}
+
+type HardwareResourceCheckResponse struct {
+	Status string                           `json:"status"`
+	Result []HardwareResourceCountApiResult `json:"result"`
+}
+
+type HardwareResourceCountApiResult struct {
+	IP       string   `json:"ip"`
+	NodeType string   `json:"node_type"`
+	Checks   []Checks `json:"checks"`
 }

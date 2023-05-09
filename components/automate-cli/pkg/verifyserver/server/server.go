@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"strings"
 
 	"github.com/ansrivas/fiberprometheus"
@@ -48,7 +49,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 			statusservice.NewStatusService()).
 		AddBatchCheckService(
 			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(
-				trigger.NewHardwareResourceCountCheck(),
+				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
 				trigger.NewSshUserAccessCheck(),
 				trigger.NewCertificateCheck(),
 				trigger.NewExternalOpensearchCheck(),
