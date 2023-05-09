@@ -3,12 +3,13 @@ package hardwareresourcechecktrigger
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/lib/logger"
-	"github.com/stretchr/testify/require"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/chef/automate/lib/logger"
+	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -209,7 +210,7 @@ func TestNewHardwareResourceCountCheck(t *testing.T) {
 	hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), testPort)
 	assert.NotNil(t, hrc)
 	assert.NotNil(t, hrc.log)
-	assert.Equal(t, "http://localhost", hrc.host)
+	assert.Equal(t, constants.LOCAL_HOST_URL, hrc.host)
 	assert.Equal(t, testPort, hrc.port)
 }
 

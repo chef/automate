@@ -22,7 +22,7 @@ type HardwareResourceCountCheck struct {
 func NewHardwareResourceCountCheck(log logger.Logger, port string) *HardwareResourceCountCheck {
 	return &HardwareResourceCountCheck{
 		log:  log,
-		host: "http://localhost",
+		host: constants.LOCAL_HOST_URL,
 		port: port,
 	}
 }
