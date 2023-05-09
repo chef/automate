@@ -170,7 +170,7 @@ func TestBatchCheckAPI(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
-			assert.Contains(t, string(body), test.expectedBody)
+			assert.Contains(t, test.expectedBody, string(body))
 			assert.Equal(t, test.expectedCode, res.StatusCode)
 		})
 	}

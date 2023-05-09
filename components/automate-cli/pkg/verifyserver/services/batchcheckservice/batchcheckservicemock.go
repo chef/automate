@@ -142,7 +142,24 @@ func (mss *MockExternalOpensearchCheck) Run(config models.Config) map[string]mod
 func SetupMockExternalOpensearchCheck() trigger.ICheck {
 	return &MockExternalOpensearchCheck{
 		ExternalOpensearchCheckFunc: func(config models.Config) map[string]models.CheckTriggerResponse {
-			m := map[string]models.CheckTriggerResponse{}
+			m := map[string]models.CheckTriggerResponse{
+				"1.2.3.5": {
+					Status: "Passed",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   "external-opensearch",
+						Message: "External Opensearch Check",
+						Checks: []models.Checks{
+							{
+								Title: "external-opensearch-check-1",
+							},
+							{
+								Title: "external-opensearch-check-2",
+							},
+						},
+					},
+				},
+			}
 			return m
 		},
 	}
@@ -159,7 +176,24 @@ func (mss *MockExternalPostgresCheck) Run(config models.Config) map[string]model
 func SetupMockExternalPostgresCheck() trigger.ICheck {
 	return &MockExternalPostgresCheck{
 		ExternalPostgresCheckFunc: func(config models.Config) map[string]models.CheckTriggerResponse {
-			m := map[string]models.CheckTriggerResponse{}
+			m := map[string]models.CheckTriggerResponse{
+				"1.2.3.6": {
+					Status: "Passed",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   "external-postgresql",
+						Message: "External Postgres Check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			}
 			return m
 		},
 	}

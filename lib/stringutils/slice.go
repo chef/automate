@@ -36,14 +36,14 @@ func SliceIntersection(first, second []string) []string {
 	return out
 }
 
-// This method is used to return uncomman elements between the two slices
-func SliceDifference(a, b []string) []string {
-	mb := make(map[string]struct{}, len(b))
-	for _, x := range b {
+// This method is used to return uncomman elements between the two slices. It returns (A-B) operation
+func SliceDifference(first, second []string) []string {
+	mb := make(map[string]struct{}, len(second))
+	for _, x := range second {
 		mb[x] = struct{}{}
 	}
 	var diff []string
-	for _, x := range a {
+	for _, x := range first {
 		if _, found := mb[x]; !found {
 			diff = append(diff, x)
 		}
