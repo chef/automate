@@ -4,7 +4,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-
 type MockSoftwareVersionService struct {
 	GetSoftwareServicesFunc func() (models.SoftwareVersionDetails, error)
 }
@@ -12,5 +11,3 @@ type MockSoftwareVersionService struct {
 func (msv *MockSoftwareVersionService) GetSoftwareVersionServices() (models.SoftwareVersionDetails, error) {
 	return msv.GetSoftwareServicesFunc()
 }
-
-

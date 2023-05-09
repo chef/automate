@@ -5,12 +5,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,19 +22,19 @@ func SetupMockSoftwareVersionService() softwareversionservice.ISoftwareVersionSe
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title: "mkdir availability",
-						Passed: true,
-						SuccessMsg: "mkdir is available",
-						ErrorMsg: "",
+						Title:         "mkdir availability",
+						Passed:        true,
+						SuccessMsg:    "mkdir is available",
+						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 				},
-			},nil
+			}, nil
 		},
 	}
 }
 
-func SetupHandlers(sv softwareversionservice.ISoftwareVersionService) (*fiber.App,error) {
+func SetupHandler(sv softwareversionservice.ISoftwareVersionService) (*fiber.App, error) {
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func SetupHandlers(sv softwareversionservice.ISoftwareVersionService) (*fiber.Ap
 		Handler: handler,
 	}
 	vs.Setup()
-	return vs.App,nil
+	return vs.App, nil
 }
 
 func TestSoftwareVersionAPI(t *testing.T) {
@@ -65,17 +65,16 @@ func TestSoftwareVersionAPI(t *testing.T) {
 		{
 			description:  "200:success software version check route",
 			expectedCode: 200,
-			expectedBody: `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""}]}}`,
-					
+			expectedBody: `{"status":"SUCCESS","result":{"passed":true,"Checks":[{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""}]}}`,
 		},
 	}
-	sofftwareversioncheckEndpoint := "/api/v1/checks/software-versions"
-	app,err := SetupHandlers(SetupMockSoftwareVersionService())
+	softwareversioncheckEndpoint := "/api/v1/checks/software-versions"
+	app, err := SetupHandler(SetupMockSoftwareVersionService())
 	assert.NoError(t, err)
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-			req := httptest.NewRequest("GET", sofftwareversioncheckEndpoint, nil)
-			req.Header.Add("Content-Type" , "application/json")
+			req := httptest.NewRequest("GET", softwareversioncheckEndpoint, nil)
+			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)

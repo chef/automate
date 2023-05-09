@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
+	"github.com/stretchr/testify/assert"
 )
 
 var osTestVersion = map[string][]string{
@@ -19,6 +21,36 @@ const successfile = "./successfile"
 const failurefile = "./failurefile"
 const versionfile = "./versionfile"
 
+var check = []string{"mkdir"}
+
+func TestGetSoftwareVersionService(t *testing.T) {
+	service := NewSoftwareVersionService()
+	service.(*SoftwareVersionService).cmdCheckArray = check
+	service.(*SoftwareVersionService).osFilepath = successfile
+	sv, err := service.GetSoftwareVersionServices()
+	if err != nil {
+		logger.NewLogrusStandardLogger().Error(err)
+	}
+	assert.Equal(t, models.SoftwareVersionDetails{
+		Passed: true,
+		Checks: []models.Checks{
+			{
+				Title:         "mkdir availability",
+				Passed:        true,
+				SuccessMsg:    "mkdir is available",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			{
+				Title:         "Ubuntu availability",
+				Passed:        true,
+				SuccessMsg:    "Ubuntu version is 20.04",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+		},
+	}, sv)
+}
 func TestCheckOs(t *testing.T) {
 	type args struct {
 		osVersions map[string][]string
@@ -91,8 +123,8 @@ func TestCheckCommandVersion(t *testing.T) {
 				cmdName: "mkdir",
 			},
 			expectedBody: models.Checks{
-				Title:          "mkdir availability",
-				Passed:         true,
+				Title:         "mkdir availability",
+				Passed:        true,
 				SuccessMsg:    "mkdir is available",
 				ErrorMsg:      "",
 				ResolutionMsg: "",
@@ -104,8 +136,8 @@ func TestCheckCommandVersion(t *testing.T) {
 				cmdName: "abc",
 			},
 			expectedBody: models.Checks{
-				Title:          "abc availability",
-				Passed:         false,
+				Title:         "abc availability",
+				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "abc is not available",
 				ResolutionMsg: "Ensure abc is available in $PATH on the node",
@@ -137,10 +169,10 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: failurefile,
 			},
 			expectedBody: models.Checks{
-				Title:          "Debian GNU/Linux 10 (buster) availability",
-				Passed:         false,
+				Title:         "Debian GNU/Linux 10 (buster) availability",
+				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate", 
+				ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate",
 				ResolutionMsg: "Ensure Debian GNU/Linux 10 (buster) correct version is installed on the node",
 			},
 		},
@@ -150,8 +182,8 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: successfile,
 			},
 			expectedBody: models.Checks{
-				Title:          "Ubuntu availability",
-				Passed:         true,
+				Title:         "Ubuntu availability",
+				Passed:        true,
 				SuccessMsg:    "Ubuntu version is 20.04",
 				ErrorMsg:      "",
 				ResolutionMsg: "",
@@ -164,8 +196,8 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: versionfile,
 			},
 			expectedBody: models.Checks{
-				Title:          "SUSE Linux availability",
-				Passed:         false,
+				Title:         "SUSE Linux availability",
+				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "SUSE Linux version is not supported by automate",
 				ResolutionMsg: "Ensure SUSE Linux correct version is installed on the node",
