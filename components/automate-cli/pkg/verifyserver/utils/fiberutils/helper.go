@@ -1,11 +1,9 @@
 package fiberutils
 
 import (
-	"fmt"
 	"net/url"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/gofiber/fiber"
 	"github.com/sirupsen/logrus"
 )
 
@@ -41,21 +39,4 @@ func ConstructIpAndNodeTypeMap(config models.Config) map[string]string {
 	}
 
 	return ipNodeMap
-}
-
-func HostToEndPoint(host, port, path, NodeType string) string {
-	if NodeType == "" {
-		endPoint := fmt.Sprintf("%s:%s%s", host, port, path)
-		return endPoint
-	}
-
-	endPoint := fmt.Sprintf("%s:%s%s?node_type=%s", host, port, path, NodeType)
-	return endPoint
-}
-
-func SendError(endPoint, host, errMsg string, errCode int, output chan<- models.CheckTriggerResponse, ctr models.CheckTriggerResponse) {
-	//host, _ := GetHostFormEndPoint(endPoint)
-	ctr.Host = host
-	ctr.Error = &fiber.Error{Code: errCode, Message: errMsg}
-	output <- ctr
 }
