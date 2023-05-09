@@ -8,17 +8,19 @@ import (
 )
 
 type SystemResourceCheck struct {
-	log  logger.Logger
-	port string
+	log             logger.Logger
+	port            string
+	deploymentState string
 }
 
-func NewSystemResourceCheck(log logger.Logger, port string) *SystemResourceCheck {
+func NewSystemResourceCheck(log logger.Logger, port, deploymentState string) *SystemResourceCheck {
 	return &SystemResourceCheck{
-		log:  log,
-		port: port,
+		log:             log,
+		port:            port,
+		deploymentState: deploymentState,
 	}
 }
 
 func (src *SystemResourceCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, "")
+	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, src.deploymentState)
 }
