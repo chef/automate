@@ -5,12 +5,16 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/softwareversionchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
+
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 
 	"github.com/ansrivas/fiberprometheus"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
@@ -71,12 +75,10 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				trigger.NewNfsBackupConfigCheck(),
 				trigger.NewOpensearchS3BucketAccessCheck(),
 				trigger.NewS3BackupConfigCheck(),
-				trigger.NewSoftwareVersionCheck(),
-				trigger.NewSystemResourceCheck(),
-				trigger.NewSshUserAccessCheck(),
-			))).
-		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port))
-
+				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
+				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
+				systemuserchecktrigger.NewSystemUserCheck(l, port),
+			)))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

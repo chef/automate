@@ -1,6 +1,8 @@
 package trigger
 
-import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+)
 
 type CheckTrigger struct {
 	HardwareResourceCountCheck    ICheck
