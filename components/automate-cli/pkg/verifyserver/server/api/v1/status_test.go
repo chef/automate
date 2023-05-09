@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -23,7 +24,7 @@ func SetupMockStatusService() statusservice.IStatusService {
 				{
 					ServiceName: "deployment-service",
 					Version:     "chef/deployment-service/0.1.0/20230502070345",
-					Status:      "OK",
+					Status:      constants.OK,
 				},
 			}, nil
 		},

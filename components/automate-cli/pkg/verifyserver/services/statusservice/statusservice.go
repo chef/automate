@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
@@ -79,8 +80,10 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 		if len(matches) == 8 {
 			serviceName := strings.Split(matches[7], ".default")[0]
 			status := strings.ToUpper(matches[4])
-			if status == "UP" {
-				status = "OK"
+			if status == constants.UP {
+				status = constants.OK
+			} else if status == constants.DOWN {
+				status = constants.CRITICAL
 			}
 			response = append(response, models.ServiceDetails{
 				ServiceName: serviceName,
