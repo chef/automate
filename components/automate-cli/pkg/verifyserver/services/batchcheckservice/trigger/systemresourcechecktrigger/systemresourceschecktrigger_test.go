@@ -60,7 +60,7 @@ func TestSystemUserCheck_Run(t *testing.T) {
 			},
 		}
 
-		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), "8080", "pre-deploy")
+		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), "8080")
 		ctr := suc.Run(config)
 		// Assert the expected result
 		require.Len(t, ctr, 2) // Modify the count based on your configuration

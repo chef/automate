@@ -62,13 +62,14 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SSHUser     SSHUser     `json:"ssh_user"`
-	Arch        string      `json:"arch"`
-	Backup      Backup      `json:"backup"`
-	Hardware    Hardware    `json:"hardware"`
-	Certificate Certificate `json:"certificate"`
-	ExternalOS  ExternalOS  `json:"external_opensearch"`
-	ExternalPG  ExternalPG  `json:"external_postgresql"`
+	SSHUser         SSHUser     `json:"ssh_user"`
+	Arch            string      `json:"arch"`
+	Backup          Backup      `json:"backup"`
+	Hardware        Hardware    `json:"hardware"`
+	Certificate     Certificate `json:"certificate"`
+	ExternalOS      ExternalOS  `json:"external_opensearch"`
+	ExternalPG      ExternalPG  `json:"external_postgresql"`
+	DeploymentState string      `json:"deployment_state"`
 }
 
 type BatchCheckResponse struct {

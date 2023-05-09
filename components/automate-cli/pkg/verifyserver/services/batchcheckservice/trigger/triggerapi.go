@@ -30,13 +30,13 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 		endPoint := ""
 
 		if path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
-			endPoint = fmt.Sprintf("%s:%s%s?node_type=%s", ip, port, path, nodeType)
+			endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s", ip, port, path, nodeType)
 
 		} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
-			endPoint = fmt.Sprintf("%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
+			endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
 
 		} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
-			endPoint = fmt.Sprintf("%s:%s%s", ip, port, path)
+			endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
 		}
 
 		go triggerCheckAPI(endPoint, ip, outputCh)
