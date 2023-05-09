@@ -8,6 +8,6 @@ type MockSoftwareVersionService struct {
 	GetSoftwareServicesFunc func() (models.SoftwareVersionDetails, error)
 }
 
-func (msv *MockSoftwareVersionService) GetSoftwareVersionServices() (models.SoftwareVersionDetails, error) {
+func (msv *MockSoftwareVersionService) GetSoftwareVersionServices(string) (models.SoftwareVersionDetails, error) {
 	return msv.GetSoftwareServicesFunc()
 }

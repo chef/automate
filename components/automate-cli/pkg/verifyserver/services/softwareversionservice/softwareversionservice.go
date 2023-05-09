@@ -12,7 +12,7 @@ import (
 )
 
 type ISoftwareVersionService interface {
-	GetSoftwareVersionServices() (models.SoftwareVersionDetails, error)
+	GetSoftwareVersionServices(string) (models.SoftwareVersionDetails, error)
 }
 
 type SoftwareVersionService struct {
@@ -27,14 +27,20 @@ func NewSoftwareVersionService() ISoftwareVersionService {
 	}
 }
 
-const osFilepath = "/test/testfile"
+const osFilepath = "/etc/os-release"
 
-var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "pvcreate", "vgcreate", "lvcreate", "mv", "systemd", "wget"}
+var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "pvcreate", "vgcreate", "lvcreate", "mv", "systemd", "wget", "exec"}
 
-func (sv *SoftwareVersionService) GetSoftwareVersionServices() (models.SoftwareVersionDetails, error) {
+func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (models.SoftwareVersionDetails, error) {
 	serviceResponse := models.SoftwareVersionDetails{}
 	serviceResponse.Passed = true
 	serviceResponseArray := []models.Checks{}
+	if query == "postgres" {
+		sv.cmdCheckArray = append(sv.cmdCheckArray, "stat")
+	}
+	if query == "opensearch" {
+		sv.cmdCheckArray = append(sv.cmdCheckArray, "openssl")
+	}
 	for i := 0; i < len(sv.cmdCheckArray); i++ {
 		checkResponse := checkCommandVersion(sv.cmdCheckArray[i])
 		if !checkResponse.Passed {
@@ -52,7 +58,6 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices() (models.SoftwareV
 			},
 		}, err
 	}
-	logger.NewLogrusStandardLogger().Error("Error while OS version = Vivek")
 	if !osResponse.Passed {
 		serviceResponse.Passed = false
 	}
@@ -84,7 +89,7 @@ func checkCommandVersion(cmdName string) models.Checks {
 }
 
 func readFile(osFilepath string) ([]byte, error) {
-	data, err := ioutil.ReadFile(osFilepath)
+	data, err := ioutil.ReadFile(osFilepath) // nosemgrep
 	if err != nil {
 		logger.NewLogrusStandardLogger().Error("Error while reading the OS file from the path = ", err)
 		return []byte{}, err
@@ -120,16 +125,16 @@ func checkOsVersion(osFilepath string) (models.Checks, error) {
 		"Amazon Linux": {"2"},
 		"SUSE Linux":   {"12"},
 	}
-	checkresponse := models.Checks{}
+	checkResponse := models.Checks{}
 	var name, version, err = getOsVersion(osFilepath)
 	if err != nil {
 		return models.Checks{}, err
 	}
 	for key := range osVersions {
 		if strings.Contains(name, key) {
-			correctversion := checkOs(osVersions, version, key)
-			if correctversion {
-				checkresponse = models.Checks{
+			correctVersion := checkOs(osVersions, version, key)
+			if correctVersion {
+				checkResponse = models.Checks{
 					Title:         key + " availability",
 					Passed:        true,
 					SuccessMsg:    key + " version is " + version,
@@ -138,7 +143,7 @@ func checkOsVersion(osFilepath string) (models.Checks, error) {
 				}
 				break
 			}
-			checkresponse = models.Checks{
+			checkResponse = models.Checks{
 				Title:         key + " availability",
 				Passed:        false,
 				SuccessMsg:    "",
@@ -147,7 +152,7 @@ func checkOsVersion(osFilepath string) (models.Checks, error) {
 			}
 			break
 		}
-		checkresponse = models.Checks{
+		checkResponse = models.Checks{
 			Title:         name + " availability",
 			Passed:        false,
 			SuccessMsg:    "",
@@ -155,31 +160,31 @@ func checkOsVersion(osFilepath string) (models.Checks, error) {
 			ResolutionMsg: "Ensure " + name + " correct version is installed on the node",
 		}
 	}
-	return checkresponse, nil
+	return checkResponse, nil
 }
 
 func checkOs(osVersions map[string][]string, version string, key string) bool {
-	correctversion := false
+	correctVersion := false
 	if key == "Ubuntu" {
-		split := strings.Split(version, ".")      
-		checkversion := split[0] + "." + split[1] 
-		re := regexp.MustCompile(checkversion)
+		split := strings.Split(version, ".")
+		checkVersion := split[0] + "." + split[1]
+		re := regexp.MustCompile(checkVersion)
 
 		for _, str := range osVersions[key] {
 			if re.MatchString(str) {
-				correctversion = true
+				correctVersion = true
 				break
 			}
 		}
 	} else if key == "Red Hat" {
-		checkversion, _ := strconv.ParseFloat(version, 64)
-		if checkversion >= 7 {
-			correctversion = true
+		checkVersion, _ := strconv.ParseFloat(version, 64)
+		if checkVersion >= 7 {
+			correctVersion = true
 		}
 	} else {
 		if osVersions[key][0] == version {
-			correctversion = true
+			correctVersion = true
 		}
 	}
-	return correctversion
+	return correctVersion
 }

@@ -27,7 +27,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 	service := NewSoftwareVersionService()
 	service.(*SoftwareVersionService).cmdCheckArray = check
 	service.(*SoftwareVersionService).osFilepath = successfile
-	sv, err := service.GetSoftwareVersionServices()
+	sv, err := service.GetSoftwareVersionServices("opensearch")
 	if err != nil {
 		logger.NewLogrusStandardLogger().Error(err)
 	}
@@ -38,6 +38,13 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				Title:         "mkdir availability",
 				Passed:        true,
 				SuccessMsg:    "mkdir is available",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			{
+				Title:         "openssl availability",
+				Passed:        true,
+				SuccessMsg:    "openssl is available",
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
