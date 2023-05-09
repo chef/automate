@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/bmizerany/assert"
@@ -16,30 +17,83 @@ import (
 
 const (
 	softwareVersionResp = `{
-       "status": "success",
-       "result": {
-         "passed": true,
-         "msg": "API result message",
-         "check": "API check",
-         "checks": [
-           {
-             "title": "Check 1",
-             "passed": true,
-             "success_msg": "Check 1 passed",
-             "error_msg": "",
-             "resolution_msg": "No resolution required"
-           },
-           {
-             "title": "Check 2",
-             "passed": false,
-             "success_msg": "",
-             "error_msg": "Check 2 failed",
-             "resolution_msg": "Please check the configuration"
-           }
-         ]
-       },
-       "host": ""
-     }`
+		"status": "success",
+		"result": {
+			"passed": true,
+			"msg": "API result message",
+			"check": "API check",
+			"checks": [
+				{
+					"title": "Check 1",
+					"passed": true,
+					"success_msg": "Check 1 passed",
+					"error_msg": "",
+					"resolution_msg": "No resolution required"
+				},
+				{
+					"title": "Check 2",
+					"passed": false,
+					"success_msg": "",
+					"error_msg": "Check 2 failed",
+					"resolution_msg": "Please check the configuration"
+				}
+			]
+		},
+		"host": ""
+	}`
+
+	resourceCheck = `{
+		"status": "SUCCESS",
+		"result": {
+			"passed": true,
+			"checks": [
+				{
+					"title": "CPU count check",
+					"passed": true,
+					"success_msg": "CPU count is >= 4",
+					"error_msg": "",
+					"resolution_msg": ""
+				},
+				{
+					"title": "CPU speed check",
+					"passed": true,
+					"success_msg": "CPU speed should be >= 2Ghz",
+					"error_msg": "",
+					"resolution_msg": ""
+				}
+			]
+		}
+	}`
+
+	systemUser = `{
+		"status": "SUCCESS",
+		"result": {
+			"passed": true,
+			"checks": [
+				{
+					"title": "User creation/validation check",
+					"passed": true,
+					"success_msg": "User is created or found successfully",
+					"error_msg": "",
+					"resolution_msg": ""
+				},
+				{
+					"title": "Group creation/validation check",
+					"passed": true,
+					"success_msg": "Group is created or found successfully",
+					"error_msg": "",
+					"resolution_msg": ""
+				},
+				{
+					"title": "User and group mapping successfully",
+					"passed": true,
+					"success_msg": "User and group mapping successful",
+					"error_msg": "",
+					"resolution_msg": ""
+				}
+			]
+		}
+	}`
 )
 
 func TestTriggerCheckAPI(t *testing.T) {
@@ -128,89 +182,103 @@ func TestTriggerCheckAPI(t *testing.T) {
 }
 
 func TestRunCheck(t *testing.T) {
-
 	t.Run("Software Version Check", func(t *testing.T) {
-		// Create a test server to mock the API endpoint
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Define the response based on the test case
-			w.WriteHeader(http.StatusOK)
-			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
-			require.NoError(t, err)
-		}))
+		// Create a dummy server
+		server, host, port := createDummyServer()
 		defer server.Close()
 
+		// Test data
 		config := models.Config{
 			Hardware: models.Hardware{
-				AutomateNodeCount:   1,
-				AutomateNodeIps:     []string{server.URL},
-				PostgresqlNodeCount: 1,
-				PostgresqlNodeIps:   []string{"127.0.0.1"},
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{host},
 			},
 		}
+		log := logger.NewLogrusStandardLogger()
 
-		// Call the function under test
-		result := RunCheck(config, logger.NewLogrusStandardLogger(), "", constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
-		fmt.Printf("Tese check: %+v\n", result[server.URL].Error)
-		// Assert the expected result
-		require.Len(t, result, 2) // Modify the count based on your configuration
-		require.Nil(t, result[server.URL].Error)
-		require.Error(t, result["127.0.0.1"].Error)
+		path := constants.SOFTWARE_VERSION_CHECK_API_PATH
+
+		// Call the function being tested
+		result := RunCheck(config, log, port, path, "")
+		require.NotNil(t, result)
+		require.Nil(t, result[host].Error)
+		require.Len(t, result[host].Result.Checks, 2)
 	})
 
 	t.Run("System Resource Check", func(t *testing.T) {
-		// Create a test server to mock the API endpoint
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Define the response based on the test case
-			w.WriteHeader(http.StatusOK)
-			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
-			require.NoError(t, err)
-		}))
+		// Create a dummy server
+		server, host, port := createDummyServer()
 		defer server.Close()
 
+		// Test data
 		config := models.Config{
 			Hardware: models.Hardware{
-				AutomateNodeCount:   1,
-				AutomateNodeIps:     []string{server.URL},
-				PostgresqlNodeCount: 1,
-				PostgresqlNodeIps:   []string{"127.0.0.1"},
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{host},
 			},
 		}
+		log := logger.NewLogrusStandardLogger()
 
-		// Call the function under test
-		result := RunCheck(config, logger.NewLogrusStandardLogger(), "", constants.SYSTEM_RESOURCE_CHECK_API_PATH, "pre-deploy")
+		path := constants.SYSTEM_RESOURCE_CHECK_API_PATH
+		depState := "your_deployment_state"
 
-		// Assert the expected result
-		require.Len(t, result, 2) // Modify the count based on your configuration
-		require.Nil(t, result[server.URL].Error)
-		require.Error(t, result["127.0.0.1"].Error)
+		// Call the function being tested
+		result := RunCheck(config, log, port, path, depState)
+		require.NotNil(t, result)
+		require.Nil(t, result[host].Error)
+		require.Len(t, result[host].Result.Checks, 2)
+		require.Equal(t, result[host].Status, "SUCCESS")
 	})
 
 	t.Run("System User Check", func(t *testing.T) {
-		// Create a test server to mock the API endpoint
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Define the response based on the test case
-			w.WriteHeader(http.StatusOK)
-			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
-			require.NoError(t, err)
-		}))
+		// Create a dummy server
+		server, host, port := createDummyServer()
 		defer server.Close()
 
+		// Test data
 		config := models.Config{
 			Hardware: models.Hardware{
-				AutomateNodeCount:   1,
-				AutomateNodeIps:     []string{server.URL},
-				PostgresqlNodeCount: 1,
-				PostgresqlNodeIps:   []string{"127.0.0.1"},
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{host},
 			},
 		}
+		log := logger.NewLogrusStandardLogger()
 
-		// Call the function under test
-		result := RunCheck(config, logger.NewLogrusStandardLogger(), "", constants.SYSTEM_USER_CHECK_API_PATH, "")
+		path := constants.SYSTEM_USER_CHECK_API_PATH
+		depState := ""
 
-		// Assert the expected result
-		require.Len(t, result, 2) // Modify the count based on your configuration
-		require.Nil(t, result[server.URL].Error)
-		require.Equal(t, result[server.URL].Result.Passed, true)
-		require.Error(t, result["127.0.0.1"].Error)
+		// Call the function being tested
+		result := RunCheck(config, log, port, path, depState)
+		require.NotNil(t, result)
+		require.Nil(t, result[host].Error)
+		require.Len(t, result[host].Result.Checks, 3)
+		require.Equal(t, result[host].Status, "SUCCESS")
 	})
+}
+
+// Helper function to create a dummy server
+func createDummyServer() (*httptest.Server, string, string) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(softwareVersionResp))
+		}
+		if r.URL.Path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(resourceCheck))
+		}
+
+		if r.URL.Path == constants.SYSTEM_USER_CHECK_API_PATH {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(systemUser))
+		}
+	}))
+
+	// Extract IP and port from the server's URL
+	address := server.URL[strings.Index(server.URL, "//")+2:]
+	colonIndex := strings.Index(address, ":")
+	ip := address[:colonIndex]
+	port := address[colonIndex+1:]
+
+	return server, ip, port
 }
