@@ -111,14 +111,14 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 	Service Name            Process State  Health Check  Uptime (s) PID 
 	deployment-service      running        ok            954        7631
 	backup-gateway          running        ok            898        8171
-	automate-pg-gateway     running        ok            898        8239
+	automate-pg-gateway     running        warn          898        8239
 	automate-es-gateway     running        ok            897        8292
-	pg-sidecar-service      running        ok            895        8547
+	pg-sidecar-service      running        critical      895        8547
 	es-sidecar-service      running        ok            897        8311
 	license-control-service running        ok            893        8578
 	automate-cs-bookshelf   running        ok            891        8633
 	automate-cs-oc-bifrost  running        ok            892        8605
-	automate-cs-oc-erchef   running        ok            891        8678
+	automate-cs-oc-erchef   running        unknown       891        8678
 	automate-cs-nginx       running        ok            895        8502
 	automate-load-balancer  running        ok            862        9278
 	`
@@ -146,7 +146,7 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 	habSvcStatusOutputOnOS = `
 	package                                               type        desired  state  elapsed (s)  pid   group
 	chef/automate-ha-opensearch/1.3.7/20230223065900      standalone  up       up     1538         5653  automate-ha-opensearch.default
-	chef/automate-ha-elasticsidecar/0.1.0/20230223070538  standalone  up       up     1537         5739  automate-ha-elasticsidecar.default
+	chef/automate-ha-elasticsidecar/0.1.0/20230223070538  standalone  up       down     1537         5739  automate-ha-elasticsidecar.default
 	`
 )
 
@@ -161,7 +161,7 @@ func TestStatusServiceOnFE(t *testing.T) {
 	}, log)
 	actualOutput, err := ss.GetServices()
 	assert.NoError(t, err)
-	expectedOutput := []models.ServiceDetails{{ServiceName: "deployment-service", Status: "OK", Version: "chef/deployment-service/0.1.0/20230502070345"}, {ServiceName: "license-control-service", Status: "OK", Version: "chef/license-control-service/1.0.0/20230223070129"}, {ServiceName: "automate-load-balancer", Status: "OK", Version: "chef/automate-load-balancer/0.1.0/20230427090837"}, {ServiceName: "backup-gateway", Status: "OK", Version: "chef/backup-gateway/0.1.0/20230223070223"}, {ServiceName: "pg-sidecar-service", Status: "OK", Version: "chef/pg-sidecar-service/0.0.1/20230223070131"}, {ServiceName: "automate-cs-oc-bifrost", Status: "OK", Version: "chef/automate-cs-oc-bifrost/15.4.0/20230223070128"}, {ServiceName: "automate-cs-bookshelf", Status: "OK", Version: "chef/automate-cs-bookshelf/15.4.0/20230410161619"}, {ServiceName: "automate-cs-nginx", Status: "OK", Version: "chef/automate-cs-nginx/15.4.0/20230223065651"}, {ServiceName: "automate-es-gateway", Status: "OK", Version: "chef/automate-es-gateway/0.1.0/20230223070033"}, {ServiceName: "es-sidecar-service", Status: "OK", Version: "chef/es-sidecar-service/1.0.0/20230130152441"}, {ServiceName: "automate-cs-oc-erchef", Status: "OK", Version: "chef/automate-cs-oc-erchef/15.4.0/20230410161619"}, {ServiceName: "automate-pg-gateway", Status: "OK", Version: "chef/automate-pg-gateway/0.0.1/20230130151627"}}
+	expectedOutput := []models.ServiceDetails{{ServiceName: "deployment-service", Status: "OK", Version: "chef/deployment-service/0.1.0/20230502070345"}, {ServiceName: "license-control-service", Status: "OK", Version: "chef/license-control-service/1.0.0/20230223070129"}, {ServiceName: "automate-load-balancer", Status: "OK", Version: "chef/automate-load-balancer/0.1.0/20230427090837"}, {ServiceName: "backup-gateway", Status: "OK", Version: "chef/backup-gateway/0.1.0/20230223070223"}, {ServiceName: "pg-sidecar-service", Status: "CRITICAL", Version: "chef/pg-sidecar-service/0.0.1/20230223070131"}, {ServiceName: "automate-cs-oc-bifrost", Status: "OK", Version: "chef/automate-cs-oc-bifrost/15.4.0/20230223070128"}, {ServiceName: "automate-cs-bookshelf", Status: "OK", Version: "chef/automate-cs-bookshelf/15.4.0/20230410161619"}, {ServiceName: "automate-cs-nginx", Status: "OK", Version: "chef/automate-cs-nginx/15.4.0/20230223065651"}, {ServiceName: "automate-es-gateway", Status: "OK", Version: "chef/automate-es-gateway/0.1.0/20230223070033"}, {ServiceName: "es-sidecar-service", Status: "OK", Version: "chef/es-sidecar-service/1.0.0/20230130152441"}, {ServiceName: "automate-cs-oc-erchef", Status: "UNKNOWN", Version: "chef/automate-cs-oc-erchef/15.4.0/20230410161619"}, {ServiceName: "automate-pg-gateway", Status: "WARN", Version: "chef/automate-pg-gateway/0.0.1/20230130151627"}}
 	assert.Equal(t, expectedOutput, actualOutput)
 }
 
@@ -176,7 +176,7 @@ func TestStatusServiceOnBE(t *testing.T) {
 	}, log)
 	actualOutput, err := ss.GetServices()
 	assert.NoError(t, err)
-	expectedOutput := []models.ServiceDetails{{ServiceName: "automate-ha-opensearch", Status: "OK", Version: "chef/automate-ha-opensearch/1.3.7/20230223065900"}, {ServiceName: "automate-ha-elasticsidecar", Status: "OK", Version: "chef/automate-ha-elasticsidecar/0.1.0/20230223070538"}}
+	expectedOutput := []models.ServiceDetails{{ServiceName: "automate-ha-opensearch", Status: "OK", Version: "chef/automate-ha-opensearch/1.3.7/20230223065900"}, {ServiceName: "automate-ha-elasticsidecar", Status: "CRITICAL", Version: "chef/automate-ha-elasticsidecar/0.1.0/20230223070538"}}
 	assert.Equal(t, expectedOutput, actualOutput)
 }
 
