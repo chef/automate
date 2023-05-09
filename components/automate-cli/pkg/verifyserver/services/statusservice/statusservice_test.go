@@ -180,94 +180,6 @@ func TestStatusServiceOnBE(t *testing.T) {
 	assert.Equal(t, expectedOutput, actualOutput)
 }
 
-func TestParseChefAutomateStatusOnA2(t *testing.T) {
-	output := automateStatusOutputOnA2
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseChefAutomateStatus(output)
-}
-
-func TestParseHabSvcStatusOnA2(t *testing.T) {
-	output := habSvcStatusWithLicenseOutputOnA2
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseHabSvcStatus(output)
-}
-
-func TestParseChefAutomateStatusOnCS(t *testing.T) {
-	output := automateStatusOutputOnCS
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseChefAutomateStatus(output)
-}
-
-func TestParseHabSvcStatusOnCS(t *testing.T) {
-	output := habSvcStatusOutputOnCS
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseHabSvcStatus(output)
-}
-
-func TestParseChefAutomateStatusOnPG(t *testing.T) {
-	output := statusservice.AutomateStatusOnBE
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseChefAutomateStatus(output)
-}
-
-func TestParseHabSvcStatusOnPG(t *testing.T) {
-	output := habSvcStatusOutputOnPG
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseHabSvcStatus(output)
-}
-
-func TestParseChefAutomateStatusOnOS(t *testing.T) {
-	output := ``
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseChefAutomateStatus(output)
-}
-
-func TestParseHabSvcStatusOnOS(t *testing.T) {
-	output := habSvcStatusOutputOnOS
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	ss.ParseHabSvcStatus(output)
-}
-
 func TestCheckIfBENodePositive(t *testing.T) {
 	output := statusservice.AutomateStatusOnBE
 	log, err := logger.NewLogger("text", "debug")
@@ -288,4 +200,231 @@ func TestCheckIfBENodeNegative(t *testing.T) {
 	}, log)
 
 	assert.False(t, ss.CheckIfBENode(output))
+}
+
+func TestParseChefAutomateStatus(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
+		return nil, nil
+	}, log)
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               string
+		expected            int
+		isError             bool
+		errorMsg            string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "A2 Node",
+			input:               automateStatusOutputOnA2,
+			expected:            35,
+			isError:             false,
+			errorMsg:            "",
+		},
+		{
+			testCaseDescription: "CS Node",
+			input:               automateStatusOutputOnCS,
+			expected:            12,
+			isError:             false,
+			errorMsg:            "",
+		},
+		{
+			testCaseDescription: "BE Node",
+			input:               statusservice.AutomateStatusOnBE,
+			expected:            0,
+			isError:             true,
+			errorMsg:            "No table found in output",
+		},
+		{
+			testCaseDescription: "Empty Response",
+			input:               "",
+			expected:            0,
+			isError:             true,
+			errorMsg:            "No table found in output",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			out, err := ss.ParseChefAutomateStatus(tc.input)
+			if tc.isError {
+				assert.Error(t, err)
+				assert.Equal(t, tc.errorMsg, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.expected, len(out))
+		})
+	}
+}
+
+func TestParseHabSvcStatus(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
+		return nil, nil
+	}, log)
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               string
+		expected            int
+		isError             bool
+		errorMsg            string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "A2 Node",
+			input:               habSvcStatusWithLicenseOutputOnA2,
+			expected:            35,
+			isError:             false,
+			errorMsg:            "",
+		},
+		{
+			testCaseDescription: "CS Node",
+			input:               habSvcStatusOutputOnCS,
+			expected:            12,
+			isError:             false,
+			errorMsg:            "",
+		},
+		{
+			testCaseDescription: "PG Node",
+			input:               habSvcStatusOutputOnPG,
+			expected:            3,
+			isError:             false,
+			errorMsg:            "",
+		},
+		{
+			testCaseDescription: "OS Node",
+			input:               habSvcStatusOutputOnOS,
+			expected:            2,
+			isError:             false,
+			errorMsg:            "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			out, err := ss.ParseHabSvcStatus(tc.input)
+			if tc.isError {
+				assert.Error(t, err)
+				assert.Equal(t, tc.errorMsg, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.expected, len(out))
+		})
+	}
+}
+
+func TestGetServicesFromHabSvcStatus(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               func(cmd string) ([]byte, error)
+		expected            int
+		isError             bool
+		errorMsg            string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Sucessful Response",
+			input: func(cmd string) ([]byte, error) {
+				return []byte(habSvcStatusWithLicenseOutputOnA2), nil
+			},
+			expected: 35,
+			isError:  false,
+			errorMsg: "",
+		},
+		{
+			testCaseDescription: "Failed Response",
+			input: func(cmd string) ([]byte, error) {
+				return []byte("Failed to execute command"), errors.New("exit status 1")
+			},
+			expected: 0,
+			isError:  true,
+			errorMsg: "Error getting services from hab svc status",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+
+			ss := statusservice.NewStatusService(tc.input, log)
+			out, err := ss.GetServicesFromHabSvcStatus()
+			if tc.isError {
+				assert.Error(t, err)
+				assert.Equal(t, tc.errorMsg, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.expected, len(out))
+		})
+	}
+}
+
+func TestGetServicesFromAutomateStatus(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               func(cmd string) ([]byte, error)
+		expected            int
+		isError             bool
+		errorMsg            string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Sucessful Response",
+			input: func(cmd string) ([]byte, error) {
+				return []byte(automateStatusOutputOnCS), nil
+			},
+			expected: 12,
+			isError:  false,
+			errorMsg: "",
+		},
+		{
+			testCaseDescription: "BE Node",
+			input: func(cmd string) ([]byte, error) {
+				return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
+			},
+			expected: 0,
+			isError:  false,
+			errorMsg: "",
+		},
+		{
+			testCaseDescription: "Failed Response",
+			input: func(cmd string) ([]byte, error) {
+				return []byte("Failed to execute command"), errors.New("exit status 1")
+			},
+			expected: 0,
+			isError:  true,
+			errorMsg: "Error getting services from chef-automate status",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+
+			ss := statusservice.NewStatusService(tc.input, log)
+			out, err := ss.GetServicesFromAutomateStatus()
+			if tc.isError {
+				assert.Error(t, err)
+				assert.Equal(t, tc.errorMsg, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.expected, len(out))
+		})
+	}
 }
