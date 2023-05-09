@@ -1,178 +1,216 @@
 package trigger
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bmizerany/assert"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
-	"github.com/gofiber/fiber"
-
+	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/require"
 )
 
 const (
 	softwareVersionResp = `{
-      "passed": true,
-      "checks": [
-        {
-          "title": "sysctl availability",
-          "passed": true,
-          "success_msg": "sysctl is available",
-          "error_msg": "",
-          "resolution_msg": ""
-        },
-        {
-          "title": "systemd availability",
-          "passed": true,
-          "success_msg": "systemd is available and used as init system service",
-          "error_msg": "",
-          "resolution_msg": ""
-        }
-      ]
-    }
-    `
+       "status": "success",
+       "result": {
+         "passed": true,
+         "msg": "API result message",
+         "check": "API check",
+         "checks": [
+           {
+             "title": "Check 1",
+             "passed": true,
+             "success_msg": "Check 1 passed",
+             "error_msg": "",
+             "resolution_msg": "No resolution required"
+           },
+           {
+             "title": "Check 2",
+             "passed": false,
+             "success_msg": "",
+             "error_msg": "Check 2 failed",
+             "resolution_msg": "Please check the configuration"
+           }
+         ]
+       },
+       "host": ""
+     }`
 )
 
-// mockTransport is a mock implementation of the http.RoundTripper interface
-type mockTransport struct{}
-
-// RoundTrip returns an error for every request
-func (m *mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	return nil, fmt.Errorf("mock error")
-}
-
 func TestTriggerCheckAPI(t *testing.T) {
-	t.Run("cannot reach", func(t *testing.T) {
-		// create channels to receive the output and error messages
-		outputCh := make(chan models.CheckTriggerResponse, 1)
+	t.Run("Passed", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Define the response based on the test case
+			w.WriteHeader(http.StatusOK)
+			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
+			require.NoError(t, err)
+		}))
+		defer server.Close()
 
-		// make the HTTP request to an invalid URL
-		go triggerCheckAPI("invalid-url", outputCh)
+		output := make(chan models.CheckTriggerResponse)
 
-		// expect an error to be returned
-		select {
-		case result := <-outputCh:
-			require.NotEmpty(t, result.Error)
-			require.Equal(t, result.Error, &fiber.Error{Code: 400, Message: "error triggering the API invalid-url: Get \"invalid-url\": unsupported protocol scheme \"\""})
+		// Call the function under test
+		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, output)
 
-		}
+		// Wait for the response
+		response := <-output
+		fmt.Printf("response: %+v\n", response)
+		// Assert the expected response
+		require.NotNil(t, response)
 	})
+	t.Run("Endpoint not reachable", func(t *testing.T) {
+		endPoint := "http://nonexistent-api.com"
+		host := "example.com"
+		output := make(chan models.CheckTriggerResponse)
 
-	t.Run("Bad request", func(t *testing.T) {
-		// create channels to receive the output and error messages
-		outputCh := make(chan models.CheckTriggerResponse, 1)
+		// Call the function under test
+		go triggerCheckAPI(endPoint, host, output)
 
-		// call the function being tested with an endpoint that returns an error status code
-		mockServer2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Wait for the response
+		response := <-output
+
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint", response.Error.Message)
+	})
+	t.Run("Non-OK status code", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Return a non-OK status code
 			w.WriteHeader(http.StatusBadRequest)
 		}))
-		defer mockServer2.Close()
+		defer server.Close()
 
-		go triggerCheckAPI(mockServer2.URL, outputCh)
+		output := make(chan models.CheckTriggerResponse)
 
-		select {
-		case result := <-outputCh:
-			errMsg := &fiber.Error{Code: 400, Message: "error triggering the API http://127.0.0.1:54594: status code 400 "}
-			require.NotEmpty(t, result.Host)
-			require.NotEmpty(t, result.Error)
-			require.Equal(t, errMsg.Code, result.Error.Code)
-		}
+		// Call the function under test
+		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, output)
 
+		// Wait for the response
+		response := <-output
+
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		assert.Equal(t, http.StatusBadRequest, response.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint", response.Error.Message)
 	})
 
-	t.Run("Invalid JSON", func(t *testing.T) {
-
-		outputCh := make(chan models.CheckTriggerResponse, 1)
-
-		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	t.Run("Error decoding response JSON", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Return a valid status code but an invalid JSON response
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`invalid JSON`))
+			w.Write([]byte("{ invalid json }"))
 		}))
-		defer mockServer.Close()
+		defer server.Close()
 
-		go triggerCheckAPI(mockServer.URL, outputCh)
+		output := make(chan models.CheckTriggerResponse)
 
-		select {
-		case result := <-outputCh:
-			require.NotEmpty(t, result.Error)
-			require.Equal(t, result.Error.Code, http.StatusInternalServerError)
+		// Call the function under test
+		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, output)
 
-		}
+		// Wait for the response
+		response := <-output
+
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
+		assert.Equal(t, "error while parsing the response data", response.Error.Message)
 	})
 
-	t.Run("Returns OK", func(t *testing.T) {
-		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(softwareVersionResp))
-		}))
-		defer mockServer.Close()
-
-		// create channels to receive the output and error messages
-		outputCh := make(chan models.CheckTriggerResponse, 1)
-
-		// call the function being tested
-		go triggerCheckAPI(mockServer.URL, outputCh)
-
-		// verify that the function produces the expected result
-		select {
-		case result := <-outputCh:
-			mockURL, err := fiberutils.GetHostFormEndPoint(mockServer.URL)
-			require.NoError(t, err)
-			require.Equal(t, mockURL, result.Host)
-			fmt.Printf("result: %+v\n", result)
-		}
-	})
 }
 
 func TestRunCheck(t *testing.T) {
-	t.Run("Returns OK", func(t *testing.T) {
-		mockServer1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	t.Run("Software Version Check", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Define the response based on the test case
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(softwareVersionResp))
+			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
+			require.NoError(t, err)
 		}))
-		defer mockServer1.Close()
+		defer server.Close()
 
 		config := models.Config{
 			Hardware: models.Hardware{
-				AutomateNodeIps:     []string{mockServer1.URL},
 				AutomateNodeCount:   1,
-				PostgresqlNodeIps:   []string{"http://psql-fqdn.com"},
+				AutomateNodeIps:     []string{server.URL},
 				PostgresqlNodeCount: 1,
+				PostgresqlNodeIps:   []string{"127.0.0.1"},
 			},
 		}
 
-		resp := runCheck(config, "/abc/def", "8080")
-		fmt.Printf("resp: %+v\n", resp)
-		require.NotNil(t, resp)
-		require.NotNil(t, resp["http://psql-fqdn.com"])
-		require.NotNil(t, resp[mockServer1.URL])
-		require.Equal(t, 2, len(resp))
-	
+		// Call the function under test
+		result := RunCheck(config, logger.NewLogrusStandardLogger(), "", constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
+		fmt.Printf("Tese check: %+v\n", result[server.URL].Error)
+		// Assert the expected result
+		require.Len(t, result, 2) // Modify the count based on your configuration
+		require.Nil(t, result[server.URL].Error)
+		require.Error(t, result["127.0.0.1"].Error)
 	})
-	t.Run("Incorrect API", func(t *testing.T) {
-		mockServer1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	t.Run("System Resource Check", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Define the response based on the test case
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(softwareVersionResp))
+			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
+			require.NoError(t, err)
 		}))
-		defer mockServer1.Close()
+		defer server.Close()
 
 		config := models.Config{
 			Hardware: models.Hardware{
-				AutomateNodeIps:   []string{"not-a-valid-api"},
-				AutomateNodeCount: 1,
+				AutomateNodeCount:   1,
+				AutomateNodeIps:     []string{server.URL},
+				PostgresqlNodeCount: 1,
+				PostgresqlNodeIps:   []string{"127.0.0.1"},
 			},
 		}
 
-		resp := runCheck(config, "/abc/def", "8080")
-		fmt.Printf("resp: %+v\n", resp)
-		require.NotNil(t, resp)
-		require.NotNil(t, resp["not-a-valid-api"])
-		require.NotNil(t, resp[mockServer1.URL])
-		require.Equal(t, 1, len(resp))
-		require.Error(t, resp[mockServer1.URL].Error)
+		// Call the function under test
+		result := RunCheck(config, logger.NewLogrusStandardLogger(), "", constants.SYSTEM_RESOURCE_CHECK_API_PATH, "pre-deploy")
+
+		// Assert the expected result
+		require.Len(t, result, 2) // Modify the count based on your configuration
+		require.Nil(t, result[server.URL].Error)
+		require.Error(t, result["127.0.0.1"].Error)
 	})
 
+	t.Run("System User Check", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Define the response based on the test case
+			w.WriteHeader(http.StatusOK)
+			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
+			require.NoError(t, err)
+		}))
+		defer server.Close()
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				AutomateNodeCount:   1,
+				AutomateNodeIps:     []string{server.URL},
+				PostgresqlNodeCount: 1,
+				PostgresqlNodeIps:   []string{"127.0.0.1"},
+			},
+		}
+
+		// Call the function under test
+		result := RunCheck(config, logger.NewLogrusStandardLogger(), "", constants.SYSTEM_USER_CHECK_API_PATH, "")
+
+		// Assert the expected result
+		require.Len(t, result, 2) // Modify the count based on your configuration
+		require.Nil(t, result[server.URL].Error)
+		require.Equal(t, result[server.URL].Result.Passed, true)
+		require.Error(t, result["127.0.0.1"].Error)
+	})
 }
