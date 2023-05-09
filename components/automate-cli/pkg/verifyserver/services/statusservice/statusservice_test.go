@@ -1,6 +1,7 @@
 package statusservice_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -151,7 +152,7 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 	automateStatusOutputOnBE = `FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory`
 )
 
-func TestStatusService(t *testing.T) {
+func TestStatusServiceOnFE(t *testing.T) {
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
@@ -163,6 +164,21 @@ func TestStatusService(t *testing.T) {
 	actualOutput, err := ss.GetServices()
 	assert.NoError(t, err)
 	expectedOutput := []models.ServiceDetails{{ServiceName: "deployment-service", Status: "OK", Version: "chef/deployment-service/0.1.0/20230502070345"}, {ServiceName: "license-control-service", Status: "OK", Version: "chef/license-control-service/1.0.0/20230223070129"}, {ServiceName: "automate-load-balancer", Status: "OK", Version: "chef/automate-load-balancer/0.1.0/20230427090837"}, {ServiceName: "backup-gateway", Status: "OK", Version: "chef/backup-gateway/0.1.0/20230223070223"}, {ServiceName: "pg-sidecar-service", Status: "OK", Version: "chef/pg-sidecar-service/0.0.1/20230223070131"}, {ServiceName: "automate-cs-oc-bifrost", Status: "OK", Version: "chef/automate-cs-oc-bifrost/15.4.0/20230223070128"}, {ServiceName: "automate-cs-bookshelf", Status: "OK", Version: "chef/automate-cs-bookshelf/15.4.0/20230410161619"}, {ServiceName: "automate-cs-nginx", Status: "OK", Version: "chef/automate-cs-nginx/15.4.0/20230223065651"}, {ServiceName: "automate-es-gateway", Status: "OK", Version: "chef/automate-es-gateway/0.1.0/20230223070033"}, {ServiceName: "es-sidecar-service", Status: "OK", Version: "chef/es-sidecar-service/1.0.0/20230130152441"}, {ServiceName: "automate-cs-oc-erchef", Status: "OK", Version: "chef/automate-cs-oc-erchef/15.4.0/20230410161619"}, {ServiceName: "automate-pg-gateway", Status: "OK", Version: "chef/automate-pg-gateway/0.0.1/20230130151627"}}
+	assert.Equal(t, expectedOutput, actualOutput)
+}
+
+func TestStatusServiceOnBE(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
+	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
+		if cmd == "chef-automate status" {
+			return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
+		}
+		return []byte(habSvcStatusOutputOnOS), nil
+	}, log)
+	actualOutput, err := ss.GetServices()
+	assert.NoError(t, err)
+	expectedOutput := []models.ServiceDetails{{ServiceName: "automate-ha-opensearch", Status: "OK", Version: "chef/automate-ha-opensearch/1.3.7/20230223065900"}, {ServiceName: "automate-ha-elasticsidecar", Status: "OK", Version: "chef/automate-ha-elasticsidecar/0.1.0/20230223070538"}}
 	assert.Equal(t, expectedOutput, actualOutput)
 }
 
@@ -255,7 +271,7 @@ func TestParseHabSvcStatusOnOS(t *testing.T) {
 }
 
 func TestCheckIfBENodePositive(t *testing.T) {
-	output := "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory"
+	output := statusservice.AutomateStatusOnBE
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {

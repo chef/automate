@@ -24,6 +24,10 @@ type StatusService struct {
 	Log                     logger.Logger
 }
 
+const (
+	AutomateStatusOnBE = "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory"
+)
+
 func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log logger.Logger) IStatusService {
 	return &StatusService{
 		ExecuteShellCommandFunc: executeShellCommand,
@@ -139,5 +143,5 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]mode
 
 // Check if it's a backend node
 func (ss *StatusService) CheckIfBENode(output string) bool {
-	return strings.Contains(output, "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory")
+	return strings.Contains(output, AutomateStatusOnBE)
 }
