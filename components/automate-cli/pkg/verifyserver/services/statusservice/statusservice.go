@@ -25,6 +25,8 @@ type StatusService struct {
 }
 
 const (
+	AutomateStatusCmd  = "chef-automate status"
+	HabStatusCmd       = "HAB_LICENSE=accept-no-persist hab svc status"
 	AutomateStatusOnBE = "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory"
 )
 
@@ -56,10 +58,10 @@ func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
 
 // Get the services from
 func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc("HAB_LICENSE=accept-no-persist hab svc status")
-	ss.Log.Debug("Output for 'HAB_LICENSE=accept-no-persist hab svc status' command: ", string(output))
+	output, err := ss.ExecuteShellCommandFunc(HabStatusCmd)
+	ss.Log.Debug("Output for '"+HabStatusCmd+"' command: ", string(output))
 	if err != nil {
-		ss.Log.Error("Error while running 'HAB_LICENSE=accept-no-persist hab svc status' command: ", err)
+		ss.Log.Error("Error while running '"+HabStatusCmd+"' command: ", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from hab svc status")
 	}
 	return ss.ParseHabSvcStatus(string(output))
@@ -101,10 +103,10 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 
 // Get the services from chef-automate status
 func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc("chef-automate status")
-	ss.Log.Debug("Output for 'chef-automate status' command: ", string(output))
+	output, err := ss.ExecuteShellCommandFunc(AutomateStatusCmd)
+	ss.Log.Debug("Output for '"+AutomateStatusCmd+"' command: ", string(output))
 	if err != nil {
-		ss.Log.Error("Error while running 'chef-automate status' command: ", err)
+		ss.Log.Error("Error while running '"+AutomateStatusCmd+"' command: ", err)
 		//If it's a backend node, return an empty map
 		if ss.CheckIfBENode(string(output)) {
 			return make(map[string]models.ServiceDetails), nil

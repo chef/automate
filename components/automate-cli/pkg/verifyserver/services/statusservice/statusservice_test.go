@@ -148,15 +148,13 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 	chef/automate-ha-opensearch/1.3.7/20230223065900      standalone  up       up     1538         5653  automate-ha-opensearch.default
 	chef/automate-ha-elasticsidecar/0.1.0/20230223070538  standalone  up       up     1537         5739  automate-ha-elasticsidecar.default
 	`
-
-	automateStatusOutputOnBE = `FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory`
 )
 
 func TestStatusServiceOnFE(t *testing.T) {
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		if cmd == "chef-automate status" {
+		if cmd == statusservice.AutomateStatusCmd {
 			return []byte(automateStatusOutputOnCS), nil
 		}
 		return []byte(habSvcStatusOutputOnCS), nil
@@ -171,7 +169,7 @@ func TestStatusServiceOnBE(t *testing.T) {
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		if cmd == "chef-automate status" {
+		if cmd == statusservice.AutomateStatusCmd {
 			return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
 		}
 		return []byte(habSvcStatusOutputOnOS), nil
@@ -227,7 +225,7 @@ func TestParseHabSvcStatusOnCS(t *testing.T) {
 }
 
 func TestParseChefAutomateStatusOnPG(t *testing.T) {
-	output := automateStatusOutputOnBE
+	output := statusservice.AutomateStatusOnBE
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
