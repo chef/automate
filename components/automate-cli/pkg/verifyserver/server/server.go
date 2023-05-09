@@ -7,6 +7,7 @@ import (
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
@@ -14,7 +15,6 @@ import (
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
 )
-
 const (
 	SERVICE      = "verify-server"
 	DEFAULT_PORT = "7799"
@@ -62,6 +62,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				trigger.NewSystemResourceCheck(),
 				trigger.NewSshUserAccessCheck(),
 			)))
+		v1.handler.AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService())
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
@@ -71,7 +72,6 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 	vs.Setup()
 	return vs, nil
 }
-
 func (vs *VerifyServer) Start() error {
 	err := vs.App.Listen(":" + vs.Port)
 	if err != nil {

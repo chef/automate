@@ -1,0 +1,188 @@
+package softwareversionservice
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+)
+
+var osTestVersion = map[string][]string{
+	"Red Hat Linux": {"7,8,9"},
+	"Ubuntu":        {"16.04.x", "18.04.x", "20.04.x", "22.04.x"},
+	"Centos":        {"7"},
+	"Amazon Linux":  {"2"},
+	"SUSE Linux":    {"12"},
+}
+
+const successfile = "./successfile"
+const failurefile = "./failurefile"
+const versionfile = "./versionfile"
+
+func TestCheckOs(t *testing.T) {
+	type args struct {
+		osVersions map[string][]string
+		version    string
+		key        string
+	}
+	tests := []struct {
+		description  string
+		args         args
+		expectedBody bool
+	}{
+		{
+			description: "If the os is Ubuntu",
+			args: args{
+				osVersions: osTestVersion,
+				version:    "20.04.65",
+				key:        "Ubuntu",
+			},
+			expectedBody: true,
+		},
+		{
+			description: "If the os is Red Hat OS",
+			args: args{
+				osVersions: osTestVersion,
+				version:    "8",
+				key:        "Red Hat",
+			},
+			expectedBody: true,
+		},
+		{
+			description: "If the os is out of other three that is Centos, AmazonLinux or SUSE LINUX",
+			args: args{
+				osVersions: osTestVersion,
+				version:    "2",
+				key:        "Amazon Linux",
+			},
+			expectedBody: true,
+		},
+		{
+			description: "If the OS is not supported",
+			args: args{
+				osVersions: osTestVersion,
+				version:    "10",
+				key:        "Centos",
+			},
+			expectedBody: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			if got := checkOs(tt.args.osVersions, tt.args.version, tt.args.key); got != tt.expectedBody {
+				t.Errorf("checkOs() = %v, want %v", got, tt.expectedBody)
+			}
+		})
+	}
+}
+
+func TestCheckCommandVersion(t *testing.T) {
+	type args struct {
+		cmdName string
+	}
+	tests := []struct {
+		description  string
+		args         args
+		expectedBody models.Checks
+	}{
+		{
+			description: "If the cammand is present in the node",
+			args: args{
+				cmdName: "mkdir",
+			},
+			expectedBody: models.Checks{
+				Title:          "mkdir availability",
+				Passed:         true,
+				Success_msg:    "mkdir is available",
+				Error_msg:      "",
+				Resolution_msg: "",
+			},
+		},
+		{
+			description: "If the cammand is not present in the node",
+			args: args{
+				cmdName: "abc",
+			},
+			expectedBody: models.Checks{
+				Title:          "abc availability",
+				Passed:         false,
+				Success_msg:    "",
+				Error_msg:      "abc is not available",
+				Resolution_msg: "Ensure abc is available in $PATH on the node",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			if got := checkCommandVersion(tt.args.cmdName); !reflect.DeepEqual(got, tt.expectedBody) {
+				t.Errorf("checkCommandVersion() = %v, want %v", got, tt.expectedBody)
+			}
+		})
+	}
+}
+
+func TestCheckOsVersion(t *testing.T) {
+	type args struct {
+		osFilepath string
+	}
+	tests := []struct {
+		description  string
+		args         args
+		expectedBody models.Checks
+		expectedErr  bool
+	}{
+		{
+			description: "If the OS is not compatble with the automate",
+			args: args{
+				osFilepath: failurefile,
+			},
+			expectedBody: models.Checks{
+				Title:          "Debian GNU/Linux 10 (buster) availability",
+				Passed:         false,
+				Success_msg:    "",
+				Error_msg:      "Debian GNU/Linux 10 (buster) version is not supported by automate", 
+				Resolution_msg: "Ensure Debian GNU/Linux 10 (buster) correct version is installed on the node",
+			},
+		},
+		{
+			description: "If the os and version both are correct",
+			args: args{
+				osFilepath: successfile,
+			},
+			expectedBody: models.Checks{
+				Title:          "Ubuntu availability",
+				Passed:         true,
+				Success_msg:    "Ubuntu version is 20.04",
+				Error_msg:      "",
+				Resolution_msg: "",
+			},
+			expectedErr: false,
+		},
+		{
+			description: "If the os name is correct but version is incorrect",
+			args: args{
+				osFilepath: versionfile,
+			},
+			expectedBody: models.Checks{
+				Title:          "SUSE Linux availability",
+				Passed:         false,
+				Success_msg:    "",
+				Error_msg:      "SUSE Linux version is not supported by automate",
+				Resolution_msg: "Ensure SUSE Linux correct version is installed on the node",
+			},
+			expectedErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			got, err := checkOsVersion(tt.args.osFilepath)
+			if (err != nil) != tt.expectedErr {
+				t.Errorf("checkOsVersion() error = %v, wantErr %v", err, tt.expectedErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.expectedBody) {
+				t.Errorf("checkOsVersion() = %v, want %v", got, tt.expectedBody)
+			}
+		})
+	}
+}

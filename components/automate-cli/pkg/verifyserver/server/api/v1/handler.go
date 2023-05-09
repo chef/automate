@@ -1,15 +1,17 @@
 package v1
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 )
 
 type Handler struct {
-	Logger        logger.Logger
-	StatusService statusservice.IStatusService
-	BatchCheckService batchcheckservice.IBatchCheckService
+	Logger                 logger.Logger
+	StatusService          statusservice.IStatusService
+	BatchCheckService      batchcheckservice.IBatchCheckService
+	SoftwareVersionService softwareversionservice.ISoftwareVersionService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -23,5 +25,10 @@ func (h *Handler) AddStatusService(ss statusservice.IStatusService) *Handler {
 
 func (h *Handler) AddBatchCheckService(bc batchcheckservice.IBatchCheckService) *Handler {
 	h.BatchCheckService = bc
+	return h
+}
+
+func (h *Handler) AddSoftwareVersionService(sv softwareversionservice.ISoftwareVersionService) *Handler {
+	h.SoftwareVersionService = sv
 	return h
 }
