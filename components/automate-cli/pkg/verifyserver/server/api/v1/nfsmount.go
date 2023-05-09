@@ -20,6 +20,6 @@ func (h *Handler) NFSMount(c *fiber.Ctx) {
 		return
 	}
 
-	NFSMountDetails := h.NFSMountService.GetNFSMountDetails(reqBody, false)
+	NFSMountDetails := h.NFSMountService.GetNFSMountDetails(reqBody)
 	c.JSON(response.BuildSuccessResponse(NFSMountDetails))
 }

@@ -3,14 +3,18 @@ package nfsmountservice
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
-	"time"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/lib/mockserver"
+	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -88,9 +92,21 @@ var (
 )
 
 func TestNFSMountService(t *testing.T) {
-	nm := NewNFSMountService()
-	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{}, true)
+	testPort := "1234"
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+	assert.NotNil(t, nm)
+	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{})
 	assert.Equal(t, new([]models.NFSMountResponse), nmDetails)
+}
+
+func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error {
+	l, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%s", port))
+	if err != nil {
+		return err
+	}
+	mockServer.Listener = l
+	mockServer.Start()
+	return nil
 }
 
 func TestCheckMount(t *testing.T) {
@@ -104,9 +120,11 @@ func TestCheckMount(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		nodeData := &models.NFSMountResponse{}
-		checkMount("/mnt/automate_backups", nodeData, e.ResultBody)
-		assert.Equal(t, e.ExpectedRes, nodeData.CheckList[0].Passed)
+		t.Run(e.TestName, func(t *testing.T) {
+			nodeData := &models.NFSMountResponse{}
+			checkMount("/mnt/automate_backups", nodeData, e.ResultBody)
+			assert.Equal(t, e.ExpectedRes, nodeData.CheckList[0].Passed)
+		})
 	}
 }
 
@@ -154,11 +172,13 @@ func TestCheckShare(t *testing.T) {
 		},
 	}
 	for _, e := range tests {
-		node := new(models.NFSMountResponse)
-		checkShare(e.Data, compareWith, node, e.NfsMounted)
-		// checkShare function will append check result in node object.
-		isPassed := node.CheckList[0].Passed
-		assert.Equal(t, e.ExpectedCheckRes, isPassed)
+		t.Run(e.TestName, func(t *testing.T) {
+			node := new(models.NFSMountResponse)
+			checkShare(e.Data, compareWith, node, e.NfsMounted)
+			// checkShare function will append check result in node object.
+			isPassed := node.CheckList[0].Passed
+			assert.Equal(t, e.ExpectedCheckRes, isPassed)
+		})
 	}
 }
 
@@ -195,17 +215,24 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 		},
 	}
 	for _, e := range tests {
-		res, err := getResultStructFromRespBody(e.Body)
-		if e.ExpectedErr != nil {
-			assert.Error(t, err)
-		}
-		assert.Equal(t, res, e.ExpectedResp)
-
+		t.Run(e.TestName, func(t *testing.T) {
+			res, err := getResultStructFromRespBody(e.Body)
+			if e.ExpectedErr != nil {
+				assert.Error(t, err)
+			}
+			assert.Equal(t, res, e.ExpectedResp)
+		})
 	}
 }
 
 func TestTriggerAPI(t *testing.T) {
-	ts := mockserver.NewAPI(t).HttpReqMock("/api/v1/fetch/nfs-mount-loc", 200, []byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT), 1*time.Second).Build()
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT))
+	}))
+	err := startMockServerOnCustomPort(mockServer, "1234")
+	assert.NoError(t, err)
+	defer mockServer.Close()
 	tests := []struct {
 		TestName         string
 		URL              string
@@ -214,7 +241,7 @@ func TestTriggerAPI(t *testing.T) {
 	}{
 		{
 			TestName:         "Valid URL with running server",
-			URL:              ts.URL,
+			URL:              constants.LOCAL_HOST_URL + ":1234",
 			ExpectedResponse: SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT,
 			ExpectedError:    nil,
 		},
@@ -232,68 +259,91 @@ func TestTriggerAPI(t *testing.T) {
 		},
 	}
 	for _, e := range tests {
-		resp, err := triggerAPI(e.URL, "/mnt")
-		if e.ExpectedError != nil {
-			require.Error(t, err)
-		} else {
-			body, _ := ioutil.ReadAll(resp.Body)
-			require.Equal(t, e.ExpectedResponse, string(body))
-		}
+		t.Run(e.TestName, func(t *testing.T) {
+			resp, err := triggerAPI(e.URL, "/mnt")
+			if e.ExpectedError != nil {
+				require.Error(t, err)
+			} else {
+				body, _ := ioutil.ReadAll(resp.Body)
+				require.Equal(t, e.ExpectedResponse, string(body))
+			}
+		})
 	}
 }
 
 func TestDoAPICall(t *testing.T) {
-	ts := mockserver.NewAPI(t).HttpReqMock("/api/v1/fetch/nfs-mount-loc", 200, []byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT), 1*time.Second).Build()
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT))
+	}))
+	err := startMockServerOnCustomPort(mockServer, "1234")
+	assert.NoError(t, err)
+	defer mockServer.Close()
+	mockServer2 := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Invalid JSON"))
+	}))
+	err = startMockServerOnCustomPort(mockServer2, "1235")
+	assert.NoError(t, err)
+	defer mockServer.Close()
 	tests := []struct {
 		TestName                     string
 		URL                          string
-		ChangeURLResponse            bool
+		InvalidURLResponse           bool
 		ExpectedCheckListReponsePass bool
 		ExpectedError                error
 	}{
 		{
 			TestName:                     "Valid URL with running Server",
-			URL:                          ts.URL,
-			ChangeURLResponse:            false,
+			URL:                          "localhost",
+			InvalidURLResponse:           false,
 			ExpectedCheckListReponsePass: true,
 			ExpectedError:                nil,
 		},
 		{
 			TestName:                     "Invalid URL",
 			URL:                          "http:/anything.com",
-			ChangeURLResponse:            false,
+			InvalidURLResponse:           false,
 			ExpectedCheckListReponsePass: false,
 			ExpectedError:                errors.New(""),
 		},
 		{
 			TestName:                     "Valid URL but Some Different Response",
-			URL:                          ts.URL,
-			ChangeURLResponse:            true,
+			URL:                          "localhost",
+			InvalidURLResponse:           true,
 			ExpectedCheckListReponsePass: false,
 			ExpectedError:                errors.New(""),
 		},
 	}
 
 	for index, e := range tests {
-		if e.ChangeURLResponse {
-			e.URL = mockserver.NewAPI(t).HttpReqMock("/api/v1/fetch/nfs-mount-loc", 200, []byte("Anything Wrong For failing the getResultStructFromRespBody fn call"), 1*time.Second).Build().URL
-		}
-		shareMap := make(map[string]models.NFSMountLocResponse)
-		countMap := make(map[models.NFSMountLocResponse]int)
-
-		resp := doAPICall(e.URL, true, "node_type", "/mount-location", shareMap, "key"+strconv.Itoa(index), countMap)
-		if e.ExpectedError != nil {
-			assert.Error(t, resp.Error)
-		} else {
-			assert.Equal(t, resp.CheckList[0].Passed, e.ExpectedCheckListReponsePass)
-		}
+		t.Run(e.TestName, func(t *testing.T) {
+			shareMap := make(map[string]models.NFSMountLocResponse)
+			countMap := make(map[models.NFSMountLocResponse]int)
+			testPort := "1234"
+			// we have two test server running on port 1235 we have wrong response giving server running
+			if e.InvalidURLResponse {
+				testPort = "1235"
+			}
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			resp := nm.DoAPICall(e.URL, "node_type", "/mount-location", shareMap, "key"+strconv.Itoa(index), countMap)
+			if e.ExpectedError != nil {
+				assert.Error(t, resp.Error)
+			} else {
+				assert.Equal(t, resp.CheckList[0].Passed, e.ExpectedCheckListReponsePass)
+			}
+		})
 	}
 }
 
 func TestGetNFSMountDetails(t *testing.T) {
-	ts := mockserver.NewAPI(t).HttpReqMock("/api/v1/fetch/nfs-mount-loc", 200, []byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT), 1*time.Second).Build()
-	ts2 := mockserver.NewAPI(t).HttpReqMock("/api/v1/fetch/nfs-mount-loc", 200, []byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT), 1*time.Second).Build()
-
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT))
+	}))
+	err := startMockServerOnCustomPort(mockServer, "1234")
+	assert.NoError(t, err)
+	defer mockServer.Close()
 	tests := []struct {
 		TestName string
 		ReqBody  models.NFSMountRequest
@@ -302,33 +352,33 @@ func TestGetNFSMountDetails(t *testing.T) {
 		{
 			TestName: "Giving all services Valid IPs",
 			ReqBody: models.NFSMountRequest{
-				AutomateNodeIPs:        []string{ts.URL, ts2.URL},
-				ChefInfraServerNodeIPs: []string{ts.URL},
-				PostgresqlNodeIPs:      []string{ts.URL, ts2.URL},
-				OpensearchNodeIPs:      []string{ts.URL},
+				AutomateNodeIPs:        []string{"localhost", "localhost"},
+				ChefInfraServerNodeIPs: []string{"localhost"},
+				PostgresqlNodeIPs:      []string{"localhost", "localhost"},
+				OpensearchNodeIPs:      []string{"localhost"},
 			},
 			Response: []models.NFSMountResponse{
-				{IP: ts.URL, NodeType: "automate", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
-				{IP: ts2.URL, NodeType: "automate", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
-				{IP: ts.URL, NodeType: "chef-infra-server", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
-				{IP: ts.URL, NodeType: "postgresql", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
-				{IP: ts2.URL, NodeType: "postgresql", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
-				{IP: ts.URL, NodeType: "opensearch", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
@@ -337,27 +387,27 @@ func TestGetNFSMountDetails(t *testing.T) {
 		{
 			TestName: "Giving some Valid And Invalid Ips",
 			ReqBody: models.NFSMountRequest{
-				AutomateNodeIPs:        []string{ts.URL, "192.168.54.34"},
-				ChefInfraServerNodeIPs: []string{ts.URL},
-				PostgresqlNodeIPs:      []string{"anything.com", ts2.URL},
-				OpensearchNodeIPs:      []string{ts.URL},
+				AutomateNodeIPs:        []string{"localhost", "192.168.54.34"},
+				ChefInfraServerNodeIPs: []string{"localhost"},
+				PostgresqlNodeIPs:      []string{"anything.com", "localhost"},
+				OpensearchNodeIPs:      []string{"localhost"},
 			},
 			Response: []models.NFSMountResponse{
-				{IP: ts.URL, NodeType: "automate", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
 				{IP: "192.168.54.34", NodeType: "automate", CheckList: nil, Error: errors.New("")},
-				{IP: ts.URL, NodeType: "chef-infra-server", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
 				{IP: "anything.com", NodeType: "postgresql", CheckList: nil, Error: errors.New("")},
-				{IP: ts2.URL, NodeType: "postgresql", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
-				{IP: ts.URL, NodeType: "opensearch", CheckList: []models.Checks{
+				{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
 					{Passed: true},
 					{Passed: true},
 				}, Error: nil},
@@ -366,18 +416,21 @@ func TestGetNFSMountDetails(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		nm := NewNFSMountService()
-		resp := nm.GetNFSMountDetails(e.ReqBody, true)
-		for index, te := range *resp {
-			if e.Response[index].Error != nil {
-				assert.Error(t, te.Error)
-			} else {
-				assert.Equal(t, te.CheckList[0].Passed, e.Response[index].CheckList[0].Passed)
-				assert.Equal(t, te.CheckList[1].Passed, e.Response[index].CheckList[1].Passed)
+		t.Run(e.TestName, func(t *testing.T) {
+			testPort := "1234"
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			resp := nm.GetNFSMountDetails(e.ReqBody)
+			for index, te := range *resp {
+				if e.Response[index].Error != nil {
+					assert.Error(t, te.Error)
+				} else {
+					assert.Equal(t, te.CheckList[0].Passed, e.Response[index].CheckList[0].Passed)
+					assert.Equal(t, te.CheckList[1].Passed, e.Response[index].CheckList[1].Passed)
+				}
+				assert.Equal(t, e.Response[index].IP, te.IP)
+				assert.Equal(t, e.Response[index].NodeType, te.NodeType)
 			}
-			assert.Equal(t, e.Response[index].IP, te.IP)
-			assert.Equal(t, e.Response[index].NodeType, te.NodeType)
-		}
+		})
 	}
 }
 
@@ -448,17 +501,17 @@ func TestMakeRespBody(t *testing.T) {
 			ExpectedError: nil,
 		},
 	}
-	// mp := map[string][]models.NFSMountResponse{"my": {VALID_NFS_MOUNT_BUT_NOT_SHARED_RESPONSE, VALID_NFS_MOUNT_BUT_NOT_SHARED_RESPONSE}}
-	// fmt.Println(mp)
 	for _, e := range tests {
-		respBody := []models.NFSMountResponse{}
-		makeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap)
-		assert.Equal(t, len(respBody), e.RespBodyLen)
-		if e.ExpectedError != nil {
-			assert.Error(t, respBody[0].Error)
-		} else {
-			assert.Equal(t, e.NfsMounted, respBody[0].CheckList[0].Passed)
-			assert.Equal(t, e.NfsShared, respBody[0].CheckList[1].Passed)
-		}
+		t.Run(e.TestName, func(t *testing.T) {
+			respBody := []models.NFSMountResponse{}
+			makeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap)
+			assert.Equal(t, len(respBody), e.RespBodyLen)
+			if e.ExpectedError != nil {
+				assert.Error(t, respBody[0].Error)
+			} else {
+				assert.Equal(t, e.NfsMounted, respBody[0].CheckList[0].Passed)
+				assert.Equal(t, e.NfsShared, respBody[0].CheckList[1].Passed)
+			}
+		})
 	}
 }
