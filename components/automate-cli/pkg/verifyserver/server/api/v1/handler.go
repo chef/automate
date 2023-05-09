@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"net"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
@@ -11,6 +13,13 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/lib/logger"
 )
+
+type Server struct {
+	port        int
+	listenerTCP net.Listener
+	listenerUDP net.PacketConn
+	protocol    string
+}
 
 type Handler struct {
 	Logger                       logger.Logger
