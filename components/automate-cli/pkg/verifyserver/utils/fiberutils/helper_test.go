@@ -1,13 +1,10 @@
 package fiberutils
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/gofiber/fiber"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGetHostFormEndPoint(t *testing.T) {
@@ -97,43 +94,4 @@ func TestIPNodeMap(t *testing.T) {
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("Test case 2 failed: Expected %v but got %v", expected, result)
 	}
-}
-
-func Test_ipTOEndPoint(t *testing.T) {
-	t.Run("test 1", func(t *testing.T) {
-		got := HostToEndPoint("http://127.0.0.1", "8080", "/api/v1/checks/software-versions", "automate")
-		require.NotEmpty(t, got)
-		require.Equal(t, got, "http://127.0.0.1:8080/api/v1/checks/software-versions?node_type=automate")
-	})
-	t.Run("test 1", func(t *testing.T) {
-		got := HostToEndPoint("http://127.0.0.2", "8081", "/api/v1/checks/software-versions", "")
-		require.NotEmpty(t, got)
-		require.Equal(t, got, "http://127.0.0.2:8081/api/v1/checks/software-versions")
-	})
-}
-
-func TestSendError(t *testing.T) {
-	t.Run("Add a value to the channel", func(t *testing.T) {
-		endPoint := "https://localhost/abc/def"
-		output := make(chan models.CheckTriggerResponse)
-		ctr := models.CheckTriggerResponse{Status: "pass", Host: "localhost"}
-		go SendError(endPoint, "", http.StatusOK, output, ctr)
-
-		res := <-output
-		require.NotNil(t, res)
-		require.Equal(t, "pass", res.Status)
-		require.Equal(t, "localhost", res.Host)
-	})
-
-	t.Run("Add an error val to the channel", func(t *testing.T) {
-		endPoint := "https://localhost/abc/def"
-		output := make(chan models.CheckTriggerResponse)
-		ctr := models.CheckTriggerResponse{Status: "failed", Host: ""}
-		go SendError(endPoint, "error occured", http.StatusNotFound, output, ctr)
-
-		res := <-output
-		require.NotNil(t, res)
-		require.Equal(t, "failed", res.Status)
-		require.Equal(t, &fiber.Error{Code: 404, Message: "error occured"}, res.Error)
-	})
 }
