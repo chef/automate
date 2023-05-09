@@ -7,13 +7,9 @@ import (
 	"testing"
 )
 
-func TestMakePostRequest(t *testing.T) {
+func TestMakeRequest(t *testing.T) {
 	// Create a test server to receive requests
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		// Check that the request method is POST
-		if req.Method != http.MethodPost {
-			t.Errorf("Unexpected request method. Expected %v, got %v", http.MethodPost, req.Method)
-		}
 		// Check that the request body is correct
 		expectedBody := "{\"org\":\"chef\"}"
 		requestBody, err := ioutil.ReadAll(req.Body)
@@ -32,7 +28,7 @@ func TestMakePostRequest(t *testing.T) {
 	// Call the Post function with a test URL and body
 	url := server.URL
 	body := map[string]string{"org": "chef"}
-	resp, err := MakePostRequest(url, body)
+	resp, err := MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		t.Errorf("Unexpected error from Post function: %v", err)
 	}

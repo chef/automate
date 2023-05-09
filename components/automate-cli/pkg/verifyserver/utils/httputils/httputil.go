@@ -10,12 +10,12 @@ import (
 )
 
 //Post - This function performs HTTP Post request to the given endpoint with the provided request body
-func MakePostRequest(url string, body interface{}) (*http.Response, error) {
+func MakeRequest(requestMethod string, url string, body interface{}) (*http.Response, error) {
 	requestBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest(requestMethod, url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}

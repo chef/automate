@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -83,7 +84,7 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) map[string]model
 func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body interface{}) (
 	*models.HardwareResourceCheckResponse, error) {
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.HARDWARE_RESOURCE_CHECK_API_PATH)
-	resp, err := httputils.MakePostRequest(url, body)
+	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		ss.log.Error("Error while Performing Hardware resource count check from batch Check API : ", err)
 		return nil, err
