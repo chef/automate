@@ -61,8 +61,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				trigger.NewSoftwareVersionCheck(),
 				trigger.NewSystemResourceCheck(),
 				trigger.NewSshUserAccessCheck(),
-			)))
-		v1.handler.AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService())
+			))).
+		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService())
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

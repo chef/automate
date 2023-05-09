@@ -39,6 +39,7 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices() (models.SoftwareV
 	}
 	osResponse, err := checkOsVersion(osFilepath)
 	if err != nil {
+        logger.NewLogrusStandardLogger().Error("Error while Os version = ",err)
 		return models.SoftwareVersionDetails{}, err
 	}
 	if !osResponse.Passed {
@@ -57,24 +58,24 @@ func checkCommandVersion(cmdName string) models.Checks {
 		return models.Checks{
 			Title:          cmdName + " availability",
 			Passed:         false,
-			Success_msg:    "",
-			Error_msg:      cmdName + " is not available",
-			Resolution_msg: "Ensure " + cmdName + " is available in $PATH on the node",
+			SuccessMsg:    "",
+			ErrorMsg:      cmdName + " is not available",
+			ResolutionMsg: "Ensure " + cmdName + " is available in $PATH on the node",
 		}
 	}
 	return models.Checks{
 		Title:          cmdName + " availability",
 		Passed:         true,
-		Success_msg:    cmdName + " is available",
-		Error_msg:      "",
-		Resolution_msg: "",
+		SuccessMsg:    cmdName + " is available",
+		ErrorMsg:      "",
+		ResolutionMsg: "",
 	}
 }
 
 func ReadFile(osFilepath string) ([]byte, error) {
 	data, err := ioutil.ReadFile(osFilepath)
 	if err != nil {
-		logger.NewLogger(true).Error("Error while reading the file = ", err)
+		logger.NewLogrusStandardLogger().Error("Error while reading the OS file from the path = ",err)
 	}
 	return data, nil
 }
@@ -119,27 +120,27 @@ func checkOsVersion(osFilepath string) (models.Checks, error) {
 				checkresponse = models.Checks{
 					Title:          key + " availability",
 					Passed:         true,
-					Success_msg:    key + " version is " + version,
-					Error_msg:      "",
-					Resolution_msg: "",
+					SuccessMsg:    key + " version is " + version,
+					ErrorMsg:      "",
+					ResolutionMsg: "",
 				}
                 break
 			}
 			checkresponse = models.Checks{
 				Title:          key + " availability",
 				Passed:         false,
-				Success_msg:    "",
-				Error_msg:      key + " version is not supported by automate",
-				Resolution_msg: "Ensure " + key + " correct version is installed on the node",
+				SuccessMsg:    "",
+				ErrorMsg:      key + " version is not supported by automate",
+				ResolutionMsg: "Ensure " + key + " correct version is installed on the node",
 			}
             break
 		}
 		checkresponse = models.Checks{
 			Title:          name + " availability",
 			Passed:         false,
-			Success_msg:    "",
-			Error_msg:      name + " version is not supported by automate",
-			Resolution_msg: "Ensure " + name + " correct version is installed on the node",
+			SuccessMsg:    "",
+			ErrorMsg:      name + " version is not supported by automate",
+			ResolutionMsg: "Ensure " + name + " correct version is installed on the node",
 		}
 	}
 	return checkresponse, nil

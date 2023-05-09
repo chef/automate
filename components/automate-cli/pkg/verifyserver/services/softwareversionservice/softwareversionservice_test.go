@@ -93,9 +93,9 @@ func TestCheckCommandVersion(t *testing.T) {
 			expectedBody: models.Checks{
 				Title:          "mkdir availability",
 				Passed:         true,
-				Success_msg:    "mkdir is available",
-				Error_msg:      "",
-				Resolution_msg: "",
+				SuccessMsg:    "mkdir is available",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
 			},
 		},
 		{
@@ -106,9 +106,9 @@ func TestCheckCommandVersion(t *testing.T) {
 			expectedBody: models.Checks{
 				Title:          "abc availability",
 				Passed:         false,
-				Success_msg:    "",
-				Error_msg:      "abc is not available",
-				Resolution_msg: "Ensure abc is available in $PATH on the node",
+				SuccessMsg:    "",
+				ErrorMsg:      "abc is not available",
+				ResolutionMsg: "Ensure abc is available in $PATH on the node",
 			},
 		},
 	}
@@ -139,9 +139,9 @@ func TestCheckOsVersion(t *testing.T) {
 			expectedBody: models.Checks{
 				Title:          "Debian GNU/Linux 10 (buster) availability",
 				Passed:         false,
-				Success_msg:    "",
-				Error_msg:      "Debian GNU/Linux 10 (buster) version is not supported by automate", 
-				Resolution_msg: "Ensure Debian GNU/Linux 10 (buster) correct version is installed on the node",
+				SuccessMsg:    "",
+				ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate", 
+				ResolutionMsg: "Ensure Debian GNU/Linux 10 (buster) correct version is installed on the node",
 			},
 		},
 		{
@@ -152,9 +152,9 @@ func TestCheckOsVersion(t *testing.T) {
 			expectedBody: models.Checks{
 				Title:          "Ubuntu availability",
 				Passed:         true,
-				Success_msg:    "Ubuntu version is 20.04",
-				Error_msg:      "",
-				Resolution_msg: "",
+				SuccessMsg:    "Ubuntu version is 20.04",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
 			},
 			expectedErr: false,
 		},
@@ -166,9 +166,9 @@ func TestCheckOsVersion(t *testing.T) {
 			expectedBody: models.Checks{
 				Title:          "SUSE Linux availability",
 				Passed:         false,
-				Success_msg:    "",
-				Error_msg:      "SUSE Linux version is not supported by automate",
-				Resolution_msg: "Ensure SUSE Linux correct version is installed on the node",
+				SuccessMsg:    "",
+				ErrorMsg:      "SUSE Linux version is not supported by automate",
+				ResolutionMsg: "Ensure SUSE Linux correct version is installed on the node",
 			},
 			expectedErr: false,
 		},
