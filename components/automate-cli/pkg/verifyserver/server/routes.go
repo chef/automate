@@ -7,12 +7,13 @@ import (
 func (vs *VerifyServer) SetupRoutes() {
 	// Status
 	vs.App.Get("/status", vs.Handler.GetStatus)
-
+	
 	apiGroup := vs.App.Group("/api")
 	apiV1Group := apiGroup.Group("/v1")
 	apiChecksGroup := apiV1Group.Group("/checks")
 	apiChecksGroup.Get("/fqdn", vs.Handler.CheckFqdn)
 	apiChecksGroup.Post("/batch-checks", vs.Handler.BatchCheck)
+	apiChecksGroup.Get("/software-versions", vs.Handler.CheckSoftwareVersion)
 
 	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }
