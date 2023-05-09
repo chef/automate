@@ -8,16 +8,14 @@ import (
 )
 
 type SystemResourceCheck struct {
-	log             logger.Logger
-	port            string
-	deploymentState string
+	log  logger.Logger
+	port string
 }
 
-func NewSystemResourceCheck(log logger.Logger, port, deploymentState string) *SystemResourceCheck {
+func NewSystemResourceCheck(log logger.Logger, port string) *SystemResourceCheck {
 	return &SystemResourceCheck{
-		log:             log,
-		port:            port,
-		deploymentState: deploymentState,
+		log:  log,
+		port: port,
 	}
 }
 
