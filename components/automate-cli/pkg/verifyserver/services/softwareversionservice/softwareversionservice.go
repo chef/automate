@@ -72,7 +72,7 @@ func checkCommandVersion(cmdName string) models.Checks {
 	}
 }
 
-func ReadFile(osFilepath string) ([]byte, error) {
+func readFile(osFilepath string) ([]byte, error) {
 	data, err := ioutil.ReadFile(osFilepath)
 	if err != nil {
 		logger.NewLogrusStandardLogger().Error("Error while reading the OS file from the path = ",err)
@@ -80,8 +80,8 @@ func ReadFile(osFilepath string) ([]byte, error) {
 	return data, nil
 }
 
-func GetOsVersion(osFilepath string) (string, string, error) {
-	data, err := ReadFile(osFilepath)
+func getOsVersion(osFilepath string) (string, string, error) {
+	data, err := readFile(osFilepath)
 	if err != nil {
 		return "", "", err
 	}
@@ -109,7 +109,7 @@ func checkOsVersion(osFilepath string) (models.Checks, error) {
 		"SUSE Linux":   {"12"},
 	}
 	checkresponse := models.Checks{}
-	var name, version, err = GetOsVersion(osFilepath)
+	var name, version, err = getOsVersion(osFilepath)
 	if err != nil {
 		return models.Checks{}, err
 	}

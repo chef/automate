@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -24,9 +24,9 @@ func SetupMockSoftwareVersionService() softwareversionservice.ISoftwareVersionSe
 					{
 						Title: "mkdir availability",
 						Passed: true,
-						Success_msg: "mkdir is available",
-						Error_msg: "",
-						Resolution_msg: "",
+						SuccessMsg: "mkdir is available",
+						ErrorMsg: "",
+						ResolutionMsg: "",
 					},
 				},
 			},nil
@@ -35,7 +35,10 @@ func SetupMockSoftwareVersionService() softwareversionservice.ISoftwareVersionSe
 }
 
 func SetupHandlers(sv softwareversionservice.ISoftwareVersionService) (*fiber.App,error) {
-	log := logger.NewLogger(true)
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		return nil, err
+	}
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
