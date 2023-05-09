@@ -249,6 +249,11 @@ func TestCheckIfBENode(t *testing.T) {
 			expected:            true,
 		},
 		{
+			testCaseDescription: "Negative",
+			input:               "some error output",
+			expected:            false,
+		},
+		{
 			testCaseDescription: "Empty",
 			input:               "",
 			expected:            false,
@@ -260,28 +265,6 @@ func TestCheckIfBENode(t *testing.T) {
 			assert.Equal(t, tc.expected, ss.CheckIfBENode(tc.input))
 		})
 	}
-}
-
-func TestCheckIfBENodePositive(t *testing.T) {
-	output := statusservice.AutomateStatusOnBE
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	assert.True(t, ss.CheckIfBENode(output))
-}
-
-func TestCheckIfBENodeNegative(t *testing.T) {
-	output := ""
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
-
-	assert.False(t, ss.CheckIfBENode(output))
 }
 
 func TestParseChefAutomateStatus(t *testing.T) {

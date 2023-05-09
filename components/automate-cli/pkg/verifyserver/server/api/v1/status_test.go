@@ -17,17 +17,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockStatusService() statusservice.IStatusService {
-	return &statusservice.MockStatusService{
-		GetServicesFunc: func() ([]models.ServiceDetails, error) {
-			return []models.ServiceDetails{
-				{
-					ServiceName: "deployment-service",
-					Version:     "chef/deployment-service/0.1.0/20230502070345",
-					Status:      constants.OK,
-				},
-			}, nil
-		},
+func SetupMockStatusService(httpStatus int) statusservice.IStatusService {
+	if httpStatus == 200 {
+		return &statusservice.MockStatusService{
+			GetServicesFunc: func() ([]models.ServiceDetails, error) {
+				return []models.ServiceDetails{
+					{
+						ServiceName: "deployment-service",
+						Version:     "chef/deployment-service/0.1.0/20230502070345",
+						Status:      constants.OK,
+					},
+				}, nil
+			},
+		}
+	} else {
+		return &statusservice.MockStatusService{
+			GetServicesFunc: func() ([]models.ServiceDetails, error) {
+				return []models.ServiceDetails(nil), fiber.NewError(fiber.StatusInternalServerError, "Some error occurred")
+			},
+		}
 	}
 }
 
@@ -49,7 +57,7 @@ func SetupDefaultHandlers(ss statusservice.IStatusService) (*fiber.App, error) {
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup()
+	vs.Setup(false)
 	return vs.App, nil
 }
 
@@ -64,14 +72,18 @@ func TestStatusAPI(t *testing.T) {
 			expectedCode: 200,
 			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}]}}",
 		},
+		{
+			description:  "500:InternalServerError status route",
+			expectedCode: 500,
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Some error occurred\"}}",
+		},
 	}
 	statusEndpoint := "/status"
-	// Setup the app as it is done in the main function
-	app, err := SetupDefaultHandlers(SetupMockStatusService())
-	assert.NoError(t, err)
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
+			app, err := SetupDefaultHandlers(SetupMockStatusService(test.expectedCode))
+			assert.NoError(t, err)
 			req := httptest.NewRequest("GET", statusEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
