@@ -150,34 +150,116 @@ chef/automate-cs-oc-erchef/15.4.0/20230410161619   standalone  up       up     1
 	`
 )
 
-func TestStatusServiceOnFE(t *testing.T) {
+func TestStatusService(t *testing.T) {
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		if cmd == statusservice.AutomateStatusCmd {
-			return []byte(automateStatusOutputOnCS), nil
-		}
-		return []byte(habSvcStatusOutputOnCS), nil
-	}, log)
-	actualOutput, err := ss.GetServices()
-	assert.NoError(t, err)
-	expectedOutput := []models.ServiceDetails{{ServiceName: "deployment-service", Status: "OK", Version: "chef/deployment-service/0.1.0/20230502070345"}, {ServiceName: "license-control-service", Status: "OK", Version: "chef/license-control-service/1.0.0/20230223070129"}, {ServiceName: "automate-load-balancer", Status: "OK", Version: "chef/automate-load-balancer/0.1.0/20230427090837"}, {ServiceName: "backup-gateway", Status: "OK", Version: "chef/backup-gateway/0.1.0/20230223070223"}, {ServiceName: "pg-sidecar-service", Status: "CRITICAL", Version: "chef/pg-sidecar-service/0.0.1/20230223070131"}, {ServiceName: "automate-cs-oc-bifrost", Status: "OK", Version: "chef/automate-cs-oc-bifrost/15.4.0/20230223070128"}, {ServiceName: "automate-cs-bookshelf", Status: "OK", Version: "chef/automate-cs-bookshelf/15.4.0/20230410161619"}, {ServiceName: "automate-cs-nginx", Status: "OK", Version: "chef/automate-cs-nginx/15.4.0/20230223065651"}, {ServiceName: "automate-es-gateway", Status: "OK", Version: "chef/automate-es-gateway/0.1.0/20230223070033"}, {ServiceName: "es-sidecar-service", Status: "OK", Version: "chef/es-sidecar-service/1.0.0/20230130152441"}, {ServiceName: "automate-cs-oc-erchef", Status: "UNKNOWN", Version: "chef/automate-cs-oc-erchef/15.4.0/20230410161619"}, {ServiceName: "automate-pg-gateway", Status: "WARN", Version: "chef/automate-pg-gateway/0.0.1/20230130151627"}}
-	assert.Equal(t, expectedOutput, actualOutput)
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               func(cmd string) ([]byte, error)
+		expectedOutput      []models.ServiceDetails
+		isError             bool
+		errorMsg            string
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "FE Node",
+			input: func(cmd string) ([]byte, error) {
+				if cmd == statusservice.AutomateStatusCmd {
+					return []byte(automateStatusOutputOnCS), nil
+				}
+				return []byte(habSvcStatusOutputOnCS), nil
+			},
+			expectedOutput: []models.ServiceDetails{{ServiceName: "deployment-service", Status: "OK", Version: "chef/deployment-service/0.1.0/20230502070345"}, {ServiceName: "license-control-service", Status: "OK", Version: "chef/license-control-service/1.0.0/20230223070129"}, {ServiceName: "automate-load-balancer", Status: "OK", Version: "chef/automate-load-balancer/0.1.0/20230427090837"}, {ServiceName: "backup-gateway", Status: "OK", Version: "chef/backup-gateway/0.1.0/20230223070223"}, {ServiceName: "pg-sidecar-service", Status: "CRITICAL", Version: "chef/pg-sidecar-service/0.0.1/20230223070131"}, {ServiceName: "automate-cs-oc-bifrost", Status: "OK", Version: "chef/automate-cs-oc-bifrost/15.4.0/20230223070128"}, {ServiceName: "automate-cs-bookshelf", Status: "OK", Version: "chef/automate-cs-bookshelf/15.4.0/20230410161619"}, {ServiceName: "automate-cs-nginx", Status: "OK", Version: "chef/automate-cs-nginx/15.4.0/20230223065651"}, {ServiceName: "automate-es-gateway", Status: "OK", Version: "chef/automate-es-gateway/0.1.0/20230223070033"}, {ServiceName: "es-sidecar-service", Status: "OK", Version: "chef/es-sidecar-service/1.0.0/20230130152441"}, {ServiceName: "automate-cs-oc-erchef", Status: "UNKNOWN", Version: "chef/automate-cs-oc-erchef/15.4.0/20230410161619"}, {ServiceName: "automate-pg-gateway", Status: "WARN", Version: "chef/automate-pg-gateway/0.0.1/20230130151627"}},
+			isError:        false,
+			errorMsg:       "",
+		},
+		{
+			testCaseDescription: "BE Node",
+			input: func(cmd string) ([]byte, error) {
+				if cmd == statusservice.AutomateStatusCmd {
+					return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
+				}
+				return []byte(habSvcStatusOutputOnOS), nil
+			},
+			expectedOutput: []models.ServiceDetails{{ServiceName: "automate-ha-opensearch", Status: "OK", Version: "chef/automate-ha-opensearch/1.3.7/20230223065900"}, {ServiceName: "automate-ha-elasticsidecar", Status: "CRITICAL", Version: "chef/automate-ha-elasticsidecar/0.1.0/20230223070538"}},
+			isError:        false,
+			errorMsg:       "",
+		},
+		{
+			testCaseDescription: "Hab Error",
+			input: func(cmd string) ([]byte, error) {
+				if cmd == statusservice.AutomateStatusCmd {
+					return []byte(automateStatusOutputOnCS), nil
+				}
+				return []byte("Failed to execute hab command"), errors.New("exit status 2")
+			},
+			expectedOutput: []models.ServiceDetails(nil),
+			isError:        true,
+			errorMsg:       "Error getting services from hab svc status",
+		},
+		{
+			testCaseDescription: "Automate Error",
+			input: func(cmd string) ([]byte, error) {
+				if cmd == statusservice.AutomateStatusCmd {
+					return []byte("Failed to execute automate command"), errors.New("exit status 2")
+				}
+				return []byte(habSvcStatusWithLicenseOutputOnA2), nil
+			},
+			expectedOutput: []models.ServiceDetails(nil),
+			isError:        true,
+			errorMsg:       "Error getting services from chef-automate status",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+
+			ss := statusservice.NewStatusService(tc.input, log)
+			actualOutput, err := ss.GetServices()
+			if tc.isError {
+				assert.Error(t, err)
+				assert.Equal(t, tc.errorMsg, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.expectedOutput, actualOutput)
+		})
+	}
 }
 
-func TestStatusServiceOnBE(t *testing.T) {
+func TestCheckIfBENode(t *testing.T) {
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		if cmd == statusservice.AutomateStatusCmd {
-			return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
-		}
-		return []byte(habSvcStatusOutputOnOS), nil
+		return nil, nil
 	}, log)
-	actualOutput, err := ss.GetServices()
-	assert.NoError(t, err)
-	expectedOutput := []models.ServiceDetails{{ServiceName: "automate-ha-opensearch", Status: "OK", Version: "chef/automate-ha-opensearch/1.3.7/20230223065900"}, {ServiceName: "automate-ha-elasticsidecar", Status: "CRITICAL", Version: "chef/automate-ha-elasticsidecar/0.1.0/20230223070538"}}
-	assert.Equal(t, expectedOutput, actualOutput)
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		input               string
+		expected            bool
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "Positive",
+			input:               statusservice.AutomateStatusOnBE,
+			expected:            true,
+		},
+		{
+			testCaseDescription: "Empty",
+			input:               "",
+			expected:            false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			assert.Equal(t, tc.expected, ss.CheckIfBENode(tc.input))
+		})
+	}
 }
 
 func TestCheckIfBENodePositive(t *testing.T) {
@@ -305,6 +387,13 @@ func TestParseHabSvcStatus(t *testing.T) {
 			expected:            2,
 			isError:             false,
 			errorMsg:            "",
+		},
+		{
+			testCaseDescription: "Empty Response",
+			input:               "",
+			expected:            0,
+			isError:             true,
+			errorMsg:            "No table found in output",
 		},
 	}
 
