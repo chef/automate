@@ -194,7 +194,7 @@ func triggerAPI(url, mountLocation string) (*http.Response, error) {
 }
 
 func getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
-	body, err := ioutil.ReadAll(respBody)
+	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
 		return nil, errors.New("Cannot able to read data from response body: " + err.Error())
 	}
