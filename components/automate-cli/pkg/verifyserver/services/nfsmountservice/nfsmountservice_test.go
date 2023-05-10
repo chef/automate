@@ -1,4 +1,4 @@
-package nfsmountservice
+package nfsmountservice_test
 
 import (
 	"bytes"
@@ -14,6 +14,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -93,7 +94,7 @@ var (
 
 func TestNFSMountService(t *testing.T) {
 	testPort := "1234"
-	nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+	nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
 	assert.NotNil(t, nm)
 	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{})
 	assert.Equal(t, new([]models.NFSMountResponse), nmDetails)
@@ -122,7 +123,7 @@ func TestCheckMount(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			nodeData := &models.NFSMountResponse{}
-			checkMount("/mnt/automate_backups", nodeData, e.ResultBody)
+			nfsmountservice.CheckMount("/mnt/automate_backups", nodeData, e.ResultBody)
 			assert.Equal(t, e.ExpectedRes, nodeData.CheckList[0].Passed)
 		})
 	}
@@ -174,7 +175,7 @@ func TestCheckShare(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			node := new(models.NFSMountResponse)
-			checkShare(e.Data, compareWith, node, e.NfsMounted)
+			nfsmountservice.CheckShare(e.Data, compareWith, node, e.NfsMounted)
 			// checkShare function will append check result in node object.
 			isPassed := node.CheckList[0].Passed
 			assert.Equal(t, e.ExpectedCheckRes, isPassed)
@@ -216,7 +217,7 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	}
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			res, err := getResultStructFromRespBody(e.Body)
+			res, err := nfsmountservice.GetResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
 			}
@@ -260,7 +261,7 @@ func TestTriggerAPI(t *testing.T) {
 	}
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			resp, err := triggerAPI(e.URL, "/mnt")
+			resp, err := nfsmountservice.TriggerAPI(e.URL, "/mnt")
 			if e.ExpectedError != nil {
 				require.Error(t, err)
 			} else {
@@ -325,7 +326,7 @@ func TestDoAPICall(t *testing.T) {
 			if e.InvalidURLResponse {
 				testPort = "1235"
 			}
-			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
 			resp := nm.DoAPICall(e.URL, "node_type", "/mount-location", shareMap, "key"+strconv.Itoa(index), countMap)
 			if e.ExpectedError != nil {
 				assert.Error(t, resp.Error)
@@ -418,7 +419,7 @@ func TestGetNFSMountDetails(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
 			resp := nm.GetNFSMountDetails(e.ReqBody)
 			for index, te := range *resp {
 				if e.Response[index].Error != nil {
@@ -439,7 +440,7 @@ func TestMakeRespBody(t *testing.T) {
 		TestName          string
 		CountMap          map[models.NFSMountLocResponse]int
 		OrderList         []string
-		NfsMountResultMap map[string][]models.NFSMountResponse
+		NfsMountResultMap map[string]models.NFSMountResponse
 		ShareMap          map[string]models.NFSMountLocResponse
 		RespBodyLen       int
 		NfsMounted        bool
@@ -452,8 +453,8 @@ func TestMakeRespBody(t *testing.T) {
 				SUCCESS_NFS_MOUNT_LOC_RESULT_STRUCT: 5,
 			},
 			OrderList: []string{"my-own-key"},
-			NfsMountResultMap: map[string][]models.NFSMountResponse{
-				"my-own-key": {VALID_NFS_MOUNT_RESPONSE},
+			NfsMountResultMap: map[string]models.NFSMountResponse{
+				"my-own-key": VALID_NFS_MOUNT_RESPONSE,
 			},
 			ShareMap: map[string]models.NFSMountLocResponse{
 				"my-own-key": SUCCESS_NFS_MOUNT_LOC_RESULT_STRUCT,
@@ -470,8 +471,8 @@ func TestMakeRespBody(t *testing.T) {
 				SUCCESS_NFS_MOUNT_LOC_RESULT_STRUCT2: 4,
 			},
 			OrderList: []string{"my-own-key"},
-			NfsMountResultMap: map[string][]models.NFSMountResponse{
-				"my-own-key": {VALID_NFS_MOUNT_RESPONSE},
+			NfsMountResultMap: map[string]models.NFSMountResponse{
+				"my-own-key": VALID_NFS_MOUNT_RESPONSE,
 			},
 			ShareMap: map[string]models.NFSMountLocResponse{
 				"my-own-key": SUCCESS_NFS_MOUNT_LOC_RESULT_STRUCT2,
@@ -489,8 +490,8 @@ func TestMakeRespBody(t *testing.T) {
 				NFS_NOT_MOUNTED_STRUCT:               1,
 			},
 			OrderList: []string{"my-own-key"},
-			NfsMountResultMap: map[string][]models.NFSMountResponse{
-				"my-own-key": {VALID_NFS_MOUNT_BUT_NOT_SHARED_RESPONSE},
+			NfsMountResultMap: map[string]models.NFSMountResponse{
+				"my-own-key": VALID_NFS_MOUNT_BUT_NOT_SHARED_RESPONSE,
 			},
 			ShareMap: map[string]models.NFSMountLocResponse{
 				"my-own-key": NFS_NOT_MOUNTED_STRUCT,
@@ -504,7 +505,7 @@ func TestMakeRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			respBody := []models.NFSMountResponse{}
-			makeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap)
+			nfsmountservice.MakeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap)
 			assert.Equal(t, len(respBody), e.RespBodyLen)
 			if e.ExpectedError != nil {
 				assert.Error(t, respBody[0].Error)

@@ -257,7 +257,7 @@ func SetupMockNFSMountService() nfsmountservice.INFSService {
 		DoAPICallFunc: func(ip, NodeType, mountLocation string, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) models.NFSMountResponse {
 			return models.NFSMountResponse{}
 		},
-		MakeConcurrentCallFunc: func(ip, NodeType, mountLocation string, ch chan string, nfsMountResultMap map[string][]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) {
+		MakeConcurrentCallFunc: func(ip, NodeType, mountLocation string, ch chan string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) {
 		},
 	}
 }

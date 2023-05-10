@@ -21,7 +21,7 @@ import (
 
 type INFSService interface {
 	GetNFSMountDetails(models.NFSMountRequest) *[]models.NFSMountResponse
-	MakeConcurrentCall(string, string, string, chan string, map[string][]models.NFSMountResponse, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int)
+	MakeConcurrentCall(string, string, string, chan string, map[string]models.NFSMountResponse, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int)
 	DoAPICall(string, string, string, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int) models.NFSMountResponse
 }
 
@@ -39,16 +39,16 @@ func NewNFSMountService(log logger.Logger, port string) INFSService {
 
 var mut *sync.Mutex = &sync.Mutex{}
 
-func (nm *NFSMountService) MakeConcurrentCall(ip string, node_type string, mountLocation string, ch chan string, nfsMountResultMap map[string][]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) {
+func (nm *NFSMountService) MakeConcurrentCall(ip string, node_type string, mountLocation string, ch chan string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) {
 	res := nm.DoAPICall(ip, node_type, mountLocation, shareMap, key, countMap)
 	// Mutex Lock is Mandatory. What if two routines tries to write at same time.
 	mut.Lock()
-	nfsMountResultMap[key] = append(nfsMountResultMap[key], res)
+	nfsMountResultMap[key] = res
 	mut.Unlock()
 	ch <- "done"
 }
 
-func makeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int, orderList []string, nfsMountResultMap map[string][]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse) {
+func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int, orderList []string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse) {
 	compareWith := models.NFSMountLocResponse{}
 	currMax := 0
 	// Finding the Majority element and putting in the compareWith variable for the later comparisons
@@ -61,27 +61,26 @@ func makeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMo
 	}
 
 	for _, key := range orderList {
-		for _, val := range nfsMountResultMap[key] {
-			// Need to check error first. Because while making call to the API if something get wrong
-			// then we are storing checkList as nil and putting the error in Error field.
-			if val.Error == nil {
-				// if nfs is mounted then in our first check for the particular node it will be true. hence we are passing that which checking shareability
-				// Test2 - Check for NFS Volume is Shared among all nodes or not
-				if val.CheckList[0].Passed {
-					checkShare(shareMap[key], compareWith, &val, true)
-				} else {
-					checkShare(shareMap[key], compareWith, &val, false)
-				}
+		val := nfsMountResultMap[key]
+		// Need to check error first. Because while making call to the API if something get wrong
+		// then we are storing checkList as nil and putting the error in Error field.
+		if val.Error == nil {
+			// if nfs is mounted then in our first check for the particular node it will be true. hence we are passing that which checking shareability
+			// Test2 - Check for NFS Volume is Shared among all nodes or not
+			if val.CheckList[0].Passed {
+				CheckShare(shareMap[key], compareWith, &val, true)
+			} else {
+				CheckShare(shareMap[key], compareWith, &val, false)
 			}
-			*respBody = append(*respBody, val)
 		}
+		*respBody = append(*respBody, val)
 	}
 }
 
 func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
 	respBody := new([]models.NFSMountResponse)
 	// For storing the output of go routine temporary in nfsMountResultMap
-	nfsMountResultMap := make(map[string][]models.NFSMountResponse)
+	nfsMountResultMap := make(map[string]models.NFSMountResponse)
 	ch := make(chan string)
 	// Will use these both the maps in checking the shareability
 	// countMap will help us to find the Majority element.
@@ -121,7 +120,7 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 		<-ch
 	}
 
-	makeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap)
+	MakeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap)
 
 	close(ch)
 	return respBody
@@ -135,14 +134,14 @@ func (nm *NFSMountService) DoAPICall(ip string, node_type string, mountLocation 
 	url := fmt.Sprintf("http://%s:%s", ip, nm.port)
 
 	// It will trigger /nfs-mount-loc API
-	resp, err := triggerAPI(url, mountLocation)
+	resp, err := TriggerAPI(url, mountLocation)
 	if err != nil {
 		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
 		return node
 	}
 
 	// Getting the result struct from whole response
-	result, err := getResultStructFromRespBody(resp.Body)
+	result, err := GetResultStructFromRespBody(resp.Body)
 	if err != nil {
 		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
 		return node
@@ -154,15 +153,14 @@ func (nm *NFSMountService) DoAPICall(ip string, node_type string, mountLocation 
 		shareMap[key] = *result
 		mut.Unlock()
 	}
-	// fmt.Println(result)
 
 	// Test1 - Check for NFS Volume is mounted at correct Mount Location or not
-	checkMount(mountLocation, &node, result)
+	CheckMount(mountLocation, &node, result)
 
 	return node
 }
 
-func triggerAPI(url, mountLocation string) (*http.Response, error) {
+func TriggerAPI(url, mountLocation string) (*http.Response, error) {
 	// Request Body for /nfs-mount-loc API
 	reqBody := models.NFSMountLocRequest{
 		MountLocation: mountLocation,
@@ -193,7 +191,7 @@ func triggerAPI(url, mountLocation string) (*http.Response, error) {
 	return resp, nil
 }
 
-func getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
+func GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
 	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
 		return nil, errors.New("Cannot able to read data from response body: " + err.Error())
@@ -228,7 +226,7 @@ func getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocRespons
 	return resultField, nil
 }
 
-func checkMount(mountLocation string, node *models.NFSMountResponse, data *models.NFSMountLocResponse) {
+func CheckMount(mountLocation string, node *models.NFSMountResponse, data *models.NFSMountLocResponse) {
 	if data.Address != "" {
 		check := createCheck("NFS Mount", true, constants.MOUNT_SUCCESS_MSG, "", "")
 		node.CheckList = append(node.CheckList, check)
@@ -238,7 +236,7 @@ func checkMount(mountLocation string, node *models.NFSMountResponse, data *model
 	}
 }
 
-func checkShare(data models.NFSMountLocResponse, compareWith models.NFSMountLocResponse, node *models.NFSMountResponse, nfsMounted bool) {
+func CheckShare(data models.NFSMountLocResponse, compareWith models.NFSMountLocResponse, node *models.NFSMountResponse, nfsMounted bool) {
 	// nfsMounted is holding volume is mounted or not. If volume is not mounted then how we can check it's shareability
 	if nfsMounted && data.Address == compareWith.Address && data.Nfs == compareWith.Nfs && data.MountLocation == compareWith.MountLocation {
 		check := createCheck("NFS Mount", true, constants.SHARE_SUCCESS_MSG, "", "")
