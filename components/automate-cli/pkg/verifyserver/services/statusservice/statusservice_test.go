@@ -50,6 +50,47 @@ const (
 	automate-cs-nginx       running        ok            1163       7671
 	automate-load-balancer  running        ok            1164       7640`
 
+	automateStatusOutputOnA2Unhealthy = `Status from deployment with channel [current] and type [local]
+
+	Service Name            Process State  Health Check  Uptime (s) PID  
+	deployment-service      running        ok            34         12910
+	backup-gateway          running        ok            29         13359
+	automate-pg-gateway     running        ok            30         13328
+	automate-es-gateway     running        CRITICAL      30         13297
+	automate-ui             running        ok            30         13316
+	pg-sidecar-service      running        ok            29         13397
+	cereal-service          running        ok            29         13425
+	event-service           running        ok            29         13454
+	authz-service           running        ok            28         13525
+	es-sidecar-service      running        ok            28         13502
+	event-feed-service      running        ok            27         13608
+	automate-dex            running        CRITICAL      27         13583
+	teams-service           running        ok            26         13659
+	session-service         running        CRITICAL      26         13702
+	authn-service           running        ok            25         13763
+	secrets-service         running        ok            25         13801
+	applications-service    running        CRITICAL      24         13849
+	notifications-service   running        ok            24         13873
+	nodemanager-service     running        ok            23         13985
+	compliance-service      running        CRITICAL      23         14015
+	license-control-service running        ok            22         14086
+	local-user-service      running        CRITICAL      21         14135
+	config-mgmt-service     running        unknown       21         14154
+	ingest-service          running        unknown       20         14212
+	infra-proxy-service     running        ok            20         14250
+	data-feed-service       running        ok            19         14295
+	event-gateway           running        ok            19         14325
+	report-manager-service  running        ok            18         14382
+	user-settings-service   running        ok            16         14471
+	automate-gateway        running        unknown       17         14449
+	automate-cs-bookshelf   running        ok            16         14529
+	automate-cs-oc-bifrost  running        CRITICAL      15         14565
+	automate-cs-oc-erchef   running        CRITICAL      14         14606
+	automate-cs-nginx       running        CRITICAL      14         14646
+	automate-load-balancer  running        ok            13         14662
+	
+	UnhealthyStatusError: System status is unhealthy: One or more services are unhealthy`
+
 	habSvcStatusWithLicenseOutputOnA2 = `+---------------------------------------------+
 
 	Chef License Acceptance
@@ -310,6 +351,13 @@ func TestParseChefAutomateStatus(t *testing.T) {
 			expected:            0,
 			isError:             true,
 			errorMsg:            "No table found in output",
+		},
+		{
+			testCaseDescription: "A2 Node Unhealthy",
+			input:               automateStatusOutputOnA2Unhealthy,
+			expected:            35,
+			isError:             false,
+			errorMsg:            "",
 		},
 	}
 

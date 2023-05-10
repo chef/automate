@@ -25,9 +25,10 @@ type StatusService struct {
 }
 
 const (
-	AutomateStatusCmd  = "chef-automate status"
-	HabStatusCmd       = "HAB_LICENSE=accept-no-persist hab svc status"
-	AutomateStatusOnBE = "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory"
+	AutomateStatusCmd       = "chef-automate status"
+	HabStatusCmd            = "HAB_LICENSE=accept-no-persist hab svc status"
+	AutomateStatusOnBE      = "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory"
+	automateStatusUnhealthy = "UnhealthyStatusError: System status is unhealthy: One or more services are unhealthy"
 )
 
 func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log logger.Logger) IStatusService {
@@ -81,7 +82,7 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 		if i == 0 || line == "" {
 			continue
 		}
-		regex := regexp.MustCompile(`(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)`)
+		regex := regexp.MustCompile(`(?m)^\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\d+)\s+(\d+)\s+(\S+)$`)
 		matches := regex.FindStringSubmatch(line)
 		if len(matches) == 8 {
 			serviceName := strings.Split(matches[7], ".default")[0]
@@ -105,7 +106,7 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc(AutomateStatusCmd)
 	ss.Log.Debug("Output for '"+AutomateStatusCmd+"' command: ", string(output))
-	if err != nil {
+	if err != nil && !strings.Contains(string(output), automateStatusUnhealthy) {
 		ss.Log.Error("Error while running '"+AutomateStatusCmd+"' command: ", err)
 		//If it's a backend node, return an empty map
 		if ss.CheckIfBENode(string(output)) {
@@ -130,7 +131,7 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]mode
 		if i == 0 || line == "" {
 			continue
 		}
-		regex := regexp.MustCompile(`(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)`)
+		regex := regexp.MustCompile(`(?m)^\s*(\S+)\s+(\S+)\s+(\S+)\s+(\d+)\s+(\d+)$`)
 		matches := regex.FindStringSubmatch(line)
 		if len(matches) == 6 {
 			response[matches[1]] = models.ServiceDetails{
