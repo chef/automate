@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/lib/logger"
@@ -207,7 +208,7 @@ func TestStatusService(t *testing.T) {
 		{
 			testCaseDescription: "FE Node",
 			input: func(cmd string) ([]byte, error) {
-				if cmd == statusservice.AutomateStatusCmd {
+				if cmd == constants.AUTOMATESTATUSCMD {
 					return []byte(automateStatusOutputOnCS), nil
 				}
 				return []byte(habSvcStatusOutputOnCS), nil
@@ -219,8 +220,8 @@ func TestStatusService(t *testing.T) {
 		{
 			testCaseDescription: "BE Node",
 			input: func(cmd string) ([]byte, error) {
-				if cmd == statusservice.AutomateStatusCmd {
-					return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
+				if cmd == constants.AUTOMATESTATUSCMD {
+					return []byte(constants.AUTOMATESTATUSONBEERROR), errors.New("exit status 90")
 				}
 				return []byte(habSvcStatusOutputOnOS), nil
 			},
@@ -231,7 +232,7 @@ func TestStatusService(t *testing.T) {
 		{
 			testCaseDescription: "Hab Error",
 			input: func(cmd string) ([]byte, error) {
-				if cmd == statusservice.AutomateStatusCmd {
+				if cmd == constants.AUTOMATESTATUSCMD {
 					return []byte(automateStatusOutputOnCS), nil
 				}
 				return []byte("Failed to execute hab command"), errors.New("exit status 2")
@@ -243,7 +244,7 @@ func TestStatusService(t *testing.T) {
 		{
 			testCaseDescription: "Automate Error",
 			input: func(cmd string) ([]byte, error) {
-				if cmd == statusservice.AutomateStatusCmd {
+				if cmd == constants.AUTOMATESTATUSCMD {
 					return []byte("Failed to execute automate command"), errors.New("exit status 2")
 				}
 				return []byte(habSvcStatusWithLicenseOutputOnA2), nil
@@ -286,7 +287,7 @@ func TestCheckIfBENode(t *testing.T) {
 	testCases := []testCaseInfo{
 		{
 			testCaseDescription: "Positive",
-			input:               statusservice.AutomateStatusOnBE,
+			input:               constants.AUTOMATESTATUSONBEERROR,
 			expected:            true,
 		},
 		{
@@ -340,7 +341,7 @@ func TestParseChefAutomateStatus(t *testing.T) {
 		},
 		{
 			testCaseDescription: "BE Node",
-			input:               statusservice.AutomateStatusOnBE,
+			input:               constants.AUTOMATESTATUSONBEERROR,
 			expected:            0,
 			isError:             true,
 			errorMsg:            "No table found in output",
@@ -522,7 +523,7 @@ func TestGetServicesFromAutomateStatus(t *testing.T) {
 		{
 			testCaseDescription: "BE Node",
 			input: func(cmd string) ([]byte, error) {
-				return []byte(statusservice.AutomateStatusOnBE), errors.New("exit status 90")
+				return []byte(constants.AUTOMATESTATUSONBEERROR), errors.New("exit status 90")
 			},
 			expected: 0,
 			isError:  false,

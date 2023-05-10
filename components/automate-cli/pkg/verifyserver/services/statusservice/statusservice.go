@@ -19,13 +19,6 @@ type StatusService struct {
 	Log                     logger.Logger
 }
 
-const (
-	AutomateStatusCmd       = "chef-automate status"
-	HabStatusCmd            = "HAB_LICENSE=accept-no-persist hab svc status"
-	AutomateStatusOnBE      = "FileAccessError: Unable to access the file or directory: Failed to read deployment-service TLS certificates: Could not read the service cert: open /hab/svc/deployment-service/data/deployment-service.crt: no such file or directory"
-	automateStatusUnhealthy = "UnhealthyStatusError: System status is unhealthy: One or more services are unhealthy"
-)
-
 func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log logger.Logger) IStatusService {
 	return &StatusService{
 		ExecuteShellCommandFunc: executeShellCommand,
@@ -55,16 +48,17 @@ func (ss *StatusService) GetServices() (*[]models.ServiceDetails, error) {
 
 // Get the services from
 func (ss *StatusService) GetServicesFromHabSvcStatus() (*[]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc(HabStatusCmd)
-	ss.Log.Debug("Output for '"+HabStatusCmd+"' command: ", string(output))
+	output, err := ss.ExecuteShellCommandFunc(constants.HABSTATUSCMD)
+	ss.Log.Debug("Output for '"+constants.HABSTATUSCMD+"' command: ", string(output))
 	if err != nil {
-		ss.Log.Error("Error while running '"+HabStatusCmd+"' command: ", err)
+		ss.Log.Error("Error while running '"+constants.HABSTATUSCMD+"' command: ", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from hab svc status")
 	}
 	return ss.ParseHabSvcStatus(string(output))
 }
 
 // Parse the output of hab svc status
+// TODO: We need to update the below function/regex if the output of hab svc status changes
 func (ss *StatusService) ParseHabSvcStatus(output string) (*[]models.ServiceDetails, error) {
 	response := make([]models.ServiceDetails, 0)
 
@@ -100,10 +94,10 @@ func (ss *StatusService) ParseHabSvcStatus(output string) (*[]models.ServiceDeta
 
 // Get the services from chef-automate status
 func (ss *StatusService) GetServicesFromAutomateStatus() (*map[string]models.ServiceDetails, error) {
-	output, err := ss.ExecuteShellCommandFunc(AutomateStatusCmd)
-	ss.Log.Debug("Output for '"+AutomateStatusCmd+"' command: ", string(output))
-	if err != nil && !strings.Contains(string(output), automateStatusUnhealthy) {
-		ss.Log.Error("Error while running '"+AutomateStatusCmd+"' command: ", err)
+	output, err := ss.ExecuteShellCommandFunc(constants.AUTOMATESTATUSCMD)
+	ss.Log.Debug("Output for '"+constants.AUTOMATESTATUSCMD+"' command: ", string(output))
+	if err != nil && !strings.Contains(string(output), constants.AUTOMATESTATUSUNHEALTHYERROR) {
+		ss.Log.Error("Error while running '"+constants.AUTOMATESTATUSCMD+"' command: ", err)
 		//If it's a backend node, return an empty map
 		if ss.CheckIfBENode(string(output)) {
 			return &map[string]models.ServiceDetails{}, nil
@@ -114,6 +108,7 @@ func (ss *StatusService) GetServicesFromAutomateStatus() (*map[string]models.Ser
 }
 
 // Parse the output of chef-automate status
+// TODO: We need to update the below function/regex if the output of chef-automate status changes
 func (ss *StatusService) ParseChefAutomateStatus(output string) (*map[string]models.ServiceDetails, error) {
 	response := make(map[string]models.ServiceDetails)
 
@@ -142,5 +137,5 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (*map[string]mod
 
 // Check if it's a backend node
 func (ss *StatusService) CheckIfBENode(output string) bool {
-	return strings.Contains(output, AutomateStatusOnBE)
+	return strings.Contains(output, constants.AUTOMATESTATUSONBEERROR)
 }
