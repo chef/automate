@@ -76,9 +76,10 @@ type BatchCheckResponse struct {
 	Result []BatchCheckResult `json:"result"`
 }
 type BatchCheckResult struct {
-	NodeType string      `json:"node_type"`
-	Ip       string      `json:"ip"`
-	Tests    []ApiResult `json:"tests"`
+	NodeType string       `json:"node_type"`
+	Ip       string       `json:"ip"`
+	Tests    []ApiResult  `json:"tests"`
+	Error    *fiber.Error `json:"error,omitempty"`
 }
 
 type CheckTriggerResponse struct {
@@ -87,10 +88,16 @@ type CheckTriggerResponse struct {
 	Error  *fiber.Error `json:"error,omitempty"`
 }
 type ApiResult struct {
-	Passed  bool     `json:"passed"`
-	Message string   `json:"msg"`
-	Check   string   `json:"check"`
-	Checks  []Checks `json:"checks"`
+	Passed  bool         `json:"passed"`
+	Message string       `json:"msg"`
+	Check   string       `json:"check"`
+	Checks  []Checks     `json:"checks"`
+	Error   *fiber.Error `json:"error,omitempty"`
+}
+
+type BatchCheckResponseResult struct {
+	Result ApiResult    `json:"result"`
+	Error  *fiber.Error `json:"error,omitempty"`
 }
 
 type Checks struct {
