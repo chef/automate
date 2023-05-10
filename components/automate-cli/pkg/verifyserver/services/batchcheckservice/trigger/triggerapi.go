@@ -90,7 +90,6 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
-
 	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{

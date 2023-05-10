@@ -268,7 +268,6 @@ func TestTriggerCheckAPI(t *testing.T) {
 		require.Equal(t, http.StatusNotFound, response.Error.Code)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
 	})
-
 }
 
 func Test_RunCheck(t *testing.T) {
