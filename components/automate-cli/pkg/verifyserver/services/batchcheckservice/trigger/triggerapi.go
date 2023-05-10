@@ -1,7 +1,6 @@
 package trigger
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -56,28 +55,29 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerResponse) {
 	var ctr models.CheckTriggerResponse
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endPoint, nil)
+	req, err := http.NewRequest(http.MethodGet, endPoint, nil)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host: host,
 			Error: &fiber.Error{
 				Code:    http.StatusInternalServerError,
-				Message: "error while creating the request",
+				Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
 			},
 		}
 		return
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	
+	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host: host,
 			Error: &fiber.Error{
 				Code:    http.StatusInternalServerError,
-				Message: "error while connecting to the endpoint",
+				Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
 			},
 		}
 		return
@@ -90,7 +90,7 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 			Host: host,
 			Error: &fiber.Error{
 				Code:    resp.StatusCode,
-				Message: "error while connecting to the endpoint",
+				Message: "error while connecting to the endpoint, received invalid status code",
 			},
 		}
 		return
@@ -101,7 +101,7 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 			Host: host,
 			Error: &fiber.Error{
 				Code:    http.StatusInternalServerError,
-				Message: "error while parsing the response data",
+				Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
 			},
 		}
 		return

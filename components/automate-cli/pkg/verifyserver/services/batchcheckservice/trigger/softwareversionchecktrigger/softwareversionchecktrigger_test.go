@@ -1,6 +1,7 @@
 package softwareversionchecktrigger
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -35,15 +36,14 @@ const (
 					"resolution_msg": "Please check the configuration"
 				}
 			]
-		},
-		"host": ""
+		}
 	}`
 )
 
 func TestSoftwareVersionCheck_Run(t *testing.T) {
 	t.Run("Software Version Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(http.StatusOK)
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -62,11 +62,19 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		require.Nil(t, ctr[host].Error)
 		require.Len(t, ctr[host].Result.Checks, 2)
 
+		checkResp := ctr[host].Result.Checks[1]
+
+		assert.Equal(t, "Check 2", checkResp.Title)
+		assert.Equal(t, false, checkResp.Passed)
+		assert.Equal(t, "", checkResp.SuccessMsg)
+		assert.Equal(t, "Check 2 failed", checkResp.ErrorMsg)
+		assert.Equal(t, "Please check the configuration", checkResp.ResolutionMsg)
+
 	})
 
 	t.Run("Failed Software Version Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(http.StatusInternalServerError)
+		server, host, port := createDummyServer(t, http.StatusInternalServerError)
 		defer server.Close()
 
 		// Test data
@@ -82,14 +90,18 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 
 		require.Len(t, ctr, 1)
 		require.NotNil(t, ctr[host].Error)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[host].Error.Error())
 	})
 }
 
 // Helper function to create a dummy server
-func createDummyServer(requiredStatusCode int) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
+			assert.Equal(t, constants.SOFTWARE_VERSION_CHECK_API_PATH, r.URL.Path)
+			reqParameters := r.URL.Query()
+			assert.Equal(t, 1, len(reqParameters))
+			assert.Equal(t, "automate", reqParameters.Get("node_type"))
 			if r.URL.Path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(softwareVersionResp))
