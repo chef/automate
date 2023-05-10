@@ -132,7 +132,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
 		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint", response.Error.Message)
+		assert.Equal(t, `error while connecting to the endpoint:Get "http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com: no such host`, response.Error.Message)
 	})
 	t.Run("Non-OK status code", func(t *testing.T) {
 		// Create a test server to mock the API endpoint
@@ -153,7 +153,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
 		assert.Equal(t, http.StatusBadRequest, response.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint", response.Error.Message)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
 	})
 
 	t.Run("Error decoding response JSON", func(t *testing.T) {
@@ -176,9 +176,8 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
 		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
-		assert.Equal(t, "error while parsing the response data", response.Error.Message)
+		assert.Equal(t, `error while parsing the response data:invalid character 'i' looking for beginning of object key string`, response.Error.Message)
 	})
-
 }
 
 func TestRunCheck(t *testing.T) {
