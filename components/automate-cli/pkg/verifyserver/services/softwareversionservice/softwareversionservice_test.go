@@ -18,9 +18,9 @@ var osTestVersion = map[string][]string{
 	"SUSE Linux":    {"12"},
 }
 
-const successfile = "./testfiles/successfile"
-const failurefile = "./testfiles/failurefile"
-const versionfile = "./testfiles/versionfile"
+const successfile  = "./testfiles/success.txt"
+const failurefile  = "./testfiles/failure.txt"
+const versionfile  = "./testfiles/version.txt"
 const failfilepath = "./failfilepath"
 
 var checktrue = []string{"mkdir"}
@@ -225,7 +225,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 		{
 			description: "If the entered Query is not supported by us",
 			args: args{
-				query: "wrongquery",
+				query:      "wrongquery",
 				checkarray: checktrue,
 				osFilepath: successfile,
 			},

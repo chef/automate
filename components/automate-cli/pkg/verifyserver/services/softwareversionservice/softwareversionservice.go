@@ -32,8 +32,8 @@ func NewSoftwareVersionService(logger logger.Logger) ISoftwareVersionService {
 
 const (
 	availability = " availability"
-	Ensure = "Ensure "
-	osFilepath = "/etc/os-release"
+	Ensure       = "Ensure "
+	osFilepath   = "/etc/os-release"
 )
 
 var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "pvcreate", "vgcreate", "lvcreate", "mv", "systemd", "wget", "exec"}
@@ -50,7 +50,7 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (mode
 	} else if query == "opensearch" {
 		cmdArray = []string{"openssl"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	} else if query == "bastion" || query == "automate" || query == "chef-server"{
+	} else if query == "bastion" || query == "automate" || query == "chef-server" {
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
 	} else {
 		sv.logger.Error("The Query parameter is not supported")
@@ -121,7 +121,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (models.Chec
 	}
 	checkResponse := models.Checks{}
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
-	sv.logger.Debug("Got the OS Version = ",osVersion)
+	sv.logger.Debug("Got the OS Version = ", osVersion)
 	sv.logger.Debug("Got the OS Name = ", osName)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as file path doesnot exit = ", err)

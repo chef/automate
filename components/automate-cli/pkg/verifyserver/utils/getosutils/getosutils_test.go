@@ -7,8 +7,8 @@ import (
 )
 
 // const failurefile = "components/automate-cli/pkg/verifyserver/services/softwareversionservice/testfiles/successfile"
-const successfile = "../../services/softwareversionservice/testfiles/successfile"
-const failurefile = "../../services/softwareversionservice/testfiles/file"
+const successfile = "../../services/softwareversionservice/testfiles/success.txt"
+const failurefile = "../../services/softwareversionservice/testfiles/wrongfile.txt"
 
 func TestGetOsVersion(t *testing.T) {
 	type args struct {
