@@ -11,6 +11,7 @@ directories:
   - ./components/automate-cs-nginx
   - ./components/automate-cs-oc-bifrost
   - ./components/automate-cs-oc-erchef
+  - ./components/automate-cs-ocid
   - ./components/automate-debug
   - ./components/automate-deployment
   - ./components/automate-dex

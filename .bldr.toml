@@ -194,6 +194,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/ocid/*",
   "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
@@ -408,6 +409,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/ocid/*",
   "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
@@ -508,6 +510,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/ocid/*",
   "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
@@ -955,6 +958,13 @@ paths = [
   "lib/secrets/*",
   "lib/stringutils/*",
   "lib/user/*"
+]
+
+
+[automate-cs-ocid]
+plan_path = "components/automate-cs-ocid"
+paths = [
+  "components/automate-cs-ocid/*"
 ]
 
 [automate-workflow-nginx]
