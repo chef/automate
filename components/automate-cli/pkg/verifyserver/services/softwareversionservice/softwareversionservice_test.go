@@ -63,7 +63,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Ubuntu availability",
+						Title:         "Linux Version Check",
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -98,7 +98,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Ubuntu availability",
+						Title:         "Linux Version Check",
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -126,7 +126,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Ubuntu availability",
+						Title:         "Linux Version Check",
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -161,7 +161,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						ResolutionMsg: "Ensure wrongcammand is available in $PATH on the node",
 					},
 					{
-						Title:         "Ubuntu availability",
+						Title:         "Linux Version Check",
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -178,8 +178,33 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: failfilepath,
 			},
-			expectedBody: nil,
-			expectedError: "Error while getting the OS Version: open ./failfilepath: no such file or directory",
+			expectedBody: &models.SoftwareVersionDetails{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         "stat availability",
+						Passed:        true,
+						SuccessMsg:    "stat is available",
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         "mkdir availability",
+						Passed:        true,
+						SuccessMsg:    "mkdir is available",
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         "Linux Version Check",
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      "Unable to get the os version from /etc/os-release file",
+						ResolutionMsg: "Ensure if the /etc/os-release is availabile on the path",
+					},
+				},
+			},
+			expectedError: "",
 		},
 		{
 			description: "If the os version is not supported by automate",
@@ -206,7 +231,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Debian GNU/Linux 10 (buster) availability",
+						Title:         "Linux Version Check",
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate",
@@ -363,7 +388,7 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: failurefile,
 			},
 			expectedBody: &models.Checks{
-				Title:         "Debian GNU/Linux 10 (buster) availability",
+				Title:         "Linux Version Check",
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate",
@@ -376,7 +401,7 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: successfile,
 			},
 			expectedBody: &models.Checks{
-				Title:         "Ubuntu availability",
+				Title:         "Linux Version Check",
 				Passed:        true,
 				SuccessMsg:    "Ubuntu version is 20.04",
 				ErrorMsg:      "",
@@ -390,7 +415,7 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: versionfile,
 			},
 			expectedBody: &models.Checks{
-				Title:         "SUSE Linux availability",
+				Title:         "Linux Version Check",
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "SUSE Linux version is not supported by automate",

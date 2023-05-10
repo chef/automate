@@ -31,9 +31,10 @@ func NewSoftwareVersionService(logger logger.Logger) ISoftwareVersionService {
 }
 
 const (
-	AVAILABILITY = " availability"
-	ENSURE       = "Ensure "
-	OSFILEPATH   = "/etc/os-release"
+	AVAILABILITY        = " availability"
+	ENSURE              = "Ensure "
+	OSFILEPATH          = "/etc/os-release"
+	LINUX_VERSION_CHECK = "Linux Version Check"
 )
 
 var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "pvcreate", "vgcreate", "lvcreate", "mv", "systemd", "wget", "exec"}
@@ -54,7 +55,7 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*mod
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
 	} else {
 		sv.logger.Error("The Query parameter is not supported")
-		return nil, errors.New("The query "+ query +" is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server")
+		return nil, errors.New("The query " + query + " is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server")
 	}
 
 	for i := 0; i < len(cmdArray); i++ {
@@ -67,7 +68,6 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*mod
 	osResponse, err := sv.checkOsVersion(sv.osFilepath)
 	if err != nil {
 		sv.logger.Error("Error while getting the OS Version = ", err)
-		return nil, errors.Wrap(err, "Error while getting the OS Version")
 	}
 	if !osResponse.Passed {
 		serviceResponse.Passed = false
@@ -114,15 +114,21 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 	sv.logger.Debug("Got the OS Version = ", osVersion)
 	sv.logger.Debug("Got the OS Name = ", osName)
 	if err != nil {
-		sv.logger.Error("Enable to get OS Version as file path doesnot exit = ", err)
-		return nil, err
+		sv.logger.Error("Enable to get OS Version as file on path doesnot exit = ", err)
+		return &models.Checks{
+			Title:         LINUX_VERSION_CHECK,
+			Passed:        false,
+			SuccessMsg:    "",
+			ErrorMsg:      "Unable to get the os version from /etc/os-release file",
+			ResolutionMsg: ENSURE + "if the /etc/os-release is availabile on the path",
+		}, nil
 	}
 	for key := range osVersions {
 		if strings.Contains(osName, key) {
 			correctVersion := sv.checkOs(osVersions, osVersion, key)
 			if correctVersion {
 				checkResponse = models.Checks{
-					Title:         key + AVAILABILITY,
+					Title:         LINUX_VERSION_CHECK,
 					Passed:        true,
 					SuccessMsg:    key + " version is " + osVersion,
 					ErrorMsg:      "",
@@ -131,7 +137,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 				break
 			}
 			checkResponse = models.Checks{
-				Title:         key + AVAILABILITY,
+				Title:         LINUX_VERSION_CHECK,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      key + " version is not supported by automate",
@@ -140,7 +146,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 			break
 		}
 		checkResponse = models.Checks{
-			Title:         osName + AVAILABILITY,
+			Title:         LINUX_VERSION_CHECK,
 			Passed:        false,
 			SuccessMsg:    "",
 			ErrorMsg:      osName + " version is not supported by automate",

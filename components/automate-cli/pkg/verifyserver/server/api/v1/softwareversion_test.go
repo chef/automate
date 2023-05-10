@@ -50,6 +50,7 @@ func TestSoftwareVersionAPI(t *testing.T) {
 		requestBody   models.SoftwareVersionDetails
 		expectedBody  string
 		expectedError error
+		query         string
 	}{
 		{
 			description:  "200:success software version check route",
@@ -68,19 +69,21 @@ func TestSoftwareVersionAPI(t *testing.T) {
 			},
 			expectedBody:  `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""}]}}`,
 			expectedError: nil,
+			query:         "opensearch",
 		},
 		{
-			description:   "500:Error while getting the file",
-			expectedCode:  500,
+			description:   "400:If the query entered by the User is not supported",
+			expectedCode:  400,
 			requestBody:   models.SoftwareVersionDetails{},
-			expectedBody:  `{"status":"FAILED","result":null,"error":{"code":500,"message":"open /testfile: no such file or directory"}}`,
-			expectedError: errors.New("open /testfile: no such file or directory"),
+			expectedBody:  `{"status":"FAILED","result":null,"error":{"code":400,"message":"The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"}}`,
+			expectedError: errors.New("The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"),
+			query:         "wrongquery",
 		},
 	}
-	softwareversioncheckEndpoint := "/api/v1/checks/software-versions/?node_type=opensearch"
 	for _, test := range tests {
 
 		t.Run(test.description, func(t *testing.T) {
+			softwareversioncheckEndpoint := "/api/v1/checks/software-versions/?node_type=" + test.query
 			app := SetupHandler(SetupMockSoftwareVersionService(test.requestBody, test.expectedError))
 			req := httptest.NewRequest("GET", softwareversioncheckEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")
