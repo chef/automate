@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// const failurefile = "components/automate-cli/pkg/verifyserver/services/softwareversionservice/testfiles/successfile"
 const successfile = "../../services/softwareversionservice/testfiles/success.txt"
 const failurefile = "../../services/softwareversionservice/testfiles/wrongfile.txt"
 
@@ -19,7 +18,7 @@ func TestGetOsVersion(t *testing.T) {
 		args        args
 		osName      string
 		osVersion   string
-		expectedErr bool
+		expectedErr string
 	}{
 		{
 			description: "When we get the OSName and OSVersion correct",
@@ -28,7 +27,7 @@ func TestGetOsVersion(t *testing.T) {
 			},
 			osName:      "Ubuntu 20.04.6",
 			osVersion:   "20.04",
-			expectedErr: false,
+			expectedErr: "",
 		},
 		{
 			description: "When we are not able to get the OSName or OSVersion",
@@ -37,15 +36,14 @@ func TestGetOsVersion(t *testing.T) {
 			},
 			osName:      "",
 			osVersion:   "",
-			expectedErr: true,
+			expectedErr: "open ../../services/softwareversionservice/testfiles/wrongfile.txt: no such file or directory",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			got, got1, err := GetOsVersion(tt.args.osFilepath)
-			if (err != nil) != tt.expectedErr {
-				assert.Equal(t, err, tt.expectedErr)
-				return
+			if err != nil {
+				assert.Equal(t, tt.expectedErr, err.Error())
 			}
 			if got != tt.osName {
 				assert.Equal(t, got, tt.osName)

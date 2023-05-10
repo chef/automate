@@ -1,7 +1,6 @@
 package softwareversionservice
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -18,9 +17,9 @@ var osTestVersion = map[string][]string{
 	"SUSE Linux":    {"12"},
 }
 
-const successfile  = "./testfiles/success.txt"
-const failurefile  = "./testfiles/failure.txt"
-const versionfile  = "./testfiles/version.txt"
+const successfile = "./testfiles/success.txt"
+const failurefile = "./testfiles/failure.txt"
+const versionfile = "./testfiles/version.txt"
 const failfilepath = "./failfilepath"
 
 var checktrue = []string{"mkdir"}
@@ -38,7 +37,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 		description   string
 		args          args
 		expectedBody  models.SoftwareVersionDetails
-		expectedError error
+		expectedError string
 	}{
 		{
 			description: "If the query parameter is postgres",
@@ -73,7 +72,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 					},
 				},
 			},
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			description: "If the query parameter is opensearch",
@@ -108,7 +107,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 					},
 				},
 			},
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			description: "If the query parameter is automate or chef-server",
@@ -136,7 +135,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 					},
 				},
 			},
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			description: "If the query parameter is file is wrong",
@@ -171,7 +170,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 					},
 				},
 			},
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			description: "If the file is not avalable for OS Version ",
@@ -186,7 +185,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 					{},
 				},
 			},
-			expectedError: errors.New("open ./failfilepath: no such file or directory"),
+			expectedError: "open ./failfilepath: no such file or directory",
 		},
 		{
 			description: "If the os version is not supported by automate",
@@ -235,14 +234,17 @@ func TestGetSoftwareVersionService(t *testing.T) {
 					{},
 				},
 			},
-			expectedError: errors.New("the query is not supported"),
+			expectedError: "the query is not supported",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			service.(*SoftwareVersionService).osFilepath = tt.args.osFilepath
 			service.(*SoftwareVersionService).cmdCheckArray = tt.args.checkarray
-			got, _ := service.GetSoftwareVersionServices(tt.args.query)
+			got, err := service.GetSoftwareVersionServices(tt.args.query)
+			if err != nil {
+				assert.Equal(t, tt.expectedError, err.Error())
+			}
 			if !reflect.DeepEqual(got, tt.expectedBody) {
 				assert.Equal(t, got, tt.expectedBody)
 			}
