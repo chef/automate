@@ -8,28 +8,27 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 )
 
-type SshUserAccessCheck struct {
+type CertificateCheck struct {
 	host string
 	port string
 	log  logger.Logger
 }
 
-func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
-	return &SshUserAccessCheck{
+func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
+	return &CertificateCheck{
 		log:  log,
 		host: constants.LOCAL_HOST_URL,
 		port: port,
 	}
 }
 
-func (ss *SshUserAccessCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	ss.log.Info("Performing SSH user access check from batch check ")
+func (ss *CertificateCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
+	ss.log.Info("Performing Certificate check from batch check ")
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
 		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 
@@ -38,16 +37,22 @@ func (ss *SshUserAccessCheck) Run(config models.Config) map[string]models.CheckT
 	//This map will hold the Response against each IP
 	finalResult := make(map[string]models.CheckTriggerResponse)
 
-	ips := configutils.GetIps(config)
+	certificate := config.Certificate
 
-	for _, ip := range ips {
-		var requestBody map[string]interface{}
-		data, _ := json.Marshal(config.SSHUser)
-		json.Unmarshal(data, &requestBody)
-		requestBody[ip] = ip
-		go ss.TriggerCheckAndFormatOutput(ip, requestBody, outputCh)
+	for _, node := range certificate.Nodes {
+
+		//construct the request for Certificate Check API
+		requestBody := models.CertificateCheckRequest{
+			RootCertificate:  certificate.RootCert,
+			PrivateKey:       node.Key,
+			NodeCertificate:  node.Cert,
+			AdminPrivateKey:  node.AdminKey,
+			AdminCertificate: node.AdminCert,
+		}
+		go ss.TriggerCheckAndFormatOutput(node.IP, requestBody, outputCh)
 	}
 
+	//Read response from output channel
 	for i := 0; i < count; i++ {
 		resp := <-outputCh
 		finalResult[resp.Host] = resp
@@ -56,16 +61,16 @@ func (ss *SshUserAccessCheck) Run(config models.Config) map[string]models.CheckT
 	return finalResult
 }
 
-func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, body interface{}, output chan<- models.CheckTriggerResponse) {
+func (ss *CertificateCheck) TriggerCheckAndFormatOutput(host string, body interface{}, output chan<- models.CheckTriggerResponse) {
 	var checkResp models.CheckTriggerResponse
-	resp, err := ss.TriggerSshUserAccessCheck(body)
+	resp, err := ss.TriggerCertificateCheck(body)
 	if err != nil {
 		checkResp = models.CheckTriggerResponse{
 			Error: fiber.NewError(fiber.StatusServiceUnavailable, err.Error()),
 			Result: models.ApiResult{
 				Passed:  false,
-				Check:   constants.SSH_USER,
-				Message: constants.SSH_USER_MSG,
+				Check:   constants.CERTIFICATE,
+				Message: constants.CERTIFICATE_MSG,
 			},
 			Host: host,
 		}
@@ -80,8 +85,8 @@ func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, body inte
 			Status: resp.Status,
 			Result: models.ApiResult{
 				Passed:  isPassed,
-				Check:   constants.SSH_USER,
-				Message: constants.SSH_USER_MSG,
+				Check:   constants.CERTIFICATE,
+				Message: constants.CERTIFICATE_MSG,
 				Checks:  resp.Result.Checks,
 			},
 			Host: host,
@@ -92,23 +97,23 @@ func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, body inte
 }
 
 // TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response
-func (ss *SshUserAccessCheck) TriggerSshUserAccessCheck(body interface{}) (
+func (ss *CertificateCheck) TriggerCertificateCheck(body interface{}) (
 	*models.CheckTriggerResponse, error) {
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.SSH_USER_CHECK_API_PATH)
 	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
-		ss.log.Error("Error while Performing SSH user access check from batch Check API : ", err)
+		ss.log.Error("Error while Performing Certificate check from batch Check API : ", err)
 		return nil, err
 	}
 	respBody, err := ioutil.ReadAll(resp.Body) // nosemgrep
 	if err != nil {
-		ss.log.Error("Error while reading response of SSH user access check from batch Check API : ", err)
+		ss.log.Error("Error while reading response of Certificate check from batch Check API : ", err)
 		return nil, err
 	}
 	response := models.CheckTriggerResponse{}
 	err = json.Unmarshal(respBody, &response)
 	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of SSH user access check from batch Check API : ", err)
+		ss.log.Error("Error while reading unmarshalling response of Certificate check from batch Check API : ", err)
 		return nil, err
 	}
 	return &response, nil
