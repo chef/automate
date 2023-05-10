@@ -20,5 +20,5 @@ func NewSystemUserCheck(log logger.Logger, port string) *SystemUserCheck {
 }
 
 func (suc *SystemUserCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	return trigger.RunCheck(config, suc.log, suc.port, constants.SYSTEM_USER_CHECK_API_PATH, config.DeploymentState)
+	return trigger.RunCheck(config, suc.log, suc.port, constants.SYSTEM_USER_CHECK_API_PATH, "")
 }

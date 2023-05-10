@@ -1,11 +1,12 @@
 package softwareversionchecktrigger
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -61,6 +62,7 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 1)
 		require.Nil(t, ctr[host].Error)
 		require.Len(t, ctr[host].Result.Checks, 2)
+		require.Equal(t, "API check", ctr[host].Result.Check)
 
 		checkResp := ctr[host].Result.Checks[1]
 
@@ -90,6 +92,7 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 
 		require.Len(t, ctr, 1)
 		require.NotNil(t, ctr[host].Error)
+		require.Equal(t, ctr[host].Error.Code, http.StatusInternalServerError)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[host].Error.Error())
 	})
 }

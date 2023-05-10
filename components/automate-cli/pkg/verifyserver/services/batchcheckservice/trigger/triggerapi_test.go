@@ -42,20 +42,43 @@ const (
 		"host": ""
 	}`
 
-	resourceCheck = `{
+	automateResourceCheck = `{
 		"status": "SUCCESS",
 		"result": {
 			"passed": true,
 			"checks": [
 				{
-					"title": "CPU count check",
+					"title": "Automate CPU count check",
 					"passed": true,
 					"success_msg": "CPU count is >= 4",
 					"error_msg": "",
 					"resolution_msg": ""
 				},
 				{
-					"title": "CPU speed check",
+					"title": "Automate CPU speed check",
+					"passed": true,
+					"success_msg": "CPU speed should be >= 2Ghz",
+					"error_msg": "",
+					"resolution_msg": ""
+				}
+			]
+		}
+	}`
+
+	pgResourceCheck = `{
+		"status": "SUCCESS",
+		"result": {
+			"passed": true,
+			"checks": [
+				{
+					"title": "PG CPU count check",
+					"passed": true,
+					"success_msg": "CPU count is >= 4",
+					"error_msg": "",
+					"resolution_msg": ""
+				},
+				{
+					"title": "PG CPU speed check",
 					"passed": true,
 					"success_msg": "CPU speed should be >= 2Ghz",
 					"error_msg": "",
@@ -262,9 +285,18 @@ func createDummyServer() (*httptest.Server, string, string) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(softwareVersionResp))
 		}
+
 		if r.URL.Path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(resourceCheck))
+
+			reqParameters := r.URL.Query()
+			nodeType := reqParameters.Get("node_type")
+			if nodeType == "automate" {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(automateResourceCheck))
+			} else {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(pgResourceCheck))
+			}
 		}
 
 		if r.URL.Path == constants.SYSTEM_USER_CHECK_API_PATH {
@@ -278,6 +310,5 @@ func createDummyServer() (*httptest.Server, string, string) {
 	colonIndex := strings.Index(address, ":")
 	ip := address[:colonIndex]
 	port := address[colonIndex+1:]
-
 	return server, ip, port
 }

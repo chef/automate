@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bmizerany/assert"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
@@ -40,7 +41,7 @@ const (
 func TestSystemResourceCheck_Run(t *testing.T) {
 	t.Run("System Resource Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(http.StatusOK)
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -49,6 +50,7 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			DeploymentState: "pre-release",
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
@@ -58,12 +60,20 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 1)
 		require.Nil(t, ctr[host].Error)
 		require.Len(t, ctr[host].Result.Checks, 2)
+		require.Equal(t, "SUCCESS", ctr[host].Status)
+		checkResp := ctr[host].Result.Checks[1]
+
+		assert.Equal(t, "CPU speed check", checkResp.Title)
+		assert.Equal(t, true, checkResp.Passed)
+		assert.Equal(t, "CPU speed should be >= 2Ghz", checkResp.SuccessMsg)
+		assert.Equal(t, "", checkResp.ErrorMsg)
+		assert.Equal(t, "", checkResp.ResolutionMsg)
 
 	})
 
 	t.Run("Failed Resource Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(http.StatusInternalServerError)
+		server, host, port := createDummyServer(t, http.StatusInternalServerError)
 		defer server.Close()
 
 		// Test data
@@ -79,13 +89,20 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 
 		require.Len(t, ctr, 1)
 		require.NotNil(t, ctr[host].Error)
+		require.Equal(t, ctr[host].Error.Code, http.StatusInternalServerError)
+		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[host].Error.Error())
 	})
 }
 
 // Helper function to create a dummy server
-func createDummyServer(requiredStatusCode int) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, constants.SYSTEM_RESOURCE_CHECK_API_PATH, r.URL.Path)
+			reqParameters := r.URL.Query()
+			assert.Equal(t, 2, len(reqParameters))
+			assert.Equal(t, "automate", reqParameters.Get("node_type"))
+			assert.Equal(t, "pre-release", reqParameters.Get("deployment_state"))
 
 			if r.URL.Path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 				w.WriteHeader(http.StatusOK)
