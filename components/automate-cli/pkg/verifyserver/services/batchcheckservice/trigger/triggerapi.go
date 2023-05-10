@@ -11,7 +11,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 )
 
 func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) map[string]models.CheckTriggerResponse {
@@ -21,24 +20,31 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 		config.Hardware.PostgresqlNodeCount +
 		config.Hardware.OpenSearchNodeCount
 
-	outputCh := make(chan models.CheckTriggerResponse, count)
+	outputCh := make(chan models.CheckTriggerResponse)
 
-	ipNodeMap := fiberutils.ConstructIpAndNodeTypeMap(config)
+	// TODO:: Run the Check for bastion as well
+	// added one for bastion node
+	//if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
+	//	count = count + 1
+	//	endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
+	//	go triggerCheckAPI(endpoint, "127.0.0.1", outputCh)
+	//}
 
-	for ip, nodeType := range ipNodeMap {
-		endPoint := ""
-
-		if path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
-			endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s", ip, port, path, nodeType)
-
-		} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
-			endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
-
-		} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
-			endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
-		}
-
-		go triggerCheckAPI(endPoint, ip, outputCh)
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		endpoint := prepareEndpoint(path, ip, port, "automate", depState)
+		go triggerCheckAPI(endpoint, ip, outputCh)
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		endpoint := prepareEndpoint(path, ip, port, "chef-infra-server", depState)
+		go triggerCheckAPI(endpoint, ip, outputCh)
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
+		go triggerCheckAPI(endpoint, ip, outputCh)
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
+		go triggerCheckAPI(endpoint, ip, outputCh)
 	}
 
 	for i := 0; i < count; i++ {
@@ -47,9 +53,23 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 			result[res.Host] = res
 		}
 	}
-	close(outputCh)
 
 	return result
+}
+
+func prepareEndpoint(path, ip, port, nodeType, depState string) string {
+	endPoint := ""
+	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
+		endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s", ip, port, path, nodeType)
+
+	} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
+		endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
+
+	} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
+		endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
+	}
+
+	return endPoint
 }
 
 func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerResponse) {
@@ -70,7 +90,7 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
-	
+
 	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
