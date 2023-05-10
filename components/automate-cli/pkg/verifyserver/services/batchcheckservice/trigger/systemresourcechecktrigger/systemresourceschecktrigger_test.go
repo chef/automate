@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bmizerany/assert"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
