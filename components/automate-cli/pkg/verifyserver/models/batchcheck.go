@@ -82,9 +82,12 @@ type BatchCheckResult struct {
 }
 
 type CheckTriggerResponse struct {
-	Status string       `json:"status"`
-	Result ApiResult    `json:"result"`
-	Error  *fiber.Error `json:"error,omitempty"`
+	Status    string       `json:"status"`
+	Result    ApiResult    `json:"result"`
+	Host      string       `json:"host"`
+	NodeType  string       `json:"node_type"`
+	CheckType string       `json:"check_type"`
+	Error     *fiber.Error `json:"error,omitempty"`
 }
 type ApiResult struct {
 	Passed  bool     `json:"passed"`

@@ -238,19 +238,20 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 
 		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1234")
 		request := GetRequestJson()
-		mapStruct := hrc.Run(request)
+		finalResp := hrc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
-		assert.Equal(t, totalIps, len(mapStruct))
+		assert.Equal(t, totalIps, len(finalResp))
 
-		for ip, resp := range mapStruct {
+		for _, resp := range finalResp {
 			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, resp.Result.Check)
 			assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
 			assert.Nil(t, resp.Error)
-			if ip == "14.15.16.17" {
-				triggerResp := mapStruct["14.15.16.17"]
+			if resp.Host == "14.15.16.17" {
+				triggerResp := resp
 				assert.Equal(t, "SUCCESS", triggerResp.Status)
 				assert.NotEmpty(t, triggerResp.Result)
+				assert.Equal(t, constants.OPENSEARCH, triggerResp.NodeType)
 				assert.Equal(t, resp.Result.Passed, false)
 				assert.Equal(t, 4, len(triggerResp.Result.Checks))
 				assert.Equal(t, "IP address", triggerResp.Result.Checks[0].Title)

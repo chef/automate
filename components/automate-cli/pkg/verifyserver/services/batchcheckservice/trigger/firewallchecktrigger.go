@@ -8,9 +8,9 @@ func NewFirewallCheck() *FirewallCheck {
 	return &FirewallCheck{}
 }
 
-func (ss *FirewallCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }

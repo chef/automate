@@ -8,9 +8,9 @@ func NewSystemUserCheck() *SystemUserCheck {
 	return &SystemUserCheck{}
 }
 
-func (ss *SystemUserCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (suc *SystemUserCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }
