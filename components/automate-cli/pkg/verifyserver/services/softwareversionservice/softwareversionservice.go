@@ -1,7 +1,6 @@
 package softwareversionservice
 
 import (
-	"errors"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -10,10 +9,11 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/getosutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/pkg/errors"
 )
 
 type ISoftwareVersionService interface {
-	GetSoftwareVersionServices(string) (models.SoftwareVersionDetails, error)
+	GetSoftwareVersionServices(string) (*models.SoftwareVersionDetails, error)
 }
 
 type SoftwareVersionService struct {
@@ -25,20 +25,20 @@ type SoftwareVersionService struct {
 func NewSoftwareVersionService(logger logger.Logger) ISoftwareVersionService {
 	return &SoftwareVersionService{
 		cmdCheckArray: cmdCheckArray,
-		osFilepath:    osFilepath,
+		osFilepath:    OSFILEPATH,
 		logger:        logger,
 	}
 }
 
 const (
-	availability = " availability"
-	Ensure       = "Ensure "
-	osFilepath   = "/etc/os-release"
+	AVAILABILITY = " availability"
+	ENSURE       = "Ensure "
+	OSFILEPATH   = "/etc/os-release"
 )
 
 var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "pvcreate", "vgcreate", "lvcreate", "mv", "systemd", "wget", "exec"}
 
-func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (models.SoftwareVersionDetails, error) {
+func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*models.SoftwareVersionDetails, error) {
 	sv.logger.Debug("The query paramter entered = ", query)
 	serviceResponse := models.SoftwareVersionDetails{}
 	serviceResponse.Passed = true
@@ -54,12 +54,7 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (mode
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
 	} else {
 		sv.logger.Error("The Query parameter is not supported")
-		return models.SoftwareVersionDetails{
-			Passed: false,
-			Checks: []models.Checks{
-				{},
-			},
-		}, errors.New("the query is not supported")
+		return nil, errors.New("The query "+ query +" is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server")
 	}
 
 	for i := 0; i < len(cmdArray); i++ {
@@ -67,43 +62,38 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (mode
 		if !checkResponse.Passed {
 			serviceResponse.Passed = false
 		}
-		serviceResponseArray = append(serviceResponseArray, checkResponse)
+		serviceResponseArray = append(serviceResponseArray, *checkResponse)
 	}
 	osResponse, err := sv.checkOsVersion(sv.osFilepath)
 	if err != nil {
 		sv.logger.Error("Error while getting the OS Version = ", err)
-		return models.SoftwareVersionDetails{
-			Passed: false,
-			Checks: []models.Checks{
-				{},
-			},
-		}, err
+		return nil, errors.Wrap(err, "Error while getting the OS Version")
 	}
 	if !osResponse.Passed {
 		serviceResponse.Passed = false
 	}
-	serviceResponseArray = append(serviceResponseArray, osResponse)
+	serviceResponseArray = append(serviceResponseArray, *osResponse)
 	serviceResponse.Checks = serviceResponseArray
 	sv.logger.Debug("The Passed value for the response = ", serviceResponse.Passed)
 	sv.logger.Debug("The Checks array for the response = ", serviceResponse.Checks)
-	return models.SoftwareVersionDetails{
+	return &models.SoftwareVersionDetails{
 		Passed: serviceResponse.Passed,
 		Checks: serviceResponse.Checks,
 	}, nil
 }
-func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) models.Checks {
+func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Checks {
 	_, err := exec.LookPath(cmdName)
 	if err != nil {
-		return models.Checks{
-			Title:         cmdName + availability,
+		return &models.Checks{
+			Title:         cmdName + AVAILABILITY,
 			Passed:        false,
 			SuccessMsg:    "",
 			ErrorMsg:      cmdName + " is not available",
-			ResolutionMsg: Ensure + cmdName + " is available in $PATH on the node",
+			ResolutionMsg: ENSURE + cmdName + " is available in $PATH on the node",
 		}
 	}
-	return models.Checks{
-		Title:         cmdName + availability,
+	return &models.Checks{
+		Title:         cmdName + AVAILABILITY,
 		Passed:        true,
 		SuccessMsg:    cmdName + " is available",
 		ErrorMsg:      "",
@@ -111,7 +101,7 @@ func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) models.Che
 	}
 }
 
-func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (models.Checks, error) {
+func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Checks, error) {
 	osVersions := map[string][]string{
 		"Red Hat":      {"7,8,9"},
 		"Ubuntu":       {"16.04.x", "18.04.x", "20.04.x", "22.04.x"},
@@ -125,14 +115,14 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (models.Chec
 	sv.logger.Debug("Got the OS Name = ", osName)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as file path doesnot exit = ", err)
-		return models.Checks{}, err
+		return nil, err
 	}
 	for key := range osVersions {
 		if strings.Contains(osName, key) {
 			correctVersion := sv.checkOs(osVersions, osVersion, key)
 			if correctVersion {
 				checkResponse = models.Checks{
-					Title:         key + availability,
+					Title:         key + AVAILABILITY,
 					Passed:        true,
 					SuccessMsg:    key + " version is " + osVersion,
 					ErrorMsg:      "",
@@ -141,23 +131,23 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (models.Chec
 				break
 			}
 			checkResponse = models.Checks{
-				Title:         key + availability,
+				Title:         key + AVAILABILITY,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      key + " version is not supported by automate",
-				ResolutionMsg: Ensure + key + " correct version is installed on the node",
+				ResolutionMsg: ENSURE + key + " correct version is installed on the node",
 			}
 			break
 		}
 		checkResponse = models.Checks{
-			Title:         osName + availability,
+			Title:         osName + AVAILABILITY,
 			Passed:        false,
 			SuccessMsg:    "",
 			ErrorMsg:      osName + " version is not supported by automate",
-			ResolutionMsg: Ensure + osName + " correct version is installed on the node",
+			ResolutionMsg: ENSURE + osName + " correct version is installed on the node",
 		}
 	}
-	return checkResponse, nil
+	return &checkResponse, nil
 }
 
 func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVersion string, osName string) bool {

@@ -18,8 +18,8 @@ import (
 
 func SetupMockSoftwareVersionService(response models.SoftwareVersionDetails, err error) softwareversionservice.ISoftwareVersionService {
 	return &softwareversionservice.MockSoftwareVersionService{
-		GetSoftwareServicesFunc: func() (models.SoftwareVersionDetails, error) {
-			return response, err
+		GetSoftwareServicesFunc: func() (*models.SoftwareVersionDetails, error) {
+			return &response, err
 		},
 	}
 }
@@ -73,7 +73,7 @@ func TestSoftwareVersionAPI(t *testing.T) {
 			description:   "500:Error while getting the file",
 			expectedCode:  500,
 			requestBody:   models.SoftwareVersionDetails{},
-			expectedBody:  `{"status":"FAILED","result":null,"error":{"code":0,"message":"open /testfile: no such file or directory"}}`,
+			expectedBody:  `{"status":"FAILED","result":null,"error":{"code":500,"message":"open /testfile: no such file or directory"}}`,
 			expectedError: errors.New("open /testfile: no such file or directory"),
 		},
 	}

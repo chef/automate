@@ -1,7 +1,6 @@
 package softwareversionservice
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -36,7 +35,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 	tests := []struct {
 		description   string
 		args          args
-		expectedBody  models.SoftwareVersionDetails
+		expectedBody  *models.SoftwareVersionDetails
 		expectedError string
 	}{
 		{
@@ -46,7 +45,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: successfile,
 			},
-			expectedBody: models.SoftwareVersionDetails{
+			expectedBody: &models.SoftwareVersionDetails{
 				Passed: true,
 				Checks: []models.Checks{
 					{
@@ -81,7 +80,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: successfile,
 			},
-			expectedBody: models.SoftwareVersionDetails{
+			expectedBody: &models.SoftwareVersionDetails{
 				Passed: true,
 				Checks: []models.Checks{
 					{
@@ -116,7 +115,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: successfile,
 			},
-			expectedBody: models.SoftwareVersionDetails{
+			expectedBody: &models.SoftwareVersionDetails{
 				Passed: true,
 				Checks: []models.Checks{
 					{
@@ -144,7 +143,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checkfalse,
 				osFilepath: successfile,
 			},
-			expectedBody: models.SoftwareVersionDetails{
+			expectedBody: &models.SoftwareVersionDetails{
 				Passed: false,
 				Checks: []models.Checks{
 					{
@@ -179,13 +178,8 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: failfilepath,
 			},
-			expectedBody: models.SoftwareVersionDetails{
-				Passed: false,
-				Checks: []models.Checks{
-					{},
-				},
-			},
-			expectedError: "open ./failfilepath: no such file or directory",
+			expectedBody: nil,
+			expectedError: "Error while getting the OS Version: open ./failfilepath: no such file or directory",
 		},
 		{
 			description: "If the os version is not supported by automate",
@@ -194,7 +188,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: failurefile,
 			},
-			expectedBody: models.SoftwareVersionDetails{
+			expectedBody: &models.SoftwareVersionDetails{
 				Passed: false,
 				Checks: []models.Checks{
 					{
@@ -228,13 +222,8 @@ func TestGetSoftwareVersionService(t *testing.T) {
 				checkarray: checktrue,
 				osFilepath: successfile,
 			},
-			expectedBody: models.SoftwareVersionDetails{
-				Passed: false,
-				Checks: []models.Checks{
-					{},
-				},
-			},
-			expectedError: "the query is not supported",
+			expectedBody: nil,
+			expectedError: "The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server",
 		},
 	}
 	for _, tt := range tests {
@@ -244,8 +233,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 			got, err := service.GetSoftwareVersionServices(tt.args.query)
 			if err != nil {
 				assert.Equal(t, tt.expectedError, err.Error())
-			}
-			if !reflect.DeepEqual(got, tt.expectedBody) {
+			} else {
 				assert.Equal(t, got, tt.expectedBody)
 			}
 		})
@@ -301,12 +289,11 @@ func TestCheckOs(t *testing.T) {
 			expectedBody: false,
 		},
 	}
-	// cs.(*s3configservice.S3ConfigService)
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			if got := sv.(*SoftwareVersionService).checkOs(tt.args.osVersions, tt.args.version, tt.args.key); got != tt.expectedBody {
-				assert.Equal(t, got, tt.expectedBody)
-			}
+			got := sv.(*SoftwareVersionService).checkOs(tt.args.osVersions, tt.args.version, tt.args.key)	
+			assert.Equal(t, got, tt.expectedBody)
+			
 		})
 	}
 }
@@ -320,14 +307,14 @@ func TestCheckCommandVersion(t *testing.T) {
 	tests := []struct {
 		description  string
 		args         args
-		expectedBody models.Checks
+		expectedBody *models.Checks
 	}{
 		{
 			description: "If the cammand is present in the node",
 			args: args{
 				cmdName: "mkdir",
 			},
-			expectedBody: models.Checks{
+			expectedBody: &models.Checks{
 				Title:         "mkdir availability",
 				Passed:        true,
 				SuccessMsg:    "mkdir is available",
@@ -340,7 +327,7 @@ func TestCheckCommandVersion(t *testing.T) {
 			args: args{
 				cmdName: "abc",
 			},
-			expectedBody: models.Checks{
+			expectedBody: &models.Checks{
 				Title:         "abc availability",
 				Passed:        false,
 				SuccessMsg:    "",
@@ -351,9 +338,9 @@ func TestCheckCommandVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			if got := sv.(*SoftwareVersionService).checkCommandVersion(tt.args.cmdName); !reflect.DeepEqual(got, tt.expectedBody) {
-				assert.Equal(t, got, tt.expectedBody)
-			}
+			got := sv.(*SoftwareVersionService).checkCommandVersion(tt.args.cmdName)
+			assert.Equal(t, got, tt.expectedBody)
+			
 		})
 	}
 }
@@ -367,7 +354,7 @@ func TestCheckOsVersion(t *testing.T) {
 	tests := []struct {
 		description  string
 		args         args
-		expectedBody models.Checks
+		expectedBody *models.Checks
 		expectedErr  bool
 	}{
 		{
@@ -375,7 +362,7 @@ func TestCheckOsVersion(t *testing.T) {
 			args: args{
 				osFilepath: failurefile,
 			},
-			expectedBody: models.Checks{
+			expectedBody: &models.Checks{
 				Title:         "Debian GNU/Linux 10 (buster) availability",
 				Passed:        false,
 				SuccessMsg:    "",
@@ -388,7 +375,7 @@ func TestCheckOsVersion(t *testing.T) {
 			args: args{
 				osFilepath: successfile,
 			},
-			expectedBody: models.Checks{
+			expectedBody: &models.Checks{
 				Title:         "Ubuntu availability",
 				Passed:        true,
 				SuccessMsg:    "Ubuntu version is 20.04",
@@ -402,7 +389,7 @@ func TestCheckOsVersion(t *testing.T) {
 			args: args{
 				osFilepath: versionfile,
 			},
-			expectedBody: models.Checks{
+			expectedBody: &models.Checks{
 				Title:         "SUSE Linux availability",
 				Passed:        false,
 				SuccessMsg:    "",
@@ -418,8 +405,7 @@ func TestCheckOsVersion(t *testing.T) {
 			if (err != nil) != tt.expectedErr {
 				assert.Equal(t, err, tt.expectedErr)
 				return
-			}
-			if !reflect.DeepEqual(got, tt.expectedBody) {
+			} else {
 				assert.Equal(t, got, tt.expectedBody)
 			}
 		})
