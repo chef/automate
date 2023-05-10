@@ -11,12 +11,7 @@ import (
 )
 
 type IStatusService interface {
-	GetServices() ([]models.ServiceDetails, error)
-	GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error)
-	GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error)
-	ParseChefAutomateStatus(output string) (map[string]models.ServiceDetails, error)
-	ParseHabSvcStatus(output string) ([]models.ServiceDetails, error)
-	CheckIfBENode(output string) bool
+	GetServices() (*[]models.ServiceDetails, error)
 }
 
 type StatusService struct {
@@ -38,7 +33,7 @@ func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log 
 	}
 }
 
-func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
+func (ss *StatusService) GetServices() (*[]models.ServiceDetails, error) {
 	habResponse, err := ss.GetServicesFromHabSvcStatus()
 	if err != nil {
 		return nil, err
@@ -49,16 +44,17 @@ func (ss *StatusService) GetServices() ([]models.ServiceDetails, error) {
 		return nil, err
 	}
 
-	for i, service := range habResponse {
-		if automateService, ok := automateResponse[service.ServiceName]; ok {
-			habResponse[i].Status = automateService.Status
+	for i, service := range *habResponse {
+		if automateService, ok := (*automateResponse)[service.ServiceName]; ok {
+			(*habResponse)[i].Status = automateService.Status
 		}
 	}
+
 	return habResponse, nil
 }
 
 // Get the services from
-func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails, error) {
+func (ss *StatusService) GetServicesFromHabSvcStatus() (*[]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc(HabStatusCmd)
 	ss.Log.Debug("Output for '"+HabStatusCmd+"' command: ", string(output))
 	if err != nil {
@@ -69,7 +65,7 @@ func (ss *StatusService) GetServicesFromHabSvcStatus() ([]models.ServiceDetails,
 }
 
 // Parse the output of hab svc status
-func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetails, error) {
+func (ss *StatusService) ParseHabSvcStatus(output string) (*[]models.ServiceDetails, error) {
 	response := make([]models.ServiceDetails, 0)
 
 	tableStart := strings.Index(output, "package")
@@ -99,18 +95,18 @@ func (ss *StatusService) ParseHabSvcStatus(output string) ([]models.ServiceDetai
 			})
 		}
 	}
-	return response, nil
+	return &response, nil
 }
 
 // Get the services from chef-automate status
-func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.ServiceDetails, error) {
+func (ss *StatusService) GetServicesFromAutomateStatus() (*map[string]models.ServiceDetails, error) {
 	output, err := ss.ExecuteShellCommandFunc(AutomateStatusCmd)
 	ss.Log.Debug("Output for '"+AutomateStatusCmd+"' command: ", string(output))
 	if err != nil && !strings.Contains(string(output), automateStatusUnhealthy) {
 		ss.Log.Error("Error while running '"+AutomateStatusCmd+"' command: ", err)
 		//If it's a backend node, return an empty map
 		if ss.CheckIfBENode(string(output)) {
-			return make(map[string]models.ServiceDetails), nil
+			return &map[string]models.ServiceDetails{}, nil
 		}
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from chef-automate status")
 	}
@@ -118,7 +114,7 @@ func (ss *StatusService) GetServicesFromAutomateStatus() (map[string]models.Serv
 }
 
 // Parse the output of chef-automate status
-func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]models.ServiceDetails, error) {
+func (ss *StatusService) ParseChefAutomateStatus(output string) (*map[string]models.ServiceDetails, error) {
 	response := make(map[string]models.ServiceDetails)
 
 	tableStart := strings.Index(output, "Service Name")
@@ -141,7 +137,7 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (map[string]mode
 			}
 		}
 	}
-	return response, nil
+	return &response, nil
 }
 
 // Check if it's a backend node

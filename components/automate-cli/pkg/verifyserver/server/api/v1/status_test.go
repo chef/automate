@@ -20,8 +20,8 @@ import (
 func SetupMockStatusService(httpStatus int) statusservice.IStatusService {
 	if httpStatus == 200 {
 		return &statusservice.MockStatusService{
-			GetServicesFunc: func() ([]models.ServiceDetails, error) {
-				return []models.ServiceDetails{
+			GetServicesFunc: func() (*[]models.ServiceDetails, error) {
+				return &[]models.ServiceDetails{
 					{
 						ServiceName: "deployment-service",
 						Version:     "chef/deployment-service/0.1.0/20230502070345",
@@ -32,8 +32,8 @@ func SetupMockStatusService(httpStatus int) statusservice.IStatusService {
 		}
 	} else {
 		return &statusservice.MockStatusService{
-			GetServicesFunc: func() ([]models.ServiceDetails, error) {
-				return []models.ServiceDetails(nil), fiber.NewError(fiber.StatusInternalServerError, "Some error occurred")
+			GetServicesFunc: func() (*[]models.ServiceDetails, error) {
+				return nil, fiber.NewError(fiber.StatusInternalServerError, "Some error occurred")
 			},
 		}
 	}
