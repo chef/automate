@@ -12,11 +12,16 @@ func (h *Handler) NFSMount(c *fiber.Ctx) {
 	reqBody := models.NFSMountRequest{}
 	if err := c.BodyParser(&reqBody); err != nil {
 		h.Logger.Error(err.Error())
-		c.JSON(response.BuildFailedResponse(&fiber.Error{Code: http.StatusBadRequest, Message: "Invalid Body Request"}))
+		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Invalid Body Request"})
 		return
 	}
-	if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 || len(reqBody.PostgresqlNodeIPs) == 0 || len(reqBody.OpensearchNodeIPs) == 0 || reqBody.MountLocation == "" {
-		c.JSON(response.BuildFailedResponse(&fiber.Error{Code: http.StatusBadRequest, Message: "Give all the required body parameters"}))
+	if len(reqBody.AutomateNodeIPs) == 0 || len(reqBody.ChefInfraServerNodeIPs) == 0 || len(reqBody.PostgresqlNodeIPs) == 0 || len(reqBody.OpensearchNodeIPs) == 0 {
+		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty"})
+		return
+	}
+
+	if reqBody.MountLocation == "" {
+		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Mount Location cannot be empty"})
 		return
 	}
 

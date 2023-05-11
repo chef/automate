@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -254,11 +255,6 @@ func SetupMockNFSMountService() nfsmountservice.INFSService {
 				},
 			}
 		},
-		DoAPICallFunc: func(ip, NodeType, mountLocation string, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) models.NFSMountResponse {
-			return models.NFSMountResponse{}
-		},
-		MakeConcurrentCallFunc: func(ip, NodeType, mountLocation string, ch chan string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) {
-		},
 	}
 }
 
@@ -297,26 +293,47 @@ func TestNFSMount(t *testing.T) {
 		},
 		{
 			TestName:     "Invalid Body Request",
-			ExpectedCode: 200,
+			ExpectedCode: 400,
 			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"Invalid Body Request"}}`,
-			RequestBody: `{
-				"automate_node_ip": [
-					"localhost",
-					"localhost"
-				],
-			}`,
+			RequestBody:  "Invalid Body",
 		},
 		{
-			TestName:     "Not Given all the required body parameters",
-			ExpectedCode: 200,
-			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"Give all the required body parameters"}}`,
+			TestName:     "Not Given all the required IPs",
+			ExpectedCode: 400,
+			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty"}}`,
 			RequestBody: `{
 				"automate_node_ips": []
 			}`,
 		},
+		{
+			TestName:     "Not Given the mount location",
+			ExpectedCode: 400,
+			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"Mount Location cannot be empty"}}`,
+			RequestBody: `{
+				"automate_node_ips": [
+					"localhost",
+					"localhost"
+				],
+				"chef_infra_server_node_ips": [
+					"localhost",
+					"localhost"
+				],
+				"postgresql_node_ips": [
+					"localhost",
+					"localhost",
+					"localhost"
+				],
+				"opensearch_node_ips": [
+					"localhost",
+					"localhost",
+					"localhost"
+				]
+			}`,
+		},
 	}
 
-	NFSMountEndpoint := "/api/v1/checks/nfs-mount"
+	NFSMountEndpoint := constants.NFS_MOUNT_ENDPOINT
+
 	app, err := SetupNFSMountHandler(SetupMockNFSMountService())
 	assert.NoError(t, err)
 

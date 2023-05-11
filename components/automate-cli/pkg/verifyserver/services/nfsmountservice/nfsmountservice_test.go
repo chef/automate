@@ -126,15 +126,11 @@ func TestCheckMount(t *testing.T) {
 }
 
 func TestCheckShare(t *testing.T) {
-	compareWith := models.NFSMountLocResponse{
-		Address:       "10.0.0.11",
-		Nfs:           "10.0.0.11:/backup_share",
-		MountLocation: "/mnt/automate_backups",
-	}
 	tests := []struct {
 		TestName         string
 		Data             models.NFSMountLocResponse
 		NfsMounted       bool
+		NfsShared        bool
 		ExpectedCheckRes bool
 	}{
 		{
@@ -145,6 +141,7 @@ func TestCheckShare(t *testing.T) {
 				MountLocation: "/mnt/automate_backups",
 			},
 			NfsMounted:       true,
+			NfsShared:        true,
 			ExpectedCheckRes: true,
 		},
 		{
@@ -155,6 +152,7 @@ func TestCheckShare(t *testing.T) {
 				MountLocation: "/mnt/automate_backups",
 			},
 			NfsMounted:       false,
+			NfsShared:        false,
 			ExpectedCheckRes: false,
 		},
 		{
@@ -165,13 +163,14 @@ func TestCheckShare(t *testing.T) {
 				MountLocation: "/mnt/automate",
 			},
 			NfsMounted:       true,
+			NfsShared:        false,
 			ExpectedCheckRes: false,
 		},
 	}
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			node := new(models.NFSMountResponse)
-			nfsmountservice.CheckShare(e.Data, compareWith, node, e.NfsMounted)
+			nfsmountservice.CheckShare(e.NfsMounted, e.NfsShared, "/mnt/automate", e.Data, node)
 			// checkShare function will append check result in node object.
 			isPassed := node.CheckList[0].Passed
 			assert.Equal(t, e.ExpectedCheckRes, isPassed)
@@ -216,6 +215,8 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 			res, err := nfsmountservice.GetResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 			assert.Equal(t, res, e.ExpectedResp)
 		})
@@ -376,6 +377,7 @@ func TestGetNFSMountDetails(t *testing.T) {
 				if e.Response[index].Error != nil {
 					assert.Error(t, te.Error)
 				} else {
+					assert.NoError(t, te.Error)
 					assert.Equal(t, te.CheckList[0].Passed, e.Response[index].CheckList[0].Passed)
 					assert.Equal(t, te.CheckList[1].Passed, e.Response[index].CheckList[1].Passed)
 				}
@@ -456,11 +458,12 @@ func TestMakeRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			respBody := []models.NFSMountResponse{}
-			nfsmountservice.MakeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap)
+			nfsmountservice.MakeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap, "/mnt/automate_backpus")
 			assert.Equal(t, len(respBody), e.RespBodyLen)
 			if e.ExpectedError != nil {
 				assert.Error(t, respBody[0].Error)
 			} else {
+				assert.NoError(t, respBody[0].Error)
 				assert.Equal(t, e.NfsMounted, respBody[0].CheckList[0].Passed)
 				assert.Equal(t, e.NfsShared, respBody[0].CheckList[1].Passed)
 			}

@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gofiber/fiber"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gofiber/fiber"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -20,8 +21,6 @@ import (
 
 type INFSService interface {
 	GetNFSMountDetails(models.NFSMountRequest) *[]models.NFSMountResponse
-	//MakeConcurrentCall(string, string, string, chan string, map[string]models.NFSMountResponse, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int)
-	//DoAPICall(string, string, string, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int) models.NFSMountResponse
 }
 
 type NFSMountService struct {
@@ -29,74 +28,16 @@ type NFSMountService struct {
 	log  logger.Logger
 }
 
+type TempResponse struct {
+	MountLocRes models.NFSMountLocResponse
+	MountResp   models.NFSMountResponse
+}
+
 func NewNFSMountService(log logger.Logger, port string) *NFSMountService {
 	return &NFSMountService{
 		port: port,
 		log:  log,
 	}
-}
-
-func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
-	res, err := nm.DoAPICall(ip, mountLocation)
-
-	mountResp := prepareMountResp(ip, nodeType, mountLocation, res, err)
-
-	respMap := make(map[string]TempResponse)
-	tempResp := TempResponse{
-		MountResp: mountResp,
-	}
-	if err == nil {
-		tempResp.MountLocRes = *res
-	}
-	respMap[key] = tempResp
-	respChan <- respMap
-}
-
-func prepareMountResp(ip, nodeType, mountLocation string, mountLocResp *models.NFSMountLocResponse, err error) models.NFSMountResponse {
-	node := models.NFSMountResponse{}
-	node.IP = ip
-	node.NodeType = nodeType
-
-	if err != nil {
-		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
-		return node
-	}
-	CheckMount(mountLocation, &node, mountLocResp)
-	return node
-}
-
-func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int,
-	orderList []string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse) {
-	compareWith := models.NFSMountLocResponse{}
-	currMax := 0
-	// Finding the Majority element and putting in the compareWith variable for the later comparisons
-	for k, v := range countMap {
-		if v > currMax {
-			currMax = v
-			compareWith = k
-		}
-	}
-
-	for _, key := range orderList {
-		val := nfsMountResultMap[key]
-		// Need to check error first. Because while making call to the API if something get wrong
-		// then we are storing checkList as nil and putting the error in Error field.
-		if val.Error == nil {
-			// if nfs is mounted then in our first check for the particular node it will be true. hence we are passing that which checking shareability
-			// Test2 - Check for NFS Volume is Shared among all nodes or not
-			if val.CheckList[0].Passed {
-				CheckShare(shareMap[key], compareWith, &val, true)
-			} else {
-				CheckShare(shareMap[key], compareWith, &val, false)
-			}
-		}
-		*respBody = append(*respBody, val)
-	}
-}
-
-type TempResponse struct {
-	MountLocRes models.NFSMountLocResponse
-	MountResp   models.NFSMountResponse
 }
 
 func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
@@ -114,45 +55,57 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 	var orderList []string
 
 	for index, ip := range reqBody.AutomateNodeIPs {
-		key := "automate" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "automate", reqBody.MountLocation, ch, key)
+		key := constants.AUTOMATE + ip + strconv.Itoa(index)
+		go nm.MakeConcurrentCall(ip, constants.AUTOMATE, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.ChefInfraServerNodeIPs {
-		key := "chef-infra-server" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "chef-infra-server", reqBody.MountLocation, ch, key)
+		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
+		go nm.MakeConcurrentCall(ip, constants.CHEF_INFRA_SERVER, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.PostgresqlNodeIPs {
-		key := "postgresql" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "postgresql", reqBody.MountLocation, ch, key)
+		key := constants.POSTGRESQL + ip + strconv.Itoa(index)
+		go nm.MakeConcurrentCall(ip, constants.POSTGRESQL, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.OpensearchNodeIPs {
-		key := "opensearch" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "opensearch", reqBody.MountLocation, ch, key)
+		key := constants.OPENSEARCH + ip + strconv.Itoa(index)
+		go nm.MakeConcurrentCall(ip, constants.OPENSEARCH, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
-	// it will help us to hold the program until all triggered go routines cameback
 	for i := 0; i < len(orderList); i++ {
-		select {
-		case tempResponse := <-ch:
-			for k, v := range tempResponse {
-				nfsMountResultMap[k] = v.MountResp
-				if v.MountResp.Error == nil {
-					shareMap[k] = v.MountLocRes
-					countMap[v.MountLocRes] = countMap[v.MountLocRes] + 1
-				}
+		tempResponse := <-ch
+		for k, v := range tempResponse {
+			nfsMountResultMap[k] = v.MountResp
+			if v.MountResp.Error == nil {
+				shareMap[k] = v.MountLocRes
+				countMap[v.MountLocRes] = countMap[v.MountLocRes] + 1
 			}
 		}
 	}
-
-	MakeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap)
+	MakeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap, reqBody.MountLocation)
 	return respBody
+}
+
+func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
+	res, err := nm.DoAPICall(ip, mountLocation)
+
+	mountResp := prepareMountResp(ip, nodeType, mountLocation, res, err)
+
+	respMap := make(map[string]TempResponse)
+	tempResp := TempResponse{
+		MountResp: mountResp,
+	}
+	if err == nil {
+		tempResp.MountLocRes = *res
+	}
+	respMap[key] = tempResp
+	respChan <- respMap
 }
 
 func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
@@ -222,6 +175,38 @@ func GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocRespons
 	return resultField, nil
 }
 
+func prepareMountResp(ip, nodeType, mountLocation string, mountLocResp *models.NFSMountLocResponse, err error) models.NFSMountResponse {
+	node := models.NFSMountResponse{}
+	node.IP = ip
+	node.NodeType = nodeType
+
+	if err != nil {
+		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
+		return node
+	}
+	CheckMount(mountLocation, &node, mountLocResp)
+	return node
+}
+
+func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int, orderList []string,
+	nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, mountLocation string) {
+	var isShared bool = false
+	if len(countMap) == 1 {
+		isShared = true
+	}
+
+	for _, key := range orderList {
+		val := nfsMountResultMap[key]
+		// Need to check error first. Because while making call to the API if something get wrong
+		// then we are storing checkList as nil and putting the error in Error field.
+		if val.Error == nil {
+			// Test2 - Check for NFS Volume is Shared among all nodes or not
+			CheckShare(val.CheckList[0].Passed, isShared, mountLocation, shareMap[key], &val)
+		}
+		*respBody = append(*respBody, val)
+	}
+}
+
 func CheckMount(mountLocation string, node *models.NFSMountResponse, data *models.NFSMountLocResponse) {
 	if data.Address != "" {
 		check := createCheck("NFS Mount", true, constants.MOUNT_SUCCESS_MSG, "", "")
@@ -232,15 +217,19 @@ func CheckMount(mountLocation string, node *models.NFSMountResponse, data *model
 	}
 }
 
-func CheckShare(data models.NFSMountLocResponse, compareWith models.NFSMountLocResponse, node *models.NFSMountResponse, nfsMounted bool) {
-	// nfsMounted is holding volume is mounted or not. If volume is not mounted then how we can check it's shareability
-	if nfsMounted && data.Address == compareWith.Address && data.Nfs == compareWith.Nfs && data.MountLocation == compareWith.MountLocation {
-		check := createCheck("NFS Mount", true, constants.SHARE_SUCCESS_MSG, "", "")
-		node.CheckList = append(node.CheckList, check)
+func CheckShare(nfsMounted, nfsShared bool, mountLocation string, data models.NFSMountLocResponse, node *models.NFSMountResponse) {
+	var check models.Checks
+	if nfsMounted && nfsShared {
+		// nfs is mounted and shared among all the nodes
+		check = createCheck("NFS Mount", true, constants.SHARE_SUCCESS_MSG, "", "")
+	} else if nfsMounted {
+		// nfs is mounted but it's not shared
+		check = createCheck("NFS Mount", false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG, data.Nfs), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG, data.Nfs, mountLocation))
 	} else {
-		check := createCheck("NFS Mount", false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG, compareWith.MountLocation), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG, compareWith.MountLocation))
-		node.CheckList = append(node.CheckList, check)
+		// nfs volume is not mounted with the node.
+		check = createCheck("NFS Mount", false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG_WITHOUT_MOUNT, mountLocation), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG_WITHOUT_MOUNT, mountLocation))
 	}
+	node.CheckList = append(node.CheckList, check)
 }
 
 func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
