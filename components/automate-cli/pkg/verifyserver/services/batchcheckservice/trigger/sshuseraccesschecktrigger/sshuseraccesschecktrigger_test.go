@@ -1,128 +1,355 @@
 package trigger
 
 import (
-	reflect "reflect"
+	"encoding/json"
+	"fmt"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestNewSshUserAccessCheck(t *testing.T) {
-	type args struct {
-		log  logger.Logger
-		port string
-	}
-	tests := []struct {
-		name string
-		args args
-		want *SshUserAccessCheck
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSshUserAccessCheck(tt.args.log, tt.args.port); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewSshUserAccessCheck() = %v, want %v", got, tt.want)
+// mockTransport is a mock implementation of the http.RoundTripper interface
+type mockTransport struct{}
+
+// RoundTrip returns an error for every request
+func (m *mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	return nil, fmt.Errorf("mock error")
+}
+
+const (
+	sshCheckSuccessResp = `{
+		"status": "SUCCESS",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{
+			  "title": "SSH user accessible",
+			  "passed": true,
+			  "success_msg": "SSH user is accessible for the node: <node_ip>",
+			  "error_msg": "",
+			  "resolution_msg": ""
+			},
+			{
+			  "title": "Sudo password valid",
+			  "passed": true,
+			  "success_msg": "SSH user sudo password is valid for the node: <node_ip>",
+			  "error_msg": "",
+			  "resolution_msg": ""
 			}
-		})
+		  ]
+		}
+	  }`
+	sshCheckFailureResp = `{
+		"status": "SUCCESS",
+		"result": {
+		  "passed": false,
+		  "checks": [
+			{
+			  "title": "SSH user unaccessible",
+			  "passed": false,
+			  "success_msg": "",
+			  "error_msg": "SSH user is unaccessible for the node with IP <node_ip>",
+			  "resolution_msg": "Give SSH access to the user with the give key on the node: <node_ip>"
+			},
+			{
+			  "title": "Sudo password invalid",
+			  "passed": false,
+			  "success_msg": "",
+			  "error_msg": "SSH user sudo password is invalid for the node with IP <node_ip>",
+			  "resolution_msg": "Ensure you have provided the correct sudo password and the user has sudo access on the node: <node_ip>"
+			}
+		  ]
+		}
+	  }`
+)
+
+func GetRequestJson() models.Config {
+	ipConfig := models.Config{}
+
+	json.Unmarshal([]byte(`{
+		  "ssh_user": {
+			"user_name": "ubuntu",
+			"private_key": "test_key",
+			"sudo_password": "test@123"
+		  },
+		  "arch": "existing_nodes",
+		  "backup": {
+			"file_system": {
+			  "mount_location": "/mnt/automate_backups"
+			}
+		  },
+		  "hardware": {
+			"automate_node_count": 1,
+			"automate_node_ips": [
+			  "1.2.3.4"
+			],
+			"chef_infra_server_node_count": 1,
+			"chef_infra_server_node_ips": [
+			  "5.6.7.8"
+			],
+			"postgresql_node_count": 1,
+			"postgresql_node_ips": [
+			  "9.10.11.12"
+			],
+			"opensearch_node_count": 1,
+			"opensearch_node_ips": [
+			  "14.15.16.17"
+			]
+		  },
+		  "certificate": {
+			"fqdn":"my_fqdn",
+			"root_cert":"---- VALID ROOT CA ----",
+			"nodes":[
+				{
+					"ip":"1.2.3.4",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				},
+				{
+					"ip":"5.6.7.8",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				},
+				{
+					"ip":"9.10.11.12",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				},
+				{
+					"ip":"14.15.16.17",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				}
+			]
+		  }
+		}`), &ipConfig)
+	return ipConfig
+}
+
+func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error {
+	l, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%s", port))
+	if err != nil {
+		return err
 	}
+	mockServer.Listener = l
+	mockServer.Start()
+	return nil
+}
+
+func TestNewSshUserAccessCheck(t *testing.T) {
+	testPort := "1234"
+	cc := NewSshUserAccessCheck(logger.NewTestLogger(), testPort)
+	assert.NotNil(t, cc)
+	assert.NotNil(t, cc.log)
+	assert.Equal(t, constants.LOCAL_HOST_URL, cc.host)
+	assert.Equal(t, testPort, cc.port)
 }
 
 func TestSshUserAccessCheck_Run(t *testing.T) {
-	type fields struct {
-		host string
-		port string
-		log  logger.Logger
-	}
-	type args struct {
-		config models.Config
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   map[string]models.CheckTriggerResponse
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ss := &SshUserAccessCheck{
-				host: tt.fields.host,
-				port: tt.fields.port,
-				log:  tt.fields.log,
+	t.Run("Returns OK", func(t *testing.T) {
+		//starting the mock server on custom port
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(sshCheckSuccessResp))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		request := GetRequestJson()
+		mapStruct := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(mapStruct))
+
+		for ip, resp := range mapStruct {
+			assert.Equal(t, constants.SSH_USER, resp.Result.Check)
+			assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
+			assert.NotEmpty(t, resp.Result.Checks)
+			assert.Nil(t, resp.Error)
+			if ip == "14.15.16.17" {
+				triggerResp := mapStruct["14.15.16.17"]
+				assert.Equal(t, "SUCCESS", triggerResp.Status)
+				assert.NotEmpty(t, triggerResp.Result)
+				assert.Equal(t, resp.Result.Passed, true)
+				assert.Equal(t, 2, len(triggerResp.Result.Checks))
+				assert.Equal(t, "SSH user accessible", triggerResp.Result.Checks[0].Title)
+				assert.Equal(t, true, triggerResp.Result.Checks[0].Passed)
+				assert.Equal(t, "SSH user is accessible for the node: <node_ip>", triggerResp.Result.Checks[0].SuccessMsg)
+				assert.Nil(t, triggerResp.Error)
+
+			} else {
+				assert.Equal(t, resp.Result.Passed, true)
 			}
-			if got := ss.Run(tt.args.config); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SshUserAccessCheck.Run() = %v, want %v", got, tt.want)
+		}
+	})
+
+	t.Run("Failure response", func(t *testing.T) {
+		//starting the mock server on custom port
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(sshCheckFailureResp))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		request := GetRequestJson()
+		mapStruct := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(mapStruct))
+
+		for ip, resp := range mapStruct {
+			assert.Equal(t, constants.SSH_USER, resp.Result.Check)
+			assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
+			assert.NotEmpty(t, resp.Result.Checks)
+			assert.Nil(t, resp.Error)
+			if ip == "14.15.16.17" {
+				triggerResp := mapStruct["14.15.16.17"]
+				assert.Equal(t, "SUCCESS", triggerResp.Status)
+				assert.NotEmpty(t, triggerResp.Result)
+				assert.Equal(t, resp.Result.Passed, false)
+				assert.Equal(t, 2, len(triggerResp.Result.Checks))
+				assert.Equal(t, "Sudo password invalid", triggerResp.Result.Checks[1].Title)
+				assert.Equal(t, false, triggerResp.Result.Checks[1].Passed)
+				assert.Equal(t, "SSH user sudo password is invalid for the node with IP <node_ip>", triggerResp.Result.Checks[1].ErrorMsg)
+				assert.Equal(t, "Ensure you have provided the correct sudo password and the user has sudo access on the node: <node_ip>", triggerResp.Result.Checks[1].ResolutionMsg)
+				assert.Empty(t, triggerResp.Result.Checks[1].SuccessMsg)
+				assert.Nil(t, triggerResp.Error)
+
+			} else {
+				assert.Equal(t, resp.Result.Passed, false)
 			}
-		})
-	}
+		}
+	})
+
+	t.Run("Returns error", func(t *testing.T) {
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`invalid JSON`))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		request := GetRequestJson()
+		mapStruct := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(mapStruct))
+
+		for _, resp := range mapStruct {
+			assert.Equal(t, constants.SSH_USER, resp.Result.Check)
+			assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
+			assert.NotNil(t, resp.Error)
+			assert.Empty(t, resp.Result.Checks)
+			assert.Equal(t, resp.Result.Passed, false)
+		}
+	})
+
 }
 
 func TestSshUserAccessCheck_TriggerCheckAndFormatOutput(t *testing.T) {
-	type fields struct {
-		host string
-		port string
-		log  logger.Logger
-	}
-	type args struct {
-		host   string
-		body   interface{}
-		output chan<- models.CheckTriggerResponse
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ss := &SshUserAccessCheck{
-				host: tt.fields.host,
-				port: tt.fields.port,
-				log:  tt.fields.log,
-			}
-			ss.TriggerCheckAndFormatOutput(tt.args.host, tt.args.body, tt.args.output)
-		})
-	}
+	t.Run("Success", func(t *testing.T) {
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(sshCheckSuccessResp))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		outputCh := make(chan models.CheckTriggerResponse, 1)
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		cc.TriggerCheckAndFormatOutput("1.2.3.4", GetSshRequest(), outputCh)
+
+		assert.Equal(t, 1, len(outputCh))
+		resp := <-outputCh
+		assert.NotEmpty(t, resp.Host)
+		assert.Equal(t, "SUCCESS", resp.Status)
+		assert.NotNil(t, resp.Result)
+		assert.Nil(t, resp.Error)
+		assert.Equal(t, constants.SSH_USER, resp.Result.Check)
+		assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
+		assert.Equal(t, true, resp.Result.Passed)
+		assert.Equal(t, 2, len(resp.Result.Checks))
+	})
+	t.Run("Error", func(t *testing.T) {
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`invalid JSON`))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		outputCh := make(chan models.CheckTriggerResponse, 1)
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		cc.TriggerCheckAndFormatOutput("1.2.3.4", GetSshRequest(), outputCh)
+
+		assert.Equal(t, 1, len(outputCh))
+		resp := <-outputCh
+		assert.NotEmpty(t, resp.Host)
+		assert.NotNil(t, resp.Result)
+		assert.NotNil(t, resp.Error)
+		assert.Equal(t, constants.SSH_USER, resp.Result.Check)
+		assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
+		assert.Equal(t, false, resp.Result.Passed)
+		assert.Empty(t, resp.Result.Checks)
+	})
+
+}
+
+func GetSshRequest() interface{} {
+	request := map[string]string{}
+	request["ip"] = "1.2.3.4"
+	request["user_name"] = "admin"
+	request["private_key"] = "----- BEGIN PRIVATE RSA KEY ------"
+	request["sudo_password"] = "sudo"
+	return request
 }
 
 func TestSshUserAccessCheck_TriggerSshUserAccessCheck(t *testing.T) {
-	type fields struct {
-		host string
-		port string
-		log  logger.Logger
-	}
-	type args struct {
-		body interface{}
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *models.CheckTriggerResponse
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ss := &SshUserAccessCheck{
-				host: tt.fields.host,
-				port: tt.fields.port,
-				log:  tt.fields.log,
-			}
-			got, err := ss.TriggerSshUserAccessCheck(tt.args.body)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SshUserAccessCheck.TriggerSshUserAccessCheck() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SshUserAccessCheck.TriggerSshUserAccessCheck() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Run("cannot reach", func(t *testing.T) {
+		// create the CheckTrigger instance to be tested
+		cc := SshUserAccessCheck{log: logger.NewTestLogger(), host: "invalid-url"}
+
+		// make the HTTP request to an invalid URL
+		resp, err := cc.TriggerSshUserAccessCheck(GetRequestJson())
+
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
+
+	t.Run("Bad request", func(t *testing.T) {
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		resp, err := cc.TriggerSshUserAccessCheck(GetRequestJson())
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
 }
