@@ -1,7 +1,6 @@
 package batchcheckservice
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 )
@@ -22,48 +21,10 @@ func (mss *MockHardwareResourceCountCheck) Run(config models.Config) []models.Ch
 	return mss.HardwareResourceCountCheckFunc(config)
 }
 
-func SetupMockHardwareResourceCountCheck() trigger.ICheck {
+func SetupMockHardwareResourceCountCheck(resp []models.CheckTriggerResponse) trigger.ICheck {
 	return &MockHardwareResourceCountCheck{
 		HardwareResourceCountCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{
-				{
-					Status:   "Passed",
-					Host:     "1.2.3.4",
-					NodeType: "automate",
-					Result: models.ApiResult{
-						Passed:  false,
-						Check:   "hardware-resource-count",
-						Message: "Hardware Resource Count Check",
-						Checks: []models.Checks{
-							{
-								Title: "hardware-resource-check-1",
-							},
-							{
-								Title: "hardware-resource-check-2",
-							},
-						},
-					},
-				},
-				{
-					Status:   "Passed",
-					Host:     "1.2.4.5",
-					NodeType: "",
-					Result: models.ApiResult{
-						Passed:  true,
-						Check:   "hardware-resource-count",
-						Message: "Hardware Resource Count Check",
-						Checks: []models.Checks{
-							{
-								Title: "hardware-resource-check-1",
-							},
-							{
-								Title: "hardware-resource-check-2",
-							},
-						},
-					},
-				},
-			}
-			return m
+			return resp
 		},
 	}
 }
@@ -76,46 +37,10 @@ func (mss *MockSshUserAccessCheck) Run(config models.Config) []models.CheckTrigg
 	return mss.SshUserAccessCheckFunc(config)
 }
 
-func SetupMockSshUserAccessCheck() trigger.ICheck {
+func SetupMockSshUserAccessCheck(resp []models.CheckTriggerResponse) trigger.ICheck {
 	return &MockSshUserAccessCheck{
 		SshUserAccessCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{
-				{
-					Status: "Passed",
-					Host:   "1.2.3.4",
-					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
-						Checks: []models.Checks{
-							{
-								Title: "ssh-user-check-1",
-							},
-							{
-								Title: "ssh-user-check-2",
-							},
-						},
-					},
-				},
-				{
-					Status: "Passed",
-					Host:   "1.2.4.5",
-					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
-						Checks: []models.Checks{
-							{
-								Title: "ssh-user-check-1",
-							},
-							{
-								Title: "ssh-user-check-2",
-							},
-						},
-					},
-				},
-			}
-			return m
+			return resp
 		},
 	}
 }
@@ -145,11 +70,10 @@ func (mss *MockExternalOpenSearchCheck) Run(config models.Config) []models.Check
 	return mss.ExternalOpenSearchCheckFunc(config)
 }
 
-func SetupMockExternalOpenSearchCheck() trigger.ICheck {
+func SetupMockExternalOpenSearchCheck(resp []models.CheckTriggerResponse) trigger.ICheck {
 	return &MockExternalOpenSearchCheck{
 		ExternalOpenSearchCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{}
-			return m
+			return resp
 		},
 	}
 }
@@ -162,11 +86,10 @@ func (mss *MockExternalPostgresCheck) Run(config models.Config) []models.CheckTr
 	return mss.ExternalPostgresCheckFunc(config)
 }
 
-func SetupMockExternalPostgresCheck() trigger.ICheck {
+func SetupMockExternalPostgresCheck(resp []models.CheckTriggerResponse) trigger.ICheck {
 	return &MockExternalPostgresCheck{
 		ExternalPostgresCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{}
-			return m
+			return resp
 		},
 	}
 }
@@ -182,42 +105,7 @@ func (mss *MockFirewallCheck) Run(config models.Config) []models.CheckTriggerRes
 func SetupMockFirewallCheck() trigger.ICheck {
 	return &MockFirewallCheck{
 		FirewallCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{
-				{
-					Status: "Passed",
-					Host:   "1.2.3.4",
-					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.FIREWALL,
-						Message: "Firewall-check",
-						Checks: []models.Checks{
-							{
-								Title: "Firewall-check-1",
-							},
-							{
-								Title: "Firewall-check-2",
-							},
-						},
-					},
-				},
-				{
-					Status: "Passed",
-					Host:   "1.2.4.5",
-					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.FIREWALL,
-						Message: "Firewall-check",
-						Checks: []models.Checks{
-							{
-								Title: "Firewall-check-1",
-							},
-							{
-								Title: "Firewall-check-2",
-							},
-						},
-					},
-				},
-			}
+			m := []models.CheckTriggerResponse{}
 			return m
 		},
 	}
@@ -234,42 +122,7 @@ func (mss *MockFqdnCheck) Run(config models.Config) []models.CheckTriggerRespons
 func SetupMockFqdnCheck() trigger.ICheck {
 	return &MockFqdnCheck{
 		FqdnCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{
-				{
-					Status: "Passed",
-					Host:   "1.2.3.4",
-					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.FQDN,
-						Message: "fqdn-check",
-						Checks: []models.Checks{
-							{
-								Title: "Fqdn-check-1",
-							},
-							{
-								Title: "Fqdn-check-2",
-							},
-						},
-					},
-				},
-				{
-					Status: "Passed",
-					Host:   "1.2.4.5",
-					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.FQDN,
-						Message: "fqdn-check",
-						Checks: []models.Checks{
-							{
-								Title: "Fqdn-check-1",
-							},
-							{
-								Title: "Fqdn-check-2",
-							},
-						},
-					},
-				},
-			}
+			m := []models.CheckTriggerResponse{}
 			return m
 		},
 	}

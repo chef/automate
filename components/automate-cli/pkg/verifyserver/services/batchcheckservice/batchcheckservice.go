@@ -33,7 +33,10 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		}
 		for i := 0; i < len(bastionChecks); i++ {
 			result := <-bastionCheckResultChan
-			checkTriggerRespMap[result[0].CheckType] = result
+			if len(result) > 0 {
+				checkTriggerRespMap[result[0].CheckType] = result
+			}
+
 		}
 		defer close(bastionCheckResultChan)
 	}
@@ -91,38 +94,44 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 		return ss.CheckTrigger.ExternalPostgresCheck
 	case constants.NFS_BACKUP_CONFIG:
 		return ss.CheckTrigger.NfsBackupConfigCheck
+	default:
+		return nil
 	}
-	return nil
 }
 
 func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse,
 	hardwareDetails models.Hardware, checks []string) models.BatchCheckResponse {
-	//var result []models.BatchCheckResult
-	//var resultIndex = 0
-	//for k, v := range batchApisResultMap {
-	//	result[resultIndex].Ip = k
-	//	result[resultIndex].NodeType = getNodeTypeFromIp(k, hardwareDetails)
-	//	result[resultIndex].Tests = v
-	//	resultIndex = resultIndex + 1
-	//}
+	ipMap := make(map[string][]models.CheckTriggerResponse)
+	for k, v := range checkTriggerRespMap {
+		for _, checkResp := range v {
+			checkIndex, _ := getIndexOfCheck(checks, k)
+			ip := checkResp.Host
+			nodeType := checkResp.NodeType
+			ipMapKey := ip + "_" + nodeType
+			if checkIndex >= len(ipMap[ipMapKey]) {
+				ipMap[ipMapKey] = append(ipMap[ipMapKey], checkResp)
+			} else {
+				ipMap[ipMapKey] = append(ipMap[ipMapKey], models.CheckTriggerResponse{})
+				copy(ipMap[ipMapKey][checkIndex+1:], ipMap[ipMapKey][checkIndex:])
+				ipMap[ipMapKey][checkIndex] = checkResp
+			}
+		}
+	}
+
+	var result = make([]models.BatchCheckResult, len(ipMap))
+	var resultIndex = 0
+	for _, v := range ipMap {
+		result[resultIndex].Ip = v[0].Host
+		result[resultIndex].NodeType = v[0].NodeType
+		resultArray := []models.ApiResult{}
+		for _, checkResult := range v {
+			resultArray = append(resultArray, checkResult.Result)
+		}
+		result[resultIndex].Tests = resultArray
+		resultIndex = resultIndex + 1
+	}
 	return models.BatchCheckResponse{
 		Status: "SUCCESS",
-		//Result: result,
+		Result: result,
 	}
-}
-
-func getNodeTypeFromIp(ip string, hardwareDetails models.Hardware) string {
-	if stringutils.SliceContains(hardwareDetails.AutomateNodeIps, ip) {
-		return "automate"
-	}
-	if stringutils.SliceContains(hardwareDetails.ChefInfraServerNodeIps, ip) {
-		return "chef_server"
-	}
-	if stringutils.SliceContains(hardwareDetails.PostgresqlNodeIps, ip) {
-		return "postgresql"
-	}
-	if stringutils.SliceContains(hardwareDetails.OpenSearchNodeIps, ip) {
-		return "opensearch"
-	}
-	return ""
 }
