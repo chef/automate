@@ -9,7 +9,9 @@ func NewSshUserAccessCheck() *SshUserAccessCheck {
 	return &SshUserAccessCheck{}
 }
 
-func (ss *SshUserAccessCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{}
+func (suc *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
+	}
 	return m
 }

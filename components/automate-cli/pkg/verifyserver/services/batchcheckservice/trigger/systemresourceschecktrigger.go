@@ -8,9 +8,9 @@ func NewSystemResourceCheck() *SystemResourceCheck {
 	return &SystemResourceCheck{}
 }
 
-func (ss *SystemResourceCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (src *SystemResourceCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }

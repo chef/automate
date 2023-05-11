@@ -9,9 +9,9 @@ func NewCertificateCheck() *CertificateCheck {
 	return &CertificateCheck{}
 }
 
-func (ss *CertificateCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (cc *CertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }

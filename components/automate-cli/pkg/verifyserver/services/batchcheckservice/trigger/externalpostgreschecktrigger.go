@@ -8,9 +8,9 @@ func NewExternalPostgresCheck() *ExternalPostgresCheck {
 	return &ExternalPostgresCheck{}
 }
 
-func (ss *ExternalPostgresCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (epc *ExternalPostgresCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }

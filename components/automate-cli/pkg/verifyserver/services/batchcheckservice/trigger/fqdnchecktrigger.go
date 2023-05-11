@@ -8,9 +8,9 @@ func NewFqdnCheck() *FqdnCheck {
 	return &FqdnCheck{}
 }
 
-func (ss *FqdnCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (fqc *FqdnCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }

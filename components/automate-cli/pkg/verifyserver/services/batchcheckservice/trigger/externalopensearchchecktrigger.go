@@ -8,9 +8,9 @@ func NewExternalOpensearchCheck() *ExternalOpensearchCheck {
 	return &ExternalOpensearchCheck{}
 }
 
-func (ss *ExternalOpensearchCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
-	m := map[string]models.CheckTriggerResponse{
-		"f": models.CheckTriggerResponse{},
+func (eosc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTriggerResponse {
+	m := []models.CheckTriggerResponse{
+		models.CheckTriggerResponse{},
 	}
 	return m
 }
