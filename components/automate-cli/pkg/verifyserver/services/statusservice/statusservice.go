@@ -19,7 +19,7 @@ type StatusService struct {
 	Log                     logger.Logger
 }
 
-func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log logger.Logger) IStatusService {
+func NewStatusService(executeShellCommand func(cmd string) ([]byte, error), log logger.Logger) *StatusService {
 	return &StatusService{
 		ExecuteShellCommandFunc: executeShellCommand,
 		Log:                     log,

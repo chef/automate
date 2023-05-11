@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockStatusService(httpStatus int) statusservice.IStatusService {
+func SetupMockStatusService(httpStatus int) *statusservice.MockStatusService {
 	if httpStatus == 200 {
 		return &statusservice.MockStatusService{
 			GetServicesFunc: func() (*[]models.ServiceDetails, error) {

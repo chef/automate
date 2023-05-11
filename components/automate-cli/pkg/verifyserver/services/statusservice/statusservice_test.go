@@ -276,7 +276,7 @@ func TestCheckIfBENode(t *testing.T) {
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	}, log).(*statusservice.StatusService)
+	}, log)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -314,7 +314,7 @@ func TestParseChefAutomateStatus(t *testing.T) {
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	}, log).(*statusservice.StatusService)
+	}, log)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -383,7 +383,7 @@ func TestParseHabSvcStatus(t *testing.T) {
 	assert.NoError(t, err)
 	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
 		return nil, nil
-	}, log).(*statusservice.StatusService)
+	}, log)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -483,7 +483,7 @@ func TestGetServicesFromHabSvcStatus(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
 
-			ss := statusservice.NewStatusService(tc.input, log).(*statusservice.StatusService)
+			ss := statusservice.NewStatusService(tc.input, log)
 			out, err := ss.GetServicesFromHabSvcStatus()
 			if tc.isError {
 				assert.Error(t, err)
@@ -543,7 +543,7 @@ func TestGetServicesFromAutomateStatus(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
 
-			ss := statusservice.NewStatusService(tc.input, log).(*statusservice.StatusService)
+			ss := statusservice.NewStatusService(tc.input, log)
 			out, err := ss.GetServicesFromAutomateStatus()
 			if tc.isError {
 				assert.Error(t, err)
