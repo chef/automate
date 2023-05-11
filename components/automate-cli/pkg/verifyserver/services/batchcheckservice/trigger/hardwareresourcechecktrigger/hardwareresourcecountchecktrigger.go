@@ -102,11 +102,11 @@ func prepareErrorTriggerResponse(finalResult []models.CheckTriggerResponse, host
 	finalResult = append(finalResult, models.CheckTriggerResponse{
 		Host:     host,
 		NodeType: nodeType,
-		Error:    fiber.NewError(fiber.StatusServiceUnavailable, errorString),
 		Result: models.ApiResult{
 			Passed:  false,
 			Check:   constants.HARDWARE_RESOURCE_COUNT,
 			Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
+			Error:   fiber.NewError(fiber.StatusServiceUnavailable, errorString),
 		},
 	})
 	return finalResult
