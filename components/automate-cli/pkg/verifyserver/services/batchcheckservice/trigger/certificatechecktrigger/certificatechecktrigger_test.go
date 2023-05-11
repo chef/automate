@@ -214,17 +214,16 @@ func TestCertificateCheck_Run(t *testing.T) {
 
 		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
 		request := GetRequestJson()
-		mapStruct := cc.Run(request)
+		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
-		assert.Equal(t, totalIps, len(mapStruct))
+		assert.Equal(t, totalIps, len(finalResp))
 
-		for ip, resp := range mapStruct {
+		for _, resp := range finalResp {
 			assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
 			assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
-			assert.Nil(t, resp.Error)
-			if ip == "14.15.16.17" {
-				triggerResp := mapStruct["14.15.16.17"]
+			if resp.Host == "14.15.16.17" {
+				triggerResp := resp
 				assert.Equal(t, "SUCCESS", triggerResp.Status)
 				assert.NotEmpty(t, triggerResp.Result)
 				assert.Equal(t, resp.Result.Passed, true)
@@ -232,8 +231,6 @@ func TestCertificateCheck_Run(t *testing.T) {
 				assert.Equal(t, "Certificates have valid expiry date", triggerResp.Result.Checks[0].Title)
 				assert.Equal(t, true, triggerResp.Result.Checks[0].Passed)
 				assert.Equal(t, "All certificates expiry date is later than 365 days", triggerResp.Result.Checks[0].SuccessMsg)
-				assert.Nil(t, triggerResp.Error)
-
 			} else {
 				assert.Equal(t, resp.Result.Passed, true)
 			}
@@ -252,17 +249,16 @@ func TestCertificateCheck_Run(t *testing.T) {
 
 		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
 		request := GetRequestJson()
-		mapStruct := cc.Run(request)
+		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
-		assert.Equal(t, totalIps, len(mapStruct))
+		assert.Equal(t, totalIps, len(finalResp))
 
-		for ip, resp := range mapStruct {
+		for _, resp := range finalResp {
 			assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
 			assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
-			assert.Nil(t, resp.Error)
-			if ip == "14.15.16.17" {
-				triggerResp := mapStruct["14.15.16.17"]
+			if resp.Host == "14.15.16.17" {
+				triggerResp := resp
 				assert.Equal(t, "SUCCESS", triggerResp.Status)
 				assert.NotEmpty(t, triggerResp.Result)
 				assert.Equal(t, resp.Result.Passed, false)
@@ -272,7 +268,6 @@ func TestCertificateCheck_Run(t *testing.T) {
 				assert.Equal(t, "The <node/root/admin> certificates are not of X509 V3 format", triggerResp.Result.Checks[1].ErrorMsg)
 				assert.Equal(t, "Generate and provide certificates of X509 v3 format", triggerResp.Result.Checks[1].ResolutionMsg)
 				assert.Empty(t, triggerResp.Result.Checks[1].SuccessMsg)
-				assert.Nil(t, triggerResp.Error)
 
 			} else {
 				assert.Equal(t, resp.Result.Passed, false)
@@ -291,14 +286,14 @@ func TestCertificateCheck_Run(t *testing.T) {
 
 		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
 		request := GetRequestJson()
-		mapStruct := cc.Run(request)
+		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
-		assert.Equal(t, totalIps, len(mapStruct))
+		assert.Equal(t, totalIps, len(finalResp))
 
-		for _, resp := range mapStruct {
+		for _, resp := range finalResp {
 			assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
 			assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
-			assert.NotNil(t, resp.Error)
+			assert.NotNil(t, resp.Result.Error)
 			assert.Empty(t, resp.Result.Checks)
 			assert.Equal(t, resp.Result.Passed, false)
 		}
@@ -319,14 +314,14 @@ func TestCertificateCheck_TriggerCheckAndFormatOutput(t *testing.T) {
 		outputCh := make(chan models.CheckTriggerResponse, 1)
 
 		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
-		cc.TriggerCheckAndFormatOutput("1.2.3.4", GetCertificateRequest(), outputCh)
+		cc.TriggerCheckAndFormatOutput("1.2.3.4", constants.AUTOMATE, GetCertificateRequest(), outputCh)
 
 		assert.Equal(t, 1, len(outputCh))
 		resp := <-outputCh
 		assert.NotEmpty(t, resp.Host)
 		assert.Equal(t, "SUCCESS", resp.Status)
 		assert.NotNil(t, resp.Result)
-		assert.Nil(t, resp.Error)
+		assert.Nil(t, resp.Result.Error)
 		assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
 		assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 		assert.Equal(t, true, resp.Result.Passed)
@@ -344,13 +339,13 @@ func TestCertificateCheck_TriggerCheckAndFormatOutput(t *testing.T) {
 		outputCh := make(chan models.CheckTriggerResponse, 1)
 
 		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
-		cc.TriggerCheckAndFormatOutput("1.2.3.4", GetCertificateRequest(), outputCh)
+		cc.TriggerCheckAndFormatOutput("1.2.3.4", constants.AUTOMATE, GetCertificateRequest(), outputCh)
 
 		assert.Equal(t, 1, len(outputCh))
 		resp := <-outputCh
 		assert.NotEmpty(t, resp.Host)
 		assert.NotNil(t, resp.Result)
-		assert.NotNil(t, resp.Error)
+		assert.NotNil(t, resp.Result.Error)
 		assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
 		assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 		assert.Equal(t, false, resp.Result.Passed)

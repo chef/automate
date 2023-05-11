@@ -11,7 +11,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
 )
 
 type SshUserAccessCheck struct {
@@ -28,64 +27,59 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 	}
 }
 
-func (ss *SshUserAccessCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
+func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing SSH user access check from batch check ")
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
 		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 
 	outputCh := make(chan models.CheckTriggerResponse, count)
 
-	//This map will hold the Response against each IP
-	finalResult := make(map[string]models.CheckTriggerResponse)
+	var finalResult []models.CheckTriggerResponse
 
-	ips := configutils.GetIps(config)
-
-	for _, ip := range ips {
+	for _, ip := range config.Hardware.AutomateNodeIps {
 		var requestBody map[string]interface{}
 		data, _ := json.Marshal(config.SSHUser)
 		json.Unmarshal(data, &requestBody)
 		requestBody[ip] = ip
-		go ss.TriggerCheckAndFormatOutput(ip, requestBody, outputCh)
+		go ss.TriggerCheckAndFormatOutput(ip, constants.AUTOMATE, requestBody, outputCh)
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		var requestBody map[string]interface{}
+		data, _ := json.Marshal(config.SSHUser)
+		json.Unmarshal(data, &requestBody)
+		requestBody[ip] = ip
+		go ss.TriggerCheckAndFormatOutput(ip, constants.CHEF_INFRA_SERVER, requestBody, outputCh)
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		var requestBody map[string]interface{}
+		data, _ := json.Marshal(config.SSHUser)
+		json.Unmarshal(data, &requestBody)
+		requestBody[ip] = ip
+		go ss.TriggerCheckAndFormatOutput(ip, constants.POSTGRESQL, requestBody, outputCh)
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		var requestBody map[string]interface{}
+		data, _ := json.Marshal(config.SSHUser)
+		json.Unmarshal(data, &requestBody)
+		requestBody[ip] = ip
+		go ss.TriggerCheckAndFormatOutput(ip, constants.OPENSEARCH, requestBody, outputCh)
 	}
 
 	for i := 0; i < count; i++ {
 		resp := <-outputCh
-		finalResult[resp.Host] = resp
+		finalResult = append(finalResult, resp)
 	}
 	close(outputCh)
 	return finalResult
 }
 
-func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, body interface{}, output chan<- models.CheckTriggerResponse) {
+func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, nodeType string, body interface{}, output chan<- models.CheckTriggerResponse) {
 	var checkResp models.CheckTriggerResponse
 	resp, err := ss.TriggerSshUserAccessCheck(body)
 	if err != nil {
-		checkResp = models.CheckTriggerResponse{
-			Error: fiber.NewError(fiber.StatusServiceUnavailable, err.Error()),
-			Result: models.ApiResult{
-				Passed:  false,
-				Check:   constants.SSH_USER,
-				Message: constants.SSH_USER_MSG,
-			},
-			Host: host,
-		}
+		checkResp = configutils.PrepareTriggerResponse(nil, host, nodeType, err.Error(), constants.SSH_USER, constants.SSH_USER_MSG, true)
 	} else {
-		isPassed := true
-		for _, check := range resp.Result.Checks {
-			if !check.Passed {
-				isPassed = false
-			}
-		}
-		checkResp = models.CheckTriggerResponse{
-			Status: resp.Status,
-			Result: models.ApiResult{
-				Passed:  isPassed,
-				Check:   constants.SSH_USER,
-				Message: constants.SSH_USER_MSG,
-				Checks:  resp.Result.Checks,
-			},
-			Host: host,
-		}
+		checkResp = configutils.PrepareTriggerResponse(resp, host, nodeType, "", constants.SSH_USER, constants.SSH_USER_MSG, false)
 	}
 	output <- checkResp
 

@@ -8,9 +8,9 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
 )
 
 type CertificateCheck struct {
@@ -27,7 +27,7 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 	}
 }
 
-func (ss *CertificateCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
+func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
 		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
@@ -35,12 +35,13 @@ func (ss *CertificateCheck) Run(config models.Config) map[string]models.CheckTri
 	outputCh := make(chan models.CheckTriggerResponse, count)
 
 	//This map will hold the Response against each IP
-	finalResult := make(map[string]models.CheckTriggerResponse)
+	var finalResult []models.CheckTriggerResponse
 
 	certificate := config.Certificate
 
+	hostMap := configutils.GetNodeTypeMap(config)
 	for _, node := range certificate.Nodes {
-
+		nodeTypes := hostMap[node.IP]
 		//construct the request for Certificate Check API
 		requestBody := models.CertificateCheckRequest{
 			RootCertificate:  certificate.RootCert,
@@ -49,48 +50,28 @@ func (ss *CertificateCheck) Run(config models.Config) map[string]models.CheckTri
 			AdminPrivateKey:  node.AdminKey,
 			AdminCertificate: node.AdminCert,
 		}
-		go ss.TriggerCheckAndFormatOutput(node.IP, requestBody, outputCh)
+
+		for i := 0; i < len(nodeTypes); i++ {
+			go ss.TriggerCheckAndFormatOutput(node.IP, nodeTypes[i], requestBody, outputCh)
+		}
 	}
 
 	//Read response from output channel
 	for i := 0; i < count; i++ {
 		resp := <-outputCh
-		finalResult[resp.Host] = resp
+		finalResult = append(finalResult, resp)
 	}
 	close(outputCh)
 	return finalResult
 }
 
-func (ss *CertificateCheck) TriggerCheckAndFormatOutput(host string, body interface{}, output chan<- models.CheckTriggerResponse) {
+func (ss *CertificateCheck) TriggerCheckAndFormatOutput(host string, nodeType string, body interface{}, output chan<- models.CheckTriggerResponse) {
 	var checkResp models.CheckTriggerResponse
 	resp, err := ss.TriggerCertificateCheck(body)
 	if err != nil {
-		checkResp = models.CheckTriggerResponse{
-			Error: fiber.NewError(fiber.StatusServiceUnavailable, err.Error()),
-			Result: models.ApiResult{
-				Passed:  false,
-				Check:   constants.CERTIFICATE,
-				Message: constants.CERTIFICATE_MSG,
-			},
-			Host: host,
-		}
+		checkResp = configutils.PrepareTriggerResponse(nil, host, nodeType, err.Error(), constants.CERTIFICATE, constants.CERTIFICATE_MSG, true)
 	} else {
-		isPassed := true
-		for _, check := range resp.Result.Checks {
-			if !check.Passed {
-				isPassed = false
-			}
-		}
-		checkResp = models.CheckTriggerResponse{
-			Status: resp.Status,
-			Result: models.ApiResult{
-				Passed:  isPassed,
-				Check:   constants.CERTIFICATE,
-				Message: constants.CERTIFICATE_MSG,
-				Checks:  resp.Result.Checks,
-			},
-			Host: host,
-		}
+		checkResp = configutils.PrepareTriggerResponse(resp, host, nodeType, "", constants.CERTIFICATE, constants.CERTIFICATE_MSG, false)
 	}
 	output <- checkResp
 

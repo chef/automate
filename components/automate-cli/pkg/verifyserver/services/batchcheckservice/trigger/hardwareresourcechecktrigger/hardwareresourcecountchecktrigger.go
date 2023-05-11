@@ -6,10 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 )
@@ -39,27 +38,21 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 	// for each and every IP to make the processing simple at the caller end
 	if err != nil {
 		for _, ip := range config.Hardware.AutomateNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.AUTOMATE, err.Error())
+			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.AUTOMATE, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
 		}
 		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.CHEF_INFRA_SERVER, err.Error())
+			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.CHEF_INFRA_SERVER, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
 		}
 		for _, ip := range config.Hardware.PostgresqlNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.POSTGRESQL, err.Error())
+			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.POSTGRESQL, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
 		}
 		for _, ip := range config.Hardware.OpenSearchNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.OPENSEARCH, err.Error())
+			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.OPENSEARCH, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
 		}
 		return finalResult
 	}
 	// send the success response
 	for _, result := range resp.Result {
-		isPassed := true
-		for _, check := range result.Checks {
-			if !check.Passed {
-				isPassed = false
-			}
-		}
 		finalResult = append(finalResult,
 			models.CheckTriggerResponse{
 				Status: resp.Status,
@@ -67,7 +60,7 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 					Check:   constants.HARDWARE_RESOURCE_COUNT,
 					Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
 					Checks:  result.Checks,
-					Passed:  isPassed,
+					Passed:  configutils.IsPassed(result.Checks),
 				},
 				NodeType: result.NodeType,
 				Host:     result.IP,
@@ -97,18 +90,4 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 		return nil, err
 	}
 	return &response, nil
-}
-
-func prepareErrorTriggerResponse(finalResult []models.CheckTriggerResponse, host, nodeType, errorString string) []models.CheckTriggerResponse {
-	finalResult = append(finalResult, models.CheckTriggerResponse{
-		Host:     host,
-		NodeType: nodeType,
-		Result: models.ApiResult{
-			Passed:  false,
-			Check:   constants.HARDWARE_RESOURCE_COUNT,
-			Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
-			Error:   fiber.NewError(fiber.StatusServiceUnavailable, errorString),
-		},
-	})
-	return finalResult
 }
