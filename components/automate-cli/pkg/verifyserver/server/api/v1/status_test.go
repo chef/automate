@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -16,17 +17,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockStatusService() statusservice.IStatusService {
-	return &statusservice.MockStatusService{
-		GetServicesFunc: func() []models.ServiceDetails {
-			return []models.ServiceDetails{
-				{
-					ServiceName: "automate",
-					Version:     "4.5.20",
-					Status:      "up",
-				},
-			}
-		},
+func SetupMockStatusService(httpStatus int) *statusservice.MockStatusService {
+	if httpStatus == 200 {
+		return &statusservice.MockStatusService{
+			GetServicesFunc: func() (*[]models.ServiceDetails, error) {
+				return &[]models.ServiceDetails{
+					{
+						ServiceName: "deployment-service",
+						Version:     "chef/deployment-service/0.1.0/20230502070345",
+						Status:      constants.OK,
+					},
+				}, nil
+			},
+		}
+	} else {
+		return &statusservice.MockStatusService{
+			GetServicesFunc: func() (*[]models.ServiceDetails, error) {
+				return nil, fiber.NewError(fiber.StatusInternalServerError, "Some error occurred")
+			},
+		}
 	}
 }
 
@@ -48,7 +57,7 @@ func SetupDefaultHandlers(ss statusservice.IStatusService) (*fiber.App, error) {
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup()
+	vs.Setup(false)
 	return vs.App, nil
 }
 
@@ -61,16 +70,20 @@ func TestStatusAPI(t *testing.T) {
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"ok\",\"services\":[{\"service_name\":\"automate\",\"status\":\"up\",\"version\":\"4.5.20\"}]}}",
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}]}}",
+		},
+		{
+			description:  "500:InternalServerError status route",
+			expectedCode: 500,
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Some error occurred\"}}",
 		},
 	}
 	statusEndpoint := "/status"
-	// Setup the app as it is done in the main function
-	app, err := SetupDefaultHandlers(SetupMockStatusService())
-	assert.NoError(t, err)
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
+			app, err := SetupDefaultHandlers(SetupMockStatusService(test.expectedCode))
+			assert.NoError(t, err)
 			req := httptest.NewRequest("GET", statusEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)

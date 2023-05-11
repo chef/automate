@@ -46,7 +46,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 	app := fiber.New(fconf)
 	handler := v1.NewHandler(l).
 		AddStatusService(
-			statusservice.NewStatusService()).
+			statusservice.NewStatusService(fiberutils.ExecuteShellCommand, l)).
 		AddBatchCheckService(
 			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(
 				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
@@ -69,7 +69,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup()
+	vs.Setup(true)
 	return vs, nil
 }
 
@@ -84,15 +84,18 @@ func (vs *VerifyServer) Start() error {
 	return nil
 }
 
-func (vs *VerifyServer) Setup() {
+func (vs *VerifyServer) Setup(isMetricsRequired bool) {
 	vs.App.Use(cors.New())
 
 	// Define middleware to log all requests
 	vs.App.Use(middleware.Logger(fiberutils.GetLogConfig(vs.Log)))
 
-	prometheus := fiberprometheus.New(SERVICE)
-	prometheus.RegisterAt(vs.App, "/metrics")
-	vs.App.Use(prometheus.Middleware)
+	// Added this condition to avoid error "duplicate metrics collector registration attempted"
+	if isMetricsRequired {
+		prometheus := fiberprometheus.New(SERVICE)
+		prometheus.RegisterAt(vs.App, "/metrics")
+		vs.App.Use(prometheus.Middleware)
+	}
 
 	vs.SetupRoutes()
 }
