@@ -5,19 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -226,52 +222,6 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	}
 }
 
-func TestTriggerAPI(t *testing.T) {
-	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT))
-	}))
-	err := startMockServerOnCustomPort(mockServer, "1234")
-	assert.NoError(t, err)
-	defer mockServer.Close()
-	tests := []struct {
-		TestName         string
-		URL              string
-		ExpectedResponse string
-		ExpectedError    error
-	}{
-		{
-			TestName:         "Valid URL with running server",
-			URL:              constants.LOCAL_HOST_URL + ":1234",
-			ExpectedResponse: SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT,
-			ExpectedError:    nil,
-		},
-		{
-			TestName:         "Invalid URL",
-			URL:              "http:/whatever.com/",
-			ExpectedResponse: "",
-			ExpectedError:    errors.New(""),
-		},
-		{
-			TestName:         "Valid URL but no server running there",
-			URL:              "http://whatever.com/",
-			ExpectedResponse: "",
-			ExpectedError:    nil,
-		},
-	}
-	for _, e := range tests {
-		t.Run(e.TestName, func(t *testing.T) {
-			resp, err := nfsmountservice.TriggerAPI(e.URL, "/mnt")
-			if e.ExpectedError != nil {
-				require.Error(t, err)
-			} else {
-				body, _ := ioutil.ReadAll(resp.Body)
-				require.Equal(t, e.ExpectedResponse, string(body))
-			}
-		})
-	}
-}
-
 func TestDoAPICall(t *testing.T) {
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -317,21 +267,22 @@ func TestDoAPICall(t *testing.T) {
 		},
 	}
 
-	for index, e := range tests {
+	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			shareMap := make(map[string]models.NFSMountLocResponse)
-			countMap := make(map[models.NFSMountLocResponse]int)
 			testPort := "1234"
 			// we have two test server running on port 1235 we have wrong response giving server running
 			if e.InvalidURLResponse {
 				testPort = "1235"
 			}
 			nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
-			resp := nm.DoAPICall(e.URL, "node_type", "/mount-location", shareMap, "key"+strconv.Itoa(index), countMap)
+			resp, err := nm.DoAPICall(e.URL, "/mount-location")
 			if e.ExpectedError != nil {
-				assert.Error(t, resp.Error)
+				assert.Error(t, err)
 			} else {
-				assert.Equal(t, resp.CheckList[0].Passed, e.ExpectedCheckListReponsePass)
+				assert.NoError(t, err)
+				assert.Equal(t, "10.0.0.11", resp.Address)
+				assert.Equal(t, "/mnt/automate_backups", resp.MountLocation)
+				assert.Equal(t, "10.0.0.11:/automate_backups", resp.Nfs)
 			}
 		})
 	}

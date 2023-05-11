@@ -5,24 +5,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gofiber/fiber"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
 )
 
 type INFSService interface {
 	GetNFSMountDetails(models.NFSMountRequest) *[]models.NFSMountResponse
-	MakeConcurrentCall(string, string, string, chan string, map[string]models.NFSMountResponse, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int)
-	DoAPICall(string, string, string, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int) models.NFSMountResponse
+	//MakeConcurrentCall(string, string, string, chan string, map[string]models.NFSMountResponse, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int)
+	//DoAPICall(string, string, string, map[string]models.NFSMountLocResponse, string, map[models.NFSMountLocResponse]int) models.NFSMountResponse
 }
 
 type NFSMountService struct {
@@ -30,30 +29,48 @@ type NFSMountService struct {
 	log  logger.Logger
 }
 
-func NewNFSMountService(log logger.Logger, port string) INFSService {
+func NewNFSMountService(log logger.Logger, port string) *NFSMountService {
 	return &NFSMountService{
 		port: port,
 		log:  log,
 	}
 }
 
-var mut *sync.Mutex = &sync.Mutex{}
+func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
+	res, err := nm.DoAPICall(ip, mountLocation)
 
-func (nm *NFSMountService) MakeConcurrentCall(ip string, node_type string, mountLocation string, ch chan string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) {
-	res := nm.DoAPICall(ip, node_type, mountLocation, shareMap, key, countMap)
-	// Mutex Lock is Mandatory. What if two routines tries to write at same time.
-	mut.Lock()
-	nfsMountResultMap[key] = res
-	mut.Unlock()
-	ch <- "done"
+	mountResp := prepareMountResp(ip, nodeType, mountLocation, res, err)
+
+	respMap := make(map[string]TempResponse)
+	tempResp := TempResponse{
+		MountResp: mountResp,
+	}
+	if err == nil {
+		tempResp.MountLocRes = *res
+	}
+	respMap[key] = tempResp
+	respChan <- respMap
 }
 
-func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int, orderList []string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse) {
+func prepareMountResp(ip, nodeType, mountLocation string, mountLocResp *models.NFSMountLocResponse, err error) models.NFSMountResponse {
+	node := models.NFSMountResponse{}
+	node.IP = ip
+	node.NodeType = nodeType
+
+	if err != nil {
+		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
+		return node
+	}
+	CheckMount(mountLocation, &node, mountLocResp)
+	return node
+}
+
+func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int,
+	orderList []string, nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse) {
 	compareWith := models.NFSMountLocResponse{}
 	currMax := 0
 	// Finding the Majority element and putting in the compareWith variable for the later comparisons
 	for k, v := range countMap {
-		// fmt.Println(k, v)
 		if v > currMax {
 			currMax = v
 			compareWith = k
@@ -77,11 +94,16 @@ func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMo
 	}
 }
 
+type TempResponse struct {
+	MountLocRes models.NFSMountLocResponse
+	MountResp   models.NFSMountResponse
+}
+
 func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
 	respBody := new([]models.NFSMountResponse)
 	// For storing the output of go routine temporary in nfsMountResultMap
 	nfsMountResultMap := make(map[string]models.NFSMountResponse)
-	ch := make(chan string)
+	ch := make(chan map[string]TempResponse)
 	// Will use these both the maps in checking the shareability
 	// countMap will help us to find the Majority element.
 	// we are storing each node response in share map corresponds to unique key.
@@ -93,75 +115,50 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 
 	for index, ip := range reqBody.AutomateNodeIPs {
 		key := "automate" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "automate", reqBody.MountLocation, ch, nfsMountResultMap, shareMap, key, countMap)
+		go nm.MakeConcurrentCall(ip, "automate", reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.ChefInfraServerNodeIPs {
 		key := "chef-infra-server" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "chef-infra-server", reqBody.MountLocation, ch, nfsMountResultMap, shareMap, key, countMap)
+		go nm.MakeConcurrentCall(ip, "chef-infra-server", reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.PostgresqlNodeIPs {
 		key := "postgresql" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "postgresql", reqBody.MountLocation, ch, nfsMountResultMap, shareMap, key, countMap)
+		go nm.MakeConcurrentCall(ip, "postgresql", reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.OpensearchNodeIPs {
 		key := "opensearch" + ip + strconv.Itoa(index)
-		go nm.MakeConcurrentCall(ip, "opensearch", reqBody.MountLocation, ch, nfsMountResultMap, shareMap, key, countMap)
+		go nm.MakeConcurrentCall(ip, "opensearch", reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	// it will help us to hold the program until all triggered go routines cameback
 	for i := 0; i < len(orderList); i++ {
-		<-ch
+		select {
+		case tempResponse := <-ch:
+			for k, v := range tempResponse {
+				nfsMountResultMap[k] = v.MountResp
+				if v.MountResp.Error == nil {
+					shareMap[k] = v.MountLocRes
+					countMap[v.MountLocRes] = countMap[v.MountLocRes] + 1
+				}
+			}
+		}
 	}
 
 	MakeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap)
-
-	close(ch)
 	return respBody
 }
 
-func (nm *NFSMountService) DoAPICall(ip string, node_type string, mountLocation string, shareMap map[string]models.NFSMountLocResponse, key string, countMap map[models.NFSMountLocResponse]int) models.NFSMountResponse {
-	node := models.NFSMountResponse{}
-	node.IP = ip
-	node.NodeType = node_type
+func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
 
-	url := fmt.Sprintf("http://%s:%s", ip, nm.port)
+	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, "/api/v1/fetch/nfs-mount-loc")
 
-	// It will trigger /nfs-mount-loc API
-	resp, err := TriggerAPI(url, mountLocation)
-	if err != nil {
-		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
-		return node
-	}
-
-	// Getting the result struct from whole response
-	result, err := GetResultStructFromRespBody(resp.Body)
-	if err != nil {
-		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
-		return node
-	}
-	// if address is empty then we are not storing it. Because it's of no use while doing the comparisons
-	if result.Address != "" {
-		mut.Lock()
-		countMap[*result] = countMap[*result] + 1
-		shareMap[key] = *result
-		mut.Unlock()
-	}
-
-	// Test1 - Check for NFS Volume is mounted at correct Mount Location or not
-	CheckMount(mountLocation, &node, result)
-
-	return node
-}
-
-func TriggerAPI(url, mountLocation string) (*http.Response, error) {
-	// Request Body for /nfs-mount-loc API
 	reqBody := models.NFSMountLocRequest{
 		MountLocation: mountLocation,
 	}
@@ -172,8 +169,6 @@ func TriggerAPI(url, mountLocation string) (*http.Response, error) {
 		return nil, errors.New("Failed to Marshal: " + err.Error())
 	}
 
-	reqURL := url + "/api/v1/fetch/nfs-mount-loc"
-	// fmt.Println(reqURL)
 	httpReq, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(reqBodyJSON))
 	if err != nil {
 		return nil, errors.New("Failed to Create HTTP request: " + err.Error())
@@ -188,7 +183,8 @@ func TriggerAPI(url, mountLocation string) (*http.Response, error) {
 	if err != nil {
 		return nil, errors.New("Failed to send the HTTP request: " + err.Error())
 	}
-	return resp, nil
+
+	return GetResultStructFromRespBody(resp.Body)
 }
 
 func GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
