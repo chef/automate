@@ -1,4 +1,4 @@
-package trigger
+package certificatechecktrigger
 
 import (
 	"encoding/json"

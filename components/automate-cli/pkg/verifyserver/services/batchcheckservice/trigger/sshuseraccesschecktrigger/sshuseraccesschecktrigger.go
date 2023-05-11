@@ -1,4 +1,4 @@
-package trigger
+package sshuseraccesschecktrigger
 
 import (
 	"encoding/json"
