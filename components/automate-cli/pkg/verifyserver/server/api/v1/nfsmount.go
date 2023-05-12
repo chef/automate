@@ -26,6 +26,6 @@ func (h *Handler) NFSMount(c *fiber.Ctx) {
 	}
 	h.Logger.Debug("Mount Location Recieved: ", reqBody.MountLocation)
 
-	NFSMountDetails := h.NFSMountService.GetNFSMountDetails(reqBody)
-	c.JSON(response.BuildSuccessResponse(NFSMountDetails))
+	NfsMountDetails := h.NFSMountService.GetNFSMountDetails(reqBody)
+	c.JSON(response.BuildSuccessResponse(NfsMountDetails))
 }

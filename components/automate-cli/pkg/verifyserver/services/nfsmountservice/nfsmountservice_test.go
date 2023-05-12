@@ -1,4 +1,4 @@
-package nfsmountservice_test
+package nfsmountservice
 
 import (
 	"bytes"
@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -90,7 +89,7 @@ var (
 
 func TestNFSMountService(t *testing.T) {
 	testPort := "1234"
-	nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort)
 	assert.NotNil(t, nm)
 	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{})
 	assert.Equal(t, new([]models.NFSMountResponse), nmDetails)
@@ -119,7 +118,7 @@ func TestCheckMount(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			nodeData := &models.NFSMountResponse{}
-			nfsmountservice.CheckMount("/mnt/automate_backups", nodeData, e.ResultBody)
+			checkMount("/mnt/automate_backups", nodeData, e.ResultBody)
 			assert.Equal(t, e.ExpectedRes, nodeData.CheckList[0].Passed)
 		})
 	}
@@ -170,7 +169,7 @@ func TestCheckShare(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			node := new(models.NFSMountResponse)
-			nfsmountservice.CheckShare(e.NfsMounted, e.NfsShared, "/mnt/automate", e.Data, node)
+			checkShare(e.NfsMounted, e.NfsShared, "/mnt/automate", e.Data, node)
 			// checkShare function will append check result in node object.
 			isPassed := node.CheckList[0].Passed
 			assert.Equal(t, e.ExpectedCheckRes, isPassed)
@@ -213,7 +212,7 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			res, err := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort).GetResultStructFromRespBody(e.Body)
+			res, err := NewNFSMountService(logger.NewTestLogger(), testPort).getResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
 			} else {
@@ -276,8 +275,8 @@ func TestDoAPICall(t *testing.T) {
 			if e.InvalidURLResponse {
 				testPort = "1235"
 			}
-			nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
-			resp, err := nm.DoAPICall(e.URL, "/mount-location")
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			resp, err := nm.doAPICall(e.URL, "/mount-location")
 			if e.ExpectedError != nil {
 				assert.Error(t, err)
 			} else {
@@ -372,7 +371,7 @@ func TestGetNFSMountDetails(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			nm := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort)
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
 			resp := nm.GetNFSMountDetails(e.ReqBody)
 			for index, te := range *resp {
 				if e.Response[index].Error != nil {
@@ -459,7 +458,7 @@ func TestMakeRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			respBody := []models.NFSMountResponse{}
-			nfsmountservice.MakeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap, "/mnt/automate_backpus")
+			makeRespBody(&respBody, e.CountMap, e.OrderList, e.NfsMountResultMap, e.ShareMap, "/mnt/automate_backpus")
 			assert.Equal(t, len(respBody), e.RespBodyLen)
 			if e.ExpectedError != nil {
 				assert.Error(t, respBody[0].Error)

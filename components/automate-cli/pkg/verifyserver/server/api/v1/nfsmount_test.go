@@ -268,7 +268,221 @@ func TestNFSMount(t *testing.T) {
 		{
 			TestName:     "Valid Body Request",
 			ExpectedCode: 200,
-			ExpectedBody: `{"status":"SUCCESS","result":[{"ip":"localhost","node_type":"automate","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"automate","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"chef-infra-server","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"chef-infra-server","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"postgresql","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"postgresql","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"postgresql","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"opensearch","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"opensearch","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null},{"ip":"localhost","node_type":"opensearch","checks":[{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location found","error_msg":"","resolution_msg":""},{"title":"NFS Mount","passed":true,"success_msg":"NFS mount location is shared across given nodes","error_msg":"","resolution_msg":""}],"error":null}]}`,
+			ExpectedBody: `{
+				"status": "SUCCESS",
+				"result": [
+					{
+						"ip": "localhost",
+						"node_type": "automate",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "automate",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "chef-infra-server",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "chef-infra-server",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "postgresql",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "postgresql",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "postgresql",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "opensearch",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "opensearch",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					},
+					{
+						"ip": "localhost",
+						"node_type": "opensearch",
+						"checks": [
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location found",
+								"error_msg": "",
+								"resolution_msg": ""
+							},
+							{
+								"title": "NFS Mount",
+								"passed": true,
+								"success_msg": "NFS mount location is shared across given nodes",
+								"error_msg": "",
+								"resolution_msg": ""
+							}
+						],
+						"error": null
+					}
+				]
+			}`,
 			RequestBody: `{
 				"automate_node_ips": [
 					"localhost",
@@ -294,13 +508,27 @@ func TestNFSMount(t *testing.T) {
 		{
 			TestName:     "Invalid Body Request",
 			ExpectedCode: 400,
-			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"Invalid Body Request"}}`,
-			RequestBody:  "Invalid Body",
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "Invalid Body Request"
+				}
+			}`,
+			RequestBody: "Invalid Body",
 		},
 		{
 			TestName:     "Not Given all the required IPs",
 			ExpectedCode: 400,
-			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty"}}`,
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "AutomateNodeIPs, ChefInfraServerNodeIPs, PostgresqlNodeIPs or OpensearchNodeIPs cannot be empty"
+				}
+			}`,
 			RequestBody: `{
 				"automate_node_ips": []
 			}`,
@@ -308,7 +536,14 @@ func TestNFSMount(t *testing.T) {
 		{
 			TestName:     "Not Given the mount location",
 			ExpectedCode: 400,
-			ExpectedBody: `{"status":"FAILED","result":null,"error":{"code":400,"message":"Mount Location cannot be empty"}}`,
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "Mount Location cannot be empty"
+				}
+			}`,
 			RequestBody: `{
 				"automate_node_ips": [
 					"localhost",
@@ -346,7 +581,7 @@ func TestNFSMount(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, test.TestName)
-			assert.Contains(t, string(body), test.ExpectedBody)
+			assert.JSONEq(t, string(body), test.ExpectedBody)
 			assert.Equal(t, test.ExpectedCode, res.StatusCode)
 		})
 	}

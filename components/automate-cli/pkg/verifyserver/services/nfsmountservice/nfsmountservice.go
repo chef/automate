@@ -1,7 +1,6 @@
 package nfsmountservice
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,13 +8,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -57,28 +56,28 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 	for index, ip := range reqBody.AutomateNodeIPs {
 		key := constants.AUTOMATE + ip + strconv.Itoa(index)
 		nm.log.Debug("Call Initiated for Automate node having IP: ", ip)
-		go nm.MakeConcurrentCall(ip, constants.AUTOMATE, reqBody.MountLocation, ch, key)
+		go nm.makeConcurrentCall(ip, constants.AUTOMATE, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.ChefInfraServerNodeIPs {
 		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
 		nm.log.Debug("Call Initiated for Chefserver node having IP: ", ip)
-		go nm.MakeConcurrentCall(ip, constants.CHEF_INFRA_SERVER, reqBody.MountLocation, ch, key)
+		go nm.makeConcurrentCall(ip, constants.CHEF_INFRA_SERVER, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.PostgresqlNodeIPs {
 		key := constants.POSTGRESQL + ip + strconv.Itoa(index)
 		nm.log.Debug("Call Initiated for Postgresql node having IP: ", ip)
-		go nm.MakeConcurrentCall(ip, constants.POSTGRESQL, reqBody.MountLocation, ch, key)
+		go nm.makeConcurrentCall(ip, constants.POSTGRESQL, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.OpensearchNodeIPs {
 		key := constants.OPENSEARCH + ip + strconv.Itoa(index)
 		nm.log.Debug("Call Initiated for Opensearch node having IP: ", ip)
-		go nm.MakeConcurrentCall(ip, constants.OPENSEARCH, reqBody.MountLocation, ch, key)
+		go nm.makeConcurrentCall(ip, constants.OPENSEARCH, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
@@ -95,7 +94,7 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 	nm.log.Debug(prettyMap(nfsMountResultMap))
 	nm.log.Debug("All calls Completed")
 
-	MakeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap, reqBody.MountLocation)
+	makeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap, reqBody.MountLocation)
 	return respBody
 }
 
@@ -104,8 +103,8 @@ func prettyMap(mp map[string]models.NFSMountResponse) string {
 	return string(b)
 }
 
-func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
-	res, err := nm.DoAPICall(ip, mountLocation)
+func (nm *NFSMountService) makeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
+	res, err := nm.doAPICall(ip, mountLocation)
 	nm.log.Debugf("result got from /nfs-mount-loc API for %s: %v", ip, res)
 
 	mountResp := prepareMountResp(ip, nodeType, mountLocation, res, err)
@@ -121,7 +120,7 @@ func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountL
 	respChan <- respMap
 }
 
-func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
+func (nm *NFSMountService) doAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
 	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, constants.NFS_MOUNT_LOC_API_PATH)
 	nm.log.Debug("Request URL: ", reqURL)
 
@@ -129,34 +128,16 @@ func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.N
 		MountLocation: mountLocation,
 	}
 
-	// Converting Body into json encoding for passing into request
-	reqBodyJSON, err := json.Marshal(reqBody)
-	if err != nil {
-		nm.log.Error(err.Error())
-		return nil, errors.New("Failed to Marshal: " + err.Error())
-	}
-
-	httpReq, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(reqBodyJSON))
-	if err != nil {
-		nm.log.Error(err.Error())
-		return nil, errors.New("Failed to Create HTTP request: " + err.Error())
-	}
-
-	client := http.Client{
-		Timeout: constants.TIMEOUT * time.Second,
-	}
-
-	// Making the actual call
-	resp, err := client.Do(httpReq)
+	resp, err := httputils.MakeRequest(http.MethodPost, reqURL, reqBody)
 	if err != nil {
 		nm.log.Error(err.Error())
 		return nil, errors.New("Failed to send the HTTP request: " + err.Error())
 	}
 
-	return nm.GetResultStructFromRespBody(resp.Body)
+	return nm.getResultStructFromRespBody(resp.Body)
 }
 
-func (nm *NFSMountService) GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
+func (nm *NFSMountService) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
 	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
 		nm.log.Error(err.Error())
@@ -164,20 +145,20 @@ func (nm *NFSMountService) GetResultStructFromRespBody(respBody io.Reader) (*mod
 	}
 
 	// Converting API Response Body into Generic Response Struct.
-	APIRespStruct := response.ResponseBody{}
-	err = json.Unmarshal(body, &APIRespStruct)
+	ApiRespStruct := response.ResponseBody{}
+	err = json.Unmarshal(body, &ApiRespStruct)
 	if err != nil {
 		return nil, errors.New("Failed to Unmarshal: " + err.Error())
 	}
 
 	// If API(/nfs-mount-loc) is itself failing.
-	if APIRespStruct.Error != nil {
-		nm.log.Error(APIRespStruct.Error)
-		return nil, APIRespStruct.Error
+	if ApiRespStruct.Error != nil {
+		nm.log.Error(ApiRespStruct.Error)
+		return nil, ApiRespStruct.Error
 	}
 
-	// Converting interface into JSON encoding. APIResp.Result is a interface and for accessing the values we are converting that into json.
-	resultByte, err := json.Marshal(APIRespStruct.Result)
+	// Converting interface into JSON encoding. ApiResp.Result is a interface and for accessing the values we are converting that into json.
+	resultByte, err := json.Marshal(ApiRespStruct.Result)
 	if err != nil {
 		return nil, errors.New("Failed to Marshal: " + err.Error())
 	}
@@ -201,13 +182,14 @@ func prepareMountResp(ip, nodeType, mountLocation string, mountLocResp *models.N
 		node.Error = fiber.NewError(http.StatusBadRequest, err.Error())
 		return node
 	}
-	CheckMount(mountLocation, &node, mountLocResp)
+	checkMount(mountLocation, &node, mountLocResp)
 	return node
 }
 
-func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int, orderList []string,
+func makeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMountLocResponse]int, orderList []string,
 	nfsMountResultMap map[string]models.NFSMountResponse, shareMap map[string]models.NFSMountLocResponse, mountLocation string) {
 	var isShared bool = false
+
 	if len(countMap) == 1 {
 		isShared = true
 	}
@@ -218,13 +200,13 @@ func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMo
 		// then we are storing checkList as nil and putting the error in Error field.
 		if val.Error == nil {
 			// Test2 - Check for NFS Volume is Shared among all nodes or not
-			CheckShare(val.CheckList[0].Passed, isShared, mountLocation, shareMap[key], &val)
+			checkShare(val.CheckList[0].Passed, isShared, mountLocation, shareMap[key], &val)
 		}
 		*respBody = append(*respBody, val)
 	}
 }
 
-func CheckMount(mountLocation string, node *models.NFSMountResponse, data *models.NFSMountLocResponse) {
+func checkMount(mountLocation string, node *models.NFSMountResponse, data *models.NFSMountLocResponse) {
 	if data.Address != "" {
 		check := createCheck(constants.NFS_MOUNT, true, constants.MOUNT_SUCCESS_MSG, "", "")
 		node.CheckList = append(node.CheckList, check)
@@ -234,7 +216,7 @@ func CheckMount(mountLocation string, node *models.NFSMountResponse, data *model
 	}
 }
 
-func CheckShare(nfsMounted, nfsShared bool, mountLocation string, data models.NFSMountLocResponse, node *models.NFSMountResponse) {
+func checkShare(nfsMounted, nfsShared bool, mountLocation string, data models.NFSMountLocResponse, node *models.NFSMountResponse) {
 	var check models.Checks
 	if nfsMounted && nfsShared {
 		// nfs is mounted and shared among all the nodes
