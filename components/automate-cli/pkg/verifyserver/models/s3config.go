@@ -1,6 +1,5 @@
 package models
 
-// S3ServiceCheck
 type S3ServiceCheck struct {
 	Title         string `json:"title"`
 	Passed        bool   `json:"passed"`
