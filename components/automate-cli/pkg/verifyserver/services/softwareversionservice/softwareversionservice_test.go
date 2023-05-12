@@ -9,11 +9,12 @@ import (
 )
 
 var osTestVersion = map[string][]string{
-	"Red Hat Linux": {"7,8,9"},
+	"Red Hat Linux": {"7, 8, 9"},
 	"Ubuntu":        {"16.04.x", "18.04.x", "20.04.x", "22.04.x"},
 	"Centos":        {"7"},
 	"Amazon Linux":  {"2"},
 	"SUSE Linux":    {"12"},
+	"Debian":        {"9", "10", "11", "12"},
 }
 
 const successfile = "./testfiles/success.txt"
@@ -26,7 +27,9 @@ var checkfalse = []string{"wrongcammand"}
 
 func TestGetSoftwareVersionService(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	service := NewSoftwareVersionService(log)
+	service := NewSoftwareVersionService(log, func(cmd string) (string, error) {
+		return "", nil
+	})
 	type args struct {
 		query      string
 		checkarray []string
@@ -109,7 +112,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 			expectedError: "",
 		},
 		{
-			description: "If the query parameter is automate or chef-server",
+			description: "If the query parameter is automate, chef-server or Bastion",
 			args: args{
 				query:      "automate",
 				checkarray: checktrue,
@@ -199,8 +202,8 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						Title:         "Linux Version Check",
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      "Unable to get the os version from /etc/os-release file",
-						ResolutionMsg: "Ensure if the /etc/os-release is availabile on the path",
+						ErrorMsg:      "Its not feasible to determine the Operating system version",
+						ResolutionMsg: "Please run system on the supported platforms.",
 					},
 				},
 			},
@@ -234,8 +237,8 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						Title:         "Linux Version Check",
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate",
-						ResolutionMsg: "Ensure Debian GNU/Linux 10 (buster) correct version is installed on the node",
+						ErrorMsg:      "Kali Linux version is not supported by automate",
+						ResolutionMsg: "Ensure Kali Linux correct version is installed on the node",
 					},
 				},
 			},
@@ -243,12 +246,12 @@ func TestGetSoftwareVersionService(t *testing.T) {
 		{
 			description: "If the entered Query is not supported by us",
 			args: args{
-				query:      "wrongquery",
+				query:      "wrong-query",
 				checkarray: checktrue,
 				osFilepath: successfile,
 			},
-			expectedBody: nil,
-			expectedError: "The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server",
+			expectedBody:  nil,
+			expectedError: "The query wrong-query is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server",
 		},
 	}
 	for _, tt := range tests {
@@ -266,7 +269,9 @@ func TestGetSoftwareVersionService(t *testing.T) {
 }
 func TestCheckOs(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sv := NewSoftwareVersionService(log)
+	sv := NewSoftwareVersionService(log, func(cmd string) (string, error) {
+		return "", nil
+	})
 	type args struct {
 		osVersions map[string][]string
 		version    string
@@ -296,6 +301,15 @@ func TestCheckOs(t *testing.T) {
 			expectedBody: true,
 		},
 		{
+			description: "If the OS is debian",
+			args: args{
+				osVersions: osTestVersion,
+				version:    "10",
+				key:        "Debian",
+			},
+			expectedBody: true,
+		},
+		{
 			description: "If the os is out of other three that is Centos, AmazonLinux or SUSE LINUX",
 			args: args{
 				osVersions: osTestVersion,
@@ -316,16 +330,18 @@ func TestCheckOs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got := sv.(*SoftwareVersionService).checkOs(tt.args.osVersions, tt.args.version, tt.args.key)	
+			got := sv.(*SoftwareVersionService).checkOs(tt.args.osVersions, tt.args.version, tt.args.key)
 			assert.Equal(t, got, tt.expectedBody)
-			
+
 		})
 	}
 }
 
 func TestCheckCommandVersion(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sv := NewSoftwareVersionService(log)
+	sv := NewSoftwareVersionService(log, func(cmd string) (string, error) {
+		return "", nil
+	})
 	type args struct {
 		cmdName string
 	}
@@ -365,14 +381,16 @@ func TestCheckCommandVersion(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			got := sv.(*SoftwareVersionService).checkCommandVersion(tt.args.cmdName)
 			assert.Equal(t, got, tt.expectedBody)
-			
+
 		})
 	}
 }
 
 func TestCheckOsVersion(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sv := NewSoftwareVersionService(log)
+	sv := NewSoftwareVersionService(log, func(cmd string) (string, error) {
+		return "", nil
+	})
 	type args struct {
 		osFilepath string
 	}
@@ -391,8 +409,8 @@ func TestCheckOsVersion(t *testing.T) {
 				Title:         "Linux Version Check",
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      "Debian GNU/Linux 10 (buster) version is not supported by automate",
-				ResolutionMsg: "Ensure Debian GNU/Linux 10 (buster) correct version is installed on the node",
+				ErrorMsg:      "Kali Linux version is not supported by automate",
+				ResolutionMsg: "Ensure Kali Linux correct version is installed on the node",
 			},
 		},
 		{

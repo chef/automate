@@ -9,7 +9,7 @@ import (
 func (h *Handler) CheckSoftwareVersion(c *fiber.Ctx) {
 	services, err := h.SoftwareVersionService.GetSoftwareVersionServices(c.Query("node_type"))
 	if err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(response.BuildFailedResponse(&fiber.Error{Message: err.Error(),Code: 400}))
+		c.Next(&fiber.Error{Message: err.Error(),Code: fiber.StatusBadRequest})
 		return
 	}
 	c.JSON(response.BuildSuccessResponse(models.SoftwareVersionDetails{

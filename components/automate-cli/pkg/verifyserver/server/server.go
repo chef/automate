@@ -81,7 +81,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 			))).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
-		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l))
+		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

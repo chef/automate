@@ -1,12 +1,12 @@
 package softwareversionservice
 
 import (
-	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/getosutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
@@ -20,9 +20,10 @@ type SoftwareVersionService struct {
 	cmdCheckArray []string
 	osFilepath    string
 	logger        logger.Logger
+	CheckPath     func(cmd string) (string, error)
 }
 
-func NewSoftwareVersionService(logger logger.Logger) ISoftwareVersionService {
+func NewSoftwareVersionService(logger logger.Logger, CheckPath func(cmd string) (string, error)) ISoftwareVersionService {
 	return &SoftwareVersionService{
 		cmdCheckArray: cmdCheckArray,
 		osFilepath:    OSFILEPATH,
@@ -31,13 +32,22 @@ func NewSoftwareVersionService(logger logger.Logger) ISoftwareVersionService {
 }
 
 const (
-	AVAILABILITY        = " availability"
-	ENSURE              = "Ensure "
-	OSFILEPATH          = "/etc/os-release"
-	LINUX_VERSION_CHECK = "Linux Version Check"
+	AVAILABILITY              = " availability"
+	ENSURE                    = "Ensure "
+	OSFILEPATH                = "/etc/os-release"
+	LINUX_VERSION_CHECK       = "Linux Version Check"
+	UBUNTU                    = "Ubuntu"
+	RED_HAT                   = "Red Hat"
+	OPENSEARCH                = "opensearch"
+	AUTOMATE                  = "automate"
+	POSTGRES                  = "postgres"
+	CHEF_SERVER               = "chef-server"
+	BASTION                   = "bastion"
+	DEBIAN                    = "Debian"
+	RED_HAT_SUPPORTED_VERSION = 7
 )
 
-var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "pvcreate", "vgcreate", "lvcreate", "mv", "systemd", "wget", "exec"}
+var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "mv", "systemd", "wget", "exec", "rsync"}
 
 func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*models.SoftwareVersionDetails, error) {
 	sv.logger.Debug("The query paramter entered = ", query)
@@ -45,13 +55,13 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*mod
 	serviceResponse.Passed = true
 	serviceResponseArray := []models.Checks{}
 	cmdArray := []string{}
-	if query == "postgres" {
+	if query == POSTGRES {
 		cmdArray = []string{"stat"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	} else if query == "opensearch" {
+	} else if query == OPENSEARCH {
 		cmdArray = []string{"openssl"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	} else if query == "bastion" || query == "automate" || query == "chef-server" {
+	} else if query == BASTION || query == AUTOMATE || query == CHEF_SERVER {
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
 	} else {
 		sv.logger.Error("The Query parameter is not supported")
@@ -81,8 +91,10 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*mod
 		Checks: serviceResponse.Checks,
 	}, nil
 }
+
 func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Checks {
-	_, err := exec.LookPath(cmdName)
+	_, err := fiberutils.CheckPath(cmdName)
+	sv.logger.Debug(err)
 	if err != nil {
 		return &models.Checks{
 			Title:         cmdName + AVAILABILITY,
@@ -108,6 +120,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 		"Centos":       {"7"},
 		"Amazon Linux": {"2"},
 		"SUSE Linux":   {"12"},
+		"Debian":       {"9", "10", "11", "12"},
 	}
 	checkResponse := models.Checks{}
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
@@ -119,8 +132,8 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 			Title:         LINUX_VERSION_CHECK,
 			Passed:        false,
 			SuccessMsg:    "",
-			ErrorMsg:      "Unable to get the os version from /etc/os-release file",
-			ResolutionMsg: ENSURE + "if the /etc/os-release is availabile on the path",
+			ErrorMsg:      "Its not feasible to determine the Operating system version",
+			ResolutionMsg: "Please run system on the supported platforms.",
 		}, nil
 	}
 	for key := range osVersions {
@@ -158,8 +171,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 
 func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVersion string, osName string) bool {
 	correctVersion := false
-	sv.logger.Debug("The Version of the node = ", osVersion)
-	if osName == "Ubuntu" {
+	if osName == UBUNTU {
 		split := strings.Split(osVersion, ".")
 		checkVersion := split[0] + "." + split[1]
 		re := regexp.MustCompile(checkVersion)
@@ -170,9 +182,16 @@ func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVers
 				break
 			}
 		}
-	} else if osName == "Red Hat" {
+	} else if osName == DEBIAN {
+		for _, str := range osVersions[osName] {
+			if str == osVersion {
+				correctVersion = true
+				break
+			}
+		}
+	} else if osName == RED_HAT {
 		checkVersion, _ := strconv.ParseFloat(osVersion, 64)
-		if checkVersion >= 7 {
+		if checkVersion >= RED_HAT_SUPPORTED_VERSION {
 			correctVersion = true
 		}
 	} else {
