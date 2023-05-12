@@ -1,12 +1,11 @@
 package opensearchbackupservice
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 	elastic "github.com/olivere/elastic/v7"
 	elasticaws "github.com/olivere/elastic/v7/aws/v4"
@@ -24,6 +23,7 @@ type IOpenSearchclient interface {
 type OSS3BackupService struct {
 	OSClient     IOpenSearchclient
 	OSOperations IOpensearchOperations
+	Log          logger.Logger
 }
 
 type SnapshotRepoRequest struct {
@@ -43,10 +43,11 @@ func NewOpenSearchclient() IOpenSearchclient {
 	return &OpenSearchclient{}
 }
 
-func NewOSS3BackupService() IOSS3BackupService {
+func NewOSS3BackupService(log logger.Logger) IOSS3BackupService {
 	return &OSS3BackupService{
 		OSClient:     NewOpenSearchclient(),
-		OSOperations: NewOpensearchOperations(),
+		OSOperations: NewOpensearchOperations(log),
+		Log:          log,
 	}
 }
 
@@ -54,17 +55,15 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 
 	url := request.Endpoint
 
-	fmt.Println("URL: ", url)
-
 	client, err := ss.OSClient.CreateAWSClient(request, url)
 
 	if err != nil {
-		fmt.Println(err)
+		ss.Log.Error(err)
 		return models.S3BackupManagedResponse{}, err
 	}
 
 	if _, err = ss.OSOperations.CreateTestIndex(client, ctx, TestIndexName); err != nil {
-		fmt.Println(err)
+		ss.Log.Error("Index creation failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(IndexCreateFailedMessage, IndexCreateFailedResolution)},
@@ -79,7 +78,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 	}
 
 	if _, err = ss.OSOperations.CreateSnapshotRepo(client, ctx, snapshotCreateReq, TestRepoName); err != nil {
-		fmt.Println(err)
+		ss.Log.Error("Snapshot Repo creation failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotRepoCreateFailedMessage, SnapShotRepoCreateFailedResolution)},
@@ -87,7 +86,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 	}
 
 	if _, err = ss.OSOperations.CreateSnapshot(client, ctx, TestRepoName, TestSnapshotName, TestIndexName); err != nil {
-		fmt.Println(err)
+		ss.Log.Error("Snapshot creation failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotCreateFailedMessage, SnapShotCreateFailedResolution)},
@@ -95,7 +94,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 	}
 
 	if status, err := ss.OSOperations.GetSnapshotStatus(client, ctx, TestRepoName, TestSnapshotName); err != nil || status != "SUCCESS" {
-		fmt.Println(err)
+		ss.Log.Error("Snapshot Status check failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotCreateFailedMessage, SnapShotCreateFailedResolution)},
@@ -103,7 +102,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 	}
 
 	if _, err = ss.OSOperations.DeleteTestSnapshot(client, ctx, TestRepoName, TestSnapshotName); err != nil {
-		fmt.Println(err)
+		ss.Log.Error("Snapshot deleteion failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotDeleteFailedMessage, SnapShotDeleteFailedResolution)},
@@ -111,7 +110,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 	}
 
 	if _, err = ss.OSOperations.DeleteTestSnapshotRepo(client, ctx, TestRepoName); err != nil {
-		fmt.Println(err)
+		ss.Log.Error("Snapshot Repo deletion failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotRepoDeleteFailedMessage, SnapShotRepoDeleteFailedResolution)},
@@ -119,7 +118,7 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 	}
 
 	if _, err = ss.OSOperations.DeleteTestIndex(client, ctx, TestIndexName); err != nil {
-		fmt.Println(err)
+		ss.Log.Error("Index deletion failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
 			Checks: []models.S3BackupChecks{createFailedResponse(IndexDeleteFailedMessage, IndexDeleteFailedResolution)},

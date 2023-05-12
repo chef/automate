@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 	elastic "github.com/olivere/elastic/v7"
 )
@@ -19,7 +20,9 @@ type IOpensearchOperations interface {
 	DeleteTestIndex(*elastic.Client, *fiber.Ctx, string) (bool, error)
 }
 
-type OpensearchOperations struct{}
+type OpensearchOperations struct {
+	Log logger.Logger
+}
 
 type SnapshotStatus struct {
 	Snapshots []snapshotStatus `json:"snapshots"`
@@ -33,8 +36,10 @@ type snapshotStatus struct {
 	IncludeGlobalState bool   `json:"include_global_state"`
 }
 
-func NewOpensearchOperations() IOpensearchOperations {
-	return &OpensearchOperations{}
+func NewOpensearchOperations(log logger.Logger) IOpensearchOperations {
+	return &OpensearchOperations{
+		Log: log,
+	}
 }
 
 type SnapshotRepoRequestS3 struct {
@@ -68,7 +73,6 @@ func (s3Request *SnapshotRepoRequestS3) createSnapshotRepoRequest() SnapshotRepo
 			"region":    s3Request.Region,
 		},
 	}
-	fmt.Println("Request created: ", req)
 	return req
 }
 
@@ -89,11 +93,10 @@ func (os *OpensearchOperations) CreateTestIndex(client *elastic.Client, ctx *fib
 	res, err := createIndex.Do(ctx.Context())
 
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
-	fmt.Println("Index creation: ", res.Acknowledged)
+	os.Log.Info("Index creation status ", res.Acknowledged)
 
 	return res.Acknowledged, nil
 }
@@ -103,11 +106,10 @@ func (os *OpensearchOperations) CreateSnapshotRepo(client *elastic.Client, ctx *
 	createRepo.BodyJson(req.createSnapshotRepoRequest())
 	res, err := createRepo.Do(ctx.Context())
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
-	fmt.Println("Snapshot repo creation: ", res.Acknowledged)
+	os.Log.Info("Snapshot repo creation: ", res.Acknowledged)
 
 	return res.Acknowledged, nil
 }
@@ -117,12 +119,11 @@ func (os *OpensearchOperations) CreateSnapshot(client *elastic.Client, ctx *fibe
 	createSnapshot.BodyJson(createSnapshotRequest(index))
 	res, err := createSnapshot.Do(ctx.Context())
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
-	fmt.Print("Snapshot creation: ", res.Snapshot)
-	return true, nil
+	os.Log.Info("Snapshot creation: ", *res.Accepted)
+	return *res.Accepted, nil
 }
 
 func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *fiber.Ctx, repoName string, snapshotName string) (string, error) {
@@ -135,7 +136,6 @@ func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *f
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
@@ -146,7 +146,7 @@ func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *f
 		return "", err
 	}
 
-	fmt.Println("status: ", snapshotStatusList.Snapshots[0].State)
+	os.Log.Info("Snapshot Status: ", snapshotStatusList.Snapshots[0].State)
 
 	return snapshotStatusList.Snapshots[0].State, nil
 }
@@ -155,11 +155,10 @@ func (os *OpensearchOperations) DeleteTestSnapshot(client *elastic.Client, ctx *
 
 	deleteSnapshot, err := client.SnapshotDelete(repoName, snapshotName).Do(ctx.Context())
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
-	fmt.Println("Index Deletion: ", deleteSnapshot.Acknowledged)
+	os.Log.Info("Snapshot Deletion status: ", deleteSnapshot.Acknowledged)
 	return deleteSnapshot.Acknowledged, nil
 }
 
@@ -167,21 +166,19 @@ func (os *OpensearchOperations) DeleteTestSnapshotRepo(client *elastic.Client, c
 
 	deleteRepo, err := client.SnapshotDeleteRepository(repoName).Do(ctx.Context())
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
-	fmt.Println("Index Deletion: ", deleteRepo.Acknowledged)
+	os.Log.Info("Snapshot Repo Deletion status: ", deleteRepo.Acknowledged)
 	return deleteRepo.Acknowledged, nil
 }
 
 func (os *OpensearchOperations) DeleteTestIndex(client *elastic.Client, ctx *fiber.Ctx, index string) (bool, error) {
 	deleteIndex, err := client.DeleteIndex(index).Do(ctx.Context())
 	if err != nil {
-		fmt.Println(err)
 		return false, err
 	}
 
-	fmt.Println("Index Deletion: ", deleteIndex.Acknowledged)
+	os.Log.Info("Index Deletion: ", deleteIndex.Acknowledged)
 	return deleteIndex.Acknowledged, nil
 }
