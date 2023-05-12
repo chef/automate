@@ -1,6 +1,7 @@
 package constants
 
 const (
+	IP_ADDRESSS                     = "IP address"
 	UNIQUE_SUCCESS_MESSAGE          = "IP address is unique"
 	UNIQUE_ERROR_MESSAGE            = "IP address is not unique"
 	UNIQUE_RESOLUTION_MESSAGE       = "IP address for %s Type should be unique."
@@ -10,7 +11,7 @@ const (
 	VALID_FORMAT_SUCCESS_MESSAGE    = "IP address is of valid format"
 	VALID_FORMAT_ERROR_MESSAGE      = "IP address is of invalid format"
 	VALID_FORMAT_RESOLUTION_MESSAGE = "IP address %s should be changed in config to valid format."
-	SHARED_SUCCESS_MESSAGE          = "Not shared with backend nodes"
+	SHARED_SUCCESS_MESSAGE          = "Not shared with %s nodes"
 	SHARED_ERROR_MESSAGE            = "IP address is common in %s Type and %s Type"
 	SHARED_RESOLUTION_MESSAGE       = "Unique IP address should be used for %s Type and %s Type"
 )

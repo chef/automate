@@ -1,7 +1,6 @@
 package hardwareresourcecount_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bmizerany/assert"
@@ -39,7 +38,7 @@ var (
 	VALID_HARDWARE_RESOURCE_COUNT_RESPONSE = []models.HardwareResourceResponse{
 		{
 			IP:       "172.154.0.1",
-			NodeType: "Automate",
+			NodeType: "automate",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -65,7 +64,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Automate Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "automate Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -73,7 +72,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.2",
-			NodeType: "Automate",
+			NodeType: "automate",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -99,7 +98,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Automate Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "automate Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -107,7 +106,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.3",
-			NodeType: "Chef-infra-server",
+			NodeType: "chef-infra-server",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -133,7 +132,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Chef-infra-server Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "chef-infra-server Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -141,7 +140,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.4",
-			NodeType: "Chef-infra-server",
+			NodeType: "chef-infra-server",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -167,7 +166,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Chef-infra-server Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "chef-infra-server Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -175,7 +174,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.5",
-			NodeType: "Postgresql",
+			NodeType: "postgresql",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -194,14 +193,14 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Not shared with backend nodes",
+					SuccessMsg:    "Not shared with frontend nodes",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Postgresql Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -209,7 +208,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.6",
-			NodeType: "Postgresql",
+			NodeType: "postgresql",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -228,14 +227,14 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Not shared with backend nodes",
+					SuccessMsg:    "Not shared with frontend nodes",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Postgresql Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -243,7 +242,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.7",
-			NodeType: "Postgresql",
+			NodeType: "postgresql",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -262,14 +261,14 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Not shared with backend nodes",
+					SuccessMsg:    "Not shared with frontend nodes",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Postgresql Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -277,7 +276,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.8",
-			NodeType: "Opensearch",
+			NodeType: "opensearch",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -296,14 +295,14 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Not shared with backend nodes",
+					SuccessMsg:    "Not shared with frontend nodes",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Opensearch Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -311,7 +310,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.9",
-			NodeType: "Opensearch",
+			NodeType: "opensearch",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -330,14 +329,14 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Not shared with backend nodes",
+					SuccessMsg:    "Not shared with frontend nodes",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Opensearch Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -345,7 +344,7 @@ var (
 		},
 		{
 			IP:       "172.154.0.10",
-			NodeType: "Opensearch",
+			NodeType: "opensearch",
 			Checks: []models.Checks{
 				{
 					Title:         "IP address",
@@ -364,14 +363,14 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Not shared with backend nodes",
+					SuccessMsg:    "Not shared with frontend nodes",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "Opensearch Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -490,7 +489,6 @@ func TestValidateHardwareResources(t *testing.T) {
 
 	for _, e := range tests {
 		res := hardwareresourcecount.ValidateHardwareResources(e.MinNodeCount, e.ReqNodeCount, e.NodeType, e.IP, e.Set, e.SetBackend)
-		fmt.Println(res)
 		assert.Equal(t, e.ExpectedRes, res.Checks[0].Passed)
 	}
 }
