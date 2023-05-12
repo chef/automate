@@ -55,7 +55,7 @@ func SetupOSBackupHandler(ss opensearchbackupservice.IOSS3BackupService) (*fiber
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup(false)
+	vs.SetupRoutes()
 	return vs.App, nil
 }
 

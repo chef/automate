@@ -93,7 +93,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddMockServerServices(startmockserverservice.New(l)).
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
-		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService())
+		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

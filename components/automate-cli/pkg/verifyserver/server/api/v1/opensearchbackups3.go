@@ -18,8 +18,6 @@ func (h *Handler) CheckOSBackupS3(c *fiber.Ctx) {
 		return
 	}
 
-	fmt.Println("In handler got the req ", req)
-
 	resp, err := h.OSBackupService.OSS3BackupVerify(*req, c)
 	if err != nil {
 
