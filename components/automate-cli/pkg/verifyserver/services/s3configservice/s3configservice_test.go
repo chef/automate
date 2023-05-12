@@ -24,19 +24,26 @@ var (
 	s3BucketAccessTitle         = "S3 bucket access test"
 	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key: RequestError: send request failed\ncaused by: Put \"s3://example-s3.aws.region.com/backups/automate\": unsupported protocol scheme \"s3\""
 	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
+	req                         = models.S3ConfigRequest{
+		Endpoint:   "s3://example-s3.aws.region.com",
+		BucketName: "backups",
+		BasePath:   "automate",
+		AccessKey:  "VALID-ACCESS-KEY",
+		SecretKey:  "SECRET-KEY",
+	}
 )
 
 func TestGetS3Connection(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
-	services := cs.GetS3Connection(models.S3ConfigRequest{
+	services := cs.GetS3Connection(&models.S3ConfigRequest{
 		Endpoint:   "s3://example-s3.aws.region.com",
 		BucketName: "backups",
 		BasePath:   "automate",
 		AccessKey:  "VALID-ACCESS-KEY",
 		SecretKey:  "SECRET-KEY",
 	})
-	assert.Equal(t, models.S3ServiceCheck{
+	assert.Equal(t, &models.S3ServiceCheck{
 		Title:         s3ConnectionTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -48,14 +55,14 @@ func TestGetS3Connection(t *testing.T) {
 func TestGetBucketAccessFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
-	services := cs.GetBucketAccess(models.S3ConfigRequest{
+	services := cs.GetBucketAccess(&models.S3ConfigRequest{
 		Endpoint:   "s3://example-s3.aws.region.com",
 		BucketName: "backups",
 		BasePath:   "automate",
 		AccessKey:  "VALID-ACCESS-KEY",
 		SecretKey:  "SECRET-KEY",
 	})
-	assert.Equal(t, models.S3ServiceCheck{
+	assert.Equal(t, &models.S3ServiceCheck{
 		Title:         s3BucketAccessTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -67,6 +74,7 @@ func TestGetBucketAccessFailure(t *testing.T) {
 func TestAwsConnection(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 }
@@ -74,6 +82,7 @@ func TestAwsConnection(t *testing.T) {
 func TestListBucketsFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	s3Client := s3.New(sess)
@@ -84,6 +93,7 @@ func TestListBucketsFailure(t *testing.T) {
 func TestUploadObjectFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	// s3Client := s3.New(sess)
@@ -94,6 +104,7 @@ func TestUploadObjectFailure(t *testing.T) {
 func TestListObjectsFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	s3Client := s3.New(sess)
@@ -104,6 +115,7 @@ func TestListObjectsFailure(t *testing.T) {
 func TestDeleteObjectsFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	s3Client := s3.New(sess)
@@ -132,6 +144,7 @@ func TestListBucketsSuccess(t *testing.T) {
 			}
 		},
 	})
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	err = cs.(*s3configservice.S3ConfigService).ListBuckets(&s3.S3{
@@ -163,6 +176,7 @@ func TestUploadObjectSuccess(t *testing.T) {
 			}
 		},
 	})
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	err = cs.(*s3configservice.S3ConfigService).UploadObject(sess)
@@ -188,6 +202,7 @@ func TestListObjectsSuccess(t *testing.T) {
 			}
 		},
 	})
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	err = cs.(*s3configservice.S3ConfigService).ListObjects(&s3.S3{
@@ -219,6 +234,7 @@ func TestDeleteObjectsSuccess(t *testing.T) {
 			}
 		},
 	})
+	cs.(*s3configservice.S3ConfigService).Req = &req
 	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
 	err = cs.(*s3configservice.S3ConfigService).DeleteObjects(&s3.S3{

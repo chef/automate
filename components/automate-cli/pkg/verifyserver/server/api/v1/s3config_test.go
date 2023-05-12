@@ -33,11 +33,11 @@ var (
 
 func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.S3Config {
 	return &s3configservice.MockS3Config{
-		GetS3ConnectionFunc: func(models.S3ConfigRequest) models.S3ServiceCheck {
-			return mockS3ConnectionModel
+		GetS3ConnectionFunc: func(*models.S3ConfigRequest) *models.S3ServiceCheck {
+			return &mockS3ConnectionModel
 		},
-		GetBucketAccessFunc: func(models.S3ConfigRequest) models.S3ServiceCheck {
-			return mockS3BucketAccessModel
+		GetBucketAccessFunc: func(*models.S3ConfigRequest) *models.S3ServiceCheck {
+			return &mockS3BucketAccessModel
 		},
 	}
 }

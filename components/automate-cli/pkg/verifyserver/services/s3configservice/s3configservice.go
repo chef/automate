@@ -21,30 +21,30 @@ var (
 )
 
 type S3Config interface {
-	GetS3Connection(models.S3ConfigRequest) models.S3ServiceCheck
-	GetBucketAccess(models.S3ConfigRequest) models.S3ServiceCheck
+	GetS3Connection(*models.S3ConfigRequest) *models.S3ServiceCheck
+	GetBucketAccess(*models.S3ConfigRequest) *models.S3ServiceCheck
 }
 
 type S3ConfigService struct {
-	logger   logger.Logger
-	req      models.S3ConfigRequest
-	awsUtils awsutils.AwsUtils
+	Logger   logger.Logger
+	Req      *models.S3ConfigRequest
+	AwsUtils awsutils.AwsUtils
 }
 
 func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) S3Config {
 	return &S3ConfigService{
-		logger:   logger,
-		awsUtils: awsUtils,
+		Logger:   logger,
+		AwsUtils: awsUtils,
 	}
 }
 
-func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.S3ServiceCheck {
-	ss.req = req
+func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.S3ServiceCheck {
+	ss.Req = req
 	sess, err := ss.AwsConnection()
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
-	s3Client := ss.awsUtils.New(sess)
+	s3Client := ss.AwsUtils.New(sess)
 	err = ss.ListBuckets(s3Client)
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
@@ -52,12 +52,12 @@ func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.S3
 	return ss.Response(s3ConnectionTitle, s3ConnectionSuccessMsg, "", "", true)
 }
 
-func (ss *S3ConfigService) GetBucketAccess(req models.S3ConfigRequest) models.S3ServiceCheck {
-	ss.req = req
+func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.S3ServiceCheck {
+	ss.Req = req
 
 	// S3 connection
 	sess, err := ss.AwsConnection()
-	s3Client := ss.awsUtils.New(sess)
+	s3Client := ss.AwsUtils.New(sess)
 	if err != nil {
 		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
@@ -83,58 +83,58 @@ func (ss *S3ConfigService) GetBucketAccess(req models.S3ConfigRequest) models.S3
 }
 
 func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
-	sess, err := ss.awsUtils.NewSessionWithOptions(ss.req.Endpoint, ss.req.AccessKey, ss.req.SecretKey)
+	sess, err := ss.AwsUtils.NewSessionWithOptions(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey)
 	if err != nil {
-		ss.logger.Error("s3 config aws connection failed: ", err.Error())
+		ss.Logger.Error("s3 config aws connection failed: ", err.Error())
 		return nil, err
 	}
-	ss.logger.Info("s3 config aws connection success")
+	ss.Logger.Info("s3 config aws connection success")
 	return sess, nil
 }
 
 func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
 	// list buckets in s3 to verify secrete and access key
-	_, err := ss.awsUtils.ListBuckets(s3Client)
+	_, err := ss.AwsUtils.ListBuckets(s3Client)
 	if err != nil {
-		ss.logger.Error("s3 config list bucket failed: ", err.Error())
+		ss.Logger.Error("s3 config list bucket failed: ", err.Error())
 		return err
 	}
-	ss.logger.Info("s3 config list object success")
+	ss.Logger.Info("s3 config list object success")
 	return nil
 }
 
 func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
-	_, err := ss.awsUtils.DeleteObject(s3Client, ss.req.BucketName, ss.req.BasePath)
+	_, err := ss.AwsUtils.DeleteObject(s3Client, ss.Req.BucketName, ss.Req.BasePath)
 	if err != nil {
-		ss.logger.Error("s3 config delete object failed: ", err.Error())
+		ss.Logger.Error("s3 config delete object failed: ", err.Error())
 		return err
 	}
-	ss.logger.Info("s3 config delete object success")
+	ss.Logger.Info("s3 config delete object success")
 	return nil
 }
 
 func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
-	_, err := ss.awsUtils.ListObjectsV2(s3Client, ss.req.BucketName, ss.req.BasePath)
+	_, err := ss.AwsUtils.ListObjectsV2(s3Client, ss.Req.BucketName, ss.Req.BasePath)
 	if err != nil {
-		ss.logger.Error("s3 config list object failed: ", err.Error())
+		ss.Logger.Error("s3 config list object failed: ", err.Error())
 		return err
 	}
-	ss.logger.Info("s3 config list object success")
+	ss.Logger.Info("s3 config list object success")
 	return nil
 }
 
 func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
-	_, err := ss.awsUtils.NewUploader(sess, ss.req.BucketName, ss.req.BasePath)
+	_, err := ss.AwsUtils.NewUploader(sess, ss.Req.BucketName, ss.Req.BasePath)
 	if err != nil {
-		ss.logger.Error("s3 config upload object failed: ", err.Error())
+		ss.Logger.Error("s3 config upload object failed: ", err.Error())
 		return err
 	}
-	ss.logger.Info("s3 config upload object success")
+	ss.Logger.Info("s3 config upload object success")
 	return nil
 }
 
-func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) models.S3ServiceCheck {
-	return models.S3ServiceCheck{
+func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) *models.S3ServiceCheck {
+	return &models.S3ServiceCheck{
 		Title:         Title,
 		Passed:        Passed,
 		SuccessMsg:    SuccessMsg,
