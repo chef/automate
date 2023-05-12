@@ -332,7 +332,7 @@ func TestNFSMount(t *testing.T) {
 		},
 	}
 
-	NFSMountEndpoint := constants.NFS_MOUNT_ENDPOINT
+	NFSMountEndpoint := constants.NFS_MOUNT_API_PATH
 
 	app, err := SetupNFSMountHandler(SetupMockNFSMountService())
 	assert.NoError(t, err)

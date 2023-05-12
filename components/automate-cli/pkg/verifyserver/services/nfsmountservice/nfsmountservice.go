@@ -110,7 +110,7 @@ func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountL
 
 func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
 
-	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, "/api/v1/fetch/nfs-mount-loc")
+	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, constants.NFS_MOUNT_LOC_API_PATH)
 
 	reqBody := models.NFSMountLocRequest{
 		MountLocation: mountLocation,
@@ -119,21 +119,24 @@ func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.N
 	// Converting Body into json encoding for passing into request
 	reqBodyJSON, err := json.Marshal(reqBody)
 	if err != nil {
+		nm.log.Debug(err.Error())
 		return nil, errors.New("Failed to Marshal: " + err.Error())
 	}
 
 	httpReq, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(reqBodyJSON))
 	if err != nil {
+		nm.log.Debug(err.Error())
 		return nil, errors.New("Failed to Create HTTP request: " + err.Error())
 	}
 
 	client := http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: constants.TIMEOUT * time.Second,
 	}
 
 	// Making the actual call
 	resp, err := client.Do(httpReq)
 	if err != nil {
+		nm.log.Debug(err.Error())
 		return nil, errors.New("Failed to send the HTTP request: " + err.Error())
 	}
 
@@ -170,7 +173,6 @@ func GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocRespons
 	if err != nil {
 		return nil, errors.New("Failed to Unmarshal: " + err.Error())
 	}
-	// fmt.Println(resultField)
 
 	return resultField, nil
 }
@@ -209,10 +211,10 @@ func MakeRespBody(respBody *[]models.NFSMountResponse, countMap map[models.NFSMo
 
 func CheckMount(mountLocation string, node *models.NFSMountResponse, data *models.NFSMountLocResponse) {
 	if data.Address != "" {
-		check := createCheck("NFS Mount", true, constants.MOUNT_SUCCESS_MSG, "", "")
+		check := createCheck(constants.NFS_MOUNT, true, constants.MOUNT_SUCCESS_MSG, "", "")
 		node.CheckList = append(node.CheckList, check)
 	} else {
-		check := createCheck("NFS Mount", false, "", constants.MOUNT_ERROR_MSG, fmt.Sprintf(constants.MOUNT_RESOLUTION_MSG, mountLocation))
+		check := createCheck(constants.NFS_MOUNT, false, "", constants.MOUNT_ERROR_MSG, fmt.Sprintf(constants.MOUNT_RESOLUTION_MSG, mountLocation))
 		node.CheckList = append(node.CheckList, check)
 	}
 }
@@ -221,13 +223,13 @@ func CheckShare(nfsMounted, nfsShared bool, mountLocation string, data models.NF
 	var check models.Checks
 	if nfsMounted && nfsShared {
 		// nfs is mounted and shared among all the nodes
-		check = createCheck("NFS Mount", true, constants.SHARE_SUCCESS_MSG, "", "")
+		check = createCheck(constants.NFS_MOUNT, true, constants.SHARE_SUCCESS_MSG, "", "")
 	} else if nfsMounted {
 		// nfs is mounted but it's not shared
-		check = createCheck("NFS Mount", false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG, data.Nfs), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG, data.Nfs, mountLocation))
+		check = createCheck(constants.NFS_MOUNT, false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG, data.Nfs), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG, data.Nfs, mountLocation))
 	} else {
 		// nfs volume is not mounted with the node.
-		check = createCheck("NFS Mount", false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG_WITHOUT_MOUNT, mountLocation), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG_WITHOUT_MOUNT, mountLocation))
+		check = createCheck(constants.NFS_MOUNT, false, "", fmt.Sprintf(constants.SHARE_ERROR_MSG_WITHOUT_MOUNT, mountLocation), fmt.Sprintf(constants.SHARE_RESOLUTION_MSG_WITHOUT_MOUNT, mountLocation))
 	}
 	node.CheckList = append(node.CheckList, check)
 }
