@@ -23,19 +23,19 @@ var (
 	s3ConnectionSuccessMsg             = "Machine is able to connect with S3 using the provided access key and secret key"
 	s3BucketAccessTitle                = "S3 bucket access test"
 	s3BucketAccessErrorMsg             = "Machine is not able to access the S3 bucket using the provided access key and secret key"
-	s3BucketAccessResolutionMsg        = "Provide the necessary acess to the S3 bucket"
+	s3BucketAccessResolutionMsg        = "Provide the necessary access to the S3 bucket"
 	s3BucketAccessSuccessMsg           = "Machine is able to access the S3 bucket using the provided access key and secret key"
 	successMessageS3Config             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with S3 using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"S3 bucket access test\",\"passed\":true,\"success_msg\":\"Machine is able to access the S3 bucket using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}"
-	failureMessageS3Config             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with S3 using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct S3 url or access or secret keys\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary acess to the S3 bucket\"}]}}"
-	bucketAccessfailureMessageS3Config = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with S3 using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary acess to the S3 bucket\"}]}}"
+	failureMessageS3Config             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with S3 using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct S3 url or access or secret keys\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the S3 bucket\"}]}}"
+	bucketAccessfailureMessageS3Config = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with S3 using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the S3 bucket\"}]}}"
 )
 
-func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.ServiceCheck) s3configservice.S3Config {
+func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.S3Config {
 	return &s3configservice.MockS3Config{
-		GetS3ConnectionFunc: func(models.S3ConfigRequest) models.ServiceCheck {
+		GetS3ConnectionFunc: func(models.S3ConfigRequest) models.S3ServiceCheck {
 			return mockS3ConnectionModel
 		},
-		GetBucketAccessFunc: func(models.S3ConfigRequest) models.ServiceCheck {
+		GetBucketAccessFunc: func(models.S3ConfigRequest) models.S3ServiceCheck {
 			return mockS3BucketAccessModel
 		},
 	}
@@ -65,20 +65,20 @@ func TestS3Config(t *testing.T) {
 		expectedCode            int
 		expectedBody            string
 		body                    string
-		mockS3ConnectionModel   models.ServiceCheck
-		mockS3BucketAccessModel models.ServiceCheck
+		mockS3ConnectionModel   models.S3ServiceCheck
+		mockS3BucketAccessModel models.S3ServiceCheck
 	}{
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			mockS3ConnectionModel: models.ServiceCheck{
+			mockS3ConnectionModel: models.S3ServiceCheck{
 				Title:         s3ConnectionTitle,
 				Passed:        true,
 				SuccessMsg:    s3ConnectionSuccessMsg,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			mockS3BucketAccessModel: models.ServiceCheck{
+			mockS3BucketAccessModel: models.S3ServiceCheck{
 				Title:         s3BucketAccessTitle,
 				Passed:        true,
 				SuccessMsg:    s3BucketAccessSuccessMsg,
@@ -97,14 +97,14 @@ func TestS3Config(t *testing.T) {
 		{
 			description:  "200:fail both s3connection and s3BucketAccess",
 			expectedCode: 200,
-			mockS3ConnectionModel: models.ServiceCheck{
+			mockS3ConnectionModel: models.S3ServiceCheck{
 				Title:         s3ConnectionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      s3ConnectionErrorMsg,
 				ResolutionMsg: s3ConnectionResolutionMsg,
 			},
-			mockS3BucketAccessModel: models.ServiceCheck{
+			mockS3BucketAccessModel: models.S3ServiceCheck{
 				Title:         s3BucketAccessTitle,
 				Passed:        false,
 				SuccessMsg:    "",
@@ -123,14 +123,14 @@ func TestS3Config(t *testing.T) {
 		{
 			description:  "200:fail s3BucketAccess",
 			expectedCode: 200,
-			mockS3ConnectionModel: models.ServiceCheck{
+			mockS3ConnectionModel: models.S3ServiceCheck{
 				Title:         s3ConnectionTitle,
 				Passed:        true,
 				SuccessMsg:    s3ConnectionSuccessMsg,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			mockS3BucketAccessModel: models.ServiceCheck{
+			mockS3BucketAccessModel: models.S3ServiceCheck{
 				Title:         s3BucketAccessTitle,
 				Passed:        false,
 				SuccessMsg:    "",

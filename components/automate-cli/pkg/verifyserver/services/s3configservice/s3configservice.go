@@ -1,14 +1,10 @@
 package s3configservice
 
 import (
-	"strings"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 )
@@ -20,33 +16,35 @@ var (
 	s3ConnectionSuccessMsg      = "Machine is able to connect with S3 using the provided access key and secret key"
 	s3BucketAccessTitle         = "S3 bucket access test"
 	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key"
-	s3BucketAccessResolutionMsg = "Provide the necessary acess to the S3 bucket"
+	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
 	s3BucketAccessSuccessMsg    = "Machine is able to access the S3 bucket using the provided access key and secret key"
 )
 
 type S3Config interface {
-	GetS3Connection(models.S3ConfigRequest) models.ServiceCheck
-	GetBucketAccess(models.S3ConfigRequest) models.ServiceCheck
+	GetS3Connection(models.S3ConfigRequest) models.S3ServiceCheck
+	GetBucketAccess(models.S3ConfigRequest) models.S3ServiceCheck
 }
 
 type S3ConfigService struct {
-	logger logger.Logger
-	req    models.S3ConfigRequest
+	logger   logger.Logger
+	req      models.S3ConfigRequest
+	awsUtils awsutils.AwsUtils
 }
 
-func NewS3ConfigService(logger logger.Logger) S3Config {
+func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) S3Config {
 	return &S3ConfigService{
-		logger: logger,
+		logger:   logger,
+		awsUtils: awsUtils,
 	}
 }
 
-func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.ServiceCheck {
+func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.S3ServiceCheck {
 	ss.req = req
 	sess, err := ss.AwsConnection()
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
-	s3Client := s3.New(sess)
+	s3Client := ss.awsUtils.New(sess)
 	err = ss.ListBuckets(s3Client)
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
@@ -54,12 +52,12 @@ func (ss *S3ConfigService) GetS3Connection(req models.S3ConfigRequest) models.Se
 	return ss.Response(s3ConnectionTitle, s3ConnectionSuccessMsg, "", "", true)
 }
 
-func (ss *S3ConfigService) GetBucketAccess(req models.S3ConfigRequest) models.ServiceCheck {
+func (ss *S3ConfigService) GetBucketAccess(req models.S3ConfigRequest) models.S3ServiceCheck {
 	ss.req = req
 
 	// S3 connection
 	sess, err := ss.AwsConnection()
-	s3Client := s3.New(sess)
+	s3Client := ss.awsUtils.New(sess)
 	if err != nil {
 		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
@@ -85,16 +83,7 @@ func (ss *S3ConfigService) GetBucketAccess(req models.S3ConfigRequest) models.Se
 }
 
 func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
-	config := aws.Config{
-		Endpoint:         &ss.req.Endpoint,
-		Region:           aws.String("us-east-1"),
-		DisableSSL:       aws.Bool(true),
-		S3ForcePathStyle: aws.Bool(true),
-		Credentials:      credentials.NewStaticCredentials(ss.req.AccessKey, ss.req.SecretKey, ""),
-	}
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config: config,
-	})
+	sess, err := ss.awsUtils.NewSessionWithOptions(ss.req.Endpoint, ss.req.AccessKey, ss.req.SecretKey)
 	if err != nil {
 		ss.logger.Error("s3 config aws connection failed: ", err.Error())
 		return nil, err
@@ -105,7 +94,7 @@ func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
 
 func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
 	// list buckets in s3 to verify secrete and access key
-	_, err := s3Client.ListBuckets(nil)
+	_, err := ss.awsUtils.ListBuckets(s3Client)
 	if err != nil {
 		ss.logger.Error("s3 config list bucket failed: ", err.Error())
 		return err
@@ -115,11 +104,7 @@ func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
 }
 
 func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
-	_, err := s3Client.DeleteObject(
-		&s3.DeleteObjectInput{
-			Bucket: aws.String(ss.req.BucketName),
-			Key:    aws.String(ss.req.BasePath),
-		})
+	_, err := ss.awsUtils.DeleteObject(s3Client, ss.req.BucketName, ss.req.BasePath)
 	if err != nil {
 		ss.logger.Error("s3 config delete object failed: ", err.Error())
 		return err
@@ -129,10 +114,7 @@ func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
 }
 
 func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
-	_, err := s3Client.ListObjectsV2(&s3.ListObjectsV2Input{
-		Bucket: aws.String(ss.req.BucketName),
-		Prefix: aws.String(ss.req.BasePath),
-	})
+	_, err := ss.awsUtils.ListObjectsV2(s3Client, ss.req.BucketName, ss.req.BasePath)
 	if err != nil {
 		ss.logger.Error("s3 config list object failed: ", err.Error())
 		return err
@@ -142,12 +124,7 @@ func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
 }
 
 func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
-	uploader := s3manager.NewUploader(sess)
-	_, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(ss.req.BucketName),   // Bucket to be used
-		Key:    aws.String(ss.req.BasePath),     // Name of the file to be saved
-		Body:   strings.NewReader("my request"), // File
-	})
+	_, err := ss.awsUtils.NewUploader(sess, ss.req.BucketName, ss.req.BasePath)
 	if err != nil {
 		ss.logger.Error("s3 config upload object failed: ", err.Error())
 		return err
@@ -156,8 +133,8 @@ func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
 	return nil
 }
 
-func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) models.ServiceCheck {
-	return models.ServiceCheck{
+func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) models.S3ServiceCheck {
+	return models.S3ServiceCheck{
 		Title:         Title,
 		Passed:        Passed,
 		SuccessMsg:    SuccessMsg,

@@ -1,6 +1,7 @@
 package models
 
-type ServiceCheck struct {
+// S3ServiceCheck
+type S3ServiceCheck struct {
 	Title         string `json:"title"`
 	Passed        bool   `json:"passed"`
 	SuccessMsg    string `json:"success_msg"`
@@ -16,6 +17,6 @@ type S3ConfigRequest struct {
 	SecretKey  string `json:"secret_key"`
 }
 type S3ConfigResponse struct {
-	Passed bool           `json:"passed"`
-	Checks []ServiceCheck `json:"checks"`
+	Passed bool             `json:"passed"`
+	Checks []S3ServiceCheck `json:"checks"`
 }

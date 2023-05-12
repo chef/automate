@@ -20,7 +20,7 @@ func (h *Handler) GetS3Config(c *fiber.Ctx) {
 	bucketAccess := h.S3ConfigService.GetBucketAccess(*s3ConfigRequest)
 	c.JSON(response.BuildSuccessResponse(&models.S3ConfigResponse{
 		Passed: s3Connection.Passed && bucketAccess.Passed,
-		Checks: []models.ServiceCheck{
+		Checks: []models.S3ServiceCheck{
 			s3Connection, bucketAccess,
 		},
 	}))
