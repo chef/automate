@@ -19,6 +19,6 @@ func NewSoftwareVersionCheck(log logger.Logger, port string) *SoftwareVersionChe
 	}
 }
 
-func (svc *SoftwareVersionCheck) Run(config models.Config) map[string]models.CheckTriggerResponse {
+func (svc *SoftwareVersionCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return trigger.RunCheck(config, svc.log, svc.port, constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
 }

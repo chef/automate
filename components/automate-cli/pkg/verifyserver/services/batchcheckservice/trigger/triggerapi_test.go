@@ -223,8 +223,8 @@ func TestRunCheck(t *testing.T) {
 		// Call the function being tested
 		result := RunCheck(config, log, port, path, "")
 		require.NotNil(t, result)
-		require.Nil(t, result[host].Error)
-		require.Len(t, result[host].Result.Checks, 2)
+		require.Nil(t, result[0].Error)
+		require.Len(t, result[0].Result.Checks, 2)
 	})
 
 	t.Run("System Resource Check", func(t *testing.T) {
@@ -247,9 +247,9 @@ func TestRunCheck(t *testing.T) {
 		// Call the function being tested
 		result := RunCheck(config, log, port, path, depState)
 		require.NotNil(t, result)
-		require.Nil(t, result[host].Error)
-		require.Len(t, result[host].Result.Checks, 2)
-		require.Equal(t, result[host].Status, "SUCCESS")
+		require.Nil(t, result[0].Error)
+		require.Len(t, result[0].Result.Checks, 2)
+		require.Equal(t, result[0].Status, "SUCCESS")
 	})
 
 	t.Run("System User Check", func(t *testing.T) {
@@ -272,9 +272,9 @@ func TestRunCheck(t *testing.T) {
 		// Call the function being tested
 		result := RunCheck(config, log, port, path, depState)
 		require.NotNil(t, result)
-		require.Nil(t, result[host].Error)
-		require.Len(t, result[host].Result.Checks, 3)
-		require.Equal(t, result[host].Status, "SUCCESS")
+		require.Nil(t, result[0].Error)
+		require.Len(t, result[0].Result.Checks, 3)
+		require.Equal(t, result[0].Status, "SUCCESS")
 	})
 }
 
