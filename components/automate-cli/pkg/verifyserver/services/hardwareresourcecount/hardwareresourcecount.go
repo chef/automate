@@ -31,6 +31,7 @@ func RunHardwareResourceCountCheck(minNodeCount, reqNodeCount int, nodetype stri
 	ch <- respMap
 }
 
+// This function is mainly used for calling the 4 main checks, and preparing the response.
 func ValidateHardwareResources(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setbackend map[string]string) models.HardwareResourceResponse {
 	var res = models.HardwareResourceResponse{}
 	res.NodeType = nodetype
@@ -51,6 +52,7 @@ func ValidateHardwareResources(minNodeCount, reqNodeCount int, nodetype string, 
 	return res
 }
 
+// This function will check that are we getting unique ips for each service. Like for automate if we get node count 2 in request, then we are also getting 2 unique ips of automate.
 func UniqueIP(nodetype string, set int, nodecount int) models.Checks {
 	var check = models.Checks{}
 	if set == nodecount {
