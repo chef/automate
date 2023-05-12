@@ -1,6 +1,7 @@
 package batchcheckservice
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 )
@@ -56,7 +57,44 @@ func (mss *MockCertificateCheck) Run(config models.Config) []models.CheckTrigger
 func SetupMockCertificateCheck() trigger.ICheck {
 	return &MockCertificateCheck{
 		CertificateCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
-			m := []models.CheckTriggerResponse{}
+			m := []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.4",
+					NodeType: "automate",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.CERTIFICATE,
+						Message: "certificate-check",
+						Checks: []models.Checks{
+							{
+								Title: "certificate-check-1",
+							},
+							{
+								Title: "certificate-check-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.4",
+					NodeType: "chef-infra-server",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.CERTIFICATE,
+						Message: "certificate-check",
+						Checks: []models.Checks{
+							{
+								Title: "certificate-check-1",
+							},
+							{
+								Title: "certificate-check-2",
+							},
+						},
+					},
+				},
+			}
 			return m
 		},
 	}

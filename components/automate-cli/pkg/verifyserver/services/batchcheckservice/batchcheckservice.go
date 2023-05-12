@@ -46,7 +46,7 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 			checkTriggerRespMap[check] = resp
 		}
 	}
-	return constructBatchCheckResponse(checkTriggerRespMap, config.Hardware, append(bastionChecks, remoteChecks...))
+	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...))
 }
 
 func getIndexOfCheck(checks []string, check string) (int, error) {
@@ -99,25 +99,39 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 	}
 }
 
-func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse,
-	hardwareDetails models.Hardware, checks []string) models.BatchCheckResponse {
+func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse, checks []string) models.BatchCheckResponse {
 	ipMap := make(map[string][]models.CheckTriggerResponse)
-	for k, v := range checkTriggerRespMap {
-		for _, checkResp := range v {
-			checkIndex, _ := getIndexOfCheck(checks, k)
-			ip := checkResp.Host
-			nodeType := checkResp.NodeType
+	
+	//Construct map with unique ip+nodeType keys to segregate the response
+	for checkName, checkResponses := range checkTriggerRespMap {
+		for _, checkResponse := range checkResponses {
+			checkIndex, _ := getIndexOfCheck(checks, checkName)
+			ip := checkResponse.Host
+			nodeType := checkResponse.NodeType
 			ipMapKey := ip + "_" + nodeType
-			if checkIndex >= len(ipMap[ipMapKey]) {
-				ipMap[ipMapKey] = append(ipMap[ipMapKey], checkResp)
+			_, ok := ipMap[ipMapKey]
+			if ok {
+				ipMap[ipMapKey][checkIndex] = checkResponse
 			} else {
-				ipMap[ipMapKey] = append(ipMap[ipMapKey], models.CheckTriggerResponse{})
-				copy(ipMap[ipMapKey][checkIndex+1:], ipMap[ipMapKey][checkIndex:])
-				ipMap[ipMapKey][checkIndex] = checkResp
+				ipMap[ipMapKey] = make([]models.CheckTriggerResponse, len(checks))
+				ipMap[ipMapKey][checkIndex] = checkResponse
 			}
 		}
 	}
 
+	// Arranging the per map values in order in which we got the checks input. 
+	// Example if certificate check is passed first as input then in final response certificate will come up then other checks
+	for k, v := range ipMap {
+		arr := []models.CheckTriggerResponse{}
+		for _, checkResp := range v {
+			if checkResp.Host != "" {
+				arr = append(arr, checkResp)
+			}
+		}
+		ipMap[k] = arr
+	}
+
+	// Constructing response which is needed by the handler
 	var result = make([]models.BatchCheckResult, len(ipMap))
 	var resultIndex = 0
 	for _, v := range ipMap {
