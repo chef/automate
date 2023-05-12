@@ -72,7 +72,7 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		assert.Equal(t, "Check 2 failed", checkResp.ErrorMsg)
 		assert.Equal(t, "Please check the configuration", checkResp.ResolutionMsg)
 
-		checkResp := ctr[host].Result.Checks[1]
+		checkResp := ctr[0].Result.Checks[1]
 
 		assert.Equal(t, "Check 2", checkResp.Title)
 		assert.Equal(t, false, checkResp.Passed)
