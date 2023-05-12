@@ -212,7 +212,8 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	}
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			res, err := nfsmountservice.GetResultStructFromRespBody(e.Body)
+			testPort := "1234"
+			res, err := nfsmountservice.NewNFSMountService(logger.NewTestLogger(), testPort).GetResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
 			} else {

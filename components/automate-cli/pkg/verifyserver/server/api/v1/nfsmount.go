@@ -24,6 +24,7 @@ func (h *Handler) NFSMount(c *fiber.Ctx) {
 		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Mount Location cannot be empty"})
 		return
 	}
+	h.Logger.Debug("Mount Location Recieved: ", reqBody.MountLocation)
 
 	NFSMountDetails := h.NFSMountService.GetNFSMountDetails(reqBody)
 	c.JSON(response.BuildSuccessResponse(NFSMountDetails))

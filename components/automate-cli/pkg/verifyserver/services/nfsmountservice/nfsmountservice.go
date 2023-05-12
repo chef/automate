@@ -56,24 +56,28 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 
 	for index, ip := range reqBody.AutomateNodeIPs {
 		key := constants.AUTOMATE + ip + strconv.Itoa(index)
+		nm.log.Debug("Call Initiated for Automate node having IP: ", ip)
 		go nm.MakeConcurrentCall(ip, constants.AUTOMATE, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.ChefInfraServerNodeIPs {
 		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
+		nm.log.Debug("Call Initiated for Chefserver node having IP: ", ip)
 		go nm.MakeConcurrentCall(ip, constants.CHEF_INFRA_SERVER, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.PostgresqlNodeIPs {
 		key := constants.POSTGRESQL + ip + strconv.Itoa(index)
+		nm.log.Debug("Call Initiated for Postgresql node having IP: ", ip)
 		go nm.MakeConcurrentCall(ip, constants.POSTGRESQL, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
 
 	for index, ip := range reqBody.OpensearchNodeIPs {
 		key := constants.OPENSEARCH + ip + strconv.Itoa(index)
+		nm.log.Debug("Call Initiated for Opensearch node having IP: ", ip)
 		go nm.MakeConcurrentCall(ip, constants.OPENSEARCH, reqBody.MountLocation, ch, key)
 		orderList = append(orderList, key)
 	}
@@ -88,12 +92,21 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 			}
 		}
 	}
+	nm.log.Debug(prettyMap(nfsMountResultMap))
+	nm.log.Debug("All calls Completed")
+
 	MakeRespBody(respBody, countMap, orderList, nfsMountResultMap, shareMap, reqBody.MountLocation)
 	return respBody
 }
 
+func prettyMap(mp map[string]models.NFSMountResponse) string {
+	b, _ := json.MarshalIndent(mp, "", "  ")
+	return string(b)
+}
+
 func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
 	res, err := nm.DoAPICall(ip, mountLocation)
+	nm.log.Debugf("result got from /nfs-mount-loc API for %s: %v", ip, res)
 
 	mountResp := prepareMountResp(ip, nodeType, mountLocation, res, err)
 
@@ -109,8 +122,8 @@ func (nm *NFSMountService) MakeConcurrentCall(ip string, nodeType string, mountL
 }
 
 func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
-
 	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, constants.NFS_MOUNT_LOC_API_PATH)
+	nm.log.Debug("Request URL: ", reqURL)
 
 	reqBody := models.NFSMountLocRequest{
 		MountLocation: mountLocation,
@@ -119,13 +132,13 @@ func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.N
 	// Converting Body into json encoding for passing into request
 	reqBodyJSON, err := json.Marshal(reqBody)
 	if err != nil {
-		nm.log.Debug(err.Error())
+		nm.log.Error(err.Error())
 		return nil, errors.New("Failed to Marshal: " + err.Error())
 	}
 
 	httpReq, err := http.NewRequest(http.MethodPost, reqURL, bytes.NewBuffer(reqBodyJSON))
 	if err != nil {
-		nm.log.Debug(err.Error())
+		nm.log.Error(err.Error())
 		return nil, errors.New("Failed to Create HTTP request: " + err.Error())
 	}
 
@@ -136,16 +149,17 @@ func (nm *NFSMountService) DoAPICall(ip string, mountLocation string) (*models.N
 	// Making the actual call
 	resp, err := client.Do(httpReq)
 	if err != nil {
-		nm.log.Debug(err.Error())
+		nm.log.Error(err.Error())
 		return nil, errors.New("Failed to send the HTTP request: " + err.Error())
 	}
 
-	return GetResultStructFromRespBody(resp.Body)
+	return nm.GetResultStructFromRespBody(resp.Body)
 }
 
-func GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
+func (nm *NFSMountService) GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
 	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
+		nm.log.Error(err.Error())
 		return nil, errors.New("Cannot able to read data from response body: " + err.Error())
 	}
 
@@ -158,6 +172,7 @@ func GetResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocRespons
 
 	// If API(/nfs-mount-loc) is itself failing.
 	if APIRespStruct.Error != nil {
+		nm.log.Error(APIRespStruct.Error)
 		return nil, APIRespStruct.Error
 	}
 
