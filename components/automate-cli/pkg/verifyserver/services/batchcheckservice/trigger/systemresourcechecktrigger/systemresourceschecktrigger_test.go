@@ -58,10 +58,10 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 
 		// Assert the expected result
 		require.Len(t, ctr, 1)
-		require.Nil(t, ctr[host].Error)
-		require.Len(t, ctr[host].Result.Checks, 2)
-		require.Equal(t, "SUCCESS", ctr[host].Status)
-		checkResp := ctr[host].Result.Checks[1]
+		require.Nil(t, ctr[0].Error)
+		require.Len(t, ctr[0].Result.Checks, 2)
+		require.Equal(t, "SUCCESS", ctr[0].Status)
+		checkResp := ctr[0].Result.Checks[1]
 
 		assert.Equal(t, "CPU speed check", checkResp.Title)
 		assert.Equal(t, true, checkResp.Passed)
@@ -88,9 +88,9 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		ctr := suc.Run(config)
 
 		require.Len(t, ctr, 1)
-		require.NotNil(t, ctr[host].Error)
-		require.Equal(t, ctr[host].Error.Code, http.StatusInternalServerError)
-		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[host].Error.Error())
+		require.NotNil(t, ctr[0].Error)
+		require.Equal(t, ctr[0].Error.Code, http.StatusInternalServerError)
+		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Error.Error())
 	})
 }
 

@@ -60,11 +60,11 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 
 		// Assert the expected result
 		require.Len(t, ctr, 1)
-		require.Nil(t, ctr[host].Error)
-		require.Len(t, ctr[host].Result.Checks, 2)
-		require.Equal(t, "API check", ctr[host].Result.Check)
+		require.Nil(t, ctr[0].Error)
+		require.Len(t, ctr[0].Result.Checks, 2)
+		require.Equal(t, "API check", ctr[0].Result.Check)
 
-		checkResp := ctr[host].Result.Checks[1]
+		checkResp := ctr[0].Result.Checks[1]
 
 		assert.Equal(t, "Check 2", checkResp.Title)
 		assert.Equal(t, false, checkResp.Passed)
@@ -91,9 +91,9 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		ctr := suc.Run(config)
 
 		require.Len(t, ctr, 1)
-		require.NotNil(t, ctr[host].Error)
-		require.Equal(t, ctr[host].Error.Code, http.StatusInternalServerError)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[host].Error.Error())
+		require.NotNil(t, ctr[0].Error)
+		require.Equal(t, ctr[0].Error.Code, http.StatusInternalServerError)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Error.Error())
 	})
 }
 

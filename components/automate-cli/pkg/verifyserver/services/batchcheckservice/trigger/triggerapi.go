@@ -13,8 +13,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) map[string]models.CheckTriggerResponse {
-	result := make(map[string]models.CheckTriggerResponse)
+func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
+	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
 		config.Hardware.ChefInfraServerNodeCount +
 		config.Hardware.PostgresqlNodeCount +
@@ -50,7 +50,7 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	for i := 0; i < count; i++ {
 		select {
 		case res := <-outputCh:
-			result[res.Host] = res
+			result = append(result, res)
 		}
 	}
 
