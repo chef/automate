@@ -13,4 +13,5 @@ const (
 	SYSTEM_USER_CHECK_API_PATH       = "/api/v1/checks/system-user"
 	FIREWALL_API_PATH                = "/api/v1/checks/firewall"
 	SSH_USER_CHECK_API_PATH          = "/api/v1/checks/ssh-users"
+	CERTIFICATE_CHECK_API_PATH       = "/api/v1/checks/certificate"
 )

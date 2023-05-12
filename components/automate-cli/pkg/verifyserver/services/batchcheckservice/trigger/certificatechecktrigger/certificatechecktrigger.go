@@ -80,7 +80,7 @@ func (ss *CertificateCheck) TriggerCheckAndFormatOutput(host string, nodeType st
 // TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response
 func (ss *CertificateCheck) TriggerCertificateCheck(body interface{}) (
 	*models.CheckTriggerResponse, error) {
-	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.SSH_USER_CHECK_API_PATH)
+	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.CERTIFICATE_CHECK_API_PATH)
 	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		ss.log.Error("Error while Performing Certificate check from batch Check API : ", err)
