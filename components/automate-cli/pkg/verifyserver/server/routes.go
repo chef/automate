@@ -20,6 +20,7 @@ func (vs *VerifyServer) SetupRoutes() {
 
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
+	apiChecksGroup.Post("/aws-opensearch-s3-bucket-access", vs.Handler.CheckOSBackupS3)
 
 	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }
