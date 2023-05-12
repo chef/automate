@@ -1,0 +1,17 @@
+package opensearchbackupservice
+
+const TestRepoName = "S3BackupVerifyNew"
+const TestSnapshotName = "test-snapshot-managed"
+const TestIndexName = "test-index-managed"
+const IndexCreateFailedMessage = "Failed to create an index on the Opensearch Domain"
+const IndexCreateFailedResolution = "Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create an index."
+const SnapShotRepoCreateFailedMessage = "Failed to create the Snapshot Repository on the Opensearch Domain"
+const SnapShotRepoCreateFailedResolution = "Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create the Snapsshot Repository."
+const SnapShotCreateFailedMessage = "Failed to create the Snapshot on the Opensearch Domain"
+const SnapShotCreateFailedResolution = "Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot."
+const IndexDeleteFailedMessage = "Failed to delete an index on the Opensearch Domain"
+const IndexDeleteFailedResolution = "Provide the IAM user proper permissions to delete an index."
+const SnapShotRepoDeleteFailedMessage = "Failed to delete the Snapshot Repository on the Opensearch Domain"
+const SnapShotRepoDeleteFailedResolution = "Provide the IAM user proper permissions to delete the Snapshot Repository."
+const SnapShotDeleteFailedMessage = "Failed to delete the Snapshot on the Opensearch Domain"
+const SnapShotDeleteFailedResolution = "Provide the IAM user proper permissions to delete the Snapshot."
