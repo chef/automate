@@ -6,12 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/logger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 
 	"github.com/stretchr/testify/assert"
@@ -38,7 +38,10 @@ func SetupMockOpensearchBackupS3Service() opensearchbackupservice.IOSS3BackupSer
 }
 
 func SetupOSBackupHandler(ss opensearchbackupservice.IOSS3BackupService) (*fiber.App, error) {
-	log := logger.NewLogger(true)
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		return nil, err
+	}
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
@@ -52,7 +55,7 @@ func SetupOSBackupHandler(ss opensearchbackupservice.IOSS3BackupService) (*fiber
 		App:     app,
 		Handler: handler,
 	}
-	vs.Setup()
+	vs.Setup(false)
 	return vs.App, nil
 }
 
