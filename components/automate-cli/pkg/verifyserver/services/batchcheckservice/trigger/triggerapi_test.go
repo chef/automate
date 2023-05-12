@@ -42,20 +42,20 @@ const (
 		"host": ""
 	}`
 
-	automateResourceCheck = `{
+	osResourceCheck = `{
 		"status": "SUCCESS",
 		"result": {
 			"passed": true,
 			"checks": [
 				{
-					"title": "Automate CPU count check",
+					"title": "OS CPU count check",
 					"passed": true,
 					"success_msg": "CPU count is >= 4",
 					"error_msg": "",
 					"resolution_msg": ""
 				},
 				{
-					"title": "Automate CPU speed check",
+					"title": "OS CPU speed check",
 					"passed": true,
 					"success_msg": "CPU speed should be >= 2Ghz",
 					"error_msg": "",
@@ -201,9 +201,27 @@ func TestTriggerCheckAPI(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
 		assert.Equal(t, `error while parsing the response data:invalid character 'i' looking for beginning of object key string`, response.Error.Message)
 	})
+
+	t.Run("Request creation error", func(t *testing.T) {
+		endPoint := "http://example.com/api/v1/checks/software-versions"
+		host := "example.com"
+		output := make(chan models.CheckTriggerResponse)
+
+		// Call the function under test
+		go triggerCheckAPI(endPoint, host, output)
+
+		// Wait for the response
+		response := <-output
+		fmt.Printf("response: %+v\n", response.Error.Message)
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		require.Equal(t, http.StatusNotFound, response.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
+	})
+
 }
 
-func TestRunCheck(t *testing.T) {
+func Test_RunCheck(t *testing.T) {
 	t.Run("Software Version Check", func(t *testing.T) {
 		// Create a dummy server
 		server, host, port := createDummyServer()
@@ -212,8 +230,8 @@ func TestRunCheck(t *testing.T) {
 		// Test data
 		config := models.Config{
 			Hardware: models.Hardware{
-				AutomateNodeCount: 1,
-				AutomateNodeIps:   []string{host},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{host},
 			},
 		}
 		log := logger.NewLogrusStandardLogger()
@@ -227,7 +245,7 @@ func TestRunCheck(t *testing.T) {
 		require.Len(t, result[0].Result.Checks, 2)
 	})
 
-	t.Run("System Resource Check", func(t *testing.T) {
+	t.Run("System Resource Check - Automate", func(t *testing.T) {
 		// Create a dummy server
 		server, host, port := createDummyServer()
 		defer server.Close()
@@ -250,6 +268,39 @@ func TestRunCheck(t *testing.T) {
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 2)
 		require.Equal(t, result[0].Status, "SUCCESS")
+	})
+
+	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
+		// Create a dummy server
+		server, host, port := createDummyServer()
+		defer server.Close()
+
+		// Test data
+		config := models.Config{
+			Hardware: models.Hardware{
+				PostgresqlNodeCount: 1,
+				PostgresqlNodeIps:   []string{host},
+				OpenSearchNodeCount: 1,
+				OpenSearchNodeIps:   []string{host},
+			},
+		}
+		log := logger.NewLogrusStandardLogger()
+
+		path := constants.SYSTEM_RESOURCE_CHECK_API_PATH
+		depState := "your_deployment_state"
+
+		// Call the function being tested
+		result := RunCheck(config, log, port, path, depState)
+		fmt.Printf("OS PG result: %+v\n", result)
+		require.Equal(t, 2, len(result))
+		require.NotNil(t, result)
+		require.Nil(t, result[0].Error)
+		require.Len(t, result[0].Result.Checks, 2)
+		require.Equal(t, result[0].Status, "SUCCESS")
+		require.Nil(t, result[1].Error)
+		require.Len(t, result[1].Result.Checks, 2)
+		require.Equal(t, result[1].Status, "SUCCESS")
+
 	})
 
 	t.Run("System User Check", func(t *testing.T) {
@@ -290,9 +341,9 @@ func createDummyServer() (*httptest.Server, string, string) {
 
 			reqParameters := r.URL.Query()
 			nodeType := reqParameters.Get("node_type")
-			if nodeType == "automate" {
+			if nodeType == "opensearch" {
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(automateResourceCheck))
+				w.Write([]byte(osResourceCheck))
 			} else {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(pgResourceCheck))

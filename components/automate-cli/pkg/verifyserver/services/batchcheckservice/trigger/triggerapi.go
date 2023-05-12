@@ -39,11 +39,11 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 		go triggerCheckAPI(endpoint, ip, outputCh)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
+		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
 		go triggerCheckAPI(endpoint, ip, outputCh)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
+		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
 		go triggerCheckAPI(endpoint, ip, outputCh)
 	}
 
