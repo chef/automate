@@ -13,7 +13,7 @@ import (
 )
 
 type ISoftwareVersionService interface {
-	GetSoftwareVersionServices(string) (*models.SoftwareVersionDetails, error)
+	GetSoftwareVersionDetails(string) (*models.SoftwareVersionDetails, error)
 }
 
 type SoftwareVersionService struct {
@@ -49,7 +49,7 @@ const (
 
 var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "mv", "systemd", "wget", "exec", "rsync"}
 
-func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*models.SoftwareVersionDetails, error) {
+func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*models.SoftwareVersionDetails, error) {
 	sv.logger.Debug("The query paramter entered = ", query)
 	serviceResponse := models.SoftwareVersionDetails{}
 	serviceResponse.Passed = true
@@ -94,7 +94,7 @@ func (sv *SoftwareVersionService) GetSoftwareVersionServices(query string) (*mod
 
 func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Checks {
 	_, err := fiberutils.CheckPath(cmdName)
-	sv.logger.Debug(err)
+	sv.logger.Error("The errror which checking cammand file path = ",err)
 	if err != nil {
 		return &models.Checks{
 			Title:         cmdName + AVAILABILITY,

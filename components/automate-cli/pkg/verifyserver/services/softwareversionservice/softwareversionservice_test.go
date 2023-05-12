@@ -23,9 +23,9 @@ const versionfile = "./testfiles/version.txt"
 const failfilepath = "./failfilepath"
 
 var checktrue = []string{"mkdir"}
-var checkfalse = []string{"wrongcammand"}
+var checkfalse = []string{"wrong-cammand"}
 
-func TestGetSoftwareVersionService(t *testing.T) {
+func TestGetSoftwareVersionDetails(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	service := NewSoftwareVersionService(log, func(cmd string) (string, error) {
 		return "", nil
@@ -157,11 +157,11 @@ func TestGetSoftwareVersionService(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "wrongcammand availability",
+						Title:         "wrong-cammand availability",
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      "wrongcammand is not available",
-						ResolutionMsg: "Ensure wrongcammand is available in $PATH on the node",
+						ErrorMsg:      "wrong-cammand is not available",
+						ResolutionMsg: "Ensure wrong-cammand is available in $PATH on the node",
 					},
 					{
 						Title:         "Linux Version Check",
@@ -258,7 +258,7 @@ func TestGetSoftwareVersionService(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			service.(*SoftwareVersionService).osFilepath = tt.args.osFilepath
 			service.(*SoftwareVersionService).cmdCheckArray = tt.args.checkarray
-			got, err := service.GetSoftwareVersionServices(tt.args.query)
+			got, err := service.GetSoftwareVersionDetails(tt.args.query)
 			if err != nil {
 				assert.Equal(t, tt.expectedError, err.Error())
 			} else {

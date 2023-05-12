@@ -5,9 +5,9 @@ import (
 )
 
 type MockSoftwareVersionService struct {
-	GetSoftwareServicesFunc func(string) (*models.SoftwareVersionDetails, error)
+	GetSoftwareDetailsFunc func(string) (*models.SoftwareVersionDetails, error)
 }
 
-func (msv *MockSoftwareVersionService) GetSoftwareVersionServices(string) (*models.SoftwareVersionDetails, error) {
-	return msv.GetSoftwareServicesFunc("opensearch")
+func (msv *MockSoftwareVersionService) GetSoftwareVersionDetails(string) (*models.SoftwareVersionDetails, error) {
+	return msv.GetSoftwareDetailsFunc("opensearch")
 }

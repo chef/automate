@@ -18,7 +18,7 @@ import (
 
 func SetupMockSoftwareVersionService(response models.SoftwareVersionDetails, err error) softwareversionservice.ISoftwareVersionService {
 	return &softwareversionservice.MockSoftwareVersionService{
-		GetSoftwareServicesFunc: func(string) (*models.SoftwareVersionDetails, error) {
+		GetSoftwareDetailsFunc: func(string) (*models.SoftwareVersionDetails, error) {
 			return &response, err
 		},
 	}
