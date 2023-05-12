@@ -24,15 +24,15 @@ func NewHardwareResourceCountService(log logger.Logger) *HardwareResourceCountSe
 	}
 }
 
-func RunHardwareResourceCountCheck(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setbackend map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
-	response := ValidateHardwareResources(minNodeCount, reqNodeCount, nodetype, ip, set, setbackend)
+func RunHardwareResourceCountCheck(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setOfCluster map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
+	response := ValidateHardwareResources(minNodeCount, reqNodeCount, nodetype, ip, set, setOfCluster)
 	respMap := make(map[string]models.HardwareResourceResponse)
 	respMap[key] = response
 	ch <- respMap
 }
 
 // This function is mainly used for calling the 4 main checks, and preparing the response.
-func ValidateHardwareResources(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setbackend map[string]string) models.HardwareResourceResponse {
+func ValidateHardwareResources(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setOfCluster map[string]string) models.HardwareResourceResponse {
 	var res = models.HardwareResourceResponse{}
 	res.NodeType = nodetype
 	res.IP = ip
@@ -43,7 +43,7 @@ func ValidateHardwareResources(minNodeCount, reqNodeCount int, nodetype string, 
 	checks = ValidFormat(ip)
 	res.Checks = append(res.Checks, checks)
 
-	checks = SharedIP(nodetype, ip, setbackend)
+	checks = SharedIP(nodetype, ip, setOfCluster)
 	res.Checks = append(res.Checks, checks)
 
 	checks = ValidCount(minNodeCount, reqNodeCount, nodetype)
@@ -74,21 +74,21 @@ func ValidFormat(ip string) models.Checks {
 }
 
 // This function will check if any of the frontend nodes(Automate and CS) are shared with any of the backend nodes(Postgres and Opensearch) and vice-versa.
-func SharedIP(nodetype, ip string, set map[string]string) models.Checks {
+func SharedIP(nodetype, ip string, setOfCluster map[string]string) models.Checks {
 	var check = models.Checks{}
 	var opposite_cluster_type string
 
 	//This is for giving the appropriate success message.
 	if nodetype == constants.AUTOMATE || nodetype == constants.CHEF_INFRA_SERVER {
-		opposite_cluster_type = "backend"
+		opposite_cluster_type = constants.BACKEND_CLUSTER
 	} else {
-		opposite_cluster_type = "frontend"
+		opposite_cluster_type = constants.FRONTEND_CLUSTER
 	}
 
-	if set[ip] == "" {
+	if setOfCluster[ip] == "" {
 		check = createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.SHARED_SUCCESS_MESSAGE, opposite_cluster_type), "", "")
 	} else {
-		check = createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.SHARED_ERROR_MESSAGE, nodetype, set[ip]), fmt.Sprintf(constants.SHARED_RESOLUTION_MESSAGE, nodetype, set[ip]))
+		check = createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.SHARED_ERROR_MESSAGE, nodetype, setOfCluster[ip]), fmt.Sprintf(constants.SHARED_RESOLUTION_MESSAGE, nodetype, setOfCluster[ip]))
 	}
 	return check
 }

@@ -2,6 +2,8 @@ package constants
 
 const (
 	IP_ADDRESSS                     = "IP address"
+	BACKEND_CLUSTER                 = "backend"
+	FRONTEND_CLUSTER                = "frontend"
 	UNIQUE_SUCCESS_MESSAGE          = "IP address is unique"
 	UNIQUE_ERROR_MESSAGE            = "IP address is not unique"
 	UNIQUE_RESOLUTION_MESSAGE       = "IP address for %s Type should be unique."
