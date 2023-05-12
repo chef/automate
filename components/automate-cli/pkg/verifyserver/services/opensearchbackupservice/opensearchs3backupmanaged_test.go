@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,9 +24,14 @@ var request = models.S3BackupDetails{
 }
 
 func TestIndexCreationFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
 		OSClient:     SetupMockOpensearchClient(),
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: false, Err: errors.New("Index Creation failed")}}),
+		Log:          log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create an index on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create an index."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -35,12 +41,14 @@ func TestIndexCreationFailed(t *testing.T) {
 }
 
 func TestSnapshotRepoCreationFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
-		OSClient: SetupMockOpensearchClient(),
-		OSOperations: SetupMockOSOperations([]TestMockFunc{{
-			TestCase: true,
-			Err:      nil,
-		}, {TestCase: false, Err: errors.New("Snapshot Repo Creation failed")}}),
+		OSClient:     SetupMockOpensearchClient(),
+		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Repo Creation failed")}}),
+		Log:          log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot Repository on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create the Snapsshot Repository."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -50,10 +58,15 @@ func TestSnapshotRepoCreationFailed(t *testing.T) {
 }
 
 func TestSnapshotCreationFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
 		OSClient: SetupMockOpensearchClient(),
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil},
 			{TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		Log: log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -63,10 +76,15 @@ func TestSnapshotCreationFailed(t *testing.T) {
 }
 
 func TestSnapshotStatusFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
 		OSClient: SetupMockOpensearchClient(),
 		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil},
 			{TestCase: false, Err: errors.New("Snapshot Creation Status is failed")}}),
+		Log: log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to create the Snapshot on the Opensearch Domain","resolution_msg":"Setup Opensearch with valid Configuration and provide the IAM user proper permissions to create a Snapshot."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -76,10 +94,14 @@ func TestSnapshotStatusFailed(t *testing.T) {
 }
 
 func TestSnapshotDeletionFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
-		OSClient: SetupMockOpensearchClient(),
-		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil},
-			{TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		OSClient:     SetupMockOpensearchClient(),
+		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		Log:          log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete the Snapshot on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete the Snapshot."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -89,10 +111,14 @@ func TestSnapshotDeletionFailed(t *testing.T) {
 }
 
 func TestSnapshotRepoDeletionFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
-		OSClient: SetupMockOpensearchClient(),
-		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil},
-			{TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		OSClient:     SetupMockOpensearchClient(),
+		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		Log:          log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete the Snapshot Repository on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete the Snapshot Repository."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -102,10 +128,14 @@ func TestSnapshotRepoDeletionFailed(t *testing.T) {
 }
 
 func TestIndexDeletionFailed(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
-		OSClient: SetupMockOpensearchClient(),
-		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil},
-			{TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		OSClient:     SetupMockOpensearchClient(),
+		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: false, Err: errors.New("Snapshot Creation failed")}}),
+		Log:          log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":false,"success_msg":"","error_msg":"Failed to delete an index on the Opensearch Domain","resolution_msg":"Provide the IAM user proper permissions to delete an index."}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
@@ -115,10 +145,14 @@ func TestIndexDeletionFailed(t *testing.T) {
 }
 
 func TestSuccessfulBackup(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
 	s := OSS3BackupService{
-		OSClient: SetupMockOpensearchClient(),
-		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil},
-			{TestCase: true, Err: nil}}),
+		OSClient:     SetupMockOpensearchClient(),
+		OSOperations: SetupMockOSOperations([]TestMockFunc{{TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}, {TestCase: true, Err: nil}}),
+		Log:          log,
 	}
 	expectedResponse := `{"title":"Create test backup","passed":true,"success_msg":"OpenSearch is able to create backup to provided S3","error_msg":"","resolution_msg":""}`
 	resp, _ := s.OSS3BackupVerify(request, &fiber.Ctx{})
