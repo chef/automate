@@ -2,6 +2,7 @@ package trigger
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -37,8 +38,7 @@ const (
 					"resolution_msg": "Please check the configuration"
 				}
 			]
-		},
-		"host": ""
+		}
 	}`
 
 	osResourceCheck = `{
@@ -100,7 +100,7 @@ const (
 					"resolution_msg": ""
 				},
 				{
-					"title": "Automate CPU speed check",
+					"title": "OS CPU speed check",
 					"passed": true,
 					"success_msg": "CPU speed should be >= 2Ghz",
 					"error_msg": "",
@@ -402,6 +402,39 @@ func Test_RunCheck(t *testing.T) {
 				require.True(t, resp2.Passed)
 			}
 		}
+	})
+
+	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
+		// Create a dummy server
+		server, host, port := createDummyServer()
+		defer server.Close()
+
+		// Test data
+		config := models.Config{
+			Hardware: models.Hardware{
+				PostgresqlNodeCount: 1,
+				PostgresqlNodeIps:   []string{host},
+				OpenSearchNodeCount: 1,
+				OpenSearchNodeIps:   []string{host},
+			},
+		}
+		log := logger.NewLogrusStandardLogger()
+
+		path := constants.SYSTEM_RESOURCE_CHECK_API_PATH
+		depState := "your_deployment_state"
+
+		// Call the function being tested
+		result := RunCheck(config, log, port, path, depState)
+		fmt.Printf("OS PG result: %+v\n", result)
+		require.Equal(t, 2, len(result))
+		require.NotNil(t, result)
+		require.Nil(t, result[0].Error)
+		require.Len(t, result[0].Result.Checks, 2)
+		require.Equal(t, result[0].Status, "SUCCESS")
+		require.Nil(t, result[1].Error)
+		require.Len(t, result[1].Result.Checks, 2)
+		require.Equal(t, result[1].Status, "SUCCESS")
+
 	})
 
 	t.Run("System User Check", func(t *testing.T) {
