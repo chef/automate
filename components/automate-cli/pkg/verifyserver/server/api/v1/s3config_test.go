@@ -28,6 +28,7 @@ var (
 	successMessageS3Config             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with S3 using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"S3 bucket access test\",\"passed\":true,\"success_msg\":\"Machine is able to access the S3 bucket using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}"
 	failureMessageS3Config             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with S3 using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct S3 url or access or secret keys\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the S3 bucket\"}]}}"
 	bucketAccessfailureMessageS3Config = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with S3 using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the S3 bucket\"}]}}"
+	errorBodyParser = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":0,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
 )
 
 func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.S3Config {
@@ -145,6 +146,30 @@ func TestS3Config(t *testing.T) {
 				"secret_key": "SECRET-KEY"
 			}`,
 			expectedBody: bucketAccessfailureMessageS3Config,
+		},
+		{
+			description:  "400: body parser error",
+			expectedCode: 400,
+			mockS3ConnectionModel: models.S3ServiceCheck{
+				Title:         s3ConnectionTitle,
+				Passed:        true,
+				SuccessMsg:    s3ConnectionSuccessMsg,
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			mockS3BucketAccessModel: models.S3ServiceCheck{
+				Title:         s3BucketAccessTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      s3BucketAccessErrorMsg,
+				ResolutionMsg: s3BucketAccessResolutionMsg,
+			},
+			body: `{
+				"endpoint": "s3://example-s3.aws.region.com",
+				"bucket_name": "backups",
+				"base_path": "automate",
+			}`,
+			expectedBody: errorBodyParser,
 		},
 	}
 	statusEndpoint := "/api/v1/checks/s3-config"
