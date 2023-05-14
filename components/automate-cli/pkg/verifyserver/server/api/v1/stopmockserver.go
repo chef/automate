@@ -12,8 +12,6 @@ func (h *Handler) StopMockServer(c *fiber.Ctx) {
 
 	reqBody := new(models.StopMockServerRequestBody)
 	err := c.BodyParser(&reqBody)
-
-	// If request body is invalid
 	if err != nil {
 		errMsg := fiber.Error{
 			Code:    fiber.StatusBadRequest,
@@ -24,7 +22,6 @@ func (h *Handler) StopMockServer(c *fiber.Ctx) {
 		return
 	}
 
-	// If port number is invalid
 	if reqBody.Port < 0 || reqBody.Port > 65535 {
 		errMsg := fiber.Error{
 			Code:    fiber.StatusBadRequest,
@@ -42,7 +39,7 @@ func (h *Handler) StopMockServer(c *fiber.Ctx) {
 		return
 	}
 
-	server, updatedMockServers := getMockServer(reqBody, mockServers)
+	server, updatedMockServerServices := getMockServer(reqBody, mockServers)
 	if server != nil {
 		if server.Port == reqBody.Port && server.Protocol != reqBody.Protocol {
 			// Request body protocol do not match with protocol of running server on given port.
@@ -63,7 +60,7 @@ func (h *Handler) StopMockServer(c *fiber.Ctx) {
 			c.Next(&errMsg)
 			return
 		}
-		h.MockServersService.SetMockServers(updatedMockServers)
+		h.MockServersService.SetMockServers(updatedMockServerServices)
 		c.Status(fiber.StatusOK).JSON(response.BuildSuccessResponse("Server stop successfully"))
 		return
 	}
@@ -76,15 +73,15 @@ func (h *Handler) StopMockServer(c *fiber.Ctx) {
 
 func getMockServer(reqBody *models.StopMockServerRequestBody, mockServers []*models.Server) (*models.Server, []*models.Server) {
 	var server *models.Server
-	var updatedMockServers []*models.Server
+	var updatedMockServerServices []*models.Server
 
 	for _, s := range mockServers {
 		if s.Port == reqBody.Port {
 			server = s
 		} else {
-			updatedMockServers = append(updatedMockServers, s)
+			updatedMockServerServices = append(updatedMockServerServices, s)
 		}
 	}
 
-	return server, updatedMockServers
+	return server, updatedMockServerServices
 }
