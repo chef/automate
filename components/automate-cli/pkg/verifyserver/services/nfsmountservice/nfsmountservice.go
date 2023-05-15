@@ -50,7 +50,7 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 	// So that we don't need to again call the API for checking the shareability
 	shareMap := make(map[string]models.NFSMountLocResponse)
 	countMap := make(map[models.NFSMountLocResponse]int)
-	// using orderList to store the order. so we can generate the same reponse order which create response.
+	// using orderList to store the order. so we can generate the same response order which create response.
 	var orderList []string
 
 	for index, ip := range reqBody.AutomateNodeIPs {
@@ -145,20 +145,20 @@ func (nm *NFSMountService) getResultStructFromRespBody(respBody io.Reader) (*mod
 	}
 
 	// Converting API Response Body into Generic Response Struct.
-	ApiRespStruct := response.ResponseBody{}
-	err = json.Unmarshal(body, &ApiRespStruct)
+	apiRespStruct := response.ResponseBody{}
+	err = json.Unmarshal(body, &apiRespStruct)
 	if err != nil {
 		return nil, errors.New("Failed to Unmarshal: " + err.Error())
 	}
 
 	// If API(/nfs-mount-loc) is itself failing.
-	if ApiRespStruct.Error != nil {
-		nm.log.Error(ApiRespStruct.Error)
-		return nil, ApiRespStruct.Error
+	if apiRespStruct.Error != nil {
+		nm.log.Error(apiRespStruct.Error)
+		return nil, apiRespStruct.Error
 	}
 
-	// Converting interface into JSON encoding. ApiResp.Result is a interface and for accessing the values we are converting that into json.
-	resultByte, err := json.Marshal(ApiRespStruct.Result)
+	// Converting interface into JSON encoding. apiResp.Result is a interface and for accessing the values we are converting that into json.
+	resultByte, err := json.Marshal(apiRespStruct.Result)
 	if err != nil {
 		return nil, errors.New("Failed to Marshal: " + err.Error())
 	}
