@@ -351,7 +351,8 @@ steps:
   - label: "[unit] chef-ui-library"
     command:
       - cd components/chef-ui-library
-      - npm install && npm run lint && npm run test
+      - node -v
+      - npm cache clean --force && npm install && npm run lint && npm run test
     timeout_in_minutes: 20
     retry:
       automatic:
