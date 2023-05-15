@@ -19,7 +19,7 @@ import (
 
 func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareResourceCountService {
 	return &hardwareresourcecount.MockHardwareResourceCountService{
-		GetHardwareResourceCountFunc: func(req models.HardwareResourceRequest) []models.HardwareResourceResponse {
+		GetHardwareResourceCountFunc: func(req models.Hardware) []models.HardwareResourceResponse {
 			return []models.HardwareResourceResponse{
 				{
 					IP:       "172.154.0.1",
@@ -49,7 +49,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "automate Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "automate type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -83,7 +83,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "automate Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "automate type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -117,7 +117,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "chef-infra-server Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "chef-infra-server type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -151,7 +151,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "chef-infra-server Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "chef-infra-server type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -185,7 +185,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "postgresql type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -219,7 +219,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "postgresql type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -253,7 +253,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "postgresql type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -287,7 +287,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "opensearch type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -321,7 +321,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "opensearch type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -355,7 +355,7 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 						{
 							Title:         "IP address",
 							Passed:        true,
-							SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
+							SuccessMsg:    "opensearch type has valid count as per Automate HA requirement",
 							ErrorMsg:      "",
 							ResolutionMsg: "",
 						},
@@ -453,7 +453,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "automate Type has valid count as per Automate HA requirement",
+								"success_msg": "automate type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -487,7 +487,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "automate Type has valid count as per Automate HA requirement",
+								"success_msg": "automate type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -521,7 +521,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "chef-infra-server Type has valid count as per Automate HA requirement",
+								"success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -555,7 +555,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "chef-infra-server Type has valid count as per Automate HA requirement",
+								"success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -589,7 +589,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "postgresql Type has valid count as per Automate HA requirement",
+								"success_msg": "postgresql type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -623,7 +623,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "postgresql Type has valid count as per Automate HA requirement",
+								"success_msg": "postgresql type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -657,7 +657,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "postgresql Type has valid count as per Automate HA requirement",
+								"success_msg": "postgresql type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -691,7 +691,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "opensearch Type has valid count as per Automate HA requirement",
+								"success_msg": "opensearch type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -725,7 +725,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "opensearch Type has valid count as per Automate HA requirement",
+								"success_msg": "opensearch type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -759,7 +759,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 							{
 								"title": "IP address",
 								"passed": true,
-								"success_msg": "opensearch Type has valid count as per Automate HA requirement",
+								"success_msg": "opensearch type has valid count as per Automate HA requirement",
 								"error_msg": "",
 								"resolution_msg": ""
 							}
@@ -782,7 +782,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 			}`,
 		},
 		{
-			TestName: "400:Failure Mismatch of Node Count and len of Node Ips",
+			TestName: "400:Failure Node Count and length of Node Ips should be equal.",
 			RequestBody: `{
 				"automate_node_count": 2,
 				"automate_node_ips": [
@@ -812,7 +812,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "Mismatch of Node Count and length of Node Ips."
+					"message": "Node Count and length of Node Ips should be equal."
 				}
 			}`,
 		},
@@ -826,7 +826,7 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 		t.Run(test.TestName, func(t *testing.T) {
 			bodyReader := strings.NewReader(test.RequestBody)
 			req := httptest.NewRequest("POST", hardwareResourceCountCheckEndpoint, bodyReader)
-			req.Header.Add("Content-Type", "application/json")
+			req.Header.Add("Content-type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)

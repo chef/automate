@@ -11,7 +11,7 @@ import (
 )
 
 type IHardwareResourceCountService interface {
-	GetHardwareResourceCount(models.HardwareResourceRequest) []models.HardwareResourceResponse
+	GetHardwareResourceCount(models.Hardware) []models.HardwareResourceResponse
 }
 
 type HardwareResourceCountService struct {
@@ -24,84 +24,79 @@ func NewHardwareResourceCountService(log logger.Logger) *HardwareResourceCountSe
 	}
 }
 
-func RunHardwareResourceCountCheck(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setOfCluster map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
-	response := ValidateHardwareResources(minNodeCount, reqNodeCount, nodetype, ip, set, setOfCluster)
+// runHardwareResourceCountCheck function will make call to ValidateHardwareResources function, and store the response in channel.
+// In this function, nodeSet parameter contains set of nodes of similar node type.
+// OppositeTypeSet parameter contains nodes of opposite type.
+// For eg: nodeSet contains automate nodes, then OppositeTypeSet will contains Postgresql and Opensearch Nodes.
+func runHardwareResourceCountCheck(reqNodeCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
+	minNodeCount := getMinNodesHARequirement(nodeType)
+	response := validateHardwareResources(minNodeCount, reqNodeCount, nodeType, ip, nodeSet, oppositeTypeSet)
 	respMap := make(map[string]models.HardwareResourceResponse)
 	respMap[key] = response
 	ch <- respMap
 }
 
-// This function is mainly used for calling the 4 main checks, and preparing the response.
-func ValidateHardwareResources(minNodeCount, reqNodeCount int, nodetype string, ip string, set, setOfCluster map[string]string) models.HardwareResourceResponse {
+// validateHardwareResources function is mainly used for calling the 4 main checks, and preparing the response.
+func validateHardwareResources(minNodeCount, reqNodeCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string) models.HardwareResourceResponse {
 	var res = models.HardwareResourceResponse{}
-	res.NodeType = nodetype
+	res.NodeType = nodeType
 	res.IP = ip
 
-	checks := UniqueIP(nodetype, len(set), reqNodeCount)
+	checks := uniqueIP(nodeType, len(nodeSet), reqNodeCount)
 	res.Checks = append(res.Checks, checks)
 
-	checks = ValidFormat(ip)
+	checks = validFormat(ip)
 	res.Checks = append(res.Checks, checks)
 
-	checks = SharedIP(nodetype, ip, setOfCluster)
+	checks = sharedIP(nodeType, ip, oppositeTypeSet)
 	res.Checks = append(res.Checks, checks)
 
-	checks = ValidCount(minNodeCount, reqNodeCount, nodetype)
+	checks = validCount(minNodeCount, len(nodeSet), nodeType)
 	res.Checks = append(res.Checks, checks)
 
 	return res
 }
 
-// This function will check that are we getting unique ips for each service. Like for automate if we get node count 2 in request, then we are also getting 2 unique ips of automate.
-func UniqueIP(nodetype string, set int, nodecount int) models.Checks {
-	var check = models.Checks{}
-	if set == nodecount {
-		check = createCheck(constants.IP_ADDRESSS, true, constants.UNIQUE_SUCCESS_MESSAGE, "", "")
-	} else {
-		check = createCheck(constants.IP_ADDRESSS, false, "", constants.UNIQUE_ERROR_MESSAGE, fmt.Sprintf(constants.UNIQUE_RESOLUTION_MESSAGE, nodetype))
+// uniqueIP function will check that are we getting unique ips for each service.
+// Like for automate if we get node count 2 in request, then we are also getting 2 unique ips of automate.
+func uniqueIP(nodeType string, nodeSetLen int, reqNodeCount int) models.Checks {
+	if nodeSetLen == reqNodeCount {
+		return createCheck(constants.IP_ADDRESSS, true, constants.UNIQUE_SUCCESS_MESSAGE, "", "")
 	}
-	return check
+	return createCheck(constants.IP_ADDRESSS, false, "", constants.UNIQUE_ERROR_MESSAGE, fmt.Sprintf(constants.UNIQUE_RESOLUTION_MESSAGE, nodeType))
 }
 
-func ValidFormat(ip string) models.Checks {
-	var check = models.Checks{}
+// validFormat function will check that if our ip is in correct format or not.
+func validFormat(ip string) models.Checks {
 	if net.ParseIP(ip) == nil {
-		check = createCheck(constants.IP_ADDRESSS, false, "", constants.VALID_FORMAT_ERROR_MESSAGE, fmt.Sprintf(constants.VALID_FORMAT_RESOLUTION_MESSAGE, ip))
-	} else {
-		check = createCheck(constants.IP_ADDRESSS, true, constants.VALID_FORMAT_SUCCESS_MESSAGE, "", "")
+		return createCheck(constants.IP_ADDRESSS, false, "", constants.VALID_FORMAT_ERROR_MESSAGE, fmt.Sprintf(constants.VALID_FORMAT_RESOLUTION_MESSAGE, ip))
 	}
-	return check
+	return createCheck(constants.IP_ADDRESSS, true, constants.VALID_FORMAT_SUCCESS_MESSAGE, "", "")
 }
 
-// This function will check if any of the frontend nodes(Automate and CS) are shared with any of the backend nodes(Postgres and Opensearch) and vice-versa.
-func SharedIP(nodetype, ip string, setOfCluster map[string]string) models.Checks {
-	var check = models.Checks{}
-	var opposite_cluster_type string
+// sharedIP function will check if any of the frontend nodes(Automate and CS) are shared with any of the backend nodes(Postgres and Opensearch) and vice-versa.
+func sharedIP(nodeType, ip string, oppositeTypeSet map[string]string) models.Checks {
+	var oppositeClusterType string
 
-	//This is for giving the appropriate success message.
-	if nodetype == constants.AUTOMATE || nodetype == constants.CHEF_INFRA_SERVER {
-		opposite_cluster_type = constants.BACKEND_CLUSTER
+	// This is for giving the appropriate success message.
+	if nodeType == constants.AUTOMATE || nodeType == constants.CHEF_INFRA_SERVER {
+		oppositeClusterType = constants.BACKEND_CLUSTER
 	} else {
-		opposite_cluster_type = constants.FRONTEND_CLUSTER
+		oppositeClusterType = constants.FRONTEND_CLUSTER
 	}
 
-	if setOfCluster[ip] == "" {
-		check = createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.SHARED_SUCCESS_MESSAGE, opposite_cluster_type), "", "")
-	} else {
-		check = createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.SHARED_ERROR_MESSAGE, nodetype, setOfCluster[ip]), fmt.Sprintf(constants.SHARED_RESOLUTION_MESSAGE, nodetype, setOfCluster[ip]))
+	if oppositeTypeSet[ip] == "" {
+		return createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.SHARED_SUCCESS_MESSAGE, oppositeClusterType), "", "")
 	}
-	return check
+	return createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.SHARED_ERROR_MESSAGE, nodeType, oppositeTypeSet[ip]), fmt.Sprintf(constants.SHARED_RESOLUTION_MESSAGE, nodeType, oppositeTypeSet[ip]))
 }
 
-// This function will check if the node count we are getting in request is fulfilling the minimum HA requirements.
-func ValidCount(minNodeCount, reqNodeCount int, nodetype string) models.Checks {
-	var check = models.Checks{}
-	if reqNodeCount >= minNodeCount {
-		check = createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.VALID_COUNT_SUCCESS_MESSAGE, nodetype), "", "")
-	} else {
-		check = createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.VALID_COUNT_ERROR_MESSAGE, nodetype), fmt.Sprintf(constants.VALID_COUNT_RESOLUTION_MESSAGE, nodetype))
+// validCount function will check if the node count we are getting in request is fulfilling the minimum HA requirements.
+func validCount(minNodeCount, nodeSetLen int, nodeType string) models.Checks {
+	if nodeSetLen >= minNodeCount {
+		return createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.VALID_COUNT_SUCCESS_MESSAGE, nodeType), "", "")
 	}
-	return check
+	return createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.VALID_COUNT_ERROR_MESSAGE, nodeType), fmt.Sprintf(constants.VALID_COUNT_RESOLUTION_MESSAGE, nodeType))
 }
 
 func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
@@ -114,29 +109,21 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 	}
 }
 
-func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.HardwareResourceRequest) []models.HardwareResourceResponse {
-	var response = []models.HardwareResourceResponse{}
-	is_managed_services := false
-	ch := make(chan map[string]models.HardwareResourceResponse)
-
-	//This structure holds minimum HA requirements as per Public Doc
-	var minNodeCount = models.CountPerHARequirements{
-		AutomateCount:        2,
-		ChefInfraServerCount: 2,
-		PostgresqlCount:      3,
-		OpenSearchCount:      3,
+// getMinNodesHARequirement function returns minimum HA requirements as per Public Doc
+func getMinNodesHARequirement(nodeType string) int {
+	if nodeType == constants.AUTOMATE {
+		return constants.MIN_AUTOMATE_REQ
+	} else if nodeType == constants.CHEF_INFRA_SERVER {
+		return constants.MIN_CHEF_INFRA_SERVER_REQ
+	} else if nodeType == constants.POSTGRESQL {
+		return constants.MIN_POSTGRESQL_REQ
+	} else {
+		return constants.MIN_OPENSEARCH_REQ
 	}
+}
 
-	if req.PostgresqlNodeCount == 0 && req.OpenSearchNodeCount == 0 {
-		is_managed_services = true
-	}
-
-	//This map is for temporarily storing the output of go routine.
-	hardwareResultMap := make(map[string]models.HardwareResourceResponse)
-	//For storing the response in a specified order.
-	var hardwareResultOrderList []string
-
-	//These maps are used for storing all the nodes of particular services.
+// createNodeSet function is used for storing all the nodes of particular services.
+func createNodeSet(req models.Hardware) (map[string]string, map[string]string, map[string]string, map[string]string, map[string]string, map[string]string) {
 	setAutomate := make(map[string]string)
 	setChefServer := make(map[string]string)
 	setPostgresql := make(map[string]string)
@@ -159,29 +146,47 @@ func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Har
 		setOpensearch[ip] = constants.OPENSEARCH
 		setBackend[ip] = constants.OPENSEARCH
 	}
+	return setAutomate, setChefServer, setPostgresql, setOpensearch, setFrontend, setBackend
+}
+
+func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Hardware) []models.HardwareResourceResponse {
+	var response = []models.HardwareResourceResponse{}
+	isManagedServices := false
+	ch := make(chan map[string]models.HardwareResourceResponse)
+
+	if req.PostgresqlNodeCount == 0 && req.OpenSearchNodeCount == 0 {
+		isManagedServices = true
+	}
+
+	// This map is for temporarily storing the output of go routine.
+	hardwareResultMap := make(map[string]models.HardwareResourceResponse)
+	// For storing the response in a specified order.
+	var hardwareResultOrderList []string
+
+	setAutomate, setChefServer, setPostgresql, setOpensearch, setFrontend, setBackend := createNodeSet(req)
 
 	for index, ip := range req.AutomateNodeIps {
 		key := constants.AUTOMATE + ip + strconv.Itoa(index)
-		go RunHardwareResourceCountCheck(minNodeCount.AutomateCount, req.AutomateNodeCount, constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
+		go runHardwareResourceCountCheck(req.AutomateNodeCount, constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
 		hardwareResultOrderList = append(hardwareResultOrderList, key)
 	}
 
 	for index, ip := range req.ChefInfraServerNodeIps {
 		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
-		go RunHardwareResourceCountCheck(minNodeCount.ChefInfraServerCount, req.ChefInfraServerNodeCount, constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
+		go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
 		hardwareResultOrderList = append(hardwareResultOrderList, key)
 	}
 
-	if !is_managed_services {
+	if !isManagedServices {
 		for index, ip := range req.PostgresqlNodeIps {
 			key := constants.POSTGRESQL + ip + strconv.Itoa(index)
-			go RunHardwareResourceCountCheck(minNodeCount.PostgresqlCount, req.PostgresqlNodeCount, constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
+			go runHardwareResourceCountCheck(req.PostgresqlNodeCount, constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
 			hardwareResultOrderList = append(hardwareResultOrderList, key)
 		}
 
 		for index, ip := range req.OpenSearchNodeIps {
 			key := constants.OPENSEARCH + ip + strconv.Itoa(index)
-			go RunHardwareResourceCountCheck(minNodeCount.OpenSearchCount, req.OpenSearchNodeCount, constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
+			go runHardwareResourceCountCheck(req.OpenSearchNodeCount, constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
 			hardwareResultOrderList = append(hardwareResultOrderList, key)
 		}
 	}

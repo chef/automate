@@ -1,16 +1,15 @@
-package hardwareresourcecount_test
+package hardwareresourcecount
 
 import (
 	"testing"
 
 	"github.com/bmizerany/assert"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/lib/logger"
 )
 
 var (
-	VALID_HARDWARE_RESOURCE_COUNT_REQUEST = &models.HardwareResourceRequest{
+	VALID_HARDWARE_RESOURCE_COUNT_REQUEST = &models.Hardware{
 		AutomateNodeCount: 2,
 		AutomateNodeIps: []string{
 			"172.154.0.1",
@@ -64,7 +63,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "automate Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "automate type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -98,7 +97,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "automate Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "automate type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -132,7 +131,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "chef-infra-server Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "chef-infra-server type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -166,7 +165,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "chef-infra-server Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "chef-infra-server type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -200,7 +199,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "postgresql type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -234,7 +233,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "postgresql type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -268,7 +267,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "postgresql Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "postgresql type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -302,7 +301,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "opensearch type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -336,7 +335,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "opensearch type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -370,7 +369,7 @@ var (
 				{
 					Title:         "IP address",
 					Passed:        true,
-					SuccessMsg:    "opensearch Type has valid count as per Automate HA requirement",
+					SuccessMsg:    "opensearch type has valid count as per Automate HA requirement",
 					ErrorMsg:      "",
 					ResolutionMsg: "",
 				},
@@ -380,8 +379,8 @@ var (
 )
 
 func TestHardwareResourceCountService(t *testing.T) {
-	hrc := hardwareresourcecount.NewHardwareResourceCountService(logger.NewTestLogger())
-	resourcecount := hrc.GetHardwareResourceCount(models.HardwareResourceRequest{})
+	hrc := NewHardwareResourceCountService(logger.NewTestLogger())
+	resourcecount := hrc.GetHardwareResourceCount(models.Hardware{})
 	assert.Equal(t, []models.HardwareResourceResponse{}, resourcecount)
 }
 
@@ -400,7 +399,7 @@ func TestUniqueIP(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		res := hardwareresourcecount.UniqueIP(e.NodeType, e.Set, e.NodeCount)
+		res := uniqueIP(e.NodeType, e.Set, e.NodeCount)
 		assert.Equal(t, e.ExpectedRes, res.Passed)
 	}
 }
@@ -419,7 +418,7 @@ func TestValidFormat(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		res := hardwareresourcecount.ValidFormat(e.IP)
+		res := validFormat(e.IP)
 		assert.Equal(t, e.ExpectedRes, res.Passed)
 	}
 }
@@ -438,7 +437,7 @@ func TestValidCount(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		res := hardwareresourcecount.ValidCount(e.MinNodeCount, e.ReqNodeCount, e.NodeType)
+		res := validCount(e.MinNodeCount, e.ReqNodeCount, e.NodeType)
 		assert.Equal(t, e.ExpectedRes, res.Passed)
 	}
 }
@@ -460,7 +459,7 @@ func TestSharedIP(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		res := hardwareresourcecount.SharedIP(e.NodeType, e.IP, e.Set)
+		res := sharedIP(e.NodeType, e.IP, e.Set)
 		assert.Equal(t, e.ExpectedRes, res.Passed)
 	}
 }
@@ -488,12 +487,12 @@ func TestValidateHardwareResources(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		res := hardwareresourcecount.ValidateHardwareResources(e.MinNodeCount, e.ReqNodeCount, e.NodeType, e.IP, e.Set, e.SetBackend)
+		res := validateHardwareResources(e.MinNodeCount, e.ReqNodeCount, e.NodeType, e.IP, e.Set, e.SetBackend)
 		assert.Equal(t, e.ExpectedRes, res.Checks[0].Passed)
 	}
 }
 
 func TestGetHardwareResourceCount(t *testing.T) {
-	res := hardwareresourcecount.NewHardwareResourceCountService(logger.NewTestLogger()).GetHardwareResourceCount(*VALID_HARDWARE_RESOURCE_COUNT_REQUEST)
+	res := NewHardwareResourceCountService(logger.NewTestLogger()).GetHardwareResourceCount(*VALID_HARDWARE_RESOURCE_COUNT_REQUEST)
 	assert.Equal(t, VALID_HARDWARE_RESOURCE_COUNT_RESPONSE, res)
 }
