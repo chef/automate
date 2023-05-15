@@ -206,66 +206,66 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EventFeedServiceClient interface {
+	// List Events
 	//
-	//List Events
+	// Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
+	// Adding a filter makes a list of all events that meet the filter criteria.
 	//
-	//Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
-	//Adding a filter makes a list of all events that meet the filter criteria.
+	// Example:
+	// ```
+	// eventfeed?collapse=true&filter=organization:4thcafe&page_size=100&start=1592546400000&end=1593151199999
+	// ```
 	//
-	//Example:
-	//```
-	//eventfeed?collapse=true&filter=organization:4thcafe&page_size=100&start=1592546400000&end=1593151199999
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventFeed(ctx context.Context, in *request.GetEventFeedRequest, opts ...grpc.CallOption) (*response.GetEventFeedResponse, error)
+	// List Counts of Event Types
 	//
-	//List Counts of Event Types
+	// Returns totals for role, cookbook, and organization events.
 	//
-	//Returns totals for role, cookbook, and organization events.
+	// Example:
+	// ```
+	// event_type_counts?start=1592546400000&end=1593151199999
+	// ```
 	//
-	//Example:
-	//```
-	//event_type_counts?start=1592546400000&end=1593151199999
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventTypeCounts(ctx context.Context, in *request.GetEventTypeCountsRequest, opts ...grpc.CallOption) (*response.GetEventTypeCountsResponse, error)
+	// List Counts of Individual Event Tasks
 	//
-	//List Counts of Individual Event Tasks
+	// Returns the total counts of actions taken in an event. The counted actions are: update, create, and delete.
 	//
-	//Returns the total counts of actions taken in an event. The counted actions are: update, create, and delete.
+	// Example:
+	// ```
+	// event_task_counts?start=1592546400000&end=1593151199999
+	// ```
 	//
-	//Example:
-	//```
-	//event_task_counts?start=1592546400000&end=1593151199999
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventTaskCounts(ctx context.Context, in *request.GetEventTaskCountsRequest, opts ...grpc.CallOption) (*response.GetEventTaskCountsResponse, error)
+	// List Summary Data of Events
 	//
-	//List Summary Data of Events
+	// Returns data that populates the guitar strings visual on the top of the event feed.
 	//
-	//Returns data that populates the guitar strings visual on the top of the event feed.
+	// Example:
+	// ```
+	// eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
+	// ```
 	//
-	//Example:
-	//```
-	//eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventStringBuckets(ctx context.Context, in *request.GetEventStringBucketsRequest, opts ...grpc.CallOption) (*response.GetEventStringBucketsResponse, error)
 	EventExport(ctx context.Context, in *request.EventExportRequest, opts ...grpc.CallOption) (EventFeedService_EventExportClient, error)
 }
@@ -348,66 +348,66 @@ func (x *eventFeedServiceEventExportClient) Recv() (*response.EventExportRespons
 
 // EventFeedServiceServer is the server API for EventFeedService service.
 type EventFeedServiceServer interface {
+	// List Events
 	//
-	//List Events
+	// Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
+	// Adding a filter makes a list of all events that meet the filter criteria.
 	//
-	//Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
-	//Adding a filter makes a list of all events that meet the filter criteria.
+	// Example:
+	// ```
+	// eventfeed?collapse=true&filter=organization:4thcafe&page_size=100&start=1592546400000&end=1593151199999
+	// ```
 	//
-	//Example:
-	//```
-	//eventfeed?collapse=true&filter=organization:4thcafe&page_size=100&start=1592546400000&end=1593151199999
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventFeed(context.Context, *request.GetEventFeedRequest) (*response.GetEventFeedResponse, error)
+	// List Counts of Event Types
 	//
-	//List Counts of Event Types
+	// Returns totals for role, cookbook, and organization events.
 	//
-	//Returns totals for role, cookbook, and organization events.
+	// Example:
+	// ```
+	// event_type_counts?start=1592546400000&end=1593151199999
+	// ```
 	//
-	//Example:
-	//```
-	//event_type_counts?start=1592546400000&end=1593151199999
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventTypeCounts(context.Context, *request.GetEventTypeCountsRequest) (*response.GetEventTypeCountsResponse, error)
+	// List Counts of Individual Event Tasks
 	//
-	//List Counts of Individual Event Tasks
+	// Returns the total counts of actions taken in an event. The counted actions are: update, create, and delete.
 	//
-	//Returns the total counts of actions taken in an event. The counted actions are: update, create, and delete.
+	// Example:
+	// ```
+	// event_task_counts?start=1592546400000&end=1593151199999
+	// ```
 	//
-	//Example:
-	//```
-	//event_task_counts?start=1592546400000&end=1593151199999
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventTaskCounts(context.Context, *request.GetEventTaskCountsRequest) (*response.GetEventTaskCountsResponse, error)
+	// List Summary Data of Events
 	//
-	//List Summary Data of Events
+	// Returns data that populates the guitar strings visual on the top of the event feed.
 	//
-	//Returns data that populates the guitar strings visual on the top of the event feed.
+	// Example:
+	// ```
+	// eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
+	// ```
 	//
-	//Example:
-	//```
-	//eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
-	//```
+	// Authorization Action:
+	// ```
+	// ```
 	//
-	//Authorization Action:
-	//```
 	//event:events:list
-	//```
 	GetEventStringBuckets(context.Context, *request.GetEventStringBucketsRequest) (*response.GetEventStringBucketsResponse, error)
 	EventExport(*request.EventExportRequest, EventFeedService_EventExportServer) error
 }

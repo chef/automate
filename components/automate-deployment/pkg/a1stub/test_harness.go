@@ -92,11 +92,12 @@ osQYj4UQRiMOwQfFY7R9rjdWHdrYeBS6BvWMu6NZY105upZfKVWhAD0=
 // StartTestHarness does what is necessary to be able to run the
 // `migrate-from-v1` code against a host that doesn't actually have A1
 // installed. The test harness consists of these things:
-// * sanity checks to make sure we actually don't have a1 installed, just in
-//   case.
-// * a set of stub binaries for commands such as `automate-ctl`;
-//   StartTestHarness puts these in the PATH
-// * a stub A1 API HTTP server.
+//   - sanity checks to make sure we actually don't have a1 installed, just in
+//     case.
+//   - a set of stub binaries for commands such as `automate-ctl`;
+//     StartTestHarness puts these in the PATH
+//   - a stub A1 API HTTP server.
+//
 // These components generally support invoking failure modes by setting the
 // `FAILURE` environment variable to a value as defined in a1upgrade/upgrade.go
 func StartTestHarness() error {

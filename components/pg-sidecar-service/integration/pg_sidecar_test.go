@@ -22,7 +22,7 @@ func TestPGSidecar(t *testing.T) {
 	defer cancel()
 
 	pgs, err := client.NewClient(
-		client.WithHost("localhost"),
+		client.WithHost("127.0.0.1"),
 		client.WithPort(10100),
 		client.WithTLSCertPath("/hab/svc/pg-sidecar-service/config/service.crt"),
 		client.WithTLSKeyPath("/hab/svc/pg-sidecar-service/config/service.key"),
@@ -509,7 +509,7 @@ func newPgHelper() (*pgHelper, error) {
 	pgh := &pgHelper{
 		conInfo: &pg.A2ConnInfo{
 			User: "automate",
-			Host: "localhost",
+			Host: "127.0.0.1",
 			Port: 5432,
 			Certs: pg.TLSCertPaths{
 				Cert:     "/hab/svc/automate-postgresql/config/server.crt",

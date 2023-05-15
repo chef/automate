@@ -913,6 +913,7 @@ type Event struct {
 
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Types that are assignable to Event:
+	//
 	//	*Event_CCRSuccess
 	//	*Event_CCRFailure
 	//	*Event_ComplianceSuccess

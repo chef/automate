@@ -184,7 +184,8 @@ type CreateUserReq struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	// Note: we're explicitly more strict than email (RFC 1034), although PGV
 	// knows how to validate an email address using
-	//   [(validate.rules).string.email = true];
+	//
+	//	[(validate.rules).string.email = true];
 	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty" toml:"email,omitempty" mapstructure:"email,omitempty"`
 	// Note: password validation happens in the service's handler
 	Password string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty" toml:"password,omitempty" mapstructure:"password,omitempty"`

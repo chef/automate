@@ -552,7 +552,10 @@ func (efs ElasticFeedStore) GetActionLine(formattedFilters map[string][]string, 
 		return &feed.ActionLine{}, errors.Wrapf(err, "obtaining search source for action %s", action)
 	}
 
-	data, _ := json.Marshal(src)
+	data, err := json.Marshal(src)
+	if err != nil {
+		return &feed.ActionLine{}, errors.Wrapf(err, "failed to marshal json")
+	}
 	logrus.WithFields(logrus.Fields{
 		"action":       action,
 		"query_string": string(data),

@@ -687,7 +687,6 @@ func parseDesiredState(s string) DesiredProcessState {
 // both the old and new service:
 //
 // https://github.com/habitat-sh/habitat/issues/5317
-//
 func preferredDeployedService(svcA, svcB DeployedService) DeployedService {
 	if svcA.DesiredProcessState == ProcessStateUp {
 		return svcA
@@ -1270,12 +1269,12 @@ func (t *LocalTarget) startHabSupFromLauncher(m manifest.ReleaseManifest, writer
 // waitForHabSupToStart waits for the supervisor status command to
 // complete successfully.  There are two cases we are trying to handle with this loop:
 //
-// - systemctl will return a 0 exit code in some
-//   cases of `hab sup run` failures (for example if /bin/hab doesn't
-//   exist).
+//   - systemctl will return a 0 exit code in some
+//     cases of `hab sup run` failures (for example if /bin/hab doesn't
+//     exist).
 //
-// - the main hab-sup process starts, it may take a few moments before
-//   the daemon is listening.
+//   - the main hab-sup process starts, it may take a few moments before
+//     the daemon is listening.
 //
 // TODO(ssd) 2018-06-19: We currently look up the exact path to our
 // manifest version of hab and hab-sup in this function since it is

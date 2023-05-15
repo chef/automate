@@ -285,7 +285,7 @@ func GetMinimumCurrentManifestVersion(ctx context.Context, version, channel, ver
 	}
 }
 
-//isSemVersionFmt checks the provided version is in semantic version format, if yes, will return the major version
+// isSemVersionFmt checks the provided version is in semantic version format, if yes, will return the major version
 func IsSemVersionFmt(version string) (string, bool) {
 	splitStrings := strings.Split(version, ".")
 	if len(splitStrings) > 1 {
@@ -373,7 +373,7 @@ func findNextMajorVersionForSemantic(currentMajor string, list []string) (int, s
 	return 0, ""
 }
 
-//GetAllVersions gives the list of all released versions of given channel in ascending order of version numbers
+// GetAllVersions gives the list of all released versions of given channel in ascending order of version numbers
 func GetAllVersions(ctx context.Context, channel, versionsPath string, optionalURL ...string) ([]string, error) {
 	if versionsPath != "" {
 		return getVersionsFromPath(versionsPath)

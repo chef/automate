@@ -4420,7 +4420,7 @@ type ComplianceConfigRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//No of days for the config
+	// No of days for the config
 	Value int32 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty" toml:"value,omitempty" mapstructure:"value,omitempty"`
 }
 
@@ -4469,9 +4469,9 @@ type ComplianceConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Policy name to get from config
+	// Policy name to get from config
 	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty" toml:"policy_name,omitempty" mapstructure:"policy_name,omitempty"`
-	//No of days to get for config
+	// No of days to get for config
 	Value int32 `protobuf:"varint,2,opt,name=value,proto3" json:"value,omitempty" toml:"value,omitempty" mapstructure:"value,omitempty"`
 }
 

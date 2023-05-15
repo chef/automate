@@ -9,11 +9,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
-
 	eventErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
 )
 
 var (
@@ -167,19 +166,22 @@ func ConvertAPIKeyToBackendKey(parameter string) string {
 // To be used on filtering Events
 //
 // Example:
-//   [
-//    "environment:adios",
-//    "environment:hola",
-//    "cookbook:awesome",
-//    "roles:lalala",
-//   ]
+//
+//	[
+//	 "environment:adios",
+//	 "environment:hola",
+//	 "cookbook:awesome",
+//	 "roles:lalala",
+//	]
 //
 // The returned filters would look like:
 //
 // map[string][]string [
-// 	"environment": ["adios","hola"],
-// 	"cookbook": ["awesome"],
-// 	"roles": ["lalala"],
+//
+//	"environment": ["adios","hola"],
+//	"cookbook": ["awesome"],
+//	"roles": ["lalala"],
+//
 // ]
 func FormatFilters(filters []string) (map[string][]string, error) {
 	return stringutils.FormatFiltersWithKeyConverter(filters, ConvertAPIKeyToBackendKey)

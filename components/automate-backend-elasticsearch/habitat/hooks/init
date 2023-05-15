@@ -27,8 +27,8 @@
   openssl req -new -key {{pkg.svc_config_path}}/certificates/odfe-admin.key -out {{pkg.svc_config_path}}/certificates/odfe-admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
 
   #Use the CSR to generate the signed node Certificate:
-  openssl x509 -req -in {{pkg.svc_config_path}}/certificates/odfe-node.csr -CA {{pkg.svc_config_path}}/certificates/MyRootCA.pem -CAkey {{pkg.svc_config_path}}/certificates/MyRootCA.key -CAcreateserial -out {{pkg.svc_config_path}}/certificates/odfe-node.pem -sha256
+  openssl x509 -extfile <(printf "subjectAltName=DNS:chefnode") -req -in {{pkg.svc_config_path}}/certificates/odfe-node.csr -CA {{pkg.svc_config_path}}/certificates/MyRootCA.pem -CAkey {{pkg.svc_config_path}}/certificates/MyRootCA.key -CAcreateserial -out {{pkg.svc_config_path}}/certificates/odfe-node.pem -sha256
 
   #Use the CSR to generate the signed admin Certificate:
-  openssl x509 -req -in {{pkg.svc_config_path}}/certificates/odfe-admin.csr -CA {{pkg.svc_config_path}}/certificates/MyRootCA.pem -CAkey {{pkg.svc_config_path}}/certificates/MyRootCA.key -CAcreateserial -out {{pkg.svc_config_path}}/certificates/odfe-admin.pem -sha256
+  openssl x509 -extfile <(printf "subjectAltName=DNS:chefadmin") -req -in {{pkg.svc_config_path}}/certificates/odfe-admin.csr -CA {{pkg.svc_config_path}}/certificates/MyRootCA.pem -CAkey {{pkg.svc_config_path}}/certificates/MyRootCA.key -CAcreateserial -out {{pkg.svc_config_path}}/certificates/odfe-admin.pem -sha256
 {{/unless}}

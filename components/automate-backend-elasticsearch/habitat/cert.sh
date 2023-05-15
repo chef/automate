@@ -10,7 +10,7 @@ openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "admin-pkcs12.key" -topk8 -out "admin.key"
  
 openssl req -new -key admin.key -out admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
  
-openssl x509 -days 1095 -req -in admin.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out admin.pem -sha256
+openssl x509 -extfile <(printf "subjectAltName=DNS:chefadmin") -days 1095 -req -in admin.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out admin.pem -sha256
  
 openssl genrsa -out ssl-pkcs12.key 2048
  
@@ -18,7 +18,7 @@ openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "ssl-pkcs12.key" -topk8 -out "ssl.key" -no
  
 openssl req -new -key ssl.key -out ssl.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode'
  
-openssl x509 -days 1095 -req -in ssl.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out ssl.pem -sha256
+openssl x509 -extfile <(printf "subjectAltName=DNS:chefnode") -days 1095 -req -in ssl.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out ssl.pem -sha256
  
 cat <<EOF >> habitat/default.toml
 # root pem cert that signed the two cert/key pairs below

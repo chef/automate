@@ -28,8 +28,7 @@ using this tool.
 
 In addition, this command requires the database file to be located on a
 filesystem that supports memory-mapped files. In particular, VBox shared
-filesystems are known to not support memory mapping.
-`
+filesystems are known to not support memory mapping.`
 
 func inspectDBCmd() *cobra.Command {
 	return &cobra.Command{
@@ -84,13 +83,11 @@ func prettyPrintDeploy(d *deployment.Deployment) {
 	fmt.Println(buf.String())
 }
 
-//
 // Why?  I just wanted newlines in our pretty-printing.
 //
 // Some inspiration from:
-//  https://gist.github.com/justincase/5469009
 //
-//
+//	https://gist.github.com/justincase/5469009
 func pretty(buf io.Writer, v reflect.Value, depth int) {
 	indent := strings.Repeat("  ", depth)
 	nextIndent := strings.Repeat("  ", depth+1)

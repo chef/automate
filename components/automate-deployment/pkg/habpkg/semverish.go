@@ -14,7 +14,6 @@ import (
 //
 // Unlike traditional semver, it supports any non-zero number of
 // version parts.
-//
 type SemverishVersion struct {
 	parts      []int
 	prerelease string
