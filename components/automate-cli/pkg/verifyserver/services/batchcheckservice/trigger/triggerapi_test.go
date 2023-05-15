@@ -2,7 +2,6 @@ package trigger
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -424,17 +423,67 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState)
-		fmt.Printf("OS PG result: %+v\n", result)
-		require.Equal(t, 2, len(result))
-		require.NotNil(t, result)
-		require.Nil(t, result[0].Error)
-		require.Len(t, result[0].Result.Checks, 2)
-		require.Equal(t, result[0].Status, "SUCCESS")
-		require.Nil(t, result[1].Error)
-		require.Len(t, result[1].Result.Checks, 2)
-		require.Equal(t, result[1].Status, "SUCCESS")
+		results := RunCheck(config, log, port, path, depState)
+		for _, result := range results {
+			if result.NodeType == "bastion" {
+				require.Equal(t, "PASSED", result.Status)
+				require.Empty(t, result.Result.Message)
+				require.True(t, result.Result.Passed)
 
+				resp1 := result.Result.Checks[0]
+				require.Equal(t, "Bastion CPU count check", resp1.Title)
+				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
+				require.Empty(t, resp1.ResolutionMsg)
+				require.Empty(t, resp1.ErrorMsg)
+				require.True(t, resp1.Passed)
+
+				resp2 := result.Result.Checks[1]
+				require.Equal(t, "Bastion CPU speed check", resp2.Title)
+				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
+				require.Empty(t, resp2.ResolutionMsg)
+				require.Empty(t, resp2.ErrorMsg)
+				require.True(t, resp2.Passed)
+			}
+
+			if result.NodeType == "opensearch" {
+				require.Equal(t, "SUCCESS", result.Status)
+				require.Empty(t, result.Result.Message)
+				require.True(t, result.Result.Passed)
+
+				resp1 := result.Result.Checks[0]
+				require.Equal(t, "OS CPU count check", resp1.Title)
+				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
+				require.Empty(t, resp1.ResolutionMsg)
+				require.Empty(t, resp1.ErrorMsg)
+				require.True(t, resp1.Passed)
+
+				resp2 := result.Result.Checks[1]
+				require.Equal(t, "OS CPU speed check", resp2.Title)
+				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
+				require.Empty(t, resp2.ResolutionMsg)
+				require.Empty(t, resp2.ErrorMsg)
+				require.True(t, resp2.Passed)
+			}
+			if result.NodeType == "postgresql" {
+				require.Equal(t, "PASSED", result.Status)
+				require.Empty(t, result.Result.Message)
+				require.True(t, result.Result.Passed)
+
+				resp1 := result.Result.Checks[0]
+				require.Equal(t, "PG CPU count check", resp1.Title)
+				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
+				require.Empty(t, resp1.ResolutionMsg)
+				require.Empty(t, resp1.ErrorMsg)
+				require.True(t, resp1.Passed)
+
+				resp2 := result.Result.Checks[1]
+				require.Equal(t, "PG CPU speed check", resp2.Title)
+				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
+				require.Empty(t, resp2.ResolutionMsg)
+				require.Empty(t, resp2.ErrorMsg)
+				require.True(t, resp2.Passed)
+			}
+		}
 	})
 
 	t.Run("System User Check", func(t *testing.T) {
