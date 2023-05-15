@@ -91,31 +91,16 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 	serviceResponse.Checks = checks
 	sv.logger.Debug("The Passed value for the response: ", serviceResponse.Passed)
 	sv.logger.Debug("The Checks array for the response: ", serviceResponse.Checks)
-	return &models.SoftwareVersionDetails{
-		Passed: serviceResponse.Passed,
-		Checks: serviceResponse.Checks,
-	}, nil
+	return serviceResponse, nil
 }
 
 func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Checks {
 	_, err := fiberutils.CheckPath(cmdName)
 	if err != nil {
 		sv.logger.Error("The errror which checking cammand file path: ", err)
-		return &models.Checks{
-			Title:         cmdName + AVAILABILITY,
-			Passed:        false,
-			SuccessMsg:    "",
-			ErrorMsg:      cmdName + " is not available",
-			ResolutionMsg: ENSURE + cmdName + " is available in $PATH on the node",
-		}
+		return failureResponse(cmdName+AVAILABILITY, cmdName+" is not available", ENSURE+cmdName+" is available in $PATH on the node")
 	}
-	return &models.Checks{
-		Title:         cmdName + AVAILABILITY,
-		Passed:        true,
-		SuccessMsg:    cmdName + " is available",
-		ErrorMsg:      "",
-		ResolutionMsg: "",
-	}
+	return successResponse(cmdName+AVAILABILITY, cmdName+" is available")
 }
 
 func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Checks, error) {
@@ -127,17 +112,11 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 		"SUSE Linux":   {"12"},
 		"Debian":       {"9", "10", "11", "12"},
 	}
-	checkResponse := models.Checks{}
+	checkResponse := &models.Checks{}
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
-		return &models.Checks{
-			Title:         LINUX_VERSION_CHECK,
-			Passed:        false,
-			SuccessMsg:    "",
-			ErrorMsg:      "Its not feasible to determine the Operating system version",
-			ResolutionMsg: "Please run system on the supported platforms.",
-		}, nil
+		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run system on the supported platforms."), nil
 	}
 	sv.logger.Debug("Got the OS Version: ", osVersion)
 	sv.logger.Debug("Got the OS Name: ", osName)
@@ -145,33 +124,15 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 		if strings.Contains(strings.ToLower(osName), strings.ToLower(key)) {
 			correctVersion := sv.checkOs(osVersions, osVersion, key)
 			if correctVersion {
-				checkResponse = models.Checks{
-					Title:         LINUX_VERSION_CHECK,
-					Passed:        true,
-					SuccessMsg:    key + " version is " + osVersion,
-					ErrorMsg:      "",
-					ResolutionMsg: "",
-				}
+				checkResponse = successResponse(LINUX_VERSION_CHECK, key+" version is "+osVersion)
 				break
 			}
-			checkResponse = models.Checks{
-				Title:         LINUX_VERSION_CHECK,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      key + " version is not supported by automate",
-				ResolutionMsg: ENSURE + key + " correct version is installed on the node",
-			}
+			checkResponse = failureResponse(LINUX_VERSION_CHECK, key+" version is not supported by automate", ENSURE+key+" correct version is installed on the node")
 			break
 		}
-		checkResponse = models.Checks{
-			Title:         LINUX_VERSION_CHECK,
-			Passed:        false,
-			SuccessMsg:    "",
-			ErrorMsg:      osName + " version is not supported by automate",
-			ResolutionMsg: ENSURE + osName + " correct version is installed on the node",
-		}
+		checkResponse = failureResponse(LINUX_VERSION_CHECK, osName+" version is not supported by automate", ENSURE+osName+" correct version is installed on the node")
 	}
-	return &checkResponse, nil
+	return checkResponse, nil
 }
 
 func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVersion string, osName string) bool {
@@ -206,4 +167,26 @@ func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVers
 		}
 	}
 	return correctVersion
+}
+
+func successResponse(title string, success_msg string) *models.Checks {
+	checkResponse := &models.Checks{
+		Title:         title,
+		Passed:        true,
+		SuccessMsg:    success_msg,
+		ErrorMsg:      "",
+		ResolutionMsg: "",
+	}
+	return checkResponse
+}
+
+func failureResponse(title string, error_msg string, resolution_msg string) *models.Checks {
+	checkResponse := &models.Checks{
+		Title:         title,
+		Passed:        false,
+		SuccessMsg:    "",
+		ErrorMsg:      error_msg,
+		ResolutionMsg: resolution_msg,
+	}
+	return checkResponse
 }

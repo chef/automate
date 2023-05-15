@@ -16,6 +16,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	SuccessExpectedBodyForOpensearch      = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"openssl availability","passed":true,"success_msg":"openssl is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
+	SuccessExpectedBodyForPostgres        = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
+	SuccessExpectedBodyForNonSupportingOS = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":false,"success_msg":"","error_msg":"Kali Linux version is not supported by automate","resolution_msg":"Ensure Kali Linux correct version is installed on the node"}]}}`
+	FailureResponseForWrongQuery          = `{"status":"FAILED","result":null,"error":{"code":400,"message":"The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"}}`
+	LinuxVersionTitle                     = "Linux Version Check"
+	MkdirTitle                            = "mkdir availability"
+	OpensslTitle                          = "openssl availability"
+	StatTitle                             = "stat availability"
+	MkdirIsAvailable                      = "mkdir is available"
+	OpensslIsAvailable                    = "openssl is available"
+	StatIsAvailable                       = "stat is available"
+)
+
 func SetupMockSoftwareVersionService(response models.SoftwareVersionDetails, err error) softwareversionservice.ISoftwareVersionService {
 	return &softwareversionservice.MockSoftwareVersionService{
 		GetSoftwareDetailsFunc: func(string) (*models.SoftwareVersionDetails, error) {
@@ -24,7 +38,7 @@ func SetupMockSoftwareVersionService(response models.SoftwareVersionDetails, err
 	}
 }
 
-func SetupHandler(sv softwareversionservice.ISoftwareVersionService) *fiber.App {
+func SetupCheckSoftwareVersionChecksHandler(sv softwareversionservice.ISoftwareVersionService) *fiber.App {
 	log, _ := logger.NewLogger("text", "debug")
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,
@@ -59,21 +73,21 @@ func TestSoftwareVersionAPI(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "openssl availability",
+						Title:         OpensslTitle,
 						Passed:        true,
-						SuccessMsg:    "openssl is available",
+						SuccessMsg:    OpensslIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -81,7 +95,7 @@ func TestSoftwareVersionAPI(t *testing.T) {
 					},
 				},
 			},
-			expectedBody:  `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"openssl availability","passed":true,"success_msg":"openssl is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`,
+			expectedBody:  SuccessExpectedBodyForOpensearch,
 			expectedError: nil,
 			query:         "opensearch",
 		},
@@ -93,21 +107,21 @@ func TestSoftwareVersionAPI(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "stat availability",
+						Title:         StatTitle,
 						Passed:        true,
-						SuccessMsg:    "stat is available",
+						SuccessMsg:    StatIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -115,7 +129,7 @@ func TestSoftwareVersionAPI(t *testing.T) {
 					},
 				},
 			},
-			expectedBody:  `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`,
+			expectedBody:  SuccessExpectedBodyForPostgres,
 			expectedError: nil,
 			query:         "postgres",
 		},
@@ -127,21 +141,21 @@ func TestSoftwareVersionAPI(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "stat availability",
+						Title:         StatTitle,
 						Passed:        true,
-						SuccessMsg:    "stat is available",
+						SuccessMsg:    StatIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Kali Linux version is not supported by automate",
@@ -149,7 +163,7 @@ func TestSoftwareVersionAPI(t *testing.T) {
 					},
 				},
 			},
-			expectedBody:  `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":false,"success_msg":"","error_msg":"Kali Linux version is not supported by automate","resolution_msg":"Ensure Kali Linux correct version is installed on the node"}]}}`,
+			expectedBody:  SuccessExpectedBodyForNonSupportingOS,
 			expectedError: nil,
 			query:         "postgres",
 		},
@@ -157,21 +171,16 @@ func TestSoftwareVersionAPI(t *testing.T) {
 			description:   "400:If the query entered by the User is not supported",
 			expectedCode:  400,
 			responseBody:  models.SoftwareVersionDetails{},
-			expectedBody:  `{"status":"FAILED","result":null,"error":{"code":400,"message":"The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"}}`,
+			expectedBody:  FailureResponseForWrongQuery,
 			expectedError: errors.New("The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"),
 			query:         "wrongquery",
-		},
-		{
-			description:  "200:If the OS Version is wrong",
-			expectedCode: 200,
-			responseBody: models.SoftwareVersionDetails{},
 		},
 	}
 	for _, test := range tests {
 
 		t.Run(test.description, func(t *testing.T) {
 			softwareversioncheckEndpoint := "/api/v1/checks/software-versions/?node_type=" + test.query
-			app := SetupHandler(SetupMockSoftwareVersionService(test.responseBody, test.expectedError))
+			app := SetupCheckSoftwareVersionChecksHandler(SetupMockSoftwareVersionService(test.responseBody, test.expectedError))
 			req := httptest.NewRequest("GET", softwareversioncheckEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)

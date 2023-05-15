@@ -17,13 +17,24 @@ var osTestVersion = map[string][]string{
 	"Debian":        {"9", "10", "11", "12"},
 }
 
-const successfile = "./testfiles/success.txt"
-const failurefile = "./testfiles/failure.txt"
-const versionfile = "./testfiles/version.txt"
-const failfilepath = "./failfilepath"
+const (
+	successfile        = "./testfiles/success.txt"
+	failurefile        = "./testfiles/failure.txt"
+	versionfile        = "./testfiles/version.txt"
+	failfilepath       = "./failfilepath"
+	LinuxVersionTitle  = "Linux Version Check"
+	MkdirTitle         = "mkdir availability"
+	OpensslTitle       = "openssl availability"
+	StatTitle          = "stat availability"
+	MkdirIsAvailable   = "mkdir is available"
+	OpensslIsAvailable = "openssl is available"
+	StatIsAvailable    = "stat is available"
+)
 
-var checktrue = []string{"mkdir"}
-var checkfalse = []string{"wrong-cammand"}
+var (
+	checktrue  = []string{"mkdir"}
+	checkfalse = []string{"wrong-cammand"}
+)
 
 func TestGetSoftwareVersionDetails(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
@@ -52,21 +63,21 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "stat availability",
+						Title:         StatTitle,
 						Passed:        true,
-						SuccessMsg:    "stat is available",
+						SuccessMsg:    StatIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -87,21 +98,21 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "openssl availability",
+						Title:         OpensslTitle,
 						Passed:        true,
-						SuccessMsg:    "openssl is available",
+						SuccessMsg:    OpensslIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -122,14 +133,14 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -150,9 +161,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
-						Title:         "stat availability",
+						Title:         StatTitle,
 						Passed:        true,
-						SuccessMsg:    "stat is available",
+						SuccessMsg:    StatIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -164,7 +175,7 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 						ResolutionMsg: "Ensure wrong-cammand is available in $PATH on the node",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
 						ErrorMsg:      "",
@@ -185,21 +196,21 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
-						Title:         "stat availability",
+						Title:         StatTitle,
 						Passed:        true,
-						SuccessMsg:    "stat is available",
+						SuccessMsg:    StatIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Its not feasible to determine the Operating system version",
@@ -220,21 +231,21 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
-						Title:         "stat availability",
+						Title:         StatTitle,
 						Passed:        true,
-						SuccessMsg:    "stat is available",
+						SuccessMsg:    StatIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "mkdir availability",
+						Title:         MkdirTitle,
 						Passed:        true,
-						SuccessMsg:    "mkdir is available",
+						SuccessMsg:    MkdirIsAvailable,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Linux Version Check",
+						Title:         LinuxVersionTitle,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "Kali Linux version is not supported by automate",
@@ -356,9 +367,9 @@ func TestCheckCommandVersion(t *testing.T) {
 				cmdName: "mkdir",
 			},
 			expectedBody: &models.Checks{
-				Title:         "mkdir availability",
+				Title:         MkdirTitle,
 				Passed:        true,
-				SuccessMsg:    "mkdir is available",
+				SuccessMsg:    MkdirIsAvailable,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
@@ -406,7 +417,7 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: failurefile,
 			},
 			expectedBody: &models.Checks{
-				Title:         "Linux Version Check",
+				Title:         LinuxVersionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "Kali Linux version is not supported by automate",
@@ -419,7 +430,7 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: successfile,
 			},
 			expectedBody: &models.Checks{
-				Title:         "Linux Version Check",
+				Title:         LinuxVersionTitle,
 				Passed:        true,
 				SuccessMsg:    "Ubuntu version is 20.04",
 				ErrorMsg:      "",
@@ -433,7 +444,7 @@ func TestCheckOsVersion(t *testing.T) {
 				osFilepath: versionfile,
 			},
 			expectedBody: &models.Checks{
-				Title:         "Linux Version Check",
+				Title:         LinuxVersionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "SUSE Linux version is not supported by automate",
