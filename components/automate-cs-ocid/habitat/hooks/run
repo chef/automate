@@ -7,14 +7,30 @@ cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
-export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
 export DATABASE_URL="{{cfg.DATABASE_URL}}"
 
+OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+
+# Set webui key from erchef component
 WEBUI_SRC_PATH="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
 WEBUI_KEY=`sed ':a;N;$!ba;s/\n/\\n/g' $WEBUI_SRC_PATH`
-PRIVATE_CHEF_SECRETS_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config/private-chef-secrets.json"
+PRIVATE_CHEF_SECRETS_PATH="$OCID_CONFIG_FOLDER_PATH/private-chef-secrets.json"
 ruby /hab/svc/automate-cs-ocid/config/tasks/set_webui_key.rb "$WEBUI_KEY" "$PRIVATE_CHEF_SECRETS_PATH"
+
+# Setup environment specific configurations for integration with erchef
+export ENV_CONFIG_FILE_PATH="$OCID_CONFIG_FOLDER_PATH/settings/$RAILS_ENV.yml"
+export CHEF_SERVER_ENDPOINT="{{cfg.chef_server.endpoint}}"
+export CHEF_SERVER_SUPERUSER="{{cfg.chef_server.superuser}}"
+export CHEF_SERVER_SSL_VERIFY_MODE="{{cfg.chef_server.ssl_verify_mode}}"
+ruby /hab/svc/automate-cs-ocid/config/tasks/set_env_vars.rb
+
+# NOTE: Please keep this statement just before running
+# any environment specific command e.g. starting rails server.
+# The running server will follow the configurations that are
+# exported from this JSON file. So if this file is getting updated
+# pls make sure export happens after the file is updated.
+export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
 bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
