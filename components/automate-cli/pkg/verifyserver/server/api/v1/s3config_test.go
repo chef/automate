@@ -31,7 +31,7 @@ var (
 	errorBodyParser                    = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
 )
 
-func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.S3Config {
+func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.IS3Config {
 	return &s3configservice.MockS3Config{
 		GetS3ConnectionFunc: func(*models.S3ConfigRequest) *models.S3ServiceCheck {
 			return &mockS3ConnectionModel
@@ -42,7 +42,7 @@ func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel mod
 	}
 }
 
-func SetupS3ConfigHandlers(ss s3configservice.S3Config) *fiber.App {
+func SetupS3ConfigHandlers(ss s3configservice.IS3Config) *fiber.App {
 	log, _ := logger.NewLogger("text", "debug")
 	fconf := &fiber.Settings{
 		ServerHeader: server.SERVICE,

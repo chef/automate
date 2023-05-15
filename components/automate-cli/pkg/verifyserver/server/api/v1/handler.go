@@ -12,14 +12,14 @@ import (
 )
 
 type Handler struct {
-	Logger                   logger.Logger
-	StatusService            statusservice.IStatusService
+	Logger                     logger.Logger
+	StatusService              statusservice.IStatusService
 	BatchCheckService            batchcheckservice.IBatchCheckService
 	NFSMountService              nfsmountservice.INFSService
 	MockServersService           startmockserverservice.IStartMockServersService
 	HardwareResourceCountService hardwareresourcecount.IHardwareResourceCountService
 	SoftwareVersionService       softwareversionservice.ISoftwareVersionService
-	S3ConfigService s3configservice.IS3Config
+	S3ConfigService   s3configservice.IS3Config
 }
 
 func NewHandler(logger logger.Logger) *Handler {

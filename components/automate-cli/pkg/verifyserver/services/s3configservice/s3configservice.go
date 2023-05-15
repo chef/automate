@@ -1,8 +1,6 @@
 package s3configservice
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -23,7 +21,7 @@ var (
 	region                      = ""
 )
 
-type S3Config interface {
+type IS3Config interface {
 	GetS3Connection(*models.S3ConfigRequest) *models.S3ServiceCheck
 	GetBucketAccess(*models.S3ConfigRequest) *models.S3ServiceCheck
 }
@@ -34,7 +32,7 @@ type S3ConfigService struct {
 	AwsUtils awsutils.AwsUtils
 }
 
-func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) S3Config {
+func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) IS3Config {
 	return &S3ConfigService{
 		Logger:   logger,
 		AwsUtils: awsUtils,
@@ -60,7 +58,6 @@ func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.
 func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.S3ServiceCheck {
 	ss.Req = req
 	ss.Req.Region = region
-	fmt.Println(req.Region, "req")
 	// S3 connection
 	sess, err := ss.AwsConnection()
 	s3Client := ss.AwsUtils.New(sess)
