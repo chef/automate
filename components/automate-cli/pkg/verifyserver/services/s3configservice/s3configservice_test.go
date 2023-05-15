@@ -81,6 +81,17 @@ func TestAwsConnection(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestListBucketsFailure(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
+	cs.(*s3configservice.S3ConfigService).Req = &req
+	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
+	assert.NoError(t, err)
+	s3Client := s3.New(sess)
+	err = cs.(*s3configservice.S3ConfigService).ListBuckets(s3Client)
+	assert.Error(t, err)
+}
+
 func TestUploadObjectFailure(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
@@ -113,6 +124,41 @@ func TestDeleteObjectsFailure(t *testing.T) {
 	err = cs.(*s3configservice.S3ConfigService).DeleteObjects(s3Client)
 	assert.Error(t, err)
 }
+
+func TestListBucketsSuccess(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	cs := s3configservice.NewS3ConfigService(log, &awsutils.MockAwsUtils{
+		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
+			return &session.Session{}, nil
+		},
+		ListBucketsFunc: func(s3Client *s3.S3) (*s3.ListBucketsOutput, error) {
+			return &s3.ListBucketsOutput{
+				Buckets: []*s3.Bucket{},
+			}, nil
+		},
+		NewFunc: func(sess *session.Session) *s3.S3 {
+			return &s3.S3{
+				Client: client.New(
+					aws.Config{},
+					metadata.ClientInfo{},
+					request.Handlers{},
+				),
+			}
+		},
+	})
+	cs.(*s3configservice.S3ConfigService).Req = &req
+	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
+	assert.NoError(t, err)
+	err = cs.(*s3configservice.S3ConfigService).ListBuckets(&s3.S3{
+		Client: client.New(
+			aws.Config{},
+			metadata.ClientInfo{},
+			request.Handlers{},
+		),
+	})
+	assert.NoError(t, err)
+}
+
 func TestUploadObjectSuccess(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, &awsutils.MockAwsUtils{

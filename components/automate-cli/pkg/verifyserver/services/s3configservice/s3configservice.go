@@ -1,6 +1,8 @@
 package s3configservice
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -18,6 +20,7 @@ var (
 	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key"
 	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
 	s3BucketAccessSuccessMsg    = "Machine is able to access the S3 bucket using the provided access key and secret key"
+	region                      = ""
 )
 
 type S3Config interface {
@@ -40,12 +43,14 @@ func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) S3Conf
 
 func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.S3ServiceCheck {
 	ss.Req = req
+	region = req.Region
+	ss.Req.Region = ""
 	sess, err := ss.AwsConnection()
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
 	s3Client := ss.AwsUtils.New(sess)
-	err = ss.ListObjects(s3Client)
+	err = ss.ListBuckets(s3Client)
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
@@ -54,7 +59,8 @@ func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.
 
 func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.S3ServiceCheck {
 	ss.Req = req
-
+	ss.Req.Region = region
+	fmt.Println(req.Region, "req")
 	// S3 connection
 	sess, err := ss.AwsConnection()
 	s3Client := ss.AwsUtils.New(sess)
@@ -90,6 +96,17 @@ func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
 	}
 	ss.Logger.Info("s3 config aws connection success")
 	return sess, nil
+}
+
+func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
+	// list buckets in s3 to verify secrete and access key
+	_, err := ss.AwsUtils.ListBuckets(s3Client)
+	if err != nil {
+		ss.Logger.Error("s3 config list bucket failed: ", err.Error())
+		return err
+	}
+	ss.Logger.Info("s3 config list object success")
+	return nil
 }
 
 func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {

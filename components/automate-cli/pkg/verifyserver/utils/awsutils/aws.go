@@ -17,6 +17,7 @@ type AwsUtils interface {
 	NewSessionWithOptions(endpoint, accessKey, secretKey, region string) (*session.Session, error)
 	DeleteObject(s3Client *s3.S3, BucketName, BasePath string) (*s3.DeleteObjectOutput, error)
 	ListObjectsV2(s3Client *s3.S3, BucketName, BasePath string) (*s3.ListObjectsV2Output, error)
+	ListBuckets(s3Client *s3.S3) (*s3.ListBucketsOutput, error)
 	NewUploader(sess *session.Session, BucketName, BasePath string) (*s3manager.UploadOutput, error)
 	New(sess *session.Session) *s3.S3
 }
@@ -62,6 +63,10 @@ func (au *AwsUtilsImpl) NewUploader(sess *session.Session, BucketName, BasePath 
 		Key:    aws.String(BasePath),            // Name of the file to be saved
 		Body:   strings.NewReader("my request"), // File
 	})
+}
+
+func (au *AwsUtilsImpl) ListBuckets(s3Client *s3.S3) (*s3.ListBucketsOutput, error) {
+	return s3Client.ListBuckets(nil)
 }
 
 func (au *AwsUtilsImpl) New(sess *session.Session) *s3.S3 {
