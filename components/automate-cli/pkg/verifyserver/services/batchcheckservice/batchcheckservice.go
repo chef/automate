@@ -33,7 +33,10 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		}
 		for i := 0; i < len(bastionChecks); i++ {
 			result := <-bastionCheckResultChan
-			checkTriggerRespMap[result[0].CheckType] = result
+			if len(result) > 0 {
+				checkTriggerRespMap[result[0].CheckType] = result
+			}
+
 		}
 		defer close(bastionCheckResultChan)
 	}
@@ -43,7 +46,7 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 			checkTriggerRespMap[check] = resp
 		}
 	}
-	return constructBatchCheckResponse(checkTriggerRespMap, config.Hardware, append(bastionChecks, remoteChecks...))
+	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...))
 }
 
 func getIndexOfCheck(checks []string, check string) (int, error) {
@@ -91,38 +94,58 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 		return ss.CheckTrigger.ExternalPostgresCheck
 	case constants.NFS_BACKUP_CONFIG:
 		return ss.CheckTrigger.NfsBackupConfigCheck
+	default:
+		return nil
 	}
-	return nil
 }
 
-func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse,
-	hardwareDetails models.Hardware, checks []string) models.BatchCheckResponse {
-	//var result []models.BatchCheckResult
-	//var resultIndex = 0
-	//for k, v := range batchApisResultMap {
-	//	result[resultIndex].Ip = k
-	//	result[resultIndex].NodeType = getNodeTypeFromIp(k, hardwareDetails)
-	//	result[resultIndex].Tests = v
-	//	resultIndex = resultIndex + 1
-	//}
+func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse, checks []string) models.BatchCheckResponse {
+	ipMap := make(map[string][]models.CheckTriggerResponse)
+	
+	//Construct map with unique ip+nodeType keys to segregate the response
+	for checkName, checkResponses := range checkTriggerRespMap {
+		for _, checkResponse := range checkResponses {
+			checkIndex, _ := getIndexOfCheck(checks, checkName)
+			ip := checkResponse.Host
+			nodeType := checkResponse.NodeType
+			ipMapKey := ip + "_" + nodeType
+			_, ok := ipMap[ipMapKey]
+			if ok {
+				ipMap[ipMapKey][checkIndex] = checkResponse
+			} else {
+				ipMap[ipMapKey] = make([]models.CheckTriggerResponse, len(checks))
+				ipMap[ipMapKey][checkIndex] = checkResponse
+			}
+		}
+	}
+
+	// Arranging the per map values in order in which we got the checks input. 
+	// Example if certificate check is passed first as input then in final response certificate will come up then other checks
+	for k, v := range ipMap {
+		arr := []models.CheckTriggerResponse{}
+		for _, checkResp := range v {
+			if checkResp.Host != "" {
+				arr = append(arr, checkResp)
+			}
+		}
+		ipMap[k] = arr
+	}
+
+	// Constructing response which is needed by the handler
+	var result = make([]models.BatchCheckResult, len(ipMap))
+	var resultIndex = 0
+	for _, v := range ipMap {
+		result[resultIndex].Ip = v[0].Host
+		result[resultIndex].NodeType = v[0].NodeType
+		resultArray := []models.ApiResult{}
+		for _, checkResult := range v {
+			resultArray = append(resultArray, checkResult.Result)
+		}
+		result[resultIndex].Tests = resultArray
+		resultIndex = resultIndex + 1
+	}
 	return models.BatchCheckResponse{
 		Status: "SUCCESS",
-		//Result: result,
+		Result: result,
 	}
-}
-
-func getNodeTypeFromIp(ip string, hardwareDetails models.Hardware) string {
-	if stringutils.SliceContains(hardwareDetails.AutomateNodeIps, ip) {
-		return "automate"
-	}
-	if stringutils.SliceContains(hardwareDetails.ChefInfraServerNodeIps, ip) {
-		return "chef_server"
-	}
-	if stringutils.SliceContains(hardwareDetails.PostgresqlNodeIps, ip) {
-		return "postgresql"
-	}
-	if stringutils.SliceContains(hardwareDetails.OpenSearchNodeIps, ip) {
-		return "opensearch"
-	}
-	return ""
 }
