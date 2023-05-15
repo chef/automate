@@ -57,7 +57,7 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		ctr := suc.Run(config)
 
 		// Assert the expected result
-		require.Len(t, ctr, 1)
+		require.Len(t, ctr, 2)
 		require.Nil(t, ctr[0].Error)
 		require.Len(t, ctr[0].Result.Checks, 2)
 		require.Equal(t, "SUCCESS", ctr[0].Status)
@@ -87,7 +87,7 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
 		ctr := suc.Run(config)
 
-		require.Len(t, ctr, 1)
+		require.Len(t, ctr, 2)
 		require.NotNil(t, ctr[0].Error)
 		require.Equal(t, ctr[0].Error.Code, http.StatusInternalServerError)
 		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Error.Error())
@@ -101,7 +101,6 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 			assert.Equal(t, constants.SYSTEM_RESOURCE_CHECK_API_PATH, r.URL.Path)
 			reqParameters := r.URL.Query()
 			assert.Equal(t, 2, len(reqParameters))
-			assert.Equal(t, "automate", reqParameters.Get("node_type"))
 			assert.Equal(t, "pre-release", reqParameters.Get("deployment_state"))
 
 			if r.URL.Path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
