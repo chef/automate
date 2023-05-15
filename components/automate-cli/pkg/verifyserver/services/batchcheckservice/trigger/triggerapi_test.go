@@ -423,6 +423,7 @@ func Test_RunCheck(t *testing.T) {
 		depState := ""
 		// Call the function being tested
 		result := RunCheck(config, log, port, path, depState)
+		require.Len(t, result, 1)
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 3)
