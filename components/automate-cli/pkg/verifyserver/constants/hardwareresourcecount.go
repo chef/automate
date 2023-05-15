@@ -1,7 +1,7 @@
 package constants
 
 const (
-	IP_ADDRESSS                     = "IP address"
+	IP_ADDRESS                      = "IP address"
 	BACKEND_CLUSTER                 = "backend"
 	FRONTEND_CLUSTER                = "frontend"
 	UNIQUE_SUCCESS_MESSAGE          = "IP address is unique"
@@ -9,7 +9,7 @@ const (
 	UNIQUE_RESOLUTION_MESSAGE       = "IP address for %s type should be unique."
 	VALID_COUNT_SUCCESS_MESSAGE     = "%s type has valid count as per Automate HA requirement"
 	VALID_COUNT_ERROR_MESSAGE       = "%s type has invalid count as per Automate HA requirement"
-	VALID_COUNT_RESOLUTION_MESSAGE  = "Hardware Resouce Count for %s type should be according to Automate HA requirements."
+	VALID_COUNT_RESOLUTION_MESSAGE  = "Hardware Resource Count for %s type should be according to Automate HA requirements."
 	VALID_FORMAT_SUCCESS_MESSAGE    = "IP address is of valid format"
 	VALID_FORMAT_ERROR_MESSAGE      = "IP address is of invalid format"
 	VALID_FORMAT_RESOLUTION_MESSAGE = "IP address %s should be changed in config to valid format."

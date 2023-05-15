@@ -61,17 +61,17 @@ func validateHardwareResources(minNodeCount, reqNodeCount int, nodeType string, 
 // Like for automate if we get node count 2 in request, then we are also getting 2 unique ips of automate.
 func uniqueIP(nodeType string, nodeSetLen int, reqNodeCount int) models.Checks {
 	if nodeSetLen == reqNodeCount {
-		return createCheck(constants.IP_ADDRESSS, true, constants.UNIQUE_SUCCESS_MESSAGE, "", "")
+		return createCheck(constants.IP_ADDRESS, true, constants.UNIQUE_SUCCESS_MESSAGE, "", "")
 	}
-	return createCheck(constants.IP_ADDRESSS, false, "", constants.UNIQUE_ERROR_MESSAGE, fmt.Sprintf(constants.UNIQUE_RESOLUTION_MESSAGE, nodeType))
+	return createCheck(constants.IP_ADDRESS, false, "", constants.UNIQUE_ERROR_MESSAGE, fmt.Sprintf(constants.UNIQUE_RESOLUTION_MESSAGE, nodeType))
 }
 
 // validFormat function will check that if our ip is in correct format or not.
 func validFormat(ip string) models.Checks {
 	if net.ParseIP(ip) == nil {
-		return createCheck(constants.IP_ADDRESSS, false, "", constants.VALID_FORMAT_ERROR_MESSAGE, fmt.Sprintf(constants.VALID_FORMAT_RESOLUTION_MESSAGE, ip))
+		return createCheck(constants.IP_ADDRESS, false, "", constants.VALID_FORMAT_ERROR_MESSAGE, fmt.Sprintf(constants.VALID_FORMAT_RESOLUTION_MESSAGE, ip))
 	}
-	return createCheck(constants.IP_ADDRESSS, true, constants.VALID_FORMAT_SUCCESS_MESSAGE, "", "")
+	return createCheck(constants.IP_ADDRESS, true, constants.VALID_FORMAT_SUCCESS_MESSAGE, "", "")
 }
 
 // sharedIP function will check if any of the frontend nodes(Automate and CS) are shared with any of the backend nodes(Postgres and Opensearch) and vice-versa.
@@ -86,17 +86,17 @@ func sharedIP(nodeType, ip string, oppositeTypeSet map[string]string) models.Che
 	}
 
 	if oppositeTypeSet[ip] == "" {
-		return createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.SHARED_SUCCESS_MESSAGE, oppositeClusterType), "", "")
+		return createCheck(constants.IP_ADDRESS, true, fmt.Sprintf(constants.SHARED_SUCCESS_MESSAGE, oppositeClusterType), "", "")
 	}
-	return createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.SHARED_ERROR_MESSAGE, nodeType, oppositeTypeSet[ip]), fmt.Sprintf(constants.SHARED_RESOLUTION_MESSAGE, nodeType, oppositeTypeSet[ip]))
+	return createCheck(constants.IP_ADDRESS, false, "", fmt.Sprintf(constants.SHARED_ERROR_MESSAGE, nodeType, oppositeTypeSet[ip]), fmt.Sprintf(constants.SHARED_RESOLUTION_MESSAGE, nodeType, oppositeTypeSet[ip]))
 }
 
 // validCount function will check if the node count we are getting in request is fulfilling the minimum HA requirements.
 func validCount(minNodeCount, nodeSetLen int, nodeType string) models.Checks {
 	if nodeSetLen >= minNodeCount {
-		return createCheck(constants.IP_ADDRESSS, true, fmt.Sprintf(constants.VALID_COUNT_SUCCESS_MESSAGE, nodeType), "", "")
+		return createCheck(constants.IP_ADDRESS, true, fmt.Sprintf(constants.VALID_COUNT_SUCCESS_MESSAGE, nodeType), "", "")
 	}
-	return createCheck(constants.IP_ADDRESSS, false, "", fmt.Sprintf(constants.VALID_COUNT_ERROR_MESSAGE, nodeType), fmt.Sprintf(constants.VALID_COUNT_RESOLUTION_MESSAGE, nodeType))
+	return createCheck(constants.IP_ADDRESS, false, "", fmt.Sprintf(constants.VALID_COUNT_ERROR_MESSAGE, nodeType), fmt.Sprintf(constants.VALID_COUNT_RESOLUTION_MESSAGE, nodeType))
 }
 
 func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
