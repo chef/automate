@@ -251,7 +251,7 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 				osFilepath: successfile,
 			},
 			expectedBody:  nil,
-			expectedError: "The query wrong-query is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server",
+			expectedError: "The query wrong-query is not supported. The Supported query's are: postgres, opensearch, bastion, automate, chef-server",
 		},
 	}
 	for _, tt := range tests {

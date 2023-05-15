@@ -50,22 +50,23 @@ const (
 var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "mv", "systemd", "wget", "exec", "rsync"}
 
 func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*models.SoftwareVersionDetails, error) {
-	sv.logger.Debug("The query paramter entered = ", query)
-	serviceResponse := models.SoftwareVersionDetails{}
+	sv.logger.Debug("The query parameter entered: ", query)
+	serviceResponse := &models.SoftwareVersionDetails{}
 	serviceResponse.Passed = true
-	serviceResponseArray := []models.Checks{}
+	serviceResponseArray := []*models.Checks{}
 	cmdArray := []string{}
-	if query == POSTGRES {
+	switch query {
+	case POSTGRES:
 		cmdArray = []string{"stat"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	} else if query == OPENSEARCH {
+	case OPENSEARCH:
 		cmdArray = []string{"openssl"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	} else if query == BASTION || query == AUTOMATE || query == CHEF_SERVER {
+	case AUTOMATE, CHEF_SERVER, BASTION:
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	} else {
+	default:
 		sv.logger.Error("The Query parameter is not supported")
-		return nil, errors.New("The query " + query + " is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server")
+		return nil, errors.New("The query " + query + " is not supported. The Supported query's are: postgres, opensearch, bastion, automate, chef-server")
 	}
 
 	for i := 0; i < len(cmdArray); i++ {
@@ -73,19 +74,23 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 		if !checkResponse.Passed {
 			serviceResponse.Passed = false
 		}
-		serviceResponseArray = append(serviceResponseArray, *checkResponse)
+		serviceResponseArray = append(serviceResponseArray, checkResponse)
 	}
 	osResponse, err := sv.checkOsVersion(sv.osFilepath)
 	if err != nil {
-		sv.logger.Error("Error while getting the OS Version = ", err)
+		sv.logger.Error("Error while getting the OS Version: ", osResponse.ErrorMsg)
 	}
 	if !osResponse.Passed {
 		serviceResponse.Passed = false
 	}
-	serviceResponseArray = append(serviceResponseArray, *osResponse)
-	serviceResponse.Checks = serviceResponseArray
-	sv.logger.Debug("The Passed value for the response = ", serviceResponse.Passed)
-	sv.logger.Debug("The Checks array for the response = ", serviceResponse.Checks)
+	serviceResponseArray = append(serviceResponseArray, osResponse)
+	checks := make([]models.Checks, len(serviceResponseArray))
+	for i, svcResp := range serviceResponseArray {
+		checks[i] = *svcResp
+	}
+	serviceResponse.Checks = checks
+	sv.logger.Debug("The Passed value for the response: ", serviceResponse.Passed)
+	sv.logger.Debug("The Checks array for the response: ", serviceResponse.Checks)
 	return &models.SoftwareVersionDetails{
 		Passed: serviceResponse.Passed,
 		Checks: serviceResponse.Checks,
@@ -94,8 +99,8 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 
 func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Checks {
 	_, err := fiberutils.CheckPath(cmdName)
-	sv.logger.Error("The errror which checking cammand file path = ",err)
 	if err != nil {
+		sv.logger.Error("The errror which checking cammand file path: ", err)
 		return &models.Checks{
 			Title:         cmdName + AVAILABILITY,
 			Passed:        false,
@@ -124,10 +129,8 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 	}
 	checkResponse := models.Checks{}
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
-	sv.logger.Debug("Got the OS Version = ", osVersion)
-	sv.logger.Debug("Got the OS Name = ", osName)
 	if err != nil {
-		sv.logger.Error("Enable to get OS Version as file on path doesnot exit = ", err)
+		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
 		return &models.Checks{
 			Title:         LINUX_VERSION_CHECK,
 			Passed:        false,
@@ -136,8 +139,10 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 			ResolutionMsg: "Please run system on the supported platforms.",
 		}, nil
 	}
+	sv.logger.Debug("Got the OS Version: ", osVersion)
+	sv.logger.Debug("Got the OS Name: ", osName)
 	for key := range osVersions {
-		if strings.Contains(osName, key) {
+		if strings.Contains(strings.ToLower(osName), strings.ToLower(key)) {
 			correctVersion := sv.checkOs(osVersions, osVersion, key)
 			if correctVersion {
 				checkResponse = models.Checks{
@@ -171,7 +176,8 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 
 func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVersion string, osName string) bool {
 	correctVersion := false
-	if osName == UBUNTU {
+	switch osName {
+	case UBUNTU:
 		split := strings.Split(osVersion, ".")
 		checkVersion := split[0] + "." + split[1]
 		re := regexp.MustCompile(checkVersion)
@@ -182,19 +188,19 @@ func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVers
 				break
 			}
 		}
-	} else if osName == DEBIAN {
+	case RED_HAT:
+		checkVersion, _ := strconv.ParseFloat(osVersion, 64)
+		if checkVersion >= RED_HAT_SUPPORTED_VERSION {
+			correctVersion = true
+		}
+	case DEBIAN:
 		for _, str := range osVersions[osName] {
 			if str == osVersion {
 				correctVersion = true
 				break
 			}
 		}
-	} else if osName == RED_HAT {
-		checkVersion, _ := strconv.ParseFloat(osVersion, 64)
-		if checkVersion >= RED_HAT_SUPPORTED_VERSION {
-			correctVersion = true
-		}
-	} else {
+	default:
 		if osVersions[osName][0] == osVersion {
 			correctVersion = true
 		}
