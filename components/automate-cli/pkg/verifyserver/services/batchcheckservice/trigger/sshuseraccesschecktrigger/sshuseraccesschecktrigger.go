@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
@@ -59,9 +60,9 @@ func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, nodeType 
 	var checkResp models.CheckTriggerResponse
 	resp, err := ss.TriggerSshUserAccessCheck(body)
 	if err != nil {
-		checkResp = configutils.PrepareTriggerResponse(nil, host, nodeType, err.Error(), constants.SSH_USER, constants.SSH_USER_MSG, true)
+		checkResp = checkutils.PrepareTriggerResponse(nil, host, nodeType, err.Error(), constants.SSH_USER, constants.SSH_USER_MSG, true)
 	} else {
-		checkResp = configutils.PrepareTriggerResponse(resp, host, nodeType, "", constants.SSH_USER, constants.SSH_USER_MSG, false)
+		checkResp = checkutils.PrepareTriggerResponse(resp, host, nodeType, "", constants.SSH_USER, constants.SSH_USER_MSG, false)
 	}
 	output <- checkResp
 
