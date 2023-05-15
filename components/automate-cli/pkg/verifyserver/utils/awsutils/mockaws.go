@@ -7,21 +7,18 @@ import (
 )
 
 type MockAwsUtils struct {
-	NewSessionWithOptionsFunc func(endpoint, accessKey, secretKey string) (*session.Session, error)
-	ListBucketsFunc           func(s3Client *s3.S3) (*s3.ListBucketsOutput, error)
+	NewSessionWithOptionsFunc func(endpoint, accessKey, secretKey, region string) (*session.Session, error)
 	DeleteObjectFunc          func(s3Client *s3.S3, BucketName, BasePath string) (*s3.DeleteObjectOutput, error)
 	ListObjectsV2Func         func(s3Client *s3.S3, BucketName, BasePath string) (*s3.ListObjectsV2Output, error)
 	NewUploaderFunc           func(sess *session.Session, BucketName, BasePath string) (*s3manager.UploadOutput, error)
 	NewFunc                   func(sess *session.Session) *s3.S3
 }
 
-func (mau *MockAwsUtils) NewSessionWithOptions(endpoint, accessKey, secretKey string) (*session.Session, error) {
-	return mau.NewSessionWithOptionsFunc(endpoint, accessKey, secretKey)
+func (mau *MockAwsUtils) NewSessionWithOptions(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
+	return mau.NewSessionWithOptionsFunc(endpoint, accessKey, secretKey, region)
 }
 
-func (mau *MockAwsUtils) ListBuckets(s3Client *s3.S3) (*s3.ListBucketsOutput, error) {
-	return mau.ListBucketsFunc(s3Client)
-}
+
 
 func (mau *MockAwsUtils) DeleteObject(s3Client *s3.S3, BucketName, BasePath string) (*s3.DeleteObjectOutput, error) {
 	return mau.DeleteObjectFunc(s3Client, BucketName, BasePath)

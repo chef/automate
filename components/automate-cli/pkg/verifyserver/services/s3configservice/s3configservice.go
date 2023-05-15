@@ -45,7 +45,7 @@ func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
 	s3Client := ss.AwsUtils.New(sess)
-	err = ss.ListBuckets(s3Client)
+	err = ss.ListObjects(s3Client)
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
@@ -83,24 +83,13 @@ func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.
 }
 
 func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
-	sess, err := ss.AwsUtils.NewSessionWithOptions(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey)
+	sess, err := ss.AwsUtils.NewSessionWithOptions(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
 	if err != nil {
 		ss.Logger.Error("s3 config aws connection failed: ", err.Error())
 		return nil, err
 	}
 	ss.Logger.Info("s3 config aws connection success")
 	return sess, nil
-}
-
-func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
-	// list buckets in s3 to verify secrete and access key
-	_, err := ss.AwsUtils.ListBuckets(s3Client)
-	if err != nil {
-		ss.Logger.Error("s3 config list bucket failed: ", err.Error())
-		return err
-	}
-	ss.Logger.Info("s3 config list object success")
-	return nil
 }
 
 func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {

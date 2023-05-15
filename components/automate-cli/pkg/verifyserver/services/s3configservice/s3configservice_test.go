@@ -19,10 +19,10 @@ import (
 
 var (
 	s3ConnectionTitle           = "S3 connection test"
-	s3ConnectionErrorMsg        = "Machine is not able to connect with S3 using the provided access key and secret key: RequestError: send request failed\ncaused by: Get \"s3://example-s3.aws.region.com/\": unsupported protocol scheme \"s3\""
+	s3ConnectionErrorMsg        = "Machine is not able to connect with S3 using the provided access key and secret key: RequestError: send request failed\ncaused by: Get \"s3://backups.example-s3.aws.region.com/?list-type=2&prefix=automate\": unsupported protocol scheme \"s3\""
 	s3ConnectionResolutionMsg   = "Provide the correct S3 url or access or secret keys"
 	s3BucketAccessTitle         = "S3 bucket access test"
-	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key: RequestError: send request failed\ncaused by: Put \"s3://example-s3.aws.region.com/backups/automate\": unsupported protocol scheme \"s3\""
+	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key: RequestError: send request failed\ncaused by: Put \"s3://backups.example-s3.aws.region.com/automate\": unsupported protocol scheme \"s3\""
 	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
 	req                         = models.S3ConfigRequest{
 		Endpoint:   "s3://example-s3.aws.region.com",
@@ -42,6 +42,7 @@ func TestGetS3Connection(t *testing.T) {
 		BasePath:   "automate",
 		AccessKey:  "VALID-ACCESS-KEY",
 		SecretKey:  "SECRET-KEY",
+		Region:     "ap-south-1",
 	})
 	assert.Equal(t, &models.S3ServiceCheck{
 		Title:         s3ConnectionTitle,
@@ -61,6 +62,7 @@ func TestGetBucketAccessFailure(t *testing.T) {
 		BasePath:   "automate",
 		AccessKey:  "VALID-ACCESS-KEY",
 		SecretKey:  "SECRET-KEY",
+		Region:     "ap-south-1",
 	})
 	assert.Equal(t, &models.S3ServiceCheck{
 		Title:         s3BucketAccessTitle,
@@ -77,17 +79,6 @@ func TestAwsConnection(t *testing.T) {
 	cs.(*s3configservice.S3ConfigService).Req = &req
 	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
 	assert.NoError(t, err)
-}
-
-func TestListBucketsFailure(t *testing.T) {
-	log, _ := logger.NewLogger("text", "debug")
-	cs := s3configservice.NewS3ConfigService(log, awsutils.NewAwsUtils())
-	cs.(*s3configservice.S3ConfigService).Req = &req
-	sess, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
-	assert.NoError(t, err)
-	s3Client := s3.New(sess)
-	err = cs.(*s3configservice.S3ConfigService).ListBuckets(s3Client)
-	assert.Error(t, err)
 }
 
 func TestUploadObjectFailure(t *testing.T) {
@@ -122,45 +113,10 @@ func TestDeleteObjectsFailure(t *testing.T) {
 	err = cs.(*s3configservice.S3ConfigService).DeleteObjects(s3Client)
 	assert.Error(t, err)
 }
-
-func TestListBucketsSuccess(t *testing.T) {
-	log, _ := logger.NewLogger("text", "debug")
-	cs := s3configservice.NewS3ConfigService(log, &awsutils.MockAwsUtils{
-		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey string) (*session.Session, error) {
-			return &session.Session{}, nil
-		},
-		ListBucketsFunc: func(s3Client *s3.S3) (*s3.ListBucketsOutput, error) {
-			return &s3.ListBucketsOutput{
-				Buckets: []*s3.Bucket{},
-			}, nil
-		},
-		NewFunc: func(sess *session.Session) *s3.S3 {
-			return &s3.S3{
-				Client: client.New(
-					aws.Config{},
-					metadata.ClientInfo{},
-					request.Handlers{},
-				),
-			}
-		},
-	})
-	cs.(*s3configservice.S3ConfigService).Req = &req
-	_, err := cs.(*s3configservice.S3ConfigService).AwsConnection()
-	assert.NoError(t, err)
-	err = cs.(*s3configservice.S3ConfigService).ListBuckets(&s3.S3{
-		Client: client.New(
-			aws.Config{},
-			metadata.ClientInfo{},
-			request.Handlers{},
-		),
-	})
-	assert.NoError(t, err)
-}
-
 func TestUploadObjectSuccess(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, &awsutils.MockAwsUtils{
-		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey string) (*session.Session, error) {
+		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
 			return &session.Session{}, nil
 		},
 		NewUploaderFunc: func(sess *session.Session, BucketName, BasePath string) (*s3manager.UploadOutput, error) {
@@ -186,7 +142,7 @@ func TestUploadObjectSuccess(t *testing.T) {
 func TestListObjectsSuccess(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, &awsutils.MockAwsUtils{
-		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey string) (*session.Session, error) {
+		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
 			return &session.Session{}, nil
 		},
 		ListObjectsV2Func: func(s3Client *s3.S3, BucketName, BasePath string) (*s3.ListObjectsV2Output, error) {
@@ -218,7 +174,7 @@ func TestListObjectsSuccess(t *testing.T) {
 func TestDeleteObjectsSuccess(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	cs := s3configservice.NewS3ConfigService(log, &awsutils.MockAwsUtils{
-		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey string) (*session.Session, error) {
+		NewSessionWithOptionsFunc: func(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
 			return &session.Session{}, nil
 		},
 		DeleteObjectFunc: func(s3Client *s3.S3, BucketName, BasePath string) (*s3.DeleteObjectOutput, error) {
