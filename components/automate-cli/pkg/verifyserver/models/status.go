@@ -9,4 +9,5 @@ type ServiceDetails struct {
 type StatusDetails struct {
 	Status   string            `json:"status"`
 	Services *[]ServiceDetails `json:"services"`
+	Error    string            `json:"error"`
 }

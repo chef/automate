@@ -1,6 +1,7 @@
 package v1_test
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http/httptest"
 	"testing"
@@ -17,8 +18,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockStatusService(httpStatus int) *statusservice.MockStatusService {
-	if httpStatus == 200 {
+func SetupMockStatusService(isError bool) *statusservice.MockStatusService {
+	if !isError {
 		return &statusservice.MockStatusService{
 			GetServicesFunc: func() (*[]models.ServiceDetails, error) {
 				return &[]models.ServiceDetails{
@@ -33,7 +34,7 @@ func SetupMockStatusService(httpStatus int) *statusservice.MockStatusService {
 	} else {
 		return &statusservice.MockStatusService{
 			GetServicesFunc: func() (*[]models.ServiceDetails, error) {
-				return nil, fiber.NewError(fiber.StatusInternalServerError, "Some error occurred")
+				return nil, errors.New("some error occurred")
 			},
 		}
 	}
@@ -65,24 +66,27 @@ func TestStatusAPI(t *testing.T) {
 	tests := []struct {
 		description  string
 		expectedCode int
+		isError      bool
 		expectedBody string
 	}{
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}]}}",
+			isError:      false,
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}],\"error\":\"\"}}",
 		},
 		{
-			description:  "500:InternalServerError status route",
-			expectedCode: 500,
-			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Some error occurred\"}}",
+			description:  "200:with error status route",
+			expectedCode: 200,
+			isError:      true,
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[],\"error\":\"some error occurred\"}}",
 		},
 	}
 	statusEndpoint := "/status"
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-			app, err := SetupDefaultHandlers(SetupMockStatusService(test.expectedCode))
+			app, err := SetupDefaultHandlers(SetupMockStatusService(test.isError))
 			assert.NoError(t, err)
 			req := httptest.NewRequest("GET", statusEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")

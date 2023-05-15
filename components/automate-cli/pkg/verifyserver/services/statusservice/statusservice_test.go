@@ -239,7 +239,7 @@ func TestStatusService(t *testing.T) {
 			},
 			expectedOutput: nil,
 			isError:        true,
-			errorMsg:       "Error getting services from hab svc status",
+			errorMsg:       "error getting services from hab svc status",
 		},
 		{
 			testCaseDescription: "Automate Error",
@@ -251,7 +251,7 @@ func TestStatusService(t *testing.T) {
 			},
 			expectedOutput: nil,
 			isError:        true,
-			errorMsg:       "Error getting services from chef-automate status",
+			errorMsg:       "error getting services from chef-automate status",
 		},
 	}
 
@@ -344,14 +344,14 @@ func TestParseChefAutomateStatus(t *testing.T) {
 			input:               constants.AUTOMATESTATUSONBEERROR,
 			expected:            0,
 			isError:             true,
-			errorMsg:            "No table found in output",
+			errorMsg:            "no table found in output",
 		},
 		{
 			testCaseDescription: "Empty Response",
 			input:               "",
 			expected:            0,
 			isError:             true,
-			errorMsg:            "No table found in output",
+			errorMsg:            "no table found in output",
 		},
 		{
 			testCaseDescription: "A2 Node Unhealthy",
@@ -427,7 +427,7 @@ func TestParseHabSvcStatus(t *testing.T) {
 			input:               "",
 			expected:            0,
 			isError:             true,
-			errorMsg:            "No table found in output",
+			errorMsg:            "no table found in output",
 		},
 	}
 
@@ -476,7 +476,7 @@ func TestGetServicesFromHabSvcStatus(t *testing.T) {
 			},
 			expected: 0,
 			isError:  true,
-			errorMsg: "Error getting services from hab svc status",
+			errorMsg: "error getting services from hab svc status",
 		},
 	}
 
@@ -536,7 +536,7 @@ func TestGetServicesFromAutomateStatus(t *testing.T) {
 			},
 			expected: 0,
 			isError:  true,
-			errorMsg: "Error getting services from chef-automate status",
+			errorMsg: "error getting services from chef-automate status",
 		},
 	}
 
