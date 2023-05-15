@@ -15,18 +15,24 @@ const (
 	DEFAULT_TIMEZONE       = "UTC"
 )
 
-func GetLogConfig(log logger.Logger) (lc middleware.LoggerConfig) {
+func CfgLogTimeZone() string {
 	timeZone := DEFAULT_TIMEZONE
+	if loc, err := time.LoadLocation(DEFAULT_TIMEZONE); err == nil {
+		time.Local = loc
+	}
 	envTimeZone := os.Getenv(VERIFY_SERVER_TIMEZONE)
 	if envTimeZone != "" {
-		if _, err := time.LoadLocation(envTimeZone); err == nil {
+		if loc, err := time.LoadLocation(envTimeZone); err == nil {
 			timeZone = envTimeZone
+			time.Local = loc
 		}
 	}
-	log.Info("Using TimeZone: " + timeZone)
+	return timeZone
+}
+
+func GetLogConfig(log logger.Logger) (lc middleware.LoggerConfig) {
 	lc = middleware.LoggerConfig{
 		TimeFormat: time.RFC3339,
-		TimeZone:   timeZone,
 	}
 	if log.NewEntry().Logger.GetLevel() <= logrus.DebugLevel {
 		lc.Format = generateLogFormat(

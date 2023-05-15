@@ -6,14 +6,12 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSystemdCreateUtils(t *testing.T) {
+func TestLogUtils(t *testing.T) {
 	l, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
-	cw := majorupgrade_utils.NewCustomWriter()
 
 	t.Run("It should create the debug format in case of debug level", func(t *testing.T) {
 		lc := fiberutils.GetLogConfig(l)
@@ -32,22 +30,17 @@ func TestSystemdCreateUtils(t *testing.T) {
 			"  ${green}${bytesSent}${reset}  |  \n")
 	})
 	t.Run("It should print the selected timezone", func(t *testing.T) {
-		l, err := logger.NewLoggerWithOut("text", "debug", cw.CliWriter)
-		assert.NoError(t, err)
-		fiberutils.GetLogConfig(l)
-		assert.Contains(t, cw.Output(), "Using TimeZone: UTC")
+		assert.Equal(t, "UTC", fiberutils.CfgLogTimeZone())
 	})
 	t.Run("It should use UTC if timezone format is incorrect", func(t *testing.T) {
 		os.Setenv(fiberutils.VERIFY_SERVER_TIMEZONE, "GAMU")
 		defer os.Unsetenv(fiberutils.VERIFY_SERVER_TIMEZONE)
-		lc := fiberutils.GetLogConfig(l)
-		assert.Contains(t, lc.TimeZone, fiberutils.DEFAULT_TIMEZONE)
+		assert.Equal(t, fiberutils.DEFAULT_TIMEZONE, fiberutils.CfgLogTimeZone())
 	})
 	t.Run("It should use timezone provided its correct", func(t *testing.T) {
 		testTimeZone := "America/New_York"
 		os.Setenv(fiberutils.VERIFY_SERVER_TIMEZONE, testTimeZone)
 		defer os.Unsetenv(fiberutils.VERIFY_SERVER_TIMEZONE)
-		lc := fiberutils.GetLogConfig(l)
-		assert.Contains(t, lc.TimeZone, testTimeZone)
+		assert.Equal(t, testTimeZone, fiberutils.CfgLogTimeZone())
 	})
 }

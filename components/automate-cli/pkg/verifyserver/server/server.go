@@ -1,8 +1,10 @@
 package server
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"strings"
+	"time"
+
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 
 	"github.com/ansrivas/fiberprometheus"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -14,6 +16,7 @@ import (
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -39,6 +42,14 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	l.NewEntry().Logger.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: time.RFC3339,
+		FullTimestamp:   true,
+	})
+
+	l.Info("Using TimeZone: " + fiberutils.CfgLogTimeZone())
+
 	fconf := &fiber.Settings{
 		ServerHeader: SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
