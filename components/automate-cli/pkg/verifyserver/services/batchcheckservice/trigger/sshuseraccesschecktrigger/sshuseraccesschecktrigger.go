@@ -35,34 +35,16 @@ func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerRes
 	outputCh := make(chan models.CheckTriggerResponse, count)
 
 	var finalResult []models.CheckTriggerResponse
+	hostMap := configutils.GetNodeTypeMap(config)
+	for ip, types := range hostMap {
+		for i := 0; i < len(types); i++ {
+			var requestBody map[string]interface{}
+			data, _ := json.Marshal(config.SSHUser)
+			json.Unmarshal(data, &requestBody)
+			requestBody[ip] = ip
+			go ss.TriggerCheckAndFormatOutput(ip, types[i], requestBody, outputCh)
+		}
 
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		var requestBody map[string]interface{}
-		data, _ := json.Marshal(config.SSHUser)
-		json.Unmarshal(data, &requestBody)
-		requestBody[ip] = ip
-		go ss.TriggerCheckAndFormatOutput(ip, constants.AUTOMATE, requestBody, outputCh)
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		var requestBody map[string]interface{}
-		data, _ := json.Marshal(config.SSHUser)
-		json.Unmarshal(data, &requestBody)
-		requestBody[ip] = ip
-		go ss.TriggerCheckAndFormatOutput(ip, constants.CHEF_INFRA_SERVER, requestBody, outputCh)
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		var requestBody map[string]interface{}
-		data, _ := json.Marshal(config.SSHUser)
-		json.Unmarshal(data, &requestBody)
-		requestBody[ip] = ip
-		go ss.TriggerCheckAndFormatOutput(ip, constants.POSTGRESQL, requestBody, outputCh)
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		var requestBody map[string]interface{}
-		data, _ := json.Marshal(config.SSHUser)
-		json.Unmarshal(data, &requestBody)
-		requestBody[ip] = ip
-		go ss.TriggerCheckAndFormatOutput(ip, constants.OPENSEARCH, requestBody, outputCh)
 	}
 
 	for i := 0; i < count; i++ {
