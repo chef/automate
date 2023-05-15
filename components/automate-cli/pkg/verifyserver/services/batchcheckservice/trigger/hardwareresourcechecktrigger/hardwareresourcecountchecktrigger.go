@@ -10,6 +10,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 )
@@ -30,50 +31,50 @@ func NewHardwareResourceCountCheck(log logger.Logger, port string) *HardwareReso
 
 func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Hardware Resource count check from batch check ")
+	return trigger.RunCheck(config, ss.log, ss.port, constants.HARDWARE_RESOURCE_CHECK_API_PATH, "", http.MethodPost, config.Hardware)
+	// var finalResult []models.CheckTriggerResponse
 
-	var finalResult []models.CheckTriggerResponse
+	// resp, err := ss.TriggerHardwareResourceCountCheck(config.Hardware)
 
-	resp, err := ss.TriggerHardwareResourceCountCheck(config.Hardware)
-
-	// In case of error, send the slice of checkTriggerResponse
-	// for each and every IP to make the processing simple at the caller end
-	if err != nil {
-		for _, ip := range config.Hardware.AutomateNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.AUTOMATE, err.Error())
-		}
-		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.CHEF_INFRA_SERVER, err.Error())
-		}
-		for _, ip := range config.Hardware.PostgresqlNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.POSTGRESQL, err.Error())
-		}
-		for _, ip := range config.Hardware.OpenSearchNodeIps {
-			finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.OPENSEARCH, err.Error())
-		}
-		return finalResult
-	}
-	// send the success response
-	for _, result := range resp.Result {
-		isPassed := true
-		for _, check := range result.Checks {
-			if !check.Passed {
-				isPassed = false
-			}
-		}
-		finalResult = append(finalResult,
-			models.CheckTriggerResponse{
-				Status: resp.Status,
-				Result: models.ApiResult{
-					Check:   constants.HARDWARE_RESOURCE_COUNT,
-					Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
-					Checks:  result.Checks,
-					Passed:  isPassed,
-				},
-				NodeType: result.NodeType,
-				Host:     result.IP,
-			})
-	}
-	return finalResult
+	// // In case of error, send the slice of checkTriggerResponse
+	// // for each and every IP to make the processing simple at the caller end
+	// if err != nil {
+	// 	for _, ip := range config.Hardware.AutomateNodeIps {
+	// 		finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.AUTOMATE, err.Error())
+	// 	}
+	// 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+	// 		finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.CHEF_INFRA_SERVER, err.Error())
+	// 	}
+	// 	for _, ip := range config.Hardware.PostgresqlNodeIps {
+	// 		finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.POSTGRESQL, err.Error())
+	// 	}
+	// 	for _, ip := range config.Hardware.OpenSearchNodeIps {
+	// 		finalResult = prepareErrorTriggerResponse(finalResult, ip, constants.OPENSEARCH, err.Error())
+	// 	}
+	// 	return finalResult
+	// }
+	// // send the success response
+	// for _, result := range resp.Result {
+	// 	isPassed := true
+	// 	for _, check := range result.Checks {
+	// 		if !check.Passed {
+	// 			isPassed = false
+	// 		}
+	// 	}
+	// 	finalResult = append(finalResult,
+	// 		models.CheckTriggerResponse{
+	// 			Status: resp.Status,
+	// 			Result: models.ApiResult{
+	// 				Check:   constants.HARDWARE_RESOURCE_COUNT,
+	// 				Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
+	// 				Checks:  result.Checks,
+	// 				Passed:  isPassed,
+	// 			},
+	// 			NodeType: result.NodeType,
+	// 			Host:     result.IP,
+	// 		})
+	// }
+	// return finalResult
 }
 
 // TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response

@@ -91,11 +91,13 @@ type CheckTriggerResponse struct {
 	CheckType string       `json:"check_type"`
 }
 type ApiResult struct {
-	Passed  bool         `json:"passed"`
-	Message string       `json:"msg"`
-	Check   string       `json:"check"`
-	Checks  []Checks     `json:"checks"`
-	Error   *fiber.Error `json:"error,omitempty"`
+	Passed   bool         `json:"passed"`
+	Message  string       `json:"msg"`
+	Check    string       `json:"check"`
+	Checks   []Checks     `json:"checks"`
+	Error    *fiber.Error `json:"error,omitempty"`
+	NodeType string       `json:"node_type"`
+	IP       string       `json:"ip"`
 }
 
 type Checks struct {

@@ -1,8 +1,10 @@
 package trigger
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -13,7 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
+func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
 		config.Hardware.ChefInfraServerNodeCount +
@@ -22,28 +24,36 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 
 	outputCh := make(chan models.CheckTriggerResponse)
 
+	if path == constants.HARDWARE_RESOURCE_CHECK_API_PATH {
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", method, outputCh, reqBody)
+
+		res := <-outputCh
+		result = append(result, res)
+		return result
+	}
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
-		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, outputCh)
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", method, outputCh, reqBody)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, constants.AUTOMATE, depState)
-		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, outputCh)
+		endpoint := prepareEndpoint(path, ip, port, "automate", depState)
+		go triggerCheckAPI(endpoint, ip, "automate", method, outputCh, reqBody)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, constants.CHEF_INFRA_SERVER, depState)
-		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, outputCh)
+		endpoint := prepareEndpoint(path, ip, port, "chef-infra-server", depState)
+		go triggerCheckAPI(endpoint, ip, "chef-infra-server", method, outputCh, reqBody)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, constants.OPENSEARCH, depState)
-		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, outputCh)
+		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
+		go triggerCheckAPI(endpoint, ip, "opensearch", method, outputCh, reqBody)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, constants.POSTGRESQL, depState)
-		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, outputCh)
+		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
+		go triggerCheckAPI(endpoint, ip, "postgresql", method, outputCh, reqBody)
 	}
 
 	for i := 0; i < count; i++ {
@@ -64,17 +74,31 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
 
-	} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
+	} else {
 		endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
 	}
-
 	return endPoint
 }
 
-func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.CheckTriggerResponse) {
+// triggerCheckAPI prepares interface request body to io.Reader and triggers the API where where response and error is passed into
+// the output channel and func exits
+func triggerCheckAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody interface{}) {
 	var ctr models.CheckTriggerResponse
 
-	req, err := http.NewRequest(http.MethodGet, endPoint, nil)
+	reader, err := interfaceToIOReader(reqBody)
+	if err != nil {
+		output <- models.CheckTriggerResponse{
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
+			},
+			Host:     host,
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	req, err := http.NewRequest(method, endPoint, reader)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host: host,
@@ -132,4 +156,18 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 	ctr.Host = host
 	ctr.NodeType = nodeType
 	output <- ctr
+}
+
+func interfaceToIOReader(body interface{}) (io.Reader, error) {
+	var reader io.Reader
+	if body != nil {
+		bx, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		reader = bytes.NewBuffer(bx)
+
+	}
+	return reader, nil
 }

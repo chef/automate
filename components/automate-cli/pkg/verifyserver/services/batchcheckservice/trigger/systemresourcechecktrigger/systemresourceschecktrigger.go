@@ -1,6 +1,8 @@
 package systemresourcechecktrigger
 
 import (
+	"net/http"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
@@ -20,5 +22,5 @@ func NewSystemResourceCheck(log logger.Logger, port string) *SystemResourceCheck
 }
 
 func (src *SystemResourceCheck) Run(config models.Config) []models.CheckTriggerResponse {
-	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, config.DeploymentState)
+	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, config.DeploymentState, http.MethodGet, nil)
 }

@@ -1,6 +1,8 @@
 package softwareversionchecktrigger
 
 import (
+	"net/http"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
@@ -20,5 +22,5 @@ func NewSoftwareVersionCheck(log logger.Logger, port string) *SoftwareVersionChe
 }
 
 func (svc *SoftwareVersionCheck) Run(config models.Config) []models.CheckTriggerResponse {
-	return trigger.RunCheck(config, svc.log, svc.port, constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
+	return trigger.RunCheck(config, svc.log, svc.port, constants.SOFTWARE_VERSION_CHECK_API_PATH, "", http.MethodGet, nil)
 }

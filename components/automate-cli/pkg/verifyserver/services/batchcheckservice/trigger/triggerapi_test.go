@@ -2,6 +2,7 @@ package trigger
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -161,6 +162,148 @@ const (
 			]
 		}
 	}`
+
+	hardwareCheckResp = `{
+		"status": "SUCCESS",
+		"result": [
+			{
+				"ip": "172.154.0.1",
+				"node_type": "automate",
+				"checks": [
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is unique",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is of valid format",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "Not shared with backend nodes",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
+						"error_msg": "",
+						"resolution_msg": ""
+					}
+				]
+			},
+			{
+				"ip": "172.154.0.3",
+				"node_type": "chef-infra-server",
+				"checks": [
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is unique",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is of valid format",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "Not shared with backend nodes",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
+						"error_msg": "",
+						"resolution_msg": ""
+					}
+				]
+			},
+			{
+				"ip": "172.154.0.5",
+				"node_type": "postgresql",
+				"checks": [
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is unique",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is of valid format",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "Not shared with backend nodes",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
+						"error_msg": "",
+						"resolution_msg": ""
+					}
+				]
+			},
+			{
+				"ip": "172.154.0.8",
+				"node_type": "opensearch",
+				"checks": [
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is unique",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "IP address is of valid format",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "Not shared with backend nodes",
+						"error_msg": "",
+						"resolution_msg": ""
+					},
+					{
+						"title": "IP address",
+						"passed": true,
+						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
+						"error_msg": "",
+						"resolution_msg": ""
+					}
+				]
+			}
+		]
+	}`
 )
 
 func TestTriggerCheckAPI(t *testing.T) {
@@ -169,8 +312,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Define the response based on the test case
 			w.WriteHeader(http.StatusOK)
-			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
-			require.NoError(t, err)
+			w.Write([]byte(softwareVersionResp))
 		}))
 		defer server.Close()
 
@@ -182,11 +324,14 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Wait for the response
 		response := <-output
 		// Assert the expected response
+		bx, _ := json.MarshalIndent(response, "", "\t")
+		ioutil.WriteFile("results.json", bx, 077)
+
 		require.NotNil(t, response)
 		require.Equal(t, "success", response.Status)
 		require.Equal(t, "API result message", response.Result.Message)
 		require.Equal(t, "API check", response.Result.Check)
-		require.Equal(t, "automate", response.NodeType)
+		require.Equal(t, "automate", response.Result.NodeType)
 		require.True(t, response.Result.Passed)
 	})
 	t.Run("Endpoint not reachable", func(t *testing.T) {
@@ -288,7 +433,7 @@ func Test_RunCheck(t *testing.T) {
 
 		// Call the function being tested
 
-		result := RunCheck(config, log, port, path, "")
+		result := RunCheck(config, log, port, path, "", http.MethodGet, nil)
 		require.Equal(t, 2, len(result))
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
@@ -313,7 +458,7 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState)
+		result := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 2)
@@ -340,7 +485,7 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		results := RunCheck(config, log, port, path, depState)
+		results := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
 		for _, result := range results {
 			if result.NodeType == constants.BASTION {
 				require.Equal(t, "PASSED", result.Status)
@@ -503,12 +648,35 @@ func Test_RunCheck(t *testing.T) {
 		path := constants.SYSTEM_USER_CHECK_API_PATH
 		depState := ""
 		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState)
+		result := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
 		require.Len(t, result, 1)
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 3)
 		require.Equal(t, result[0].Status, "SUCCESS")
+	})
+
+	t.Run("Hardware Resource Check", func(t *testing.T) {
+		// Create a dummy server
+		server, _, port := createDummyServer()
+		defer server.Close()
+
+		tempConfig := GetHardwareReqJson()
+		// Test data
+		config := models.Config{
+			SSHUser:  tempConfig.SSHUser,
+			Hardware: tempConfig.Hardware,
+		}
+		log := logger.NewLogrusStandardLogger()
+
+		path := constants.HARDWARE_RESOURCE_CHECK_API_PATH
+		depState := ""
+		// Call the function being tested
+		result := RunCheck(config, log, port, path, depState, http.MethodPost, config.Hardware)
+		require.Len(t, result, 1)
+		require.NotNil(t, result)
+		// require.Equal(t, result[0].Status, "SUCCESS")
+		// require.Len(t, 4, result[0].)
 	})
 }
 
@@ -547,6 +715,11 @@ func createDummyServer() (*httptest.Server, string, string) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(systemUser))
 		}
+
+		if r.URL.Path == constants.HARDWARE_RESOURCE_CHECK_API_PATH {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(hardwareCheckResp))
+		}
 	}))
 
 	// Extract IP and port from the server's URL
@@ -555,4 +728,69 @@ func createDummyServer() (*httptest.Server, string, string) {
 	ip := address[:colonIndex]
 	port := address[colonIndex+1:]
 	return server, ip, port
+}
+
+func Test_interfaceToIOReader(t *testing.T) {
+	t.Run("Null Response", func(t *testing.T) {
+		reader, err := interfaceToIOReader(nil)
+		require.NoError(t, err)
+		require.Nil(t, reader)
+	})
+
+	t.Run("Cannot marshal rquest body", func(t *testing.T) {
+		reqBody := make(chan string)
+		reader, err := interfaceToIOReader(reqBody)
+		require.Error(t, err)
+		require.Equal(t, "json: unsupported type: chan string", err.Error())
+		require.Nil(t, reader)
+	})
+
+	t.Run("Get the io.Reader", func(t *testing.T) {
+		reqBody := models.Config{
+			Hardware: models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{"127.0.0.1"},
+			},
+		}
+		reader, err := interfaceToIOReader(reqBody)
+		require.NoError(t, err)
+		require.NotNil(t, reader)
+	})
+}
+
+func GetHardwareReqJson() models.Config {
+	ipConfig := models.Config{}
+
+	json.Unmarshal([]byte(`{
+		  "ssh_user": {
+			"user_name": "ubuntu",
+			"private_key": "test_key",
+			"sudo_password": "test@123"
+		  },
+		  "arch": "existing_nodes",
+		  "backup": {
+			"file_system": {
+			  "mount_location": "/mnt/automate_backups"
+			}
+		  },
+		  "hardware": {
+			"automate_node_count": 1,
+			"automate_node_ips": [
+			  "1.2.3.4"
+			],
+			"chef_infra_server_node_count": 1,
+			"chef_infra_server_node_ips": [
+			  "5.6.7.8"
+			],
+			"postgresql_node_count": 1,
+			"postgresql_node_ips": [
+			  "9.10.11.12"
+			],
+			"opensearch_node_count": 1,
+			"opensearch_node_ips": [
+			  "14.15.16.17"
+			]
+		  }
+		}`), &ipConfig)
+	return ipConfig
 }
