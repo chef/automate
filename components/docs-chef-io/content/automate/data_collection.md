@@ -79,7 +79,7 @@ In order to have Chef Infra Server send run data from connected Chef Infra Clien
 
 ### Setting Up Data Collection on Chef Infra Server Deployed with the Chef Automate Installer
 
-This step sets up data collection from a standalone Chef Infra Server deployed with the Chef Automate Installer to a separate Chef Automate server.
+This step sets up data collection from an embedded Chef Infra Server deployed with the Chef Automate Installer to a separate Chef Automate server.
 
 Open the `config.toml` file and include the external automate configuration settings:
 
@@ -103,7 +103,7 @@ Then, run `chef-automate config patch config.toml`.
 
 ### Setting Up Data Collection on Chef Infra Server Versions 12.14 and Higher
 
-Instead of setting the token directly in `/etc/opscode/chef-server.rb` as was done in older versions of the Chef Infra Server, we'll use the `set-secret` command, so that your API token does not live in
+On a standalone Chef Infra Server install, instead of setting the token directly in `/etc/opscode/chef-server.rb` as was done in older versions of the Chef Infra Server, we'll use the `set-secret` command, so that your API token does not live in
 plaintext in a file:
 
 ```shell
