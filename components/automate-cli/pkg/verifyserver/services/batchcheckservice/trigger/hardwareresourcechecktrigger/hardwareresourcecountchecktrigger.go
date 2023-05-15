@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
@@ -36,18 +37,13 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 
 	// In case of error, send the slice of checkTriggerResponse
 	// for each and every IP to make the processing simple at the caller end
+
 	if err != nil {
-		for _, ip := range config.Hardware.AutomateNodeIps {
-			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.AUTOMATE, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
-		}
-		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.CHEF_INFRA_SERVER, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
-		}
-		for _, ip := range config.Hardware.PostgresqlNodeIps {
-			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.POSTGRESQL, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
-		}
-		for _, ip := range config.Hardware.OpenSearchNodeIps {
-			finalResult = append(finalResult, configutils.PrepareTriggerResponse(nil, ip, constants.OPENSEARCH, err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
+		hostMap := configutils.GetNodeTypeMap(config)
+		for ip, types := range hostMap {
+			for i := 0; i < len(types); i++ {
+				finalResult = append(finalResult, checkutils.PrepareTriggerResponse(nil, ip, types[i], err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
+			}
 		}
 		return finalResult
 	}
@@ -60,7 +56,7 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 					Check:   constants.HARDWARE_RESOURCE_COUNT,
 					Message: constants.HARDWARE_RESOURCE_COUNT_MSG,
 					Checks:  result.Checks,
-					Passed:  configutils.IsPassed(result.Checks),
+					Passed:  checkutils.IsPassed(result.Checks),
 				},
 				NodeType: result.NodeType,
 				Host:     result.IP,
