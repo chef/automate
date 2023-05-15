@@ -2,7 +2,6 @@ package trigger
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -66,7 +65,7 @@ const (
 	}`
 
 	pgResourceCheck = `{
-		"status": "SUCCESS",
+		"status": "PASSED",
 		"result": {
 			"passed": true,
 			"checks": [
@@ -79,6 +78,52 @@ const (
 				},
 				{
 					"title": "PG CPU speed check",
+					"passed": true,
+					"success_msg": "CPU speed should be >= 2Ghz",
+					"error_msg": "",
+					"resolution_msg": ""
+				}
+			]
+		}
+	}`
+
+	automateResourceCheck = `{
+		"status": "PASSED",
+		"result": {
+			"passed": true,
+			"checks": [
+				{
+					"title": "Automate CPU count check",
+					"passed": true,
+					"success_msg": "CPU count is >= 4",
+					"error_msg": "",
+					"resolution_msg": ""
+				},
+				{
+					"title": "Automate CPU speed check",
+					"passed": true,
+					"success_msg": "CPU speed should be >= 2Ghz",
+					"error_msg": "",
+					"resolution_msg": ""
+				}
+			]
+		}
+	}`
+
+	bastionResourceCheck = `{
+		"status": "PASSED",
+		"result": {
+			"passed": true,
+			"checks": [
+				{
+					"title": "Bastion CPU count check",
+					"passed": true,
+					"success_msg": "CPU count is >= 4",
+					"error_msg": "",
+					"resolution_msg": ""
+				},
+				{
+					"title": "Bastion CPU speed check",
 					"passed": true,
 					"success_msg": "CPU speed should be >= 2Ghz",
 					"error_msg": "",
@@ -133,13 +178,17 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, output)
+		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, "automate", output)
 
 		// Wait for the response
 		response := <-output
-		fmt.Printf("response: %+v\n", response)
 		// Assert the expected response
 		require.NotNil(t, response)
+		require.Equal(t, "success", response.Status)
+		require.Equal(t, "API result message", response.Result.Message)
+		require.Equal(t, "API check", response.Result.Check)
+		require.Equal(t, "automate", response.NodeType)
+		require.True(t, response.Result.Passed)
 	})
 	t.Run("Endpoint not reachable", func(t *testing.T) {
 		endPoint := "http://nonexistent-api.com"
@@ -147,7 +196,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, output)
+		go triggerCheckAPI(endPoint, host, "postgresql", output)
 
 		// Wait for the response
 		response := <-output
@@ -156,6 +205,8 @@ func TestTriggerCheckAPI(t *testing.T) {
 		require.NotNil(t, response.Error)
 		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
 		assert.Equal(t, `error while connecting to the endpoint:Get "http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com: no such host`, response.Error.Message)
+		require.Equal(t, "postgresql", response.NodeType)
+
 	})
 	t.Run("Non-OK status code", func(t *testing.T) {
 		// Create a test server to mock the API endpoint
@@ -168,7 +219,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, output)
+		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, "automate", output)
 
 		// Wait for the response
 		response := <-output
@@ -191,7 +242,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, output)
+		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, "automate", output)
 
 		// Wait for the response
 		response := <-output
@@ -208,11 +259,10 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, output)
+		go triggerCheckAPI(endPoint, host, "automate", output)
 
 		// Wait for the response
 		response := <-output
-		fmt.Printf("response: %+v\n", response.Error.Message)
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
 		require.Equal(t, http.StatusNotFound, response.Error.Code)
@@ -239,7 +289,9 @@ func Test_RunCheck(t *testing.T) {
 		path := constants.SOFTWARE_VERSION_CHECK_API_PATH
 
 		// Call the function being tested
+
 		result := RunCheck(config, log, port, path, "")
+		require.Equal(t, 2, len(result))
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 2)
@@ -267,7 +319,7 @@ func Test_RunCheck(t *testing.T) {
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 2)
-		require.Equal(t, result[0].Status, "SUCCESS")
+		require.Equal(t, result[0].Status, "PASSED")
 	})
 
 	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
@@ -290,17 +342,67 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState)
-		fmt.Printf("OS PG result: %+v\n", result)
-		require.Equal(t, 2, len(result))
-		require.NotNil(t, result)
-		require.Nil(t, result[0].Error)
-		require.Len(t, result[0].Result.Checks, 2)
-		require.Equal(t, result[0].Status, "SUCCESS")
-		require.Nil(t, result[1].Error)
-		require.Len(t, result[1].Result.Checks, 2)
-		require.Equal(t, result[1].Status, "SUCCESS")
+		results := RunCheck(config, log, port, path, depState)
+		for _, result := range results {
+			if result.NodeType == "bastion" {
+				require.Equal(t, "PASSED", result.Status)
+				require.Empty(t, result.Result.Message)
+				require.True(t, result.Result.Passed)
 
+				resp1 := result.Result.Checks[0]
+				require.Equal(t, "Bastion CPU count check", resp1.Title)
+				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
+				require.Empty(t, resp1.ResolutionMsg)
+				require.Empty(t, resp1.ErrorMsg)
+				require.True(t, resp1.Passed)
+
+				resp2 := result.Result.Checks[1]
+				require.Equal(t, "Bastion CPU speed check", resp2.Title)
+				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
+				require.Empty(t, resp2.ResolutionMsg)
+				require.Empty(t, resp2.ErrorMsg)
+				require.True(t, resp2.Passed)
+			}
+
+			if result.NodeType == "opensearch" {
+				require.Equal(t, "SUCCESS", result.Status)
+				require.Empty(t, result.Result.Message)
+				require.True(t, result.Result.Passed)
+
+				resp1 := result.Result.Checks[0]
+				require.Equal(t, "OS CPU count check", resp1.Title)
+				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
+				require.Empty(t, resp1.ResolutionMsg)
+				require.Empty(t, resp1.ErrorMsg)
+				require.True(t, resp1.Passed)
+
+				resp2 := result.Result.Checks[1]
+				require.Equal(t, "OS CPU speed check", resp2.Title)
+				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
+				require.Empty(t, resp2.ResolutionMsg)
+				require.Empty(t, resp2.ErrorMsg)
+				require.True(t, resp2.Passed)
+			}
+			if result.NodeType == "postgresql" {
+				require.Equal(t, "PASSED", result.Status)
+				require.Empty(t, result.Result.Message)
+				require.True(t, result.Result.Passed)
+
+				resp1 := result.Result.Checks[0]
+				require.Equal(t, "PG CPU count check", resp1.Title)
+				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
+				require.Empty(t, resp1.ResolutionMsg)
+				require.Empty(t, resp1.ErrorMsg)
+				require.True(t, resp1.Passed)
+
+				resp2 := result.Result.Checks[1]
+				require.Equal(t, "PG CPU speed check", resp2.Title)
+				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
+				require.Empty(t, resp2.ResolutionMsg)
+				require.Empty(t, resp2.ErrorMsg)
+				require.True(t, resp2.Passed)
+			}
+		}
 	})
 
 	t.Run("System User Check", func(t *testing.T) {
@@ -319,7 +421,6 @@ func Test_RunCheck(t *testing.T) {
 
 		path := constants.SYSTEM_USER_CHECK_API_PATH
 		depState := ""
-
 		// Call the function being tested
 		result := RunCheck(config, log, port, path, depState)
 		require.NotNil(t, result)
@@ -344,9 +445,19 @@ func createDummyServer() (*httptest.Server, string, string) {
 			if nodeType == "opensearch" {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(osResourceCheck))
-			} else {
+			}
+			if nodeType == "postgresql" {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(pgResourceCheck))
+			}
+			if nodeType == "bastion" {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(bastionResourceCheck))
+			}
+
+			if nodeType == "automate" {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(automateResourceCheck))
 			}
 		}
 

@@ -22,29 +22,28 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 
 	outputCh := make(chan models.CheckTriggerResponse)
 
-	// TODO:: Run the Check for bastion as well
 	// added one for bastion node
-	//if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
-	//	count = count + 1
-	//	endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-	//	go triggerCheckAPI(endpoint, "127.0.0.1", outputCh)
-	//}
+	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
+		count = count + 1
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", outputCh)
+	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, "automate", depState)
-		go triggerCheckAPI(endpoint, ip, outputCh)
+		go triggerCheckAPI(endpoint, ip, "automate", outputCh)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, "chef-infra-server", depState)
-		go triggerCheckAPI(endpoint, ip, outputCh)
+		go triggerCheckAPI(endpoint, ip, "chef-infra-server", outputCh)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
-		go triggerCheckAPI(endpoint, ip, outputCh)
+		go triggerCheckAPI(endpoint, ip, "opensearch", outputCh)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
-		go triggerCheckAPI(endpoint, ip, outputCh)
+		go triggerCheckAPI(endpoint, ip, "postgresql", outputCh)
 	}
 
 	for i := 0; i < count; i++ {
@@ -72,7 +71,7 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	return endPoint
 }
 
-func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerResponse) {
+func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.CheckTriggerResponse) {
 	var ctr models.CheckTriggerResponse
 
 	req, err := http.NewRequest(http.MethodGet, endPoint, nil)
@@ -83,6 +82,7 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 				Code:    http.StatusInternalServerError,
 				Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
 			},
+			NodeType: nodeType,
 		}
 		return
 	}
@@ -99,6 +99,7 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 				Code:    http.StatusInternalServerError,
 				Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
 			},
+			NodeType: nodeType,
 		}
 		return
 	}
@@ -112,6 +113,7 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 				Code:    resp.StatusCode,
 				Message: "error while connecting to the endpoint, received invalid status code",
 			},
+			NodeType: nodeType,
 		}
 		return
 	}
@@ -123,10 +125,12 @@ func triggerCheckAPI(endPoint, host string, output chan<- models.CheckTriggerRes
 				Code:    http.StatusInternalServerError,
 				Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
 			},
+			NodeType: nodeType,
 		}
 		return
 	}
 
 	ctr.Host = host
+	ctr.NodeType = nodeType
 	output <- ctr
 }
