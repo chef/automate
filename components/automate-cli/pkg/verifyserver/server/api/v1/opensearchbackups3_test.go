@@ -82,6 +82,54 @@ func TestOpensearchS3BackupAPI(t *testing.T) {
 				"aws_role_arn": "arn:to:the:backend:role"
 			  }`,
 			expectedBody: "{\"passed\":true,\"checks\":[{\"title\":\"Create test backup\",\"passed\":true,\"success_msg\":\"OpenSearch is able to create backup to provided S3\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}",
+		}, {
+			description:  "400:Bad Request - Mandatory field set to empty",
+			expectedCode: 400,
+			requestBody: `
+			{
+				"endpoint": "https://maangedos.es.amazonaws.com",
+				"username": "admin",
+				"password": "admin",
+				"s3_bucket": "",
+				"s3_basepath": "path/to/backup",
+				"aws_access_key": "accesskey",
+				"aws_secret_key": "secretkey",
+				"aws_region": "eu-north-1",
+				"aws_role_arn": "arn:to:the:backend:role"
+			  }`,
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Invalid request body for S3 backup check\"}}",
+		}, {
+			description:  "400:Bad Request - Incorrect key name",
+			expectedCode: 400,
+			requestBody: `
+			{
+				"endpoint": "https://maangedos.es.amazonaws.com",
+				"username": "admin",
+				"password": "admin",
+				"s3bucketname": "os-snapshot",
+				"s3_basepath": "path/to/backup",
+				"aws_access_key": "accesskey",
+				"aws_secret_key": "secretkey",
+				"aws_region": "eu-north-1",
+				"aws_role_arn": "arn:to:the:backend:role"
+			  }`,
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Invalid request body for S3 backup check\"}}",
+		}, {
+			description:  "400:Bad Request - Malformed json",
+			expectedCode: 400,
+			requestBody: `
+			{
+				"endpoint": "https://maangedos.es.amazonaws.com",
+				"username": "admin",
+				"password": "admin",
+				"s3_bucket": "os-snapshot",
+				"s3_basepath": "path/to/backup",
+				"aws_access_key": "accesskey",
+				"aws_secret_key": "secretkey",
+				"aws_region": "eu-north-1"
+				"aws_role_arn": "arn:to:the:backend:role"
+			  }`,
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '\\\"' after object key:value pair\"}}",
 		},
 	}
 	osS3BackupEndpoint := "/api/v1/checks/aws-opensearch-s3-bucket-access"
