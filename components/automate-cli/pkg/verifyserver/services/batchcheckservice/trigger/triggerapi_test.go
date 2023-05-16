@@ -319,7 +319,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", http.MethodGet, output, nil)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -331,7 +331,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		require.Equal(t, "success", response.Status)
 		require.Equal(t, "API result message", response.Result.Message)
 		require.Equal(t, "API check", response.Result.Check)
-		require.Equal(t, "automate", response.Result.NodeType)
+		require.Equal(t, "automate", response.NodeType)
 		require.True(t, response.Result.Passed)
 	})
 	t.Run("Endpoint not reachable", func(t *testing.T) {
