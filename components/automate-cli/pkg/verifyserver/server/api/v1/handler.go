@@ -62,6 +62,6 @@ func (h *Handler) AddS3ConfigService(ss s3configservice.IS3Config) *Handler {
 }
 
 func (h *Handler) AddStopMockServerService(sm stopmockserverservice.IStopMockServerService) *Handler {
-	h.StopMockServerService = sm
+	h.StopMockServersService = sm
 	return h
 }

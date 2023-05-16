@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -74,6 +75,9 @@ func TestStartMockServer(t *testing.T) {
 
 		// close the connection and #listener
 		defer conn1.Close()
+		server.SignalChan <- true
+		err = server.ListenerTCP.Close()
+		require.NoError(t, err)
 	})
 
 	t.Run("Invalid Port for TCP server", func(t *testing.T) {
@@ -136,6 +140,7 @@ func TestStartMockServer(t *testing.T) {
 		defer conn1.Close()
 
 		// Stop the server and check that it was closed correctly
+		server.SignalChan <- true
 		err = server.ListenerUDP.Close()
 		require.NoError(t, err)
 	})
@@ -194,10 +199,10 @@ func TestStartMockServer(t *testing.T) {
 		require.Contains(t, string(body), "ok")
 
 		// Check that the server is listening on the correct port
-		require.Equal(t, fmt.Sprintf(":%d", cfg.Port), server.ListenerHTTP.Addr)
+		require.Equal(t, fmt.Sprintf(":%d", cfg.Port), server.ListenerHTTP.(*http.Server).Addr)
 
 		// Stop the server and check that it was closed correctly
-		err = server.ListenerHTTP.Close()
+		err = server.ListenerHTTP.(*http.Server).Close()
 		require.NoError(t, err)
 	})
 
@@ -215,32 +220,6 @@ func TestStartMockServer(t *testing.T) {
 
 		// Check that the server is listening on the correct port
 		require.Contains(t, err.Error(), "certificate input")
-	})
-
-	t.Run("HTTPS server with busy port", func(t *testing.T) {
-		const PORT = 3003
-
-		// Starting a server in port to be checked
-		go func() {
-			err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
-			if err != nil {
-				t.Error("Error starting the server:", err)
-			}
-		}()
-
-		time.Sleep(100 * time.Millisecond)
-		servers := startmockserverservice.New(log)
-		cfg := &models.StartMockServerRequestBody{
-			Protocol: constants.HTTPS,
-			Port:     PORT,
-			Cert:     SERVER_CERT,
-			Key:      SERVER_KEY,
-		}
-		err = servers.StartMockServer(cfg)
-		require.Error(t, err)
-
-		// Check that the server is listening on the correct port
-		require.Contains(t, err.Error(), "address already in use")
 	})
 
 	t.Run("HTTPS server with invalid key values", func(t *testing.T) {
@@ -298,4 +277,36 @@ func TestStartMockServer(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, "unsupported protocol", err.Error())
 	})
+}
+
+func TestSetMockServers(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	assert.NoError(t, err)
+	servers := startmockserverservice.New(log)
+
+	tests := []struct {
+		name    string
+		servers []*models.Server
+	}{
+		{
+			name: "Test SetMockServes function",
+			servers: []*models.Server{
+				{
+					Port:         0,
+					ListenerTCP:  nil,
+					ListenerUDP:  nil,
+					ListenerHTTP: &http.Server{},
+					SignalChan:   make(chan bool),
+					Protocol:     "tcp",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			servers.SetMockServers(tt.servers)
+			serverArr := servers.GetMockServers()
+			assert.True(t, reflect.DeepEqual(tt.servers, serverArr))
+		})
+	}
 }

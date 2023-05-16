@@ -2,7 +2,6 @@ package stopmockserverservice
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -11,9 +10,6 @@ import (
 
 type IStopMockServerService interface {
 	StopMockServer(server *models.Server) error
-	StopTCPServer(server *models.Server) error
-	StopUDPServer(server *models.Server) error
-	StopHTTPSServer(server *models.Server) error
 }
 
 // StopMockServerService provides functionality to stop mock servers.
@@ -45,11 +41,10 @@ func (sm *StopMockServerService) StopMockServer(server *models.Server) error {
 }
 
 func (sm *StopMockServerService) StopTCPServer(server *models.Server) error {
-
+	sm.Logger.Info("Stop TCP server request recieved")
 	server.SignalChan <- true
 	if err := server.ListenerTCP.Close(); err != nil {
-		errString := fmt.Sprintf("Error while stopping TCP server: %v", err.Error())
-		sm.Logger.Error(fmt.Errorf(errString))
+		sm.Logger.Error("Error while stopping TCP server: ", err.Error())
 		return err
 	}
 
@@ -57,11 +52,10 @@ func (sm *StopMockServerService) StopTCPServer(server *models.Server) error {
 }
 
 func (sm *StopMockServerService) StopUDPServer(server *models.Server) error {
-
+	sm.Logger.Info("Stop UDP server request recieved")
 	server.SignalChan <- true
 	if err := server.ListenerUDP.Close(); err != nil {
-		errString := fmt.Sprintf("Error while stopping UDP server: %v", err.Error())
-		sm.Logger.Error(fmt.Errorf(errString))
+		sm.Logger.Error("Error while stopping UDP server: ", err.Error())
 		return err
 	}
 
@@ -69,10 +63,9 @@ func (sm *StopMockServerService) StopUDPServer(server *models.Server) error {
 }
 
 func (sm *StopMockServerService) StopHTTPSServer(server *models.Server) error {
-
+	sm.Logger.Info("Stop HTTPS server request recieved")
 	if err := server.ListenerHTTP.Shutdown(context.Background()); err != nil {
-		errString := fmt.Sprintf("Error while stopping HTTPS server: %v", err.Error())
-		sm.Logger.Error(fmt.Errorf(errString))
+		sm.Logger.Error("Error while stopping HTTPS server: ", err.Error())
 		return err
 	}
 

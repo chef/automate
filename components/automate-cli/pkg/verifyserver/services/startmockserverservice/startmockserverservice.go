@@ -84,10 +84,11 @@ func (s *MockServerService) StartTCPServer(port int) (*models.Server, error) {
 			if err != nil {
 				select {
 				case <-signalChan:
-					s.logger.Infoln("Stopping accepting incoming connections....")
+					s.logger.Infoln("Stopping TCP server....")
 					return
 				default:
 					s.logger.Errorln("Error accepting connection:", err)
+					return
 				}
 			}
 			s.HandleTCPRequest(conn)
@@ -136,6 +137,7 @@ func (s *MockServerService) StartUDPServer(port int) (*models.Server, error) {
 					return
 				default:
 					s.logger.Errorln("Error receiving message:", err)
+					return
 				}
 			}
 			s.HandleUDPRequest(conn, addr, buf[:n])

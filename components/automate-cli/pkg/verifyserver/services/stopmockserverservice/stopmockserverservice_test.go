@@ -1,16 +1,17 @@
 package stopmockserverservice_test
 
 import (
+	"context"
 	"errors"
 	"net"
 	"testing"
 	"time"
 
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,35 +20,10 @@ const (
 	SERVER_CERT = "-----BEGIN CERTIFICATE-----\nMIIDTTCCAjWgAwIBAgIUNidKDNanRMXILhrf1//SuK7DC3UwDQYJKoZIhvcNAQEL\nBQAwYzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMREwDwYDVQQDDAhw\ncm9ncmVzczAeFw0yMzA1MDkxMjAwMjZaFw0yNjA1MDgxMjAwMjZaMDYxCzAJBgNV\nBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRIwEAYDVQQDDAlsb2NhbGhvc3Qw\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvhXRRavsHge7uBNENi3sU\nYQEVcLpXf0J/yLjGC1Rhk4qS+38xeJh6AVaBk8tqHRPKGB3KMukLwUp2mr4UemSw\naB+RHwBHIGynnRvgVF+MJKko2P5KlSEfOi9hLLAskXKRP1arTSf/0z33YHGf3gwl\nAh+Yd9ZSuk6XrqjR92/y+JuWKTsSH6w+X4uCDqaJODx6/nb17Quj/8utbkC0ccQR\n4G8E9anWTCdaBq0QJgNmBdABu8hjM2SqljITzneFsIHNnUcqzPhYrSmgaDcxKX8B\nskLfrGLV5w/esKeHlp7XbenVX13ffthQPEvtay33Aq6WP65U+DE1yGDXUmqA01pr\nAgMBAAGjJjAkMCIGA1UdEQQbMBmCCWxvY2FsaG9zdIIMaHR0cHMtc2VydmVyMA0G\nCSqGSIb3DQEBCwUAA4IBAQCxXspmv+BCRVFykb80embuZGCXMh7YmH3j5dJZhaKL\n/PPcUjgJTYRanDSSwt5IFyyYwiYG9qdUrRLxR5pgpdj0vNRaLdabG24UsVQQuK1Y\nrxb/6HF2AwWASiS5YLKoVMwg1sYiskpA7gJ23Xe34BVckqAd+Yoss4zDNR3d/yRM\nQYbnr/STpW4c+7jHL+vlpu/OdHwEtsTNrUG6lk0YO1lGH43a0rmvMzYOCgZEfr3h\nK4zbwy053Vq8PGIH24/bNu67pSfslgGI30bN9PmUdFMwEFuRC7rCFgQ8LpRbJNf1\nf5CUhHWn2nC05XOzKm+Kj/NHPtw5iJkrQvLNtsdiO92O\n-----END CERTIFICATE-----"
 )
 
-func StartServer(protocol string, port int, cert string, key string, l logger.Logger) (*models.Server, error) {
-	servers := startmockserverservice.New(l)
-
-	cfg := &models.StartMockServerRequestBody{
-		Protocol: protocol,
-		Port:     port,
-		Cert:     cert,
-		Key:      key,
-	}
-	err := servers.StartMockServer(cfg)
-	if err != nil {
-		return nil, err
-	}
-	server := servers.GetMockServers()[0]
-	return server, nil
-}
-
-func ErrorForServer(protocol string, server *models.Server) {
-	switch protocol {
-	case constants.TCP:
-		server.ListenerTCP = &MockListener{}
-	case constants.UDP:
-		server.ListenerUDP = &MockPacketConn{}
-	}
-
-}
-
 func TestStopMockServer(t *testing.T) {
-	l, err := logger.NewLogger("text", "debug")
+	// Create a buffer to capture log output
+	cw := majorupgrade_utils.NewCustomWriter()
+	l, err := logger.NewLoggerWithOut("text", "info", cw.CliWriter)
 	assert.NoError(t, err)
 	tests := []struct {
 		name     string
@@ -57,6 +33,7 @@ func TestStopMockServer(t *testing.T) {
 		key      string
 		wantErr  bool
 		err      string
+		out      string
 	}{
 		{
 			name:     "Stop TCP server",
@@ -64,6 +41,7 @@ func TestStopMockServer(t *testing.T) {
 			protocol: "tcp",
 			cert:     "",
 			key:      "",
+			out:      "Stopping TCP server....",
 		},
 		{
 			name:     "Stop UDP server",
@@ -71,6 +49,7 @@ func TestStopMockServer(t *testing.T) {
 			protocol: "udp",
 			cert:     "",
 			key:      "",
+			out:      "Stopping UDP server....",
 		},
 		{
 			name:     "Stop HTTPS server",
@@ -78,6 +57,7 @@ func TestStopMockServer(t *testing.T) {
 			protocol: "https",
 			cert:     SERVER_CERT,
 			key:      SERVER_KEY,
+			out:      "HTTPS server stopped gracefully",
 		},
 		{
 			name:     "Error while stopping UDP server",
@@ -97,66 +77,113 @@ func TestStopMockServer(t *testing.T) {
 			wantErr:  true,
 			err:      "Error while shutting TCP server",
 		},
+		{
+			name:     "Stop HTTPS server",
+			port:     80,
+			protocol: "https",
+			cert:     SERVER_CERT,
+			key:      SERVER_KEY,
+			wantErr:  true,
+			err:      "Error while shutting HTTPs server",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := stopmockserverservice.NewStopMockServerService(l)
-
-			server, err := StartServer(tt.protocol, tt.port, tt.cert, tt.key, l)
-			assert.NoError(t, err)
 			if tt.wantErr {
-				ErrorForServer(tt.protocol, server)
+				server := ErrorForServer(tt.protocol, tt.port)
 				err = s.StopMockServer(server)
+				time.Sleep(100 * time.Millisecond)
 				assert.Error(t, err)
 				assert.Equal(t, tt.err, err.Error())
+				assert.Contains(t, cw.Output(), tt.err)
 			} else {
-				err = s.StopMockServer(server)
+				server, err := StartServer(tt.protocol, tt.port, tt.cert, tt.key, l)
 				assert.NoError(t, err)
+				err = s.StopMockServer(server)
+				time.Sleep(100 * time.Millisecond)
+				assert.NoError(t, err)
+				assert.Contains(t, cw.Output(), tt.out)
 			}
 		})
 	}
 }
 
-type MockListener struct{}
+func StartServer(protocol string, port int, cert string, key string, l logger.Logger) (*models.Server, error) {
+	servers := startmockserverservice.New(l)
 
-func (l *MockListener) Accept() (net.Conn, error) {
+	cfg := &models.StartMockServerRequestBody{
+		Protocol: protocol,
+		Port:     port,
+		Cert:     cert,
+		Key:      key,
+	}
+	err := servers.StartMockServer(cfg)
+	if err != nil {
+		return nil, err
+	}
+	server := servers.GetMockServers()[0]
+	return server, nil
+}
+
+func ErrorForServer(protocol string, port int) *models.Server {
+	signalChan := make(chan bool, 1)
+	return &models.Server{
+		Port:         port,
+		ListenerTCP:  &MockTCPListener{},
+		ListenerUDP:  &MockUDPListener{},
+		ListenerHTTP: &MockHTTPSServer{},
+		SignalChan:   signalChan,
+		Protocol:     protocol,
+	}
+}
+
+type MockTCPListener struct{}
+
+func (l *MockTCPListener) Accept() (net.Conn, error) {
 	return nil, nil
 }
 
-func (l *MockListener) Close() error {
+func (l *MockTCPListener) Close() error {
 	return errors.New("Error while shutting TCP server")
 }
 
-func (l *MockListener) Addr() net.Addr {
+func (l *MockTCPListener) Addr() net.Addr {
 	return nil
 }
 
-type MockPacketConn struct{}
+type MockUDPListener struct{}
 
-func (l *MockPacketConn) Close() error {
+func (l *MockUDPListener) Close() error {
 	return errors.New("Error while shutting UDP server")
 }
 
-func (l *MockPacketConn) ReadFrom(p []byte) (n int, addr net.Addr, err error) {
+func (l *MockUDPListener) ReadFrom(p []byte) (n int, addr net.Addr, err error) {
 	return 0, nil, nil
 }
 
-func (l *MockPacketConn) WriteTo(p []byte, addr net.Addr) (n int, err error) {
+func (l *MockUDPListener) WriteTo(p []byte, addr net.Addr) (n int, err error) {
 	return 0, nil
 }
 
-func (l *MockPacketConn) LocalAddr() net.Addr {
+func (l *MockUDPListener) LocalAddr() net.Addr {
 	return nil
 }
 
-func (l *MockPacketConn) SetDeadline(t time.Time) error {
+func (l *MockUDPListener) SetDeadline(t time.Time) error {
 	return nil
 }
 
-func (l *MockPacketConn) SetReadDeadline(t time.Time) error {
+func (l *MockUDPListener) SetReadDeadline(t time.Time) error {
 	return nil
 }
 
-func (l *MockPacketConn) SetWriteDeadline(t time.Time) error {
+func (l *MockUDPListener) SetWriteDeadline(t time.Time) error {
 	return nil
+}
+
+type MockHTTPSServer struct{}
+
+func (s *MockHTTPSServer) Shutdown(ctx context.Context) error {
+	return errors.New("Error while shutting HTTPs server")
 }
