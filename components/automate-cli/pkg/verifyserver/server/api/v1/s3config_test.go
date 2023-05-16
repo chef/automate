@@ -29,6 +29,13 @@ var (
 	failureMessageS3Config             = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to connect with S3 using the provided access key and secret key\",\"resolution_msg\":\"Provide the correct S3 url or access or secret keys\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the S3 bucket\"}]}}"
 	bucketAccessfailureMessageS3Config = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"S3 connection test\",\"passed\":true,\"success_msg\":\"Machine is able to connect with S3 using the provided access key and secret key\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"S3 bucket access test\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"Machine is not able to access the S3 bucket using the provided access key and secret key\",\"resolution_msg\":\"Provide the necessary access to the S3 bucket\"}]}}"
 	errorBodyParser                    = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
+	reqBody                            = `{
+		"endpoint": "s3://example-s3.aws.region.com",
+		"bucket_name": "backups",
+		"base_path": "automate",
+		"access_key": "VALID-ACCESS-KEY",
+		"secret_key": "SECRET-KEY"
+	}`
 )
 
 func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.IS3Config {
@@ -86,13 +93,7 @@ func TestS3Config(t *testing.T) {
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			body: `{
-				"endpoint": "s3://example-s3.aws.region.com",
-				"bucket_name": "backups",
-				"base_path": "automate",
-				"access_key": "VALID-ACCESS-KEY",
-				"secret_key": "SECRET-KEY"
-			}`,
+			body:         reqBody,
 			expectedBody: successMessageS3Config,
 		},
 		{
@@ -112,13 +113,7 @@ func TestS3Config(t *testing.T) {
 				ErrorMsg:      s3BucketAccessErrorMsg,
 				ResolutionMsg: s3BucketAccessResolutionMsg,
 			},
-			body: `{
-				"endpoint": "s3://example-s3.aws.region.com",
-				"bucket_name": "backups",
-				"base_path": "automate",
-				"access_key": "VALID-ACCESS-KEY",
-				"secret_key": "SECRET-KEY"
-			}`,
+			body:         reqBody,
 			expectedBody: failureMessageS3Config,
 		},
 		{
@@ -138,13 +133,7 @@ func TestS3Config(t *testing.T) {
 				ErrorMsg:      s3BucketAccessErrorMsg,
 				ResolutionMsg: s3BucketAccessResolutionMsg,
 			},
-			body: `{
-				"endpoint": "s3://example-s3.aws.region.com",
-				"bucket_name": "backups",
-				"base_path": "automate",
-				"access_key": "VALID-ACCESS-KEY",
-				"secret_key": "SECRET-KEY"
-			}`,
+			body:         reqBody,
 			expectedBody: bucketAccessfailureMessageS3Config,
 		},
 		{
