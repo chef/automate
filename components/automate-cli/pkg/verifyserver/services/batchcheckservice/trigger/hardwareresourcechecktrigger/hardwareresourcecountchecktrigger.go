@@ -3,9 +3,10 @@ package hardwareresourcechecktrigger
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gofiber/fiber"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"

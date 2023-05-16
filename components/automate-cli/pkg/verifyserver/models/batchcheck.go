@@ -62,13 +62,14 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SSHUser     SSHUser     `json:"ssh_user"`
-	Arch        string      `json:"arch"`
-	Backup      Backup      `json:"backup"`
-	Hardware    Hardware    `json:"hardware"`
-	Certificate Certificate `json:"certificate"`
-	ExternalOS  ExternalOS  `json:"external_opensearch"`
-	ExternalPG  ExternalPG  `json:"external_postgresql"`
+	SSHUser         SSHUser     `json:"ssh_user"`
+	Arch            string      `json:"arch"`
+	Backup          Backup      `json:"backup"`
+	Hardware        Hardware    `json:"hardware"`
+	Certificate     Certificate `json:"certificate"`
+	ExternalOS      ExternalOS  `json:"external_opensearch"`
+	ExternalPG      ExternalPG  `json:"external_postgresql"`
+	DeploymentState string      `json:"deployment_state"`
 }
 
 type BatchCheckResponse struct {
@@ -82,11 +83,12 @@ type BatchCheckResult struct {
 }
 
 type CheckTriggerResponse struct {
-	Status    string    `json:"status"`
-	Result    ApiResult `json:"result"`
-	Host      string    `json:"host"`
-	NodeType  string    `json:"node_type"`
-	CheckType string    `json:"check_type"`
+	Status    string       `json:"status"`
+	Result    ApiResult    `json:"result"`
+	Host      string       `json:"host"`
+	Error     *fiber.Error `json:"error,omitempty"`
+	NodeType  string       `json:"node_type"`
+	CheckType string       `json:"check_type"`
 }
 type ApiResult struct {
 	Passed  bool         `json:"passed"`
