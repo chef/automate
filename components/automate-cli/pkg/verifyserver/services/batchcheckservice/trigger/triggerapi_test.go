@@ -445,7 +445,7 @@ func Test_RunCheck(t *testing.T) {
 				require.True(t, resp2.Passed)
 			}
 
-			if result.NodeType == "opensearch" {
+			if result.NodeType == constants.OPENSEARCH {
 				require.Equal(t, "SUCCESS", result.Status)
 				require.Empty(t, result.Result.Message)
 				require.True(t, result.Result.Passed)
@@ -464,7 +464,7 @@ func Test_RunCheck(t *testing.T) {
 				require.Empty(t, resp2.ErrorMsg)
 				require.True(t, resp2.Passed)
 			}
-			if result.NodeType == "postgresql" {
+			if result.NodeType == constants.POSTGRESQL {
 				require.Equal(t, "PASSED", result.Status)
 				require.Empty(t, result.Result.Message)
 				require.True(t, result.Result.Passed)
