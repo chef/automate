@@ -20,9 +20,9 @@ ruby /hab/svc/automate-cs-ocid/config/tasks/set_webui_key.rb "$WEBUI_KEY" "$PRIV
 
 # Setup environment specific configurations for integration with erchef
 export ENV_CONFIG_FILE_PATH="$OCID_CONFIG_FOLDER_PATH/settings/$RAILS_ENV.yml"
-export CHEF_SERVER_ENDPOINT="{{cfg.chef_server.endpoint}}"
-export CHEF_SERVER_SUPERUSER="{{cfg.chef_server.superuser}}"
-export CHEF_SERVER_SSL_VERIFY_MODE="{{cfg.chef_server.ssl_verify_mode}}"
+export CHEF_SERVER_ENDPOINT="{{cfg.ocid.chef_server_config.endpoint}}"
+export CHEF_SERVER_SUPERUSER="{{cfg.ocid.chef_server_config.superuser}}"
+export CHEF_SERVER_SSL_VERIFY_MODE="{{cfg.ocid.chef_server_config.ssl_verify_mode}}"
 ruby /hab/svc/automate-cs-ocid/config/tasks/set_env_vars.rb
 
 # NOTE: Please keep this statement just before running
