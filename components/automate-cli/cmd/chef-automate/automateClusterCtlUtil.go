@@ -140,7 +140,7 @@ func tailFile(logFilePath string, executed chan struct{}) {
 
 	}
 }
-func doBootstrapEnv(airgapBundlePath string, saas bool) error {
+func doBootstrapEnv(airgapBundlePath string, saas bool, frontend bool, backend bool) error {
 	conf := new(dc.AutomateConfig)
 	if err := mergeFlagOverrides(conf); err != nil {
 		return status.Wrap(
@@ -184,9 +184,21 @@ func doBootstrapEnv(airgapBundlePath string, saas bool) error {
 		return status.Annotate(err, status.DeployError)
 	}
 	if offlineMode {
-		err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, airgapBundlePath)
-		if err != nil {
-			return status.Annotate(err, status.DeployError)
+		if frontend {
+			err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		} else if backend {
+			err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -203,7 +215,7 @@ func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
 			return status.New(status.InvalidCommandArgsError, errMLSA)
 		}
 	}
-	err := doBootstrapEnv(airgapBundlePath, saas)
+	err := doBootstrapEnv(airgapBundlePath, saas, false, false)
 	if err != nil {
 		return err
 	}

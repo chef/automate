@@ -45,7 +45,7 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 		return status.Wrap(errors.New("Incorrect command usage"), 0, workspaceUpgradeHelpDocs)
 	}
 	if isA2HARBFileExist() {
-		err, upgraded := upgradeWorspace(args[0], upgradeRunCmdFlags.saas)
+		err, upgraded := upgradeWorspace(args[0], upgradeRunCmdFlags.saas, upgradeRunCmdFlags.upgradefrontends, upgradeRunCmdFlags.upgradebackends)
 		if err != nil {
 			return status.Annotate(err, status.UpgradeError)
 		}
@@ -59,7 +59,7 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
 
-func upgradeWorspace(bundle string, saas bool) (error, bool) {
+func upgradeWorspace(bundle string, saas bool, frontend bool, backend bool) (error, bool) {
 	updateAvailabe, err := checkIfNewBundleHaveWorkspaceUpdate(bundle, saas)
 	if err != nil {
 		writer.Println(err.Error())
@@ -86,7 +86,7 @@ func upgradeWorspace(bundle string, saas bool) (error, bool) {
 		}
 		if upgradeAccepted {
 			writer.Println("Bootstraping for new version.")
-			err := doBootstrapEnv(bundle, upgradeRunCmdFlags.saas)
+			err := doBootstrapEnv(bundle, upgradeRunCmdFlags.saas, frontend, backend)
 			if err != nil {
 				writer.Println(err.Error())
 				return nil, false
