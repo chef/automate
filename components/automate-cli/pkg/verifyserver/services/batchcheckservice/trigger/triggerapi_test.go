@@ -178,7 +178,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, "automate", output)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", output)
 
 		// Wait for the response
 		response := <-output
@@ -196,7 +196,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, "postgresql", output)
+		go triggerCheckAPI(endPoint, host, constants.POSTGRESQL, output)
 
 		// Wait for the response
 		response := <-output
@@ -219,7 +219,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, "automate", output)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
 
 		// Wait for the response
 		response := <-output
@@ -242,7 +242,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+"/api/v1/checks/software-versions", server.URL, "automate", output)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
 
 		// Wait for the response
 		response := <-output
@@ -259,7 +259,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, "automate", output)
+		go triggerCheckAPI(endPoint, host, constants.AUTOMATE, output)
 
 		// Wait for the response
 		response := <-output
@@ -344,7 +344,7 @@ func Test_RunCheck(t *testing.T) {
 		// Call the function being tested
 		results := RunCheck(config, log, port, path, depState)
 		for _, result := range results {
-			if result.NodeType == "bastion" {
+			if result.NodeType == constants.BASTION {
 				require.Equal(t, "PASSED", result.Status)
 				require.Empty(t, result.Result.Message)
 				require.True(t, result.Result.Passed)
@@ -364,7 +364,7 @@ func Test_RunCheck(t *testing.T) {
 				require.True(t, resp2.Passed)
 			}
 
-			if result.NodeType == "opensearch" {
+			if result.NodeType == constants.OPENSEARCH {
 				require.Equal(t, "SUCCESS", result.Status)
 				require.Empty(t, result.Result.Message)
 				require.True(t, result.Result.Passed)
@@ -383,7 +383,7 @@ func Test_RunCheck(t *testing.T) {
 				require.Empty(t, resp2.ErrorMsg)
 				require.True(t, resp2.Passed)
 			}
-			if result.NodeType == "postgresql" {
+			if result.NodeType == constants.POSTGRESQL {
 				require.Equal(t, "PASSED", result.Status)
 				require.Empty(t, result.Result.Message)
 				require.True(t, result.Result.Passed)
@@ -443,20 +443,20 @@ func createDummyServer() (*httptest.Server, string, string) {
 
 			reqParameters := r.URL.Query()
 			nodeType := reqParameters.Get("node_type")
-			if nodeType == "opensearch" {
+			if nodeType == constants.OPENSEARCH {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(osResourceCheck))
 			}
-			if nodeType == "postgresql" {
+			if nodeType == constants.POSTGRESQL {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(pgResourceCheck))
 			}
-			if nodeType == "bastion" {
+			if nodeType == constants.BASTION {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(bastionResourceCheck))
 			}
 
-			if nodeType == "automate" {
+			if nodeType == constants.AUTOMATE {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(automateResourceCheck))
 			}
