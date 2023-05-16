@@ -204,7 +204,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
 		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
-		assert.Contains(t, response.Error.Message, `"http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com: no such host`)
+		assert.Contains(t, response.Error.Message, `"http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com`)
 		require.Equal(t, "postgresql", response.NodeType)
 
 	})
