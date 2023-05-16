@@ -38,12 +38,12 @@ var (
 	}`
 )
 
-func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.S3ServiceCheck) s3configservice.IS3Config {
+func SetupMockS3ConfigService(mockS3ConnectionModel, mockS3BucketAccessModel models.Checks) s3configservice.IS3Config {
 	return &s3configservice.MockS3Config{
-		GetS3ConnectionFunc: func(*models.S3ConfigRequest) *models.S3ServiceCheck {
+		GetS3ConnectionFunc: func(*models.S3ConfigRequest) *models.Checks {
 			return &mockS3ConnectionModel
 		},
-		GetBucketAccessFunc: func(*models.S3ConfigRequest) *models.S3ServiceCheck {
+		GetBucketAccessFunc: func(*models.S3ConfigRequest) *models.Checks {
 			return &mockS3BucketAccessModel
 		},
 	}
@@ -73,20 +73,20 @@ func TestS3Config(t *testing.T) {
 		expectedCode            int
 		expectedBody            string
 		body                    string
-		mockS3ConnectionModel   models.S3ServiceCheck
-		mockS3BucketAccessModel models.S3ServiceCheck
+		mockS3ConnectionModel   models.Checks
+		mockS3BucketAccessModel models.Checks
 	}{
 		{
 			description:  "200:success status route",
 			expectedCode: 200,
-			mockS3ConnectionModel: models.S3ServiceCheck{
+			mockS3ConnectionModel: models.Checks{
 				Title:         s3ConnectionTitle,
 				Passed:        true,
 				SuccessMsg:    s3ConnectionSuccessMsg,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			mockS3BucketAccessModel: models.S3ServiceCheck{
+			mockS3BucketAccessModel: models.Checks{
 				Title:         s3BucketAccessTitle,
 				Passed:        true,
 				SuccessMsg:    s3BucketAccessSuccessMsg,
@@ -99,14 +99,14 @@ func TestS3Config(t *testing.T) {
 		{
 			description:  "200:fail both s3connection and s3BucketAccess",
 			expectedCode: 200,
-			mockS3ConnectionModel: models.S3ServiceCheck{
+			mockS3ConnectionModel: models.Checks{
 				Title:         s3ConnectionTitle,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      s3ConnectionErrorMsg,
 				ResolutionMsg: s3ConnectionResolutionMsg,
 			},
-			mockS3BucketAccessModel: models.S3ServiceCheck{
+			mockS3BucketAccessModel: models.Checks{
 				Title:         s3BucketAccessTitle,
 				Passed:        false,
 				SuccessMsg:    "",
@@ -119,14 +119,14 @@ func TestS3Config(t *testing.T) {
 		{
 			description:  "200:fail s3BucketAccess",
 			expectedCode: 200,
-			mockS3ConnectionModel: models.S3ServiceCheck{
+			mockS3ConnectionModel: models.Checks{
 				Title:         s3ConnectionTitle,
 				Passed:        true,
 				SuccessMsg:    s3ConnectionSuccessMsg,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			mockS3BucketAccessModel: models.S3ServiceCheck{
+			mockS3BucketAccessModel: models.Checks{
 				Title:         s3BucketAccessTitle,
 				Passed:        false,
 				SuccessMsg:    "",
@@ -139,14 +139,14 @@ func TestS3Config(t *testing.T) {
 		{
 			description:  "400: body parser error",
 			expectedCode: 400,
-			mockS3ConnectionModel: models.S3ServiceCheck{
+			mockS3ConnectionModel: models.Checks{
 				Title:         s3ConnectionTitle,
 				Passed:        true,
 				SuccessMsg:    s3ConnectionSuccessMsg,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			mockS3BucketAccessModel: models.S3ServiceCheck{
+			mockS3BucketAccessModel: models.Checks{
 				Title:         s3BucketAccessTitle,
 				Passed:        false,
 				SuccessMsg:    "",

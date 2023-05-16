@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
+const (
 	s3ConnectionTitle           = "S3 connection test"
 	s3ConnectionErrorMsg        = "Machine is not able to connect with S3 using the provided access key and secret key"
 	s3ConnectionResolutionMsg   = "Provide the correct S3 url or access or secret keys"
@@ -18,12 +18,11 @@ var (
 	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key"
 	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
 	s3BucketAccessSuccessMsg    = "Machine is able to access the S3 bucket using the provided access key and secret key"
-	region                      = ""
 )
 
 type IS3Config interface {
-	GetS3Connection(*models.S3ConfigRequest) *models.S3ServiceCheck
-	GetBucketAccess(*models.S3ConfigRequest) *models.S3ServiceCheck
+	GetS3Connection(*models.S3ConfigRequest) *models.Checks
+	GetBucketAccess(*models.S3ConfigRequest) *models.Checks
 }
 
 type S3ConfigService struct {
@@ -39,11 +38,9 @@ func NewS3ConfigService(logger logger.Logger, awsUtils awsutils.AwsUtils) IS3Con
 	}
 }
 
-func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.S3ServiceCheck {
+func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.Checks {
 	ss.Req = req
-	region = req.Region
-	ss.Req.Region = ""
-	sess, err := ss.AwsConnection()
+	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, "")
 	if err != nil {
 		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
 	}
@@ -55,16 +52,15 @@ func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.
 	return ss.Response(s3ConnectionTitle, s3ConnectionSuccessMsg, "", "", true)
 }
 
-func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.S3ServiceCheck {
+func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.Checks {
 	ss.Req = req
-	ss.Req.Region = region
 	// S3 connection
-	sess, err := ss.AwsConnection()
-	s3Client := ss.AwsUtils.New(sess)
+	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
 	if err != nil {
 		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
 	}
 
+	s3Client := ss.AwsUtils.New(sess)
 	// upload data in s3 bucket
 	err = ss.UploadObject(sess)
 	if err != nil {
@@ -85,8 +81,8 @@ func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.
 	return ss.Response(s3BucketAccessTitle, s3BucketAccessSuccessMsg, "", "", true)
 }
 
-func (ss *S3ConfigService) AwsConnection() (*session.Session, error) {
-	sess, err := ss.AwsUtils.NewSessionWithOptions(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
+func (ss *S3ConfigService) AwsConnection(endpoint, accessKey,secretKey, region string) (*session.Session, error) {
+	sess, err := ss.AwsUtils.NewSessionWithOptions(endpoint, accessKey,secretKey, region)
 	if err != nil {
 		ss.Logger.Error("s3 config aws connection failed: ", err.Error())
 		return nil, err
@@ -136,8 +132,8 @@ func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
 	return nil
 }
 
-func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) *models.S3ServiceCheck {
-	return &models.S3ServiceCheck{
+func (ss *S3ConfigService) Response(Title, SuccessMsg, ErrorMsg, ResolutionMsg string, Passed bool) *models.Checks {
+	return &models.Checks{
 		Title:         Title,
 		Passed:        Passed,
 		SuccessMsg:    SuccessMsg,

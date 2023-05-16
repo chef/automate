@@ -1,12 +1,5 @@
 package models
 
-type S3ServiceCheck struct {
-	Title         string `json:"title"`
-	Passed        bool   `json:"passed"`
-	SuccessMsg    string `json:"success_msg"`
-	ErrorMsg      string `json:"error_msg"`
-	ResolutionMsg string `json:"resolution_msg"`
-}
 
 type S3ConfigRequest struct {
 	Endpoint   string `json:"endpoint"`
@@ -18,5 +11,5 @@ type S3ConfigRequest struct {
 }
 type S3ConfigResponse struct {
 	Passed bool             `json:"passed"`
-	Checks []S3ServiceCheck `json:"checks"`
+	Checks []Checks `json:"checks"`
 }
