@@ -25,25 +25,25 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
-		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", outputCh)
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, outputCh)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "automate", depState)
-		go triggerCheckAPI(endpoint, ip, "automate", outputCh)
+		endpoint := prepareEndpoint(path, ip, port, constants.AUTOMATE, depState)
+		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, outputCh)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "chef-infra-server", depState)
-		go triggerCheckAPI(endpoint, ip, "chef-infra-server", outputCh)
+		endpoint := prepareEndpoint(path, ip, port, constants.CHEF_INFRA_SERVER, depState)
+		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, outputCh)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
-		go triggerCheckAPI(endpoint, ip, "opensearch", outputCh)
+		endpoint := prepareEndpoint(path, ip, port, constants.OPENSEARCH, depState)
+		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, outputCh)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
-		go triggerCheckAPI(endpoint, ip, "postgresql", outputCh)
+		endpoint := prepareEndpoint(path, ip, port, constants.POSTGRESQL, depState)
+		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, outputCh)
 	}
 
 	for i := 0; i < count; i++ {
