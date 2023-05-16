@@ -61,6 +61,7 @@ message ConfigRequest {
 			}
 
     }
+
 		message Service {}
 	}
 }
