@@ -3,21 +3,11 @@ package s3configservice
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
-)
-
-const (
-	s3ConnectionTitle           = "S3 connection test"
-	s3ConnectionErrorMsg        = "Machine is not able to connect with S3 using the provided access key and secret key"
-	s3ConnectionResolutionMsg   = "Provide the correct S3 url or access or secret keys"
-	s3ConnectionSuccessMsg      = "Machine is able to connect with S3 using the provided access key and secret key"
-	s3BucketAccessTitle         = "S3 bucket access test"
-	s3BucketAccessErrorMsg      = "Machine is not able to access the S3 bucket using the provided access key and secret key"
-	s3BucketAccessResolutionMsg = "Provide the necessary access to the S3 bucket"
-	s3BucketAccessSuccessMsg    = "Machine is able to access the S3 bucket using the provided access key and secret key"
 )
 
 type IS3Config interface {
@@ -42,14 +32,14 @@ func (ss *S3ConfigService) GetS3Connection(req *models.S3ConfigRequest) *models.
 	ss.Req = req
 	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, "")
 	if err != nil {
-		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
+		return ss.Response(constants.S3_CONNECTION_TITLE, "", errors.Wrap(err, constants.S3_CONNECTION_ERROR_MSG).Error(), constants.S3_CONNECTION_RESOLUTION_MSG, false)
 	}
 	s3Client := ss.AwsUtils.New(sess)
 	err = ss.ListBuckets(s3Client)
 	if err != nil {
-		return ss.Response(s3ConnectionTitle, "", errors.Wrap(err, s3ConnectionErrorMsg).Error(), s3ConnectionResolutionMsg, false)
+		return ss.Response(constants.S3_CONNECTION_TITLE, "", errors.Wrap(err, constants.S3_CONNECTION_ERROR_MSG).Error(), constants.S3_CONNECTION_RESOLUTION_MSG, false)
 	}
-	return ss.Response(s3ConnectionTitle, s3ConnectionSuccessMsg, "", "", true)
+	return ss.Response(constants.S3_CONNECTION_TITLE, constants.S3_CONNECTION_SUCCESS_MSG, "", "", true)
 }
 
 func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.Checks {
@@ -57,37 +47,37 @@ func (ss *S3ConfigService) GetBucketAccess(req *models.S3ConfigRequest) *models.
 	// S3 connection
 	sess, err := ss.AwsConnection(ss.Req.Endpoint, ss.Req.AccessKey, ss.Req.SecretKey, ss.Req.Region)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
+		return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
 	}
 
 	s3Client := ss.AwsUtils.New(sess)
 	// upload data in s3 bucket
 	err = ss.UploadObject(sess)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
+		return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
 	}
 
 	// read/list data in s3 bucket
 	err = ss.ListObjects(s3Client)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
+		return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
 	}
 
 	// delete data in s3 bucket
 	err = ss.DeleteObjects(s3Client)
 	if err != nil {
-		return ss.Response(s3BucketAccessTitle, "", errors.Wrap(err, s3BucketAccessErrorMsg).Error(), s3BucketAccessResolutionMsg, false)
+		return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, "", errors.Wrap(err, constants.S3_BUCKET_ACCESS_ERROR_MSG).Error(), constants.S3_BUCKET_ACCESS_RESOLUTION_MSG, false)
 	}
-	return ss.Response(s3BucketAccessTitle, s3BucketAccessSuccessMsg, "", "", true)
+	return ss.Response(constants.S3_BUCKET_ACCESS_TITLE, constants.S3_BUCKET_ACCESS_SUCCESS_MSG, "", "", true)
 }
 
-func (ss *S3ConfigService) AwsConnection(endpoint, accessKey,secretKey, region string) (*session.Session, error) {
-	sess, err := ss.AwsUtils.NewSessionWithOptions(endpoint, accessKey,secretKey, region)
+func (ss *S3ConfigService) AwsConnection(endpoint, accessKey, secretKey, region string) (*session.Session, error) {
+	sess, err := ss.AwsUtils.NewSessionWithOptions(endpoint, accessKey, secretKey, region)
 	if err != nil {
 		ss.Logger.Error("s3 config aws connection failed: ", err.Error())
 		return nil, err
 	}
-	ss.Logger.Info("s3 config aws connection success")
+	ss.Logger.Debug("s3 config aws connection success")
 	return sess, nil
 }
 
@@ -98,7 +88,7 @@ func (ss *S3ConfigService) ListBuckets(s3Client *s3.S3) error {
 		ss.Logger.Error("s3 config list bucket failed: ", err.Error())
 		return err
 	}
-	ss.Logger.Info("s3 config list object success")
+	ss.Logger.Debug("s3 config list object success")
 	return nil
 }
 
@@ -108,7 +98,7 @@ func (ss *S3ConfigService) DeleteObjects(s3Client *s3.S3) error {
 		ss.Logger.Error("s3 config delete object failed: ", err.Error())
 		return err
 	}
-	ss.Logger.Info("s3 config delete object success")
+	ss.Logger.Debug("s3 config delete object success")
 	return nil
 }
 
@@ -118,7 +108,7 @@ func (ss *S3ConfigService) ListObjects(s3Client *s3.S3) error {
 		ss.Logger.Error("s3 config list object failed: ", err.Error())
 		return err
 	}
-	ss.Logger.Info("s3 config list object success")
+	ss.Logger.Debug("s3 config list object success")
 	return nil
 }
 
@@ -128,7 +118,7 @@ func (ss *S3ConfigService) UploadObject(sess *session.Session) error {
 		ss.Logger.Error("s3 config upload object failed: ", err.Error())
 		return err
 	}
-	ss.Logger.Info("s3 config upload object success")
+	ss.Logger.Debug("s3 config upload object success")
 	return nil
 }
 
