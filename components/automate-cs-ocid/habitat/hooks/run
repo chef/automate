@@ -10,20 +10,13 @@ export RACK_ENV="{{cfg.rack_env}}"
 
 export DATABASE_URL="{{cfg.DATABASE_URL}}"
 
-OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+export OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
 
 # Set webui key from erchef component
-WEBUI_SRC_PATH="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
-export WEBUI_KEY=`sed ':a;N;$!ba;s/\n/\\n/g' $WEBUI_SRC_PATH`
-export PRIVATE_CHEF_SECRETS_PATH="$OCID_CONFIG_FOLDER_PATH/private-chef-secrets.json"
-ruby /hab/svc/automate-cs-ocid/config/tasks/set_webui_key.rb
+source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
 
 # Setup environment specific configurations for integration with erchef
-export ENV_CONFIG_FILE_PATH="$OCID_CONFIG_FOLDER_PATH/settings/$RAILS_ENV.yml"
-export CHEF_SERVER_ENDPOINT="{{cfg.ocid.chef_server_config.endpoint}}"
-export CHEF_SERVER_SUPERUSER="{{cfg.ocid.chef_server_config.superuser}}"
-export CHEF_SERVER_SSL_VERIFY_MODE="{{cfg.ocid.chef_server_config.ssl_verify_mode}}"
-ruby /hab/svc/automate-cs-ocid/config/tasks/set_env_vars.rb
+source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
 
 # NOTE: Please keep this statement just before running
 # any environment specific command e.g. starting rails server.
