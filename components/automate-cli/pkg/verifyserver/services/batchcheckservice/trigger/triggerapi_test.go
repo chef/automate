@@ -568,7 +568,7 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		results := RunCheck(config, log, port, path, depState)
+		results := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
 		for _, result := range results {
 			if result.NodeType == "bastion" {
 				require.Equal(t, "PASSED", result.Status)

@@ -41,6 +41,7 @@ const (
 func TestSystemResourceCheck_Run(t *testing.T) {
 	t.Run("System Resource Check", func(t *testing.T) {
 		// Create a dummy server
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
