@@ -14,9 +14,9 @@ OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
 
 # Set webui key from erchef component
 WEBUI_SRC_PATH="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
-WEBUI_KEY=`sed ':a;N;$!ba;s/\n/\\n/g' $WEBUI_SRC_PATH`
-PRIVATE_CHEF_SECRETS_PATH="$OCID_CONFIG_FOLDER_PATH/private-chef-secrets.json"
-ruby /hab/svc/automate-cs-ocid/config/tasks/set_webui_key.rb "$WEBUI_KEY" "$PRIVATE_CHEF_SECRETS_PATH"
+export WEBUI_KEY=`sed ':a;N;$!ba;s/\n/\\n/g' $WEBUI_SRC_PATH`
+export PRIVATE_CHEF_SECRETS_PATH="$OCID_CONFIG_FOLDER_PATH/private-chef-secrets.json"
+ruby /hab/svc/automate-cs-ocid/config/tasks/set_webui_key.rb
 
 # Setup environment specific configurations for integration with erchef
 export ENV_CONFIG_FILE_PATH="$OCID_CONFIG_FOLDER_PATH/settings/$RAILS_ENV.yml"
