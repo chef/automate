@@ -116,7 +116,7 @@ Once configured, `/root/.chef/credentials` will look like as shown below:
   [default]
   client_name = "<name_of_user>"
   client_key = "/root/.chef/<pem_file_of_user>"
-  chef_server_url = "https://chefserver.example.com/organizations/<name_of_organization>/"
+  chef_server_url = "https://chefinfraserver.example.com/organizations/<name_of_organization>/"
 ```
 
 1. Run the following command:
