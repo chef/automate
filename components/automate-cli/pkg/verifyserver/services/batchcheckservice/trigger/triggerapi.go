@@ -15,6 +15,12 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
+func RunCheckAllInstance(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody []interface{}) []models.CheckTriggerResponse {
+	var result []models.CheckTriggerResponse
+
+	return result
+}
+
 func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
