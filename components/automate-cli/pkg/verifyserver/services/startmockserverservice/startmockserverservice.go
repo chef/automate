@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -156,35 +157,46 @@ func (s *MockServerService) StartHTTPSServer(port int, cert string, key string) 
 	// Create the TLS configuration for the server
 	config := &tls.Config{
 		Certificates: []tls.Certificate{tlsCert},
-		MinVersion:   tls.VersionTLS13,
+		MinVersion:   tls.VersionTLS12,
 	}
+	m := http.NewServeMux()
 
 	// Create the HTTPS server
 	server := &http.Server{
 		Addr:      fmt.Sprintf(":%d", port),
+		Handler:   m,
 		TLSConfig: config,
 	}
 
 	// Handle response
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+	m.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("ok\n"))
 	})
 
+	serverErr := make(chan error)
 	// Start the HTTPS server
-	go func() {
+	go func(serverStarted chan error) {
 		err = server.ListenAndServeTLS("", "")
 		if err != nil && err != http.ErrServerClosed {
 			s.logger.Errorln("Error starting HTTPS server: ", err)
-			return
+			serverStarted <- err
 		}
-		s.logger.Infof("HTTPS server started on port %d\n", port)
-	}()
+	}(serverErr)
 
-	return &models.Server{
-		Port:         port,
-		ListenerTCP:  nil,
-		ListenerUDP:  nil,
-		ListenerHTTP: server,
-		Protocol:     constants.HTTPS,
-	}, nil
+	timeout := time.After(100 * time.Millisecond)
+
+	// Waiting for 100 milli second in case of any error before returning
+	select {
+	case err := <-serverErr:
+		return nil, err
+	case <-timeout:
+		s.logger.Infof("HTTPS server started succesfully on port %d", port)
+		return &models.Server{
+			Port:         port,
+			ListenerTCP:  nil,
+			ListenerUDP:  nil,
+			ListenerHTTP: server,
+			Protocol:     constants.HTTPS,
+		}, nil
+	}
 }

@@ -3,6 +3,7 @@ package startmockserverservice_test
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"testing"
 
@@ -183,6 +184,30 @@ func TestStartMockServer(t *testing.T) {
 
 		// Check that the server is listening on the correct port
 		require.Contains(t, err.Error(), "certificate input")
+	})
+	t.Run("HTTPS server with busy port", func(t *testing.T) {
+
+		const PORT = 8002
+		// Starting a server in port to be checked
+		go func() {
+			err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
+			if err != nil {
+				fmt.Println("Error starting the server:", err)
+			}
+		}()
+
+		servers := startmockserverservice.New(log)
+		cfg := &models.StartMockServerRequestBody{
+			Protocol: "https",
+			Port:     PORT,
+			Cert:     SERVER_CERT,
+			Key:      SERVER_KEY,
+		}
+		err = servers.StartMockServer(cfg)
+		require.Error(t, err)
+
+		// Check that the server is listening on the correct port
+		require.Contains(t, err.Error(), "address already in use")
 	})
 
 	t.Run("Unsupported protocol", func(t *testing.T) {
