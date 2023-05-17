@@ -71,6 +71,8 @@ Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory.
 Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
+{{< note >}} If restoring a backup from different version, make sure to pass `--airgap-bundle` flag alone with the pathe to latest airgap bundle for a seemless restore {{< /note >}}
+
 To restore on a new host, run:
 
 ```shell
