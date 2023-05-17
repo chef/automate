@@ -25,3 +25,14 @@ func GetOsVersion(osFilepath string) (string, string, error) {
 	}
 	return name, version, nil
 }
+
+func GetKernelVersion(kernelFilepath string) (string, error) {
+	data, err := fileutils.ReadFile(kernelFilepath)
+	if err != nil {
+		return "",err
+	}
+	kernelVersion := string(data)
+	split := strings.Split(kernelVersion, ".")
+	kernelVersion = split[0] + "." + split[1]
+	return kernelVersion,nil
+}

@@ -17,17 +17,19 @@ import (
 )
 
 var (
-	SuccessExpectedBodyForOpensearch      = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"openssl availability","passed":true,"success_msg":"openssl is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
-	SuccessExpectedBodyForPostgres        = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
-	SuccessExpectedBodyForNonSupportingOS = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":false,"success_msg":"","error_msg":"Kali Linux version is not supported by automate","resolution_msg":"Ensure Kali Linux correct version is installed on the node"}]}}`
-	FailureResponseForWrongQuery          = `{"status":"FAILED","result":null,"error":{"code":400,"message":"The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"}}`
-	LinuxVersionTitle                     = "Linux Version Check"
-	MkdirTitle                            = "mkdir availability"
-	OpensslTitle                          = "openssl availability"
-	StatTitle                             = "stat availability"
-	MkdirIsAvailable                      = "mkdir is available"
-	OpensslIsAvailable                    = "openssl is available"
-	StatIsAvailable                       = "stat is available"
+	SuccessExpectedBodyForOpensearch          = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"openssl availability","passed":true,"success_msg":"openssl is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Kernel Version Check","passed":true,"success_msg":"Linux kernel version is 5.10","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
+	SuccessExpectedBodyForPostgres            = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Kernel Version Check","passed":true,"success_msg":"Linux kernel version is 5.10","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
+	SuccessExpectedBodyForNonSupportingOS     = `{"status":"SUCCESS","result":{"passed":false,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Kernel Version Check","passed":true,"success_msg":"Linux kernel version is 5.10","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":false,"success_msg":"","error_msg":"Kali Linux version is not supported by automate","resolution_msg":"Ensure Kali Linux correct version is installed on the node"}]}}`
+	SuccessExpectedBodyForNonSupportingKernel = `{"status":"SUCCESS","result":{"passed":false,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Kernel Version Check","passed":false,"success_msg":"","error_msg":"Linux kernel version is lower than 3.2","resolution_msg":"Use a linux version whose kernel version is greater than 3.2"},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
+	FailureResponseForWrongQuery              = `{"status":"FAILED","result":null,"error":{"code":400,"message":"The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"}}`
+	LinuxVersionTitle                         = "Linux Version Check"
+	KernelVersionTitle                        = "Kernel Version Check"
+	MkdirTitle                                = "mkdir availability"
+	OpensslTitle                              = "openssl availability"
+	StatTitle                                 = "stat availability"
+	MkdirIsAvailable                          = "mkdir is available"
+	OpensslIsAvailable                        = "openssl is available"
+	StatIsAvailable                           = "stat is available"
 )
 
 func SetupMockSoftwareVersionService(response models.SoftwareVersionDetails, err error) softwareversionservice.ISoftwareVersionService {
@@ -87,6 +89,13 @@ func TestSoftwareVersionAPI(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
+						Title:         KernelVersionTitle,
+						Passed:        true,
+						SuccessMsg:    "Linux kernel version is 5.10",
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
@@ -121,6 +130,13 @@ func TestSoftwareVersionAPI(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
+						Title:         KernelVersionTitle,
+						Passed:        true,
+						SuccessMsg:    "Linux kernel version is 5.10",
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         LinuxVersionTitle,
 						Passed:        true,
 						SuccessMsg:    "Ubuntu version is 20.04",
@@ -135,10 +151,10 @@ func TestSoftwareVersionAPI(t *testing.T) {
 		},
 		{
 
-			description:  "200:success software version but OS is not supported",
+			description:  "200:success in software version and kernel version but OS is not supported",
 			expectedCode: 200,
 			responseBody: models.SoftwareVersionDetails{
-				Passed: true,
+				Passed: false,
 				Checks: []models.Checks{
 					{
 						Title:         StatTitle,
@@ -155,6 +171,13 @@ func TestSoftwareVersionAPI(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
+						Title:         KernelVersionTitle,
+						Passed:        true,
+						SuccessMsg:    "Linux kernel version is 5.10",
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         LinuxVersionTitle,
 						Passed:        false,
 						SuccessMsg:    "",
@@ -166,6 +189,46 @@ func TestSoftwareVersionAPI(t *testing.T) {
 			expectedBody:  SuccessExpectedBodyForNonSupportingOS,
 			expectedError: nil,
 			query:         "postgres",
+		},
+		{
+			description: "200:If query, cammand  and OS is supported but Kernel version is outdated",
+			expectedCode: 200,
+			responseBody: models.SoftwareVersionDetails{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         StatTitle,
+						Passed:        true,
+						SuccessMsg:    StatIsAvailable,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         MkdirTitle,
+						Passed:        true,
+						SuccessMsg:    MkdirIsAvailable,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         KernelVersionTitle,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      "Linux kernel version is lower than 3.2",
+						ResolutionMsg: "Use a linux version whose kernel version is greater than 3.2",
+					},
+					{
+						Title:         LinuxVersionTitle,
+						Passed:        true,
+						SuccessMsg:    "Ubuntu version is 20.04",
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
+			expectedBody: SuccessExpectedBodyForNonSupportingKernel,
+			expectedError: nil,
+			query: "postgres",
 		},
 		{
 			description:   "400:If the query entered by the User is not supported",

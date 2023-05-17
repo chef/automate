@@ -1,6 +1,7 @@
 package softwareversionservice
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,17 +18,19 @@ type ISoftwareVersionService interface {
 }
 
 type SoftwareVersionService struct {
-	cmdCheckArray []string
-	osFilepath    string
-	logger        logger.Logger
-	CheckPath     func(cmd string) (string, error)
+	cmdCheckArray  []string
+	osFilePath     string
+	kernelFilePath string
+	logger         logger.Logger
+	CheckPath      func(cmd string) (string, error)
 }
 
 func NewSoftwareVersionService(logger logger.Logger, CheckPath func(cmd string) (string, error)) ISoftwareVersionService {
 	return &SoftwareVersionService{
-		cmdCheckArray: cmdCheckArray,
-		osFilepath:    OSFILEPATH,
-		logger:        logger,
+		cmdCheckArray:  cmdCheckArray,
+		osFilePath:     OSFILEPATH,
+		kernelFilePath: KERNELFILEPATH,
+		logger:         logger,
 	}
 }
 
@@ -35,7 +38,9 @@ const (
 	AVAILABILITY              = " availability"
 	ENSURE                    = "Ensure "
 	OSFILEPATH                = "/etc/os-release"
+	KERNELFILEPATH            = "/proc/sys/kernel/osrelease"
 	LINUX_VERSION_CHECK       = "Linux Version Check"
+	KERNAL_VERSION_CHECK      = "Kernal Version Check"
 	UBUNTU                    = "Ubuntu"
 	RED_HAT                   = "Red Hat"
 	OPENSEARCH                = "opensearch"
@@ -45,6 +50,7 @@ const (
 	BASTION                   = "bastion"
 	DEBIAN                    = "Debian"
 	RED_HAT_SUPPORTED_VERSION = 7
+	KERNAL_SUPPORTED_VERSION  = 3.2
 )
 
 var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "mv", "systemd", "wget", "exec", "rsync"}
@@ -76,13 +82,21 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 		}
 		serviceResponseArray = append(serviceResponseArray, checkResponse)
 	}
-	osResponse, err := sv.checkOsVersion(sv.osFilepath)
+	osResponse, err := sv.checkOsVersion(sv.osFilePath)
 	if err != nil {
 		sv.logger.Error("Error while getting the OS Version: ", osResponse.ErrorMsg)
 	}
 	if !osResponse.Passed {
 		serviceResponse.Passed = false
 	}
+	kernelResponse, err := sv.checkKernelVersion(sv.kernelFilePath)
+	if err != nil {
+		sv.logger.Error("Error while getting the Kernal Version: ", kernelResponse.ErrorMsg)
+	}
+	if !kernelResponse.Passed {
+		serviceResponse.Passed = false
+	}
+	serviceResponseArray = append(serviceResponseArray, kernelResponse)
 	serviceResponseArray = append(serviceResponseArray, osResponse)
 	checks := make([]models.Checks, len(serviceResponseArray))
 	for i, svcResp := range serviceResponseArray {
@@ -116,7 +130,7 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
-		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run system on the supported platforms."), nil
+		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run automate on the supported platforms."), nil
 	}
 	sv.logger.Debug("Got the OS Version: ", osVersion)
 	sv.logger.Debug("Got the OS Name: ", osName)
@@ -167,6 +181,20 @@ func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVers
 		}
 	}
 	return correctVersion
+}
+
+func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath string) (*models.Checks, error) {
+	kernelVersion, err := getosutils.GetKernelVersion(kernelFilePath)
+	if err != nil {
+		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
+		return failureResponse(KERNAL_VERSION_CHECK, "Its not feasible to determine the Kernal version of the system", "Please run automate on the supported platforms."), nil
+	}
+	sv.logger.Debug("Got the kernal version:",kernelVersion)
+	checkVersion, _ := strconv.ParseFloat(kernelVersion, 64)
+	if checkVersion >= KERNAL_SUPPORTED_VERSION {
+		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+ fmt.Sprintf("%.2f", checkVersion)), nil
+	}
+	return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is lower than 3.2", "Use a linux version whose kernel version is greater than 3.2"), nil
 }
 
 func successResponse(title string, success_msg string) *models.Checks {

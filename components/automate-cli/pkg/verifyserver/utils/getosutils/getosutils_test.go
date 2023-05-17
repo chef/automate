@@ -8,6 +8,7 @@ import (
 
 const successfile = "../../services/softwareversionservice/testfiles/success.txt"
 const failurefile = "../../services/softwareversionservice/testfiles/wrongfile.txt"
+const successKernelfile = "../../services/softwareversionservice/testfiles/successkernal.txt"
 
 func TestGetOsVersion(t *testing.T) {
 	type args struct {
@@ -51,6 +52,46 @@ func TestGetOsVersion(t *testing.T) {
 			if got1 != tt.osVersion {
 				assert.Equal(t, got, tt.osVersion)
 			}
+		})
+	}
+}
+
+func TestGetKernalVersion(t *testing.T) {
+	type args struct {
+		kernelFilepath string
+	}
+	tests := []struct {
+		description     string
+		args            args
+		expectedVersion string
+		expectedErr     string
+	}{
+		{
+			description: "If able to get the kernel version",
+			args: args{
+				kernelFilepath: successKernelfile,
+			},
+			expectedVersion: "5.10",
+			expectedErr:     "",
+		},
+		{
+			description: "If not able to get the Kernel version from the file",
+			args: args{
+				kernelFilepath: failurefile,
+			},
+			expectedVersion: "",
+			expectedErr: "open ../../services/softwareversionservice/testfiles/wrongfile.txt: no such file or directory",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			got, err := GetKernelVersion(tt.args.kernelFilepath)
+			if err != nil {
+				assert.Equal(t, tt.expectedErr, err.Error())
+			}
+
+			assert.Equal(t, got, tt.expectedVersion)
+
 		})
 	}
 }
