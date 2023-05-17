@@ -1,12 +1,15 @@
 package startmockserverservice_test
 
 import (
+	"crypto/tls"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/lib/logger"
@@ -23,11 +26,12 @@ func TestStartMockServer(t *testing.T) {
 
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
+	PORT, err := GetFreePort()
 	t.Run("Start TCP server and check response", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "tcp",
-			Port:     3000,
+			Protocol: constants.TCP,
+			Port:     PORT,
 		}
 
 		err = servers.StartMockServer(cfg)
@@ -40,15 +44,15 @@ func TestStartMockServer(t *testing.T) {
 		require.Equal(t, cfg.Port, server.ListenerTCP.Addr().(*net.TCPAddr).Port)
 		{
 			// create a new TCP connection
-			conn1, err := net.Dial("tcp", ":3000")
+			conn1, err := net.Dial(constants.TCP, fmt.Sprintf(":%d", cfg.Port))
 			if err != nil {
 				t.Errorf("Error dialing TCP connection: %v", err)
 				return
 			}
 
-			// write a message to the connection
-			message := "test message"
-			_, err = conn1.Write([]byte(message))
+			// write a MESSAGE to the connection
+			MESSAGE := "test message"
+			_, err = conn1.Write([]byte(MESSAGE))
 			if err != nil {
 				t.Errorf("Error writing message to connection: %v", err)
 				return
@@ -65,7 +69,7 @@ func TestStartMockServer(t *testing.T) {
 
 			// verify that the response contains the message
 			if !strings.Contains(response, "ok") {
-				t.Errorf("Unexpected response. Expected message should contain \"%v\" \nActual message received: %v\n", message, response)
+				t.Errorf("Unexpected response. Expected message should contain \"%v\" \nActual message received: %v\n", MESSAGE, response)
 			}
 
 			// close the connection and #listener
@@ -76,7 +80,7 @@ func TestStartMockServer(t *testing.T) {
 	t.Run("Invalid Port for TCP server", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "tcp",
+			Protocol: constants.TCP,
 			Port:     80000,
 		}
 
@@ -87,8 +91,8 @@ func TestStartMockServer(t *testing.T) {
 	t.Run("Start UDP server", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "udp",
-			Port:     8001,
+			Protocol: constants.UDP,
+			Port:     PORT,
 		}
 		err := servers.StartMockServer(cfg)
 
@@ -101,7 +105,7 @@ func TestStartMockServer(t *testing.T) {
 		require.Equal(t, cfg.Port, server.ListenerUDP.LocalAddr().(*net.UDPAddr).Port)
 
 		{
-			conn1, err := net.Dial("udp", ":8001")
+			conn1, err := net.Dial(constants.UDP, fmt.Sprintf(":%d", cfg.Port))
 			if err != nil {
 				t.Errorf("Error dialing TCP connection: %v", err)
 				return
@@ -141,7 +145,7 @@ func TestStartMockServer(t *testing.T) {
 	t.Run("Invalid Port for UDP server", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "udp",
+			Protocol: constants.UDP,
 			Port:     800000,
 		}
 
@@ -153,8 +157,8 @@ func TestStartMockServer(t *testing.T) {
 	t.Run("Start HTTPS server", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "https",
-			Port:     8002,
+			Protocol: constants.HTTPS,
+			Port:     PORT,
 			Cert:     SERVER_CERT,
 			Key:      SERVER_KEY,
 		}
@@ -163,6 +167,33 @@ func TestStartMockServer(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, server)
 
+		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+
+		client := &http.Client{Transport: tr}
+
+		httpReq, err := http.NewRequest("GET", fmt.Sprintf("https://localhost:%d", cfg.Port), nil)
+
+		require.NoError(t, err)
+
+		// Perform the request
+		resp, err := client.Do(httpReq)
+		if err != nil {
+			t.Error("Error sending request:", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Read the response body
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Error("Error reading response body:", err)
+			return
+		}
+
+		// Print the response body
+		fmt.Println(string(body))
+		fmt.Println(startmockserverservice.GetPrivateIP())
+		require.Contains(t, string(body), startmockserverservice.GetPrivateIP())
 		// Check that the server is listening on the correct port
 		require.Equal(t, fmt.Sprintf(":%d", cfg.Port), server.ListenerHTTP.Addr)
 
@@ -174,8 +205,8 @@ func TestStartMockServer(t *testing.T) {
 	t.Run("HTTPS server with invalid cert values", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "https",
-			Port:     8002,
+			Protocol: constants.HTTPS,
+			Port:     PORT,
 			Cert:     "",
 			Key:      "",
 		}
@@ -185,9 +216,9 @@ func TestStartMockServer(t *testing.T) {
 		// Check that the server is listening on the correct port
 		require.Contains(t, err.Error(), "certificate input")
 	})
+
 	t.Run("HTTPS server with busy port", func(t *testing.T) {
 
-		const PORT = 8002
 		// Starting a server in port to be checked
 		go func() {
 			err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
@@ -198,7 +229,7 @@ func TestStartMockServer(t *testing.T) {
 
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
-			Protocol: "https",
+			Protocol: constants.HTTPS,
 			Port:     PORT,
 			Cert:     SERVER_CERT,
 			Key:      SERVER_KEY,
@@ -213,7 +244,7 @@ func TestStartMockServer(t *testing.T) {
 	t.Run("Unsupported protocol", func(t *testing.T) {
 		servers := startmockserverservice.New(log)
 		err := servers.StartMockServer(&models.StartMockServerRequestBody{
-			Port:     8003,
+			Port:     PORT,
 			Protocol: "http",
 			Cert:     "",
 			Key:      "",
@@ -222,4 +253,17 @@ func TestStartMockServer(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, "unsupported protocol", err.Error())
 	})
+}
+
+// GetFreePort asks the kernel for a free open port that is ready to use.
+func GetFreePort() (port int, err error) {
+	var a *net.TCPAddr
+	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
+		var l *net.TCPListener
+		if l, err = net.ListenTCP("tcp", a); err == nil {
+			defer l.Close()
+			return l.Addr().(*net.TCPAddr).Port, nil
+		}
+	}
+	return
 }

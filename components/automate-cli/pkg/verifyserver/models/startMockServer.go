@@ -20,3 +20,8 @@ type Server struct {
 	ListenerHTTP *http.Server
 	Protocol     string
 }
+
+type HTTPSServerResponse struct {
+	Private_IP string `json:"private_ip"`
+	Status     string `json:"status"`
+}

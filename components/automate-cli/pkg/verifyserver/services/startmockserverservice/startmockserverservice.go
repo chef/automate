@@ -2,6 +2,7 @@ package startmockserverservice
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -170,7 +171,23 @@ func (s *MockServerService) StartHTTPSServer(port int, cert string, key string) 
 
 	// Handle response
 	m.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Write([]byte("ok\n"))
+		privateIP := GetPrivateIP()
+
+		fmt.Println(privateIP)
+		response := models.HTTPSServerResponse{
+			Private_IP: privateIP,
+			Status:     "ok",
+		}
+
+		jsonData, err := json.Marshal(response)
+		if err != nil {
+			http.Error(rw, "Failed to marshal JSON", http.StatusInternalServerError)
+			return
+		}
+
+		rw.Header().Set("Content-Type", "application/json")
+
+		rw.Write(jsonData)
 	})
 
 	serverErr := make(chan error)
@@ -199,4 +216,36 @@ func (s *MockServerService) StartHTTPSServer(port int, cert string, key string) 
 			Protocol:     constants.HTTPS,
 		}, nil
 	}
+}
+
+// Function to get the private IP address of the server
+func GetPrivateIP() string {
+	// Get all network interfaces
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return "Unknown"
+	}
+
+	// Iterate through the interfaces and find the first non-loopback, non-virtual interface with an IP address
+	for _, iface := range interfaces {
+		if iface.Flags&net.FlagLoopback == 0 && iface.Flags&net.FlagUp != 0 {
+			addrs, err := iface.Addrs()
+			if err != nil {
+				continue
+			}
+
+			for _, addr := range addrs {
+				ipnet, ok := addr.(*net.IPNet)
+				if ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+					return ipnet.IP.String()
+				}
+				ipaddr, ok := addr.(*net.IPAddr)
+				if ok && !ipaddr.IP.IsLoopback() && ipaddr.IP.To4() != nil {
+					return ipaddr.IP.String()
+				}
+			}
+		}
+	}
+
+	return "Unknown"
 }
