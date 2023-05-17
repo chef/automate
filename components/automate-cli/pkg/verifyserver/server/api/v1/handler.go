@@ -3,15 +3,17 @@ package v1
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/lib/logger"
 )
 
 type Handler struct {
-	Logger            logger.Logger
-	StatusService     statusservice.IStatusService
-	BatchCheckService batchcheckservice.IBatchCheckService
-	NFSMountService   nfsmountservice.INFSService
+	Logger             logger.Logger
+	StatusService      statusservice.IStatusService
+	BatchCheckService  batchcheckservice.IBatchCheckService
+	MockServersService startmockserverservice.IStartMockServersService
+	NFSMountService    nfsmountservice.INFSService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -20,6 +22,11 @@ func NewHandler(logger logger.Logger) *Handler {
 
 func (h *Handler) AddStatusService(ss statusservice.IStatusService) *Handler {
 	h.StatusService = ss
+	return h
+}
+
+func (h *Handler) AddMockServerServices(mss startmockserverservice.IStartMockServersService) *Handler {
+	h.MockServersService = mss
 	return h
 }
 
