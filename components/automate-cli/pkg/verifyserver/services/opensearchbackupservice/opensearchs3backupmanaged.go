@@ -62,11 +62,11 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 		return models.S3BackupManagedResponse{}, err
 	}
 
-	if _, err = ss.OSOperations.CreateTestIndex(client, ctx, TestIndexName); err != nil {
+	if _, err = ss.OSOperations.CreateTestIndex(client, ctx, TEST_INDEX_NAME); err != nil {
 		ss.Log.Error("Index creation failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(IndexCreateFailedMessage, IndexCreateFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(INDEX_CREATE_FAILED_MESSAGE, INDEX_CREATE_FAILED_RESOLUTION)},
 		}, err
 	}
 
@@ -77,51 +77,51 @@ func (ss *OSS3BackupService) OSS3BackupVerify(request models.S3BackupDetails, ct
 		Region:   request.AWSRegion,
 	}
 
-	if _, err = ss.OSOperations.CreateSnapshotRepo(client, ctx, snapshotCreateReq, TestRepoName); err != nil {
+	if _, err = ss.OSOperations.CreateSnapshotRepo(client, ctx, snapshotCreateReq, TEST_REPO_NAME); err != nil {
 		ss.Log.Error("Snapshot Repo creation failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotRepoCreateFailedMessage, SnapShotRepoCreateFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(SNAPSHOT_REPO_CREATE_FAILED_MESSAGE, SNAPSHOT_REPO_CREATE_FAILED_RESOLUTION)},
 		}, err
 	}
 
-	if _, err = ss.OSOperations.CreateSnapshot(client, ctx, TestRepoName, TestSnapshotName, TestIndexName); err != nil {
+	if _, err = ss.OSOperations.CreateSnapshot(client, ctx, TEST_REPO_NAME, TEST_SNAPSHOT_NAME, TEST_INDEX_NAME); err != nil {
 		ss.Log.Error("Snapshot creation failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotCreateFailedMessage, SnapShotCreateFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(SNAPSHOT_CREATE_FAILED_MESSAGE, SNAPSHOT_CREATE_FAILED_RSOLUTION)},
 		}, err
 	}
 
-	if status, err := ss.OSOperations.GetSnapshotStatus(client, ctx, TestRepoName, TestSnapshotName); err != nil || status != "SUCCESS" {
+	if status, err := ss.OSOperations.GetSnapshotStatus(client, ctx, TEST_REPO_NAME, TEST_SNAPSHOT_NAME); err != nil || status != "SUCCESS" {
 		ss.Log.Error("Snapshot Status check failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotCreateFailedMessage, SnapShotCreateFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(SNAPSHOT_CREATE_FAILED_MESSAGE, SNAPSHOT_CREATE_FAILED_RSOLUTION)},
 		}, err
 	}
 
-	if _, err = ss.OSOperations.DeleteTestSnapshot(client, ctx, TestRepoName, TestSnapshotName); err != nil {
+	if _, err = ss.OSOperations.DeleteTestSnapshot(client, ctx, TEST_REPO_NAME, TEST_SNAPSHOT_NAME); err != nil {
 		ss.Log.Error("Snapshot deleteion failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotDeleteFailedMessage, SnapShotDeleteFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(SNAPSHOT_DELETE_FAILED_MESSAGE, SNAPSHOT_DELETE_FAILED_RESOLUTION)},
 		}, err
 	}
 
-	if _, err = ss.OSOperations.DeleteTestSnapshotRepo(client, ctx, TestRepoName); err != nil {
+	if _, err = ss.OSOperations.DeleteTestSnapshotRepo(client, ctx, TEST_REPO_NAME); err != nil {
 		ss.Log.Error("Snapshot Repo deletion failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(SnapShotRepoDeleteFailedMessage, SnapShotRepoDeleteFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(SNAPSHOT_REPO_DELETE_FAILED_MESSAGE, SNAPSHOT_REPO_DELETE_FAILED_RESOLUTION)},
 		}, err
 	}
 
-	if _, err = ss.OSOperations.DeleteTestIndex(client, ctx, TestIndexName); err != nil {
+	if _, err = ss.OSOperations.DeleteTestIndex(client, ctx, TEST_INDEX_NAME); err != nil {
 		ss.Log.Error("Index deletion failed: ", err)
 		return models.S3BackupManagedResponse{
 			Passed: false,
-			Checks: []models.S3BackupChecks{createFailedResponse(IndexDeleteFailedMessage, IndexDeleteFailedResolution)},
+			Checks: []models.S3BackupChecks{createFailedResponse(INDEX_DELETE_FAILED_MESSAGE, INDEX_DELETE_FAILED_RESOLUTION)},
 		}, err
 	}
 
