@@ -22,6 +22,7 @@ var (
 	SuccessExpectedBodyForNonSupportingOS     = `{"status":"SUCCESS","result":{"passed":false,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Kernel Version Check","passed":true,"success_msg":"Linux kernel version is 5.10","error_msg":"","resolution_msg":""},{"title":"Linux Version Check","passed":false,"success_msg":"","error_msg":"Kali Linux version is not supported by automate","resolution_msg":"Ensure Kali Linux correct version is installed on the node"}]}}`
 	SuccessExpectedBodyForNonSupportingKernel = `{"status":"SUCCESS","result":{"passed":false,"checks":[{"title":"stat availability","passed":true,"success_msg":"stat is available","error_msg":"","resolution_msg":""},{"title":"mkdir availability","passed":true,"success_msg":"mkdir is available","error_msg":"","resolution_msg":""},{"title":"Kernel Version Check","passed":false,"success_msg":"","error_msg":"Linux kernel version is lower than 3.2","resolution_msg":"Use a linux version whose kernel version is greater than 3.2"},{"title":"Linux Version Check","passed":true,"success_msg":"Ubuntu version is 20.04","error_msg":"","resolution_msg":""}]}}`
 	FailureResponseForWrongQuery              = `{"status":"FAILED","result":null,"error":{"code":400,"message":"The query wrongquery is not supported. The Supported query's are = postgres, opensearch, bastion, automate, chef-server"}}`
+	FailureResponseForEmptyQuery              = `{"status":"FAILED","result":null,"error":{"code":400,"message":"Unsupported query or missing query. Expected value for query 'node_type' are bastion, automate, chef-server, postgres or opensearch."}}`
 	LinuxVersionTitle                         = "Linux Version Check"
 	KernelVersionTitle                        = "Kernel Version Check"
 	MkdirTitle                                = "mkdir availability"
@@ -191,7 +192,7 @@ func TestSoftwareVersionAPI(t *testing.T) {
 			query:         "postgres",
 		},
 		{
-			description: "200:If query, cammand  and OS is supported but Kernel version is outdated",
+			description:  "200:If query, cammand  and OS is supported but Kernel version is outdated",
 			expectedCode: 200,
 			responseBody: models.SoftwareVersionDetails{
 				Passed: false,
@@ -226,9 +227,17 @@ func TestSoftwareVersionAPI(t *testing.T) {
 					},
 				},
 			},
-			expectedBody: SuccessExpectedBodyForNonSupportingKernel,
+			expectedBody:  SuccessExpectedBodyForNonSupportingKernel,
 			expectedError: nil,
-			query: "postgres",
+			query:         "postgres",
+		},
+		{
+			description:  `400:If the passed query is empty or spelling of 'node-type' is incorrect`,
+			expectedCode: 400,
+			responseBody: models.SoftwareVersionDetails{},
+			expectedBody: FailureResponseForEmptyQuery,
+			expectedError: errors.New(`Unsupported query or missing query. Expected value for query 'node_type' are bastion, automate, chef-server, postgres or opensearch.`),
+			query: "",
 		},
 		{
 			description:   "400:If the query entered by the User is not supported",

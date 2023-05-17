@@ -8,7 +8,7 @@ import (
 
 func (h *Handler) CheckSoftwareVersion(c *fiber.Ctx) {
 	if c.Query("node_type") == "" {
-		c.Next(&fiber.Error{Message: "The empty query is not supported. The Supported query's are: postgres, opensearch, bastion, automate, chef-server", Code: fiber.StatusBadRequest})
+		c.Next(&fiber.Error{Message: `Unsupported query or missing query. Expected value for query 'node_type' are bastion, automate, chef-server, postgres or opensearch.`, Code: fiber.StatusBadRequest})
 		return
 	}
 	services, err := h.SoftwareVersionService.GetSoftwareVersionDetails(c.Query("node_type"))
