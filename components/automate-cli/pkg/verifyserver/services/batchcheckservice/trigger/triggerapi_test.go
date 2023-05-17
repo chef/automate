@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -488,4 +489,30 @@ func createDummyServer() (*httptest.Server, string, string) {
 	ip := address[:colonIndex]
 	port := address[colonIndex+1:]
 	return server, ip, port
+}
+
+func TestRunParallelChecksWithRequest(t *testing.T) {
+	type args struct {
+		config   models.Config
+		log      logger.Logger
+		port     string
+		path     string
+		depState string
+		method   string
+		requests []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := RunParallelChecksWithRequest(tt.args.config, tt.args.log, tt.args.port, tt.args.path, tt.args.depState, tt.args.method, tt.args.requests); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RunParallelChecksWithRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
