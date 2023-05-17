@@ -224,7 +224,7 @@ func TestStartMockServer(t *testing.T) {
 		go func() {
 			err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
 			if err != nil {
-				fmt.Println("Error starting the server:", err)
+				t.Error("Error starting the server:", err)
 			}
 		}()
 
