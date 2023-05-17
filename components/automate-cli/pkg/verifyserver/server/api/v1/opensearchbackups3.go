@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/gofiber/fiber"
 )
 
@@ -33,7 +34,7 @@ func (h *Handler) CheckOSBackupS3(c *fiber.Ctx) {
 		c.Next(&fiber.Error{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	c.Status(fiber.StatusOK).JSON(resp)
+	c.JSON(response.BuildSuccessResponse(resp))
 
 }
 
