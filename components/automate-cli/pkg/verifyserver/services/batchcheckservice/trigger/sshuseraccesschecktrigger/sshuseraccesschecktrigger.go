@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
@@ -30,12 +31,9 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 
 func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing SSH user access check from batch check ")
-	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
-		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 
-	outputCh := make(chan models.CheckTriggerResponse, count)
+	var requests []interface{}
 
-	var finalResult []models.CheckTriggerResponse
 	hostMap := configutils.GetNodeTypeMap(config)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
@@ -43,17 +41,40 @@ func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerRes
 			data, _ := json.Marshal(config.SSHUser)
 			json.Unmarshal(data, &requestBody)
 			requestBody[ip] = ip
-			go ss.TriggerCheckAndFormatOutput(ip, types[i], requestBody, outputCh)
+			requests = append(requests, requestBody)
 		}
 
 	}
 
-	for i := 0; i < count; i++ {
-		resp := <-outputCh
-		finalResult = append(finalResult, resp)
-	}
-	close(outputCh)
-	return finalResult
+	return trigger.RunParallelChecksWithRequest(config, ss.log, ss.port, constants.SSH_USER_CHECK_API_PATH, "", http.MethodPost, requests)
+
+	//COMMENTING OLD CHANGES _ WILL REMOVE AFTER FINAL REVIEW
+
+	// ss.log.Info("Performing SSH user access check from batch check ")
+	// count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
+	// 	config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
+
+	// outputCh := make(chan models.CheckTriggerResponse, count)
+
+	// var finalResult []models.CheckTriggerResponse
+	// hostMap := configutils.GetNodeTypeMap(config)
+	// for ip, types := range hostMap {
+	// 	for i := 0; i < len(types); i++ {
+	// 		var requestBody map[string]interface{}
+	// 		data, _ := json.Marshal(config.SSHUser)
+	// 		json.Unmarshal(data, &requestBody)
+	// 		requestBody[ip] = ip
+	// 		go ss.TriggerCheckAndFormatOutput(ip, types[i], requestBody, outputCh)
+	// 	}
+
+	// }
+
+	// for i := 0; i < count; i++ {
+	// 	resp := <-outputCh
+	// 	finalResult = append(finalResult, resp)
+	// }
+	// close(outputCh)
+	// return finalResult
 }
 
 func (ss *SshUserAccessCheck) TriggerCheckAndFormatOutput(host string, nodeType string, body interface{}, output chan<- models.CheckTriggerResponse) {

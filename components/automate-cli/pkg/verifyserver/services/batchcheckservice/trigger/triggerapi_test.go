@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -178,7 +179,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", output)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -196,7 +197,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, constants.POSTGRESQL, output)
+		go triggerCheckAPI(endPoint, host, constants.POSTGRESQL, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -219,7 +220,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -242,7 +243,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -259,7 +260,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, constants.AUTOMATE, output)
+		go triggerCheckAPI(endPoint, host, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -474,4 +475,30 @@ func createDummyServer() (*httptest.Server, string, string) {
 	ip := address[:colonIndex]
 	port := address[colonIndex+1:]
 	return server, ip, port
+}
+
+func TestRunParallelChecksWithRequest(t *testing.T) {
+	type args struct {
+		config   models.Config
+		log      logger.Logger
+		port     string
+		path     string
+		depState string
+		method   string
+		requests []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := RunParallelChecksWithRequest(tt.args.config, tt.args.log, tt.args.port, tt.args.path, tt.args.depState, tt.args.method, tt.args.requests); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RunParallelChecksWithRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
@@ -30,22 +31,15 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 
 func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
-	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
-		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 
-	outputCh := make(chan models.CheckTriggerResponse, count)
-
-	//This map will hold the Response against each IP
-	var finalResult []models.CheckTriggerResponse
-
-	certificate := config.Certificate
+	var requests []interface{}
 
 	hostMap := configutils.GetNodeTypeMap(config)
-	for _, node := range certificate.Nodes {
+	for _, node := range config.Certificate.Nodes {
 		nodeTypes := hostMap[node.IP]
 		//construct the request for Certificate Check API
 		requestBody := models.CertificateCheckRequest{
-			RootCertificate:  certificate.RootCert,
+			RootCertificate:  config.Certificate.RootCert,
 			PrivateKey:       node.Key,
 			NodeCertificate:  node.Cert,
 			AdminPrivateKey:  node.AdminKey,
@@ -53,17 +47,48 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 		}
 
 		for i := 0; i < len(nodeTypes); i++ {
-			go ss.TriggerCheckAndFormatOutput(node.IP, nodeTypes[i], requestBody, outputCh)
+			requests = append(requests, requestBody)
 		}
 	}
 
-	//Read response from output channel
-	for i := 0; i < count; i++ {
-		resp := <-outputCh
-		finalResult = append(finalResult, resp)
-	}
-	close(outputCh)
-	return finalResult
+	return trigger.RunParallelChecksWithRequest(config, ss.log, ss.port, constants.SSH_USER_CHECK_API_PATH, "", http.MethodPost, requests)
+
+	//COMMENTING OLD CHANGES _ WILL REMOVE AFTER FINAL REVIEW
+
+	// count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
+	// 	config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
+
+	// outputCh := make(chan models.CheckTriggerResponse, count)
+
+	// //This map will hold the Response against each IP
+	// var finalResult []models.CheckTriggerResponse
+
+	// certificate := config.Certificate
+
+	// hostMap := configutils.GetNodeTypeMap(config)
+	// for _, node := range certificate.Nodes {
+	// 	nodeTypes := hostMap[node.IP]
+	// 	//construct the request for Certificate Check API
+	// 	requestBody := models.CertificateCheckRequest{
+	// 		RootCertificate:  certificate.RootCert,
+	// 		PrivateKey:       node.Key,
+	// 		NodeCertificate:  node.Cert,
+	// 		AdminPrivateKey:  node.AdminKey,
+	// 		AdminCertificate: node.AdminCert,
+	// 	}
+
+	// 	for i := 0; i < len(nodeTypes); i++ {
+	// 		go ss.TriggerCheckAndFormatOutput(node.IP, nodeTypes[i], requestBody, outputCh)
+	// 	}
+	// }
+
+	// //Read response from output channel
+	// for i := 0; i < count; i++ {
+	// 	resp := <-outputCh
+	// 	finalResult = append(finalResult, resp)
+	// }
+	// close(outputCh)
+	// return finalResult
 }
 
 func (ss *CertificateCheck) TriggerCheckAndFormatOutput(host string, nodeType string, body interface{}, output chan<- models.CheckTriggerResponse) {

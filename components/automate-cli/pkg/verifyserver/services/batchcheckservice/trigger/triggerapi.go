@@ -1,8 +1,10 @@
 package trigger
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -26,24 +28,24 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
 		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, outputCh)
+		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, http.MethodGet, outputCh, nil)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.AUTOMATE, depState)
-		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, outputCh)
+		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, http.MethodGet, outputCh, nil)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.CHEF_INFRA_SERVER, depState)
-		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, outputCh)
+		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, http.MethodGet, outputCh, nil)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.OPENSEARCH, depState)
-		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, outputCh)
+		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, http.MethodGet, outputCh, nil)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.POSTGRESQL, depState)
-		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, outputCh)
+		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, http.MethodGet, outputCh, nil)
 	}
 
 	for i := 0; i < count; i++ {
@@ -71,10 +73,25 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	return endPoint
 }
 
-func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.CheckTriggerResponse) {
+// triggerCheckAPI prepares interface request body to io.Reader and triggers the API where where response and error is passed into
+// the output channel and func exits
+func triggerCheckAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody interface{}) {
 	var ctr models.CheckTriggerResponse
 
-	req, err := http.NewRequest(http.MethodGet, endPoint, nil)
+	reader, err := interfaceToIOReader(reqBody)
+	if err != nil {
+		output <- models.CheckTriggerResponse{
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
+			},
+			Host:     host,
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	req, err := http.NewRequest(method, endPoint, reader)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host: host,
@@ -90,7 +107,6 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
-
 	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
@@ -133,4 +149,43 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 	ctr.Host = host
 	ctr.NodeType = nodeType
 	output <- ctr
+}
+
+func interfaceToIOReader(body interface{}) (io.Reader, error) {
+	var reader io.Reader
+	if body != nil {
+		bx, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		reader = bytes.NewBuffer(bx)
+
+	}
+	return reader, nil
+}
+
+func RunParallelChecksWithRequest(config models.Config, log logger.Logger, port string, path string, depState string, method string, requests []interface{}) []models.CheckTriggerResponse {
+	var result []models.CheckTriggerResponse
+	count := config.Hardware.AutomateNodeCount +
+		config.Hardware.ChefInfraServerNodeCount +
+		config.Hardware.PostgresqlNodeCount +
+		config.Hardware.OpenSearchNodeCount
+
+	outputCh := make(chan models.CheckTriggerResponse)
+
+	for request := range requests {
+
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, http.MethodPost, outputCh, request)
+
+	}
+
+	for i := 0; i < count; i++ {
+		res := <-outputCh
+		result = append(result, res)
+
+	}
+
+	return result
 }
