@@ -8,7 +8,7 @@ import (
 
 const successfile = "../../services/softwareversionservice/testfiles/success.txt"
 const failurefile = "../../services/softwareversionservice/testfiles/wrongfile.txt"
-const successKernelfile = "../../services/softwareversionservice/testfiles/successkernal.txt"
+const successKernelfile = "../../services/softwareversionservice/testfiles/successkernel.txt"
 
 func TestGetOsVersion(t *testing.T) {
 	type args struct {
