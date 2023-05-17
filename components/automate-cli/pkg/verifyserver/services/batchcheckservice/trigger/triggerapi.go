@@ -32,28 +32,29 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 		result = append(result, res)
 		return result
 	}
+
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
-		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, method, outputCh, reqBody)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "automate", depState)
-		go triggerCheckAPI(endpoint, ip, "automate", method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, ip, port, constants.AUTOMATE, depState)
+		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, method, outputCh, reqBody)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "chef-infra-server", depState)
-		go triggerCheckAPI(endpoint, ip, "chef-infra-server", method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, ip, port, constants.CHEF_INFRA_SERVER, depState)
+		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, method, outputCh, reqBody)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "opensearch", depState)
-		go triggerCheckAPI(endpoint, ip, "opensearch", method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, ip, port, constants.OPENSEARCH, depState)
+		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, method, outputCh, reqBody)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		endpoint := prepareEndpoint(path, ip, port, "postgresql", depState)
-		go triggerCheckAPI(endpoint, ip, "postgresql", method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, ip, port, constants.POSTGRESQL, depState)
+		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, method, outputCh, reqBody)
 	}
 
 	for i := 0; i < count; i++ {

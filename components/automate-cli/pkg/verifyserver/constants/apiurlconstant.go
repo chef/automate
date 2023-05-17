@@ -10,4 +10,5 @@ const (
 	SOFTWARE_VERSION_CHECK_API_PATH  = "/api/v1/checks/software-versions"
 	SYSTEM_RESOURCE_CHECK_API_PATH   = "/api/v1/checks/system-resource"
 	SYSTEM_USER_CHECK_API_PATH       = "/api/v1/checks/system-user"
+	FIREWALL_API_PATH                = "/api/v1/checks/firewall"
 )
