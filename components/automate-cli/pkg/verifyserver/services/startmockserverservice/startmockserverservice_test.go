@@ -163,8 +163,8 @@ func TestStartMockServer(t *testing.T) {
 			Key:      SERVER_KEY,
 		}
 		err := servers.StartMockServer(cfg)
-		server := servers.GetMockServers()[0]
 		require.NoError(t, err)
+		server := servers.GetMockServers()[0]
 		require.NotNil(t, server)
 
 		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -191,8 +191,6 @@ func TestStartMockServer(t *testing.T) {
 		}
 
 		// Print the response body
-		fmt.Println(string(body))
-		fmt.Println(startmockserverservice.GetPrivateIP())
 		require.Contains(t, string(body), startmockserverservice.GetPrivateIP())
 		// Check that the server is listening on the correct port
 		require.Equal(t, fmt.Sprintf(":%d", cfg.Port), server.ListenerHTTP.Addr)
@@ -223,7 +221,7 @@ func TestStartMockServer(t *testing.T) {
 		go func() {
 			err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
 			if err != nil {
-				fmt.Println("Error starting the server:", err)
+				t.Error("Error starting the server:", err)
 			}
 		}()
 
