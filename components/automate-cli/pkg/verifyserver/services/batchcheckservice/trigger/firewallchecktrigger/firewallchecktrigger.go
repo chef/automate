@@ -17,20 +17,6 @@ type FirewallCheck struct {
 	log  logger.Logger
 }
 
-// type Request struct {
-//  Requests []ReqBody
-// }
-
-// type ReqBody struct {
-// 	SourceNodeIP               string `json:"source_node_ip"`
-// 	DestinationNodeIP          string `json:"destination_node_ip"`
-// 	DestinationServicePort     string `json:"destination_service_port"`
-// 	DestinationServiceProtocol string `json:"destination_service_protocol"`
-// 	Cert                       string `json:"cert"`
-// 	Key                        string `json:"key"`
-// 	RootCert                   string `json:"root_cert"`
-// }
-
 func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 	return &FirewallCheck{
 		log:  log,
@@ -42,7 +28,7 @@ func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	fc.log.Info("Performing Firewall check from batch check ")
 	requests := makeRequests(config)
-	bx, _ := json.MarshalIndent("reqbody", "", "\t")
+	bx, _ := json.MarshalIndent(requests, "", "\t")
 	ioutil.WriteFile("abc.json", bx, 0777)
 	return trigger.RunCheckMultiRequests(config, fc.log, fc.port, constants.FIREWALL_API_PATH, "", http.MethodPost, requests)
 }
