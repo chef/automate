@@ -1,8 +1,6 @@
 package firewallchecktrigger
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -28,8 +26,6 @@ func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	fc.log.Info("Performing Firewall check from batch check ")
 	requests := makeRequests(config)
-	bx, _ := json.MarshalIndent(requests, "", "\t")
-	ioutil.WriteFile("abc.json", bx, 0777)
 	return trigger.RunCheckMultiRequests(config, fc.log, fc.port, constants.FIREWALL_API_PATH, "", http.MethodPost, requests)
 }
 
