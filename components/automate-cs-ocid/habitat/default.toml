@@ -37,3 +37,12 @@ db_name="automate-cs-ocid"
 pool_max_size=5
 pool_init_size=5
 pool_queue_max=50
+
+[ocid]
+  [chef_server_config]
+    endpoint="https://127.0.0.1:443"
+    superuser="pivotal"
+    # By default the certificate verification is disabled for chef-server(erchef)
+    # But if you have a valid certificate in your chef-server then you should
+    # set it to: verify_peer
+    ssl_verify_mode="verify_none"

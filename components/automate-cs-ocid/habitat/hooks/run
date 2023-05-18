@@ -7,14 +7,23 @@ cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
-export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
 export DATABASE_URL="{{cfg.DATABASE_URL}}"
 
-WEBUI_SRC_PATH="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
-WEBUI_KEY=`sed ':a;N;$!ba;s/\n/\\n/g' $WEBUI_SRC_PATH`
-PRIVATE_CHEF_SECRETS_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config/private-chef-secrets.json"
-ruby /hab/svc/automate-cs-ocid/config/tasks/set_webui_key.rb "$WEBUI_KEY" "$PRIVATE_CHEF_SECRETS_PATH"
+export OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+
+# Set webui key from erchef component
+source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
+
+# Setup environment specific configurations for integration with erchef
+source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
+
+# NOTE: Please keep this statement just before running
+# any environment specific command e.g. starting rails server.
+# The running server will follow the configurations that are
+# exported from this JSON file. So if this file is getting updated
+# pls make sure export happens after the file is updated.
+export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
 bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
