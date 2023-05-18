@@ -41,89 +41,229 @@ func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 
 func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	fc.log.Info("Performing Firewall check from batch check ")
-	reqbody, _ := createReqBody(config)
-	bx, _ := json.MarshalIndent(reqbody, "", "\t")
+	requests := makeRequests(config)
+	bx, _ := json.MarshalIndent("reqbody", "", "\t")
 	ioutil.WriteFile("abc.json", bx, 0777)
 	return nil
-	return trigger.RunCheckAllInstance(config, fc.log, fc.port, constants.FIREWALL_API_PATH, "", http.MethodPost, nil)
+	return trigger.RunCheckMultiRequests(config, fc.log, fc.port, constants.FIREWALL_API_PATH, "", http.MethodPost, requests)
 }
 
-func createReqBody(config models.Config) ([]ReqBody, error) {
+// The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
+// TODO: Check about Cert and Key
+func makeRequests(config models.Config) []ReqBody {
 	var reqBodies []ReqBody
 
-	// Get the ports configuration
-	ports := constructPorts()
-
-	// source automate - dest postgres
+	// _____________________________________________ Row 1: Chef Automate to all the OS and PG nodes _____________________________________________
+	// Dest postgres
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 			reqBody := ReqBody{
-				SourceNodeIP:           sourceNodeIP,
-				DestinationNodeIP:      destNodeIP,
-				DestinationServicePort: "7432",
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "7432",
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
 	}
 
-	// source automate - dest postgres
+	// Dest opensearch
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 			reqBody := ReqBody{
-				SourceNodeIP:           sourceNodeIP,
-				DestinationNodeIP:      destNodeIP,
-				DestinationServicePort: "9200",
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "9200",
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
 	}
 
-	// TODO: correct the rest
+	// _____________________________________________ Row 1: Chef Infra to all the OS and PG nodes _____________________________________________
+	// Dest automate
+	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
+		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
+			reqBody := ReqBody{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "443",
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+
+	// Dest postgres
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody, err := createReqBodyForNodes(sourceNodeIP, destNodeIP, ports.ChefInfraServer)
-			if err != nil {
-				return nil, err
+			reqBody := ReqBody{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "7432",
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
 	}
 
-	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
+	// Dest opensearch
+	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody, err := createReqBodyForNodes(sourceNodeIP, destNodeIP, ports.Postgresql)
-			if err != nil {
-				return nil, err
+			reqBody := ReqBody{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "9200",
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
 	}
 
-	// Add other pairings as needed for different server types
-
-	return reqBodies, nil
-}
-
-func createReqBodyForNodes(sourceIP, destIP string, instances []Instance) (ReqBody, error) {
-	var reqBody ReqBody
-
-	// Find the matching instance configuration for the given server type
-	var instanceConfig Instance
-	for _, instance := range instances {
-		if instance.Name == constants.OPENSEARCH {
-			instanceConfig = instance
-			break
+	// _____________________________________________ Row 1: PSQL to all the PG nodes (TCP AND UDP ports) _____________________________________________
+	// Dest postgres UDP
+	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
+		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
+			reqBody := ReqBody{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "9638",
+				DestinationServiceProtocol: "udp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+	// Dest postgres UDP
+	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
+		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
+			for _, port := range postgresqlTCPPorts {
+				reqBody := ReqBody{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
+					Cert:                       config.Certificate.Nodes[0].Cert,
+					Key:                        config.Certificate.Nodes[0].Key,
+					RootCert:                   config.Certificate.RootCert,
+				}
+				reqBodies = append(reqBodies, reqBody)
+			}
 		}
 	}
 
-	// Set the values in the request body
-	reqBody.SourceNodeIP = sourceIP
-	reqBody.DestinationNodeIP = destIP
-	reqBody.DestinationServicePort = instanceConfig.PortProtocolMap["tcp"][0]
-	reqBody.DestinationServiceProtocol = "tcp"
-	reqBody.Cert = ""
-	reqBody.Key = ""
-	reqBody.RootCert = ""
+	// _____________________________________________ Row 1: OS to all the OS nodes (TCP AND UDP ports) _____________________________________________
+	// Dest Opensearch UDP
+	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
+		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
+			reqBody := ReqBody{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "9638",
+				DestinationServiceProtocol: "udp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+	// Dest Opensearch UDP
+	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
+		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
+			for _, port := range opensearchTCPPorts {
+				reqBody := ReqBody{
+					SourceNodeIP:               sourceNodeIP,
+					DestinationNodeIP:          destNodeIP,
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
+					Cert:                       config.Certificate.Nodes[0].Cert,
+					Key:                        config.Certificate.Nodes[0].Key,
+					RootCert:                   config.Certificate.RootCert,
+				}
+				reqBodies = append(reqBodies, reqBody)
+			}
+		}
+	}
 
-	return reqBody, nil
+	// _____________________________________________ Row 1: Bastion to all the HA nodes (TCP AND UDP ports) _____________________________________________
+	// Dest Automate
+	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
+		for _, port := range a2CsTCPPorts {
+			reqBody := ReqBody{
+				SourceNodeIP:               "127.0.0.1", // Bastion host
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     port,
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+	// Dest Chef Infra
+	for _, destNodeIP := range config.Hardware.ChefInfraServerNodeIps {
+		for _, port := range a2CsTCPPorts {
+			reqBody := ReqBody{
+				SourceNodeIP:               "127.0.0.1", // Bastion host
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     port,
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+	// Dest Postgres
+	for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
+		for _, port := range postgresBastionPorts {
+			reqBody := ReqBody{
+				SourceNodeIP:               "127.0.0.1", // Bastion host
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     port,
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+	// Dest Chef Infra
+	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
+		for _, port := range ossBastionPorts {
+			reqBody := ReqBody{
+				SourceNodeIP:               "127.0.0.1", // Bastion host
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     port,
+				DestinationServiceProtocol: "tcp",
+				Cert:                       config.Certificate.Nodes[0].Cert,
+				Key:                        config.Certificate.Nodes[0].Key,
+				RootCert:                   config.Certificate.RootCert,
+			}
+			reqBodies = append(reqBodies, reqBody)
+		}
+	}
+
+	return reqBodies
 }

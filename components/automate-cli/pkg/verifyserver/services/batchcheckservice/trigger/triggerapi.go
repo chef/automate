@@ -15,8 +15,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func RunCheckAllInstance(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody []interface{}) []models.CheckTriggerResponse {
+func RunCheckMultiRequests(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
+	// outputCh := make(chan models.CheckTriggerResponse)
 
 	return result
 }
