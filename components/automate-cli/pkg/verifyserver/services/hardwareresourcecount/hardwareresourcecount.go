@@ -123,25 +123,30 @@ func getMinNodesHARequirement(nodeType string) int {
 }
 
 // createNodeSet function is used for storing all the nodes of particular services.
-func createNodeSet(req models.Hardware) (map[string]string, map[string]string, map[string]string, map[string]string, map[string]string, map[string]string) {
+func (hrc *HardwareResourceCountService) createNodeSet(req models.Hardware) (map[string]string, map[string]string, map[string]string, map[string]string, map[string]string, map[string]string) {
 	setAutomate := make(map[string]string)
 	setChefServer := make(map[string]string)
 	setPostgresql := make(map[string]string)
 	setOpensearch := make(map[string]string)
 	setBackend := make(map[string]string)
 	setFrontend := make(map[string]string)
+
+	hrc.log.Debug("Storing the Automate Ips in map")
 	for _, ip := range req.AutomateNodeIps {
 		setAutomate[ip] = constants.AUTOMATE
 		setFrontend[ip] = constants.AUTOMATE
 	}
+	hrc.log.Debug("Storing the Chef-Infra-Server Ips in map")
 	for _, ip := range req.ChefInfraServerNodeIps {
 		setChefServer[ip] = constants.CHEF_INFRA_SERVER
 		setFrontend[ip] = constants.CHEF_INFRA_SERVER
 	}
+	hrc.log.Debug("Storing the Postgresql Ips in map")
 	for _, ip := range req.PostgresqlNodeIps {
 		setPostgresql[ip] = constants.POSTGRESQL
 		setBackend[ip] = constants.POSTGRESQL
 	}
+	hrc.log.Debug("Storing the Opensearch Ips in map")
 	for _, ip := range req.OpenSearchNodeIps {
 		setOpensearch[ip] = constants.OPENSEARCH
 		setBackend[ip] = constants.OPENSEARCH
@@ -163,16 +168,18 @@ func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Har
 	// For storing the response in a specified order.
 	var hardwareResultOrderList []string
 
-	setAutomate, setChefServer, setPostgresql, setOpensearch, setFrontend, setBackend := createNodeSet(req)
+	setAutomate, setChefServer, setPostgresql, setOpensearch, setFrontend, setBackend := hrc.createNodeSet(req)
 
 	for index, ip := range req.AutomateNodeIps {
 		key := constants.AUTOMATE + ip + strconv.Itoa(index)
+		hrc.log.Debug("Call Initiated for Automate node having IP: ", ip)
 		go runHardwareResourceCountCheck(req.AutomateNodeCount, constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
 		hardwareResultOrderList = append(hardwareResultOrderList, key)
 	}
 
 	for index, ip := range req.ChefInfraServerNodeIps {
 		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
+		hrc.log.Debug("Call Initiated for Chefserver node having IP: ", ip)
 		go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
 		hardwareResultOrderList = append(hardwareResultOrderList, key)
 	}
@@ -180,17 +187,20 @@ func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Har
 	if !isManagedServices {
 		for index, ip := range req.PostgresqlNodeIps {
 			key := constants.POSTGRESQL + ip + strconv.Itoa(index)
+			hrc.log.Debug("Call Initiated for Postgresql node having IP: ", ip)
 			go runHardwareResourceCountCheck(req.PostgresqlNodeCount, constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
 			hardwareResultOrderList = append(hardwareResultOrderList, key)
 		}
 
 		for index, ip := range req.OpenSearchNodeIps {
 			key := constants.OPENSEARCH + ip + strconv.Itoa(index)
+			hrc.log.Debug("Call Initiated for Opensearch node having IP: ", ip)
 			go runHardwareResourceCountCheck(req.OpenSearchNodeCount, constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
 			hardwareResultOrderList = append(hardwareResultOrderList, key)
 		}
 	}
 
+	hrc.log.Debug("All calls Completed")
 	for i := 0; i < len(hardwareResultOrderList); i++ {
 		tempResponse := <-ch
 		for k, v := range tempResponse {
