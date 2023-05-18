@@ -52,17 +52,21 @@ message ConfigRequest {
 				google.protobuf.Int32Value abandoned_upload_cleanup_interval = 3;
 				google.protobuf.Int32Value deleted_data_cleanup_interval = 4;
 				google.protobuf.BoolValue stream_download = 5;
-
 				ChefServerConfig chef_server_config = 6;
+				OauthApplication oauth_application = 7;
 
 				message ChefServerConfig {
 					google.protobuf.StringValue endpoint = 1;
 					google.protobuf.StringValue superuser = 2;
 					google.protobuf.StringValue ssl_verify_mode = 3;
 				}
-			}
 
-          }
+				message OauthApplication {
+					google.protobuf.StringValue name = 1;
+					google.protobuf.StringValue redirect_uri = 2;
+				}
+			}
+    }
 		message Service {}
 	}
 }

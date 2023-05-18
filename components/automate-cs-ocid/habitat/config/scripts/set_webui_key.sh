@@ -1,7 +1,5 @@
 WEBUI_SRC_PATH="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
 export WEBUI_KEY=`sed ':a;N;$!ba;s/\n/\\n/g' $WEBUI_SRC_PATH`
-echo "WEBUI_KEY:"
-echo $WEBUI_KEY
 if [[ -z $WEBUI_KEY ]]
   then
     echo "Could not find the webui key in erchef service. Pls wait for erchef to be running before OCID can be started..."
