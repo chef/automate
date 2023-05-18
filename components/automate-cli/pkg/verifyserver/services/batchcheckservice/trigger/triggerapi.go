@@ -23,6 +23,7 @@ type ReqBody struct {
 	Cert                       string `json:"cert"`
 	Key                        string `json:"key"`
 	RootCert                   string `json:"root_cert"`
+	NodeType                   string `json:"node_type"`
 }
 
 func RunCheckMultiRequests(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
@@ -37,7 +38,7 @@ func RunCheckMultiRequests(config models.Config, log logger.Logger, port string,
 
 	for _, reqBody := range reqBodies {
 		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", method, outputCh, reqBody)
+		go triggerCheckAPI(endpoint, "127.0.0.1", reqBody.NodeType, method, outputCh, reqBody)
 	}
 
 	for i := 0; i < len(reqBodies); i++ {

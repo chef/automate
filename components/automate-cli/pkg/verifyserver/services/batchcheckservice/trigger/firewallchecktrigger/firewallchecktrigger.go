@@ -57,6 +57,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 			reqBody := trigger.ReqBody{
+				NodeType:                   constants.AUTOMATE,
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "7432",
@@ -80,6 +81,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.AUTOMATE,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -97,6 +99,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.CHEF_INFRA_SERVER,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -113,6 +116,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.CHEF_INFRA_SERVER,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -129,6 +133,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.CHEF_INFRA_SERVER,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -146,6 +151,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.POSTGRESQL,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -162,6 +168,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 					Cert:                       config.Certificate.Nodes[0].Cert,
 					Key:                        config.Certificate.Nodes[0].Key,
 					RootCert:                   config.Certificate.RootCert,
+					NodeType:                   constants.POSTGRESQL,
 				}
 				reqBodies = append(reqBodies, reqBody)
 			}
@@ -180,6 +187,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.OPENSEARCH,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -196,6 +204,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 					Cert:                       config.Certificate.Nodes[0].Cert,
 					Key:                        config.Certificate.Nodes[0].Key,
 					RootCert:                   config.Certificate.RootCert,
+					NodeType:                   constants.OPENSEARCH,
 				}
 				reqBodies = append(reqBodies, reqBody)
 			}
@@ -214,6 +223,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.BASTION,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -229,6 +239,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.BASTION,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -244,6 +255,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.BASTION,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -259,6 +271,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 				Cert:                       config.Certificate.Nodes[0].Cert,
 				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
+				NodeType:                   constants.BASTION,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
