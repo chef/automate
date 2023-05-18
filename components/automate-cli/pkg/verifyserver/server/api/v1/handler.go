@@ -2,16 +2,18 @@ package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/lib/logger"
 )
 
 type Handler struct {
-	Logger            logger.Logger
-	StatusService     statusservice.IStatusService
-	BatchCheckService batchcheckservice.IBatchCheckService
-	NFSMountService   nfsmountservice.INFSService
+	Logger                       logger.Logger
+	StatusService                statusservice.IStatusService
+	BatchCheckService            batchcheckservice.IBatchCheckService
+	NFSMountService              nfsmountservice.INFSService
+	HardwareResourceCountService hardwareresourcecount.IHardwareResourceCountService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -30,5 +32,10 @@ func (h *Handler) AddBatchCheckService(bc batchcheckservice.IBatchCheckService) 
 
 func (h *Handler) AddNFSMountService(nm nfsmountservice.INFSService) *Handler {
 	h.NFSMountService = nm
+	return h
+}
+
+func (h *Handler) AddHardwareResourceCountService(hrc hardwareresourcecount.IHardwareResourceCountService) *Handler {
+	h.HardwareResourceCountService = hrc
 	return h
 }

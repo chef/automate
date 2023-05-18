@@ -112,6 +112,8 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 )
 
+require github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
+
 require (
 	cloud.google.com/go v0.60.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
@@ -131,7 +133,6 @@ require (
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/cosiner/argv v0.0.0-20170225145430-13bacc38a0a5 // indirect
@@ -173,6 +174,8 @@ require (
 	github.com/klauspost/compress v1.10.10 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/klauspost/pgzip v1.2.4 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
+	github.com/kr/text v0.1.0 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
