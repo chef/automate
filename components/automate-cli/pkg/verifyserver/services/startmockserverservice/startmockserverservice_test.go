@@ -27,7 +27,6 @@ func TestStartMockServer(t *testing.T) {
 
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
-	PORT, err := GetFreePort()
 	t.Run("Start TCP server and check response", func(t *testing.T) {
 		const PORT = 3000
 		servers := startmockserverservice.New(log)
@@ -219,6 +218,7 @@ func TestStartMockServer(t *testing.T) {
 	})
 
 	t.Run("HTTPS server with busy port", func(t *testing.T) {
+		const PORT = 3003
 
 		// Starting a server in port to be checked
 		go func() {
@@ -298,17 +298,4 @@ func TestStartMockServer(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, "unsupported protocol", err.Error())
 	})
-}
-
-// GetFreePort asks the kernel for a free open port that is ready to use.
-func GetFreePort() (port int, err error) {
-	var a *net.TCPAddr
-	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
-		var l *net.TCPListener
-		if l, err = net.ListenTCP("tcp", a); err == nil {
-			defer l.Close()
-			return l.Addr().(*net.TCPAddr).Port, nil
-		}
-	}
-	return
 }
