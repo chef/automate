@@ -21,15 +21,15 @@ type FirewallCheck struct {
 //  Requests []ReqBody
 // }
 
-type ReqBody struct {
-	SourceNodeIP               string `json:"source_node_ip"`
-	DestinationNodeIP          string `json:"destination_node_ip"`
-	DestinationServicePort     string `json:"destination_service_port"`
-	DestinationServiceProtocol string `json:"destination_service_protocol"`
-	Cert                       string `json:"cert"`
-	Key                        string `json:"key"`
-	RootCert                   string `json:"root_cert"`
-}
+// type ReqBody struct {
+// 	SourceNodeIP               string `json:"source_node_ip"`
+// 	DestinationNodeIP          string `json:"destination_node_ip"`
+// 	DestinationServicePort     string `json:"destination_service_port"`
+// 	DestinationServiceProtocol string `json:"destination_service_protocol"`
+// 	Cert                       string `json:"cert"`
+// 	Key                        string `json:"key"`
+// 	RootCert                   string `json:"root_cert"`
+// }
 
 func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 	return &FirewallCheck{
@@ -44,20 +44,19 @@ func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse
 	requests := makeRequests(config)
 	bx, _ := json.MarshalIndent("reqbody", "", "\t")
 	ioutil.WriteFile("abc.json", bx, 0777)
-	return nil
 	return trigger.RunCheckMultiRequests(config, fc.log, fc.port, constants.FIREWALL_API_PATH, "", http.MethodPost, requests)
 }
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
 // TODO: Check about Cert and Key
-func makeRequests(config models.Config) []ReqBody {
-	var reqBodies []ReqBody
+func makeRequests(config models.Config) []trigger.ReqBody {
+	var reqBodies []trigger.ReqBody
 
 	// _____________________________________________ Row 1: Chef Automate to all the OS and PG nodes _____________________________________________
 	// Dest postgres
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "7432",
@@ -73,7 +72,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest opensearch
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "9200",
@@ -90,7 +89,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest automate
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "443",
@@ -106,7 +105,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest postgres
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "7432",
@@ -122,7 +121,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest opensearch
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "9200",
@@ -139,7 +138,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest postgres UDP
 	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "9638",
@@ -155,7 +154,7 @@ func makeRequests(config models.Config) []ReqBody {
 	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 			for _, port := range postgresqlTCPPorts {
-				reqBody := ReqBody{
+				reqBody := trigger.ReqBody{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
 					DestinationServicePort:     port,
@@ -173,7 +172,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest Opensearch UDP
 	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "9638",
@@ -189,7 +188,7 @@ func makeRequests(config models.Config) []ReqBody {
 	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 			for _, port := range opensearchTCPPorts {
-				reqBody := ReqBody{
+				reqBody := trigger.ReqBody{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
 					DestinationServicePort:     port,
@@ -207,7 +206,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest Automate
 	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, port := range a2CsTCPPorts {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               "127.0.0.1", // Bastion host
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -222,7 +221,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest Chef Infra
 	for _, destNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, port := range a2CsTCPPorts {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               "127.0.0.1", // Bastion host
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -237,7 +236,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest Postgres
 	for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, port := range postgresBastionPorts {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               "127.0.0.1", // Bastion host
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -252,7 +251,7 @@ func makeRequests(config models.Config) []ReqBody {
 	// Dest Chef Infra
 	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, port := range ossBastionPorts {
-			reqBody := ReqBody{
+			reqBody := trigger.ReqBody{
 				SourceNodeIP:               "127.0.0.1", // Bastion host
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,

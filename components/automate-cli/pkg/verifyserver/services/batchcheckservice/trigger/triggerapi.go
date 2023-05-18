@@ -15,9 +15,37 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
+type ReqBody struct {
+	SourceNodeIP               string `json:"source_node_ip"`
+	DestinationNodeIP          string `json:"destination_node_ip"`
+	DestinationServicePort     string `json:"destination_service_port"`
+	DestinationServiceProtocol string `json:"destination_service_protocol"`
+	Cert                       string `json:"cert"`
+	Key                        string `json:"key"`
+	RootCert                   string `json:"root_cert"`
+}
+
 func RunCheckMultiRequests(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
-	// outputCh := make(chan models.CheckTriggerResponse)
+	outputCh := make(chan models.CheckTriggerResponse)
+
+	reqBodies, ok := reqBody.([]ReqBody)
+	if !ok {
+		log.Error("reqbody isn't a []ReqBody slice")
+		return nil
+	}
+
+	for _, reqBody := range reqBodies {
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", method, outputCh, reqBody)
+	}
+
+	for i := 0; i < len(reqBodies); i++ {
+		select {
+		case res := <-outputCh:
+			result = append(result, res)
+		}
+	}
 
 	return result
 }
