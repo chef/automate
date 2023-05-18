@@ -18,6 +18,7 @@ type Server struct {
 	ListenerTCP  net.Listener
 	ListenerUDP  net.PacketConn
 	ListenerHTTP *http.Server
+	SignalChan   chan bool
 	Protocol     string
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 
 	"github.com/ansrivas/fiberprometheus"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -80,7 +81,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
 			))).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
-		AddMockServerServices(startmockserverservice.New(l))
+		AddMockServerServices(startmockserverservice.New(l)).
+		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
