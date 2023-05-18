@@ -1,13 +1,13 @@
 package statusservice
 
 import (
+	"errors"
 	"regexp"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
 )
 
 type IStatusService interface {
@@ -52,7 +52,7 @@ func (ss *StatusService) GetServicesFromHabSvcStatus() (*[]models.ServiceDetails
 	ss.Log.Debug("Output for '"+constants.HABSTATUSCMD+"' command: ", string(output))
 	if err != nil {
 		ss.Log.Error("Error while running '"+constants.HABSTATUSCMD+"' command: ", err)
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from hab svc status")
+		return nil, errors.New("error getting services from hab svc status")
 	}
 	return ss.ParseHabSvcStatus(string(output))
 }
@@ -64,7 +64,7 @@ func (ss *StatusService) ParseHabSvcStatus(output string) (*[]models.ServiceDeta
 
 	tableStart := strings.Index(output, "package")
 	if tableStart == -1 {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "No table found in output")
+		return nil, errors.New("no table found in output")
 	}
 
 	lines := strings.Split(output[tableStart:], "\n")
@@ -102,7 +102,7 @@ func (ss *StatusService) GetServicesFromAutomateStatus() (*map[string]models.Ser
 		if ss.CheckIfBENode(string(output)) {
 			return &map[string]models.ServiceDetails{}, nil
 		}
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error getting services from chef-automate status")
+		return nil, errors.New("error getting services from chef-automate status")
 	}
 	return ss.ParseChefAutomateStatus(string(output))
 }
@@ -114,7 +114,7 @@ func (ss *StatusService) ParseChefAutomateStatus(output string) (*map[string]mod
 
 	tableStart := strings.Index(output, "Service Name")
 	if tableStart == -1 {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "No table found in output")
+		return nil, errors.New("no table found in output")
 	}
 
 	lines := strings.Split(output[tableStart:], "\n")
