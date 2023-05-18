@@ -228,6 +228,7 @@ func TestStartMockServer(t *testing.T) {
 			}
 		}()
 
+		time.Sleep(100 * time.Millisecond)
 		servers := startmockserverservice.New(log)
 		cfg := &models.StartMockServerRequestBody{
 			Protocol: constants.HTTPS,
