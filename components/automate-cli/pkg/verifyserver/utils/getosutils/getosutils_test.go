@@ -20,6 +20,7 @@ func TestGetOsVersion(t *testing.T) {
 		osName      string
 		osVersion   string
 		expectedErr string
+		wantErr     bool
 	}{
 		{
 			description: "When we get the OSName and OSVersion correct",
@@ -29,6 +30,7 @@ func TestGetOsVersion(t *testing.T) {
 			osName:      "Ubuntu 20.04.6",
 			osVersion:   "20.04",
 			expectedErr: "",
+			wantErr:     false,
 		},
 		{
 			description: "When we are not able to get the OSName or OSVersion",
@@ -38,12 +40,13 @@ func TestGetOsVersion(t *testing.T) {
 			osName:      "",
 			osVersion:   "",
 			expectedErr: "open ../../services/softwareversionservice/testfiles/wrongfile.txt: no such file or directory",
+			wantErr:     true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			got, got1, err := GetOsVersion(tt.args.osFilepath)
-			if err != nil {
+			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
 			}
 			if got != tt.osName {
@@ -65,6 +68,7 @@ func TestGetKernalVersion(t *testing.T) {
 		args            args
 		expectedVersion string
 		expectedErr     string
+		wantErr         bool
 	}{
 		{
 			description: "If able to get the kernel version",
@@ -73,6 +77,7 @@ func TestGetKernalVersion(t *testing.T) {
 			},
 			expectedVersion: "5.10",
 			expectedErr:     "",
+			wantErr:         false,
 		},
 		{
 			description: "If not able to get the Kernel version from the file",
@@ -80,13 +85,14 @@ func TestGetKernalVersion(t *testing.T) {
 				kernelFilepath: failurefile,
 			},
 			expectedVersion: "",
-			expectedErr: "open ../../services/softwareversionservice/testfiles/wrongfile.txt: no such file or directory",
+			expectedErr:     "open ../../services/softwareversionservice/testfiles/wrongfile.txt: no such file or directory",
+			wantErr:         true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			got, err := GetKernelVersion(tt.args.kernelFilepath)
-			if err != nil {
+			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
 			}
 

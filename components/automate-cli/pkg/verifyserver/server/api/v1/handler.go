@@ -15,7 +15,7 @@ type Handler struct {
 	BatchCheckService            batchcheckservice.IBatchCheckService
 	NFSMountService              nfsmountservice.INFSService
 	HardwareResourceCountService hardwareresourcecount.IHardwareResourceCountService
-	SoftwareVersionService softwareversionservice.ISoftwareVersionService
+	SoftwareVersionService       softwareversionservice.ISoftwareVersionService
 }
 
 func NewHandler(logger logger.Logger) *Handler {

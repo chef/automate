@@ -25,7 +25,7 @@ func (h *Handler) CheckSoftwareVersion(c *fiber.Ctx) {
 			Checks: services.Checks,
 		}))
 	} else {
-		c.Next(&fiber.Error{Message: `The value `+ query + ` of query 'node_type' is not supported. The supported values are: bastion, automate, chef-infra-server, postgresql, opensearch.`, Code: fiber.StatusBadRequest})
+		c.Next(&fiber.Error{Message: `The value '`+ query + `' of query 'node_type' is not supported. The supported values are: bastion, automate, chef-infra-server, postgresql, opensearch.`, Code: fiber.StatusBadRequest})
 		return
 	}
 }

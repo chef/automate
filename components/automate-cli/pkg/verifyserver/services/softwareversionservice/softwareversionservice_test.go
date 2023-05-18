@@ -397,9 +397,9 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			service.(*SoftwareVersionService).osFilePath = tt.args.osFilepath
-			service.(*SoftwareVersionService).kernelFilePath = tt.args.kernelFilepath
-			service.(*SoftwareVersionService).cmdCheckArray = tt.args.checkarray
+			service.osFilePath = tt.args.osFilepath
+			service.kernelFilePath = tt.args.kernelFilepath
+			service.cmdCheckArray = tt.args.checkarray
 			got, _ := service.GetSoftwareVersionDetails(tt.args.query)
 			assert.Equal(t, got, tt.expectedBody)
 		})
@@ -468,7 +468,7 @@ func TestCheckOs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got := sv.(*SoftwareVersionService).checkOs(tt.args.osVersions, tt.args.version, tt.args.key)
+			got := sv.checkOs(tt.args.osVersions, tt.args.version, tt.args.key)
 			assert.Equal(t, got, tt.expectedBody)
 
 		})
@@ -517,7 +517,7 @@ func TestCheckCommandVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got := sv.(*SoftwareVersionService).checkCommandVersion(tt.args.cmdName)
+			got := sv.checkCommandVersion(tt.args.cmdName)
 			assert.Equal(t, got, tt.expectedBody)
 
 		})
@@ -600,7 +600,7 @@ func TestCheckOsVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got, err := sv.(*SoftwareVersionService).checkOsVersion(tt.args.osFilepath)
+			got, err := sv.checkOsVersion(tt.args.osFilepath)
 			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
 				return
@@ -668,7 +668,7 @@ func TestCheckKernelVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			got, err := sv.(*SoftwareVersionService).checkKernelVersion(tt.args.kernelFilePath)
+			got, err := sv.checkKernelVersion(tt.args.kernelFilePath)
 			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
 				return

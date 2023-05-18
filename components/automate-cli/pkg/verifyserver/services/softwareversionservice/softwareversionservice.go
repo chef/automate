@@ -26,7 +26,7 @@ type SoftwareVersionService struct {
 	CheckPath      func(cmd string) (string, error)
 }
 
-func NewSoftwareVersionService(logger logger.Logger, CheckPath func(cmd string) (string, error)) ISoftwareVersionService {
+func NewSoftwareVersionService(logger logger.Logger, CheckPath func(cmd string) (string, error)) *SoftwareVersionService {
 	return &SoftwareVersionService{
 		cmdCheckArray:  cmdCheckArray,
 		osFilePath:     OSFILEPATH,
