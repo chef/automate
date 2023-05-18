@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/getosutils"
@@ -43,11 +44,6 @@ const (
 	KERNAL_VERSION_CHECK      = "Kernal Version Check"
 	UBUNTU                    = "Ubuntu"
 	RED_HAT                   = "Red Hat"
-	OPENSEARCH                = "opensearch"
-	AUTOMATE                  = "automate"
-	POSTGRES                  = "postgres"
-	CHEF_SERVER               = "chef-server"
-	BASTION                   = "bastion"
 	DEBIAN                    = "Debian"
 	RED_HAT_SUPPORTED_VERSION = 7
 	KERNAL_SUPPORTED_VERSION  = 3.2
@@ -62,17 +58,17 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 	serviceResponseArray := []*models.Checks{}
 	cmdArray := []string{}
 	switch query {
-	case POSTGRES:
+	case constants.POSTGRESQL:
 		cmdArray = []string{"stat"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	case OPENSEARCH:
+	case constants.OPENSEARCH:
 		cmdArray = []string{"openssl"}
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
-	case AUTOMATE, CHEF_SERVER, BASTION:
+	case constants.BASTION, constants.AUTOMATE, constants.CHEF_INFRA_SERVER:
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
 	default:
 		sv.logger.Error("The Query parameter is not supported")
-		return nil, errors.New("The query " + query + " is not supported. The Supported query's are: postgres, opensearch, bastion, automate, chef-server")
+		return nil, errors.New(`The value `+ query + ` of query 'node_type' is not supported. The supported values are: bastion, automate, chef-infra-server, postgresql, opensearch.`)
 	}
 
 	for i := 0; i < len(cmdArray); i++ {
@@ -96,22 +92,19 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 	if !kernelResponse.Passed {
 		serviceResponse.Passed = false
 	}
-	serviceResponseArray = append(serviceResponseArray, kernelResponse)
-	serviceResponseArray = append(serviceResponseArray, osResponse)
+	serviceResponseArray = append(serviceResponseArray, kernelResponse, osResponse)
 	checks := make([]models.Checks, len(serviceResponseArray))
 	for i, svcResp := range serviceResponseArray {
 		checks[i] = *svcResp
 	}
 	serviceResponse.Checks = checks
-	sv.logger.Debug("The Passed value for the response: ", serviceResponse.Passed)
-	sv.logger.Debug("The Checks array for the response: ", serviceResponse.Checks)
 	return serviceResponse, nil
 }
 
 func (sv *SoftwareVersionService) checkCommandVersion(cmdName string) *models.Checks {
 	_, err := fiberutils.CheckPath(cmdName)
 	if err != nil {
-		sv.logger.Error("The errror which checking cammand file path: ", err)
+		sv.logger.Error("Error while checking command file path: ", err)
 		return failureResponse(cmdName+AVAILABILITY, cmdName+" is not available", ENSURE+cmdName+" is available in $PATH on the node")
 	}
 	return successResponse(cmdName+AVAILABILITY, cmdName+" is available")
@@ -129,8 +122,8 @@ func (sv *SoftwareVersionService) checkOsVersion(osFilepath string) (*models.Che
 	checkResponse := &models.Checks{}
 	var osName, osVersion, err = getosutils.GetOsVersion(osFilepath)
 	if err != nil {
-		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
-		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run automate on the supported platforms."), nil
+		sv.logger.Error("Enable to get OS Version as the file on the path does not exist: ", err)
+		return failureResponse(LINUX_VERSION_CHECK, "Its not feasible to determine the Operating system version", "Please run automate on the supported platforms."), err
 	}
 	sv.logger.Debug("Got the OS Version: ", osVersion)
 	sv.logger.Debug("Got the OS Name: ", osName)
@@ -168,16 +161,12 @@ func (sv *SoftwareVersionService) checkOs(osVersions map[string][]string, osVers
 		if checkVersion >= RED_HAT_SUPPORTED_VERSION {
 			correctVersion = true
 		}
-	case DEBIAN:
+	default:
 		for _, str := range osVersions[osName] {
 			if str == osVersion {
 				correctVersion = true
 				break
 			}
-		}
-	default:
-		if osVersions[osName][0] == osVersion {
-			correctVersion = true
 		}
 	}
 	return correctVersion
@@ -187,12 +176,12 @@ func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath string) (*mo
 	kernelVersion, err := getosutils.GetKernelVersion(kernelFilePath)
 	if err != nil {
 		sv.logger.Error("Enable to get OS Version as the file on the path does not exit: ", err)
-		return failureResponse(KERNAL_VERSION_CHECK, "Its not feasible to determine the Kernal version of the system", "Please run automate on the supported platforms."), nil
+		return failureResponse(KERNAL_VERSION_CHECK, "Its not feasible to determine the Kernal version of the system", "Please run automate on the supported platforms."), err
 	}
-	sv.logger.Debug("Got the kernal version:",kernelVersion)
+	sv.logger.Debug("Got the kernal version:", kernelVersion)
 	checkVersion, _ := strconv.ParseFloat(kernelVersion, 64)
 	if checkVersion >= KERNAL_SUPPORTED_VERSION {
-		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+ fmt.Sprintf("%.2f", checkVersion)), nil
+		return successResponse(KERNAL_VERSION_CHECK, "Linux kernal version is "+fmt.Sprintf("%.2f", checkVersion)), nil
 	}
 	return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is lower than 3.2", "Use a linux version whose kernel version is greater than 3.2"), nil
 }

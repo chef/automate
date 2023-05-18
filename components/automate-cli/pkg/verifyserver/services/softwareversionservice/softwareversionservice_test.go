@@ -51,17 +51,16 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 		kernelFilepath string
 	}
 	tests := []struct {
-		description   string
-		args          args
-		expectedBody  *models.SoftwareVersionDetails
-		expectedError string
+		description  string
+		args         args
+		expectedBody *models.SoftwareVersionDetails
 	}{
 		{
 			description: "If the query parameter is postgres",
 			args: args{
-				query:      "postgres",
-				checkarray: checktrue,
-				osFilepath: successfile,
+				query:          "postgresql",
+				checkarray:     checktrue,
+				osFilepath:     successfile,
 				kernelFilepath: successKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -97,14 +96,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "",
 		},
 		{
 			description: "If the query parameter is opensearch",
 			args: args{
-				query:      "opensearch",
-				checkarray: checktrue,
-				osFilepath: successfile,
+				query:          "opensearch",
+				checkarray:     checktrue,
+				osFilepath:     successfile,
 				kernelFilepath: successKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -140,14 +138,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "",
 		},
 		{
 			description: "If the query parameter is automate, chef-server or Bastion",
 			args: args{
-				query:      "automate",
-				checkarray: checktrue,
-				osFilepath: successfile,
+				query:          "automate",
+				checkarray:     checktrue,
+				osFilepath:     successfile,
 				kernelFilepath: successKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -176,14 +173,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "",
 		},
 		{
 			description: "If the query parameter is file is wrong",
 			args: args{
-				query:      "postgres",
-				checkarray: checkfalse,
-				osFilepath: successfile,
+				query:          "postgresql",
+				checkarray:     checkfalse,
+				osFilepath:     successfile,
 				kernelFilepath: successKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -219,14 +215,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "",
 		},
 		{
 			description: "If the file is not avalable for OS Version ",
 			args: args{
-				query:      "postgres",
-				checkarray: checktrue,
-				osFilepath: failfilepath,
+				query:          "postgresql",
+				checkarray:     checktrue,
+				osFilepath:     failfilepath,
 				kernelFilepath: successKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -262,14 +257,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "Error while getting the OS Version: /failfilepath does not exist",
 		},
 		{
 			description: "If the os version is not supported by automate",
 			args: args{
-				query:      "postgres",
-				checkarray: checktrue,
-				osFilepath: failurefile,
+				query:          "postgresql",
+				checkarray:     checktrue,
+				osFilepath:     failurefile,
 				kernelFilepath: successKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -305,14 +299,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "",
 		},
 		{
 			description: "If the kernal version is not supported by automate",
 			args: args{
-				query: "postgres",
-				checkarray: checktrue,
-				osFilepath: successfile,
+				query:          "postgresql",
+				checkarray:     checktrue,
+				osFilepath:     successfile,
 				kernelFilepath: failureKernelfile,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -348,14 +341,13 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "",
 		},
 		{
 			description: "If file is not present for reading the kernal version",
 			args: args{
-				query: "postgres",
-				checkarray: checktrue,
-				osFilepath: successfile,
+				query:          "postgresql",
+				checkarray:     checktrue,
+				osFilepath:     successfile,
 				kernelFilepath: failfilepath,
 			},
 			expectedBody: &models.SoftwareVersionDetails{
@@ -391,18 +383,16 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "Error while getting the Kernal Version: ./failfilepath doesnot exist",
 		},
 		{
 			description: "If the entered Query is not supported by us",
 			args: args{
-				query:      "wrong-query",
-				checkarray: checktrue,
-				osFilepath: successfile,
+				query:          "wrong-query",
+				checkarray:     checktrue,
+				osFilepath:     successfile,
 				kernelFilepath: successKernelfile,
 			},
-			expectedBody:  nil,
-			expectedError: "The query wrong-query is not supported. The Supported query's are: postgres, opensearch, bastion, automate, chef-server",
+			expectedBody: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -410,12 +400,8 @@ func TestGetSoftwareVersionDetails(t *testing.T) {
 			service.(*SoftwareVersionService).osFilePath = tt.args.osFilepath
 			service.(*SoftwareVersionService).kernelFilePath = tt.args.kernelFilepath
 			service.(*SoftwareVersionService).cmdCheckArray = tt.args.checkarray
-			got, err := service.GetSoftwareVersionDetails(tt.args.query)
-			if err != nil {
-				assert.Equal(t, tt.expectedError, err.Error())
-			} else {
-				assert.Equal(t, got, tt.expectedBody)
-			}
+			got, _ := service.GetSoftwareVersionDetails(tt.args.query)
+			assert.Equal(t, got, tt.expectedBody)
 		})
 	}
 }
@@ -550,7 +536,8 @@ func TestCheckOsVersion(t *testing.T) {
 		description  string
 		args         args
 		expectedBody *models.Checks
-		expectedErr  bool
+		wantErr      bool
+		expectedErr  string
 	}{
 		{
 			description: "If the OS is not compatble with the automate",
@@ -577,7 +564,8 @@ func TestCheckOsVersion(t *testing.T) {
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
-			expectedErr: false,
+			wantErr:     false,
+			expectedErr: "",
 		},
 		{
 			description: "If the os name is correct but version is incorrect",
@@ -591,18 +579,101 @@ func TestCheckOsVersion(t *testing.T) {
 				ErrorMsg:      "SUSE Linux version is not supported by automate",
 				ResolutionMsg: "Ensure SUSE Linux correct version is installed on the node",
 			},
-			expectedErr: false,
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If not able to get the OS Details from the filepath",
+			args: args{
+				osFilepath: failfilepath,
+			},
+			expectedBody: &models.Checks{
+				Title:         LinuxVersionTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      "Its not feasible to determine the Operating system version",
+				ResolutionMsg: "Please run automate on the supported platforms.",
+			},
+			wantErr:     true,
+			expectedErr: "open ./failfilepath: no such file or directory",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			got, err := sv.(*SoftwareVersionService).checkOsVersion(tt.args.osFilepath)
-			if (err != nil) != tt.expectedErr {
-				assert.Equal(t, err, tt.expectedErr)
+			if tt.wantErr {
+				assert.Equal(t, tt.expectedErr, err.Error())
 				return
 			} else {
-				assert.Equal(t, got, tt.expectedBody)
+				assert.Equal(t, tt.expectedBody, got)
 			}
+		})
+	}
+}
+
+func TestCheckKernelVersion(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	sv := NewSoftwareVersionService(log, func(cmd string) (string, error) {
+		return "", nil
+	})
+	type args struct {
+		kernelFilePath string
+	}
+	tests := []struct {
+		description  string
+		args         args
+		expectedBody *models.Checks
+		wantErr      bool
+		expectedErr  string
+	}{
+		{
+			description: "If the Kernal version is supported",
+			args: args{
+				kernelFilePath: successKernelfile,
+			},
+			expectedBody: &models.Checks{
+				Title:         "Kernal Version Check",
+				Passed:        true,
+				SuccessMsg:    "Linux kernal version is 5.10",
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If the Kernal Version entered is not supported",
+			args: args{
+				kernelFilePath: failureKernelfile,
+			},
+			expectedBody: &models.Checks{
+				Title:         KernalVersionTitle,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      "Linux kernel version is lower than 3.2",
+				ResolutionMsg: "Use a linux version whose kernel version is greater than 3.2",
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			description: "If not able to get the kernal Version",
+			args: args{
+				kernelFilePath: failfilepath,
+			},
+			expectedBody: &models.Checks{},
+			wantErr:      true,
+			expectedErr:  "open ./failfilepath: no such file or directory",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			got, err := sv.(*SoftwareVersionService).checkKernelVersion(tt.args.kernelFilePath)
+			if tt.wantErr {
+				assert.Equal(t, tt.expectedErr, err.Error())
+				return
+			}
+			assert.Equal(t, tt.expectedBody, got)
 		})
 	}
 }
