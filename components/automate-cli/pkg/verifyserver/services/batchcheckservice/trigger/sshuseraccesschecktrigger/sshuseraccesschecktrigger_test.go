@@ -12,7 +12,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // mockTransport is a mock implementation of the http.RoundTripper interface
@@ -263,59 +262,6 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 
 }
 
-func TestSshUserAccessCheck_TriggerCheckAndFormatOutput(t *testing.T) {
-	t.Run("Success", func(t *testing.T) {
-		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(sshCheckSuccessResp))
-		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
-		assert.NoError(t, err)
-		defer mockServer.Close()
-
-		outputCh := make(chan models.CheckTriggerResponse, 1)
-
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
-		cc.TriggerCheckAndFormatOutput("1.2.3.4", constants.AUTOMATE, GetSshRequest(), outputCh)
-
-		assert.Equal(t, 1, len(outputCh))
-		resp := <-outputCh
-		assert.NotEmpty(t, resp.Host)
-		assert.Equal(t, "SUCCESS", resp.Status)
-		assert.NotNil(t, resp.Result)
-		assert.Nil(t, resp.Result.Error)
-		assert.Equal(t, constants.SSH_USER, resp.Result.Check)
-		assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
-		assert.Equal(t, true, resp.Result.Passed)
-		assert.Equal(t, 2, len(resp.Result.Checks))
-	})
-	t.Run("Error", func(t *testing.T) {
-		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`invalid JSON`))
-		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
-		assert.NoError(t, err)
-		defer mockServer.Close()
-
-		outputCh := make(chan models.CheckTriggerResponse, 1)
-
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
-		cc.TriggerCheckAndFormatOutput("1.2.3.4", constants.AUTOMATE, GetSshRequest(), outputCh)
-
-		assert.Equal(t, 1, len(outputCh))
-		resp := <-outputCh
-		assert.NotEmpty(t, resp.Host)
-		assert.NotNil(t, resp.Result)
-		assert.NotNil(t, resp.Result.Error)
-		assert.Equal(t, constants.SSH_USER, resp.Result.Check)
-		assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
-		assert.Equal(t, false, resp.Result.Passed)
-		assert.Empty(t, resp.Result.Checks)
-	})
-
-}
-
 func GetSshRequest() interface{} {
 	request := map[string]string{}
 	request["ip"] = "1.2.3.4"
@@ -323,31 +269,4 @@ func GetSshRequest() interface{} {
 	request["private_key"] = "----- BEGIN PRIVATE RSA KEY ------"
 	request["sudo_password"] = "sudo"
 	return request
-}
-
-func TestSshUserAccessCheck_TriggerSshUserAccessCheck(t *testing.T) {
-	t.Run("cannot reach", func(t *testing.T) {
-		// create the CheckTrigger instance to be tested
-		cc := SshUserAccessCheck{log: logger.NewTestLogger(), host: "invalid-url"}
-
-		// make the HTTP request to an invalid URL
-		resp, err := cc.TriggerSshUserAccessCheck(GetRequestJson())
-
-		require.Error(t, err)
-		require.Nil(t, resp)
-	})
-
-	t.Run("Bad request", func(t *testing.T) {
-		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusBadRequest)
-		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
-		assert.NoError(t, err)
-		defer mockServer.Close()
-
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
-		resp, err := cc.TriggerSshUserAccessCheck(GetRequestJson())
-		require.Error(t, err)
-		require.Nil(t, resp)
-	})
 }
