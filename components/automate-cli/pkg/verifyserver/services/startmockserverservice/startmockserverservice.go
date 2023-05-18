@@ -130,7 +130,6 @@ func (s *MockServerService) StartUDPServer(port int) (*models.Server, error) {
 }
 
 func (s *MockServerService) HandleUDPRequest(conn *net.UDPConn, addr *net.UDPAddr, buf []byte) {
-
 	conn.WriteToUDP([]byte("ok"), addr)
 }
 
