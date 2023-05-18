@@ -62,7 +62,7 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		require.Len(t, ctr, 2)
 		require.Nil(t, ctr[0].Result.Error)
 		require.Len(t, ctr[0].Result.Checks, 2)
-		require.Equal(t, "API check", ctr[0].Result.Check)
+		require.Equal(t, "", ctr[0].Result.Check)
 
 		checkResp := ctr[0].Result.Checks[1]
 

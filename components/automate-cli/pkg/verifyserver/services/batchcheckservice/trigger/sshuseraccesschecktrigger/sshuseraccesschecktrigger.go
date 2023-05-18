@@ -28,6 +28,8 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
 
 	ss.log.Info("Performing SSH user access check from batch check ")
+	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
+		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 
 	outputCh := make(chan models.CheckTriggerResponse, count)
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.SSH_USER_CHECK_API_PATH)

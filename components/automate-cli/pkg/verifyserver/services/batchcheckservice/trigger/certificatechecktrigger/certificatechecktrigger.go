@@ -38,7 +38,7 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 		nodeTypes := hostMap[node.IP]
 		//construct the request for Certificate Check API
 		requestBody := models.CertificateCheckRequest{
-			RootCertificate:  config.Certificate.RootCert,
+			RootCertificate:  certificate.RootCert,
 			PrivateKey:       node.Key,
 			NodeCertificate:  node.Cert,
 			AdminPrivateKey:  node.AdminKey,
