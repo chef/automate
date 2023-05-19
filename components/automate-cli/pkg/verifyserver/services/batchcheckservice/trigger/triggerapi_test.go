@@ -413,17 +413,17 @@ func TestTriggerCheckAPI(t *testing.T) {
 		defer server.Close()
 
 		output := make(chan models.CheckTriggerResponse)
-
+		reqBody := make(chan string)
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodPost, output, reqBody)
 
 		// Wait for the response
 		response := <-output
 
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
-		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
-		assert.Equal(t, `error while parsing the response data:invalid character 'i' looking for beginning of object key string`, response.Error.Message)
+		assert.Equal(t, http.StatusBadRequest, response.Error.Code)
+		assert.Equal(t, `error while reading the request body: json: unsupported type: chan string`, response.Error.Message)
 	})
 
 	t.Run("Request creation error", func(t *testing.T) {

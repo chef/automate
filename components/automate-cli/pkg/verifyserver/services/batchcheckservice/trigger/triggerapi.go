@@ -15,6 +15,10 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
+var (
+	BastionNodeIP = "127.0.0.1"
+)
+
 type ReqBody struct {
 	SourceNodeIP               string `json:"source_node_ip"`
 	DestinationNodeIP          string `json:"destination_node_ip"`
@@ -63,8 +67,8 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	outputCh := make(chan models.CheckTriggerResponse)
 
 	if path == constants.HARDWARE_RESOURCE_CHECK_API_PATH {
-		endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", "bastion", method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, BastionNodeIP, port, "bastion", depState)
+		go triggerCheckAPI(endpoint, BastionNodeIP, "bastion", method, outputCh, reqBody)
 
 		res := <-outputCh
 		result = append(result, res)
@@ -74,8 +78,8 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
-		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, BastionNodeIP, port, constants.BASTION, depState)
+		go triggerCheckAPI(endpoint, BastionNodeIP, constants.BASTION, method, outputCh, reqBody)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
