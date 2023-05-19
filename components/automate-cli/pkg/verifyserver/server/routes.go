@@ -15,6 +15,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Post("/batch-checks", vs.Handler.BatchCheck)
 	apiChecksGroup.Post("/nfs-mount", vs.Handler.NFSMount)
 	apiChecksGroup.Post("/hardware-resource-count", vs.Handler.HardwareResourceCount)
+	apiChecksGroup.Get("/software-versions", vs.Handler.CheckSoftwareVersion)
 
 	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }

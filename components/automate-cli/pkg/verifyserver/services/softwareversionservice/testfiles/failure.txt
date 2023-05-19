@@ -1,0 +1,6 @@
+NAME="Kali Linux"
+VERSION="12"
+ID=kaliLinux
+PRETTY_NAME="Kali Linux"
+VERSION_ID="12.04"
+
