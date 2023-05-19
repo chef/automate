@@ -48,8 +48,8 @@ func RunCheckMultiRequests(config models.Config, log logger.Logger, port string,
 				result = append(result, res)
 			}
 		}
-
 	}
+
 	return result
 }
 

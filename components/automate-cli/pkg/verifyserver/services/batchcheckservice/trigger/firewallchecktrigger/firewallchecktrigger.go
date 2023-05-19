@@ -30,7 +30,6 @@ func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse
 }
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
-// TODO: Check about Cert and Key
 func makeRequests(config models.Config) []trigger.ReqBody {
 	var reqBodies []trigger.ReqBody
 

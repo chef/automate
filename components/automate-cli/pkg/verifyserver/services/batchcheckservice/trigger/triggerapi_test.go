@@ -304,6 +304,38 @@ const (
 			}
 		]
 	}`
+
+	firewallCheckResp1 = `{
+		"status": "SUCCESS",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{
+			  "title": "Automate Check",
+			  "passed": true,
+			  "success_msg": "Success on automate",
+			  "error_msg": "",
+			  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+			}
+		  ]
+		}
+	  }`
+
+	firewallCheckResp2 = `{
+		"status": "SUCCESS",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{
+			  "title": "Bastion Check",
+			  "passed": true,
+			  "success_msg": "Success on bastion",
+			  "error_msg": "",
+			  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+			}
+		  ]
+		}
+	  }`
 )
 
 func TestTriggerCheckAPI(t *testing.T) {
@@ -323,9 +355,6 @@ func TestTriggerCheckAPI(t *testing.T) {
 
 		// Wait for the response
 		response := <-output
-		// Assert the expected response
-		bx, _ := json.MarshalIndent(response, "", "\t")
-		ioutil.WriteFile("results.json", bx, 077)
 
 		require.NotNil(t, response)
 		require.Equal(t, "success", response.Status)
@@ -417,7 +446,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 func Test_RunCheck(t *testing.T) {
 	t.Run("Software Version Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer()
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -442,7 +471,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("System Resource Check - Automate", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer()
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -467,7 +496,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer()
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -550,7 +579,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer()
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -633,7 +662,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("System User Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer()
+		server, host, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		// Test data
@@ -658,7 +687,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("Hardware Resource Check", func(t *testing.T) {
 		// Create a dummy server
-		server, _, port := createDummyServer()
+		server, _, port := createDummyServer(t, http.StatusOK)
 		defer server.Close()
 
 		tempConfig := GetHardwareReqJson()
@@ -681,7 +710,7 @@ func Test_RunCheck(t *testing.T) {
 }
 
 // Helper function to create a dummy server
-func createDummyServer() (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
 			w.WriteHeader(http.StatusOK)
@@ -720,6 +749,30 @@ func createDummyServer() (*httptest.Server, string, string) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(hardwareCheckResp))
 		}
+
+		if r.URL.Path == constants.FIREWALL_API_PATH {
+			body, err := ioutil.ReadAll(r.Body)
+			require.NoError(t, err)
+
+			var req ReqBody
+
+			err = json.Unmarshal(body, &req)
+			require.NoError(t, err)
+			require.NotZero(t, req)
+			require.NotEmpty(t, req)
+
+			if req.NodeType == constants.AUTOMATE {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(firewallCheckResp1))
+			} else if req.NodeType == constants.BASTION {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(firewallCheckResp2))
+			} else {
+				w.WriteHeader(http.StatusOK)
+			}
+
+		}
+
 	}))
 
 	// Extract IP and port from the server's URL
@@ -793,4 +846,112 @@ func GetHardwareReqJson() models.Config {
 		  }
 		}`), &ipConfig)
 	return ipConfig
+}
+
+func Test_RunCheckMultiRequests(t *testing.T) {
+	t.Run("Return data", func(t *testing.T) {
+		// Create a dummy server
+		server, host, port := createDummyServer(t, http.StatusOK)
+		defer server.Close()
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				AutomateNodeIps:        []string{host},
+				PostgresqlNodeIps:      []string{host},
+				OpenSearchNodeIps:      []string{host},
+				ChefInfraServerNodeIps: []string{host},
+			},
+			Certificate: models.Certificate{
+				Nodes: []models.NodeCert{
+					{
+						Cert: "cert",
+						Key:  "key",
+					},
+				},
+				RootCert: "root_cert",
+			},
+		}
+
+		// Test data
+		requests := []ReqBody{
+			{
+				SourceNodeIP:               "192.168.0.1",
+				DestinationNodeIP:          "192.168.0.2",
+				DestinationServicePort:     "8080",
+				DestinationServiceProtocol: "tcp1",
+				Cert:                       "cer1",
+				Key:                        "key1",
+				RootCert:                   "rootcer1",
+				NodeType:                   constants.AUTOMATE,
+			},
+			{
+				SourceNodeIP:               "192.168.0.3",
+				DestinationNodeIP:          "192.168.0.4",
+				DestinationServicePort:     "8080",
+				DestinationServiceProtocol: "tcp2",
+				Cert:                       "cer2",
+				Key:                        "key2",
+				RootCert:                   "rootcer2",
+				NodeType:                   constants.BASTION,
+			},
+		}
+		log := logger.NewLogrusStandardLogger()
+
+		path := constants.FIREWALL_API_PATH
+
+		// Call the function being tested
+
+		result := RunCheckMultiRequests(config, log, port, path, "", http.MethodPost, requests)
+		require.Equal(t, 2, len(result))
+		require.NotNil(t, result)
+		require.Nil(t, result[0].Error)
+		require.Len(t, result[0].Result.Checks, 1)
+
+		for _, rep := range result {
+
+			if rep.NodeType == constants.AUTOMATE {
+				require.NotEmpty(t, rep.Status)
+				require.NotEmpty(t, rep.Result)
+				require.Equal(t, rep.Host, "192.168.0.1")
+				require.True(t, rep.Result.Passed)
+				require.True(t, rep.Result.Passed)
+				require.Equal(t, "Automate Check", rep.Result.Checks[0].Title)
+				require.True(t, rep.Result.Checks[0].Passed)
+
+			}
+			if rep.NodeType == constants.BASTION {
+				require.Equal(t, "SUCCESS", rep.Status)
+				require.NotEmpty(t, rep.Result)
+				require.Equal(t, rep.Host, "192.168.0.3")
+				require.True(t, rep.Result.Passed)
+				require.Equal(t, "Bastion Check", rep.Result.Checks[0].Title)
+				require.True(t, rep.Result.Checks[0].Passed)
+			}
+		}
+
+	})
+
+	t.Run("Return NIl", func(t *testing.T) {
+		// Create a dummy server
+		server, host, port := createDummyServer(t, http.StatusOK)
+		defer server.Close()
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				AutomateNodeIps: []string{host},
+			},
+		}
+
+		// Test data
+		requests := "some random string  value"
+		log := logger.NewLogrusStandardLogger()
+
+		path := constants.FIREWALL_API_PATH
+
+		// Call the function being tested
+
+		result := RunCheckMultiRequests(config, log, port, path, "", http.MethodPost, requests)
+		require.Equal(t, 0, len(result))
+		require.Nil(t, result)
+	})
 }

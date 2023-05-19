@@ -77,6 +77,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 				require.Equal(t, rep.Host, "127.0.0.1")
 				require.Equal(t, "Check for reachability of service at destination port", rep.Result.Checks[0].Title)
 				require.False(t, rep.Result.Checks[0].Passed)
+				require.True(t, rep.Result.Passed)
 			}
 		}
 	})
