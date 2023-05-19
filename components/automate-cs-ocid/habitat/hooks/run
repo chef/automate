@@ -18,10 +18,32 @@ source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
 # Setup environment specific configurations for integration with erchef
 source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
 
+# TEST: register multiple OCID application
+echo "chef server config from run hook:"
+echo {{cfg.ocid.chef_server_config}}
+echo "oauth_application from run hook1:"
+echo {{cfg.ocid.oauth_applications}}
+# export OAUTH_APPLICATIONS={{cfg.ocid.oauth_applications}}
+# echo "oauth_application from run hook2:"
+# echo $OAUTH_APPLICATIONS
+for i in $(cat {{cfg.ocid.oauth_applications}}); do
+  #statements
+  echo "inside for loop"
+  echo $i
+done
+# for i in $OAUTH_APPLICATIONS; do
+#   echo "inside for loop"
+#   echo $i
+# done
+# for (( i = 0; i < 10; i++ )); do
+#   #statements
+# done
+bundle exec bin/rake 'oauth_application:register1[{{cfg.ocid.oauth_applications}}]'
+
 # Registering oauth application
-if [[ ! -z "{{cfg.ocid.oauth_application.name}}" ]]; then
-  bundle exec bin/rake 'oauth_application:register[{{cfg.ocid.oauth_application.name}}, {{cfg.ocid.oauth_application.redirect_uri}}]'
-fi
+# if [[ ! -z "{{cfg.ocid.oauth_application.name}}" ]]; then
+#   bundle exec bin/rake 'oauth_application:register[{{cfg.ocid.oauth_application.name}}, {{cfg.ocid.oauth_application.redirect_uri}}]'
+# fi
 
 # Dumping registered oauth application details in a file
 export REGISTERED_OAUTH_APPS_FILE_PATH="{{pkg.svc_config_path}}/registered_oauth_applications.yaml"

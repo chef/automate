@@ -53,7 +53,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value deleted_data_cleanup_interval = 4;
 				google.protobuf.BoolValue stream_download = 5;
 				ChefServerConfig chef_server_config = 6;
-				OauthApplication oauth_application = 7;
+				repeated OauthApplication oauth_applications = 7;
 
 				message ChefServerConfig {
 					google.protobuf.StringValue endpoint = 1;
