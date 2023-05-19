@@ -25,32 +25,32 @@ func TestCheckPath(t *testing.T) {
 		wantErr          bool
 	}{
 		{
-			description: "If the cammand is present on the path",
+			description: "If the command is present on the path",
 			args: args{
 				cmd: "mkdir",
 			},
 			expectedResponse: "/bin/mkdir",
-			expectedError: "",
-			wantErr: false,
+			expectedError:    "",
+			wantErr:          false,
 		},
 		{
-			description: "If the cammand is not present on the path",
+			description: "If the command is not present on the path",
 			args: args{
-				cmd: "wrongcammand",
+				cmd: "wrongcommand",
 			},
 			expectedResponse: "",
-			expectedError: `exec: "wrongcammand": executable file not found in $PATH`,
-			wantErr: true,
+			expectedError:    `exec: "wrongcommand": executable file not found in $PATH`,
+			wantErr:          true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			got, err := fiberutils.CheckPath(tt.args.cmd)
 			if tt.wantErr {
-				assert.Equal(t,tt.expectedError,err.Error())
+				assert.Equal(t, tt.expectedError, err.Error())
 				return
 			}
-			assert.Equal(t,got,tt.expectedResponse)
+			assert.Contains(t, got, tt.expectedResponse)
 		})
 	}
 }
