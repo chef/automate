@@ -145,6 +145,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 - Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
 - Following config will by default leave the backup configuration empty
+- To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
 
 {{< /note >}}
 
@@ -188,55 +189,55 @@ config_file = "configs/automate.toml"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
 # Add Automate load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# root_ca = """root_ca_contents"""
+# Add private/public keys for automate nodes
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # Or you can provide certificates at the node level using the below fields
 # [[automate.config.certs_by_ip]]
 # ip = "A.B.C.D"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [chef_server.config]
 instance_count = "2"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add Chef Server load balancer keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # Or you can provide certificates at the node level using the below fields
 # [[chef_server.config.certs_by_ip]]
 # ip = "I.J.K.L"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [opensearch.config]
 instance_count = "3"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add OpenSearch load balancer root-ca and keys
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+# Add OpenSearch root-ca and keys
+# root_ca = """root_ca_contents"""
+# admin_key = """admin_private_key_contents"""
+# admin_cert = """admin_public_key_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # Or you can provide certificates at the node level using the below fields
 # [[opensearch.config.certs_by_ip]]
 # ip = "A1.A2.A3.A4"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [postgresql.config]
 instance_count = "3"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add Postgresql root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # Or you can provide certificates at the node level using the below fields
 # [[postgresql.config.certs_by_ip]]
 # ip = "D1.D2.D3.D4"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [existing_infra.config]
 ## === INPUT NEEDED ===
 # provide comma separate IP address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]

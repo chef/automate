@@ -211,6 +211,8 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 - Following config will create s3 bucket for backup.
 
+- To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
+
 {{< /note >}}
 
 ```config
@@ -234,33 +236,35 @@ fqdn = ""
 instance_count = "1"
 config_file = "configs/automate.toml"
 enable_custom_certs = false
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add Automate load balancer root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [chef_server.config]
 instance_count = "1"
 enable_custom_certs = false
-# Add Chef Server load balancer root-ca and keys
-# private_key = ""
-# public_key = ""
+# Add Chef Server load balancer keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [opensearch.config]
 instance_count = "3"
 enable_custom_certs = false
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+# Add OpenSearch root-ca and keys
+# root_ca = """root_ca_contents"""
+# admin_key = """admin_private_key_contents"""
+# admin_cert = """admin_public_key_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [postgresql.config]
 instance_count = "3"
 enable_custom_certs = false
-# Add Postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add Postgresql root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [aws.config]
 profile = "default"
