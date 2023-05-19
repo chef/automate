@@ -9,6 +9,10 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
+var (
+	BastionNodeIP = "127.0.0.1"
+)
+
 type FirewallCheck struct {
 	host string
 	port string
@@ -197,7 +201,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, port := range a2CsTCPPorts {
 			reqBody := trigger.ReqBody{
-				SourceNodeIP:               "127.0.0.1", // Bastion host
+				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
@@ -213,7 +217,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	for _, destNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, port := range a2CsTCPPorts {
 			reqBody := trigger.ReqBody{
-				SourceNodeIP:               "127.0.0.1", // Bastion host
+				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
@@ -229,7 +233,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, port := range postgresBastionPorts {
 			reqBody := trigger.ReqBody{
-				SourceNodeIP:               "127.0.0.1", // Bastion host
+				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
@@ -245,7 +249,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, port := range ossBastionPorts {
 			reqBody := trigger.ReqBody{
-				SourceNodeIP:               "127.0.0.1", // Bastion host
+				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
