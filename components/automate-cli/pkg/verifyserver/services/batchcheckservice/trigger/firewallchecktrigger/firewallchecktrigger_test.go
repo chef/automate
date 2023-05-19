@@ -64,14 +64,14 @@ func TestFirewallCheck_Run(t *testing.T) {
 		require.Len(t, resp, 30)
 
 		for _, rep := range resp {
-			if rep.CheckType == constants.BASTION {
+			if rep.NodeType == constants.BASTION {
 				require.Empty(t, rep.Status)
 				require.Empty(t, rep.Result)
 				require.Equal(t, rep.Host, "127.0.0.1")
 				require.Equal(t, http.StatusInternalServerError, rep.Error.Code)
 				require.Equal(t, "error while parsing the response data:EOF", rep.Error.Message)
 			}
-			if rep.CheckType == constants.AUTOMATE {
+			if rep.NodeType == constants.AUTOMATE {
 				require.NotEmpty(t, rep.Status)
 				require.NotEmpty(t, rep.Result)
 				require.Equal(t, rep.Host, "127.0.0.1")

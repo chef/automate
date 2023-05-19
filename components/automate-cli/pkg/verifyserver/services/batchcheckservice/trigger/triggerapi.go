@@ -39,7 +39,7 @@ func RunCheckMultiRequests(config models.Config, log logger.Logger, port string,
 
 		for _, reqBody := range reqBodies {
 			endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-			go triggerCheckAPI(endpoint, "127.0.0.1", reqBody.NodeType, method, outputCh, reqBody)
+			go triggerCheckAPI(endpoint, reqBody.SourceNodeIP, reqBody.NodeType, method, outputCh, reqBody)
 		}
 
 		for i := 0; i < len(reqBodies); i++ {
