@@ -48,13 +48,10 @@ func TestGetOsVersion(t *testing.T) {
 			got, got1, err := GetOsVersion(tt.args.osFilepath)
 			if tt.wantErr {
 				assert.Equal(t, tt.expectedErr, err.Error())
+				return
 			}
-			if got != tt.osName {
-				assert.Equal(t, got, tt.osName)
-			}
-			if got1 != tt.osVersion {
-				assert.Equal(t, got, tt.osVersion)
-			}
+			assert.Equal(t, got, tt.osName)
+			assert.Equal(t, got1, tt.osVersion)
 		})
 	}
 }

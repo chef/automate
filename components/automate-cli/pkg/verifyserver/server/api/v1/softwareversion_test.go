@@ -232,12 +232,12 @@ func TestSoftwareVersionAPI(t *testing.T) {
 			query:         "postgresql",
 		},
 		{
-			description:  `400:If the passed query is empty or spelling of 'node-type' is incorrect`,
-			expectedCode: 400,
-			responseBody: models.SoftwareVersionDetails{},
-			expectedBody: FailureResponseForEmptyQuery,
+			description:   `400:If the passed query is empty or spelling of 'node-type' is incorrect`,
+			expectedCode:  400,
+			responseBody:  models.SoftwareVersionDetails{},
+			expectedBody:  FailureResponseForEmptyQuery,
 			expectedError: errors.New(`Unsupported query or missing query. Expected value for query 'node_type' are bastion, automate, chef-infra-server, postgresql or opensearch.`),
-			query: "",
+			query:         "",
 		},
 		{
 			description:   "400:If the query entered by the User is not supported",

@@ -68,7 +68,7 @@ func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*mode
 		cmdArray = append(cmdArray, sv.cmdCheckArray...)
 	default:
 		sv.logger.Error("The Query parameter is not supported")
-		return nil, errors.New(`The value `+ query + ` of query 'node_type' is not supported. The supported values are: bastion, automate, chef-infra-server, postgresql, opensearch.`)
+		return nil, errors.New(`The value ` + query + ` of query 'node_type' is not supported. The supported values are: bastion, automate, chef-infra-server, postgresql, opensearch.`)
 	}
 
 	for i := 0; i < len(cmdArray); i++ {
@@ -186,24 +186,24 @@ func (sv *SoftwareVersionService) checkKernelVersion(kernelFilePath string) (*mo
 	return failureResponse(KERNAL_VERSION_CHECK, "Linux kernel version is lower than 3.2", "Use a linux version whose kernel version is greater than 3.2"), nil
 }
 
-func successResponse(title string, success_msg string) *models.Checks {
+func successResponse(title string, successMsg string) *models.Checks {
 	checkResponse := &models.Checks{
 		Title:         title,
 		Passed:        true,
-		SuccessMsg:    success_msg,
+		SuccessMsg:    successMsg,
 		ErrorMsg:      "",
 		ResolutionMsg: "",
 	}
 	return checkResponse
 }
 
-func failureResponse(title string, error_msg string, resolution_msg string) *models.Checks {
+func failureResponse(title string, errorMsg string, resolutionMsg string) *models.Checks {
 	checkResponse := &models.Checks{
 		Title:         title,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      error_msg,
-		ResolutionMsg: resolution_msg,
+		ErrorMsg:      errorMsg,
+		ResolutionMsg: resolutionMsg,
 	}
 	return checkResponse
 }
