@@ -6,6 +6,7 @@ type FqdnRequest struct {
 	IsAfterDeployment bool     `json:"is_after_deployment"`
 	ApiToken          string   `json:"api_token"`
 	Nodes             []string `json:"nodes"`
+	NodeType          string   `json:"node_type"`
 }
 
 type FqdnResponse struct {

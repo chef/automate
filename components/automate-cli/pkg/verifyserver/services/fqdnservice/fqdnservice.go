@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -86,16 +86,28 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string) (
 	}
 
 	client := fq.createClient(rootCert)
+	fqdnResultChan := make(chan string)
 
 	for i := 0; i < 50; i++ {
-		res, err := client.Get(fmt.Sprintf("https://%s", fqdn))
-		if err != nil {
-			fq.log.Error(err.Error())
-			return createCheck(constants.NODE_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE), false
-		}
+		go func(fqdnResultChan chan string) {
+			res, err := client.Get(fmt.Sprintf("https://%s", fqdn))
+			if err != nil {
+				fq.log.Error(err.Error())
+				fqdnResultChan <- "got error"
+				return
+			}
+			nodeIP := res.Header.Get("x-server-ip")
+			fqdnResultChan <- nodeIP
+		}(fqdnResultChan)
+	}
 
-		delete(setNodes, res.Header.Get("x-server-ip"))
-		// if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
+	for i := 0; i < 50; i++ {
+		chanResult := <-fqdnResultChan
+		if chanResult == "got error" {
+			break
+		}
+		delete(setNodes, chanResult)
+		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
 		if len(setNodes) == 0 {
 			return createCheck(constants.NODE_TITLE, true, constants.NODE_SUCCESS_MESSAGE, "", ""), true
 		}
@@ -137,7 +149,7 @@ func (fq *FqdnService) checkChefServerStatus(fqdn, rootCert string) (models.Chec
 		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE), false
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE), false
@@ -149,6 +161,7 @@ func (fq *FqdnService) checkChefServerStatus(fqdn, rootCert string) (models.Chec
 	if data["status"] != "pong" {
 		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE), false
 	}
+	fq.log.Debug("Chef Server Status is all okay.")
 	return createCheck(constants.CHEF_SERVER_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", ""), true
 }
 
@@ -172,7 +185,7 @@ func (fq *FqdnService) checkAutomateStatus(fqdn, rootCert, apiToken string) (mod
 		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE), false
 	}
 
-	resBody, err := ioutil.ReadAll(resp.Body)
+	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE), false
@@ -183,6 +196,7 @@ func (fq *FqdnService) checkAutomateStatus(fqdn, rootCert, apiToken string) (mod
 	if data["ok"] != true {
 		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE), false
 	}
+	fq.log.Debug("Automate Status is all okay")
 	return createCheck(constants.AUTOMATE_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", ""), true
 }
 
@@ -203,11 +217,13 @@ func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest) models.Fqdn
 	response.Checks = append(response.Checks, check)
 
 	if req.IsAfterDeployment {
-		check, _ = fq.checkChefServerStatus(req.Fqdn, req.RootCert)
-		response.Checks = append(response.Checks, check)
-
-		check, _ = fq.checkAutomateStatus(req.Fqdn, req.RootCert, req.ApiToken)
-		response.Checks = append(response.Checks, check)
+		if req.NodeType == constants.CHEF_INFRA_SERVER {
+			check, _ = fq.checkChefServerStatus(req.Fqdn, req.RootCert)
+			response.Checks = append(response.Checks, check)
+		} else if req.NodeType == constants.AUTOMATE {
+			check, _ = fq.checkAutomateStatus(req.Fqdn, req.RootCert, req.ApiToken)
+			response.Checks = append(response.Checks, check)
+		}
 	} else {
 		check, _ = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes)
 		response.Checks = append(response.Checks, check)
