@@ -50,7 +50,7 @@ func getDeploymentModeFromConfig(configPath string) (string, error) {
 			return "", err
 		}
 		if config.Get("architecture.existing_infra") != nil {
-			if config.Get("external.database.type") != nil {
+			if config.Get("external.database") != nil {
 				if config.Get("external.database.type") == "aws" {
 					return EXISTING_INFRA_AWS_MANAGED, nil
 				} else if config.Get("external.database.type") == "self-managed" {
