@@ -2,13 +2,11 @@ package config_verify
 
 import (
 	"container/list"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
-	"net/http"
 	"strings"
 
 	"github.com/chef/automate/lib/config_parser"
@@ -26,68 +24,6 @@ func validateAutomateFQDN(fqdn string) error {
 	}
 	return nil
 }
-
-func verifyCertificate(domain string) error {
-	// Load the system's root certificate pool
-	rootCAs, err := x509.SystemCertPool()
-	if err != nil {
-		rootCAs = x509.NewCertPool()
-	}
-
-	// Add additional root certificates to the pool, if needed
-	// For example, if you have a custom CA that issued the server's certificate
-	// rootCAs.AppendCertsFromPEM([]byte(myCustomCA))
-
-	// Create a new TLS config with the trusted root certificate pool
-	// We need InsecureSkipVerify to bypass  x509: certificate relies
-	// on legacy Common Name field, use SANs
-	tlsConfig := &tls.Config{
-		ServerName:         domain,
-		RootCAs:            rootCAs,
-		InsecureSkipVerify: true,
-	}
-
-	// Create a new HTTP transport with the custom TLS config
-	tr := &http.Transport{
-		TLSClientConfig: tlsConfig,
-	}
-
-	// Create a new HTTP client with the custom transport
-	client := &http.Client{Transport: tr}
-
-	// Make a GET request to the HTTPS endpoint
-	resp, err := client.Get("https://" + domain)
-	if err != nil {
-		return fmt.Errorf("fqdn is invalid %s", err.Error())
-	}
-	defer resp.Body.Close()
-
-	// Verify the server certificate presented during the TLS handshake
-	// TODO: need to discuss how to skip this for dev env
-	if len(resp.TLS.PeerCertificates) == 0 {
-		return fmt.Errorf("server did not present a certificate")
-	}
-	serverCert := resp.TLS.PeerCertificates[0]
-	if _, err := serverCert.Verify(x509.VerifyOptions{Roots: rootCAs}); err != nil {
-		return fmt.Errorf("server certificate verification failed: %s", err.Error())
-	}
-
-	return nil
-}
-
-// func getSingleErrorFromList(l *list.List) error {
-// 	errorString := ""
-// 	for e := l.Front(); e != nil; e = e.Next() {
-// 		errorString = errorString + "\n" + e.Value.(string)
-// 	}
-// 	if errorString == "" {
-// 		return nil
-// 	}
-// 	return errors.New(errorString)
-// }
-
-// TODO: check if there are other types of keys and if
-// it's verification is different
 
 // parseCertAndKey function that supports RSA and ECDSA and Ed25519 keys
 func parseCertAndKey(certData, keyData []byte) error {
