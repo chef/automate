@@ -215,7 +215,7 @@ func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
 			return status.New(status.InvalidCommandArgsError, errMLSA)
 		}
 	}
-	err := doBootstrapEnv(airgapBundlePath, saas, false, false)
+	err := doBootstrapEnv(airgapBundlePath, saas, upgradeRunCmdFlags.upgradefrontends, upgradeRunCmdFlags.upgradebackends)
 	if err != nil {
 		return err
 	}
