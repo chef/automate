@@ -30,6 +30,7 @@ func getTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Architecture.ConfigInitials.HabitatUIDGid = "habitat_uid_gid"
 	config.Architecture.ConfigInitials.BackupConfig = "object_storage"
 	config.ObjectStorage.Config.BucketName = "s4"
+	config.ExternalDB.Database.Type = "aws"
 
 	// Automate Config
 	config.Automate.Config.AdminPassword = "adminpassword"
@@ -303,7 +304,7 @@ func getFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Aws.Config.PrivateCustomSubnets = []string{"subnet-abcdef01", "subnet-abcdef02"}
 	config.Aws.Config.PublicCustomSubnets = []string{"subnet-abcdef03", "subnet-abcdef04"}
 	config.Aws.Config.SSHKeyPairName = "my_key_pair"
-	config.Aws.Config.SetupManagedServices = false
+	config.Aws.Config.SetupManagedServices = true
 	config.Aws.Config.OpensearchDomainName = "my-opensearch-domain"
 	config.Aws.Config.OpensearchDomainUrl = "https://my-opensearch-domain.domain.com"
 	config.Aws.Config.OpensearchUsername = "opensearch_user"
