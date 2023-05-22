@@ -17,5 +17,8 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Post("/hardware-resource-count", vs.Handler.HardwareResourceCount)
 	apiChecksGroup.Get("/software-versions", vs.Handler.CheckSoftwareVersion)
 
+	apiStartGroup := apiV1Group.Group("/start")
+	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
+
 	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }
