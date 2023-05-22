@@ -2,7 +2,7 @@ package config_verify
 
 import (
 	"container/list"
-	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -282,7 +282,7 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 		for _, tls := range config.Global.V1.GetFrontendTls() {
 			if tls.CertPath != "" || tls.KeyPath != "" {
 				if tls.CertPath != "" {
-					certData, err := ioutil.ReadFile(tls.CertPath)
+					certData, err := os.ReadFile(tls.CertPath)
 					if err != nil {
 						e.AddInvalidValue("global.v1.frontend_tls.cert_path ", err.Error())
 					} else {
@@ -290,7 +290,7 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 					}
 				}
 				if tls.KeyPath != "" {
-					keyData, err := ioutil.ReadFile(tls.KeyPath)
+					keyData, err := os.ReadFile(tls.KeyPath)
 					if err != nil {
 						e.AddInvalidValue("global.v1.frontend_tls.key_path ", err.Error())
 					} else {
