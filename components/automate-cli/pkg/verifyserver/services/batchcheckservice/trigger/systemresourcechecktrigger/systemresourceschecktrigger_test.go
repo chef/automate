@@ -93,6 +93,8 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Error.Error())
 	})
 }
+
+// Helper function to create a dummy server
 func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
