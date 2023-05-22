@@ -208,13 +208,29 @@ func TestStartMockServer(t *testing.T) {
 			Protocol: constants.HTTPS,
 			Port:     PORT,
 			Cert:     "",
-			Key:      "",
+			Key:      SERVER_KEY,
 		}
 		err := servers.StartMockServer(cfg)
 		require.Error(t, err)
 
 		// Check that the server is listening on the correct port
 		require.Contains(t, err.Error(), "certificate input")
+	})
+
+	t.Run("HTTPS server with invalid key values", func(t *testing.T) {
+		const PORT = 3002
+		servers := startmockserverservice.New(log)
+		cfg := &models.StartMockServerRequestBody{
+			Protocol: constants.HTTPS,
+			Port:     PORT,
+			Cert:     SERVER_CERT,
+			Key:      "",
+		}
+		err := servers.StartMockServer(cfg)
+		require.Error(t, err)
+
+		// Check that the server is listening on the correct port
+		require.Contains(t, err.Error(), "key input")
 	})
 
 	t.Run("HTTPS server with busy port", func(t *testing.T) {
