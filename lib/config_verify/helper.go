@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"regexp"
 	"strconv"
@@ -31,7 +30,7 @@ func validateRequiredBooleanField(value interface{}, fieldName string, errorList
 func validateRequiredPathField(value string, fieldName string, errorList *list.List) {
 	if len(value) > 0 {
 		if _, err := os.Stat(value); err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
+			if errors.Is(err, os.ErrNotExist) {
 				errorList.PushBack(fmt.Sprintf("Invalid %s: %s (path does not exist)", fieldName, value))
 			} else {
 				errorList.PushBack(fmt.Sprintf("Invalid %s: %s (%v)", fieldName, value, err))
