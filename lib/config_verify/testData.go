@@ -42,7 +42,7 @@ func getTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Automate.Config.PublicKey = "/path/to/public/key"
 	config.Automate.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// ChefServer Config
@@ -52,7 +52,7 @@ func getTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.ChefServer.Config.PublicKey = "/path/to/public/key"
 	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// Opensearch Config
@@ -67,7 +67,7 @@ func getTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Opensearch.Config.NodesDn = "nodes_dn"
 	config.Opensearch.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// Postgresql Config
@@ -78,14 +78,14 @@ func getTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Postgresql.Config.PublicKey = "/path/to/public/key"
 	config.Postgresql.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// ExistingInfra Config
-	config.ExistingInfra.Config.AutomatePrivateIps = []string{"127.0.0.1", "192.168.0.1"}
-	config.ExistingInfra.Config.ChefServerPrivateIps = []string{"127.0.0.1", "192.168.0.1"}
-	config.ExistingInfra.Config.OpensearchPrivateIps = []string{"127.0.0.1", "192.168.0.1"}
-	config.ExistingInfra.Config.PostgresqlPrivateIps = []string{"127.0.0.1", "192.168.0.1"}
+	config.ExistingInfra.Config.AutomatePrivateIps = []string{"127.0.0.1", "127.0.0.1"}
+	config.ExistingInfra.Config.ChefServerPrivateIps = []string{"127.0.0.1", "127.0.0.1"}
+	config.ExistingInfra.Config.OpensearchPrivateIps = []string{"127.0.0.1", "127.0.0.1"}
+	config.ExistingInfra.Config.PostgresqlPrivateIps = []string{"127.0.0.1", "127.0.0.1"}
 
 	// ExternalDB Config
 	config.ExternalDB.Database.Type = "postgre_sql"
@@ -151,7 +151,7 @@ func getTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 	config.Automate.Config.PublicKey = "/path/to/public/key"
 	config.Automate.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// ChefServer Config
@@ -161,7 +161,7 @@ func getTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 	config.ChefServer.Config.PublicKey = "/path/to/public/key"
 	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// Opensearch Config
@@ -176,7 +176,7 @@ func getTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 	config.Opensearch.Config.NodesDn = "nodes_dn"
 	config.Opensearch.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// Postgresql Config
@@ -187,14 +187,14 @@ func getTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 	config.Postgresql.Config.PublicKey = "/path/to/public/key"
 	config.Postgresql.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	// ExistingInfra Config
-	config.ExistingInfra.Config.AutomatePrivateIps = []string{"127.0.0.1", "192.168.0.1"}
-	config.ExistingInfra.Config.ChefServerPrivateIps = []string{"127.0.0.1", "192.168.0.1"}
-	config.ExistingInfra.Config.OpensearchPrivateIps = []string{"127.0.0.1", "192.168.0.1"}
-	config.ExistingInfra.Config.PostgresqlPrivateIps = []string{"127.0.0.1", "192.168.0.1"}
+	config.ExistingInfra.Config.AutomatePrivateIps = []string{"127.0.0.1", "127.0.0.1"}
+	config.ExistingInfra.Config.ChefServerPrivateIps = []string{"127.0.0.1", "127.0.0.1"}
+	config.ExistingInfra.Config.OpensearchPrivateIps = []string{"127.0.0.1", "127.0.0.1"}
+	config.ExistingInfra.Config.PostgresqlPrivateIps = []string{"127.0.0.1", "127.0.0.1"}
 
 	// ExternalDB Config
 	config.ExternalDB.Database.Type = "postgre_sql"
@@ -260,7 +260,7 @@ func getFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Automate.Config.PublicKey = "/path/to/public_key"
 	config.Automate.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	config.ChefServer.Config.InstanceCount = "1"
@@ -269,7 +269,7 @@ func getFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.ChefServer.Config.PublicKey = "/path/to/chef_public_key"
 	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 	config.Opensearch.Config.InstanceCount = "1"
 	config.Opensearch.Config.EnableCustomCerts = false
@@ -282,7 +282,7 @@ func getFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Opensearch.Config.NodesDn = "CN=nodes"
 	config.Opensearch.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 	config.Postgresql.Config.InstanceCount = "1"
 	config.Postgresql.Config.EnableCustomCerts = true
@@ -291,13 +291,13 @@ func getFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Postgresql.Config.PublicKey = "/path/to/postgresql_public_key"
 	config.Postgresql.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	config.Aws.Config.Profile = "my_aws_profile"
 	config.Aws.Config.Region = "us-west-2"
 	config.Aws.Config.AwsVpcId = "vpc-12345678"
-	config.Aws.Config.AwsCidrBlockAddr = "10.0.0.0/16"
+	config.Aws.Config.AwsCidrBlockAddr = "0.0.0.0/00"
 	config.Aws.Config.PrivateCustomSubnets = []string{"subnet-abcdef01", "subnet-abcdef02"}
 	config.Aws.Config.PublicCustomSubnets = []string{"subnet-abcdef03", "subnet-abcdef04"}
 	config.Aws.Config.SSHKeyPairName = "my_key_pair"
@@ -357,7 +357,7 @@ func getTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Architecture.ConfigInitials.SudoPassword = "password"
 	config.Architecture.ConfigInitials.LoggingMonitoringManagement = "ELK"
 	config.Architecture.ConfigInitials.NewElk = "true"
-	config.Architecture.ConfigInitials.ExistingElkInstanceIP = "10.0.0.1"
+	config.Architecture.ConfigInitials.ExistingElkInstanceIP = "0.0.0.0"
 	config.Architecture.ConfigInitials.ExistingElkPort = "9200"
 	config.Architecture.ConfigInitials.ExistingElkCert = "/path/to/elk_cert"
 	config.Architecture.ConfigInitials.ExistingElkUsername = "elk_user"
@@ -379,7 +379,7 @@ func getTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Automate.Config.PublicKey = "/path/to/public_key"
 	config.Automate.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	config.ChefServer.Config.InstanceCount = "1"
@@ -388,7 +388,7 @@ func getTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.ChefServer.Config.PublicKey = "/path/to/chef_public_key"
 	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 	config.Opensearch.Config.InstanceCount = "1"
 	config.Opensearch.Config.EnableCustomCerts = false
@@ -401,7 +401,7 @@ func getTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Opensearch.Config.NodesDn = "CN=nodes"
 	config.Opensearch.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 	config.Postgresql.Config.InstanceCount = "1"
 	config.Postgresql.Config.EnableCustomCerts = false
@@ -410,7 +410,7 @@ func getTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Postgresql.Config.PublicKey = "/path/to/postgresql_public_key"
 	config.Postgresql.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
-		{IP: "192.168.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "", PublicKey: "", NodesDn: ""},
 	}
 
 	config.Aws.Config.Profile = "my_aws_profile"

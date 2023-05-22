@@ -268,7 +268,7 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 	if fqdn == nil {
 		e.AddMissingKey("global.v1.fqdn")
 	} else {
-		// Validate Fqdn and its reachability
+		// Validate Fqdn
 		if err := validateAutomateFQDN(fqdn.Value); err != nil {
 			e.AddInvalidValue("global.v1.fqdn", err.Error())
 		}
