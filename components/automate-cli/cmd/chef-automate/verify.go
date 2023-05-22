@@ -186,7 +186,7 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 	case deploymentMode == AWS_MANAGED_SERVICES:
 		err := v.verifyHaAWSManagedDeploy(configPath)
 		return err
-	case deploymentMode == EXISTING_INFRA_MODE:
+	case deploymentMode == EXISTING_INFRA_MODE || deploymentMode == HA_MODE:
 		err := v.verifyHaOnpremDeploy(configPath)
 		return err
 	case deploymentMode == EXISTING_INFRA_AWS_MANAGED:
@@ -194,9 +194,6 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 		return err
 	case deploymentMode == EXISTING_INFRA_SELF_MANAGED:
 		err := v.verifyHaOnPremCustManagedDeploy(configPath)
-		return err
-	case deploymentMode == HA_MODE:
-		err := v.verifyHaOnpremDeploy(configPath)
 		return err
 	case deploymentMode == AUTOMATE:
 		err := v.verifyStandaloneDeploy(configPath)
