@@ -26,53 +26,17 @@ func NewSystemResourceService(log logger.Logger, osFsUtil IGetOsAndFileSystemInf
 }
 
 const (
-	MIN_CPU_COUNT = 4
-	MIN_CPU_SPEED = 2.0
-	MIN_MEMORY    = 14
-
-	//Free In GB BEFORE DEPLOYMENT
-	HAB_FREE_DISK_BEFORE_DEP_A2      = 80
-	HAB_FREE_DISK_BEFORE_DEP_CS      = 80
-	HAB_FREE_DISK_BEFORE_DEP_PG      = 150
-	HAB_FREE_DISK_BEFORE_DEP_OS      = 150
-	HAB_FREE_DISK_BEFORE_DEP_BASTION = 150
-
-	//Free Space in GB After deployment
-	HAB_FREE_DISK_AFTER_DEP_A2      = 10
-	HAB_FREE_DISK_AFTER_DEP_CS      = 10
-	HAB_FREE_DISK_AFTER_DEP_PG      = 50
-	HAB_FREE_DISK_AFTER_DEP_OS      = 50
-	HAB_FREE_DISK_AFTER_DEP_BASTION = 30
-
-	//Free space in percentage after deployment
-	HAB_FREE_DISK_AFTER_DEP_A2_IN_PER      = 0.05
-	HAB_FREE_DISK_AFTER_DEP_CS_IN_PER      = 0.05
-	HAB_FREE_DISK_AFTER_DEP_PG_IN_PER      = 0.15
-	HAB_FREE_DISK_AFTER_DEP_OS_IN_PER      = 0.15
-	HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER = 0.15
-
-	//Free space In GB for /tmp
-	TMP_FREE_DISK        = 10
-	TMP_FREE_DISK_IN_PER = 0.05
-
-	ROOT_FREE_DISK        = 20
-	ROOT_FREE_DISK_IN_PER = 0.20
-
-	//files path
 	CPU_INFO_FILE = "/proc/cpuinfo"
 
-	//check titles or names
 	CPU_COUNT_CHECK_TITLE   = "CPU count check"
 	CPU_SPEED_CHECK_TITLE   = "CPU speed check"
 	MEMORY_SIZE_CHECK_TITLE = "Memory size check"
 	FREE_SPACE_CHECK        = "%s free space check"
 
-	//free space check msg
 	SUCCESS_MSG        = "%s should have free space >=%vGB"
 	ERROR_MSG          = "%s free space is %0.2fGB"
 	SUCCESS_MSG_IN_PER = ` or %v%% of total size of /hab`
 
-	//Error msg
 	INVALID_NODE_TYPE_ERR = "given query node_type with value=%s is not supported"
 )
 
@@ -131,7 +95,7 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 		return nil, fmt.Errorf("given query deployment_state with value=%s is not supported", deploymentState)
 	}
 
-	tmpFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/tmp", TMP_FREE_DISK_IN_PER, TMP_FREE_DISK)
+	tmpFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
 
 	if !tmpFreeSpaceCheck.Passed {
 		srsResponse.Passed = false
@@ -139,7 +103,7 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 
 	srsResponse.Checks = append(srsResponse.Checks, *tmpFreeSpaceCheck)
 
-	rootFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/", ROOT_FREE_DISK_IN_PER, ROOT_FREE_DISK)
+	rootFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
 
 	if !rootFreeSpaceCheck.Passed {
 		srsResponse.Passed = false
@@ -154,12 +118,12 @@ func (srs *SystemResourcesService) GetCpuCountCheck() *models.Checks {
 	srs.logger.Debug("CPU count is : ", cpuCount)
 
 	var checkResp *models.Checks
-	if cpuCount >= MIN_CPU_COUNT {
-		successMsg := fmt.Sprintf("CPU count is >=%v", MIN_CPU_COUNT)
+	if cpuCount >= constants.MIN_CPU_COUNT {
+		successMsg := fmt.Sprintf("CPU count is >=%v", constants.MIN_CPU_COUNT)
 		checkResp = srs.GetChecksModel(true, CPU_COUNT_CHECK_TITLE, successMsg, "", "")
 	} else {
 		errorMsg := fmt.Sprintf("CPU count is %v", cpuCount)
-		resolutionMsg := fmt.Sprintf("CPU count should be >=%v", MIN_CPU_COUNT)
+		resolutionMsg := fmt.Sprintf("CPU count should be >=%v", constants.MIN_CPU_COUNT)
 		checkResp = srs.GetChecksModel(false, CPU_COUNT_CHECK_TITLE, "", errorMsg, resolutionMsg)
 	}
 	return checkResp
@@ -180,14 +144,14 @@ func (srs *SystemResourcesService) GetCpuSpeedCheck(cpuInfoFile string) *models.
 
 	srs.logger.Debug("CPU speed is : ", cpuSpeed)
 
-	if cpuSpeed >= MIN_CPU_SPEED {
+	if cpuSpeed >= constants.MIN_CPU_SPEED {
 		srs.logger.Debug("CPU speed is ", cpuSpeed)
-		successMsg := fmt.Sprintf("CPU speed should be >=%vGHz", MIN_CPU_SPEED)
+		successMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED)
 		resp = srs.GetChecksModel(true, CPU_SPEED_CHECK_TITLE, successMsg, "", "")
 	} else {
 		srs.logger.Debug("CPU speed is ", cpuSpeed)
 		errorMsg := fmt.Sprintf("CPU speed is %vGHz", cpuSpeed)
-		resolutionMsg := fmt.Sprintf("CPU speed should be >=%vGHz", MIN_CPU_SPEED)
+		resolutionMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED)
 		resp = srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", errorMsg, resolutionMsg)
 	}
 	return resp
@@ -206,13 +170,13 @@ func (srs *SystemResourcesService) GetMemorySizeCheck() *models.Checks {
 		return resp
 	}
 
-	srs.logger.Debug("Current memory of system is :", memoryInGB)
-	if memoryInGB >= MIN_MEMORY {
-		successMsg := fmt.Sprintf("Memory should be >=%v", MIN_MEMORY)
+	srs.logger.Debugf("Current memory of system is :%vGB", memoryInGB)
+	if memoryInGB >= constants.MIN_MEMORY {
+		successMsg := fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY)
 		resp = srs.GetChecksModel(true, MEMORY_SIZE_CHECK_TITLE, successMsg, "", "")
 	} else {
-		errorMsg := fmt.Sprintf("Memory is %.2f", memoryInGB)
-		resolutionMsg := fmt.Sprintf("Memory should be >=%v", MIN_MEMORY)
+		errorMsg := fmt.Sprintf("Memory is %.2fGB", memoryInGB)
+		resolutionMsg := fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY)
 		resp = srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", errorMsg, resolutionMsg)
 	}
 	return resp
@@ -225,7 +189,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType st
 	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Unable to determine free space of /hab :", err)
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), "Please run system on supported platform")
 		return resp, nil
 	}
 
@@ -233,20 +197,20 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType st
 
 	switch nodeType {
 	case constants.AUTOMATE:
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(HAB_FREE_DISK_BEFORE_DEP_A2, currentFreeSpaceInGB, 0, HAB_FREE_DISK_BEFORE_DEP_A2, constants.PRE_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_A2, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_A2, constants.PRE_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.CHEF_INFRA_SERVER:
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(HAB_FREE_DISK_BEFORE_DEP_CS, currentFreeSpaceInGB, 0, HAB_FREE_DISK_BEFORE_DEP_CS, constants.PRE_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_CS, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_CS, constants.PRE_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.OPENSEARCH:
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(HAB_FREE_DISK_BEFORE_DEP_OS, currentFreeSpaceInGB, 0, HAB_FREE_DISK_BEFORE_DEP_OS, constants.PRE_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_OS, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_OS, constants.PRE_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.POSTGRESQL:
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(HAB_FREE_DISK_BEFORE_DEP_PG, currentFreeSpaceInGB, 0, HAB_FREE_DISK_BEFORE_DEP_PG, constants.PRE_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_PG, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_PG, constants.PRE_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.BASTION:
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(HAB_FREE_DISK_BEFORE_DEP_BASTION, currentFreeSpaceInGB, 0, HAB_FREE_DISK_BEFORE_DEP_BASTION, constants.PRE_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_BASTION, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_BASTION, constants.PRE_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	default:
 		srs.logger.Errorf(INVALID_NODE_TYPE_ERR, nodeType)
 		return nil, fmt.Errorf(INVALID_NODE_TYPE_ERR, nodeType)
@@ -261,7 +225,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Unable to determine free space of /hab :", err.Error())
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), "Please run system on supported platform")
 		return resp, nil
 	}
 	srs.logger.Debugf("current free space in /hab after deployment :%0.2fGB", currentFreeSpaceInGB)
@@ -278,25 +242,25 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 
 	switch nodeType {
 	case constants.AUTOMATE:
-		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, HAB_FREE_DISK_AFTER_DEP_A2)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, float64(HAB_FREE_DISK_AFTER_DEP_A2), constants.POST_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_A2), constants.POST_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.CHEF_INFRA_SERVER:
-		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, HAB_FREE_DISK_AFTER_DEP_CS)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, float64(HAB_FREE_DISK_AFTER_DEP_CS), constants.POST_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_CS), constants.POST_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.OPENSEARCH:
-		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, HAB_FREE_DISK_AFTER_DEP_OS)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, float64(HAB_FREE_DISK_AFTER_DEP_OS), constants.POST_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_OS), constants.POST_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.POSTGRESQL:
-		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, HAB_FREE_DISK_AFTER_DEP_PG)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, float64(HAB_FREE_DISK_AFTER_DEP_PG), constants.POST_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_PG), constants.POST_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.BASTION:
-		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, HAB_FREE_DISK_AFTER_DEP_BASTION)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, float64(HAB_FREE_DISK_AFTER_DEP_BASTION), constants.POST_DEPLOY, "/hab")
-		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), successMsg, errorMsg, resolutionMsg)
+		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION)
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_BASTION), constants.POST_DEPLOY, "/hab")
+		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	default:
 		srs.logger.Debugf(INVALID_NODE_TYPE_ERR, nodeType)
 		return nil, fmt.Errorf(INVALID_NODE_TYPE_ERR, nodeType)
@@ -304,21 +268,14 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 	return resp, nil
 }
 
-func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB float64) *models.Checks {
+func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB float64, checkTitle string) *models.Checks {
 	srs.logger.Debugf("free disk space check is running for %s directory", dirPath)
-	pathName := ""
-
-	if dirPath == "/" {
-		pathName = "/(root volume)"
-	} else {
-		pathName = dirPath
-	}
 
 	var resp *models.Checks
 	currentFreeSpaceInDir, err := srs.GetFreeDiskSpaceOfGivenDir(dirPath)
 	if err != nil {
 		srs.logger.Errorf("Unable to determine free space of %s error=%v", dirPath, err)
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, pathName), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
 		return resp
 	}
 
@@ -328,7 +285,7 @@ func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, fr
 	totalSpaceInHab, err = srs.GetTotalSpaceOfGivenDir("/hab")
 	if err != nil {
 		srs.logger.Error("Unable to determine total space of /hab :", err)
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, pathName), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
 		return resp
 	}
 
@@ -337,12 +294,16 @@ func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, fr
 	expectedFreeSpaceValue := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInHab, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB)
 	srs.logger.Debugf("Expected free space calculated for %s is %0.2fGB", dirPath, expectedFreeSpaceValue)
 
-	passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceValue, currentFreeSpaceInDir, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB, constants.POST_DEPLOY, pathName)
-	resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, pathName), successMsg, errorMsg, resolutionMsg)
+	passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceValue, currentFreeSpaceInDir, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB, constants.POST_DEPLOY, dirPath)
+	resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), successMsg, errorMsg, resolutionMsg)
 	return resp
 }
 
 func (srs *SystemResourcesService) GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceCalculated, currentFreeSpace, expectedFreeSpaceWantInPer, expectedFreeSpaceWantInGB float64, deploymentState, dirName string) (bool, string, string, string) {
+
+	if dirName == "/" {
+		dirName = "/(root volume)"
+	}
 
 	successMsg := ""
 	resolutionMsg := ""
