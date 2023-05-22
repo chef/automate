@@ -17,6 +17,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Post("/hardware-resource-count", vs.Handler.HardwareResourceCount)
 	apiChecksGroup.Get("/software-versions", vs.Handler.CheckSoftwareVersion)
 	apiChecksGroup.Post("/s3-config", vs.Handler.GetS3Config)
+	apiChecksGroup.Post("/port-reachable", vs.Handler.PortReachable)
 
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
