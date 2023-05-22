@@ -145,15 +145,15 @@ func validateAWSConfigCerts(config *config_parser.HAAwsConfigToml) *list.List {
 func validateEnvFields(config *config_parser.HAAwsConfigToml) *list.List {
 	errorList := list.New()
 
-	validateRequiredStringField(config.Aws.Config.Profile, "aws profile name", errorList)
-	validateRequiredStringField(config.Aws.Config.Region, "aws region", errorList)
-	validateRequiredStringField(config.Aws.Config.SSHKeyPairName, "aws ssh_key_pair_name", errorList)
-	validateRequiredStringField(config.Aws.Config.LBAccessLogs, "aws lb_access_logs", errorList)
-	validateRequiredStringField(config.Aws.Config.AutomateServerInstanceType, "aws automate_server_instance_type", errorList)
-	validateRequiredStringField(config.Aws.Config.ChefServerInstanceType, "aws chef_server_instance_type", errorList)
-	validateRequiredStringField(config.Aws.Config.OpensearchServerInstanceType, "aws opensearch_server_instance_type", errorList)
-	validateRequiredStringField(config.Aws.Config.PostgresqlServerInstanceType, "aws postgresql_server_instance_type", errorList)
-	validateRequiredStringField(config.Aws.Config.AutomateLbCertificateArn, "aws automate_lb_certificate_arn", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.Profile, "aws profile name", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.Region, "aws region", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.SSHKeyPairName, "aws ssh_key_pair_name", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.LBAccessLogs, "aws lb_access_logs", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.AutomateServerInstanceType, "aws automate_server_instance_type", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.ChefServerInstanceType, "aws chef_server_instance_type", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.OpensearchServerInstanceType, "aws opensearch_server_instance_type", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.PostgresqlServerInstanceType, "aws postgresql_server_instance_type", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.AutomateLbCertificateArn, "aws automate_lb_certificate_arn", errorList)
 	validateRequiredStringField(config.Aws.Config.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn", errorList)
 	validateRequiredNumberField(config.Aws.Config.AutomateEbsVolumeIops, "aws automate_ebs_volume_iops", errorList)
 	validateRequiredNumberField(config.Aws.Config.AutomateEbsVolumeSize, "aws automate_ebs_volume_size", errorList)
@@ -161,14 +161,15 @@ func validateEnvFields(config *config_parser.HAAwsConfigToml) *list.List {
 	validateRequiredNumberField(config.Aws.Config.ChefEbsVolumeIops, "aws chef_ebs_volume_iops", errorList)
 	validateRequiredNumberField(config.Aws.Config.ChefEbsVolumeSize, "aws chef_ebs_volume_size", errorList)
 	validateRequiredStringField(config.Aws.Config.ChefEbsVolumeType, "aws chef_ebs_volume_type", errorList)
+	validateRequiredBooleanField(config.Aws.Config.SetupManagedServices, "aws setup_managed_services", errorList)
 
 	if !config.Aws.Config.SetupManagedServices {
 		validateRequiredNumberField(config.Aws.Config.OpensearchEbsVolumeIops, "aws opensearch_ebs_volume_iops", errorList)
 		validateRequiredNumberField(config.Aws.Config.OpensearchEbsVolumeSize, "aws opensearch_ebs_volume_size", errorList)
-		validateRequiredStringField(config.Aws.Config.OpensearchEbsVolumeType, "aws opensearch_ebs_volume_type", errorList)
+		validateRequiredStringTypeField(config.Aws.Config.OpensearchEbsVolumeType, "aws opensearch_ebs_volume_type", errorList)
 		validateRequiredNumberField(config.Aws.Config.PostgresqlEbsVolumeIops, "aws postgresql_ebs_volume_iops", errorList)
 		validateRequiredNumberField(config.Aws.Config.PostgresqlEbsVolumeSize, "aws postgresql_ebs_volume_size", errorList)
-		validateRequiredStringField(config.Aws.Config.PostgresqlEbsVolumeType, "aws postgresql_ebs_volume_type", errorList)
+		validateRequiredStringTypeField(config.Aws.Config.PostgresqlEbsVolumeType, "aws postgresql_ebs_volume_type", errorList)
 	}
 
 	return errorList

@@ -20,13 +20,10 @@ func validateRequiredNumberField(value string, fieldName string, errorList *list
 	}
 }
 
-func validateRequiredBooleanField(value string, fieldName string, errorList *list.List) {
-	if len(value) > 0 {
-		if _, err := strconv.ParseBool(value); err != nil {
-			errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
-		}
-	} else {
-		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
+func validateRequiredBooleanField(value interface{}, fieldName string, errorList *list.List) {
+	_, ok := value.(bool)
+	if !ok {
+		errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
 	}
 }
 
