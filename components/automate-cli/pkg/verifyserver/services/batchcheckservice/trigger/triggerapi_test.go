@@ -2,7 +2,6 @@ package trigger
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -38,7 +37,8 @@ const (
 					"resolution_msg": "Please check the configuration"
 				}
 			]
-		}
+		},
+		"host": ""
 	}`
 
 	osResourceCheck = `{
@@ -100,7 +100,7 @@ const (
 					"resolution_msg": ""
 				},
 				{
-					"title": "OS CPU speed check",
+					"title": "Automate CPU speed check",
 					"passed": true,
 					"success_msg": "CPU speed should be >= 2Ghz",
 					"error_msg": "",
@@ -162,180 +162,6 @@ const (
 			]
 		}
 	}`
-
-	hardwareCheckResp = `{
-		"status": "SUCCESS",
-		"result": [
-			{
-				"ip": "172.154.0.1",
-				"node_type": "automate",
-				"checks": [
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is unique",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is of valid format",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "Not shared with backend nodes",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			},
-			{
-				"ip": "172.154.0.3",
-				"node_type": "chef-infra-server",
-				"checks": [
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is unique",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is of valid format",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "Not shared with backend nodes",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			},
-			{
-				"ip": "172.154.0.5",
-				"node_type": "postgresql",
-				"checks": [
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is unique",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is of valid format",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "Not shared with backend nodes",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			},
-			{
-				"ip": "172.154.0.8",
-				"node_type": "opensearch",
-				"checks": [
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is unique",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "IP address is of valid format",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "Not shared with backend nodes",
-						"error_msg": "",
-						"resolution_msg": ""
-					},
-					{
-						"title": "IP address",
-						"passed": true,
-						"success_msg": "<Node_type> Type has valid count as per Automate HA requirement",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		]
-	}`
-
-	firewallCheckResp1 = `{
-		"status": "SUCCESS",
-		"result": {
-		  "passed": true,
-		  "checks": [
-			{
-			  "title": "Automate Check",
-			  "passed": true,
-			  "success_msg": "Success on automate",
-			  "error_msg": "",
-			  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-			}
-		  ]
-		}
-	  }`
-
-	firewallCheckResp2 = `{
-		"status": "SUCCESS",
-		"result": {
-		  "passed": true,
-		  "checks": [
-			{
-			  "title": "Bastion Check",
-			  "passed": true,
-			  "success_msg": "Success on bastion",
-			  "error_msg": "",
-			  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-			}
-		  ]
-		}
-	  }`
 )
 
 func TestTriggerCheckAPI(t *testing.T) {
@@ -344,18 +170,19 @@ func TestTriggerCheckAPI(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Define the response based on the test case
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(softwareVersionResp))
+			err := json.NewEncoder(w).Encode(json.RawMessage(softwareVersionResp))
+			require.NoError(t, err)
 		}))
 		defer server.Close()
 
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", output)
 
 		// Wait for the response
 		response := <-output
-
+		// Assert the expected response
 		require.NotNil(t, response)
 		require.Equal(t, "success", response.Status)
 		require.Equal(t, "API result message", response.Result.Message)
@@ -369,7 +196,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, constants.POSTGRESQL, http.MethodGet, output, nil)
+		go triggerCheckAPI(endPoint, host, constants.POSTGRESQL, output)
 
 		// Wait for the response
 		response := <-output
@@ -392,7 +219,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
 
 		// Wait for the response
 		response := <-output
@@ -413,17 +240,17 @@ func TestTriggerCheckAPI(t *testing.T) {
 		defer server.Close()
 
 		output := make(chan models.CheckTriggerResponse)
-		reqBody := make(chan string)
+
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodPost, output, reqBody)
+		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
 
 		// Wait for the response
 		response := <-output
 
 		// Assert the expected error response
 		require.NotNil(t, response.Error)
-		assert.Equal(t, http.StatusBadRequest, response.Error.Code)
-		assert.Equal(t, `error while reading the request body: json: unsupported type: chan string`, response.Error.Message)
+		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
+		assert.Equal(t, `error while parsing the response data:invalid character 'i' looking for beginning of object key string`, response.Error.Message)
 	})
 
 	t.Run("Request creation error", func(t *testing.T) {
@@ -432,7 +259,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, constants.AUTOMATE, http.MethodGet, output, nil)
+		go triggerCheckAPI(endPoint, host, constants.AUTOMATE, output)
 
 		// Wait for the response
 		response := <-output
@@ -441,12 +268,13 @@ func TestTriggerCheckAPI(t *testing.T) {
 		require.Equal(t, http.StatusNotFound, response.Error.Code)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
 	})
+
 }
 
 func Test_RunCheck(t *testing.T) {
 	t.Run("Software Version Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
+		server, host, port := createDummyServer()
 		defer server.Close()
 
 		// Test data
@@ -462,7 +290,7 @@ func Test_RunCheck(t *testing.T) {
 
 		// Call the function being tested
 
-		result := RunCheck(config, log, port, path, "", http.MethodGet, nil)
+		result := RunCheck(config, log, port, path, "")
 		require.Equal(t, 2, len(result))
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
@@ -471,7 +299,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("System Resource Check - Automate", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
+		server, host, port := createDummyServer()
 		defer server.Close()
 
 		// Test data
@@ -487,7 +315,7 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
+		result := RunCheck(config, log, port, path, depState)
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 2)
@@ -496,7 +324,7 @@ func Test_RunCheck(t *testing.T) {
 
 	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
+		server, host, port := createDummyServer()
 		defer server.Close()
 
 		// Test data
@@ -514,7 +342,7 @@ func Test_RunCheck(t *testing.T) {
 		depState := "your_deployment_state"
 
 		// Call the function being tested
-		results := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
+		results := RunCheck(config, log, port, path, depState)
 		for _, result := range results {
 			if result.NodeType == constants.BASTION {
 				require.Equal(t, "PASSED", result.Status)
@@ -577,92 +405,9 @@ func Test_RunCheck(t *testing.T) {
 		}
 	})
 
-	t.Run("System Resource Check - PostgreSQL, OpenSearch", func(t *testing.T) {
-		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
-		defer server.Close()
-
-		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
-				PostgresqlNodeCount: 1,
-				PostgresqlNodeIps:   []string{host},
-				OpenSearchNodeCount: 1,
-				OpenSearchNodeIps:   []string{host},
-			},
-		}
-		log := logger.NewLogrusStandardLogger()
-
-		path := constants.SYSTEM_RESOURCE_CHECK_API_PATH
-		depState := "your_deployment_state"
-
-		// Call the function being tested
-		results := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
-		for _, result := range results {
-			if result.NodeType == "bastion" {
-				require.Equal(t, "PASSED", result.Status)
-				require.Empty(t, result.Result.Message)
-				require.True(t, result.Result.Passed)
-
-				resp1 := result.Result.Checks[0]
-				require.Equal(t, "Bastion CPU count check", resp1.Title)
-				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
-				require.Empty(t, resp1.ResolutionMsg)
-				require.Empty(t, resp1.ErrorMsg)
-				require.True(t, resp1.Passed)
-
-				resp2 := result.Result.Checks[1]
-				require.Equal(t, "Bastion CPU speed check", resp2.Title)
-				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
-				require.Empty(t, resp2.ResolutionMsg)
-				require.Empty(t, resp2.ErrorMsg)
-				require.True(t, resp2.Passed)
-			}
-
-			if result.NodeType == constants.OPENSEARCH {
-				require.Equal(t, "SUCCESS", result.Status)
-				require.Empty(t, result.Result.Message)
-				require.True(t, result.Result.Passed)
-
-				resp1 := result.Result.Checks[0]
-				require.Equal(t, "OS CPU count check", resp1.Title)
-				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
-				require.Empty(t, resp1.ResolutionMsg)
-				require.Empty(t, resp1.ErrorMsg)
-				require.True(t, resp1.Passed)
-
-				resp2 := result.Result.Checks[1]
-				require.Equal(t, "OS CPU speed check", resp2.Title)
-				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
-				require.Empty(t, resp2.ResolutionMsg)
-				require.Empty(t, resp2.ErrorMsg)
-				require.True(t, resp2.Passed)
-			}
-			if result.NodeType == constants.POSTGRESQL {
-				require.Equal(t, "PASSED", result.Status)
-				require.Empty(t, result.Result.Message)
-				require.True(t, result.Result.Passed)
-
-				resp1 := result.Result.Checks[0]
-				require.Equal(t, "PG CPU count check", resp1.Title)
-				require.Equal(t, "CPU count is >= 4", resp1.SuccessMsg)
-				require.Empty(t, resp1.ResolutionMsg)
-				require.Empty(t, resp1.ErrorMsg)
-				require.True(t, resp1.Passed)
-
-				resp2 := result.Result.Checks[1]
-				require.Equal(t, "PG CPU speed check", resp2.Title)
-				require.Equal(t, "CPU speed should be >= 2Ghz", resp2.SuccessMsg)
-				require.Empty(t, resp2.ResolutionMsg)
-				require.Empty(t, resp2.ErrorMsg)
-				require.True(t, resp2.Passed)
-			}
-		}
-	})
-
 	t.Run("System User Check", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
+		server, host, port := createDummyServer()
 		defer server.Close()
 
 		// Test data
@@ -677,40 +422,17 @@ func Test_RunCheck(t *testing.T) {
 		path := constants.SYSTEM_USER_CHECK_API_PATH
 		depState := ""
 		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState, http.MethodGet, nil)
+		result := RunCheck(config, log, port, path, depState)
 		require.Len(t, result, 1)
 		require.NotNil(t, result)
 		require.Nil(t, result[0].Error)
 		require.Len(t, result[0].Result.Checks, 3)
 		require.Equal(t, result[0].Status, "SUCCESS")
 	})
-
-	t.Run("Hardware Resource Check", func(t *testing.T) {
-		// Create a dummy server
-		server, _, port := createDummyServer(t, http.StatusOK)
-		defer server.Close()
-
-		tempConfig := GetHardwareReqJson()
-		// Test data
-		config := models.Config{
-			SSHUser:  tempConfig.SSHUser,
-			Hardware: tempConfig.Hardware,
-		}
-		log := logger.NewLogrusStandardLogger()
-
-		path := constants.HARDWARE_RESOURCE_CHECK_API_PATH
-		depState := ""
-		// Call the function being tested
-		result := RunCheck(config, log, port, path, depState, http.MethodPost, config.Hardware)
-		require.Len(t, result, 1)
-		require.NotNil(t, result)
-		// require.Equal(t, result[0].Status, "SUCCESS")
-		// require.Len(t, 4, result[0].)
-	})
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, string, string) {
+func createDummyServer() (*httptest.Server, string, string) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
 			w.WriteHeader(http.StatusOK)
@@ -744,35 +466,6 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(systemUser))
 		}
-
-		if r.URL.Path == constants.HARDWARE_RESOURCE_CHECK_API_PATH {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(hardwareCheckResp))
-		}
-
-		if r.URL.Path == constants.FIREWALL_API_PATH {
-			body, err := ioutil.ReadAll(r.Body)
-			require.NoError(t, err)
-
-			var req ReqBody
-
-			err = json.Unmarshal(body, &req)
-			require.NoError(t, err)
-			require.NotZero(t, req)
-			require.NotEmpty(t, req)
-
-			if req.NodeType == constants.AUTOMATE {
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(firewallCheckResp1))
-			} else if req.NodeType == constants.BASTION {
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte(firewallCheckResp2))
-			} else {
-				w.WriteHeader(http.StatusOK)
-			}
-
-		}
-
 	}))
 
 	// Extract IP and port from the server's URL
@@ -781,177 +474,4 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 	ip := address[:colonIndex]
 	port := address[colonIndex+1:]
 	return server, ip, port
-}
-
-func Test_interfaceToIOReader(t *testing.T) {
-	t.Run("Null Response", func(t *testing.T) {
-		reader, err := interfaceToIOReader(nil)
-		require.NoError(t, err)
-		require.Nil(t, reader)
-	})
-
-	t.Run("Cannot marshal rquest body", func(t *testing.T) {
-		reqBody := make(chan string)
-		reader, err := interfaceToIOReader(reqBody)
-		require.Error(t, err)
-		require.Equal(t, "json: unsupported type: chan string", err.Error())
-		require.Nil(t, reader)
-	})
-
-	t.Run("Get the io.Reader", func(t *testing.T) {
-		reqBody := models.Config{
-			Hardware: models.Hardware{
-				AutomateNodeCount: 1,
-				AutomateNodeIps:   []string{"127.0.0.1"},
-			},
-		}
-		reader, err := interfaceToIOReader(reqBody)
-		require.NoError(t, err)
-		require.NotNil(t, reader)
-	})
-}
-
-func GetHardwareReqJson() models.Config {
-	ipConfig := models.Config{}
-
-	json.Unmarshal([]byte(`{
-		  "ssh_user": {
-			"user_name": "ubuntu",
-			"private_key": "test_key",
-			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
-			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
-			}
-		  },
-		  "hardware": {
-			"automate_node_count": 1,
-			"automate_node_ips": [
-			  "1.2.3.4"
-			],
-			"chef_infra_server_node_count": 1,
-			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
-			],
-			"postgresql_node_count": 1,
-			"postgresql_node_ips": [
-			  "9.10.11.12"
-			],
-			"opensearch_node_count": 1,
-			"opensearch_node_ips": [
-			  "14.15.16.17"
-			]
-		  }
-		}`), &ipConfig)
-	return ipConfig
-}
-
-func Test_RunCheckMultiRequests(t *testing.T) {
-	t.Run("Return data", func(t *testing.T) {
-		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
-		defer server.Close()
-
-		config := models.Config{
-			Hardware: models.Hardware{
-				AutomateNodeIps:        []string{host},
-				PostgresqlNodeIps:      []string{host},
-				OpenSearchNodeIps:      []string{host},
-				ChefInfraServerNodeIps: []string{host},
-			},
-			Certificate: models.Certificate{
-				Nodes: []models.NodeCert{
-					{
-						Cert: "cert",
-						Key:  "key",
-					},
-				},
-				RootCert: "root_cert",
-			},
-		}
-
-		// Test data
-		requests := []ReqBody{
-			{
-				SourceNodeIP:               "192.168.0.1",
-				DestinationNodeIP:          "192.168.0.2",
-				DestinationServicePort:     "8080",
-				DestinationServiceProtocol: "tcp1",
-				Cert:                       "cer1",
-				Key:                        "key1",
-				RootCert:                   "rootcer1",
-				NodeType:                   constants.AUTOMATE,
-			},
-			{
-				SourceNodeIP:               "192.168.0.3",
-				DestinationNodeIP:          "192.168.0.4",
-				DestinationServicePort:     "8080",
-				DestinationServiceProtocol: "tcp2",
-				Cert:                       "cer2",
-				Key:                        "key2",
-				RootCert:                   "rootcer2",
-				NodeType:                   constants.BASTION,
-			},
-		}
-		log := logger.NewLogrusStandardLogger()
-
-		path := constants.FIREWALL_API_PATH
-
-		// Call the function being tested
-
-		result := RunCheckMultiRequests(config, log, port, path, "", http.MethodPost, requests)
-		require.Equal(t, 2, len(result))
-		require.NotNil(t, result)
-		require.Nil(t, result[0].Error)
-		require.Len(t, result[0].Result.Checks, 1)
-
-		for _, rep := range result {
-
-			if rep.NodeType == constants.AUTOMATE {
-				require.NotEmpty(t, rep.Status)
-				require.NotEmpty(t, rep.Result)
-				require.Equal(t, rep.Host, "192.168.0.1")
-				require.True(t, rep.Result.Passed)
-				require.True(t, rep.Result.Passed)
-				require.Equal(t, "Automate Check", rep.Result.Checks[0].Title)
-				require.True(t, rep.Result.Checks[0].Passed)
-
-			}
-			if rep.NodeType == constants.BASTION {
-				require.Equal(t, "SUCCESS", rep.Status)
-				require.NotEmpty(t, rep.Result)
-				require.Equal(t, rep.Host, "192.168.0.3")
-				require.True(t, rep.Result.Passed)
-				require.Equal(t, "Bastion Check", rep.Result.Checks[0].Title)
-				require.True(t, rep.Result.Checks[0].Passed)
-			}
-		}
-
-	})
-
-	t.Run("Return NIl", func(t *testing.T) {
-		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusOK)
-		defer server.Close()
-
-		config := models.Config{
-			Hardware: models.Hardware{
-				AutomateNodeIps: []string{host},
-			},
-		}
-
-		// Test data
-		requests := "some random string  value"
-		log := logger.NewLogrusStandardLogger()
-
-		path := constants.FIREWALL_API_PATH
-
-		// Call the function being tested
-
-		result := RunCheckMultiRequests(config, log, port, path, "", http.MethodPost, requests)
-		require.Equal(t, 0, len(result))
-		require.Nil(t, result)
-	})
 }

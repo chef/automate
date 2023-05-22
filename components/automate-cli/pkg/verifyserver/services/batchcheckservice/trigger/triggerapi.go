@@ -1,10 +1,8 @@
 package trigger
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -15,49 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-var (
-	BastionNodeIP = "127.0.0.1"
-)
-
-type ReqBody struct {
-	SourceNodeIP               string `json:"source_node_ip"`
-	DestinationNodeIP          string `json:"destination_node_ip"`
-	DestinationServicePort     string `json:"destination_service_port"`
-	DestinationServiceProtocol string `json:"destination_service_protocol"`
-	Cert                       string `json:"cert"`
-	Key                        string `json:"key"`
-	RootCert                   string `json:"root_cert"`
-	NodeType                   string `json:"node_type"`
-}
-
-func RunCheckMultiRequests(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
-	var result []models.CheckTriggerResponse
-	outputCh := make(chan models.CheckTriggerResponse)
-
-	if path == constants.FIREWALL_API_PATH {
-		reqBodies, ok := reqBody.([]ReqBody)
-		if !ok {
-			log.Error("reqbody isn't a []ReqBody slice")
-			return nil
-		}
-
-		for _, reqBody := range reqBodies {
-			endpoint := prepareEndpoint(path, "127.0.0.1", port, "bastion", depState)
-			go triggerCheckAPI(endpoint, reqBody.SourceNodeIP, reqBody.NodeType, method, outputCh, reqBody)
-		}
-
-		for i := 0; i < len(reqBodies); i++ {
-			select {
-			case res := <-outputCh:
-				result = append(result, res)
-			}
-		}
-	}
-
-	return result
-}
-
-func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string, method string, reqBody interface{}) []models.CheckTriggerResponse {
+func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
 		config.Hardware.ChefInfraServerNodeCount +
@@ -66,37 +22,28 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 
 	outputCh := make(chan models.CheckTriggerResponse)
 
-	if path == constants.HARDWARE_RESOURCE_CHECK_API_PATH {
-		endpoint := prepareEndpoint(path, BastionNodeIP, port, "bastion", depState)
-		go triggerCheckAPI(endpoint, BastionNodeIP, "bastion", method, outputCh, reqBody)
-
-		res := <-outputCh
-		result = append(result, res)
-		return result
-	}
-
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
-		endpoint := prepareEndpoint(path, BastionNodeIP, port, constants.BASTION, depState)
-		go triggerCheckAPI(endpoint, BastionNodeIP, constants.BASTION, method, outputCh, reqBody)
+		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
+		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, outputCh)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.AUTOMATE, depState)
-		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, method, outputCh, reqBody)
+		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, outputCh)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.CHEF_INFRA_SERVER, depState)
-		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, method, outputCh, reqBody)
+		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, outputCh)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.OPENSEARCH, depState)
-		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, method, outputCh, reqBody)
+		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, outputCh)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.POSTGRESQL, depState)
-		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, method, outputCh, reqBody)
+		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, outputCh)
 	}
 
 	for i := 0; i < count; i++ {
@@ -117,31 +64,17 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
 
-	} else {
+	} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
 		endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
 	}
+
 	return endPoint
 }
 
-// triggerCheckAPI prepares interface request body to io.Reader and triggers the API where where response and error is passed into
-// the output channel and func exits
-func triggerCheckAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody interface{}) {
+func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.CheckTriggerResponse) {
 	var ctr models.CheckTriggerResponse
 
-	reader, err := interfaceToIOReader(reqBody)
-	if err != nil {
-		output <- models.CheckTriggerResponse{
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
-			},
-			Host:     host,
-			NodeType: nodeType,
-		}
-		return
-	}
-
-	req, err := http.NewRequest(method, endPoint, reader)
+	req, err := http.NewRequest(http.MethodGet, endPoint, nil)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host: host,
@@ -157,6 +90,7 @@ func triggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
@@ -199,18 +133,4 @@ func triggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	ctr.Host = host
 	ctr.NodeType = nodeType
 	output <- ctr
-}
-
-func interfaceToIOReader(body interface{}) (io.Reader, error) {
-	var reader io.Reader
-	if body != nil {
-		bx, err := json.Marshal(body)
-		if err != nil {
-			return nil, err
-		}
-
-		reader = bytes.NewBuffer(bx)
-
-	}
-	return reader, nil
 }

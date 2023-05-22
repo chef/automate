@@ -1,7 +1,10 @@
 package firewallchecktrigger
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +13,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,7 +63,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 		fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), port)
 		resp := fwc.Run(config)
 		require.NotNil(t, resp)
-		require.Len(t, resp, 30)
+		require.Len(t, resp, 19)
 
 		for _, rep := range resp {
 			if rep.NodeType == constants.BASTION {
@@ -108,7 +110,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 		fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), port)
 		ctr := fwc.Run(config)
 
-		require.Len(t, ctr, 30)
+		require.Len(t, ctr, 19)
 		require.NotNil(t, ctr[0].Error)
 		require.Equal(t, ctr[0].Error.Code, http.StatusInternalServerError)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Error.Error())
@@ -136,7 +138,7 @@ func TestMakeRequests(t *testing.T) {
 	}
 
 	// Define the expected result
-	expected := []trigger.ReqBody{
+	expected := []models.FirewallRequest{
 		// Expected requests for Chef Automate to all the OS and PG nodes
 		{
 			SourceNodeIP:               "10.0.0.1",
@@ -153,8 +155,9 @@ func TestMakeRequests(t *testing.T) {
 
 	// Call the function
 	result := makeRequests(config)
+	fmt.Println(result)
 
-	require.Len(t, result, 92)
+	require.Len(t, result, 70)
 	require.Equal(t, expected[0].SourceNodeIP, result[0].SourceNodeIP)
 	require.Equal(t, expected[0].DestinationNodeIP, result[0].DestinationNodeIP)
 	require.Equal(t, "automate", result[0].NodeType)
@@ -168,7 +171,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 				body, err := ioutil.ReadAll(r.Body)
 				require.NoError(t, err)
 
-				var req trigger.ReqBody
+				var req models.FirewallRequest
 
 				err = json.Unmarshal(body, &req)
 				require.NoError(t, err)
@@ -206,3 +209,6 @@ func createDummyServer(t *testing.T, requiredStatusCode int) (*httptest.Server, 
 
 	return server, ip, port
 }
+
+
+

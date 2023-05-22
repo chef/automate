@@ -1,12 +1,18 @@
 package firewallchecktrigger
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber"
 )
 
 var (
@@ -34,173 +40,182 @@ func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse
 }
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
-func makeRequests(config models.Config) []trigger.ReqBody {
-	var reqBodies []trigger.ReqBody
+func makeRequests(config models.Config) []models.FirewallRequest {
+	var reqBodies []models.FirewallRequest
 
-	// _____________________________________________ Row 1: Chef Automate to all the OS and PG nodes _____________________________________________
+	reqBodies = append(reqBodies, getRequestsForAutomateAsSource(config)...)
+	reqBodies = append(reqBodies, getRequestsForChefServerAsSource(config)...)
+	reqBodies = append(reqBodies, getRequestsForPostgresAsSource(config)...)
+	reqBodies = append(reqBodies, getRequestsForOpensearchAsSource(config)...)
+	reqBodies = append(reqBodies, getRequestAsBastionSource(config)...)
+
+	return reqBodies
+}
+
+func getCertForNodeFromConfig(config models.Config, ip string) models.NodeCert {
+	var nodeCert models.NodeCert
+	for _, node := range config.Certificate.Nodes {
+		if node.IP == ip {
+			nodeCert = node
+			break
+		}
+	}
+	return nodeCert
+
+}
+
+// getRequestsForAutomateAsSource gives the requests for all the ports and types automate as source
+func getRequestsForAutomateAsSource(config models.Config) []models.FirewallRequest {
+	var reqBodies []models.FirewallRequest
 	// Dest postgres
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				NodeType:                   constants.AUTOMATE,
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "7432",
 				DestinationServiceProtocol: "tcp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
-				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
-	}
 
-	// Dest opensearch
-	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "9200",
 				DestinationServiceProtocol: "tcp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
-				RootCert:                   config.Certificate.RootCert,
-				NodeType:                   constants.AUTOMATE,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
 	}
+	return reqBodies
 
-	// _____________________________________________ Row 1: Chef Infra to all the OS and PG nodes _____________________________________________
-	// Dest automate
+}
+
+// getRequestsForChefServerAsSource gives the requests for all the ports where chefserver is the source
+func getRequestsForChefServerAsSource(config models.Config) []models.FirewallRequest {
+
+	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
-			reqBody := trigger.ReqBody{
+			nodeCert := getCertForNodeFromConfig(config, destNodeIP)
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "443",
-				DestinationServiceProtocol: "tcp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
+				DestinationServiceProtocol: "https",
+				Cert:                       nodeCert.Cert,
+				Key:                        nodeCert.Key,
 				RootCert:                   config.Certificate.RootCert,
 				NodeType:                   constants.CHEF_INFRA_SERVER,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
-	}
 
-	// Dest postgres
-	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
+		// Dest postgres
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "7432",
 				DestinationServiceProtocol: "tcp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
-				RootCert:                   config.Certificate.RootCert,
 				NodeType:                   constants.CHEF_INFRA_SERVER,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
-	}
 
-	// Dest opensearch
-	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
+		// Dest opensearch
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "9200",
 				DestinationServiceProtocol: "tcp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
-				RootCert:                   config.Certificate.RootCert,
 				NodeType:                   constants.CHEF_INFRA_SERVER,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
+
 	}
 
-	// _____________________________________________ Row 1: PSQL to all the PG nodes (TCP AND UDP ports) _____________________________________________
-	// Dest postgres UDP
+	return reqBodies
+}
+
+// getRequestsForPostgresAsSource gives the requests for all the ports where postgres is source
+func getRequestsForPostgresAsSource(config models.Config) []models.FirewallRequest {
+	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := trigger.ReqBody{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9638",
-				DestinationServiceProtocol: "udp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
-				RootCert:                   config.Certificate.RootCert,
-				NodeType:                   constants.POSTGRESQL,
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-	}
-	// Dest postgres UDP
-	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
-		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			for _, port := range postgresqlTCPPorts {
-				reqBody := trigger.ReqBody{
+			if sourceNodeIP != destNodeIP {
+				reqBody := models.FirewallRequest{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
-					DestinationServicePort:     port,
-					DestinationServiceProtocol: "tcp",
-					Cert:                       config.Certificate.Nodes[0].Cert,
-					Key:                        config.Certificate.Nodes[0].Key,
-					RootCert:                   config.Certificate.RootCert,
+					DestinationServicePort:     "9638",
+					DestinationServiceProtocol: "udp",
 					NodeType:                   constants.POSTGRESQL,
 				}
 				reqBodies = append(reqBodies, reqBody)
+
+				for _, port := range postgresqlTCPPorts {
+					reqBody := models.FirewallRequest{
+						SourceNodeIP:               sourceNodeIP,
+						DestinationNodeIP:          destNodeIP,
+						DestinationServicePort:     port,
+						DestinationServiceProtocol: "tcp",
+
+						NodeType: constants.POSTGRESQL,
+					}
+					reqBodies = append(reqBodies, reqBody)
+				}
 			}
 		}
 	}
 
-	// _____________________________________________ Row 1: OS to all the OS nodes (TCP AND UDP ports) _____________________________________________
-	// Dest Opensearch UDP
+	return reqBodies
+}
+
+// getRequestsForOpensearchAsSource gives the requests for all the ports where opensearch is source
+func getRequestsForOpensearchAsSource(config models.Config) []models.FirewallRequest {
+	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := trigger.ReqBody{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9638",
-				DestinationServiceProtocol: "udp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
-				RootCert:                   config.Certificate.RootCert,
-				NodeType:                   constants.OPENSEARCH,
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-	}
-	// Dest Opensearch UDP
-	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
-		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			for _, port := range opensearchTCPPorts {
-				reqBody := trigger.ReqBody{
+			if sourceNodeIP != destNodeIP {
+				reqBody := models.FirewallRequest{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
-					DestinationServicePort:     port,
-					DestinationServiceProtocol: "tcp",
-					Cert:                       config.Certificate.Nodes[0].Cert,
-					Key:                        config.Certificate.Nodes[0].Key,
-					RootCert:                   config.Certificate.RootCert,
+					DestinationServicePort:     "9638",
+					DestinationServiceProtocol: "udp",
 					NodeType:                   constants.OPENSEARCH,
 				}
 				reqBodies = append(reqBodies, reqBody)
+
+				for _, port := range opensearchTCPPorts {
+					reqBody := models.FirewallRequest{
+						SourceNodeIP:               sourceNodeIP,
+						DestinationNodeIP:          destNodeIP,
+						DestinationServicePort:     port,
+						DestinationServiceProtocol: "tcp",
+
+						NodeType: constants.OPENSEARCH,
+					}
+					reqBodies = append(reqBodies, reqBody)
+				}
 			}
+
 		}
 	}
 
-	// _____________________________________________ Row 1: Bastion to all the HA nodes (TCP AND UDP ports) _____________________________________________
-	// Dest Automate
+	return reqBodies
+}
+
+func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
+	var reqBodies []models.FirewallRequest
+
 	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
 		for _, port := range a2CsTCPPorts {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -216,7 +231,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	// Dest Chef Infra
 	for _, destNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, port := range a2CsTCPPorts {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -232,7 +247,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	// Dest Postgres
 	for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, port := range postgresBastionPorts {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -248,7 +263,7 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	// Dest Chef Infra
 	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, port := range ossBastionPorts {
-			reqBody := trigger.ReqBody{
+			reqBody := models.FirewallRequest{
 				SourceNodeIP:               BastionNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
@@ -263,4 +278,113 @@ func makeRequests(config models.Config) []trigger.ReqBody {
 	}
 
 	return reqBodies
+}
+
+func triggerFirewallAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody interface{}) {
+	var ctr models.CheckTriggerResponse
+
+	reader, err := interfaceToIOReader(reqBody)
+	if err != nil {
+		output <- models.CheckTriggerResponse{
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
+			},
+			Host:     host,
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	req, err := http.NewRequest(method, endPoint, reader)
+	if err != nil {
+		output <- models.CheckTriggerResponse{
+			Host: host,
+			Error: &fiber.Error{
+				Code:    http.StatusInternalServerError,
+				Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
+			},
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		output <- models.CheckTriggerResponse{
+			Host: host,
+			Error: &fiber.Error{
+				Code:    http.StatusInternalServerError,
+				Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
+			},
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		output <- models.CheckTriggerResponse{
+			Host: host,
+			Error: &fiber.Error{
+				Code:    resp.StatusCode,
+				Message: "error while connecting to the endpoint, received invalid status code",
+			},
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&ctr); err != nil {
+		output <- models.CheckTriggerResponse{
+			Host: host,
+			Error: &fiber.Error{
+				Code:    http.StatusInternalServerError,
+				Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
+			},
+			NodeType: nodeType,
+		}
+		return
+	}
+
+	ctr.Host = host
+	ctr.NodeType = nodeType
+	output <- ctr
+}
+
+func interfaceToIOReader(body interface{}) (io.Reader, error) {
+	var reader io.Reader
+	if body != nil {
+		bx, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		reader = bytes.NewBuffer(bx)
+
+	}
+	return reader, nil
+}
+
+// triggerMultipleRequests triggers multiple requests for firewall api on bastion host
+func triggerMultipleRequests(config models.Config, log logger.Logger, endPoint, method string, requests []models.FirewallRequest) []models.CheckTriggerResponse {
+	var result []models.CheckTriggerResponse
+	outputCh := make(chan models.CheckTriggerResponse)
+
+	for _, reqBody := range requests {
+		go triggerFirewallAPI(endPoint, reqBody.SourceNodeIP, reqBody.NodeType, method, outputCh, reqBody)
+	}
+
+	for i := 0; i < len(requests); i++ {
+		select {
+		case res := <-outputCh:
+			result = append(result, res)
+		}
+	}
+
+	return result
 }
