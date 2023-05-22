@@ -68,7 +68,7 @@ const (
 	FREE_SPACE_CHECK        = "%s free space check"
 
 	//free space check msg
-	SUCCESS_MSG        = "%s should have free space >=%0.2fGB"
+	SUCCESS_MSG        = "%s should have free space >=%vGB"
 	ERROR_MSG          = "%s free space is %0.2fGB"
 	SUCCESS_MSG_IN_PER = ` or %v%% of total size of /hab`
 

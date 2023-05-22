@@ -149,7 +149,7 @@ func TestGetMemorySizeCheck(t *testing.T) {
 				Title:         MEMORY_SIZE_CHECK_TITLE,
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf("Memory is %v", MIN_MEMORY-2),
+				ErrorMsg:      fmt.Sprintf("Memory is %0.2f", float64(MIN_MEMORY-2)),
 				ResolutionMsg: fmt.Sprintf("Memory should be >=%v", MIN_MEMORY),
 			},
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
@@ -216,7 +216,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/tmp"),
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/tmp", 9),
+				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/tmp", float64(9)),
 				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/tmp", TMP_FREE_DISK) + fmt.Sprintf(SUCCESS_MSG_IN_PER, TMP_FREE_DISK_IN_PER*100),
 			},
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
@@ -248,7 +248,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/tmp"),
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/tmp", 14),
+				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/tmp", float64(14)),
 				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/tmp", TMP_FREE_DISK) + fmt.Sprintf(SUCCESS_MSG_IN_PER, TMP_FREE_DISK_IN_PER*100),
 			},
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
@@ -291,7 +291,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/(root volume)", 19),
+				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/(root volume)", float64(19)),
 				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/(root volume)", ROOT_FREE_DISK) + fmt.Sprintf(SUCCESS_MSG_IN_PER, ROOT_FREE_DISK_IN_PER*100),
 			},
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
@@ -307,7 +307,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),
 				Passed:        false,
 				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/(root volume)", 25),
+				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/(root volume)", float64(25)),
 				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/(root volume)", ROOT_FREE_DISK) + fmt.Sprintf(SUCCESS_MSG_IN_PER, ROOT_FREE_DISK_IN_PER*100),
 			},
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
@@ -410,7 +410,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		{
 			testCaseDescription: "Pre-deployment hab free space check | automate",
 			nodeType:            constants.AUTOMATE,
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", HAB_FREE_DISK_BEFORE_DEP_A2-1), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_BEFORE_DEP_A2)),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(HAB_FREE_DISK_BEFORE_DEP_A2-1)), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_BEFORE_DEP_A2)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, HAB_FREE_DISK_BEFORE_DEP_A2 - 1, nil
@@ -472,7 +472,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		{
 			testCaseDescription: "Post-deployment hab free space check | automate",
 			nodeType:            constants.AUTOMATE,
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", 14), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(SUCCESS_MSG_IN_PER, HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100)),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(14)), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(SUCCESS_MSG_IN_PER, HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 14, nil
@@ -483,7 +483,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		{
 			testCaseDescription: "Post-deployment hab free space check | chef-server",
 			nodeType:            constants.CHEF_INFRA_SERVER,
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_CS-1), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_CS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, HAB_FREE_DISK_AFTER_DEP_CS_IN_PER*100)),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(HAB_FREE_DISK_AFTER_DEP_CS-1)), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_CS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, HAB_FREE_DISK_AFTER_DEP_CS_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, HAB_FREE_DISK_AFTER_DEP_CS - 1, nil
@@ -505,7 +505,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		{
 			testCaseDescription: "Post-deployment hab free space check | opensearch",
 			nodeType:            constants.OPENSEARCH,
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", 100), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_OS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, HAB_FREE_DISK_AFTER_DEP_OS_IN_PER*100)),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(100)), fmt.Sprintf(SUCCESS_MSG, "/hab", HAB_FREE_DISK_AFTER_DEP_OS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, HAB_FREE_DISK_AFTER_DEP_OS_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 1000, 100, nil
