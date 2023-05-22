@@ -30,9 +30,13 @@ To add a common custom certificate for all the nodes of the Chef Automate servic
 ```toml
 [automate.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
+
+# Add Automate Load Balancer root-ca
+root_ca = """ADD_YOUR_ROOT_CA_HERE"""
+
+# Add Automate node internal public and private keys
+private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
 ```
 
 ### Common custom certificate for Chef Server
@@ -91,7 +95,10 @@ To add unique custom certificates for 2 the nodes of the Chef Automate service, 
 ```toml
 [automate.config]
 enable_custom_certs = true
+
+# Add Automate Load Balancer root-ca
 root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
+
 [[automate.config.certs_by_ip]]
 ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
 private_key = "ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"

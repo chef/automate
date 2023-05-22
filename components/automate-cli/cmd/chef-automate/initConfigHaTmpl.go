@@ -65,8 +65,11 @@ config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
+
+# Add Automate Load Balancer root-ca
 # root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
 
@@ -79,7 +82,8 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer keys
+
+# Add Chef Server node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
 
@@ -94,6 +98,7 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
+
 # Add OpenSearch root-ca and keys
 # root_ca = """root_ca_contents"""
 # admin_key = """admin_private_key_contents"""
@@ -111,6 +116,7 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
+
 # Add Postgresql root-ca and keys
 # root_ca = """root_ca_contents"""
 # private_key = """private_key_contents"""
@@ -368,10 +374,14 @@ config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
+
+# Add Automate Load Balancer root-ca
 # root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
+
 # [[automate.config.certs_by_ip]]
 # ip = ""
 # private_key = """private_key_contents"""
@@ -385,9 +395,11 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer keys
+
+# Add Chef Server node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
+
 # [[chef_server.config.certs_by_ip]]
 # ip = ""
 # private_key = """private_key_contents"""
@@ -403,7 +415,7 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add OpenSearch load balancer root-ca and keys
+# Add OpenSearch root-ca and keys
 # root_ca = """root_ca_contents"""
 # admin_key = """admin_private_key_contents"""
 # admin_cert = """admin_public_key_contents"""
@@ -424,7 +436,7 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add postgresql load balancer root-ca and keys
+# Add postgresql root-ca and keys
 # root_ca = """root_ca_contents"""
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""

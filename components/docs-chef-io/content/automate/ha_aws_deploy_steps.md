@@ -236,15 +236,19 @@ fqdn = ""
 instance_count = "1"
 config_file = "configs/automate.toml"
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
+
+# Add Automate Load Balancer root-ca
 # root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
 
 [chef_server.config]
 instance_count = "1"
 enable_custom_certs = false
-# Add Chef Server load balancer keys
+
+# Add Chef Server node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
 

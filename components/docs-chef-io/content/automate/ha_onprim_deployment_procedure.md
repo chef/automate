@@ -188,11 +188,14 @@ instance_count = "2"
 config_file = "configs/automate.toml"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
+
+# Add Automate Load Balancer root-ca
 # root_ca = """root_ca_contents"""
-# Add private/public keys for automate nodes
+
+# Add Automate node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
+
 # Or you can provide certificates at the node level using the below fields
 # [[automate.config.certs_by_ip]]
 # ip = "A.B.C.D"
@@ -202,9 +205,11 @@ enable_custom_certs = false
 instance_count = "2"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer keys
+
+# Add Chef Server node internal public and private keys
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
+
 # Or you can provide certificates at the node level using the below fields
 # [[chef_server.config.certs_by_ip]]
 # ip = "I.J.K.L"
