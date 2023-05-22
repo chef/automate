@@ -14,4 +14,5 @@ const (
 	FIREWALL_API_PATH                = "/api/v1/checks/firewall"
 	SSH_USER_CHECK_API_PATH          = "/api/v1/checks/ssh-users"
 	CERTIFICATE_CHECK_API_PATH       = "/api/v1/checks/certificate"
+	PORT_REACHABLE_API_PATH          = "/api/v1/checks/port-reachable"
 )
