@@ -6,7 +6,7 @@ import (
 
 func TestConfigValidateOnPrem(t *testing.T) {
 	t.Run("Test Success config Validation", func(t *testing.T) {
-		config := getTestOnPremConfigData()
+		config := GetTestOnPremConfigData()
 
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateOnPrem(config)
@@ -16,7 +16,7 @@ func TestConfigValidateOnPrem(t *testing.T) {
 	})
 
 	t.Run("Test Failed Config Validation", func(t *testing.T) {
-		config := getTestOnPremFailedConfigData()
+		config := GetTestOnPremFailedConfigData()
 
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateOnPrem(config)
@@ -28,7 +28,7 @@ func TestConfigValidateOnPrem(t *testing.T) {
 	})
 
 	t.Run("Test Success AWS Config Validation", func(t *testing.T) {
-		config := getTestAWSConfigData()
+		config := GetTestAWSConfigData()
 
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateAWS(config)
@@ -38,7 +38,7 @@ func TestConfigValidateOnPrem(t *testing.T) {
 	})
 
 	t.Run("Test Failed AWS Config Validation", func(t *testing.T) {
-		config := getFailedTestAWSConfigData()
+		config := GetFailedTestAWSConfigData()
 
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateAWS(config)
@@ -50,7 +50,7 @@ func TestConfigValidateOnPrem(t *testing.T) {
 	})
 
 	t.Run("Test Success Automate SC Config Validation", func(t *testing.T) {
-		config := getAutomateScConfigTestData()
+		config := GetAutomateScConfigTestData()
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateStandalone(config)
 		if err != nil {
@@ -59,7 +59,7 @@ func TestConfigValidateOnPrem(t *testing.T) {
 	})
 
 	t.Run("Test Failed Automate SC Config Validation", func(t *testing.T) {
-		config := getFAiledAutomateScConfigTestData()
+		config := GetFAiledAutomateScConfigTestData()
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateStandalone(config)
 		if err != nil {
