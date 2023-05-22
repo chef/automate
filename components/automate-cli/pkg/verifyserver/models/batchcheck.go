@@ -126,3 +126,14 @@ type HardwareResourceCountApiResult struct {
 	NodeType string   `json:"node_type"`
 	Checks   []Checks `json:"checks"`
 }
+
+type FirewallRequest struct {
+	SourceNodeIP               string `json:"source_node_ip"`
+	DestinationNodeIP          string `json:"destination_node_ip"`
+	DestinationServicePort     string `json:"destination_service_port"`
+	DestinationServiceProtocol string `json:"destination_service_protocol"`
+	Cert                       string `json:"cert"`
+	Key                        string `json:"key"`
+	RootCert                   string `json:"root_cert"`
+	NodeType                   string `json:"node_type"`
+}

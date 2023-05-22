@@ -10,7 +10,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber"
 )
@@ -35,8 +34,12 @@ func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 
 func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	fc.log.Info("Performing Firewall check from batch check ")
+
 	requests := makeRequests(config)
-	return trigger.RunCheckMultiRequests(config, fc.log, fc.port, constants.FIREWALL_API_PATH, "", http.MethodPost, requests)
+
+	endPoint := fmt.Sprintf("http://%s:%s%s", constants.LOCAL_HOST, fc.port, constants.FIREWALL_API_PATH)
+
+	return triggerMultipleRequests(config, fc.log, endPoint, http.MethodPost, requests)
 }
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
