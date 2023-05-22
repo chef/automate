@@ -187,17 +187,17 @@ func doBootstrapEnv(airgapBundlePath string, saas bool, frontend bool, backend b
 		if frontend {
 			err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata, upgradeRunCmdFlags.airgap)
 			if err != nil {
-				return err
+				return status.Annotate(err, status.DeployError)
 			}
 		} else if backend {
 			err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata, upgradeRunCmdFlags.airgap)
 			if err != nil {
-				return err
+				return status.Annotate(err, status.DeployError)
 			}
 		} else {
 			err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, upgradeRunCmdFlags.airgap)
 			if err != nil {
-				return err
+				return status.Annotate(err, status.DeployError)
 			}
 		}
 	}
