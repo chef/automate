@@ -32,6 +32,7 @@ type ObjectStorage struct {
 	BasePath   string `json:"base_path"`
 	AccessKey  string `json:"access_key"`
 	SecretKey  string `json:"secret_key"`
+	AWSRegion  string `json:"aws_region"`
 }
 type Backup struct {
 	FileSystem    FileSystem    `json:"file_system"`
@@ -39,9 +40,10 @@ type Backup struct {
 }
 
 type Certificate struct {
-	Fqdn     string     `json:"fqdn"`
-	RootCert string     `json:"root_cert"`
-	Nodes    []NodeCert `json:"nodes"`
+	AutomateFqdn   string     `json:"automate_fqdn"`
+	ChefServerFqdn string     `json:"cs_fqdn"`
+	RootCert       string     `json:"root_cert"`
+	Nodes          []NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -50,6 +52,7 @@ type ExternalOS struct {
 	OSUsername     string `json:"opensearch_usename"`
 	OSUserPassword string `json:"opensearch_user_password"`
 	OSCert         string `json:"opensearch_cert"`
+	OSRoleArn      string `json:"opensearch_role_arn"`
 }
 
 type ExternalPG struct {
@@ -147,4 +150,34 @@ type FirewallRequest struct {
 	Cert                       string `json:"cert"`
 	Key                        string `json:"key"`
 	RootCert                   string `json:"root_cert"`
+}
+
+type NFSMountCheckResponse struct {
+	Status string             `json:"status"`
+	Result []NFSMountResponse `json:"result"`
+}
+
+type S3OpenSearchBackupRequest struct {
+	Endpoint   string `json:"endpoint" validate:"required"`
+	Username   string `json:"username" validate:"required"`
+	Password   string `json:"password" validate:"required"`
+	S3Bucket   string `json:"s3_bucket" validate:"required"`
+	S3BasePath string `json:"s3_basepath" validate:"required"`
+	AccessKey  string `json:"aws_access_key" validate:"required"`
+	SecretKey  string `json:"aws_secret_key" validate:"required"`
+	AWSRegion  string `json:"aws_region" validate:"required"`
+	AWSRoleArn string `json:"aws_role_arn" validate:"required"`
+}
+
+type FqdnRequest struct {
+	Fqdn              string   `json:"fqdn"`
+	RootCert          string   `json:"root_cert"`
+	IsAfterDeployment bool     `json:"is_after_deployment"`
+	Nodes             []string `json:"nodes"`
+}
+
+type NodeIpRequest struct {
+	NodeType string      `json:"node_type"`
+	NodeIP   string      `json:"node_ip"`
+	Request  interface{} `json:"intergface"`
 }

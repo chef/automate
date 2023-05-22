@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
+// RunCheck triggers API on all the nodes present in the config like automate,chef server, opensearch, postgres and bastion
 func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
@@ -58,6 +59,47 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	return result
 }
 
+// RunCheckOnSpecifiedNodes triggers the API on gives node ips only, requires for various API's like S3/Minio backup config
+func RunCheckOnSpecifiedNode(nodeIps []string, log logger.Logger, port string, path string, nodeType string, method string, reqBody interface{}) []models.CheckTriggerResponse {
+	log.Debugf("Triggering the api call for specified nodes only")
+	outputCh := make(chan models.CheckTriggerResponse)
+	for _, ip := range nodeIps {
+		log.Debugf("Triggering api %s for the node %s", path, ip)
+		endpoint := prepareEndpoint(path, ip, port, nodeType, "")
+		go triggerCheckAPI(endpoint, ip, nodeType, outputCh, method, reqBody)
+	}
+
+	return getResultFromOutputChan(len(nodeIps), outputCh)
+}
+
+// RunCheckWithEndPointSpecified triggers the API on given endpoint with node ip, node type
+func RunCheckWithEndPointSpecified(endPoint string, log logger.Logger, reqList []models.NodeIpRequest, method string) []models.CheckTriggerResponse {
+	log.Debugf("Triggering the api call for specified nodes only")
+
+	outputCh := make(chan models.CheckTriggerResponse)
+
+	for _, req := range reqList {
+		log.Debugf("Triggering api on enpoint %s for the node %s", endPoint, req.NodeIP)
+		go triggerCheckAPI(endPoint, req.NodeIP, req.NodeType, outputCh, method, req.Request)
+
+	}
+
+	return getResultFromOutputChan(len(reqList), outputCh)
+}
+
+func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerResponse) []models.CheckTriggerResponse {
+	var result []models.CheckTriggerResponse
+
+	for i := 0; i < reqList; i++ {
+		select {
+		case res := <-outputCh:
+			result = append(result, res)
+		}
+	}
+
+	return result
+}
+
 func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	endPoint := ""
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH {
@@ -66,7 +108,7 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
 
-	} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
+	} else {
 		endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
 	}
 

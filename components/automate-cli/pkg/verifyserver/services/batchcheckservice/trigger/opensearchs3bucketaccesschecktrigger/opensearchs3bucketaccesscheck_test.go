@@ -1,0 +1,239 @@
+package opensearchs3bucketaccesschecktrigger
+
+import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/logger"
+	"github.com/stretchr/testify/assert"
+)
+
+var (
+	externalOs = models.ExternalOS{
+		OSDomainName:   "Name of the domain",
+		OSDomainURL:    "open-search-url",
+		OSRoleArn:      "Role-ARN",
+		OSUsername:     "username",
+		OSUserPassword: "password",
+	}
+
+	s3Properties = models.ObjectStorage{
+		Endpoint:   "s3-url-com",
+		BucketName: "test",
+		BasePath:   "tt.com",
+		AccessKey:  "access-kkey",
+		SecretKey:  "secret-key",
+	}
+)
+
+const (
+	apiResponseSuccess = `
+	{
+		"status": "SUCCESS",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{
+			  "title": "Create test backup",
+			  "passed": true,
+			  "success_msg": "OpenSearch is able to create backup to provided S3",
+			  "error_msg": "",
+			  "resolution_msg": ""
+			}
+		  ]
+		}
+	  }
+	`
+
+	apiResponseFailure = `
+	{
+		"status": "SUCCESS",
+		"result": {
+		  "passed": false,
+		  "checks": [
+			{
+			  "title": "Create test backup",
+			  "passed": false,
+			  "success_msg": "",
+			  "error_msg": "OpenSearch is not able to create backup to provided S3",
+			  "resolution_msg": "Setup OpenSearch with valid configurations for S3 backup"
+			}
+		  ]
+		}
+	  }
+	`
+
+	apiTriggerResponseSuccess = `
+	[
+		{
+			"status": "SUCCESS",
+			"host": "open-search-url",
+			"node_type": "opensearch",
+			"result": {
+				"passed": true,
+				"checks": [
+					{
+						"title": "Create test backup",
+						"passed": true,
+						"success_msg": "OpenSearch is able to create backup to provided S3",
+						"error_msg": "",
+						"resolution_msg": ""
+					}
+				]
+			}
+		}
+	]
+ `
+
+	apiTriggerResponseFailure = `[
+		{
+		"status": "SUCCESS",
+		"host": "open-search-url",
+		"node_type": "opensearch",
+		"result": {
+			"passed": false,
+			"checks": [
+				{
+					"title": "Create test backup",
+					"passed": false,
+					"success_msg": "",
+					"error_msg": "OpenSearch is not able to create backup to provided S3",
+					"resolution_msg": "Setup OpenSearch with valid configurations for S3 backup"
+				}
+			]
+		}
+	}
+	]
+ `
+)
+
+func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
+
+	type args struct {
+		config models.Config
+	}
+	tests := []struct {
+		name             string
+		args             args
+		httpResponseCode int
+		isPassed         bool
+		response         string
+		isError          bool
+	}{
+		{
+			name: "Success Response",
+			args: args{
+				config: models.Config{
+					ExternalOS: externalOs,
+					Backup: models.Backup{
+						ObjectStorage: s3Properties,
+					},
+				},
+			},
+			httpResponseCode: http.StatusOK,
+			isPassed:         true,
+			response:         apiTriggerResponseSuccess,
+			isError:          false,
+		},
+		{
+			name: "Failure Response",
+			args: args{
+				config: models.Config{
+					ExternalOS: externalOs,
+					Backup: models.Backup{
+						ObjectStorage: s3Properties,
+					},
+				},
+			},
+			httpResponseCode: http.StatusOK,
+			isPassed:         false,
+			response:         apiTriggerResponseFailure,
+			isError:          false,
+		},
+		{
+			name: "Internal Server Error",
+			args: args{
+				config: models.Config{
+					ExternalOS: externalOs,
+					Backup: models.Backup{
+						ObjectStorage: s3Properties,
+					},
+				},
+			},
+			httpResponseCode: http.StatusInternalServerError,
+			isPassed:         false,
+			response:         "error while connecting to the endpoint, received invalid status code",
+			isError:          true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var want []models.CheckTriggerResponse
+			json.Unmarshal([]byte(tt.response), &want)
+			server, host, port := createDummyServer(t, tt.httpResponseCode, tt.isPassed)
+			defer server.Close()
+
+			osb := &OpensearchS3BucketAccessCheck{
+				log:  logger.NewLogrusStandardLogger(),
+				port: port,
+				host: host,
+			}
+
+			got := osb.Run(tt.args.config)
+			if tt.isError {
+				assert.Len(t, got, 1)
+				assert.NotNil(t, got[0].Error)
+				assert.Equal(t, "opensearch", got[0].NodeType)
+				assert.Equal(t, got[0].Error.Code, tt.httpResponseCode)
+				assert.Equal(t, tt.response, got[0].Error.Error())
+			} else {
+				assert.Equal(t, got, want)
+				assert.NotNil(t, got)
+				assert.Nil(t, got[0].Error)
+			}
+
+		})
+	}
+}
+
+// Helper function to create a dummy server
+func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
+	if requiredStatusCode == http.StatusOK {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH {
+				if isPassed {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(apiResponseSuccess))
+				} else {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(apiResponseFailure))
+				}
+			}
+		}))
+
+		// Extract IP and port from the server's URL
+		address := server.URL[strings.Index(server.URL, "//")+2:]
+		colonIndex := strings.Index(address, ":")
+		ip := address[:colonIndex]
+		port := address[colonIndex+1:]
+
+		return server, ip, port
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(requiredStatusCode)
+	}))
+
+	// Extract IP and port from the server's URL
+	address := server.URL[strings.Index(server.URL, "//")+2:]
+	colonIndex := strings.Index(address, ":")
+	ip := address[:colonIndex]
+	port := address[colonIndex+1:]
+
+	return server, ip, port
+}
