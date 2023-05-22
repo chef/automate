@@ -22,6 +22,8 @@ func (vs *VerifyServer) SetupRoutes() {
 	
 	apiChecksGroup.Get("/system-user", vs.Handler.CheckSystemUser)
 
+		apiChecksGroup.Get("/system-resource", vs.Handler.GetSystemResource)
+
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
 	apiChecksGroup.Post("/aws-opensearch-s3-bucket-access", vs.Handler.CheckOSBackupS3)

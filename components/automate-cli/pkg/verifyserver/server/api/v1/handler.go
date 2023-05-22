@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -30,6 +31,7 @@ type Handler struct {
 	PortReachableService         portreachableservice.IPortReachableService
 	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
 	SystemUserService            systemuserservice.SystemUserService
+	SystemResourceService        systemresourceservice.ISystemResourcesService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -92,5 +94,10 @@ func (h *Handler) AddPortReachableService(pr portreachableservice.IPortReachable
 
 func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.ExternalPostgresqlService) *Handler {
 	h.ExternalPostgresqlService = pg
+	return h
+}
+
+func (h *Handler) AddSystemResourceService(srs systemresourceservice.ISystemResourcesService) *Handler {
+	h.SystemResourceService = srs
 	return h
 }

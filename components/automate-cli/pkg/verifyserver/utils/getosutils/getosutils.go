@@ -1,6 +1,7 @@
 package getosutils
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -35,4 +36,26 @@ func GetKernelVersion(kernelFilepath string) (string, error) {
 	split := strings.Split(kernelVersion, ".")
 	kernelVersion = split[0] + "." + split[1]
 	return kernelVersion, nil
+}
+
+func GetCPUSpeed(cpuInfoFile string) (float64, error) {
+	cpuInfo, err := fileutils.ReadFile(cpuInfoFile)
+	if err != nil {
+		return float64(0), err
+	}
+
+	lines := strings.Split(string(cpuInfo), "\n")
+	var cpuSpeed float64
+
+	for _, line := range lines {
+		if strings.HasPrefix(line, "cpu MHz") {
+			parts := strings.Split(line, ":")
+			cpuSpeed, err = strconv.ParseFloat(strings.TrimSpace(parts[1]), 64)
+			if err != nil {
+				return float64(0), err
+			}
+			break
+		}
+	}
+	return cpuSpeed / 1000, nil
 }
