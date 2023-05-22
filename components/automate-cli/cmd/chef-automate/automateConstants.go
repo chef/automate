@@ -1,10 +1,13 @@
 package main
 
 const (
-	AWS_MODE            = "AWS_MODE"
-	EXISTING_INFRA_MODE = "EXISTING_INFRA_MODE"
-	AUTOMATE            = "AUTOMATE"
-	HA_MODE             = "HA_MODE"
+	AWS_MODE                    = "AWS_MODE"
+	AWS_MANAGED_SERVICES        = "AWS_MANAGED_SERVICES"
+	EXISTING_INFRA_MODE         = "EXISTING_INFRA_MODE"
+	EXISTING_INFRA_AWS_MANAGED  = "EXISTING_INFRA_AWS_MANAGED"
+	EXISTING_INFRA_SELF_MANAGED = "EXISTING_INFRA_SELF_MANAGED"
+	AUTOMATE                    = "AUTOMATE"
+	HA_MODE                     = "HA_MODE"
 )
 
 const AUTOMATE_HA_RUN_LOG_DIR = "/hab/a2_deploy_workspace/logs"

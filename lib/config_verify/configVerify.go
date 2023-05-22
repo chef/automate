@@ -47,16 +47,12 @@ func (cv *ConfigVerifyImpl) ConfigValidateStandalone(config *sc.AutomateConfig) 
 }
 
 func ConfigValidateAWS(config *config_parser.HAAwsConfigToml) error {
-
-	/* This function will read the config toml file and will try to parse it in the structure.
-	   On successful parse, it will return the config structure. This is applicable for both
-	   AWS Provision and Deployment configuration both with Chef Managed and AWS Managed resources. */
 	errorList := list.New()
-	validateRequiredStringField(config.Architecture.ConfigInitials.SecretsKeyFile, "secrets_key_file", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.SecretsStoreFile, "secrets_store_file", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.Architecture, "Architecture", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.WorkspacePath, "workspace_path", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.SSHUser, "ssh_user", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SecretsKeyFile, "secrets_key_file", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SecretsStoreFile, "secrets_store_file", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.Architecture, "Architecture", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.WorkspacePath, "workspace_path", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SSHUser, "ssh_user", errorList)
 	validateRequiredPathField(config.Architecture.ConfigInitials.SSHKeyFile, "ssh_key_file", errorList)
 	validateBackupMount(config.Architecture.ConfigInitials.BackupMount, errorList)
 
@@ -154,13 +150,13 @@ func validateEnvFields(config *config_parser.HAAwsConfigToml) *list.List {
 	validateRequiredStringTypeField(config.Aws.Config.OpensearchServerInstanceType, "aws opensearch_server_instance_type", errorList)
 	validateRequiredStringTypeField(config.Aws.Config.PostgresqlServerInstanceType, "aws postgresql_server_instance_type", errorList)
 	validateRequiredStringTypeField(config.Aws.Config.AutomateLbCertificateArn, "aws automate_lb_certificate_arn", errorList)
-	validateRequiredStringField(config.Aws.Config.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn", errorList)
 	validateRequiredNumberField(config.Aws.Config.AutomateEbsVolumeIops, "aws automate_ebs_volume_iops", errorList)
 	validateRequiredNumberField(config.Aws.Config.AutomateEbsVolumeSize, "aws automate_ebs_volume_size", errorList)
-	validateRequiredStringField(config.Aws.Config.AutomateEbsVolumeType, "aws automate_ebs_volume_type", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.AutomateEbsVolumeType, "aws automate_ebs_volume_type", errorList)
 	validateRequiredNumberField(config.Aws.Config.ChefEbsVolumeIops, "aws chef_ebs_volume_iops", errorList)
 	validateRequiredNumberField(config.Aws.Config.ChefEbsVolumeSize, "aws chef_ebs_volume_size", errorList)
-	validateRequiredStringField(config.Aws.Config.ChefEbsVolumeType, "aws chef_ebs_volume_type", errorList)
+	validateRequiredStringTypeField(config.Aws.Config.ChefEbsVolumeType, "aws chef_ebs_volume_type", errorList)
 	validateRequiredBooleanField(config.Aws.Config.SetupManagedServices, "aws setup_managed_services", errorList)
 
 	if !config.Aws.Config.SetupManagedServices {
@@ -176,32 +172,25 @@ func validateEnvFields(config *config_parser.HAAwsConfigToml) *list.List {
 }
 
 func ConfigValidateOnPrem(config *config_parser.HAOnPremConfigToml) error {
-
-	/* This function will read the OnPrem config toml file and will try to parse it in the structure.
-	   On successful parse, it will return the config structure. This is applicable for Chef Managed,
-	   AWS Managed and Customer Managed resources*/
 	errorList := list.New()
 
 	// Validate required fields
-	validateRequiredStringField(config.Architecture.ConfigInitials.SecretsKeyFile, "secrets_key_file", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.SecretsStoreFile, "secrets_store_file", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.Architecture, "Architecture", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.WorkspacePath, "workspace_path", errorList)
-	validateRequiredStringField(config.Architecture.ConfigInitials.SSHUser, "ssh_user", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SecretsKeyFile, "secrets_key_file", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SecretsStoreFile, "secrets_store_file", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.Architecture, "Architecture", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.WorkspacePath, "workspace_path", errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SSHUser, "ssh_user", errorList)
 	validateRequiredPathField(config.Architecture.ConfigInitials.SSHKeyFile, "ssh_key_file", errorList)
 	validateRequiredNumberField(config.Automate.Config.InstanceCount, "automate instance_count", errorList)
+	validateFQDN(config.Automate.Config.Fqdn, errorList)
 	validateRequiredNumberField(config.ChefServer.Config.InstanceCount, "chef-server instance_count", errorList)
 	validateRequiredNumberField(config.Opensearch.Config.InstanceCount, "open-search instance_count", errorList)
 	validateRequiredNumberField(config.Postgresql.Config.InstanceCount, "postgres-sql instance_count", errorList)
 	validateBackupMount(config.Architecture.ConfigInitials.BackupMount, errorList)
 
-	if len(config.ExistingInfra.Config.AutomatePrivateIps) < 1 {
-		errorList.PushBack("Invalid or empty automate_private_ips")
-	}
+	validateRequiredStringListField(config.ExistingInfra.Config.AutomatePrivateIps, "automate_private_ips", errorList)
+	validateRequiredStringListField(config.ExistingInfra.Config.ChefServerPrivateIps, "chef_server_private_ips", errorList)
 
-	if len(config.ExistingInfra.Config.ChefServerPrivateIps) < 1 {
-		errorList.PushBack("Invalid or empty chef_server_private_ips")
-	}
 	if (config.ExternalDB.Database.Type != "aws") && (config.ExternalDB.Database.Type != "self-managed") {
 		if len(config.ExistingInfra.Config.OpensearchPrivateIps) < 1 {
 			errorList.PushBack("Invalid or empty opensearch_private_ips")
@@ -214,22 +203,12 @@ func ConfigValidateOnPrem(config *config_parser.HAOnPremConfigToml) error {
 
 	if len(config.Architecture.ConfigInitials.BackupConfig) > 0 {
 		if config.Architecture.ConfigInitials.BackupConfig == "object_storage" {
-			if len(config.ObjectStorage.Config.AccessKey) < 1 {
-				errorList.PushBack("Invalid or empty access_key")
-			}
-			if len(config.ObjectStorage.Config.SecretKey) < 1 {
-				errorList.PushBack("Invalid or empty secret_key")
-			}
-			if len(config.ObjectStorage.Config.BucketName) < 1 {
-				errorList.PushBack("Invalid or empty bucket_name")
-			}
-			if len(config.ObjectStorage.Config.Endpoint) < 1 {
-				errorList.PushBack("Invalid or empty endpoint")
-			}
+			validateRequiredStringTypeField(config.ObjectStorage.Config.AccessKey, "access_key", errorList)
+			validateRequiredStringTypeField(config.ObjectStorage.Config.SecretKey, "secret_key", errorList)
+			validateRequiredStringTypeField(config.ObjectStorage.Config.BucketName, "bucket_name", errorList)
+			validateRequiredStringTypeField(config.ObjectStorage.Config.Endpoint, "endpoint", errorList)
 		} else if config.Architecture.ConfigInitials.BackupConfig == "file_system" {
-			// if len(config.ObjectStoragconfig.AccessKey) < 1 {
-			// 	errorList.PushBack("Invalid or empty access_key")
-			// }
+			// no check needed
 		} else {
 			errorList.PushBack("Invalid or empty backup_config")
 		}
@@ -283,10 +262,6 @@ func validateExternalDbFields(config *config_parser.HAOnPremConfigToml) *list.Li
 }
 
 func ConfigValidateStandalone(config *sc.AutomateConfig) error {
-
-	/* This function will read the Standalone Automate config toml file and will try to parse it in the structure.
-	   On successful parse, it will return the config structure. */
-
 	e := c.NewInvalidConfigError()
 
 	fqdn := config.Global.V1.Fqdn

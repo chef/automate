@@ -38,6 +38,48 @@ func getModeFromConfig(configPath string) (string, error) {
 	}
 }
 
+func getDeploymentModeFromConfig(configPath string) (string, error) {
+	initConfigHAPath := initConfigHAPathFlags.path
+	if len(configPath) > 0 {
+		initConfigHAPath = configPath
+	}
+	if checkIfFileExist(initConfigHAPath) {
+		config, err := ptoml.LoadFile(initConfigHAPath)
+		if err != nil {
+			writer.Println(err.Error())
+			return "", err
+		}
+		if config.Get("architecture.existing_infra") != nil {
+			if config.Get("external.database.type") != nil {
+				if config.Get("external.database.type") == "aws" {
+					return EXISTING_INFRA_AWS_MANAGED, nil
+				} else if config.Get("external.database.type") == "self-managed" {
+					return EXISTING_INFRA_SELF_MANAGED, nil
+				}
+			}
+			return EXISTING_INFRA_MODE, nil
+		} else if config.Get("architecture.aws") != nil {
+			if config.Get("aws.config") != nil {
+				value := config.Get("aws.config.setup_managed_services")
+				if boolValue, ok := value.(bool); ok {
+					if boolValue {
+						return AWS_MANAGED_SERVICES, nil
+					}
+				} else {
+					return "", status.New(status.ConfigError, "aws.config.setup_managed_services value has to be boolean")
+				}
+			}
+			return AWS_MODE, nil
+		} else {
+			return AUTOMATE, nil
+		}
+	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
+		return HA_MODE, nil
+	} else {
+		return AUTOMATE, nil
+	}
+}
+
 func checkIPAddress(ip string) error {
 	if net.ParseIP(ip) == nil {
 		return errors.New("Ip Address is invalid.")

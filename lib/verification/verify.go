@@ -64,6 +64,10 @@ func (v *VerificationModule) VerifyHAAWSManagedProvision(configFile string) erro
 	if err != nil {
 		return err
 	}
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateAWS(config); err != nil {
+		return err
+	}
 	validateAWSManagedProvisionConfig(config)
 	return nil
 }
@@ -103,6 +107,10 @@ func (v *VerificationModule) VerifyOnPremAWSManagedDeployment(configFile string)
 	if err != nil {
 		return err
 	}
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
+		return err
+	}
 	validateOnPremAWSConfig(config)
 	return nil
 }
@@ -111,6 +119,10 @@ func (v *VerificationModule) VerifyOnPremCustManagedDeployment(configFile string
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
+		return err
+	}
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
 		return err
 	}
 	validateOnPremCustomerConfig(config)

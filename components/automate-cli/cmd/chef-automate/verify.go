@@ -89,55 +89,10 @@ func init() {
 
 	// flags for Verify Command
 	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSProvision,
-		"ha-aws-provision",
-		false,
-		"Use this flag to verify the AWS Provision config")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSManagedProvision,
-		"ha-aws-managed-provision",
-		false,
-		"Use this flag to verify the AWS Provision config with Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haOnpremDeploy,
-		"ha-onprem-deploy",
-		false,
-		"Use this flag to verify the On-Premise setup and config with Chef Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haOnPremAWSManagedDeploy,
-		"ha-onprem-aws-deploy",
-		false,
-		"Use this flag to verify the On-Premise setup and config with AWS Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haOnPremCustManagedDeploy,
-		"ha-onprem-customer-deploy",
-		false,
-		"Use this flag to verify the On-Premise setup and config with Customer Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSDeploy,
-		"ha-aws-deploy",
-		false,
-		"Use this flag to verify the AWS Deployment setup and config")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSManagedDeploy,
-		"ha-aws-managed-deploy",
-		false,
-		"Use this flag to verify the AWS Deployment setup and config with Managed Services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.standaloneDeploy,
-		"standalone-deploy",
-		false,
-		"Use this flag to verify the Automate standalone setup and config")
-	verifyCmd.PersistentFlags().BoolVar(
 		&flagsObj.certificates,
 		"certificates",
 		false,
 		"Use this flag to verify the certificates provided in the file")
-	verifyCmd.PersistentFlags().StringVar(
-		&flagsObj.file,
-		"file",
-		"",
-		"Config file that needs to be verified")
 	verifyServeCmd.Flags().BoolVarP(
 		&flagsObj.debug,
 		"debug",
@@ -219,7 +174,7 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 		configPath = args[0]
 	}
 
-	deploymentMode, err := getModeFromConfig(configPath)
+	deploymentMode, err := getDeploymentModeFromConfig(configPath)
 	if err != nil {
 		return err
 	}
@@ -228,14 +183,23 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 	case deploymentMode == AWS_MODE:
 		err := v.verifyHaAWSDeploy(configPath)
 		return err
+	case deploymentMode == AWS_MANAGED_SERVICES:
+		err := v.verifyHaAWSManagedDeploy(configPath)
+		return err
+	case deploymentMode == EXISTING_INFRA_MODE:
+		err := v.verifyHaOnpremDeploy(configPath)
+		return err
+	case deploymentMode == EXISTING_INFRA_AWS_MANAGED:
+		err := v.verifyHaOnPremAWSManagedDeploy(configPath)
+		return err
+	case deploymentMode == EXISTING_INFRA_SELF_MANAGED:
+		err := v.verifyHaOnPremCustManagedDeploy(configPath)
+		return err
 	case deploymentMode == HA_MODE:
 		err := v.verifyHaOnpremDeploy(configPath)
 		return err
 	case deploymentMode == AUTOMATE:
 		err := v.verifyStandaloneDeploy(configPath)
-		return err
-	case deploymentMode == EXISTING_INFRA_MODE:
-		err := v.verifyHaOnpremDeploy(configPath)
 		return err
 	case flagsObj.certificates:
 		err := v.Verification.VerifyCertificates("")
@@ -244,7 +208,6 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 		fmt.Println(cmd.UsageString())
 		return nil
 	}
-
 }
 
 func (v *verifyCmdFlow) verifyHaAWSProvision(configPath string) error {
@@ -271,16 +234,10 @@ func (v *verifyCmdFlow) verifyHaAWSDeploy(configPath string) error {
 }
 
 func (v *verifyCmdFlow) verifyHaAWSManagedDeploy(configPath string) error {
-	if v.ManagedServicesOn {
-		if v.A2HARBFileExist {
-			if err := v.Verification.VerifyHAAWSManagedDeployment(configPath); err != nil {
-				return status.Annotate(err, status.ConfigError)
-			}
-			return nil
-		}
-		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
+	if err := v.Verification.VerifyHAAWSManagedDeployment(configPath); err != nil {
+		return status.Annotate(err, status.ConfigError)
 	}
-	return status.New(status.InvalidCommandArgsError, "Managed Services flag is not set. Cannot verify the config.")
+	return nil
 }
 
 func (v *verifyCmdFlow) verifyStandaloneDeploy(configPath string) error {

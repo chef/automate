@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,10 +34,6 @@ func validateRequiredPathField(value string, fieldName string, errorList *list.L
 			} else {
 				errorList.PushBack(fmt.Sprintf("Invalid %s: %s (%v)", fieldName, value, err))
 			}
-		} else {
-			if !filepath.IsAbs(value) {
-				errorList.PushBack(fmt.Sprintf("Invalid %s: %s (path must be absolute)", fieldName, value))
-			}
 		}
 	} else {
 		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
@@ -52,7 +47,7 @@ func validateRequiredStringTypeField(value interface{}, fieldName string, errorL
 	}
 }
 
-func validateRequiredStringField(value string, fieldName string, errorList *list.List) {
+func validateRequiredStringListField(value []string, fieldName string, errorList *list.List) {
 	if len(value) < 1 {
 		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
 	}
