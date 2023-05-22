@@ -21,16 +21,18 @@ type IFqdnService interface {
 }
 
 type FqdnService struct {
-	log logger.Logger
+	log     logger.Logger
+	timeout time.Duration
 }
 
-func NewFqdnService(log logger.Logger) *FqdnService {
+func NewFqdnService(log logger.Logger, timeout time.Duration) *FqdnService {
 	return &FqdnService{
-		log: log,
+		log:     log,
+		timeout: timeout,
 	}
 }
 
-func createClient(rootCert string) *http.Client {
+func (fq *FqdnService) createClient(rootCert string) *http.Client {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM([]byte(rootCert))
 
@@ -40,12 +42,13 @@ func createClient(rootCert string) *http.Client {
 				RootCAs: caCertPool,
 			},
 		},
-		Timeout: 10 * time.Second,
+		Timeout: fq.timeout * time.Second,
 	}
 
 	return client
 }
 
+// createErrorMessage function is converting map into string to make more readable for end user.
 func createErrorMessage(setNodes map[string]int) string {
 	temp := "["
 	for k := range setNodes {
@@ -60,7 +63,7 @@ func createErrorMessage(setNodes map[string]int) string {
 
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
 func (fq *FqdnService) fqdnReachable(fqdn, rootCert string) (models.Checks, bool) {
-	client := createClient(rootCert)
+	client := fq.createClient(rootCert)
 
 	res, err := client.Get(fmt.Sprintf("https://%s", fqdn))
 	if err != nil {
@@ -82,7 +85,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string) (
 		setNodes[k] += 1
 	}
 
-	client := createClient(rootCert)
+	client := fq.createClient(rootCert)
 
 	for i := 0; i < 50; i++ {
 		res, err := client.Get(fmt.Sprintf("https://%s", fqdn))
@@ -92,6 +95,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string) (
 		}
 
 		delete(setNodes, res.Header.Get("x-server-ip"))
+		// if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
 		if len(setNodes) == 0 {
 			return createCheck(constants.NODE_TITLE, true, constants.NODE_SUCCESS_MESSAGE, "", ""), true
 		}
@@ -125,7 +129,7 @@ func (fq *FqdnService) validateCertificate(fqdn, rootCert string) (models.Checks
 
 // checkChefServerStatus function will check that all the services are in ok state or not.
 func (fq *FqdnService) checkChefServerStatus(fqdn, rootCert string) (models.Checks, bool) {
-	client := createClient(rootCert)
+	client := fq.createClient(rootCert)
 
 	res, err := client.Get(fmt.Sprintf("https://%s/_status", fqdn))
 	if err != nil {
@@ -150,7 +154,7 @@ func (fq *FqdnService) checkChefServerStatus(fqdn, rootCert string) (models.Chec
 
 // checkAutomateStatus function will check that all the services are in ok state or not.
 func (fq *FqdnService) checkAutomateStatus(fqdn, rootCert, apiToken string) (models.Checks, bool) {
-	client := createClient(rootCert)
+	client := fq.createClient(rootCert)
 
 	apiUrl := fmt.Sprintf("https://%s/api/v0/status", fqdn)
 	// Create a new HTTP GET request

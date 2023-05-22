@@ -118,7 +118,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
-		AddFqdnService(fqdnservice.NewFqdnService(l))
+		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT))
 
 	vs := &VerifyServer{
 		Port:    port,
