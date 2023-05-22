@@ -1,4 +1,5 @@
 require 'active_record/base'
+require 'fileutils'
 namespace :oauth_application do
   desc "Task to register a new oauth application"
   task :register, [:app_name, :redirect_uri] => :environment do |t, args|
@@ -13,8 +14,14 @@ namespace :oauth_application do
   task :save_registered_app_details_to_file => :environment do
     registered_apps = Doorkeeper::Application.select(:name, :redirect_uri, :uid, :secret).group_by(&:name).as_json
     yaml_file_content = registered_apps.to_yaml
-    file_path = "/hab/svc/automate-cs-ocid/data/registered_oauth_applications.yaml"
+    file_path = ENV['REGISTERED_OAUTH_APPS_FILE_PATH']
+
+    # Making sure the directory is created before writing in the file
+    dir = File.dirname(file_path)
+    unless File.directory?(dir)
+      FileUtils.mkdir_p(dir)
+    end
+    
     File.open(file_path, 'w') { |file| file.write(yaml_file_content) }
-    puts "Dumped registered app details to file: #{file_path}"
   end
 end

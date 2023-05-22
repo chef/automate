@@ -645,7 +645,7 @@ func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		// TODO: Once we test with HA setup we will work on it. Need to clarify with automate team.
 	} else {
-		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/data/registered_oauth_applications.yaml"
+		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
 		content, err := ioutil.ReadFile(oauthAppDetailsFilePath)
     if err != nil {
     	printErr := "Could not find the file with the registered application details. Pls restart OC-ID to generate it."

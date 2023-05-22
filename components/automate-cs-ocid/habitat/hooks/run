@@ -24,6 +24,7 @@ if [[ ! -z "{{cfg.ocid.oauth_application.name}}" ]]; then
 fi
 
 # Dumping registered oauth application details in a file
+export REGISTERED_OAUTH_APPS_FILE_PATH="{{pkg.svc_config_path}}/registered_oauth_applications.yaml"
 bundle exec bin/rake oauth_application:save_registered_app_details_to_file
 
 # NOTE: Please keep this statement just before running
