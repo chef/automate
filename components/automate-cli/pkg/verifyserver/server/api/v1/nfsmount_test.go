@@ -17,6 +17,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	nfsErrorBodyParser    = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Invalid Body Request\"}}"
+	errorMountLocEmpty = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Mount Location cannot be empty\"}}"
+	successMsg         = "{\"status\":\"SUCCESS\",\"result\":{\"address\":\"\",\"mount_location\":\"/data\",\"nfs\":\"\"}}"
+)
+
 func SetupNFSMountHandler(nm nfsmountservice.INFSService) (*fiber.App, error) {
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
@@ -253,6 +259,13 @@ func SetupMockNFSMountService() nfsmountservice.INFSService {
 					},
 					Error: nil,
 				},
+			}
+		},
+		GetNFSMountLocFunc: func(reqBody models.NFSMountLocRequest) *models.NFSMountLocResponse {
+			return &models.NFSMountLocResponse{
+				Address:       "",
+				Nfs:           "",
+				MountLocation: "/data",
 			}
 		},
 	}
@@ -582,6 +595,59 @@ func TestNFSMount(t *testing.T) {
 			body, err := ioutil.ReadAll(res.Body) //nosemgrep
 			assert.NoError(t, err, test.TestName)
 			assert.JSONEq(t, string(body), test.ExpectedBody)
+			assert.Equal(t, test.ExpectedCode, res.StatusCode)
+		})
+	}
+}
+
+func TestNFSMountLocation(t *testing.T) {
+	tests := []struct {
+		TestName     string
+		ExpectedCode int
+		ExpectedBody string
+		RequestBody  string
+	}{
+		{
+			TestName:     "400:Invalid Body Request",
+			ExpectedCode: 400,
+			ExpectedBody: nfsErrorBodyParser,
+			RequestBody: `{
+				"mount_location": "Invalid Body Request",
+				""
+			}`,
+		},
+		{
+			TestName:     "400:Mount Location cannot be empty",
+			ExpectedCode: 400,
+			ExpectedBody: errorMountLocEmpty,
+			RequestBody: `{
+				"mount_location":""
+			}`,
+		},
+		{
+			TestName:     "200:Success",
+			ExpectedCode: 200,
+			ExpectedBody: successMsg,
+			RequestBody: `{
+				"mount_location":"/data"
+			}`,
+		},
+	}
+
+	NFSMounLoctEndpoint := constants.NFS_MOUNT_LOC_API_PATH
+
+	app, err := SetupNFSMountHandler(SetupMockNFSMountService())
+	assert.NoError(t, err)
+
+	for _, test := range tests {
+		t.Run(test.TestName, func(t *testing.T) {
+			req := httptest.NewRequest("POST", NFSMounLoctEndpoint, strings.NewReader(test.RequestBody))
+			req.Header.Add("Content-Type", "application/json")
+			res, err := app.Test(req, -1)
+			assert.NoError(t, err)
+			body, err := ioutil.ReadAll(res.Body)
+			assert.NoError(t, err, test.TestName)
+			assert.Contains(t, string(body), test.ExpectedBody)
 			assert.Equal(t, test.ExpectedCode, res.StatusCode)
 		})
 	}

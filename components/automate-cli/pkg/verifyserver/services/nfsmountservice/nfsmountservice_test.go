@@ -467,3 +467,37 @@ func TestMakeRespBody(t *testing.T) {
 		})
 	}
 }
+
+func TestGetNFSMountLoc(t *testing.T) {
+	tests := []struct {
+		TestName     string
+		Response     models.NFSMountLocResponse
+		Request      models.NFSMountLocRequest
+		ExpectedBody *models.NFSMountLocResponse
+	}{
+		{
+			TestName: "",
+			Response: models.NFSMountLocResponse{
+				Address:       "",
+				Nfs:           "",
+				MountLocation: "/data",
+			},
+			Request: models.NFSMountLocRequest{
+				MountLocation: "/data",
+			},
+			ExpectedBody: &models.NFSMountLocResponse{
+				Address:       "",
+				Nfs:           "",
+				MountLocation: "/data",
+			},
+		},
+	}
+	for _, e := range tests {
+		t.Run(e.TestName, func(t *testing.T) {
+			testPort := "1234"
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			resp := nm.GetNFSMountLoc(e.Request)
+			assert.Equal(t, e.ExpectedBody, resp)
+		})
+	}
+}

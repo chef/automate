@@ -20,7 +20,9 @@ type NFSMountLocRequest struct {
 }
 
 type NFSMountLocResponse struct {
-	Address       string `json:"address"`
-	MountLocation string `json:"mount_location"`
-	Nfs           string `json:"nfs"`
+	Address            string `json:"address"`
+	MountLocation      string `json:"mount_location"`
+	Nfs                string `json:"nfs"`
+	StorageCapacity    string `json:"storage_capacity"`
+	AvailableFreeSpace string `json:"Available_free_space"`
 }

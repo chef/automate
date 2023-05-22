@@ -20,7 +20,7 @@ import (
 
 type INFSService interface {
 	GetNFSMountDetails(models.NFSMountRequest) *[]models.NFSMountResponse
-	GetNFSMountLoc(models.NFSMountLocRequest) *models.NFSMountLocResponse
+	GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse
 }
 
 type NFSMountService struct {
@@ -100,12 +100,12 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 }
 
 func (nm *NFSMountService) GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse {
-	
-	return &models.NFSMountLocResponse{
+	res := &models.NFSMountLocResponse{
 		Address:       "",
 		Nfs:           "",
 		MountLocation: req.MountLocation,
 	}
+	return res
 }
 
 func prettyMap(mp map[string]models.NFSMountResponse) string {

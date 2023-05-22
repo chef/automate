@@ -6,7 +6,7 @@ import (
 
 type MockNFSMountService struct {
 	GetNFSMountDetailsFunc func(reqBody models.NFSMountRequest) *[]models.NFSMountResponse
-	GetNFSMountLocFunc     func(reqBody models.NFSMountLocRequest) *models.NFSMountLocResponse
+	GetNFSMountLocFunc     func(req models.NFSMountLocRequest) *models.NFSMountLocResponse
 }
 
 func (mnm *MockNFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
