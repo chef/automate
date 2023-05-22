@@ -219,30 +219,23 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 		configPath = args[0]
 	}
 
+	deploymentMode, err := getModeFromConfig(configPath)
+	if err != nil {
+		return err
+	}
+
 	switch true {
-	case flagsObj.haAWSProvision:
-		err := v.verifyHaAWSProvision(configPath)
-		return err
-	case flagsObj.haAWSManagedProvision:
-		err := v.verifyHaAWSManagedProvision(configPath)
-		return err
-	case flagsObj.haAWSDeploy:
+	case deploymentMode == AWS_MODE:
 		err := v.verifyHaAWSDeploy(configPath)
 		return err
-	case flagsObj.haAWSManagedDeploy:
-		err := v.verifyHaAWSManagedDeploy(configPath)
-		return err
-	case flagsObj.standaloneDeploy:
-		err := v.verifyStandaloneDeploy(configPath)
-		return err
-	case flagsObj.haOnpremDeploy:
+	case deploymentMode == HA_MODE:
 		err := v.verifyHaOnpremDeploy(configPath)
 		return err
-	case flagsObj.haOnPremAWSManagedDeploy:
-		err := v.verifyHaOnPremAWSManagedDeploy(configPath)
+	case deploymentMode == AUTOMATE:
+		err := v.verifyStandaloneDeploy(configPath)
 		return err
-	case flagsObj.haOnPremCustManagedDeploy:
-		err := v.verifyHaOnPremCustManagedDeploy(configPath)
+	case deploymentMode == EXISTING_INFRA_MODE:
+		err := v.verifyHaOnpremDeploy(configPath)
 		return err
 	case flagsObj.certificates:
 		err := v.Verification.VerifyCertificates("")
@@ -271,16 +264,10 @@ func (v *verifyCmdFlow) verifyHaAWSManagedProvision(configPath string) error {
 }
 
 func (v *verifyCmdFlow) verifyHaAWSDeploy(configPath string) error {
-	if !v.ManagedServicesOn {
-		if v.A2HARBFileExist {
-			if err := v.Verification.VerifyHAAWSDeployment(configPath); err != nil {
-				return status.Annotate(err, status.ConfigError)
-			}
-			return nil
-		}
-		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
+	if err := v.Verification.VerifyHAAWSDeployment(configPath); err != nil {
+		return status.Annotate(err, status.ConfigError)
 	}
-	return status.New(status.InvalidCommandArgsError, "This flag will not verify the Managed Services Setup. Please use the --ha-aws-managed-deploy flag.")
+	return nil
 }
 
 func (v *verifyCmdFlow) verifyHaAWSManagedDeploy(configPath string) error {
@@ -297,13 +284,9 @@ func (v *verifyCmdFlow) verifyHaAWSManagedDeploy(configPath string) error {
 }
 
 func (v *verifyCmdFlow) verifyStandaloneDeploy(configPath string) error {
-	if v.A2HARBFileExist {
-		return status.New(status.InvalidCommandArgsError, "Deployment type does not match with the requested flag.")
-	}
 	if err := v.Verification.VerifyStandaloneDeployment(configPath); err != nil {
 		return status.Annotate(err, status.ConfigError)
 	}
-
 	return nil
 }
 

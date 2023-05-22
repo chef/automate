@@ -1,8 +1,6 @@
 package config_parser
 
 import (
-	"path/filepath"
-
 	sc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -13,52 +11,52 @@ type ConfigParser interface {
 	ParseAWSAutomateConfig(configFile string) (*HAAwsConfigToml, error)
 	ParseOnPremConfig(configFile string) (*HAOnPremConfigToml, error)
 	ParseStandaloneConfig(configFile string) (*sc.AutomateConfig, error)
-	ParseDeploymentType(configFile string) (string, error)
+	// ParseDeploymentType(configFile string) (string, error)
 }
 
 type ConfigParserImpl struct{}
 
-func ParseDeploymentType(configPath string) (string, error) {
-	initConfigHAPath := initConfigHAPathFlags.path
-	if len(configPath) > 0 {
-		initConfigHAPath = configPath
-	}
-	if checkIfFileExist(initConfigHAPath) {
-		config, err := ptoml.LoadFile(initConfigHAPath)
-		if err != nil {
-			writer.Println(err.Error())
-			return "", err
-		}
-		if config.Get("architecture.existing_infra") != nil {
-			return EXISTING_INFRA_MODE, nil
-		} else if config.Get("architecture.aws") != nil {
-			return AWS_MODE, nil
-		} else {
-			return AUTOMATE, nil
-		}
-	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
-		return HA_MODE, nil
-	} else {
-		return AUTOMATE, nil
-	}
-}
+// func ParseDeploymentType(configFile string) (string, error) {
+// 	initConfigHAPath := initConfigHAPathFlags.path
+// 	if len(configPath) > 0 {
+// 		initConfigHAPath = configPath
+// 	}
+// 	if checkIfFileExist(initConfigHAPath) {
+// 		config, err := ptoml.LoadFile(initConfigHAPath)
+// 		if err != nil {
+// 			writer.Println(err.Error())
+// 			return "", err
+// 		}
+// 		if config.Get("architecture.existing_infra") != nil {
+// 			return EXISTING_INFRA_MODE, nil
+// 		} else if config.Get("architecture.aws") != nil {
+// 			return AWS_MODE, nil
+// 		} else {
+// 			return AUTOMATE, nil
+// 		}
+// 	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
+// 		return HA_MODE, nil
+// 	} else {
+// 		return AUTOMATE, nil
+// 	}
+// }
 
-func getDeployer(configPath string) (deployManager, error) {
-	deployerType, err := getModeFromConfig(configPath)
-	if err != nil {
-		return nil, err
-	}
-	if deployerType == AWS_MODE {
-		return newAwsDeployemnt(configPath), nil
-	}
-	if deployerType == EXISTING_INFRA_MODE {
-		return newExistingInfa(configPath), nil
-	}
-	if deployerType == HA_MODE {
-		return newHaWithoutConfig(), nil
-	}
-	return nil, nil
-}
+// func getDeployer(configPath string) (deployManager, error) {
+// 	deployerType, err := getModeFromConfig(configPath)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	if deployerType == AWS_MODE {
+// 		return newAwsDeployemnt(configPath), nil
+// 	}
+// 	if deployerType == EXISTING_INFRA_MODE {
+// 		return newExistingInfa(configPath), nil
+// 	}
+// 	if deployerType == HA_MODE {
+// 		return newHaWithoutConfig(), nil
+// 	}
+// 	return nil, nil
+// }
 
 func (cp *ConfigParserImpl) ParseAWSAutomateConfig(configFile string) (*HAAwsConfigToml, error) {
 	return ParseAWSAutomateConfig(configFile)

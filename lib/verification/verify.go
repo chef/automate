@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/config_parser"
+	"github.com/chef/automate/lib/config_verify"
 	"github.com/chef/automate/lib/reporting"
 	"github.com/jedib0t/go-pretty/v5/table"
 )
@@ -73,6 +74,10 @@ func (v *VerificationModule) VerifyHAAWSDeployment(configFile string) error {
 	if err != nil {
 		return err
 	}
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateAWS(config); err != nil {
+		return err
+	}
 	validateAWSDeploymentConfig(config)
 	return nil
 }
@@ -83,6 +88,11 @@ func (v *VerificationModule) VerifyHAAWSManagedDeployment(configFile string) err
 	if err != nil {
 		return err
 	}
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateAWS(config); err != nil {
+		return err
+	}
+
 	validateAWSManagedDeploymentConfig(config)
 	return nil
 }
@@ -113,8 +123,11 @@ func (v *VerificationModule) VerifyStandaloneDeployment(configFile string) error
 	if err != nil {
 		return err
 	}
-	validateStandaloneDeploymentConfig(config)
-	return nil
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateStandalone(config); err != nil {
+		return err
+	}
+	return validateStandaloneDeploymentConfig(config)
 }
 
 func (v *VerificationModule) VerifyCertificates(certContents string) error {
@@ -127,6 +140,10 @@ func (v *VerificationModule) VerifyOnPremDeployment(configFile string) error {
 	configParser := &config_parser.ConfigParserImpl{}
 	config, err := configParser.ParseOnPremConfig(configFile)
 	if err != nil {
+		return err
+	}
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
 		return err
 	}
 	var ipsMap = make(map[string]string)
