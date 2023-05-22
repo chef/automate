@@ -3,11 +3,10 @@ require 'fileutils'
 namespace :oauth_application do
   desc "Task to register a new oauth application"
   task :register, [:app_name, :redirect_uri] => :environment do |t, args|
-    puts "Registering new application..."
-    app = Doorkeeper::Application.find_or_create_by(:name => args.app_name)
-    app.update(:redirect_uri => args.redirect_uri)
-    app.save!
-    puts "Registered new application: #{args.app_name} with app: #{app.as_json.to_s}"
+    ActiveRecord::Base.transaction do
+      app = Doorkeeper::Application.find_or_create_by(:name => args.app_name)
+      app.update!(:redirect_uri => args.redirect_uri)
+    end
   end
 
   desc "Task to generate a file with the details of all the registered oauth application under OC-ID"
@@ -22,6 +21,6 @@ namespace :oauth_application do
       FileUtils.mkdir_p(dir)
     end
     
-    File.open(file_path, 'w') { |file| file.write(yaml_file_content) }
+    File.write(file_path, yaml_file_content)
   end
 end
