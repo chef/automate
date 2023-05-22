@@ -29,6 +29,7 @@ func getTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Architecture.ConfigInitials.BackupMount = "/path/to/backup/mount"
 	config.Architecture.ConfigInitials.HabitatUIDGid = "habitat_uid_gid"
 	config.Architecture.ConfigInitials.BackupConfig = "object_storage"
+	config.ObjectStorage.Config.BucketName = "s4"
 
 	// Automate Config
 	config.Automate.Config.AdminPassword = "adminpassword"
@@ -138,6 +139,7 @@ func getTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 	config.Architecture.ConfigInitials.BackupMount = "/mnt/automate_backups"
 	config.Architecture.ConfigInitials.HabitatUIDGid = "habitat_uid_gid"
 	config.Architecture.ConfigInitials.BackupConfig = "object_storage"
+	config.ObjectStorage.Config.BucketName = "s3"
 
 	// Automate Config
 	config.Automate.Config.AdminPassword = "adminpassword"
@@ -364,7 +366,7 @@ func getTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Architecture.ConfigInitials.ExistingElkPassword = "elk_password"
 	config.Architecture.ConfigInitials.BackupMount = "/mnt/automate_backups"
 	config.Architecture.ConfigInitials.BackupConfig = "/path/to/backup_config"
-	config.Architecture.ConfigInitials.S3BucketName = "my-s3-bucket"
+	config.Architecture.ConfigInitials.S3BucketName = "s3"
 	config.Architecture.ConfigInitials.HabitatUIDGid = "123:456"
 
 	config.Automate.Config.AdminPassword = "admin_password"
