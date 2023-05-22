@@ -30,9 +30,8 @@ func (vs *VerifyServer) SetupRoutes() {
 
 	apiStopGroup := apiV1Group.Group("/stop")
 	apiStopGroup.Post("/mock-server", vs.Handler.StopMockServer)
-	apiChecksGroup.Post("/nfs-mount-loc", vs.Handler.NFSMount)
 	apiFetchGroup := apiV1Group.Group("/fetch")
-	apiFetchGroup.Post("/s3-config", vs.Handler.NFSMountLoc)
+	apiFetchGroup.Post("/nfs-mount-loc", vs.Handler.NFSMountLoc)
 
 	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }
