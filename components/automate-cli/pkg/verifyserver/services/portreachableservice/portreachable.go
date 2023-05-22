@@ -74,7 +74,7 @@ func (pr *PortReachableService) udpClient(protocolType, host, port string) error
 
 	// Reading the server response
 	buffer := make([]byte, 2048)
-	n, err := conn.Read(buffer)
+	n, _, err := conn.ReadFromUDP(buffer)
 	if err != nil {
 		return fmt.Errorf("read error: %w", err)
 	}
@@ -91,7 +91,8 @@ func (pr *PortReachableService) httpsClient(ip, cert string, port int) error {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
+				RootCAs:    caCertPool,
+				MinVersion: tls.VersionTLS12,
 			},
 		},
 		Timeout: time.Second * pr.timeout,

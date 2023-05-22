@@ -1,7 +1,7 @@
 package v1_test
 
 import (
-	"io"
+	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -168,7 +168,7 @@ func TestBatchCheckAPI(t *testing.T) {
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
-			body, err := io.ReadAll(res.Body)
+			body, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
 			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, test.expectedCode, res.StatusCode)
