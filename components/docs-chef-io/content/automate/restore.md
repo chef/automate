@@ -147,7 +147,7 @@ sudo chef-automate backup fix-repo-permissions <path>
 
 {{< note >}}
 
-- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a diffrent bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
+- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a different bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
 
 {{< /note >}}
 
