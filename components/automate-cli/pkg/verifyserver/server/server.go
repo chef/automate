@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/nfsmountbackupchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/opensearchs3bucketaccesschecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/s3backupchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/softwareversionchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/sshuseraccesschecktrigger"
@@ -92,8 +93,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				trigger.NewExternalPostgresCheck(),
 				firewallchecktrigger.NewFirewallCheck(l, port),
 				trigger.NewFqdnCheck(),
-				nfsmountbackupchecktrigger.NewNfsBackupConfigCheck(),
-				opensearchs3bucketaccesscheck.NewOpensearchS3BucketAccessCheck(),
+				nfsmountbackupchecktrigger.NewNfsBackupConfigCheck(l, port),
+				opensearchs3bucketaccesschecktrigger.NewOpensearchS3BucketAccessCheck(l, port),
 				s3backupchecktrigger.NewS3BackupConfigCheck(l, port),
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),

@@ -73,6 +73,7 @@ type Config struct {
 	ExternalOS      ExternalOS  `json:"external_opensearch"`
 	ExternalPG      ExternalPG  `json:"external_postgresql"`
 	DeploymentState string      `json:"deployment_state"`
+	APIToken        string      `json:"api_token"`
 }
 
 type BatchCheckResponse struct {
@@ -174,6 +175,8 @@ type FqdnRequest struct {
 	RootCert          string   `json:"root_cert"`
 	IsAfterDeployment bool     `json:"is_after_deployment"`
 	Nodes             []string `json:"nodes"`
+	ApiToken          string   `json:"api_token"`
+	NodeType          string   `json:"node_type"`
 }
 
 type NodeIpRequest struct {
