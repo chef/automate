@@ -2,7 +2,6 @@ package config_verify
 
 import (
 	"container/list"
-	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -22,51 +21,6 @@ func validateAutomateFQDN(fqdn string) error {
 	if strings.HasPrefix(fqdn, "http://") || strings.HasPrefix(fqdn, "https://") {
 		return fmt.Errorf("fqdn should not include protocol (http:// or https://)")
 	}
-	return nil
-}
-
-// parseCertAndKey function that supports RSA and ECDSA and Ed25519 keys
-func parseCertAndKey(certData, keyData []byte) error {
-	// Parse the public key from the certificate data
-	certBlock, _ := pem.Decode(certData)
-	if certBlock == nil {
-		return fmt.Errorf("failed to parse certificate data")
-	}
-	_, err := x509.ParseCertificate(certBlock.Bytes)
-	if err != nil {
-		return fmt.Errorf("failed to parse certificate: %s", err)
-	}
-	// Parse the private key from the key data
-	keyBlock, _ := pem.Decode(keyData)
-	if keyBlock == nil {
-		return fmt.Errorf("failed to parse private key data")
-	}
-
-	switch keyBlock.Type {
-	case "RSA PRIVATE KEY":
-		_, err := x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
-		if err != nil {
-			return fmt.Errorf("failed to parse RSA private key: %s", err)
-		}
-	case "EC PRIVATE KEY":
-		_, err := x509.ParseECPrivateKey(keyBlock.Bytes)
-		if err != nil {
-			return fmt.Errorf("failed to parse EC private key: %s", err)
-		}
-	case "PRIVATE KEY":
-		_, err := x509.ParsePKCS8PrivateKey(keyBlock.Bytes)
-		if err != nil {
-			return fmt.Errorf("failed to parse PKCS8 private key: %s", err)
-		}
-	case "ED25519 PRIVATE KEY":
-		_, err := x509.ParsePKCS8PrivateKey(keyBlock.Bytes)
-		if err != nil {
-			return fmt.Errorf("failed to parse ED25519 private key: %s", err)
-		}
-	default:
-		return fmt.Errorf("unknown private key type: %s", keyBlock.Type)
-	}
-
 	return nil
 }
 

@@ -2,7 +2,6 @@ package config_verify
 
 import (
 	"container/list"
-	"os"
 	"strings"
 	"time"
 
@@ -278,47 +277,6 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 	frontendTLS := config.Global.V1.FrontendTls
 	if len(frontendTLS) < 1 {
 		e.AddMissingKey("global.v1.frontend_tls")
-	} else {
-		for _, tls := range config.Global.V1.GetFrontendTls() {
-			if tls.CertPath != "" || tls.KeyPath != "" {
-				if tls.CertPath != "" {
-					certData, err := os.ReadFile(tls.CertPath)
-					if err != nil {
-						e.AddInvalidValue("global.v1.frontend_tls.cert_path ", err.Error())
-					} else {
-						tls.Cert = string(certData)
-					}
-				}
-				if tls.KeyPath != "" {
-					keyData, err := os.ReadFile(tls.KeyPath)
-					if err != nil {
-						e.AddInvalidValue("global.v1.frontend_tls.key_path ", err.Error())
-					} else {
-						tls.Key = string(keyData)
-					}
-				}
-
-				if tls.Cert != "" && tls.Key != "" {
-					err := parseCertAndKey([]byte(tls.Cert), []byte(tls.Key))
-					if err != nil {
-						e.AddInvalidValue("global.v1.frontend_tls", err.Error())
-					}
-				} else {
-					if tls.Cert == "" {
-						e.AddMissingKey("global.v1.frontend_tls.cert")
-					}
-					if tls.Key == "" {
-						e.AddMissingKey("global.v1.frontend_tls.key")
-					}
-				}
-			}
-
-			if tls.ServerName != "" {
-				if err := validateAutomateFQDN(tls.ServerName); err != nil {
-					e.AddInvalidValue("global.v1.frontend_tls.server_name", err.Error())
-				}
-			}
-		}
 	}
 
 	deploymentType := config.Deployment.V1.Svc.DeploymentType
