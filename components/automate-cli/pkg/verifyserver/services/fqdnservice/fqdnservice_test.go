@@ -644,3 +644,67 @@ func TestCheckStatus_Failure(t *testing.T) {
 		assert.Equal(t, e.ExpectedRes, checks)
 	}
 }
+
+func TestUnmarshal_Failure(t *testing.T) {
+	httpsTestPort := 443
+	// Create a test server with a handler that returns a failure response.
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/_status":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("test"))
+		case "/api/v0/status":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("test"))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	err := startHTTPSMockServer(server, strconv.Itoa(httpsTestPort))
+	assert.NoError(t, err)
+	defer server.Close()
+
+	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
+	assert.NotNil(t, fq)
+
+	tests := []struct {
+		TestName    string
+		NodeType    string
+		ExpectedRes models.Checks
+	}{
+		{
+			TestName: "Chef Infra Server Unmarshal Failure",
+			NodeType: constants.CHEF_INFRA_SERVER,
+			ExpectedRes: models.Checks{
+				Title:         constants.CHEF_SERVER_TITLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+				ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+			},
+		},
+		{
+			TestName: "Automate Unmarshal Failure",
+			NodeType: constants.AUTOMATE,
+			ExpectedRes: models.Checks{
+				Title:         constants.AUTOMATE_TITLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+				ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+			},
+		},
+	}
+
+	for _, e := range tests {
+		var checks models.Checks
+		if e.NodeType == constants.CHEF_INFRA_SERVER {
+			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT)
+		} else {
+			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN)
+		}
+
+		assert.Equal(t, e.ExpectedRes, checks)
+	}
+}
