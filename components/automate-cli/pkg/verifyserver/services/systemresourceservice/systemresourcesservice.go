@@ -135,7 +135,6 @@ func (srs *SystemResourcesService) GetCpuSpeedCheck(cpuInfoFile string) *models.
 	var resp *models.Checks
 
 	if err != nil {
-		//TODO error also needs to be written from this function to above function needs to confirm.
 		srs.logger.Error("Error occured while getting cpu speed :", err)
 		ResolutionMsg := "Please run system on supported platform"
 		resp = srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", err.Error(), ResolutionMsg)
