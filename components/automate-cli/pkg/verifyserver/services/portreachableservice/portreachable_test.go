@@ -224,9 +224,9 @@ func startHTTPSMockServerOnCustomPort(mockServer *httptest.Server, port string) 
 }
 
 func TestGetPortReachableDetails(t *testing.T) {
-	tcpTestPort := 1234
-	udpTestPort := 1235
-	httpsTestPort := 1236
+	tcpTestPort := 3069
+	udpTestPort := 3070
+	httpsTestPort := 3071
 
 	tcpMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

@@ -65,7 +65,7 @@ func (servers *MockServerService) StartMockServer(cfg *models.StartMockServerReq
 func (s *MockServerService) StartTCPServer(port int) (*models.Server, error) {
 	// create a TCP listener on the specified port and
 	// save the listener instance in the handler struct
-	listener, err := net.Listen(constants.TCP, fmt.Sprintf("localhost:%d", port))
+	listener, err := net.Listen(constants.TCP, fmt.Sprintf(":%d", port))
 
 	if err != nil {
 
