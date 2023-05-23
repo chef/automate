@@ -19,9 +19,10 @@ import (
 )
 
 var (
-	LOCALHOST             = "localhost"
-	SERVER_NOT_RUNNING_IP = "192.168.43.23"
-	SERVER_CRT            = `-----BEGIN CERTIFICATE-----
+	LOCALHOST                 = "localhost"
+	SERVER_NOT_RUNNING_IP     = "192.168.43.23"
+	INVALID_FORMAT_RUNNING_IP = "192.168.43.23.32"
+	SERVER_CRT                = `-----BEGIN CERTIFICATE-----
 MIIGrzCCBJegAwIBAgIJAMgNHiWQ140JMA0GCSqGSIb3DQEBCwUAMGwxCzAJBgNV
 BAYTAklOMRIwEAYDVQQIDAlLYXJuYXRha2ExEjAQBgNVBAcMCUJlbmdhbHVydTEW
 MBQGA1UECgwNUHJvZ3Jlc3MtdGVzdDEMMAoGA1UECwwDT3JnMQ8wDQYDVQQDDAZS
@@ -141,21 +142,48 @@ D+YLStm+V/xzmcSdd7h9zfZstJGXQmcAqoStfdBuRH1u3Wu97ory4+e0OsqkhNhS
 gAvv7gUqzOym7L1rQqaJo3h2oBmE9OVmyGVyyrAhd5VwH+ve+cEyOwXUqSH4CTlT
 cDO0rxyp16R84JLEj2vtqK/E5tp8Ew52
 -----END CERTIFICATE-----`
-	TIMEOUT = 2
+	DIFF_SERVER_ROOT_CA = `-----BEGIN CERTIFICATE-----
+MIIFojCCA4oCCQCrZnj0fDgwXTANBgkqhkiG9w0BAQsFADCBkjELMAkGA1UEBhMC
+SU4xEjAQBgNVBAgMCUtBUk5BVEFLQTESMBAGA1UEBwwJQkVOR0FMVVJVMRYwFAYD
+VQQKDA1Qcm9ncmVzcy10ZXN0MQswCQYDVQQLDAJJVDEUMBIGA1UEAwwLZXhhbXBs
+ZS5jb20xIDAeBgkqhkiG9w0BCQEWEXRlc3RAcHJvZ3Jlc3MuY29tMB4XDTIzMDUy
+MzExNTQwMloXDTI4MDUyMDExNTQwMlowgZIxCzAJBgNVBAYTAklOMRIwEAYDVQQI
+DAlLQVJOQVRBS0ExEjAQBgNVBAcMCUJFTkdBTFVSVTEWMBQGA1UECgwNUHJvZ3Jl
+c3MtdGVzdDELMAkGA1UECwwCSVQxFDASBgNVBAMMC2V4YW1wbGUuY29tMSAwHgYJ
+KoZIhvcNAQkBFhF0ZXN0QHByb2dyZXNzLmNvbTCCAiIwDQYJKoZIhvcNAQEBBQAD
+ggIPADCCAgoCggIBANRXdcgEe7fXCmr3YRh/xM9r5Sr8FZtzE4NjRAxCbV1S+eTa
+Z1DMidTImm0y70J02JSxuumpvxRcEtrjZzaoZGZTSm5Cy4YBwHv/vtbREaPI6uoO
++3iV2ykwmSrQHgvvkVb50zpAfHjc8P6aNcDgN0N8XWjLpx9E4P/K4FoE0xgfuMEj
+jBvObpB/OxBtDrbqU2OIKiEVhbMITD2mIIkweTOODeejK1xVxJJurG+4Y6MTrwSJ
+Wd4N1WQcyr5WjwLLPjWTV2I3Ng9Z6CvHaVL2/i442NK6pD6nGLQ8NuOoawcAAIgR
+lkCm6E18uHoCoR8q71O7p2fqTiJF2RJVNBsWZbhp8upGUrs6vuTXZEj10OCwGvbY
+riLbIDrKQbTUbf0mKmktKTc+9r0dO+U0E0k5J0vd8Y1yZoOSD+iLB+uASpN4v+BZ
+hy9IQFgdtWFbuBbZV3oQ8q4ui8Xq5sNbgeVKoXPgJZ42kCubXffOq2u8jgGqtNHC
+iEMdXOeaN6CofVhUEBYRLUwxwJEi8PrXCNK3Icl7JcGEUT0V0OMpPV9aoD7NFNtZ
+lO/bXCmDSYGCM3W3vAcQKXtuV6L0lETt4WNap2MnifOAb401efFy9XBCytUQ7uQz
+YXTVLaGJthidyTK7JghMo8BLz3Cyxath59frANqPLtnbCRValsN6tz3DQqdtAgMB
+AAEwDQYJKoZIhvcNAQELBQADggIBAFAejo9UNuI4y+/OHLtWHz0ZJ0eeGLxCq/sh
+Wv3EohH2tTgb6ls/CmNlxvhqJV6/rNE6n/eWdEa/8ONi0EqSD12OowogxkHDxV2m
+mLcSYpEjRJovEZze13ryR4YguAhy5Cukc5GautdUKXJYgKZleZXGRLTkL60opkhp
+73zKiQIhV04a4DDY0HxgSAqYN9do8H0bkn3XsRfjLTmorwoGGWvz0TVCv3QWWlgb
+zOmPIZ5xKG3iniTWXQXGACTDUyIjO7DenZZAIJd3n6KR7HZ0cufzVSsRrnTnETJu
+KG0HiRai9wsJyDusTwmd1gbrnBsHxBQp4ylq/ojufLqwaUwFpJz41A/2KkRdqz7g
+Fi6NZQIIEfk8pp+0pEvlNy0a23aMYz8wXzTUkeqUpfmmt9DPC20bYjC9lnrTiSjb
+NOLostbtejT6iggKSU0I17L+LN7tgpQgcCk0MojRWFBmlm34sHhbNxtuOwVdKh1f
+b2qf3Jo1n6RB+DdU96tYxn6p7HF/0dCZ6S74GirKmZMAKbdap/d4mgTszHvVHcWt
+ek2LMF/JQQKIXMNKJbo+F1cipClfBVBgTDOcLAoQ1x/SmR9O2RNHD01dq+GW537R
+qUZKHRSxo/0WgcntahccsLc3wXA2pWyMXrhcggnyOnEp2XgnVzHPVof1PoG6XWf9
+VZDL9oxn
+-----END CERTIFICATE-----`
+	WRONG_ROOT_CA = `-----BEGIN CERTIFICATE-----
+abcd
+-----END CERTIFICATE-----`
+	TIMEOUT = 1
 )
 
 func TestPortReachableDetails(t *testing.T) {
 	pr := portreachableservice.NewPortReachableService(logger.NewTestLogger(), time.Duration(TIMEOUT))
 	assert.NotNil(t, pr)
-
-	prDetails := pr.GetPortReachableDetails(models.PortReachableRequest{})
-	assert.Equal(t, models.Checks{
-		Title:         "Check for reachability of service at destination port",
-		Passed:        true,
-		SuccessMsg:    "The  service running at :0 is reachable",
-		ErrorMsg:      "",
-		ResolutionMsg: "",
-	}, prDetails)
 }
 
 func startTCPMockServerOnCustomPort(mockServer *httptest.Server, port string) error {
@@ -227,6 +255,7 @@ func TestGetPortReachableDetails(t *testing.T) {
 	tcpTestPort := 3069
 	udpTestPort := 3070
 	httpsTestPort := 3071
+	httpsTestPort2 := 3072
 
 	tcpMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -247,6 +276,14 @@ func TestGetPortReachableDetails(t *testing.T) {
 	err = startHTTPSMockServerOnCustomPort(httpsMockServer, strconv.Itoa(httpsTestPort))
 	assert.NoError(t, err)
 	defer httpsMockServer.Close()
+
+	httpsMockServerWithDiffStatusCode := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
+		w.Write([]byte("OK"))
+	}))
+	err = startHTTPSMockServerOnCustomPort(httpsMockServerWithDiffStatusCode, strconv.Itoa(httpsTestPort2))
+	assert.NoError(t, err)
+	defer httpsMockServerWithDiffStatusCode.Close()
 
 	pr := portreachableservice.NewPortReachableService(logger.NewTestLogger(), time.Duration(TIMEOUT))
 	assert.NotNil(t, pr)
@@ -320,6 +357,22 @@ func TestGetPortReachableDetails(t *testing.T) {
 			},
 		},
 		{
+			"Wrong Format IP for UDP server",
+			models.PortReachableRequest{
+				DestinationNodeIp:              INVALID_FORMAT_RUNNING_IP,
+				DestinationNodePort:            udpTestPort,
+				DestinationNodeServiceProtocol: constants.UDP,
+				RootCA:                         "",
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      fmt.Sprintf(constants.PORT_REACHABLE_ERROR_MSG, constants.UDP, INVALID_FORMAT_RUNNING_IP, udpTestPort),
+				ResolutionMsg: fmt.Sprintf(constants.PORT_REACHABLE_RESOLUTION_MSG, udpTestPort, INVALID_FORMAT_RUNNING_IP),
+			},
+		},
+		{
 			"HTTPS Server running there",
 			models.PortReachableRequest{
 				DestinationNodeIp:              LOCALHOST,
@@ -333,6 +386,54 @@ func TestGetPortReachableDetails(t *testing.T) {
 				SuccessMsg:    fmt.Sprintf(constants.PORT_REACHABLE_SUCCESS_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
 				ErrorMsg:      "",
 				ResolutionMsg: "",
+			},
+		},
+		{
+			"HTTPS Server running there but giving different server rootCA",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+				RootCA:                         DIFF_SERVER_ROOT_CA,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      fmt.Sprintf(constants.PORT_REACHABLE_ERROR_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
+				ResolutionMsg: fmt.Sprintf(constants.PORT_REACHABLE_RESOLUTION_MSG, httpsTestPort, LOCALHOST),
+			},
+		},
+		{
+			"HTTPS Server running there but giving wrong rootCA",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+				RootCA:                         WRONG_ROOT_CA,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      fmt.Sprintf(constants.PORT_REACHABLE_ERROR_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
+				ResolutionMsg: fmt.Sprintf(constants.PORT_REACHABLE_RESOLUTION_MSG, httpsTestPort, LOCALHOST),
+			},
+		},
+		{
+			"HTTPS Server running there but giving wrong response status code",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort2,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+				RootCA:                         CA_CERT,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      fmt.Sprintf(constants.PORT_REACHABLE_ERROR_MSG, constants.HTTPS, LOCALHOST, httpsTestPort2),
+				ResolutionMsg: fmt.Sprintf(constants.PORT_REACHABLE_RESOLUTION_MSG, httpsTestPort2, LOCALHOST),
 			},
 		},
 		{

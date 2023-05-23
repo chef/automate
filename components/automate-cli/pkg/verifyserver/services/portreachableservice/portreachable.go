@@ -31,6 +31,7 @@ func NewPortReachableService(log logger.Logger, timeout time.Duration) *PortReac
 }
 
 func (pr *PortReachableService) tcpClient(protocolType, host, port string) error {
+	pr.log.Debug("Trying to connect TCP server")
 	pr.log.Debug("URL: ", net.JoinHostPort(host, port))
 	timeout := time.Second * pr.timeout
 	// In TCP connection, if we are getting the connection it's sufficient to check the reachibility
@@ -44,8 +45,9 @@ func (pr *PortReachableService) tcpClient(protocolType, host, port string) error
 }
 
 func (pr *PortReachableService) udpClient(protocolType, host, port string) error {
+	pr.log.Debug("Trying to connect UDP server")
 	pr.log.Debug("URL: ", net.JoinHostPort(host, port))
-	udpServer, err := net.ResolveUDPAddr(protocolType, host+":"+port)
+	udpServer, err := net.ResolveUDPAddr(protocolType, net.JoinHostPort(host, port))
 	if err != nil {
 		return fmt.Errorf("ResolveUDPAddr failed: %w", err)
 	}
@@ -83,10 +85,11 @@ func (pr *PortReachableService) udpClient(protocolType, host, port string) error
 }
 
 func (pr *PortReachableService) httpsClient(ip, cert string, port int) error {
+	pr.log.Debug("Trying to connect https server")
 	caCertPool := x509.NewCertPool()
 	ok := caCertPool.AppendCertsFromPEM([]byte(cert))
 	if !ok {
-		return errors.New("certificate error")
+		return errors.New("certificate error: root_ca is not of correct format")
 	}
 	client := &http.Client{
 		Transport: &http.Transport{
