@@ -534,3 +534,20 @@ func TestGetNFSMountLoc(t *testing.T) {
 		})
 	}
 }
+
+func TestGetNFSMountLocCmdExectionError(t *testing.T) {
+			testPort := "1234"
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort, func(cmd string) ([]byte, error) {
+				return nil, errors.New("")
+			})
+			resp := nm.GetNFSMountLoc(models.NFSMountLocRequest{
+				MountLocation: "/nfs",
+			})
+			assert.Equal(t, &models.NFSMountLocResponse{
+				Address:            "",
+				Nfs:                "",
+				MountLocation:      "/nfs",
+				StorageCapacity:    "",
+				AvailableFreeSpace: "",
+			}, resp)
+}

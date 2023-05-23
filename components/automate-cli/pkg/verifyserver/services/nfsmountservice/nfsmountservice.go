@@ -103,15 +103,14 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 }
 
 func (nm *NFSMountService) GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse {
-	res := &models.NFSMountLocResponse{
-		Address:       "",
-		Nfs:           "",
-		MountLocation: req.MountLocation,
-	}
 	output, err := nm.executeCommand()
 	if err != nil {
 		nm.log.Error("Error executing `df -h` command")
-		return res
+		return &models.NFSMountLocResponse{
+			Address:       "",
+			Nfs:           "",
+			MountLocation: req.MountLocation,
+		}
 	}
 	mounts := nm.getMountDetails(output, req.MountLocation)
 	return mounts
