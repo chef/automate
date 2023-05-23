@@ -18,8 +18,9 @@ import (
 )
 
 const (
-	LOCALHOST = "localhost"
-	APITOKEN  = "WFlC7Q2sucYRg7IjCSKaDJV4kYE="
+	LOCALHOST  = "localhost"
+	LOCALHOST2 = "localhost2"
+	APITOKEN   = "WFlC7Q2sucYRg7IjCSKaDJV4kYE="
 )
 
 var (
@@ -285,7 +286,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 		{
 			"Case is Before Deployment, FQDN and Nodes are not reachable, Certicate is valid",
 			models.FqdnRequest{
-				Fqdn:              "localhost2",
+				Fqdn:              LOCALHOST2,
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: false,
@@ -473,7 +474,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 		{
 			"Case is After Deployment, FQDN is not reachable, Chef Server Status is not okay",
 			models.FqdnRequest{
-				Fqdn:              "localhost2",
+				Fqdn:              LOCALHOST2,
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
@@ -537,7 +538,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 		{
 			"Case is After Deployment, FQDN is not reachable, Automate Status is not okay",
 			models.FqdnRequest{
-				Fqdn:              "localhost2",
+				Fqdn:              LOCALHOST2,
 				NodeType:          constants.AUTOMATE,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
@@ -578,7 +579,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 
 func TestCheckStatus_Failure(t *testing.T) {
 	httpsTestPort := 443
-	// Create a test server with a handler that returns a failure response
+	// Create a test server with a handler that returns a failure response.
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/_status":
