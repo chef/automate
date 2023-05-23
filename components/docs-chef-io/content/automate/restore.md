@@ -62,6 +62,13 @@ Ensure access for the backup type used:
          # Use "m" for megabytes and "g" for gigabytes
      ```
 
+{{< note >}}
+
+- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+
+{{< /note >}}
+
+
 ## Restore From a Filesystem Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
@@ -71,7 +78,6 @@ Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory.
 Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
-{{< warning >}} If restoring a backup from different version, make sure to passing `--airgap-bundle` flag alone with the path to latest airgap is mandatory {{< /warning >}}
 
 To restore on a new host, run:
 
@@ -138,6 +144,12 @@ sudo chef-automate backup fix-repo-permissions <path>
 ```
 
 ## Restore From an AWS S3 Backup
+
+{{< note >}}
+
+- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a diffrent bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
+
+{{< /note >}}
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
