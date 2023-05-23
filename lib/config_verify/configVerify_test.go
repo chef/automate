@@ -27,6 +27,30 @@ func TestConfigValidateOnPrem(t *testing.T) {
 		t.Fail()
 	})
 
+	t.Run("Test Failed On prem AWS managed Config Validation", func(t *testing.T) {
+		config := GetTestOnPremFailedConfigData()
+		config.ExternalDB.Database.Type = "aws"
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
+	t.Run("Test Failed Self-managed Config Validation", func(t *testing.T) {
+		config := GetTestOnPremFailedConfigData()
+		config.ExternalDB.Database.Type = "self-managed"
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
 	t.Run("Test Success AWS Config Validation", func(t *testing.T) {
 		config := GetTestAWSConfigData()
 

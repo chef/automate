@@ -90,22 +90,6 @@ func GetTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 
 	// ExternalDB Config
 	config.ExternalDB.Database.Type = ""
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL = "sample-postgres-instance"
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName = "superuser"
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword = "superuserpassword"
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName = "dbuser"
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword = "dbuserpassword"
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLCertificate = "/path/to/postgresql/cert"
-	config.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert = "/path/to/postgresql/rootcert"
-	config.ExternalDB.Database.Opensearch.OpensearchInstanceURL = "sample-opensearch-instance"
-	config.ExternalDB.Database.Opensearch.OpensearchSuperUserName = "opensearchuser"
-	config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword = "opensearchuserpassword"
-	config.ExternalDB.Database.Opensearch.OpensearchCertificate = "/path/to/opensearch/cert"
-	config.ExternalDB.Database.Opensearch.OpensearchRootCert = "/path/to/opensearch/rootcert"
-	config.ExternalDB.Database.Opensearch.OpensearchDomainName = "opensearchdomain"
-	config.ExternalDB.Database.Opensearch.AWS.AwsOsSnapshotRoleArn = "sample-role-arn"
-	config.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeyId = "sample-access-key-id"
-	config.ExternalDB.Database.Opensearch.AWS.OsUserAccessKeySecret = "sample-access-key-secret"
 
 	// ObjectStorage Config
 	config.ObjectStorage.Config.AccessKey = "sample-access-key"
@@ -122,12 +106,12 @@ func GetTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Architecture.ConfigInitials.BackupMount = "/mnt/"
 	config.Automate.Config.Fqdn = ".com"
 	config.ChefServer.Config.EnableCustomCerts = true
-	config.ChefServer.Config.PrivateKey = "key"
-	config.ChefServer.Config.PublicKey = "key"
+	config.ChefServer.Config.PrivateKey = ""
 	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
 		{IP: "127.0.0.1", PrivateKey: "key", PublicKey: "key", NodesDn: ""},
 		{IP: "127.0.0.1", PrivateKey: "key", PublicKey: "key", NodesDn: ""},
 	}
+	config.Architecture.ConfigInitials.BackupConfig = "file_system"
 	config.ExistingInfra.Config.AutomatePrivateIps = []string{}
 	config.ExistingInfra.Config.ChefServerPrivateIps = []string{}
 	config.ExistingInfra.Config.OpensearchPrivateIps = []string{"11", "12.1"}
@@ -137,9 +121,16 @@ func GetTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Architecture.ConfigInitials.Architecture = ""
 	config.Architecture.ConfigInitials.WorkspacePath = "34"
 	config.Automate.Config.EnableCustomCerts = true
-	config.ExternalDB.Database.Type = "self-managed"
+	config.Automate.Config.PublicKey = ""
 	config.Postgresql.Config.EnableCustomCerts = true
+	config.Postgresql.Config.PrivateKey = ""
 	config.Opensearch.Config.EnableCustomCerts = true
+	config.Opensearch.Config.RootCA = ""
+	config.Opensearch.Config.AdminCert = "ssf"
+	config.Opensearch.Config.AdminKey = ""
+	config.Opensearch.Config.PrivateKey = ""
+	config.Opensearch.Config.PublicKey = ""
+	config.Opensearch.Config.PublicKey = ""
 	config.Architecture.ConfigInitials.SSHUser = ""
 	config.ObjectStorage.Config.BucketName = "s4"
 
@@ -270,6 +261,7 @@ func GetFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Architecture.ConfigInitials.SSHKeyFile = "./pem"
 	config.Automate.Config.Fqdn = " "
 	config.ChefServer.Config.EnableCustomCerts = true
+
 	config.ChefServer.Config.PrivateKey = "chef_private_key"
 	config.ChefServer.Config.PublicKey = "chef_public_key"
 	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
@@ -301,13 +293,21 @@ func GetFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config.Architecture.ConfigInitials.BackupMount = "/mnt/"
 	config.Architecture.ConfigInitials.S3BucketName = "failed_s3"
 	config.Automate.Config.EnableCustomCerts = true
+	config.Automate.Config.PrivateKey = ""
 	config.Postgresql.Config.EnableCustomCerts = true
+	config.Postgresql.Config.RootCA = ""
+	config.Postgresql.Config.PrivateKey = ""
+	config.Postgresql.Config.PublicKey = ""
+	config.Postgresql.Config.PrivateKey = ""
 	config.Aws.Config.SetupManagedServices = true
 	config.Opensearch.Config.EnableCustomCerts = true
+	config.Opensearch.Config.PrivateKey = ""
 	config.Aws.Config.AutomateEbsVolumeIops = "ten"
 	config.Aws.Config.AutomateEbsVolumeSize = "twenty"
 	config.Aws.Config.PostgresqlEbsVolumeIops = "q2ds"
 	config.Aws.Config.PostgresqlEbsVolumeSize = "feg2"
+
+	config.Opensearch.Config.EnableCustomCerts = true
 
 	return config
 }
