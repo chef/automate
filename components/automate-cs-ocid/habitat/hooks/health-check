@@ -7,7 +7,7 @@ curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root_ca.crt"
 curlOpts="$curlOpts --resolve automate-cs-ocid:{{cfg.network.port}}:127.0.0.1"
 curlOpts="$curlOpts --noproxy automate-cs-ocid"
 # shellcheck disable=SC2086
-output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "https://automate-cs-ocid:{{cfg.network.port}}/id/signin")
+output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "http://automate-cs-ocid:{{cfg.network.port}}/id/signin")
 res=$?
 if [ "0" != "$res" ]; then
     echo "health check curl command returned exit code ${res}:"
