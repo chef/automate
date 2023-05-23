@@ -25,13 +25,7 @@ func TestGetCpuCountCheck(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "Cpu count is expected",
-			respWant: &models.Checks{
-				Title:         CPU_COUNT_CHECK_TITLE,
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf("CPU count is >=%v", constants.MIN_CPU_COUNT),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,CPU_COUNT_CHECK_TITLE,fmt.Sprintf("CPU count is >=%v", constants.MIN_CPU_COUNT),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetNumberOfCPUFunc: func() int {
 					return constants.MIN_CPU_COUNT
@@ -40,13 +34,7 @@ func TestGetCpuCountCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Cpu count is not expected",
-			respWant: &models.Checks{
-				Title:         CPU_COUNT_CHECK_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf("CPU count is %v", constants.MIN_CPU_COUNT-1),
-				ResolutionMsg: fmt.Sprintf("CPU count should be >=%v", constants.MIN_CPU_COUNT),
-			},
+			respWant : srv.GetChecksModel(false,CPU_COUNT_CHECK_TITLE,"",fmt.Sprintf("CPU count is %v", constants.MIN_CPU_COUNT-1),fmt.Sprintf("CPU count should be >=%v", constants.MIN_CPU_COUNT)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetNumberOfCPUFunc: func() int {
 					return constants.MIN_CPU_COUNT - 1
@@ -70,13 +58,7 @@ func TestGetCpuSpeedCheck(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "CPU speed is expected",
-			respWant: &models.Checks{
-				Title:         CPU_SPEED_CHECK_TITLE,
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,CPU_SPEED_CHECK_TITLE,fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetCPUSpeedFunc: func(s string) (float64, error) {
 					return constants.MIN_CPU_SPEED + 1, nil
@@ -85,13 +67,7 @@ func TestGetCpuSpeedCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "CPU speed is not expected",
-			respWant: &models.Checks{
-				Title:         CPU_SPEED_CHECK_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf("CPU speed is %vGHz", constants.MIN_CPU_SPEED-1),
-				ResolutionMsg: fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED),
-			},
+			respWant : srv.GetChecksModel(false,CPU_SPEED_CHECK_TITLE,"",fmt.Sprintf("CPU speed is %vGHz", constants.MIN_CPU_SPEED-1),fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetCPUSpeedFunc: func(s string) (float64, error) {
 					return constants.MIN_CPU_SPEED - 1, nil
@@ -100,13 +76,7 @@ func TestGetCpuSpeedCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "System is not running on supported platform",
-			respWant: &models.Checks{
-				Title:         CPU_SPEED_CHECK_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      errors.New("open " + CPU_INFO_FILE + ": no such file or directory").Error(),
-				ResolutionMsg: "Please run system on supported platform",
-			},
+			respWant : srv.GetChecksModel(false, CPU_SPEED_CHECK_TITLE,"",errors.New("open " + CPU_INFO_FILE + ": no such file or directory").Error(),"Please run system on supported platform"),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetCPUSpeedFunc: func(s string) (float64, error) {
 					return 0, errors.New("open " + s + ": no such file or directory")
@@ -130,13 +100,7 @@ func TestGetMemorySizeCheck(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "Memory value is expected",
-			respWant: &models.Checks{
-				Title:         MEMORY_SIZE_CHECK_TITLE,
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,MEMORY_SIZE_CHECK_TITLE,fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetMemoryFunc: func() (float64, error) {
 					return float64(constants.MIN_MEMORY), nil
@@ -145,13 +109,7 @@ func TestGetMemorySizeCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Memory value is not expected",
-			respWant: &models.Checks{
-				Title:         MEMORY_SIZE_CHECK_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf("Memory is %0.2fGB", float64(constants.MIN_MEMORY-2)),
-				ResolutionMsg: fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY),
-			},
+			respWant : srv.GetChecksModel(false,MEMORY_SIZE_CHECK_TITLE,"",fmt.Sprintf("Memory is %0.2fGB", float64(constants.MIN_MEMORY-2)),fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetMemoryFunc: func() (float64, error) {
 					return float64(constants.MIN_MEMORY - 2), nil
@@ -160,13 +118,7 @@ func TestGetMemorySizeCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Getting error while reading cpuInfo file",
-			respWant: &models.Checks{
-				Title:         MEMORY_SIZE_CHECK_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      "Failed to read /proc/meminfo",
-				ResolutionMsg: "Please run system on supported platform",
-			},
+			respWant : srv.GetChecksModel(false,MEMORY_SIZE_CHECK_TITLE,"","Failed to read /proc/meminfo","Please run system on supported platform"),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetMemoryFunc: func() (float64, error) {
 					return float64(0), errors.New("Failed to read /proc/meminfo")
@@ -194,13 +146,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 	testCasesTmpSpaceCheck := []testCase{
 		{
 			testCaseDescription: "Checking free disk in /tmp",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 11, nil
@@ -210,13 +156,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in /tmp",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/tmp", float64(9)),
-				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100),
-			},
+			respWant : srv.GetChecksModel(false,fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),"",fmt.Sprintf(ERROR_MSG, "/tmp", float64(9)),fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 9, nil
@@ -226,13 +166,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in /tmp",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 16, nil
@@ -242,13 +176,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in /tmp",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/tmp", float64(14)),
-				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100),
-			},
+			respWant : srv.GetChecksModel(false,fmt.Sprintf(FREE_SPACE_CHECK, "Temp"),"",fmt.Sprintf(ERROR_MSG, "/tmp", float64(14)),fmt.Sprintf(SUCCESS_MSG, "/tmp", constants.TMP_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.TMP_FREE_DISK_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 14, nil
@@ -269,13 +197,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 	testCasesRootSpaceCheck := []testCase{
 		{
 			testCaseDescription: "Checking free disk in / (root)",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 21, nil
@@ -285,13 +207,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in / (root)",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/(root volume)", float64(19)),
-				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100),
-			},
+			respWant : srv.GetChecksModel(false,fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),"", fmt.Sprintf(ERROR_MSG, "/(root volume)", float64(19)),fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 19, nil
@@ -301,13 +217,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in / (root)",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      fmt.Sprintf(ERROR_MSG, "/(root volume)", float64(25)),
-				ResolutionMsg: fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100),
-			},
+			respWant : srv.GetChecksModel(false,fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),"",fmt.Sprintf(ERROR_MSG, "/(root volume)", float64(25)),fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100)),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 200, 25, nil
@@ -317,13 +227,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Checking free disk in / (root)",
-			respWant: &models.Checks{
-				Title:         fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),
-				Passed:        true,
-				SuccessMsg:    fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100),
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
+			respWant : srv.GetChecksModel(true,fmt.Sprintf(FREE_SPACE_CHECK, "/(root volume)"),fmt.Sprintf(SUCCESS_MSG, "/(root volume)", constants.ROOT_FREE_DISK_IN_GB) + fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.ROOT_FREE_DISK_IN_PER*100),"",""),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 200, 42, nil
