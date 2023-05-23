@@ -441,6 +441,7 @@ paths = [
   "lib/cereal/*",
   "lib/config/*",
   "lib/config_parser/*",
+  "lib/config_verify/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/httputils/*",
