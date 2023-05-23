@@ -19,7 +19,7 @@ import (
 
 func SetupMockFqdnService() fqdnservice.IFqdnService {
 	return &fqdnservice.MockFqdnService{
-		CheckFqdnReachabilityFunc: func(req models.FqdnRequest) models.FqdnResponse {
+		CheckFqdnReachabilityFunc: func(req models.FqdnRequest, port string) models.FqdnResponse {
 			return models.FqdnResponse{
 				Passed: true,
 				Checks: []models.Checks{

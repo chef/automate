@@ -18,4 +18,5 @@ const (
 	A2_CS_SUCCESS_MESSAGE          = "All services are up and running"
 	A2_CS_ERROR_MESSAGE            = "All services are not in ok state"
 	A2_CS_RESOLUTION_MESSAGE       = "Please restart the services."
+	DEFAULT_HTTPS_PORT             = "443"
 )

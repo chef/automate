@@ -17,7 +17,7 @@ import (
 )
 
 type IFqdnService interface {
-	CheckFqdnReachability(models.FqdnRequest) models.FqdnResponse
+	CheckFqdnReachability(models.FqdnRequest, string) models.FqdnResponse
 }
 
 type FqdnService struct {
@@ -63,10 +63,10 @@ func createErrorMessage(setNodes map[string]int) string {
 }
 
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
-func (fq *FqdnService) fqdnReachable(fqdn, rootCert string) models.Checks {
+func (fq *FqdnService) fqdnReachable(fqdn, rootCert, port string) models.Checks {
 	client := fq.createClient(rootCert)
 
-	res, err := client.Get(fmt.Sprintf("https://%s", fqdn))
+	res, err := client.Get(fmt.Sprintf("https://%s:%s", fqdn, port))
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
@@ -79,7 +79,7 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert string) models.Checks {
 }
 
 // nodeReachable function will check that our load balancer will correctly redirecting to all the nodes or not.
-func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string) models.Checks {
+func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, port string) models.Checks {
 	// creating a map for storing all the nodes given in request.
 	setNodes := make(map[string]int)
 	for _, k := range reqNodes {
@@ -91,7 +91,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string) m
 
 	for i := 0; i < 50; i++ {
 		go func(fqdnResultChan chan string) {
-			res, err := client.Get(fmt.Sprintf("https://%s", fqdn))
+			res, err := client.Get(fmt.Sprintf("https://%s:%s", fqdn, port))
 			if err != nil {
 				fq.log.Error(err.Error())
 				fqdnResultChan <- "got error"
@@ -141,10 +141,10 @@ func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
 }
 
 // checkChefServerStatus function will check that all the services are in ok state or not.
-func (fq *FqdnService) CheckChefServerStatus(fqdn, rootCert string) models.Checks {
+func (fq *FqdnService) CheckChefServerStatus(fqdn, rootCert, port string) models.Checks {
 	client := fq.createClient(rootCert)
 
-	res, err := client.Get(fmt.Sprintf("https://%s/_status", fqdn))
+	res, err := client.Get(fmt.Sprintf("https://%s:%s/_status", fqdn, port))
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
@@ -171,10 +171,10 @@ func (fq *FqdnService) CheckChefServerStatus(fqdn, rootCert string) models.Check
 }
 
 // checkAutomateStatus function will check that all the services are in ok state or not.
-func (fq *FqdnService) CheckAutomateStatus(fqdn, rootCert, apiToken string) models.Checks {
+func (fq *FqdnService) CheckAutomateStatus(fqdn, rootCert, apiToken, port string) models.Checks {
 	client := fq.createClient(rootCert)
 
-	apiUrl := fmt.Sprintf("https://%s/api/v0/status", fqdn)
+	apiUrl := fmt.Sprintf("https://%s:%s/api/v0/status", fqdn, port)
 	// Create a new HTTP GET request
 	req, err := http.NewRequest("GET", apiUrl, nil)
 	if err != nil {
@@ -220,22 +220,22 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 	}
 }
 
-func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest) models.FqdnResponse {
+func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string) models.FqdnResponse {
 	var response = models.FqdnResponse{}
 
-	check := fq.fqdnReachable(req.Fqdn, req.RootCert)
+	check := fq.fqdnReachable(req.Fqdn, req.RootCert, port)
 	response.Checks = append(response.Checks, check)
 
 	if req.IsAfterDeployment {
 		if req.NodeType == constants.CHEF_INFRA_SERVER {
-			check = fq.CheckChefServerStatus(req.Fqdn, req.RootCert)
+			check = fq.CheckChefServerStatus(req.Fqdn, req.RootCert, port)
 			response.Checks = append(response.Checks, check)
 		} else if req.NodeType == constants.AUTOMATE {
-			check = fq.CheckAutomateStatus(req.Fqdn, req.RootCert, req.ApiToken)
+			check = fq.CheckAutomateStatus(req.Fqdn, req.RootCert, req.ApiToken, port)
 			response.Checks = append(response.Checks, check)
 		}
 	} else {
-		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes)
+		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, port)
 		response.Checks = append(response.Checks, check)
 
 		check = fq.validateCertificate(req.RootCert)

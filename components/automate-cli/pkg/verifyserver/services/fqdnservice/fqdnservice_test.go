@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 	"time"
 
@@ -212,7 +211,7 @@ func startHTTPSMockServer(mockServer *httptest.Server, port string) error {
 }
 
 func TestCheckFqdnReachability(t *testing.T) {
-	httpsTestPort := 443
+	httpsTestPort := "2345"
 	httpsMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/":
@@ -233,7 +232,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 			http.NotFound(w, r)
 		}
 	}))
-	err := startHTTPSMockServer(httpsMockServer, strconv.Itoa(httpsTestPort))
+	err := startHTTPSMockServer(httpsMockServer, httpsTestPort)
 	assert.NoError(t, err)
 	defer httpsMockServer.Close()
 
@@ -571,14 +570,14 @@ func TestCheckFqdnReachability(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			res := fq.CheckFqdnReachability(e.ReqBody)
+			res := fq.CheckFqdnReachability(e.ReqBody, httpsTestPort)
 			assert.Equal(t, e.ResponseBody, res)
 		})
 	}
 }
 
 func TestCheckStatus_Failure(t *testing.T) {
-	httpsTestPort := 443
+	httpsTestPort := "3345"
 	// Create a test server with a handler that returns a failure response.
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -597,7 +596,7 @@ func TestCheckStatus_Failure(t *testing.T) {
 		}
 	}))
 
-	err := startHTTPSMockServer(server, strconv.Itoa(httpsTestPort))
+	err := startHTTPSMockServer(server, httpsTestPort)
 	assert.NoError(t, err)
 	defer server.Close()
 
@@ -636,9 +635,9 @@ func TestCheckStatus_Failure(t *testing.T) {
 	for _, e := range tests {
 		var checks models.Checks
 		if e.NodeType == constants.CHEF_INFRA_SERVER {
-			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT)
+			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT, httpsTestPort)
 		} else {
-			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN)
+			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN, httpsTestPort)
 		}
 
 		assert.Equal(t, e.ExpectedRes, checks)
@@ -646,7 +645,7 @@ func TestCheckStatus_Failure(t *testing.T) {
 }
 
 func TestUnmarshal_Failure(t *testing.T) {
-	httpsTestPort := 443
+	httpsTestPort := "4345"
 	// Create a test server with a handler that returns a failure response.
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -661,7 +660,7 @@ func TestUnmarshal_Failure(t *testing.T) {
 		}
 	}))
 
-	err := startHTTPSMockServer(server, strconv.Itoa(httpsTestPort))
+	err := startHTTPSMockServer(server, httpsTestPort)
 	assert.NoError(t, err)
 	defer server.Close()
 
@@ -700,9 +699,9 @@ func TestUnmarshal_Failure(t *testing.T) {
 	for _, e := range tests {
 		var checks models.Checks
 		if e.NodeType == constants.CHEF_INFRA_SERVER {
-			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT)
+			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT, httpsTestPort)
 		} else {
-			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN)
+			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN, httpsTestPort)
 		}
 
 		assert.Equal(t, e.ExpectedRes, checks)

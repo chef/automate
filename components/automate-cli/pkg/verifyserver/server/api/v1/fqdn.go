@@ -35,6 +35,6 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 		return
 	}
 
-	res := h.FqdnService.CheckFqdnReachability(*req)
+	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT)
 	return c.JSON(response.BuildSuccessResponse(res))
 }
