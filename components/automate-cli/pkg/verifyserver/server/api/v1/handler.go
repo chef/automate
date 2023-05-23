@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -70,6 +71,11 @@ func (h *Handler) AddS3ConfigService(ss s3configservice.IS3Config) *Handler {
 
 func (h *Handler) AddStopMockServerService(sm stopmockserverservice.IStopMockServerService) *Handler {
 	h.StopMockServersService = sm
+	return h
+}
+
+func (h *Handler) AddSystemUserService(su systemuserservice.SystemUser) *Handler {
+	h.SystemUserService = su
 	return h
 }
 

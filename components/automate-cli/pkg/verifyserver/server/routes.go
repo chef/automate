@@ -27,5 +27,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiStopGroup := apiV1Group.Group("/stop")
 	apiStopGroup.Post("/mock-server", vs.Handler.StopMockServer)
 
+	apiChecksGroup.Get("/system-user", vs.Handler.CheckSystemUser)
+	
 	fiberutils.LogResgisteredRoutes(vs.App.Stack(), vs.Log)
 }

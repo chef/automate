@@ -28,6 +28,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
