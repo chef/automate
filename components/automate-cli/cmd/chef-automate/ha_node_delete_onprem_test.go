@@ -273,7 +273,7 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 	// even though validation will fail still we check if modify config is working as expected or not
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).postgresqlIp[0])
+	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).postgresqlIpList[0])
 	assert.Equal(t, "2", nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
 	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.CertsByIP))
 	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))

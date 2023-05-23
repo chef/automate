@@ -34,7 +34,7 @@ type DeleteNodeOnPremImpl struct {
 	automateIpList          []string
 	chefServerIpList        []string
 	opensearchIpList        []string
-	postgresqlIp            []string
+	postgresqlIpList        []string
 	nodeUtils               NodeOpUtils
 	flags                   AddDeleteNodeHACmdFlags
 	configpath              string
@@ -93,7 +93,7 @@ func (dni *DeleteNodeOnPremImpl) prepare() error {
 }
 
 func (dni *DeleteNodeOnPremImpl) validate() error {
-	dni.automateIpList, dni.chefServerIpList, dni.opensearchIpList, dni.postgresqlIp = splitIPCSV(
+	dni.automateIpList, dni.chefServerIpList, dni.opensearchIpList, dni.postgresqlIpList = splitIPCSV(
 		dni.flags.automateIp,
 		dni.flags.chefServerIp,
 		dni.flags.opensearchIp,
@@ -103,7 +103,7 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 	exceptionIps = append(exceptionIps, dni.automateIpList...)
 	exceptionIps = append(exceptionIps, dni.chefServerIpList...)
 	exceptionIps = append(exceptionIps, dni.opensearchIpList...)
-	exceptionIps = append(exceptionIps, dni.postgresqlIp...)
+	exceptionIps = append(exceptionIps, dni.postgresqlIpList...)
 	updatedConfig, err := dni.nodeUtils.pullAndUpdateConfig(&dni.sshUtil, exceptionIps)
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 	dni.config = *updatedConfig
 	dni.copyConfigForUserPrompt = dni.config
 	if dni.nodeUtils.isManagedServicesOn() {
-		if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIp) > 0 {
+		if len(dni.opensearchIpList) > 0 || len(dni.postgresqlIpList) > 0 {
 			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
 		}
 	}
@@ -152,7 +152,7 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
 	err = modifyConfigForDeleteNode(
 		&dni.config.Postgresql.Config.InstanceCount,
 		&dni.config.ExistingInfra.Config.PostgresqlPrivateIps,
-		dni.postgresqlIp,
+		dni.postgresqlIpList,
 		&dni.config.Postgresql.Config.CertsByIP,
 	)
 	if err != nil {
@@ -179,8 +179,8 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	if len(dni.opensearchIpList) > 0 {
 		dni.writer.Println("OpenSearch => " + strings.Join(dni.opensearchIpList, ", "))
 	}
-	if len(dni.postgresqlIp) > 0 {
-		dni.writer.Println("Postgresql => " + strings.Join(dni.postgresqlIp, ", "))
+	if len(dni.postgresqlIpList) > 0 {
+		dni.writer.Println("Postgresql => " + strings.Join(dni.postgresqlIpList, ", "))
 	}
 	dni.writer.Println("Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.")
 	return dni.writer.Confirm("This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue?")
@@ -204,7 +204,7 @@ func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
 	if !dni.nodeUtils.isManagedServicesOn() {
 		validations = append(validations, []SvcDetailOnPrem{
 			{dni.opensearchIpList, "OpenSearch", OPENSEARCH_MIN_INSTANCE_COUNT, dni.config.Opensearch.Config.InstanceCount, dni.config.ExistingInfra.Config.OpensearchPrivateIps},
-			{dni.postgresqlIp, "Postgresql", POSTGRESQL_MIN_INSTANCE_COUNT, dni.config.Postgresql.Config.InstanceCount, dni.config.ExistingInfra.Config.PostgresqlPrivateIps},
+			{dni.postgresqlIpList, "Postgresql", POSTGRESQL_MIN_INSTANCE_COUNT, dni.config.Postgresql.Config.InstanceCount, dni.config.ExistingInfra.Config.PostgresqlPrivateIps},
 		}...)
 	}
 	for _, v := range validations {
