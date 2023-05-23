@@ -27,6 +27,18 @@ func TestConfigValidateOnPrem(t *testing.T) {
 		t.Fail()
 	})
 
+	t.Run("Test Failed AWS Config Validation", func(t *testing.T) {
+		config := GetTestOnPremFailedSMConfigData()
+
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
 	t.Run("Test Success AWS Config Validation", func(t *testing.T) {
 		config := GetTestAWSConfigData()
 

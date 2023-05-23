@@ -92,7 +92,7 @@ func validateOneOf(msgPrefix string, input string, allowedValues []string) (bool
 
 func checkIPAddress(ip string) error {
 	if net.ParseIP(ip) == nil {
-		return errors.New("ip Address is invalid.")
+		return errors.New("ip Address is invalid")
 	} else {
 		return nil
 	}

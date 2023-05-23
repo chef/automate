@@ -41,6 +41,13 @@ func GetTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	return config
 }
 
+func GetTestOnPremFailedSMConfigData() *config_parser.HAOnPremConfigToml {
+	config := initializeCommonConfig()
+	config.ExternalDB.Database.Type = "self-managed"
+
+	return config
+}
+
 func GetTestOnPremConfigData() *config_parser.HAOnPremConfigToml {
 	config := initializeCommonConfig()
 
@@ -176,6 +183,7 @@ func GetFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 
 	config.Architecture.ConfigInitials.S3BucketName = "failed_s3"
 	config.Automate.Config.EnableCustomCerts = true
+	config.Aws.Config.SetupManagedServices = true
 
 	return config
 }
@@ -193,6 +201,7 @@ func GetAutomateScConfigTestData() *sc.AutomateConfig {
 	c.Deployment.V1.Svc.Origin = w.String("chef")
 	c.Deployment.V1.Svc.PackageCleanupMode = w.String("conservative")
 	c.Deployment.V1.Svc.Products = []string{"automate", "chef-server"}
+	c.Deployment.V1.Svc.ManifestCacheExpiry = w.String("4m")
 
 	return c
 }
@@ -207,6 +216,7 @@ func GetFAiledAutomateScConfigTestData() *sc.AutomateConfig {
 	c.Deployment.V1.Svc.Origin = w.String("12")
 	c.Deployment.V1.Svc.PackageCleanupMode = w.String("xtz")
 	c.Deployment.V1.Svc.Products = []string{"ch", "che"}
+	c.Deployment.V1.Svc.ManifestCacheExpiry = w.String("")
 
 	return c
 }
