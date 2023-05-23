@@ -98,3 +98,38 @@ func TestGetKernalVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestGetCPUSpeed(t *testing.T) {
+	type testCase struct {
+		testCaseDescreption string
+		filepath            string
+		cpuSpeedWant        float64
+		errWant             string
+	}
+
+	testCases := []testCase{
+		{
+			testCaseDescreption: "Valid file path and syntax of file",
+			filepath:            "../../services/systemresourceservice/testfiles/cpuinfo",
+			cpuSpeedWant:        3109.616 / 1000,
+			errWant:             "",
+		},
+		{
+			testCaseDescreption: "Valid file path and syntax of file",
+			filepath:            "../../services/systemresourceservice/testfiles/filenotexist",
+			cpuSpeedWant:        float64(0),
+			errWant:             "open ../../services/systemresourceservice/testfiles/filenotexist: no such file or directory",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
+			cpuSpeedGot, err := GetCPUSpeed(testCase.filepath)
+
+			if err != nil {
+				assert.Equal(t, testCase.errWant, err.Error())
+			}
+			assert.Equal(t, testCase.cpuSpeedWant, cpuSpeedGot)
+		})
+	}
+}
