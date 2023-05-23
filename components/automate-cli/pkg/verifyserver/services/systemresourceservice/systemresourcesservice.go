@@ -35,7 +35,7 @@ const (
 
 	SUCCESS_MSG        = "%s should have free space >=%vGB"
 	ERROR_MSG          = "%s free space is %0.2fGB"
-	SUCCESS_MSG_IN_PER = ` or %v%% of total size of /hab`
+	SUCCESS_MSG_IN_PER = " or %v%% of total size of /hab"
 
 	INVALID_NODE_TYPE_ERR = "given query node_type with value=%s is not supported"
 )
