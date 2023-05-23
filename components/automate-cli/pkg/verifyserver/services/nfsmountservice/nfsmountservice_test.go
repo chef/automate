@@ -85,11 +85,21 @@ var (
 		},
 		Error: nil,
 	}
+	cmdRes = `Filesystem       Size  Used Avail Use% Mounted on
+/dev/root         49G  2.6G   46G   6% /
+tmpfs             16G     0   16G   0% /dev/shm
+tmpfs            6.3G  892K  6.3G   1% /run
+tmpfs            5.0M     0  5.0M   0% /run/lock
+/dev/xvda15      105M  6.1M   99M   6% /boot/efi
+172.31.26.202:/  8.0E     0  8.0E   0% /nfs
+tmpfs            3.2G  4.0K  3.2G   1% /run/user/1000`
 )
 
 func TestNFSMountService(t *testing.T) {
 	testPort := "1234"
-	nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, func(cmd string) ([]byte, error) {
+		return nil, nil
+	})
 	assert.NotNil(t, nm)
 	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{})
 	assert.Equal(t, new([]models.NFSMountResponse), nmDetails)
@@ -212,7 +222,9 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			res, err := NewNFSMountService(logger.NewTestLogger(), testPort).getResultStructFromRespBody(e.Body)
+			res, err := NewNFSMountService(logger.NewTestLogger(), testPort, func(cmd string) ([]byte, error) {
+				return nil, nil
+			}).getResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
 			} else {
@@ -272,7 +284,9 @@ func TestDoAPICall(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			nm := NewNFSMountService(logger.NewTestLogger(), e.Port)
+			nm := NewNFSMountService(logger.NewTestLogger(), e.Port, func(cmd string) ([]byte, error) {
+				return nil, nil
+			})
 			resp, err := nm.doAPICall(e.URL, "/mount-location")
 			if e.ExpectedError != nil {
 				assert.Error(t, err)
@@ -368,7 +382,9 @@ func TestGetNFSMountDetails(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			nm := NewNFSMountService(logger.NewTestLogger(), Testport)
+			nm := NewNFSMountService(logger.NewTestLogger(), Testport, func(cmd string) ([]byte, error) {
+				return nil, nil
+			})
 			resp := nm.GetNFSMountDetails(e.ReqBody)
 			for index, te := range *resp {
 				if e.Response[index].Error != nil {
@@ -471,31 +487,48 @@ func TestMakeRespBody(t *testing.T) {
 func TestGetNFSMountLoc(t *testing.T) {
 	tests := []struct {
 		TestName     string
-		Response     models.NFSMountLocResponse
 		Request      models.NFSMountLocRequest
 		ExpectedBody *models.NFSMountLocResponse
+		CmdRes       bool
 	}{
 		{
-			TestName: "",
-			Response: models.NFSMountLocResponse{
-				Address:       "",
-				Nfs:           "",
-				MountLocation: "/data",
-			},
+			TestName: "Nfs not found",
 			Request: models.NFSMountLocRequest{
 				MountLocation: "/data",
 			},
 			ExpectedBody: &models.NFSMountLocResponse{
-				Address:       "",
-				Nfs:           "",
-				MountLocation: "/data",
+				Address:            "",
+				Nfs:                "",
+				MountLocation:      "/data",
+				StorageCapacity:    "",
+				AvailableFreeSpace: "",
 			},
+			CmdRes: false,
+		},
+		{
+			TestName: "Nfs found",
+			Request: models.NFSMountLocRequest{
+				MountLocation: "/nfs",
+			},
+			ExpectedBody: &models.NFSMountLocResponse{
+				Address:            "172.31.26.202",
+				Nfs:                "172.31.26.202:/",
+				MountLocation:      "/nfs",
+				StorageCapacity:    "8.0E",
+				AvailableFreeSpace: "8.0E",
+			},
+			CmdRes: true,
 		},
 	}
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort, func(cmd string) ([]byte, error) {
+				if e.CmdRes {
+					return []byte(cmdRes), nil
+				}
+				return nil, nil
+			})
 			resp := nm.GetNFSMountLoc(e.Request)
 			assert.Equal(t, e.ExpectedBody, resp)
 		})

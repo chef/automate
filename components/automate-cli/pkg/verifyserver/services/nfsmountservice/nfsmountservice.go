@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -24,8 +25,9 @@ type INFSService interface {
 }
 
 type NFSMountService struct {
-	port string
-	log  logger.Logger
+	ExecuteShellCommandFunc func(cmd string) ([]byte, error)
+	port                    string
+	log                     logger.Logger
 }
 
 type TempResponse struct {
@@ -33,10 +35,11 @@ type TempResponse struct {
 	MountResp   models.NFSMountResponse
 }
 
-func NewNFSMountService(log logger.Logger, port string) *NFSMountService {
+func NewNFSMountService(log logger.Logger, port string, executeShellCommand func(cmd string) ([]byte, error)) *NFSMountService {
 	return &NFSMountService{
-		port: port,
-		log:  log,
+		port:                    port,
+		log:                     log,
+		ExecuteShellCommandFunc: executeShellCommand,
 	}
 }
 
@@ -105,7 +108,12 @@ func (nm *NFSMountService) GetNFSMountLoc(req models.NFSMountLocRequest) *models
 		Nfs:           "",
 		MountLocation: req.MountLocation,
 	}
-	return res
+	output, err := nm.executeCommand()
+	if err != nil {
+		return res
+	}
+	mounts := nm.getMountDetails(output, req.MountLocation)
+	return mounts
 }
 
 func prettyMap(mp map[string]models.NFSMountResponse) string {
@@ -248,5 +256,36 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 		SuccessMsg:    successMsg,
 		ErrorMsg:      errorMsg,
 		ResolutionMsg: resolutionMsg,
+	}
+}
+
+func (nm *NFSMountService) executeCommand() (string, error) {
+	output, err := nm.ExecuteShellCommandFunc(constants.MOUNT_CMD)
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
+func (nm *NFSMountService) getMountDetails(output, mountLocation string) *models.NFSMountLocResponse {
+	lines := strings.Split(output, "\n")
+	// Skip the header line
+	for _, line := range lines[1:] {
+		fields := strings.Fields(line)
+		if len(fields) >= 6 {
+			if fields[5] == mountLocation {
+				addr := strings.Split(fields[0], ":")
+				return &models.NFSMountLocResponse{
+					Address:            addr[0],
+					Nfs:                fields[0],
+					MountLocation:      fields[5],
+					StorageCapacity:    fields[1],
+					AvailableFreeSpace: fields[3],
+				}
+			}
+		}
+	}
+	return &models.NFSMountLocResponse{
+		MountLocation: mountLocation,
 	}
 }

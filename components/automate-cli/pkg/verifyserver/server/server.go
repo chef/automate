@@ -97,7 +97,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
 			))).
-		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
+		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, fiberutils.ExecuteShellCommand)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
 		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).
