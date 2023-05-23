@@ -110,6 +110,7 @@ func (nm *NFSMountService) GetNFSMountLoc(req models.NFSMountLocRequest) *models
 	}
 	output, err := nm.executeCommand()
 	if err != nil {
+		nm.log.Error("Error executing `df -h` command")
 		return res
 	}
 	mounts := nm.getMountDetails(output, req.MountLocation)
@@ -275,6 +276,7 @@ func (nm *NFSMountService) getMountDetails(output, mountLocation string) *models
 		if len(fields) >= 6 {
 			if fields[5] == mountLocation {
 				addr := strings.Split(fields[0], ":")
+				nm.log.Debug("Mount location found")
 				return &models.NFSMountLocResponse{
 					Address:            addr[0],
 					Nfs:                fields[0],
@@ -285,6 +287,8 @@ func (nm *NFSMountService) getMountDetails(output, mountLocation string) *models
 			}
 		}
 	}
+
+	nm.log.Debug("Mount location Not found")
 	return &models.NFSMountLocResponse{
 		MountLocation: mountLocation,
 	}
