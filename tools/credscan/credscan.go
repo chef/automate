@@ -150,6 +150,9 @@ var a2Config = config{
 
 		// Exclude test file for externalopensearchservice with uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/externalopensearchservice/externalopensearchservice_test.go`},
+
+		// Exclude test file for fqdnservice which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/services/fqdnservice/fqdnservice_test.go`},
 	},
 	contentInclude: []pattern{
 		{
