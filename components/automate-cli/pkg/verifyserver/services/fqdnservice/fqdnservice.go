@@ -39,7 +39,8 @@ func (fq *FqdnService) createClient(rootCert string) *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
+				RootCAs:    caCertPool,
+				MinVersion: tls.VersionTLS12,
 			},
 		},
 		Timeout: fq.timeout * time.Second,
