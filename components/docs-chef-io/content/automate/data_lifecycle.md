@@ -43,6 +43,27 @@ The default is to remove Chef Infra Client run data after 30 days, to label node
 The Compliance data lifecycle settings allow you to remove compliance reports and compliance scans after a set amount of days.
 The default is to remove compliance reports after 60 days, and to remove compliance scans after 60 days.
 
+### Max Shards
+
+The max shards is the number of the shards which should be patched to run the data life cycle. If the client run and compliance data lifecycle is set to  30 days, the max shards should be 1000. Patch the following configuration in the `.toml` file to set the max shards data lifecycle.
+
+```bash
+[opensearch]
+[opensearch.v1]
+[opensearch.v1.sys]
+[opensearch.v1.sys.cluster]
+max_shards_per_node = 1000
+```
+
+Refer to the following table for some calculated max shreds with respect to the client run and compliance data lifecycle.
+
+| Days | Max Shred Per Node |
+| ---- | ------------------ |
+| 30   | 1000               |
+| 60   | 1200               |
+| 90   | 1300               |
+| 365  | 12000              |
+
 ## Data Lifecycle API
 
 Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in OpenSearch or PostgreSQL.
