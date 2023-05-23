@@ -45,7 +45,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ### Max Shards
 
-The max shards is the number of the shards which should be patched to run the data life cycle. If the client run and compliance data lifecycle is set to  30 days, the max shards should be 1000. Patch the following configuration in the `.toml` file to set the max shards data lifecycle.
+The max shards are the number of shards that should be patched to run the data life cycle. If the client runs and the compliance data lifecycle is set to  30 days, the max shards should be 1000. Patch the following configuration in the `.toml` file to fix the max shards data lifecycle.
 
 ```bash
 [opensearch]
@@ -55,7 +55,7 @@ The max shards is the number of the shards which should be patched to run the da
 max_shards_per_node = 1000
 ```
 
-Refer to the following table for some calculated max shreds with respect to the client run and compliance data lifecycle.
+Refer to the following table for calculated max shreds for the client run and compliance data lifecycle.
 
 | Days | Max Shred Per Node |
 | ---- | ------------------ |
