@@ -121,6 +121,17 @@ func GetTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	config.Architecture.ConfigInitials.SSHKeyFile = "./pem"
 	config.Architecture.ConfigInitials.BackupMount = "/mnt/"
 	config.Automate.Config.Fqdn = ".com"
+	config.ChefServer.Config.EnableCustomCerts = true
+	config.ChefServer.Config.PrivateKey = "key"
+	config.ChefServer.Config.PublicKey = "key"
+	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
+		{IP: "127.0.0.1", PrivateKey: "key", PublicKey: "key", NodesDn: ""},
+		{IP: "127.0.0.1", PrivateKey: "key", PublicKey: "key", NodesDn: ""},
+	}
+	config.ExistingInfra.Config.AutomatePrivateIps = []string{}
+	config.ExistingInfra.Config.ChefServerPrivateIps = []string{}
+	config.ExistingInfra.Config.OpensearchPrivateIps = []string{"11", "12.1"}
+	config.ExistingInfra.Config.PostgresqlPrivateIps = []string{"12.1", "127.0.0.1"}
 
 	config.Architecture.ConfigInitials.SecretsStoreFile = ""
 	config.Architecture.ConfigInitials.Architecture = ""
@@ -258,6 +269,27 @@ func GetFailedTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	config := GetTestAWSConfigData()
 	config.Architecture.ConfigInitials.SSHKeyFile = "./pem"
 	config.Automate.Config.Fqdn = " "
+	config.ChefServer.Config.EnableCustomCerts = true
+	config.ChefServer.Config.PrivateKey = "chef_private_key"
+	config.ChefServer.Config.PublicKey = "chef_public_key"
+	config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
+		{IP: "127.0.0.1", PrivateKey: "chef_private_key", PublicKey: "public_key", NodesDn: "test.com"},
+		{IP: "127.0.0.1", PrivateKey: "private_key", PublicKey: "chef_public_key", NodesDn: "test.co"},
+	}
+	config.Aws.Config.Profile = ""
+	config.Aws.Config.Region = ""
+	config.Aws.Config.AwsVpcId = ""
+	config.Aws.Config.AwsCidrBlockAddr = "block"
+	config.Aws.Config.PrivateCustomSubnets = []string{}
+	config.Aws.Config.PublicCustomSubnets = []string{}
+	config.Aws.Config.AmiID = ""
+	config.Aws.Config.LBAccessLogs = "34"
+	config.Aws.Config.AutomateServerInstanceType = ""
+	config.Aws.Config.ChefServerInstanceType = ""
+	config.Aws.Config.OpensearchServerInstanceType = ""
+	config.Aws.Config.PostgresqlServerInstanceType = "454"
+	config.Aws.Config.AutomateLbCertificateArn = ""
+	config.Aws.Config.ChefServerLbCertificateArn = ""
 
 	config.Architecture.ConfigInitials.SecretsKeyFile = ""
 	config.Architecture.ConfigInitials.SecretsStoreFile = ""
