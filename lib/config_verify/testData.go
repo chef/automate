@@ -190,20 +190,23 @@ func GetAutomateScConfigTestData() *sc.AutomateConfig {
 	c.Deployment.V1.Svc.UpgradeStrategy = w.String("at-once")
 	c.Deployment.V1.Svc.AdminUser.Username = w.String("cowboy")
 	c.Deployment.V1.Svc.AdminUser.Password = w.String("ponies")
+	c.Deployment.V1.Svc.Origin = w.String("chef")
+	c.Deployment.V1.Svc.PackageCleanupMode = w.String("conservative")
+	c.Deployment.V1.Svc.Products = []string{"automate", "chef-server"}
 
 	return c
 }
 
 func GetFAiledAutomateScConfigTestData() *sc.AutomateConfig {
-
-	c := sc.NewAutomateConfig()
+	c := GetAutomateScConfigTestData()
 	c.Global.V1.Fqdn = w.String(".com")
-	c.Global.V1.FrontendTls = validTLSCredentialSliceForTest()
 	c.Deployment.V1.Svc.DeploymentType = w.String("test")
 	c.Deployment.V1.Svc.Channel = w.String("none")
-	c.Deployment.V1.Svc.UpgradeStrategy = w.String("at-once")
-	c.Deployment.V1.Svc.AdminUser.Username = w.String("cowboy")
-	c.Deployment.V1.Svc.AdminUser.Password = w.String("ponies")
+	c.Deployment.V1.Svc.AdminUser.Username = w.String("")
+	c.Deployment.V1.Svc.AdminUser.Password = w.String("")
+	c.Deployment.V1.Svc.Origin = w.String("12")
+	c.Deployment.V1.Svc.PackageCleanupMode = w.String("xtz")
+	c.Deployment.V1.Svc.Products = []string{"ch", "che"}
 
 	return c
 }
