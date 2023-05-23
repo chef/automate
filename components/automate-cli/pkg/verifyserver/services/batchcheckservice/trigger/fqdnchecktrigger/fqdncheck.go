@@ -44,15 +44,15 @@ func getRequestsForFqdn(config models.Config) []models.NodeIpRequest {
 		IsAfterDeployment = true
 	}
 
-	nodeIpRequestList = append(nodeIpRequestList, getNodeRequests(config.Hardware.AutomateNodeIps, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, IsAfterDeployment)...)
+	nodeIpRequestList = append(nodeIpRequestList, getNodeRequests(config.Hardware.AutomateNodeIps, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, IsAfterDeployment, config.APIToken)...)
 
-	nodeIpRequestList = append(nodeIpRequestList, getNodeRequests(config.Hardware.ChefInfraServerNodeIps, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, IsAfterDeployment)...)
+	nodeIpRequestList = append(nodeIpRequestList, getNodeRequests(config.Hardware.ChefInfraServerNodeIps, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, IsAfterDeployment, config.APIToken)...)
 
 	return nodeIpRequestList
 }
 
 // getNodeRequests get the request with the node id and node type
-func getNodeRequests(nodeIps []string, nodeType string, rootcert string, fqdn string, isAfterDeployment bool) []models.NodeIpRequest {
+func getNodeRequests(nodeIps []string, nodeType string, rootcert string, fqdn string, isAfterDeployment bool, apiToken string) []models.NodeIpRequest {
 	var nodeIpRequestList []models.NodeIpRequest
 	for _, ip := range nodeIps {
 		fqdnReq := models.FqdnRequest{
@@ -60,6 +60,8 @@ func getNodeRequests(nodeIps []string, nodeType string, rootcert string, fqdn st
 			RootCert:          rootcert,
 			IsAfterDeployment: isAfterDeployment,
 			Nodes:             []string{ip},
+			NodeType:          nodeType,
+			ApiToken:          apiToken,
 		}
 
 		nodeIpRequest := models.NodeIpRequest{

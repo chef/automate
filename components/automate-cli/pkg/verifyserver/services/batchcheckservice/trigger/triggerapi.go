@@ -1,10 +1,8 @@
 package trigger
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -50,47 +48,6 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	}
 
 	for i := 0; i < count; i++ {
-		select {
-		case res := <-outputCh:
-			result = append(result, res)
-		}
-	}
-
-	return result
-}
-
-// RunCheckOnSpecifiedNodes triggers the API on gives node ips only, requires for various API's like S3/Minio backup config
-func RunCheckOnSpecifiedNode(nodeIps []string, log logger.Logger, port string, path string, nodeType string, method string, reqBody interface{}) []models.CheckTriggerResponse {
-	log.Debugf("Triggering the api call for specified nodes only")
-	outputCh := make(chan models.CheckTriggerResponse)
-	for _, ip := range nodeIps {
-		log.Debugf("Triggering api %s for the node %s", path, ip)
-		endpoint := prepareEndpoint(path, ip, port, nodeType, "")
-		go triggerCheckAPI(endpoint, ip, nodeType, outputCh, method, reqBody)
-	}
-
-	return getResultFromOutputChan(len(nodeIps), outputCh)
-}
-
-// RunCheckWithEndPointSpecified triggers the API on given endpoint with node ip, node type
-func RunCheckWithEndPointSpecified(endPoint string, log logger.Logger, reqList []models.NodeIpRequest, method string) []models.CheckTriggerResponse {
-	log.Debugf("Triggering the api call for specified nodes only")
-
-	outputCh := make(chan models.CheckTriggerResponse)
-
-	for _, req := range reqList {
-		log.Debugf("Triggering api on enpoint %s for the node %s", endPoint, req.NodeIP)
-		go triggerCheckAPI(endPoint, req.NodeIP, req.NodeType, outputCh, method, req.Request)
-
-	}
-
-	return getResultFromOutputChan(len(reqList), outputCh)
-}
-
-func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerResponse) []models.CheckTriggerResponse {
-	var result []models.CheckTriggerResponse
-
-	for i := 0; i < reqList; i++ {
 		select {
 		case res := <-outputCh:
 			result = append(result, res)
@@ -209,18 +166,4 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	ctr.Host = host
 	ctr.NodeType = nodeType
 	output <- ctr
-}
-
-func interfaceToIOReader(body interface{}) (io.Reader, error) {
-	var reader io.Reader
-	if body != nil {
-		bx, err := json.Marshal(body)
-		if err != nil {
-			return nil, err
-		}
-
-		reader = bytes.NewBuffer(bx)
-
-	}
-	return reader, nil
 }
