@@ -1,6 +1,6 @@
 package response
 
-import "github.com/gofiber/fiber"
+import "github.com/gofiber/fiber/v2"
 
 const (
 	SUCCESS = "SUCCESS"
