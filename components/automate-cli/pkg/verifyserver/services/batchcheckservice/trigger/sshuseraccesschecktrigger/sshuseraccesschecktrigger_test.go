@@ -3,6 +3,7 @@ package sshuseraccesschecktrigger
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -164,7 +165,17 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		request := GetRequestJson()
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.SShUserRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
 
+			sshRequest := GetSshRequest()
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.PrivateKey, sshRequest.PrivateKey)
+			assert.Equal(t, actualRequest.Username, sshRequest.Username)
+			assert.Equal(t, actualRequest.SudoPassword, sshRequest.SudoPassword)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(sshCheckSuccessResp))
 		}))
@@ -200,6 +211,17 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 	t.Run("Failure response", func(t *testing.T) {
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.SShUserRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			sshRequest := GetSshRequest()
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.PrivateKey, sshRequest.PrivateKey)
+			assert.Equal(t, actualRequest.Username, sshRequest.Username)
+			assert.Equal(t, actualRequest.SudoPassword, sshRequest.SudoPassword)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(sshCheckFailureResp))
 		}))

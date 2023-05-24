@@ -3,6 +3,7 @@ package certificatechecktrigger
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -233,14 +234,14 @@ func GetRequestJson() models.Config {
 }
 
 func GetCertificateRequest() models.CertificateCheckRequest {
-	req := models.CertificateCheckRequest{}
-	json.Unmarshal([]byte(`{
-		"RootCertificate": "---- VALID ROOT CA ----",
-		"PrivateKey": "---- VALID PRIVATE KEY ----",
-		"NodeCertificate": "---- VALID NODE CERT ----",
-		"AdminPrivateKey": "---- VALID ADMIN PRIVATE KEY ----",
-		"AdminCertificate": "---- VALID ADMIN CERT ----"
-	 }`), &req)
+	req := models.CertificateCheckRequest{
+		AdminPrivateKey:  "---- VALID ADMIN PRIVATE KEY ----",
+		PrivateKey:       "---- VALID PRIVATE KEY ----",
+		NodeCertificate:  "---- VALID NODE CERT ----",
+		RootCertificate:  "---- VALID ROOT CA ----",
+		AdminCertificate: "---- VALID ADMIN CERT ----",
+	}
+
 	return req
 }
 
@@ -269,6 +270,18 @@ func TestCertificateCheck_Run(t *testing.T) {
 		request := GetRequestJson()
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.CertificateCheckRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			certificateRequest := GetCertificateRequest()
+
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.NodeCertificate, certificateRequest.NodeCertificate)
+			assert.Equal(t, actualRequest.AdminCertificate, certificateRequest.AdminCertificate)
+			assert.NotNil(t, actualRequest)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(certificateCheckSuccessResp))
 		}))
@@ -301,6 +314,18 @@ func TestCertificateCheck_Run(t *testing.T) {
 		request := GetRequestJson()
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.CertificateCheckRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			certificateRequest := GetCertificateRequest()
+
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.NodeCertificate, certificateRequest.NodeCertificate)
+			assert.Equal(t, actualRequest.AdminCertificate, certificateRequest.AdminCertificate)
+			assert.NotNil(t, actualRequest)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(certificateCheckSuccessResp))
 		}))
@@ -346,6 +371,18 @@ func TestCertificateCheck_Run(t *testing.T) {
 	t.Run("Failure response", func(t *testing.T) {
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.CertificateCheckRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			certificateRequest := GetCertificateRequest()
+
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.NodeCertificate, certificateRequest.NodeCertificate)
+			assert.Equal(t, actualRequest.AdminCertificate, certificateRequest.AdminCertificate)
+			assert.NotNil(t, actualRequest)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(certificateCheckFailureResp))
 		}))
@@ -381,6 +418,18 @@ func TestCertificateCheck_Run(t *testing.T) {
 
 	t.Run("Returns error", func(t *testing.T) {
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.CertificateCheckRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			certificateRequest := GetCertificateRequest()
+
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.NodeCertificate, certificateRequest.NodeCertificate)
+			assert.Equal(t, actualRequest.AdminCertificate, certificateRequest.AdminCertificate)
+			assert.NotNil(t, actualRequest)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`invalid JSON`))
 		}))
@@ -402,6 +451,18 @@ func TestCertificateCheck_Run(t *testing.T) {
 	})
 	t.Run("Returns 500 Internal server error", func(t *testing.T) {
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.CertificateCheckRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			certificateRequest := GetCertificateRequest()
+
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.NodeCertificate, certificateRequest.NodeCertificate)
+			assert.Equal(t, actualRequest.AdminCertificate, certificateRequest.AdminCertificate)
+			assert.NotNil(t, actualRequest)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`invalid JSON`))
 		}))
