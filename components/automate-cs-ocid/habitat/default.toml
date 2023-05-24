@@ -39,7 +39,7 @@ pool_init_size=5
 pool_queue_max=50
 
 [ocid]
-  [chef_server_config]
+  [ocid.chef_server_config]
     endpoint="https://127.0.0.1:443"
     superuser="pivotal"
     # By default the certificate verification is disabled for chef-server(erchef)
