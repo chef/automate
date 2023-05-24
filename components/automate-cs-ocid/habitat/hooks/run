@@ -27,6 +27,6 @@ export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
 bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
-bundle exec bin/thin start -p 9090 --ssl --ssl-key-file {{pkg.svc_config_path}}/service.key --ssl-cert-file {{pkg.svc_config_path}}/service.crt
+bundle exec bin/unicorn -p "{{cfg.network.port}}"
 
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
