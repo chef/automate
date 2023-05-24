@@ -627,3 +627,65 @@ func TestFirewallCheck_Run(t *testing.T) {
 
 	}
 }
+
+func TestTriggerFirewallAPI(t *testing.T) {
+	request := models.FirewallRequest{
+		SourceNodeIP:      "test",
+		DestinationNodeIP: "testdest",
+	}
+	t.Run("Endpoint not reachable", func(t *testing.T) {
+		endPoint := "http://nonexistent-api.com"
+		host := "example.com"
+		output := make(chan models.CheckTriggerResponse)
+
+		// Call the function under test
+		go triggerFirewallAPI(endPoint, host, constants.AUTOMATE, http.MethodPost, output, request)
+
+		// Wait for the response
+		response := <-output
+
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
+		assert.Contains(t, response.Error.Message, `"http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com`)
+		require.Equal(t, "automate", response.NodeType)
+
+	})
+	t.Run("Non-OK status code", func(t *testing.T) {
+		// Create a test server to mock the API endpoint
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Return a non-OK status code
+			w.WriteHeader(http.StatusBadRequest)
+		}))
+		defer server.Close()
+
+		output := make(chan models.CheckTriggerResponse)
+
+		// Call the function under test
+		go triggerFirewallAPI(server.URL+constants.FIREWALL_API_PATH, server.URL, constants.AUTOMATE, http.MethodPost, output, request)
+
+		// Wait for the response
+		response := <-output
+
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		assert.Equal(t, http.StatusBadRequest, response.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
+	})
+
+	t.Run("Request creation error", func(t *testing.T) {
+		endPoint := "http://example.com/api/v1/checks/firewall"
+		host := "example.com"
+		output := make(chan models.CheckTriggerResponse)
+
+		// Call the function under test
+
+		go triggerFirewallAPI(endPoint, host, constants.AUTOMATE, http.MethodPost, output, request)
+		// Wait for the response
+		response := <-output
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		require.Equal(t, http.StatusNotFound, response.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
+	})
+}
