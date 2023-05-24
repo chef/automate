@@ -3,7 +3,6 @@ package stopmockserverservice_test
 import (
 	"context"
 	"errors"
-	"net"
 	"testing"
 	"time"
 
@@ -12,6 +11,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/chef/automate/lib/tcp"
+	"github.com/chef/automate/lib/udp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -127,63 +128,28 @@ func StartServer(protocol string, port int, cert string, key string, l logger.Lo
 }
 
 func ErrorForServer(protocol string, port int) *models.Server {
+	mockTCPListener := &tcp.MockTCPListener{
+		CloseFunc: func() error {
+			return errors.New("Error while shutting TCP server")
+		},
+	}
+	mockUDPListener := &udp.MockUDPListener{
+		CloseFunc: func() error {
+			return errors.New("Error while shutting UDP server")
+		},
+	}
+	mockHTTPSServer := &stopmockserverservice.MockHTTPSServer{
+		ShutdownFunc: func(ctx context.Context) error {
+			return errors.New("Error while shutting HTTPs server")
+		},
+	}
 	signalChan := make(chan bool, 1)
 	return &models.Server{
 		Port:         port,
-		ListenerTCP:  &MockTCPListener{},
-		ListenerUDP:  &MockUDPListener{},
-		ListenerHTTP: &MockHTTPSServer{},
+		ListenerTCP:  mockTCPListener,
+		ListenerUDP:  mockUDPListener,
+		ListenerHTTP: mockHTTPSServer,
 		SignalChan:   signalChan,
 		Protocol:     protocol,
 	}
-}
-
-type MockTCPListener struct{}
-
-func (l *MockTCPListener) Accept() (net.Conn, error) {
-	return nil, nil
-}
-
-func (l *MockTCPListener) Close() error {
-	return errors.New("Error while shutting TCP server")
-}
-
-func (l *MockTCPListener) Addr() net.Addr {
-	return nil
-}
-
-type MockUDPListener struct{}
-
-func (l *MockUDPListener) Close() error {
-	return errors.New("Error while shutting UDP server")
-}
-
-func (l *MockUDPListener) ReadFrom(p []byte) (n int, addr net.Addr, err error) {
-	return 0, nil, nil
-}
-
-func (l *MockUDPListener) WriteTo(p []byte, addr net.Addr) (n int, err error) {
-	return 0, nil
-}
-
-func (l *MockUDPListener) LocalAddr() net.Addr {
-	return nil
-}
-
-func (l *MockUDPListener) SetDeadline(t time.Time) error {
-	return nil
-}
-
-func (l *MockUDPListener) SetReadDeadline(t time.Time) error {
-	return nil
-}
-
-func (l *MockUDPListener) SetWriteDeadline(t time.Time) error {
-	return nil
-}
-
-type MockHTTPSServer struct{}
-
-func (s *MockHTTPSServer) Shutdown(ctx context.Context) error {
-	return errors.New("Error while shutting HTTPs server")
 }

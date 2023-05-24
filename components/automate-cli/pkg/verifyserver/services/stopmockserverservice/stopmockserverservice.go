@@ -41,6 +41,7 @@ func (sm *StopMockServerService) StopMockServer(server *models.Server) error {
 }
 
 func (sm *StopMockServerService) StopTCPServer(server *models.Server) error {
+	defer close(server.SignalChan)
 	sm.Logger.Info("Stop TCP server request recieved")
 	server.SignalChan <- true
 	if err := server.ListenerTCP.Close(); err != nil {
@@ -52,6 +53,7 @@ func (sm *StopMockServerService) StopTCPServer(server *models.Server) error {
 }
 
 func (sm *StopMockServerService) StopUDPServer(server *models.Server) error {
+	defer close(server.SignalChan)
 	sm.Logger.Info("Stop UDP server request recieved")
 	server.SignalChan <- true
 	if err := server.ListenerUDP.Close(); err != nil {

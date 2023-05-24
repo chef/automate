@@ -3,7 +3,8 @@ package v1_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
+
 	"net/http/httptest"
 	"testing"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,7 +59,7 @@ func SetupStopMockServerHandlers(sm stopmockserverservice.IStopMockServerService
 	if err != nil {
 		return nil, err
 	}
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
@@ -97,7 +98,7 @@ func TestStopMockServerAPI(t *testing.T) {
 		{
 			description:  "400:bad request",
 			expectedCode: 400,
-			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Stop mock server request body parsing failed: invalid character '\\\\n' in string literal\"}}",
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Invalid Body Request\"}}",
 			protocol:     constants.UDP,
 			reqBody: `{
 				"port": 5431,
@@ -137,7 +138,7 @@ func TestStopMockServerAPI(t *testing.T) {
 		{
 			description:  "500:error while shutting server down",
 			expectedCode: 500,
-			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Error while stoppping server: Error while shutting down the server\"}}",
+			expectedBody: "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Error while shutting down the server\"}}",
 			protocol:     constants.TCP,
 			reqBody: `{
 				"port": 1234,
@@ -168,7 +169,7 @@ func TestStopMockServerAPI(t *testing.T) {
 		req.Header.Add("Content-Type", "application/json")
 		res, err := app.Test(req, -1)
 		assert.NoError(t, err)
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		assert.NoError(t, err, test.description)
 		assert.Contains(t, string(body), test.expectedBody)
 		assert.Equal(t, test.expectedCode, res.StatusCode)
