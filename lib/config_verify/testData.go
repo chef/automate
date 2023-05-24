@@ -336,18 +336,18 @@ func GetAutomateScConfigTestData() *sc.AutomateConfig {
 }
 
 func GetFAiledAutomateScConfigTestData() *sc.AutomateConfig {
-	c_failed := GetAutomateScConfigTestData()
-	c_failed.Global.V1.Fqdn = w.String(".com")
-	c_failed.Deployment.V1.Svc.DeploymentType = w.String("test")
-	c_failed.Deployment.V1.Svc.Channel = w.String("none")
-	c_failed.Deployment.V1.Svc.AdminUser.Username = w.String("")
-	c_failed.Deployment.V1.Svc.AdminUser.Password = w.String("")
-	c_failed.Deployment.V1.Svc.Origin = w.String("12")
-	c_failed.Deployment.V1.Svc.PackageCleanupMode = w.String("xtz")
-	c_failed.Deployment.V1.Svc.Products = []string{"ch", "che"}
-	c_failed.Deployment.V1.Svc.ManifestCacheExpiry = w.String("")
+	cFailed := GetAutomateScConfigTestData()
+	cFailed.Global.V1.Fqdn = w.String(".com")
+	cFailed.Deployment.V1.Svc.DeploymentType = w.String("test")
+	cFailed.Deployment.V1.Svc.Channel = w.String("none")
+	cFailed.Deployment.V1.Svc.AdminUser.Username = w.String("")
+	cFailed.Deployment.V1.Svc.AdminUser.Password = w.String("")
+	cFailed.Deployment.V1.Svc.Origin = w.String("12")
+	cFailed.Deployment.V1.Svc.PackageCleanupMode = w.String("xtz")
+	cFailed.Deployment.V1.Svc.Products = []string{"ch", "che"}
+	cFailed.Deployment.V1.Svc.ManifestCacheExpiry = w.String("")
 
-	return c_failed
+	return cFailed
 }
 
 func validTLSCredentialForTest() *shared.FrontendTLSCredential {
