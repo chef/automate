@@ -49,6 +49,23 @@ const (
 		}
 	  }`
 
+	automatePgFailureResponse = `
+	{
+			"status": "SUCCESS",
+			"result": {
+			  "passed": false,
+			  "checks": [
+				{
+				  "title": "Check for reachability of service at destination port",
+				  "passed": false,
+				  "success_msg": "",
+				  "error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+				  "resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+				}
+			  ]
+			}
+		  }
+	`
 	apiTriggerAutomatePgPass = `[
 		{
 			"status": "SUCCESS",
@@ -189,6 +206,145 @@ const (
 	]
 	 `
 
+	apiTriggerFailureResponse = `[
+		{
+			"status": "SUCCESS",
+			"host": "10.0.0.1",
+			"node_type": "automate",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		},
+		{
+			"status": "SUCCESS",
+			"host": "127.0.0.1",
+			"node_type": "bastion",
+			"result": {
+				"passed": false,
+				"checks": [
+					{
+						"title": "Check for reachability of service at destination port",
+						"passed": false,
+						"success_msg": "",
+						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
+						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
+					}
+				]
+			}
+		}
+	]`
+
 	apiTriggerInvalidParsedResponse = `{
 		"status": "SUCCESS",
 		"host": "10.0.0.1",
@@ -275,7 +431,7 @@ func TestMakeRequests(t *testing.T) {
 }
 
 // Helper function to create a dummy server
-func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseResponse bool) (*httptest.Server, string, string) {
+func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseResponse bool, isFailed bool) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == constants.FIREWALL_API_PATH {
@@ -292,6 +448,9 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 					w.WriteHeader(http.StatusOK)
 					w.Write([]byte(apiTriggerInvalidParsedResponse))
 
+				} else if isFailed {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(automatePgFailureResponse))
 				} else {
 					w.WriteHeader(http.StatusOK)
 					w.Write([]byte(automatepgTcpPass))
@@ -334,6 +493,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 		httpStatusCode       int
 		isError              bool
 		invalidParseResponse bool
+		isFailed             bool
 	}{
 		{
 			name: "Automate Pg Passed",
@@ -350,6 +510,24 @@ func TestFirewallCheck_Run(t *testing.T) {
 				},
 			},
 			response:       apiTriggerAutomatePgPass,
+			httpStatusCode: http.StatusOK,
+		},
+		{
+			name: "Automate Pg failure",
+			args: args{
+				config: models.Config{
+					Hardware: models.Hardware{
+						AutomateNodeIps:   []string{"10.0.0.1"},
+						PostgresqlNodeIps: []string{"10.0.0.3"},
+					},
+					Certificate: models.Certificate{
+						RootCert: "test-cert",
+						Nodes:    nodes,
+					},
+				},
+			},
+			isFailed:       true,
+			response:       apiTriggerFailureResponse,
 			httpStatusCode: http.StatusOK,
 		},
 		{
@@ -389,13 +567,31 @@ func TestFirewallCheck_Run(t *testing.T) {
 			httpStatusCode:       http.StatusOK,
 			isError:              true,
 			invalidParseResponse: true,
+		}, {
+			name: "Status Bad Request",
+			args: args{
+				config: models.Config{
+					Hardware: models.Hardware{
+						AutomateNodeIps:   []string{"10.0.0.1"},
+						PostgresqlNodeIps: []string{"10.0.0.3"},
+					},
+					Certificate: models.Certificate{
+						RootCert: "test-cert",
+						Nodes:    nodes,
+					},
+				},
+			},
+			response:             "error while connecting to the endpoint, received invalid status code",
+			httpStatusCode:       http.StatusBadRequest,
+			isError:              true,
+			invalidParseResponse: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				// Create a dummy server
-				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse)
+				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed)
 				defer server.Close()
 
 				fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), port)
@@ -405,7 +601,11 @@ func TestFirewallCheck_Run(t *testing.T) {
 				if tt.isError {
 					assert.NotNil(t, got[0].Error)
 					assert.Contains(t, got[0].Error.Error(), tt.response)
-					assert.Equal(t, got[0].Error.Code, http.StatusInternalServerError)
+					if tt.httpStatusCode == http.StatusBadRequest {
+						assert.Equal(t, got[0].Error.Code, tt.httpStatusCode)
+					} else {
+						assert.Equal(t, got[0].Error.Code, http.StatusInternalServerError)
+					}
 					for i := range got {
 						assert.NotNil(t, got[i].NodeType)
 						assert.NotNil(t, got[i].Host)
