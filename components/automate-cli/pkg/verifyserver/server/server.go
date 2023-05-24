@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ansrivas/fiberprometheus"
+	"github.com/ansrivas/fiberprometheus/v2"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
@@ -14,16 +14,16 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
-	"github.com/gofiber/fiber/middleware"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,7 +58,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 
 	l.Info("Using TimeZone: " + fiberutils.CfgLogTimeZone())
 
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
@@ -112,7 +112,7 @@ func (vs *VerifyServer) Setup(isMetricsRequired bool) {
 	vs.App.Use(cors.New())
 
 	// Define middleware to log all requests
-	vs.App.Use(middleware.Logger(fiberutils.GetLogConfig(vs.Log)))
+	vs.App.Use(fiberlogger.New(fiberutils.GetLogConfig(vs.Log)))
 
 	// Added this condition to avoid error "duplicate metrics collector registration attempted"
 	if isMetricsRequired {

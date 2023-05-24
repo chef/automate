@@ -5,15 +5,14 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handler) HardwareResourceCount(c *fiber.Ctx) {
+func (h *Handler) HardwareResourceCount(c *fiber.Ctx) error {
 	req := new(models.Hardware)
 	if err := c.BodyParser(req); err != nil {
 		h.Logger.Error(err.Error())
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Invalid Body Request"})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
 
 	if req.AutomateNodeCount != len(req.AutomateNodeIps) ||
@@ -21,9 +20,8 @@ func (h *Handler) HardwareResourceCount(c *fiber.Ctx) {
 		req.PostgresqlNodeCount != len(req.PostgresqlNodeIps) ||
 		req.OpenSearchNodeCount != len(req.OpenSearchNodeIps) {
 		h.Logger.Error("Node Count and length of Node Ips should be equal.")
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Node Count and length of Node Ips should be equal."})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Node Count and length of Node Ips should be equal.")
 	}
 	res := h.HardwareResourceCountService.GetHardwareResourceCount(*req)
-	c.JSON(response.BuildSuccessResponse(res))
+	return c.JSON(response.BuildSuccessResponse(res))
 }

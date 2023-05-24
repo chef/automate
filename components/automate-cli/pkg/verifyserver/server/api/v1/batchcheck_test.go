@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -74,7 +74,7 @@ func SetupHandlers(ss batchcheckservice.IBatchCheckService) (*fiber.App, error) 
 	if err != nil {
 		return nil, err
 	}
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}

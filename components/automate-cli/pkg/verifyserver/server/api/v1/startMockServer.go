@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handler) StartMockServer(c *fiber.Ctx) {
+func (h *Handler) StartMockServer(c *fiber.Ctx) error {
 
 	reqBody := new(models.StartMockServerRequestBody)
 	err := c.BodyParser(&reqBody)
@@ -18,23 +18,20 @@ func (h *Handler) StartMockServer(c *fiber.Ctx) {
 	if err != nil {
 		errString := fmt.Sprintf("start mock-server request body parsing failed: %v", err.Error())
 		h.Logger.Error(fmt.Errorf(errString))
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Invalid request body"})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Invalid request body")
 	}
 
 	// If port number is invalid
 	err = validatePortRange(reqBody.Port, h)
 	if err != nil {
 		h.Logger.Error(err)
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Invalid port number"})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Invalid port number")
 	}
 
 	// Server is already running in the port
 	if err = validatePortAlreadyInUse(reqBody.Port, h); err != nil {
 		h.Logger.Error(err)
-		c.Next(&fiber.Error{Code: http.StatusConflict, Message: fmt.Sprintf(`"%s" server is already running on port %d`, reqBody.Protocol, reqBody.Port)})
-		return
+		return fiber.NewError(http.StatusConflict, fmt.Sprintf(`"%s" server is already running on port %d`, reqBody.Protocol, reqBody.Port))
 	}
 
 	err = h.MockServersService.StartMockServer(reqBody)
@@ -42,9 +39,10 @@ func (h *Handler) StartMockServer(c *fiber.Ctx) {
 	if err != nil {
 		errString := fmt.Sprintf("start mock-server request failed. Error: %v", err.Error())
 		h.Logger.Error(fmt.Errorf(errString))
-		c.Next(&fiber.Error{Code: http.StatusInternalServerError, Message: err.Error()})
-		return
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
+
+	return nil
 }
 
 func validatePortRange(requestBodyPort int, h *Handler) error {

@@ -1,6 +1,6 @@
 package models
 
-import "github.com/gofiber/fiber"
+import "github.com/gofiber/fiber/v2"
 
 type BatchCheckRequest struct {
 	Checks []string `json:"checks"`
