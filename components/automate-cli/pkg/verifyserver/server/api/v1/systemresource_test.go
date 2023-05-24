@@ -1,7 +1,6 @@
 package v1_test
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http/httptest"
@@ -117,8 +116,8 @@ func TestSystemResourceAPI(t *testing.T) {
 			testCaseDescreption: "400:WrongQuery | deployment_state",
 			responseBody:        nil,
 			expectedCode:        400,
-			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"given query deployment_state with value=InvalidDepState is not supported\"}}",
-			expectedError:       errors.New("given query deployment_state with value=InvalidDepState is not supported"),
+			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'deployment_state' are pre-deploy,post-deploy\"}}",
+			expectedError:       fmt.Errorf(`Unsupported query or missing query. Expected values for query 'deployment_state' are %s,%s`, constants.PRE_DEPLOY, constants.POST_DEPLOY),
 			nodeType:            "automate",
 			deploymentState:     "InvalidDepState",
 		},
@@ -126,8 +125,8 @@ func TestSystemResourceAPI(t *testing.T) {
 			testCaseDescreption: "400:WrongQuery | nodeType",
 			responseBody:        nil,
 			expectedCode:        400,
-			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"given query node_type with value=wrongnode is not supported\"}}",
-			expectedError:       errors.New("given query node_type with value=wrongnode is not supported"),
+			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'node_type' are automate,chef-infra-server,postgresql,opensearch,bastion\"}}",
+			expectedError:       fmt.Errorf(`Unsupported query or missing query. Expected values for query 'node_type' are %s,%s,%s,%s,%s`, constants.AUTOMATE, constants.CHEF_INFRA_SERVER, constants.POSTGRESQL, constants.OPENSEARCH, constants.BASTION),
 			nodeType:            "wrongnode",
 			deploymentState:     "pre-deploy",
 		},
