@@ -27,13 +27,3 @@ func TestGetNumberOfCPU(t *testing.T) {
 		})
 	}
 }
-
-func TestGetCPUSpeed(t *testing.T) {
-	// sysOsUtil := NewGetOsAndFileSystemInfo()
-	//cpu info file content is required
-}
-
-func TestGetMemory(t *testing.T) {
-	// sysOsUtil := NewGetOsAndFileSystemInfo()
-	// cpuSpeed,err := sysOsUtil.GetCPUSpeed()
-}

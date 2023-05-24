@@ -114,7 +114,7 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 
 func (srs *SystemResourcesService) GetCpuCountCheck() *models.Checks {
 	srs.logger.Debug("CPU count check is running")
-	cpuCount := srs.GetOsAndFileSystemInfo.GetNumberOfCPU() //need to find better way for unit test
+	cpuCount := srs.GetOsAndFileSystemInfo.GetNumberOfCPU()
 	srs.logger.Debug("CPU count is : ", cpuCount)
 
 	var checkResp *models.Checks
