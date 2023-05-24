@@ -64,7 +64,9 @@ Ensure access for the backup type used:
 
 {{< note >}}
 
-- If you are restoring the backup from an older version, then you need to provide the `--airgap-bundle </path/to/current/bundle>`.
+- If you are restoring the backup taken from an older version of Automate, then you need to provide the `--airgap-bundle </path/to/current/bundle>` with your restore command.
+
+In non-airgapped or Internet-connected environment, user can create airgap-bundle using `chef-automate airgap-bundle create --version <CURRENT_INSTALLED_VERSION>` command.
 
 {{< /note >}}
 
@@ -148,6 +150,7 @@ sudo chef-automate backup fix-repo-permissions <path>
 {{< note >}}
 
 - If you have not configured S3 access and secret keys during deployment or if you have taken backup on a different bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
+- In somecase, the restore might not recognise the secret and access key provided in configuration. In such case, provide `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` with the restore command
 
 {{< /note >}}
 
