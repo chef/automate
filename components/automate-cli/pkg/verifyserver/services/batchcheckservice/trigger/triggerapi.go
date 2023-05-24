@@ -73,8 +73,11 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	return endPoint
 }
 
-// triggerCheckAPI prepares interface request body to io.Reader and triggers the API where where response and error is passed into
-// the output channel and func exits
+// TriggerCheckAPI triggers the API with provided enpoint,host,nodetype,method and reqbody.
+// EndPoint should be string
+// The method can be GET,POST,PUT
+// Return an channel for output
+// In case of error, error is stored in output channel itself
 func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody interface{}) {
 	var ctr models.CheckTriggerResponse
 

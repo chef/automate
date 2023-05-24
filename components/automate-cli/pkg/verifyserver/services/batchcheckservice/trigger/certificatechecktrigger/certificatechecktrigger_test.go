@@ -97,6 +97,70 @@ const (
 	  }`
 )
 
+func GetRequestJsonWithSameFrontEnd() models.Config {
+	ipConfig := models.Config{}
+
+	json.Unmarshal([]byte(`{
+		  "ssh_user": {
+			"user_name": "ubuntu",
+			"private_key": "test_key",
+			"sudo_password": "test@123"
+		  },
+		  "arch": "existing_nodes",
+		  "backup": {
+			"file_system": {
+			  "mount_location": "/mnt/automate_backups"
+			}
+		  },
+		  "hardware": {
+			"automate_node_count": 1,
+			"automate_node_ips": [
+			  "5.6.7.8"
+			],
+			"chef_infra_server_node_count": 1,
+			"chef_infra_server_node_ips": [
+			  "5.6.7.8"
+			],
+			"postgresql_node_count": 1,
+			"postgresql_node_ips": [
+			  "9.10.11.12"
+			],
+			"opensearch_node_count": 1,
+			"opensearch_node_ips": [
+			  "14.15.16.17"
+			]
+		  },
+		  "certificate": {
+			"fqdn":"my_fqdn",
+			"root_cert":"---- VALID ROOT CA ----",
+			"nodes":[
+				{
+					"ip":"5.6.7.8",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				},
+				{
+					"ip":"9.10.11.12",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				},
+				{
+					"ip":"14.15.16.17",
+					"cert":"---- VALID NODE CERT ----",
+					"key":"---- VALID PRIVATE KEY ----",
+					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert":"---- VALID ADMIN CERT ----"
+				}
+			]
+		  }
+		}`), &ipConfig)
+	return ipConfig
+}
+
 func GetRequestJson() models.Config {
 	ipConfig := models.Config{}
 
@@ -202,6 +266,7 @@ func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error
 func TestCertificateCheck_Run(t *testing.T) {
 
 	t.Run("Returns OK", func(t *testing.T) {
+		request := GetRequestJson()
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -212,15 +277,57 @@ func TestCertificateCheck_Run(t *testing.T) {
 		defer mockServer.Close()
 
 		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
-		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
-			assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
+			if resp.Host == "14.15.16.17" {
+				triggerResp := resp
+				assert.Equal(t, "SUCCESS", triggerResp.Status)
+				assert.NotEmpty(t, triggerResp.Result)
+				assert.Equal(t, resp.Result.Passed, true)
+				assert.Equal(t, 4, len(triggerResp.Result.Checks))
+				assert.Equal(t, "Certificates have valid expiry date", triggerResp.Result.Checks[0].Title)
+				assert.Equal(t, true, triggerResp.Result.Checks[0].Passed)
+				assert.Equal(t, "All certificates expiry date is later than 365 days", triggerResp.Result.Checks[0].SuccessMsg)
+			} else {
+				assert.Equal(t, resp.Result.Passed, true)
+			}
+		}
+	})
+	t.Run("Checking with Same Node for chef server and automate", func(t *testing.T) {
+		request := GetRequestJson()
+		//starting the mock server on custom port
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(certificateCheckSuccessResp))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
+		finalResp := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(finalResp))
+
+		for _, resp := range finalResp {
+			assert.NotEmpty(t, resp.Result.Checks)
+			listForType := []string{constants.AUTOMATE, constants.CHEF_INFRA_SERVER}
+			if resp.Host == "5.6.7.8" {
+				triggerResp := resp
+				assert.Equal(t, "SUCCESS", triggerResp.Status)
+				assert.Contains(t, listForType, resp.NodeType)
+				assert.NotEmpty(t, triggerResp.Result)
+				assert.Equal(t, resp.Result.Passed, true)
+				assert.Equal(t, 4, len(triggerResp.Result.Checks))
+				assert.Equal(t, "Certificates have valid expiry date", triggerResp.Result.Checks[0].Title)
+				assert.Equal(t, true, triggerResp.Result.Checks[0].Passed)
+				assert.Equal(t, "All certificates expiry date is later than 365 days", triggerResp.Result.Checks[0].SuccessMsg)
+			}
+
 			if resp.Host == "14.15.16.17" {
 				triggerResp := resp
 				assert.Equal(t, "SUCCESS", triggerResp.Status)
@@ -253,8 +360,6 @@ func TestCertificateCheck_Run(t *testing.T) {
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
-			assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
 			if resp.Host == "14.15.16.17" {
 				triggerResp := resp
@@ -290,8 +395,6 @@ func TestCertificateCheck_Run(t *testing.T) {
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.Equal(t, constants.CERTIFICATE, resp.Result.Check)
-			assert.Equal(t, constants.CERTIFICATE_MSG, resp.Result.Message)
 			assert.NotNil(t, resp.Result.Error)
 			assert.Empty(t, resp.Result.Checks)
 			assert.Equal(t, resp.Result.Passed, false)

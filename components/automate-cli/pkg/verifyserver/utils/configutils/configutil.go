@@ -5,29 +5,29 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func GetIps(config models.Config) []string {
+func GetIps(hardware models.Hardware) []string {
 	var ipArray []string
 
-	ipArray = append(ipArray, config.Hardware.AutomateNodeIps...)
-	ipArray = append(ipArray, config.Hardware.ChefInfraServerNodeIps...)
-	ipArray = append(ipArray, config.Hardware.PostgresqlNodeIps...)
-	ipArray = append(ipArray, config.Hardware.OpenSearchNodeIps...)
+	ipArray = append(ipArray, hardware.AutomateNodeIps...)
+	ipArray = append(ipArray, hardware.ChefInfraServerNodeIps...)
+	ipArray = append(ipArray, hardware.PostgresqlNodeIps...)
+	ipArray = append(ipArray, hardware.OpenSearchNodeIps...)
 	return ipArray
 }
 
-func GetNodeTypeMap(config models.Config) map[string][]string {
+func GetNodeTypeMap(hardware models.Hardware) map[string][]string {
 	hostMap := make(map[string][]string)
 
-	for _, ip := range config.Hardware.AutomateNodeIps {
+	for _, ip := range hardware.AutomateNodeIps {
 		hostMap[ip] = append(hostMap[ip], constants.AUTOMATE)
 	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+	for _, ip := range hardware.ChefInfraServerNodeIps {
 		hostMap[ip] = append(hostMap[ip], constants.CHEF_INFRA_SERVER)
 	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
+	for _, ip := range hardware.PostgresqlNodeIps {
 		hostMap[ip] = append(hostMap[ip], constants.POSTGRESQL)
 	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
+	for _, ip := range hardware.OpenSearchNodeIps {
 		hostMap[ip] = append(hostMap[ip], constants.OPENSEARCH)
 	}
 	return hostMap

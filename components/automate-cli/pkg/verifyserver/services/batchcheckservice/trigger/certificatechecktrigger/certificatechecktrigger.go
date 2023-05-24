@@ -38,7 +38,7 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 
 	certificate := config.Certificate
 
-	hostMap := configutils.GetNodeTypeMap(config)
+	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.CERTIFICATE_CHECK_API_PATH)
 	for _, node := range certificate.Nodes {
 		nodeTypes := hostMap[node.IP]

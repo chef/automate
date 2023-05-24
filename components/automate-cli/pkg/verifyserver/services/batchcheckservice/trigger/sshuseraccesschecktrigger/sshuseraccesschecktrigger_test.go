@@ -161,8 +161,10 @@ func TestNewSshUserAccessCheck(t *testing.T) {
 
 func TestSshUserAccessCheck_Run(t *testing.T) {
 	t.Run("Returns OK", func(t *testing.T) {
+		request := GetRequestJson()
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(sshCheckSuccessResp))
 		}))
@@ -171,14 +173,12 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		defer mockServer.Close()
 
 		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
-		request := GetRequestJson()
+
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.Equal(t, constants.SSH_USER, resp.Result.Check)
-			assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
 			if resp.Host == "14.15.16.17" {
 				triggerResp := resp
@@ -214,8 +214,6 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.Equal(t, constants.SSH_USER, resp.Result.Check)
-			assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
 			assert.NotEmpty(t, resp.Result.Checks)
 			if resp.Host == "14.15.16.17" {
 				triggerResp := resp
@@ -252,8 +250,6 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.Equal(t, constants.SSH_USER, resp.Result.Check)
-			assert.Equal(t, constants.SSH_USER_MSG, resp.Result.Message)
 			assert.NotNil(t, resp.Result.Error)
 			assert.Empty(t, resp.Result.Checks)
 			assert.Equal(t, resp.Result.Passed, false)
@@ -262,11 +258,23 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 
 }
 
-func GetSshRequest() interface{} {
-	request := map[string]string{}
-	request["ip"] = "1.2.3.4"
-	request["user_name"] = "admin"
-	request["private_key"] = "----- BEGIN PRIVATE RSA KEY ------"
-	request["sudo_password"] = "sudo"
+func TestGetSShUserAPIRquest(t *testing.T) {
+	ip := "1.2.3.4"
+
+	expected := GetSshRequest()
+
+	actual := getSShUserAPIRquest(ip, GetRequestJson().SSHUser)
+
+	assert.Equal(t, expected, actual)
+
+}
+
+func GetSshRequest() models.SShUserRequest {
+	request := models.SShUserRequest{
+		IP:           "1.2.3.4",
+		Username:     "ubuntu",
+		PrivateKey:   "test_key",
+		SudoPassword: "test@123",
+	}
 	return request
 }

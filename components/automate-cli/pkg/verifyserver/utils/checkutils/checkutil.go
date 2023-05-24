@@ -17,19 +17,19 @@ func PrepareTriggerResponse(resp *models.CheckTriggerResponse, host, nodeType, e
 				Error:   fiber.NewError(fiber.StatusServiceUnavailable, errorString),
 			},
 		}
-	} else {
-		return models.CheckTriggerResponse{
-			Status:   resp.Status,
-			Host:     host,
-			NodeType: nodeType,
-			Result: models.ApiResult{
-				Passed:  IsPassed(resp.Result.Checks),
-				Check:   check,
-				Message: msg,
-				Checks:  resp.Result.Checks,
-			},
-		}
 	}
+	return models.CheckTriggerResponse{
+		Status:   resp.Status,
+		Host:     host,
+		NodeType: nodeType,
+		Result: models.ApiResult{
+			Passed:  IsPassed(resp.Result.Checks),
+			Check:   check,
+			Message: msg,
+			Checks:  resp.Result.Checks,
+		},
+	}
+
 }
 
 func IsPassed(checks []models.Checks) bool {

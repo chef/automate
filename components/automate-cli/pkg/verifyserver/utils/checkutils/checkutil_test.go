@@ -49,27 +49,14 @@ func TestPrepareTriggerResponse_WithNoError(t *testing.T) {
 	result := PrepareTriggerResponse(resp, host, nodeType, errorString, check, msg, isError)
 
 	// Assert
-	if result.Status != resp.Status {
-		t.Errorf("Expected status %s, but got %s", resp.Status, result.Status)
-	}
-	if result.Host != host {
-		t.Errorf("Expected host %s, but got %s", host, result.Host)
-	}
-	if result.NodeType != nodeType {
-		t.Errorf("Expected node type %s, but got %s", nodeType, result.NodeType)
-	}
-	if result.Result.Passed != resp.Result.Passed {
-		t.Errorf("Expected passed %t, but got %t", resp.Result.Passed, result.Result.Passed)
-	}
-	if result.Result.Check != check {
-		t.Errorf("Expected check %s, but got %s", check, result.Result.Check)
-	}
-	if result.Result.Message != msg {
-		t.Errorf("Expected message %s, but got %s", msg, result.Result.Message)
-	}
-	if len(result.Result.Checks) != len(resp.Result.Checks) {
-		t.Errorf("Expected checks length %d, but got %d", len(resp.Result.Checks), len(result.Result.Checks))
-	}
+	assert.Equal(t, resp.Status, result.Status)
+	assert.Equal(t, host, result.Host)
+	assert.Equal(t, nodeType, result.NodeType)
+	assert.Equal(t, resp.Result.Passed, result.Result.Passed)
+	assert.Equal(t, check, result.Result.Check)
+	assert.Equal(t, msg, result.Result.Message)
+	assert.Equal(t, len(resp.Result.Checks), len(result.Result.Checks))
+
 }
 
 func TestPrepareTriggerResponse_WithError(t *testing.T) {
@@ -86,22 +73,12 @@ func TestPrepareTriggerResponse_WithError(t *testing.T) {
 	result := PrepareTriggerResponse(resp, host, nodeType, errorString, check, msg, isError)
 
 	// Assert
-	if result.Status != "" {
-		t.Errorf("Expected empty status, but got %s", result.Status)
-	}
-	if result.Host != host {
-		t.Errorf("Expected host %s, but got %s", host, result.Host)
-	}
-	if result.NodeType != nodeType {
-		t.Errorf("Expected node type %s, but got %s", nodeType, result.NodeType)
-	}
-	if result.Result.Passed != false {
-		t.Errorf("Expected passed false, but got %t", result.Result.Passed)
-	}
-	if result.Result.Check != check {
-		t.Errorf("Expected check %s, but got %s", check, result.Result.Check)
-	}
-	if result.Result.Message != msg {
-		t.Errorf("Expected message %s, but got %s", msg, result.Result.Message)
-	}
+	assert.Equal(t, resp.Status, result.Status)
+	assert.Equal(t, host, result.Host)
+	assert.Equal(t, nodeType, result.NodeType)
+	assert.Equal(t, resp.Result.Passed, result.Result.Passed)
+	assert.Equal(t, check, result.Result.Check)
+	assert.Equal(t, msg, result.Result.Message)
+	assert.Equal(t, len(resp.Result.Checks), len(result.Result.Checks))
+
 }

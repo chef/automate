@@ -9,22 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func GetRequestJson() models.Config {
-	ipConfig := models.Config{}
+func GetRequestJson() models.Hardware {
+	ipConfig := models.Hardware{}
 
-	json.Unmarshal([]byte(`{
-		  "ssh_user": {
-			"user_name": "ubuntu",
-			"private_key": "test_key",
-			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
-			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
-			}
-		  },
-		  "hardware": {
+	json.Unmarshal([]byte(` {
 			"automate_node_count": 1,
 			"automate_node_ips": [
 			  "1.2.3.4"
@@ -42,7 +30,7 @@ func GetRequestJson() models.Config {
 			  "14.15.16.17"
 			]
 		  }
-		}`), &ipConfig)
+		`), &ipConfig)
 	return ipConfig
 }
 func TestGetIps(t *testing.T) {
@@ -64,10 +52,10 @@ func TestGetIps(t *testing.T) {
 func TestGetNodeTypeMap(t *testing.T) {
 
 	expected := map[string][]string{
-		"1.2.3.4":     []string{constants.AUTOMATE},
-		"5.6.7.8":     []string{constants.CHEF_INFRA_SERVER},
-		"9.10.11.12":  []string{constants.POSTGRESQL},
-		"14.15.16.17": []string{constants.OPENSEARCH},
+		"1.2.3.4":     {constants.AUTOMATE},
+		"5.6.7.8":     {constants.CHEF_INFRA_SERVER},
+		"9.10.11.12":  {constants.POSTGRESQL},
+		"14.15.16.17": {constants.OPENSEARCH},
 	}
 
 	assert.Equal(t, expected, GetNodeTypeMap(GetRequestJson()))
@@ -81,11 +69,11 @@ func TestGetNodeTypeMap(t *testing.T) {
 		},
 	}
 
-	expected_1 := map[string][]string{
-		"192.168.1.1": []string{constants.AUTOMATE, constants.CHEF_INFRA_SERVER},
-		"192.168.1.3": []string{constants.OPENSEARCH},
-		"192.168.1.4": []string{constants.POSTGRESQL},
+	expectedNew := map[string][]string{
+		"192.168.1.1": {constants.AUTOMATE, constants.CHEF_INFRA_SERVER},
+		"192.168.1.3": {constants.OPENSEARCH},
+		"192.168.1.4": {constants.POSTGRESQL},
 	}
 
-	assert.Equal(t, expected_1, GetNodeTypeMap(config))
+	assert.Equal(t, expectedNew, GetNodeTypeMap(config.Hardware))
 }

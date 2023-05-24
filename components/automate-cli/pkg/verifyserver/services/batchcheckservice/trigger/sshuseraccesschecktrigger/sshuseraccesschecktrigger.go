@@ -1,7 +1,6 @@
 package sshuseraccesschecktrigger
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -36,22 +35,30 @@ func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerRes
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.SSH_USER_CHECK_API_PATH)
 
 	var finalResult []models.CheckTriggerResponse
-	hostMap := configutils.GetNodeTypeMap(config)
+	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
-			var requestBody map[string]interface{}
-			data, _ := json.Marshal(config.SSHUser)
-			json.Unmarshal(data, &requestBody)
-			requestBody[ip] = ip
+			requestBody := getSShUserAPIRquest(ip, config.SSHUser)
 			go trigger.TriggerCheckAPI(url, ip, types[i], http.MethodPost, outputCh, requestBody)
 		}
-
 	}
-
 	for i := 0; i < count; i++ {
 		resp := <-outputCh
 		finalResult = append(finalResult, resp)
 	}
 	close(outputCh)
+	fmt.Println(finalResult)
+
 	return finalResult
+}
+
+func getSShUserAPIRquest(ip string, sshUser models.SSHUser) models.SShUserRequest {
+
+	return models.SShUserRequest{
+		IP:           ip,
+		Username:     sshUser.Username,
+		SudoPassword: sshUser.SudoPassword,
+		PrivateKey:   sshUser.PrivateKey,
+	}
+
 }
