@@ -101,6 +101,27 @@ allowed_licenses:
 
 fallbacks:
   golang:
+    - name: golang.org/x/term
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/term/master/LICENSE
+    - name: golang.org/x/oauth2
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/oauth2/master/LICENSE
+    - name: github.com/klauspost/compress
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/klauspost/compress/master/LICENSE
+    - name: github.com/jpillora/backoff
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/jpillora/backoff/master/LICENSE
+    - name: github.com/google/uuid
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/google/uuid/master/LICENSE
+    - name: github.com/google/martian/v3
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/google/martian/master/LICENSE
+    - name: github.com/go-kit/log
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/go-kit/log/main/LICENSE
     - name: github.com/kevinburke/go-bindata
       license_id: CC0-1.0
       license_content: https://raw.githubusercontent.com/kevinburke/go-bindata/master/LICENSE
