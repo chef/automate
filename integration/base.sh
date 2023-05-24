@@ -450,6 +450,7 @@ __run_test() {
     # Load the test definition
     # shellcheck source=/dev/null
     log_info "Installing golang"
+    sudo rm -rf /usr/local/go
     sudo curl -fsSL https://go.dev/dl/go1.19.3.linux-amd64.tar.gz -o golang.tar.gz
     sudo tar -C /usr/local -xzf golang.tar.gz
     sudo rm golang.tar.gz
