@@ -164,15 +164,15 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 				errorList.PushBack("Missing certificates for some Postgresql private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.PostgresqlPrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
-			for _, node := range config_onprem_postgres.Config.CertsByIP {
-				if len(strings.TrimSpace(node.IP)) < 1 ||
-					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
-					len(strings.TrimSpace(node.PublicKey)) < 1 {
+			for _, pg_node := range config_onprem_postgres.Config.CertsByIP {
+				if len(strings.TrimSpace(pg_node.IP)) < 1 ||
+					len(strings.TrimSpace(pg_node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(pg_node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for postgresql requires ip, private_key and public_key. Some of them are missing.")
 				}
 				errorList.PushBackList(checkCertValid([]keydetails{
-					{key: node.PrivateKey, certtype: "private_key", svc: "postgresql cert_by_ip for ip " + node.IP},
-					{key: node.PublicKey, certtype: "public_key", svc: "postgresql cert_by_ip for ip " + node.IP},
+					{key: pg_node.PrivateKey, certtype: "private_key", svc: "postgresql cert_by_ip for ip " + pg_node.IP},
+					{key: pg_node.PublicKey, certtype: "public_key", svc: "postgresql cert_by_ip for ip " + pg_node.IP},
 				}))
 			}
 		} else {
@@ -209,15 +209,15 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 				errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
-			for _, node := range config.Opensearch.Config.CertsByIP {
-				if len(strings.TrimSpace(node.IP)) < 1 ||
-					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
-					len(strings.TrimSpace(node.PublicKey)) < 1 {
+			for _, os_node := range config.Opensearch.Config.CertsByIP {
+				if len(strings.TrimSpace(os_node.IP)) < 1 ||
+					len(strings.TrimSpace(os_node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(os_node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
 				}
 				errorList.PushBackList(checkCertValid([]keydetails{
-					{key: node.PrivateKey, certtype: "private_key", svc: "opensearch cert_by_ip for ip " + node.IP},
-					{key: node.PublicKey, certtype: "public_key", svc: "opensearch cert_by_ip for ip " + node.IP},
+					{key: os_node.PrivateKey, certtype: "private_key", svc: "opensearch cert_by_ip for ip " + os_node.IP},
+					{key: os_node.PublicKey, certtype: "public_key", svc: "opensearch cert_by_ip for ip " + os_node.IP},
 				}))
 			}
 		} else {
