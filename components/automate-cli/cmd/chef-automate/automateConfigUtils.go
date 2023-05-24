@@ -43,41 +43,63 @@ func getDeploymentModeFromConfig(configPath string) (string, error) {
 	if len(configPath) > 0 {
 		initConfigHAPath = configPath
 	}
+
 	if checkIfFileExist(initConfigHAPath) {
-		config, err := ptoml.LoadFile(initConfigHAPath)
-		if err != nil {
-			writer.Println(err.Error())
-			return "", err
-		}
-		if config.Get("architecture.existing_infra") != nil {
-			if config.Get("external.database") != nil {
-				if config.Get("external.database.type") == "aws" {
-					return EXISTING_INFRA_AWS_MANAGED, nil
-				} else if config.Get("external.database.type") == "self-managed" {
-					return EXISTING_INFRA_SELF_MANAGED, nil
-				}
-			}
-			return EXISTING_INFRA_MODE, nil
-		} else if config.Get("architecture.aws") != nil {
-			if config.Get("aws.config") != nil {
-				value := config.Get("aws.config.setup_managed_services")
-				if boolValue, ok := value.(bool); ok {
-					if boolValue {
-						return AWS_MANAGED_SERVICES, nil
-					}
-				} else {
-					return "", status.New(status.ConfigError, "aws.config.setup_managed_services value has to be boolean")
-				}
-			}
-			return AWS_MODE, nil
-		} else {
-			return AUTOMATE, nil
-		}
-	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
-		return HA_MODE, nil
-	} else {
-		return AUTOMATE, nil
+		return getDeploymentModeFromTomlConfig(initConfigHAPath)
 	}
+
+	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
+		return HA_MODE, nil
+	}
+
+	return AUTOMATE, nil
+}
+
+func getDeploymentModeFromTomlConfig(configPath string) (string, error) {
+	config, err := ptoml.LoadFile(configPath)
+	if err != nil {
+		writer.Println(err.Error())
+		return "", err
+	}
+
+	if config.Get("architecture.existing_infra") != nil {
+		return getDeploymentModeForExistingInfra(config)
+	} else if config.Get("architecture.aws") != nil {
+		return getDeploymentModeForAWS(config)
+	}
+
+	return AUTOMATE, nil
+}
+
+func getDeploymentModeForExistingInfra(config *ptoml.Tree) (string, error) {
+	if config.Get("external.database") != nil {
+		dbType := config.Get("external.database.type").(string)
+		switch dbType {
+		case "aws":
+			return EXISTING_INFRA_AWS_MANAGED, nil
+		case "self-managed":
+			return EXISTING_INFRA_SELF_MANAGED, nil
+		default:
+			return "", status.New(status.ConfigError, "Invalid external.database.type value")
+		}
+	}
+
+	return EXISTING_INFRA_MODE, nil
+}
+
+func getDeploymentModeForAWS(config *ptoml.Tree) (string, error) {
+	if config.Get("aws.config") != nil {
+		setupManagedServices := config.Get("aws.config.setup_managed_services")
+		if boolValue, ok := setupManagedServices.(bool); ok {
+			if boolValue {
+				return AWS_MANAGED_SERVICES, nil
+			}
+		} else {
+			return "", status.New(status.ConfigError, "aws.config.setup_managed_services value has to be boolean")
+		}
+	}
+
+	return AWS_MODE, nil
 }
 
 func checkIPAddress(ip string) error {
