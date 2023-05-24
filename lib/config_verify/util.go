@@ -88,15 +88,15 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 				errorList.PushBack("Missing certificates for some automate private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.AutomatePrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
-			for _, node := range config.Automate.Config.CertsByIP {
-				if len(strings.TrimSpace(node.IP)) < 1 ||
-					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
-					len(strings.TrimSpace(node.PublicKey)) < 1 {
+			for _, a2_node := range config.Automate.Config.CertsByIP {
+				if len(strings.TrimSpace(a2_node.IP)) < 1 ||
+					len(strings.TrimSpace(a2_node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(a2_node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for Automate requires ip, private_key and public_key. Some of them are missing.")
 				}
 				errorList.PushBackList(checkCertValid([]keydetails{
-					{key: node.PrivateKey, certtype: "private_key", svc: "automate cert_by_ip for ip " + node.IP},
-					{key: node.PublicKey, certtype: "public_key", svc: "automate cert_by_ip for ip " + node.IP},
+					{key: a2_node.PrivateKey, certtype: "private_key", svc: "automate cert_by_ip for ip " + a2_node.IP},
+					{key: a2_node.PublicKey, certtype: "public_key", svc: "automate cert_by_ip for ip " + a2_node.IP},
 				}))
 			}
 		} else {
@@ -126,15 +126,15 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 				errorList.PushBack("Missing certificates for some ChefServer private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.ChefServerPrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
-			for _, node := range config.ChefServer.Config.CertsByIP {
-				if len(strings.TrimSpace(node.IP)) < 1 ||
-					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
-					len(strings.TrimSpace(node.PublicKey)) < 1 {
+			for _, cs_node := range config.ChefServer.Config.CertsByIP {
+				if len(strings.TrimSpace(cs_node.IP)) < 1 ||
+					len(strings.TrimSpace(cs_node.PrivateKey)) < 1 ||
+					len(strings.TrimSpace(cs_node.PublicKey)) < 1 {
 					errorList.PushBack("Field certs_by_ip for chef_server requires ip, private_key and public_key. Some of them are missing.")
 				}
 				errorList.PushBackList(checkCertValid([]keydetails{
-					{key: node.PrivateKey, certtype: "private_key", svc: "chef-server cert_by_ip for ip " + node.IP},
-					{key: node.PublicKey, certtype: "public_key", svc: "chef-server cert_by_ip for ip " + node.IP},
+					{key: cs_node.PrivateKey, certtype: "private_key", svc: "chef-server cert_by_ip for ip " + cs_node.IP},
+					{key: cs_node.PublicKey, certtype: "public_key", svc: "chef-server cert_by_ip for ip " + cs_node.IP},
 				}))
 			}
 		} else {
