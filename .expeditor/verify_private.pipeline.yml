@@ -518,7 +518,7 @@ steps:
       - sudo curl -fsSL https://go.dev/dl/go1.19.3.linux-amd64.tar.gz -o golang.tar.gz
       - sudo tar -C /usr/local -xzf golang.tar.gz
       - sudo rm golang.tar.gz
-      - go version
+      - sudo /usr/local/go version
       - integration/run_test integration/tests/v2_to_v3_upgrade.sh
     timeout_in_minutes: 25
     expeditor:
