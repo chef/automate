@@ -211,8 +211,10 @@ func startHTTPSMockServer(mockServer *httptest.Server, port string) error {
 }
 
 func TestCheckFqdnReachability(t *testing.T) {
-	httpsTestPort := "2345"
-	httpsMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	httpsSuccessPort := "2345"
+	httpsFailurePort := "3345"
+	httpsFailedUnmarshalPort := "4345"
+	httpsSuccessMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/":
 			w.Header().Set("x-server-ip", "172.154.0.2")
@@ -232,16 +234,65 @@ func TestCheckFqdnReachability(t *testing.T) {
 			http.NotFound(w, r)
 		}
 	}))
-	err := startHTTPSMockServer(httpsMockServer, httpsTestPort)
+
+	err := startHTTPSMockServer(httpsSuccessMockServer, httpsSuccessPort)
 	assert.NoError(t, err)
-	defer httpsMockServer.Close()
+	defer httpsSuccessMockServer.Close()
+
+	httpsFailureMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/":
+			w.Header().Set("x-server-ip", "172.154.0.2")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+		case "/_status":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"status": "ping"
+			}`))
+		case "/api/v0/status":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"ok": false
+			}`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	err = startHTTPSMockServer(httpsFailureMockServer, httpsFailurePort)
+	assert.NoError(t, err)
+	defer httpsFailureMockServer.Close()
+
+	httpsFailedUnmarshalMockserver := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/":
+			w.Header().Set("x-server-ip", "172.154.0.2")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+		case "/_status":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("test"))
+		case "/api/v0/status":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("test"))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+
+	err = startHTTPSMockServer(httpsFailedUnmarshalMockserver, httpsFailedUnmarshalPort)
+	assert.NoError(t, err)
+	defer httpsFailedUnmarshalMockserver.Close()
 
 	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
 	assert.NotNil(t, fq)
+
 	tests := []struct {
 		TestName     string
 		ReqBody      models.FqdnRequest
 		ResponseBody models.FqdnResponse
+		Port         string
 	}{
 		{
 			"Case is Before Deployment, FQDN is reachable, Nodes are reachable and Certicate is valid",
@@ -281,6 +332,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is Before Deployment, FQDN and Nodes are not reachable, Certicate is valid",
@@ -320,6 +372,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is Before Deployment, FQDN and Nodes are not reachable, Certificate block type is wrong",
@@ -359,6 +412,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is Before Deployment, FQDN and Nodes are not reachable, Certicate is not SAN based",
@@ -398,6 +452,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is Before Deployment, FQDN and Nodes are not reachable, Certicate is invalid",
@@ -437,6 +492,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is After Deployment, FQDN is reachable, Chef Server Status is okay",
@@ -469,6 +525,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is After Deployment, FQDN is not reachable, Chef Server Status is not okay",
@@ -501,6 +558,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is After Deployment, FQDN is reachable, Automate Status is okay",
@@ -533,6 +591,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
 		},
 		{
 			"Case is After Deployment, FQDN is not reachable, Automate Status is not okay",
@@ -565,145 +624,146 @@ func TestCheckFqdnReachability(t *testing.T) {
 					},
 				},
 			},
+			httpsSuccessPort,
+		},
+		{
+			"Case is After Deployment, FQDN is reachable, Automate Status is not okay",
+			models.FqdnRequest{
+				Fqdn:              LOCALHOST,
+				NodeType:          constants.AUTOMATE,
+				RootCert:          CA_CERT,
+				IsAfterDeployment: true,
+				ApiToken:          APITOKEN,
+				Nodes: []string{
+					"172.154.0.2",
+				},
+			},
+			models.FqdnResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.FQDN_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.AUTOMATE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+					},
+				},
+			},
+			httpsFailurePort,
+		},
+		{
+			"Case is After Deployment, FQDN is reachable, Chef Server Status is not okay",
+			models.FqdnRequest{
+				Fqdn:              LOCALHOST,
+				NodeType:          constants.CHEF_INFRA_SERVER,
+				RootCert:          CA_CERT,
+				IsAfterDeployment: true,
+				ApiToken:          APITOKEN,
+				Nodes: []string{
+					"172.154.0.2",
+				},
+			},
+			models.FqdnResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.FQDN_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CHEF_SERVER_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+					},
+				},
+			},
+			httpsFailurePort,
+		},
+		{
+			"Case is After Deployment, FQDN is reachable, Automate Status is giving wrong response",
+			models.FqdnRequest{
+				Fqdn:              LOCALHOST,
+				NodeType:          constants.AUTOMATE,
+				RootCert:          CA_CERT,
+				IsAfterDeployment: true,
+				ApiToken:          APITOKEN,
+				Nodes: []string{
+					"172.154.0.2",
+				},
+			},
+			models.FqdnResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.FQDN_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.AUTOMATE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+					},
+				},
+			},
+			httpsFailedUnmarshalPort,
+		},
+		{
+			"Case is After Deployment, FQDN is reachable, Chef Server Status is giving wrong response",
+			models.FqdnRequest{
+				Fqdn:              LOCALHOST,
+				NodeType:          constants.CHEF_INFRA_SERVER,
+				RootCert:          CA_CERT,
+				IsAfterDeployment: true,
+				ApiToken:          APITOKEN,
+				Nodes: []string{
+					"172.154.0.2",
+				},
+			},
+			models.FqdnResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.FQDN_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CHEF_SERVER_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+					},
+				},
+			},
+			httpsFailedUnmarshalPort,
 		},
 	}
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			res := fq.CheckFqdnReachability(e.ReqBody, httpsTestPort)
+			res := fq.CheckFqdnReachability(e.ReqBody, e.Port)
 			assert.Equal(t, e.ResponseBody, res)
 		})
-	}
-}
-
-func TestCheckStatus_Failure(t *testing.T) {
-	httpsTestPort := "3345"
-	// Create a test server with a handler that returns a failure response.
-	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/_status":
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{
-				"status": "ping"
-			}`))
-		case "/api/v0/status":
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{
-				"ok": false
-			}`))
-		default:
-			http.NotFound(w, r)
-		}
-	}))
-
-	err := startHTTPSMockServer(server, httpsTestPort)
-	assert.NoError(t, err)
-	defer server.Close()
-
-	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
-	assert.NotNil(t, fq)
-
-	tests := []struct {
-		TestName    string
-		NodeType    string
-		ExpectedRes models.Checks
-	}{
-		{
-			TestName: "Chef Infra Server Failure",
-			NodeType: constants.CHEF_INFRA_SERVER,
-			ExpectedRes: models.Checks{
-				Title:         constants.CHEF_SERVER_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
-				ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
-			},
-		},
-		{
-			TestName: "Automate Failure",
-			NodeType: constants.AUTOMATE,
-			ExpectedRes: models.Checks{
-				Title:         constants.AUTOMATE_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
-				ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
-			},
-		},
-	}
-
-	for _, e := range tests {
-		var checks models.Checks
-		if e.NodeType == constants.CHEF_INFRA_SERVER {
-			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT, httpsTestPort)
-		} else {
-			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN, httpsTestPort)
-		}
-
-		assert.Equal(t, e.ExpectedRes, checks)
-	}
-}
-
-func TestUnmarshal_Failure(t *testing.T) {
-	httpsTestPort := "4345"
-	// Create a test server with a handler that returns a failure response.
-	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/_status":
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("test"))
-		case "/api/v0/status":
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("test"))
-		default:
-			http.NotFound(w, r)
-		}
-	}))
-
-	err := startHTTPSMockServer(server, httpsTestPort)
-	assert.NoError(t, err)
-	defer server.Close()
-
-	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
-	assert.NotNil(t, fq)
-
-	tests := []struct {
-		TestName    string
-		NodeType    string
-		ExpectedRes models.Checks
-	}{
-		{
-			TestName: "Chef Infra Server Unmarshal Failure",
-			NodeType: constants.CHEF_INFRA_SERVER,
-			ExpectedRes: models.Checks{
-				Title:         constants.CHEF_SERVER_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
-				ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
-			},
-		},
-		{
-			TestName: "Automate Unmarshal Failure",
-			NodeType: constants.AUTOMATE,
-			ExpectedRes: models.Checks{
-				Title:         constants.AUTOMATE_TITLE,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
-				ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
-			},
-		},
-	}
-
-	for _, e := range tests {
-		var checks models.Checks
-		if e.NodeType == constants.CHEF_INFRA_SERVER {
-			checks = fq.CheckChefServerStatus(LOCALHOST, CA_CERT, httpsTestPort)
-		} else {
-			checks = fq.CheckAutomateStatus(LOCALHOST, CA_CERT, APITOKEN, httpsTestPort)
-		}
-
-		assert.Equal(t, e.ExpectedRes, checks)
 	}
 }
