@@ -31,7 +31,7 @@ func NewPortReachableService(log logger.Logger, timeout time.Duration) IPortReac
 }
 
 func (pr *PortReachableService) tcpClient(protocolType, host, port string) error {
-	pr.log.Debug("Trying to connect TCP server")
+	pr.log.Debug(fmt.Sprintf("Trying to connect %s server on %s:%s", protocolType, host, port))
 	pr.log.Debug("URL: ", net.JoinHostPort(host, port))
 	timeout := time.Second * pr.timeout
 	// In TCP connection, if we are getting the connection it's sufficient to check the reachibility
@@ -45,7 +45,7 @@ func (pr *PortReachableService) tcpClient(protocolType, host, port string) error
 }
 
 func (pr *PortReachableService) udpClient(protocolType, host, port string) error {
-	pr.log.Debug("Trying to connect UDP server")
+	pr.log.Debug(fmt.Sprintf("Trying to connect %s server on %s:%s", protocolType, host, port))
 	pr.log.Debug("URL: ", net.JoinHostPort(host, port))
 	udpServer, err := net.ResolveUDPAddr(protocolType, net.JoinHostPort(host, port))
 	if err != nil {
@@ -84,8 +84,8 @@ func (pr *PortReachableService) udpClient(protocolType, host, port string) error
 	return nil
 }
 
-func (pr *PortReachableService) httpsClient(ip, cert string, port int) error {
-	pr.log.Debug("Trying to connect https server")
+func (pr *PortReachableService) httpsClient(host, cert string, port int) error {
+	pr.log.Debug(fmt.Sprintf("Trying to connect https server on %s:%d", host, port))
 	caCertPool := x509.NewCertPool()
 	ok := caCertPool.AppendCertsFromPEM([]byte(cert))
 	if !ok {
@@ -100,7 +100,7 @@ func (pr *PortReachableService) httpsClient(ip, cert string, port int) error {
 		},
 		Timeout: time.Second * pr.timeout,
 	}
-	url := fmt.Sprintf("https://%s:%d", ip, port)
+	url := fmt.Sprintf("https://%s:%d", host, port)
 	pr.log.Debug("URL: ", url)
 	resp, err := client.Get(url)
 	if err != nil {

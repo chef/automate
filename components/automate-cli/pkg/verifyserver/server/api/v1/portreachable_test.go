@@ -118,7 +118,7 @@ func TestPortReachable(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "please give rootCA value"
+					"message": "RootCA value is mandatory for protocol HTTPS"
 				}
 			}`,
 			RequestBody: `{
@@ -142,6 +142,23 @@ func TestPortReachable(t *testing.T) {
 				"destination_node_ip": "13.37.23.16",
 				"destination_node_port": 1234,
 				"destination_node_service_protocol": "udp4"
+			  }`,
+		},
+		{
+			TestName:     "Giving Invalid Port Number",
+			ExpectedCode: 400,
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "Invalid port number"
+				}
+			}`,
+			RequestBody: `{
+				"destination_node_ip": "13.37.23.16",
+				"destination_node_port": -1,
+				"destination_node_service_protocol": "udp"
 			  }`,
 		},
 	}
