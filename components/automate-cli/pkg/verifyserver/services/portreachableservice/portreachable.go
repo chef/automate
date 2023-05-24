@@ -23,7 +23,7 @@ type PortReachableService struct {
 	timeout time.Duration
 }
 
-func NewPortReachableService(log logger.Logger, timeout time.Duration) *PortReachableService {
+func NewPortReachableService(log logger.Logger, timeout time.Duration) IPortReachableService {
 	return &PortReachableService{
 		log:     log,
 		timeout: timeout,

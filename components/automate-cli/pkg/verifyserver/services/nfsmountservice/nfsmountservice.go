@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -137,7 +138,7 @@ func (nm *NFSMountService) doAPICall(ip string, mountLocation string) (*models.N
 }
 
 func (nm *NFSMountService) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
-	body, err := io.ReadAll(respBody) // nosemgrep
+	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
 		nm.log.Error(err.Error())
 		return nil, errors.New("Cannot able to read data from response body: " + err.Error())
