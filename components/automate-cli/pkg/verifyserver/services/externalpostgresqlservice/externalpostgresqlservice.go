@@ -90,7 +90,7 @@ func createTempFile(content string) (string, error) {
 	}
 	_, err = tempFile.WriteString((content))
 	if err != nil {
-		return "", errors.Wrap(err,"writing rootca to a file failed",)
+		return "", errors.Wrap(err,"writing rootca to a file failed")
 	}
 	return tempFile.Name(), nil
 }
