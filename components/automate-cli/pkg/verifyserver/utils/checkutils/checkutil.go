@@ -2,7 +2,7 @@ package checkutils
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func PrepareTriggerResponse(resp *models.CheckTriggerResponse, host, nodeType, errorString, check, msg string, isError bool) models.CheckTriggerResponse {
