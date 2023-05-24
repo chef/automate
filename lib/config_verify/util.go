@@ -2,11 +2,13 @@ package config_verify
 
 import (
 	"container/list"
+	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/chef/automate/lib/config_parser"
 	"github.com/chef/automate/lib/stringutils"
@@ -66,6 +68,15 @@ func checkCertValid(keys []keydetails) *list.List {
 		block, _ := pem.Decode([]byte(el.key))
 		if block == nil {
 			errorList.PushBack("Invalid format. Failed to decode " + el.certtype + " for " + el.svc)
+		} else if el.certtype == "root_ca" {
+			rootCA, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				errorList.PushBack("Failed to parse " + el.certtype + " for " + el.svc)
+			} else {
+				if time.Now().After(rootCA.NotAfter) {
+					errorList.PushBack(el.certtype + " for " + el.svc + " certificate has expired.")
+				}
+			}
 		}
 	}
 	return errorList
@@ -177,7 +188,6 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 			}
 		} else {
 			// check if all the default certs are given
-
 			if len(strings.TrimSpace(config_onprem_postgres.Config.RootCA)) < 1 ||
 				len(strings.TrimSpace(config_onprem_postgres.Config.PrivateKey)) < 1 ||
 				len(strings.TrimSpace(config_onprem_postgres.Config.PublicKey)) < 1 {

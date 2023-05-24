@@ -43,7 +43,7 @@ func validateRequiredPathField(value string, fieldName string, errorList *list.L
 
 func validateRequiredStringTypeField(value interface{}, fieldName string, errorList *list.List) {
 	strValue, ok := value.(string)
-	if !ok || len(strings.TrimSpace(strValue)) == 0 {
+	if !ok || len(strings.TrimSpace(strValue)) < 1 {
 		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
 	}
 }
