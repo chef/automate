@@ -85,9 +85,11 @@ fi
 
 workdir="/go/src/github.com/chef/automate"
 CURR_DIR=$(pwd)
+GOLANG_VERSION=$(cat $CURR_DIR/GOLANG_VERSION | tr -d '\n' )
 
 docker_run_args=(
         "--detach"
+        "--env" "GOLANG_VERSION=$GOLANG_VERSION"
         "--env" "CI"
         "--env" "HOST_PWD=$CURR_DIR"
         "--env" "HAB_ORIGIN=$HAB_ORIGIN"
