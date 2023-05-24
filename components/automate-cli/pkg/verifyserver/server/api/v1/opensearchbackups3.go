@@ -32,6 +32,7 @@ func (h *Handler) CheckOSBackupS3(c *fiber.Ctx) {
 		errString := fmt.Sprintf("S3 backup check failed : %v", err.Error())
 		h.Logger.Error(fmt.Errorf(errString))
 		c.Next(&fiber.Error{Code: http.StatusInternalServerError, Message: err.Error()})
+		return
 	}
 
 	c.JSON(response.BuildSuccessResponse(resp))
