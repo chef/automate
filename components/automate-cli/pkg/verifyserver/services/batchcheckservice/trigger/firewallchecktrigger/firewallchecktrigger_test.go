@@ -367,8 +367,9 @@ func TestMakeRequests(t *testing.T) {
 	config := models.Config{
 		Hardware: hardware,
 		Certificate: models.Certificate{
+
 			Nodes: []models.NodeCert{
-				{
+				{IP: "10.0.0.1",
 					Cert: "cert",
 					Key:  "key",
 				},
