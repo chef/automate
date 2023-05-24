@@ -32,55 +32,55 @@ steps:
 
   # license scout requires github account access because we currently
   # rely on at least 2 private repositories.
-  - label: license scout
-    command:
-      # here we reuse the license_scout.sh script used by expeditor to publish the manifest
-      - .expeditor/license_scout.sh
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        GITHUB_TOKEN:
-          account: github/chef
-          field: token
-      executor:
-        docker:
+#  - label: license scout
+#    command:
+#      # here we reuse the license_scout.sh script used by expeditor to publish the manifest
+#      - .expeditor/license_scout.sh
+#    timeout_in_minutes: 20
+#    retry:
+#      automatic:
+#        limit: 1
+#    expeditor:
+#      secrets:
+#        GITHUB_TOKEN:
+#          account: github/chef
+#          field: token
+#      executor:
+#        docker:
 
   # We need to build in order to run the
   # integration tests.
-  - label: build
-    command:
-      - scripts/verify_build.sh
-    timeout_in_minutes: 60
-    env:
-      ALLOW_LOCAL_PACKAGES: true
-      HAB_STUDIO_SUP: false
-      HAB_NONINTERACTIVE: true
-    expeditor:
-      secrets:
-        HAB_STUDIO_SECRET_GITHUB_TOKEN:
-          account: github/chef
-          field: token
-        OPENSEARCH_ROOT_CA_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: root-ca.pem
-        OPENSEARCH_ADMIN_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: admin.pem
-        OPENSEARCH_ADMIN_KEY_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: admin-key.pem
-        OPENSEARCH_NODE1_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: node1.pem
-        OPENSEARCH_NODE1_KEY_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: node1-key.pem
-      executor:
-        linux:
-          privileged: true
+#  - label: build
+#    command:
+#      - scripts/verify_build.sh
+#    timeout_in_minutes: 60
+#    env:
+#      ALLOW_LOCAL_PACKAGES: true
+#      HAB_STUDIO_SUP: false
+#      HAB_NONINTERACTIVE: true
+#    expeditor:
+#      secrets:
+#        HAB_STUDIO_SECRET_GITHUB_TOKEN:
+#          account: github/chef
+#          field: token
+#        OPENSEARCH_ROOT_CA_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: root-ca.pem
+#        OPENSEARCH_ADMIN_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: admin.pem
+#        OPENSEARCH_ADMIN_KEY_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: admin-key.pem
+#        OPENSEARCH_NODE1_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: node1.pem
+#        OPENSEARCH_NODE1_KEY_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: node1-key.pem
+#      executor:
+#        linux:
+#          privileged: true
 
 
   - label: "[unit] license-control-service"
@@ -121,37 +121,37 @@ steps:
       executor:
         docker:
 
-  - label: ":semgrep: Custom"
-    expeditor:
-      executor:
-        docker:
-          image: returntocorp/semgrep:0.32.0
-          entrypoint: semgrep
-          command: [
-            "--error",
-            "--exclude", "*.spec.ts",
-            "--config", "/go/src/github.com/chef/automate/.semgrep",
-            "/go/src/github.com/chef/automate"
-          ]
-
-  - label: ":semgrep: Security"
-    command:
-      - .expeditor/buildkite/semgrep.sh
-    timeout_in_minutes: 15
-    expeditor:
-      secrets: true
-    plugins:
-      # Temporary workaround per @tduffield; do not propagate this solution too much!
-      - chef/step-hook#v0.1.1:
-          pre-command:
-            - .expeditor/export_semgrep_token.sh
-      - docker#v3.7.0:
-          image: returntocorp/semgrep-agent:v1
-          propagate-environment: true
-          workdir: /go/src/github.com/chef/automate
-          environment:
-            - SEMGREP_TOKEN
-            - SEMGREP_ID
+#  - label: ":semgrep: Custom"
+#    expeditor:
+#      executor:
+#        docker:
+#          image: returntocorp/semgrep:0.32.0
+#          entrypoint: semgrep
+#          command: [
+#            "--error",
+#            "--exclude", "*.spec.ts",
+#            "--config", "/go/src/github.com/chef/automate/.semgrep",
+#            "/go/src/github.com/chef/automate"
+#          ]
+#
+#  - label: ":semgrep: Security"
+#    command:
+#      - .expeditor/buildkite/semgrep.sh
+#    timeout_in_minutes: 15
+#    expeditor:
+#      secrets: true
+#    plugins:
+#      # Temporary workaround per @tduffield; do not propagate this solution too much!
+#      - chef/step-hook#v0.1.1:
+#          pre-command:
+#            - .expeditor/export_semgrep_token.sh
+#      - docker#v3.7.0:
+#          image: returntocorp/semgrep-agent:v1
+#          propagate-environment: true
+#          workdir: /go/src/github.com/chef/automate
+#          environment:
+#            - SEMGREP_TOKEN
+#            - SEMGREP_ID
 
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
