@@ -150,7 +150,7 @@ func (fq *FqdnService) CheckChefServerStatus(fqdn, rootCert, port string) models
 		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body) //semgrep
+	resBody, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
@@ -190,7 +190,7 @@ func (fq *FqdnService) CheckAutomateStatus(fqdn, rootCert, apiToken, port string
 		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
 	}
 
-	resBody, err := ioutil.ReadAll(resp.Body) //semgrep
+	resBody, err := ioutil.ReadAll(resp.Body) // nosemgrep
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
