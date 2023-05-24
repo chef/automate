@@ -152,18 +152,19 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 
 	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if config.Postgresql.Config.EnableCustomCerts {
-		if len(config.Postgresql.Config.CertsByIP) > 0 {
-			if len(strings.TrimSpace(config.Postgresql.Config.RootCA)) < 1 {
+		config_onprem_postgres := config.Postgresql
+		if len(config_onprem_postgres.Config.CertsByIP) > 0 {
+			if len(strings.TrimSpace(config_onprem_postgres.Config.RootCA)) < 1 {
 				errorList.PushBack("Postgresql root_ca is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+				{key: config_onprem_postgres.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
 			}))
-			if !stringutils.SubSlice(config.ExistingInfra.Config.PostgresqlPrivateIps, extractIPsFromCertsByIP(config.Postgresql.Config.CertsByIP)) {
+			if !stringutils.SubSlice(config.ExistingInfra.Config.PostgresqlPrivateIps, extractIPsFromCertsByIP(config_onprem_postgres.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some Postgresql private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.PostgresqlPrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
-			for _, node := range config.Postgresql.Config.CertsByIP {
+			for _, node := range config_onprem_postgres.Config.CertsByIP {
 				if len(strings.TrimSpace(node.IP)) < 1 ||
 					len(strings.TrimSpace(node.PrivateKey)) < 1 ||
 					len(strings.TrimSpace(node.PublicKey)) < 1 {
@@ -176,33 +177,35 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 			}
 		} else {
 			// check if all the default certs are given
-			if len(strings.TrimSpace(config.Postgresql.Config.RootCA)) < 1 ||
-				len(strings.TrimSpace(config.Postgresql.Config.PrivateKey)) < 1 ||
-				len(strings.TrimSpace(config.Postgresql.Config.PublicKey)) < 1 {
+
+			if len(strings.TrimSpace(config_onprem_postgres.Config.RootCA)) < 1 ||
+				len(strings.TrimSpace(config_onprem_postgres.Config.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(config_onprem_postgres.Config.PublicKey)) < 1 {
 				errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
-				{key: config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
-				{key: config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+				{key: config_onprem_postgres.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+				{key: config_onprem_postgres.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
+				{key: config_onprem_postgres.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
 			}))
 		}
 	}
 
 	// if CustomCertsEnabled is disabled, then skip validation for custom certs and use self signed certs
 	if config.Opensearch.Config.EnableCustomCerts {
-		if len(config.Opensearch.Config.CertsByIP) > 0 {
-			if len(strings.TrimSpace(config.Opensearch.Config.RootCA)) < 1 ||
-				len(strings.TrimSpace(config.Opensearch.Config.AdminKey)) < 1 ||
-				len(strings.TrimSpace(config.Opensearch.Config.AdminCert)) < 1 {
+		config_onprem_opensearch := config.Opensearch
+		if len(config_onprem_opensearch.Config.CertsByIP) > 0 {
+			if len(strings.TrimSpace(config_onprem_opensearch.Config.RootCA)) < 1 ||
+				len(strings.TrimSpace(config_onprem_opensearch.Config.AdminKey)) < 1 ||
+				len(strings.TrimSpace(config_onprem_opensearch.Config.AdminCert)) < 1 {
 				errorList.PushBack("Opensearch root_ca, admin_key or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-				{key: config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-				{key: config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
 			}))
-			if !stringutils.SubSlice(config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(config.Opensearch.Config.CertsByIP)) {
+			if !stringutils.SubSlice(config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(config_onprem_opensearch.Config.CertsByIP)) {
 				errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
 			}
 			// check if all the certs are valid for given IPs
@@ -219,19 +222,19 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 			}
 		} else {
 			// check if all the default certs are given
-			if len(strings.TrimSpace(config.Opensearch.Config.RootCA)) < 1 ||
-				len(strings.TrimSpace(config.Opensearch.Config.AdminKey)) < 1 ||
-				len(strings.TrimSpace(config.Opensearch.Config.AdminCert)) < 1 ||
-				len(strings.TrimSpace(config.Opensearch.Config.PrivateKey)) < 1 ||
-				len(strings.TrimSpace(config.Opensearch.Config.PublicKey)) < 1 {
+			if len(strings.TrimSpace(config_onprem_opensearch.Config.RootCA)) < 1 ||
+				len(strings.TrimSpace(config_onprem_opensearch.Config.AdminKey)) < 1 ||
+				len(strings.TrimSpace(config_onprem_opensearch.Config.AdminCert)) < 1 ||
+				len(strings.TrimSpace(config_onprem_opensearch.Config.PrivateKey)) < 1 ||
+				len(strings.TrimSpace(config_onprem_opensearch.Config.PublicKey)) < 1 {
 				errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-				{key: config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-				{key: config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
-				{key: config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
-				{key: config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
+				{key: config_onprem_opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
 			}))
 		}
 	}
