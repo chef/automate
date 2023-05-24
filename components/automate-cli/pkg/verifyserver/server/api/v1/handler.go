@@ -18,8 +18,8 @@ import (
 )
 
 type Handler struct {
-	Logger                       logger.Logger
-	StatusService                statusservice.IStatusService
+	Logger                         logger.Logger
+	StatusService                  statusservice.IStatusService
 	BatchCheckService            batchcheckservice.IBatchCheckService
 	NFSMountService              nfsmountservice.INFSService
 	MockServersService           startmockserverservice.IStartMockServersService

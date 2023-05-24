@@ -41,70 +41,47 @@ const (
 )
 
 func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, deploymentState string) (*models.ApiResult, error) {
+
 	srsResponse := &models.ApiResult{
 		Passed: true,
 		Checks: []models.Checks{},
 	}
-
+	
 	cpuCountCheck := srs.GetCpuCountCheck()
-
 	if !cpuCountCheck.Passed {
 		srsResponse.Passed = false
 	}
-
 	srsResponse.Checks = append(srsResponse.Checks, *cpuCountCheck)
 
 	cpuSpeedCheck := srs.GetCpuSpeedCheck(CPU_INFO_FILE)
-
 	if !cpuSpeedCheck.Passed {
 		srsResponse.Passed = false
 	}
-
 	srsResponse.Checks = append(srsResponse.Checks, *cpuSpeedCheck)
 
 	memorySizeCheck := srs.GetMemorySizeCheck()
-
 	if !memorySizeCheck.Passed {
 		srsResponse.Passed = false
 	}
-
 	srsResponse.Checks = append(srsResponse.Checks, *memorySizeCheck)
 
-	switch deploymentState {
-	case constants.PRE_DEPLOY:
-		habFreeSpaceCheckPreDepl, err := srs.GetHabFreeSpaceCheckPreDeployment(nodeType)
-		if err != nil {
-			return nil, err
-		}
-		if !habFreeSpaceCheckPreDepl.Passed {
-			srsResponse.Passed = false
-		}
-		srsResponse.Checks = append(srsResponse.Checks, *habFreeSpaceCheckPreDepl)
-
-	case constants.POST_DEPLOY:
-		habFreeSpaceCheckPostDepl, err := srs.GetHabFreeSpaceCheckPostDeployment(nodeType)
-		if err != nil {
-			return nil, err
-		}
-		if !habFreeSpaceCheckPostDepl.Passed {
-			srsResponse.Passed = false
-		}
-		srsResponse.Checks = append(srsResponse.Checks, *habFreeSpaceCheckPostDepl)
-	default:
-		srs.logger.Errorf("Wrong query deployment_state=%s", deploymentState)
-		return nil, fmt.Errorf("given query deployment_state with value=%s is not supported", deploymentState)
+	habFreeSpaceCheck, err := srs.GetFreeHabSpace(nodeType, deploymentState)
+	if err != nil {
+		return nil, err
 	}
 
-	tmpFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
+	if !habFreeSpaceCheck.Passed {
+		srsResponse.Passed = false
+	}
+	srsResponse.Checks = append(srsResponse.Checks, *habFreeSpaceCheck)
 
+	tmpFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
 	if !tmpFreeSpaceCheck.Passed {
 		srsResponse.Passed = false
 	}
-
 	srsResponse.Checks = append(srsResponse.Checks, *tmpFreeSpaceCheck)
 
 	rootFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
-
 	if !rootFreeSpaceCheck.Passed {
 		srsResponse.Passed = false
 	}
@@ -117,43 +94,33 @@ func (srs *SystemResourcesService) GetCpuCountCheck() *models.Checks {
 	cpuCount := srs.GetOsAndFileSystemInfo.GetNumberOfCPU()
 	srs.logger.Debug("CPU count is : ", cpuCount)
 
-	var checkResp *models.Checks
 	if cpuCount >= constants.MIN_CPU_COUNT {
 		successMsg := fmt.Sprintf("CPU count is >=%v", constants.MIN_CPU_COUNT)
-		checkResp = srs.GetChecksModel(true, CPU_COUNT_CHECK_TITLE, successMsg, "", "")
-	} else {
-		errorMsg := fmt.Sprintf("CPU count is %v", cpuCount)
-		resolutionMsg := fmt.Sprintf("CPU count should be >=%v", constants.MIN_CPU_COUNT)
-		checkResp = srs.GetChecksModel(false, CPU_COUNT_CHECK_TITLE, "", errorMsg, resolutionMsg)
+		return srs.GetChecksModel(true, CPU_COUNT_CHECK_TITLE, successMsg, "", "")
 	}
-	return checkResp
+
+	errorMsg := fmt.Sprintf("CPU count is %v", cpuCount)
+	resolutionMsg := fmt.Sprintf("CPU count should be >=%v", constants.MIN_CPU_COUNT)
+	return srs.GetChecksModel(false, CPU_COUNT_CHECK_TITLE, "", errorMsg, resolutionMsg)
 }
 
 func (srs *SystemResourcesService) GetCpuSpeedCheck(cpuInfoFile string) *models.Checks {
 	srs.logger.Debug("CPU speed check is running")
 	cpuSpeed, err := srs.GetOsAndFileSystemInfo.GetCPUSpeed(cpuInfoFile)
-	var resp *models.Checks
 
 	if err != nil {
 		srs.logger.Error("Error occured while getting cpu speed :", err)
 		ResolutionMsg := "Please run system on supported platform"
-		resp = srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", err.Error(), ResolutionMsg)
-		return resp
+		return srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", err.Error(), ResolutionMsg)
 	}
-
 	srs.logger.Debug("CPU speed is : ", cpuSpeed)
-
 	if cpuSpeed >= constants.MIN_CPU_SPEED {
-		srs.logger.Debug("CPU speed is ", cpuSpeed)
 		successMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED)
-		resp = srs.GetChecksModel(true, CPU_SPEED_CHECK_TITLE, successMsg, "", "")
-	} else {
-		srs.logger.Debug("CPU speed is ", cpuSpeed)
-		errorMsg := fmt.Sprintf("CPU speed is %vGHz", cpuSpeed)
-		resolutionMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED)
-		resp = srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", errorMsg, resolutionMsg)
+		return srs.GetChecksModel(true, CPU_SPEED_CHECK_TITLE, successMsg, "", "")
 	}
-	return resp
+	errorMsg := fmt.Sprintf("CPU speed is %vGHz", cpuSpeed)
+	resolutionMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED) //check with float
+	return srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", errorMsg, resolutionMsg)
 }
 
 func (srs *SystemResourcesService) GetMemorySizeCheck() *models.Checks {
@@ -161,24 +128,33 @@ func (srs *SystemResourcesService) GetMemorySizeCheck() *models.Checks {
 	memoryInGB, err := srs.GetOsAndFileSystemInfo.GetMemory()
 	srs.logger.Debug("Current memory of system is :", memoryInGB)
 
-	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Error occured while getting memory information : ", err.Error())
 		resolutionMsg := "Please run system on supported platform"
-		resp = srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", err.Error(), resolutionMsg)
-		return resp
+		return srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", err.Error(), resolutionMsg)
 	}
-
 	srs.logger.Debugf("Current memory of system is :%vGB", memoryInGB)
+
 	if memoryInGB >= constants.MIN_MEMORY {
 		successMsg := fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY)
-		resp = srs.GetChecksModel(true, MEMORY_SIZE_CHECK_TITLE, successMsg, "", "")
-	} else {
-		errorMsg := fmt.Sprintf("Memory is %.2fGB", memoryInGB)
-		resolutionMsg := fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY)
-		resp = srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", errorMsg, resolutionMsg)
+		return srs.GetChecksModel(true, MEMORY_SIZE_CHECK_TITLE, successMsg, "", "")
 	}
-	return resp
+	errorMsg := fmt.Sprintf("Memory is %.2fGB", memoryInGB)
+	resolutionMsg := fmt.Sprintf("Memory should be >=%vGB", constants.MIN_MEMORY)
+	return srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", errorMsg, resolutionMsg)
+}
+
+func (srs *SystemResourcesService) GetFreeHabSpace(nodeType, deploymentState string) (*models.Checks, error) {
+
+	switch deploymentState {
+	case constants.PRE_DEPLOY:
+		return srs.GetHabFreeSpaceCheckPreDeployment(nodeType)
+	case constants.POST_DEPLOY:
+		return srs.GetHabFreeSpaceCheckPostDeployment(nodeType)
+	default:
+		srs.logger.Errorf("Wrong query deployment_state=%s", deploymentState)
+		return nil, fmt.Errorf("given query deployment_state with value=%s is not supported", deploymentState)
+	}
 }
 
 func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType string) (*models.Checks, error) {
@@ -191,7 +167,6 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType st
 		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), "Please run system on supported platform")
 		return resp, nil
 	}
-
 	srs.logger.Debugf("The current total free space in hab : %0.2fGB", currentFreeSpaceInGB)
 
 	switch nodeType {
@@ -230,13 +205,11 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 	srs.logger.Debugf("current free space in /hab after deployment :%0.2fGB", currentFreeSpaceInGB)
 
 	totalSpaceInGBInHab, err := srs.GetTotalSpaceOfGivenDir("/hab")
-
 	if err != nil {
 		srs.logger.Error("Unable to retrive total space of /hab :", err.Error())
 		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", err.Error(), "Please run system on supported platform")
 		return resp, nil
 	}
-
 	srs.logger.Debugf("current total space in /hab : %0.2f", totalSpaceInGBInHab)
 
 	switch nodeType {
@@ -270,32 +243,26 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB float64, checkTitle string) *models.Checks {
 	srs.logger.Debugf("free disk space check is running for %s directory", dirPath)
 
-	var resp *models.Checks
 	currentFreeSpaceInDir, err := srs.GetFreeDiskSpaceOfGivenDir(dirPath)
 	if err != nil {
 		srs.logger.Errorf("Unable to determine free space of %s error=%v", dirPath, err)
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
-		return resp
+		return srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
 	}
-
 	srs.logger.Debugf("Current free disk space in %s is %0.2fGB", dirPath, currentFreeSpaceInDir)
-
 	var totalSpaceInHab float64
 	totalSpaceInHab, err = srs.GetTotalSpaceOfGivenDir("/hab")
+
 	if err != nil {
 		srs.logger.Error("Unable to determine total space of /hab :", err)
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
-		return resp
+		return srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
 	}
-
 	srs.logger.Debugf("Current total space in /hab : %0.2fGB", totalSpaceInHab)
 
 	expectedFreeSpaceValue := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInHab, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB)
 	srs.logger.Debugf("Expected free space calculated for %s is %0.2fGB", dirPath, expectedFreeSpaceValue)
 
 	passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceValue, currentFreeSpaceInDir, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB, constants.POST_DEPLOY, dirPath)
-	resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), successMsg, errorMsg, resolutionMsg)
-	return resp
+	return srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), successMsg, errorMsg, resolutionMsg)
 }
 
 func (srs *SystemResourcesService) GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpaceCalculated, currentFreeSpace, expectedFreeSpaceWantInPer, expectedFreeSpaceWantInGB float64, deploymentState, dirName string) (bool, string, string, string) {

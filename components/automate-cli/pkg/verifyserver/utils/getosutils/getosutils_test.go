@@ -115,7 +115,7 @@ func TestGetCPUSpeed(t *testing.T) {
 			errWant:             "",
 		},
 		{
-			testCaseDescreption: "Valid file path and syntax of file",
+			testCaseDescreption: "Invalid file path",
 			filepath:            "../../services/systemresourceservice/testfiles/filenotexist",
 			cpuSpeedWant:        float64(0),
 			errWant:             "open ../../services/systemresourceservice/testfiles/filenotexist: no such file or directory",
