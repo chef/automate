@@ -122,8 +122,8 @@ func (os *OpensearchOperations) CreateSnapshot(client *elastic.Client, ctx *fibe
 		return false, err
 	}
 
-	os.Log.Info("Snapshot creation: ", *res.Accepted)
-	return *res.Accepted, nil
+	os.Log.Info("Snapshot creation: ", res.Accepted)
+	return true, nil
 }
 
 func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *fiber.Ctx, repoName string, snapshotName string) (string, error) {
