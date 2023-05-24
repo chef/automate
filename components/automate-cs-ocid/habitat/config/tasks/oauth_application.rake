@@ -1,17 +1,19 @@
 require 'active_record/base'
 require 'fileutils'
 namespace :oauth_application do
-  desc "Task to register multiple oauth application"
-  task :register1, [:oauth_applications] => :environment do |t, args|
-    puts "oauth_applications:"
-    puts args.oauth_applications
-  end
-
-  desc "Task to register a new oauth application"
-  task :register, [:app_name, :redirect_uri] => :environment do |t, args|
+  desc "Task to register oauth applications"
+  task :register => :environment do
+    # This task expects an environment variable to be set with a json string
+    # containing a list of oauth application objects. The list should have the following schema:
+    # [{"name"=>"<app name>", "redirect_uri"=>"<callback url for redirect>"}]
+    oauth_applications_json = ENV['OAUTH_APPLICATIONS_JSON']
+    oauth_applications = JSON.parse(oauth_applications_json)
     ActiveRecord::Base.transaction do
-      app = Doorkeeper::Application.find_or_create_by(:name => args.app_name)
-      app.update!(:redirect_uri => args.redirect_uri)
+      oauth_applications.each_with_index do |oauth_application, counter|
+        next if oauth_application['name'].blank?
+        app = Doorkeeper::Application.find_or_create_by(:name => oauth_application['name'])
+        app.update!(:redirect_uri => oauth_application['redirect_uri'])
+      end
     end
   end
 
