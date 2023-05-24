@@ -2,6 +2,7 @@ package opensearchbackupservice
 
 import (
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/gofiber/fiber"
@@ -30,26 +31,36 @@ func (osc *MockOpensearchClient) CreateAWSClient(req models.S3BackupDetails, url
 	return osc.CreateAWSClientFunc(req, url)
 }
 
-type MockHttpClient struct {
-	DoFunc func(*http.Request) (*http.Response, error)
+// type MockHttpClient struct {
+// 	DoFunc func(*http.Request) (*http.Response, error)
+// }
+
+// func (mss *MockHttpClient) Do(r *http.Request) (*http.Response, error) {
+// 	return mss.DoFunc(r)
+// }
+
+type DummyHttpClient struct {
+	responseMock string
 }
 
-func (mss *MockHttpClient) Do(r *http.Request) (*http.Response, error) {
-	return mss.DoFunc(r)
+func (c *DummyHttpClient) Do(r *http.Request) (*http.Response, error) {
+	recorder := httptest.NewRecorder()
+	recorder.Write([]byte(c.responseMock))
+	recorder.Header().Set("Content-Type", "application/json")
+
+	return recorder.Result(), nil
 }
 
-func SetupMockOpensearchClient() IOpenSearchclient {
+func MockHttpClient(responseMock string) *DummyHttpClient {
+	return &DummyHttpClient{responseMock}
+}
+
+func SetupMockOpensearchClient(responseMock string) IOpenSearchclient {
 	return &MockOpensearchClient{
 		CreateAWSClientFunc: func(req models.S3BackupDetails, url string) (*elastic.Client, error) {
-			httpClient := &MockHttpClient{
-				DoFunc: func(r *http.Request) (*http.Response, error) {
-					if r.URL.Path != "" {
-					}
-					return nil, nil
-				},
-			}
+			httpClient := MockHttpClient(responseMock)
 			var err error
-			createRepoClient, err := elastic.NewClient(elastic.SetURL(req.Endpoint), elastic.SetSniff(false), elastic.SetHttpClient(httpClient), elastic.SetHealthcheck(false))
+			createRepoClient, err := elastic.NewClient(elastic.SetSniff(false), elastic.SetHttpClient(httpClient), elastic.SetHealthcheck(false))
 			if err != nil {
 				return nil, errors.Wrap(err, "Failed to create ES client with aws signing")
 			}
