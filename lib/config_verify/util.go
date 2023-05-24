@@ -14,6 +14,10 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 )
 
+const (
+	FOR_CERTS = " for certs "
+)
+
 func validateAutomateFQDN(fqdn string) error {
 	if strings.Contains(fqdn, " ") {
 		return errors.New("domain name cannot contain spaces")
@@ -267,62 +271,36 @@ func validateIPs(config *config_parser.HAOnPremConfigToml) *list.List {
 	const notValidErrorString = "is not valid"
 	errorList := list.New()
 
-	for _, element := range config.ExistingInfra.Config.AutomatePrivateIps {
-		if checkIPAddress(element) != nil {
-			errorList.PushBack("Automate private Ip " + element + notValidErrorString)
-		}
+	validateIPList(config.ExistingInfra.Config.AutomatePrivateIps, "Automate private Ip", notValidErrorString, errorList)
+	validateIPList(config.ExistingInfra.Config.ChefServerPrivateIps, "chef server private Ip", notValidErrorString, errorList)
+
+	if config.ExternalDB.Database.Type != "aws" && config.ExternalDB.Database.Type != "self-managed" {
+		validateIPList(config.ExistingInfra.Config.OpensearchPrivateIps, "open search private Ip", notValidErrorString, errorList)
+		validateIPList(config.ExistingInfra.Config.PostgresqlPrivateIps, "Postgresql private Ip", notValidErrorString, errorList)
 	}
 
-	for _, element := range config.ExistingInfra.Config.ChefServerPrivateIps {
-		if checkIPAddress(element) != nil {
-			errorList.PushBack("chef server private Ip " + element + notValidErrorString)
-		}
-	}
-
-	if (config.ExternalDB.Database.Type != "aws") && (config.ExternalDB.Database.Type != "self-managed") {
-		for _, element := range config.ExistingInfra.Config.OpensearchPrivateIps {
-			if checkIPAddress(element) != nil {
-				errorList.PushBack("open search private Ip " + element + notValidErrorString)
-			}
-		}
-
-		for _, element := range config.ExistingInfra.Config.PostgresqlPrivateIps {
-			if checkIPAddress(element) != nil {
-				errorList.PushBack("Postgresql private Ip " + element + notValidErrorString)
-			}
-		}
-	}
-
-	if config.Automate.Config.EnableCustomCerts {
-		for _, element := range config.Automate.Config.CertsByIP {
-			if checkIPAddress(element.IP) != nil {
-				errorList.PushBack("Automate IP " + element.IP + " for certs " + notValidErrorString)
-			}
-		}
-	}
-	if config.ChefServer.Config.EnableCustomCerts {
-		for _, element := range config.ChefServer.Config.CertsByIP {
-			if checkIPAddress(element.IP) != nil {
-				errorList.PushBack("ChefServer IP " + element.IP + " for certs " + notValidErrorString)
-			}
-		}
-	}
-
-	if config.Opensearch.Config.EnableCustomCerts {
-		for _, element := range config.Opensearch.Config.CertsByIP {
-			if checkIPAddress(element.IP) != nil {
-				errorList.PushBack("Opensearch IP " + element.IP + " for certs " + notValidErrorString)
-			}
-		}
-	}
-
-	if config.Postgresql.Config.EnableCustomCerts {
-		for _, element := range config.Postgresql.Config.CertsByIP {
-			if checkIPAddress(element.IP) != nil {
-				errorList.PushBack("Postgresql IP " + element.IP + " for certs " + notValidErrorString)
-			}
-		}
-	}
+	validateCertsByIP(config.Automate.Config.EnableCustomCerts, config.Automate.Config.CertsByIP, "Automate IP", FOR_CERTS, notValidErrorString, errorList)
+	validateCertsByIP(config.ChefServer.Config.EnableCustomCerts, config.ChefServer.Config.CertsByIP, "ChefServer IP", FOR_CERTS, notValidErrorString, errorList)
+	validateCertsByIP(config.Opensearch.Config.EnableCustomCerts, config.Opensearch.Config.CertsByIP, "Opensearch IP", FOR_CERTS, notValidErrorString, errorList)
+	validateCertsByIP(config.Postgresql.Config.EnableCustomCerts, config.Postgresql.Config.CertsByIP, "Postgresql IP", FOR_CERTS, notValidErrorString, errorList)
 
 	return errorList
+}
+
+func validateIPList(ipList []string, prefix string, suffix string, errorList *list.List) {
+	for _, element := range ipList {
+		if checkIPAddress(element) != nil {
+			errorList.PushBack(prefix + " " + element + suffix)
+		}
+	}
+}
+
+func validateCertsByIP(enableCustomCerts bool, certsByIP []config_parser.CertByIP, prefix string, suffix string, notValidErrorString string, errorList *list.List) {
+	if enableCustomCerts {
+		for _, element := range certsByIP {
+			if checkIPAddress(element.IP) != nil {
+				errorList.PushBack(prefix + " " + element.IP + suffix + notValidErrorString)
+			}
+		}
+	}
 }

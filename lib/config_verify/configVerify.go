@@ -81,62 +81,88 @@ func ConfigValidateAWS(config *config_parser.HAAwsConfigToml) error {
 
 func validateAWSConfigCerts(config *config_parser.HAAwsConfigToml) *list.List {
 	errorList := list.New()
+
 	if config.Automate.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(config.Automate.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
-		}
-		// If root_ca is provided, check that it is valid
-		if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
-			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
-			}))
-		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
-			{key: config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
-		}))
+		validateAwsAutomateCerts(config, errorList)
 	}
+
 	if config.ChefServer.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(config.ChefServer.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(config.ChefServer.Config.PublicKey)) < 1 {
-			errorList.PushBack("ChefServer root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
-		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
-			{key: config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
-		}))
+		validateAwsChefServerCerts(config, errorList)
 	}
+
 	if config.Postgresql.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(config.Postgresql.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(config.Postgresql.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(config.Postgresql.Config.PublicKey)) < 1 {
-			errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
-		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
-			{key: config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
-			{key: config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
-		}))
+		validateAwsPostgresqlCerts(config, errorList)
 	}
+
 	if config.Opensearch.Config.EnableCustomCerts {
-		if len(strings.TrimSpace(config.Opensearch.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(config.Opensearch.Config.AdminKey)) < 1 ||
-			len(strings.TrimSpace(config.Opensearch.Config.AdminCert)) < 1 ||
-			len(strings.TrimSpace(config.Opensearch.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(config.Opensearch.Config.PublicKey)) < 1 {
-			errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
-		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-			{key: config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-			{key: config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
-			{key: config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
-			{key: config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
-		}))
+		validateAwsOpensearchCerts(config, errorList)
 	}
+
 	return errorList
 }
+
+func validateAwsAutomateCerts(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if len(strings.TrimSpace(config.Automate.Config.PrivateKey)) < 1 ||
+		len(strings.TrimSpace(config.Automate.Config.PublicKey)) < 1 {
+		errorList.PushBack("Automate public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+	}
+
+	if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+		}))
+	}
+
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
+		{key: config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
+	}))
+}
+
+func validateAwsChefServerCerts(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if len(strings.TrimSpace(config.ChefServer.Config.PrivateKey)) < 1 ||
+		len(strings.TrimSpace(config.ChefServer.Config.PublicKey)) < 1 {
+		errorList.PushBack("ChefServer root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+	}
+
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
+		{key: config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
+	}))
+}
+
+func validateAwsPostgresqlCerts(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if len(strings.TrimSpace(config.Postgresql.Config.RootCA)) < 1 ||
+		len(strings.TrimSpace(config.Postgresql.Config.PrivateKey)) < 1 ||
+		len(strings.TrimSpace(config.Postgresql.Config.PublicKey)) < 1 {
+		errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+	}
+
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+		{key: config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
+		{key: config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+	}))
+}
+
+func validateAwsOpensearchCerts(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if len(strings.TrimSpace(config.Opensearch.Config.RootCA)) < 1 ||
+		len(strings.TrimSpace(config.Opensearch.Config.AdminKey)) < 1 ||
+		len(strings.TrimSpace(config.Opensearch.Config.AdminCert)) < 1 ||
+		len(strings.TrimSpace(config.Opensearch.Config.PrivateKey)) < 1 ||
+		len(strings.TrimSpace(config.Opensearch.Config.PublicKey)) < 1 {
+		errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+	}
+
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
+		{key: config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
+		{key: config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+		{key: config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
+		{key: config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+	}))
+}
+
 func validateEnvFields(config *config_parser.HAAwsConfigToml) *list.List {
 	errorList := list.New()
 
@@ -263,22 +289,41 @@ func validateExternalDbFields(config *config_parser.HAOnPremConfigToml) *list.Li
 func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 	e := c.NewInvalidConfigError()
 
+	validateFqdn(config, e)
+	validateFrontendTLS(config, e)
+	validateDeploymentType(config, e)
+	validateChannelValue(config, e)
+	validateUpgradeStrategyValue(config, e)
+	validateManifestCacheExpiry(config, e)
+	validatePackageCleanupModeValue(config, e)
+	validateProducts(config, e)
+
+	if e.IsEmpty() {
+		return nil
+	}
+
+	return e
+}
+
+func validateFqdn(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	fqdn := config.Global.V1.Fqdn
 	if fqdn == nil {
 		e.AddMissingKey("global.v1.fqdn")
 	} else {
-		// Validate Fqdn
 		if err := validateAutomateFQDN(fqdn.Value); err != nil {
 			e.AddInvalidValue("global.v1.fqdn", err.Error())
 		}
 	}
+}
 
-	// Parse frontend TLS configuration
+func validateFrontendTLS(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	frontendTLS := config.Global.V1.FrontendTls
 	if len(frontendTLS) < 1 {
 		e.AddMissingKey("global.v1.frontend_tls")
 	}
+}
 
+func validateDeploymentType(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	deploymentType := config.Deployment.V1.Svc.DeploymentType
 	if deploymentType == nil {
 		e.AddMissingKey("deployment.v1.svc.deployment_type")
@@ -287,7 +332,9 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 			e.AddInvalidValue("deployment.v1.svc.deployment_type", "The only supported deployment type is 'local'")
 		}
 	}
+}
 
+func validateChannelValue(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	channel := config.Deployment.V1.Svc.Channel
 	if channel == nil {
 		e.AddMissingKey("deployment.v1.svc.channel")
@@ -296,7 +343,9 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 			e.AddInvalidValue("deployment.v1.svc.channel", msg)
 		}
 	}
+}
 
+func validateUpgradeStrategyValue(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	upgradeStrategy := config.Deployment.V1.Svc.UpgradeStrategy
 	if upgradeStrategy == nil {
 		e.AddMissingKey("deployment.v1.svc.upgrade_strategy")
@@ -305,30 +354,31 @@ func ConfigValidateStandalone(config *sc.AutomateConfig) error {
 			e.AddInvalidValue("deployment.v1.svc.upgrade_strategy", msg)
 		}
 	}
+}
 
+func validateManifestCacheExpiry(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	if v := config.Deployment.V1.Svc.GetManifestCacheExpiry().GetValue(); v != "" {
 		_, parseErr := time.ParseDuration(v)
 		if parseErr != nil {
 			e.AddInvalidValue("deployment.v1.svc.manifest_cache_expiry", parseErr.Error())
 		}
 	}
+}
 
+func validatePackageCleanupModeValue(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	packageCleanupMode := config.Deployment.V1.Svc.PackageCleanupMode
 	if packageCleanupMode != nil {
 		if valid, msg := validatePackageCleanupMode(packageCleanupMode.Value); !valid {
 			e.AddInvalidValue("deployment.v1.svc.package_cleanup_mode", msg)
 		}
 	}
+}
 
+func validateProducts(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	if desiredProducts := config.Deployment.V1.Svc.GetProducts(); len(desiredProducts) > 0 {
 		validationErr := services.ValidateProductDeployment(desiredProducts)
 		if validationErr != nil {
 			e.AddInvalidValue("deployment.v1.svc.products", validationErr.Error())
 		}
 	}
-
-	if e.IsEmpty() {
-		return nil
-	}
-	return e
 }

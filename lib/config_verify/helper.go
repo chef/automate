@@ -10,13 +10,17 @@ import (
 	"strings"
 )
 
+const (
+	INVALID_EMPTY_VALUE = "Invalid or empty %s"
+)
+
 func validateRequiredNumberField(value string, fieldName string, errorList *list.List) {
 	if len(value) > 0 {
 		if _, err := strconv.Atoi(value); err != nil {
 			errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
 		}
 	} else {
-		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
+		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 }
 
@@ -37,20 +41,20 @@ func validateRequiredPathField(value string, fieldName string, errorList *list.L
 			}
 		}
 	} else {
-		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
+		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 }
 
 func validateRequiredStringTypeField(value interface{}, fieldName string, errorList *list.List) {
 	strValue, ok := value.(string)
 	if !ok || len(strings.TrimSpace(strValue)) < 1 {
-		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
+		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 }
 
 func validateRequiredStringListField(value []string, fieldName string, errorList *list.List) {
 	if len(value) < 1 {
-		errorList.PushBack(fmt.Sprintf("Invalid or empty %s", fieldName))
+		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 }
 
