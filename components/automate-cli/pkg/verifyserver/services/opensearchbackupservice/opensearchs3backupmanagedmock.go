@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 )

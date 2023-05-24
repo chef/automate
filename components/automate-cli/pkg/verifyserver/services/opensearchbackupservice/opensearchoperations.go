@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	elastic "github.com/olivere/elastic/v7"
 )
 
@@ -36,7 +36,7 @@ type snapshotStatus struct {
 	IncludeGlobalState bool   `json:"include_global_state"`
 }
 
-func NewOpensearchOperations(log logger.Logger) IOpensearchOperations {
+func NewOpensearchOperations(log logger.Logger) *OpensearchOperations {
 	return &OpensearchOperations{
 		Log: log,
 	}

@@ -7,7 +7,7 @@ import (
 	constant "github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	elastic "github.com/olivere/elastic/v7"
 	elasticaws "github.com/olivere/elastic/v7/aws/v4"
 	"github.com/pkg/errors"
@@ -40,11 +40,11 @@ type SnapshotRequest struct {
 
 type OpenSearchclient struct{}
 
-func NewOpenSearchclient() IOpenSearchclient {
+func NewOpenSearchclient() *OpenSearchclient {
 	return &OpenSearchclient{}
 }
 
-func NewOSS3BackupService(log logger.Logger) IOSS3BackupService {
+func NewOSS3BackupService(log logger.Logger) *OSS3BackupService {
 	return &OSS3BackupService{
 		OSClient:     NewOpenSearchclient(),
 		OSOperations: NewOpensearchOperations(log),
