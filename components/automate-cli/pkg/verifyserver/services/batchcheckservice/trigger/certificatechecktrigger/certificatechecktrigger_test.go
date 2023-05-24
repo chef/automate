@@ -400,5 +400,26 @@ func TestCertificateCheck_Run(t *testing.T) {
 			assert.Equal(t, resp.Result.Passed, false)
 		}
 	})
+	t.Run("Returns 500 Internal server error", func(t *testing.T) {
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`invalid JSON`))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1234")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewCertificateCheck(logger.NewTestLogger(), "1234")
+		request := GetRequestJson()
+		finalResp := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(finalResp))
+
+		for _, resp := range finalResp {
+			assert.NotNil(t, resp.Error)
+			assert.Empty(t, resp.Result.Checks)
+			assert.Equal(t, resp.Result.Passed, false)
+		}
+	})
 
 }

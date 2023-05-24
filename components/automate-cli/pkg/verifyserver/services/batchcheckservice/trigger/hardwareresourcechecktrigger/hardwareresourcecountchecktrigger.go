@@ -39,7 +39,7 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 	// for each and every IP to make the processing simple at the caller end
 
 	if err != nil {
-		hostMap := configutils.GetNodeTypeMap(config)
+		hostMap := configutils.GetNodeTypeMap(config.Hardware)
 		for ip, types := range hostMap {
 			for i := 0; i < len(types); i++ {
 				finalResult = append(finalResult, checkutils.PrepareTriggerResponse(nil, ip, types[i], err.Error(), constants.HARDWARE_RESOURCE_COUNT, constants.HARDWARE_RESOURCE_COUNT_MSG, true))
