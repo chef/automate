@@ -147,13 +147,6 @@ sudo chef-automate backup fix-repo-permissions <path>
 
 ## Restore From an AWS S3 Backup
 
-{{< note >}}
-
-- If you have not configured S3 access and secret keys during deployment or if you have taken backup on a different bucket, then you need to provide the `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` flags.
-- In somecase, the restore might not recognise the secret and access key provided in configuration. In such case, provide `--s3-access-key <Access_Key>` and `--s3-secret-key <Secret_Key>` with the restore command
-
-{{< /note >}}
-
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
 See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
@@ -161,19 +154,19 @@ See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
 To restore from an AWS S3 bucket backup on a new host, run:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --s3-access-key <access_key> --s3-secret-key <secret_key>
 ```
 
 To restore from an AWS S3 bucket backup on an existing Chef Automate host, run:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key <access_key> --s3-secret-key <secret_key>
 ```
 
 Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight --s3-access-key <access_key> --s3-secret-key <secret_key>
 ```
 
 A successful restore shows the timestamp of the backup used at the end of the status output:
