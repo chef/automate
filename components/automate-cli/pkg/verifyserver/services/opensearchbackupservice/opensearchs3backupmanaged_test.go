@@ -3,6 +3,7 @@ package opensearchbackupservice
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -12,14 +13,14 @@ import (
 )
 
 var request = models.S3BackupDetails{
-	Endpoint:   "",
+	Endpoint:   "testurl",
 	Username:   "",
 	Password:   "",
 	S3Bucket:   "",
 	S3BasePath: "",
-	AccessKey:  "",
-	SecretKey:  "",
-	AWSRegion:  "",
+	AccessKey:  "access",
+	SecretKey:  "secret",
+	AWSRegion:  "region",
 	AWSRoleArn: "",
 }
 
@@ -159,4 +160,21 @@ func TestSuccessfulBackup(t *testing.T) {
 	assert.Equal(t, resp.Passed, true)
 	response, _ := json.Marshal(resp.Checks[0])
 	assert.Equal(t, string(response), expectedResponse)
+}
+
+func TestCreateIndex(t *testing.T) {
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
+	os := OpensearchOperations{
+		Log: log,
+	}
+
+	awsClient := SetupMockOpensearchClient()
+	client, err := awsClient.CreateAWSClient(request, "testing")
+
+	resp, err := os.CreateTestIndex(client, &fiber.Ctx{}, "abc")
+
+	fmt.Println(resp)
 }

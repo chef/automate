@@ -1,9 +1,12 @@
 package opensearchbackupservice
 
 import (
+	"net/http"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/gofiber/fiber"
 	elastic "github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
 )
 
 type TestMockFunc struct {
@@ -27,10 +30,30 @@ func (osc *MockOpensearchClient) CreateAWSClient(req models.S3BackupDetails, url
 	return osc.CreateAWSClientFunc(req, url)
 }
 
+type MockHttpClient struct {
+	DoFunc func(*http.Request) (*http.Response, error)
+}
+
+func (mss *MockHttpClient) Do(r *http.Request) (*http.Response, error) {
+	return mss.DoFunc(r)
+}
+
 func SetupMockOpensearchClient() IOpenSearchclient {
 	return &MockOpensearchClient{
 		CreateAWSClientFunc: func(req models.S3BackupDetails, url string) (*elastic.Client, error) {
-			return &elastic.Client{}, nil
+			httpClient := &MockHttpClient{
+				DoFunc: func(r *http.Request) (*http.Response, error) {
+					if r.URL.Path != "" {
+					}
+					return nil, nil
+				},
+			}
+			var err error
+			createRepoClient, err := elastic.NewClient(elastic.SetURL(req.Endpoint), elastic.SetSniff(false), elastic.SetHttpClient(httpClient), elastic.SetHealthcheck(false))
+			if err != nil {
+				return nil, errors.Wrap(err, "Failed to create ES client with aws signing")
+			}
+			return createRepoClient, nil
 		},
 	}
 }
@@ -103,3 +126,12 @@ func SetupMockOSOperations(resp []TestMockFunc) IOpensearchOperations {
 	}
 
 }
+
+// func SetupMockOpensearchClient() IOpenSearchclient {
+// 	return &MockOpensearchClient{
+// 		CreateAWSClientFunc: func(req models.S3BackupDetails, url string) (*elastic.Client, error)
+// 		{
+
+// 		},
+// 	}
+// }
