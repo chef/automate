@@ -19,8 +19,6 @@ const (
 		"status": "success",
 		"result": {
 			"passed": true,
-			"msg": "API result message",
-			"check": "API check",
 			"checks": [
 				{
 					"title": "Check 1",
