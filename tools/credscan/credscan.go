@@ -100,6 +100,9 @@ var a2Config = config{
 		{regex: `components/automate-ha-elasticsidecar/habitat/config/certificates/.*\.pem`},
 		{regex: `components/automate-ha-elasticsidecar/habitat/config/certificates/.*\.key`},
 
+		// Test data for config_verify, this is just a placeholder
+		{regex: `components/lib/config_verify/testdata/.*\.pem`},
+
 		// Test data for cypress; only removing the beg and end of pem key
 		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
 
