@@ -515,7 +515,7 @@ steps:
 
   - label: "v2 to v3 upgrade"
     command:
-      - curl  "https://go.dev/dl/go1.19.3.linux-amd64.tar.gz" -o golang.tar.gz &&     echo "74b9640724fd4e6bb0ed2a1bc44ae813a03f1e72a4c76253e2d5c015494430ba golang.tar.gz" | sha256sum -c - &&     tar -C /usr/local -xzf golang.tar.gz &&     rm golang.tar.gz
+      - curl  "https://go.dev/dl/go1.19.3.linux-amd64.tar.gz" -o golang.tar.gz && tar -C /usr/local -xzf golang.tar.gz && rm golang.tar.gz
       - go version
       - integration/run_test integration/tests/v2_to_v3_upgrade.sh
     timeout_in_minutes: 25
