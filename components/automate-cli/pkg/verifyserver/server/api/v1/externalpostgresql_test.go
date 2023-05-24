@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -40,7 +40,7 @@ func SetupMockExternalPostgresqlService(responseBody *models.ExternalPgResponse,
 
 func SetupExternalPostgresqlHandlers(pg externalpostgresqlservice.ISExternalPostgresqlService) (*fiber.App, error) {
 	log, _ := logger.NewLogger("text", "debug")
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
