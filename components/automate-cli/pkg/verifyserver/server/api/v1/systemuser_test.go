@@ -16,12 +16,21 @@ import (
 )
 
 var (
-	HabUserSuccessTitle = "User creation/validation check"
-	HabGroupSuccessTitle = "Group creation/validation check"
+	HabUserSuccessTitle                = "User creation/validation check"
+	HabUserFailureTitle                = "User validation failure"
+	HabGroupSuccessTitle               = "Group creation/validation check"
+	HabGroupFailureTitle               = "Group Validation failure"
 	HabUserAndGroupMappingSuccessTitle = "User and group mapping successfully"
-	HabUserSuccessMsg = "User is created or found successfully"
-	HabGroupSuccessMsg = "Group is created or found successfully"
-	HabUserAndGroupMapSuccessMSg = "User and group mapping successful"
+	HabUserAndGroupMappingFailureTitle = "User and group mapping failed"
+	HabUserSuccessMsg                  = "User is created or found successfully"
+	HabUserErrorMsg                    = "User found but failed the validation"
+	HabUserResolutionMsg               = "Check the user name"
+	HabGroupSuccessMsg                 = "Group is created or found successfully"
+	HabGroupErrorMsg                   = "Group found but failed the validation"
+	HabGroupResolutionMsg              = "Check the group name"
+	HabUserAndGroupMapSuccessMSg       = "User and group mapping successful"
+	HabUserAndGroupMapErrorMsg         = "User and group mapping failure"
+	HabUserAndGroupMapResolutionMsg    = "Verify the mapping for the user and the group"
 )
 
 func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error) {
@@ -46,57 +55,59 @@ func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error
 	return vs.App, nil
 }
 
-func SetupMockSystemUserService() systemuserservice.SystemUser {
-	return &systemuserservice.MockSystemUserService {
+func SetupMockSystemUserService(response models.SystemUserResponse) systemuserservice.SystemUser {
+	return &systemuserservice.MockSystemUserService{
 		GetSystemUserServiceDetailsFunc: func() *models.SystemUserResponse {
-			return &models.SystemUserResponse{
-				Passed: true,
-				Checks: []models.SystemUserServiceCheck{
-					{
-						Title: HabUserSuccessTitle,
-						Passed: true,
-						SuccessMsg: HabUserSuccessMsg,
-						ErrorMsg: "",
-						ResolutionMsg: "",
-					},
-					{
-						Title: HabGroupSuccessTitle,
-						Passed: true,
-						SuccessMsg: HabGroupSuccessMsg,
-						ErrorMsg: "",
-						ResolutionMsg: "",
-					},
-					{
-						Title: HabUserAndGroupMappingSuccessTitle,
-						Passed: true,
-						SuccessMsg: HabUserAndGroupMapSuccessMSg,
-						ErrorMsg: "",
-						ResolutionMsg: "",
-					},
-				},
-			}
+			return &response
 		},
 	}
 }
 
 func TestSystemUser(t *testing.T) {
 	tests := []struct {
-		description string
+		description  string
 		expectedCode int
+		responseBody models.SystemUserResponse
 		expectedBody string
 	}{
 		{
-			description: "200:User and Group verified and mapping validated",
+			description:  "200:User and Group verified and mapping validated",
 			expectedCode: 200,
+			responseBody: models.SystemUserResponse{
+				Passed: true,
+				Checks: []models.SystemUserServiceCheck{
+					{
+						Title:         HabUserSuccessTitle,
+						Passed:        true,
+						SuccessMsg:    HabUserSuccessMsg,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         HabGroupSuccessTitle,
+						Passed:        true,
+						SuccessMsg:    HabGroupSuccessMsg,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         HabUserAndGroupMappingSuccessTitle,
+						Passed:        true,
+						SuccessMsg:    HabUserAndGroupMapSuccessMSg,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
 			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"User creation/validation check\",\"passed\":true,\"success_msg\":\"User is created or found successfully\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Group creation/validation check\",\"passed\":true,\"success_msg\":\"Group is created or found successfully\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"User and group mapping successfully\",\"passed\":true,\"success_msg\":\"User and group mapping successful\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}",
 		},
 	}
-	systemuserCheckEndpoint := "/api/v1/checks/system-user"
-	app, err := SetupSystemUserHandlers(SetupMockSystemUserService())
-	assert.NoError(t, err)
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
+			systemuserCheckEndpoint := "/api/v1/checks/system-user"
+			app, err := SetupSystemUserHandlers(SetupMockSystemUserService(test.responseBody))
+			assert.NoError(t, err)
 			req := httptest.NewRequest("GET", systemuserCheckEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)

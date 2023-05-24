@@ -10,4 +10,3 @@ type MockSystemUserService struct {
 func (msu *MockSystemUserService) GetSystemUserServiceDetails() *models.SystemUserResponse {
 	return msu.GetSystemUserServiceDetailsFunc()
 }
-

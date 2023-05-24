@@ -1,11 +1,38 @@
 package fiberutils_test
 
 import (
+	"os/user"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestCommand(t *testing.T) {
+	f := &fiberutils.ExecCmdServiceImp{}
+
+	output, err := f.Command("echo", []string{"Hello"})
+	assert.Contains(t, string(output), "Hello")
+	assert.Equal(t, nil, err)
+}
+
+func TestLookup(t *testing.T) {
+	s := &fiberutils.UserCmdServiceImp{}
+	username := "hab"
+	u, err := s.Lookup(username)
+	if u == nil {
+		assert.Equal(t, user.UnknownUserError(username), err)
+	}
+}
+
+func TestLookupGroup(t *testing.T) {
+	s := &fiberutils.UserCmdServiceImp{}
+	groupname := "hab"
+	u, err := s.LookupGroup(groupname)
+	if u == nil {
+		assert.Equal(t, user.UnknownGroupError("hab"), err)
+	}
+}
 
 func TestExecuteShellCommand(t *testing.T) {
 	out, err := fiberutils.ExecuteShellCommand("echo 'Hello World'")
