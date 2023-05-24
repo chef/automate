@@ -18,7 +18,7 @@ Data Lifecycle manages the retention of events, service groups, Chef Infra Clien
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
-Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
+Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, set the respective value of [max shards](/automate/data_lifecycle/#max-shards) to run the data lifecycle.
 
 ![Data Lifecycle](/images/automate/data-lifecycle.png)
 
@@ -45,9 +45,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ## Max Shards
 
-The max shards are the number of shards that should be patched to run the data life cycle. If the client runs and the compliance data lifecycle is set to  30 days, the max shards should be 1000. Patch the following configuration in the `.toml` file to fix the max shards data lifecycle.
-
-Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
+The max shards are the number of shards that should be patched to run the data lifecycle. If the client runs and the compliance data lifecycle is set to  30 days, the max shards should be 1000. Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
 
 | Days | Max Shred Per Node |
 | ---- | ------------------ |
@@ -56,7 +54,7 @@ Refer to the following table for calculated max shards for the client run and co
 | 90   | 3000               |
 | 365  | 12000              |
 
-To set the value of max shards per node, set the value of `max_shards_per_node` in the following way:
+To set the value of max shards per node, patch the following configuration in the `.toml` file.
 
 ```bash
 [opensearch]
