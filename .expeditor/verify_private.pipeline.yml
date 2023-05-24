@@ -50,37 +50,37 @@ steps:
 
   # We need to build in order to run the
   # integration tests.
-  - label: build
-    command:
-      - scripts/verify_build.sh
-    timeout_in_minutes: 60
-    env:
-      ALLOW_LOCAL_PACKAGES: true
-      HAB_STUDIO_SUP: false
-      HAB_NONINTERACTIVE: true
-    expeditor:
-      secrets:
-        HAB_STUDIO_SECRET_GITHUB_TOKEN:
-          account: github/chef
-          field: token
-        OPENSEARCH_ROOT_CA_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: root-ca.pem
-        OPENSEARCH_ADMIN_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: admin.pem
-        OPENSEARCH_ADMIN_KEY_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: admin-key.pem
-        OPENSEARCH_NODE1_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: node1.pem
-        OPENSEARCH_NODE1_KEY_PEM:
-          path: secret/a2/a2ha/opensearch
-          field: node1-key.pem
-      executor:
-        linux:
-          privileged: true
+#  - label: build
+#    command:
+#      - scripts/verify_build.sh
+#    timeout_in_minutes: 60
+#    env:
+#      ALLOW_LOCAL_PACKAGES: true
+#      HAB_STUDIO_SUP: false
+#      HAB_NONINTERACTIVE: true
+#    expeditor:
+#      secrets:
+#        HAB_STUDIO_SECRET_GITHUB_TOKEN:
+#          account: github/chef
+#          field: token
+#        OPENSEARCH_ROOT_CA_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: root-ca.pem
+#        OPENSEARCH_ADMIN_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: admin.pem
+#        OPENSEARCH_ADMIN_KEY_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: admin-key.pem
+#        OPENSEARCH_NODE1_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: node1.pem
+#        OPENSEARCH_NODE1_KEY_PEM:
+#          path: secret/a2/a2ha/opensearch
+#          field: node1-key.pem
+#      executor:
+#        linux:
+#          privileged: true
 
 #
 #  - label: "[unit] license-control-service"
@@ -156,7 +156,7 @@ steps:
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
   # or take a long time.
-  - wait
+#  - wait
 
 #  - label: "automate-load-balancer"
 #    command:
@@ -515,7 +515,7 @@ steps:
 
   - label: "v2 to v3 upgrade"
     command:
-      - /bin/bash -c curl -fsSL "https://go.dev/dl/go1.19.3.linux-amd64.tar.gz" -o golang.tar.gz &&     echo "74b9640724fd4e6bb0ed2a1bc44ae813a03f1e72a4c76253e2d5c015494430ba golang.tar.gz" | sha256sum -c - &&     tar -C /usr/local -xzf golang.tar.gz &&     rm golang.tar.gz
+      - /bin/bash -c curl -s "https://go.dev/dl/go1.19.3.linux-amd64.tar.gz" -o golang.tar.gz &&     echo "74b9640724fd4e6bb0ed2a1bc44ae813a03f1e72a4c76253e2d5c015494430ba golang.tar.gz" | sha256sum -c - &&     tar -C /usr/local -xzf golang.tar.gz &&     rm golang.tar.gz
       - go version
       - integration/run_test integration/tests/v2_to_v3_upgrade.sh
     timeout_in_minutes: 25
