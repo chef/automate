@@ -83,7 +83,7 @@ func TestConfigValidateOnPrem(t *testing.T) {
 	})
 
 	t.Run("Test Failed Automate SC Config Validation", func(t *testing.T) {
-		config := GetFAiledAutomateScConfigTestData()
+		config := GetFailedAutomateScConfigTestData()
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateStandalone(config)
 		if err != nil {

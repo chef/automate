@@ -325,8 +325,10 @@ func validateFqdn(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	} else {
 		errorList := list.New()
 		validateFQDN(fqdn.Value, errorList)
-		err := getSingleErrorFromList(errorList)
-		e.AddInvalidValue("global.v1.fqdn", err.Error())
+		if errorList.Len() > 0 {
+			err := getSingleErrorFromList(errorList)
+			e.AddInvalidValue("global.v1.fqdn", err.Error())
+		}
 	}
 }
 

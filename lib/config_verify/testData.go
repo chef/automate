@@ -335,9 +335,9 @@ func GetAutomateScConfigTestData() *sc.AutomateConfig {
 	return c
 }
 
-func GetFAiledAutomateScConfigTestData() *sc.AutomateConfig {
+func GetFailedAutomateScConfigTestData() *sc.AutomateConfig {
 	cFailed := GetAutomateScConfigTestData()
-	cFailed.Global.V1.Fqdn = w.String(".com")
+	cFailed.Global.V1.Fqdn = w.String("-com-")
 	cFailed.Deployment.V1.Svc.DeploymentType = w.String("test")
 	cFailed.Deployment.V1.Svc.Channel = w.String("none")
 	cFailed.Deployment.V1.Svc.AdminUser.Username = w.String("")
