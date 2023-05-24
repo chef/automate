@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -26,6 +27,7 @@ type Handler struct {
 	StopMockServersService       stopmockserverservice.IStopMockServerService
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
 	PortReachableService         portreachableservice.IPortReachableService
+	ExternalPostgresqlService    externalpostgresqlservice.ISExternalPostgresqlService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -78,5 +80,10 @@ func (h *Handler) AddOSS3BackupService(ss opensearchbackupservice.IOSS3BackupSer
 
 func (h *Handler) AddPortReachableService(pr portreachableservice.IPortReachableService) *Handler {
 	h.PortReachableService = pr
+	return h
+}
+
+func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.ISExternalPostgresqlService) *Handler {
+	h.ExternalPostgresqlService = pg
 	return h
 }

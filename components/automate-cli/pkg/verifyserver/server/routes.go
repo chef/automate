@@ -18,7 +18,8 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Get("/software-versions", vs.Handler.CheckSoftwareVersion)
 	apiChecksGroup.Post("/s3-config", vs.Handler.GetS3Config)
 	apiChecksGroup.Post("/port-reachable", vs.Handler.PortReachable)
-
+	apiChecksGroup.Post("/external-postgresql", vs.Handler.CheckExternalPostgresql)
+	
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
 	apiChecksGroup.Post("/aws-opensearch-s3-bucket-access", vs.Handler.CheckOSBackupS3)

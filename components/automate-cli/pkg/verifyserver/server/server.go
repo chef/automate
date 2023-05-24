@@ -26,6 +26,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber/v2"
@@ -96,7 +98,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
 		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
-		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT))
+		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
+		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(),l))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
