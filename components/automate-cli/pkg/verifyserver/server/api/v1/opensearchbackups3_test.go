@@ -23,7 +23,7 @@ func SetupMockOpensearchBackupS3Service() opensearchbackupservice.IOSS3BackupSer
 		OSS3BackupVerifyFunc: func(request models.S3BackupDetails, ctx *fiber.Ctx) (models.S3BackupManagedResponse, error) {
 			return models.S3BackupManagedResponse{
 				Passed: true,
-				Checks: []models.S3BackupChecks{
+				Checks: []models.Checks{
 					{
 						Title:         "Create test backup",
 						Passed:        true,
