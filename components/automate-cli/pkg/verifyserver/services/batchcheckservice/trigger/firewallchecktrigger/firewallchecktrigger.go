@@ -64,8 +64,9 @@ func getCertForNodeFromConfig(config models.Config, ip string) models.NodeCert {
 // getRequestsForAutomateAsSource gives the requests for all the ports and types automate as source
 func getRequestsForAutomateAsSource(config models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
-	// Dest postgres
+
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
+		// Dest postgres
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
@@ -77,6 +78,7 @@ func getRequestsForAutomateAsSource(config models.Config) []models.FirewallReque
 		}
 
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
+			//Dest Opensearch
 			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
@@ -95,6 +97,7 @@ func getRequestsForChefServerAsSource(config models.Config) []models.FirewallReq
 
 	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
+		//Dest Automate
 		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
 			nodeCert := getCertForNodeFromConfig(config, destNodeIP)
 			reqBody := models.FirewallRequest{
@@ -140,26 +143,31 @@ func getRequestsForChefServerAsSource(config models.Config) []models.FirewallReq
 func getRequestsForPostgresAsSource(config models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
+		//Dest Other postgres nodes
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			if sourceNodeIP != destNodeIP {
+			if sourceNodeIP == destNodeIP {
+				continue
+			}
+			//for Upd
+			reqBody := models.FirewallRequest{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "9638",
+				DestinationServiceProtocol: "udp",
+			}
+			reqBodies = append(reqBodies, reqBody)
+
+			//for tcp
+			for _, port := range postgresqlTCPPorts {
 				reqBody := models.FirewallRequest{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
-					DestinationServicePort:     "9638",
-					DestinationServiceProtocol: "udp",
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
 				}
 				reqBodies = append(reqBodies, reqBody)
-
-				for _, port := range postgresqlTCPPorts {
-					reqBody := models.FirewallRequest{
-						SourceNodeIP:               sourceNodeIP,
-						DestinationNodeIP:          destNodeIP,
-						DestinationServicePort:     port,
-						DestinationServiceProtocol: "tcp",
-					}
-					reqBodies = append(reqBodies, reqBody)
-				}
 			}
+
 		}
 	}
 
@@ -170,25 +178,30 @@ func getRequestsForPostgresAsSource(config models.Config) []models.FirewallReque
 func getRequestsForOpensearchAsSource(config models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
+		//other postgres nodes
 		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			if sourceNodeIP != destNodeIP {
+			if sourceNodeIP == destNodeIP {
+				continue
+			}
+			//for upd
+			reqBody := models.FirewallRequest{
+				SourceNodeIP:               sourceNodeIP,
+				DestinationNodeIP:          destNodeIP,
+				DestinationServicePort:     "9638",
+				DestinationServiceProtocol: "udp",
+			}
+			reqBodies = append(reqBodies, reqBody)
+
+			//for tcp
+			for _, port := range opensearchTCPPorts {
 				reqBody := models.FirewallRequest{
 					SourceNodeIP:               sourceNodeIP,
 					DestinationNodeIP:          destNodeIP,
-					DestinationServicePort:     "9638",
-					DestinationServiceProtocol: "udp",
+					DestinationServicePort:     port,
+					DestinationServiceProtocol: "tcp",
 				}
 				reqBodies = append(reqBodies, reqBody)
 
-				for _, port := range opensearchTCPPorts {
-					reqBody := models.FirewallRequest{
-						SourceNodeIP:               sourceNodeIP,
-						DestinationNodeIP:          destNodeIP,
-						DestinationServicePort:     port,
-						DestinationServiceProtocol: "tcp",
-					}
-					reqBodies = append(reqBodies, reqBody)
-				}
 			}
 
 		}
@@ -201,6 +214,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 
 	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
+		//Dest Chef Infra server
 		for _, port := range a2CsTCPPorts {
 			reqBody := models.FirewallRequest{
 				SourceNodeIP:               constants.LOCAL_HOST,
@@ -238,7 +252,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 			reqBodies = append(reqBodies, reqBody)
 		}
 	}
-	// Dest Chef Infra
+	// Dest Opensearch
 	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, port := range ossBastionPorts {
 			reqBody := models.FirewallRequest{
@@ -353,5 +367,6 @@ func triggerMultipleRequests(config models.Config, log logger.Logger, endPoint, 
 		}
 	}
 
+	close(outputCh)
 	return result
 }
