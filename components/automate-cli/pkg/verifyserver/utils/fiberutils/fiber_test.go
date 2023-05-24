@@ -52,13 +52,7 @@ func TestCustomErrorHandler(t *testing.T) {
 
 	// Register a route that always returns an error
 	app.Get("/panic", func(ctx *fiber.Ctx) error {
-		defer func() error {
-			if err := recover(); err != nil {
-				return errors.New(err.(string))
-			}
-			return nil
-		}()
-		panic("test panic")
+		return errors.New("test panic")
 	})
 
 	// Make a request to the error route and assert that the response is correct
@@ -70,4 +64,26 @@ func TestCustomErrorHandler(t *testing.T) {
 	body, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 	assert.Contains(t, "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Internal Server Error\"}}", string(body))
+}
+
+func TestUserDefinedError(t *testing.T) {
+	// Replace the default error handler with CustomErrorHandler
+	app := fiber.New(fiber.Config{
+		ErrorHandler: fiberutils.CustomErrorHandler,
+	})
+
+	// Register a route that always returns an error
+	app.Get("/bad-request", func(ctx *fiber.Ctx) error {
+		return fiber.NewError(http.StatusBadRequest, "This is a bad request!!!!!")
+	})
+
+	// Make a request to the error route and assert that the response is correct
+	req, _ := http.NewRequest(http.MethodGet, "/bad-request", nil)
+	resp, err := app.Test(req)
+
+	assert.NoError(t, err, "app.Test should not return an error")
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode, "response status should be 400")
+	body, err := io.ReadAll(resp.Body)
+	assert.NoError(t, err)
+	assert.Contains(t, "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"This is a bad request!!!!!\"}}", string(body))
 }
