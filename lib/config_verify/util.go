@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -17,18 +16,6 @@ import (
 const (
 	FOR_CERTS = " for certs "
 )
-
-func validateAutomateFQDN(fqdn string) error {
-	if strings.Contains(fqdn, " ") {
-		return errors.New("domain name cannot contain spaces")
-	}
-
-	// Check for "http://" or "https://" in the FQDN value
-	if strings.HasPrefix(fqdn, "http://") || strings.HasPrefix(fqdn, "https://") {
-		return fmt.Errorf("fqdn should not include protocol (http:// or https://)")
-	}
-	return nil
-}
 
 func validateChannel(channel string) (bool, string) {
 	return validateOneOf("Channel", channel, []string{"current", "acceptance", "dev"})
@@ -53,9 +40,8 @@ func validateOneOf(msgPrefix string, input string, allowedValues []string) (bool
 func checkIPAddress(ip string) error {
 	if net.ParseIP(ip) == nil {
 		return errors.New("ip Address is invalid")
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func extractIPsFromCertsByIP(certsByIp []config_parser.CertByIP) []string {
@@ -72,7 +58,7 @@ func checkCertValid(keys []keydetails) *list.List {
 		block, _ := pem.Decode([]byte(el.key))
 		if block == nil {
 			errorList.PushBack("Invalid format. Failed to decode " + el.certtype + " for " + el.svc)
-		} else if el.certtype == "root_ca" {
+		} else if el.certtype == rootCa {
 			rootCA, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
 				errorList.PushBack("Failed to parse " + el.certtype + " for " + el.svc)
@@ -112,7 +98,7 @@ func validateAutomateCerts(config *config_parser.HAOnPremConfigToml, errorList *
 	if len(config.Automate.Config.CertsByIP) > 0 {
 		if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+				{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
 			}))
 		}
 
@@ -128,8 +114,8 @@ func validateAutomateCerts(config *config_parser.HAOnPremConfigToml, errorList *
 			}
 
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: a2Node.PrivateKey, certtype: "private_key", svc: "automate cert_by_ip for ip " + a2Node.IP},
-				{key: a2Node.PublicKey, certtype: "public_key", svc: "automate cert_by_ip for ip " + a2Node.IP},
+				{key: a2Node.PrivateKey, certtype: privateKey, svc: automate + " cert_by_ip for ip " + a2Node.IP},
+				{key: a2Node.PublicKey, certtype: publicKey, svc: automate + " cert_by_ip for ip " + a2Node.IP},
 			}))
 		}
 	} else {
@@ -140,13 +126,13 @@ func validateAutomateCerts(config *config_parser.HAOnPremConfigToml, errorList *
 
 		if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+				{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
 			}))
 		}
 
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
-			{key: config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
+			{key: config.Automate.Config.PrivateKey, certtype: privateKey, svc: automate},
+			{key: config.Automate.Config.PublicKey, certtype: publicKey, svc: automate},
 		}))
 	}
 }
@@ -164,8 +150,8 @@ func validateChefServerCerts(config *config_parser.HAOnPremConfigToml, errorList
 				errorList.PushBack("Field certs_by_ip for chef_server requires ip, private_key and public_key. Some of them are missing.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: csNode.PrivateKey, certtype: "private_key", svc: "chef-server cert_by_ip for ip " + csNode.IP},
-				{key: csNode.PublicKey, certtype: "public_key", svc: "chef-server cert_by_ip for ip " + csNode.IP},
+				{key: csNode.PrivateKey, certtype: privateKey, svc: chefServer + " cert_by_ip for ip " + csNode.IP},
+				{key: csNode.PublicKey, certtype: publicKey, svc: chefServer + " cert_by_ip for ip " + csNode.IP},
 			}))
 		}
 	} else {
@@ -175,8 +161,8 @@ func validateChefServerCerts(config *config_parser.HAOnPremConfigToml, errorList
 			errorList.PushBack("ChefServer public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
-			{key: config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
+			{key: config.ChefServer.Config.PrivateKey, certtype: privateKey, svc: chefServer},
+			{key: config.ChefServer.Config.PublicKey, certtype: publicKey, svc: chefServer},
 		}))
 	}
 }
@@ -188,7 +174,7 @@ func validatePostgresqlCerts(config *config_parser.HAOnPremConfigToml, errorList
 			errorList.PushBack("Postgresql root_ca is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: configOnpremPostgres.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
+			{key: configOnpremPostgres.Config.RootCA, certtype: rootCa, svc: postgreSql},
 		}))
 		if !stringutils.SubSlice(config.ExistingInfra.Config.PostgresqlPrivateIps, extractIPsFromCertsByIP(configOnpremPostgres.Config.CertsByIP)) {
 			errorList.PushBack("Missing certificates for some Postgresql private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.PostgresqlPrivateIps, ", "))
@@ -201,8 +187,8 @@ func validatePostgresqlCerts(config *config_parser.HAOnPremConfigToml, errorList
 				errorList.PushBack("Field certs_by_ip for postgresql requires ip, private_key and public_key. Some of them are missing.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: pgNode.PrivateKey, certtype: "private_key", svc: "postgresql cert_by_ip for ip " + pgNode.IP},
-				{key: pgNode.PublicKey, certtype: "public_key", svc: "postgresql cert_by_ip for ip " + pgNode.IP},
+				{key: pgNode.PrivateKey, certtype: privateKey, svc: postgreSql + " cert_by_ip for ip " + pgNode.IP},
+				{key: pgNode.PublicKey, certtype: publicKey, svc: postgreSql + " cert_by_ip for ip " + pgNode.IP},
 			}))
 		}
 	} else {
@@ -213,9 +199,9 @@ func validatePostgresqlCerts(config *config_parser.HAOnPremConfigToml, errorList
 			errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: configOnpremPostgres.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
-			{key: configOnpremPostgres.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
-			{key: configOnpremPostgres.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+			{key: configOnpremPostgres.Config.RootCA, certtype: rootCa, svc: postgreSql},
+			{key: configOnpremPostgres.Config.PrivateKey, certtype: privateKey, svc: postgreSql},
+			{key: configOnpremPostgres.Config.PublicKey, certtype: publicKey, svc: postgreSql},
 		}))
 	}
 }
@@ -229,9 +215,9 @@ func validateOpensearchCerts(config *config_parser.HAOnPremConfigToml, errorList
 			errorList.PushBack("Opensearch root_ca, admin_key or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: configOnpremOpensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-			{key: configOnpremOpensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-			{key: configOnpremOpensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
+			{key: configOnpremOpensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
+			{key: configOnpremOpensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
+			{key: configOnpremOpensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
 		}))
 		if !stringutils.SubSlice(config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(configOnpremOpensearch.Config.CertsByIP)) {
 			errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
@@ -244,8 +230,8 @@ func validateOpensearchCerts(config *config_parser.HAOnPremConfigToml, errorList
 				errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: osNode.PrivateKey, certtype: "private_key", svc: "opensearch cert_by_ip for ip " + osNode.IP},
-				{key: osNode.PublicKey, certtype: "public_key", svc: "opensearch cert_by_ip for ip " + osNode.IP},
+				{key: osNode.PrivateKey, certtype: privateKey, svc: openSearch + " cert_by_ip for ip " + osNode.IP},
+				{key: osNode.PublicKey, certtype: publicKey, svc: openSearch + " cert_by_ip for ip " + osNode.IP},
 			}))
 		}
 	} else {
@@ -258,11 +244,11 @@ func validateOpensearchCerts(config *config_parser.HAOnPremConfigToml, errorList
 			errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: configOnpremOpensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-			{key: configOnpremOpensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-			{key: configOnpremOpensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
-			{key: configOnpremOpensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
-			{key: configOnpremOpensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+			{key: configOnpremOpensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
+			{key: configOnpremOpensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
+			{key: configOnpremOpensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
+			{key: configOnpremOpensearch.Config.PrivateKey, certtype: privateKey, svc: openSearch},
+			{key: configOnpremOpensearch.Config.PublicKey, certtype: publicKey, svc: openSearch},
 		}))
 	}
 }

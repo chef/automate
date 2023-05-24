@@ -12,6 +12,18 @@ import (
 	"github.com/chef/automate/lib/config_parser"
 )
 
+const (
+	rootCa     = "root_ca"
+	publicKey  = "public_key"
+	privateKey = "private_key"
+	adminKey   = "admin_key"
+	adminCert  = "admin_cert"
+	automate   = "automate"
+	chefServer = "chef-server"
+	openSearch = "opensearch"
+	postgreSql = "postgresql"
+)
+
 type keydetails struct {
 	key      string
 	certtype string
@@ -54,6 +66,7 @@ func ConfigValidateAWS(config *config_parser.HAAwsConfigToml) error {
 	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SSHUser, "ssh_user", errorList)
 	validateRequiredPathField(config.Architecture.ConfigInitials.SSHKeyFile, "ssh_key_file", errorList)
 	validateBackupMount(config.Architecture.ConfigInitials.BackupMount, errorList)
+	validateRequiredStringTypeField(config.Architecture.ConfigInitials.BackupConfig, "backup_config set either efs or s3", errorList)
 
 	if config.Architecture.ConfigInitials.BackupConfig == "s3" && len(strings.TrimSpace(config.Architecture.ConfigInitials.S3BucketName)) < 1 {
 		errorList.PushBack("Invalid or empty s3_bucketName")
@@ -109,13 +122,13 @@ func validateAwsAutomateCerts(config *config_parser.HAAwsConfigToml, errorList *
 
 	if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.Automate.Config.RootCA, certtype: "root_ca", svc: "automate"},
+			{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
 		}))
 	}
 
 	errorList.PushBackList(checkCertValid([]keydetails{
-		{key: config.Automate.Config.PrivateKey, certtype: "private_key", svc: "automate"},
-		{key: config.Automate.Config.PublicKey, certtype: "public_key", svc: "automate"},
+		{key: config.Automate.Config.PrivateKey, certtype: privateKey, svc: automate},
+		{key: config.Automate.Config.PublicKey, certtype: publicKey, svc: automate},
 	}))
 }
 
@@ -126,8 +139,8 @@ func validateAwsChefServerCerts(config *config_parser.HAAwsConfigToml, errorList
 	}
 
 	errorList.PushBackList(checkCertValid([]keydetails{
-		{key: config.ChefServer.Config.PrivateKey, certtype: "private_key", svc: "chef-server"},
-		{key: config.ChefServer.Config.PublicKey, certtype: "public_key", svc: "chef-server"},
+		{key: config.ChefServer.Config.PrivateKey, certtype: privateKey, svc: chefServer},
+		{key: config.ChefServer.Config.PublicKey, certtype: publicKey, svc: chefServer},
 	}))
 }
 
@@ -139,9 +152,9 @@ func validateAwsPostgresqlCerts(config *config_parser.HAAwsConfigToml, errorList
 	}
 
 	errorList.PushBackList(checkCertValid([]keydetails{
-		{key: config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
-		{key: config.Postgresql.Config.PrivateKey, certtype: "private_key", svc: "postgresql"},
-		{key: config.Postgresql.Config.PublicKey, certtype: "public_key", svc: "postgresql"},
+		{key: config.Postgresql.Config.RootCA, certtype: rootCa, svc: postgreSql},
+		{key: config.Postgresql.Config.PrivateKey, certtype: privateKey, svc: postgreSql},
+		{key: config.Postgresql.Config.PublicKey, certtype: publicKey, svc: postgreSql},
 	}))
 }
 
@@ -155,11 +168,11 @@ func validateAwsOpensearchCerts(config *config_parser.HAAwsConfigToml, errorList
 	}
 
 	errorList.PushBackList(checkCertValid([]keydetails{
-		{key: config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},
-		{key: config.Opensearch.Config.AdminKey, certtype: "admin_key", svc: "opensearch"},
-		{key: config.Opensearch.Config.AdminCert, certtype: "admin_cert", svc: "opensearch"},
-		{key: config.Opensearch.Config.PrivateKey, certtype: "private_key", svc: "opensearch"},
-		{key: config.Opensearch.Config.PublicKey, certtype: "public_key", svc: "opensearch"},
+		{key: config.Opensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
+		{key: config.Opensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
+		{key: config.Opensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
+		{key: config.Opensearch.Config.PrivateKey, certtype: privateKey, svc: openSearch},
+		{key: config.Opensearch.Config.PublicKey, certtype: publicKey, svc: openSearch},
 	}))
 }
 
@@ -310,9 +323,10 @@ func validateFqdn(config *sc.AutomateConfig, e *c.InvalidConfigError) {
 	if fqdn == nil {
 		e.AddMissingKey("global.v1.fqdn")
 	} else {
-		if err := validateAutomateFQDN(fqdn.Value); err != nil {
-			e.AddInvalidValue("global.v1.fqdn", err.Error())
-		}
+		errorList := list.New()
+		validateFQDN(fqdn.Value, errorList)
+		err := getSingleErrorFromList(errorList)
+		e.AddInvalidValue("global.v1.fqdn", err.Error())
 	}
 }
 
