@@ -8,6 +8,7 @@ import (
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/softwareversionchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
@@ -73,7 +74,6 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				trigger.NewCertificateCheck(),
 				trigger.NewExternalOpensearchCheck(),
 				trigger.NewExternalPostgresCheck(),
-				trigger.NewFirewallCheck(),
 				trigger.NewFqdnCheck(),
 				trigger.NewNfsBackupConfigCheck(),
 				trigger.NewOpensearchS3BucketAccessCheck(),
@@ -81,6 +81,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
+				firewallchecktrigger.NewFirewallCheck(l, port),
 			))).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
