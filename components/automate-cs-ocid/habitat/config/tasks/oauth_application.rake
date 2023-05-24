@@ -9,7 +9,8 @@ namespace :oauth_application do
     oauth_applications_json = ENV['OAUTH_APPLICATIONS_JSON']
     oauth_applications = JSON.parse(oauth_applications_json)
     ActiveRecord::Base.transaction do
-      oauth_applications.each_with_index do |oauth_application, counter|
+      oauth_applications.each do |oauth_application|
+        # Making sure the iteration doesn't execute in case of empty value for app name
         next if oauth_application['name'].blank?
         app = Doorkeeper::Application.find_or_create_by(:name => oauth_application['name'])
         app.update!(:redirect_uri => oauth_application['redirect_uri'])
