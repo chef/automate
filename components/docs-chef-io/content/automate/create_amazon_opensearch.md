@@ -28,24 +28,24 @@ Before proceeding, make sure you have the following prerequisites in place:
 2. Sign in to your AWS account using your credentials.
 
 ## Step 2: Navigate to the Amazon OpenSearch Service Dashboard
-1. Once you are logged in to the AWS Management Console, search for "OpenSearch" in the search bar at the top of the page.
-2. Click on the "Amazon OpenSearch Service" service from the search results to open the Amazon OpenSearch Service dashboard.
+1. Once you are logged in to the AWS Management Console, search for **OpenSearch** in the search bar at the top of the page.
+2. Click on the **Amazon OpenSearch Service** service from the search results to open the Amazon OpenSearch Service dashboard.
 
 ## Step 3: Create a New Amazon OpenSearch 1.3 Cluster
-1. In the Amazon OpenSearch Service dashboard, click on the "Create a new domain" button.
-2. **Domain name**: Enter a new "Domain name" for your OpenSearch cluster
-3. In "Domain creation method", select "Standard create"
+1. In the Amazon OpenSearch Service dashboard, click on the **Create a new domain** button.
+2. **Domain name**: Enter a new **Domain name** for your OpenSearch cluster
+3. In **Domain creation method**, select **Standard create**
 4. Choose the appropriate deployment configuration, such as development or production, based on your requirements.
-5. Under the "Engine options" section, select "1.3" as the version for your cluster.
-6. In the "Networks" section, provide the following information:
+5. Under the **Engine options** section, select **1.3** as the version for your cluster.
+6. In the **Networks** section, provide the following information:
    - **VPC**: Select the VPC in which you have your automate cluster
    - **Subnets**: Select all three private subnets available in your VPC
    - **Security groups**: Select a security block that has incoming access from your VPC cidr range.
-7. Enable "Fine-grained access control", create you "Master username" and "Master password".
-8. Under "Access policy", select "Configure domain level access policy" and choose action "Allow".
+7. Enable **Fine-grained access control**, create you **Master username** and **Master password**.
+8. Under **Access policy**, select **Configure domain level access policy** and choose action **Allow**.
 9. Configure the remaining settings, such as the number of nodes, storage options, and access policies, as per your requirements.
 10. Review all the settings and make sure they are accurate.
-11. Click on the "Confirm" button to start the cluster creation process.
+11. Click on the **Confirm** button to start the cluster creation process.
 
 ## Step 4: Wait for the Amazon OpenSearch Cluster to be Created
 1. The Amazon OpenSearch cluster creation process may take several minutes. Wait for the process to complete.
@@ -56,7 +56,7 @@ Once the Amazon OpenSearch 1.3 cluster is created successfully, you can obtain t
 
 1. Go to the Amazon OpenSearch Service dashboard.
 2. Find and select your newly created cluster from the list.
-3. In the cluster details view, navigate to the "Endpoint" tab.
+3. In the cluster details view, navigate to the **Endpoint** tab.
 4. Here you will find the following connection details:
    - **Domain name**: This is the domain name we gave for this OpenSearch cluster.
    - **Endpoint/Hostname**: This is the endpoint or hostname of your OpenSearch cluster. It will look something like `my-opensearch-cluster-1234567890.us-east-1.es.amazonaws.com`.

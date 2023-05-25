@@ -28,29 +28,29 @@ Before proceeding, make sure you have the following prerequisites in place:
 2. Sign in to your AWS account using your credentials.
 
 ## Step 2: Navigate to the Amazon RDS Dashboard
-1. Once you are logged in to the AWS Management Console, search for "RDS" in the search bar at the top of the page.
-2. Click on the "Amazon RDS" service from the search results to open the Amazon RDS dashboard.
+1. Once you are logged in to the AWS Management Console, search for **RDS** in the search bar at the top of the page.
+2. Click on the **Amazon RDS** service from the search results to open the Amazon RDS dashboard.
 
 ## Step 3: Create a New Amazon RDS PostgreSQL Instance
-1. In the Amazon RDS dashboard, click on the "Create database" button.
-2. On the "Choose a database creation method" page, select the "Standard Create" option.
-3. Under the "Engine options" section, select "PostgreSQL" as the database engine.
+1. In the Amazon RDS dashboard, click on the **Create database** button.
+2. On the **Choose a database creation method** page, select the **Standard Create** option.
+3. Under the **Engine options** section, select **PostgreSQL** as the database engine.
 4. Choose PostgreSQL 13.5-R1.
-5. Under the "Templates" section, select the template that suits your needs or choose the default template.
-6. In the "Settings" section, provide the following information:
+5. Under the **Templates** section, select the template that suits your needs or choose the default template.
+6. In the **Settings** section, provide the following information:
    - **DB instance identifier**: Enter a unique identifier for your RDS instance.
    - **Master username**: Specify the username for the master user account.
    - **Master password**: Set a secure password for the master user account.
-7. In the "DB instance size" section, select the appropriate instance size for your needs.
-8. In the "Connectivity" section, 
-  - Select "Don't connect to an EC2 compute resource".
-  - Select "Network type" as per your requirements.
-  - In "Virtual private cloud" select the VPC that you want to use for your Automate cluster.
+7. In the **DB instance size** section, select the appropriate instance size for your needs.
+8. In the **Connectivity** section, 
+  - Select **Don't connect to an EC2 compute resource**.
+  - Select **Network type** as per your requirements.
+  - In **Virtual private cloud** select the VPC that you want to use for your Automate cluster.
   - Choose any private subnet available in your VPC.
-  - In "Public Access" select "NO"
+  - In **Public Access** select **NO**
 9. Configure the remaining settings as per your requirements.
 10. Review all the settings and make sure they are accurate.
-11. Click on the "Create database" button to start the creation process.
+11. Click on the **Create database** button to start the creation process.
 
 ## Step 4: Wait for the Amazon RDS Instance to be Created
 1. The RDS instance creation process may take a few minutes. Wait for the process to complete.
@@ -60,18 +60,18 @@ Before proceeding, make sure you have the following prerequisites in place:
 
 1. Go to the Amazon RDS dashboard.
 2. Find and select your newly created PostgreSQL instance from the list.
-3. In the instance details view, navigate to the "Connectivity & security" tab.
-4. Open the Security Group under "VPC security groups"
-5. Under "Inbound Rules", edit and select "Type" as "PostgreSQL"
-6. Select "Source" as "custom" and give appropriate cidr block for your VPC
-7. Click "Save Rules"
+3. In the instance details view, navigate to the **Connectivity & security** tab.
+4. Open the Security Group under **VPC security groups**
+5. Under **Inbound Rules**, edit and select **Type** as **PostgreSQL**
+6. Select **Source** as **custom** and give appropriate cidr block for your VPC
+7. Click **Save Rules**
 
 ## Step 6: Retrieve Connection Details
 Once the Amazon RDS PostgreSQL instance is created successfully, you can obtain the necessary connection details.
 
 1. Go to the Amazon RDS dashboard.
 2. Find and select your newly created PostgreSQL instance from the list.
-3. In the instance details view, navigate to the "Connectivity & security" tab.
+3. In the instance details view, navigate to the **Connectivity & security** tab.
 4. Here you will find the following connection details:
    - **Instance URL**: This is the endpoint or hostname of your RDS instance. It will look something like `my-rds-instance.abcdefg12345.us-east-1.rds.amazonaws.com`.
    - **Port**: The port number on which your PostgreSQL instance is listening. The default port is usually `5432`.
