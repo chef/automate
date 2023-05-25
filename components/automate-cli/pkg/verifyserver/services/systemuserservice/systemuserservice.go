@@ -9,8 +9,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
-//serivce have variable, that variable get the instance
-
 type SystemUser interface {
 	GetSystemUserServiceDetails() *models.SystemUserResponse
 }
