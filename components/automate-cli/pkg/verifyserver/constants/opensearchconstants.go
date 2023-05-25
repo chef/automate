@@ -16,4 +16,6 @@ const (
 	SNAPSHOT_REPO_DELETE_FAILED_RESOLUTION = "Provide the IAM user proper permissions to delete the Snapshot Repository."
 	SNAPSHOT_DELETE_FAILED_MESSAGE         = "Failed to delete the Snapshot on the Opensearch Domain"
 	SNAPSHOT_DELETE_FAILED_RESOLUTION      = "Provide the IAM user proper permissions to delete the Snapshot."
+	SNAPSHOT_STATUS_API                    = "/_snapshot/%s/%s/_status"
+	INVALID_REQUEST_ERROR                  = "Invalid request body for S3 backup check"
 )

@@ -37,8 +37,15 @@ func (h *Handler) CheckOSBackupS3(c *fiber.Ctx) error {
 
 func requestValidator(req models.S3BackupDetails) bool {
 
-	if len(req.Endpoint) == 0 || len(req.Username) == 0 || len(req.Password) == 0 || len(req.S3Bucket) == 0 || len(req.S3BasePath) == 0 ||
-		len(req.AccessKey) == 0 || len(req.SecretKey) == 0 || len(req.AWSRegion) == 0 || len(req.AWSRoleArn) == 0 {
+	if len(req.Endpoint) == 0 ||
+		len(req.Username) == 0 ||
+		len(req.Password) == 0 ||
+		len(req.S3Bucket) == 0 ||
+		len(req.S3BasePath) == 0 ||
+		len(req.AccessKey) == 0 ||
+		len(req.SecretKey) == 0 ||
+		len(req.AWSRegion) == 0 ||
+		len(req.AWSRoleArn) == 0 {
 		return false
 	}
 	return true
