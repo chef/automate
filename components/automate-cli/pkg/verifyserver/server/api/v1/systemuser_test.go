@@ -11,7 +11,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,7 +38,7 @@ func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error
 	if err != nil {
 		return nil, err
 	}
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
