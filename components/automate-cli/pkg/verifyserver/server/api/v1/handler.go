@@ -5,6 +5,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
@@ -24,6 +25,7 @@ type Handler struct {
 	S3ConfigService              s3configservice.IS3Config
 	StopMockServersService       stopmockserverservice.IStopMockServerService
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
+	PortReachableService         portreachableservice.IPortReachableService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -72,5 +74,9 @@ func (h *Handler) AddStopMockServerService(sm stopmockserverservice.IStopMockSer
 func (h *Handler) AddOSS3BackupService(ss opensearchbackupservice.IOSS3BackupService) *Handler {
 	h.OSBackupService = ss
 	return h
+}
 
+func (h *Handler) AddPortReachableService(pr portreachableservice.IPortReachableService) *Handler {
+	h.PortReachableService = pr
+	return h
 }

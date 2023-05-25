@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ansrivas/fiberprometheus/v2"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
@@ -18,6 +19,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
@@ -93,7 +95,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddMockServerServices(startmockserverservice.New(l)).
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
-		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l))
+		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
+		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
