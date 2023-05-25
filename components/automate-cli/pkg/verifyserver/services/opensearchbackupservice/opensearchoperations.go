@@ -96,7 +96,7 @@ func (os *OpensearchOperations) CreateTestIndex(client *elastic.Client, ctx *fib
 		return false, err
 	}
 
-	os.Log.Info("Index creation status ", res.Acknowledged)
+	os.Log.Debug("Index creation status ", res.Acknowledged)
 
 	return res.Acknowledged, nil
 }
@@ -109,7 +109,7 @@ func (os *OpensearchOperations) CreateSnapshotRepo(client *elastic.Client, ctx *
 		return false, err
 	}
 
-	os.Log.Info("Snapshot repo creation: ", res.Acknowledged)
+	os.Log.Debug("Snapshot repo creation: ", res.Acknowledged)
 
 	return res.Acknowledged, nil
 }
@@ -122,8 +122,8 @@ func (os *OpensearchOperations) CreateSnapshot(client *elastic.Client, ctx *fibe
 		return false, err
 	}
 
-	os.Log.Info("Snapshot creation: ", res.Accepted)
-	return true, nil
+	os.Log.Debug("Snapshot creation: ", res.Accepted)
+	return *res.Accepted, nil
 }
 
 func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *fiber.Ctx, repoName string, snapshotName string) (string, error) {
@@ -146,7 +146,7 @@ func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *f
 		return "", err
 	}
 
-	os.Log.Info("Snapshot Status: ", snapshotStatusList.Snapshots[0].State)
+	os.Log.Debug("Snapshot Status: ", snapshotStatusList.Snapshots[0].State)
 
 	return snapshotStatusList.Snapshots[0].State, nil
 }
@@ -158,7 +158,7 @@ func (os *OpensearchOperations) DeleteTestSnapshot(client *elastic.Client, ctx *
 		return false, err
 	}
 
-	os.Log.Info("Snapshot Deletion status: ", deleteSnapshot.Acknowledged)
+	os.Log.Debug("Snapshot Deletion status: ", deleteSnapshot.Acknowledged)
 	return deleteSnapshot.Acknowledged, nil
 }
 
@@ -169,7 +169,7 @@ func (os *OpensearchOperations) DeleteTestSnapshotRepo(client *elastic.Client, c
 		return false, err
 	}
 
-	os.Log.Info("Snapshot Repo Deletion status: ", deleteRepo.Acknowledged)
+	os.Log.Debug("Snapshot Repo Deletion status: ", deleteRepo.Acknowledged)
 	return deleteRepo.Acknowledged, nil
 }
 
@@ -179,6 +179,6 @@ func (os *OpensearchOperations) DeleteTestIndex(client *elastic.Client, ctx *fib
 		return false, err
 	}
 
-	os.Log.Info("Index Deletion: ", deleteIndex.Acknowledged)
+	os.Log.Debug("Index Deletion: ", deleteIndex.Acknowledged)
 	return deleteIndex.Acknowledged, nil
 }

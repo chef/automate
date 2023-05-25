@@ -323,7 +323,10 @@ func TestDeleteIndex(t *testing.T) {
 
 func TestCreateSnapShot(t *testing.T) {
 
-	response := `{}`
+	response := `{
+		"accepted" :true,
+		"snapshot" :{}
+	}`
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		assert.Error(t, err)
@@ -340,6 +343,40 @@ func TestCreateSnapShot(t *testing.T) {
 	assert.NoError(t, err)
 
 	resp, err := os.CreateSnapshot(client, &fiber.Ctx{}, "repo", "snapshot", "index")
+	assert.NoError(t, err)
+
+	fmt.Println(resp)
+}
+
+func TestGetSnapshotStatus(t *testing.T) {
+
+	response := `{
+		"snapshots" : [
+			{
+				"snapshot": "test-snap",
+				"repository": "test-repo",
+				"uuid": "test-id",
+				"state": "SUCCESS",
+				"include_global_state": false
+			}
+		]
+	}`
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
+	os := OpensearchOperations{
+		Log: log,
+	}
+	testServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	defer testServer.Close()
+	request.Endpoint = testServer.URL
+
+	awsClient := SetupMockOpensearchClient(response)
+	client, err := awsClient.CreateAWSClient(request, "testing")
+	assert.NoError(t, err)
+
+	resp, err := os.GetSnapshotStatus(client, &fiber.Ctx{}, "repo", "snapshot")
 	assert.NoError(t, err)
 
 	fmt.Println(resp)
