@@ -178,9 +178,3 @@ type FqdnRequest struct {
 	ApiToken          string   `json:"api_token"`
 	NodeType          string   `json:"node_type"`
 }
-
-type NodeIpRequest struct {
-	NodeType string      `json:"node_type"`
-	NodeIP   string      `json:"node_ip"`
-	Request  interface{} `json:"intergface"`
-}

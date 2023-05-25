@@ -1,6 +1,8 @@
 package checkutils
 
 import (
+	"fmt"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/gofiber/fiber/v2"
 )
@@ -40,4 +42,8 @@ func IsPassed(checks []models.Checks) bool {
 		}
 	}
 	return isPassed
+}
+
+func PrepareEndPoint(ip, port, path string) string {
+	return fmt.Sprintf("http://%s:%s%s", ip, port, path)
 }

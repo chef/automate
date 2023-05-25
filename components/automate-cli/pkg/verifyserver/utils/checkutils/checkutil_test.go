@@ -82,3 +82,32 @@ func TestPrepareTriggerResponse_WithError(t *testing.T) {
 	assert.Equal(t, len(resp.Result.Checks), len(result.Result.Checks))
 
 }
+
+func TestPrepareEndPoint(t *testing.T) {
+	type args struct {
+		ip   string
+		port string
+		path string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "Correct Enpoint",
+			args: args{
+				ip:   "127.0.0.1",
+				port: "1234",
+				path: "/test",
+			},
+			want: "http://127.0.0.1:1234/test",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := PrepareEndPoint(tt.args.ip, tt.args.port, tt.args.path)
+			assert.Equal(t, got, tt.want)
+		})
+	}
+}

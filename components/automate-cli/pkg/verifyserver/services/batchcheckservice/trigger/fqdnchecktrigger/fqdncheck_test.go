@@ -2,6 +2,7 @@ package fqdnchecktrigger
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -13,7 +14,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	certificate = models.Certificate{
+		AutomateFqdn:   "www.example.com",
+		ChefServerFqdn: "www.example.com",
+		RootCert:       "rootcert",
+	}
+)
+
 const (
+	token              = "test-token"
 	fqnResponseSuccess = `{
 		"status": "SUCCESS",
 		"result": {
@@ -291,17 +301,15 @@ func TestFqdnCheck_Run(t *testing.T) {
 		isError    bool
 	}{
 		{
-			name: "Passed Automate Node Check",
+			// 	name: "Passed Automate Node Check",
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
+					Certificate: certificate,
+					APIToken:    token,
 				},
 			},
 			isPassed:   true,
@@ -317,11 +325,8 @@ func TestFqdnCheck_Run(t *testing.T) {
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
-					APIToken: "test-token",
+					Certificate: certificate,
+					APIToken:    token,
 				},
 			},
 			isPassed:   false,
@@ -337,11 +342,8 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
-					APIToken: "test-token",
+					Certificate: certificate,
+					APIToken:    "test-token",
 				},
 			},
 			isPassed:   false,
@@ -357,10 +359,8 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
+					Certificate: certificate,
+					APIToken:    token,
 				},
 			},
 			isPassed:   true,
@@ -376,10 +376,8 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8", "5.6.7.8"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
+					Certificate: certificate,
+					APIToken:    token,
 				},
 			},
 			isPassed:   false,
@@ -395,15 +393,30 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
+					Certificate: certificate,
+					APIToken:    token,
 				},
 			},
 			isPassed:   false,
 			response:   "error while connecting to the endpoint, received invalid status code",
 			httpStatus: http.StatusInternalServerError,
+			isError:    true,
+		},
+		{
+			name: "400 Bad Reqest",
+			args: args{
+				config: models.Config{
+					Hardware: models.Hardware{
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
+					},
+					Certificate: certificate,
+					APIToken:    token,
+				},
+			},
+			isPassed:   false,
+			response:   "error while connecting to the endpoint, received invalid status code",
+			httpStatus: http.StatusBadRequest,
 			isError:    true,
 		},
 		{
@@ -414,11 +427,9 @@ func TestFqdnCheck_Run(t *testing.T) {
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: models.Certificate{
-						AutomateFqdn: "www.example.com",
-						RootCert:     "rootcert",
-					},
+					Certificate:     certificate,
 					DeploymentState: "post-deploy",
+					APIToken:        token,
 				},
 			},
 			isPassed:   true,
@@ -435,12 +446,12 @@ func TestFqdnCheck_Run(t *testing.T) {
 			server, host, port := createDummyServer(t, tt.httpStatus, tt.isPassed)
 			defer server.Close()
 
-			fqc := &FqdnCheck{
-				port: port,
-				log:  logger.NewLogrusStandardLogger(),
-				host: host,
-			}
+			fqc := NewFqdnCheck(
 
+				logger.NewLogrusStandardLogger(), port,
+			)
+
+			fqc.host = host
 			got := fqc.Run(tt.args.config)
 
 			if tt.isError {
@@ -462,6 +473,19 @@ func TestFqdnCheck_Run(t *testing.T) {
 func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var got models.FqdnRequest
+			req := r.Body
+			reader, _ := io.ReadAll(req)
+			json.Unmarshal(reader, &got)
+
+			wantReq := getRequest()
+
+			assert.NotNil(t, got)
+			assert.Equal(t, got.RootCert, wantReq.RootCert)
+			assert.Equal(t, got.ApiToken, wantReq.ApiToken)
+			assert.NotNil(t, got.Nodes)
+			assert.Equal(t, got.Fqdn, wantReq.Fqdn)
+
 			if r.URL.Path == constants.FQDN_LOAD_BALANCER_CHECK {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)
@@ -493,4 +517,13 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 	port := address[colonIndex+1:]
 
 	return server, ip, port
+}
+
+func getRequest() models.FqdnRequest {
+
+	return models.FqdnRequest{
+		Fqdn:     certificate.AutomateFqdn,
+		RootCert: certificate.RootCert,
+		ApiToken: token,
+	}
 }

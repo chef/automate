@@ -6,6 +6,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -35,7 +36,10 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.Che
 		AWSRegion:  config.Backup.ObjectStorage.AWSRegion,
 		AWSRoleArn: config.ExternalOS.OSRoleArn,
 	}
-	response := trigger.RunCheckOnSpecifiedNode([]string{osb.host}, osb.log, osb.port, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH, constants.OPENSEARCH, http.MethodPost, s3OpensearchBackupRequest)
+
+	endPoint := checkutils.PrepareEndPoint(osb.host, osb.port, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH)
+
+	response := triggerCheckForOpensearchS3Backup(endPoint, osb.log, constants.OPENSEARCH, http.MethodPost, s3OpensearchBackupRequest)
 
 	return setHostAsOpensearchInResponse(response, config.ExternalOS.OSDomainURL)
 
@@ -48,4 +52,21 @@ func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExt
 		result = append(result, resp)
 	}
 	return result
+}
+
+// RunCheckOnSpecifiedNodes triggers the API on gives node ips only, requires for various API's like S3/Minio backup config
+func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, nodeType string, method string, reqBody models.S3OpenSearchBackupRequest) []models.CheckTriggerResponse {
+	var result []models.CheckTriggerResponse
+	log.Debugf("Triggering the api call for Opensearch for S3 backup")
+	outputCh := make(chan models.CheckTriggerResponse)
+
+	//There will be only one request which will check the connection
+	go trigger.TriggerCheckAPI(endPoint, reqBody.Endpoint, nodeType, method, outputCh, reqBody)
+
+	//As we are triggering only one request for checking the connection for opensearch and s3 bucket
+	res := <-outputCh
+	result = append(result, res)
+
+	return result
+
 }

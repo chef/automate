@@ -2,6 +2,7 @@ package s3backupchecktrigger
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -62,8 +63,7 @@ const (
 			}
 		  ]
 		}
-	  },
-	  {
+	  },{
 		"status": "SUCCESS",
 		"node_type": "automate",
 		"result": {
@@ -167,7 +167,19 @@ const (
 	BucketName = "test"
 	accessKey  = "test-access-key"
 	secretKey  = "test-secret-key"
+	awsRegion  = "region"
 )
+
+func getRequest() models.S3ConfigRequest {
+	return models.S3ConfigRequest{
+		Endpoint:   endPoint,
+		BucketName: BucketName,
+		BasePath:   basePath,
+		AccessKey:  accessKey,
+		SecretKey:  secretKey,
+		Region:     awsRegion,
+	}
+}
 
 func TestS3BackupConfigCheck_Run(t *testing.T) {
 	type args struct {
@@ -199,6 +211,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
+							AWSRegion:  awsRegion,
 						},
 					},
 				},
@@ -213,7 +226,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount: 2,
+						AutomateNodeCount: 1,
 					},
 					Backup: models.Backup{
 						ObjectStorage: models.ObjectStorage{
@@ -222,6 +235,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
+							AWSRegion:  awsRegion,
 						},
 					},
 				},
@@ -245,6 +259,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
+							AWSRegion:  awsRegion,
 						},
 					},
 				},
@@ -281,15 +296,15 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			server, host, port := createDummyServer(t, tt.httpStatusCode, tt.isPassed)
 			defer server.Close()
 
-			svc := &S3BackupConfigCheck{
-				log:  logger.NewLogrusStandardLogger(),
-				port: port,
-			}
+			svc := NewS3BackupConfigCheck(
+				logger.NewLogrusStandardLogger(),
+				port,
+			)
 
 			tt.args.config.Hardware.AutomateNodeIps = []string{host, host}
 
 			json.Unmarshal([]byte(tt.response), &want)
-			for i, _ := range want {
+			for i := range want {
 				want[i].Host = host
 			}
 
@@ -313,6 +328,15 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var got models.S3ConfigRequest
+			req := r.Body
+			reader, _ := io.ReadAll(req)
+			json.Unmarshal(reader, &got)
+
+			wantReq := getRequest()
+
+			assert.NotNil(t, got)
+			assert.Equal(t, got, wantReq)
 			if r.URL.Path == constants.S3_BACKUP_CHECK_API_PATH {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)

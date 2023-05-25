@@ -1,8 +1,10 @@
 package trigger
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -166,4 +168,18 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	ctr.Host = host
 	ctr.NodeType = nodeType
 	output <- ctr
+}
+
+func interfaceToIOReader(body interface{}) (io.Reader, error) {
+	var reader io.Reader
+	if body != nil {
+		bx, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		reader = bytes.NewBuffer(bx)
+
+	}
+	return reader, nil
 }

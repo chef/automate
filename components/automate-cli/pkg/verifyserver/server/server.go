@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/certificatechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/fqdnchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/nfsmountbackupchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/opensearchs3bucketaccesschecktrigger"
@@ -92,7 +93,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				trigger.NewExternalOpensearchCheck(),
 				trigger.NewExternalPostgresCheck(),
 				firewallchecktrigger.NewFirewallCheck(l, port),
-				trigger.NewFqdnCheck(),
+				fqdnchecktrigger.NewFqdnCheck(l, port),
 				nfsmountbackupchecktrigger.NewNfsBackupConfigCheck(l, port),
 				opensearchs3bucketaccesschecktrigger.NewOpensearchS3BucketAccessCheck(l, port),
 				s3backupchecktrigger.NewS3BackupConfigCheck(l, port),

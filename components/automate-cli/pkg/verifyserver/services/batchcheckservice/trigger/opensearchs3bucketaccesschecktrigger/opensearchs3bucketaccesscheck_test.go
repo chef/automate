@@ -178,11 +178,8 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			server, host, port := createDummyServer(t, tt.httpResponseCode, tt.isPassed)
 			defer server.Close()
 
-			osb := &OpensearchS3BucketAccessCheck{
-				log:  logger.NewLogrusStandardLogger(),
-				port: port,
-				host: host,
-			}
+			osb := NewOpensearchS3BucketAccessCheck(logger.NewLogrusStandardLogger(), port)
+			osb.host = host
 
 			got := osb.Run(tt.args.config)
 			if tt.isError {

@@ -1,12 +1,12 @@
 package fqdnchecktrigger
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -26,53 +26,63 @@ func NewFqdnCheck(log logger.Logger, port string) *FqdnCheck {
 
 func (fqc *FqdnCheck) Run(config models.Config) []models.CheckTriggerResponse {
 
-	reqList := getRequestsForFqdn(config)
-	endPointForRequest := fmt.Sprintf("http://%s:%s%s", fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
+	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 
-	response := trigger.RunCheckWithEndPointSpecified(endPointForRequest, fqc.log, reqList, http.MethodPost)
+	response := triggerFqdnCheck(&config, endPoint, fqc.log)
 
 	return response
 
 }
 
 // getRequestsForFqdn gets all the requests for automate and chef-server for fqdn
-func getRequestsForFqdn(config models.Config) []models.NodeIpRequest {
+func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger) []models.CheckTriggerResponse {
+	log.Debug("Trigger FQDN check for automate and chef server fqdn")
+	var result []models.CheckTriggerResponse
+	outputCh := make(chan models.CheckTriggerResponse)
 	IsAfterDeployment := false
-	var nodeIpRequestList []models.NodeIpRequest
+	reqCount := 0
 
-	if config.DeploymentState == "post-deploy" {
+	if config.DeploymentState == constants.POST_DEPLOY {
 		IsAfterDeployment = true
 	}
 
-	nodeIpRequestList = append(nodeIpRequestList, getNodeRequests(config.Hardware.AutomateNodeIps, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, IsAfterDeployment, config.APIToken)...)
-
-	nodeIpRequestList = append(nodeIpRequestList, getNodeRequests(config.Hardware.ChefInfraServerNodeIps, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, IsAfterDeployment, config.APIToken)...)
-
-	return nodeIpRequestList
-}
-
-// getNodeRequests get the request with the node id and node type
-func getNodeRequests(nodeIps []string, nodeType string, rootcert string, fqdn string, isAfterDeployment bool, apiToken string) []models.NodeIpRequest {
-	var nodeIpRequestList []models.NodeIpRequest
-	for _, ip := range nodeIps {
-		fqdnReq := models.FqdnRequest{
-			Fqdn:              fqdn,
-			RootCert:          rootcert,
-			IsAfterDeployment: isAfterDeployment,
-			Nodes:             []string{ip},
-			NodeType:          nodeType,
-			ApiToken:          apiToken,
-		}
-
-		nodeIpRequest := models.NodeIpRequest{
-			NodeType: nodeType,
-			NodeIP:   ip,
-			Request:  fqdnReq,
-		}
-
-		nodeIpRequestList = append(nodeIpRequestList, nodeIpRequest)
-
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		log.Debugf("Trigger FQDN check for automate for automate ip %s", ip)
+		reqCount++
+		req := getFqdnCheckRequest(ip, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, IsAfterDeployment, config.APIToken)
+		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
 	}
 
-	return nodeIpRequestList
+	if config.Certificate.ChefServerFqdn != "" {
+		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+			log.Debugf("Trigger FQDN check for automate for chefserver ip %s", ip)
+			reqCount++
+			req := getFqdnCheckRequest(ip, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, IsAfterDeployment, config.APIToken)
+			go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
+
+		}
+	}
+
+	for i := 0; i < reqCount; i++ {
+		res := <-outputCh
+		result = append(result, res)
+	}
+
+	close(outputCh)
+	return result
+
+}
+
+// getFqdnCheckRequest creates req list for all the node ips with their fqdn
+func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAfterDeployment bool, apiToken string) models.FqdnRequest {
+	fqdnReq := models.FqdnRequest{
+		Fqdn:              fqdn,
+		RootCert:          rootcert,
+		IsAfterDeployment: isAfterDeployment,
+		Nodes:             []string{ip},
+		NodeType:          nodeType,
+		ApiToken:          apiToken,
+	}
+
+	return fqdnReq
 }
