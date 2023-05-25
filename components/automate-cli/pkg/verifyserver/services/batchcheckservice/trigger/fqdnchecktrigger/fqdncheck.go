@@ -34,7 +34,7 @@ func (fqc *FqdnCheck) Run(config models.Config) []models.CheckTriggerResponse {
 
 }
 
-// triggerFqdnCheck triggers all the fqdn requests for fqdn
+//triggerFqdnCheck triggers all the fqdn requests for fqdn
 func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger FQDN check for automate and chef server fqdn")
 	var result []models.CheckTriggerResponse
@@ -73,7 +73,7 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 
 }
 
-// getFqdnCheckRequest creates req list for all the node ips with their fqdn
+//getFqdnCheckRequest creates req list for all the node ips with their fqdn
 func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAfterDeployment bool, apiToken string) models.FqdnRequest {
 
 	fqdnReq := models.FqdnRequest{

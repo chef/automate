@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber/v2"
@@ -37,7 +38,8 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 		MountLocation:          config.Backup.FileSystem.MountLocation,
 	}
 
-	nfsMountAPIResponse, err := nbc.TriggerCheckForMountService(nfsMountReq)
+	//Triggers only one API call for nfs mount API
+	nfsMountAPIResponse, err := nbc.triggerCheckForMountService(nfsMountReq)
 	if err != nil {
 		response := constructErrorResult(config, err)
 		return response
@@ -49,9 +51,9 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 
 }
 
-// TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response
-func (ss *NfsBackupConfigCheck) TriggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
-	url := fmt.Sprintf("http://%s:%s%s", ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
+//triggerCheckForMountService - Call the Hardware resource API and format response
+func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
+	url := checkutils.PrepareEndPoint(ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
 	fmt.Println(url)
 	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
@@ -72,7 +74,7 @@ func (ss *NfsBackupConfigCheck) TriggerCheckForMountService(body models.NFSMount
 	return apiResp, nil
 }
 
-// constructErrorResult constructs the error response when recived from the API
+//constructErrorResult constructs the error response when recived from the API
 func constructErrorResult(config models.Config, err error) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	for _, ip := range config.Hardware.AutomateNodeIps {
@@ -90,7 +92,7 @@ func constructErrorResult(config models.Config, err error) []models.CheckTrigger
 	return result
 }
 
-// prepareErrorResult error result error result using the error we got
+//prepareErrorResult error result error result using the error we got
 func prepareErrorResult(finalResult []models.CheckTriggerResponse, host, nodeType string, err error) []models.CheckTriggerResponse {
 	finalResult = append(finalResult, models.CheckTriggerResponse{
 		Host:     host,
@@ -103,7 +105,7 @@ func prepareErrorResult(finalResult []models.CheckTriggerResponse, host, nodeTyp
 	return finalResult
 }
 
-// constructSuccessResult returns the result if we got a response the API
+//constructSuccessResult returns the result if we got a response the API
 func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	for _, res := range resp.Result {

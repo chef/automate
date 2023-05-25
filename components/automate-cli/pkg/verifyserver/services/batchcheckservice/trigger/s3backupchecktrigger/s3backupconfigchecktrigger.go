@@ -27,7 +27,7 @@ func (svc *S3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerR
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, constants.S3_BACKUP_CHECK_API_PATH, constants.AUTOMATE, http.MethodPost, req)
 }
 
-// runCheckForS3Config triggers the API on gives node automate nodes only for validating s3 backup config
+//runCheckForS3Config triggers the API on gives node automate nodes only for validating s3 backup config
 func runCheckForS3Config(nodeIps []string, log logger.Logger, port string, path string, nodeType string, method string, reqBody models.S3ConfigRequest) []models.CheckTriggerResponse {
 	log.Debugf("Triggering the api call for automate nodes only for s3 backup config")
 	outputCh := make(chan models.CheckTriggerResponse)
@@ -42,7 +42,7 @@ func runCheckForS3Config(nodeIps []string, log logger.Logger, port string, path 
 	return response
 }
 
-// getResultFromOutputChan gets the result from output channel
+//getResultFromOutputChan gets the result from output channel
 func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerResponse) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 
