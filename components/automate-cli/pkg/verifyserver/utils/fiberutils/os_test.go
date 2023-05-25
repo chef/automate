@@ -30,7 +30,7 @@ func TestLookupGroup(t *testing.T) {
 	groupname := "hab"
 	u, err := s.LookupGroup(groupname)
 	if u == nil {
-		assert.Equal(t, user.UnknownGroupError("hab"), err)
+		assert.Equal(t, user.UnknownGroupError(groupname), err)
 	}
 }
 

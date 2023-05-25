@@ -19,13 +19,14 @@ var (
 	HabUserAndGroupMappingSuccessTitle = "User and group mapping successfully"
 	HabUserAndGroupMappingFailureTitle = "User and group mapping failed"
 	HabUserSuccessMsg                  = "User is created or found successfully"
-	HabUserErrorMsg                    = "User found but failed the validation"
+	HabUserErrorMsg                    = "Hab user creation failed"
 	HabUserResolutionMsg               = "Check the user name"
 	HabGroupSuccessMsg                 = "Group is created or found successfully"
-	HabGroupErrorMsg                   = "Group found but failed the validation"
+	HabGroupErrorMsg                   = "Hab group not found"
 	HabGroupResolutionMsg              = "Check the group name"
 	HabUserAndGroupMapSuccessMSg       = "User and group mapping successful"
-	HabUserAndGroupMapErrorMsg         = "User and group mapping failure"
+	HabUserInGroupErrorMsg             = "User hab is not a member of group hab"
+	HabPrimaryGroupMatchErrorMsg       = "Primary group mapping for user hab is not hab group"
 	HabUserAndGroupMapResolutionMsg    = "Verify the mapping for the user and the group"
 )
 
@@ -212,7 +213,7 @@ func TestValidateHabUserAndGroupMappingFailedForWrongGroupName(t *testing.T) {
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabUserAndGroupMapErrorMsg,
+		ErrorMsg:      HabUserInGroupErrorMsg,
 		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 	}, service)
 }
@@ -246,7 +247,7 @@ func TestValidateHabUserAndGroupMappingPrimaryGroupMappingFailed(t *testing.T) {
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabUserAndGroupMapErrorMsg,
+		ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
 		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 	}, service)
 }
@@ -323,7 +324,7 @@ func TestValidateHabUserAndGroupMappingCommandExecutionFail(t *testing.T) {
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabUserAndGroupMapErrorMsg,
+		ErrorMsg:      HabUserInGroupErrorMsg,
 		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 	}, service)
 }
@@ -357,7 +358,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabUserAndGroupMapErrorMsg,
+		ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
 		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 	}, service)
 }
@@ -397,7 +398,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabUserAndGroupMapErrorMsg,
+		ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
 		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 	}, service)
 }
@@ -554,7 +555,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 						Title:         HabUserAndGroupMappingFailureTitle,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      HabUserAndGroupMapErrorMsg,
+						ErrorMsg:      HabUserInGroupErrorMsg,
 						ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 					},
 				},

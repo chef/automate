@@ -17,20 +17,11 @@ import (
 
 var (
 	HabUserSuccessTitle                = "User creation/validation check"
-	HabUserFailureTitle                = "User validation failure"
 	HabGroupSuccessTitle               = "Group creation/validation check"
-	HabGroupFailureTitle               = "Group Validation failure"
 	HabUserAndGroupMappingSuccessTitle = "User and group mapping successfully"
-	HabUserAndGroupMappingFailureTitle = "User and group mapping failed"
 	HabUserSuccessMsg                  = "User is created or found successfully"
-	HabUserErrorMsg                    = "User found but failed the validation"
-	HabUserResolutionMsg               = "Check the user name"
 	HabGroupSuccessMsg                 = "Group is created or found successfully"
-	HabGroupErrorMsg                   = "Group found but failed the validation"
-	HabGroupResolutionMsg              = "Check the group name"
 	HabUserAndGroupMapSuccessMSg       = "User and group mapping successful"
-	HabUserAndGroupMapErrorMsg         = "User and group mapping failure"
-	HabUserAndGroupMapResolutionMsg    = "Verify the mapping for the user and the group"
 )
 
 func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error) {
