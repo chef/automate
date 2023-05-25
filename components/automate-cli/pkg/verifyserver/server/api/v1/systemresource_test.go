@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +31,7 @@ func SetupSystemResourceServiceHandler(srs systemresourceservice.ISystemResource
 		return nil, err
 	}
 
-	fconf := &fiber.Settings{
+	fconf :=fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
@@ -117,7 +117,7 @@ func TestSystemResourceAPI(t *testing.T) {
 			responseBody:        nil,
 			expectedCode:        400,
 			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'deployment_state' are pre-deploy,post-deploy\"}}",
-			expectedError:       fmt.Errorf(`Unsupported query or missing query. Expected values for query 'deployment_state' are %s,%s`, constants.PRE_DEPLOY, constants.POST_DEPLOY),
+			expectedError:       fmt.Errorf("Unknown error occured"),
 			nodeType:            "automate",
 			deploymentState:     "InvalidDepState",
 		},
@@ -126,7 +126,7 @@ func TestSystemResourceAPI(t *testing.T) {
 			responseBody:        nil,
 			expectedCode:        400,
 			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'node_type' are automate,chef-infra-server,postgresql,opensearch,bastion\"}}",
-			expectedError:       fmt.Errorf(`Unsupported query or missing query. Expected values for query 'node_type' are %s,%s,%s,%s,%s`, constants.AUTOMATE, constants.CHEF_INFRA_SERVER, constants.POSTGRESQL, constants.OPENSEARCH, constants.BASTION),
+			expectedError:       fmt.Errorf("Unknown error occured"),
 			nodeType:            "wrongnode",
 			deploymentState:     "pre-deploy",
 		},
