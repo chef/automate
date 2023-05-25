@@ -46,7 +46,7 @@ func (pg *ExternalPostgresqlService) GetPgConnection(req *models.ExternalPgReque
 			Passed: false,
 			Checks: []models.ExternalPgConnectionDetails{failResponse(constants.EXTERNALPGFAILCONNECTIONTITLE, constants.EXTERNALPGCONNECTIONERRORMSG, constants.EXTERNALPGCONNECTIONRESOLUTIONMSG)},
 		}
-		return resp,nil
+		return resp, nil
 	}
 
 	resp = &models.ExternalPgResponse{
@@ -85,11 +85,11 @@ func createTempFile(content string) (string, error) {
 
 	tempFile, err := os.CreateTemp("", "root-cert")
 	if err != nil {
-		return "", errors.Wrap(err,"file creation failed ")
+		return "", errors.Wrap(err, "file creation failed ")
 	}
 	_, err = tempFile.WriteString((content))
 	if err != nil {
-		return "", errors.Wrap(err,"writing rootca to a file failed")
+		return "", errors.Wrap(err, "writing rootca to a file failed")
 	}
 	return tempFile.Name(), nil
 }
@@ -97,12 +97,12 @@ func createTempFile(content string) (string, error) {
 func deleteTempFile(tempFile string) error {
 
 	err := os.Remove(tempFile)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	//check if the file still exists
-	if _,err := os.Stat(tempFile); err == nil {
-		return errors.Wrap(err,"Failed to delete file")
+	if _, err := os.Stat(tempFile); err == nil {
+		return errors.Wrap(err, "Failed to delete file")
 	}
 	return nil
 }
