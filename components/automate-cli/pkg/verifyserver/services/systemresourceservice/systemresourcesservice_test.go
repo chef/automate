@@ -76,7 +76,7 @@ func TestGetCpuSpeedCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "System is not running on supported platform",
-			respWant:            srv.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", errors.New("open "+CPU_INFO_FILE+": no such file or directory").Error(), "Please run system on supported platform"),
+			respWant:            srv.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", errors.New("open "+CPU_INFO_FILE+": no such file or directory").Error(), RESOLUTION_MSG),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetCPUSpeedFunc: func(s string) (float64, error) {
 					return 0, errors.New("open " + s + ": no such file or directory")
@@ -118,7 +118,7 @@ func TestGetMemorySizeCheck(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Getting error while reading cpuInfo file",
-			respWant:            srv.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", "Failed to read /proc/meminfo", "Please run system on supported platform"),
+			respWant:            srv.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", "Failed to read /proc/meminfo", RESOLUTION_MSG),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetMemoryFunc: func() (float64, error) {
 					return float64(0), errors.New("Failed to read /proc/meminfo")
@@ -322,7 +322,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | error case",
-			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", DISK_SPACE_CALC_ERR, "Please run system on supported platform"),
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", DISK_SPACE_CALC_ERR, RESOLUTION_MSG),
 			mockOsFsUtil: &MockGetOsAndFileSystemInfo{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return -1, -1, errors.New(DISK_SPACE_CALC_ERR)

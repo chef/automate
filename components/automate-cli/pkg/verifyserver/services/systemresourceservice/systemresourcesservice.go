@@ -38,6 +38,7 @@ const (
 	SUCCESS_MSG_IN_PER = " or %v%% of total size of /hab"
 
 	INVALID_NODE_TYPE_ERR = "given query node_type with value=%s is not supported"
+	RESOLUTION_MSG        = "Please run system on supported platform"
 )
 
 func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, deploymentState string) (*models.ApiResult, error) {
@@ -46,7 +47,7 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 		Passed: true,
 		Checks: []models.Checks{},
 	}
-	
+
 	cpuCountCheck := srs.GetCpuCountCheck()
 	if !cpuCountCheck.Passed {
 		srsResponse.Passed = false
@@ -110,8 +111,7 @@ func (srs *SystemResourcesService) GetCpuSpeedCheck(cpuInfoFile string) *models.
 
 	if err != nil {
 		srs.logger.Error("Error occured while getting cpu speed :", err)
-		ResolutionMsg := "Please run system on supported platform"
-		return srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", err.Error(), ResolutionMsg)
+		return srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", err.Error(), RESOLUTION_MSG)
 	}
 	srs.logger.Debug("CPU speed is : ", cpuSpeed)
 	if cpuSpeed >= constants.MIN_CPU_SPEED {
@@ -130,8 +130,7 @@ func (srs *SystemResourcesService) GetMemorySizeCheck() *models.Checks {
 
 	if err != nil {
 		srs.logger.Error("Error occured while getting memory information : ", err.Error())
-		resolutionMsg := "Please run system on supported platform"
-		return srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", err.Error(), resolutionMsg)
+		return srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", err.Error(), RESOLUTION_MSG)
 	}
 	srs.logger.Debugf("Current memory of system is :%vGB", memoryInGB)
 
@@ -164,7 +163,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType st
 	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Unable to determine free space of /hab :", err)
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), RESOLUTION_MSG)
 		return resp, nil
 	}
 	srs.logger.Debugf("The current total free space in hab : %0.2fGB", currentFreeSpaceInGB)
@@ -199,7 +198,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Unable to determine free space of /hab :", err.Error())
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", err.Error(), RESOLUTION_MSG)
 		return resp, nil
 	}
 	srs.logger.Debugf("current free space in /hab after deployment :%0.2fGB", currentFreeSpaceInGB)
@@ -207,7 +206,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 	totalSpaceInGBInHab, err := srs.GetTotalSpaceOfGivenDir("/hab")
 	if err != nil {
 		srs.logger.Error("Unable to retrive total space of /hab :", err.Error())
-		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", err.Error(), "Please run system on supported platform")
+		resp = srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "/hab"), "", err.Error(), RESOLUTION_MSG)
 		return resp, nil
 	}
 	srs.logger.Debugf("current total space in /hab : %0.2f", totalSpaceInGBInHab)
@@ -246,7 +245,7 @@ func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, fr
 	currentFreeSpaceInDir, err := srs.GetFreeDiskSpaceOfGivenDir(dirPath)
 	if err != nil {
 		srs.logger.Errorf("Unable to determine free space of %s error=%v", dirPath, err)
-		return srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
+		return srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), RESOLUTION_MSG)
 	}
 	srs.logger.Debugf("Current free disk space in %s is %0.2fGB", dirPath, currentFreeSpaceInDir)
 	var totalSpaceInHab float64
@@ -254,7 +253,7 @@ func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, fr
 
 	if err != nil {
 		srs.logger.Error("Unable to determine total space of /hab :", err)
-		return srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), "Please run system on supported platform")
+		return srs.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, checkTitle), "", err.Error(), RESOLUTION_MSG)
 	}
 	srs.logger.Debugf("Current total space in /hab : %0.2fGB", totalSpaceInHab)
 
