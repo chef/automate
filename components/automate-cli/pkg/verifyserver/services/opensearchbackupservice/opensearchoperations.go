@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber/v2"
 	elastic "github.com/olivere/elastic/v7"
@@ -128,7 +129,7 @@ func (os *OpensearchOperations) CreateSnapshot(client *elastic.Client, ctx *fibe
 
 func (os *OpensearchOperations) GetSnapshotStatus(client *elastic.Client, ctx *fiber.Ctx, repoName string, snapshotName string) (string, error) {
 
-	snapshotStatusUrl := fmt.Sprintf("/_snapshot/%s/%s/_status", repoName, snapshotName)
+	snapshotStatusUrl := fmt.Sprintf(constants.SNAPSHOT_STATUS_API, repoName, snapshotName)
 	res, err := client.PerformRequest(ctx.Context(), elastic.PerformRequestOptions{
 		Method: "GET",
 		Path:   snapshotStatusUrl,

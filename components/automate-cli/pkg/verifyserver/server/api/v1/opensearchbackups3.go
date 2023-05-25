@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +14,7 @@ func (h *Handler) CheckOSBackupS3(c *fiber.Ctx) error {
 	req := new(models.S3BackupDetails)
 
 	if err := c.BodyParser(req); err != nil {
-		errString := fmt.Sprintf("Invalid request for S3 backup check: %v", err.Error())
+		errString := fmt.Sprintf("%s %v", constants.INVALID_REQUEST_ERROR, err.Error())
 		h.Logger.Error(fmt.Errorf(errString))
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
