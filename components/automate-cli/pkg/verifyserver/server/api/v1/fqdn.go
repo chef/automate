@@ -18,21 +18,18 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 
 	if req.Fqdn == "" || req.RootCert == "" || len(req.Nodes) == 0 {
 		h.Logger.Error("Fqdn, Root Cert and Nodes can't be empty.")
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Fqdn, Root Cert and Nodes can't be empty, Please provide all the required fields."})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Fqdn, Root Cert and Nodes can't be empty, Please provide all the required fields.")
 	}
 
 	if req.IsAfterDeployment &&
 		(req.NodeType == "" || (req.NodeType != constants.AUTOMATE && req.NodeType != constants.CHEF_INFRA_SERVER)) {
 		h.Logger.Error("Node Type should be automate or chef-infra-server.")
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Node Type should be automate or chef-infra-server, Please provide Node Type."})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Node Type should be automate or chef-infra-server, Please provide Node Type.")
 	}
 
 	if req.IsAfterDeployment && req.ApiToken == "" {
 		h.Logger.Error("Api Token can't be empty.")
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Api Token can't be empty, it is needed for checking the Automate status."})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Api Token can't be empty, it is needed for checking the Automate status.")
 	}
 
 	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT)
