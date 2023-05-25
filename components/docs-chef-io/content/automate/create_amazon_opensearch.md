@@ -1,3 +1,19 @@
++++
+title = "Create Amazon OpenSearch"
+draft = false
+gh_repo = "automate"
+[menu]
+  [menu.automate]
+    title = "Create Amazon OpenSearch"
+    parent = "automate/deploy_high_availability/reference"
+    identifier = "automate/deploy_high_availability/reference/create_amazon_opensearch.md Create Amazon OpenSearch"
+    weight = 210
++++
+
+{{< warning >}}
+{{% automate/ha-warn %}}
+{{< /warning >}}
+
 # Creating an Amazon OpenSearch 1.3 Cluster and Obtaining Connection Details
 
 This guide will walk you through the process of creating an Amazon OpenSearch 1.3 cluster and retrieving the necessary connection details, including the hostname, username, and password.

@@ -1,3 +1,19 @@
++++
+title = "Create Amazon RDS"
+draft = false
+gh_repo = "automate"
+[menu]
+  [menu.automate]
+    title = "Create Amazon RDS"
+    parent = "automate/deploy_high_availability/reference"
+    identifier = "automate/deploy_high_availability/reference/create_amazon_rds.md Create Amazon RDS"
+    weight = 210
++++
+
+{{< warning >}}
+{{% automate/ha-warn %}}
+{{< /warning >}}
+
 # Creating an Amazon RDS PostgreSQL Instance and Obtaining Connection Details
 
 This guide will walk you through the process of creating an Amazon RDS PostgreSQL instance and retrieving the necessary connection details, including the hostname, port, username, and password.
