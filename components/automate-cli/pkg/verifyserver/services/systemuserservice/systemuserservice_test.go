@@ -499,3 +499,72 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
+	mockUser := &fiberutils.UserCmdServiceMock{
+		LookupFunc: func(name string) (*user.User, error) {
+			return &user.User{}, errors.New("user not found")
+		},
+		LookupGroupFunc: func(name string) (*user.Group, error) {
+			return &user.Group{}, errors.New("Group 'hab' doesn't exists")
+		},
+		LookupGroupIdFunc: func(name string) (*user.Group, error) {
+			return &user.Group{}, errors.New("User 'hab' is not a member of group 'hab'")
+		},
+	}
+	mockExec := &fiberutils.ExecCmdServiceMock{
+		CommandFunc: func(name string, args []string) ([]byte, error) {
+			return []byte{}, errors.New("exit status 1")
+		},
+	}
+	log, err := logger.NewLogger("text", "debug")
+	if err != nil {
+		assert.Error(t, err)
+	}
+	s := &SystemUserService{
+		Log:  log,
+		exec: mockExec,
+		user: mockUser,
+	}
+
+	tests := []struct {
+		description  string
+		expectedBody *models.SystemUserResponse
+	}{
+		{
+			description: "User and group not validated and mapping not successful",
+			expectedBody: &models.SystemUserResponse{
+				Passed: false,
+				Checks: []models.SystemUserServiceCheck{
+					{
+						Title:         HabUserFailureTitle,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      HabUserErrorMsg,
+						ResolutionMsg: HabUserResolutionMsg,
+					},
+					{
+						Title:         HabGroupFailureTitle,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      HabGroupErrorMsg,
+						ResolutionMsg: HabGroupResolutionMsg,
+					},
+					{
+						Title:         HabUserAndGroupMappingFailureTitle,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      HabUserAndGroupMapErrorMsg,
+						ResolutionMsg: HabUserAndGroupMapResolutionMsg,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			got := s.GetSystemUserServiceDetails()
+			assert.Equal(t, tt.expectedBody, got)
+		})
+	}
+}
