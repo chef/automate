@@ -15,7 +15,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-// RunCheck triggers API on all the nodes present in the config like automate,chef server, opensearch, postgres and bastion
 func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
