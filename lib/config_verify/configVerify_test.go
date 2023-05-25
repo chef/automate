@@ -2,6 +2,8 @@ package config_verify
 
 import (
 	"testing"
+
+	"github.com/chef/automate/lib/config_parser"
 )
 
 func TestConfigValidateOnPrem(t *testing.T) {
@@ -86,6 +88,66 @@ func TestConfigValidateOnPrem(t *testing.T) {
 		config := GetFailedAutomateScConfigTestData()
 		cv := &ConfigVerifyImpl{}
 		err := cv.ConfigValidateStandalone(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
+	t.Run("Test Failed Scenario where HA Onprem Automate CertByIp is not provided", func(t *testing.T) {
+		config := GetTestOnPremFailedConfigData()
+		config.Automate.Config.EnableCustomCerts = true
+		config.Automate.Config.PrivateKey = ""
+		config.Automate.Config.PublicKey = "/path/key"
+		config.Automate.Config.CertsByIP = []config_parser.CertByIP{}
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
+	t.Run("Test Failed Scenario where HA Onprem ChefServer CertByIp is not provided", func(t *testing.T) {
+		config := GetTestOnPremFailedConfigData()
+		config.ChefServer.Config.EnableCustomCerts = true
+		config.ChefServer.Config.PrivateKey = ""
+		config.ChefServer.Config.PrivateKey = ""
+		config.ChefServer.Config.CertsByIP = []config_parser.CertByIP{}
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
+	t.Run("Test Failed Scenario where HA Onprem Postgres CertByIp is not provided", func(t *testing.T) {
+		config := GetTestOnPremFailedConfigData()
+		config.Postgresql.Config.EnableCustomCerts = true
+		config.Postgresql.Config.PrivateKey = ""
+		config.Postgresql.Config.PrivateKey = ""
+		config.Postgresql.Config.CertsByIP = []config_parser.CertByIP{}
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
+		if err != nil {
+			return
+		}
+		// If there is no error, fail the test case
+		t.Fail()
+	})
+
+	t.Run("Test Failed Scenario where HA Onprem OpenSearch CertByIp is not provided", func(t *testing.T) {
+		config := GetTestOnPremFailedConfigData()
+		config.Opensearch.Config.EnableCustomCerts = true
+		config.Opensearch.Config.PrivateKey = ""
+		config.Opensearch.Config.PrivateKey = ""
+		config.Opensearch.Config.CertsByIP = []config_parser.CertByIP{}
+		cv := &ConfigVerifyImpl{}
+		err := cv.ConfigValidateOnPrem(config)
 		if err != nil {
 			return
 		}

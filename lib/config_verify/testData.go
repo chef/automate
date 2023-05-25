@@ -110,6 +110,8 @@ func GetTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	configOnpremFailed.Architecture.ConfigInitials.SSHKeyFile = "./pem"
 	configOnpremFailed.Architecture.ConfigInitials.BackupMount = "/mnt/"
 	configOnpremFailed.Automate.Config.Fqdn = ".com"
+	configOnpremFailed.Automate.Config.PrivateKey = ""
+	configOnpremFailed.Automate.Config.PublicKey = "/path/key"
 	configOnpremFailed.ChefServer.Config.EnableCustomCerts = true
 	configOnpremFailed.ChefServer.Config.PrivateKey = ""
 	configOnpremFailed.ChefServer.Config.CertsByIP = []config_parser.CertByIP{
@@ -130,7 +132,7 @@ func GetTestOnPremFailedConfigData() *config_parser.HAOnPremConfigToml {
 	configOnpremFailed.Postgresql.Config.EnableCustomCerts = true
 	configOnpremFailed.Postgresql.Config.PrivateKey = ""
 	configOnpremFailed.Opensearch.Config.EnableCustomCerts = true
-	configOnpremFailed.Opensearch.Config.RootCA = ""
+	configOnpremFailed.Opensearch.Config.RootCA = "/rootCA"
 	configOnpremFailed.Opensearch.Config.AdminCert = "ssf"
 	configOnpremFailed.Opensearch.Config.AdminKey = ""
 	configOnpremFailed.Opensearch.Config.PrivateKey = ""
