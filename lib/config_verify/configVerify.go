@@ -66,11 +66,8 @@ func ConfigValidateAWS(config *config_parser.HAAwsConfigToml) error {
 	validateRequiredStringTypeField(config.Architecture.ConfigInitials.SSHUser, "ssh_user", errorList)
 	validateRequiredPathField(config.Architecture.ConfigInitials.SSHKeyFile, "ssh_key_file", errorList)
 	validateBackupMount(config.Architecture.ConfigInitials.BackupMount, errorList)
-	validateRequiredStringTypeField(config.Architecture.ConfigInitials.BackupConfig, "backup_config set either efs or s3", errorList)
+	validateAWSBackupConfig(config, errorList)
 
-	if config.Architecture.ConfigInitials.BackupConfig == "s3" && len(strings.TrimSpace(config.Architecture.ConfigInitials.S3BucketName)) < 1 {
-		errorList.PushBack("Invalid or empty s3_bucketName")
-	}
 	validateFQDN(config.Automate.Config.Fqdn, errorList)
 
 	if len(config.Automate.Config.AdminPassword) > 0 {

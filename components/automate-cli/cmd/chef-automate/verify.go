@@ -177,7 +177,7 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 	case deploymentMode == AWS_MANAGED_SERVICES:
 		err := v.verifyHaAWSManagedDeploy(configPath)
 		return err
-	case deploymentMode == EXISTING_INFRA_MODE || deploymentMode == HA_MODE:
+	case deploymentMode == EXISTING_INFRA_MODE:
 		err := v.verifyHaOnpremDeploy(configPath)
 		return err
 	case deploymentMode == EXISTING_INFRA_AWS_MANAGED:

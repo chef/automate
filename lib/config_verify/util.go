@@ -167,6 +167,26 @@ func validateChefServerCerts(config *config_parser.HAOnPremConfigToml, errorList
 	}
 }
 
+func validateAWSBackupConfig(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if config.Aws.Config.SetupManagedServices {
+		if config.Architecture.ConfigInitials.BackupConfig != "s3" {
+			errorList.PushBack("Invalid backup_config. Only 's3' is supported.")
+		} else {
+			checkForValidS3Bucket(config, errorList)
+		}
+	} else {
+		if config.Architecture.ConfigInitials.BackupConfig != "efs" && config.Architecture.ConfigInitials.BackupConfig != "s3" {
+			errorList.PushBack("Invalid backup_config. It should be 'efs' or 's3'.")
+		}
+	}
+}
+
+func checkForValidS3Bucket(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if config.Architecture.ConfigInitials.BackupConfig == "s3" && len(strings.TrimSpace(config.Architecture.ConfigInitials.S3BucketName)) < 1 {
+		errorList.PushBack("Invalid or empty s3_bucketName.")
+	}
+}
+
 func validatePostgresqlCerts(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
 	configOnpremPostgres := config.Postgresql
 	if len(configOnpremPostgres.Config.CertsByIP) > 0 {

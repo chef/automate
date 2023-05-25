@@ -64,8 +64,7 @@ func (v *VerificationModule) VerifyHAAWSManagedProvision(configFile string) erro
 	if err != nil {
 		return err
 	}
-	configVerify := &config_verify.ConfigVerifyImpl{}
-	if err := configVerify.ConfigValidateAWS(config); err != nil {
+	if err := configVerifyAWS(config); err != nil {
 		return err
 	}
 	validateAWSManagedProvisionConfig(config)
@@ -78,8 +77,7 @@ func (v *VerificationModule) VerifyHAAWSDeployment(configFile string) error {
 	if err != nil {
 		return err
 	}
-	configVerify := &config_verify.ConfigVerifyImpl{}
-	if err := configVerify.ConfigValidateAWS(config); err != nil {
+	if err := configVerifyAWS(config); err != nil {
 		return err
 	}
 	validateAWSDeploymentConfig(config)
@@ -92,11 +90,9 @@ func (v *VerificationModule) VerifyHAAWSManagedDeployment(configFile string) err
 	if err != nil {
 		return err
 	}
-	configVerify := &config_verify.ConfigVerifyImpl{}
-	if err := configVerify.ConfigValidateAWS(config); err != nil {
+	if err := configVerifyAWS(config); err != nil {
 		return err
 	}
-
 	validateAWSManagedDeploymentConfig(config)
 	return nil
 }
@@ -107,8 +103,7 @@ func (v *VerificationModule) VerifyOnPremAWSManagedDeployment(configFile string)
 	if err != nil {
 		return err
 	}
-	configVerify := &config_verify.ConfigVerifyImpl{}
-	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
+	if err := configVerifyOnPrem(config); err != nil {
 		return err
 	}
 	validateOnPremAWSConfig(config)
@@ -121,8 +116,7 @@ func (v *VerificationModule) VerifyOnPremCustManagedDeployment(configFile string
 	if err != nil {
 		return err
 	}
-	configVerify := &config_verify.ConfigVerifyImpl{}
-	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
+	if err := configVerifyOnPrem(config); err != nil {
 		return err
 	}
 	validateOnPremCustomerConfig(config)
@@ -155,8 +149,7 @@ func (v *VerificationModule) VerifyOnPremDeployment(configFile string) error {
 	if err != nil {
 		return err
 	}
-	configVerify := &config_verify.ConfigVerifyImpl{}
-	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
+	if err := configVerifyOnPrem(config); err != nil {
 		return err
 	}
 	var ipsMap = make(map[string]string)
@@ -189,6 +182,22 @@ func (v *VerificationModule) VerifyOnPremDeployment(configFile string) error {
 
 	runTests(ipsMap, numberOfNodes)
 
+	return nil
+}
+
+func configVerifyOnPrem(config *config_parser.HAOnPremConfigToml) error {
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateOnPrem(config); err != nil {
+		return err
+	}
+	return nil
+}
+
+func configVerifyAWS(config *config_parser.HAAwsConfigToml) error {
+	configVerify := &config_verify.ConfigVerifyImpl{}
+	if err := configVerify.ConfigValidateAWS(config); err != nil {
+		return err
+	}
 	return nil
 }
 
