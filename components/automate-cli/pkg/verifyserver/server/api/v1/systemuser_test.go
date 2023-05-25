@@ -75,7 +75,7 @@ func TestSystemUser(t *testing.T) {
 			expectedCode: 200,
 			responseBody: models.SystemUserResponse{
 				Passed: true,
-				Checks: []models.SystemUserServiceCheck{
+				Checks: []models.Checks{
 					{
 						Title:         HabUserSuccessTitle,
 						Passed:        true,

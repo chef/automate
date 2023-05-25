@@ -32,7 +32,7 @@ func NewSystemUserService(log logger.Logger) *SystemUserService {
 func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserResponse {
 	serviceResponse := &models.SystemUserResponse{}
 	serviceResponse.Passed = true
-	serviceResponseArray := []*models.SystemUserServiceCheck{}
+	serviceResponseArray := []*models.Checks{}
 
 	habUserResponse, isHabUserCreated := su.ValidateHabUser()
 	if isHabUserCreated {
@@ -54,7 +54,7 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 	}
 
 	serviceResponseArray = append(serviceResponseArray, habGroupResponse, habUserAndGroupMapResponse)
-	checks := make([]models.SystemUserServiceCheck, len(serviceResponseArray))
+	checks := make([]models.Checks, len(serviceResponseArray))
 	for i, serviceResp := range serviceResponseArray {
 		checks[i] = *serviceResp
 	}
@@ -63,7 +63,7 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 
 }
 
-func (su *SystemUserService) ValidateHabUser() (*models.SystemUserServiceCheck, bool) {
+func (su *SystemUserService) ValidateHabUser() (*models.Checks, bool) {
 	isHabUserPresent := su.isHabUserPresent(constants.USERNAME)
 
 	if !isHabUserPresent {
@@ -79,7 +79,7 @@ func (su *SystemUserService) ValidateHabUser() (*models.SystemUserServiceCheck, 
 	return successResponse(constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_USER_HAB_SUCCESS_MSG), false
 }
 
-func (su *SystemUserService) ValidateHabGroup() *models.SystemUserServiceCheck {
+func (su *SystemUserService) ValidateHabGroup() *models.Checks {
 	isHabGroupPresent := su.isHabGroupPresent(constants.GROUPNAME)
 
 	if !isHabGroupPresent {
@@ -90,7 +90,7 @@ func (su *SystemUserService) ValidateHabGroup() *models.SystemUserServiceCheck {
 	return successResponse(constants.SYSTEM_GROUP_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_GROUP_HAB_SUCCESS_MSG)
 }
 
-func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.SystemUserServiceCheck {
+func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.Checks {
 	// Check if "hab" user is a member of "hab" group
 	userInGroup := su.checkUserInGroup(constants.USERNAME, constants.GROUPNAME)
 
@@ -148,13 +148,13 @@ func (su *SystemUserService) checkUserInGroup(username, groupname string) bool {
 
 // Check if a user's primary group matches a specified group
 func (su *SystemUserService) checkPrimaryGroupMatch(username, groupname string) bool {
-	u, err := su.user.Lookup(username)
+	sysUser, err := su.user.Lookup(username)
 	if err != nil {
 		su.Log.Error("User 'hab' not found")
 		return false
 	}
 
-	groups, err := u.GroupIds()
+	groups, err := sysUser.GroupIds()
 	if err != nil {
 		return false
 	}
@@ -174,8 +174,8 @@ func (su *SystemUserService) checkPrimaryGroupMatch(username, groupname string) 
 	return false
 }
 
-func successResponse(title string, successMsg string) *models.SystemUserServiceCheck {
-	checkResponse := &models.SystemUserServiceCheck{
+func successResponse(title string, successMsg string) *models.Checks {
+	checkResponse := &models.Checks{
 		Title:         title,
 		Passed:        true,
 		SuccessMsg:    successMsg,
@@ -185,8 +185,8 @@ func successResponse(title string, successMsg string) *models.SystemUserServiceC
 	return checkResponse
 }
 
-func failureResponse(title string, errorMsg string, resolutionMsg string) *models.SystemUserServiceCheck {
-	checkResponse := &models.SystemUserServiceCheck{
+func failureResponse(title string, errorMsg string, resolutionMsg string) *models.Checks {
+	checkResponse := &models.Checks{
 		Title:         title,
 		Passed:        false,
 		SuccessMsg:    "",

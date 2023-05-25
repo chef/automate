@@ -60,7 +60,7 @@ func TestValidateHabUserSuccess(t *testing.T) {
 	}
 	service, _ := s.ValidateHabUser()
 	assert.Equal(t, service.Passed, true)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserSuccessTitle,
 		Passed:        true,
 		SuccessMsg:    HabUserSuccessMsg,
@@ -92,7 +92,7 @@ func TestValidateHabUserFailure(t *testing.T) {
 	}
 	service, _ := s.ValidateHabUser()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -124,7 +124,7 @@ func TestValidateHabUserCreatedSuccess(t *testing.T) {
 	}
 	service, _ := s.ValidateHabUser()
 	assert.Equal(t, service.Passed, true)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserSuccessTitle,
 		Passed:        true,
 		SuccessMsg:    HabUserSuccessMsg,
@@ -149,7 +149,7 @@ func TestValidateHabGroup(t *testing.T) {
 	}
 	service := s.ValidateHabGroup()
 	assert.Equal(t, service.Passed, true)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabGroupSuccessTitle,
 		Passed:        true,
 		SuccessMsg:    HabGroupSuccessMsg,
@@ -174,7 +174,7 @@ func TestValidateHabGroupFailed(t *testing.T) {
 	}
 	service := s.ValidateHabGroup()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabGroupFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -208,7 +208,7 @@ func TestValidateHabUserAndGroupMappingFailedForWrongGroupName(t *testing.T) {
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -242,7 +242,7 @@ func TestValidateHabUserAndGroupMappingPrimaryGroupMappingFailed(t *testing.T) {
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -285,7 +285,7 @@ func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, true)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserAndGroupMappingSuccessTitle,
 		Passed:        true,
 		SuccessMsg:    HabUserAndGroupMapSuccessMSg,
@@ -319,7 +319,7 @@ func TestValidateHabUserAndGroupMappingCommandExecutionFail(t *testing.T) {
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -353,7 +353,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -393,7 +393,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.SystemUserServiceCheck{
+	assert.Equal(t, &models.Checks{
 		Title:         HabUserAndGroupMappingFailureTitle,
 		Passed:        false,
 		SuccessMsg:    "",
@@ -466,7 +466,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 			description: "User and group not validated and mapping not successful",
 			expectedBody: &models.SystemUserResponse{
 				Passed: true,
-				Checks: []models.SystemUserServiceCheck{
+				Checks: []models.Checks{
 					{
 						Title:         HabUserSuccessTitle,
 						Passed:        true,
@@ -535,7 +535,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 			description: "User and group not validated and mapping not successful",
 			expectedBody: &models.SystemUserResponse{
 				Passed: false,
-				Checks: []models.SystemUserServiceCheck{
+				Checks: []models.Checks{
 					{
 						Title:         HabUserFailureTitle,
 						Passed:        false,
