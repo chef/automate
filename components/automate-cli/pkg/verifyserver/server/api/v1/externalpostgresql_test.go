@@ -28,6 +28,7 @@ var (
 	ExternalPgfailureMessage          = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"External Postgresql Connection failed\",\"passed\":false,\"status\":\"\",\"success_msg\":\"\",\"error_msg\":\"Machine is unable to connect with External Managed Postgresql\",\"resolution_msg\":\"Ensure that the Postgres configuration provided is correct\"}]}}"
 	ExternalPgInternalServerError     = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Internal Server Error\"}}"
 	ErrorBodyParser                   = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
+	InvalidRequest                    = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Request Parameters cannot be empty\"}}"
 )
 
 func SetupMockExternalPostgresqlService(responseBody *models.ExternalPgResponse, err error) externalpostgresqlservice.ISExternalPostgresqlService {
@@ -101,6 +102,21 @@ func TestExternalPostgresql(t *testing.T) {
 						"postgresql_instance_url": "A.B.C.D",
 						"postgresq_instance_port": "7432",
 					}`,
+		},
+		{
+			description:  "400: body parser error",
+			responseBody: nil,
+			expectedCode: 400,
+			expectedBody: InvalidRequest,
+			body: `{
+				"postgresql_instance_url": "A.B.C.D",
+				"postgresql_instance_port": "7432",
+				"postgresql_superuser_username": "postgres",
+				"postgresql_superuser_password": "Progress123",
+				"postgresql_dbuser_username": "postgres",
+				"postgresql_dbuser_password": "Progress123",
+				"postgresql_root_cert": ""
+				}`,
 		},
 		{
 			description:   "500: Internal Server error",

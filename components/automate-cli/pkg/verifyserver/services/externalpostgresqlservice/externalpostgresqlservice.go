@@ -96,7 +96,6 @@ func (pg *ExternalPostgresqlService) createTempFile(content string) (string, err
 }
 
 func deleteTempFile(tempFile string) error {
-
 	return os.Remove(tempFile)
 }
 
