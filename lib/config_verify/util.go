@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	FOR_CERTS = " for certs "
+	FOR_CERTS  = " for certs "
+	CERT_BY_IP = " cert_by_ip for ip "
 )
 
 func validateChannel(channel string) (bool, string) {
@@ -114,8 +115,8 @@ func validateAutomateCerts(config *config_parser.HAOnPremConfigToml, errorList *
 			}
 
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: a2Node.PrivateKey, certtype: privateKey, svc: automate + " cert_by_ip for ip " + a2Node.IP},
-				{key: a2Node.PublicKey, certtype: publicKey, svc: automate + " cert_by_ip for ip " + a2Node.IP},
+				{key: a2Node.PrivateKey, certtype: privateKey, svc: automate + CERT_BY_IP + a2Node.IP},
+				{key: a2Node.PublicKey, certtype: publicKey, svc: automate + CERT_BY_IP + a2Node.IP},
 			}))
 		}
 	} else {
@@ -150,8 +151,8 @@ func validateChefServerCerts(config *config_parser.HAOnPremConfigToml, errorList
 				errorList.PushBack("Field certs_by_ip for chef_server requires ip, private_key and public_key. Some of them are missing.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: csNode.PrivateKey, certtype: privateKey, svc: chefServer + " cert_by_ip for ip " + csNode.IP},
-				{key: csNode.PublicKey, certtype: publicKey, svc: chefServer + " cert_by_ip for ip " + csNode.IP},
+				{key: csNode.PrivateKey, certtype: privateKey, svc: chefServer + CERT_BY_IP + csNode.IP},
+				{key: csNode.PublicKey, certtype: publicKey, svc: chefServer + CERT_BY_IP + csNode.IP},
 			}))
 		}
 	} else {
@@ -207,8 +208,8 @@ func validatePostgresqlCerts(config *config_parser.HAOnPremConfigToml, errorList
 				errorList.PushBack("Field certs_by_ip for postgresql requires ip, private_key and public_key. Some of them are missing.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: pgNode.PrivateKey, certtype: privateKey, svc: postgreSql + " cert_by_ip for ip " + pgNode.IP},
-				{key: pgNode.PublicKey, certtype: publicKey, svc: postgreSql + " cert_by_ip for ip " + pgNode.IP},
+				{key: pgNode.PrivateKey, certtype: privateKey, svc: postgreSql + CERT_BY_IP + pgNode.IP},
+				{key: pgNode.PublicKey, certtype: publicKey, svc: postgreSql + CERT_BY_IP + pgNode.IP},
 			}))
 		}
 	} else {
@@ -250,8 +251,8 @@ func validateOpensearchCerts(config *config_parser.HAOnPremConfigToml, errorList
 				errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: osNode.PrivateKey, certtype: privateKey, svc: openSearch + " cert_by_ip for ip " + osNode.IP},
-				{key: osNode.PublicKey, certtype: publicKey, svc: openSearch + " cert_by_ip for ip " + osNode.IP},
+				{key: osNode.PrivateKey, certtype: privateKey, svc: openSearch + CERT_BY_IP + osNode.IP},
+				{key: osNode.PublicKey, certtype: publicKey, svc: openSearch + CERT_BY_IP + osNode.IP},
 			}))
 		}
 	} else {
