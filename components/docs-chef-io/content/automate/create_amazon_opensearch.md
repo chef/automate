@@ -62,7 +62,7 @@ Once the Amazon OpenSearch 1.3 cluster is created successfully, you can obtain t
 3. In the cluster details view, navigate to the **Endpoint** tab.
 4. Here you will find the following connection details:
    - **Domain name**: This is the domain name we gave for this OpenSearch cluster.
-   - **Endpoint/Hostname**: This is the endpoint or hostname of your OpenSearch cluster. It will look something like `my-opensearch-cluster-1234567890.us-east-1.es.amazonaws.com`.
+   - **Domain URL**: This is the endpoint or hostname of your OpenSearch cluster. It will look something like `my-opensearch-cluster-1234567890.us-east-1.es.amazonaws.com`.
    - **Username**: The username for accessing your OpenSearch cluster.
    - **Password**: The password for the specified username.
 
