@@ -1,8 +1,8 @@
 package models
 
 import (
+	"context"
 	"net"
-	"net/http"
 )
 
 // StartMockServerRequestBody contains the configuration for starting a mock server.
@@ -17,10 +17,15 @@ type Server struct {
 	Port         int
 	ListenerTCP  net.Listener
 	ListenerUDP  net.PacketConn
-	ListenerHTTP *http.Server
+	ListenerHTTP HTTPsListener
+	SignalChan   chan bool
 	Protocol     string
 }
 
 type HTTPSServerResponse struct {
 	Status string `json:"status"`
+}
+
+type HTTPsListener interface {
+	Shutdown(ctx context.Context) error
 }

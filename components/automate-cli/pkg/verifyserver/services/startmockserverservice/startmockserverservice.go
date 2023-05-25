@@ -23,6 +23,7 @@ type MockServerService struct {
 type IStartMockServersService interface {
 	StartMockServer(cfg *models.StartMockServerRequestBody) error
 	GetMockServers() []*models.Server
+	SetMockServers(servers []*models.Server)
 }
 
 func New(logger logger.Logger) IStartMockServersService {
@@ -34,6 +35,10 @@ func New(logger logger.Logger) IStartMockServersService {
 // func to get mock server list
 func (s *MockServerService) GetMockServers() []*models.Server {
 	return s.MockServers
+}
+
+func (s *MockServerService) SetMockServers(servers []*models.Server) {
+	s.MockServers = servers
 }
 
 // StartMockServer starts a mock server of the given type and port.
@@ -70,12 +75,21 @@ func (s *MockServerService) StartTCPServer(port int) (*models.Server, error) {
 
 	s.logger.Infof("TCP server started on port %d\n", port)
 
+	//Create a channel to listen for close signal
+	signalChan := make(chan bool, 1)
+
 	go func() {
 		for {
 			conn, err := listener.Accept()
 			if err != nil {
-				s.logger.Errorln("Error accepting connection:", err)
-				return
+				select {
+				case <-signalChan:
+					s.logger.Infoln("Stopping TCP server....")
+					return
+				default:
+					s.logger.Errorln("Error accepting connection:", err)
+					return
+				}
 			}
 			s.HandleTCPRequest(conn)
 		}
@@ -86,6 +100,7 @@ func (s *MockServerService) StartTCPServer(port int) (*models.Server, error) {
 		ListenerTCP: listener,
 		ListenerUDP: nil,
 		Protocol:    constants.TCP,
+		SignalChan:  signalChan,
 	}, nil
 }
 
@@ -108,14 +123,22 @@ func (s *MockServerService) StartUDPServer(port int) (*models.Server, error) {
 	}
 
 	s.logger.Infof("UDP server started on port %d\n", port)
+	//Create a channel to listen for close signal
+	signalChan := make(chan bool, 1)
 
 	go func() {
 		for {
 			buf := make([]byte, 1024)
 			n, addr, err := conn.ReadFromUDP(buf)
 			if err != nil {
-				s.logger.Errorln("Error receiving message:", err)
-				return
+				select {
+				case <-signalChan:
+					s.logger.Infoln("Stopping UDP server....")
+					return
+				default:
+					s.logger.Errorln("Error receiving message:", err)
+					return
+				}
 			}
 			s.HandleUDPRequest(conn, addr, buf[:n])
 		}
@@ -126,11 +149,11 @@ func (s *MockServerService) StartUDPServer(port int) (*models.Server, error) {
 		ListenerTCP: nil,
 		ListenerUDP: conn,
 		Protocol:    constants.UDP,
+		SignalChan:  signalChan,
 	}, nil
 }
 
 func (s *MockServerService) HandleUDPRequest(conn *net.UDPConn, addr *net.UDPAddr, buf []byte) {
-
 	conn.WriteToUDP([]byte("ok"), addr)
 }
 
@@ -177,10 +200,11 @@ func (s *MockServerService) StartHTTPSServer(port int, cert string, key string) 
 	serverErr := make(chan error)
 	// Start the HTTPS server
 	go func(serverStarted chan error) {
-		err = server.ListenAndServeTLS("", "")
-		if err != nil && err != http.ErrServerClosed {
+		if err = server.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 			s.logger.Errorln("Error starting HTTPS server: ", err)
 			serverStarted <- err
+		} else {
+			s.logger.Infof("HTTPS server stopped gracefully")
 		}
 	}(serverErr)
 

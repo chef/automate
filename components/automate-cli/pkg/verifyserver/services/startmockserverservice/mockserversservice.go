@@ -5,6 +5,7 @@ import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models
 type MockServersService struct {
 	StartMockServerFunc func(cfg *models.StartMockServerRequestBody) error
 	GetMockServersFunc  func() []*models.Server
+	SetMockServersFunc  func([]*models.Server)
 }
 
 func (mss *MockServersService) StartMockServer(cfg *models.StartMockServerRequestBody) error {
@@ -13,4 +14,8 @@ func (mss *MockServersService) StartMockServer(cfg *models.StartMockServerReques
 
 func (mss *MockServersService) GetMockServers() []*models.Server {
 	return mss.GetMockServersFunc()
+}
+
+func (mss *MockServersService) SetMockServers(servers []*models.Server) {
+	mss.SetMockServersFunc(servers)
 }
