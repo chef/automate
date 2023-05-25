@@ -1,7 +1,8 @@
 name: chef-automate license apply
 synopsis: Apply Chef Automate license
 usage: chef-automate license apply LICENSE [flags]
-description: "Apply Chef Automate license token.\n\t- <LICENSE> must be valid encoded license string\n"
+description: "Apply Chef Automate license token.\n\t- <LICENSE> must be valid encoded
+  license string\n"
 options:
 - name: force
   shorthand: f

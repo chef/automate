@@ -1,7 +1,8 @@
 name: chef-automate deploy
 synopsis: Deploy Chef Automate
 usage: chef-automate deploy [/path/to/config.toml] [flags]
-description: "Deploy a new Chef Automate instance using the supplied configuration.\n\t- <CONFIG_FILE> must be a valid path to a TOML formatted configuration file"
+description: "Deploy a new Chef Automate instance using the supplied configuration.\n\t-
+  <CONFIG_FILE> must be a valid path to a TOML formatted configuration file"
 options:
 - name: accept-terms-and-mlsa
   default_value: "false"
