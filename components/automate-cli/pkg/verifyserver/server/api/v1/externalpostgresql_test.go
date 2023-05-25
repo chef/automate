@@ -2,7 +2,7 @@ package v1_test
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -128,7 +128,7 @@ func TestExternalPostgresql(t *testing.T) {
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body) // nosemgrep
+			body, err := io.ReadAll(res.Body)
 			t.Log(body, "body")
 			assert.NoError(t, err, test.description)
 			assert.Contains(t, string(body), test.expectedBody)

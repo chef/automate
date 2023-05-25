@@ -2,7 +2,6 @@ package externalpostgresqlservice
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -84,7 +83,7 @@ func (p *ExternalPostgresqlService) CheckExternalPgConnection(rootcert string) e
 
 func createTempFile(content string) (string, error) {
 
-	tempFile, err := ioutil.TempFile("", "root-cert") // nosemgrep
+	tempFile, err := os.CreateTemp("", "root-cert")
 	if err != nil {
 		return "", errors.Wrap(err,"file creation failed ")
 	}
