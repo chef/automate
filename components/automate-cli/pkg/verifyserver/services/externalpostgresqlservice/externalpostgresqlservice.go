@@ -33,7 +33,7 @@ func (pg *ExternalPostgresqlService) GetPgConnection(req *models.ExternalPgReque
 	pg.Req = req
 
 	//creating a temp file to the copy content of a rootcert into a file
-	rootcert, err := createTempFile(req.PostgresqlRootCert)
+	rootcert, err := pg.createTempFile(req.PostgresqlRootCert)
 	if err != nil {
 		return nil, err
 	}
@@ -76,12 +76,12 @@ func (p *ExternalPostgresqlService) CheckExternalPgConnection(rootcert string) e
 			p.logger.Error("External Postgresql Connection failed: ", err.Error())
 			return err
 		}
-		p.logger.Info("External Postgresql aws connection success")
+		p.logger.Info("External Postgresql aws connection success",i)
 	}
 	return nil
 }
 
-func createTempFile(content string) (string, error) {
+func (pg *ExternalPostgresqlService) createTempFile(content string) (string, error) {
 
 	tempFile, err := os.CreateTemp("", "root-cert")
 	if err != nil {
@@ -91,20 +91,13 @@ func createTempFile(content string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "writing rootca to a file failed")
 	}
+	pg.logger.Debug("File created : "+tempFile.Name())
 	return tempFile.Name(), nil
 }
 
 func deleteTempFile(tempFile string) error {
 
-	err := os.Remove(tempFile)
-	if err != nil {
-		return err
-	}
-	//check if the file still exists
-	if _, err := os.Stat(tempFile); err == nil {
-		return errors.Wrap(err, "Failed to delete file")
-	}
-	return nil
+	return os.Remove(tempFile)
 }
 
 func successResponse(Title string, SuccessMsg string) models.ExternalPgConnectionDetails {
