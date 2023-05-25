@@ -64,9 +64,9 @@ Ensure access for the backup type used:
 
 {{< note >}}
 
-- If you are restoring the backup taken from an older version of Automate, then you need to provide the `--airgap-bundle </path/to/current/bundle>` with your restore command.
+- If restoring the backup from an older version of Automate, you must provide the `--airgap-bundle </path/to/current/bundle>` with your restore command.
 
-In non-airgapped or Internet-connected environment, user can create airgap-bundle using `chef-automate airgap-bundle create --version <CURRENT_INSTALLED_VERSION>` command.
+- In a non-airgapped or Internet-connected environment, the user can create an airgap-bundle using the `chef-automate airgap-bundle create --version <CURRENT_INSTALLED_VERSION>` command.
 
 {{< /note >}}
 
