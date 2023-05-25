@@ -45,6 +45,7 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.Che
 
 }
 
+// setHostAsOpensearchInResponse sets the Host as external OS endpoint as this will help us in mapping the result correctly
 func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExternalUrl string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	for _, resp := range response {
@@ -54,7 +55,7 @@ func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExt
 	return result
 }
 
-// RunCheckOnSpecifiedNodes triggers the API on gives node ips only, requires for various API's like S3/Minio backup config
+// triggerCheckForOpensearchS3Backup triggers the API on given for external opensearch connectivity with s3
 func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, nodeType string, method string, reqBody models.S3OpenSearchBackupRequest) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	log.Debugf("Triggering the api call for Opensearch for S3 backup")

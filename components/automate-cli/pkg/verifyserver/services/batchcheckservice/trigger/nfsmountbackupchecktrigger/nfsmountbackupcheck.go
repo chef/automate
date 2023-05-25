@@ -72,6 +72,7 @@ func (ss *NfsBackupConfigCheck) TriggerCheckForMountService(body models.NFSMount
 	return apiResp, nil
 }
 
+// constructErrorResult constructs the error response when recived from the API
 func constructErrorResult(config models.Config, err error) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	for _, ip := range config.Hardware.AutomateNodeIps {
@@ -89,6 +90,7 @@ func constructErrorResult(config models.Config, err error) []models.CheckTrigger
 	return result
 }
 
+// prepareErrorResult error result error result using the error we got
 func prepareErrorResult(finalResult []models.CheckTriggerResponse, host, nodeType string, err error) []models.CheckTriggerResponse {
 	finalResult = append(finalResult, models.CheckTriggerResponse{
 		Host:     host,
@@ -101,6 +103,7 @@ func prepareErrorResult(finalResult []models.CheckTriggerResponse, host, nodeTyp
 	return finalResult
 }
 
+// constructSuccessResult returns the result if we got a response the API
 func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	for _, res := range resp.Result {
