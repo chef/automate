@@ -169,11 +169,12 @@ func validateChefServerCerts(config *config_parser.HAOnPremConfigToml, errorList
 }
 
 func validateAWSBackupConfig(config *config_parser.HAAwsConfigToml, errorList *list.List) {
+	if config.Architecture.ConfigInitials.BackupConfig == "s3" {
+		checkForValidS3Bucket(config, errorList)
+	}
 	if config.Aws.Config.SetupManagedServices {
 		if config.Architecture.ConfigInitials.BackupConfig != "s3" {
 			errorList.PushBack("Invalid backup_config. Only 's3' is supported.")
-		} else {
-			checkForValidS3Bucket(config, errorList)
 		}
 	} else {
 		if config.Architecture.ConfigInitials.BackupConfig != "efs" && config.Architecture.ConfigInitials.BackupConfig != "s3" {
