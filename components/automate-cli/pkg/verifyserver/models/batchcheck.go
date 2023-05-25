@@ -125,6 +125,21 @@ type HardwareResourceCountApiResult struct {
 	Checks   []Checks `json:"checks"`
 }
 
+type CertificateCheckRequest struct {
+	RootCertificate  string `json:"root_certificate"`
+	PrivateKey       string `json:"private_key"`
+	NodeCertificate  string `json:"node_certificate"`
+	AdminPrivateKey  string `json:"admin_private_key"`
+	AdminCertificate string `json:"admin_certificate"`
+}
+
+type SShUserRequest struct {
+	IP           string `json:"ip"`
+	Username     string `json:"user_name"`
+	PrivateKey   string `json:"private_key"`
+	SudoPassword string `json:"sudo_password"`
+}
+
 type FirewallRequest struct {
 	SourceNodeIP               string `json:"source_node_ip"`
 	DestinationNodeIP          string `json:"destination_node_ip"`

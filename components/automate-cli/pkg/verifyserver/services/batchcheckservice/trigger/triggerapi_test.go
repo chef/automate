@@ -19,8 +19,6 @@ const (
 		"status": "success",
 		"result": {
 			"passed": true,
-			"msg": "API result message",
-			"check": "API check",
 			"checks": [
 				{
 					"title": "Check 1",
@@ -178,15 +176,15 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", output)
+		go TriggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, "automate", http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
 		// Assert the expected response
 		require.NotNil(t, response)
 		require.Equal(t, "success", response.Status)
-		require.Equal(t, "API result message", response.Result.Message)
-		require.Equal(t, "API check", response.Result.Check)
+		require.Equal(t, "", response.Result.Message)
+		require.Equal(t, "", response.Result.Check)
 		require.Equal(t, "automate", response.NodeType)
 		require.True(t, response.Result.Passed)
 	})
@@ -196,7 +194,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, constants.POSTGRESQL, output)
+		go TriggerCheckAPI(endPoint, host, constants.POSTGRESQL, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -219,7 +217,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
+		go TriggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -242,7 +240,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, output)
+		go TriggerCheckAPI(server.URL+constants.SOFTWARE_VERSION_CHECK_API_PATH, server.URL, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -259,7 +257,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		output := make(chan models.CheckTriggerResponse)
 
 		// Call the function under test
-		go triggerCheckAPI(endPoint, host, constants.AUTOMATE, output)
+		go TriggerCheckAPI(endPoint, host, constants.AUTOMATE, http.MethodGet, output, nil)
 
 		// Wait for the response
 		response := <-output
@@ -267,6 +265,22 @@ func TestTriggerCheckAPI(t *testing.T) {
 		require.NotNil(t, response.Error)
 		require.Equal(t, http.StatusNotFound, response.Error.Code)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
+	})
+	t.Run("Invalid Request Body", func(t *testing.T) {
+		endPoint := "http://example.com/api/v1/checks/software-versions"
+		host := "example.com"
+		output := make(chan models.CheckTriggerResponse)
+		reqBody := make(chan int) //invalid request
+
+		// Call the function under test
+		go TriggerCheckAPI(endPoint, host, constants.AUTOMATE, http.MethodGet, output, reqBody)
+
+		// Wait for the response
+		response := <-output
+		// Assert the expected error response
+		require.NotNil(t, response.Error)
+		require.Equal(t, http.StatusBadRequest, response.Error.Code)
+		assert.Equal(t, "error while reading the request body: json: unsupported type: chan int", response.Error.Message)
 	})
 
 }

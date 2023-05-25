@@ -9,8 +9,10 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/certificatechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/softwareversionchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/sshuseraccesschecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
@@ -70,8 +72,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddBatchCheckService(
 			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(
 				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
-				trigger.NewSshUserAccessCheck(),
-				trigger.NewCertificateCheck(),
+				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, port),
+				certificatechecktrigger.NewCertificateCheck(l, port),
 				trigger.NewExternalOpensearchCheck(),
 				trigger.NewExternalPostgresCheck(),
 				trigger.NewFqdnCheck(),

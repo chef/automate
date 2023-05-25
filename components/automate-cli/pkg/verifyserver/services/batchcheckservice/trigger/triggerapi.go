@@ -1,8 +1,10 @@
 package trigger
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -26,24 +28,24 @@ func RunCheck(config models.Config, log logger.Logger, port string, path string,
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
 		endpoint := prepareEndpoint(path, "127.0.0.1", port, constants.BASTION, depState)
-		go triggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, outputCh)
+		go TriggerCheckAPI(endpoint, "127.0.0.1", constants.BASTION, http.MethodGet, outputCh, nil)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.AUTOMATE, depState)
-		go triggerCheckAPI(endpoint, ip, constants.AUTOMATE, outputCh)
+		go TriggerCheckAPI(endpoint, ip, constants.AUTOMATE, http.MethodGet, outputCh, nil)
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.CHEF_INFRA_SERVER, depState)
-		go triggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, outputCh)
+		go TriggerCheckAPI(endpoint, ip, constants.CHEF_INFRA_SERVER, http.MethodGet, outputCh, nil)
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.OPENSEARCH, depState)
-		go triggerCheckAPI(endpoint, ip, constants.OPENSEARCH, outputCh)
+		go TriggerCheckAPI(endpoint, ip, constants.OPENSEARCH, http.MethodGet, outputCh, nil)
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
 		endpoint := prepareEndpoint(path, ip, port, constants.POSTGRESQL, depState)
-		go triggerCheckAPI(endpoint, ip, constants.POSTGRESQL, outputCh)
+		go TriggerCheckAPI(endpoint, ip, constants.POSTGRESQL, http.MethodGet, outputCh, nil)
 	}
 
 	for i := 0; i < count; i++ {
@@ -71,10 +73,35 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	return endPoint
 }
 
-func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.CheckTriggerResponse) {
+// TriggerCheckAPI triggers the API with provided enpoint,host,nodetype,method and reqbody.
+// EndPoint should be string
+// The method can be GET,POST,PUT
+// Return an channel for output
+// In case of error, error is stored in output channel itself
+func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody interface{}) {
 	var ctr models.CheckTriggerResponse
 
-	req, err := http.NewRequest(http.MethodGet, endPoint, nil)
+	reader, err := interfaceToIOReader(reqBody)
+	if err != nil {
+		output <- models.CheckTriggerResponse{
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
+			},
+			Host:     host,
+			NodeType: nodeType,
+			Result: models.ApiResult{
+				Passed: false,
+				Error: &fiber.Error{
+					Code:    http.StatusBadRequest,
+					Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
+				},
+			},
+		}
+		return
+	}
+
+	req, err := http.NewRequest(method, endPoint, reader)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host: host,
@@ -83,6 +110,13 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 				Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
 			},
 			NodeType: nodeType,
+			Result: models.ApiResult{
+				Passed: false,
+				Error: &fiber.Error{
+					Code:    http.StatusInternalServerError,
+					Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
+				},
+			},
 		}
 		return
 	}
@@ -90,7 +124,6 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
-
 	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
@@ -100,6 +133,13 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 				Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
 			},
 			NodeType: nodeType,
+			Result: models.ApiResult{
+				Passed: false,
+				Error: &fiber.Error{
+					Code:    http.StatusInternalServerError,
+					Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
+				},
+			},
 		}
 		return
 	}
@@ -114,6 +154,13 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 				Message: "error while connecting to the endpoint, received invalid status code",
 			},
 			NodeType: nodeType,
+			Result: models.ApiResult{
+				Passed: false,
+				Error: &fiber.Error{
+					Code:    http.StatusInternalServerError,
+					Message: "error while connecting to the endpoint, received invalid status code",
+				},
+			},
 		}
 		return
 	}
@@ -126,6 +173,13 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 				Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
 			},
 			NodeType: nodeType,
+			Result: models.ApiResult{
+				Passed: false,
+				Error: &fiber.Error{
+					Code:    http.StatusInternalServerError,
+					Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
+				},
+			},
 		}
 		return
 	}
@@ -133,4 +187,18 @@ func triggerCheckAPI(endPoint, host, nodeType string, output chan<- models.Check
 	ctr.Host = host
 	ctr.NodeType = nodeType
 	output <- ctr
+}
+
+func interfaceToIOReader(body interface{}) (io.Reader, error) {
+	var reader io.Reader
+	if body != nil {
+		bx, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		reader = bytes.NewBuffer(bx)
+
+	}
+	return reader, nil
 }
