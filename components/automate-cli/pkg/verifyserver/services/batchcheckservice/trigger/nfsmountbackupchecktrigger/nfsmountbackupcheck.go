@@ -8,7 +8,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber/v2"
@@ -51,7 +50,7 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 }
 
 // TriggerHardwareResourceCountCheck - Call the Hardware resource API and format response
-func (ss *NfsBackupConfigCheck) TriggerCheckForMountService(body interface{}) (*models.NFSMountCheckResponse, error) {
+func (ss *NfsBackupConfigCheck) TriggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
 	url := fmt.Sprintf("http://%s:%s%s", ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
 	fmt.Println(url)
 	resp, err := httputils.MakeRequest(http.MethodPost, url, body)

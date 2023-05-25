@@ -47,7 +47,7 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 	}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		log.Debugf("Trigger FQDN check for automate for automate ip %s", ip)
+		log.Debugf("Trigger FQDN check for automate ip %s", ip)
 		reqCount++
 		req := getFqdnCheckRequest(ip, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, IsAfterDeployment, config.APIToken)
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
@@ -55,7 +55,7 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 
 	if config.Certificate.ChefServerFqdn != "" {
 		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-			log.Debugf("Trigger FQDN check for automate for chefserver ip %s", ip)
+			log.Debugf("Trigger FQDN check for chefserver ip %s", ip)
 			reqCount++
 			req := getFqdnCheckRequest(ip, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, IsAfterDeployment, config.APIToken)
 			go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
@@ -75,6 +75,7 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 
 // getFqdnCheckRequest creates req list for all the node ips with their fqdn
 func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAfterDeployment bool, apiToken string) models.FqdnRequest {
+
 	fqdnReq := models.FqdnRequest{
 		Fqdn:              fqdn,
 		RootCert:          rootcert,
