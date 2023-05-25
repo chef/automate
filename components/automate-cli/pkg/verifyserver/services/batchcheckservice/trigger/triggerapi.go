@@ -67,7 +67,7 @@ func prepareEndpoint(path, ip, port, nodeType, depState string) string {
 	} else if path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		endPoint = fmt.Sprintf("http://%s:%s%s?node_type=%s&deployment_state=%s", ip, port, path, nodeType, depState)
 
-	} else {
+	} else if path == constants.SYSTEM_USER_CHECK_API_PATH {
 		endPoint = fmt.Sprintf("http://%s:%s%s", ip, port, path)
 	}
 

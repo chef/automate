@@ -13,7 +13,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	
 	"github.com/stretchr/testify/assert"
 )
 
