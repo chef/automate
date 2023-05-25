@@ -1,10 +1,9 @@
 package systemresourceservice
 
 import (
+	"github.com/stretchr/testify/assert"
 	"runtime"
 	"testing"
-
-	"github.com/bmizerany/assert"
 )
 
 func TestGetNumberOfCPU(t *testing.T) {
