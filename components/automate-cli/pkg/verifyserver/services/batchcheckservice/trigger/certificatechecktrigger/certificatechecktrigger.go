@@ -30,7 +30,12 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 
 	count := 0
 
-	var requests []interface{}
+	outputCh := make(chan models.CheckTriggerResponse, count)
+
+	//This map will hold the Response against each IP
+	var finalResult []models.CheckTriggerResponse
+
+	certificate := config.Certificate
 
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.CERTIFICATE_CHECK_API_PATH)
@@ -58,30 +63,4 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 	}
 	close(outputCh)
 	return finalResult
-}
-
-	// hostMap := configutils.GetNodeTypeMap(config)
-	// for _, node := range certificate.Nodes {
-	// 	nodeTypes := hostMap[node.IP]
-	// 	//construct the request for Certificate Check API
-	// 	requestBody := models.CertificateCheckRequest{
-	// 		RootCertificate:  certificate.RootCert,
-	// 		PrivateKey:       node.Key,
-	// 		NodeCertificate:  node.Cert,
-	// 		AdminPrivateKey:  node.AdminKey,
-	// 		AdminCertificate: node.AdminCert,
-	// 	}
-
-	// 	for i := 0; i < len(nodeTypes); i++ {
-	// 		go ss.TriggerCheckAndFormatOutput(node.IP, nodeTypes[i], requestBody, outputCh)
-	// 	}
-	// }
-
-	// //Read response from output channel
-	// for i := 0; i < count; i++ {
-	// 	resp := <-outputCh
-	// 	finalResult = append(finalResult, resp)
-	// }
-	// close(outputCh)
-	// return finalResult
 }

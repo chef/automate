@@ -2,7 +2,7 @@ package constants
 
 const (
 	LOCAL_HOST_URL                           = "http://localhost"
-	LOCAL_HOST                       = "127.0.0.1"
+	LOCAL_HOST                               = "127.0.0.1"
 	LOCALHOST                                = "127.0.0.1"
 	CONTENT_TYPE                             = "Content-Type"
 	TYPE_JSON                                = "application/json"
@@ -12,9 +12,9 @@ const (
 	SOFTWARE_VERSION_CHECK_API_PATH          = "/api/v1/checks/software-versions"
 	SYSTEM_RESOURCE_CHECK_API_PATH           = "/api/v1/checks/system-resource"
 	SYSTEM_USER_CHECK_API_PATH               = "/api/v1/checks/system-user"
-	FIREWALL_API_PATH                = "/api/v1/checks/firewall"
-	SSH_USER_CHECK_API_PATH          = "/api/v1/checks/ssh-users"
-	CERTIFICATE_CHECK_API_PATH       = "/api/v1/checks/certificate"
+	FIREWALL_API_PATH                        = "/api/v1/checks/firewall"
+	SSH_USER_CHECK_API_PATH                  = "/api/v1/checks/ssh-users"
+	CERTIFICATE_CHECK_API_PATH               = "/api/v1/checks/certificate"
 	S3_BACKUP_CHECK_API_PATH                 = "/api/v1/checks/s3-config"
 	FQDN_LOAD_BALANCER_CHECK                 = "/api/v1/checks/fqdn"
 	AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH = "/api/v1/checks/aws-opensearch-s3-bucket-access"
