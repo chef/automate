@@ -161,8 +161,8 @@ func GetTestAWSConfigData() *config_parser.HAAwsConfigToml {
 	configAws.Architecture.ConfigInitials.ExistingElkUsername = "elk_user"
 	configAws.Architecture.ConfigInitials.ExistingElkPassword = "elk_password"
 	configAws.Architecture.ConfigInitials.BackupMount = "/mnt/automate_backups"
-	configAws.Architecture.ConfigInitials.BackupConfig = "/path/to/backup_config"
-	configAws.Architecture.ConfigInitials.S3BucketName = "s3"
+	configAws.Architecture.ConfigInitials.BackupConfig = "s3"
+	configAws.Architecture.ConfigInitials.S3BucketName = "bucket_name"
 	configAws.Architecture.ConfigInitials.HabitatUIDGid = "123:456"
 
 	configAws.Automate.Config.AdminPassword = "admin_password"
