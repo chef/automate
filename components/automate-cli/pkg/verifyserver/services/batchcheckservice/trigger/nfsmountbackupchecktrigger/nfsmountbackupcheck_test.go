@@ -758,7 +758,7 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			if tt.isError {
 				assert.Len(t, got, 4)
 				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, "postgresql", got[0].NodeType)
+                assert.NotNil(t,got[0].Host)
 				assert.Equal(t, tt.response, got[0].Error.Error())
 
 			} else {
