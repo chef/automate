@@ -320,7 +320,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 	}, service)
 }
 
-func TestDeleteUser(t *testing.T) {
+func TestDeleteUserAndGroup(t *testing.T) {
 	mockExec := &fiberutils.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
 			return []byte{}, errors.New("Could not delete user")
@@ -334,7 +334,7 @@ func TestDeleteUser(t *testing.T) {
 		Log:  log,
 		exec: mockExec,
 	}
-	err = s.deleteUser("hab")
+	err = s.deleteUserAndGroup("hab")
 	if err != nil {
 		assert.Equal(t, "Could not delete user", err.Error())
 	}

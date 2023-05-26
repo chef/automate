@@ -47,7 +47,7 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 	}
 
 	if isHabUserCreated {
-		defer su.deleteUser(constants.USERNAME)
+		defer su.deleteUserAndGroup(constants.USERNAME)
 	}
 
 	serviceResponseArray = append(serviceResponseArray, habUserResponse, habGroupResponse, habUserAndGroupMapResponse)
@@ -120,7 +120,7 @@ func (su *SystemUserService) isHabGroupPresent(groupname string) bool {
 }
 
 // Delete a user
-func (su *SystemUserService) deleteUser(username string) error {
+func (su *SystemUserService) deleteUserAndGroup(username string) error {
 	_, err := su.exec.Command(constants.USERDELCMD, []string{username})
 	return err
 }
