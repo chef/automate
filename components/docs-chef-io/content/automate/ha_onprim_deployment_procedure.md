@@ -273,8 +273,8 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 - Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites) to know more.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
-- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](automate/create_amazon_rds) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
-- Set up AWS OpenSearch 1.3. Click [here](automate/create_amazon_opensearch) to know more.
+- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
+- Set up AWS OpenSearch 1.3. Click [here](/automate/create_amazon_opensearch/) to know more.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
