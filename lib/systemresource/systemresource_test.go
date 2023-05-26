@@ -1,4 +1,4 @@
-package systemresourceservice
+package systemresource
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetNumberOfCPU(t *testing.T) {
-	sysOsUtil := NewGetOsAndFileSystemInfo()
+	sysOsUtil := NewSystemResourceInfoImpl()
 
 	type testCase struct {
 		numCpuWant int

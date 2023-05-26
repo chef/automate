@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockSystemResourceService(responseBody *models.ApiResult, err error) *systemresourceservice.MockSystemResourcesService {
+func SetupMockSystemResourceService(responseBody *models.ApiResult, err error) systemresourceservice.ISystemResourcesService {
 	return &systemresourceservice.MockSystemResourcesService{
 		GetSystemResourcesForDeploymentFunc: func(s1, s2 string) (*models.ApiResult, error) {
 			return responseBody, err
@@ -31,7 +31,7 @@ func SetupSystemResourceServiceHandler(srs systemresourceservice.ISystemResource
 		return nil, err
 	}
 
-	fconf :=fiber.Config{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}

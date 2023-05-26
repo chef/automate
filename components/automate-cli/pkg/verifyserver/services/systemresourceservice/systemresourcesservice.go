@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/systemresource"
 )
 
 type ISystemResourcesService interface {
@@ -14,20 +15,18 @@ type ISystemResourcesService interface {
 }
 
 type SystemResourcesService struct {
-	logger                 logger.Logger
-	GetOsAndFileSystemInfo IGetOsAndFileSystemInfo
+	logger             logger.Logger
+	systemResourceInfo systemresource.SystemResourceInfo
 }
 
-func NewSystemResourceService(log logger.Logger, osFsUtil IGetOsAndFileSystemInfo) *SystemResourcesService {
+func NewSystemResourceService(log logger.Logger, sysResInfo systemresource.SystemResourceInfo) *SystemResourcesService {
 	return &SystemResourcesService{
-		logger:                 log,
-		GetOsAndFileSystemInfo: osFsUtil,
+		logger:             log,
+		systemResourceInfo: sysResInfo,
 	}
 }
 
 const (
-	CPU_INFO_FILE = "/proc/cpuinfo"
-
 	CPU_COUNT_CHECK_TITLE   = "CPU count check"
 	CPU_SPEED_CHECK_TITLE   = "CPU speed check"
 	MEMORY_SIZE_CHECK_TITLE = "Memory size check"
@@ -48,25 +47,25 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 		Checks: []models.Checks{},
 	}
 
-	cpuCountCheck := srs.GetCpuCountCheck()
+	cpuCountCheck := srs.CheckCpuCount()
 	if !cpuCountCheck.Passed {
 		srsResponse.Passed = false
 	}
 	srsResponse.Checks = append(srsResponse.Checks, *cpuCountCheck)
 
-	cpuSpeedCheck := srs.GetCpuSpeedCheck(CPU_INFO_FILE)
+	cpuSpeedCheck := srs.CheckCpuSpeed()
 	if !cpuSpeedCheck.Passed {
 		srsResponse.Passed = false
 	}
 	srsResponse.Checks = append(srsResponse.Checks, *cpuSpeedCheck)
 
-	memorySizeCheck := srs.GetMemorySizeCheck()
+	memorySizeCheck := srs.CheckMemorySize()
 	if !memorySizeCheck.Passed {
 		srsResponse.Passed = false
 	}
 	srsResponse.Checks = append(srsResponse.Checks, *memorySizeCheck)
 
-	habFreeSpaceCheck, err := srs.GetFreeHabSpace(nodeType, deploymentState)
+	habFreeSpaceCheck, err := srs.CheckHabFreeSpace(nodeType, deploymentState)
 	if err != nil {
 		return nil, err
 	}
@@ -76,13 +75,13 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 	}
 	srsResponse.Checks = append(srsResponse.Checks, *habFreeSpaceCheck)
 
-	tmpFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
+	tmpFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
 	if !tmpFreeSpaceCheck.Passed {
 		srsResponse.Passed = false
 	}
 	srsResponse.Checks = append(srsResponse.Checks, *tmpFreeSpaceCheck)
 
-	rootFreeSpaceCheck := srs.GetFreeDiskSpaceCheckOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
+	rootFreeSpaceCheck := srs.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
 	if !rootFreeSpaceCheck.Passed {
 		srsResponse.Passed = false
 	}
@@ -90,9 +89,9 @@ func (srs *SystemResourcesService) GetSystemResourcesForDeployment(nodeType, dep
 	return srsResponse, nil
 }
 
-func (srs *SystemResourcesService) GetCpuCountCheck() *models.Checks {
+func (srs *SystemResourcesService) CheckCpuCount() *models.Checks {
 	srs.logger.Debug("CPU count check is running")
-	cpuCount := srs.GetOsAndFileSystemInfo.GetNumberOfCPU()
+	cpuCount := srs.systemResourceInfo.GetNumberOfCPU()
 	srs.logger.Debug("CPU count is : ", cpuCount)
 
 	if cpuCount >= constants.MIN_CPU_COUNT {
@@ -105,9 +104,9 @@ func (srs *SystemResourcesService) GetCpuCountCheck() *models.Checks {
 	return srs.GetChecksModel(false, CPU_COUNT_CHECK_TITLE, "", errorMsg, resolutionMsg)
 }
 
-func (srs *SystemResourcesService) GetCpuSpeedCheck(cpuInfoFile string) *models.Checks {
+func (srs *SystemResourcesService) CheckCpuSpeed() *models.Checks {
 	srs.logger.Debug("CPU speed check is running")
-	cpuSpeed, err := srs.GetOsAndFileSystemInfo.GetCPUSpeed(cpuInfoFile)
+	cpuSpeed, err := srs.systemResourceInfo.GetCPUSpeed()
 
 	if err != nil {
 		srs.logger.Error("Error occured while getting cpu speed :", err)
@@ -119,13 +118,13 @@ func (srs *SystemResourcesService) GetCpuSpeedCheck(cpuInfoFile string) *models.
 		return srs.GetChecksModel(true, CPU_SPEED_CHECK_TITLE, successMsg, "", "")
 	}
 	errorMsg := fmt.Sprintf("CPU speed is %vGHz", cpuSpeed)
-	resolutionMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED) //check with float
+	resolutionMsg := fmt.Sprintf("CPU speed should be >=%vGHz", constants.MIN_CPU_SPEED)
 	return srs.GetChecksModel(false, CPU_SPEED_CHECK_TITLE, "", errorMsg, resolutionMsg)
 }
 
-func (srs *SystemResourcesService) GetMemorySizeCheck() *models.Checks {
+func (srs *SystemResourcesService) CheckMemorySize() *models.Checks {
 	srs.logger.Debug("Memory size check is running")
-	memoryInGB, err := srs.GetOsAndFileSystemInfo.GetMemory()
+	memoryInGB, err := srs.systemResourceInfo.GetMemory()
 	srs.logger.Debug("Current memory of system is :", memoryInGB)
 
 	if err != nil {
@@ -143,20 +142,20 @@ func (srs *SystemResourcesService) GetMemorySizeCheck() *models.Checks {
 	return srs.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", errorMsg, resolutionMsg)
 }
 
-func (srs *SystemResourcesService) GetFreeHabSpace(nodeType, deploymentState string) (*models.Checks, error) {
+func (srs *SystemResourcesService) CheckHabFreeSpace(nodeType, deploymentState string) (*models.Checks, error) {
 
 	switch deploymentState {
 	case constants.PRE_DEPLOY:
-		return srs.GetHabFreeSpaceCheckPreDeployment(nodeType)
+		return srs.CheckHabFreeSpacePreDeployment(nodeType)
 	case constants.POST_DEPLOY:
-		return srs.GetHabFreeSpaceCheckPostDeployment(nodeType)
+		return srs.CheckHabFreeSpacePostDeployment(nodeType)
 	default:
 		srs.logger.Errorf("Wrong query deployment_state=%s", deploymentState)
 		return nil, fmt.Errorf("given query deployment_state with value=%s is not supported", deploymentState)
 	}
 }
 
-func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType string) (*models.Checks, error) {
+func (srs *SystemResourcesService) CheckHabFreeSpacePreDeployment(nodeType string) (*models.Checks, error) {
 	srs.logger.Debug("Hab free space check is running for node_type : ", nodeType, " and deployment_state :", constants.PRE_DEPLOY)
 
 	currentFreeSpaceInGB, err := srs.GetFreeDiskSpaceOfGivenDir("/hab")
@@ -191,7 +190,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPreDeployment(nodeType st
 	return resp, nil
 }
 
-func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType string) (*models.Checks, error) {
+func (srs *SystemResourcesService) CheckHabFreeSpacePostDeployment(nodeType string) (*models.Checks, error) {
 	srs.logger.Debugf("Hab free space check is running for node_type : %s  and deployment_state : %s", nodeType, constants.POST_DEPLOY)
 	currentFreeSpaceInGB, err := srs.GetFreeDiskSpaceOfGivenDir("/hab")
 
@@ -239,7 +238,7 @@ func (srs *SystemResourcesService) GetHabFreeSpaceCheckPostDeployment(nodeType s
 	return resp, nil
 }
 
-func (srs *SystemResourcesService) GetFreeDiskSpaceCheckOfDir(dirPath string, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB float64, checkTitle string) *models.Checks {
+func (srs *SystemResourcesService) CheckFreeDiskSpaceOfDir(dirPath string, freeDiskSpaceWantInPer, freeDiskSpaceWantInGB float64, checkTitle string) *models.Checks {
 	srs.logger.Debugf("free disk space check is running for %s directory", dirPath)
 
 	currentFreeSpaceInDir, err := srs.GetFreeDiskSpaceOfGivenDir(dirPath)
@@ -314,7 +313,7 @@ func (srs *SystemResourcesService) GetChecksModel(passed bool, checkTitle, succe
 }
 
 func (srs *SystemResourcesService) GetFreeDiskSpaceOfGivenDir(dirPath string) (float64, error) {
-	isPathExist, err := srs.GetOsAndFileSystemInfo.CheckPathExists(dirPath)
+	isPathExist, err := srs.systemResourceInfo.CheckPathExists(dirPath)
 	if err != nil {
 		return 0, err
 	}
@@ -322,12 +321,12 @@ func (srs *SystemResourcesService) GetFreeDiskSpaceOfGivenDir(dirPath string) (f
 	if !isPathExist {
 		dirPath = "/"
 	}
-	_, freeSpace, err := srs.GetOsAndFileSystemInfo.GetDiskSpaceInfo(dirPath)
+	_, freeSpace, err := srs.systemResourceInfo.GetDiskSpaceInfo(dirPath)
 	return freeSpace, err
 }
 
 func (srs *SystemResourcesService) GetTotalSpaceOfGivenDir(dirPath string) (float64, error) {
-	isPathExist, err := srs.GetOsAndFileSystemInfo.CheckPathExists(dirPath)
+	isPathExist, err := srs.systemResourceInfo.CheckPathExists(dirPath)
 
 	if err != nil {
 		return 0, err
@@ -336,6 +335,6 @@ func (srs *SystemResourcesService) GetTotalSpaceOfGivenDir(dirPath string) (floa
 	if !isPathExist {
 		dirPath = "/"
 	}
-	totalSpace, _, err := srs.GetOsAndFileSystemInfo.GetDiskSpaceInfo(dirPath)
+	totalSpace, _, err := srs.systemResourceInfo.GetDiskSpaceInfo(dirPath)
 	return totalSpace, err
 }
