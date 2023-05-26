@@ -1,16 +1,13 @@
 package firewallchecktrigger
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type FirewallCheck struct {
@@ -268,84 +265,6 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 	return reqBodies
 }
 
-func triggerFirewallAPI(endPoint, host, nodeType, method string, output chan<- models.CheckTriggerResponse, reqBody models.FirewallRequest) {
-	var ctr models.CheckTriggerResponse
-
-	reqReader, err := json.Marshal(reqBody)
-	if err != nil {
-		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while parsing the request:%s", err.Error()),
-			},
-			NodeType: nodeType,
-		}
-		return
-	}
-
-	reader := bytes.NewBuffer(reqReader)
-
-	req, err := http.NewRequest(method, endPoint, reader)
-	if err != nil {
-		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
-			},
-			NodeType: nodeType,
-		}
-		return
-	}
-
-	client := http.Client{
-		Timeout: 5 * time.Second,
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
-			},
-			NodeType: nodeType,
-		}
-		return
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    resp.StatusCode,
-				Message: "error while connecting to the endpoint, received invalid status code",
-			},
-			NodeType: nodeType,
-		}
-		return
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&ctr); err != nil {
-		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
-			},
-			NodeType: nodeType,
-		}
-		return
-	}
-
-	ctr.Host = host
-	ctr.NodeType = nodeType
-	output <- ctr
-}
-
 // triggerMultipleRequests triggers multiple requests for firewall api on bastion host
 func triggerMultipleRequests(config models.Config, log logger.Logger, endPoint, method string, requestsMap map[string][]models.FirewallRequest) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
@@ -355,7 +274,7 @@ func triggerMultipleRequests(config models.Config, log logger.Logger, endPoint, 
 	for nodeType, requests := range requestsMap {
 		for _, reqBody := range requests {
 			reqCount++
-			go triggerFirewallAPI(endPoint, reqBody.SourceNodeIP, nodeType, method, outputCh, reqBody)
+			go trigger.TriggerCheckAPI(endPoint, reqBody.SourceNodeIP, nodeType, method, outputCh, reqBody)
 		}
 
 	}

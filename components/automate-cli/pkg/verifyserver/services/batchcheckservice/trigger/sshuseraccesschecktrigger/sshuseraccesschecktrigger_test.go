@@ -179,11 +179,11 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(sshCheckSuccessResp))
 		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
+		err := startMockServerOnCustomPort(mockServer, "1124")
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1124")
 
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -225,11 +225,11 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(sshCheckFailureResp))
 		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
+		err := startMockServerOnCustomPort(mockServer, "1235")
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1235")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -261,11 +261,11 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`invalid JSON`))
 		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
+		err := startMockServerOnCustomPort(mockServer, "1236")
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1234")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1236")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
