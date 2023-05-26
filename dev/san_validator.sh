@@ -18,11 +18,18 @@ is_root_ca() {
     #Check the certificate is RootCA is not
     is_self_signed=$(openssl verify -CAfile "$cert" "$cert" 2>&1)
 
-    if [[ $is_self_signed == *error* ]]; then
+    #enable case insensitive match for reg-ex
+    shopt -s nocasematch
+    if [[ ! -z $(cat "$cert") ]] && [[ $is_self_signed == *error* ]]; then
+            #disable case insensitive match for reg-ex
+            shopt -u nocasematch
             return 1
     else
+            #disable case insensitive match for reg-ex
+            shopt -u nocasematch
             return 0
     fi
+
 }
 
 # If the certificate path provide validate only that certificate
