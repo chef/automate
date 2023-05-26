@@ -458,6 +458,7 @@ paths = [
   "lib/reporting/*",
   "lib/secrets/*",
   "lib/stringutils/*",
+  "lib/systemresource/*"
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
