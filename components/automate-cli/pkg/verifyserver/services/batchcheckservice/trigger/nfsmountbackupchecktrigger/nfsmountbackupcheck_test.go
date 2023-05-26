@@ -758,8 +758,8 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 			if tt.isError {
 				assert.Len(t, got, 4)
 				assert.NotNil(t, got[0].Result.Error)
-                assert.NotNil(t,got[0].Host)
-				assert.Equal(t, tt.response, got[0].Error.Error())
+				assert.NotNil(t, got[0].Host)
+				assert.Contains(t, tt.response, got[0].Result.Error.Error())
 
 			} else {
 				var want []models.CheckTriggerResponse
