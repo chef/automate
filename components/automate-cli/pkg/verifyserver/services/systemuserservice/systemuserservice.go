@@ -86,9 +86,9 @@ func (su *SystemUserService) ValidateHabGroup() *models.Checks {
 
 func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.Checks {
 	// Check if "hab" user's primary group is "hab" group
-	userPrimayGroup := su.checkUserPrimaryGroup(constants.USERNAME, constants.GROUPNAME)
+	userPrimaryGroup := su.checkUserPrimaryGroup(constants.USERNAME, constants.GROUPNAME)
 
-	if !userPrimayGroup {
+	if !userPrimaryGroup {
 		su.Log.Error("Validation failed: Primary group mapping for user 'hab' is not 'hab' group")
 		return failureResponse(constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE, constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG, constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG)
 	}
