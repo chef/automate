@@ -19,7 +19,7 @@ type FirewallCheck struct {
 func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 	return &FirewallCheck{
 		log:  log,
-		host: constants.LOCAL_HOST_URL,
+		host: constants.LOCAL_HOST,
 		port: port,
 	}
 }
