@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -18,20 +19,14 @@ import (
 )
 
 var (
-	ExternalPgSuccessConnectionTitle  = "Connection successfully tested"
-	ExternalPgFailConnectionTitle     = "External Postgresql Connection failed"
-	ExternalPgConnectionErrorMsg      = "Machine is unable to connect with External Managed Postgresql"
-	ExternalPgConnectionResolutionMsg = "Ensure that the Postgres configuration provided is correct"
-	ExternalPgConnectionSuccessMsg    = "Connection successfully tested"
-	ExternalPgDebugMsg                = "Review security group or firewall settings as well on the infrastructure"
-	ExternalPgsuccessMessage          = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"Connection successfully tested\",\"passed\":true,\"status\":\"\",\"success_msg\":\"Connection successfully tested\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}"
-	ExternalPgfailureMessage          = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"External Postgresql Connection failed\",\"passed\":false,\"status\":\"\",\"success_msg\":\"\",\"error_msg\":\"Machine is unable to connect with External Managed Postgresql\",\"resolution_msg\":\"Ensure that the Postgres configuration provided is correct\"}]}}"
-	ExternalPgInternalServerError     = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Internal Server Error\"}}"
-	ErrorBodyParser                   = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
-	InvalidRequest                    = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Request Parameters cannot be empty\"}}"
+	ExternalPgsuccessMessage      = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"Machine is able to connect with external managed PostgreSQL\",\"passed\":true,\"status\":\"\",\"success_msg\":\"Connection successfully tested\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}"
+	ExternalPgfailureMessage      = "{\"status\":\"SUCCESS\",\"result\":{\"passed\":false,\"checks\":[{\"title\":\"External Postgresql connection failed\",\"passed\":false,\"status\":\"\",\"success_msg\":\"\",\"error_msg\":\"Machine is unable to connect with external managed PostgreSQL\",\"resolution_msg\":\"Ensure that the PostgreSQL configuration provided is correct. Review security group or firewall settings as well on the infrastructure\"}]}}"
+	ExternalPgInternalServerError = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":500,\"message\":\"Internal Server Error\"}}"
+	ErrorBodyParser               = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"invalid character '}' looking for beginning of object key string\"}}"
+	InvalidRequest                = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Request Parameters cannot be empty\"}}"
 )
 
-func SetupMockExternalPostgresqlService(responseBody *models.ExternalPgResponse, err error) externalpostgresqlservice.ISExternalPostgresqlService {
+func SetupMockExternalPostgresqlService(responseBody *models.ExternalPgResponse, err error) externalpostgresqlservice.ExternalPostgresqlService {
 	return &externalpostgresqlservice.MockExternalPostgresqlService{
 		GetPgConnectionFunc: func(*models.ExternalPgRequest) (*models.ExternalPgResponse, error) {
 			return responseBody, err
@@ -39,7 +34,7 @@ func SetupMockExternalPostgresqlService(responseBody *models.ExternalPgResponse,
 	}
 }
 
-func SetupExternalPostgresqlHandlers(pg externalpostgresqlservice.ISExternalPostgresqlService) (*fiber.App, error) {
+func SetupExternalPostgresqlHandlers(pg externalpostgresqlservice.ExternalPostgresqlService) (*fiber.App, error) {
 	log, _ := logger.NewLogger("text", "debug")
 	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
@@ -73,9 +68,9 @@ func TestExternalPostgresql(t *testing.T) {
 				Passed: true,
 				Checks: []models.ExternalPgConnectionDetails{
 					{
-						Title:         ExternalPgSuccessConnectionTitle,
+						Title:         constants.EXTERNAL_PG_SUCCESS_CONNECTION_TITLE,
 						Passed:        true,
-						SuccessMsg:    ExternalPgConnectionSuccessMsg,
+						SuccessMsg:    constants.EXTERNAL_PG_CONNECTION_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -104,7 +99,37 @@ func TestExternalPostgresql(t *testing.T) {
 					}`,
 		},
 		{
-			description:  "400: body parser error",
+			description:  "400: body parser error with special character",
+			responseBody: nil,
+			expectedCode: 400,
+			expectedBody: InvalidRequest,
+			body: `{
+				"postgresql&_instance_url": "A.B.C.D",
+				"postgresql_instance_port": "7432",
+				"postgresql_superuser_username": "postgres",
+				"postgresql_superuser_password": "Progress123",
+				"postgresql_dbuser_username": "postgres",
+				"postgresql_dbuser_password": "Progress123",
+				"postgresql_root_cert": ""
+				}`,
+		},
+		{
+			description:  "400: body parser error with invalid type",
+			responseBody: nil,
+			expectedCode: 400,
+			expectedBody: InvalidRequest,
+			body: `{
+				"postgresql&_instance_url": 1234,
+				"postgresql_instance_port": "7432",
+				"postgresql_superuser_username": "postgres",
+				"postgresql_superuser_password": "Progress123",
+				"postgresql_dbuser_username": "postgres",
+				"postgresql_dbuser_password": "Progress123",
+				"postgresql_root_cert": ""
+				}`,
+		},
+		{
+			description:  "400: Request validator with empty string",
 			responseBody: nil,
 			expectedCode: 400,
 			expectedBody: InvalidRequest,

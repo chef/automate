@@ -28,9 +28,15 @@ type FileUtils interface {
 	WriteToFile(filepath string, data []byte) error
 	ReadFile(filename string) ([]byte, error)
 	WriteFile(filepath string, data []byte, perm os.FileMode) error
+	CreateTempFile(content string, filename string) (string, error)
+	DeleteTempFile(tempFile string) error
 }
 
 type FileSystemUtils struct{}
+
+func NewFileSystemUtils() FileUtils {
+	return &FileSystemUtils{}
+}
 
 func (fsu *FileSystemUtils) PathExists(path string) (bool, error) {
 	return PathExists(path)
@@ -58,6 +64,12 @@ func (fsu *FileSystemUtils) ReadFile(filename string) ([]byte, error) {
 }
 func (fsu *FileSystemUtils) WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return WriteFile(filepath, data, perm)
+}
+func (fsu *FileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
+	return CreateTempFile(content, filename)
+}
+func (fsu *FileSystemUtils) DeleteTempFile(tempFile string) error {
+	return DeleteTempFile(tempFile)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -146,4 +158,20 @@ func ReadFile(filename string) ([]byte, error) {
 
 func WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return ioutil.WriteFile(filepath, data, perm) // nosemgrep
+}
+
+func CreateTempFile(content string, filename string) (string, error) {
+	tempFile, err := os.CreateTemp("", filename)
+	if err != nil {
+		return "", errors.Wrap(err, "file creation failed ")
+	}
+	_, err = tempFile.WriteString((content))
+	if err != nil {
+		return "", errors.Wrap(err, "writing to a file failed ")
+	}
+	return tempFile.Name(), nil
+}
+
+func DeleteTempFile(tempFile string) error {
+	return os.Remove(tempFile)
 }

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
@@ -11,7 +12,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -27,7 +27,7 @@ type Handler struct {
 	StopMockServersService       stopmockserverservice.IStopMockServerService
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
 	PortReachableService         portreachableservice.IPortReachableService
-	ExternalPostgresqlService    externalpostgresqlservice.ISExternalPostgresqlService
+	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -83,7 +83,7 @@ func (h *Handler) AddPortReachableService(pr portreachableservice.IPortReachable
 	return h
 }
 
-func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.ISExternalPostgresqlService) *Handler {
+func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.ExternalPostgresqlService) *Handler {
 	h.ExternalPostgresqlService = pg
 	return h
 }

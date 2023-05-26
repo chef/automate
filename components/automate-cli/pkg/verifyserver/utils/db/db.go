@@ -1,6 +1,10 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "github.com/lib/pq"
+)
 
 type DBImpl struct {
 }
@@ -10,7 +14,6 @@ type DB interface {
 
 func NewDBImpl() DB {
 	return &DBImpl{}
-
 }
 
 func (di *DBImpl) InitPostgresDB(con string) error {

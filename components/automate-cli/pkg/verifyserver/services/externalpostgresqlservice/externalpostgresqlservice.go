@@ -2,38 +2,38 @@ package externalpostgresqlservice
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
-	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 )
 
-type ISExternalPostgresqlService interface {
+type ExternalPostgresqlService interface {
 	GetPgConnection(*models.ExternalPgRequest) (*models.ExternalPgResponse, error)
 }
 
-type ExternalPostgresqlService struct {
-	logger  logger.Logger
-	DBUtils db.DB
-	Req     *models.ExternalPgRequest
+type ExternalPostgresqlServiceImpl struct {
+	logger    logger.Logger
+	DBUtils   db.DB
+	fileUtils fileutils.FileUtils
+	Req       *models.ExternalPgRequest
 }
 
-func NewExternalPostgresqlService(db db.DB, logger logger.Logger) *ExternalPostgresqlService {
-	return &ExternalPostgresqlService{
-		logger:  logger,
-		DBUtils: db,
+func NewExternalPostgresqlService(db db.DB, fileutils fileutils.FileUtils, logger logger.Logger) *ExternalPostgresqlServiceImpl {
+	return &ExternalPostgresqlServiceImpl{
+		logger:    logger,
+		DBUtils:   db,
+		fileUtils: fileutils,
 	}
 }
 
-func (pg *ExternalPostgresqlService) GetPgConnection(req *models.ExternalPgRequest) (*models.ExternalPgResponse, error) {
+func (pg *ExternalPostgresqlServiceImpl) GetPgConnection(req *models.ExternalPgRequest) (*models.ExternalPgResponse, error) {
 	pg.Req = req
 
-	//creating a temp file to the copy content of a rootcert into a file
-	rootcert, err := pg.createTempFile(req.PostgresqlRootCert)
+	//creating a temp file to copy the content of a rootcert into a file
+	rootcert, err := pg.fileUtils.CreateTempFile(req.PostgresqlRootCert, "root-cert")
 	if err != nil {
 		return nil, err
 	}
@@ -44,22 +44,22 @@ func (pg *ExternalPostgresqlService) GetPgConnection(req *models.ExternalPgReque
 		pg.logger.Error(err)
 		resp = &models.ExternalPgResponse{
 			Passed: false,
-			Checks: []models.ExternalPgConnectionDetails{failResponse(constants.EXTERNALPGFAILCONNECTIONTITLE, constants.EXTERNALPGCONNECTIONERRORMSG, constants.EXTERNALPGCONNECTIONRESOLUTIONMSG)},
+			Checks: []models.ExternalPgConnectionDetails{failResponse(constants.EXTERNAL_PG_FAIL_CONNECTION_TITLE, constants.EXTERNAL_PG_CONNECTION_ERROR_MSG, constants.EXTERNAL_PG_CONNECTION_RESOLUTION_MSG)},
 		}
 		return resp, nil
 	}
 
 	resp = &models.ExternalPgResponse{
 		Passed: true,
-		Checks: []models.ExternalPgConnectionDetails{successResponse(constants.EXTERNALPGSUCCESSCONNECTIONTITLE, constants.EXTERNALPGCONNECTIONSUCCESSMSG)},
+		Checks: []models.ExternalPgConnectionDetails{successResponse(constants.EXTERNAL_PG_SUCCESS_CONNECTION_TITLE, constants.EXTERNAL_PG_CONNECTION_SUCCESS_MSG)},
 	}
 
 	// delete the file when its done
-	defer deleteTempFile(rootcert)
+	defer pg.fileUtils.DeleteTempFile(rootcert)
 
 	return resp, nil
 }
-func (p *ExternalPostgresqlService) CheckExternalPgConnection(rootcert string) error {
+func (p *ExternalPostgresqlServiceImpl) CheckExternalPgConnection(rootcert string) error {
 
 	connStr := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=postgres sslmode=verify-ca sslrootcert=%s",
@@ -76,34 +76,16 @@ func (p *ExternalPostgresqlService) CheckExternalPgConnection(rootcert string) e
 			p.logger.Error("External Postgresql Connection failed: ", err.Error())
 			return err
 		}
-		p.logger.Info("External Postgresql aws connection success",i)
+		p.logger.Info("External Postgresql aws connection success", i)
 	}
 	return nil
 }
 
-func (pg *ExternalPostgresqlService) createTempFile(content string) (string, error) {
-
-	tempFile, err := os.CreateTemp("", "root-cert")
-	if err != nil {
-		return "", errors.Wrap(err, "file creation failed ")
-	}
-	_, err = tempFile.WriteString((content))
-	if err != nil {
-		return "", errors.Wrap(err, "writing rootca to a file failed")
-	}
-	pg.logger.Debug("File created : "+tempFile.Name())
-	return tempFile.Name(), nil
-}
-
-func deleteTempFile(tempFile string) error {
-	return os.Remove(tempFile)
-}
-
 func successResponse(Title string, SuccessMsg string) models.ExternalPgConnectionDetails {
 	Resp := models.ExternalPgConnectionDetails{
-		Title:         constants.EXTERNALPGSUCCESSCONNECTIONTITLE,
+		Title:         constants.EXTERNAL_PG_SUCCESS_CONNECTION_TITLE,
 		Passed:        true,
-		SuccessMsg:    constants.EXTERNALPGCONNECTIONSUCCESSMSG,
+		SuccessMsg:    constants.EXTERNAL_PG_CONNECTION_SUCCESS_MSG,
 		ErrorMsg:      "",
 		ResolutionMsg: "",
 	}
@@ -111,11 +93,11 @@ func successResponse(Title string, SuccessMsg string) models.ExternalPgConnectio
 }
 func failResponse(Title string, ErrorMsg string, ResolutionMsg string) models.ExternalPgConnectionDetails {
 	Resp := models.ExternalPgConnectionDetails{
-		Title:         constants.EXTERNALPGFAILCONNECTIONTITLE,
+		Title:         constants.EXTERNAL_PG_FAIL_CONNECTION_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      constants.EXTERNALPGCONNECTIONERRORMSG,
-		ResolutionMsg: constants.EXTERNALPGCONNECTIONRESOLUTIONMSG,
+		ErrorMsg:      constants.EXTERNAL_PG_CONNECTION_ERROR_MSG,
+		ResolutionMsg: constants.EXTERNAL_PG_CONNECTION_RESOLUTION_MSG,
 	}
 	return Resp
 }
