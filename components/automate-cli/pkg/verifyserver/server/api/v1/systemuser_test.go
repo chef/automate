@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -13,15 +14,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
-)
-
-var (
-	HabUserSuccessTitle                = "User creation/validation check"
-	HabGroupSuccessTitle               = "Group creation/validation check"
-	HabUserAndGroupMappingSuccessTitle = "User and group mapping successfully"
-	HabUserSuccessMsg                  = "User is created or found successfully"
-	HabGroupSuccessMsg                 = "Group is created or found successfully"
-	HabUserAndGroupMapSuccessMSg       = "User and group mapping successful"
 )
 
 func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error) {
@@ -68,23 +60,23 @@ func TestSystemUser(t *testing.T) {
 				Passed: true,
 				Checks: []*models.Checks{
 					{
-						Title:         HabUserSuccessTitle,
+						Title:         constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE,
 						Passed:        true,
-						SuccessMsg:    HabUserSuccessMsg,
+						SuccessMsg:    constants.SYSTEM_USER_HAB_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         HabGroupSuccessTitle,
+						Title:         constants.SYSTEM_GROUP_HAB_VALIDATION_SUCCESS_TITLE,
 						Passed:        true,
-						SuccessMsg:    HabGroupSuccessMsg,
+						SuccessMsg:    constants.SYSTEM_GROUP_HAB_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         HabUserAndGroupMappingSuccessTitle,
+						Title:         constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_TITLE,
 						Passed:        true,
-						SuccessMsg:    HabUserAndGroupMapSuccessMSg,
+						SuccessMsg:    constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},

@@ -5,29 +5,12 @@ import (
 	"os/user"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
-)
-
-var (
-	HabUserSuccessTitle                = "User creation/validation check"
-	HabUserFailureTitle                = "User validation failure"
-	HabGroupSuccessTitle               = "Group creation/validation check"
-	HabGroupFailureTitle               = "Group Validation failure"
-	HabUserAndGroupMappingSuccessTitle = "User and group mapping successfully"
-	HabUserAndGroupMappingFailureTitle = "User and group mapping failed"
-	HabUserSuccessMsg                  = "User is created or found successfully"
-	HabUserErrorMsg                    = "Hab user creation failed"
-	HabUserResolutionMsg               = "Check the user name"
-	HabGroupSuccessMsg                 = "Group is created or found successfully"
-	HabGroupErrorMsg                   = "Hab group not found"
-	HabGroupResolutionMsg              = "Check the group name"
-	HabUserAndGroupMapSuccessMSg       = "User and group mapping successful"
-	HabPrimaryGroupMatchErrorMsg       = "Primary group mapping for user hab is not hab group"
-	HabUserAndGroupMapResolutionMsg    = "Verify the mapping for the user and the group"
 )
 
 func TestNewSystemUserService(t *testing.T) {
@@ -62,9 +45,9 @@ func TestValidateHabUserSuccess(t *testing.T) {
 	service, _ := s.ValidateHabUser()
 	assert.Equal(t, service.Passed, true)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserSuccessTitle,
+		Title:         constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE,
 		Passed:        true,
-		SuccessMsg:    HabUserSuccessMsg,
+		SuccessMsg:    constants.SYSTEM_USER_HAB_SUCCESS_MSG,
 		ErrorMsg:      "",
 		ResolutionMsg: "",
 	}, service)
@@ -94,11 +77,11 @@ func TestValidateHabUserFailure(t *testing.T) {
 	service, _ := s.ValidateHabUser()
 	assert.Equal(t, service.Passed, false)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserFailureTitle,
+		Title:         constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabUserErrorMsg,
-		ResolutionMsg: HabUserResolutionMsg,
+		ErrorMsg:      constants.SYSTEM_USER_HAB_ERROR_MSG ,
+		ResolutionMsg: constants.SYSTEM_USER_HAB_RESOLUTION_MSG,
 	}, service)
 }
 
@@ -126,9 +109,9 @@ func TestValidateHabUserCreatedSuccess(t *testing.T) {
 	service, _ := s.ValidateHabUser()
 	assert.Equal(t, service.Passed, true)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserSuccessTitle,
+		Title:         constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE,
 		Passed:        true,
-		SuccessMsg:    HabUserSuccessMsg,
+		SuccessMsg:    constants.SYSTEM_USER_HAB_SUCCESS_MSG,
 		ErrorMsg:      "",
 		ResolutionMsg: "",
 	}, service)
@@ -151,9 +134,9 @@ func TestValidateHabGroup(t *testing.T) {
 	service := s.ValidateHabGroup()
 	assert.Equal(t, service.Passed, true)
 	assert.Equal(t, &models.Checks{
-		Title:         HabGroupSuccessTitle,
+		Title:         constants.SYSTEM_GROUP_HAB_VALIDATION_SUCCESS_TITLE,
 		Passed:        true,
-		SuccessMsg:    HabGroupSuccessMsg,
+		SuccessMsg:    constants.SYSTEM_GROUP_HAB_SUCCESS_MSG,
 		ErrorMsg:      "",
 		ResolutionMsg: "",
 	}, service)
@@ -176,11 +159,11 @@ func TestValidateHabGroupFailed(t *testing.T) {
 	service := s.ValidateHabGroup()
 	assert.Equal(t, service.Passed, false)
 	assert.Equal(t, &models.Checks{
-		Title:         HabGroupFailureTitle,
+		Title:         constants.SYSTEM_GROUP_HAB_VALIDATION_FAILURE_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabGroupErrorMsg,
-		ResolutionMsg: HabGroupResolutionMsg,
+		ErrorMsg:      constants.SYSTEM_GROUP_HAB_ERROR_MSG,
+		ResolutionMsg: constants.SYSTEM_GROUP_HAB_RESOLUTION_MSG,
 	}, service)
 }
 
@@ -213,11 +196,11 @@ func TestValidateHabUserAndGroupMappingFailed(t *testing.T) {
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserAndGroupMappingFailureTitle,
+		Title:         constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
-		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
+		ErrorMsg:      constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG,
+		ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 	}, service)
 }
 
@@ -250,9 +233,9 @@ func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, true)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserAndGroupMappingSuccessTitle,
+		Title:         constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_TITLE,
 		Passed:        true,
-		SuccessMsg:    HabUserAndGroupMapSuccessMSg,
+		SuccessMsg:    constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_MSG,
 		ErrorMsg:      "",
 		ResolutionMsg: "",
 	}, service)
@@ -278,11 +261,11 @@ func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserAndGroupMappingFailureTitle,
+		Title:         constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
-		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
+		ErrorMsg:      constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG,
+		ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 	}, service)
 }
 
@@ -312,11 +295,11 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
 	assert.Equal(t, &models.Checks{
-		Title:         HabUserAndGroupMappingFailureTitle,
+		Title:         constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE,
 		Passed:        false,
 		SuccessMsg:    "",
-		ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
-		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
+		ErrorMsg:      constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG,
+		ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 	}, service)
 }
 
@@ -386,23 +369,23 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 				Passed: true,
 				Checks: []*models.Checks{
 					{
-						Title:         HabUserSuccessTitle,
+						Title:         constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE,
 						Passed:        true,
-						SuccessMsg:    HabUserSuccessMsg,
+						SuccessMsg:    constants.SYSTEM_USER_HAB_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         HabGroupSuccessTitle,
+						Title:         constants.SYSTEM_GROUP_HAB_VALIDATION_SUCCESS_TITLE,
 						Passed:        true,
-						SuccessMsg:    HabGroupSuccessMsg,
+						SuccessMsg:    constants.SYSTEM_GROUP_HAB_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         HabUserAndGroupMappingSuccessTitle,
+						Title:         constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_TITLE,
 						Passed:        true,
-						SuccessMsg:    HabUserAndGroupMapSuccessMSg,
+						SuccessMsg:    constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_MSG,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -455,25 +438,25 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 				Passed: false,
 				Checks: []*models.Checks{
 					{
-						Title:         HabUserFailureTitle,
+						Title:         constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      HabUserErrorMsg,
-						ResolutionMsg: HabUserResolutionMsg,
+						ErrorMsg:      constants.SYSTEM_USER_HAB_ERROR_MSG ,
+						ResolutionMsg: constants.SYSTEM_USER_HAB_RESOLUTION_MSG,
 					},
 					{
-						Title:         HabGroupFailureTitle,
+						Title:         constants.SYSTEM_GROUP_HAB_VALIDATION_FAILURE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      HabGroupErrorMsg,
-						ResolutionMsg: HabGroupResolutionMsg,
+						ErrorMsg:      constants.SYSTEM_GROUP_HAB_ERROR_MSG,
+						ResolutionMsg: constants.SYSTEM_GROUP_HAB_RESOLUTION_MSG,
 					},
 					{
-						Title:         HabUserAndGroupMappingFailureTitle,
+						Title:         constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
-						ResolutionMsg: HabUserAndGroupMapResolutionMsg,
+						ErrorMsg:      constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG,
+						ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 					},
 				},
 			},

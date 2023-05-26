@@ -4,25 +4,24 @@ import (
 	"os/user"
 	"testing"
 
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestLookup(t *testing.T) {
 	s := &userutils.UserUtilImp{}
-	username := "hab"
-	sysUser, err := s.Lookup(username)
+	sysUser, err := s.Lookup(constants.USERNAME)
 	if sysUser == nil {
-		assert.Equal(t, user.UnknownUserError(username), err)
+		assert.Equal(t, user.UnknownUserError(constants.USERNAME), err)
 	}
 }
 
 func TestLookupGroup(t *testing.T) {
 	s := &userutils.UserUtilImp{}
-	groupname := "hab"
-	group, err := s.LookupGroup(groupname)
+	group, err := s.LookupGroup(constants.GROUPNAME)
 	if group == nil {
-		assert.Equal(t, user.UnknownGroupError(groupname), err)
+		assert.Equal(t, user.UnknownGroupError(constants.GROUPNAME), err)
 	}
 }
 
