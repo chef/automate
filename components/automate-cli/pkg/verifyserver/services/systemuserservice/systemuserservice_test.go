@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +26,6 @@ var (
 	HabGroupErrorMsg                   = "Hab group not found"
 	HabGroupResolutionMsg              = "Check the group name"
 	HabUserAndGroupMapSuccessMSg       = "User and group mapping successful"
-	HabUserInGroupErrorMsg             = "User hab is not a member of group hab"
 	HabPrimaryGroupMatchErrorMsg       = "Primary group mapping for user hab is not hab group"
 	HabUserAndGroupMapResolutionMsg    = "Verify the mapping for the user and the group"
 )
@@ -39,7 +39,7 @@ func TestNewSystemUserService(t *testing.T) {
 }
 
 func TestValidateHabUserSuccess(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{}, nil
 		},
@@ -71,7 +71,7 @@ func TestValidateHabUserSuccess(t *testing.T) {
 }
 
 func TestValidateHabUserFailure(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{}, errors.New("user not found")
 		},
@@ -103,7 +103,7 @@ func TestValidateHabUserFailure(t *testing.T) {
 }
 
 func TestValidateHabUserCreatedSuccess(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{}, errors.New("user not found")
 		},
@@ -135,7 +135,7 @@ func TestValidateHabUserCreatedSuccess(t *testing.T) {
 }
 
 func TestValidateHabGroup(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupGroupFunc: func(name string) (*user.Group, error) {
 			return &user.Group{}, nil
 		},
@@ -160,7 +160,7 @@ func TestValidateHabGroup(t *testing.T) {
 }
 
 func TestValidateHabGroupFailed(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupGroupFunc: func(name string) (*user.Group, error) {
 			return &user.Group{}, errors.New("Group 'hab' doesn't exists")
 		},
@@ -184,18 +184,22 @@ func TestValidateHabGroupFailed(t *testing.T) {
 	}, service)
 }
 
-func TestValidateHabUserAndGroupMappingFailedForWrongGroupName(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+func TestValidateHabUserAndGroupMappingFailed(t *testing.T) {
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
-			return &user.User{}, nil
+			return &user.User{
+				Uid:      "1001",
+				Gid:      "1001",
+				Username: "hab",
+				Name:     "hab",
+				HomeDir:  "",
+			}, nil
 		},
 		LookupGroupIdFunc: func(name string) (*user.Group, error) {
-			return &user.Group{}, nil
-		},
-	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("group1"), nil
+			return &user.Group{
+				Gid:  "1002",
+				Name: "test",
+			}, nil
 		},
 	}
 	log, err := logger.NewLogger("text", "debug")
@@ -205,41 +209,6 @@ func TestValidateHabUserAndGroupMappingFailedForWrongGroupName(t *testing.T) {
 	s := &SystemUserService{
 		Log:  log,
 		user: mockUser,
-		exec: mockExec,
-	}
-	service := s.ValidateHabUserAndGroupMapping()
-	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.Checks{
-		Title:         HabUserAndGroupMappingFailureTitle,
-		Passed:        false,
-		SuccessMsg:    "",
-		ErrorMsg:      HabUserInGroupErrorMsg,
-		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
-	}, service)
-}
-
-func TestValidateHabUserAndGroupMappingPrimaryGroupMappingFailed(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
-		LookupFunc: func(name string) (*user.User, error) {
-			return &user.User{}, nil
-		},
-		LookupGroupIdFunc: func(name string) (*user.Group, error) {
-			return &user.Group{}, nil
-		},
-	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("hab"), nil
-		},
-	}
-	log, err := logger.NewLogger("text", "debug")
-	if err != nil {
-		assert.Error(t, err)
-	}
-	s := &SystemUserService{
-		Log:  log,
-		user: mockUser,
-		exec: mockExec,
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
@@ -253,7 +222,7 @@ func TestValidateHabUserAndGroupMappingPrimaryGroupMappingFailed(t *testing.T) {
 }
 
 func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{
 				Uid:      "1001",
@@ -270,11 +239,6 @@ func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
 			}, nil
 		},
 	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("hab"), nil
-		},
-	}
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		assert.Error(t, err)
@@ -282,7 +246,6 @@ func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
 	s := &SystemUserService{
 		Log:  log,
 		user: mockUser,
-		exec: mockExec,
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, true)
@@ -295,52 +258,13 @@ func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
 	}, service)
 }
 
-func TestValidateHabUserAndGroupMappingCommandExecutionFail(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
-		LookupFunc: func(name string) (*user.User, error) {
-			return &user.User{}, nil
-		},
-		LookupGroupIdFunc: func(name string) (*user.Group, error) {
-			return &user.Group{}, nil
-		},
-	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("hab"), errors.New("Command execution failed")
-		},
-	}
-	log, err := logger.NewLogger("text", "debug")
-	if err != nil {
-		assert.Error(t, err)
-	}
-	s := &SystemUserService{
-		Log:  log,
-		user: mockUser,
-		exec: mockExec,
-	}
-	service := s.ValidateHabUserAndGroupMapping()
-	assert.Equal(t, service.Passed, false)
-	assert.Equal(t, &models.Checks{
-		Title:         HabUserAndGroupMappingFailureTitle,
-		Passed:        false,
-		SuccessMsg:    "",
-		ErrorMsg:      HabUserInGroupErrorMsg,
-		ResolutionMsg: HabUserAndGroupMapResolutionMsg,
-	}, service)
-}
-
 func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
-			return &user.User{}, errors.New("Primary group mapping for user 'hab' is not 'hab' group")
+			return &user.User{}, errors.New("User not found")
 		},
 		LookupGroupIdFunc: func(name string) (*user.Group, error) {
 			return &user.Group{}, nil
-		},
-	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("hab"), nil
 		},
 	}
 	log, err := logger.NewLogger("text", "debug")
@@ -350,7 +274,6 @@ func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T
 	s := &SystemUserService{
 		Log:  log,
 		user: mockUser,
-		exec: mockExec,
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
@@ -364,7 +287,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T
 }
 
 func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{
 				Uid:      "1001",
@@ -375,12 +298,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 			}, nil
 		},
 		LookupGroupIdFunc: func(name string) (*user.Group, error) {
-			return &user.Group{}, errors.New("Group not found")
-		},
-	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("hab"), nil
+			return &user.Group{}, errors.New("Group not found with Gid")
 		},
 	}
 	log, err := logger.NewLogger("text", "debug")
@@ -390,7 +308,6 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 	s := &SystemUserService{
 		Log:  log,
 		user: mockUser,
-		exec: mockExec,
 	}
 	service := s.ValidateHabUserAndGroupMapping()
 	assert.Equal(t, service.Passed, false)
@@ -424,7 +341,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{
 				Uid:      "1001",
@@ -446,7 +363,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 	}
 	mockExec := &fiberutils.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte("hab"), nil
+			return []byte{}, nil
 		},
 	}
 	log, err := logger.NewLogger("text", "debug")
@@ -502,7 +419,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 }
 
 func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
-	mockUser := &fiberutils.UserCmdServiceMock{
+	mockUser := &userutils.UserUtilMock{
 		LookupFunc: func(name string) (*user.User, error) {
 			return &user.User{}, errors.New("user not found")
 		},
@@ -510,7 +427,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 			return &user.Group{}, errors.New("Group 'hab' doesn't exists")
 		},
 		LookupGroupIdFunc: func(name string) (*user.Group, error) {
-			return &user.Group{}, errors.New("User 'hab' is not a member of group 'hab'")
+			return &user.Group{}, errors.New("Primary group mapping failed")
 		},
 	}
 	mockExec := &fiberutils.ExecCmdServiceMock{
@@ -555,7 +472,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 						Title:         HabUserAndGroupMappingFailureTitle,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      HabUserInGroupErrorMsg,
+						ErrorMsg:      HabPrimaryGroupMatchErrorMsg,
 						ResolutionMsg: HabUserAndGroupMapResolutionMsg,
 					},
 				},

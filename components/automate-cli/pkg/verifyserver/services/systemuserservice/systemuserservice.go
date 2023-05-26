@@ -1,11 +1,10 @@
 package systemuserservice
 
 import (
-	"strings"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -15,14 +14,14 @@ type SystemUser interface {
 
 type SystemUserService struct {
 	exec fiberutils.ExecCmdService
-	user fiberutils.UserCmdService
+	user userutils.UserUtil
 	Log  logger.Logger
 }
 
 func NewSystemUserService(log logger.Logger) *SystemUserService {
 	return &SystemUserService{
 		exec: fiberutils.NewExecCmdServiceImp(),
-		user: fiberutils.NewUserCmdServiceImp(),
+		user: userutils.NewUserUtilImp(),
 		Log:  log,
 	}
 }
@@ -36,7 +35,6 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 	if !habUserResponse.Passed {
 		serviceResponse.Passed = false
 	}
-	serviceResponseArray = append(serviceResponseArray, habUserResponse)
 
 	habGroupResponse := su.ValidateHabGroup()
 	if !habGroupResponse.Passed {
@@ -52,7 +50,7 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 		defer su.deleteUser(constants.USERNAME)
 	}
 
-	serviceResponseArray = append(serviceResponseArray, habGroupResponse, habUserAndGroupMapResponse)
+	serviceResponseArray = append(serviceResponseArray, habUserResponse, habGroupResponse, habUserAndGroupMapResponse)
 	checks := make([]models.Checks, len(serviceResponseArray))
 	for i, serviceResp := range serviceResponseArray {
 		checks[i] = *serviceResp
@@ -90,24 +88,15 @@ func (su *SystemUserService) ValidateHabGroup() *models.Checks {
 }
 
 func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.Checks {
-	// Check if "hab" user is a member of "hab" group
-	userInGroup := su.checkUserInGroup(constants.USERNAME, constants.GROUPNAME)
-
-	if !userInGroup {
-		su.Log.Error("Validation failed: User 'hab' is not a member of group 'hab'")
-		return failureResponse(constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE, constants.SYSTEM_USERINGROUP_ERROR_MSG, constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG)
-	}
-	su.Log.Debug("User 'hab' is a member of group 'hab'")
-
 	// Check if "hab" user's primary group is "hab" group
-	primaryGroupMatch := su.checkPrimaryGroupMatch(constants.USERNAME, constants.GROUPNAME)
+	userPrimayGroup := su.checkUserPrimaryGroup(constants.USERNAME, constants.GROUPNAME)
 
-	if !primaryGroupMatch {
+	if !userPrimayGroup {
 		su.Log.Error("Validation failed: Primary group mapping for user 'hab' is not 'hab' group")
 		return failureResponse(constants.SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE, constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG, constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG)
 	}
-
 	su.Log.Debug("Validation passed: Primary group mapping for user 'hab' is 'hab' group")
+
 	return successResponse(constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_TITLE, constants.SYSTEM_USERANDGROUP_MAPPING_SUCCESS_MSG)
 }
 
@@ -115,7 +104,7 @@ func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.Checks {
 func (su *SystemUserService) isHabUserPresent(username string) bool {
 	_, err := su.user.Lookup(username)
 	if err != nil {
-		su.Log.Error("Hab user not present", err)
+		su.Log.Error("Hab user not present: ", err)
 		return false
 	}
 	su.Log.Debug("Hab user exists")
@@ -126,7 +115,7 @@ func (su *SystemUserService) isHabUserPresent(username string) bool {
 func (su *SystemUserService) isHabGroupPresent(groupname string) bool {
 	_, err := su.user.LookupGroup(groupname)
 	if err != nil {
-		su.Log.Error("Hab group not present", err)
+		su.Log.Error("Hab group not present: ", err)
 		return false
 	}
 	su.Log.Debug("Hab group exists")
@@ -139,53 +128,27 @@ func (su *SystemUserService) deleteUser(username string) error {
 	return err
 }
 
-// Check if a user is a member of a group
-func (su *SystemUserService) checkUserInGroup(username, groupname string) bool {
-	output, err := su.exec.Command("id", []string{"-Gn", username})
-	if err != nil {
-		su.Log.Error("Command execution failed to check group membership of user", err)
-		return false
-	}
-
-	groups := strings.Split(strings.TrimSpace(string(output)), " ")
-	for _, group := range groups {
-		if group == groupname {
-			su.Log.Debug("User is a member of group")
-			return true
-		}
-	}
-	su.Log.Debug("User is not a member of group")
-	return false
-}
-
-// Check if a user's primary group matches a specified group
-func (su *SystemUserService) checkPrimaryGroupMatch(username, groupname string) bool {
+// Check for user's primary group
+func (su *SystemUserService) checkUserPrimaryGroup(username, groupname string) bool {
 	sysUser, err := su.user.Lookup(username)
 	if err != nil {
-		su.Log.Error("User 'hab' not found", err)
+		su.Log.Error("User not found: ", err)
 		return false
 	}
 
-	groups, err := sysUser.GroupIds()
+	// Get the user's primary group
+	group, err := su.user.LookupGroupId(sysUser.Gid)
 	if err != nil {
-		su.Log.Error("Could not return list of groupIds", err)
+		su.Log.Error("Group not found by Gid '"+sysUser.Gid+"': ", err)
 		return false
 	}
 
-	for _, gid := range groups {
-		group, err := su.user.LookupGroupId(gid)
-		if err != nil {
-			su.Log.Error("Group 'hab' not found", err)
-			return false
-		}
-
-		if groupname == group.Name {
-			su.Log.Debug("User's primary group is hab")
-			return true
-		}
+	if group.Name != groupname {
+		su.Log.Debug("User's primary group is not hab")
+		return false
 	}
-	su.Log.Debug("User's primary group doesn't matches hab")
-	return false
+	su.Log.Debug("User's primary group is hab with gid '"+ sysUser.Gid+"'")
+	return true
 }
 
 func successResponse(title string, successMsg string) *models.Checks {

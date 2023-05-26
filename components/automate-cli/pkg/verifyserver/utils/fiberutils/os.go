@@ -2,7 +2,6 @@ package fiberutils
 
 import (
 	"os/exec"
-	"os/user"
 )
 
 func ExecuteShellCommand(cmd string) ([]byte, error) {
@@ -25,28 +24,4 @@ func NewExecCmdServiceImp() ExecCmdService {
 
 func (s *ExecCmdServiceImp) Command(name string, args []string) ([]byte, error) {
 	return exec.Command(name, args...).Output()
-}
-
-type UserCmdService interface {
-	Lookup(name string) (*user.User, error)
-	LookupGroup(name string) (*user.Group, error)
-	LookupGroupId(name string) (*user.Group, error)
-}
-
-type UserCmdServiceImp struct{}
-
-func NewUserCmdServiceImp() UserCmdService {
-	return &UserCmdServiceImp{}
-}
-
-func (s *UserCmdServiceImp) Lookup(name string) (*user.User, error) {
-	return user.Lookup(name)
-}
-
-func (s *UserCmdServiceImp) LookupGroup(name string) (*user.Group, error) {
-	return user.LookupGroup(name)
-}
-
-func (s *UserCmdServiceImp) LookupGroupId(name string) (*user.Group, error) {
-	return user.LookupGroupId(name)
 }

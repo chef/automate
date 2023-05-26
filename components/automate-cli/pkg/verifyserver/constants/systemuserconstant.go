@@ -18,7 +18,6 @@ const (
 	SYSTEM_GROUP_HAB_ERROR_MSG                 = "Hab group not found"
 	SYSTEM_GROUP_HAB_RESOLUTION_MSG            = "Check the group name"
 	SYSTEM_USERANDGROUP_MAPPING_FAILURE_TITLE  = "User and group mapping failed"
-	SYSTEM_USERINGROUP_ERROR_MSG               = "User hab is not a member of group hab"
 	SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG        = "Primary group mapping for user hab is not hab group"
 	SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG = "Verify the mapping for the user and the group"
 )
