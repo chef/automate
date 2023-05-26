@@ -26,7 +26,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
