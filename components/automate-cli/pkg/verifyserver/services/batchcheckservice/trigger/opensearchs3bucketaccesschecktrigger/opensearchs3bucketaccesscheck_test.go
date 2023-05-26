@@ -2,6 +2,7 @@ package opensearchs3bucketaccesschecktrigger
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -202,6 +203,13 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			want := getS3BackupOSRequest()
+			var got models.S3BackupDetails
+			req := r.Body
+			reader, _ := io.ReadAll(req)
+			json.Unmarshal(reader, &got)
+			assert.Equal(t, want, got)
+
 			if r.URL.Path == constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)
@@ -233,4 +241,18 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 	port := address[colonIndex+1:]
 
 	return server, ip, port
+}
+
+func getS3BackupOSRequest() models.S3BackupDetails {
+	return models.S3BackupDetails{
+		Endpoint:   externalOs.OSDomainURL,
+		Username:   externalOs.OSUsername,
+		Password:   externalOs.OSUserPassword,
+		S3Bucket:   s3Properties.BucketName,
+		S3BasePath: s3Properties.BasePath,
+		AccessKey:  s3Properties.AccessKey,
+		SecretKey:  s3Properties.SecretKey,
+		AWSRegion:  s3Properties.AWSRegion,
+		AWSRoleArn: externalOs.OSRoleArn,
+	}
 }
