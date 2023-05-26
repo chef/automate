@@ -66,7 +66,7 @@ func (su *SystemUserService) ValidateHabUser() (*models.Checks, bool) {
 			su.Log.Error("Failed to create user 'hab':", err)
 			return failureResponse(constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE, constants.SYSTEM_USER_HAB_ERROR_MSG, constants.SYSTEM_USER_HAB_RESOLUTION_MSG), false
 		}
-		su.Log.Debug("Created 'hab' user")
+		su.Log.Debug("Created 'hab' user and group ")
 		return successResponse(constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_USER_HAB_SUCCESS_MSG), true
 	}
 	su.Log.Debug("User 'hab' found successfully")
