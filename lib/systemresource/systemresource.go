@@ -65,6 +65,6 @@ func (s *SystemResourceInfoImpl) GetDiskSpaceInfo(dirPath string) (float64, floa
 	}
 
 	totalSpaceInGB := float64(usage.Total) / (1024 * 1024 * 1024)
-	totalFreeSpaceInGB := float64(usage.Free) / (1024 * 1024 * 1023)
+	totalFreeSpaceInGB := float64(usage.Free) / (1024 * 1024 * 1024)
 	return totalSpaceInGB, totalFreeSpaceInGB, nil
 }
