@@ -185,9 +185,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			got := osb.Run(tt.args.config)
 			if tt.isError {
 				assert.Len(t, got, 1)
-				assert.NotNil(t, got[0].Error)
+				assert.NotNil(t, got[0].Result.Error.Error)
 				assert.Equal(t, "opensearch", got[0].NodeType)
-				assert.Equal(t, got[0].Error.Code, tt.httpResponseCode)
+				assert.Equal(t, got[0].Result.Error.Code, tt.httpResponseCode)
 				assert.Equal(t, tt.response, got[0].Error.Error())
 			} else {
 				assert.Equal(t, got, want)

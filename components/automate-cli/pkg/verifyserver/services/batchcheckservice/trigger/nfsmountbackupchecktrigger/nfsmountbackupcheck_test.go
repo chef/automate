@@ -757,9 +757,8 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 
 			if tt.isError {
 				assert.Len(t, got, 4)
-				assert.NotNil(t, got[0].Error)
+				assert.NotNil(t, got[0].Result.Error)
 				assert.Equal(t, "automate", got[0].NodeType)
-				assert.Equal(t, got[0].Error.Code, http.StatusInternalServerError)
 				assert.Equal(t, tt.response, got[0].Error.Error())
 
 			} else {

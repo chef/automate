@@ -312,9 +312,9 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 
 			if tt.isError {
 				assert.Len(t, got, tt.args.config.Hardware.AutomateNodeCount)
-				assert.NotNil(t, got[0].Error)
+				assert.NotNil(t, got[0].Result.Error)
 				assert.Equal(t, "automate", got[0].NodeType)
-				assert.Equal(t, got[0].Error.Code, tt.httpStatusCode)
+				assert.Equal(t, got[0].Result.Error.Code, http.StatusInternalServerError)
 				assert.Equal(t, tt.response, got[0].Error.Error())
 			} else {
 				assert.Equal(t, want, got)

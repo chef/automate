@@ -9,9 +9,9 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type NfsBackupConfigCheck struct {
@@ -51,7 +51,7 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 
 }
 
-//triggerCheckForMountService - Call the Hardware resource API and format response
+// triggerCheckForMountService - Call the Hardware resource API and format response
 func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
 	url := checkutils.PrepareEndPoint(ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
 	fmt.Println(url)
@@ -74,38 +74,21 @@ func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMount
 	return apiResp, nil
 }
 
-//constructErrorResult constructs the error response when recived from the API
+// constructErrorResult constructs the error response when recived from the API
 func constructErrorResult(config models.Config, err error) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		result = prepareErrorResult(result, ip, constants.AUTOMATE, err)
+
+	hostMap := configutils.GetNodeTypeMap(config.Hardware)
+	for ip, types := range hostMap {
+		for i := 0; i < len(types); i++ {
+			result = append(result, checkutils.PrepareTriggerResponse(nil, ip, types[i], err.Error(), "", "", true))
+		}
 	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		result = prepareErrorResult(result, ip, constants.CHEF_INFRA_SERVER, err)
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		result = prepareErrorResult(result, ip, constants.POSTGRESQL, err)
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		result = prepareErrorResult(result, ip, constants.OPENSEARCH, err)
-	}
+
 	return result
 }
 
-//prepareErrorResult error result error result using the error we got
-func prepareErrorResult(finalResult []models.CheckTriggerResponse, host, nodeType string, err error) []models.CheckTriggerResponse {
-	finalResult = append(finalResult, models.CheckTriggerResponse{
-		Host:     host,
-		NodeType: nodeType,
-		Error: &fiber.Error{
-			Code:    http.StatusInternalServerError,
-			Message: fmt.Sprintf("Error while triggering NFS Mount API from Batch Check API: %s", err.Error()),
-		},
-	})
-	return finalResult
-}
-
-//constructSuccessResult returns the result if we got a response the API
+// constructSuccessResult returns the result if we got a response the API
 func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	for _, res := range resp.Result {
