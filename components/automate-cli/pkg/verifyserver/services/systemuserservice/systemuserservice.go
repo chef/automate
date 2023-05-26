@@ -51,11 +51,8 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 	}
 
 	serviceResponseArray = append(serviceResponseArray, habUserResponse, habGroupResponse, habUserAndGroupMapResponse)
-	checks := make([]models.Checks, len(serviceResponseArray))
-	for i, serviceResp := range serviceResponseArray {
-		checks[i] = *serviceResp
-	}
-	serviceResponse.Checks = checks
+
+	serviceResponse.Checks = serviceResponseArray
 	return serviceResponse
 
 }

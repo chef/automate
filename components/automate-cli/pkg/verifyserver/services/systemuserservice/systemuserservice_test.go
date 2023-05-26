@@ -384,7 +384,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 			description: "User and group not validated and mapping not successful",
 			expectedBody: &models.SystemUserResponse{
 				Passed: true,
-				Checks: []models.Checks{
+				Checks: []*models.Checks{
 					{
 						Title:         HabUserSuccessTitle,
 						Passed:        true,
@@ -453,7 +453,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 			description: "User and group not validated and mapping not successful",
 			expectedBody: &models.SystemUserResponse{
 				Passed: false,
-				Checks: []models.Checks{
+				Checks: []*models.Checks{
 					{
 						Title:         HabUserFailureTitle,
 						Passed:        false,
