@@ -11,11 +11,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/certificatechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/fqdnchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/nfsmountbackupchecktrigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/opensearchs3bucketaccesschecktrigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/s3backupchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/softwareversionchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/sshuseraccesschecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
@@ -100,6 +96,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
+				firewallchecktrigger.NewFirewallCheck(l, port),
 			))).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
