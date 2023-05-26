@@ -1,4 +1,4 @@
-package fiberutils
+package executil
 
 type ExecCmdServiceMock struct {
 	CommandFunc func(name string, args []string) ([]byte, error)

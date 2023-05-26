@@ -7,8 +7,8 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
+	"github.com/chef/automate/lib/userutils"
+	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +28,7 @@ func TestValidateHabUserSuccess(t *testing.T) {
 		},
 	}
 
-	mockExec := &fiberutils.ExecCmdServiceMock{
+	mockExec := &executil.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
 			return []byte{}, nil
 		},
@@ -37,12 +37,12 @@ func TestValidateHabUserSuccess(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 		exec: mockExec,
 	}
-	service, _ := s.ValidateHabUser()
+	service, _ := s.ValidateOrCreateHabUser()
 	assert.Equal(t, service.Passed, true)
 	assert.Equal(t, &models.Checks{
 		Title:         constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE,
@@ -60,7 +60,7 @@ func TestValidateHabUserFailure(t *testing.T) {
 		},
 	}
 
-	mockExec := &fiberutils.ExecCmdServiceMock{
+	mockExec := &executil.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
 			return []byte{}, errors.New("exit status 1")
 		},
@@ -69,12 +69,12 @@ func TestValidateHabUserFailure(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 		exec: mockExec,
 	}
-	service, _ := s.ValidateHabUser()
+	service, _ := s.ValidateOrCreateHabUser()
 	assert.Equal(t, service.Passed, false)
 	assert.Equal(t, &models.Checks{
 		Title:         constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE,
@@ -92,7 +92,7 @@ func TestValidateHabUserCreatedSuccess(t *testing.T) {
 		},
 	}
 
-	mockExec := &fiberutils.ExecCmdServiceMock{
+	mockExec := &executil.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
 			return []byte{}, nil
 		},
@@ -101,12 +101,12 @@ func TestValidateHabUserCreatedSuccess(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 		exec: mockExec,
 	}
-	service, _ := s.ValidateHabUser()
+	service, _ := s.ValidateOrCreateHabUser()
 	assert.Equal(t, service.Passed, true)
 	assert.Equal(t, &models.Checks{
 		Title:         constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE,
@@ -127,7 +127,7 @@ func TestValidateHabGroup(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 	}
@@ -152,7 +152,7 @@ func TestValidateHabGroupFailed(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 	}
@@ -189,7 +189,7 @@ func TestValidateHabUserAndGroupMappingFailed(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 	}
@@ -226,7 +226,7 @@ func TestValidateHabUserAndGroupMappingSuccess(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 	}
@@ -254,7 +254,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookupUsernameError(t *testing.T
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 	}
@@ -288,7 +288,7 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		user: mockUser,
 	}
@@ -301,26 +301,6 @@ func TestValidateHabUserAndGroupMappingFailedForLookUpGroupId(t *testing.T) {
 		ErrorMsg:      constants.SYSTEM_PRIMARYGROUP_MATCH_ERROR_MSG,
 		ResolutionMsg: constants.SYSTEM_USERANDGROUP_MAPPING_RESOLUTION_MSG,
 	}, service)
-}
-
-func TestDeleteUserAndGroup(t *testing.T) {
-	mockExec := &fiberutils.ExecCmdServiceMock{
-		CommandFunc: func(name string, args []string) ([]byte, error) {
-			return []byte{}, errors.New("Could not delete user")
-		},
-	}
-	log, err := logger.NewLogger("text", "debug")
-	if err != nil {
-		assert.Error(t, err)
-	}
-	s := &SystemUserService{
-		Log:  log,
-		exec: mockExec,
-	}
-	err = s.deleteUserAndGroup("hab")
-	if err != nil {
-		assert.Equal(t, "Could not delete user", err.Error())
-	}
 }
 
 func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
@@ -344,7 +324,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 			}, nil
 		},
 	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
+	mockExec := &executil.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
 			return []byte{}, nil
 		},
@@ -353,7 +333,7 @@ func TestGetSystemUserServiceDetailsSuccess(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		exec: mockExec,
 		user: mockUser,
@@ -413,7 +393,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 			return &user.Group{}, errors.New("Primary group mapping failed")
 		},
 	}
-	mockExec := &fiberutils.ExecCmdServiceMock{
+	mockExec := &executil.ExecCmdServiceMock{
 		CommandFunc: func(name string, args []string) ([]byte, error) {
 			return []byte{}, errors.New("exit status 1")
 		},
@@ -422,7 +402,7 @@ func TestGetSystemUserServiceDetailsFailed(t *testing.T) {
 	if err != nil {
 		assert.Error(t, err)
 	}
-	s := &SystemUserService{
+	s := &SystemUserServiceImp{
 		Log:  log,
 		exec: mockExec,
 		user: mockUser,

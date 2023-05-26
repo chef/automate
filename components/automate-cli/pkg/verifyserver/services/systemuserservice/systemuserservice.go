@@ -3,35 +3,35 @@ package systemuserservice
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
+	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/userutils"
 )
 
-type SystemUser interface {
+type SystemUserService interface {
 	GetSystemUserServiceDetails() *models.SystemUserResponse
 }
 
-type SystemUserService struct {
-	exec fiberutils.ExecCmdService
+type SystemUserServiceImp struct {
+	exec executil.ExecCmdService
 	user userutils.UserUtil
 	Log  logger.Logger
 }
 
-func NewSystemUserService(log logger.Logger) *SystemUserService {
-	return &SystemUserService{
-		exec: fiberutils.NewExecCmdServiceImp(),
+func NewSystemUserService(log logger.Logger) *SystemUserServiceImp {
+	return &SystemUserServiceImp{
+		exec: executil.NewExecCmdServiceImp(),
 		user: userutils.NewUserUtilImp(),
 		Log:  log,
 	}
 }
 
-func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserResponse {
+func (su *SystemUserServiceImp) GetSystemUserServiceDetails() *models.SystemUserResponse {
 	serviceResponse := &models.SystemUserResponse{}
 	serviceResponse.Passed = true
 	serviceResponseArray := []*models.Checks{}
 
-	habUserResponse, isHabUserCreated := su.ValidateHabUser()
+	habUserResponse, isHabUserCreated := su.ValidateOrCreateHabUser()
 	if !habUserResponse.Passed {
 		serviceResponse.Passed = false
 	}
@@ -47,7 +47,15 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 	}
 
 	if isHabUserCreated {
-		defer su.deleteUserAndGroup(constants.USERNAME)
+		defer func() {
+			_, _ = su.exec.Command(constants.USERDELCMD, []string{constants.USERNAME})
+
+			if su.isHabGroupPresent(constants.GROUPNAME) {
+				_, _ = su.exec.Command(constants.GROUPDELCMD, []string{constants.GROUPNAME})
+				su.Log.Debug("Group hab deleted")
+			}
+		}()
+
 	}
 
 	serviceResponseArray = append(serviceResponseArray, habUserResponse, habGroupResponse, habUserAndGroupMapResponse)
@@ -57,11 +65,11 @@ func (su *SystemUserService) GetSystemUserServiceDetails() *models.SystemUserRes
 
 }
 
-func (su *SystemUserService) ValidateHabUser() (*models.Checks, bool) {
+func (su *SystemUserServiceImp) ValidateOrCreateHabUser() (*models.Checks, bool) {
 	isHabUserPresent := su.isHabUserPresent(constants.USERNAME)
 
 	if !isHabUserPresent {
-		_, err := su.exec.Command(constants.USERADDCMD, []string{constants.USERNAME})
+		_, err := su.exec.Command(constants.USERADDCMD, []string{"-U", constants.USERNAME})
 		if err != nil {
 			su.Log.Error("Failed to create user 'hab':", err)
 			return failureResponse(constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE, constants.SYSTEM_USER_HAB_ERROR_MSG, constants.SYSTEM_USER_HAB_RESOLUTION_MSG), false
@@ -73,7 +81,7 @@ func (su *SystemUserService) ValidateHabUser() (*models.Checks, bool) {
 	return successResponse(constants.SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_USER_HAB_SUCCESS_MSG), false
 }
 
-func (su *SystemUserService) ValidateHabGroup() *models.Checks {
+func (su *SystemUserServiceImp) ValidateHabGroup() *models.Checks {
 	isHabGroupPresent := su.isHabGroupPresent(constants.GROUPNAME)
 
 	if !isHabGroupPresent {
@@ -84,7 +92,7 @@ func (su *SystemUserService) ValidateHabGroup() *models.Checks {
 	return successResponse(constants.SYSTEM_GROUP_HAB_VALIDATION_SUCCESS_TITLE, constants.SYSTEM_GROUP_HAB_SUCCESS_MSG)
 }
 
-func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.Checks {
+func (su *SystemUserServiceImp) ValidateHabUserAndGroupMapping() *models.Checks {
 	// Check if "hab" user's primary group is "hab" group
 	userPrimaryGroup := su.checkUserPrimaryGroup(constants.USERNAME, constants.GROUPNAME)
 
@@ -98,7 +106,7 @@ func (su *SystemUserService) ValidateHabUserAndGroupMapping() *models.Checks {
 }
 
 // Check if "hab" user exists
-func (su *SystemUserService) isHabUserPresent(username string) bool {
+func (su *SystemUserServiceImp) isHabUserPresent(username string) bool {
 	_, err := su.user.Lookup(username)
 	if err != nil {
 		su.Log.Error("Hab user not present: ", err)
@@ -109,7 +117,7 @@ func (su *SystemUserService) isHabUserPresent(username string) bool {
 }
 
 // Check if "hab" group exists
-func (su *SystemUserService) isHabGroupPresent(groupname string) bool {
+func (su *SystemUserServiceImp) isHabGroupPresent(groupname string) bool {
 	_, err := su.user.LookupGroup(groupname)
 	if err != nil {
 		su.Log.Error("Hab group not present: ", err)
@@ -119,14 +127,8 @@ func (su *SystemUserService) isHabGroupPresent(groupname string) bool {
 	return true
 }
 
-// Delete a user
-func (su *SystemUserService) deleteUserAndGroup(username string) error {
-	_, err := su.exec.Command(constants.USERDELCMD, []string{username})
-	return err
-}
-
 // Check for user's primary group
-func (su *SystemUserService) checkUserPrimaryGroup(username, groupname string) bool {
+func (su *SystemUserServiceImp) checkUserPrimaryGroup(username, groupname string) bool {
 	sysUser, err := su.user.Lookup(username)
 	if err != nil {
 		su.Log.Error("User not found: ", err)

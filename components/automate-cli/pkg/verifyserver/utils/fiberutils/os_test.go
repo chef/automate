@@ -7,14 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCommand(t *testing.T) {
-	f := &fiberutils.ExecCmdServiceImp{}
-
-	output, err := f.Command("echo", []string{"Hello"})
-	assert.Contains(t, string(output), "Hello")
-	assert.Equal(t, nil, err)
-}
-
 func TestExecuteShellCommand(t *testing.T) {
 	out, err := fiberutils.ExecuteShellCommand("echo 'Hello World'")
 	assert.NoError(t, err)

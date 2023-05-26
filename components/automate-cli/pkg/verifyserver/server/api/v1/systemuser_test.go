@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error) {
+func SetupSystemUserHandlers(su systemuserservice.SystemUserService) (*fiber.App, error) {
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func SetupSystemUserHandlers(su systemuserservice.SystemUser) (*fiber.App, error
 	return vs.App, nil
 }
 
-func SetupMockSystemUserService(response models.SystemUserResponse) systemuserservice.SystemUser {
+func SetupMockSystemUserService(response models.SystemUserResponse) systemuserservice.SystemUserService {
 	return &systemuserservice.MockSystemUserService{
 		GetSystemUserServiceDetailsFunc: func() *models.SystemUserResponse {
 			return &response
@@ -46,7 +46,7 @@ func SetupMockSystemUserService(response models.SystemUserResponse) systemuserse
 	}
 }
 
-func TestSystemUser(t *testing.T) {
+func TestSystemUserService(t *testing.T) {
 	tests := []struct {
 		description  string
 		expectedCode int

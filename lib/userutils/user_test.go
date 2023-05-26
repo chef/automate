@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/userutils"
+	"github.com/chef/automate/lib/userutils"
 	"github.com/stretchr/testify/assert"
 )
 

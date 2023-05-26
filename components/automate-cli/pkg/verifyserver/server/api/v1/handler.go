@@ -29,6 +29,7 @@ type Handler struct {
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
 	PortReachableService         portreachableservice.IPortReachableService
 	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
+	SystemUserService            systemuserservice.SystemUserService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -74,7 +75,7 @@ func (h *Handler) AddStopMockServerService(sm stopmockserverservice.IStopMockSer
 	return h
 }
 
-func (h *Handler) AddSystemUserService(su systemuserservice.SystemUser) *Handler {
+func (h *Handler) AddSystemUserService(su systemuserservice.SystemUserService) *Handler {
 	h.SystemUserService = su
 	return h
 }
