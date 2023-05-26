@@ -97,45 +97,53 @@ func validateCerts(config *config_parser.HAOnPremConfigToml) *list.List {
 
 func validateAutomateCerts(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
 	if len(config.Automate.Config.CertsByIP) > 0 {
-		if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
-			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
-			}))
-		}
-
-		if !stringutils.SubSlice(config.ExistingInfra.Config.AutomatePrivateIps, extractIPsFromCertsByIP(config.Automate.Config.CertsByIP)) {
-			errorList.PushBack("Missing certificates for some automate private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.AutomatePrivateIps, ", "))
-		}
-
-		for _, a2Node := range config.Automate.Config.CertsByIP {
-			if len(strings.TrimSpace(a2Node.IP)) < 1 ||
-				len(strings.TrimSpace(a2Node.PrivateKey)) < 1 ||
-				len(strings.TrimSpace(a2Node.PublicKey)) < 1 {
-				errorList.PushBack("Field certs_by_ip for Automate requires ip, private_key and public_key. Some of them are missing.")
-			}
-
-			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: a2Node.PrivateKey, certtype: privateKey, svc: automate + CERT_BY_IP + a2Node.IP},
-				{key: a2Node.PublicKey, certtype: publicKey, svc: automate + CERT_BY_IP + a2Node.IP},
-			}))
-		}
+		validateAutomateCertsByIP(config, errorList)
 	} else {
-		if len(strings.TrimSpace(config.Automate.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(config.Automate.Config.PublicKey)) < 1 {
-			errorList.PushBack("Automate public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
-		}
+		validateDefaultCerts(config, errorList)
+	}
+}
 
-		if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
-			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
-			}))
+func validateAutomateCertsByIP(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
+	if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
+		}))
+	}
+
+	if !stringutils.SubSlice(config.ExistingInfra.Config.AutomatePrivateIps, extractIPsFromCertsByIP(config.Automate.Config.CertsByIP)) {
+		errorList.PushBack("Missing certificates for some automate private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.AutomatePrivateIps, ", "))
+	}
+
+	for _, a2Node := range config.Automate.Config.CertsByIP {
+		if len(strings.TrimSpace(a2Node.IP)) < 1 ||
+			len(strings.TrimSpace(a2Node.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(a2Node.PublicKey)) < 1 {
+			errorList.PushBack("Field certs_by_ip for Automate requires ip, private_key, and public_key. Some of them are missing.")
 		}
 
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: config.Automate.Config.PrivateKey, certtype: privateKey, svc: automate},
-			{key: config.Automate.Config.PublicKey, certtype: publicKey, svc: automate},
+			{key: a2Node.PrivateKey, certtype: privateKey, svc: automate + CERT_BY_IP + a2Node.IP},
+			{key: a2Node.PublicKey, certtype: publicKey, svc: automate + CERT_BY_IP + a2Node.IP},
 		}))
 	}
+}
+
+func validateDefaultCerts(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
+	if len(strings.TrimSpace(config.Automate.Config.PrivateKey)) < 1 ||
+		len(strings.TrimSpace(config.Automate.Config.PublicKey)) < 1 {
+		errorList.PushBack("Automate public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+	}
+
+	if len(strings.TrimSpace(config.Automate.Config.RootCA)) > 0 {
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: config.Automate.Config.RootCA, certtype: rootCa, svc: automate},
+		}))
+	}
+
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: config.Automate.Config.PrivateKey, certtype: privateKey, svc: automate},
+		{key: config.Automate.Config.PublicKey, certtype: publicKey, svc: automate},
+	}))
 }
 
 func validateChefServerCerts(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
@@ -229,50 +237,62 @@ func validatePostgresqlCerts(config *config_parser.HAOnPremConfigToml, errorList
 }
 
 func validateOpensearchCerts(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
-	configOnpremOpensearch := config.Opensearch
-	if len(configOnpremOpensearch.Config.CertsByIP) > 0 {
-		if len(strings.TrimSpace(configOnpremOpensearch.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(configOnpremOpensearch.Config.AdminKey)) < 1 ||
-			len(strings.TrimSpace(configOnpremOpensearch.Config.AdminCert)) < 1 {
-			errorList.PushBack("Opensearch root_ca, admin_key or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
-		}
-		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: configOnpremOpensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
-			{key: configOnpremOpensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
-			{key: configOnpremOpensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
-		}))
-		if !stringutils.SubSlice(config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(configOnpremOpensearch.Config.CertsByIP)) {
-			errorList.PushBack("Missing certificates for some Opensearch private ips. Please make sure certificates for the following ips are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
-		}
-		// check if all the certs are valid for given IPs
-		for _, osNode := range config.Opensearch.Config.CertsByIP {
-			if len(strings.TrimSpace(osNode.IP)) < 1 ||
-				len(strings.TrimSpace(osNode.PrivateKey)) < 1 ||
-				len(strings.TrimSpace(osNode.PublicKey)) < 1 {
-				errorList.PushBack("Field certs_by_ip for opensearch requires ip, private_key and public_key. Some of them are missing.")
-			}
-			errorList.PushBackList(checkCertValid([]keydetails{
-				{key: osNode.PrivateKey, certtype: privateKey, svc: openSearch + CERT_BY_IP + osNode.IP},
-				{key: osNode.PublicKey, certtype: publicKey, svc: openSearch + CERT_BY_IP + osNode.IP},
-			}))
-		}
+	if len(config.Opensearch.Config.CertsByIP) > 0 {
+		validateOpensearchCertsByIP(config, errorList)
 	} else {
-		// check if all the default certs are given
-		if len(strings.TrimSpace(configOnpremOpensearch.Config.RootCA)) < 1 ||
-			len(strings.TrimSpace(configOnpremOpensearch.Config.AdminKey)) < 1 ||
-			len(strings.TrimSpace(configOnpremOpensearch.Config.AdminCert)) < 1 ||
-			len(strings.TrimSpace(configOnpremOpensearch.Config.PrivateKey)) < 1 ||
-			len(strings.TrimSpace(configOnpremOpensearch.Config.PublicKey)) < 1 {
-			errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Set custom_certs_enabled to false to continue without custom certificates.")
+		validateOpensearchDefaultCerts(config, errorList)
+	}
+}
+
+func validateOpensearchCertsByIP(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
+	configOnpremOpensearch := config.Opensearch
+	if !hasRequiredOpensearchCerts(config) {
+		errorList.PushBack("Opensearch root_ca, admin_key, or admin_cert is missing. Set custom_certs_enabled to false to continue without custom certificates.")
+	}
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: configOnpremOpensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
+		{key: configOnpremOpensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
+		{key: configOnpremOpensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
+	}))
+
+	if !stringutils.SubSlice(config.ExistingInfra.Config.OpensearchPrivateIps, extractIPsFromCertsByIP(configOnpremOpensearch.Config.CertsByIP)) {
+		errorList.PushBack("Missing certificates for some Opensearch private IPs. Please make sure certificates for the following IPs are provided in certs_by_ip: " + strings.Join(config.ExistingInfra.Config.OpensearchPrivateIps, ", "))
+	}
+
+	for _, osNode := range configOnpremOpensearch.Config.CertsByIP {
+		if len(strings.TrimSpace(osNode.IP)) < 1 ||
+			len(strings.TrimSpace(osNode.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(osNode.PublicKey)) < 1 {
+			errorList.PushBack("Field certs_by_ip for Opensearch requires ip, private_key, and public_key. Some of them are missing.")
 		}
 		errorList.PushBackList(checkCertValid([]keydetails{
-			{key: configOnpremOpensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
-			{key: configOnpremOpensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
-			{key: configOnpremOpensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
-			{key: configOnpremOpensearch.Config.PrivateKey, certtype: privateKey, svc: openSearch},
-			{key: configOnpremOpensearch.Config.PublicKey, certtype: publicKey, svc: openSearch},
+			{key: osNode.PrivateKey, certtype: privateKey, svc: openSearch + CERT_BY_IP + osNode.IP},
+			{key: osNode.PublicKey, certtype: publicKey, svc: openSearch + CERT_BY_IP + osNode.IP},
 		}))
 	}
+}
+
+func validateOpensearchDefaultCerts(config *config_parser.HAOnPremConfigToml, errorList *list.List) {
+	configOnpremOpensearch := config.Opensearch
+	if !hasRequiredOpensearchCerts(config) {
+		errorList.PushBack("Opensearch root_ca, admin_key, admin_cert, public_key, or private_key is missing. Set custom_certs_enabled to false to continue without custom certificates.")
+	}
+	errorList.PushBackList(checkCertValid([]keydetails{
+		{key: configOnpremOpensearch.Config.RootCA, certtype: rootCa, svc: openSearch},
+		{key: configOnpremOpensearch.Config.AdminKey, certtype: adminKey, svc: openSearch},
+		{key: configOnpremOpensearch.Config.AdminCert, certtype: adminCert, svc: openSearch},
+		{key: configOnpremOpensearch.Config.PrivateKey, certtype: privateKey, svc: openSearch},
+		{key: configOnpremOpensearch.Config.PublicKey, certtype: publicKey, svc: openSearch},
+	}))
+}
+
+func hasRequiredOpensearchCerts(config *config_parser.HAOnPremConfigToml) bool {
+	configOnpremOpensearch := config.Opensearch
+	return len(strings.TrimSpace(configOnpremOpensearch.Config.RootCA)) >= 1 &&
+		len(strings.TrimSpace(configOnpremOpensearch.Config.AdminKey)) >= 1 &&
+		len(strings.TrimSpace(configOnpremOpensearch.Config.AdminCert)) >= 1 &&
+		len(strings.TrimSpace(configOnpremOpensearch.Config.PrivateKey)) >= 1 &&
+		len(strings.TrimSpace(configOnpremOpensearch.Config.PublicKey)) >= 1
 }
 
 func validateIPs(config *config_parser.HAOnPremConfigToml) *list.List {
