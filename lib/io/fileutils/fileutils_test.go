@@ -54,7 +54,7 @@ func TestIsSymlink(t *testing.T) {
 func TestCreateTempFile(t *testing.T) {
 	content := "abc"
 	filename := "file-name"
-	t.Run("it returns true if the path exists", func(t *testing.T) {
+	t.Run("It creates the file", func(t *testing.T) {
 		res1, err := fileutils.CreateTempFile(content, filename)
 		require.NoError(t, err)
 		res2, err := fileutils.CreateTempFile(content, filename)
@@ -68,4 +68,17 @@ func TestCreateTempFile(t *testing.T) {
 		assert.Contains(t, res3, "file-name")
 		assert.Contains(t, res4, "file-name")
 	})
+}
+
+func TestDeleteTempFile(t *testing.T){
+	tempFile, err := os.CreateTemp("","testfile")
+	if err != nil{
+		return 
+	}
+	defer tempFile.Close()
+
+	err = fileutils.DeleteTempFile(tempFile.Name())
+	if err != nil{
+		return 
+	}
 }
