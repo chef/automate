@@ -105,7 +105,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, p
 	for i := 0; i < 50; i++ {
 		chanResult := <-fqdnResultChan
 		if chanResult == "got error" {
-			break
+			continue
 		}
 		delete(setNodes, chanResult)
 		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
