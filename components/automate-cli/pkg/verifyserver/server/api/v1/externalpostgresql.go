@@ -11,7 +11,7 @@ import (
 func (h *Handler) CheckExternalPostgresql(c *fiber.Ctx) error {
 	req := new(models.ExternalPgRequest)
 	if err := c.BodyParser(&req); err != nil {
-		h.Logger.Error("External postgresql config request body parsing failed: %v", err)
+		h.Logger.Error("External postgresql config request body parsing failed:", err)
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	if len(req.PostgresqlInstanceUrl) == 0 ||
