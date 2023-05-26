@@ -84,12 +84,16 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 			return nil
 		}
 	}
-	dni.prepare()
-	return dni.runDeploy()
+	return dni.prepare()
+	//return dni.runDeploy()
 }
 
 func (dni *DeleteNodeOnPremImpl) prepare() error {
-	return dni.nodeUtils.taintTerraform(dni.terraformPath)
+
+	// Stop all services on the node to be deleted
+	return dni.nodeUtils.stopServicesOnNode(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIpList, dni.opensearchIpList)
+
+	//return dni.nodeUtils.taintTerraform(dni.terraformPath)
 }
 
 func (dni *DeleteNodeOnPremImpl) validate() error {
@@ -207,6 +211,12 @@ func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
 			{dni.postgresqlIpList, "Postgresql", POSTGRESQL_MIN_INSTANCE_COUNT, dni.config.Postgresql.Config.InstanceCount, dni.config.ExistingInfra.Config.PostgresqlPrivateIps},
 		}...)
 	}
+
+	if (len(dni.automateIpList) + len(dni.chefServerIpList) + len(dni.opensearchIpList) + len(dni.postgresqlIpList)) != 1 {
+		errorList.PushBack("Only one node can be deleted at a time")
+		return errorList
+	}
+
 	for _, v := range validations {
 		if len(v.ipList) == 0 {
 			continue

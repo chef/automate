@@ -101,9 +101,9 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 			return nil
 		}
 	}
-	dna.prepare()
+	return dna.prepare()
 
-	return dna.runDeploy()
+	// return dna.runDeploy()
 }
 func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 	dna.config.Architecture.ConfigInitials.Architecture = "aws"
@@ -139,7 +139,9 @@ func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 }
 
 func (dna *DeleteNodeAWSImpl) prepare() error {
-	return dna.nodeUtils.taintTerraform(dna.terraformPath)
+	// Stop all services on the node to be deleted
+	return dna.nodeUtils.stopServicesOnNode(dna.automateIpList, dna.chefServerIpList, dna.postgresqlIpList, dna.opensearchIpList)
+	// return dna.nodeUtils.taintTerraform(dna.terraformPath)
 }
 
 func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
@@ -277,6 +279,12 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 			{dna.postgresqlIpList, dna.configPostgresqlIpList, dna.config.Postgresql.Config.InstanceCount, POSTGRESQL_MIN_INSTANCE_COUNT, "Postgresql"},
 		}...)
 	}
+
+	if (len(dna.automateIpList) + len(dna.chefServerIpList) + len(dna.opensearchIpList) + len(dna.postgresqlIpList)) != 1 {
+		errorList.PushBack("Only one node can be deleted at a time")
+		return errorList
+	}
+
 	for _, service := range services {
 		if len(service.ipList) > 1 {
 			errorList.PushBack(fmt.Sprintf("Only one %s is allowed to delete for AWS deployment type", service.name))

@@ -56,6 +56,7 @@ type MockNodeUtilsImpl struct {
 	moveAWSAutoTfvarsFileFunc                 func(path string) error
 	modifyTfArchFileFunc                      func(path string) error
 	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
+	stopServicesOnNodeFunc                    func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -114,6 +115,9 @@ func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
 func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
 	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
 }
+func (mnu *MockNodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+	return mnu.stopServicesOnNodeFunc(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList)
+}
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
@@ -134,6 +138,7 @@ type NodeOpUtils interface {
 	moveAWSAutoTfvarsFile(string) error
 	modifyTfArchFile(string) error
 	getAWSConfigIp() (*AWSConfigIp, error)
+	stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error
 }
 
 type NodeUtilsImpl struct{}
@@ -319,6 +324,63 @@ func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
 		"-c",
 		command,
 	}, path)
+}
+
+// Stop services on node
+func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+	frontendCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+	automateCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+	chefServerCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+	postgresqlCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+	opensearchCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+
+	cmd := "sudo echo 'hello'"
+
+	if len(automateIpList) > 0 {
+		automateCmd = createCmdInputs(automateIpList, cmd)
+	} else if len(chefServerIpList) > 0 {
+		chefServerCmd = createCmdInputs(chefServerIpList, cmd)
+	} else if len(postgresqlIpList) > 0 {
+		postgresqlCmd = createCmdInputs(postgresqlIpList, cmd)
+	} else if len(opensearchIpList) > 0 {
+		opensearchCmd = createCmdInputs(opensearchIpList, cmd)
+	}
+
+	infra, sshConfig, err := nu.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	nodeMap := &NodeTypeAndCmd{
+		Frontend:   frontendCmd,
+		Automate:   automateCmd,
+		ChefServer: chefServerCmd,
+		Postgresql: postgresqlCmd,
+		Opensearch: opensearchCmd,
+		Infra:      infra,
+	}
+
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, NewSSHUtil(sshConfig), writer)
+
+	_, err = cmdUtil.Execute()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createCmdInputs(ipList []string, cmd string) *Cmd {
+	return &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      cmd,
+			NodeIps:                  ipList,
+			Single:                   true,
+			NodeType:                 true,
+			SkipPrintOutput:          false,
+			HideSSHConnectionMessage: true,
+		},
+	}
 }
 
 func trimSliceSpace(slc []string) []string {
