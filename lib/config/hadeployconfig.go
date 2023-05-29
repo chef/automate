@@ -147,17 +147,6 @@ type ConfigAwsSettings struct {
 	XContact                      string   `toml:"X-Contact,omitempty"`
 	XDept                         string   `toml:"X-Dept,omitempty"`
 	XProject                      string   `toml:"X-Project,omitempty"`
-	XProduction                   string   `toml:"X-Production,omitempty"`
-	XCustomer                     string   `toml:"X-Customer,omitempty"`
-	AwsAutomateRoute53Prefix      string   `toml:"aws_automate_route53_prefix,omitempty"`
-	AwsChefServerRoute53Prefix    string   `toml:"aws_chef_server_route53_prefix,omitempty"`
-	AwsRoute53HostedZone          string   `toml:"aws_route53_hosted_zone,omitempty"`
-	PostrgesqlDbIdentifier        string   `toml:"postgresql_db_identifier,omitempty"`
-	ElasticsearchDomainName       string   `toml:"elasticsearch_domain_name,omitempty"`
-	RDSInstanceType               string   `toml:"rds_postgresql_instance_type,omitempty"`
-	RDSRestoreIdentifier          string   `toml:"rds_postgresql_restore_identifier,omitempty"`
-	DatadogAPIKey                 string   `toml:"datadog_api_key,omitempty"`
-	UseExistingManagedInfra       bool     `toml:"use_existing_managed_infra,omitempty"`
 }
 
 type ExternalSettings struct {
