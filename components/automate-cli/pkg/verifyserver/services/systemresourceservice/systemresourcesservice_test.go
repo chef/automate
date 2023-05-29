@@ -584,6 +584,17 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 			nodeType:           constants.NodeTypeAutomate,
 			deploymentState:    constants.DeploymentStatePostDeploy,
 		},
+		{
+			testCaseDescription: "nodeType=automate,deploymentState=preDeploy",
+			respWant: &models.ApiResult{
+				Passed: false,
+				Checks: validChecks,
+			},
+			mockSystemResource: mockSystemResourceInfo,
+			mockFsUtils:        mockFsUtils,
+			nodeType:           constants.NodeTypeAutomate,
+			deploymentState:    constants.DeploymentStatePostDeploy,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -596,10 +607,16 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 				}
 			}
 
+			if !testCase.respWant.Passed {
+				testCase.respWant.Checks[0] = *srv.GetChecksModel(false, CPU_COUNT_CHECK_TITLE, "", fmt.Sprintf("CPU count is %v", constants.MIN_CPU_COUNT-1), fmt.Sprintf("CPU count should be >=%v", constants.MIN_CPU_COUNT))
+				testCase.mockSystemResource.GetNumberOfCPUFunc = func() int {
+					return constants.MIN_CPU_COUNT - 1
+				}
+			}
+
 			srv.systemResourceInfo = testCase.mockSystemResource
 			srv.fileutils = testCase.mockFsUtils
 			respGet := srv.GetSystemResourcesForDeployment(testCase.nodeType, testCase.deploymentState)
-
 			assert.Equal(t, testCase.respWant, respGet)
 		})
 	}

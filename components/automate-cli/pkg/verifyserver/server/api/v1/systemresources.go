@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetNodeTypeMap() map[string]constants.NodeType {
+func getNodeTypeMap() map[string]constants.NodeType {
 	return map[string]constants.NodeType{
 		string(constants.NodeTypeAutomate):   constants.NodeTypeAutomate,
 		string(constants.NodeTypeChefServer): constants.NodeTypeChefServer,
@@ -19,9 +19,9 @@ func GetNodeTypeMap() map[string]constants.NodeType {
 	}
 }
 
-func GetNodeTypeOptions() string {
+func getNodeTypeOptions() string {
 	options := ""
-	optionsMap := GetNodeTypeMap()
+	optionsMap := getNodeTypeMap()
 
 	for option, _ := range optionsMap {
 		options = options + option + ","
@@ -29,34 +29,34 @@ func GetNodeTypeOptions() string {
 	return options[:len(options)-1]
 }
 
-func GetNodeType(nodeType string) (constants.NodeType, error) {
-	value, present := GetNodeTypeMap()[nodeType]
+func getNodeType(nodeType string) (constants.NodeType, error) {
+	value, present := getNodeTypeMap()[nodeType]
 
 	if !present {
-		return constants.NodeType(""), errors.New("Invalid NodeType,valid value can be " + GetNodeTypeOptions())
+		return constants.NodeType(""), errors.New("Invalid NodeType,valid value can be " + getNodeTypeOptions())
 	}
 	return value, nil
 }
 
-func GetDeploymentStateMap() map[string]constants.DeploymentState {
+func getDeploymentStateMap() map[string]constants.DeploymentState {
 	return map[string]constants.DeploymentState{
 		string(constants.DeploymentStatePreDeploy):  constants.DeploymentStatePreDeploy,
 		string(constants.DeploymentStatePostDeploy): constants.DeploymentStatePostDeploy,
 	}
 }
 
-func GetDeploymentState(deploymentState string) (constants.DeploymentState, error) {
-	value, present := GetDeploymentStateMap()[deploymentState]
+func getDeploymentState(deploymentState string) (constants.DeploymentState, error) {
+	value, present := getDeploymentStateMap()[deploymentState]
 
 	if !present {
-		return constants.DeploymentState(""), errors.New("Invalid DeploymentState,valid value can be " + GetDeploymentStateOptions())
+		return constants.DeploymentState(""), errors.New("Invalid DeploymentState,valid value can be " + getDeploymentStateOptions())
 	}
 	return value, nil
 }
 
-func GetDeploymentStateOptions() string {
+func getDeploymentStateOptions() string {
 	options := ""
-	optionsMap := GetDeploymentStateMap()
+	optionsMap := getDeploymentStateMap()
 
 	for option, _ := range optionsMap {
 		options = options + option + ","
@@ -66,13 +66,13 @@ func GetDeploymentStateOptions() string {
 
 func (h *Handler) GetSystemResource(c *fiber.Ctx) error {
 
-	nodeType, err := GetNodeType(c.Query("node_type"))
+	nodeType, err := getNodeType(c.Query("node_type"))
 
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf(`Unsupported query or missing query. Expected values for query 'node_type' are %v,%v,%v,%v,%v`, constants.NodeTypeAutomate, constants.NodeTypeChefServer, constants.NodeTypePostgresql, constants.NodeTypeOpensearch, constants.NodeTypeBastion))
 	}
 
-	deploymentState, err := GetDeploymentState(c.Query("deployment_state"))
+	deploymentState, err := getDeploymentState(c.Query("deployment_state"))
 
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf(`Unsupported query or missing query. Expected values for query 'deployment_state' are %s,%s`, constants.DeploymentStatePreDeploy, constants.DeploymentStatePostDeploy))

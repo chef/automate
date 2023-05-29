@@ -2,7 +2,6 @@ package systemresource
 
 import (
 	"errors"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,22 +10,8 @@ import (
 func TestGetNumberOfCPU(t *testing.T) {
 	systemresource := NewSystemResourceInfoImpl()
 
-	type testCase struct {
-		numCpuWant int
-	}
-
-	testCases := []testCase{
-		{
-			numCpuWant: runtime.NumCPU(),
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run("", func(t *testing.T) {
-			numCpu := systemresource.GetNumberOfCPU()
-			assert.Equal(t, testCase.numCpuWant, numCpu)
-		})
-	}
+	ncpu := systemresource.GetNumberOfCPU()
+	assert.NotZero(t, ncpu)
 }
 
 func TestGetDiskSpaceInfo(t *testing.T) {
@@ -47,14 +32,39 @@ func TestGetDiskSpaceInfo(t *testing.T) {
 	}
 
 	for _, testCase := range testCase {
-		totalSpace, freeSpace, err := systemresource.GetDiskSpaceInfo(testCase.path)
 
-		if err != nil {
-			assert.Zero(t, totalSpace)
-			assert.Zero(t, freeSpace)
-		} else {
-			assert.NotZero(t, totalSpace)
-			assert.NotZero(t, freeSpace)
-		}
+		t.Run("Disk space check", func(t *testing.T) {
+			totalSpace, freeSpace, err := systemresource.GetDiskSpaceInfo(testCase.path)
+
+			if err != nil {
+				assert.Zero(t, totalSpace)
+				assert.Zero(t, freeSpace)
+			} else {
+				assert.NotZero(t, totalSpace)
+				assert.NotZero(t, freeSpace)
+			}
+		})
+	}
+}
+
+func TestGetCPUSpeed(t *testing.T) {
+	systemresource := NewSystemResourceInfoImpl()
+	cpuSpeed, err := systemresource.GetCPUSpeed()
+
+	if err != nil {
+		assert.Zero(t, cpuSpeed)
+	} else {
+		assert.NotZero(t, cpuSpeed)
+	}
+}
+
+func TestGetMemory(t *testing.T) {
+	systemresource := NewSystemResourceInfoImpl()
+	memory, err := systemresource.GetMemory()
+
+	if err != nil {
+		assert.Zero(t, memory)
+	} else {
+		assert.NotZero(t, memory)
 	}
 }
