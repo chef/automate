@@ -50,3 +50,35 @@ func TestIsSymlink(t *testing.T) {
 		assert.False(t, isSymlink, "%s should not be a symlink", filePath)
 	})
 }
+
+func TestCreateTempFile(t *testing.T) {
+	content := "abc"
+	filename := "file-name"
+	t.Run("It creates the file", func(t *testing.T) {
+		res1, err := fileutils.CreateTempFile(content, filename)
+		require.NoError(t, err)
+		res2, err := fileutils.CreateTempFile(content, filename)
+		require.NoError(t, err)
+		res3, err := fileutils.CreateTempFile(content, filename)
+		require.NoError(t, err)
+		res4, err := fileutils.CreateTempFile(content, filename)
+		require.NoError(t, err)
+		assert.Contains(t, res1, "file-name")
+		assert.Contains(t, res2, "file-name")
+		assert.Contains(t, res3, "file-name")
+		assert.Contains(t, res4, "file-name")
+	})
+}
+
+func TestDeleteTempFile(t *testing.T) {
+	tempFile, err := os.CreateTemp("", "testfile")
+	if err != nil {
+		return
+	}
+	defer tempFile.Close()
+
+	err = fileutils.DeleteTempFile(tempFile.Name())
+	if err != nil {
+		return
+	}
+}

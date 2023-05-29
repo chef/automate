@@ -1,6 +1,8 @@
 package fileutils
 
-import "os"
+import (
+	"os"
+)
 
 type MockFileSystemUtils struct {
 	PathExistsFunc             func(path string) (bool, error)
@@ -12,6 +14,8 @@ type MockFileSystemUtils struct {
 	WriteToFileFunc            func(filepath string, data []byte) error
 	ReadFileFunc               func(filepath string) ([]byte, error)
 	WriteFileFunc              func(filepath string, data []byte, perm os.FileMode) error
+	CreateTempFileFunc         func(content string, filename string) (string, error)
+	DeleteTempFileFunc         func(tempFile string) error
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -40,4 +44,10 @@ func (fsu *MockFileSystemUtils) ReadFile(filepath string) ([]byte, error) {
 }
 func (fsu *MockFileSystemUtils) WriteFile(filepath string, data []byte, perm os.FileMode) error {
 	return fsu.WriteFileFunc(filepath, data, perm)
+}
+func (fsu *MockFileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
+	return fsu.CreateTempFileFunc(content, filename)
+}
+func (fsu *MockFileSystemUtils) DeleteTempFile(tempFile string) error {
+	return fsu.DeleteTempFileFunc(tempFile)
 }

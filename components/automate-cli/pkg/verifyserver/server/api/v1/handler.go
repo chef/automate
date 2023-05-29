@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
@@ -26,6 +27,7 @@ type Handler struct {
 	StopMockServersService       stopmockserverservice.IStopMockServerService
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
 	PortReachableService         portreachableservice.IPortReachableService
+	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -78,5 +80,10 @@ func (h *Handler) AddOSS3BackupService(ss opensearchbackupservice.IOSS3BackupSer
 
 func (h *Handler) AddPortReachableService(pr portreachableservice.IPortReachableService) *Handler {
 	h.PortReachableService = pr
+	return h
+}
+
+func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.ExternalPostgresqlService) *Handler {
+	h.ExternalPostgresqlService = pg
 	return h
 }
