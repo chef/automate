@@ -8,28 +8,47 @@ type HaDeployConfig struct {
 	Opensearch    *ServerConfigSettings  `toml:"opensearch,omitempty"`
 	Postgresql    *ServerConfigSettings  `toml:"postgresql,omitempty"`
 	ExistingInfra *ExistingInfraSettings `toml:"existing_infra,omitempty"`
+	Aws           *AwsSettings           `toml:"aws,omitempty"`
 	External      *ExternalSettings      `toml:"external,omitempty"`
 }
 
 type Architecture struct {
-	ExistingInfra *ExistingInfraArch `toml:"existing_infra,omitempty"`
+	ExistingInfra *ConfigInitials `toml:"existing_infra,omitempty"`
+	Aws           *ConfigInitials `toml:"aws,omitempty"`
 }
 
-type ExistingInfraArch struct {
-	SSHUser          string `toml:"ssh_user,omitempty"`
-	SSHGroupName     string `toml:"ssh_group_name,omitempty"`
-	SSHKeyFile       string `toml:"ssh_key_file,omitempty"`
-	SSHPort          string `toml:"ssh_port,omitempty"`
-	SecretsKeyFile   string `toml:"secrets_key_file,omitempty"`
-	SecretsStoreFile string `toml:"secrets_store_file,omitempty"`
-	Architecture     string `toml:"architecture,omitempty"`
-	WorkspacePath    string `toml:"workspace_path,omitempty"`
-	BackupMount      string `toml:"backup_mount,omitempty"`
-	BackupConfig     string `toml:"backup_config,omitempty"`
+type ConfigInitials struct {
+	SSHUser                     string `toml:"ssh_user,omitempty"`
+	SSHGroupName                string `toml:"ssh_group_name,omitempty"`
+	SSHKeyFile                  string `toml:"ssh_key_file,omitempty"`
+	SSHPort                     string `toml:"ssh_port,omitempty"`
+	SecretsKeyFile              string `toml:"secrets_key_file,omitempty"`
+	SecretsStoreFile            string `toml:"secrets_store_file,omitempty"`
+	SudoPassword                string `toml:"sudo_password,omitempty"`
+	LoggingMonitoringManagement string `toml:"logging_monitoring_management,omitempty"`
+	NewElk                      string `toml:"new_elk,omitempty"`
+	ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip,omitempty"`
+	ExistingElkPort             string `toml:"existing_elk_port,omitempty"`
+	ExistingElkCert             string `toml:"existing_elk_cert,omitempty"`
+	ExistingElkUsername         string `toml:"existing_elk_username,omitempty"`
+	ExistingElkPassword         string `toml:"existing_elk_password,omitempty"`
+	Architecture                string `toml:"architecture,omitempty"`
+	WorkspacePath               string `toml:"workspace_path,omitempty"`
+	BackupMount                 string `toml:"backup_mount,omitempty"`
+	BackupConfig                string `toml:"backup_config,omitempty"`
+	S3BucketName                string `toml:"s3_bucketName,omitempty"`
+	HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
 }
 
 type ObjectStorage struct {
 	Config *ConfigObjectStorage `toml:"config,omitempty"`
+}
+
+type CertByIP struct {
+	IP         string `toml:"ip,omitempty"`
+	PrivateKey string `toml:"private_key,omitempty"`
+	PublicKey  string `toml:"public_key,omitempty"`
+	NodesDn    string `toml:"nodes_dn,omitempty"`
 }
 
 type ConfigObjectStorage struct {
@@ -43,11 +62,11 @@ type ConfigObjectStorage struct {
 type AutomateSettings struct {
 	Config *ConfigAutomateSettings `toml:"config,omitempty"`
 }
-
 type ConfigAutomateSettings struct {
 	AdminPassword string `toml:"admin_password,omitempty"`
 	Fqdn          string `toml:"fqdn,omitempty"`
 	ConfigFile    string `toml:"config_file,omitempty"`
+	TeamsPort     string `toml:"teams_port,omitempty"`
 	ConfigSettings
 }
 
@@ -56,12 +75,24 @@ type ServerConfigSettings struct {
 }
 
 type ConfigSettings struct {
-	InstanceCount     string `toml:"instance_count,omitempty"`
-	EnableCustomCerts bool   `toml:"enable_custom_certs,omitempty"`
+	InstanceCount     string      `toml:"instance_count,omitempty"`
+	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
+	RootCA            string      `toml:"root_ca,omitempty"`
+	PrivateKey        string      `toml:"private_key,omitempty"`
+	PublicKey         string      `toml:"public_key,omitempty"`
+	AdminCert         string      `toml:"admin_cert,omitempty"`
+	AdminKey          string      `toml:"admin_key,omitempty"`
+	AdminDn           string      `toml:"admin_dn,omitempty"`
+	NodesDn           string      `toml:"nodes_dn,omitempty"`
+	CertsByIP         *[]CertByIP `toml:"certs_by_ip,omitempty"`
 }
 
 type ExistingInfraSettings struct {
 	Config *ConfigExistingInfraSettings `toml:"config,omitempty"`
+}
+
+type AwsSettings struct {
+	Config *ConfigAwsSettings `toml:"config,omitempty"`
 }
 
 type ConfigExistingInfraSettings struct {
@@ -69,6 +100,69 @@ type ConfigExistingInfraSettings struct {
 	ChefServerPrivateIps []string `toml:"chef_server_private_ips,omitempty"`
 	OpensearchPrivateIps []string `toml:"opensearch_private_ips,omitempty"`
 	PostgresqlPrivateIps []string `toml:"postgresql_private_ips,omitempty"`
+}
+
+type ConfigAwsSettings struct {
+	Profile                       string   `toml:"profile,omitempty"`
+	Region                        string   `toml:"region,omitempty"`
+	AwsVpcID                      string   `toml:"aws_vpc_id,omitempty"`
+	AwsCidrBlockAddr              string   `toml:"aws_cidr_block_addr,omitempty"`
+	PrivateCustomSubnets          []string `toml:"private_custom_subnets,omitempty"`
+	PublicCustomSubnets           []string `toml:"public_custom_subnets,omitempty"`
+	SSHKeyPairName                string   `toml:"ssh_key_pair_name,omitempty"`
+	SetupManagedServices          bool     `toml:"setup_managed_services,omitempty"`
+	ManagedOpensearchDomainName   string   `toml:"managed_opensearch_domain_name,omitempty"`
+	ManagedOpensearchDomainURL    string   `toml:"managed_opensearch_domain_url,omitempty"`
+	ManagedOpensearchUsername     string   `toml:"managed_opensearch_username,omitempty"`
+	ManagedOpensearchUserPassword string   `toml:"managed_opensearch_user_password,omitempty"`
+	ManagedOpensearchCertificate  string   `toml:"managed_opensearch_certificate,omitempty"`
+	AwsOsSnapshotRoleArn          string   `toml:"aws_os_snapshot_role_arn,omitempty"`
+	OsSnapshotUserAccessKeyID     string   `toml:"os_snapshot_user_access_key_id,omitempty"`
+	OsSnapshotUserAccessKeySecret string   `toml:"os_snapshot_user_access_key_secret,omitempty"`
+	ManagedRdsInstanceURL         string   `toml:"managed_rds_instance_url,omitempty"`
+	ManagedRdsSuperuserUsername   string   `toml:"managed_rds_superuser_username,omitempty"`
+	ManagedRdsSuperuserPassword   string   `toml:"managed_rds_superuser_password,omitempty"`
+	ManagedRdsDbuserUsername      string   `toml:"managed_rds_dbuser_username,omitempty"`
+	ManagedRdsDbuserPassword      string   `toml:"managed_rds_dbuser_password,omitempty"`
+	ManagedRdsCertificate         string   `toml:"managed_rds_certificate,omitempty"`
+	AmiID                         string   `toml:"ami_id,omitempty"`
+	DeleteOnTermination           bool     `toml:"delete_on_termination,omitempty"`
+	AutomateServerInstanceType    string   `toml:"automate_server_instance_type,omitempty"`
+	ChefServerInstanceType        string   `toml:"chef_server_instance_type,omitempty"`
+	OpensearchServerInstanceType  string   `toml:"opensearch_server_instance_type,omitempty"`
+	PostgresqlServerInstanceType  string   `toml:"postgresql_server_instance_type,omitempty"`
+	AutomateLbCertificateArn      string   `toml:"automate_lb_certificate_arn,omitempty"`
+	ChefServerLbCertificateArn    string   `toml:"chef_server_lb_certificate_arn,omitempty"`
+	ChefEbsVolumeIops             string   `toml:"chef_ebs_volume_iops,omitempty"`
+	ChefEbsVolumeSize             string   `toml:"chef_ebs_volume_size,omitempty"`
+	ChefEbsVolumeType             string   `toml:"chef_ebs_volume_type,omitempty"`
+	OpensearchEbsVolumeIops       string   `toml:"opensearch_ebs_volume_iops,omitempty"`
+	OpensearchEbsVolumeSize       string   `toml:"opensearch_ebs_volume_size,omitempty"`
+	OpensearchEbsVolumeType       string   `toml:"opensearch_ebs_volume_type,omitempty"`
+	PostgresqlEbsVolumeIops       string   `toml:"postgresql_ebs_volume_iops,omitempty"`
+	PostgresqlEbsVolumeSize       string   `toml:"postgresql_ebs_volume_size,omitempty"`
+	PostgresqlEbsVolumeType       string   `toml:"postgresql_ebs_volume_type,omitempty"`
+	AutomateEbsVolumeIops         string   `toml:"automate_ebs_volume_iops,omitempty"`
+	AutomateEbsVolumeSize         string   `toml:"automate_ebs_volume_size,omitempty"`
+	AutomateEbsVolumeType         string   `toml:"automate_ebs_volume_type,omitempty"`
+	AmiFilterName                 string   `toml:"ami_filter_name,omitempty"`
+	AmiFilterVirtType             string   `toml:"ami_filter_virt_type,omitempty"`
+	AmiFilterOwner                string   `toml:"ami_filter_owner,omitempty"`
+	LbAccessLogs                  string   `toml:"lb_access_logs,omitempty"`
+	XContact                      string   `toml:"X-Contact,omitempty"`
+	XDept                         string   `toml:"X-Dept,omitempty"`
+	XProject                      string   `toml:"X-Project,omitempty"`
+	XProduction                   string   `toml:"X-Production,omitempty"`
+	XCustomer                     string   `toml:"X-Customer,omitempty"`
+	AwsAutomateRoute53Prefix      string   `toml:"aws_automate_route53_prefix,omitempty"`
+	AwsChefServerRoute53Prefix    string   `toml:"aws_chef_server_route53_prefix,omitempty"`
+	AwsRoute53HostedZone          string   `toml:"aws_route53_hosted_zone,omitempty"`
+	PostrgesqlDbIdentifier        string   `toml:"postgresql_db_identifier,omitempty"`
+	ElasticsearchDomainName       string   `toml:"elasticsearch_domain_name,omitempty"`
+	RDSInstanceType               string   `toml:"rds_postgresql_instance_type,omitempty"`
+	RDSRestoreIdentifier          string   `toml:"rds_postgresql_restore_identifier,omitempty"`
+	DatadogAPIKey                 string   `toml:"datadog_api_key,omitempty"`
+	UseExistingManagedInfra       bool     `toml:"use_existing_managed_infra,omitempty"`
 }
 
 type ExternalSettings struct {
@@ -82,12 +176,13 @@ type ExternalDBSettings struct {
 }
 
 type ExternalPgSettings struct {
-	InstanceURL        string `toml:"instance_url,omitempty"`
-	SuperuserUsername  string `toml:"superuser_username,omitempty"`
-	SuperuserPassword  string `toml:"superuser_password,omitempty"`
-	DbuserUsername     string `toml:"dbuser_username,omitempty"`
-	DbuserPassword     string `toml:"dbuser_password,omitempty"`
-	PostgresqlRootCert string `toml:"postgresql_root_cert,omitempty"`
+	InstanceURL           string `toml:"instance_url,omitempty"`
+	SuperuserUsername     string `toml:"superuser_username,omitempty"`
+	SuperuserPassword     string `toml:"superuser_password,omitempty"`
+	DbuserUsername        string `toml:"dbuser_username,omitempty"`
+	DbuserPassword        string `toml:"dbuser_password,omitempty"`
+	PostgresqlRootCert    string `toml:"postgresql_root_cert,omitempty"`
+	PostgreSQLCertificate string `toml:"postgresql_certificate,omitempty"`
 }
 
 type ExternalOsSettings struct {
@@ -95,6 +190,7 @@ type ExternalOsSettings struct {
 	OpensearchDomainURL    string                 `toml:"opensearch_domain_url,omitempty"`
 	OpensearchUsername     string                 `toml:"opensearch_username,omitempty"`
 	OpensearchUserPassword string                 `toml:"opensearch_user_password,omitempty"`
+	OpensearchCertificate  string                 `toml:"opensearch_certificate,omitempty"`
 	OpensearchRootCert     string                 `toml:"opensearch_root_cert,omitempty"`
 	Aws                    *AwsExternalOsSettings `toml:"aws,omitempty"`
 }
