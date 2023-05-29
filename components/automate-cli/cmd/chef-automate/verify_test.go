@@ -5,6 +5,7 @@ import (
 
 	verification "github.com/chef/automate/lib/verification"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,11 +63,59 @@ func TestVerifyHaOnpremDeploy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := &verifyCmdFlow{
-				Verification:      tt.fields.Verification,
-				A2HARBFileExist:   tt.fields.A2HARBFileExist,
-				ManagedServicesOn: tt.fields.ManagedServicesOn,
+				Verification: tt.fields.Verification,
 			}
 			err := v.verifyHaOnpremDeploy(tt.args.configPath)
+			if tt.wantErr {
+				assert.EqualError(t, err, tt.err.Error())
+			} else {
+				assert.Equal(t, nil, err)
+			}
+		})
+	}
+}
+
+func TestVerifyCertificates(t *testing.T) {
+	type fields struct {
+		Verification verification.Verification
+	}
+	type args struct {
+		flagsObj   *verifyCmdFlags
+		cmd        *cobra.Command
+		configPath []string
+	}
+	tests := []struct {
+		name     string
+		fields   fields
+		args     args
+		mockFunc verification.Verification
+		wantErr  bool
+		err      error
+	}{
+		{
+			name: "Test VerifyCertificates",
+			args: args{
+				cmd: &cobra.Command{},
+				flagsObj: &verifyCmdFlags{
+					certificates: true,
+				},
+				configPath: []string{configFileName},
+			},
+			mockFunc: &verification.VerificationMock{
+				VerifyCertificatesFunc: func(configFile string) error {
+					return nil
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := verifyCmdFlow{
+				Verification: tt.mockFunc,
+			}
+
+			err := v.Verification.VerifyCertificates(configFileName)
 			if tt.wantErr {
 				assert.EqualError(t, err, tt.err.Error())
 			} else {
