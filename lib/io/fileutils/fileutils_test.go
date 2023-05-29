@@ -70,15 +70,15 @@ func TestCreateTempFile(t *testing.T) {
 	})
 }
 
-func TestDeleteTempFile(t *testing.T){
-	tempFile, err := os.CreateTemp("","testfile")
-	if err != nil{
-		return 
+func TestDeleteTempFile(t *testing.T) {
+	tempFile, err := os.CreateTemp("", "testfile")
+	if err != nil {
+		return
 	}
 	defer tempFile.Close()
 
 	err = fileutils.DeleteTempFile(tempFile.Name())
-	if err != nil{
-		return 
+	if err != nil {
+		return
 	}
 }
