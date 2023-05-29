@@ -17,15 +17,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockSystemResourceService(responseBody *models.ApiResult, err error) systemresourceservice.ISystemResourcesService {
-	return &systemresourceservice.MockSystemResourcesService{
-		GetSystemResourcesForDeploymentFunc: func(s1, s2 string) (*models.ApiResult, error) {
-			return responseBody, err
+func SetupMockSystemResourceService(responseBody *models.ApiResult) systemresourceservice.SystemResourcesService {
+	return &systemresourceservice.MockSystemResourcesServiceImpl{
+		GetSystemResourcesForDeploymentFunc: func(nodeType constants.NodeType, deploymentState constants.DeploymentState) *models.ApiResult {
+			return responseBody
 		},
 	}
 }
 
-func SetupSystemResourceServiceHandler(srs systemresourceservice.ISystemResourcesService) (*fiber.App, error) {
+func SetupSystemResourceServiceHandler(srs systemresourceservice.SystemResourcesService) (*fiber.App, error) {
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		return nil, err
@@ -55,8 +55,8 @@ func TestSystemResourceAPI(t *testing.T) {
 		expectedCode        int
 		expectedBody        string
 		expectedError       error
-		nodeType            string
-		deploymentState     string
+		nodeType            constants.NodeType
+		deploymentState     constants.DeploymentState
 	}{
 		{
 			testCaseDescreption: "200:Success response no error",
@@ -109,32 +109,30 @@ func TestSystemResourceAPI(t *testing.T) {
 			},
 			expectedCode:    200,
 			expectedBody:    "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"msg\":\"\",\"check\":\"\",\"checks\":[{\"title\":\"CPU count check\",\"passed\":true,\"success_msg\":\"CPU count is \\u003e=4\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"CPU speed check\",\"passed\":true,\"success_msg\":\"CPU speed should be \\u003e=2Ghz\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Memory size check\",\"passed\":true,\"success_msg\":\"Memory should be \\u003e=14GB\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Hab free space check\",\"passed\":true,\"success_msg\":\"/hab should have free space \\u003e=80GB\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Temp free space check\",\"passed\":true,\"success_msg\":\"/tmp should have free space \\u003e=10GB or 5% of total size of /hab\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"/(root volume) free space check\",\"passed\":true,\"success_msg\":\"/(root volume) should have free space \\u003e=20GB or 20% of total size of /hab\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}",
-			nodeType:        constants.AUTOMATE,
-			deploymentState: constants.PRE_DEPLOY,
+			nodeType:        constants.NodeTypeAutomate,
+			deploymentState: constants.DeploymentStatePreDeploy,
 		},
 		{
 			testCaseDescreption: "400:WrongQuery | deployment_state",
 			responseBody:        nil,
 			expectedCode:        400,
 			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'deployment_state' are pre-deploy,post-deploy\"}}",
-			expectedError:       fmt.Errorf("Unknown error occured"),
-			nodeType:            "automate",
-			deploymentState:     "InvalidDepState",
+			nodeType:            constants.NodeTypeAutomate,
+			deploymentState:     constants.DeploymentState("InvalidDepState"),
 		},
 		{
 			testCaseDescreption: "400:WrongQuery | nodeType",
 			responseBody:        nil,
 			expectedCode:        400,
 			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'node_type' are automate,chef-infra-server,postgresql,opensearch,bastion\"}}",
-			expectedError:       fmt.Errorf("Unknown error occured"),
-			nodeType:            "wrongnode",
-			deploymentState:     "pre-deploy",
+			nodeType:            constants.NodeType("wrongnode"),
+			deploymentState:     constants.DeploymentStatePreDeploy,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescreption, func(t *testing.T) {
-			app, err := SetupSystemResourceServiceHandler(SetupMockSystemResourceService(testCase.responseBody, testCase.expectedError))
+			app, err := SetupSystemResourceServiceHandler(SetupMockSystemResourceService(testCase.responseBody))
 
 			reqUrl := fmt.Sprintf("/api/v1/checks/system-resource?node_type=%s&deployment_state=%s", testCase.nodeType, testCase.deploymentState)
 			assert.NoError(t, err)

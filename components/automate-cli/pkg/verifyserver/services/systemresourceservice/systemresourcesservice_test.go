@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/systemresource"
 	"github.com/stretchr/testify/assert"
@@ -14,9 +15,10 @@ import (
 
 type testCase struct {
 	testCaseDescription string
-	nodeType            string
+	nodeType            constants.NodeType
 	respWant            *models.Checks
 	mockSystemResource  systemresource.SystemResourceInfo
+	mockFileUtils       fileutils.FileUtils
 }
 
 const (
@@ -25,7 +27,7 @@ const (
 
 func TestGetCpuCountCheck(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 
 	testCases := []testCase{
 		{
@@ -59,7 +61,7 @@ func TestGetCpuCountCheck(t *testing.T) {
 
 func TestGetCpuSpeedCheck(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 	testCases := []testCase{
 		{
 			testCaseDescription: "CPU speed is expected",
@@ -101,7 +103,7 @@ func TestGetCpuSpeedCheck(t *testing.T) {
 
 func TestGetMemorySizeCheck(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 	testCases := []testCase{
 		{
 			testCaseDescription: "Memory value is expected",
@@ -122,11 +124,11 @@ func TestGetMemorySizeCheck(t *testing.T) {
 			},
 		},
 		{
-			testCaseDescription: "Getting error while reading cpuInfo file",
-			respWant:            srv.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", "Failed to read /proc/meminfo", RESOLUTION_MSG),
+			testCaseDescription: "Error while reading memory size",
+			respWant:            srv.GetChecksModel(false, MEMORY_SIZE_CHECK_TITLE, "", "error occured while reading memory size", RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetMemoryFunc: func() (float64, error) {
-					return float64(0), errors.New("Failed to read /proc/meminfo")
+					return float64(0), errors.New("error occured while reading memory size")
 				},
 			},
 		},
@@ -143,7 +145,7 @@ func TestGetMemorySizeCheck(t *testing.T) {
 
 func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 	successMockCheckDirFunc := func(s string) (bool, error) {
 		return true, nil
 	}
@@ -156,7 +158,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 11, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -166,7 +170,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 9, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -176,7 +182,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 16, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -186,7 +194,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 14, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 	}
@@ -194,6 +204,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 	for _, testCase := range testCasesTmpSpaceCheck {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			srv.systemResourceInfo = testCase.mockSystemResource
+			srv.fileutils = testCase.mockFileUtils
 			respGet := srv.CheckFreeDiskSpaceOfDir("/tmp", constants.TMP_FREE_DISK_IN_PER, constants.TMP_FREE_DISK_IN_GB, "Temp")
 			assert.Equal(t, testCase.respWant, respGet)
 		})
@@ -207,7 +218,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 21, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -217,7 +230,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, 19, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -227,7 +242,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 200, 25, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -237,7 +254,9 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 200, 42, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 	}
@@ -245,6 +264,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 	for _, testCase := range testCasesRootSpaceCheck {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			srv.systemResourceInfo = testCase.mockSystemResource
+			srv.fileutils = testCase.mockFileUtils
 			respGet := srv.CheckFreeDiskSpaceOfDir("/", constants.ROOT_FREE_DISK_IN_PER, constants.ROOT_FREE_DISK_IN_GB, "/(root volume)")
 			assert.Equal(t, testCase.respWant, respGet)
 		})
@@ -253,7 +273,7 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 
 func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 	successMockCheckDirFunc := func(s string) (bool, error) {
 		return true, nil
 	}
@@ -261,68 +281,80 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "Pre-deployment hab free space check | automate",
-			nodeType:            constants.AUTOMATE,
+			nodeType:            constants.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_A2), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_BEFORE_DEP_A2 + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | chef-serve",
-			nodeType:            constants.CHEF_INFRA_SERVER,
+			nodeType:            constants.NodeTypeChefServer,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_CS), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_BEFORE_DEP_CS + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | postgresql",
-			nodeType:            constants.POSTGRESQL,
+			nodeType:            constants.NodeTypePostgresql,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_PG), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_BEFORE_DEP_PG + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | opensearch",
-			nodeType:            constants.OPENSEARCH,
+			nodeType:            constants.NodeTypeOpensearch,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_OS), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_BEFORE_DEP_OS + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | bastion",
-			nodeType:            constants.BASTION,
+			nodeType:            constants.NodeTypeBastion,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_BASTION), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_BEFORE_DEP_BASTION + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | automate",
-			nodeType:            constants.AUTOMATE,
+			nodeType:            constants.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(constants.HAB_FREE_DISK_BEFORE_DEP_A2-1)), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_A2)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_BEFORE_DEP_A2 - 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
@@ -332,18 +364,9 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return -1, -1, errors.New(DISK_SPACE_CALC_ERR)
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
 			},
-		},
-		{
-			testCaseDescription: "Pre-deployment hab free space check | wrong query",
-			nodeType:            "invalid",
-			respWant:            nil,
-			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
-				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
-					return 0, 0, nil
-				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 	}
@@ -351,7 +374,8 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			srv.systemResourceInfo = testCase.mockSystemResource
-			respGet, _ := srv.CheckHabFreeSpacePreDeployment(testCase.nodeType)
+			srv.fileutils = testCase.mockFileUtils
+			respGet := srv.CheckHabFreeSpacePreDeployment(testCase.nodeType)
 			assert.Equal(t, testCase.respWant, respGet)
 		})
 	}
@@ -359,7 +383,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 
 func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 	successMockCheckDirFunc := func(s string) (bool, error) {
 		return true, nil
 	}
@@ -367,79 +391,93 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "Post-deployment hab free space check | automate",
-			nodeType:            constants.AUTOMATE,
+			nodeType:            constants.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_AFTER_DEP_A2 + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | automate",
-			nodeType:            constants.AUTOMATE,
+			nodeType:            constants.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(14)), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 14, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | chef-server",
-			nodeType:            constants.CHEF_INFRA_SERVER,
+			nodeType:            constants.NodeTypeChefServer,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(constants.HAB_FREE_DISK_AFTER_DEP_CS-1)), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_CS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_AFTER_DEP_CS - 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | opensearch",
-			nodeType:            constants.OPENSEARCH,
+			nodeType:            constants.NodeTypeOpensearch,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_OS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 100, constants.HAB_FREE_DISK_AFTER_DEP_OS + 1, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | opensearch",
-			nodeType:            constants.OPENSEARCH,
+			nodeType:            constants.NodeTypeOpensearch,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(ERROR_MSG, "/hab", float64(100)), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_OS)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 1000, 100, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | postgresql",
-			nodeType:            constants.POSTGRESQL,
+			nodeType:            constants.NodeTypePostgresql,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_PG)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 1000, 1000 * constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | bastion",
-			nodeType:            constants.BASTION,
+			nodeType:            constants.NodeTypeBastion,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_BASTION)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 300 * constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, nil
 				},
-				GetCheckPathExistsFunc: successMockCheckDirFunc,
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
 	}
@@ -447,7 +485,8 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 			srv.systemResourceInfo = testCase.mockSystemResource
-			respGet, _ := srv.CheckHabFreeSpacePostDeployment(testCase.nodeType)
+			srv.fileutils = testCase.mockFileUtils
+			respGet := srv.CheckHabFreeSpacePostDeployment(testCase.nodeType)
 			assert.Equal(t, testCase.respWant, respGet)
 		})
 	}
@@ -455,7 +494,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 
 func TestGetSystemResourcesForDeployment(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{})
+	srv := NewSystemResourceService(log, &systemresource.MockSystemResourceInfoImpl{}, &fileutils.MockFileSystemUtils{})
 	successMockCheckDirFunc := func(s string) (bool, error) {
 		return true, nil
 	}
@@ -463,10 +502,10 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 	type testCase struct {
 		testCaseDescription string
 		respWant            *models.ApiResult
-		err                 error
 		mockSystemResource  *systemresource.MockSystemResourceInfoImpl
-		nodeType            string
-		deploymentState     string
+		mockFsUtils         fileutils.FileUtils
+		nodeType            constants.NodeType
+		deploymentState     constants.DeploymentState
 	}
 
 	validChecks := []models.Checks{
@@ -491,7 +530,10 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 		GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 			return 100, constants.HAB_FREE_DISK_BEFORE_DEP_A2 + 1, nil
 		},
-		GetCheckPathExistsFunc: successMockCheckDirFunc,
+	}
+
+	mockFsUtils := &fileutils.MockFileSystemUtils{
+		PathExistsFunc: successMockCheckDirFunc,
 	}
 
 	testCases := []testCase{
@@ -501,10 +543,10 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 				Passed: true,
 				Checks: validChecks,
 			},
-			err:                nil,
 			mockSystemResource: mockSystemResourceInfo,
-			nodeType:           constants.AUTOMATE,
-			deploymentState:    constants.PRE_DEPLOY,
+			mockFsUtils:        mockFsUtils,
+			nodeType:           constants.NodeTypeAutomate,
+			deploymentState:    constants.DeploymentStatePreDeploy,
 		},
 		{
 			testCaseDescription: "nodeType=automate,deploymentState=postDeploy",
@@ -512,41 +554,17 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 				Passed: true,
 				Checks: validChecks,
 			},
-			err:                nil,
 			mockSystemResource: mockSystemResourceInfo,
-			nodeType:           constants.AUTOMATE,
-			deploymentState:    constants.POST_DEPLOY,
-		},
-		{
-			testCaseDescription: "nodeType=a2,deploymentState=preDeploy",
-			respWant:            nil,
-			err:                 fmt.Errorf(INVALID_NODE_TYPE_ERR, "a2"),
-			mockSystemResource:  mockSystemResourceInfo,
-			nodeType:            "a2",
-			deploymentState:     constants.PRE_DEPLOY,
-		},
-		{
-			testCaseDescription: "nodeType=a2,deploymentState=preDeploy",
-			respWant:            nil,
-			err:                 fmt.Errorf(INVALID_NODE_TYPE_ERR, "a2"),
-			mockSystemResource:  mockSystemResourceInfo,
-			nodeType:            "a2",
-			deploymentState:     constants.POST_DEPLOY,
-		},
-		{
-			testCaseDescription: "nodeType=a2,deploymentState=preDeploy",
-			respWant:            nil,
-			err:                 fmt.Errorf("given query deployment_state with value=%s is not supported", "wrongDep"),
-			mockSystemResource:  mockSystemResourceInfo,
-			nodeType:            "a2",
-			deploymentState:     "wrongDep",
+			mockFsUtils:        mockFsUtils,
+			nodeType:           constants.NodeTypeAutomate,
+			deploymentState:    constants.DeploymentStatePostDeploy,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testCaseDescription, func(t *testing.T) {
 
-			if testCase.deploymentState == constants.POST_DEPLOY && testCase.respWant != nil {
+			if testCase.deploymentState == constants.POST_DEPLOY {
 				testCase.respWant.Checks[3] = *srv.GetChecksModel(true, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100), "", "")
 				testCase.mockSystemResource.GetDiskSpaceInfoFunc = func(s string) (float64, float64, error) {
 					return 100, 30, nil
@@ -554,8 +572,9 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 			}
 
 			srv.systemResourceInfo = testCase.mockSystemResource
-			respGet, err := srv.GetSystemResourcesForDeployment(testCase.nodeType, testCase.deploymentState)
-			assert.Equal(t, testCase.err, err)
+			srv.fileutils = testCase.mockFsUtils
+			respGet := srv.GetSystemResourcesForDeployment(testCase.nodeType, testCase.deploymentState)
+
 			assert.Equal(t, testCase.respWant, respGet)
 		})
 	}

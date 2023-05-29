@@ -100,7 +100,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
-		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl())).
+		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).
 		AddMockServerServices(startmockserverservice.New(l)).
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).

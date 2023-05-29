@@ -4,17 +4,15 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/platform/sys"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/mem"
 )
 
 type SystemResourceInfo interface {
 	GetNumberOfCPU() int
 	GetCPUSpeed() (float64, error)
 	GetMemory() (float64, error)
-	CheckPathExists(string) (bool, error)
 	GetDiskSpaceInfo(dirPath string) (float64, float64, error)
 }
 
@@ -43,18 +41,14 @@ func (s *SystemResourceInfoImpl) GetCPUSpeed() (float64, error) {
 }
 
 func (s *SystemResourceInfoImpl) GetMemory() (float64, error) {
-	systemMemoryInKB, err := sys.SystemMemoryKB()
 
+	virtualMemory, err := mem.VirtualMemory()
 	if err != nil {
 		return 0, err
 	}
 
-	val := float64(systemMemoryInKB) / (1024 * 1024)
-	return val, nil
-}
-
-func (s *SystemResourceInfoImpl) CheckPathExists(path string) (bool, error) {
-	return fileutils.PathExists(path)
+	totalRAM := float64(virtualMemory.Total) / (1024 * 1024 * 1024)
+	return totalRAM, nil
 }
 
 func (s *SystemResourceInfoImpl) GetDiskSpaceInfo(dirPath string) (float64, float64, error) {

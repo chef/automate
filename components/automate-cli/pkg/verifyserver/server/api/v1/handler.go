@@ -31,7 +31,7 @@ type Handler struct {
 	PortReachableService         portreachableservice.IPortReachableService
 	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
 	SystemUserService            systemuserservice.SystemUserService
-	SystemResourceService        systemresourceservice.ISystemResourcesService
+	SystemResourceService        systemresourceservice.SystemResourcesService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -97,7 +97,7 @@ func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.Exte
 	return h
 }
 
-func (h *Handler) AddSystemResourceService(srs systemresourceservice.ISystemResourcesService) *Handler {
+func (h *Handler) AddSystemResourceService(srs systemresourceservice.SystemResourcesService) *Handler {
 	h.SystemResourceService = srs
 	return h
 }

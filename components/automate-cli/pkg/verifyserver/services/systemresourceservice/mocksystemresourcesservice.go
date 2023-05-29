@@ -1,11 +1,14 @@
 package systemresourceservice
 
-import "github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+import (
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+)
 
-type MockSystemResourcesService struct {
-	GetSystemResourcesForDeploymentFunc func(string, string) (*models.ApiResult, error)
+type MockSystemResourcesServiceImpl struct {
+	GetSystemResourcesForDeploymentFunc func(constants.NodeType, constants.DeploymentState) *models.ApiResult
 }
 
-func (msrs *MockSystemResourcesService) GetSystemResourcesForDeployment(nodeType, deploymentState string) (*models.ApiResult, error) {
+func (msrs *MockSystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType constants.NodeType, deploymentState constants.DeploymentState) *models.ApiResult {
 	return msrs.GetSystemResourcesForDeploymentFunc(nodeType, deploymentState)
 }
