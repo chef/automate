@@ -199,23 +199,23 @@ func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePostDeployment(nodeType 
 	switch nodeType {
 	case constants.NodeTypeAutomate:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_A2), constants.POST_DEPLOY, "/hab")
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.NodeTypeChefServer:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_CS), constants.POST_DEPLOY, "/hab")
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.NodeTypeOpensearch:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_OS), constants.POST_DEPLOY, "/hab")
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.NodeTypePostgresql:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_PG), constants.POST_DEPLOY, "/hab")
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	case constants.NodeTypeBastion:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION)
-		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, float64(constants.HAB_FREE_DISK_AFTER_DEP_BASTION), constants.POST_DEPLOY, "/hab")
+		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	}
 	return resp
