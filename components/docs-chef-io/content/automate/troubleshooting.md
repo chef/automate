@@ -143,7 +143,7 @@ chef-automate iam admin-access restore NEW_PASSWORD --dry-run
 
 ## Issue: Increase in Data collector API failure
 
-### Details:
+### Details
 
 Possible reason of failures in data collector API could be due to change in the use case we are running.
 
@@ -153,8 +153,36 @@ This can be due to the following reasons:
 - Number of controls have changed
 - Increase in number of nodes
 
-
-### Possible fixes:
+### Possible fixes
 
 - Changing heap size. Heap size should not be more than 70% of the RAM
 - Upgrading machine to improve performance
+
+## Issue: Maximum Shards Open
+
+### Details
+
+The max shards are the number of shards that should be patched to run the data lifecycle. If the client runs and the compliance data lifecycle is set to specific number of  days, what should be the max shards per node configuration?
+
+### Fixes
+
+Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
+
+| Days | Max Shards Per Node |
+| ---- | ------------------ |
+| 30   | 1000               |
+| 60   | 2000               |
+| 90   | 3000               |
+| 365  | 12000              |
+
+To set the value of max shards per node, patch the following configuration in the `.toml` file.
+
+```bash
+[opensearch]
+[opensearch.v1]
+[opensearch.v1.sys]
+[opensearch.v1.sys.cluster]
+max_shards_per_node = 1000
+```
+
+Once done, run the chef-automate config patch `</path/to/your-file.toml>` to deploy your change.
