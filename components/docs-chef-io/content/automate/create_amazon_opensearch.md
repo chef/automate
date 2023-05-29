@@ -1,5 +1,5 @@
 +++
-title = "Creating an Amazon OpenSearch 1.3 Cluster and Obtaining Connection Details"
+title = "Creating an Amazon OpenSearch Cluster and Obtaining Connection Details"
 draft = false
 gh_repo = "automate"
 [menu]
