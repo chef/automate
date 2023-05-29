@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -28,6 +29,7 @@ type Handler struct {
 	OSBackupService              opensearchbackupservice.IOSS3BackupService
 	PortReachableService         portreachableservice.IPortReachableService
 	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
+	SystemUserService            systemuserservice.SystemUserService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -70,6 +72,11 @@ func (h *Handler) AddS3ConfigService(ss s3configservice.IS3Config) *Handler {
 
 func (h *Handler) AddStopMockServerService(sm stopmockserverservice.IStopMockServerService) *Handler {
 	h.StopMockServersService = sm
+	return h
+}
+
+func (h *Handler) AddSystemUserService(su systemuserservice.SystemUserService) *Handler {
+	h.SystemUserService = su
 	return h
 }
 
