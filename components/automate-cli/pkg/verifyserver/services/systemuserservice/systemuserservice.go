@@ -18,10 +18,10 @@ type SystemUserServiceImp struct {
 	Log  logger.Logger
 }
 
-func NewSystemUserService(log logger.Logger) *SystemUserServiceImp {
+func NewSystemUserService(log logger.Logger, exec executil.ExecCmdService, user userutils.UserUtil) *SystemUserServiceImp {
 	return &SystemUserServiceImp{
-		exec: executil.NewExecCmdServiceImp(),
-		user: userutils.NewUserUtilImp(),
+		exec: exec,
+		user: user,
 		Log:  log,
 	}
 }

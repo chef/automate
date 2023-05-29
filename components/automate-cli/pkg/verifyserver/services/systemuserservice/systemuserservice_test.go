@@ -17,7 +17,7 @@ func TestNewSystemUserService(t *testing.T) {
 	log, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 
-	s := NewSystemUserService(log)
+	s := NewSystemUserService(log, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())
 	assert.NotEqual(t, s, nil)
 }
 
