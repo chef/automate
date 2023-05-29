@@ -1,21 +1,22 @@
-package systemresource
+package systemresource_test
 
 import (
 	"errors"
 	"testing"
 
+	"github.com/chef/automate/lib/systemresource"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetNumberOfCPU(t *testing.T) {
-	systemresource := NewSystemResourceInfoImpl()
+	systemresource := systemresource.NewSystemResourceInfoImpl()
 
 	ncpu := systemresource.GetNumberOfCPU()
 	assert.NotZero(t, ncpu)
 }
 
 func TestGetDiskSpaceInfo(t *testing.T) {
-	systemresource := NewSystemResourceInfoImpl()
+	systemresource := systemresource.NewSystemResourceInfoImpl()
 
 	testCase := []struct {
 		path string
@@ -48,7 +49,7 @@ func TestGetDiskSpaceInfo(t *testing.T) {
 }
 
 func TestGetCPUSpeed(t *testing.T) {
-	systemresource := NewSystemResourceInfoImpl()
+	systemresource := systemresource.NewSystemResourceInfoImpl()
 	cpuSpeed, err := systemresource.GetCPUSpeed()
 
 	if err != nil {
@@ -59,7 +60,7 @@ func TestGetCPUSpeed(t *testing.T) {
 }
 
 func TestGetMemory(t *testing.T) {
-	systemresource := NewSystemResourceInfoImpl()
+	systemresource := systemresource.NewSystemResourceInfoImpl()
 	memory, err := systemresource.GetMemory()
 
 	if err != nil {

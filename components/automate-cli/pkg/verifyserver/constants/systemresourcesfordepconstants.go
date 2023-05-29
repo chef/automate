@@ -11,7 +11,6 @@ const (
 	HAB_FREE_DISK_BEFORE_DEP_OS      = 150
 	HAB_FREE_DISK_BEFORE_DEP_BASTION = 150
 
-	
 	HAB_FREE_DISK_AFTER_DEP_A2      = 10
 	HAB_FREE_DISK_AFTER_DEP_CS      = 10
 	HAB_FREE_DISK_AFTER_DEP_PG      = 50
@@ -29,4 +28,17 @@ const (
 
 	ROOT_FREE_DISK_IN_GB  = 20
 	ROOT_FREE_DISK_IN_PER = 0.20
+)
+
+const (
+	CPU_COUNT_CHECK_TITLE   = "CPU count check"
+	CPU_SPEED_CHECK_TITLE   = "CPU speed check"
+	MEMORY_SIZE_CHECK_TITLE = "Memory size check"
+	FREE_SPACE_CHECK        = "%s free space check"
+
+	SUCCESS_MSG        = "%s should have free space >=%vGB"
+	ERROR_MSG          = "%s free space is %0.2fGB"
+	SUCCESS_MSG_IN_PER = " or %v%% of total size of /hab"
+
+	RESOLUTION_MSG = "Please run system on supported platform"
 )
