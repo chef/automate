@@ -17,11 +17,10 @@ Chef-Server Ip 193.0.0.1 is not present in existing list of ip addresses. Please
 Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
 OpenSearch Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.
 Postgresql Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.`
+	automateIpNotPresent = `IP address validation failed: 
+Automate Ip 193.0.0.1 is not present in existing list of ip addresses. Please use a different private ip.`
 	multipleIpAddressError = `IP address validation failed: 
-Only one Automate is allowed to delete for AWS deployment type
-Only one Chef-Server is allowed to delete for AWS deployment type
-Only one OpenSearch is allowed to delete for AWS deployment type
-Only one Postgresql is allowed to delete for AWS deployment type`
+Only one node can be deleted at a time`
 	isManagedServicesError = `Cannot remove OpenSearch or Postgresql nodes if external.database.type is either aws or self-managed.
 Please set external.database.type to empty if you want to add OpenSearch or Postgresql nodes`
 )
@@ -80,10 +79,7 @@ func TestDeletenodeAWSValidateIsManagedServicesOnError(t *testing.T) {
 func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp:   "193.0.0.1",
-		chefServerIp: "193.0.0.1",
-		opensearchIp: "193.0.0.1",
-		postgresqlIp: "193.0.0.1",
+		automateIp: "193.0.0.1",
 	}
 	nodeDelete := NewDeleteNodeAWS(
 		w.CliWriter,
@@ -127,7 +123,7 @@ func TestDeletenodeAWSValidateErrorIpAddressNotMatched(t *testing.T) {
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
-	assert.Equal(t, err.Error(), ipAddressNotPresent)
+	assert.Equal(t, automateIpNotPresent, err.Error())
 }
 
 func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
@@ -467,6 +463,9 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
+			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+				return nil
+			},
 		},
 		CONFIG_TOML_PATH_AWS,
 		&fileutils.MockFileSystemUtils{},
@@ -538,6 +537,9 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			},
 			modifyTfArchFileFunc: func(path string) error {
 				tfArchModified = true
+				return nil
+			},
+			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
 				return nil
 			},
 		},

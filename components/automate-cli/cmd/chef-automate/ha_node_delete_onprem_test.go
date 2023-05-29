@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	multipleNodeError = `Only one node can be deleted at a time`
+)
+
 func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
 	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 	if err != nil {
@@ -29,7 +33,7 @@ func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
 func TestDeleteNodeValidateError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67,ewewedw",
+		automateIp: "192.0.2.2",
 	}
 	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -49,17 +53,14 @@ func TestDeleteNodeValidateError(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(),
-		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.`)
+	assert.Contains(t, err.Error(), `
+Automate Ip 192.0.2.2 is not present in existing list of ip addresses. Please use a different private ip.`)
 }
 
 func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp:   "10.2.1.67,ewewedw",
-		chefServerIp: "10.2.1.637,ewewedw",
-		postgresqlIp: "10.2.1.657,ewewedw",
-		opensearchIp: "10.2.1.61,ewewedw",
+		automateIp: "10.2.1.67,10.2.1.637",
 	}
 	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -80,10 +81,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
-		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
-Unable to remove node. Chef-Server instance count cannot be less than 1. Final count -1 not allowed.
-Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
-Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.`)
+		multipleNodeError)
 }
 
 func TestDeleteNodeModifyAutomate(t *testing.T) {
@@ -408,7 +406,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
-		`Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.`)
+		multipleNodeError)
 }
 
 func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
@@ -496,6 +494,9 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
+		stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+			return nil
+		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
@@ -562,6 +563,9 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		},
 		isManagedServicesOnFunc: func() bool {
 			return false
+		},
+		stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
