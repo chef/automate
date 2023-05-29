@@ -3,10 +3,8 @@ package fqdnservice
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -140,74 +138,48 @@ func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
 	return createCheck(constants.CERTIFICATE_TITLE, true, constants.CERTIFICATE_SUCCESS_MESSAGE, "", "")
 }
 
-// checkChefServerStatus function will check that all the services are in ok state or not.
-func (fq *FqdnService) CheckChefServerStatus(fqdn, rootCert, port string) models.Checks {
+// checkServiceStatus function will check that all the services are in ok state or not.
+func (fq *FqdnService) CheckServiceStatus(fqdn, rootCert, port string, reqNodes []string) models.Checks {
+	setNodes := make(map[string]int)
+	for _, k := range reqNodes {
+		setNodes[k] += 1
+		// hasher := md5.New()
+		// _, err := io.WriteString(hasher, k)
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// setNodes[hex.EncodeToString(hasher.Sum(nil))] += 1
+	}
+
 	client := fq.createClient(rootCert)
-
-	res, err := client.Get(fmt.Sprintf("https://%s:%s/_status", fqdn, port))
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
+	fqdnResultChan := make(chan string)
+	for i := 0; i < 50; i++ {
+		go func(fqdnResultChan chan string) {
+			res, err := client.Get(fmt.Sprintf("https://%s:%s/check_status", fqdn, port))
+			if err != nil {
+				fq.log.Error(err.Error())
+				fqdnResultChan <- "got error"
+				return
+			}
+			nodeIP := res.Header.Get("X-Real-IP")
+			fqdnResultChan <- nodeIP
+		}(fqdnResultChan)
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body) // nosemgrep
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
+	for i := 0; i < 50; i++ {
+		chanResult := <-fqdnResultChan
+		if chanResult == "got error" {
+			continue
+		}
+		delete(setNodes, chanResult)
+		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
+		if len(setNodes) == 0 {
+			return createCheck(constants.CHEF_SERVER_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", "")
+		}
 	}
 
-	var data map[string]interface{}
-	err = json.Unmarshal(resBody, &data)
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-
-	if data["status"] != "pong" {
-		return createCheck(constants.CHEF_SERVER_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-	fq.log.Debug("Chef Server Status is all okay.")
-	return createCheck(constants.CHEF_SERVER_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", "")
-}
-
-// checkAutomateStatus function will check that all the services are in ok state or not.
-func (fq *FqdnService) CheckAutomateStatus(fqdn, rootCert, apiToken, port string) models.Checks {
-	client := fq.createClient(rootCert)
-
-	apiUrl := fmt.Sprintf("https://%s:%s/api/v0/status", fqdn, port)
-	// Create a new HTTP GET request
-	req, err := http.NewRequest("GET", apiUrl, nil)
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-
-	// Set the API token in the Authorization header
-	req.Header.Set("api-token", apiToken)
-	resp, err := client.Do(req)
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-
-	resBody, err := ioutil.ReadAll(resp.Body) // nosemgrep
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-
-	var data map[string]interface{}
-	err = json.Unmarshal(resBody, &data)
-	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-
-	if data["ok"] != true {
-		return createCheck(constants.AUTOMATE_TITLE, false, "", constants.A2_CS_ERROR_MESSAGE, constants.A2_CS_RESOLUTION_MESSAGE)
-	}
-	fq.log.Debug("Automate Status is all okay")
-	return createCheck(constants.AUTOMATE_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", "")
+	temp := createErrorMessage(setNodes)
+	return createCheck(constants.CHEF_SERVER_TITLE, false, "", fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, temp), constants.A2_CS_RESOLUTION_MESSAGE)
 }
 
 func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
@@ -227,13 +199,8 @@ func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string
 	response.Checks = append(response.Checks, check)
 
 	if req.IsAfterDeployment {
-		if req.NodeType == constants.CHEF_INFRA_SERVER {
-			check = fq.CheckChefServerStatus(req.Fqdn, req.RootCert, port)
-			response.Checks = append(response.Checks, check)
-		} else if req.NodeType == constants.AUTOMATE {
-			check = fq.CheckAutomateStatus(req.Fqdn, req.RootCert, req.ApiToken, port)
-			response.Checks = append(response.Checks, check)
-		}
+		check = fq.CheckServiceStatus(req.Fqdn, req.RootCert, port, req.Nodes)
+		response.Checks = append(response.Checks, check)
 	} else {
 		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, port)
 		response.Checks = append(response.Checks, check)
