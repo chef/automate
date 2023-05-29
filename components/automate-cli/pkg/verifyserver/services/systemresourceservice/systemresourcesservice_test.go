@@ -199,6 +199,18 @@ func TestGetFreeDiskSpaceCheckOfDir(t *testing.T) {
 				PathExistsFunc: successMockCheckDirFunc,
 			},
 		},
+		{
+			testCaseDescription: "Checking free disk in /tmp | error",
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Temp"), "", "error occured while fetching tmp disk space", RESOLUTION_MSG),
+			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
+				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
+					return 0, 0, errors.New("error occured while fetching tmp disk space")
+				},
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
+			},
+		},
 	}
 
 	for _, testCase := range testCasesTmpSpaceCheck {
@@ -474,6 +486,19 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
 					return 300, 300 * constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, nil
+				},
+			},
+			mockFileUtils: &fileutils.MockFileSystemUtils{
+				PathExistsFunc: successMockCheckDirFunc,
+			},
+		},
+		{
+			testCaseDescription: "Post-deployment hab free space check | error case",
+			nodeType:            constants.NodeTypeAutomate,
+			respWant:            srv.GetChecksModel(false, fmt.Sprintf(FREE_SPACE_CHECK, "Hab"), "", "error occured while fetching disk space info", RESOLUTION_MSG),
+			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
+				GetDiskSpaceInfoFunc: func(s string) (float64, float64, error) {
+					return 0, 0, errors.New("error occured while fetching disk space info")
 				},
 			},
 			mockFileUtils: &fileutils.MockFileSystemUtils{
