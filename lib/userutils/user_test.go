@@ -11,17 +11,17 @@ import (
 
 func TestLookup(t *testing.T) {
 	s := &userutils.UserUtilImp{}
-	sysUser, err := s.Lookup(constants.USERNAME)
+	sysUser, err := s.Lookup(constants.USER_NAME)
 	if sysUser == nil {
-		assert.Equal(t, user.UnknownUserError(constants.USERNAME), err)
+		assert.Equal(t, user.UnknownUserError(constants.USER_NAME), err)
 	}
 }
 
 func TestLookupGroup(t *testing.T) {
 	s := &userutils.UserUtilImp{}
-	group, err := s.LookupGroup(constants.GROUPNAME)
+	group, err := s.LookupGroup(constants.GROUP_NAME)
 	if group == nil {
-		assert.Equal(t, user.UnknownGroupError(constants.GROUPNAME), err)
+		assert.Equal(t, user.UnknownGroupError(constants.GROUP_NAME), err)
 	}
 }
 

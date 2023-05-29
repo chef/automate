@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupSystemUserHandlers(su systemuserservice.SystemUserService) (*fiber.App, error) {
+func SetupMockSystemUserHandlers(su systemuserservice.SystemUserService) (*fiber.App, error) {
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func TestSystemUserService(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			systemuserCheckEndpoint := "/api/v1/checks/system-user"
-			app, err := SetupSystemUserHandlers(SetupMockSystemUserService(test.responseBody))
+			app, err := SetupMockSystemUserHandlers(SetupMockSystemUserService(test.responseBody))
 			assert.NoError(t, err)
 			req := httptest.NewRequest("GET", systemuserCheckEndpoint, nil)
 			req.Header.Add("Content-Type", "application/json")

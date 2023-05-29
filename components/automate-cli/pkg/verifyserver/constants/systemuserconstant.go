@@ -1,11 +1,11 @@
 package constants
 
 const (
-	USERNAME                                   = "hab"
-	GROUPNAME                                  = "hab"
-	USERADDCMD                                 = "useradd"
-	USERDELCMD                                 = "userdel"
-	GROUPDELCMD                                = "groupdel"
+	USER_NAME                                   = "hab"
+	GROUP_NAME                                  = "hab"
+	USER_ADD_CMD                                 = "useradd"
+	USER_DEL_CMD                                 = "userdel"
+	GROUP_DEL_CMD                                = "groupdel"
 	SYSTEM_USER_HAB_VALIDATION_SUCCESS_TITLE   = "User creation/validation check"
 	SYSTEM_USER_HAB_SUCCESS_MSG                = "User is created or found successfully"
 	SYSTEM_GROUP_HAB_VALIDATION_SUCCESS_TITLE  = "Group creation/validation check"

@@ -19,7 +19,7 @@ type SystemUserServiceImp struct {
 }
 
 func NewSystemUserService(log logger.Logger, exec executil.ExecCmdService, user userutils.UserUtil) *SystemUserServiceImp {
-	return &SystemUserServiceImp{
+	return &SystemUserServiceImp {
 		exec: exec,
 		user: user,
 		Log:  log,
@@ -48,10 +48,10 @@ func (su *SystemUserServiceImp) GetSystemUserServiceDetails() *models.SystemUser
 
 	if isHabUserCreated {
 		defer func() {
-			_, _ = su.exec.Command(constants.USERDELCMD, []string{constants.USERNAME})
+			_, _ = su.exec.Command(constants.USER_DEL_CMD, []string{constants.USER_NAME})
 
-			if su.isHabGroupPresent(constants.GROUPNAME) {
-				_, _ = su.exec.Command(constants.GROUPDELCMD, []string{constants.GROUPNAME})
+			if su.isHabGroupPresent(constants.GROUP_NAME) {
+				_, _ = su.exec.Command(constants.GROUP_DEL_CMD, []string{constants.GROUP_NAME})
 				su.Log.Debug("Group hab deleted")
 			}
 		}()
@@ -66,10 +66,10 @@ func (su *SystemUserServiceImp) GetSystemUserServiceDetails() *models.SystemUser
 }
 
 func (su *SystemUserServiceImp) ValidateOrCreateHabUser() (*models.Checks, bool) {
-	isHabUserPresent := su.isHabUserPresent(constants.USERNAME)
+	isHabUserPresent := su.isHabUserPresent(constants.USER_NAME)
 
 	if !isHabUserPresent {
-		_, err := su.exec.Command(constants.USERADDCMD, []string{"-U", constants.USERNAME})
+		_, err := su.exec.Command(constants.USER_ADD_CMD, []string{"-U", constants.USER_NAME})
 		if err != nil {
 			su.Log.Error("Failed to create user 'hab':", err)
 			return failureResponse(constants.SYSTEM_USER_HAB_VALIDATION_FAILURE_TITLE, constants.SYSTEM_USER_HAB_ERROR_MSG, constants.SYSTEM_USER_HAB_RESOLUTION_MSG), false
@@ -82,7 +82,7 @@ func (su *SystemUserServiceImp) ValidateOrCreateHabUser() (*models.Checks, bool)
 }
 
 func (su *SystemUserServiceImp) ValidateHabGroup() *models.Checks {
-	isHabGroupPresent := su.isHabGroupPresent(constants.GROUPNAME)
+	isHabGroupPresent := su.isHabGroupPresent(constants.GROUP_NAME)
 
 	if !isHabGroupPresent {
 		su.Log.Error("Group 'hab' doesn't exists")
@@ -94,7 +94,7 @@ func (su *SystemUserServiceImp) ValidateHabGroup() *models.Checks {
 
 func (su *SystemUserServiceImp) ValidateHabUserAndGroupMapping() *models.Checks {
 	// Check if "hab" user's primary group is "hab" group
-	userPrimaryGroup := su.checkUserPrimaryGroup(constants.USERNAME, constants.GROUPNAME)
+	userPrimaryGroup := su.checkUserPrimaryGroup(constants.USER_NAME, constants.GROUP_NAME)
 
 	if !userPrimaryGroup {
 		su.Log.Error("Validation failed: Primary group mapping for user 'hab' is not 'hab' group")
