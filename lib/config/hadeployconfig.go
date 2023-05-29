@@ -26,18 +26,13 @@ type ConfigInitials struct {
 	SecretsStoreFile            string `toml:"secrets_store_file,omitempty"`
 	SudoPassword                string `toml:"sudo_password,omitempty"`
 	LoggingMonitoringManagement string `toml:"logging_monitoring_management,omitempty"`
-	NewElk                      string `toml:"new_elk,omitempty"`
-	ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip,omitempty"`
-	ExistingElkPort             string `toml:"existing_elk_port,omitempty"`
-	ExistingElkCert             string `toml:"existing_elk_cert,omitempty"`
-	ExistingElkUsername         string `toml:"existing_elk_username,omitempty"`
-	ExistingElkPassword         string `toml:"existing_elk_password,omitempty"`
 	Architecture                string `toml:"architecture,omitempty"`
 	WorkspacePath               string `toml:"workspace_path,omitempty"`
 	BackupMount                 string `toml:"backup_mount,omitempty"`
 	BackupConfig                string `toml:"backup_config,omitempty"`
 	S3BucketName                string `toml:"s3_bucketName,omitempty"`
 	HabitatUIDGid               string `toml:"habitat_uid_gid,omitempty"`
+	// Elk configs not being used, it's not added
 }
 
 type ObjectStorage struct {
