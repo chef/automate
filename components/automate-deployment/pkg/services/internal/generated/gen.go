@@ -395,7 +395,7 @@ var ProductMetadataJSON = `
         "name": "chef/automate-cs-ocid",
         "data_service": false,
         "binlinks": null,
-        "uses_platform_scaffolding": true,
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
