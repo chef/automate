@@ -14,6 +14,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
+You can follow the AWS documentation directly for detailed steps to create Amazon RDS PostgrSQL Instance. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) or follow the below guide,
 This guide will walk you through the process of creating an Amazon RDS PostgreSQL instance and retrieving the necessary connection details, including the hostname, port, username, and password.
 
 ### Prerequisites
