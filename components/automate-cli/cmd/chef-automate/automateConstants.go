@@ -72,4 +72,17 @@ const (
 	`
 
 	SUDO_PASSWORD_CMD = `echo "%s" | sudo -S bash -c "`
+
+	STOP_FE_SERVICES_CMD = `sudo chef-automate stop`
+	STOP_BE_SERVICES_CMD = `sudo systemctl stop hab-sup`
+
+	EXCLUDE_OPENSEARCH_NODE_REQUEST = `
+	curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{
+	  "transient" :{
+		  "cluster.routing.allocation.exclude._ip" : "%s"
+	   }
+	}' -k -u admin:admin
+	`
 )

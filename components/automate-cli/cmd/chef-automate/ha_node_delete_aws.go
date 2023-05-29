@@ -101,9 +101,13 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 			return nil
 		}
 	}
-	return dna.prepare()
 
-	// return dna.runDeploy()
+	err = dna.prepare()
+	if err != nil {
+		return err
+	}
+
+	return dna.runDeploy()
 }
 func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 	dna.config.Architecture.ConfigInitials.Architecture = "aws"
@@ -140,8 +144,12 @@ func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 
 func (dna *DeleteNodeAWSImpl) prepare() error {
 	// Stop all services on the node to be deleted
-	return dna.nodeUtils.stopServicesOnNode(dna.automateIpList, dna.chefServerIpList, dna.postgresqlIpList, dna.opensearchIpList)
-	// return dna.nodeUtils.taintTerraform(dna.terraformPath)
+	err := dna.nodeUtils.stopServicesOnNode(dna.automateIpList, dna.chefServerIpList, dna.postgresqlIpList, dna.opensearchIpList)
+	if err != nil {
+		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
+	}
+
+	return dna.nodeUtils.taintTerraform(dna.terraformPath)
 }
 
 func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
@@ -280,6 +288,7 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 		}...)
 	}
 
+	// Check if only one node is being deleted
 	if (len(dna.automateIpList) + len(dna.chefServerIpList) + len(dna.opensearchIpList) + len(dna.postgresqlIpList)) != 1 {
 		errorList.PushBack("Only one node can be deleted at a time")
 		return errorList

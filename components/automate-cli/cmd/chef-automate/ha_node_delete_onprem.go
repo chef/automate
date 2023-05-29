@@ -84,16 +84,23 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 			return nil
 		}
 	}
-	return dni.prepare()
-	//return dni.runDeploy()
+
+	err = dni.prepare()
+	if err != nil {
+		return err
+	}
+
+	return dni.runDeploy()
 }
 
 func (dni *DeleteNodeOnPremImpl) prepare() error {
-
 	// Stop all services on the node to be deleted
-	return dni.nodeUtils.stopServicesOnNode(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIpList, dni.opensearchIpList)
+	err := dni.nodeUtils.stopServicesOnNode(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIpList, dni.opensearchIpList)
+	if err != nil {
+		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
+	}
 
-	//return dni.nodeUtils.taintTerraform(dni.terraformPath)
+	return dni.nodeUtils.taintTerraform(dni.terraformPath)
 }
 
 func (dni *DeleteNodeOnPremImpl) validate() error {
@@ -212,6 +219,7 @@ func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
 		}...)
 	}
 
+	// Check if only one node is being deleted
 	if (len(dni.automateIpList) + len(dni.chefServerIpList) + len(dni.opensearchIpList) + len(dni.postgresqlIpList)) != 1 {
 		errorList.PushBack("Only one node can be deleted at a time")
 		return errorList

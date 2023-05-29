@@ -334,15 +334,14 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, po
 	postgresqlCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	opensearchCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 
-	cmd := "sudo echo 'hello'"
-
 	if len(automateIpList) > 0 {
-		automateCmd = createCmdInputs(automateIpList, cmd)
+		automateCmd = createCmdInputs(automateIpList, STOP_FE_SERVICES_CMD)
 	} else if len(chefServerIpList) > 0 {
-		chefServerCmd = createCmdInputs(chefServerIpList, cmd)
+		chefServerCmd = createCmdInputs(chefServerIpList, STOP_FE_SERVICES_CMD)
 	} else if len(postgresqlIpList) > 0 {
-		postgresqlCmd = createCmdInputs(postgresqlIpList, cmd)
+		postgresqlCmd = createCmdInputs(postgresqlIpList, STOP_BE_SERVICES_CMD)
 	} else if len(opensearchIpList) > 0 {
+		cmd := fmt.Sprintf(EXCLUDE_OPENSEARCH_NODE_REQUEST, opensearchIpList[0]) + STOP_BE_SERVICES_CMD
 		opensearchCmd = createCmdInputs(opensearchIpList, cmd)
 	}
 
