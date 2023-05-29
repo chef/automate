@@ -216,7 +216,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 
 		sshConfig := c.getSshDetails(infra)
 		sshUtil := NewSSHUtil(sshConfig)
-		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(), sshUtil, writer)
+		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(&remoteCmdExecutor{}), sshUtil, writer)
 		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
 
 		if err != nil {
@@ -449,8 +449,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-	
-	oldCn:=getOldCn(automatesConfig)
+
+	oldCn := getOldCn(automatesConfig)
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	cn := nodesCn
@@ -686,7 +686,7 @@ func (c *certRotateFlow) getAllIPs(infra *AutomateHAInfraDetails) []string {
 	return ips
 }
 
-//getFilteredIps will return ips on which cert-rotation need to perform.
+// getFilteredIps will return ips on which cert-rotation need to perform.
 func (c *certRotateFlow) getFilteredIps(serviceIps, skipIpsList []string) []string {
 	filteredIps := []string{}
 	for _, ip := range serviceIps {
@@ -697,7 +697,7 @@ func (c *certRotateFlow) getFilteredIps(serviceIps, skipIpsList []string) []stri
 	return filteredIps
 }
 
-//compareCurrentCertsWithNewCerts compare current certs and new certs and returns ips to skip cert-rotation.
+// compareCurrentCertsWithNewCerts compare current certs and new certs and returns ips to skip cert-rotation.
 func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, newCerts *certificates, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 	isCertsSame := true
@@ -734,7 +734,7 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 	return skipIpsList
 }
 
-//comparePublicCertAndPrivateCert compare new public-cert and private cert with current public-cert and private-cert and returns ips to skip cert-rotation.
+// comparePublicCertAndPrivateCert compare new public-cert and private cert with current public-cert and private-cert and returns ips to skip cert-rotation.
 func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
 	skipIpsList := []string{}
 	for _, currentCerts := range certByIpList {
@@ -753,7 +753,7 @@ func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates,
 	return skipIpsList
 }
 
-//getFrontEndIpsForSkippingRootCAPatching compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
+// getFrontEndIpsForSkippingRootCAPatching compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
 func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService string, newRootCA string, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 
@@ -772,7 +772,7 @@ func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService s
 	return skipIpsList
 }
 
-//getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
+// getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
 func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
 	isRootCaSame := false
 

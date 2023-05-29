@@ -52,6 +52,7 @@ type CmdResult struct {
 
 type RemoteCmdExecutor interface {
 	Execute() (map[string][]*CmdResult, error)
+	Set(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer)
 }
 
 type remoteCmdExecutor struct {
@@ -60,12 +61,31 @@ type remoteCmdExecutor struct {
 	Output  *cli.Writer
 }
 
+type MockRemoteCmdExecutor struct {
+	ExecuteFunc func() (map[string][]*CmdResult, error)
+	SetFunc     func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer)
+}
+
+func (m *MockRemoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {
+	return m.ExecuteFunc()
+}
+
+func (m *MockRemoteCmdExecutor) Set(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
+	m.SetFunc(nodeMap, sshUtil, writer)
+}
+
 func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) RemoteCmdExecutor {
 	return &remoteCmdExecutor{
 		NodeMap: nodeMap,
 		SshUtil: sshUtil,
 		Output:  writer,
 	}
+}
+
+func (c *remoteCmdExecutor) Set(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
+	c.NodeMap = nodeMap
+	c.SshUtil = sshUtil
+	c.Output = writer
 }
 
 func (c *remoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {

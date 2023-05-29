@@ -494,7 +494,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+		stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
@@ -564,7 +564,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+		stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,

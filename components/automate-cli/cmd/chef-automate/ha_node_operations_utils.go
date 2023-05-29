@@ -56,7 +56,7 @@ type MockNodeUtilsImpl struct {
 	moveAWSAutoTfvarsFileFunc                 func(path string) error
 	modifyTfArchFileFunc                      func(path string) error
 	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
-	stopServicesOnNodeFunc                    func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error
+	stopServicesOnNodeFunc                    func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -115,8 +115,8 @@ func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
 func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
 	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
 }
-func (mnu *MockNodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
-	return mnu.stopServicesOnNodeFunc(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList)
+func (mnu *MockNodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+	return mnu.stopServicesOnNodeFunc(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList, infra, sshUtil)
 }
 
 type NodeOpUtils interface {
@@ -138,13 +138,17 @@ type NodeOpUtils interface {
 	moveAWSAutoTfvarsFile(string) error
 	modifyTfArchFile(string) error
 	getAWSConfigIp() (*AWSConfigIp, error)
-	stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error
+	stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error
 }
 
-type NodeUtilsImpl struct{}
+type NodeUtilsImpl struct {
+	cmdUtil RemoteCmdExecutor
+}
 
-func NewNodeUtils() NodeOpUtils {
-	return &NodeUtilsImpl{}
+func NewNodeUtils(cmdUtil RemoteCmdExecutor) NodeOpUtils {
+	return &NodeUtilsImpl{
+		cmdUtil: cmdUtil,
+	}
 }
 
 func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
@@ -327,7 +331,7 @@ func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
 }
 
 // Stop services on node
-func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 	frontendCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	automateCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	chefServerCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
@@ -345,11 +349,6 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, po
 		opensearchCmd = createCmdInputs(opensearchIpList, cmd)
 	}
 
-	infra, sshConfig, err := nu.getHaInfraDetails()
-	if err != nil {
-		return err
-	}
-
 	nodeMap := &NodeTypeAndCmd{
 		Frontend:   frontendCmd,
 		Automate:   automateCmd,
@@ -359,9 +358,9 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, po
 		Infra:      infra,
 	}
 
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, NewSSHUtil(sshConfig), writer)
+	nu.cmdUtil.Set(nodeMap, sshUtil, writer)
 
-	_, err = cmdUtil.Execute()
+	_, err := nu.cmdUtil.Execute()
 	if err != nil {
 		return err
 	}

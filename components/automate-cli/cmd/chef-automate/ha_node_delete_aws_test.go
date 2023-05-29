@@ -463,7 +463,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 				return nil
 			},
 		},
@@ -539,7 +539,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string) error {
+			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 				return nil
 			},
 		},

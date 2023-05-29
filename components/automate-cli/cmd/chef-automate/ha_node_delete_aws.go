@@ -144,7 +144,12 @@ func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 
 func (dna *DeleteNodeAWSImpl) prepare() error {
 	// Stop all services on the node to be deleted
-	err := dna.nodeUtils.stopServicesOnNode(dna.automateIpList, dna.chefServerIpList, dna.postgresqlIpList, dna.opensearchIpList)
+	infra, _, err := dna.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	err = dna.nodeUtils.stopServicesOnNode(dna.automateIpList, dna.chefServerIpList, dna.postgresqlIpList, dna.opensearchIpList, infra, dna.sshUtil)
 	if err != nil {
 		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
 	}

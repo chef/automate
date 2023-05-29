@@ -95,7 +95,12 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 
 func (dni *DeleteNodeOnPremImpl) prepare() error {
 	// Stop all services on the node to be deleted
-	err := dni.nodeUtils.stopServicesOnNode(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIpList, dni.opensearchIpList)
+	infra, _, err := dni.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	err = dni.nodeUtils.stopServicesOnNode(dni.automateIpList, dni.chefServerIpList, dni.postgresqlIpList, dni.opensearchIpList, infra, dni.sshUtil)
 	if err != nil {
 		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
 	}

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -183,7 +184,7 @@ func TestIsFinalInstanceCountAllowed(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
 	assert.NoError(t, err)
@@ -195,7 +196,7 @@ func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
 	dir := t.TempDir()
 
 	err := os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
@@ -207,7 +208,7 @@ func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
 	dir := t.TempDir()
 
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
@@ -220,7 +221,7 @@ func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
 }
 
 func TestModifyTfArchFile(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
@@ -233,8 +234,109 @@ func TestModifyTfArchFile(t *testing.T) {
 }
 
 func TestModifyTfArchFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
 	dir := t.TempDir()
 	err := nodeUtil.modifyTfArchFile(dir)
 	assert.Error(t, err)
+}
+
+func TestStopServicesOnNodeA2(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
+			// do nothing
+		},
+	})
+	err = nodeUtil.stopServicesOnNode([]string{TEST_IP_1}, nil, nil, nil, infra, &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return &SSHConfig{}
+		},
+	})
+	assert.NoError(t, err)
+}
+func TestStopServicesOnNodeCS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
+			// do nothing
+		},
+	})
+	err = nodeUtil.stopServicesOnNode(nil, []string{TEST_IP_1}, nil, nil, infra, &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return &SSHConfig{}
+		},
+	})
+	assert.NoError(t, err)
+}
+func TestStopServicesOnNodePG(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
+			// do nothing
+		},
+	})
+	err = nodeUtil.stopServicesOnNode(nil, nil, []string{TEST_IP_1}, nil, infra, &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return &SSHConfig{}
+		},
+	})
+	assert.NoError(t, err)
+}
+func TestStopServicesOnNodeOS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
+			// do nothing
+		},
+	})
+	err = nodeUtil.stopServicesOnNode(nil, nil, nil, []string{TEST_IP_1}, infra, &MockSSHUtilsImpl{
+		getSSHConfigFunc: func() *SSHConfig {
+			return &SSHConfig{}
+		},
+	})
+	assert.NoError(t, err)
 }
