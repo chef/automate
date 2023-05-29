@@ -517,7 +517,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.CHEF_SERVER_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        true,
 						SuccessMsg:    constants.A2_CS_SUCCESS_MESSAGE,
 						ErrorMsg:      "",
@@ -550,7 +550,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
 					},
 					{
-						Title:         constants.CHEF_SERVER_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
@@ -583,7 +583,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.AUTOMATE_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        true,
 						SuccessMsg:    constants.A2_CS_SUCCESS_MESSAGE,
 						ErrorMsg:      "",
@@ -616,7 +616,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
 					},
 					{
-						Title:         constants.AUTOMATE_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
@@ -649,7 +649,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.AUTOMATE_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
@@ -682,7 +682,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.CHEF_SERVER_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
@@ -715,7 +715,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.AUTOMATE_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
@@ -748,7 +748,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.CHEF_SERVER_TITLE,
+						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,

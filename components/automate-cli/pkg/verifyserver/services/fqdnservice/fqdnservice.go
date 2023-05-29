@@ -61,10 +61,17 @@ func createErrorMessage(setNodes map[string]int) string {
 }
 
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
-func (fq *FqdnService) fqdnReachable(fqdn, rootCert, port string) models.Checks {
+func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType, port string) models.Checks {
 	client := fq.createClient(rootCert)
+	var url string
 
-	res, err := client.Get(fmt.Sprintf("https://%s:%s", fqdn, port))
+	if nodeType == constants.CHEF_INFRA_SERVER {
+		url = fmt.Sprintf("https://%s:%s/_status", fqdn, port)
+	} else {
+		url = fmt.Sprintf("https://%s:%s", fqdn, port)
+	}
+
+	res, err := client.Get(url)
 	if err != nil {
 		fq.log.Error(err.Error())
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
@@ -139,7 +146,7 @@ func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
 }
 
 // checkServiceStatus function will check that all the services are in ok state or not.
-func (fq *FqdnService) CheckServiceStatus(fqdn, rootCert, port string, reqNodes []string) models.Checks {
+func (fq *FqdnService) CheckServiceStatus(fqdn, rootCert string, reqNodes []string, port string) models.Checks {
 	setNodes := make(map[string]int)
 	for _, k := range reqNodes {
 		setNodes[k] += 1
@@ -174,12 +181,12 @@ func (fq *FqdnService) CheckServiceStatus(fqdn, rootCert, port string, reqNodes 
 		delete(setNodes, chanResult)
 		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
 		if len(setNodes) == 0 {
-			return createCheck(constants.CHEF_SERVER_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", "")
+			return createCheck(constants.A2_CS_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", "")
 		}
 	}
 
 	temp := createErrorMessage(setNodes)
-	return createCheck(constants.CHEF_SERVER_TITLE, false, "", fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, temp), constants.A2_CS_RESOLUTION_MESSAGE)
+	return createCheck(constants.A2_CS_TITLE, false, "", fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, temp), constants.A2_CS_RESOLUTION_MESSAGE)
 }
 
 func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
@@ -195,11 +202,11 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string) models.FqdnResponse {
 	var response = models.FqdnResponse{}
 
-	check := fq.fqdnReachable(req.Fqdn, req.RootCert, port)
+	check := fq.fqdnReachable(req.Fqdn, req.RootCert, req.NodeType, port)
 	response.Checks = append(response.Checks, check)
 
 	if req.IsAfterDeployment {
-		check = fq.CheckServiceStatus(req.Fqdn, req.RootCert, port, req.Nodes)
+		check = fq.CheckServiceStatus(req.Fqdn, req.RootCert, req.Nodes, port)
 		response.Checks = append(response.Checks, check)
 	} else {
 		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, port)
