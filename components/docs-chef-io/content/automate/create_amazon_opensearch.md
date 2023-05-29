@@ -14,7 +14,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-This guide will walk you through the process of creating an Amazon OpenSearch 1.3 cluster and retrieving the necessary connection details, including the hostname, username, and password.
+This guide will walk you through the process of creating an Amazon OpenSearch cluster and retrieving the necessary connection details, including the hostname, username, and password.
 
 ### Prerequisites
 Before proceeding, make sure you have the following prerequisites in place:
