@@ -4,23 +4,39 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ansrivas/fiberprometheus"
+	"github.com/ansrivas/fiberprometheus/v2"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/certificatechecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/softwareversionchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/sshuseraccesschecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
-	"github.com/gofiber/fiber/middleware"
+	"github.com/chef/automate/lib/userutils"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/sirupsen/logrus"
 )
 
@@ -55,7 +71,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 
 	l.Info("Using TimeZone: " + fiberutils.CfgLogTimeZone())
 
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
@@ -66,11 +82,10 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddBatchCheckService(
 			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(
 				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
-				trigger.NewSshUserAccessCheck(),
-				trigger.NewCertificateCheck(),
+				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, port),
+				certificatechecktrigger.NewCertificateCheck(l, port),
 				trigger.NewExternalOpensearchCheck(),
 				trigger.NewExternalPostgresCheck(),
-				trigger.NewFirewallCheck(),
 				trigger.NewFqdnCheck(),
 				trigger.NewNfsBackupConfigCheck(),
 				trigger.NewOpensearchS3BucketAccessCheck(),
@@ -78,10 +93,18 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
+				firewallchecktrigger.NewFirewallCheck(l, port),
 			))).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
-		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath))
+		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
+		AddMockServerServices(startmockserverservice.New(l)).
+		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
+		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
+		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
+		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
+		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(),fileutils.NewFileSystemUtils(),l)).
+		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp()))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
@@ -107,7 +130,7 @@ func (vs *VerifyServer) Setup(isMetricsRequired bool) {
 	vs.App.Use(cors.New())
 
 	// Define middleware to log all requests
-	vs.App.Use(middleware.Logger(fiberutils.GetLogConfig(vs.Log)))
+	vs.App.Use(fiberlogger.New(fiberutils.GetLogConfig(vs.Log)))
 
 	// Added this condition to avoid error "duplicate metrics collector registration attempted"
 	if isMetricsRequired {

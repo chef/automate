@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +22,7 @@ func SetupNFSMountHandler(nm nfsmountservice.INFSService) (*fiber.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}
@@ -579,7 +579,7 @@ func TestNFSMount(t *testing.T) {
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := ioutil.ReadAll(res.Body) //nosemgrep
 			assert.NoError(t, err, test.TestName)
 			assert.JSONEq(t, string(body), test.ExpectedBody)
 			assert.Equal(t, test.ExpectedCode, res.StatusCode)

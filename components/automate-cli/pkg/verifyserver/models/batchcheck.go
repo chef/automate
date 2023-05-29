@@ -1,6 +1,6 @@
 package models
 
-import "github.com/gofiber/fiber"
+import "github.com/gofiber/fiber/v2"
 
 type BatchCheckRequest struct {
 	Checks []string `json:"checks"`
@@ -123,4 +123,29 @@ type HardwareResourceCountApiResult struct {
 	IP       string   `json:"ip"`
 	NodeType string   `json:"node_type"`
 	Checks   []Checks `json:"checks"`
+}
+
+type CertificateCheckRequest struct {
+	RootCertificate  string `json:"root_certificate"`
+	PrivateKey       string `json:"private_key"`
+	NodeCertificate  string `json:"node_certificate"`
+	AdminPrivateKey  string `json:"admin_private_key"`
+	AdminCertificate string `json:"admin_certificate"`
+}
+
+type SShUserRequest struct {
+	IP           string `json:"ip"`
+	Username     string `json:"user_name"`
+	PrivateKey   string `json:"private_key"`
+	SudoPassword string `json:"sudo_password"`
+}
+
+type FirewallRequest struct {
+	SourceNodeIP               string `json:"source_node_ip"`
+	DestinationNodeIP          string `json:"destination_node_ip"`
+	DestinationServicePort     string `json:"destination_service_port"`
+	DestinationServiceProtocol string `json:"destination_service_protocol"`
+	Cert                       string `json:"cert"`
+	Key                        string `json:"key"`
+	RootCert                   string `json:"root_cert"`
 }

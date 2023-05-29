@@ -54,5 +54,6 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- migrate-from-v1 - Run preflight checks specific to migrating from Chef Automate v1
+- migrate-from-v1 - Run preflight checks specific to migrating from Chef Automate
+  v1
 supported_on: FrontEnd

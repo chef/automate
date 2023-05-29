@@ -224,58 +224,55 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 }
 
 func TestDoAPICall(t *testing.T) {
+	testPort1 := "3066"
+	testPort2 := "3067"
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT))
 	}))
-	err := startMockServerOnCustomPort(mockServer, "1234")
+	err := startMockServerOnCustomPort(mockServer, testPort1)
 	assert.NoError(t, err)
 	defer mockServer.Close()
 	mockServer2 := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Invalid JSON"))
 	}))
-	err = startMockServerOnCustomPort(mockServer2, "1235")
+	err = startMockServerOnCustomPort(mockServer2, testPort2)
 	assert.NoError(t, err)
 	defer mockServer.Close()
 	tests := []struct {
 		TestName                     string
 		URL                          string
-		InvalidURLResponse           bool
 		ExpectedCheckListReponsePass bool
+		Port                         string
 		ExpectedError                error
 	}{
 		{
 			TestName:                     "Valid URL with running Server",
 			URL:                          "localhost",
-			InvalidURLResponse:           false,
 			ExpectedCheckListReponsePass: true,
+			Port:                         testPort1,
 			ExpectedError:                nil,
 		},
 		{
 			TestName:                     "Invalid URL",
 			URL:                          "http:/anything.com",
-			InvalidURLResponse:           false,
 			ExpectedCheckListReponsePass: false,
+			Port:                         testPort1,
 			ExpectedError:                errors.New(""),
 		},
 		{
 			TestName:                     "Valid URL but Some Different Response",
 			URL:                          "localhost",
-			InvalidURLResponse:           true,
 			ExpectedCheckListReponsePass: false,
+			Port:                         testPort2,
 			ExpectedError:                errors.New(""),
 		},
 	}
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			testPort := "1234"
-			// we have two test server running on port 1235 we have wrong response giving server running
-			if e.InvalidURLResponse {
-				testPort = "1235"
-			}
-			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			nm := NewNFSMountService(logger.NewTestLogger(), e.Port)
 			resp, err := nm.doAPICall(e.URL, "/mount-location")
 			if e.ExpectedError != nil {
 				assert.Error(t, err)
@@ -290,11 +287,12 @@ func TestDoAPICall(t *testing.T) {
 }
 
 func TestGetNFSMountDetails(t *testing.T) {
+	Testport := "3068"
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(SUCCESS_NFS_MOUNT_LOC_RESPONSE_BODY_WITH_RESULT_STRUCT))
 	}))
-	err := startMockServerOnCustomPort(mockServer, "1234")
+	err := startMockServerOnCustomPort(mockServer, Testport)
 	assert.NoError(t, err)
 	defer mockServer.Close()
 	tests := []struct {
@@ -370,8 +368,7 @@ func TestGetNFSMountDetails(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			testPort := "1234"
-			nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+			nm := NewNFSMountService(logger.NewTestLogger(), Testport)
 			resp := nm.GetNFSMountDetails(e.ReqBody)
 			for index, te := range *resp {
 				if e.Response[index].Error != nil {

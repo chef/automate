@@ -62,6 +62,15 @@ Ensure access for the backup type used:
          # Use "m" for megabytes and "g" for gigabytes
      ```
 
+{{< note >}}
+
+- If restoring the backup from an older version of Automate, you must provide the `--airgap-bundle </path/to/current/bundle>` with your restore command.
+
+- In a non-airgapped or Internet-connected environment, the user can create an airgap-bundle using the `chef-automate airgap-bundle create --version <CURRENT_INSTALLED_VERSION>` command.
+
+{{< /note >}}
+
+
 ## Restore From a Filesystem Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
@@ -70,6 +79,7 @@ Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before
 
 If you have [configured the backup directory]({{< relref "backup.md#backup-to-a-filesystem" >}}) to a directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory.
 Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
+
 
 To restore on a new host, run:
 
@@ -144,19 +154,19 @@ See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
 To restore from an AWS S3 bucket backup on a new host, run:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --s3-access-key <access_key> --s3-secret-key <secret_key>
 ```
 
 To restore from an AWS S3 bucket backup on an existing Chef Automate host, run:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key <access_key> --s3-secret-key <secret_key>
 ```
 
 Use the `--patch-config` option with a [configuration patch file]({{< relref "restore.md#prerequisites" >}}) to restore to a host with a different FQDN than that of the backup host:
 
 ```shell
-chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config </path/to/patch.toml> --skip-preflight --s3-access-key <access_key> --s3-secret-key <secret_key>
 ```
 
 A successful restore shows the timestamp of the backup used at the end of the status output:

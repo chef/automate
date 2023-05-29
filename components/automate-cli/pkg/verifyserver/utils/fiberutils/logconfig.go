@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/middleware"
+	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,8 +30,8 @@ func CfgLogTimeZone() string {
 	return timeZone
 }
 
-func GetLogConfig(log logger.Logger) (lc middleware.LoggerConfig) {
-	lc = middleware.LoggerConfig{
+func GetLogConfig(log logger.Logger) (lc fiberlogger.Config) {
+	lc = fiberlogger.Config{
 		TimeFormat: time.RFC3339,
 	}
 	if log.NewEntry().Logger.GetLevel() <= logrus.DebugLevel {

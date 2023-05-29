@@ -60,7 +60,8 @@ errors:
   description: An issue occurred during the upgrade
   code: "87"
 - name: MarshalError
-  description: Unable to convert or deconvert a textual representation of an internal object
+  description: Unable to convert or deconvert a textual representation of an internal
+    object
   code: "88"
 - name: LicenseError
   description: The license is invalid, expired or incomplete

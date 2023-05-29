@@ -3,7 +3,7 @@ package fiberutils
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/utils"
 )
 
@@ -24,7 +24,7 @@ func LogResgisteredRoutes(stack [][]*fiber.Route, logger logger.Logger) {
 	}
 }
 
-func CustomErrorHandler(ctx *fiber.Ctx, err error) {
+func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 	// Status code defaults to 500
 	code := fiber.StatusInternalServerError
 	msg := utils.StatusMessage(fiber.StatusInternalServerError)
@@ -33,5 +33,5 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) {
 		code = e.Code
 		msg = e.Message
 	}
-	ctx.Status(code).JSON(response.BuildFailedResponse(fiber.NewError(code, msg)))
+	return ctx.Status(code).JSON(response.BuildFailedResponse(fiber.NewError(code, msg)))
 }

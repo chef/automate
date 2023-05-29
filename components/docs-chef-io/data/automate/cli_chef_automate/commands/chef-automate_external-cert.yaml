@@ -26,5 +26,6 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- show - Show the external TLS/SSL certificates in Automate. Optionally, save the certificates to a file in the specified path.
+- show - Show the external TLS/SSL certificates in Automate. Optionally, save the
+  certificates to a file in the specified path.
 supported_on: FrontEnd

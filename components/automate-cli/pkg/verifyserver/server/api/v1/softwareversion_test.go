@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,7 +43,7 @@ func SetupMockSoftwareVersionService(response models.SoftwareVersionDetails, err
 
 func SetupCheckSoftwareVersionChecksHandler(sv softwareversionservice.ISoftwareVersionService) *fiber.App {
 	log, _ := logger.NewLogger("text", "debug")
-	fconf := &fiber.Settings{
+	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,
 		ErrorHandler: fiberutils.CustomErrorHandler,
 	}

@@ -15,6 +15,8 @@ const EXTERNAL_POSTGRESQL = "external-postgresql"
 const NFS_BACKUP_CONFIG = "nfs-backup-config"
 
 const HARDWARE_RESOURCE_COUNT_MSG = "Hardware Resource Count Check"
+const SSH_USER_MSG = "SSH User Access Check"
+const CERTIFICATE_MSG = "Certificate check"
 
 func GetBastionChecks() []string {
 	var checks = []string{

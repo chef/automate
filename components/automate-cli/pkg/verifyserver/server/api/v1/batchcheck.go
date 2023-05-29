@@ -9,25 +9,23 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/lib/stringutils"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handler) BatchCheck(c *fiber.Ctx) {
+func (h *Handler) BatchCheck(c *fiber.Ctx) error {
 	req := new(models.BatchCheckRequest)
 	if err := c.BodyParser(req); err != nil {
 		errString := fmt.Sprintf("batch check request body parsing failed: %v", err.Error())
 		h.Logger.Error(fmt.Errorf(errString))
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: errString})
-		return
+		return fiber.NewError(http.StatusBadRequest, errString)
 	}
 	err := validateChecks(req.Checks)
 	if err != nil {
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: err.Error()})
-		return
+		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
 
 	resp := h.BatchCheckService.BatchCheck(req.Checks, req.Config)
-	c.Status(fiber.StatusOK).JSON(response.BuildSuccessResponse(resp.Result))
+	return c.Status(fiber.StatusOK).JSON(response.BuildSuccessResponse(resp.Result))
 }
 
 func validateChecks(checks []string) error {

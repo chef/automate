@@ -1,7 +1,9 @@
 package v1
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
-func (h *Handler) CheckFqdn(c *fiber.Ctx) {}
+func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
+	return nil
+}

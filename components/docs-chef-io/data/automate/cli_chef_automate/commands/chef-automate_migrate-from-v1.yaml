@@ -2,7 +2,8 @@ name: chef-automate migrate-from-v1
 synopsis: Migrate from Chef Automate v1
 usage: |
   chef-automate migrate-from-v1 [/path/to/automate-deploy.toml] [flags]
-description: "Migrate an existing Chef Automate v1 deployment to Chef Automate v2.\n\t- <CONFIG_FILE> must be a valid path to a TOML formatted configuration file"
+description: "Migrate an existing Chef Automate v1 deployment to Chef Automate v2.\n\t-
+  <CONFIG_FILE> must be a valid path to a TOML formatted configuration file"
 options:
 - name: airgap-bundle
   usage: Path to an airgap install bundle

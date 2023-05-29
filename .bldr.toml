@@ -442,6 +442,7 @@ paths = [
   "lib/config/*",
   "lib/config_parser/*",
   "lib/db/*",
+  "lib/executil/*",
   "lib/grpc/*",
   "lib/httputils/*",
   "lib/io/*",
@@ -460,6 +461,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+  "lib/userutils/*",
   "lib/uuid4/*",
   "lib/verification/*",
   "lib/version/*"

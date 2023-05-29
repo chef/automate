@@ -39,7 +39,8 @@ see_also:
 - cancel - cancel the running backup operation
 - create - create a backup of Chef Automate
 - delete - delete backups of Chef Automate
-- fix-repo-permissions - Ensure the hab user has the required permissions on the given path
+- fix-repo-permissions - Ensure the hab user has the required permissions on the given
+  path
 - integrity - Chef Automate shared object integrity
 - list - list all Chef Automate backups
 - restore - restore a Chef Automate backup
