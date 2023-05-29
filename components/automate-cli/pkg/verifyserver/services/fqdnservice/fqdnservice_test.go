@@ -213,7 +213,7 @@ func startHTTPSMockServer(mockServer *httptest.Server, port string) error {
 func TestCheckFqdnReachability(t *testing.T) {
 	httpsSuccessPort := "2345"
 	httpsFailurePort := "3345"
-	httpsFailedUnmarshalPort := "4345"
+	httpsFailedServerPort := "4345"
 	httpsSuccessMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/":
@@ -222,14 +222,9 @@ func TestCheckFqdnReachability(t *testing.T) {
 			w.Write([]byte("OK"))
 		case "/_status":
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{
-				"status": "pong"
-			}`))
-		case "/api/v0/status":
+		case "/check_status":
+			w.Header().Set("X-Real-IP", "172.154.0.2")
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{
-				"ok": true
-			}`))
 		default:
 			http.NotFound(w, r)
 		}
@@ -247,14 +242,9 @@ func TestCheckFqdnReachability(t *testing.T) {
 			w.Write([]byte("OK"))
 		case "/_status":
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{
-				"status": "ping"
-			}`))
-		case "/api/v0/status":
+		case "check_status":
+			w.Header().Set("X-Real-IP", "172.154.0.1")
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{
-				"ok": false
-			}`))
 		default:
 			http.NotFound(w, r)
 		}
@@ -264,26 +254,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 	assert.NoError(t, err)
 	defer httpsFailureMockServer.Close()
 
-	httpsFailedUnmarshalMockserver := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/":
-			w.Header().Set("x-server-ip", "172.154.0.2")
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
-		case "/_status":
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("test"))
-		case "/api/v0/status":
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("test"))
-		default:
-			http.NotFound(w, r)
-		}
+	httpsFailedResponseserver := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
 	}))
 
-	err = startHTTPSMockServer(httpsFailedUnmarshalMockserver, httpsFailedUnmarshalPort)
+	err = startHTTPSMockServer(httpsFailedResponseserver, httpsFailedServerPort)
 	assert.NoError(t, err)
-	defer httpsFailedUnmarshalMockserver.Close()
+	defer httpsFailedResponseserver.Close()
 
 	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
 	assert.NotNil(t, fq)
@@ -553,7 +530,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
 					},
 				},
@@ -619,7 +596,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
 					},
 				},
@@ -652,7 +629,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
 					},
 				},
@@ -685,7 +662,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.A2_CS_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
 					},
 				},
@@ -693,45 +670,12 @@ func TestCheckFqdnReachability(t *testing.T) {
 			httpsFailurePort,
 		},
 		{
-			"Case is After Deployment, FQDN is reachable, Automate Status is giving wrong response",
-			models.FqdnRequest{
-				Fqdn:              LOCALHOST,
-				NodeType:          constants.AUTOMATE,
-				RootCert:          CA_CERT,
-				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
-				Nodes: []string{
-					"172.154.0.2",
-				},
-			},
-			models.FqdnResponse{
-				Passed: false,
-				Checks: []models.Checks{
-					{
-						Title:         constants.FQDN_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
-					{
-						Title:         constants.A2_CS_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
-						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
-					},
-				},
-			},
-			httpsFailedUnmarshalPort,
-		},
-		{
-			"Case is After Deployment, FQDN is reachable, Chef Server Status is giving wrong response",
+			"Case is Before Deployment, FQDN is giving bad gateway, Nodes are not reachable, Certicate is valid",
 			models.FqdnRequest{
 				Fqdn:              LOCALHOST,
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
-				IsAfterDeployment: true,
+				IsAfterDeployment: false,
 				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
@@ -742,21 +686,28 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Checks: []models.Checks{
 					{
 						Title:         constants.FQDN_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.FQDN_ERROR_MESSAGE,
+						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.NODE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
+						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
-					{
-						Title:         constants.A2_CS_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      constants.A2_CS_ERROR_MESSAGE,
-						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
-					},
 				},
 			},
-			httpsFailedUnmarshalPort,
+			httpsFailedServerPort,
 		},
 	}
 
