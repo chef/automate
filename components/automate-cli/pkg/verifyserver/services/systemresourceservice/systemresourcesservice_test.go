@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/enums"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -17,7 +18,7 @@ import (
 
 type testCase struct {
 	testCaseDescription string
-	nodeType            constants.NodeType
+	nodeType            enums.NodeType
 	respWant            *models.Checks
 	mockSystemResource  systemresource.SystemResourceInfo
 	mockFileUtils       fileutils.FileUtils
@@ -319,7 +320,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "Pre-deployment hab free space check | automate",
-			nodeType:            constants.NodeTypeAutomate,
+			nodeType:            enums.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_A2), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -335,7 +336,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | chef-serve",
-			nodeType:            constants.NodeTypeChefServer,
+			nodeType:            enums.NodeTypeChefServer,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_CS), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -351,7 +352,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | postgresql",
-			nodeType:            constants.NodeTypePostgresql,
+			nodeType:            enums.NodeTypePostgresql,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_PG), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -367,7 +368,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | opensearch",
-			nodeType:            constants.NodeTypeOpensearch,
+			nodeType:            enums.NodeTypeOpensearch,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_OS), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -383,7 +384,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | bastion",
-			nodeType:            constants.NodeTypeBastion,
+			nodeType:            enums.NodeTypeBastion,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_BASTION), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -399,7 +400,7 @@ func TestGetHabFreeSpaceCheckPreDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Pre-deployment hab free space check | automate",
-			nodeType:            constants.NodeTypeAutomate,
+			nodeType:            enums.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(constants.ERROR_MSG, "/hab", float64(constants.HAB_FREE_DISK_BEFORE_DEP_A2-1)), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_BEFORE_DEP_A2)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -447,7 +448,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 	testCases := []testCase{
 		{
 			testCaseDescription: "Post-deployment hab free space check | automate",
-			nodeType:            constants.NodeTypeAutomate,
+			nodeType:            enums.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -463,7 +464,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | automate",
-			nodeType:            constants.NodeTypeAutomate,
+			nodeType:            enums.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(constants.ERROR_MSG, "/hab", float64(14)), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_A2)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -479,7 +480,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | chef-server",
-			nodeType:            constants.NodeTypeChefServer,
+			nodeType:            enums.NodeTypeChefServer,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(constants.ERROR_MSG, "/hab", float64(constants.HAB_FREE_DISK_AFTER_DEP_CS-1)), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_CS)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -495,7 +496,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | opensearch",
-			nodeType:            constants.NodeTypeOpensearch,
+			nodeType:            enums.NodeTypeOpensearch,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_OS)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -511,7 +512,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | opensearch",
-			nodeType:            constants.NodeTypeOpensearch,
+			nodeType:            enums.NodeTypeOpensearch,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", fmt.Sprintf(constants.ERROR_MSG, "/hab", float64(100)), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_OS)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER*100)),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -527,7 +528,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | postgresql",
-			nodeType:            constants.NodeTypePostgresql,
+			nodeType:            enums.NodeTypePostgresql,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_PG)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -543,7 +544,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | bastion",
-			nodeType:            constants.NodeTypeBastion,
+			nodeType:            enums.NodeTypeBastion,
 			respWant:            srv.GetChecksModel(true, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), fmt.Sprintf(constants.SUCCESS_MSG, "/hab", constants.HAB_FREE_DISK_AFTER_DEP_BASTION)+fmt.Sprintf(constants.SUCCESS_MSG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER*100), "", ""),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -559,7 +560,7 @@ func TestGetHabFreeSpaceCheckPostDeployment(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Post-deployment hab free space check | error case",
-			nodeType:            constants.NodeTypeAutomate,
+			nodeType:            enums.NodeTypeAutomate,
 			respWant:            srv.GetChecksModel(false, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), "", "error occured while fetching disk space info", constants.RESOLUTION_MSG),
 			mockSystemResource: &systemresource.MockSystemResourceInfoImpl{
 				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
@@ -594,8 +595,8 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 		respWant            *models.ApiResult
 		mockSystemResource  *systemresource.MockSystemResourceInfoImpl
 		mockFsUtils         fileutils.FileUtils
-		nodeType            constants.NodeType
-		deploymentState     constants.DeploymentState
+		nodeType            enums.NodeType
+		deploymentState     enums.DeploymentState
 	}
 
 	validChecks := []models.Checks{
@@ -638,8 +639,8 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 			},
 			mockSystemResource: mockSystemResourceInfo,
 			mockFsUtils:        mockFsUtils,
-			nodeType:           constants.NodeTypeAutomate,
-			deploymentState:    constants.DeploymentStatePreDeploy,
+			nodeType:           enums.NodeTypeAutomate,
+			deploymentState:    enums.DeploymentStatePreDeploy,
 		},
 		{
 			testCaseDescription: "nodeType=automate,deploymentState=postDeploy",
@@ -649,8 +650,8 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 			},
 			mockSystemResource: mockSystemResourceInfo,
 			mockFsUtils:        mockFsUtils,
-			nodeType:           constants.NodeTypeAutomate,
-			deploymentState:    constants.DeploymentStatePostDeploy,
+			nodeType:           enums.NodeTypeAutomate,
+			deploymentState:    enums.DeploymentStatePostDeploy,
 		},
 		{
 			testCaseDescription: "nodeType=automate,deploymentState=preDeploy",
@@ -660,8 +661,8 @@ func TestGetSystemResourcesForDeployment(t *testing.T) {
 			},
 			mockSystemResource: mockSystemResourceInfo,
 			mockFsUtils:        mockFsUtils,
-			nodeType:           constants.NodeTypeAutomate,
-			deploymentState:    constants.DeploymentStatePostDeploy,
+			nodeType:           enums.NodeTypeAutomate,
+			deploymentState:    enums.DeploymentStatePostDeploy,
 		},
 	}
 

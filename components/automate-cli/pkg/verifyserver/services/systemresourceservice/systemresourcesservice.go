@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/enums"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
@@ -13,7 +14,7 @@ import (
 )
 
 type SystemResourcesService interface {
-	GetSystemResourcesForDeployment(constants.NodeType, constants.DeploymentState) *models.ApiResult
+	GetSystemResourcesForDeployment(enums.NodeType, enums.DeploymentState) *models.ApiResult
 }
 
 type SystemResourcesServiceImpl struct {
@@ -30,7 +31,7 @@ func NewSystemResourceService(log logger.Logger, sysResInfo systemresource.Syste
 	}
 }
 
-func (srs *SystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType constants.NodeType, deploymentState constants.DeploymentState) *models.ApiResult {
+func (srs *SystemResourcesServiceImpl) GetSystemResourcesForDeployment(nodeType enums.NodeType, deploymentState enums.DeploymentState) *models.ApiResult {
 
 	srsResponse := &models.ApiResult{
 		Passed: true,
@@ -120,19 +121,19 @@ func (srs *SystemResourcesServiceImpl) CheckMemorySize() *models.Checks {
 	return srs.GetChecksModel(false, constants.MEMORY_SIZE_CHECK_TITLE, "", errorMsg, resolutionMsg)
 }
 
-func (srs *SystemResourcesServiceImpl) CheckHabFreeSpace(nodeType constants.NodeType, deploymentState constants.DeploymentState) *models.Checks {
+func (srs *SystemResourcesServiceImpl) CheckHabFreeSpace(nodeType enums.NodeType, deploymentState enums.DeploymentState) *models.Checks {
 
 	switch deploymentState {
-	case constants.DeploymentStatePreDeploy:
+	case enums.DeploymentStatePreDeploy:
 		return srs.CheckHabFreeSpacePreDeployment(nodeType)
-	case constants.DeploymentStatePostDeploy:
+	case enums.DeploymentStatePostDeploy:
 		return srs.CheckHabFreeSpacePostDeployment(nodeType)
 	}
 	return &models.Checks{}
 }
 
-func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePreDeployment(nodeType constants.NodeType) *models.Checks {
-	srs.logger.Debug("Hab free space check is running for node_type : ", nodeType, " and deployment_state :", constants.DeploymentStatePreDeploy)
+func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePreDeployment(nodeType enums.NodeType) *models.Checks {
+	srs.logger.Debug("Hab free space check is running for node_type : ", nodeType, " and deployment_state :", enums.DeploymentStatePreDeploy)
 
 	currentFreeSpaceInGB, err := srs.GetFreeDiskSpaceOfGivenDir("/hab")
 
@@ -145,27 +146,27 @@ func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePreDeployment(nodeType c
 	srs.logger.Debugf("The current total free space in hab : %0.2fGB", currentFreeSpaceInGB)
 
 	switch nodeType {
-	case constants.NodeTypeAutomate:
+	case enums.NodeTypeAutomate:
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_A2, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_A2, constants.PRE_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypeChefServer:
+	case enums.NodeTypeChefServer:
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_CS, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_CS, constants.PRE_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypeOpensearch:
+	case enums.NodeTypeOpensearch:
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_OS, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_OS, constants.PRE_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypePostgresql:
+	case enums.NodeTypePostgresql:
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_PG, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_PG, constants.PRE_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypeBastion:
+	case enums.NodeTypeBastion:
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(constants.HAB_FREE_DISK_BEFORE_DEP_BASTION, currentFreeSpaceInGB, 0, constants.HAB_FREE_DISK_BEFORE_DEP_BASTION, constants.PRE_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
 	}
 	return resp
 }
 
-func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePostDeployment(nodeType constants.NodeType) *models.Checks {
-	srs.logger.Debugf("Hab free space check is running for node_type : %s  and deployment_state : %s", nodeType, constants.DeploymentStatePostDeploy)
+func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePostDeployment(nodeType enums.NodeType) *models.Checks {
+	srs.logger.Debugf("Hab free space check is running for node_type : %s  and deployment_state : %s", nodeType, enums.DeploymentStatePostDeploy)
 	currentFreeSpaceInGB, err := srs.GetFreeDiskSpaceOfGivenDir("/hab")
 	var resp *models.Checks
 	if err != nil {
@@ -184,23 +185,23 @@ func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePostDeployment(nodeType 
 	srs.logger.Debugf("current total space in /hab : %0.2f", totalSpaceInGBInHab)
 
 	switch nodeType {
-	case constants.NodeTypeAutomate:
+	case enums.NodeTypeAutomate:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2)
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_A2_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_A2, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypeChefServer:
+	case enums.NodeTypeChefServer:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS)
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_CS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_CS, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypeOpensearch:
+	case enums.NodeTypeOpensearch:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS)
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_OS_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_OS, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypePostgresql:
+	case enums.NodeTypePostgresql:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG)
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_PG_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_PG, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
-	case constants.NodeTypeBastion:
+	case enums.NodeTypeBastion:
 		expectedFreeSpace := srs.GetExpectedFreeSpaceValueAfterDeploy(totalSpaceInGBInHab, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION)
 		passed, successMsg, errorMsg, resolutionMsg := srs.GetCheckModelValuesDetailsForStorageChecks(expectedFreeSpace, currentFreeSpaceInGB, constants.HAB_FREE_DISK_AFTER_DEP_BASTION_IN_PER, constants.HAB_FREE_DISK_AFTER_DEP_BASTION, constants.POST_DEPLOY, "/hab")
 		resp = srs.GetChecksModel(passed, fmt.Sprintf(constants.FREE_SPACE_CHECK, "Hab"), successMsg, errorMsg, resolutionMsg)
@@ -305,7 +306,7 @@ func (srs *SystemResourcesServiceImpl) GetUsage(dirPath string) (disk.UsageStat,
 	if err != nil {
 		return disk.UsageStat{}, err
 	}
-	
+
 	if !isPathExist {
 		dirPath = "/"
 	}

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/enums"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
@@ -19,7 +20,7 @@ import (
 
 func SetupMockSystemResourceService(responseBody *models.ApiResult) systemresourceservice.SystemResourcesService {
 	return &systemresourceservice.MockSystemResourcesServiceImpl{
-		GetSystemResourcesForDeploymentFunc: func(nodeType constants.NodeType, deploymentState constants.DeploymentState) *models.ApiResult {
+		GetSystemResourcesForDeploymentFunc: func(nodeType enums.NodeType, deploymentState enums.DeploymentState) *models.ApiResult {
 			return responseBody
 		},
 	}
@@ -55,8 +56,8 @@ func TestSystemResourceAPI(t *testing.T) {
 		expectedCode        int
 		expectedBody        string
 		expectedError       error
-		nodeType            constants.NodeType
-		deploymentState     constants.DeploymentState
+		nodeType            enums.NodeType
+		deploymentState     enums.DeploymentState
 	}{
 		{
 			testCaseDescreption: "200:Success response no error",
@@ -109,24 +110,24 @@ func TestSystemResourceAPI(t *testing.T) {
 			},
 			expectedCode:    200,
 			expectedBody:    "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"msg\":\"\",\"check\":\"\",\"checks\":[{\"title\":\"CPU count check\",\"passed\":true,\"success_msg\":\"CPU count is \\u003e=4\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"CPU speed check\",\"passed\":true,\"success_msg\":\"CPU speed should be \\u003e=2Ghz\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Memory size check\",\"passed\":true,\"success_msg\":\"Memory should be \\u003e=14GB\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Hab free space check\",\"passed\":true,\"success_msg\":\"/hab should have free space \\u003e=80GB\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"Temp free space check\",\"passed\":true,\"success_msg\":\"/tmp should have free space \\u003e=10GB or 5% of total size of /hab\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"/(root volume) free space check\",\"passed\":true,\"success_msg\":\"/(root volume) should have free space \\u003e=20GB or 20% of total size of /hab\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}}",
-			nodeType:        constants.NodeTypeAutomate,
-			deploymentState: constants.DeploymentStatePreDeploy,
+			nodeType:        enums.NodeTypeAutomate,
+			deploymentState: enums.DeploymentStatePreDeploy,
 		},
 		{
 			testCaseDescreption: "400:WrongQuery | deployment_state",
 			responseBody:        nil,
 			expectedCode:        400,
 			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'deployment_state' are pre-deploy,post-deploy\"}}",
-			nodeType:            constants.NodeTypeAutomate,
-			deploymentState:     constants.DeploymentState("InvalidDepState"),
+			nodeType:            enums.NodeTypeAutomate,
+			deploymentState:     enums.DeploymentState("InvalidDepState"),
 		},
 		{
 			testCaseDescreption: "400:WrongQuery | nodeType",
 			responseBody:        nil,
 			expectedCode:        400,
 			expectedBody:        "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Unsupported query or missing query. Expected values for query 'node_type' are automate,chef-infra-server,postgresql,opensearch,bastion\"}}",
-			nodeType:            constants.NodeType("wrongnode"),
-			deploymentState:     constants.DeploymentStatePreDeploy,
+			nodeType:            enums.NodeType("wrongnode"),
+			deploymentState:     enums.DeploymentStatePreDeploy,
 		},
 	}
 
