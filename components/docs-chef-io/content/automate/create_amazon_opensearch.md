@@ -14,8 +14,8 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-You can follow the AWS documentation directly for detailed steps to create Amazon OpenSearch Cluster. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) or follow the below guide,
-This guide will walk you through the process of creating an Amazon OpenSearch cluster and retrieving the necessary connection details, including the hostname, username, and password.
+You can follow the AWS documentation directly for detailed steps on how to create an Amazon OpenSearch Cluster by clicking [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html).
+Below is our guide on the steps required to create Amazon OpenSearch cluster. This guide will walk you through the process of creating an Amazon OpenSearch cluster and retrieving the necessary connection details, including the hostname, username, and password.
 
 ### Prerequisites
 Before proceeding, make sure you have the following prerequisites in place:
