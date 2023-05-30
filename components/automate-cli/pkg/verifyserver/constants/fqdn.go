@@ -17,5 +17,6 @@ const (
 	A2_CS_SUCCESS_MESSAGE          = "All services are up and running"
 	A2_CS_ERROR_MESSAGE            = "%v is not in ok state"
 	A2_CS_RESOLUTION_MESSAGE       = "Please restart the services."
+	IP_TO_HASH_FAIL_MESSAGE        = "Failed to hash the ips."
 	DEFAULT_HTTPS_PORT             = "443"
 )

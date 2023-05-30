@@ -19,7 +19,6 @@ import (
 const (
 	LOCALHOST  = "localhost"
 	LOCALHOST2 = "localhost2"
-	APITOKEN   = "WFlC7Q2sucYRg7IjCSKaDJV4kYE="
 )
 
 var (
@@ -211,7 +210,7 @@ func startHTTPSMockServer(mockServer *httptest.Server, port string) error {
 }
 
 func TestCheckFqdnReachability(t *testing.T) {
-	httpsSuccessPort := "2345"
+	httpsSuccessPort := "5345"
 	httpsFailurePort := "3345"
 	httpsFailedServerPort := "4345"
 	httpsSuccessMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -223,7 +222,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 		case "/_status":
 			w.WriteHeader(http.StatusOK)
 		case "/check_status":
-			w.Header().Set("X-Real-IP", "172.154.0.2")
+			w.Header().Set("x-server-ip", "9baa99b32b43b7fc1aa1488bbc06348f")
 			w.WriteHeader(http.StatusOK)
 		default:
 			http.NotFound(w, r)
@@ -243,7 +242,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 		case "/_status":
 			w.WriteHeader(http.StatusOK)
 		case "check_status":
-			w.Header().Set("X-Real-IP", "172.154.0.1")
+			w.Header().Set("x-server-ip", "9baa99b32b43b7fc1aa1488bbc06348f")
 			w.WriteHeader(http.StatusOK)
 		default:
 			http.NotFound(w, r)
@@ -254,13 +253,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 	assert.NoError(t, err)
 	defer httpsFailureMockServer.Close()
 
-	httpsFailedResponseserver := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	httpsFailedResponseServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadGateway)
 	}))
 
-	err = startHTTPSMockServer(httpsFailedResponseserver, httpsFailedServerPort)
+	err = startHTTPSMockServer(httpsFailedResponseServer, httpsFailedServerPort)
 	assert.NoError(t, err)
-	defer httpsFailedResponseserver.Close()
+	defer httpsFailedResponseServer.Close()
 
 	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
 	assert.NotNil(t, fq)
@@ -278,7 +277,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: false,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -318,7 +316,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: false,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -358,7 +355,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          INVALID_BLOCK_CA_CERT,
 				IsAfterDeployment: false,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -398,7 +394,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          NOT_SAN_CA_CERT,
 				IsAfterDeployment: false,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -438,7 +433,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          INVALID_CA_CERT,
 				IsAfterDeployment: false,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -478,9 +472,8 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
-					"172.154.0.2",
+					"10.1.1.11",
 				},
 			},
 			models.FqdnResponse{
@@ -494,9 +487,9 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.A2_CS_TITLE,
+						Title:         constants.NODE_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.A2_CS_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.NODE_SUCCESS_MESSAGE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -511,7 +504,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -527,11 +519,11 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
 					},
 					{
-						Title:         constants.A2_CS_TITLE,
+						Title:         constants.NODE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
-						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
+						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
 					},
 				},
 			},
@@ -544,9 +536,8 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.AUTOMATE,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
-					"172.154.0.2",
+					"10.1.1.11",
 				},
 			},
 			models.FqdnResponse{
@@ -560,9 +551,9 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.A2_CS_TITLE,
+						Title:         constants.NODE_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.A2_CS_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.NODE_SUCCESS_MESSAGE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -577,7 +568,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.AUTOMATE,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -593,11 +583,11 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: constants.FQDN_RESOLUTION_MESSAGE,
 					},
 					{
-						Title:         constants.A2_CS_TITLE,
+						Title:         constants.NODE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
-						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
+						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
 					},
 				},
 			},
@@ -610,7 +600,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.AUTOMATE,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -626,11 +615,11 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.A2_CS_TITLE,
+						Title:         constants.NODE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
-						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
+						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
 					},
 				},
 			},
@@ -643,7 +632,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: true,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},
@@ -659,11 +647,11 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ResolutionMsg: "",
 					},
 					{
-						Title:         constants.A2_CS_TITLE,
+						Title:         constants.NODE_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, "[172.154.0.2]"),
-						ResolutionMsg: constants.A2_CS_RESOLUTION_MESSAGE,
+						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
+						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
 					},
 				},
 			},
@@ -676,7 +664,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 				NodeType:          constants.CHEF_INFRA_SERVER,
 				RootCert:          CA_CERT,
 				IsAfterDeployment: false,
-				ApiToken:          APITOKEN,
 				Nodes: []string{
 					"172.154.0.2",
 				},

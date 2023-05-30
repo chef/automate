@@ -1,10 +1,13 @@
 package fqdnservice
 
 import (
+	"crypto/md5"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -47,25 +50,59 @@ func (fq *FqdnService) createClient(rootCert string) *http.Client {
 	return client
 }
 
-// createErrorMessage function is converting map into string to make more readable for end user.
-func createErrorMessage(setNodes map[string]int) string {
+func createErrorMessage(setNodes map[string]int, reqnodes []string, isAfterDeployment bool) string {
 	temp := "["
-	for k := range setNodes {
-		temp += k
-		temp += ", "
+	for _, k := range reqnodes {
+		var val string
+		if isAfterDeployment {
+			hasher := md5.New()
+			_, err := io.WriteString(hasher, k)
+			if err != nil {
+				return constants.IP_TO_HASH_FAIL_MESSAGE
+			}
+			val = hex.EncodeToString(hasher.Sum(nil))
+		} else {
+			val = k
+		}
+
+		if setNodes[val] > 0 {
+			temp += k
+			temp += ", "
+		}
 	}
 	temp = strings.TrimSuffix(temp, ", ")
 	temp += "]"
 
-	return temp
+	return fmt.Sprintf(constants.NODE_ERROR_MESSAGE, temp)
+}
+
+// makeSet function is storing all the request nodes into the map according to the deployment.
+// if isAfterDeployment is true then it will store the hash of the ips of request nodes,
+// otherwise it will directly store the ips.
+func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) {
+	setNodes := make(map[string]int)
+	for _, k := range reqNodes {
+		if isAfterDeployment {
+			hasher := md5.New()
+			_, err := io.WriteString(hasher, k)
+			if err != nil {
+				return nil, err
+			}
+			setNodes[hex.EncodeToString(hasher.Sum(nil))] += 1
+		} else {
+			setNodes[k] += 1
+		}
+	}
+
+	return setNodes, nil
 }
 
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
-func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, IsAfterDeployment bool, port string) models.Checks {
+func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDeployment bool, port string) models.Checks {
 	client := fq.createClient(rootCert)
 	var url string
 
-	if IsAfterDeployment && nodeType == constants.CHEF_INFRA_SERVER {
+	if isAfterDeployment && nodeType == constants.CHEF_INFRA_SERVER {
 		url = fmt.Sprintf("https://%s:%s/_status", fqdn, port)
 	} else {
 		url = fmt.Sprintf("https://%s:%s", fqdn, port)
@@ -84,11 +121,18 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, IsAfterDep
 }
 
 // nodeReachable function will check that our load balancer will correctly redirecting to all the nodes or not.
-func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, port string) models.Checks {
-	// creating a map for storing all the nodes given in request.
-	setNodes := make(map[string]int)
-	for _, k := range reqNodes {
-		setNodes[k] += 1
+func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, isAfterDeployment bool, port string) models.Checks {
+	setNodes, err := makeSet(reqNodes, isAfterDeployment)
+	if err != nil {
+		fq.log.Error(err.Error())
+		return createCheck(constants.NODE_TITLE, false, "", constants.IP_TO_HASH_FAIL_MESSAGE, constants.NODE_RESOLUTION_MESSAGE)
+	}
+
+	var url string
+	if isAfterDeployment {
+		url = fmt.Sprintf("https://%s:%s/check_status", fqdn, port)
+	} else {
+		url = fmt.Sprintf("https://%s:%s", fqdn, port)
 	}
 
 	client := fq.createClient(rootCert)
@@ -96,7 +140,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, p
 
 	for i := 0; i < 50; i++ {
 		go func(fqdnResultChan chan string) {
-			res, err := client.Get(fmt.Sprintf("https://%s:%s", fqdn, port))
+			res, err := client.Get(url)
 			if err != nil {
 				fq.log.Error(err.Error())
 				fqdnResultChan <- "got error"
@@ -119,8 +163,8 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, p
 		}
 	}
 
-	temp := createErrorMessage(setNodes)
-	return createCheck(constants.NODE_TITLE, false, "", fmt.Sprintf(constants.NODE_ERROR_MESSAGE, temp), constants.NODE_RESOLUTION_MESSAGE)
+	errorMessage := createErrorMessage(setNodes, reqNodes, isAfterDeployment)
+	return createCheck(constants.NODE_TITLE, false, "", errorMessage, constants.NODE_RESOLUTION_MESSAGE)
 }
 
 // validateCertificate will check that if our root certificate is valid or not.
@@ -145,50 +189,6 @@ func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
 	return createCheck(constants.CERTIFICATE_TITLE, true, constants.CERTIFICATE_SUCCESS_MESSAGE, "", "")
 }
 
-// checkServiceStatus function will check that all the services are in ok state or not.
-func (fq *FqdnService) checkServiceStatus(fqdn, rootCert string, reqNodes []string, port string) models.Checks {
-	setNodes := make(map[string]int)
-	for _, k := range reqNodes {
-		setNodes[k] += 1
-		// hasher := md5.New()
-		// _, err := io.WriteString(hasher, k)
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// setNodes[hex.EncodeToString(hasher.Sum(nil))] += 1
-	}
-
-	client := fq.createClient(rootCert)
-	fqdnResultChan := make(chan string)
-	for i := 0; i < 50; i++ {
-		go func(fqdnResultChan chan string) {
-			res, err := client.Get(fmt.Sprintf("https://%s:%s/check_status", fqdn, port))
-			if err != nil {
-				fq.log.Error(err.Error())
-				fqdnResultChan <- "got error"
-				return
-			}
-			nodeIP := res.Header.Get("X-Real-IP")
-			fqdnResultChan <- nodeIP
-		}(fqdnResultChan)
-	}
-
-	for i := 0; i < 50; i++ {
-		chanResult := <-fqdnResultChan
-		if chanResult == "got error" {
-			continue
-		}
-		delete(setNodes, chanResult)
-		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
-		if len(setNodes) == 0 {
-			return createCheck(constants.A2_CS_TITLE, true, constants.A2_CS_SUCCESS_MESSAGE, "", "")
-		}
-	}
-
-	temp := createErrorMessage(setNodes)
-	return createCheck(constants.A2_CS_TITLE, false, "", fmt.Sprintf(constants.A2_CS_ERROR_MESSAGE, temp), constants.A2_CS_RESOLUTION_MESSAGE)
-}
-
 func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg string) models.Checks {
 	return models.Checks{
 		Title:         title,
@@ -205,13 +205,10 @@ func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string
 	check := fq.fqdnReachable(req.Fqdn, req.RootCert, req.NodeType, req.IsAfterDeployment, port)
 	response.Checks = append(response.Checks, check)
 
-	if req.IsAfterDeployment {
-		check = fq.checkServiceStatus(req.Fqdn, req.RootCert, req.Nodes, port)
-		response.Checks = append(response.Checks, check)
-	} else {
-		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, port)
-		response.Checks = append(response.Checks, check)
+	check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, req.IsAfterDeployment, port)
+	response.Checks = append(response.Checks, check)
 
+	if !req.IsAfterDeployment {
 		check = fq.validateCertificate(req.RootCert)
 		response.Checks = append(response.Checks, check)
 	}

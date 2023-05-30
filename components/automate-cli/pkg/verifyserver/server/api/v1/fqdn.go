@@ -27,11 +27,6 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Node Type should be automate or chef-infra-server, Please provide Node Type.")
 	}
 
-	if req.IsAfterDeployment && req.ApiToken == "" {
-		h.Logger.Error("Api Token can't be empty.")
-		return fiber.NewError(http.StatusBadRequest, "Api Token can't be empty, it is needed for checking the Automate status.")
-	}
-
 	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT)
 	return c.JSON(response.BuildSuccessResponse(res))
 }
