@@ -508,6 +508,7 @@ func constructAndGetNodeMap(infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 				InputFiles:               []string{inputFilePath},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.frontend,
+				CopyToTmp:                true,
 			},
 		},
 		Automate: &Cmd{
@@ -520,6 +521,7 @@ func constructAndGetNodeMap(infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 				InputFiles:               []string{inputFilePath},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.automate,
+				CopyToTmp:                true,
 			},
 		},
 		ChefServer: &Cmd{
@@ -532,6 +534,7 @@ func constructAndGetNodeMap(infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 				InputFiles:               []string{inputFilePath},
 				Outputfiles:              []string{},
 				NodeType:                 preflightCmdFlags.chef_server,
+				CopyToTmp:                true,
 			},
 		},
 		Infra: infra,
