@@ -81,4 +81,4 @@ Once the Amazon RDS PostgreSQL instance is created successfully, you can obtain 
 ### Step 6: Connect to Your Amazon RDS PostgreSQL Instance
 Using the connection details obtained in the previous step, you can now connect to your Amazon RDS PostgreSQL instance from Automate.
 
-Congratulations! You have successfully created an Amazon RDS PostgreSQL instance and its ready to be used with Automate.
+Congratulations! You have successfully created an Amazon RDS PostgreSQL instance and it's ready to be used with Automate.

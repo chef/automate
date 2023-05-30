@@ -71,4 +71,4 @@ Once the Amazon OpenSearch 1.3 cluster is created successfully, you can obtain t
 ### Step 6: Connect to Your Amazon OpenSearch 1.3 Cluster
 Using the connection details obtained in the previous step, you can now connect to your Amazon OpenSearch 1.3 cluster from Automate.
 
-Congratulations! You have successfully created an Amazon OpenSearch 1.3 cluster and its ready to be used with Automate.
+Congratulations! You have successfully created an Amazon OpenSearch 1.3 cluster and it's ready to be used with Automate.
