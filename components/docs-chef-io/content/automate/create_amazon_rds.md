@@ -37,7 +37,7 @@ Before proceeding, make sure you have the following prerequisites in place:
 4. Choose **PostgreSQL 13.5-R1**.
 5. Under the **Templates** section, select the template that suits your needs or choose the default template.
 6. In the **Settings** section, provide the following information:
-   - **DB cluster identifier**: Enter a unique identifier for your RDS instance.
+   - **DB instance identifier**: Enter a unique identifier for your RDS instance.
    - **Master username**: Specify the username for the master user account.
    - **Master password**: Set a secure password for the master user account.
 7. In the **Instance configuration** section, select the appropriate instance size for your needs.
