@@ -10,9 +10,9 @@ type HaDeployConfig struct {
 	Architecture  *Architecture          `toml:"architecture,omitempty"`
 	ObjectStorage *ObjectStorage         `toml:"object_storage,omitempty"`
 	Automate      *AutomateSettings      `toml:"automate,omitempty"`
-	ChefServer    *ServerConfigSettings  `toml:"chef_server,omitempty"`
-	Opensearch    *ServerConfigSettings  `toml:"opensearch,omitempty"`
-	Postgresql    *ServerConfigSettings  `toml:"postgresql,omitempty"`
+	ChefServer    *ChefServerSettings    `toml:"chef_server,omitempty"`
+	Opensearch    *OpensearchSettings    `toml:"opensearch,omitempty"`
+	Postgresql    *PostgresqlSettings    `toml:"postgresql,omitempty"`
 	ExistingInfra *ExistingInfraSettings `toml:"existing_infra,omitempty"`
 	Aws           *AwsSettings           `toml:"aws,omitempty"`
 	External      *ExternalSettings      `toml:"external,omitempty"`
@@ -71,20 +71,31 @@ type ConfigAutomateSettings struct {
 	ConfigSettings
 }
 
-type ServerConfigSettings struct {
+type ChefServerSettings struct {
 	Config *ConfigSettings `toml:"config,omitempty"`
 }
 
+type PostgresqlSettings struct {
+	Config *ConfigSettings `toml:"config,omitempty"`
+}
+
+type OpensearchSettings struct {
+	Config *ConfigOpensearchSettings `toml:"config,omitempty"`
+}
+type ConfigOpensearchSettings struct {
+	AdminCert string `toml:"admin_cert,omitempty"`
+	AdminKey  string `toml:"admin_key,omitempty"`
+	AdminDn   string `toml:"admin_dn,omitempty"`
+	NodesDn   string `toml:"nodes_dn,omitempty"`
+	ConfigSettings
+}
+
 type ConfigSettings struct {
+	RootCA            string      `toml:"root_ca,omitempty"`
 	InstanceCount     string      `toml:"instance_count,omitempty"`
 	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
-	RootCA            string      `toml:"root_ca,omitempty"`
 	PrivateKey        string      `toml:"private_key,omitempty"`
 	PublicKey         string      `toml:"public_key,omitempty"`
-	AdminCert         string      `toml:"admin_cert,omitempty"`
-	AdminKey          string      `toml:"admin_key,omitempty"`
-	AdminDn           string      `toml:"admin_dn,omitempty"`
-	NodesDn           string      `toml:"nodes_dn,omitempty"`
 	CertsByIP         *[]CertByIP `toml:"certs_by_ip,omitempty"`
 }
 

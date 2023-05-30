@@ -17,101 +17,114 @@ func TestParseHaDeployConfig(t *testing.T) {
 		wantErr bool
 		err     error
 	}{
-		// {
-		// 	name: "Parse AWS Config",
-		// 	args: args{configFile: "./testdata/HaAws.toml"},
-		// 	want: &HaDeployConfig{
-		// 		Architecture: &Architecture{
-		// 			Aws: &ConfigInitials{
-		// 				SSHUser:                     "",
-		// 				SSHGroupName:                "",
-		// 				SSHKeyFile:                  "",
-		// 				SSHPort:                     "",
-		// 				SecretsKeyFile:              "/hab/a2_deploy_workspace/secrets.key",
-		// 				SecretsStoreFile:            "/hab/a2_deploy_workspace/secrets.json",
-		// 				SudoPassword:                "",
-		// 				LoggingMonitoringManagement: "",
-		// 				Architecture:                "aws",
-		// 				WorkspacePath:               "/hab/a2_deploy_workspace",
-		// 				BackupMount:                 "/mnt/automate_backups",
-		// 				BackupConfig:                "",
-		// 				S3BucketName:                "",
-		// 				HabitatUIDGid:               "",
-		// 			},
-		// 		},
-		// 		Automate: &AutomateSettings{
-		// 			Config: &ConfigAutomateSettings{
-		// 				AdminPassword: "",
-		// 				Fqdn:          "",
-		// 				ConfigFile:    "configs/automate.toml",
-		// 				TeamsPort:     "",
-		// 				ConfigSettings: ConfigSettings{
-		// 					InstanceCount:     "",
-		// 					EnableCustomCerts: false,
-		// 				},
-		// 			},
-		// 		},
-		// 		ChefServer: &ServerConfigSettings{
-		// 			Config: &ConfigSettings{
-		// 				InstanceCount:     "",
-		// 				EnableCustomCerts: false,
-		// 			},
-		// 		},
-		// 		Opensearch: &ServerConfigSettings{
-		// 			Config: &ConfigSettings{
-		// 				InstanceCount:     "",
-		// 				EnableCustomCerts: false,
-		// 			},
-		// 		},
-		// 		Postgresql: &ServerConfigSettings{
-		// 			Config: &ConfigSettings{
-		// 				InstanceCount:     "",
-		// 				EnableCustomCerts: false,
-		// 			},
-		// 		},
-		// 		Aws: &AwsSettings{
-		// 			Config: &ConfigAwsSettings{
-		// 				Profile:                      "",
-		// 				Region:                       "",
-		// 				AwsVpcID:                     "",
-		// 				AwsCidrBlockAddr:             "",
-		// 				PrivateCustomSubnets:         []string{},
-		// 				PublicCustomSubnets:          []string{},
-		// 				SSHKeyPairName:               "",
-		// 				SetupManagedServices:         false,
-		// 				AmiID:                        "",
-		// 				DeleteOnTermination:          true,
-		// 				AutomateServerInstanceType:   "",
-		// 				ChefServerInstanceType:       "",
-		// 				OpensearchServerInstanceType: "",
-		// 				PostgresqlServerInstanceType: "",
-		// 				AutomateLbCertificateArn:     "",
-		// 				ChefServerLbCertificateArn:   "",
-		// 				ChefEbsVolumeIops:            "",
-		// 				ChefEbsVolumeSize:            "",
-		// 				ChefEbsVolumeType:            "",
-		// 				OpensearchEbsVolumeIops:      "",
-		// 				OpensearchEbsVolumeSize:      "",
-		// 				OpensearchEbsVolumeType:      "",
-		// 				PostgresqlEbsVolumeIops:      "",
-		// 				PostgresqlEbsVolumeSize:      "",
-		// 				PostgresqlEbsVolumeType:      "",
-		// 				AutomateEbsVolumeIops:        "",
-		// 				AutomateEbsVolumeSize:        "",
-		// 				AutomateEbsVolumeType:        "",
-		// 				AmiFilterName:                "",
-		// 				AmiFilterVirtType:            "",
-		// 				AmiFilterOwner:               "",
-		// 				LbAccessLogs:                 "false",
-		// 				XContact:                     "",
-		// 				XDept:                        "",
-		// 				XProject:                     "",
-		// 			},
-		// 		},
-		// 	},
-		// 	wantErr: false,
-		// 	err:     nil,
-		// },
+		{
+			name: "Parse AWS Config",
+			args: args{configFile: "./testdata/HaAws.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					Aws: &ConfigInitials{
+						SSHUser:                     "",
+						SSHGroupName:                "",
+						SSHKeyFile:                  "",
+						SSHPort:                     "",
+						SecretsKeyFile:              "/hab/a2_deploy_workspace/secrets.key",
+						SecretsStoreFile:            "/hab/a2_deploy_workspace/secrets.json",
+						SudoPassword:                "",
+						LoggingMonitoringManagement: "",
+						Architecture:                "aws",
+						WorkspacePath:               "/hab/a2_deploy_workspace",
+						BackupMount:                 "/mnt/automate_backups",
+						BackupConfig:                "",
+						S3BucketName:                "",
+						HabitatUIDGid:               "",
+					},
+				},
+				Automate: &AutomateSettings{
+					Config: &ConfigAutomateSettings{
+						AdminPassword: "",
+						Fqdn:          "",
+						ConfigFile:    "configs/automate.toml",
+						TeamsPort:     "",
+						ConfigSettings: ConfigSettings{
+							InstanceCount:     "",
+							EnableCustomCerts: false,
+						},
+					},
+				},
+				ChefServer: &ChefServerSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "",
+						EnableCustomCerts: false,
+					},
+				},
+				Opensearch: &OpensearchSettings{
+					Config: &ConfigOpensearchSettings{
+						AdminCert: "",
+						AdminKey:  "",
+						AdminDn:   "",
+						NodesDn:   "",
+						ConfigSettings: ConfigSettings{
+							InstanceCount:     "",
+							EnableCustomCerts: false,
+							PrivateKey:        "",
+							PublicKey:         "",
+							CertsByIP:         &[]CertByIP{},
+						},
+					},
+				},
+				Postgresql: &PostgresqlSettings{
+					Config: &ConfigSettings{
+						RootCA:            "",
+						InstanceCount:     "",
+						EnableCustomCerts: false,
+						PrivateKey:        "",
+						PublicKey:         "",
+						CertsByIP:         &[]CertByIP{},
+					},
+				},
+				Aws: &AwsSettings{
+					Config: &ConfigAwsSettings{
+						Profile:                      "",
+						Region:                       "",
+						AwsVpcID:                     "",
+						AwsCidrBlockAddr:             "",
+						PrivateCustomSubnets:         []string{},
+						PublicCustomSubnets:          []string{},
+						SSHKeyPairName:               "",
+						SetupManagedServices:         false,
+						AmiID:                        "",
+						DeleteOnTermination:          true,
+						AutomateServerInstanceType:   "",
+						ChefServerInstanceType:       "",
+						OpensearchServerInstanceType: "",
+						PostgresqlServerInstanceType: "",
+						AutomateLbCertificateArn:     "",
+						ChefServerLbCertificateArn:   "",
+						ChefEbsVolumeIops:            "",
+						ChefEbsVolumeSize:            "",
+						ChefEbsVolumeType:            "",
+						OpensearchEbsVolumeIops:      "",
+						OpensearchEbsVolumeSize:      "",
+						OpensearchEbsVolumeType:      "",
+						PostgresqlEbsVolumeIops:      "",
+						PostgresqlEbsVolumeSize:      "",
+						PostgresqlEbsVolumeType:      "",
+						AutomateEbsVolumeIops:        "",
+						AutomateEbsVolumeSize:        "",
+						AutomateEbsVolumeType:        "",
+						AmiFilterName:                "",
+						AmiFilterVirtType:            "",
+						AmiFilterOwner:               "",
+						LbAccessLogs:                 "false",
+						XContact:                     "",
+						XDept:                        "",
+						XProject:                     "",
+					},
+				},
+			},
+			wantErr: false,
+			err:     nil,
+		},
 		{
 			name: "Parse AWS Managed Config",
 			args: args{configFile: "./testdata/HaAwsManaged.toml"},
@@ -219,7 +232,7 @@ csKeX402wz9P7XM5eGsToNpAZq41Q7mFzz14DfqFNttaCMHMYi4k
 						},
 					},
 				},
-				ChefServer: &ServerConfigSettings{
+				ChefServer: &ChefServerSettings{
 					Config: &ConfigSettings{
 						InstanceCount:     "2",
 						EnableCustomCerts: true,
@@ -274,30 +287,8 @@ EM5hpYgcYA7V2hP++Im5U7MEndhRASbHW+XvCR7WKMm5V+Rt3wjy
 -----END CERTIFICATE-----`,
 					},
 				},
-				Opensearch: &ServerConfigSettings{
-					Config: &ConfigSettings{
-						InstanceCount:     "3",
-						EnableCustomCerts: true,
-						RootCA: `-----BEGIN CERTIFICATE-----
-MIIDQjCCAioCCQDgqVuWOfJnIDANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJV
-UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
-CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxETAPBgNVBAMMCHByb2dyZXNzMB4XDTIzMDUy
-MjExMzkxOFoXDTI2MDUyMTExMzkxOFowYzELMAkGA1UEBhMCVVMxEzARBgNVBAgM
-Cldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29m
-dHdhcmUgSW5jMREwDwYDVQQDDAhwcm9ncmVzczCCASIwDQYJKoZIhvcNAQEBBQAD
-ggEPADCCAQoCggEBAMgz+0U4g/jhxxlGzgY7ppZlC3F+z01DUPPDAyys3hghjjqH
-CgAhdgPBkUyHvaR7XO75kVBlu7JRBydsfug15LXS6fPMjlRPMaf8Bq0sIIlHuvf0
-D0T+Zwh/XwCBiOCRorLfc8DPSTm7OM/LwbCkxTPGdScusmMz0TuSJVtonScUK3x6
-58vy3s3GlQAIqotSy+r6nXph3fTY2b+m3RPM1QTpnZ0hV0/M6DwKWDO38o1HZXU4
-c+mDqo6CSLrBNAVnllQYZjuEf1Z7IxtT4zZHvh5quPQhE+13qM6kztSWu7fLx7T+
-uDuLvBjHIJNZpxmwDyk30+b7zWogg+jkxOTjCnECAwEAATANBgkqhkiG9w0BAQsF
-AAOCAQEAR6g2Zp3FEfOFmU3wf18Ldjq8Qu69AQd3p0a4PqjfGvVN4R1Rs9LA5uYv
-VegcVs1LB7TxN6CEMq/fZrfGtJUYMhE2V7WM0RmUAhUHHIvq+43VVN0ZT7pTKPgl
-YVLXjiBOsJpPko/j/MDIjYK67wBcOHj08bG2ew9twrfjso9SJPd4ILxlx7Iwh5R9
-pQijrBxVHcj23iuN3l23aQL25soAXSjVraG+CcU/lXr8zuHSb04M8Z0LvyylNDBd
-G5vGMhL6fl057HyQQw78h804cHukZrkA940YqEHadkEdfV6Z1G4YJOGcSsFPcSUR
-D1C7LJG3dXCCKER6zRZqjtv3wy0K5Q==
------END CERTIFICATE-----`,
+				Opensearch: &OpensearchSettings{
+					Config: &ConfigOpensearchSettings{
 						AdminKey: `-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD0aBYmZyhNjsbi
 16ybvxYSBYrIKTdCrZ2g/FeAnfxVY4/85J6KWvvfoWFDqp0nAShlmQb7Fe5GQuN1
@@ -347,58 +338,83 @@ fPwEr1CSOyHmQMQLLJsdzfB2RQ6MfG1pCH1FNPCfWjK8Rrd0Hic/sQ4Yd6q/Bmek
 b9KA5lUyk1Ox/YBBfm4RfmeKRqQKtASF8UJG3eCut0h3+uqyQpCxAx/8MlipkF7g
 1EvU3J0+e99VMZJ/wNlrAla08VsV/hjXd+NIZYkl31cghLXmTA==
 -----END CERTIFICATE-----`,
-						PrivateKey: `-----BEGIN PRIVATE KEY-----
-MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCj/umNjtsAFBql
-gQSw7HgoQKCLviq/zXP0Sr0ZMliizGY/B5pJ6rux42bAF0FcKrqL/KBzko4n3fTg
-NBHcZJUFHiL91ZqzWxjc2rxmSd9YOhPH7x31E+ozjBGKClNOR+pyf0wLrKos3HsV
-gZKFM0lKmb/xIfrLMaaHzqUE2lfP/NIcbqAgLMYgwdO5LmOPezWlH+oKhPk6qxX3
-KgidVAfQQ67pNYD+SuMNgT8/OYszz/bE3lzS7jRrt6/8UKvV8+jS/bzBbsz51FEY
-cCiS3Xd5svDpC0IcTHicvp5yHtePyYzxxCEt/P0T7dIUoVXQ780NAL8Y/CGK6TUR
-Ho7osjM9AgMBAAECggEASiB0AxdaaDuuG7conqwUV+V2bBPmENJWIksSFGyMYfHQ
-GZdfJyAh/PNTw2n/kiCCN7pV8EeDWAPcpucCV8NjFHAd0uyVQ5Letx1r4TRs7t05
-ibrMqLV6vBgI6YNnSk/5ag2eGvzN4v8552utBeY7r6u1ddItIWFs65/9OSdUX98m
-9iKC9n4D7pFvJsRoUfeD5qf5tF2cmAGS8z+y3502LPx0rNoJchHh06bkEwQIdA7Y
-TUsXIj6RXZqHgcyD0CGVI0gsT6lSywSzfUQvgLEV6Py4VD+1t2jo97bgScbLaFRN
-upC41HJFloYBvin0jtjgo/x8OUTGgW5IkBmrhw5roQKBgQDRoQiWiNtVYh+3AX2g
-DkDXqUbJLdWEElbkjxqzrC19jHCOI12S67MvNZGZ3ET//5agF5pWo/ZE1ZUy7WoJ
-2C9IdbKauGFlA0Drl1xrjHXU22/w8iDFp/F9lhbvu0vGIlCGGZlarl97Ulrha33a
-EHtxNtX7jlu3yrZdReqrUWEhWQKBgQDIRbyaVbVw8nBAKj49cqi8AayD/aAt1sYE
-KuDG0pv1ucXkOYtO2kvTxVUdBIPozdK4nVo/XT+mZ7PYSculukegjkO/Y51F6Tg+
-4jlQxMFv30UAhslacFcSNy5KCePZX/5sUbHYa6Amp5dYXMf1hud02PdIMoNygNZ4
-KKeQhL7ghQKBgF1XtTlCi1fDr5ePpF6muhzNlWVzcUWz3Nk9F4i1vDPRWzUPblVD
-erAkzEaUnGzZZDq5B9JYhAo2iI76xGLJzpQXRIY8X7HY9wlwhoilLLqxU3EYf5tD
-ovZm5KOu5Ji/ItfzgiOszXteOnVxpcJ54F2TK0kuJIz8SKPTxCCwxe1RAoGAPA3N
-VGpHEitgxZzlNP/g4R+PX7T6B0TT9AP3iyc0ZSbj1F/9ChQjkMknkJ/9/h1aBsoI
-ed+4amnGYCEg0/1b5SVD42w3iPM6ToD/ttyJNMa6pkHEtz3gnjG1y7XTgSdr34dP
-0RnU2EKA+5o2y8U8Oqmk3R1olTlVFor6VDe6FRECgYAsgRurQPvNyWTjtXp8QLZ/
-jYa8jqXkS7a26JVGKG6gq5hoaFq/fRksNYyC4H88lD/zxRmzkFkrEDIyhjVh5OMN
-PAJTLOnebC6W2xbisRJqDB2LfxmbaH2FA4kO6UzZkhYjudThu4y8uOQlEcVQO7GU
-VPVlMVkJXQmXIl6v3hCN+Q==
------END PRIVATE KEY-----`,
-						PublicKey: `-----BEGIN CERTIFICATE-----
-MIIDgTCCAmmgAwIBAgIJAPMNo6eG0UBaMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
-BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
-GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
-MjMwNTIyMTEzOTE5WhcNMjYwNTIxMTEzOTE5WjBkMQswCQYDVQQGEwJVUzETMBEG
-A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
-ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMTCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBAKP+6Y2O2wAUGqWBBLDseChAoIu+Kr/Nc/RKvRky
-WKLMZj8Hmknqu7HjZsAXQVwquov8oHOSjifd9OA0EdxklQUeIv3VmrNbGNzavGZJ
-31g6E8fvHfUT6jOMEYoKU05H6nJ/TAusqizcexWBkoUzSUqZv/Eh+ssxpofOpQTa
-V8/80hxuoCAsxiDB07kuY497NaUf6gqE+TqrFfcqCJ1UB9BDruk1gP5K4w2BPz85
-izPP9sTeXNLuNGu3r/xQq9Xz6NL9vMFuzPnUURhwKJLdd3my8OkLQhxMeJy+nnIe
-14/JjPHEIS38/RPt0hShVdDvzQ0Avxj8IYrpNREejuiyMz0CAwEAAaM3MDUwHQYD
-VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMBQGA1UdEQQNMAuCCWNoZWZub2Rl
-MTANBgkqhkiG9w0BAQsFAAOCAQEAI9B0IJgmeqgLgFvBiHhGsNzxAKo3z+YmU2Ta
-bqmcBO8gTGnLsnaQPs25sDPvM7YEkcjazhj74+f+L70+rAXl45TLkLQnIGpa4Bbg
-uBpYonPRzK3aSiDcnTeTH7LivuTJJQZptaT9jrcAcpK6AzWCopWR/E1rQ/oRCfiu
-4/PGV2nllNHC8rZm4YB3uftmjaWiwISf/gRSuD5yGu1TcCnYr5w3PhvkVAKHYLdj
-tIUlDTuTFXO/92ZCuW74YqBay+dAIB4ThU0jvUNYWTFV8MHmBgQ9CfG9WW4pjORI
-qalq5zXuKm1t+lrxCFND6cXu9Uk8HtrnSS5IqF0DprdepkyYhA==
------END CERTIFICATE-----`,
+						ConfigSettings: ConfigSettings{
+							InstanceCount:     "3",
+							EnableCustomCerts: true,
+							RootCA: `-----BEGIN CERTIFICATE-----
+	MIIDQjCCAioCCQDgqVuWOfJnIDANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJV
+	UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
+	CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxETAPBgNVBAMMCHByb2dyZXNzMB4XDTIzMDUy
+	MjExMzkxOFoXDTI2MDUyMTExMzkxOFowYzELMAkGA1UEBhMCVVMxEzARBgNVBAgM
+	Cldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29m
+	dHdhcmUgSW5jMREwDwYDVQQDDAhwcm9ncmVzczCCASIwDQYJKoZIhvcNAQEBBQAD
+	ggEPADCCAQoCggEBAMgz+0U4g/jhxxlGzgY7ppZlC3F+z01DUPPDAyys3hghjjqH
+	CgAhdgPBkUyHvaR7XO75kVBlu7JRBydsfug15LXS6fPMjlRPMaf8Bq0sIIlHuvf0
+	D0T+Zwh/XwCBiOCRorLfc8DPSTm7OM/LwbCkxTPGdScusmMz0TuSJVtonScUK3x6
+	58vy3s3GlQAIqotSy+r6nXph3fTY2b+m3RPM1QTpnZ0hV0/M6DwKWDO38o1HZXU4
+	c+mDqo6CSLrBNAVnllQYZjuEf1Z7IxtT4zZHvh5quPQhE+13qM6kztSWu7fLx7T+
+	uDuLvBjHIJNZpxmwDyk30+b7zWogg+jkxOTjCnECAwEAATANBgkqhkiG9w0BAQsF
+	AAOCAQEAR6g2Zp3FEfOFmU3wf18Ldjq8Qu69AQd3p0a4PqjfGvVN4R1Rs9LA5uYv
+	VegcVs1LB7TxN6CEMq/fZrfGtJUYMhE2V7WM0RmUAhUHHIvq+43VVN0ZT7pTKPgl
+	YVLXjiBOsJpPko/j/MDIjYK67wBcOHj08bG2ew9twrfjso9SJPd4ILxlx7Iwh5R9
+	pQijrBxVHcj23iuN3l23aQL25soAXSjVraG+CcU/lXr8zuHSb04M8Z0LvyylNDBd
+	G5vGMhL6fl057HyQQw78h804cHukZrkA940YqEHadkEdfV6Z1G4YJOGcSsFPcSUR
+	D1C7LJG3dXCCKER6zRZqjtv3wy0K5Q==
+	-----END CERTIFICATE-----`,
+
+							PrivateKey: `-----BEGIN PRIVATE KEY-----
+	MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCj/umNjtsAFBql
+	gQSw7HgoQKCLviq/zXP0Sr0ZMliizGY/B5pJ6rux42bAF0FcKrqL/KBzko4n3fTg
+	NBHcZJUFHiL91ZqzWxjc2rxmSd9YOhPH7x31E+ozjBGKClNOR+pyf0wLrKos3HsV
+	gZKFM0lKmb/xIfrLMaaHzqUE2lfP/NIcbqAgLMYgwdO5LmOPezWlH+oKhPk6qxX3
+	KgidVAfQQ67pNYD+SuMNgT8/OYszz/bE3lzS7jRrt6/8UKvV8+jS/bzBbsz51FEY
+	cCiS3Xd5svDpC0IcTHicvp5yHtePyYzxxCEt/P0T7dIUoVXQ780NAL8Y/CGK6TUR
+	Ho7osjM9AgMBAAECggEASiB0AxdaaDuuG7conqwUV+V2bBPmENJWIksSFGyMYfHQ
+	GZdfJyAh/PNTw2n/kiCCN7pV8EeDWAPcpucCV8NjFHAd0uyVQ5Letx1r4TRs7t05
+	ibrMqLV6vBgI6YNnSk/5ag2eGvzN4v8552utBeY7r6u1ddItIWFs65/9OSdUX98m
+	9iKC9n4D7pFvJsRoUfeD5qf5tF2cmAGS8z+y3502LPx0rNoJchHh06bkEwQIdA7Y
+	TUsXIj6RXZqHgcyD0CGVI0gsT6lSywSzfUQvgLEV6Py4VD+1t2jo97bgScbLaFRN
+	upC41HJFloYBvin0jtjgo/x8OUTGgW5IkBmrhw5roQKBgQDRoQiWiNtVYh+3AX2g
+	DkDXqUbJLdWEElbkjxqzrC19jHCOI12S67MvNZGZ3ET//5agF5pWo/ZE1ZUy7WoJ
+	2C9IdbKauGFlA0Drl1xrjHXU22/w8iDFp/F9lhbvu0vGIlCGGZlarl97Ulrha33a
+	EHtxNtX7jlu3yrZdReqrUWEhWQKBgQDIRbyaVbVw8nBAKj49cqi8AayD/aAt1sYE
+	KuDG0pv1ucXkOYtO2kvTxVUdBIPozdK4nVo/XT+mZ7PYSculukegjkO/Y51F6Tg+
+	4jlQxMFv30UAhslacFcSNy5KCePZX/5sUbHYa6Amp5dYXMf1hud02PdIMoNygNZ4
+	KKeQhL7ghQKBgF1XtTlCi1fDr5ePpF6muhzNlWVzcUWz3Nk9F4i1vDPRWzUPblVD
+	erAkzEaUnGzZZDq5B9JYhAo2iI76xGLJzpQXRIY8X7HY9wlwhoilLLqxU3EYf5tD
+	ovZm5KOu5Ji/ItfzgiOszXteOnVxpcJ54F2TK0kuJIz8SKPTxCCwxe1RAoGAPA3N
+	VGpHEitgxZzlNP/g4R+PX7T6B0TT9AP3iyc0ZSbj1F/9ChQjkMknkJ/9/h1aBsoI
+	ed+4amnGYCEg0/1b5SVD42w3iPM6ToD/ttyJNMa6pkHEtz3gnjG1y7XTgSdr34dP
+	0RnU2EKA+5o2y8U8Oqmk3R1olTlVFor6VDe6FRECgYAsgRurQPvNyWTjtXp8QLZ/
+	jYa8jqXkS7a26JVGKG6gq5hoaFq/fRksNYyC4H88lD/zxRmzkFkrEDIyhjVh5OMN
+	PAJTLOnebC6W2xbisRJqDB2LfxmbaH2FA4kO6UzZkhYjudThu4y8uOQlEcVQO7GU
+	VPVlMVkJXQmXIl6v3hCN+Q==
+	-----END PRIVATE KEY-----`,
+							PublicKey: `-----BEGIN CERTIFICATE-----
+	MIIDgTCCAmmgAwIBAgIJAPMNo6eG0UBaMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
+	BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
+	GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
+	MjMwNTIyMTEzOTE5WhcNMjYwNTIxMTEzOTE5WjBkMQswCQYDVQQGEwJVUzETMBEG
+	A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
+	ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMTCCASIwDQYJKoZIhvcN
+	AQEBBQADggEPADCCAQoCggEBAKP+6Y2O2wAUGqWBBLDseChAoIu+Kr/Nc/RKvRky
+	WKLMZj8Hmknqu7HjZsAXQVwquov8oHOSjifd9OA0EdxklQUeIv3VmrNbGNzavGZJ
+	31g6E8fvHfUT6jOMEYoKU05H6nJ/TAusqizcexWBkoUzSUqZv/Eh+ssxpofOpQTa
+	V8/80hxuoCAsxiDB07kuY497NaUf6gqE+TqrFfcqCJ1UB9BDruk1gP5K4w2BPz85
+	izPP9sTeXNLuNGu3r/xQq9Xz6NL9vMFuzPnUURhwKJLdd3my8OkLQhxMeJy+nnIe
+	14/JjPHEIS38/RPt0hShVdDvzQ0Avxj8IYrpNREejuiyMz0CAwEAAaM3MDUwHQYD
+	VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMBQGA1UdEQQNMAuCCWNoZWZub2Rl
+	MTANBgkqhkiG9w0BAQsFAAOCAQEAI9B0IJgmeqgLgFvBiHhGsNzxAKo3z+YmU2Ta
+	bqmcBO8gTGnLsnaQPs25sDPvM7YEkcjazhj74+f+L70+rAXl45TLkLQnIGpa4Bbg
+	uBpYonPRzK3aSiDcnTeTH7LivuTJJQZptaT9jrcAcpK6AzWCopWR/E1rQ/oRCfiu
+	4/PGV2nllNHC8rZm4YB3uftmjaWiwISf/gRSuD5yGu1TcCnYr5w3PhvkVAKHYLdj
+	tIUlDTuTFXO/92ZCuW74YqBay+dAIB4ThU0jvUNYWTFV8MHmBgQ9CfG9WW4pjORI
+	qalq5zXuKm1t+lrxCFND6cXu9Uk8HtrnSS5IqF0DprdepkyYhA==
+	-----END CERTIFICATE-----`,
+						},
 					},
 				},
-				Postgresql: &ServerConfigSettings{
+				Postgresql: &PostgresqlSettings{
 					Config: &ConfigSettings{
 						InstanceCount:     "3",
 						EnableCustomCerts: true,
@@ -525,6 +541,100 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						XContact:                      "user",
 						XDept:                         "",
 						XProject:                      "",
+					},
+				},
+			},
+			wantErr: false,
+			err:     nil,
+		},
+		{
+			name: "Parse OnPrem Config",
+			args: args{configFile: "./testdata/HaOnPrem.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					ExistingInfra: &ConfigInitials{
+						SSHUser:                     "",
+						SSHGroupName:                "",
+						SSHKeyFile:                  "",
+						SSHPort:                     "",
+						SecretsKeyFile:              "/hab/a2_deploy_workspace/secrets.key",
+						SecretsStoreFile:            "/hab/a2_deploy_workspace/secrets.json",
+						SudoPassword:                "",
+						LoggingMonitoringManagement: "",
+						Architecture:                "existing_nodes",
+						WorkspacePath:               "/hab/a2_deploy_workspace",
+						BackupMount:                 "/mnt/automate_backups",
+						BackupConfig:                "",
+						S3BucketName:                "",
+						HabitatUIDGid:               "",
+					},
+				},
+				ObjectStorage: &ObjectStorage{
+					Config: &ConfigObjectStorage{
+						BucketName: "",
+						AccessKey:  "",
+						SecretKey:  "",
+						Endpoint:   "",
+						Region:     "",
+					},
+				},
+				Automate: &AutomateSettings{
+					Config: &ConfigAutomateSettings{
+						AdminPassword: "",
+						Fqdn:          "",
+						ConfigFile:    "configs/automate.toml",
+						TeamsPort:     "",
+						ConfigSettings: ConfigSettings{
+							InstanceCount:     "",
+							EnableCustomCerts: false,
+							RootCA:            "a2_cert",
+							PrivateKey:        "a2_pvt_key",
+							PublicKey:         "a2_public_key",
+							CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "a2_pvt_key", PublicKey: "a2_public_key"}},
+						},
+					},
+				},
+				ChefServer: &ChefServerSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						RootCA:            "cs_cert",
+						PrivateKey:        "cs_pvt_key",
+						PublicKey:         "cs_public_key",
+						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "cs_pvt_key", PublicKey: "cs_public_key"}},
+					},
+				},
+				Opensearch: &OpensearchSettings{
+					Config: &ConfigOpensearchSettings{
+						ConfigSettings: ConfigSettings{
+							InstanceCount:     "",
+							EnableCustomCerts: true,
+							RootCA:            "os_cert",
+							PrivateKey:        "os_pvt_key",
+							PublicKey:         "os_public_key",
+							CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
+						},
+
+						AdminCert: "os_admin_cert",
+						AdminKey:  "os_admin_key",
+					},
+				},
+				Postgresql: &PostgresqlSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						RootCA:            "pg_cert",
+						PrivateKey:        "pg_pvt_key",
+						PublicKey:         "pg_pvt_key",
+						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "pg_pvt_key", PublicKey: "pg_pvt_key"}},
+					},
+				},
+				ExistingInfra: &ExistingInfraSettings{
+					Config: &ConfigExistingInfraSettings{
+						AutomatePrivateIps:   []string{},
+						ChefServerPrivateIps: []string{},
+						OpensearchPrivateIps: []string{},
+						PostgresqlPrivateIps: []string{},
 					},
 				},
 			},
