@@ -145,6 +145,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 - Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
 - Following config will by default leave the backup configuration empty
+- To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
 
 {{< /note >}}
 
@@ -187,56 +188,61 @@ instance_count = "2"
 config_file = "configs/automate.toml"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+
+# Add Automate Load Balancer root-ca
+# root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
+
 # Or you can provide certificates at the node level using the below fields
 # [[automate.config.certs_by_ip]]
 # ip = "A.B.C.D"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [chef_server.config]
 instance_count = "2"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+
+# Add Chef Server node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
+
 # Or you can provide certificates at the node level using the below fields
 # [[chef_server.config.certs_by_ip]]
 # ip = "I.J.K.L"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [opensearch.config]
 instance_count = "3"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add OpenSearch load balancer root-ca and keys
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+# Add OpenSearch root-ca and keys
+# root_ca = """root_ca_contents"""
+# admin_key = """admin_private_key_contents"""
+# admin_cert = """admin_public_key_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # Or you can provide certificates at the node level using the below fields
 # [[opensearch.config.certs_by_ip]]
 # ip = "A1.A2.A3.A4"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [postgresql.config]
 instance_count = "3"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add Postgresql root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # Or you can provide certificates at the node level using the below fields
 # [[postgresql.config.certs_by_ip]]
 # ip = "D1.D2.D3.D4"
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 [existing_infra.config]
 ## === INPUT NEEDED ===
 # provide comma separate IP address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
@@ -267,8 +273,8 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 - Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites) to know more.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
-- Set up AWS RDS Postgresql 13.5. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
-- Set up AWS OpenSearch 1.2. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
+- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
+- Set up AWS OpenSearch 1.3. Click [here](/automate/create_amazon_opensearch/) to know more.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
 - Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
@@ -281,7 +287,9 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
 
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
   - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
-  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
+  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps. 
+    - The master username value which you used while creating AWS RDS Postgresql can be used for both `superuser_username` and `dbuser_username`
+    - The master password value which you used while creating AWS RDS Postgresql can be used for both `superuser_password` and `dbuser_password`
   - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
   - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
   - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
@@ -364,6 +372,8 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
   - Set `type` as `self-managed`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
   - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for your Self Managed RDS.
+    - You can use the same values for both `superuser_username` and `dbuser_username` too
+    - You can use the same values for both `superuser_password` and `dbuser_password` too
   - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
   - Provide the Root ca value of Postgresql `postgresql_root_cert`.
   - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for your Self Managed OpenSearch.

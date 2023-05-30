@@ -118,13 +118,15 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 - Execute the below command to install the habitat package for `knife-ec-backup`
 
     ```cmd
-        hab pkg install chef/knife-ec-backup
+    hab pkg install chef/knife-ec-backup
     ```
 
 - Execute the below command to restore the backup.
 
     ```cmd
-        hab pkg exec chef/knife-ec-backup knife ec restore <path/to/directory/backup_file> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    hab pkg exec chef/knife-ec-backup knife ec restore <path/to/directory/backup_file> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
     ```
 
 ## Steps to Validate if Migration is Successful

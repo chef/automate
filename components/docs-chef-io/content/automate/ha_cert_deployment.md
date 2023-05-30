@@ -30,9 +30,13 @@ To add a common custom certificate for all the nodes of the Chef Automate servic
 ```toml
 [automate.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
+
+# Add Automate Load Balancer root-ca
+root_ca = """ADD_YOUR_ROOT_CA_HERE"""
+
+# Add Automate node internal public and private keys
+private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
 ```
 
 ### Common custom certificate for Chef Server
@@ -42,8 +46,8 @@ To add a common custom certificate for all the nodes of the Chef Server service,
 ```toml
 [chef_server.config]
 enable_custom_certs = true
-private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
 ```
 
 ### Common custom certificate for OpenSearch
@@ -53,11 +57,11 @@ To add a common custom certificate for all the nodes of the OpenSearch service, 
 ```toml
 [opensearch.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
-admin_key = "ADD_YOUR_ADMIN_KEY_HERE"
-admin_cert = "ADD_YOUR_ADMIN_CERT_HERE"
+root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
+private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
+admin_key = """ADD_YOUR_ADMIN_KEY_HERE"""
+admin_cert = """ADD_YOUR_ADMIN_CERT_HERE"""
 ```
 
 ### Common custom certificate for PostgreSQL
@@ -67,9 +71,9 @@ To add a common custom certificate for all the nodes of the PostgreSQL service, 
 ```toml
 [postgresql.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_HERE"
+root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
+private_key = """ADD_YOUR_PRIVATE_KEY_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_HERE"""
 ```
 
 ## Setting unique certificates for different nodes of a service
@@ -91,15 +95,18 @@ To add unique custom certificates for 2 the nodes of the Chef Automate service, 
 ```toml
 [automate.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
+
+# Add Automate Load Balancer root-ca
+root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
+
 [[automate.config.certs_by_ip]]
 ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
 [[automate.config.certs_by_ip]]
 ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
 ```
 
 ### Unique custom certificates for Chef Server
@@ -111,12 +118,12 @@ To add unique custom certificates for 2 the nodes of the Chef Server service, ad
 enable_custom_certs = true
 [[chef_server.config.certs_by_ip]]
 ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
 [[chef_server.config.certs_by_ip]]
 ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
 ```
 
 ### Unique custom certificates for OpenSearch
@@ -126,21 +133,21 @@ To add unique custom certificates for 3 of the nodes of the OpenSearch service, 
 ```toml
 [opensearch.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
-admin_key = "ADD_YOUR_ADMIN_KEY_HERE"
-admin_cert = "ADD_YOUR_ADMIN_CERT_HERE"
+root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
+admin_key = """ADD_YOUR_ADMIN_KEY_HERE"""
+admin_cert = """ADD_YOUR_ADMIN_CERT_HERE"""
 [[opensearch.config.certs_by_ip]]
 ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
 [[opensearch.config.certs_by_ip]]
 ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
 [[opensearch.config.certs_by_ip]]
 ip = "ADD_YOUR_THIRD_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_THIRD_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_THIRD_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_THIRD_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_THIRD_IP_ADDRESS_HERE"""
 ```
 
 ### Unique custom certificates for PostgreSQL
@@ -150,17 +157,17 @@ To add unique custom certificates for 3 of the nodes of the PostgreSQL service, 
 ```toml
 [postgresql.config]
 enable_custom_certs = true
-root_ca = "ADD_YOUR_ROOT_CA_CERT_HERE"
+root_ca = """ADD_YOUR_ROOT_CA_CERT_HERE"""
 [[postgresql.config.certs_by_ip]]
 ip = "ADD_YOUR_FIRST_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_FIRST_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_FIRST_IP_ADDRESS_HERE"""
 [[postgresql.config.certs_by_ip]]
 ip = "ADD_YOUR_SECOND_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_SECOND_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_SECOND_IP_ADDRESS_HERE"""
 [[postgresql.config.certs_by_ip]]
 ip = "ADD_YOUR_THIRD_IP_ADDRESS_HERE"
-private_key = "ADD_YOUR_PRIVATE_KEY_OF_THIRD_IP_ADDRESS_HERE"
-public_key = "ADD_YOUR_PUBLIC_KEY_OF_THIRD_IP_ADDRESS_HERE"
+private_key = """ADD_YOUR_PRIVATE_KEY_OF_THIRD_IP_ADDRESS_HERE"""
+public_key = """ADD_YOUR_PUBLIC_KEY_OF_THIRD_IP_ADDRESS_HERE"""
 ```
