@@ -1,7 +1,8 @@
 package config
 
 import (
-	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"fmt"
+
 	"github.com/chef/automate/lib/io/fileutils"
 	ptoml "github.com/pelletier/go-toml"
 )
@@ -64,11 +65,16 @@ type AutomateSettings struct {
 	Config *ConfigAutomateSettings `toml:"config,omitempty"`
 }
 type ConfigAutomateSettings struct {
-	AdminPassword string `toml:"admin_password,omitempty"`
-	Fqdn          string `toml:"fqdn,omitempty"`
-	ConfigFile    string `toml:"config_file,omitempty"`
-	TeamsPort     string `toml:"teams_port,omitempty"`
-	ConfigSettings
+	AdminPassword     string      `toml:"admin_password,omitempty"`
+	Fqdn              string      `toml:"fqdn,omitempty"`
+	ConfigFile        string      `toml:"config_file,omitempty"`
+	TeamsPort         string      `toml:"teams_port,omitempty"`
+	RootCA            string      `toml:"root_ca,omitempty"`
+	InstanceCount     string      `toml:"instance_count,omitempty"`
+	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
+	PrivateKey        string      `toml:"private_key,omitempty"`
+	PublicKey         string      `toml:"public_key,omitempty"`
+	CertsByIP         *[]CertByIP `toml:"certs_by_ip,omitempty"`
 }
 
 type ChefServerSettings struct {
@@ -83,11 +89,16 @@ type OpensearchSettings struct {
 	Config *ConfigOpensearchSettings `toml:"config,omitempty"`
 }
 type ConfigOpensearchSettings struct {
-	AdminCert string `toml:"admin_cert,omitempty"`
-	AdminKey  string `toml:"admin_key,omitempty"`
-	AdminDn   string `toml:"admin_dn,omitempty"`
-	NodesDn   string `toml:"nodes_dn,omitempty"`
-	ConfigSettings
+	AdminCert         string      `toml:"admin_cert,omitempty"`
+	AdminKey          string      `toml:"admin_key,omitempty"`
+	AdminDn           string      `toml:"admin_dn,omitempty"`
+	NodesDn           string      `toml:"nodes_dn,omitempty"`
+	RootCA            string      `toml:"root_ca,omitempty"`
+	InstanceCount     string      `toml:"instance_count,omitempty"`
+	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
+	PrivateKey        string      `toml:"private_key,omitempty"`
+	PublicKey         string      `toml:"public_key,omitempty"`
+	CertsByIP         *[]CertByIP `toml:"certs_by_ip,omitempty"`
 }
 
 type ConfigSettings struct {
@@ -206,12 +217,12 @@ func (c *HaDeployConfig) ParseHaDeployConfig(configFile string) (*HaDeployConfig
 	fileUtils := &fileutils.FileSystemUtils{}
 	templateBytes, err := fileUtils.ReadFile(configFile)
 	if err != nil {
-		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+		return nil, fmt.Errorf("error reading config TOML file: %w", err)
 	}
 	config := HaDeployConfig{}
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
-		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+		return nil, fmt.Errorf("error unmarshalling config TOML file: %w", err)
 	}
 	return &config, nil
 }

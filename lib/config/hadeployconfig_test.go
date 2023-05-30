@@ -1,6 +1,7 @@
 package config
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,12 +46,12 @@ func TestParseHaDeployConfig(t *testing.T) {
 						Fqdn:          "",
 						ConfigFile:    "configs/automate.toml",
 						TeamsPort:     "",
-						ConfigSettings: ConfigSettings{
-							InstanceCount:     "",
-							EnableCustomCerts: false,
-						},
+
+						InstanceCount:     "",
+						EnableCustomCerts: false,
 					},
 				},
+
 				ChefServer: &ChefServerSettings{
 					Config: &ConfigSettings{
 						InstanceCount:     "",
@@ -59,17 +60,15 @@ func TestParseHaDeployConfig(t *testing.T) {
 				},
 				Opensearch: &OpensearchSettings{
 					Config: &ConfigOpensearchSettings{
-						AdminCert: "",
-						AdminKey:  "",
-						AdminDn:   "",
-						NodesDn:   "",
-						ConfigSettings: ConfigSettings{
-							InstanceCount:     "",
-							EnableCustomCerts: false,
-							PrivateKey:        "",
-							PublicKey:         "",
-							CertsByIP:         &[]CertByIP{},
-						},
+						AdminCert:         "",
+						AdminKey:          "",
+						AdminDn:           "",
+						NodesDn:           "",
+						InstanceCount:     "",
+						EnableCustomCerts: false,
+						PrivateKey:        "",
+						PublicKey:         "",
+						CertsByIP:         nil,
 					},
 				},
 				Postgresql: &PostgresqlSettings{
@@ -79,7 +78,7 @@ func TestParseHaDeployConfig(t *testing.T) {
 						EnableCustomCerts: false,
 						PrivateKey:        "",
 						PublicKey:         "",
-						CertsByIP:         &[]CertByIP{},
+						CertsByIP:         nil,
 					},
 				},
 				Aws: &AwsSettings{
@@ -149,14 +148,12 @@ func TestParseHaDeployConfig(t *testing.T) {
 				},
 				Automate: &AutomateSettings{
 					Config: &ConfigAutomateSettings{
-						AdminPassword: "123456789",
-						Fqdn:          "",
-						ConfigFile:    "configs/automate.toml",
-						TeamsPort:     "",
-						ConfigSettings: ConfigSettings{
-							InstanceCount:     "2",
-							EnableCustomCerts: true,
-							RootCA: `-----BEGIN CERTIFICATE-----
+						AdminPassword:     "123456789",
+						Fqdn:              "",
+						ConfigFile:        "configs/automate.toml",
+						InstanceCount:     "2",
+						EnableCustomCerts: true,
+						RootCA: `-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
 U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
@@ -180,7 +177,7 @@ xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
 VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
 WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=
 -----END CERTIFICATE-----`,
-							PrivateKey: `-----BEGIN PRIVATE KEY-----
+						PrivateKey: `-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCyJbvhtNLZrgz7
 aa1W1gIGFrwtI5h23S99A8VZlRySlbvJpNpJsQZpwBqW9HtUSsErL8u5dakgFn6l
 SopXzmyzxgbuLSnAmmicNrsFI/O5BkZtacvebOjBpfm0LnPsZIfhqnlqvn8nM3a/
@@ -208,7 +205,7 @@ OJZOGKk4AMXIFM/J0qY60DLnw0B4RuzSXcKw2EGYRJihbGJAI8+KczU7LpVlOsw5
 FzQabRrE33NPYWFv0bqzas9/p9mPwFPzhq13mkrLOHwf71T63OEalaOh9WzaE2Tx
 hTp1M8sBDwrDLxCEk0X3NEL+
 -----END PRIVATE KEY-----`,
-							PublicKey: `-----BEGIN CERTIFICATE-----
+						PublicKey: `-----BEGIN CERTIFICATE-----
 MIIDgzCCAmugAwIBAgIJAPMNo6eG0UBgMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
 BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
 GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
@@ -229,9 +226,9 @@ Z9J12XYepWxARbVUcgWyHFIjnSoNpFwgrm1xybnyJ2WnjRRjpq6JvkP5+eklESEm
 Z4wjUCokbRJ8gbC7tuVgQk6DNM123j9djBm+A+5WlbvHUrD5trfbkp8kUJY4jaJF
 csKeX402wz9P7XM5eGsToNpAZq41Q7mFzz14DfqFNttaCMHMYi4k
 -----END CERTIFICATE-----`,
-						},
 					},
 				},
+
 				ChefServer: &ChefServerSettings{
 					Config: &ConfigSettings{
 						InstanceCount:     "2",
@@ -338,82 +335,82 @@ fPwEr1CSOyHmQMQLLJsdzfB2RQ6MfG1pCH1FNPCfWjK8Rrd0Hic/sQ4Yd6q/Bmek
 b9KA5lUyk1Ox/YBBfm4RfmeKRqQKtASF8UJG3eCut0h3+uqyQpCxAx/8MlipkF7g
 1EvU3J0+e99VMZJ/wNlrAla08VsV/hjXd+NIZYkl31cghLXmTA==
 -----END CERTIFICATE-----`,
-						ConfigSettings: ConfigSettings{
-							InstanceCount:     "3",
-							EnableCustomCerts: true,
-							RootCA: `-----BEGIN CERTIFICATE-----
-	MIIDQjCCAioCCQDgqVuWOfJnIDANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJV
-	UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
-	CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxETAPBgNVBAMMCHByb2dyZXNzMB4XDTIzMDUy
-	MjExMzkxOFoXDTI2MDUyMTExMzkxOFowYzELMAkGA1UEBhMCVVMxEzARBgNVBAgM
-	Cldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29m
-	dHdhcmUgSW5jMREwDwYDVQQDDAhwcm9ncmVzczCCASIwDQYJKoZIhvcNAQEBBQAD
-	ggEPADCCAQoCggEBAMgz+0U4g/jhxxlGzgY7ppZlC3F+z01DUPPDAyys3hghjjqH
-	CgAhdgPBkUyHvaR7XO75kVBlu7JRBydsfug15LXS6fPMjlRPMaf8Bq0sIIlHuvf0
-	D0T+Zwh/XwCBiOCRorLfc8DPSTm7OM/LwbCkxTPGdScusmMz0TuSJVtonScUK3x6
-	58vy3s3GlQAIqotSy+r6nXph3fTY2b+m3RPM1QTpnZ0hV0/M6DwKWDO38o1HZXU4
-	c+mDqo6CSLrBNAVnllQYZjuEf1Z7IxtT4zZHvh5quPQhE+13qM6kztSWu7fLx7T+
-	uDuLvBjHIJNZpxmwDyk30+b7zWogg+jkxOTjCnECAwEAATANBgkqhkiG9w0BAQsF
-	AAOCAQEAR6g2Zp3FEfOFmU3wf18Ldjq8Qu69AQd3p0a4PqjfGvVN4R1Rs9LA5uYv
-	VegcVs1LB7TxN6CEMq/fZrfGtJUYMhE2V7WM0RmUAhUHHIvq+43VVN0ZT7pTKPgl
-	YVLXjiBOsJpPko/j/MDIjYK67wBcOHj08bG2ew9twrfjso9SJPd4ILxlx7Iwh5R9
-	pQijrBxVHcj23iuN3l23aQL25soAXSjVraG+CcU/lXr8zuHSb04M8Z0LvyylNDBd
-	G5vGMhL6fl057HyQQw78h804cHukZrkA940YqEHadkEdfV6Z1G4YJOGcSsFPcSUR
-	D1C7LJG3dXCCKER6zRZqjtv3wy0K5Q==
-	-----END CERTIFICATE-----`,
 
-							PrivateKey: `-----BEGIN PRIVATE KEY-----
-	MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCj/umNjtsAFBql
-	gQSw7HgoQKCLviq/zXP0Sr0ZMliizGY/B5pJ6rux42bAF0FcKrqL/KBzko4n3fTg
-	NBHcZJUFHiL91ZqzWxjc2rxmSd9YOhPH7x31E+ozjBGKClNOR+pyf0wLrKos3HsV
-	gZKFM0lKmb/xIfrLMaaHzqUE2lfP/NIcbqAgLMYgwdO5LmOPezWlH+oKhPk6qxX3
-	KgidVAfQQ67pNYD+SuMNgT8/OYszz/bE3lzS7jRrt6/8UKvV8+jS/bzBbsz51FEY
-	cCiS3Xd5svDpC0IcTHicvp5yHtePyYzxxCEt/P0T7dIUoVXQ780NAL8Y/CGK6TUR
-	Ho7osjM9AgMBAAECggEASiB0AxdaaDuuG7conqwUV+V2bBPmENJWIksSFGyMYfHQ
-	GZdfJyAh/PNTw2n/kiCCN7pV8EeDWAPcpucCV8NjFHAd0uyVQ5Letx1r4TRs7t05
-	ibrMqLV6vBgI6YNnSk/5ag2eGvzN4v8552utBeY7r6u1ddItIWFs65/9OSdUX98m
-	9iKC9n4D7pFvJsRoUfeD5qf5tF2cmAGS8z+y3502LPx0rNoJchHh06bkEwQIdA7Y
-	TUsXIj6RXZqHgcyD0CGVI0gsT6lSywSzfUQvgLEV6Py4VD+1t2jo97bgScbLaFRN
-	upC41HJFloYBvin0jtjgo/x8OUTGgW5IkBmrhw5roQKBgQDRoQiWiNtVYh+3AX2g
-	DkDXqUbJLdWEElbkjxqzrC19jHCOI12S67MvNZGZ3ET//5agF5pWo/ZE1ZUy7WoJ
-	2C9IdbKauGFlA0Drl1xrjHXU22/w8iDFp/F9lhbvu0vGIlCGGZlarl97Ulrha33a
-	EHtxNtX7jlu3yrZdReqrUWEhWQKBgQDIRbyaVbVw8nBAKj49cqi8AayD/aAt1sYE
-	KuDG0pv1ucXkOYtO2kvTxVUdBIPozdK4nVo/XT+mZ7PYSculukegjkO/Y51F6Tg+
-	4jlQxMFv30UAhslacFcSNy5KCePZX/5sUbHYa6Amp5dYXMf1hud02PdIMoNygNZ4
-	KKeQhL7ghQKBgF1XtTlCi1fDr5ePpF6muhzNlWVzcUWz3Nk9F4i1vDPRWzUPblVD
-	erAkzEaUnGzZZDq5B9JYhAo2iI76xGLJzpQXRIY8X7HY9wlwhoilLLqxU3EYf5tD
-	ovZm5KOu5Ji/ItfzgiOszXteOnVxpcJ54F2TK0kuJIz8SKPTxCCwxe1RAoGAPA3N
-	VGpHEitgxZzlNP/g4R+PX7T6B0TT9AP3iyc0ZSbj1F/9ChQjkMknkJ/9/h1aBsoI
-	ed+4amnGYCEg0/1b5SVD42w3iPM6ToD/ttyJNMa6pkHEtz3gnjG1y7XTgSdr34dP
-	0RnU2EKA+5o2y8U8Oqmk3R1olTlVFor6VDe6FRECgYAsgRurQPvNyWTjtXp8QLZ/
-	jYa8jqXkS7a26JVGKG6gq5hoaFq/fRksNYyC4H88lD/zxRmzkFkrEDIyhjVh5OMN
-	PAJTLOnebC6W2xbisRJqDB2LfxmbaH2FA4kO6UzZkhYjudThu4y8uOQlEcVQO7GU
-	VPVlMVkJXQmXIl6v3hCN+Q==
-	-----END PRIVATE KEY-----`,
-							PublicKey: `-----BEGIN CERTIFICATE-----
-	MIIDgTCCAmmgAwIBAgIJAPMNo6eG0UBaMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
-	BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
-	GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
-	MjMwNTIyMTEzOTE5WhcNMjYwNTIxMTEzOTE5WjBkMQswCQYDVQQGEwJVUzETMBEG
-	A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
-	ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMTCCASIwDQYJKoZIhvcN
-	AQEBBQADggEPADCCAQoCggEBAKP+6Y2O2wAUGqWBBLDseChAoIu+Kr/Nc/RKvRky
-	WKLMZj8Hmknqu7HjZsAXQVwquov8oHOSjifd9OA0EdxklQUeIv3VmrNbGNzavGZJ
-	31g6E8fvHfUT6jOMEYoKU05H6nJ/TAusqizcexWBkoUzSUqZv/Eh+ssxpofOpQTa
-	V8/80hxuoCAsxiDB07kuY497NaUf6gqE+TqrFfcqCJ1UB9BDruk1gP5K4w2BPz85
-	izPP9sTeXNLuNGu3r/xQq9Xz6NL9vMFuzPnUURhwKJLdd3my8OkLQhxMeJy+nnIe
-	14/JjPHEIS38/RPt0hShVdDvzQ0Avxj8IYrpNREejuiyMz0CAwEAAaM3MDUwHQYD
-	VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMBQGA1UdEQQNMAuCCWNoZWZub2Rl
-	MTANBgkqhkiG9w0BAQsFAAOCAQEAI9B0IJgmeqgLgFvBiHhGsNzxAKo3z+YmU2Ta
-	bqmcBO8gTGnLsnaQPs25sDPvM7YEkcjazhj74+f+L70+rAXl45TLkLQnIGpa4Bbg
-	uBpYonPRzK3aSiDcnTeTH7LivuTJJQZptaT9jrcAcpK6AzWCopWR/E1rQ/oRCfiu
-	4/PGV2nllNHC8rZm4YB3uftmjaWiwISf/gRSuD5yGu1TcCnYr5w3PhvkVAKHYLdj
-	tIUlDTuTFXO/92ZCuW74YqBay+dAIB4ThU0jvUNYWTFV8MHmBgQ9CfG9WW4pjORI
-	qalq5zXuKm1t+lrxCFND6cXu9Uk8HtrnSS5IqF0DprdepkyYhA==
-	-----END CERTIFICATE-----`,
-						},
+						InstanceCount:     "3",
+						EnableCustomCerts: true,
+						RootCA: `-----BEGIN CERTIFICATE-----
+MIIDQjCCAioCCQDgqVuWOfJnIDANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJV
+UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
+CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxETAPBgNVBAMMCHByb2dyZXNzMB4XDTIzMDUy
+MjExMzkxOFoXDTI2MDUyMTExMzkxOFowYzELMAkGA1UEBhMCVVMxEzARBgNVBAgM
+Cldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29m
+dHdhcmUgSW5jMREwDwYDVQQDDAhwcm9ncmVzczCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAMgz+0U4g/jhxxlGzgY7ppZlC3F+z01DUPPDAyys3hghjjqH
+CgAhdgPBkUyHvaR7XO75kVBlu7JRBydsfug15LXS6fPMjlRPMaf8Bq0sIIlHuvf0
+D0T+Zwh/XwCBiOCRorLfc8DPSTm7OM/LwbCkxTPGdScusmMz0TuSJVtonScUK3x6
+58vy3s3GlQAIqotSy+r6nXph3fTY2b+m3RPM1QTpnZ0hV0/M6DwKWDO38o1HZXU4
+c+mDqo6CSLrBNAVnllQYZjuEf1Z7IxtT4zZHvh5quPQhE+13qM6kztSWu7fLx7T+
+uDuLvBjHIJNZpxmwDyk30+b7zWogg+jkxOTjCnECAwEAATANBgkqhkiG9w0BAQsF
+AAOCAQEAR6g2Zp3FEfOFmU3wf18Ldjq8Qu69AQd3p0a4PqjfGvVN4R1Rs9LA5uYv
+VegcVs1LB7TxN6CEMq/fZrfGtJUYMhE2V7WM0RmUAhUHHIvq+43VVN0ZT7pTKPgl
+YVLXjiBOsJpPko/j/MDIjYK67wBcOHj08bG2ew9twrfjso9SJPd4ILxlx7Iwh5R9
+pQijrBxVHcj23iuN3l23aQL25soAXSjVraG+CcU/lXr8zuHSb04M8Z0LvyylNDBd
+G5vGMhL6fl057HyQQw78h804cHukZrkA940YqEHadkEdfV6Z1G4YJOGcSsFPcSUR
+D1C7LJG3dXCCKER6zRZqjtv3wy0K5Q==
+-----END CERTIFICATE-----`,
+
+						PrivateKey: `-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCj/umNjtsAFBql
+gQSw7HgoQKCLviq/zXP0Sr0ZMliizGY/B5pJ6rux42bAF0FcKrqL/KBzko4n3fTg
+NBHcZJUFHiL91ZqzWxjc2rxmSd9YOhPH7x31E+ozjBGKClNOR+pyf0wLrKos3HsV
+gZKFM0lKmb/xIfrLMaaHzqUE2lfP/NIcbqAgLMYgwdO5LmOPezWlH+oKhPk6qxX3
+KgidVAfQQ67pNYD+SuMNgT8/OYszz/bE3lzS7jRrt6/8UKvV8+jS/bzBbsz51FEY
+cCiS3Xd5svDpC0IcTHicvp5yHtePyYzxxCEt/P0T7dIUoVXQ780NAL8Y/CGK6TUR
+Ho7osjM9AgMBAAECggEASiB0AxdaaDuuG7conqwUV+V2bBPmENJWIksSFGyMYfHQ
+GZdfJyAh/PNTw2n/kiCCN7pV8EeDWAPcpucCV8NjFHAd0uyVQ5Letx1r4TRs7t05
+ibrMqLV6vBgI6YNnSk/5ag2eGvzN4v8552utBeY7r6u1ddItIWFs65/9OSdUX98m
+9iKC9n4D7pFvJsRoUfeD5qf5tF2cmAGS8z+y3502LPx0rNoJchHh06bkEwQIdA7Y
+TUsXIj6RXZqHgcyD0CGVI0gsT6lSywSzfUQvgLEV6Py4VD+1t2jo97bgScbLaFRN
+upC41HJFloYBvin0jtjgo/x8OUTGgW5IkBmrhw5roQKBgQDRoQiWiNtVYh+3AX2g
+DkDXqUbJLdWEElbkjxqzrC19jHCOI12S67MvNZGZ3ET//5agF5pWo/ZE1ZUy7WoJ
+2C9IdbKauGFlA0Drl1xrjHXU22/w8iDFp/F9lhbvu0vGIlCGGZlarl97Ulrha33a
+EHtxNtX7jlu3yrZdReqrUWEhWQKBgQDIRbyaVbVw8nBAKj49cqi8AayD/aAt1sYE
+KuDG0pv1ucXkOYtO2kvTxVUdBIPozdK4nVo/XT+mZ7PYSculukegjkO/Y51F6Tg+
+4jlQxMFv30UAhslacFcSNy5KCePZX/5sUbHYa6Amp5dYXMf1hud02PdIMoNygNZ4
+KKeQhL7ghQKBgF1XtTlCi1fDr5ePpF6muhzNlWVzcUWz3Nk9F4i1vDPRWzUPblVD
+erAkzEaUnGzZZDq5B9JYhAo2iI76xGLJzpQXRIY8X7HY9wlwhoilLLqxU3EYf5tD
+ovZm5KOu5Ji/ItfzgiOszXteOnVxpcJ54F2TK0kuJIz8SKPTxCCwxe1RAoGAPA3N
+VGpHEitgxZzlNP/g4R+PX7T6B0TT9AP3iyc0ZSbj1F/9ChQjkMknkJ/9/h1aBsoI
+ed+4amnGYCEg0/1b5SVD42w3iPM6ToD/ttyJNMa6pkHEtz3gnjG1y7XTgSdr34dP
+0RnU2EKA+5o2y8U8Oqmk3R1olTlVFor6VDe6FRECgYAsgRurQPvNyWTjtXp8QLZ/
+jYa8jqXkS7a26JVGKG6gq5hoaFq/fRksNYyC4H88lD/zxRmzkFkrEDIyhjVh5OMN
+PAJTLOnebC6W2xbisRJqDB2LfxmbaH2FA4kO6UzZkhYjudThu4y8uOQlEcVQO7GU
+VPVlMVkJXQmXIl6v3hCN+Q==
+-----END PRIVATE KEY-----`,
+						PublicKey: `-----BEGIN CERTIFICATE-----
+MIIDgTCCAmmgAwIBAgIJAPMNo6eG0UBaMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
+GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzERMA8GA1UEAwwIcHJvZ3Jlc3MwHhcN
+MjMwNTIyMTEzOTE5WhcNMjYwNTIxMTEzOTE5WjBkMQswCQYDVQQGEwJVUzETMBEG
+A1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hl
+ZiBTb2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZub2RlMTCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBAKP+6Y2O2wAUGqWBBLDseChAoIu+Kr/Nc/RKvRky
+WKLMZj8Hmknqu7HjZsAXQVwquov8oHOSjifd9OA0EdxklQUeIv3VmrNbGNzavGZJ
+31g6E8fvHfUT6jOMEYoKU05H6nJ/TAusqizcexWBkoUzSUqZv/Eh+ssxpofOpQTa
+V8/80hxuoCAsxiDB07kuY497NaUf6gqE+TqrFfcqCJ1UB9BDruk1gP5K4w2BPz85
+izPP9sTeXNLuNGu3r/xQq9Xz6NL9vMFuzPnUURhwKJLdd3my8OkLQhxMeJy+nnIe
+14/JjPHEIS38/RPt0hShVdDvzQ0Avxj8IYrpNREejuiyMz0CAwEAAaM3MDUwHQYD
+VR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMBQGA1UdEQQNMAuCCWNoZWZub2Rl
+MTANBgkqhkiG9w0BAQsFAAOCAQEAI9B0IJgmeqgLgFvBiHhGsNzxAKo3z+YmU2Ta
+bqmcBO8gTGnLsnaQPs25sDPvM7YEkcjazhj74+f+L70+rAXl45TLkLQnIGpa4Bbg
+uBpYonPRzK3aSiDcnTeTH7LivuTJJQZptaT9jrcAcpK6AzWCopWR/E1rQ/oRCfiu
+4/PGV2nllNHC8rZm4YB3uftmjaWiwISf/gRSuD5yGu1TcCnYr5w3PhvkVAKHYLdj
+tIUlDTuTFXO/92ZCuW74YqBay+dAIB4ThU0jvUNYWTFV8MHmBgQ9CfG9WW4pjORI
+qalq5zXuKm1t+lrxCFND6cXu9Uk8HtrnSS5IqF0DprdepkyYhA==
+-----END CERTIFICATE-----`,
 					},
 				},
+
 				Postgresql: &PostgresqlSettings{
 					Config: &ConfigSettings{
 						InstanceCount:     "3",
@@ -548,6 +545,99 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 			err:     nil,
 		},
 		{
+			name: "Parse OnPrem Db Aws Managed Config",
+			args: args{configFile: "./testdata/HaOnPremDbAwsManaged.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					ExistingInfra: &ConfigInitials{
+						SSHUser:      "ubuntu",
+						SSHGroupName: "ubuntu",
+
+						SSHKeyFile:       "~/.ssh/A2HA.pem",
+						SSHPort:          "22",
+						SecretsKeyFile:   "/hab/a2_deploy_workspace/secrets.key",
+						SecretsStoreFile: "/hab/a2_deploy_workspace/secrets.json",
+						Architecture:     "existing_nodes",
+						WorkspacePath:    "/hab/a2_deploy_workspace",
+						BackupMount:      "/mnt/automate_backups",
+						BackupConfig:     "file_system",
+					},
+				},
+				ObjectStorage: &ObjectStorage{
+					Config: &ConfigObjectStorage{
+						BucketName: "",
+						AccessKey:  "",
+						SecretKey:  "",
+						Endpoint:   "",
+						Region:     "us-west-1",
+					},
+				},
+				Automate: &AutomateSettings{
+					Config: &ConfigAutomateSettings{
+						AdminPassword:     "123456789",
+						Fqdn:              "chefautomate.example.com",
+						InstanceCount:     "2",
+						ConfigFile:        "configs/automate.toml",
+						TeamsPort:         "",
+						EnableCustomCerts: false,
+					},
+				},
+				ChefServer: &ChefServerSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "2",
+						EnableCustomCerts: false,
+					},
+				},
+				Opensearch: &OpensearchSettings{
+					Config: &ConfigOpensearchSettings{
+						InstanceCount:     "3",
+						EnableCustomCerts: false,
+					},
+				},
+				Postgresql: &PostgresqlSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "3",
+						EnableCustomCerts: false,
+					},
+				},
+				ExistingInfra: &ExistingInfraSettings{
+					Config: &ConfigExistingInfraSettings{
+						AutomatePrivateIps:   []string{"192.0.0.11", "192.0.0.12"},
+						ChefServerPrivateIps: []string{"192.0.0.11", "192.0.0.12"},
+						OpensearchPrivateIps: []string{"192.0.0.1", "192.0.0.2", "192.0.0.2"},
+						PostgresqlPrivateIps: []string{"192.0.0.1", "192.0.0.2", "192.0.0.2"},
+					},
+				},
+				External: &ExternalSettings{
+					Database: &ExternalDBSettings{Type: "aws",
+						PostgreSQL: &ExternalPgSettings{
+							InstanceURL:        "managed-rds-db.c5gkx.ap-northeast-1.rds.amazonaws.com:5432",
+							SuperuserUsername:  "postgres",
+							SuperuserPassword:  "Progress123",
+							DbuserUsername:     "postgres",
+							DbuserPassword:     "Progress123",
+							PostgresqlRootCert: "<cert_content>",
+						},
+						OpenSearch: &ExternalOsSettings{
+							OpensearchDomainName:   "managed-services-os",
+							OpensearchDomainURL:    "search-managed-services-os.us-east-1.es.amazonaws.com",
+							OpensearchUsername:     "admin",
+							OpensearchUserPassword: "Progress@123",
+							OpensearchRootCert:     "<cert_content>",
+
+							Aws: &AwsExternalOsSettings{
+								AwsOsSnapshotRoleArn:          "arn:aws:iam::1127583934333:role/managed-services",
+								OsSnapshotUserAccessKeyID:     "AKIA..........PQS7Q7A",
+								OsSnapshotUserAccessKeySecret: "skP4Mqihj....................anAXAX",
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+			err:     nil,
+		},
+		{
 			name: "Parse OnPrem Config",
 			args: args{configFile: "./testdata/HaOnPrem.toml"},
 			want: &HaDeployConfig{
@@ -580,25 +670,22 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				Automate: &AutomateSettings{
 					Config: &ConfigAutomateSettings{
-						AdminPassword: "",
-						Fqdn:          "",
-						ConfigFile:    "configs/automate.toml",
-						TeamsPort:     "",
-						ConfigSettings: ConfigSettings{
-							InstanceCount:     "",
-							EnableCustomCerts: false,
-							RootCA:            "a2_cert",
-							PrivateKey:        "a2_pvt_key",
-							PublicKey:         "a2_public_key",
-							CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "a2_pvt_key", PublicKey: "a2_public_key"}},
-						},
+						AdminPassword:     "",
+						Fqdn:              "",
+						ConfigFile:        "configs/automate.toml",
+						TeamsPort:         "",
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						RootCA:            "a2_cert",
+						PrivateKey:        "a2_pvt_key",
+						PublicKey:         "a2_public_key",
+						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "a2_pvt_key", PublicKey: "a2_public_key"}},
 					},
 				},
 				ChefServer: &ChefServerSettings{
 					Config: &ConfigSettings{
 						InstanceCount:     "",
 						EnableCustomCerts: true,
-						RootCA:            "cs_cert",
 						PrivateKey:        "cs_pvt_key",
 						PublicKey:         "cs_public_key",
 						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "cs_pvt_key", PublicKey: "cs_public_key"}},
@@ -606,17 +693,14 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				Opensearch: &OpensearchSettings{
 					Config: &ConfigOpensearchSettings{
-						ConfigSettings: ConfigSettings{
-							InstanceCount:     "",
-							EnableCustomCerts: true,
-							RootCA:            "os_cert",
-							PrivateKey:        "os_pvt_key",
-							PublicKey:         "os_public_key",
-							CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
-						},
-
-						AdminCert: "os_admin_cert",
-						AdminKey:  "os_admin_key",
+						InstanceCount:     "",
+						EnableCustomCerts: true,
+						RootCA:            "os_cert",
+						PrivateKey:        "os_pvt_key",
+						PublicKey:         "os_public_key",
+						AdminCert:         "os_admin_cert",
+						AdminKey:          "os_admin_key",
+						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
 					},
 				},
 				Postgresql: &PostgresqlSettings{
@@ -650,10 +734,10 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
 			// Compare the actual and expected configuration structs
-			// if !reflect.DeepEqual(got, tt.want) {
-			// 	t.Errorf("got %v, want %v", got, tt.want)
-			// }
-			assert.Equal(t, tt.want, got)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+			// assert.Equal(t, tt.want, got)
 		})
 	}
 }

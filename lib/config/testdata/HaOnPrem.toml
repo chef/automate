@@ -83,7 +83,7 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = true
-# Add Chef Server load balancer root-ca and keys
+# Add Chef Server load balancer keys
 private_key = "cs_pvt_key"
 public_key = "cs_public_key"
 [[chef_server.config.certs_by_ip]]
