@@ -162,18 +162,11 @@ This can be due to the following reasons:
 
 ### Details
 
-The max shards are the number of shards that should be patched to run the data lifecycle. If the client runs and the compliance data lifecycle is set to specific number of  days, what should be the max shards per node configuration?
+The max shards are the number of shards that can be patched for running the data lifecycle to avoid overloading of shards. If the client runs and the compliance data lifecycle is set to specific number of  days, what should be the max shards per node configuration?
 
 ### Fixes
 
-Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
-
-| Days | Max Shards Per Node |
-| ---- | ------------------ |
-| 30   | 1000               |
-| 60   | 2000               |
-| 90   | 3000               |
-| 365  | 12000              |
+The error for the shards occurs when the limit of the data injection to the OpenSearch drains. For example, the shards requirement is 1025 whereas the default value of max shards is **1000**. This is a performance issue from OpenSearch which can be fixed by setting the value of max shards per node.
 
 To set the value of max shards per node, patch the following configuration in the `.toml` file.
 

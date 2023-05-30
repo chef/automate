@@ -45,7 +45,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ## Max Shards
 
-The max shards are the number of shards that should be patched to run the data lifecycle. If the client runs and the compliance data lifecycle is set to 30 days, the max shards per node configuration should be 1000. Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
+The max shards are the number of shards that can be patched for running the data lifecycle to avoid overloading of shards. If the client runs and the compliance data lifecycle is set to 30 days, the max shards per node configuration should be 1000. Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
 
 | Days | Max Shards Per Node |
 | ---- | ------------------ |
