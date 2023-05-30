@@ -162,7 +162,7 @@ This can be due to the following reasons:
 
 ### Details
 
-The max shards are the number of shards that can be patched for running the data lifecycle to avoid overloading of shards. If the client runs and the compliance data lifecycle is set to specific number of  days, what should be the max shards per node configuration?
+The max shards are the number of shards that can be patched for running the data lifecycle to avoid overloading of shards.
 
 ### Fixes
 
