@@ -638,6 +638,98 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 			err:     nil,
 		},
 		{
+			name: "Parse OnPrem Db Self-Managed Config",
+			args: args{configFile: "./testdata/HaOnPremDbSelfManaged.toml"},
+			want: &HaDeployConfig{
+				Architecture: &Architecture{
+					ExistingInfra: &ConfigInitials{
+						SSHUser:          "ubuntu",
+						SSHGroupName:     "ubuntu",
+						SSHKeyFile:       "~/.ssh/A2HA.pem",
+						SSHPort:          "22",
+						SecretsKeyFile:   "/hab/a2_deploy_workspace/secrets.key",
+						SecretsStoreFile: "/hab/a2_deploy_workspace/secrets.json",
+						Architecture:     "existing_nodes",
+						WorkspacePath:    "/hab/a2_deploy_workspace",
+						BackupMount:      "/mnt/automate_backups",
+						BackupConfig:     "file_system",
+					},
+				},
+				ObjectStorage: &ObjectStorage{
+					Config: &ConfigObjectStorage{
+						BucketName: "",
+						AccessKey:  "",
+						SecretKey:  "",
+						Endpoint:   "",
+						Region:     "us-west-1",
+					},
+				},
+				Automate: &AutomateSettings{
+					Config: &ConfigAutomateSettings{
+						AdminPassword:     "123456789",
+						Fqdn:              "chefautomate.example.com",
+						InstanceCount:     "2",
+						ConfigFile:        "configs/automate.toml",
+						TeamsPort:         "",
+						EnableCustomCerts: false,
+					},
+				},
+				ChefServer: &ChefServerSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "2",
+						EnableCustomCerts: false,
+					},
+				},
+				Opensearch: &OpensearchSettings{
+					Config: &ConfigOpensearchSettings{
+						InstanceCount:     "3",
+						EnableCustomCerts: false,
+					},
+				},
+				Postgresql: &PostgresqlSettings{
+					Config: &ConfigSettings{
+						InstanceCount:     "3",
+						EnableCustomCerts: false,
+					},
+				},
+				ExistingInfra: &ExistingInfraSettings{
+					Config: &ConfigExistingInfraSettings{
+						AutomatePrivateIps:   []string{"192.0.0.11", "192.0.0.12"},
+						ChefServerPrivateIps: []string{"192.0.0.11", "192.0.0.12"},
+						OpensearchPrivateIps: []string{"192.0.0.1", "192.0.0.2", "192.0.0.2"},
+						PostgresqlPrivateIps: []string{"192.0.0.1", "192.0.0.2", "192.0.0.2"},
+					},
+				},
+				External: &ExternalSettings{
+					Database: &ExternalDBSettings{Type: "self-managed",
+						PostgreSQL: &ExternalPgSettings{
+							InstanceURL:        "",
+							SuperuserUsername:  "",
+							SuperuserPassword:  "",
+							DbuserUsername:     "",
+							DbuserPassword:     "",
+							PostgresqlRootCert: "",
+						},
+						OpenSearch: &ExternalOsSettings{
+							OpensearchDomainName:   "",
+							OpensearchDomainURL:    "",
+							OpensearchUsername:     "",
+							OpensearchUserPassword: "",
+							OpensearchRootCert:     "",
+
+							Aws: &AwsExternalOsSettings{
+								AwsOsSnapshotRoleArn:          "",
+								OsSnapshotUserAccessKeyID:     "",
+								OsSnapshotUserAccessKeySecret: "",
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+			err:     nil,
+		},
+		{
 			name: "Parse OnPrem Config",
 			args: args{configFile: "./testdata/HaOnPrem.toml"},
 			want: &HaDeployConfig{
@@ -729,7 +821,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := HaDeployConfig{}
-			got, err := config.ParseHaDeployConfig(tt.args.configFile)
+			got, err := config.Parse(tt.args.configFile)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
@@ -737,7 +829,6 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got %v, want %v", got, tt.want)
 			}
-			// assert.Equal(t, tt.want, got)
 		})
 	}
 }
