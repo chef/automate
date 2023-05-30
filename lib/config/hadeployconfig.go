@@ -1,5 +1,11 @@
 package config
 
+import (
+	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/lib/io/fileutils"
+	ptoml "github.com/pelletier/go-toml"
+)
+
 type HaDeployConfig struct {
 	Architecture  *Architecture          `toml:"architecture,omitempty"`
 	ObjectStorage *ObjectStorage         `toml:"object_storage,omitempty"`
@@ -183,4 +189,18 @@ type AwsExternalOsSettings struct {
 	AwsOsSnapshotRoleArn          string `toml:"aws_os_snapshot_role_arn,omitempty"`
 	OsSnapshotUserAccessKeyID     string `toml:"os_snapshot_user_access_key_id,omitempty"`
 	OsSnapshotUserAccessKeySecret string `toml:"os_snapshot_user_access_key_secret,omitempty"`
+}
+
+func (c *HaDeployConfig) ParseHaDeployConfig(configFile string) (*HaDeployConfig, error) {
+	fileUtils := &fileutils.FileSystemUtils{}
+	templateBytes, err := fileUtils.ReadFile(configFile)
+	if err != nil {
+		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
+	config := HaDeployConfig{}
+	err = ptoml.Unmarshal(templateBytes, &config)
+	if err != nil {
+		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	return &config, nil
 }
