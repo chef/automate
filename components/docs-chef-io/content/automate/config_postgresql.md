@@ -14,6 +14,8 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
+## Configurations
+
 The below configurations can be patched to PostgreSQL nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --pg` from bastion.
 
 
@@ -63,6 +65,6 @@ To increase log level to DEBUG:
   ```
 - Run patch command `chef-automate config patch log.toml --pg` to apply the patch.
 
-#### Centralised Logs
+### Centralised Logs
 
-Click [here](/automate/centralizing_log/) for more information
+Click [here](/automate/centralizing_log/) for more information.

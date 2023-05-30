@@ -14,6 +14,8 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
+## Configurations
+
 The below configurations can be patched to Chef Server nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --cs` from bastion node.
 
 ### General Chef Server Configuration
@@ -36,49 +38,49 @@ ssl_verify_depth = 6
 
 #### Chef Infra Configuration In Chef Automate
 
-Click [here](/automate/chef_infra_in_chef_automate) for more information
+Click [here](/automate/chef_infra_in_chef_automate) for more information.
 
 #### Patching Automate FQDN (Fully Qualified Domain Name)
 
-Click [here](/automate/configuration/#chef-automate-fqdn) to learn more.
+Click [here](/automate/configuration/#chef-automate-fqdn) for more information.
 
 #### Auto Upgrade ON/OFF
 
-Click [here](/automate/configuration/#upgrade-strategy) to learn more.
+Click [here](/automate/configuration/#upgrade-strategy) for more information.
 
 #### Proxy Settings
 
-Click [here](/automate/configuration/#proxy-settings) for more information
+Click [here](/automate/configuration/#proxy-settings) for more information.
 
 #### Global Log Level
 
-Click [here](/automate/configuration/#global-log-level) for more information
+Click [here](/automate/configuration/#global-log-level) for more information.
 
 #### Centralised Logs
 
-Click [here](/automate/centralizing_log/) for more information
+Click [here](/automate/centralizing_log/) for more information.
 
 #### Load Balancer
-Click [here](/automate/configuration/#load-balancer) for more information
+Click [here](/automate/configuration/#load-balancer) for more information.
 
 ### Backups
 
 #### Backup to a Filesystem
 
-Click [here](/automate/backup/#backup-to-a-filesystem) for more information
+Click [here](/automate/backup/#backup-to-a-filesystem) for more information.
 
 #### Backup to AWS S3
 
-Click [here](/automate/backup/#backup-to-aws-s3) for more information
+Click [here](/automate/backup/#backup-to-aws-s3) for more information.
 
 ### Configuring External OpenSearch in Automate
 
 #### Configure External Opensearch
 
-To know about OpenSearch configuration click [here](/automate/install/#configuring-external-opensearch)
+Click [here](/automate/install/#configuring-external-opensearch) for more information.
 
 #### Adding resolvers for external OpenSearch
-To know about adding OpenSearch resolvers click [here](/automate/install/#adding-resolvers-for-opensearch)
+Click [here](/automate/install/#adding-resolvers-for-opensearch) for more information.
 
 #### Backup externally deployed OpenSearch to local filesystem
 
@@ -92,12 +94,12 @@ Click [here](/automate/install/#backup-externally-deployed-opensearch-to-aws-s3)
 
 #### Configuring External PostgresSQL
 
-Click [here](/automate/install/#configuring-an-external-postgresql-database) for more information on external PostgreSQL configuration.
+Click [here](/automate/install/#configuring-an-external-postgresql-database) for more information.
 
 #### Adding resolvers for PostgreSQl database
 
-Click [here](/automate/install/#adding-resolvers-for-postgresql-database) for more information on external PostgreSQL configuration.
+Click [here](/automate/install/#adding-resolvers-for-postgresql-database) for more information.
 
 ### Troubleshooting
 
-Click [here](/automate/configuration/#troubleshooting) for more information
+Click [here](/automate/configuration/#troubleshooting) for more information.
