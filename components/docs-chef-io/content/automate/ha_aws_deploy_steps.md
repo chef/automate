@@ -233,7 +233,7 @@ backup_mount = "/mnt/automate_backups"
 [automate.config]
 admin_password = "MY-AUTOMATE-UI-PASSWORD"
 fqdn = ""
-instance_count = "1"
+instance_count = "2"
 config_file = "configs/automate.toml"
 enable_custom_certs = false
 
@@ -245,7 +245,7 @@ enable_custom_certs = false
 # public_key = """public_key_contents"""
 
 [chef_server.config]
-instance_count = "1"
+instance_count = "2"
 enable_custom_certs = false
 
 # Add Chef Server node internal public and private keys
