@@ -188,11 +188,11 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				assert.NotNil(t, got[0].Result.Error.Error)
 				assert.Equal(t, "opensearch", got[0].NodeType)
 				assert.Equal(t, got[0].Result.Error.Code, tt.httpResponseCode)
-				assert.Equal(t, tt.response, got[0].Error.Error())
+				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
 				assert.Equal(t, got, want)
 				assert.NotNil(t, got)
-				assert.Nil(t, got[0].Error)
+				assert.Nil(t, got[0].Result.Error)
 			}
 
 		})

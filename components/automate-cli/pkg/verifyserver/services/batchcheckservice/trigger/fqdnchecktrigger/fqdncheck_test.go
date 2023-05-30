@@ -458,12 +458,12 @@ func TestFqdnCheck_Run(t *testing.T) {
 				assert.Len(t, got, tt.args.config.Hardware.ChefInfraServerNodeCount)
 				assert.NotNil(t, got[0].Result.Error)
 				assert.Equal(t, "chef-infra-server", got[0].NodeType)
-				assert.Equal(t, got[0].Result.Error.Code, http.StatusInternalServerError)
-				assert.Equal(t, tt.response, got[0].Error.Error())
+				assert.Equal(t, got[0].Result.Error.Code, tt.httpStatus)
+				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
 				assert.Equal(t, got, want)
 				assert.NotNil(t, got)
-				assert.Nil(t, got[0].Error)
+				assert.Nil(t, got[0].Result.Error)
 			}
 
 		})
