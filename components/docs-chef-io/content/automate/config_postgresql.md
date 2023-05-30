@@ -7,7 +7,7 @@ gh_repo = "automate"
     title = "HA PostgreSQL Node config"
     parent = "automate/deploy_high_availability/configuration"
     identifier = "automate/deploy_high_availability/configuration/config_postgresql.md HA PostgreSQL Node config"
-    weight = 210
+    weight = 230
 +++
 
 {{< warning >}}
@@ -18,10 +18,9 @@ gh_repo = "automate"
 
 The below configurations can be patched to PostgreSQL nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --pg` from bastion.
 
-
 ### Sample config for PostgreSQL node
 
-```
+```bash
 checkpoint_timeout = "5min"
 host = "0.0.0.0"
 log_level = "ERROR"
@@ -59,12 +58,15 @@ path = "/mnt/automate_backups/postgresql/archive"
 #### Example
 
 To increase log level to DEBUG:
+
 - Create a log.toml file with below contents on bastion:
-  ```toml
-  log_level = "DEBUG"
-  ```
+
+    ```toml
+    log_level = "DEBUG"
+    ```
+
 - Run patch command `chef-automate config patch log.toml --pg` to apply the patch.
 
-### Centralised Logs
+### Centralized Logs
 
 Click [here](/automate/centralizing_log/) for more information.

@@ -61,6 +61,7 @@ Click [here](/automate/configuration/#global-log-level) for more information.
 Click [here](/automate/centralizing_log/) for more information.
 
 #### Load Balancer
+
 Click [here](/automate/configuration/#load-balancer) for more information.
 
 ### Backups
@@ -80,6 +81,7 @@ Click [here](/automate/backup/#backup-to-aws-s3) for more information.
 Click [here](/automate/install/#configuring-external-opensearch) for more information.
 
 #### Adding resolvers for external OpenSearch
+
 Click [here](/automate/install/#adding-resolvers-for-opensearch) for more information.
 
 #### Backup externally deployed OpenSearch to local filesystem

@@ -7,7 +7,7 @@ gh_repo = "automate"
     title = "HA OpenSearch Node config"
     parent = "automate/deploy_high_availability/configuration"
     identifier = "automate/deploy_high_availability/configuration/config_opensearch.md HA OpenSearch Node config"
-    weight = 210
+    weight = 220
 +++
 
 {{< warning >}}
@@ -131,13 +131,16 @@ port = 9300
 #### Example
 
 To increase max heap size:
+
 - Create a heap.toml file with below contents on bastion:
-  ```toml
-  [runtime]
-  maxHeapsize = "2g"
-  ```
+
+    ```toml
+    [runtime]
+    maxHeapsize = "2g"
+    ```
+
 - Run patch command `chef-automate config patch log.toml --os` to apply the patch.
 
-### Centralised Logs
+### Centralized Logs
 
 Click [here](/automate/centralizing_log/) for more information.

@@ -7,7 +7,7 @@ gh_repo = "automate"
     title = "HA Automate Node config"
     parent = "automate/deploy_high_availability/configuration"
     identifier = "automate/deploy_high_availability/configuration/config_automate.md HA Automate Node config"
-    weight = 210
+    weight = 200
 +++
 
 {{< warning >}}
@@ -107,6 +107,7 @@ Click [here](/automate/install/#adding-resolvers-for-postgresql-database) for mo
 ### Automate UI Configurations
 
 #### Sign-out on Browser Close
+
 Click [here](/automate/configuration/#sign-out-on-browser-close) for more information.
 
 #### Disclosure Banner
@@ -121,7 +122,7 @@ Click [here](/automate/configuration/#disclosure-panel) for more information.
 
 Click [here](/automate/session_timeout/) for more information.
 
-####  Telemetry
+#### Telemetry
 
 Click [here](/automate/telemetry/) for more information.
 
