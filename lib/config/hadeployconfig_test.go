@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseHaDeployConfig(t *testing.T) {
+func TestParse(t *testing.T) {
 	type args struct {
 		configFile string
 	}
