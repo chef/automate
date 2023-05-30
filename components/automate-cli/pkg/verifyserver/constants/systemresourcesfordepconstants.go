@@ -28,6 +28,8 @@ const (
 
 	ROOT_FREE_DISK_IN_GB  = 20
 	ROOT_FREE_DISK_IN_PER = 0.20
+
+	GB_TO_BYTES = 1024 * 1024 * 1024
 )
 
 const (

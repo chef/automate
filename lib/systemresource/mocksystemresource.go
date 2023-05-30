@@ -1,10 +1,12 @@
 package systemresource
 
+import "github.com/shirou/gopsutil/disk"
+
 type MockSystemResourceInfoImpl struct {
 	GetNumberOfCPUFunc   func() int
 	GetCPUSpeedFunc      func() (float64, error)
 	GetMemoryFunc        func() (float64, error)
-	GetDiskSpaceInfoFunc func(string) (float64, float64, error)
+	GetDiskSpaceInfoFunc func(string) (disk.UsageStat, error)
 }
 
 func (mock *MockSystemResourceInfoImpl) GetNumberOfCPU() int {
@@ -19,6 +21,6 @@ func (mock *MockSystemResourceInfoImpl) GetMemory() (float64, error) {
 	return mock.GetMemoryFunc()
 }
 
-func (mock *MockSystemResourceInfoImpl) GetDiskSpaceInfo(dirPath string) (float64, float64, error) {
+func (mock *MockSystemResourceInfoImpl) GetDiskSpaceInfo(dirPath string) (disk.UsageStat, error) {
 	return mock.GetDiskSpaceInfoFunc(dirPath)
 }

@@ -13,7 +13,7 @@ type SystemResourceInfo interface {
 	GetNumberOfCPU() int
 	GetCPUSpeed() (float64, error)
 	GetMemory() (float64, error)
-	GetDiskSpaceInfo(dirPath string) (float64, float64, error)
+	GetDiskSpaceInfo(dirPath string) (disk.UsageStat, error)
 }
 
 func NewSystemResourceInfoImpl() *SystemResourceInfoImpl {
@@ -51,14 +51,11 @@ func (s *SystemResourceInfoImpl) GetMemory() (float64, error) {
 	return totalRAM, nil
 }
 
-func (s *SystemResourceInfoImpl) GetDiskSpaceInfo(dirPath string) (float64, float64, error) {
+func (s *SystemResourceInfoImpl) GetDiskSpaceInfo(dirPath string) (disk.UsageStat, error) {
 
 	usage, err := disk.Usage(dirPath)
 	if err != nil {
-		return 0, 0, err
+		return disk.UsageStat{}, err
 	}
-
-	totalSpaceInGB := float64(usage.Total) / (1024 * 1024 * 1024)
-	totalFreeSpaceInGB := float64(usage.Free) / (1024 * 1024 * 1024)
-	return totalSpaceInGB, totalFreeSpaceInGB, nil
+	return *usage, nil
 }

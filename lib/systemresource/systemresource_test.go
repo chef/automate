@@ -35,14 +35,14 @@ func TestGetDiskSpaceInfo(t *testing.T) {
 	for _, testCase := range testCase {
 
 		t.Run("Disk space check", func(t *testing.T) {
-			totalSpace, freeSpace, err := systemresource.GetDiskSpaceInfo(testCase.path)
+			usage, err := systemresource.GetDiskSpaceInfo(testCase.path)
 
 			if err != nil {
-				assert.Zero(t, totalSpace)
-				assert.Zero(t, freeSpace)
+				assert.Zero(t, usage)
+				assert.Zero(t, usage)
 			} else {
-				assert.NotZero(t, totalSpace)
-				assert.NotZero(t, freeSpace)
+				assert.NotZero(t, usage)
+				assert.NotZero(t, usage)
 			}
 		})
 	}

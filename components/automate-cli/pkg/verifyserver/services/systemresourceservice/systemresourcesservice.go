@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/systemresource"
+	"github.com/shirou/gopsutil/disk"
 )
 
 type SystemResourcesService interface {
@@ -134,6 +135,7 @@ func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePreDeployment(nodeType c
 	srs.logger.Debug("Hab free space check is running for node_type : ", nodeType, " and deployment_state :", constants.DeploymentStatePreDeploy)
 
 	currentFreeSpaceInGB, err := srs.GetFreeDiskSpaceOfGivenDir("/hab")
+
 	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Unable to determine free space of /hab :", err)
@@ -165,7 +167,6 @@ func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePreDeployment(nodeType c
 func (srs *SystemResourcesServiceImpl) CheckHabFreeSpacePostDeployment(nodeType constants.NodeType) *models.Checks {
 	srs.logger.Debugf("Hab free space check is running for node_type : %s  and deployment_state : %s", nodeType, constants.DeploymentStatePostDeploy)
 	currentFreeSpaceInGB, err := srs.GetFreeDiskSpaceOfGivenDir("/hab")
-
 	var resp *models.Checks
 	if err != nil {
 		srs.logger.Error("Unable to determine free space of /hab :", err.Error())
@@ -282,28 +283,36 @@ func (srs *SystemResourcesServiceImpl) GetChecksModel(passed bool, checkTitle, s
 }
 
 func (srs *SystemResourcesServiceImpl) GetFreeDiskSpaceOfGivenDir(dirPath string) (float64, error) {
-	isPathExist, err := srs.Fileutils.PathExists(dirPath)
+	usage, err := srs.GetUsage(dirPath)
+
 	if err != nil {
 		return 0, err
 	}
-
-	if !isPathExist {
-		dirPath = "/"
-	}
-	_, freeSpace, err := srs.SystemResourceInfo.GetDiskSpaceInfo(dirPath)
-	return freeSpace, err
+	return float64(usage.Free) / (1024 * 1024 * 1024), nil
 }
 
 func (srs *SystemResourcesServiceImpl) GetTotalSpaceOfGivenDir(dirPath string) (float64, error) {
-	isPathExist, err := srs.Fileutils.PathExists(dirPath)
-
+	usage, err := srs.GetUsage(dirPath)
 	if err != nil {
 		return 0, err
 	}
+	return float64(usage.Total) / (1024 * 1024 * 1024), nil
+}
 
+func (srs *SystemResourcesServiceImpl) GetUsage(dirPath string) (disk.UsageStat, error) {
+	isPathExist, err := srs.Fileutils.PathExists(dirPath)
+
+	if err != nil {
+		return disk.UsageStat{}, err
+	}
+	
 	if !isPathExist {
 		dirPath = "/"
 	}
-	totalSpace, _, err := srs.SystemResourceInfo.GetDiskSpaceInfo(dirPath)
-	return totalSpace, err
+
+	usage, err := srs.SystemResourceInfo.GetDiskSpaceInfo(dirPath)
+	if err != nil {
+		return disk.UsageStat{}, err
+	}
+	return usage, nil
 }
