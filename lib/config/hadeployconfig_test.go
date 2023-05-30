@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -816,6 +817,19 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 			},
 			wantErr: false,
 			err:     nil,
+		}, {
+			name:    "Parse OnPrem Config file not found",
+			args:    args{configFile: "./testdata/OnPremConfig.toml"},
+			want:    nil,
+			wantErr: true,
+			err:     errors.New("error reading config TOML file: open ./testdata/OnPremConfig.toml: no such file or directory"),
+		},
+		{
+			name:    "Error unmarshalling toml file",
+			args:    args{configFile: "./testdata/UnmarshalErr.toml"},
+			want:    nil,
+			wantErr: true,
+			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
 		},
 	}
 	for _, tt := range tests {
