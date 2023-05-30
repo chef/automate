@@ -124,6 +124,8 @@ Before restoring the backup on the Automate HA Chef Server, configure [S3 storag
 - Execute the below command to restore the backup.
 
     ```cmd
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
         hab pkg exec chef/knife-ec-backup knife ec restore <path/to/directory/backup_file> -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
     ```
 
