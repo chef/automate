@@ -123,7 +123,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
         - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`.  [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
         - Set `managed_rds_instance_url` as the URL with Port No. For example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
         - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
-          - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`, and 
+          - The master username value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_username` and `managed_rds_dbuser_username`
           - The master password value which you used while creating AWS RDS Postgresql can be used for both `managed_rds_superuser_password` and `managed_rds_dbuser_password`
       - Set the `ami_id` value, which depends on the AWS Region and the Operating System image you want to use.
       - Use the [Hardware Requirement Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx) to get information on which instance type you will need for your load.
