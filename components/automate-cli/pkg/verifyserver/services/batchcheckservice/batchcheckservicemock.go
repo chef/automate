@@ -16,10 +16,15 @@ func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Conf
 
 type MockHardwareResourceCountCheck struct {
 	HardwareResourceCountCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc      func() map[string]map[string][]int
 }
 
 func (mss *MockHardwareResourceCountCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return mss.HardwareResourceCountCheckFunc(config)
+}
+
+func (mss *MockHardwareResourceCountCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func SetupMockHardwareResourceCountCheck(resp []models.CheckTriggerResponse) trigger.ICheck {
@@ -27,15 +32,24 @@ func SetupMockHardwareResourceCountCheck(resp []models.CheckTriggerResponse) tri
 		HardwareResourceCountCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
 			return resp
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockSshUserAccessCheck struct {
-	SshUserAccessCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	SshUserAccessCheckFunc    func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
 }
 
 func (mss *MockSshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return mss.SshUserAccessCheckFunc(config)
+}
+
+func (mss *MockSshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func SetupMockSshUserAccessCheck(resp []models.CheckTriggerResponse) trigger.ICheck {
@@ -43,11 +57,20 @@ func SetupMockSshUserAccessCheck(resp []models.CheckTriggerResponse) trigger.ICh
 		SshUserAccessCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
 			return resp
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockCertificateCheck struct {
-	CertificateCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	CertificateCheckFunc      func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockCertificateCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockCertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -97,11 +120,20 @@ func SetupMockCertificateCheck() trigger.ICheck {
 			}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockExternalOpenSearchCheck struct {
 	ExternalOpenSearchCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc   func() map[string]map[string][]int
+}
+
+func (mss *MockExternalOpenSearchCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockExternalOpenSearchCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -113,11 +145,20 @@ func SetupMockExternalOpenSearchCheck(resp []models.CheckTriggerResponse) trigge
 		ExternalOpenSearchCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
 			return resp
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockExternalPostgresCheck struct {
 	ExternalPostgresCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockExternalPostgresCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockExternalPostgresCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -129,11 +170,20 @@ func SetupMockExternalPostgresCheck(resp []models.CheckTriggerResponse) trigger.
 		ExternalPostgresCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
 			return resp
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockFirewallCheck struct {
-	FirewallCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	FirewallCheckFunc         func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockFirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockFirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -146,11 +196,34 @@ func SetupMockFirewallCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			nodeTypePortMap := map[string]map[string][]int{
+				constants.AUTOMATE: {
+					constants.TCP: []int{9631, 9638, 22, 443, 80},
+				},
+				constants.CHEF_INFRA_SERVER: {
+					constants.TCP: []int{9631, 9638, 22, 443, 80},
+				},
+				constants.POSTGRESQL: {
+					constants.TCP: []int{7432, 9631, 5432, 6432, 9638, 22},
+					constants.UDP: []int{9638},
+				},
+				constants.OPENSEARCH: {
+					constants.TCP: []int{9200, 9300, 22, 9631, 9638},
+				},
+			}
+			return nodeTypePortMap
+		},
 	}
 }
 
 type MockFqdnCheck struct {
-	FqdnCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	FqdnCheckFunc             func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockFqdnCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockFqdnCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -163,15 +236,24 @@ func SetupMockFqdnCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockNfsBackupConfigCheck struct {
-	NfsBackupConfigCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	NfsBackupConfigCheckFunc  func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
 }
 
 func (mss *MockNfsBackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return mss.NfsBackupConfigCheckFunc(config)
+}
+
+func (mss *MockNfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func SetupMockNfsBackupConfigCheck() trigger.ICheck {
@@ -180,11 +262,20 @@ func SetupMockNfsBackupConfigCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockOpenSearchS3BucketAccessCheck struct {
 	OpenSearchS3BucketAccessCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc         func() map[string]map[string][]int
+}
+
+func (mss *MockOpenSearchS3BucketAccessCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockOpenSearchS3BucketAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -197,15 +288,24 @@ func SetupMockOpenSearchS3BucketAccessCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockS3BackupConfigCheck struct {
-	S3BackupConfigCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	S3BackupConfigCheckFunc   func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
 }
 
 func (mss *MockS3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return mss.S3BackupConfigCheckFunc(config)
+}
+
+func (mss *MockS3BackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func SetupMockS3BackupConfigCheck() trigger.ICheck {
@@ -214,11 +314,20 @@ func SetupMockS3BackupConfigCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockSoftwareVersionCheck struct {
-	SoftwareVersionCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	SoftwareVersionCheckFunc  func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockSoftwareVersionCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockSoftwareVersionCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -231,11 +340,20 @@ func SetupMockSoftwareVersionCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockSystemResourceCheck struct {
-	SystemResourceCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	SystemResourceCheckFunc   func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
+}
+
+func (mss *MockSystemResourceCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
 }
 
 func (mss *MockSystemResourceCheck) Run(config models.Config) []models.CheckTriggerResponse {
@@ -248,13 +366,21 @@ func SetupMockSystemResourceCheck() trigger.ICheck {
 			m := []models.CheckTriggerResponse{}
 			return m
 		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
+			return m
+		},
 	}
 }
 
 type MockSystemUserCheck struct {
-	SystemUserCheckFunc func(config models.Config) []models.CheckTriggerResponse
+	SystemUserCheckFunc       func(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServerFunc func() map[string]map[string][]int
 }
 
+func (mss *MockSystemUserCheck) GetPortsForMockServer() map[string]map[string][]int {
+	return mss.GetPortsForMockServerFunc()
+}
 func (mss *MockSystemUserCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return mss.SystemUserCheckFunc(config)
 }
@@ -263,6 +389,10 @@ func SetupMockSystemUserCheck() trigger.ICheck {
 	return &MockSystemUserCheck{
 		SystemUserCheckFunc: func(config models.Config) []models.CheckTriggerResponse {
 			m := []models.CheckTriggerResponse{}
+			return m
+		},
+		GetPortsForMockServerFunc: func() map[string]map[string][]int {
+			m := make(map[string]map[string][]int)
 			return m
 		},
 	}

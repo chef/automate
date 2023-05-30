@@ -20,4 +20,5 @@ const (
 	PORT_REACHABLE_API_PATH                  = "/api/v1/checks/port-reachable"
 	EXTERNAL_OPENSEARCH_API_PATH             = "/api/v1/checks/external-opensearch"
 	EXTERNAL_POSTGRESQL_API_PATH             = "/api/v1/checks/external-postgresql"
+	STATUS_API_PATH                          = "/status"
 )

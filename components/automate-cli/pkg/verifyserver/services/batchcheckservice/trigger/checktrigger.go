@@ -21,6 +21,7 @@ type CheckTrigger struct {
 }
 type ICheck interface {
 	Run(config models.Config) []models.CheckTriggerResponse
+	GetPortsForMockServer() map[string]map[string][]int
 }
 
 func NewCheckTrigger(hrc, sshC, cert, eop, epc, fc, fqdn, nfs, os3, s3b, svc, src, suc ICheck) CheckTrigger {

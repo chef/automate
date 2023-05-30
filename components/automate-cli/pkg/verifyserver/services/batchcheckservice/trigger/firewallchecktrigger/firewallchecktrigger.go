@@ -37,6 +37,25 @@ func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse
 	return response
 }
 
+func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := map[string]map[string][]int{
+		constants.AUTOMATE: {
+			constants.TCP: []int{9631, 9638, 22, 443, 80},
+		},
+		constants.CHEF_INFRA_SERVER: {
+			constants.TCP: []int{9631, 9638, 22, 443, 80},
+		},
+		constants.POSTGRESQL: {
+			constants.TCP: []int{7432, 9631, 5432, 6432, 9638, 22},
+			constants.UDP: []int{9638},
+		},
+		constants.OPENSEARCH: {
+			constants.TCP: []int{9200, 9300, 22, 9631, 9638},
+		},
+	}
+	return nodeTypePortMap
+}
+
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
 func makeRequests(config models.Config, reqMap map[string][]models.FirewallRequest) {
 	reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)

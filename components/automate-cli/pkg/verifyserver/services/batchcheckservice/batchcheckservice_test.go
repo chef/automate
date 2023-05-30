@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -544,7 +543,7 @@ func TestBatchCheckService(t *testing.T) {
 				SetupMockSoftwareVersionCheck(),
 				SetupMockSystemResourceCheck(),
 				SetupMockSystemUserCheck(),
-			))
+			), logger.NewTestLogger(), "1234")
 			resp := ss.BatchCheck([]string{
 				constants.FIREWALL,
 				constants.FQDN,
@@ -573,18 +572,12 @@ func TestBatchCheckService(t *testing.T) {
 
 			assert.Equal(t, resp.Status, "SUCCESS")
 			assert.Equal(t, len(resp.Result), test.totalIpsCount)
-			res := getResponseForIp(resp.Result, "1.2.3.4", "automate")
-			res1 := getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server")
-			res2 := getResponseForIp(resp.Result, "1.2.3.7", "postgresql")
-			res3 := getResponseForIp(resp.Result, "1.2.3.8", "postgresql")
-			res4 := getResponseForIp(resp.Result, "1.2.3.5", "opensearch")
-			res5 := getResponseForIp(resp.Result, "1.2.3.6", "opensearch")
-			assert.Equal(t, test.expectedResponseForAutomateIp, res)
-			assert.Equal(t, test.expectedResponseFromChefServerIp, res1)
-			assert.Equal(t, test.expectedResponseForPostgresIp1, res2)
-			assert.Equal(t, test.expectedResponseForPostgresIp2, res3)
-			assert.Equal(t, test.expectedResponseForOpenSearchIp1, res4)
-			assert.Equal(t, test.expectedResponseForOpenSearchIp2, res5)
+			assert.Equal(t, test.expectedResponseForAutomateIp, getResponseForIp(resp.Result, "1.2.3.4", "automate"))
+			assert.Equal(t, test.expectedResponseFromChefServerIp, getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server"))
+			assert.Equal(t, test.expectedResponseForPostgresIp1, getResponseForIp(resp.Result, "1.2.3.7", "postgresql"))
+			assert.Equal(t, test.expectedResponseForPostgresIp2, getResponseForIp(resp.Result, "1.2.3.8", "postgresql"))
+			assert.Equal(t, test.expectedResponseForOpenSearchIp1, getResponseForIp(resp.Result, "1.2.3.5", "opensearch"))
+			assert.Equal(t, test.expectedResponseForOpenSearchIp2, getResponseForIp(resp.Result, "1.2.3.6", "opensearch"))
 		})
 	}
 

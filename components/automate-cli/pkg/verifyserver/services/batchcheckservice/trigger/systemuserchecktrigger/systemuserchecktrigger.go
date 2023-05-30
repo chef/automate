@@ -22,3 +22,8 @@ func NewSystemUserCheck(log logger.Logger, port string) *SystemUserCheck {
 func (suc *SystemUserCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return trigger.RunCheck(config, suc.log, suc.port, constants.SYSTEM_USER_CHECK_API_PATH, "")
 }
+
+func (ss *SystemUserCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}

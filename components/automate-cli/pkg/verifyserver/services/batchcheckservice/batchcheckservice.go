@@ -1,9 +1,15 @@
 package batchcheckservice
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/arrayutils"
+	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -13,11 +19,15 @@ type IBatchCheckService interface {
 
 type BatchCheckService struct {
 	CheckTrigger trigger.CheckTrigger
+	port         string
+	log          logger.Logger
 }
 
-func NewBatchCheckService(trigger trigger.CheckTrigger) *BatchCheckService {
+func NewBatchCheckService(trigger trigger.CheckTrigger, log logger.Logger, port string) *BatchCheckService {
 	return &BatchCheckService{
 		CheckTrigger: trigger,
+		port:         port,
+		log:          log,
 	}
 }
 
@@ -32,13 +42,85 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
+	if len(remoteChecks) > 0 {
+    		nodeTypePortMap := map[string]map[string][]int{
+    			constants.AUTOMATE: {
+    				constants.TCP:   []int{},
+    				constants.UDP:   []int{},
+    				constants.HTTPS: []int{},
+    			},
+    			constants.CHEF_INFRA_SERVER: {
+    				constants.TCP:   []int{},
+    				constants.UDP:   []int{},
+    				constants.HTTPS: []int{},
+    			},
+    			constants.POSTGRESQL: {
+    				constants.TCP:   []int{},
+    				constants.UDP:   []int{},
+    				constants.HTTPS: []int{},
+    			},
+    			constants.OPENSEARCH: {
+    				constants.TCP:   []int{},
+    				constants.UDP:   []int{},
+    				constants.HTTPS: []int{},
+    			},
+    		}
+    		for _, check := range remoteChecks {
+    			deploymentState, err := ss.GetDeploymentState()
+    			if err != nil {
+    				ss.log.Error("Error while calling status api from batch check service:", err)
+    			}
+    			startMockServer := shouldStartMockServer(deploymentState)
+    			if startMockServer {
+    				resp := ss.GetPortsToOpenForCheck(check)
+    				if len(resp) != 0 {
+    					constructUniquePortMap(resp, &nodeTypePortMap)
+    				}
+    			}
+    		}
+    	}
+
 	// Get remote check trigger resp and append to checkTriggerRespMap (keys and values)
 	if len(remoteChecks) > 0 {
 		for key, value := range getRemoteCheckResp(ss, remoteChecks, config) {
 			checkTriggerRespMap[key] = value
 		}
 	}
+	// stop mock services
 	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...))
+}
+
+func constructUniquePortMap(resp map[string]map[string][]int, nodeTypePortMap *map[string]map[string][]int) {
+	nodeTypeMape := []string{
+		constants.AUTOMATE,
+		constants.CHEF_INFRA_SERVER,
+		constants.POSTGRESQL,
+		constants.OPENSEARCH,
+	}
+
+	for _, nodeType := range nodeTypeMape {
+		if resp[nodeType] != nil {
+			if resp[nodeType][constants.TCP] != nil {
+				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.TCP], (*nodeTypePortMap)[nodeType][constants.TCP])
+				(*nodeTypePortMap)[nodeType][constants.TCP] = append((*nodeTypePortMap)[nodeType][constants.TCP], newPortsToBeAdded...)
+			}
+			if resp[nodeType][constants.UDP] != nil {
+				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.UDP], (*nodeTypePortMap)[nodeType][constants.UDP])
+				(*nodeTypePortMap)[nodeType][constants.UDP] = append((*nodeTypePortMap)[nodeType][constants.UDP], newPortsToBeAdded...)
+			}
+			if resp[nodeType][constants.HTTPS] != nil {
+				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.HTTPS], (*nodeTypePortMap)[nodeType][constants.HTTPS])
+				(*nodeTypePortMap)[nodeType][constants.HTTPS] = append((*nodeTypePortMap)[nodeType][constants.HTTPS], newPortsToBeAdded...)
+			}
+		}
+	}
+}
+
+func shouldStartMockServer(deploymentState string) bool {
+	if deploymentState == "pre_deploy" {
+		return true
+	}
+	return false
 }
 
 func getIndexOfCheck(checks []string, check string) (int, error) {
@@ -51,6 +133,30 @@ func (ss *BatchCheckService) RunBastionCheck(check string, config models.Config,
 		resp[i].CheckType = check
 	}
 	resultChan <- resp
+}
+
+func (ss *BatchCheckService) GetPortsToOpenForCheck(check string) map[string]map[string][]int {
+	return ss.getCheckInstance(check).GetPortsForMockServer()
+}
+
+func (ss *BatchCheckService) GetDeploymentState() (string, error) {
+	url := fmt.Sprintf("%s:%s%s", constants.LOCAL_HOST_URL, ss.port, constants.STATUS_API_PATH)
+	resp, err := httputils.MakeRequest("GET", url, nil)
+	if err != nil {
+		ss.log.Error("Error while calling status api from batch check service:", err)
+		return "", err
+	}
+	var statusApiResponse models.StatusApiResponse
+	err = json.NewDecoder(resp.Body).Decode(&statusApiResponse)
+	if err != nil {
+		ss.log.Error("Error while reading unmarshalling response of status api from batch check service:", err)
+		return "", err
+	}
+	if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
+		return "pre_deploy", nil
+	}
+	ss.log.Info("outside if")
+	return "post_deploy", nil
 
 }
 
@@ -93,7 +199,7 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 
 func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse, checks []string) models.BatchCheckResponse {
 	ipMap := make(map[string][]models.CheckTriggerResponse)
-
+	
 	//Construct map with unique ip+nodeType keys to segregate the response
 	for checkName, checkResponses := range checkTriggerRespMap {
 		for _, checkResponse := range checkResponses {
@@ -111,7 +217,7 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		}
 	}
 
-	// Arranging the per map values in order in which we got the checks input.
+	// Arranging the per map values in order in which we got the checks input. 
 	// Example if certificate check is passed first as input then in final response certificate will come up then other checks
 	for k, v := range ipMap {
 		arr := []models.CheckTriggerResponse{}

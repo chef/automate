@@ -64,3 +64,14 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 	close(outputCh)
 	return finalResult
 }
+
+func (ss *CertificateCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
+
+func (ss *CertificateCheck) Rishabh() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}

@@ -58,8 +58,8 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 					Checks:  result.Checks,
 					Passed:  checkutils.IsPassed(result.Checks),
 				},
-				NodeType: result.NodeType,
-				Host:     result.IP,
+				NodeType:  result.NodeType,
+				Host:      result.IP,
 			})
 	}
 	return finalResult
@@ -86,4 +86,9 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 		return nil, err
 	}
 	return &response, nil
+}
+
+func (ss *HardwareResourceCountCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
 }
