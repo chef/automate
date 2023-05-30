@@ -930,9 +930,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "OCID"
+  - label: "ocid"
     command:
-      - integration/run_test testing_ocid.sh
+      - integration/run_test .expeditor/testing_ocid.sh
     timeout_in_minutes: 30
     expeditor:
       secrets:
