@@ -49,6 +49,7 @@ message ConfigRequest {
 			message Ocid {
 				ChefServerConfig chef_server_config = 1;
 				OauthApplicationConfig oauth_application_config = 2;
+				google.protobuf.StringValue secret_key_base = 3;
 
 				message ChefServerConfig {
 					google.protobuf.StringValue endpoint = 1;

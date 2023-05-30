@@ -19,8 +19,6 @@ bundle install
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
 
-export OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
-
 export HOME={{pkg.svc_var_path}}
 export DBNAME="{{cfg.sql.db_name}}"
 
@@ -33,6 +31,11 @@ pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper fix-permissions "$DBNAME"
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
+
+export OCID_PKG_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+
+# Setting the secret_key_base for OCID rails application
+source "{{pkg.svc_config_path}}/scripts/set_secret_key_base.sh"
 
 # Set webui key from erchef component
 source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"

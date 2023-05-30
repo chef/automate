@@ -8,5 +8,10 @@ override_configs = {
 }
 env_config['chef'] ||= {}
 env_config['chef'].merge!(override_configs)
+
+# Overriding the default `secret_key_base` with the generated value
+# of `secret_key_base` set in the environment only if it is generated.
+env_config['secret_key_base'] = ENV['SECRET_KEY_BASE'] unless ENV['SECRET_KEY_BASE'].empty?
+
 env_config_yml = env_config.to_yaml
 File.write(env_config_file_path, env_config_yml)
