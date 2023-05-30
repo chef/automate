@@ -14,11 +14,13 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
+## Configurations
+
 Automate provides various configuration options that can be patched to customize its behavior and meet specific requirements. This guide outlines some out of all the available configurations that you can modify.
 
 The below configurations can be patched to Automate nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --a2` from bastion node.
 
-## General Automate Configuration
+### General Automate Configuration options
 
 #### Patching Automate FQDN (Fully Qualified Domain Name)
 
@@ -66,7 +68,7 @@ Click [here](/automate/configuration/#compliance-configuration) for more informa
 
 Click [here](/automate/configuration/#configure-inflight-data-collector-request-maximum) for more information
 
-## Backups
+### Backups
 
 #### Backup to a Filesystem
 
@@ -76,7 +78,7 @@ Click [here](/automate/backup/#backup-to-a-filesystem) for more information
 
 Click [here](/automate/backup/#backup-to-aws-s3) for more information
 
-## Configuring External OpenSearch in Automate
+### Configuring External OpenSearch in Automate
 
 #### Configure External Opensearch
 
@@ -93,7 +95,7 @@ Click [here](/automate/install/#backup-externally-deployed-opensearch-to-local-f
 
 Click [here](/automate/install/#backup-externally-deployed-opensearch-to-aws-s3) for more information.
 
-## Configuring External PostgresSQL in Automate
+### Configuring External PostgresSQL in Automate
 
 #### Configure External PostgresSQL
 
@@ -103,7 +105,7 @@ Click [here](/automate/install/#configuring-an-external-postgresql-database) for
 
 Click [here](/automate/install/#adding-resolvers-for-postgresql-database) for more information on external PostgreSQL configuration.
 
-## Automate UI Configurations
+### Automate UI Configurations
 
 #### Sign-out on Browser Close
 Click [here](/automate/configuration/#sign-out-on-browser-close) for more information
@@ -128,6 +130,6 @@ Click [here](/automate/telemetry/) for more information
 
 Click [here](/automate/invalid_login_attempts/) for more information
 
-## Troubleshooting
+### Troubleshooting
 
 Click [here](/automate/configuration/#troubleshooting) for more information
