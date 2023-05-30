@@ -65,10 +65,13 @@ config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+
+# Add Automate Load Balancer root-ca
+# root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 
 [chef_server.config]
@@ -79,9 +82,10 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer root-ca and keys
-# private_key = ""
-# public_key = ""
+
+# Add Chef Server node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -94,12 +98,13 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add OpenSearch load balancer root-ca and keys
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+
+# Add OpenSearch root-ca and keys
+# root_ca = """root_ca_contents"""
+# admin_key = """admin_private_key_contents"""
+# admin_cert = """admin_public_key_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -111,10 +116,11 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+
+# Add Postgresql root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -368,14 +374,18 @@ config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Automate load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+
+# Add Automate Load Balancer root-ca
+# root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
+
 # [[automate.config.certs_by_ip]]
 # ip = ""
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [chef_server.config]
 ## === INPUT NEEDED ===
@@ -385,13 +395,15 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Chef Server load balancer root-ca and keys
-# private_key = ""
-# public_key = ""
+
+# Add Chef Server node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
+
 # [[chef_server.config.certs_by_ip]]
 # ip = ""
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -403,16 +415,16 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add OpenSearch load balancer root-ca and keys
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+# Add OpenSearch root-ca and keys
+# root_ca = """root_ca_contents"""
+# admin_key = """admin_private_key_contents"""
+# admin_cert = """admin_public_key_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # [[opensearch.config.certs_by_ip]]
 # ip = ""
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
@@ -424,14 +436,14 @@ instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add postgresql root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 # [[postgresql.config.certs_by_ip]]
 # ip = ""
-# private_key = ""
-# public_key = ""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 ## === ===
 
