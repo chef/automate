@@ -929,3 +929,16 @@ steps:
       executor:
         linux:
           privileged: true
+
+  - label: "OCID"
+    command:
+      - integration/run_test testing_ocid.sh
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
