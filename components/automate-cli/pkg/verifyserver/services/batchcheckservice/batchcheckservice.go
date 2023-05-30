@@ -101,7 +101,7 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 
 func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse, checks []string) models.BatchCheckResponse {
 	ipMap := make(map[string][]models.CheckTriggerResponse)
-	
+
 	//Construct map with unique ip+nodeType keys to segregate the response
 	for checkName, checkResponses := range checkTriggerRespMap {
 		for _, checkResponse := range checkResponses {
@@ -119,7 +119,7 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		}
 	}
 
-	// Arranging the per map values in order in which we got the checks input. 
+	// Arranging the per map values in order in which we got the checks input.
 	// Example if certificate check is passed first as input then in final response certificate will come up then other checks
 	for k, v := range ipMap {
 		arr := []models.CheckTriggerResponse{}
@@ -139,6 +139,7 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		result[resultIndex].NodeType = v[0].NodeType
 		resultArray := []models.ApiResult{}
 		for _, checkResult := range v {
+			checkResult.Result.Message = checkMsg(checkResult.Result.Check)
 			resultArray = append(resultArray, checkResult.Result)
 		}
 		result[resultIndex].Tests = resultArray
@@ -147,5 +148,38 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 	return models.BatchCheckResponse{
 		Status: "SUCCESS",
 		Result: result,
+	}
+}
+
+func checkMsg(check string) string {
+	switch check {
+	case constants.HARDWARE_RESOURCE_COUNT:
+		return constants.HARDWARE_RESOURCE_COUNT_MSG
+	case constants.CERTIFICATE:
+		return constants.CERTIFICATE_MSG
+	case constants.SSH_USER:
+		return constants.SSH_USER_MSG
+	case constants.SYSTEM_RESOURCES:
+		return constants.SYSTEM_RESOURCES_MSG
+	case constants.SOFTWARE_VERSIONS:
+		return constants.SOFTWARE_VERSIONS_MSG
+	case constants.SYSTEM_USER:
+		return constants.SYSTEM_USER_MSG
+	case constants.S3_BACKUP_CONFIG:
+		return constants.S3_BACKUP_CONFIG_MSG
+	case constants.FQDN:
+		return constants.FQDN_MSG
+	case constants.FIREWALL:
+		return constants.FIREWALL_MSG
+	case constants.EXTERNAL_OPENSEARCH:
+		return constants.EXTERNAL_OPENSEARCH_MSG
+	case constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS:
+		return constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_MSG
+	case constants.EXTERNAL_POSTGRESQL:
+		return constants.EXTERNAL_POSTGRESQL_MSG
+	case constants.NFS_BACKUP_CONFIG:
+		return constants.NFS_BACKUP_CONFIG_MSG
+	default:
+		return ""
 	}
 }
