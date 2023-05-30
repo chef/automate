@@ -28,8 +28,7 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
 
-	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
-		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
+	count := 0
 
 	outputCh := make(chan models.CheckTriggerResponse, count)
 
@@ -52,6 +51,7 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 		}
 
 		for i := 0; i < len(nodeTypes); i++ {
+			count++
 			go trigger.TriggerCheckAPI(url, node.IP, nodeTypes[i], http.MethodPost, outputCh, requestBody)
 		}
 	}

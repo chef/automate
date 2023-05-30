@@ -200,9 +200,9 @@ func TestTriggerCheckAPI(t *testing.T) {
 		response := <-output
 
 		// Assert the expected error response
-		require.NotNil(t, response.Error)
-		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
-		assert.Contains(t, response.Error.Message, `"http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com`)
+		require.NotNil(t, response.Result.Error)
+		assert.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
+		assert.Contains(t, response.Result.Error.Message, `"http://nonexistent-api.com": dial tcp: lookup nonexistent-api.com`)
 		require.Equal(t, "postgresql", response.NodeType)
 
 	})
@@ -223,9 +223,9 @@ func TestTriggerCheckAPI(t *testing.T) {
 		response := <-output
 
 		// Assert the expected error response
-		require.NotNil(t, response.Error)
-		assert.Equal(t, http.StatusBadRequest, response.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
+		require.NotNil(t, response.Result.Error)
+		assert.Equal(t, http.StatusBadRequest, response.Result.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Result.Error.Message)
 	})
 
 	t.Run("Error decoding response JSON", func(t *testing.T) {
@@ -246,9 +246,9 @@ func TestTriggerCheckAPI(t *testing.T) {
 		response := <-output
 
 		// Assert the expected error response
-		require.NotNil(t, response.Error)
-		assert.Equal(t, http.StatusInternalServerError, response.Error.Code)
-		assert.Equal(t, `error while parsing the response data:invalid character 'i' looking for beginning of object key string`, response.Error.Message)
+		require.NotNil(t, response.Result.Error)
+		assert.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
+		assert.Equal(t, `error while parsing the response data:invalid character 'i' looking for beginning of object key string`, response.Result.Error.Message)
 	})
 
 	t.Run("Request creation error", func(t *testing.T) {
@@ -262,9 +262,9 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Wait for the response
 		response := <-output
 		// Assert the expected error response
-		require.NotNil(t, response.Error)
-		require.Equal(t, http.StatusNotFound, response.Error.Code)
-		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Error.Message)
+		require.NotNil(t, response.Result.Error)
+		require.Equal(t, http.StatusNotFound, response.Result.Error.Code)
+		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", response.Result.Error.Message)
 	})
 	t.Run("Invalid Request Body", func(t *testing.T) {
 		endPoint := "http://example.com/api/v1/checks/software-versions"
@@ -278,9 +278,9 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Wait for the response
 		response := <-output
 		// Assert the expected error response
-		require.NotNil(t, response.Error)
-		require.Equal(t, http.StatusBadRequest, response.Error.Code)
-		assert.Equal(t, "error while reading the request body: json: unsupported type: chan int", response.Error.Message)
+		require.NotNil(t, response.Result.Error)
+		require.Equal(t, http.StatusBadRequest, response.Result.Error.Code)
+		assert.Equal(t, "error while reading the request body: json: unsupported type: chan int", response.Result.Error.Message)
 	})
 
 }
@@ -307,7 +307,7 @@ func Test_RunCheck(t *testing.T) {
 		result := RunCheck(config, log, port, path, "")
 		require.Equal(t, 2, len(result))
 		require.NotNil(t, result)
-		require.Nil(t, result[0].Error)
+		require.Nil(t, result[0].Result.Error)
 		require.Len(t, result[0].Result.Checks, 2)
 	})
 
@@ -331,7 +331,7 @@ func Test_RunCheck(t *testing.T) {
 		// Call the function being tested
 		result := RunCheck(config, log, port, path, depState)
 		require.NotNil(t, result)
-		require.Nil(t, result[0].Error)
+		require.Nil(t, result[0].Result.Error)
 		require.Len(t, result[0].Result.Checks, 2)
 		require.Equal(t, result[0].Status, "PASSED")
 	})
@@ -439,7 +439,7 @@ func Test_RunCheck(t *testing.T) {
 		result := RunCheck(config, log, port, path, depState)
 		require.Len(t, result, 1)
 		require.NotNil(t, result)
-		require.Nil(t, result[0].Error)
+		require.Nil(t, result[0].Result.Error)
 		require.Len(t, result[0].Result.Checks, 3)
 		require.Equal(t, result[0].Status, "SUCCESS")
 	})

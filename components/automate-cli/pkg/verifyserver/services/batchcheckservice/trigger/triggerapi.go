@@ -84,10 +84,6 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	reader, err := interfaceToIOReader(reqBody)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: fmt.Sprintf("error while reading the request body: %s", err.Error()),
-			},
 			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
@@ -104,11 +100,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	req, err := http.NewRequest(method, endPoint, reader)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while creating the request:%s", err.Error()),
-			},
+			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
 				Passed: false,
@@ -127,11 +119,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	resp, err := client.Do(req)
 	if err != nil {
 		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while connecting to the endpoint:%s", err.Error()),
-			},
+			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
 				Passed: false,
@@ -148,16 +136,12 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 
 	if resp.StatusCode != http.StatusOK {
 		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    resp.StatusCode,
-				Message: "error while connecting to the endpoint, received invalid status code",
-			},
+			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
 				Passed: false,
 				Error: &fiber.Error{
-					Code:    http.StatusInternalServerError,
+					Code:    resp.StatusCode,
 					Message: "error while connecting to the endpoint, received invalid status code",
 				},
 			},
@@ -167,11 +151,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 
 	if err := json.NewDecoder(resp.Body).Decode(&ctr); err != nil {
 		output <- models.CheckTriggerResponse{
-			Host: host,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: fmt.Sprintf("error while parsing the response data:%s", err.Error()),
-			},
+			Host:     host,
 			NodeType: nodeType,
 			Result: models.ApiResult{
 				Passed: false,

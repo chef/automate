@@ -477,7 +477,7 @@ func TestCertificateCheck_Run(t *testing.T) {
 		assert.Equal(t, totalIps, len(finalResp))
 
 		for _, resp := range finalResp {
-			assert.NotNil(t, resp.Error)
+			assert.NotNil(t, resp.Result.Error)
 			assert.Empty(t, resp.Result.Checks)
 			assert.Equal(t, resp.Result.Passed, false)
 		}

@@ -232,11 +232,11 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(hardwareCheckResp))
 		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
+		err := startMockServerOnCustomPort(mockServer, "1220")
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1234")
+		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1220")
 		request := GetRequestJson()
 		finalResp := hrc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -270,11 +270,11 @@ func TestHardwareResourceCountCheck_Run(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`invalid JSON`))
 		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
+		err := startMockServerOnCustomPort(mockServer, "1134")
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1234")
+		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1134")
 		request := GetRequestJson()
 		mapStruct := hrc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -306,11 +306,11 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 		}))
-		err := startMockServerOnCustomPort(mockServer, "1234")
+		err := startMockServerOnCustomPort(mockServer, "1238")
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1234")
+		hrc := NewHardwareResourceCountCheck(logger.NewTestLogger(), "1238")
 		resp, err := hrc.TriggerHardwareResourceCountCheck(GetRequestJson())
 		require.Error(t, err)
 		require.Nil(t, resp)

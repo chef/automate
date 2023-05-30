@@ -86,6 +86,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				certificatechecktrigger.NewCertificateCheck(l, port),
 				trigger.NewExternalOpensearchCheck(),
 				trigger.NewExternalPostgresCheck(),
+				firewallchecktrigger.NewFirewallCheck(l, port),
 				trigger.NewFqdnCheck(),
 				trigger.NewNfsBackupConfigCheck(),
 				trigger.NewOpensearchS3BucketAccessCheck(),
@@ -93,7 +94,6 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
-				firewallchecktrigger.NewFirewallCheck(l, port),
 			))).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
