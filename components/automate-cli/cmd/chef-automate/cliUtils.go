@@ -49,7 +49,7 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
-		if len(output) != 0 {
+		if len(strings.TrimSpace(output)) != 0 {
 			printErrorMessage("Automate", ips[0], writer, output)
 		}
 		return err
