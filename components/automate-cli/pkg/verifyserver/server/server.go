@@ -26,14 +26,16 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/db"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemuserservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/systemresourceservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/awsutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/fiberutils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/userutils"
+	"github.com/chef/automate/lib/systemresource"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
@@ -98,6 +100,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port)).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
+		AddSystemResourceService(systemresourceservice.NewSystemResourceService(l, systemresource.NewSystemResourceInfoImpl(), &fileutils.FileSystemUtils{})).
 		AddMockServerServices(startmockserverservice.New(l)).
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
