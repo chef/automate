@@ -10,6 +10,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/certificatechecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/externalopensearchchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/externalpostgresqlchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/firewallchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/fqdnchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/hardwareresourcechecktrigger"
@@ -90,8 +92,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
 				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, port),
 				certificatechecktrigger.NewCertificateCheck(l, port),
-				trigger.NewExternalOpensearchCheck(),
-				trigger.NewExternalPostgresCheck(),
+				externalopensearchchecktrigger.NewExternalOpensearchCheck(l, port),
+				externalpostgresqlchecktrigger.NewExternalPostgresCheck(l, port),
 				firewallchecktrigger.NewFirewallCheck(l, port),
 				fqdnchecktrigger.NewFqdnCheck(l, port),
 				nfsmountbackupchecktrigger.NewNfsBackupConfigCheck(l, port),
