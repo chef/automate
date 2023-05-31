@@ -18,7 +18,7 @@ Data Lifecycle manages the retention of events, service groups, Chef Infra Clien
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
-Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, please refer the section on [Impact On OpenSearch Shards](/automate/data_lifecycle/#impact-on-opensearch-shards) to set the appropriate max_shards value.
+Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, please refer the section on [Impact On OpenSearch Shards](/automate/data_lifecycle/#impact-on-opensearch-shards) to set the appropriate maximum shards per node value.
 
 ![Data Lifecycle](/images/automate/data-lifecycle.png)
 

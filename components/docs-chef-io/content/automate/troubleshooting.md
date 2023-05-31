@@ -175,9 +175,6 @@ Validation Failed: 1: this action would add [10] total shards, but this cluster 
 To set the value of max shards per node, patch the following configuration in the `.toml` file.
 
 ```bash
-[opensearch]
-[opensearch.v1]
-[opensearch.v1.sys]
 [opensearch.v1.sys.cluster]
 max_shards_per_node = 1000
 ```
