@@ -38,7 +38,8 @@ func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalO
 		Timeout: eos.timeout * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
+				RootCAs:    caCertPool,
+				MinVersion: tls.VersionTLS12,
 			},
 		},
 	}
