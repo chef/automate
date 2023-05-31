@@ -16,7 +16,7 @@ const NFS_BACKUP_CONFIG = "nfs-backup-config"
 
 const (
 	HARDWARE_RESOURCE_COUNT_MSG         = "Hardware Resource Count Check"
-	CERTIFICATE_MSG                     = "Certificate check"
+	CERTIFICATE_MSG                     = "Certificate Check"
 	SSH_USER_MSG                        = "SSH User Access Check"
 	SYSTEM_RESOURCES_MSG                = "System Resources Check"
 	SOFTWARE_VERSIONS_MSG               = "Software Versions Check"
