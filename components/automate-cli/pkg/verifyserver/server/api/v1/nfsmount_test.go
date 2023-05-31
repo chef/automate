@@ -23,7 +23,7 @@ var (
 	successMsg         = "{\"status\":\"SUCCESS\",\"result\":{\"address\":\"\",\"mount_location\":\"/data\",\"nfs\":\"\",\"storage_capacity\":\"\",\"Available_free_space\":\"\"}}"
 )
 
-func SetupNFSMountHandler(nm nfsmountservice.INFSService) (*fiber.App, error) {
+func SetupNFSMountHandler(nm nfsmountservice.NFSService) (*fiber.App, error) {
 	log, err := logger.NewLogger("text", "debug")
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func SetupNFSMountHandler(nm nfsmountservice.INFSService) (*fiber.App, error) {
 	return vs.App, nil
 }
 
-func SetupMockNFSMountService() nfsmountservice.INFSService {
+func SetupMockNFSMountService() nfsmountservice.NFSService {
 	return &nfsmountservice.MockNFSMountService{
 		GetNFSMountDetailsFunc: func(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
 			return &[]models.NFSMountResponse{

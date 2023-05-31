@@ -20,12 +20,12 @@ import (
 	"github.com/chef/automate/lib/systemresource"
 )
 
-type INFSService interface {
+type NFSService interface {
 	GetNFSMountDetails(models.NFSMountRequest) *[]models.NFSMountResponse
 	GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse
 }
 
-type NFSMountService struct {
+type NfsServiceImp struct {
 	SystemResourceInfo systemresource.SystemResourceInfo
 	port               string
 	log                logger.Logger
@@ -36,15 +36,15 @@ type TempResponse struct {
 	MountResp   models.NFSMountResponse
 }
 
-func NewNFSMountService(log logger.Logger, port string, sysResInfo systemresource.SystemResourceInfo) *NFSMountService {
-	return &NFSMountService{
+func NewNFSMountService(log logger.Logger, port string, sysResInfo systemresource.SystemResourceInfo) *NfsServiceImp {
+	return &NfsServiceImp{
 		port:               port,
 		log:                log,
 		SystemResourceInfo: sysResInfo,
 	}
 }
 
-func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
+func (nm *NfsServiceImp) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
 	respBody := new([]models.NFSMountResponse)
 	// For storing the output of go routine temporary in nfsMountResultMap
 	nfsMountResultMap := make(map[string]models.NFSMountResponse)
@@ -103,7 +103,7 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 	return respBody
 }
 
-func (nm *NFSMountService) GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse {
+func (nm *NfsServiceImp) GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse {
 	mounts := nm.getMountDetails(req.MountLocation)
 	return mounts
 }
@@ -113,7 +113,7 @@ func prettyMap(mp map[string]models.NFSMountResponse) string {
 	return string(b)
 }
 
-func (nm *NFSMountService) makeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
+func (nm *NfsServiceImp) makeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
 	res, err := nm.doAPICall(ip, mountLocation)
 	nm.log.Debugf("result got from /nfs-mount-loc API for %s: %v", ip, res)
 
@@ -130,7 +130,7 @@ func (nm *NFSMountService) makeConcurrentCall(ip string, nodeType string, mountL
 	respChan <- respMap
 }
 
-func (nm *NFSMountService) doAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
+func (nm *NfsServiceImp) doAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
 	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, constants.NFS_MOUNT_LOC_API_PATH)
 	nm.log.Debug("Request URL: ", reqURL)
 
@@ -147,7 +147,7 @@ func (nm *NFSMountService) doAPICall(ip string, mountLocation string) (*models.N
 	return nm.getResultStructFromRespBody(resp.Body)
 }
 
-func (nm *NFSMountService) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
+func (nm *NfsServiceImp) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
 	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
 		nm.log.Error(err.Error())
@@ -251,7 +251,7 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 	}
 }
 
-func (nm *NFSMountService) getMountDetails(mountLocation string) *models.NFSMountLocResponse {
+func (nm *NfsServiceImp) getMountDetails(mountLocation string) *models.NFSMountLocResponse {
 	// If we make disk partitions as false,
 	// we can't list mount info
 	diskPartition, err := nm.SystemResourceInfo.GetDiskPartitions(true)
