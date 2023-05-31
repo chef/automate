@@ -1,13 +1,12 @@
 package fqdnservice
 
 import (
-	"crypto/md5"
+	"crypto/sha1"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -55,8 +54,8 @@ func createErrorMessage(setNodes map[string]int, reqnodes []string, isAfterDeplo
 	for _, k := range reqnodes {
 		var val string
 		if isAfterDeployment {
-			hasher := md5.New()
-			_, err := io.WriteString(hasher, k)
+			hasher := sha1.New()
+			_, err := hasher.Write([]byte(k))
 			if err != nil {
 				return constants.IP_TO_HASH_FAIL_MESSAGE
 			}
@@ -83,8 +82,8 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 	setNodes := make(map[string]int)
 	for _, k := range reqNodes {
 		if isAfterDeployment {
-			hasher := md5.New()
-			_, err := io.WriteString(hasher, k)
+			hasher := sha1.New()
+			_, err := hasher.Write([]byte(k))
 			if err != nil {
 				return nil, err
 			}
