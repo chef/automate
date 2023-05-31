@@ -83,6 +83,9 @@ const (
 	  "transient" :{
 		  "cluster.routing.allocation.exclude._ip" : "%s"
 	   }
-	}' -k -u admin:admin
+	}' -k \
+	--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem \
+	--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem \
+	--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
 	`
 )
