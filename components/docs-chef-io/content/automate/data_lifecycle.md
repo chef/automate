@@ -5,20 +5,20 @@ draft = false
 
 gh_repo = "automate"
 [menu]
-  [menu.automate]
-    title = "Data Lifecycle"
-    parent = "automate/settings"
-    identifier = "automate/settings/data_lifecycle.md Data Lifecycle"
-    weight = 30
+ [menu.automate]
+ title = "Data Lifecycle"
+ parent = "automate/settings"
+ identifier = "automate/settings/data_lifecycle.md Data Lifecycle"
+ weight = 30
 +++
 
-Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
+Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
 ## Data Lifecycle
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
-Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, set the respective value of [max shards](/automate/data_lifecycle/#max-shards) to run the data lifecycle.
+Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, please refer the [max shards](/automate/data_lifecycle/#max-shards) to set the appropriate max_shards value.
 
 ![Data Lifecycle](/images/automate/data-lifecycle.png)
 
@@ -43,30 +43,35 @@ The default is to remove Chef Infra Client run data after 30 days, to label node
 The Compliance data lifecycle settings allow you to remove compliance reports and compliance scans after a set amount of days.
 The default is to remove compliance reports after 60 days, and to remove compliance scans after 60 days.
 
-## Max Shards
+## Impact on OpenSearch Shards
 
-The max shards per node is the configuration for opensearch to avoid overloading of shards while ingesting data. The default value for max shards per nodes is 1000.
+The data retention period set in the data lifecycle settings impacts the number of shards in OpenSearch.
+In case the number of shards per node grows higher than the max shards per node configured in OpenSearch, you may see failures while ingesting data to Automate.
+Refer to the [error troubleshoot]({{< relref /automate/troubleshooting/#issue-maximum-shards-open }}) document for more information.
 
-If for both client runs and the compliance data lifecycle is set to 60 days, the max shards per node configuration should be 2000. Refer to the following table for calculated max shards for the client run and compliance data lifecycle.
+The default value for max shards per node in OpenSearch is 1000.
 
-| Days | Client Run | Compliance | Max Shards Per Node |
-| ---- |  ------    | ---------- | ------------------- |
-| 30   |  350       |  650       | 1000                |
-| 60   |  700       | 1300       | 2000                |
-| 90   |  1100      | 1900       | 3000                |
-| 365  |  4000      | 8000       | 12000               |
+Refer to the following table to calculate the max shards based on your data retention requirement.
 
-To set the value of max shards per node, patch the following configuration in the `.toml` file.
+| Days | Number of Shards per Node for <br />Client Run | Number of Shards per Node for <br />Compliance | Total Number of Shards Per Node |
+| ---- |------------------------------------------------|------------------------------------------------|---------------------------------|
+| 30 | 350 | 650 | 1000 |
+| 60 | 700 | 1300 | 2000 |
+| 90 | 1100 | 1900 | 3000 |
+| 365 | 4000 | 8000 | 12000 |
+
+To set the value of max shards per node:
+1. Create the following configuration in a `.toml` file.
 
 ```bash
-[opensearch]
-[opensearch.v1]
-[opensearch.v1.sys]
 [opensearch.v1.sys.cluster]
 max_shards_per_node = 1000
 ```
 
-Once done, run the chef-automate config patch `</path/to/your-file.toml>` to deploy your change.
+2. Patch the configuration
+```bash
+chef-automate config patch </path/to/your-file.toml>
+```
 
 ## Data Lifecycle API
 
@@ -87,12 +92,12 @@ To see the combined status and configuration for all data lifecycle jobs, you ca
 
 These examples use the Unix/Linux [`curl` command](https://man7.org/linux/man-pages/man1/curl.1.html) with the options:
 
-| Short Option | Long Option  | Definition                                                                                         |
+| Short Option | Long Option | Definition |
 |--------------|--------------|---------------------------------------------------------------------------------------------------|
-| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                             |
-| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                     |
-| -k           | --insecure   | Instructs curl to proceed and operate even for server connections otherwise considered insecure.  |
-| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                      |
+| -s | --silent | Silent or quiet mode, does not show progress meter or error messages. |
+| -S | --show-error | When used with -s, --silent, it makes curl show an error message if it fails. |
+| -k | --insecure | Instructs curl to proceed and operate even for server connections otherwise considered insecure. |
+| -H | --header | Sends a header with the request. In this case, the header is your API token. |
 
 `curl -s -S` shows errors but does not show the progress meter:
 
@@ -116,99 +121,99 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
 
 ```json
 { "infra": {
-    "job_settings": [
-      { "name":"delete_nodes",
-        "disabled": true,
-        "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-        "threshold": "365d"
-      },
-      { "name":"missing_nodes",
-        "disabled": false,
-        "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-        "threshold": "1d"
-      },
-      { "name":"missing_nodes_for_deletion",
-        "disabled": false,
-        "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-        "threshold": "30d"
-      },
-      { "name":"periodic_purge_timeseries",
-        "disabled": false,
-        "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
-        "purge_policies": {
-          "opensearch": [
-            {
-              "policy_name": "actions",
-              "older_than_days": 30,
-              "disabled": false
-            },
-            {
-              "policy_name": "converge-history",
-              "older_than_days": 30,
-              "disabled": false
-            }
-          ]
-        }
-      }
-    ]
-  },
-  "compliance": {
-    "job_settings": [
-      {
-        "name": "periodic_purge",
-        "disabled": false,
-        "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
-        "purge_policies": {
-          "opensearch": [
-            {
-              "policy_name": "compliance-reports",
-              "older_than_days": 100,
-              "disabled": false
-            },
-            {
-              "policy_name": "compliance-scans",
-              "older_than_days": 100,
-              "disabled": false
-            }
-          ]
-        }
-      }
-    ]
-  },
-  "event_feed": {
-    "job_settings": [
-      {
-        "name": "periodic_purge",
-        "disabled": false,
-        "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
-        "purge_policies": {
-          "opensearch": [
-            {
-              "policy_name": "feed",
-              "older_than_days": 90,
-              "disabled": false
-            }
-          ]
-        }
-      }
-    ]
-  },
-  "services": {
-    "job_settings": [
-      {
-        "name": "disconnected_services",
-        "disabled": false,
-        "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
-        "threshold": "5m"
-      },
-      {
-        "name": "delete_disconnected_services",
-        "disabled": false,
-        "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
-        "threshold": "7d"
-      }
-    ]
-  }
+ "job_settings": [
+ { "name":"delete_nodes",
+ "disabled": true,
+ "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+ "threshold": "365d"
+ },
+ { "name":"missing_nodes",
+ "disabled": false,
+ "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+ "threshold": "1d"
+ },
+ { "name":"missing_nodes_for_deletion",
+ "disabled": false,
+ "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+ "threshold": "30d"
+ },
+ { "name":"periodic_purge_timeseries",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "actions",
+ "older_than_days": 30,
+ "disabled": false
+ },
+ {
+ "policy_name": "converge-history",
+ "older_than_days": 30,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
+ },
+ "compliance": {
+ "job_settings": [
+ {
+ "name": "periodic_purge",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "compliance-reports",
+ "older_than_days": 100,
+ "disabled": false
+ },
+ {
+ "policy_name": "compliance-scans",
+ "older_than_days": 100,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
+ },
+ "event_feed": {
+ "job_settings": [
+ {
+ "name": "periodic_purge",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "feed",
+ "older_than_days": 90,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
+ },
+ "services": {
+ "job_settings": [
+ {
+ "name": "disconnected_services",
+ "disabled": false,
+ "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
+ "threshold": "5m"
+ },
+ {
+ "name": "delete_disconnected_services",
+ "disabled": false,
+ "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
+ "threshold": "7d"
+ }
+ ]
+ }
 }
 ```
 
@@ -230,26 +235,26 @@ For example, if you want to configure compliance settings, create a smaller JSON
 
 ```json
 { "job_settings": [
-    {
-      "name": "periodic_purge",
-      "disabled": false,
-      "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
-      "purge_policies": {
-        "opensearch": [
-          {
-            "policy_name": "compliance-reports",
-            "older_than_days": 100,
-            "disabled": false
-          },
-          {
-            "policy_name": "compliance-scans",
-            "older_than_days": 100,
-            "disabled": false
-          }
-        ]
-      }
-    }
-  ]
+ {
+ "name": "periodic_purge",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "compliance-reports",
+ "older_than_days": 100,
+ "disabled": false
+ },
+ {
+ "policy_name": "compliance-scans",
+ "older_than_days": 100,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
 }
 ```
 
@@ -273,10 +278,10 @@ Infra node lifecycle jobs have the following options:
 Purge jobs have the following options:
 
 * `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
-  * `opensearch` (array) - An array of OpenSearch purge policies
-    * `disabled` (bool) - True or false if this job is enabled.
-    * `policy_name` (string) - The name of the purge policy you wish to update.
-    * `older_than_days` (int) - The threshold for what qualifies for deletion.
+* `opensearch` (array) - An array of OpenSearch purge policies
+* `disabled` (bool) - True or false if this job is enabled.
+* `policy_name` (string) - The name of the purge policy you wish to update.
+* `older_than_days` (int) - The threshold for what qualifies for deletion.
 
 Services jobs have the following options:
 
@@ -288,40 +293,40 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 
 ```json
 { "job_settings": [
-    { "name":"delete_nodes",
-      "disabled": true,
-      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-      "threshold": "365d"
-    },
-    { "name":"missing_nodes",
-      "disabled": false,
-      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-      "threshold": "1d"
-    },
-    { "name":"missing_nodes_for_deletion",
-      "disabled": false,
-      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-      "threshold": "30d"
-    },
-    { "name":"periodic_purge_timeseries",
-      "disabled": false,
-      "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
-      "purge_policies": {
-        "opensearch": [
-        {
-          "policy_name": "actions",
-          "older_than_days": 30,
-          "disabled": false
-        },
-        {
-          "policy_name": "converge-history",
-          "older_than_days": 30,
-          "disabled": false
-        }
-        ]
-      }
-    }
-  ]
+ { "name":"delete_nodes",
+ "disabled": true,
+ "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+ "threshold": "365d"
+ },
+ { "name":"missing_nodes",
+ "disabled": false,
+ "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+ "threshold": "1d"
+ },
+ { "name":"missing_nodes_for_deletion",
+ "disabled": false,
+ "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+ "threshold": "30d"
+ },
+ { "name":"periodic_purge_timeseries",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "actions",
+ "older_than_days": 30,
+ "disabled": false
+ },
+ {
+ "policy_name": "converge-history",
+ "older_than_days": 30,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
 }
 ```
 
@@ -329,8 +334,8 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 * `missing_nodes` - How long between a node's last check-in before marked as missing.
 * `missing_nodes_for_deletion` - How long a node can be missing before deletion
 * `periodic_purge_timeseries` - How often to run the purge job
-  * `actions` - Chef Infra Server actions
-  * `converge-history` - Chef Infra Client converge data
+* `actions` - Chef Infra Server actions
+* `converge-history` - Chef Infra Client converge data
 
 ##### Compliance Job Settings
 
@@ -338,32 +343,32 @@ The `compliance` data type has one compliance purge job with two OpenSearch purg
 
 ```json
 { "job_settings": [
-    {
-      "name": "periodic_purge",
-      "disabled": false,
-      "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
-      "purge_policies": {
-        "opensearch": [
-          {
-            "policy_name": "compliance-reports",
-            "older_than_days": 100,
-            "disabled": false
-          },
-          {
-            "policy_name": "compliance-scans",
-            "older_than_days": 100,
-            "disabled": false
-          }
-        ]
-      }
-    }
-  ]
+ {
+ "name": "periodic_purge",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "compliance-reports",
+ "older_than_days": 100,
+ "disabled": false
+ },
+ {
+ "policy_name": "compliance-scans",
+ "older_than_days": 100,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
 }
 ```
 
 * `periodic_purge` - How often to run the purge job
-  * `compliance-reports` - Chef InSpec reports
-  * `compliance-scans` - Chef Compliance scans
+* `compliance-reports` - Chef InSpec reports
+* `compliance-scans` - Chef Compliance scans
 
 ##### Event Feed Job Settings
 
@@ -371,25 +376,25 @@ The `event_feed` data type has one event feed purge job with one OpenSearch purg
 
 ```json
 { "job_settings": [
-    { "name": "periodic_purge",
-      "disabled": false,
-      "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
-      "purge_policies": {
-        "opensearch": [
-        {
-          "policy_name": "feed",
-          "older_than_days": 90,
-          "disabled": false
-        }
-        ]
-      }
-    }
-  ]
+ { "name": "periodic_purge",
+ "disabled": false,
+ "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
+ "purge_policies": {
+ "opensearch": [
+ {
+ "policy_name": "feed",
+ "older_than_days": 90,
+ "disabled": false
+ }
+ ]
+ }
+ }
+ ]
 }
 ```
 
 * `periodic_purge` - How often to run the purge job
-  * `feed` - Queryable event feed
+* `feed` - Queryable event feed
 
 ##### Services Job Settings
 
@@ -399,20 +404,20 @@ exceeds the threshold, and one to delete services when the time since the last
 health check exceeds the threshold.
 
 ```json
-{  "job_settings": [
-    {
-      "name": "disconnected_services",
-      "disabled": false,
-      "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
-      "threshold": "5m"
-    },
-    {
-      "name": "delete_disconnected_services",
-      "disabled": false,
-      "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
-      "threshold": "7d"
-    }
-  ]
+{ "job_settings": [
+ {
+ "name": "disconnected_services",
+ "disabled": false,
+ "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+ "threshold": "5m"
+ },
+ {
+ "name": "delete_disconnected_services",
+ "disabled": false,
+ "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+ "threshold": "7d"
+ }
+ ]
 }
 ```
 
