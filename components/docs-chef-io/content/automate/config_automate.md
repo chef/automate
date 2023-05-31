@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 ## Configurations
 
-Automate provides various configuration options that can be patched to customize its behavior and meet specific requirements. This guide outlines some out of all the available configurations that you can modify.
+The Automate node in Automate HA provides various configuration options that can be patched to customize its behavior and meet specific requirements. This guide outlines some of the commonly used configurations that you can patch.
 
 The below configurations can be patched to Automate nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --a2` from bastion node.
 
@@ -65,6 +65,26 @@ Click [here](/automate/configuration/#compliance-configuration) for more informa
 #### Configure Inflight Data Collector Request Maximum
 
 Click [here](/automate/configuration/#configure-inflight-data-collector-request-maximum) for more information.
+
+### Application
+
+#### Disable TLS Encryption to allow un-encrypted event data from Chef Habitat
+
+Click [here](/automate/applications_setup/#disable-tls-encryption-on-chef-automate) for more information.
+
+#### Enable TLS Encryption to allow un-encrypted event data from Chef Habitat
+
+Click [here](/automate/applications_setup/#re-enable-tls-on-chef-automate) for more information.
+
+### Authentication
+
+#### LDAP
+
+Click [here](/automate/ldap/) for more information.
+
+#### SAML
+
+Click [here](/automate/saml/) for more information.
 
 ### Backups
 

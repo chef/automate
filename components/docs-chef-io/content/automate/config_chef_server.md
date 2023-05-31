@@ -16,6 +16,8 @@ gh_repo = "automate"
 
 ## Configurations
 
+The Chef Server node in Automate HA provides various configuration options that can be patched to customize its behavior and meet specific requirements. This guide outlines some of the commonly used configurations that you can patch.
+
 The below configurations can be patched to Chef Server nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --cs` from bastion node.
 
 ### General Chef Server Configuration
