@@ -18,7 +18,7 @@ Data Lifecycle manages the retention of events, service groups, Chef Infra Clien
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
-Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, please refer the [max shards](/automate/data_lifecycle/#max-shards) to set the appropriate max_shards value.
+Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs. While configuring the data lifecycle in number of days, please refer the section on [Impact On OpenSearch Shards](/automate/data_lifecycle/#impact-on-opensearch-shards) to set the appropriate max_shards value.
 
 ![Data Lifecycle](/images/automate/data-lifecycle.png)
 
@@ -53,12 +53,12 @@ The default value for max shards per node in OpenSearch is 1000.
 
 Refer to the following table to calculate the max shards based on your data retention requirement.
 
-| Days | Number of Shards per Node for <br />Client Run | Number of Shards per Node for <br />Compliance | Total Number of Shards Per Node |
+| Days | Number of Shards Per Node for <br />Client Run | Number of Shards Per Node for <br />Compliance | Total Number of Shards Per Node |
 | ---- |------------------------------------------------|------------------------------------------------|---------------------------------|
-| 30 | 350 | 650 | 1000 |
-| 60 | 700 | 1300 | 2000 |
-| 90 | 1100 | 1900 | 3000 |
-| 365 | 4000 | 8000 | 12000 |
+| 30 | 350                                            | 650                                            | 1000 |
+| 60 | 700                                            | 1300                                           | 2000 |
+| 90 | 1100                                           | 1900                                           | 3000 |
+| 365 | 4000                                           | 8000                                           | 12000 |
 
 To set the value of max shards per node:
 1. Create the following configuration in a `.toml` file.
