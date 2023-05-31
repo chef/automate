@@ -46,6 +46,19 @@ func validateRequiredBooleanField(value interface{}, fieldName string, errorList
 	}
 }
 
+func validateStringBasedBoolean(value interface{}, fieldName string, errorList *list.List) {
+	switch v := value.(type) {
+	case string:
+		// Check if the string represents a valid boolean value
+		_, err := strconv.ParseBool(v)
+		if err != nil {
+			errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
+		}
+	default:
+		errorList.PushBack(fmt.Sprintf("Invalid %s: %v", fieldName, value))
+	}
+}
+
 func validateRequiredPathField(value string, fieldName string, errorList *list.List) {
 	if len(value) > 0 {
 		if _, err := os.Stat(value); err != nil {
@@ -102,28 +115,25 @@ func getSingleErrorFromList(errorList *list.List) error {
 	return nil
 }
 
-func validateFQDN(value string, errorList *list.List) {
+func validateUrl(value string, keyName string, errorList *list.List) {
 	if len(value) < 1 {
-		errorList.PushBack("Invalid or empty FQDN")
+		errorList.PushBack("Invalid or empty URL: " + keyName)
 		return
 	}
-
 	if strings.Contains(value, " ") {
-		errorList.PushBack("domain name cannot contain spaces")
+		errorList.PushBack("Domain name cannot contain spaces: " + keyName)
 		return
 	}
-
-	// Check for "http://" or "https://" in the FQDN value
+	// Check for "http://" or "https://" in the URL
 	if strings.HasPrefix(value, "http://") || strings.HasPrefix(value, "https://") {
-		errorList.PushBack("fqdn should not include protocol (http:// or https://)")
+		errorList.PushBack("URL should not include the protocol (http:// or https://): " + keyName)
 		return
 	}
-
-	// Regular expression to validate FQDN
-	regex := `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
+	// Regular expression to validate URLs with or without port number
+	regex := `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(:\d+)?$`
 	match, _ := regexp.MatchString(regex, value)
 	if !match {
-		errorList.PushBack("Invalid FQDN format")
+		errorList.PushBack("Invalid URL format: " + keyName)
 	}
 }
 
@@ -296,6 +306,10 @@ func isExternalDb(externalDbSettings *ExternalDBSettings) bool {
 func isExternalDbSelfManaged(externalDbSettings *ExternalDBSettings) bool {
 	return externalDbSettings.Type == "self-managed"
 }
+
+// func isSetupAwsManagedServices(awsSettings *ConfigAwsSettings) bool {
+// 	return awsSettings.SetupManagedServices
+// }
 
 func validateIPList(ipList []string, prefix string, errorList *list.List) {
 	for _, element := range ipList {
