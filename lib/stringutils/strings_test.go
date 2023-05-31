@@ -25,3 +25,11 @@ func TestTitleSplit(t *testing.T) {
 	assert.Equal(t, "Foo Bar", stringutils.TitleSplit("foo-bar", "-"))
 	assert.Equal(t, "Foo", stringutils.TitleSplit("foo", "-"))
 }
+
+func TestTitleReplace(t *testing.T) {
+	assert.Equal(t, "Hello World", stringutils.TitleReplace("hello_world", "_", " "))
+	assert.Equal(t, "Hello-World", stringutils.TitleReplace("hello_world", "_", "-"))
+	assert.Equal(t, "Helloworld", stringutils.TitleReplace("helloworld", "_", "-"))
+	assert.Equal(t, "Helloworld", stringutils.TitleReplace("helloworld", "-", " "))
+	assert.Equal(t, "Hello Chef", stringutils.TitleReplace("hello chef", "_", "-"))
+}

@@ -176,10 +176,10 @@ func TestDeletenodeAWSValidateErrorMoreThenOneIpAddress(t *testing.T) {
 	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
 	assert.NoError(t, err)
 	err = nodeDelete.validate()
-	assert.Contains(t, err.Error(), multipleIpAddressError)
+	assert.Contains(t, err.Error(), multipleNodeError)
 }
 
-func TestDeletenodeAWSModify(t *testing.T) {
+func TestDeletenodeAWSModifyA2(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "192.0.0.1",
@@ -230,6 +230,166 @@ func TestDeletenodeAWSModify(t *testing.T) {
 	err = nodeDelete.modifyConfig()
 	assert.NoError(t, err)
 	assert.Equal(t, "4", nodeDelete.(*DeleteNodeAWSImpl).config.Automate.Config.InstanceCount)
+}
+
+func TestDeletenodeAWSModifyCS(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		chefServerIp: "192.0.1.2",
+	}
+	nodeDelete := NewDeleteNodeAWS(
+		w.CliWriter,
+		flags,
+		&MockNodeUtilsImpl{
+			getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+				return &AWSConfigIp{
+					configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+					configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+					configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+				}, nil
+			},
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+				return nil, &SSHConfig{}, nil
+			},
+			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+				return nil
+			},
+			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+				return nil
+			},
+			getModeFromConfigFunc: func(path string) (string, error) {
+				return EXISTING_INFRA_MODE, nil
+			},
+			isManagedServicesOnFunc: func() bool {
+				return false
+			},
+			pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+			isA2HARBFileExistFunc: func() bool {
+				return true
+			},
+		},
+		CONFIG_TOML_PATH_AWS,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
+	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
+	assert.NoError(t, err)
+
+	err = nodeDelete.validate()
+	assert.NoError(t, err)
+	err = nodeDelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, "1", nodeDelete.(*DeleteNodeAWSImpl).config.ChefServer.Config.InstanceCount)
+}
+
+func TestDeletenodeAWSModifyPG(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		postgresqlIp: "192.0.3.3",
+	}
+	nodeDelete := NewDeleteNodeAWS(
+		w.CliWriter,
+		flags,
+		&MockNodeUtilsImpl{
+			getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+				return &AWSConfigIp{
+					configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+					configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+					configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+				}, nil
+			},
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+				return nil, &SSHConfig{}, nil
+			},
+			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+				return nil
+			},
+			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+				return nil
+			},
+			getModeFromConfigFunc: func(path string) (string, error) {
+				return EXISTING_INFRA_MODE, nil
+			},
+			isManagedServicesOnFunc: func() bool {
+				return false
+			},
+			pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+			isA2HARBFileExistFunc: func() bool {
+				return true
+			},
+		},
+		CONFIG_TOML_PATH_AWS,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
+	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
+	assert.NoError(t, err)
+	err = nodeDelete.validate()
+	assert.NoError(t, err)
+	err = nodeDelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, "3", nodeDelete.(*DeleteNodeAWSImpl).config.Postgresql.Config.InstanceCount)
+}
+
+func TestDeletenodeAWSModifyOS(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: "192.0.2.4",
+	}
+	nodeDelete := NewDeleteNodeAWS(
+		w.CliWriter,
+		flags,
+		&MockNodeUtilsImpl{
+			getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+				return &AWSConfigIp{
+					configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+					configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+					configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+				}, nil
+			},
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+				return nil, &SSHConfig{}, nil
+			},
+			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+				return nil
+			},
+			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+				return nil
+			},
+			getModeFromConfigFunc: func(path string) (string, error) {
+				return EXISTING_INFRA_MODE, nil
+			},
+			isManagedServicesOnFunc: func() bool {
+				return false
+			},
+			pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+			isA2HARBFileExistFunc: func() bool {
+				return true
+			},
+		},
+		CONFIG_TOML_PATH_AWS,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
+	err := nodeDelete.(*DeleteNodeAWSImpl).getAwsHAIp()
+	assert.NoError(t, err)
+	err = nodeDelete.validate()
+	assert.NoError(t, err)
+	err = nodeDelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, "5", nodeDelete.(*DeleteNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 }
 
 func TestDeleteAwsnodePrompt(t *testing.T) {
@@ -291,11 +451,11 @@ Chef-Server => 192.0.1.1, 192.0.1.2, 192.0.1.3, 192.0.1.4
 OpenSearch => 192.0.2.1, 192.0.2.2, 192.0.2.3, 192.0.2.4
 Postgresql => 192.0.3.1, 192.0.3.2, 192.0.3.3, 192.0.3.4
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
 Automate => 192.0.0.1
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
 func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
@@ -375,11 +535,11 @@ Chef-Server => 192.0.1.1, 192.0.1.2, 192.0.1.3, 192.0.1.4
 OpenSearch => 192.0.2.1, 192.0.2.2, 192.0.2.3, 192.0.2.4
 Postgresql => 192.0.3.1, 192.0.3.2, 192.0.3.3, 192.0.3.4
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
 Automate => 192.0.0.1
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodeDelete.runDeploy()
 	assert.NoError(t, err)
 	assert.Equal(t, true, autoFileMoved)
@@ -463,7 +623,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+			stopServicesOnNodeFunc: func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 				return nil
 			},
 		},
@@ -539,7 +699,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			stopServicesOnNodeFunc: func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+			stopServicesOnNodeFunc: func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 				return nil
 			},
 		},

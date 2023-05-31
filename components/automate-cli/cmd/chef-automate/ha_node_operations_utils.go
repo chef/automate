@@ -56,7 +56,7 @@ type MockNodeUtilsImpl struct {
 	moveAWSAutoTfvarsFileFunc                 func(path string) error
 	modifyTfArchFileFunc                      func(path string) error
 	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
-	stopServicesOnNodeFunc                    func(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error
+	stopServicesOnNodeFunc                    func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -115,8 +115,8 @@ func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
 func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
 	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
 }
-func (mnu *MockNodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
-	return mnu.stopServicesOnNodeFunc(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList, infra, sshUtil)
+func (mnu *MockNodeUtilsImpl) stopServicesOnNode(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+	return mnu.stopServicesOnNodeFunc(ip, nodeType, infra, sshUtil)
 }
 
 type NodeOpUtils interface {
@@ -138,7 +138,7 @@ type NodeOpUtils interface {
 	moveAWSAutoTfvarsFile(string) error
 	modifyTfArchFile(string) error
 	getAWSConfigIp() (*AWSConfigIp, error)
-	stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error
+	stopServicesOnNode(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error
 }
 
 type NodeUtilsImpl struct {
@@ -235,9 +235,6 @@ func (nu *NodeUtilsImpl) taintTerraform(path string) error {
 	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, path)
 }
 
-func (nu *NodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
-	return readConfig(path)
-}
 func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs, true)
 }
@@ -331,22 +328,25 @@ func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
 }
 
 // Stop services on node
-func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, postgresqlIpList, opensearchIpList []string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
 	frontendCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	automateCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	chefServerCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	postgresqlCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 	opensearchCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 
-	if len(automateIpList) > 0 {
-		automateCmd = createCmdInputs(automateIpList, STOP_FE_SERVICES_CMD)
-	} else if len(chefServerIpList) > 0 {
-		chefServerCmd = createCmdInputs(chefServerIpList, STOP_FE_SERVICES_CMD)
-	} else if len(postgresqlIpList) > 0 {
-		postgresqlCmd = createCmdInputs(postgresqlIpList, STOP_BE_SERVICES_CMD)
-	} else if len(opensearchIpList) > 0 {
-		cmd := fmt.Sprintf(EXCLUDE_OPENSEARCH_NODE_REQUEST, opensearchIpList[0]) + STOP_BE_SERVICES_CMD
-		opensearchCmd = createCmdInputs(opensearchIpList, cmd)
+	switch nodeType {
+	case CONST_AUTOMATE:
+		automateCmd = createCmdInputs(ip, STOP_FE_SERVICES_CMD)
+	case CONST_CHEF_SERVER:
+		chefServerCmd = createCmdInputs(ip, STOP_FE_SERVICES_CMD)
+	case CONST_POSTGRESQL:
+		postgresqlCmd = createCmdInputs(ip, STOP_BE_SERVICES_CMD)
+	case CONST_OPENSEARCH:
+		cmd := fmt.Sprintf(EXCLUDE_OPENSEARCH_NODE_REQUEST, ip) + STOP_BE_SERVICES_CMD
+		opensearchCmd = createCmdInputs(ip, cmd)
+	default:
+		return errors.New("Invalid node type")
 	}
 
 	nodeMap := &NodeTypeAndCmd{
@@ -368,11 +368,11 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(automateIpList, chefServerIpList, po
 	return nil
 }
 
-func createCmdInputs(ipList []string, cmd string) *Cmd {
+func createCmdInputs(ip string, cmd string) *Cmd {
 	return &Cmd{
 		CmdInputs: &CmdInputs{
 			Cmd:                      cmd,
-			NodeIps:                  ipList,
+			NodeIps:                  []string{ip},
 			Single:                   true,
 			NodeType:                 true,
 			SkipPrintOutput:          false,

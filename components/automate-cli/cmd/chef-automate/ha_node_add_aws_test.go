@@ -57,7 +57,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 	})
 	err := nodeAdd.validate()
 	assert.NoError(t, err)
-	assert.Equal(t, "3", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
+	assert.Equal(t, "6", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 }
 
 func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
@@ -141,15 +141,15 @@ func TestAddAwsnodePrompt(t *testing.T) {
 	assert.Contains(t, w.Output(), `Existing node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 3
+Chef-Server => 2
+OpenSearch => 6
 Postgresql => 4
 
 New node count:
 ================================================
 Automate => 6
-Chef-Server => 1
-OpenSearch => 3
+Chef-Server => 2
+OpenSearch => 6
 Postgresql => 4
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
@@ -194,22 +194,22 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 	assert.NoError(t, err)
 	err = nodeAdd.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, "4", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
+	assert.Equal(t, "7", nodeAdd.(*AddNodeAWSImpl).config.Opensearch.Config.InstanceCount)
 	res, err := nodeAdd.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
 	assert.Contains(t, w.Output(), `Existing node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 3
+Chef-Server => 2
+OpenSearch => 6
 Postgresql => 4
 
 New node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 4
+Chef-Server => 2
+OpenSearch => 7
 Postgresql => 4
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodeAdd.runDeploy()
@@ -282,15 +282,15 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 	assert.Contains(t, w.Output(), `Existing node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 3
+Chef-Server => 2
+OpenSearch => 6
 Postgresql => 4
 
 New node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 4
+Chef-Server => 2
+OpenSearch => 7
 Postgresql => 4
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, autoFileMoved)
@@ -346,15 +346,15 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 	assert.Contains(t, w.Output(), `Existing node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 3
+Chef-Server => 2
+OpenSearch => 6
 Postgresql => 4
 
 New node count:
 ================================================
 Automate => 5
-Chef-Server => 1
-OpenSearch => 4
+Chef-Server => 2
+OpenSearch => 7
 Postgresql => 4
 This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, autoFileMoved)

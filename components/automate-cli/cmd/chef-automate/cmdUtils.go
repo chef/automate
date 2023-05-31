@@ -349,9 +349,7 @@ func GetSingleIp(ips []string) (string, error) {
 
 // isValidIP will check whether the given ip is in the given remoteservice ips set or not.
 func isValidIP(ip string, ips []string) bool {
-	ipv4Regex := `^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4})`
-	match, _ := regexp.MatchString(ipv4Regex, ip)
-	if !match {
+	if !isValidIPFormat(ip) {
 		return false
 	}
 	for _, clusterIP := range ips {
@@ -360,6 +358,14 @@ func isValidIP(ip string, ips []string) bool {
 		}
 	}
 	return false
+}
+
+func isValidIPFormat(ip string) bool {
+	if strings.TrimSpace(ip) == "" {
+		return false
+	}
+	match, _ := regexp.MatchString(IPV4REGEX, ip)
+	return match
 }
 
 // printOutput of the remote jobs
