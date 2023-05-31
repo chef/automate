@@ -12,13 +12,13 @@ gh_repo = "automate"
     weight = 30
 +++
 
-Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
+Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
 ## Data Lifecycle
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
-Users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
+Users with `dataLifecycle:*` IAM access can see the data lifecycle job statuses, configure jobs or run jobs. While configuring the data lifecycle in a number of days, please refer to the section on [Impact On OpenSearch Shards](/automate/data_lifecycle/#impact-on-opensearch-shards) to set the appropriate maximum shards per node value.
 
 ![Data Lifecycle](/images/automate/data-lifecycle.png)
 
@@ -42,6 +42,38 @@ The default is to remove Chef Infra Client run data after 30 days, to label node
 
 The Compliance data lifecycle settings allow you to remove compliance reports and compliance scans after a set amount of days.
 The default is to remove compliance reports after 60 days, and to remove compliance scans after 60 days.
+
+## Impact on OpenSearch Shards
+
+The data retention period set in the data lifecycle settings impacts the number of shards in OpenSearch.
+
+If the number of shards per node grows higher than the max shards per node configured in OpenSearch, you may see failures while ingesting data to Automate. For more information, refer to the [error troubleshoot](/automate/troubleshooting/#issue-maximum-shards-open) document.
+
+The default value for max shards per node in OpenSearch is 1000.
+
+Refer to the following table to calculate the max shards based on your data retention requirement.
+
+| Days | Number of Shards Per Node for <br />Client Run | Number of Shards Per Node for <br />Compliance | Total Number of Shards Per Node |
+| ---- |------------------------------------------------|------------------------------------------------|---------------------------------|
+| 30 | 350                                            | 650                                            | 1000 |
+| 60 | 700                                            | 1300                                           | 2000 |
+| 90 | 1100                                           | 1900                                           | 3000 |
+| 365 | 4000                                           | 8000                                           | 12000 |
+
+To set the value of max shards per node:
+
+1. Create the following configuration in a `.toml` file.
+
+  ```bash
+    [opensearch.v1.sys.cluster]
+    max_shards_per_node = 1000
+  ```
+
+1. Patch the configuration
+
+  ```bash
+    chef-automate config patch </path/to/your-file.toml>
+  ```
 
 ## Data Lifecycle API
 
