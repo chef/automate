@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"net"
 	"net/http"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -16,9 +18,16 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
 
-	if req.Fqdn == "" || req.RootCert == "" || len(req.Nodes) == 0 {
+	if strings.TrimSpace(req.Fqdn) == "" || strings.TrimSpace(req.RootCert) == "" || len(req.Nodes) == 0 {
 		h.Logger.Error("Fqdn, Root Cert and Nodes can't be empty.")
 		return fiber.NewError(http.StatusBadRequest, "Fqdn, Root Cert and Nodes can't be empty, Please provide all the required fields.")
+	}
+
+	for _, ip := range req.Nodes {
+		if net.ParseIP(ip) == nil {
+			h.Logger.Error("Node IP is not valid")
+			return fiber.NewError(http.StatusBadRequest, "Node IP is not valid, Please provide the valid format IP.")
+		}
 	}
 
 	if req.IsAfterDeployment &&

@@ -34,6 +34,7 @@ func NewFqdnService(log logger.Logger, timeout time.Duration) *FqdnService {
 }
 
 func (fq *FqdnService) createClient(rootCert string) *http.Client {
+	fq.log.Debug("Creating Client")
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM([]byte(rootCert))
 
@@ -46,7 +47,7 @@ func (fq *FqdnService) createClient(rootCert string) *http.Client {
 		},
 		Timeout: fq.timeout * time.Second,
 	}
-
+	fq.log.Debug("Client Created.")
 	return client
 }
 
@@ -99,6 +100,7 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
 func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDeployment bool, port string) models.Checks {
+	fq.log.Debug("Checking Fqdn Reachability...")
 	client := fq.createClient(rootCert)
 	var url string
 
@@ -107,6 +109,7 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 	} else {
 		url = fmt.Sprintf("https://%s:%s", fqdn, port)
 	}
+	fq.log.Debug("URL: ", url)
 
 	res, err := client.Get(url)
 	if err != nil {
@@ -114,14 +117,17 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
 	}
 
+	fq.log.Debug("Status Code: ", res.StatusCode)
 	if res.StatusCode != 200 {
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
 	}
+	fq.log.Debug("Fqdn is Reachable.")
 	return createCheck(constants.FQDN_TITLE, true, constants.FQDN_SUCCESS_MESSAGE, "", "")
 }
 
 // nodeReachable function will check that our load balancer will correctly redirecting to all the nodes or not.
 func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, isAfterDeployment bool, port string) models.Checks {
+	fq.log.Debug("Checking Node Reachability...")
 	setNodes, err := makeSet(reqNodes, isAfterDeployment)
 	if err != nil {
 		fq.log.Error(err.Error())
@@ -134,10 +140,12 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, i
 	} else {
 		url = fmt.Sprintf("https://%s:%s", fqdn, port)
 	}
+	fq.log.Debug("URL: ", url)
 
 	client := fq.createClient(rootCert)
 	fqdnResultChan := make(chan string)
 
+	fq.log.Debug("Making Concurrent Calls...")
 	for i := 0; i < 50; i++ {
 		go func(fqdnResultChan chan string) {
 			res, err := client.Get(url)
@@ -159,6 +167,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, i
 		delete(setNodes, chanResult)
 		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
 		if len(setNodes) == 0 {
+			fq.log.Debug("All nodes are reachable.")
 			return createCheck(constants.NODE_TITLE, true, constants.NODE_SUCCESS_MESSAGE, "", "")
 		}
 	}
@@ -169,6 +178,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, i
 
 // validateCertificate will check that if our root certificate is valid or not.
 func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
+	fq.log.Debug("Validating Certificate...")
 	// Parse the PEM-encoded SSL certificate
 	block, _ := pem.Decode([]byte(rootCert))
 	if block == nil || block.Type != "CERTIFICATE" {

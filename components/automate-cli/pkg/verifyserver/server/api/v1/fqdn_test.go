@@ -164,6 +164,27 @@ func TestCheckFqdn(t *testing.T) {
 			}`,
 		},
 		{
+			TestName: "400: Failure - Node IP is not in valid format",
+			RequestBody: `{
+				"fqdn": "localhost",
+				"node_type": "automate",
+				"root_cert": "-----BEGIN CERTIFICATE-----\nMIIE2TCCA8GgAwIBAgIJAK/tIWfh4wDxMA0GCSqGSIb3DQEBCwUAMIGQMQswCQYD\nVQQGEwJJTjESMBAGA1UECAwJS2FybmF0YWthMRIwEAYDVQQHDAlCZW5nYWx1cnUx\nFjAUBgNVBAoMDVByb2dyZXNzLXRlc3QxCzAJBgNVBAsMAklUMRIwEAYDVQQDDAls\nb2NhbGhvc3QxIDAeBgkqhkiG9w0BCQEWEXRlc3RAcHJvZ3Jlc3MuY29tMB4XDTIz\nMDUyMzA2NDY0NFoXDTMzMDUyMDA2NDY0NFowgZAxCzAJBgNVBAYTAklOMRIwEAYD\nVQQIDAlLYXJuYXRha2ExEjAQBgNVBAcMCUJlbmdhbHVydTEWMBQGA1UECgwNUHJv\nZ3Jlc3MtdGVzdDELMAkGA1UECwwCSVQxEjAQBgNVBAMMCWxvY2FsaG9zdDEgMB4G\nCSqGSIb3DQEJARYRdGVzdEBwcm9ncmVzcy5jb20wggEiMA0GCSqGSIb3DQEBAQUA\nA4IBDwAwggEKAoIBAQDjU96JdUaSdNlRayVK9Fbs/Fu5cRaKe+WQZZDiHdIT1gtl\nITx2VYlPnQno6R3p5uCjKX1le8hJR9YrafaolIQrMnuHg6JkSB8DeahMutWufvGI\nOZu3USs1L0sd5FCq6Y5Yr0mNkQiNNNUhjFMZYvXDd9kps8olmOpR6Jwvc+UuP637\noh0zEc9OoKHicQ+SeoD7R8JbUmzy6okNWYJ5utLoVEunSkmb24NgNmkfJ5MAQcBe\nACKj905Vi8Z3Hpb5zXVxW84scXxN7ZxxRykE1Cc254iCNKrQxW+QkO1FxshOVUi5\n94E4aY+rk9FMnE9d7Hc3io3uhcTg8TbGiYwnJDwrAgMBAAGjggEyMIIBLjAdBgNV\nHQ4EFgQUXZ9TWHc3/ICalciFP2O/kUcqRX8wgcUGA1UdIwSBvTCBuoAUXZ9TWHc3\n/ICalciFP2O/kUcqRX+hgZakgZMwgZAxCzAJBgNVBAYTAklOMRIwEAYDVQQIDAlL\nYXJuYXRha2ExEjAQBgNVBAcMCUJlbmdhbHVydTEWMBQGA1UECgwNUHJvZ3Jlc3Mt\ndGVzdDELMAkGA1UECwwCSVQxEjAQBgNVBAMMCWxvY2FsaG9zdDEgMB4GCSqGSIb3\nDQEJARYRdGVzdEBwcm9ncmVzcy5jb22CCQCv7SFn4eMA8TAMBgNVHRMEBTADAQH/\nMAsGA1UdDwQEAwIC/DAUBgNVHREEDTALgglsb2NhbGhvc3QwFAYDVR0SBA0wC4IJ\nbG9jYWxob3N0MA0GCSqGSIb3DQEBCwUAA4IBAQBAYHmcpWQf8U5OfzuLWM6M2Xt6\nGxBjWAWilF4aZG/6f38fciRxHGQcXWZp1RrgHIGCjy6VpUTRyqr5ZneSZ0JxU5X8\nSe8KOg5dyu1BdzS7DdR9Ofs80EX85eoXW8KAHeWjLprN1r9NXQ7gRaFXXkFYYkXY\nDLt/b+QavfN/FZGTi/e5HlKONoNu6FxRdtuWE8d7PwjFm+Qm3nlX1qqvRyZP3gmK\nVm7y9nw2ib8nIGcH/2EKulEyDWxvHTTBjuQXytHU+oubDz3a1eFr5IkgLwusYn1P\n2QTvRmA7J/8Qj/wMN/W5ve4akoHzS1Zzfiphq5rSh+WrhUSWpL3bKzVrGEpT\n-----END CERTIFICATE-----\n",
+				"is_after_deployment": true,
+				"nodes": [
+					" "
+				]
+			}`,
+			ExpectedCode: 400,
+			ExpectedBody: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "Node IP is not valid, Please provide the valid format IP."
+				}
+			}`,
+		},
+		{
 			TestName:     "400: Failure - Invalid Body",
 			RequestBody:  "Wrong body",
 			ExpectedCode: 400,
