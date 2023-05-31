@@ -35,35 +35,35 @@ func runCheckForOpensearch(config models.Config, path string, port string, log l
 		OSUserPassword: config.ExternalOS.OSUserPassword,
 		OSCert:         config.ExternalOS.OSCert,
 	}
-	var result, result2 []models.CheckTriggerResponse
-	outputCh := make(chan models.CheckTriggerResponse)
+	var resultA2, resultCS []models.CheckTriggerResponse
+	outCh := make(chan models.CheckTriggerResponse)
 	count := 0
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		log.Debugf("Trigger Opensearch check for automate ip %s", ip)
-		count++
 		endPoint := checkutils.PrepareEndPoint(ip, port, path)
-		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
+		count++
+		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outCh, req)
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		log.Debugf("Trigger Opensearch check for chefserver ip %s", ip)
-		count++
 		endPoint := checkutils.PrepareEndPoint(ip, port, path)
-		go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
+		log.Debugf("Trigger Opensearch check for chef-infra-server ip %s", ip)
+		count++
+		go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outCh, req)
 
 	}
 
 	for i := 0; i < count; i++ {
-		res := <-outputCh
-		if res.NodeType == "automate" {
-			result = append(result, res)
-		} else if res.NodeType == "chef-infra-server" {
-			result2 = append(result2, res)
+		result := <-outCh
+		if result.NodeType == "automate" {
+			resultA2 = append(resultA2, result)
+		} else if result.NodeType == "chef-infra-server" {
+			resultCS = append(resultCS, result)
 		}
 	}
-	result = append(result, result2...)
+	resultA2 = append(resultA2, resultCS...)
 
-	close(outputCh)
-	return result
+	close(outCh)
+	return resultA2
 
 }
