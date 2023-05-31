@@ -259,7 +259,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 		},
 
 		{
-			name:           "Postgres checks are failed",
+			name:           "Opensearch checks are failed",
 			isPassed:       false,
 			isError:        false,
 			httpStatusCode: http.StatusOK,
