@@ -5,11 +5,11 @@ draft = false
 
 gh_repo = "automate"
 [menu]
- [menu.automate]
- title = "Data Lifecycle"
- parent = "automate/settings"
- identifier = "automate/settings/data_lifecycle.md Data Lifecycle"
- weight = 30
+  [menu.automate]
+    title = "Data Lifecycle"
+    parent = "automate/settings"
+    identifier = "automate/settings/data_lifecycle.md Data Lifecycle"
+    weight = 30
 +++
 
 Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
@@ -92,12 +92,12 @@ To see the combined status and configuration for all data lifecycle jobs, you ca
 
 These examples use the Unix/Linux [`curl` command](https://man7.org/linux/man-pages/man1/curl.1.html) with the options:
 
-| Short Option | Long Option | Definition |
+| Short Option | Long Option  | Definition                                                                                         |
 |--------------|--------------|---------------------------------------------------------------------------------------------------|
-| -s | --silent | Silent or quiet mode, does not show progress meter or error messages. |
-| -S | --show-error | When used with -s, --silent, it makes curl show an error message if it fails. |
-| -k | --insecure | Instructs curl to proceed and operate even for server connections otherwise considered insecure. |
-| -H | --header | Sends a header with the request. In this case, the header is your API token. |
+| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                             |
+| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                     |
+| -k           | --insecure   | Instructs curl to proceed and operate even for server connections otherwise considered insecure.  |
+| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                      |
 
 `curl -s -S` shows errors but does not show the progress meter:
 
@@ -121,99 +121,99 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
 
 ```json
 { "infra": {
- "job_settings": [
- { "name":"delete_nodes",
- "disabled": true,
- "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
- "threshold": "365d"
- },
- { "name":"missing_nodes",
- "disabled": false,
- "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
- "threshold": "1d"
- },
- { "name":"missing_nodes_for_deletion",
- "disabled": false,
- "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
- "threshold": "30d"
- },
- { "name":"periodic_purge_timeseries",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "actions",
- "older_than_days": 30,
- "disabled": false
- },
- {
- "policy_name": "converge-history",
- "older_than_days": 30,
- "disabled": false
- }
- ]
- }
- }
- ]
- },
- "compliance": {
- "job_settings": [
- {
- "name": "periodic_purge",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "compliance-reports",
- "older_than_days": 100,
- "disabled": false
- },
- {
- "policy_name": "compliance-scans",
- "older_than_days": 100,
- "disabled": false
- }
- ]
- }
- }
- ]
- },
- "event_feed": {
- "job_settings": [
- {
- "name": "periodic_purge",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "feed",
- "older_than_days": 90,
- "disabled": false
- }
- ]
- }
- }
- ]
- },
- "services": {
- "job_settings": [
- {
- "name": "disconnected_services",
- "disabled": false,
- "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
- "threshold": "5m"
- },
- {
- "name": "delete_disconnected_services",
- "disabled": false,
- "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
- "threshold": "7d"
- }
- ]
- }
+    "job_settings": [
+      { "name":"delete_nodes",
+        "disabled": true,
+        "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+        "threshold": "365d"
+      },
+      { "name":"missing_nodes",
+        "disabled": false,
+        "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+        "threshold": "1d"
+      },
+      { "name":"missing_nodes_for_deletion",
+        "disabled": false,
+        "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+        "threshold": "30d"
+      },
+      { "name":"periodic_purge_timeseries",
+        "disabled": false,
+        "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
+        "purge_policies": {
+          "opensearch": [
+            {
+              "policy_name": "actions",
+              "older_than_days": 30,
+              "disabled": false
+            },
+            {
+              "policy_name": "converge-history",
+              "older_than_days": 30,
+              "disabled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "compliance": {
+    "job_settings": [
+      {
+        "name": "periodic_purge",
+        "disabled": false,
+        "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
+        "purge_policies": {
+          "opensearch": [
+            {
+              "policy_name": "compliance-reports",
+              "older_than_days": 100,
+              "disabled": false
+            },
+            {
+              "policy_name": "compliance-scans",
+              "older_than_days": 100,
+              "disabled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "event_feed": {
+    "job_settings": [
+      {
+        "name": "periodic_purge",
+        "disabled": false,
+        "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
+        "purge_policies": {
+          "opensearch": [
+            {
+              "policy_name": "feed",
+              "older_than_days": 90,
+              "disabled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "services": {
+    "job_settings": [
+      {
+        "name": "disconnected_services",
+        "disabled": false,
+        "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
+        "threshold": "5m"
+      },
+      {
+        "name": "delete_disconnected_services",
+        "disabled": false,
+        "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=60",
+        "threshold": "7d"
+      }
+    ]
+  }
 }
 ```
 
@@ -235,26 +235,26 @@ For example, if you want to configure compliance settings, create a smaller JSON
 
 ```json
 { "job_settings": [
- {
- "name": "periodic_purge",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "compliance-reports",
- "older_than_days": 100,
- "disabled": false
- },
- {
- "policy_name": "compliance-scans",
- "older_than_days": 100,
- "disabled": false
- }
- ]
- }
- }
- ]
+    {
+      "name": "periodic_purge",
+      "disabled": false,
+      "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
+      "purge_policies": {
+        "opensearch": [
+          {
+            "policy_name": "compliance-reports",
+            "older_than_days": 100,
+            "disabled": false
+          },
+          {
+            "policy_name": "compliance-scans",
+            "older_than_days": 100,
+            "disabled": false
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
 
@@ -278,10 +278,10 @@ Infra node lifecycle jobs have the following options:
 Purge jobs have the following options:
 
 * `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
-* `opensearch` (array) - An array of OpenSearch purge policies
-* `disabled` (bool) - True or false if this job is enabled.
-* `policy_name` (string) - The name of the purge policy you wish to update.
-* `older_than_days` (int) - The threshold for what qualifies for deletion.
+  * `opensearch` (array) - An array of OpenSearch purge policies
+    * `disabled` (bool) - True or false if this job is enabled.
+    * `policy_name` (string) - The name of the purge policy you wish to update.
+    * `older_than_days` (int) - The threshold for what qualifies for deletion.
 
 Services jobs have the following options:
 
@@ -293,40 +293,40 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 
 ```json
 { "job_settings": [
- { "name":"delete_nodes",
- "disabled": true,
- "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
- "threshold": "365d"
- },
- { "name":"missing_nodes",
- "disabled": false,
- "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
- "threshold": "1d"
- },
- { "name":"missing_nodes_for_deletion",
- "disabled": false,
- "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
- "threshold": "30d"
- },
- { "name":"periodic_purge_timeseries",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "actions",
- "older_than_days": 30,
- "disabled": false
- },
- {
- "policy_name": "converge-history",
- "older_than_days": 30,
- "disabled": false
- }
- ]
- }
- }
- ]
+    { "name":"delete_nodes",
+      "disabled": true,
+      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+      "threshold": "365d"
+    },
+    { "name":"missing_nodes",
+      "disabled": false,
+      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+      "threshold": "1d"
+    },
+    { "name":"missing_nodes_for_deletion",
+      "disabled": false,
+      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+      "threshold": "30d"
+    },
+    { "name":"periodic_purge_timeseries",
+      "disabled": false,
+      "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
+      "purge_policies": {
+        "opensearch": [
+        {
+          "policy_name": "actions",
+          "older_than_days": 30,
+          "disabled": false
+        },
+        {
+          "policy_name": "converge-history",
+          "older_than_days": 30,
+          "disabled": false
+        }
+        ]
+      }
+    }
+  ]
 }
 ```
 
@@ -334,8 +334,8 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 * `missing_nodes` - How long between a node's last check-in before marked as missing.
 * `missing_nodes_for_deletion` - How long a node can be missing before deletion
 * `periodic_purge_timeseries` - How often to run the purge job
-* `actions` - Chef Infra Server actions
-* `converge-history` - Chef Infra Client converge data
+  * `actions` - Chef Infra Server actions
+  * `converge-history` - Chef Infra Client converge data
 
 ##### Compliance Job Settings
 
@@ -343,32 +343,32 @@ The `compliance` data type has one compliance purge job with two OpenSearch purg
 
 ```json
 { "job_settings": [
- {
- "name": "periodic_purge",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "compliance-reports",
- "older_than_days": 100,
- "disabled": false
- },
- {
- "policy_name": "compliance-scans",
- "older_than_days": 100,
- "disabled": false
- }
- ]
- }
- }
- ]
+    {
+      "name": "periodic_purge",
+      "disabled": false,
+      "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
+      "purge_policies": {
+        "opensearch": [
+          {
+            "policy_name": "compliance-reports",
+            "older_than_days": 100,
+            "disabled": false
+          },
+          {
+            "policy_name": "compliance-scans",
+            "older_than_days": 100,
+            "disabled": false
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
 
 * `periodic_purge` - How often to run the purge job
-* `compliance-reports` - Chef InSpec reports
-* `compliance-scans` - Chef Compliance scans
+  * `compliance-reports` - Chef InSpec reports
+  * `compliance-scans` - Chef Compliance scans
 
 ##### Event Feed Job Settings
 
@@ -376,25 +376,25 @@ The `event_feed` data type has one event feed purge job with one OpenSearch purg
 
 ```json
 { "job_settings": [
- { "name": "periodic_purge",
- "disabled": false,
- "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
- "purge_policies": {
- "opensearch": [
- {
- "policy_name": "feed",
- "older_than_days": 90,
- "disabled": false
- }
- ]
- }
- }
- ]
+    { "name": "periodic_purge",
+      "disabled": false,
+      "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
+      "purge_policies": {
+        "opensearch": [
+        {
+          "policy_name": "feed",
+          "older_than_days": 90,
+          "disabled": false
+        }
+        ]
+      }
+    }
+  ]
 }
 ```
 
 * `periodic_purge` - How often to run the purge job
-* `feed` - Queryable event feed
+  * `feed` - Queryable event feed
 
 ##### Services Job Settings
 
@@ -404,20 +404,20 @@ exceeds the threshold, and one to delete services when the time since the last
 health check exceeds the threshold.
 
 ```json
-{ "job_settings": [
- {
- "name": "disconnected_services",
- "disabled": false,
- "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
- "threshold": "5m"
- },
- {
- "name": "delete_disconnected_services",
- "disabled": false,
- "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
- "threshold": "7d"
- }
- ]
+{  "job_settings": [
+    {
+      "name": "disconnected_services",
+      "disabled": false,
+      "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+      "threshold": "5m"
+    },
+    {
+      "name": "delete_disconnected_services",
+      "disabled": false,
+      "recurrence": "FREQ=SECONDLY;DTSTART=20200612T182105Z;INTERVAL=61",
+      "threshold": "7d"
+    }
+  ]
 }
 ```
 
