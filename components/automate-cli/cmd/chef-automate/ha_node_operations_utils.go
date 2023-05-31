@@ -358,9 +358,7 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType string, infra *Automate
 		Infra:      infra,
 	}
 
-	nu.cmdUtil.Set(nodeMap, sshUtil, writer)
-
-	_, err := nu.cmdUtil.Execute()
+	_, err := nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
 	if err != nil {
 		return err
 	}

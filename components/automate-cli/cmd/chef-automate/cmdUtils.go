@@ -52,7 +52,7 @@ type CmdResult struct {
 
 type RemoteCmdExecutor interface {
 	Execute() (map[string][]*CmdResult, error)
-	Set(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer)
+	ExecuteWithNodeMap(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error)
 }
 
 type remoteCmdExecutor struct {
@@ -62,16 +62,16 @@ type remoteCmdExecutor struct {
 }
 
 type MockRemoteCmdExecutor struct {
-	ExecuteFunc func() (map[string][]*CmdResult, error)
-	SetFunc     func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer)
+	ExecuteFunc            func() (map[string][]*CmdResult, error)
+	ExecuteWithNodeMapFunc func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error)
 }
 
 func (m *MockRemoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {
 	return m.ExecuteFunc()
 }
 
-func (m *MockRemoteCmdExecutor) Set(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
-	m.SetFunc(nodeMap, sshUtil, writer)
+func (m *MockRemoteCmdExecutor) ExecuteWithNodeMap(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+	return m.ExecuteWithNodeMapFunc(nodeMap)
 }
 
 func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) RemoteCmdExecutor {
@@ -82,63 +82,72 @@ func NewRemoteCmdExecutor(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.
 	}
 }
 
-func (c *remoteCmdExecutor) Set(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
-	c.NodeMap = nodeMap
-	c.SshUtil = sshUtil
-	c.Output = writer
+func NewRemoteCmdExecutorWithoutNodeMap(sshUtil SSHUtil, writer *cli.Writer) RemoteCmdExecutor {
+	return &remoteCmdExecutor{
+		SshUtil: sshUtil,
+		Output:  writer,
+	}
+}
+
+func (c *remoteCmdExecutor) ExecuteWithNodeMap(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+	return c.execute(nodeMap)
 }
 
 func (c *remoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {
+	return c.execute(c.NodeMap)
+}
+
+func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 	timestamp := time.Now().Format("20060102150405")
 	cmdResult := map[string][]*CmdResult{}
 
-	sshConfig := getSshDetails(c.NodeMap.Infra)
+	sshConfig := getSshDetails(nodeMap.Infra)
 	c.SshUtil.setSSHConfig(sshConfig)
 
 	switch true {
-	case c.NodeMap.Frontend.CmdInputs.NodeType:
+	case nodeMap.Frontend.CmdInputs.NodeType:
 		const remoteService string = CONST_FRONTEND
-		nodeIps, err := preCmdExecCheck(c.NodeMap.Frontend, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Frontend, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
 		}
-		output := c.executeCmdOnGivenNodes(c.NodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
-	case c.NodeMap.Automate.CmdInputs.NodeType:
+	case nodeMap.Automate.CmdInputs.NodeType:
 		const remoteService string = CONST_AUTOMATE
-		nodeIps, err := preCmdExecCheck(c.NodeMap.Automate, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Automate, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(c.NodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
-	case c.NodeMap.ChefServer.CmdInputs.NodeType:
+	case nodeMap.ChefServer.CmdInputs.NodeType:
 		const remoteService string = CONST_CHEF_SERVER
-		nodeIps, err := preCmdExecCheck(c.NodeMap.ChefServer, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.ChefServer, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(c.NodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
-	case c.NodeMap.Postgresql.CmdInputs.NodeType:
+	case nodeMap.Postgresql.CmdInputs.NodeType:
 		const remoteService string = CONST_POSTGRESQL
-		nodeIps, err := preCmdExecCheck(c.NodeMap.Postgresql, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Postgresql, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(c.NodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
-	case c.NodeMap.Opensearch.CmdInputs.NodeType:
+	case nodeMap.Opensearch.CmdInputs.NodeType:
 		const remoteService string = CONST_OPENSEARCH
-		nodeIps, err := preCmdExecCheck(c.NodeMap.Opensearch, c.SshUtil, c.NodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Opensearch, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(c.NodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
 	default:
 		return cmdResult, errors.New("Missing or Unsupported flag")

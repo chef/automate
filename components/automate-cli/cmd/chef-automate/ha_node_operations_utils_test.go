@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -184,7 +183,7 @@ func TestIsFinalInstanceCountAllowed(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
 	assert.NoError(t, err)
@@ -196,7 +195,7 @@ func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
 	dir := t.TempDir()
 
 	err := os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
@@ -208,7 +207,7 @@ func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
 	dir := t.TempDir()
 
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
@@ -221,7 +220,7 @@ func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
 }
 
 func TestModifyTfArchFile(t *testing.T) {
-	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
@@ -234,7 +233,7 @@ func TestModifyTfArchFile(t *testing.T) {
 }
 
 func TestModifyTfArchFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(&remoteCmdExecutor{})
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
 	dir := t.TempDir()
 	err := nodeUtil.modifyTfArchFile(dir)
 	assert.Error(t, err)
@@ -254,8 +253,8 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
-			// do nothing
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
 		},
 	})
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_AUTOMATE, infra, &MockSSHUtilsImpl{
@@ -279,8 +278,8 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
-			// do nothing
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
 		},
 	})
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_CHEF_SERVER, infra, &MockSSHUtilsImpl{
@@ -304,8 +303,8 @@ func TestStopServicesOnNodePG(t *testing.T) {
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
-			// do nothing
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
 		},
 	})
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_POSTGRESQL, infra, &MockSSHUtilsImpl{
@@ -329,8 +328,8 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-		SetFunc: func(nodeMap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) {
-			// do nothing
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
 		},
 	})
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_OPENSEARCH, infra, &MockSSHUtilsImpl{

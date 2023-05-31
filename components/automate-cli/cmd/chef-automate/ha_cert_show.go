@@ -98,7 +98,7 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 // certShowCmdFunc is the main function for the cert show command
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(&remoteCmdExecutor{}), NewSSHUtil(&SSHConfig{}), writer)
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer)), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args)
 	}
 }
