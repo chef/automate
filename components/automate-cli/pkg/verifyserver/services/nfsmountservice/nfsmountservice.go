@@ -17,6 +17,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/systemresource"
 )
 
 type INFSService interface {
@@ -25,9 +26,9 @@ type INFSService interface {
 }
 
 type NFSMountService struct {
-	ExecuteShellCommandFunc func(cmd string) ([]byte, error)
-	port                    string
-	log                     logger.Logger
+	SystemResourceInfo systemresource.SystemResourceInfo
+	port               string
+	log                logger.Logger
 }
 
 type TempResponse struct {
@@ -35,11 +36,11 @@ type TempResponse struct {
 	MountResp   models.NFSMountResponse
 }
 
-func NewNFSMountService(log logger.Logger, port string, executeShellCommand func(cmd string) ([]byte, error)) *NFSMountService {
+func NewNFSMountService(log logger.Logger, port string, sysResInfo systemresource.SystemResourceInfo) *NFSMountService {
 	return &NFSMountService{
-		port:                    port,
-		log:                     log,
-		ExecuteShellCommandFunc: executeShellCommand,
+		port:               port,
+		log:                log,
+		SystemResourceInfo: sysResInfo,
 	}
 }
 
@@ -103,16 +104,7 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 }
 
 func (nm *NFSMountService) GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse {
-	output, err := nm.executeCommand()
-	if err != nil {
-		nm.log.Error("Error executing `df -h` command")
-		return &models.NFSMountLocResponse{
-			Address:       "",
-			Nfs:           "",
-			MountLocation: req.MountLocation,
-		}
-	}
-	mounts := nm.getMountDetails(output, req.MountLocation)
+	mounts := nm.getMountDetails(req.MountLocation)
 	return mounts
 }
 
@@ -259,34 +251,38 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 	}
 }
 
-func (nm *NFSMountService) executeCommand() (string, error) {
-	output, err := nm.ExecuteShellCommandFunc(constants.MOUNT_CMD)
+func (nm *NFSMountService) getMountDetails(mountLocation string) *models.NFSMountLocResponse {
+	// If we make disk partitions as false,
+	// we can't list mount info
+	diskPartition, err := nm.SystemResourceInfo.GetDiskPartitions(true)
 	if err != nil {
-		return "", err
+		nm.log.Error("Error getting disk partions")
+		return &models.NFSMountLocResponse{
+			Address:       "",
+			Nfs:           "",
+			MountLocation: mountLocation,
+		}
 	}
-	return string(output), nil
-}
-
-func (nm *NFSMountService) getMountDetails(output, mountLocation string) *models.NFSMountLocResponse {
-	lines := strings.Split(output, "\n")
-	// Skip the header line
-	for _, line := range lines[1:] {
-		fields := strings.Fields(line)
-		if len(fields) >= 6 {
-			if fields[5] == mountLocation {
-				addr := strings.Split(fields[0], ":")
-				nm.log.Debug("Mount location found")
+	for _, partition := range diskPartition {
+		if partition.Mountpoint == mountLocation {
+			usageStat, err := nm.SystemResourceInfo.GetDiskSpaceInfo(mountLocation)
+			if err != nil {
+				nm.log.Error("Failed to retrieve disk usage:")
 				return &models.NFSMountLocResponse{
-					Address:            addr[0],
-					Nfs:                fields[0],
-					MountLocation:      fields[5],
-					StorageCapacity:    fields[1],
-					AvailableFreeSpace: fields[3],
+					Address:       "",
+					Nfs:           "",
+					MountLocation: mountLocation,
 				}
+			}
+			return &models.NFSMountLocResponse{
+				Address:            strings.Split(partition.Device, ":")[0],
+				Nfs:                partition.Device,
+				MountLocation:      mountLocation,
+				StorageCapacity:    nm.SystemResourceInfo.FormatBytes(usageStat.Total),
+				AvailableFreeSpace: nm.SystemResourceInfo.FormatBytes(usageStat.Total),
 			}
 		}
 	}
-
 	nm.log.Debug("Mount location Not found")
 	return &models.NFSMountLocResponse{
 		MountLocation: mountLocation,

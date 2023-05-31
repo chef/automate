@@ -27,18 +27,15 @@ func (h *Handler) NFSMount(c *fiber.Ctx) error {
 	return c.JSON(response.BuildSuccessResponse(nfsMountDetails))
 }
 
-func (h *Handler) NFSMountLoc(c *fiber.Ctx) {
+func (h *Handler) NFSMountLoc(c *fiber.Ctx) error {
 	reqBody := models.NFSMountLocRequest{}
 	if err := c.BodyParser(&reqBody); err != nil {
 		h.Logger.Error(err.Error())
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Invalid Body Request"})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
 	if reqBody.MountLocation == "" {
-		c.Next(&fiber.Error{Code: http.StatusBadRequest, Message: "Mount Location cannot be empty"})
-		return
+		return fiber.NewError(http.StatusBadRequest, "Mount Location cannot be empty")
 	}
 	nfsMountLoc := h.NFSMountService.GetNFSMountLoc(reqBody)
-	c.JSON(response.BuildSuccessResponse(nfsMountLoc))
-
+	return c.JSON(response.BuildSuccessResponse(nfsMountLoc))
 }

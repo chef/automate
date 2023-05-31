@@ -13,6 +13,5 @@ const (
 	SHARE_RESOLUTION_MSG               = "NFS volume %s should be common across all given nodes at mount location: %s"
 	SHARE_RESOLUTION_MSG_WITHOUT_MOUNT = "NFS volume should be mounted and common across all given nodes at mount location: %s"
 
-	TIMEOUT   = 30
-	MOUNT_CMD = "df -h"
+	TIMEOUT = 30
 )
