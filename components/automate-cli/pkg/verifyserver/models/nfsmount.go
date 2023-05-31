@@ -24,5 +24,5 @@ type NFSMountLocResponse struct {
 	MountLocation      string `json:"mount_location"`
 	Nfs                string `json:"nfs"`
 	StorageCapacity    string `json:"storage_capacity"`
-	AvailableFreeSpace string `json:"Available_free_space"`
+	AvailableFreeSpace string `json:"available_free_space"`
 }
