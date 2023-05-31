@@ -93,14 +93,14 @@ func (eos *ExternalOpensearchService) GetExternalOpensearchDetails(reqBody model
 	return result
 }
 
-func createExternalOpensearchCheck(passed bool, title, status, success_msg, error_msg, resolution_msg, debug_msg string) models.ExternalOpensearchCheck {
+func createExternalOpensearchCheck(passed bool, title, status, successMsg, errorMsg, resolutionMsg, debugMsg string) models.ExternalOpensearchCheck {
 	return models.ExternalOpensearchCheck{
 		Title:         title,
 		Passed:        passed,
 		Status:        status,
-		SuccessMsg:    success_msg,
-		ErrorMsg:      error_msg,
-		ResolutionMsg: resolution_msg,
-		DebugMsg:      debug_msg,
+		SuccessMsg:    successMsg,
+		ErrorMsg:      errorMsg,
+		ResolutionMsg: resolutionMsg,
+		DebugMsg:      debugMsg,
 	}
 }
