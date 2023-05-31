@@ -28,6 +28,13 @@ func (eoc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTrig
 
 func runCheckForOpensearch(config models.Config, path string, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Opensearch check for automate and chef server nodes")
+	req := models.ExternalOS{
+		OSDomainName:   config.ExternalOS.OSDomainName,
+		OSDomainURL:    config.ExternalOS.OSDomainURL,
+		OSUsername:     config.ExternalOS.OSUsername,
+		OSUserPassword: config.ExternalOS.OSUserPassword,
+		OSCert:         config.ExternalOS.OSCert,
+	}
 	var result, result2 []models.CheckTriggerResponse
 	outputCh := make(chan models.CheckTriggerResponse)
 	count := 0
@@ -35,7 +42,6 @@ func runCheckForOpensearch(config models.Config, path string, port string, log l
 		log.Debugf("Trigger Opensearch check for automate ip %s", ip)
 		count++
 		endPoint := checkutils.PrepareEndPoint(ip, port, path)
-		req := getOpensearchRequest(config.ExternalOS, ip)
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
 	}
 
@@ -43,7 +49,6 @@ func runCheckForOpensearch(config models.Config, path string, port string, log l
 		log.Debugf("Trigger Opensearch check for chefserver ip %s", ip)
 		count++
 		endPoint := checkutils.PrepareEndPoint(ip, port, path)
-		req := getOpensearchRequest(config.ExternalOS, ip)
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
 
 	}
@@ -60,17 +65,5 @@ func runCheckForOpensearch(config models.Config, path string, port string, log l
 
 	close(outputCh)
 	return result
-
-}
-
-func getOpensearchRequest(details models.ExternalOS, ip string) models.ExternalOSCheckRequest {
-	return models.ExternalOSCheckRequest{
-		IP:             ip,
-		OSDomainName:   details.OSDomainName,
-		OSDomainURL:    details.OSDomainURL,
-		OSUsername:     details.OSUsername,
-		OSUserPassword: details.OSUserPassword,
-		OSCert:         details.OSCert,
-	}
 
 }

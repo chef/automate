@@ -153,12 +153,3 @@ type FirewallRequest struct {
 	Key                        string `json:"key"`
 	RootCert                   string `json:"root_cert"`
 }
-
-type ExternalOSCheckRequest struct {
-	IP             string `json:"ip"`
-	OSDomainName   string `json:"opensearch_domain_name"`
-	OSDomainURL    string `json:"opensearch_domain_url"`
-	OSUsername     string `json:"opensearch_usename"`
-	OSUserPassword string `json:"opensearch_user_password"`
-	OSCert         string `json:"opensearch_cert"`
-}
