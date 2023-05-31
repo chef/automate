@@ -31,7 +31,6 @@ type CmdInputs struct {
 	SkipPrintOutput          bool
 	HideSSHConnectionMessage bool
 	MutipleCmdWithArgs       map[string]string
-	CopyToTmp                bool
 }
 
 type NodeTypeAndCmd struct {
@@ -143,7 +142,7 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 	inputFileToOutputFileMap := map[string]string{}
 	for _, file := range inputFiles {
 		destinationFile := remoteService + "_" + timestamp + "_" + file
-		if input.CopyToTmp && strings.Contains(file, "/") {
+		if strings.Contains(file, "/") {
 			filePath := strings.Split(file, "/")
 			lastFileidx := len(filePath) - 1
 			destinationFile = filePath[lastFileidx]
