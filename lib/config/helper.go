@@ -298,11 +298,24 @@ func validateIPList(ipList []string, prefix string, errorList *list.List) {
 	}
 }
 
-func validateCertsByIP(certsByIpList []CertByIP, nodeType string, errorList *list.List) {
-	for _, element := range certsByIpList {
+func validateCertsByIP(certsByIpList *[]CertByIP, nodeType string, errorList *list.List) {
+	if certsByIpList == nil {
+		return
+	}
+	for _, element := range *certsByIpList {
+		if len(strings.TrimSpace(element.IP)) < 1 ||
+			len(strings.TrimSpace(element.PrivateKey)) < 1 ||
+			len(strings.TrimSpace(element.PublicKey)) < 1 {
+			errorList.PushBack(nodeType + "root_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false.")
+			return
+		}
 		if checkIPAddress(element.IP) != nil {
 			errorList.PushBack(nodeType + " " + element.IP + " for certs is not valid")
 		}
+		errorList.PushBackList(checkCertValid([]keydetails{
+			{key: element.PrivateKey, certtype: privateKey, svc: nodeType},
+			{key: element.PublicKey, certtype: publicKey, svc: nodeType},
+		}))
 	}
 }
 

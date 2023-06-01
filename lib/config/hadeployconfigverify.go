@@ -17,6 +17,8 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 	haDeployConfig, err := c.Parse(configFile)
 	if err != nil {
 		errorList.PushBack(err.Error())
+	} else {
+		c = haDeployConfig
 	}
 
 	if haDeployConfig.Architecture == nil {
@@ -106,7 +108,7 @@ func (c *HaDeployConfig) verifyAutomateSettings(errorList *list.List) {
 	validateNumberField(automateSettings.TeamsPort, "teams_port", errorList)
 	if automateSettings.EnableCustomCerts {
 		validateAutomateCerts(automateSettings, errorList)
-		validateCertsByIP(*automateSettings.CertsByIP, "automate ip", errorList)
+		validateCertsByIP(automateSettings.CertsByIP, "automate ip", errorList)
 	}
 }
 
@@ -118,7 +120,7 @@ func (c *HaDeployConfig) verifyChefServerSettings(errorList *list.List) {
 
 	if chefServerSettings.EnableCustomCerts {
 		validateChefServerCerts(chefServerSettings, errorList)
-		validateCertsByIP(*chefServerSettings.CertsByIP, "chef server ip", errorList)
+		validateCertsByIP(chefServerSettings.CertsByIP, "chef server ip", errorList)
 	}
 }
 
@@ -130,7 +132,7 @@ func (c *HaDeployConfig) verifyOpensearchSettings(errorList *list.List) {
 
 	if opensearchSettings.EnableCustomCerts {
 		validateOpensearchCerts(opensearchSettings, errorList)
-		validateCertsByIP(*opensearchSettings.CertsByIP, "opensearch ip", errorList)
+		validateCertsByIP(opensearchSettings.CertsByIP, "opensearch ip", errorList)
 	}
 }
 
@@ -142,7 +144,7 @@ func (c *HaDeployConfig) verifyPostgresqlSettings(errorList *list.List) {
 
 	if postgresqlSettings.EnableCustomCerts {
 		validatePostgresqlCerts(postgresqlSettings, errorList)
-		validateCertsByIP(*postgresqlSettings.CertsByIP, "postgresql ip", errorList)
+		validateCertsByIP(postgresqlSettings.CertsByIP, "postgresql ip", errorList)
 	}
 }
 

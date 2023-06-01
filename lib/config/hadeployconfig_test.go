@@ -35,7 +35,7 @@ func TestParse(t *testing.T) {
 						Architecture:                "aws",
 						WorkspacePath:               "/hab/a2_deploy_workspace",
 						BackupMount:                 "/mnt/automate_backups",
-						BackupConfig:                "",
+						BackupConfig:                "s3",
 						S3BucketName:                "",
 						HabitatUIDGid:               "",
 					},
