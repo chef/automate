@@ -32,6 +32,7 @@ type ObjectStorage struct {
 	BasePath   string `json:"base_path"`
 	AccessKey  string `json:"access_key"`
 	SecretKey  string `json:"secret_key"`
+	AWSRegion  string `json:"aws_region"`
 }
 type Backup struct {
 	FileSystem    FileSystem    `json:"file_system"`
@@ -39,9 +40,10 @@ type Backup struct {
 }
 
 type Certificate struct {
-	Fqdn     string     `json:"fqdn"`
-	RootCert string     `json:"root_cert"`
-	Nodes    []NodeCert `json:"nodes"`
+	AutomateFqdn   string     `json:"automate_fqdn"`
+	ChefServerFqdn string     `json:"cs_fqdn"`
+	RootCert       string     `json:"root_cert"`
+	Nodes          []NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -50,6 +52,7 @@ type ExternalOS struct {
 	OSUsername     string `json:"opensearch_usename"`
 	OSUserPassword string `json:"opensearch_user_password"`
 	OSCert         string `json:"opensearch_cert"`
+	OSRoleArn      string `json:"opensearch_role_arn"`
 }
 
 type ExternalPG struct {
@@ -70,6 +73,7 @@ type Config struct {
 	ExternalOS      ExternalOS  `json:"external_opensearch"`
 	ExternalPG      ExternalPG  `json:"external_postgresql"`
 	DeploymentState string      `json:"deployment_state"`
+	APIToken        string      `json:"api_token"`
 }
 
 type BatchCheckResponse struct {
@@ -147,4 +151,18 @@ type FirewallRequest struct {
 	Cert                       string `json:"cert"`
 	Key                        string `json:"key"`
 	RootCert                   string `json:"root_cert"`
+}
+
+type NFSMountCheckResponse struct {
+	Status string             `json:"status"`
+	Result []NFSMountResponse `json:"result"`
+}
+
+type FqdnRequest struct {
+	Fqdn              string   `json:"fqdn"`
+	RootCert          string   `json:"root_cert"`
+	IsAfterDeployment bool     `json:"is_after_deployment"`
+	Nodes             []string `json:"nodes"`
+	ApiToken          string   `json:"api_token"`
+	NodeType          string   `json:"node_type"`
 }

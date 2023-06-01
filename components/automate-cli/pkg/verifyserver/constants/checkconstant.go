@@ -18,6 +18,8 @@ const HARDWARE_RESOURCE_COUNT_MSG = "Hardware Resource Count Check"
 const SSH_USER_MSG = "SSH User Access Check"
 const CERTIFICATE_MSG = "Certificate check"
 
+const NFS_MOUNT_MSG = "NFS Mount Backup Check"
+
 func GetBastionChecks() []string {
 	var checks = []string{
 		HARDWARE_RESOURCE_COUNT,
