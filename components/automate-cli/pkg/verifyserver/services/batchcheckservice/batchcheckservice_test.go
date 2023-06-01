@@ -601,3 +601,75 @@ func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string
 	}
 	return ""
 }
+
+func TestCheckMsg(t *testing.T) {
+	// constants.HARDWARE_RESOURCE_COUNT
+	result := checkMsg(constants.HARDWARE_RESOURCE_COUNT)
+	expected := constants.HARDWARE_RESOURCE_COUNT_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.HARDWARE_RESOURCE_COUNT")
+
+	// constants.CERTIFICATE
+	result = checkMsg(constants.CERTIFICATE)
+	expected = constants.CERTIFICATE_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.CERTIFICATE")
+
+	// constants.SSH_USER
+	result = checkMsg(constants.SSH_USER)
+	expected = constants.SSH_USER_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.SSH_USER")
+
+	// constants.SYSTEM_RESOURCES
+	result = checkMsg(constants.SYSTEM_RESOURCES)
+	expected = constants.SYSTEM_RESOURCES_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.SYSTEM_RESOURCES")
+
+	// constants.SOFTWARE_VERSIONS
+	result = checkMsg(constants.SOFTWARE_VERSIONS)
+	expected = constants.SOFTWARE_VERSIONS_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.SOFTWARE_VERSIONS")
+
+	// constants.SYSTEM_USER
+	result = checkMsg(constants.SYSTEM_USER)
+	expected = constants.SYSTEM_USER_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.SYSTEM_USER")
+
+	// constants.S3_BACKUP_CONFIG
+	result = checkMsg(constants.S3_BACKUP_CONFIG)
+	expected = constants.S3_BACKUP_CONFIG_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.S3_BACKUP_CONFIG")
+
+	// constants.FQDN
+	result = checkMsg(constants.FQDN)
+	expected = constants.FQDN_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.FQDN")
+
+	// constants.FIREWALL
+	result = checkMsg(constants.FIREWALL)
+	expected = constants.FIREWALL_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.FIREWALL")
+
+	// constants.EXTERNAL_OPENSEARCH
+	result = checkMsg(constants.EXTERNAL_OPENSEARCH)
+	expected = constants.EXTERNAL_OPENSEARCH_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.EXTERNAL_OPENSEARCH")
+
+	// constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS
+	result = checkMsg(constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS)
+	expected = constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS")
+
+	// constants.EXTERNAL_POSTGRESQL
+	result = checkMsg(constants.EXTERNAL_POSTGRESQL)
+	expected = constants.EXTERNAL_POSTGRESQL_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.EXTERNAL_POSTGRESQL")
+
+	// constants.NFS_BACKUP_CONFIG
+	result = checkMsg(constants.NFS_BACKUP_CONFIG)
+	expected = constants.NFS_BACKUP_CONFIG_MSG
+	assert.Equal(t, expected, result, "Unexpected result for constants.NFS_BACKUP_CONFIG")
+
+	// Default case
+	result = checkMsg("unknown")
+	expected = ""
+	assert.Equal(t, expected, result, "Unexpected result for unknown input")
+}
