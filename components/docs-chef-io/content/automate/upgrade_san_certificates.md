@@ -12,6 +12,15 @@ gh_repo = "automate"
     weight = 30
 +++
 
+## Overview
+[RFC 2818](https://datatracker.ietf.org/doc/html/rfc2818#section-3.1) published in May 2000, deprecates using the Common Name (CN) field in HTTPS certificates for subject name verification.
+Instead, it recommends using the "Subject Alternative Name" extension (SAN) of the "DNS name" type.
+
+Automate is moving the product builds from Golang version 1.15 to 1.19 to keep the language features up to date.
+The change in the Golang version will impact the custom certificates used for interaction with external systems.
+The common name field of X.509 certificates will no longer be considered the hostname when the Subject Alternative Name (SAN) is absent.
+Please refer to [Go 1.15 Release Notes](https://go.dev/doc/go1.15#commonname) and our [blog](https://www.chef.io/blog/upgrading-golang-version-in-the-early-june-23-automate-release) for more information
+
 From version 4.7.x onwards, Chef Automate requires public certificates as SAN certificates.
 
 Update non-SAN Certificates involves
