@@ -139,6 +139,9 @@ Z4wjUCokbRJ8gbC7tuVgQk6DNM123j9djBm+A+5WlbvHUrD5trfbkp8kUJY4jaJF
 csKeX402wz9P7XM5eGsToNpAZq41Q7mFzz14DfqFNttaCMHMYi4k
 -----END CERTIFICATE-----"""
 
+# certs_by_ip = [[
+   
+# ]]
 
 [chef_server.config]
 ## === INPUT NEEDED ===

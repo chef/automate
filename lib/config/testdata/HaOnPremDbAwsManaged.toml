@@ -14,7 +14,7 @@ ssh_group_name = "ubuntu"
 
 # private ssh key file path to access instances
 # Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
-ssh_key_file = "~/.ssh/A2HA.pem"
+ssh_key_file = "./testdata/A2HA.pem"
 
 # custome ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"

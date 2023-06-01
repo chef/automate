@@ -14,30 +14,56 @@ func TestVerify(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *HaDeployConfig
 		wantErr bool
 		err     error
 	}{
-		// {
-		// 	name:    "Verify AWS Config",
-		// 	args:    args{configFile: "./testdata/HaAws.toml"},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// 	err:     errors.New("Invalid or empty ssh_user\nInvalid or empty ssh_key_file\nInvalid or empty s3_bucketName.\nInvalid or empty aws profile name\nInvalid or empty aws region\nInvalid or empty aws aws_vpc_id\nInvalid or empty aws private_custom_subnets\nInvalid or empty aws public_custom_subnets\nInvalid or empty aws ssh_key_pair_name\nInvalid or empty aws automate_server_instance_type\nInvalid or empty aws chef_server_instance_type\nInvalid or empty aws opensearch_server_instance_type\nInvalid or empty aws postgresql_server_instance_type\nInvalid or empty aws automate_lb_certificate_arn\nInvalid or empty aws chef_server_lb_certificate_arn\nInvalid or empty aws automate_ebs_volume_iops\nInvalid or empty aws automate_ebs_volume_size\nInvalid or empty aws automate_ebs_volume_type\nInvalid or empty aws chef_ebs_volume_iops\nInvalid or empty aws chef_ebs_volume_size\nInvalid or empty aws chef_ebs_volume_type\nInvalid or empty aws opensearch_ebs_volume_iops\nInvalid or empty aws opensearch_ebs_volume_size\nInvalid or empty aws opensearch_ebs_volume_type\nInvalid or empty aws postgresql_ebs_volume_iops\nInvalid or empty aws postgresql_ebs_volume_size\nInvalid or empty aws postgresql_ebs_volume_type\nInvalid or empty URL: automate fqdn\nInvalid or empty automate instance_count\nInvalid or empty automate instance_count\nInvalid or empty opensearch instance_count\nInvalid or empty postgresql instance_count"),
-		// },
-		// {
-		// 	name:    "Verify AWS Managed Config",
-		// 	args:    args{configFile: "./testdata/HaAwsManaged.toml"},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// 	err:     errors.New("Invalid ssh_key_file: ~/.ssh/central.pem (path does not exist)\nInvalid or empty URL: automate fqdn\nUnknown certificate type: private_key for automate\nUnknown certificate type: public_key for automate\nUnknown certificate type: private_key for chef-server\nUnknown certificate type: public_key for chef-server\nUnknown certificate type: admin_key for opensearch\nUnknown certificate type: admin_cert for opensearch\nUnknown certificate type: private_key for opensearch\nUnknown certificate type: public_key for opensearch\nUnknown certificate type: private_key for postgresql\nUnknown certificate type: public_key for postgresql"),
-		// },
+		{
+			name:    "Verify AWS Config",
+			args:    args{configFile: "./testdata/HaAws.toml"},
+			wantErr: true,
+			err:     errors.New("Invalid or empty ssh_user\nInvalid or empty ssh_key_file\nInvalid or empty s3_bucketName.\nInvalid or empty aws profile name\nInvalid or empty aws region\nInvalid or empty aws aws_vpc_id\nInvalid or empty aws private_custom_subnets\nInvalid or empty aws public_custom_subnets\nInvalid or empty aws ssh_key_pair_name\nInvalid or empty aws automate_server_instance_type\nInvalid or empty aws chef_server_instance_type\nInvalid or empty aws opensearch_server_instance_type\nInvalid or empty aws postgresql_server_instance_type\nInvalid or empty aws automate_lb_certificate_arn\nInvalid or empty aws chef_server_lb_certificate_arn\nInvalid or empty aws automate_ebs_volume_iops\nInvalid or empty aws automate_ebs_volume_size\nInvalid or empty aws automate_ebs_volume_type\nInvalid or empty aws chef_ebs_volume_iops\nInvalid or empty aws chef_ebs_volume_size\nInvalid or empty aws chef_ebs_volume_type\nInvalid or empty aws opensearch_ebs_volume_iops\nInvalid or empty aws opensearch_ebs_volume_size\nInvalid or empty aws opensearch_ebs_volume_type\nInvalid or empty aws postgresql_ebs_volume_iops\nInvalid or empty aws postgresql_ebs_volume_size\nInvalid or empty aws postgresql_ebs_volume_type\nInvalid or empty URL: automate fqdn\nInvalid or empty automate instance_count\nInvalid or empty automate instance_count\nInvalid or empty opensearch instance_count\nInvalid or empty postgresql instance_count"),
+		},
+		{
+			name:    "Verify AWS Managed Config",
+			args:    args{configFile: "./testdata/HaAwsManaged.toml"},
+			wantErr: true,
+			err:     errors.New("Invalid ssh_key_file: ~/.ssh/central.pem (path does not exist)\nInvalid or empty URL: automate fqdn\nUnknown certificate type: private_key for automate\nUnknown certificate type: public_key for automate\nUnknown certificate type: private_key for chef-server\nUnknown certificate type: public_key for chef-server\nUnknown certificate type: admin_key for opensearch\nUnknown certificate type: admin_cert for opensearch\nUnknown certificate type: private_key for opensearch\nUnknown certificate type: public_key for opensearch\nUnknown certificate type: private_key for postgresql\nUnknown certificate type: public_key for postgresql"),
+		},
 		{
 			name:    "Verify OnPrem Config",
 			args:    args{configFile: "./testdata/HaOnPrem.toml"},
-			want:    nil,
 			wantErr: true,
-			err:     errors.New("Invalid or empty ssh_user\nInvalid or empty ssh_key_file\nInvalid or empty backup_config\nInvalid or empty automate_private_ips\nInvalid or empty chef_server_private_ips\nInvalid or empty URL: automate fqdn\nInvalid or empty automate instance_count\nInvalid format. Failed to decode root_ca for automate\nInvalid format. Failed to decode private_key for automate\nInvalid format. Failed to decode public_key for automate\nInvalid format. Failed to decode private_key for automate ip\nInvalid format. Failed to decode public_key for automate ip\nInvalid or empty automate instance_count\nInvalid format. Failed to decode private_key for chef-server\nInvalid format. Failed to decode public_key for chef-server\nInvalid format. Failed to decode private_key for chef server ip\nInvalid format. Failed to decode public_key for chef server ip\nInvalid or empty opensearch instance_count\nInvalid format. Failed to decode root_ca for opensearch\nInvalid format. Failed to decode admin_key for opensearch\nInvalid format. Failed to decode admin_cert for opensearch\nInvalid format. Failed to decode private_key for opensearch\nInvalid format. Failed to decode public_key for opensearch\nInvalid format. Failed to decode private_key for opensearch ip\nInvalid format. Failed to decode public_key for opensearch ip\nInvalid or empty postgresql instance_count\nInvalid format. Failed to decode root_ca for postgresql\nInvalid format. Failed to decode private_key for postgresql\nInvalid format. Failed to decode public_key for postgresql\nInvalid format. Failed to decode private_key for postgresql ip\nInvalid format. Failed to decode public_key for postgresql ip"),
+			err:     errors.New("Invalid or empty ssh_user\nInvalid or empty ssh_key_file\nbackup_mount has to be /mnt/automate_backups\nautomate private ip 1324.2534.1is not valid\nInvalid or empty chef_server_private_ips\nURL should not include the protocol (http:// or https://): automate fqdn\nInvalid or empty automate instance_count\ninvalid config_file value it has to be configs/automate.toml\nInvalid format. Failed to decode root_ca for automate\nInvalid format. Failed to decode private_key for automate\nInvalid format. Failed to decode public_key for automate\nInvalid format. Failed to decode private_key for automate ip\nInvalid format. Failed to decode public_key for automate ip\nInvalid automate instance_count: two\nInvalid format. Failed to decode private_key for chef-server\nInvalid format. Failed to decode public_key for chef-server\nInvalid format. Failed to decode private_key for chef server ip\nInvalid format. Failed to decode public_key for chef server ip\nInvalid or empty opensearch instance_count\nOpensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.\nInvalid format. Failed to decode root_ca for opensearch\nInvalid format. Failed to decode admin_key for opensearch\nInvalid format. Failed to decode admin_cert for opensearch\nInvalid format. Failed to decode private_key for opensearch\nInvalid format. Failed to decode public_key for opensearch\nopensearch iproot_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false.\nInvalid or empty postgresql instance_count\nInvalid format. Failed to decode root_ca for postgresql\nInvalid format. Failed to decode private_key for postgresql\nInvalid format. Failed to decode public_key for postgresql\npostgresql ip 0.0.1 for certs is not valid\nInvalid format. Failed to decode private_key for postgresql ip\nInvalid format. Failed to decode public_key for postgresql ip"),
+		},
+		{
+			name:    "Verify OnPrem Db Self-Managed Config",
+			args:    args{configFile: "./testdata/HaOnPremDbSelfManaged.toml"},
+			wantErr: true,
+			err:     errors.New("Invalid ssh_key_file: ~/.ssh/A2HA.pem (path does not exist)\nInvalid or empty dbuser_username\nInvalid or empty dbuser_password\nInvalid or empty instance_url\nInvalid or empty postgresql_root_cert\nInvalid or empty superuser_password\nInvalid or empty superuser_username\nInvalid or empty opensearch_domain_name\nInvalid or empty URL: opensearch_domain_url\nInvalid or empty opensearch_root_cert\nInvalid or empty opensearch_user_password\nInvalid or empty opensearch_username\nInvalid or empty aws_os_snapshot_role_arn\nInvalid or empty os_snapshot_user_access_key_id\nInvalid or empty os_snapshot_user_access_key_secret"),
+		},
+		{
+			name:    "Verify OnPrem Db Aws Managed Config",
+			args:    args{configFile: "./testdata/HaOnPremDbAwsManaged.toml"},
+			wantErr: false,
+			err:     nil,
+		},
+		{
+			name:    "Invalid Architecture toml file",
+			args:    args{configFile: "./testdata/InvalidArchitecture.toml"},
+			wantErr: true,
+			err:     errors.New("invalid ha deploy config"),
+		},
+		{
+			name:    "Invalid toml file path",
+			args:    args{configFile: ""},
+			wantErr: true,
+			err:     errors.New("config file path is empty"),
+		},
+		{
+			name:    "error parsing toml file",
+			args:    args{configFile: "./testdata/UnmarshalErr.toml"},
+			wantErr: true,
+			err:     errors.New("invalid ha deploy config"),
 		},
 	}
 	for _, tt := range tests {
@@ -47,7 +73,7 @@ func TestVerify(t *testing.T) {
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			} else {
-				assert.Equal(t, tt.want, nil)
+				assert.Equal(t, nil, err)
 			}
 		})
 	}

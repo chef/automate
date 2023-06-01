@@ -10,7 +10,7 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 
 	// Check if config file path is empty
 	if len(configFile) < 1 {
-		errorList.PushBack("config file path is empty")
+		return errors.New("config file path is empty")
 	}
 
 	// Parse the config file
@@ -21,8 +21,8 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 		c = haDeployConfig
 	}
 
-	if haDeployConfig.Architecture == nil {
-		return errors.New("architecture cannot be nil")
+	if haDeployConfig == nil || haDeployConfig.Architecture == nil {
+		return errors.New("invalid ha deploy config")
 	}
 
 	// Validate ExistingInfra (on prem)

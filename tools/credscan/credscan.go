@@ -155,6 +155,7 @@ var a2Config = config{
 
 		// Test data for hadeployconfig
 		{regex: `lib/config/testdata/.*\.toml`},
+		{regex: `lib/config/testdata/.*\.pem`},
 		{regex: `lib/config/hadeployconfig_test.go`},
 
 		// Exclude test file for externalopensearchservice with uses RSA KEY for test cases

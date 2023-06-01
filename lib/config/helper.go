@@ -284,20 +284,12 @@ func isExternalDb(hadeployConfig *HaDeployConfig) bool {
 	return hadeployConfig.External.Database.Type == "aws" || hadeployConfig.External.Database.Type == "self-managed"
 }
 
-// func isExternalDbAwsManaged(externalDbSettings *ExternalDBSettings) bool {
-// 	return externalDbSettings.Type == "aws"
-// }
-
 func isExternalDbSelfManaged(hadeployConfig *HaDeployConfig) bool {
 	if isExternalDb(hadeployConfig) {
 		return hadeployConfig.External.Database.Type == "self-managed"
 	}
 	return false
 }
-
-// func isSetupAwsManagedServices(awsSettings *ConfigAwsSettings) bool {
-// 	return awsSettings.SetupManagedServices
-// }
 
 func validateIPList(ipList []string, prefix string, errorList *list.List) {
 	for _, element := range ipList {
