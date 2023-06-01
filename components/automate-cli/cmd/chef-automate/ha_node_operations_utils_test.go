@@ -243,7 +243,9 @@ func TestModifyTfArchFileNotExist(t *testing.T) {
 func TestStopServicesOnNodeA2(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
 		},
 	}
 
@@ -256,6 +258,13 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 		},
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
 		},
 	}, command.NewMockExecutor(t))
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, EXISTING_INFRA_MODE, infra)
@@ -264,7 +273,9 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 func TestStopServicesOnNodeCS(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
 		},
 	}
 
@@ -277,6 +288,13 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 		},
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
 		},
 	}, command.NewMockExecutor(t))
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, AWS_MODE, infra)
@@ -285,7 +303,9 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 func TestStopServicesOnNodePG(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
 		},
 	}
 
@@ -298,6 +318,13 @@ func TestStopServicesOnNodePG(t *testing.T) {
 		},
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
 		},
 	}, command.NewMockExecutor(t))
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, POSTGRESQL, EXISTING_INFRA_MODE, infra)

@@ -350,7 +350,10 @@ func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
 func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 
 	if nodeType == OPENSEARCH {
-		nu.excludeOpenSearchNode(ip, infra)
+		err := nu.excludeOpenSearchNode(ip, infra)
+		if err != nil {
+			return err
+		}
 	}
 
 	// If deployment type is AWS, then we don't need to stop services on node
@@ -358,35 +361,30 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string,
 		return nil
 	}
 
-	frontendCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
-	automateCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
-	chefServerCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
-	postgresqlCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
-	opensearchCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
-
+	var cmd string
 	switch nodeType {
 	case AUTOMATE:
-		automateCmd = createCmdInputs(ip, STOP_FE_SERVICES_CMD)
+		cmd = STOP_FE_SERVICES_CMD
 	case CHEF_SERVER:
-		chefServerCmd = createCmdInputs(ip, STOP_FE_SERVICES_CMD)
+		cmd = STOP_FE_SERVICES_CMD
 	case POSTGRESQL:
-		postgresqlCmd = createCmdInputs(ip, STOP_BE_SERVICES_CMD)
+		cmd = STOP_BE_SERVICES_CMD
 	case OPENSEARCH:
-		opensearchCmd = createCmdInputs(ip, STOP_BE_SERVICES_CMD)
+		cmd = STOP_BE_SERVICES_CMD
 	default:
 		return errors.New("Invalid node type")
 	}
 
-	nodeMap := &NodeTypeAndCmd{
-		Frontend:   frontendCmd,
-		Automate:   automateCmd,
-		ChefServer: chefServerCmd,
-		Postgresql: postgresqlCmd,
-		Opensearch: opensearchCmd,
-		Infra:      infra,
-	}
+	sshUtil := nu.cmdUtil.GetSshUtil()
 
-	_, err := nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
+	sshUtil.setSSHConfig(&SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		hostIP:     ip,
+	})
+
+	_, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, false)
 	if err != nil {
 		return err
 	}

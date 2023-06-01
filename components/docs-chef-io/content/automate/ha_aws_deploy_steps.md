@@ -391,7 +391,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 {{< /warning >}}
 
-The commands require some arguments so that it can determine which types of node you want to remove to your HA setup from your bastion host. It needs the ip address of the node you want to remove as as argument when you run the command.
+The command requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove as an argument when you run the command.
 For example,
 
 - If you want to remove node of automate, you have to run the:

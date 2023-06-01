@@ -507,7 +507,7 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 
 {{< /warning >}}
 
-The commands require some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove.
+The command requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove.
 
 For example,
 
