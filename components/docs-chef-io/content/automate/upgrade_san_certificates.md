@@ -22,6 +22,8 @@ The common name field of X.509 certificates will no longer be considered the hos
 Please refer to [Go 1.15 Release Notes](https://go.dev/doc/go1.15#commonname) and our [blog](https://www.chef.io/blog/upgrading-golang-version-in-the-early-june-23-automate-release) for more information
 
 From version 4.7.x onwards, Chef Automate requires public certificates as SAN certificates.
+Automate or Automate HA may stop working if you upgrade to this version with certificates that don't contain SAN field.
+
 
 Update non-SAN Certificates involves
 - Update internal Public Certificates
