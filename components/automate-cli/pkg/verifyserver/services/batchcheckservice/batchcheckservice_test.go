@@ -1,26 +1,31 @@
 package batchcheckservice
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
-	"net"
+	//"errors"
+	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
 
-	"github.com/gofiber/fiber/v2"
+	//"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockStartServerBatchCheckService() IStartMockServer {
-	return &MockStartServerBatchCheckService{
-		StartMockServerOnHostAndPortFunc: func(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error) {
-			return "hello", nil
+func SetupMockHttpRequestClient(responseJson string, err error) httputils.IHttpRequestClient {
+	r := ioutil.NopCloser(bytes.NewReader([]byte(responseJson)))
+	return &httputils.MockHttpRequestClient{
+		MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: 200,
+				Body:       r,
+			}, err
 		},
 	}
 }
@@ -35,6 +40,7 @@ func TestBatchCheckService(t *testing.T) {
 		externalPostgresMockedResponse   []models.CheckTriggerResponse
 		chefServerIpArray                []string
 		statusApiResponse                string
+		statusApiError                   error
 		avoidSuccessResponse             bool
 		checkForError                    bool
 		expectedResponseForAutomateIp    string
@@ -986,21 +992,6 @@ func TestBatchCheckService(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-			SetupMockStartServerBatchCheckService()
-			mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/status" {
-					w.WriteHeader(http.StatusOK)
-					w.Write([]byte(test.statusApiResponse))
-				}
-			}))
-			port := "1234"
-			if test.mockServerPort != "" {
-				port = test.mockServerPort
-			}
-			err := startMockServerOnCustomPort(mockServer, port)
-			assert.NoError(t, err)
-			defer mockServer.Close()
-
 			ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck(test.hardwareCheckMockedResponse),
 				SetupMockSshUserAccessCheck(test.sshUserCheckMockedResponse),
 				SetupMockCertificateCheck(),
@@ -1016,7 +1007,7 @@ func TestBatchCheckService(t *testing.T) {
 				SetupMockSystemUserCheck(),
 			), logger.NewTestLogger(), "1234")
 
-			ss.mockServerClient = SetupMockStartServerBatchCheckService()
+			ss.httpRequestClient = SetupMockHttpRequestClient(test.statusApiResponse, test.statusApiError)
 
 			resp, err := ss.BatchCheck([]string{
 				constants.FIREWALL,

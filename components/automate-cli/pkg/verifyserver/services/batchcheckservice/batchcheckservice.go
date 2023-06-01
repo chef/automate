@@ -40,7 +40,6 @@ func NewBatchCheckService(trigger trigger.CheckTrigger, log logger.Logger, port 
 }
 
 func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error) {
-	//batchApisResultMap := make(map[string][]models.ApiResult)
 	var bastionChecks = stringutils.SliceIntersection(checks, constants.GetBastionChecks())
 	var remoteChecks = stringutils.SliceIntersection(checks, constants.GetRemoteChecks())
 	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
@@ -83,7 +82,7 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 }
 
 func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string) (bool, error) {
-	deploymentState, err := ss.GetDeploymentState()
+	deploymentState, err := ss.getDeploymentState()
 	if err != nil {
 		ss.log.Error("Error while calling status api from batch check service:", err)
 		return false, err
@@ -153,7 +152,6 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 				key := fmt.Sprint(host, "_", constants.TCP, "_", port)
 
 				if !ipPortProtocolMap[key] {
-					fmt.Println("Request triggered for", key)
 					go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
 					totalReq = totalReq + 1
 					ipPortProtocolMap[key] = true
@@ -256,9 +254,9 @@ func (ss *BatchCheckService) GetPortsToOpenForCheck(check string) map[string]map
 	return ss.getCheckInstance(check).GetPortsForMockServer()
 }
 
-func (ss *BatchCheckService) GetDeploymentState() (string, error) {
+func (ss *BatchCheckService) getDeploymentState() (string, error) {
 	url := fmt.Sprintf("%s:%s%s", constants.LOCAL_HOST_URL, ss.port, constants.STATUS_API_PATH)
-	resp, err := httputils.MakeRequest(http.MethodGet, url, nil)
+	resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
 	if err != nil {
 		ss.log.Error("Error while calling status api from batch check service:", err)
 		return "", err
