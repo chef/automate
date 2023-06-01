@@ -26,7 +26,7 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 	// Validate ExistingInfra (on prem)
 	if haDeployConfig.Architecture.ExistingInfra != nil {
 		c.verifyConfigInitials(haDeployConfig.Architecture.ExistingInfra, errorList)
-		validateExistingInfraBackupConfig(haDeployConfig, errorList)
+		c.validateExistingInfraBackupConfig(errorList)
 		c.verifyExistingInfraSettings(haDeployConfig.ExistingInfra.Config, errorList)
 
 		// on prem aws or self-managed
@@ -40,15 +40,15 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 	// Validate Aws
 	if haDeployConfig.Architecture.Aws != nil {
 		c.verifyConfigInitials(haDeployConfig.Architecture.Aws, errorList)
-		validateAwsBackupConfig(haDeployConfig, errorList)
+		c.validateAwsBackupConfig(errorList)
 		c.validateAwsSettings(haDeployConfig.Aws.Config, errorList)
 	}
 
 	// Validate common fields
-	c.verifyAutomateSettings(haDeployConfig.Automate.Config, errorList)
-	c.verifyChefServerSettings(haDeployConfig.ChefServer.Config, errorList)
-	c.verifyOpensearchSettings(haDeployConfig.Opensearch.Config, errorList)
-	c.verifyPostgresqlSettings(haDeployConfig.Postgresql.Config, errorList)
+	c.verifyAutomateSettings(errorList)
+	c.verifyChefServerSettings(errorList)
+	c.verifyOpensearchSettings(errorList)
+	c.verifyPostgresqlSettings(errorList)
 
 	return getSingleErrorFromList(errorList)
 
@@ -67,6 +67,27 @@ func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials, er
 	validateBackupMount(configInitials.BackupMount, errorList)
 }
 
+func (c *HaDeployConfig) validateExistingInfraBackupConfig(errorList *list.List) {
+	// validate existing infra backup config
+	if c.Architecture.ExistingInfra.BackupConfig == "object_storage" {
+		c.verifyObjectStorage(c.ObjectStorage.Config, errorList)
+	} else if c.Architecture.ExistingInfra.BackupConfig == "file_system" {
+		// no check needed
+	} else {
+		errorList.PushBack("Invalid or empty backup_config")
+	}
+}
+
+func (c *HaDeployConfig) validateAwsBackupConfig(errorList *list.List) {
+	// validate aws backup config
+	checkForS3BackupConfig(c, errorList)
+	if c.Aws.Config.SetupManagedServices {
+		checkManagedServicesBackupConfig(c, errorList)
+	} else {
+		checkNonManagedServicesBackupConfig(c, errorList)
+	}
+}
+
 func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage, errorList *list.List) {
 	validateRequiredStringTypeField(objectStorage.AccessKey, "access_key", errorList)
 	validateRequiredStringTypeField(objectStorage.SecretKey, "secret_key", errorList)
@@ -74,7 +95,8 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage,
 	validateRequiredStringTypeField(objectStorage.Endpoint, "endpoint", errorList)
 }
 
-func (c *HaDeployConfig) verifyAutomateSettings(automateSettings *ConfigAutomateSettings, errorList *list.List) {
+func (c *HaDeployConfig) verifyAutomateSettings(errorList *list.List) {
+	automateSettings := c.Automate.Config
 
 	validateUrl(automateSettings.Fqdn, "automate fqdn", errorList)
 	validateAutomateAdminPassword(automateSettings, errorList)
@@ -88,7 +110,8 @@ func (c *HaDeployConfig) verifyAutomateSettings(automateSettings *ConfigAutomate
 	}
 }
 
-func (c *HaDeployConfig) verifyChefServerSettings(chefServerSettings *ConfigSettings, errorList *list.List) {
+func (c *HaDeployConfig) verifyChefServerSettings(errorList *list.List) {
+	chefServerSettings := c.ChefServer.Config
 
 	validateRequiredNumberField(chefServerSettings.InstanceCount, "automate instance_count", errorList)
 	validateRequiredBooleanField(chefServerSettings.EnableCustomCerts, "automate enable_custom_certs", errorList)
@@ -99,7 +122,8 @@ func (c *HaDeployConfig) verifyChefServerSettings(chefServerSettings *ConfigSett
 	}
 }
 
-func (c *HaDeployConfig) verifyOpensearchSettings(opensearchSettings *ConfigOpensearchSettings, errorList *list.List) {
+func (c *HaDeployConfig) verifyOpensearchSettings(errorList *list.List) {
+	opensearchSettings := c.Opensearch.Config
 
 	validateRequiredNumberField(opensearchSettings.InstanceCount, "opensearch instance_count", errorList)
 	validateRequiredBooleanField(opensearchSettings.EnableCustomCerts, "opensearch enable_custom_certs", errorList)
@@ -110,7 +134,9 @@ func (c *HaDeployConfig) verifyOpensearchSettings(opensearchSettings *ConfigOpen
 	}
 }
 
-func (c *HaDeployConfig) verifyPostgresqlSettings(postgresqlSettings *ConfigSettings, errorList *list.List) {
+func (c *HaDeployConfig) verifyPostgresqlSettings(errorList *list.List) {
+	postgresqlSettings := c.Postgresql.Config
+
 	validateRequiredNumberField(postgresqlSettings.InstanceCount, "postgresql instance_count", errorList)
 	validateRequiredBooleanField(postgresqlSettings.EnableCustomCerts, "postgresql enable_custom_certs", errorList)
 
@@ -171,6 +197,45 @@ func (c *HaDeployConfig) verifyAwsExternalOsSettings(awsExternalOpensearchSettin
 }
 
 func (c *HaDeployConfig) validateAwsSettings(aws *ConfigAwsSettings, errorList *list.List) {
+
+	validateCommonAwsSettings(aws, errorList)
+
+	if !aws.SetupManagedServices {
+		validateAwsOsPgConfig(aws, errorList)
+	} else {
+		// validate aws managed services
+		validateAwsManagedServices(aws, errorList)
+	}
+}
+
+func validateAwsOsPgConfig(aws *ConfigAwsSettings, errorList *list.List) {
+	validateRequiredNumberField(aws.OpensearchEbsVolumeIops, "aws opensearch_ebs_volume_iops", errorList)
+	validateRequiredNumberField(aws.OpensearchEbsVolumeSize, "aws opensearch_ebs_volume_size", errorList)
+	validateRequiredStringTypeField(aws.OpensearchEbsVolumeType, "aws opensearch_ebs_volume_type", errorList)
+	validateRequiredNumberField(aws.PostgresqlEbsVolumeIops, "aws postgresql_ebs_volume_iops", errorList)
+	validateRequiredNumberField(aws.PostgresqlEbsVolumeSize, "aws postgresql_ebs_volume_size", errorList)
+	validateRequiredStringTypeField(aws.PostgresqlEbsVolumeType, "aws postgresql_ebs_volume_type", errorList)
+}
+
+func validateAwsManagedServices(aws *ConfigAwsSettings, errorList *list.List) {
+	validateStringTypeField(aws.ManagedOpensearchCertificate, "aws managed_opensearch_certificate", errorList)
+	validateRequiredStringTypeField(aws.ManagedOpensearchDomainName, "aws managed_opensearch_domain_name", errorList)
+	validateUrl(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url", errorList)
+	validateRequiredStringTypeField(aws.ManagedOpensearchUserPassword, "aws managed_opensearch_user_password", errorList)
+	validateRequiredStringTypeField(aws.ManagedOpensearchUsername, "aws managed_opensearch_username", errorList)
+	validateStringTypeField(aws.ManagedRdsCertificate, "aws managed_rds_certificate", errorList)
+	validateRequiredStringTypeField(aws.ManagedRdsDbuserPassword, "aws managed_rds_dbuser_password", errorList)
+	validateRequiredStringTypeField(aws.ManagedRdsDbuserUsername, "aws managed_rds_dbuser_username", errorList)
+	validateUrl(aws.ManagedRdsInstanceURL, "aws managed_rds_instance_url", errorList)
+	validateRequiredStringTypeField(aws.ManagedRdsSuperuserPassword, "aws managed_rds_superuser_password", errorList)
+	validateRequiredStringTypeField(aws.ManagedRdsSuperuserUsername, "aws managed_rds_superuser_username", errorList)
+	validateStringTypeField(aws.AwsOsSnapshotRoleArn, "aws aws_os_snapshot_role_arn", errorList)
+	validateStringTypeField(aws.OsSnapshotUserAccessKeyID, "aws os_snapshot_user_access_key_id", errorList)
+	validateStringTypeField(aws.OsSnapshotUserAccessKeySecret, "aws os_snapshot_user_access_key_secret", errorList)
+	validateAwsOsPgConfig(aws, errorList)
+}
+
+func validateCommonAwsSettings(aws *ConfigAwsSettings, errorList *list.List) {
 	validateRequiredStringTypeField(aws.Profile, "aws profile name", errorList)
 	validateRequiredStringTypeField(aws.Region, "aws region", errorList)
 	validateRequiredStringTypeField(aws.AwsVpcID, "aws aws_vpc_id", errorList)
@@ -201,34 +266,4 @@ func (c *HaDeployConfig) validateAwsSettings(aws *ConfigAwsSettings, errorList *
 	validateRequiredStringTypeField(aws.ChefEbsVolumeType, "aws chef_ebs_volume_type", errorList)
 
 	validateRequiredBooleanField(aws.SetupManagedServices, "aws setup_managed_services", errorList)
-
-	if !aws.SetupManagedServices {
-		validateOsPgConfig(aws, errorList)
-	} else {
-		// validate aws managed services
-		validateStringTypeField(aws.ManagedOpensearchCertificate, "aws managed_opensearch_certificate", errorList)
-		validateRequiredStringTypeField(aws.ManagedOpensearchDomainName, "aws managed_opensearch_domain_name", errorList)
-		validateUrl(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url", errorList)
-		validateRequiredStringTypeField(aws.ManagedOpensearchUserPassword, "aws managed_opensearch_user_password", errorList)
-		validateRequiredStringTypeField(aws.ManagedOpensearchUsername, "aws managed_opensearch_username", errorList)
-		validateStringTypeField(aws.ManagedRdsCertificate, "aws managed_rds_certificate", errorList)
-		validateRequiredStringTypeField(aws.ManagedRdsDbuserPassword, "aws managed_rds_dbuser_password", errorList)
-		validateRequiredStringTypeField(aws.ManagedRdsDbuserUsername, "aws managed_rds_dbuser_username", errorList)
-		validateUrl(aws.ManagedRdsInstanceURL, "aws managed_rds_instance_url", errorList)
-		validateRequiredStringTypeField(aws.ManagedRdsSuperuserPassword, "aws managed_rds_superuser_password", errorList)
-		validateRequiredStringTypeField(aws.ManagedRdsSuperuserUsername, "aws managed_rds_superuser_username", errorList)
-		validateStringTypeField(aws.AwsOsSnapshotRoleArn, "aws aws_os_snapshot_role_arn", errorList)
-		validateStringTypeField(aws.OsSnapshotUserAccessKeyID, "aws os_snapshot_user_access_key_id", errorList)
-		validateStringTypeField(aws.OsSnapshotUserAccessKeySecret, "aws os_snapshot_user_access_key_secret", errorList)
-		validateOsPgConfig(aws, errorList)
-	}
-}
-
-func validateOsPgConfig(aws *ConfigAwsSettings, errorList *list.List) {
-	validateRequiredNumberField(aws.OpensearchEbsVolumeIops, "aws opensearch_ebs_volume_iops", errorList)
-	validateRequiredNumberField(aws.OpensearchEbsVolumeSize, "aws opensearch_ebs_volume_size", errorList)
-	validateRequiredStringTypeField(aws.OpensearchEbsVolumeType, "aws opensearch_ebs_volume_type", errorList)
-	validateRequiredNumberField(aws.PostgresqlEbsVolumeIops, "aws postgresql_ebs_volume_iops", errorList)
-	validateRequiredNumberField(aws.PostgresqlEbsVolumeSize, "aws postgresql_ebs_volume_size", errorList)
-	validateRequiredStringTypeField(aws.PostgresqlEbsVolumeType, "aws postgresql_ebs_volume_type", errorList)
 }

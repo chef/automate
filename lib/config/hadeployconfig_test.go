@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -840,9 +839,10 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
 			// Compare the actual and expected configuration structs
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("got %v, want %v", got, tt.want)
-			}
+			// if !reflect.DeepEqual(got, tt.want) {
+			// 	t.Errorf("got %v, want %v", got, tt.want)
+			// }
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

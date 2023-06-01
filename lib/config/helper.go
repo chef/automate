@@ -143,16 +143,6 @@ func validateConfigFile(configFile string, errorList *list.List) {
 	}
 }
 
-func validateAwsBackupConfig(c *HaDeployConfig, errorList *list.List) {
-	// validate aws backup config
-	checkForS3BackupConfig(c, errorList)
-	if c.Aws.Config.SetupManagedServices {
-		checkManagedServicesBackupConfig(c, errorList)
-	} else {
-		checkNonManagedServicesBackupConfig(c, errorList)
-	}
-}
-
 func checkForS3BackupConfig(c *HaDeployConfig, errorList *list.List) {
 	if c.Architecture.Aws.BackupConfig == "s3" {
 		checkForValidS3Bucket(c.Architecture.Aws, errorList)
@@ -168,17 +158,6 @@ func checkManagedServicesBackupConfig(c *HaDeployConfig, errorList *list.List) {
 func checkNonManagedServicesBackupConfig(c *HaDeployConfig, errorList *list.List) {
 	if c.Architecture.Aws.BackupConfig != "efs" && c.Architecture.Aws.BackupConfig != "s3" {
 		errorList.PushBack("Invalid backup_config. It should be 'efs' or 's3'.")
-	}
-}
-
-func validateExistingInfraBackupConfig(c *HaDeployConfig, errorList *list.List) {
-	// validate existing infra backup config
-	if c.Architecture.ExistingInfra.BackupConfig == "object_storage" {
-		c.verifyObjectStorage(c.ObjectStorage.Config, errorList)
-	} else if c.Architecture.ExistingInfra.BackupConfig == "file_system" {
-		// no check needed
-	} else {
-		errorList.PushBack("Invalid or empty backup_config")
 	}
 }
 
