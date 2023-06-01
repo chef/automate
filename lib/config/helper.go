@@ -274,16 +274,25 @@ func validateOpensearchCerts(opensearchSettings *ConfigOpensearchSettings, error
 	}))
 }
 
-func isExternalDb(externalDbSettings *ExternalDBSettings) bool {
-	return externalDbSettings.Type == "aws" || externalDbSettings.Type == "self-managed"
+func isExternalDb(hadeployConfig *HaDeployConfig) bool {
+	if hadeployConfig.External == nil {
+		return false
+	}
+	if hadeployConfig.External.Database == nil {
+		return false
+	}
+	return hadeployConfig.External.Database.Type == "aws" || hadeployConfig.External.Database.Type == "self-managed"
 }
 
 // func isExternalDbAwsManaged(externalDbSettings *ExternalDBSettings) bool {
 // 	return externalDbSettings.Type == "aws"
 // }
 
-func isExternalDbSelfManaged(externalDbSettings *ExternalDBSettings) bool {
-	return externalDbSettings.Type == "self-managed"
+func isExternalDbSelfManaged(hadeployConfig *HaDeployConfig) bool {
+	if isExternalDb(hadeployConfig) {
+		return hadeployConfig.External.Database.Type == "self-managed"
+	}
+	return false
 }
 
 // func isSetupAwsManagedServices(awsSettings *ConfigAwsSettings) bool {

@@ -32,7 +32,7 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 		c.verifyExistingInfraSettings(haDeployConfig.ExistingInfra.Config, errorList)
 
 		// on prem aws or self-managed
-		if isExternalDb(haDeployConfig.External.Database) {
+		if isExternalDb(haDeployConfig) {
 			c.verifyExternalPgSettings(haDeployConfig.External.Database.PostgreSQL, errorList)
 			c.verifyExternalOsSettings(haDeployConfig.External.Database.OpenSearch, errorList)
 			c.verifyAwsExternalOsSettings(haDeployConfig.External.Database.OpenSearch.Aws, errorList)
@@ -157,7 +157,7 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 	validateRequiredStringListField(existingInfraSettings.ChefServerPrivateIps, "chef_server_private_ips", errorList)
 	validateIPList(existingInfraSettings.ChefServerPrivateIps, "chef server private ip", errorList)
 
-	if !isExternalDb(c.External.Database) {
+	if isExternalDb(c) {
 		// validate opensearch Ips
 		validateRequiredStringListField(existingInfraSettings.OpensearchPrivateIps, "opensearch_private_ips", errorList)
 		validateIPList(existingInfraSettings.OpensearchPrivateIps, "opensearch private ip", errorList)
@@ -173,7 +173,7 @@ func (c *HaDeployConfig) verifyExternalPgSettings(externalPostgresqlSettings *Ex
 	validateRequiredStringTypeField(externalPostgresqlSettings.InstanceURL, "instance_url", errorList)
 	validateStringTypeField(externalPostgresqlSettings.PostgreSQLCertificate, "postgresql_certificate", errorList)
 	// In the case of AWS-managed RDS, it can be nil
-	if isExternalDbSelfManaged(c.External.Database) {
+	if isExternalDbSelfManaged(c) {
 		validateRequiredStringTypeField(externalPostgresqlSettings.PostgresqlRootCert, "postgresql_root_cert", errorList)
 	}
 	validateRequiredStringTypeField(externalPostgresqlSettings.SuperuserPassword, "superuser_password", errorList)
@@ -185,7 +185,7 @@ func (c *HaDeployConfig) verifyExternalOsSettings(externalOpensearchSettings *Ex
 	validateRequiredStringTypeField(externalOpensearchSettings.OpensearchDomainName, "opensearch_domain_name", errorList)
 	validateUrl(externalOpensearchSettings.OpensearchDomainURL, "opensearch_domain_url", errorList)
 	// In the case of AWS-managed Opensearch, it can be nil
-	if isExternalDbSelfManaged(c.External.Database) {
+	if isExternalDbSelfManaged(c) {
 		validateRequiredStringTypeField(externalOpensearchSettings.OpensearchRootCert, "opensearch_root_cert", errorList)
 	}
 	validateRequiredStringTypeField(externalOpensearchSettings.OpensearchUserPassword, "opensearch_user_password", errorList)
