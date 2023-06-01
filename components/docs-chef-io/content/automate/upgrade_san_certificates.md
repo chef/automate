@@ -34,8 +34,10 @@ Update non-SAN Certificates involves
     bash san_validator.sh
     ```
 3. If your setup has non-SAN certificates, the above script returns the list of non-SAN certificates as a response as shown below.
+
    ![invalid_san_certificates](/images/automate/invalid_san_certificates.png)
 4. If the script does not return any values as invalid certificates as below, which means your setup has valid internal certificates.
+
    ![valid_san_certificates](/images/automate/valid_san_certificates.png)
 5. If you have non-SAN certificates, run the command
     ```sh
