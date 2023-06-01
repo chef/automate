@@ -20,8 +20,6 @@ const CERTIFICATE_MSG = "Certificate check"
 
 const NFS_MOUNT_MSG = "NFS Mount Backup Check"
 
-const POST_DEPLOY = "post-deploy"
-
 func GetBastionChecks() []string {
 	var checks = []string{
 		HARDWARE_RESOURCE_COUNT,
