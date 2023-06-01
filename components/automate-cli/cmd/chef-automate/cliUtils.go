@@ -49,6 +49,9 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(script, true)
 	if err != nil {
+		if len(strings.TrimSpace(output)) != 0 {
+			printErrorMessage("Automate", ips[0], writer, output)
+		}
 		return err
 	}
 	writer.Print(output)
@@ -56,7 +59,7 @@ func RunCmdOnSingleAutomateNode(cmd *cobra.Command, args []string) error {
 }
 
 // RunCmdOnSingleAutomateNode runs the command on a single automate node
-//fileName is the name of the file in Automate - after the command execution, the file will be copied to /tmp path in bastion
+// fileName is the name of the file in Automate - after the command execution, the file will be copied to /tmp path in bastion
 func RunCmdOnSingleAutomateNodeNCopyReport(cmd *cobra.Command, args []string, fileName string, infra *AutomateHAInfraDetails) error {
 	script := GenerateOriginalAutomateCLICommand(cmd, args)
 
