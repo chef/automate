@@ -139,16 +139,21 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 	var result = make([]models.BatchCheckResult, len(ipMap))
 	var resultIndex = 0
 	for _, v := range ipMap {
+		if len(v) == 0 {
+			continue
+		}
 		result[resultIndex].Ip = v[0].Host
 		result[resultIndex].NodeType = v[0].NodeType
 		resultArray := []models.ApiResult{}
 		for _, checkResult := range v {
-			checkResult.Result.Message = checkMsg(checkResult.Result.Check)
+			checkResult.Result.Message = checkMsg(checkResult.CheckType)
+			checkResult.Result.Check = checkResult.CheckType
 			resultArray = append(resultArray, checkResult.Result)
 		}
 		result[resultIndex].Tests = resultArray
 		resultIndex = resultIndex + 1
 	}
+
 	return models.BatchCheckResponse{
 		Status: "SUCCESS",
 		Result: result,
