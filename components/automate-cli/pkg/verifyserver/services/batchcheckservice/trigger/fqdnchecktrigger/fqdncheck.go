@@ -20,7 +20,7 @@ func NewFqdnCheck(log logger.Logger, port string) *FqdnCheck {
 	return &FqdnCheck{
 		log:  log,
 		port: port,
-		host: "127.0.0.1",
+		host: constants.LOCALHOST,
 	}
 }
 
@@ -28,9 +28,7 @@ func (fqc *FqdnCheck) Run(config models.Config) []models.CheckTriggerResponse {
 
 	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 
-	response := triggerFqdnCheck(&config, endPoint, fqc.log)
-
-	return response
+	return triggerFqdnCheck(&config, endPoint, fqc.log)
 
 }
 
@@ -39,18 +37,18 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 	log.Debug("Trigger FQDN check for automate and chef server fqdn")
 	var result []models.CheckTriggerResponse
 	outputCh := make(chan models.CheckTriggerResponse)
-	IsAfterDeployment := false
+	isAfterDeployment := false
 	reqCount := 0
 
 	if config.DeploymentState == constants.POST_DEPLOY {
-		IsAfterDeployment = true
+		isAfterDeployment = true
 	}
 
 	if config.Certificate.AutomateFqdn != "" {
 		for _, ip := range config.Hardware.AutomateNodeIps {
 			log.Debugf("Trigger FQDN check for automate ip %s", ip)
 			reqCount++
-			req := getFqdnCheckRequest(ip, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, IsAfterDeployment, config.APIToken)
+			req := getFqdnCheckRequest(ip, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, isAfterDeployment, config.APIToken)
 			go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
 		}
 	}
@@ -59,7 +57,7 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 			log.Debugf("Trigger FQDN check for chefserver ip %s", ip)
 			reqCount++
-			req := getFqdnCheckRequest(ip, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, IsAfterDeployment, config.APIToken)
+			req := getFqdnCheckRequest(ip, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, isAfterDeployment, config.APIToken)
 			go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
 
 		}

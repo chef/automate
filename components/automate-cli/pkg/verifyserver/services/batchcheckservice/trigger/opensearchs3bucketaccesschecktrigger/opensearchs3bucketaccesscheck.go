@@ -39,7 +39,7 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.Che
 
 	endPoint := checkutils.PrepareEndPoint(osb.host, osb.port, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH)
 
-	response := triggerCheckForOpensearchS3Backup(endPoint, osb.log, constants.OPENSEARCH, http.MethodPost, s3OpensearchBackupRequest)
+	response := triggerCheckForOpensearchS3Backup(endPoint, osb.log, http.MethodPost, s3OpensearchBackupRequest)
 
 	return setHostAsOpensearchInResponse(response, config.ExternalOS.OSDomainURL)
 
@@ -47,22 +47,21 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.Che
 
 // setHostAsOpensearchInResponse sets the Host as external OS endpoint as this will help us in mapping the result correctly
 func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExternalUrl string) []models.CheckTriggerResponse {
-	var result []models.CheckTriggerResponse
 	for _, resp := range response {
 		resp.Host = osExternalUrl
-		result = append(result, resp)
+
 	}
-	return result
+	return response
 }
 
 // triggerCheckForOpensearchS3Backup triggers the API on given for external opensearch connectivity with s3
-func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, nodeType string, method string, reqBody models.S3BackupDetails) []models.CheckTriggerResponse {
+func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, method string, reqBody models.S3BackupDetails) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	log.Debugf("Triggering the api call for Opensearch for S3 backup")
 	outputCh := make(chan models.CheckTriggerResponse)
 
 	//There will be only one request which will check the connection
-	go trigger.TriggerCheckAPI(endPoint, reqBody.Endpoint, nodeType, method, outputCh, reqBody)
+	go trigger.TriggerCheckAPI(endPoint, reqBody.Endpoint, constants.OPENSEARCH, method, outputCh, reqBody)
 
 	//As we are triggering only one request for checking the connection for opensearch and s3 bucket
 	res := <-outputCh

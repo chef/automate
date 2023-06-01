@@ -2,7 +2,6 @@ package nfsmountbackupchecktrigger
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -54,7 +53,6 @@ func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTrigger
 // triggerCheckForMountService - Call the Hardware resource API and format response
 func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMountRequest) (*models.NFSMountCheckResponse, error) {
 	url := checkutils.PrepareEndPoint(ss.host, ss.port, constants.NFS_MOUNT_API_PATH)
-	fmt.Println(url)
 	resp, err := httputils.MakeRequest(http.MethodPost, url, body)
 	if err != nil {
 		ss.log.Error("Error while triggering NFS Mount API from Batch Check API: ", err)

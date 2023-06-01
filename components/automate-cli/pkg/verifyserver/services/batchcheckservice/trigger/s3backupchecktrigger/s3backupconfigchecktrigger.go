@@ -24,17 +24,17 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 
 func (svc *S3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
-	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, constants.S3_BACKUP_CHECK_API_PATH, constants.AUTOMATE, http.MethodPost, req)
+	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
 }
 
-//runCheckForS3Config triggers the API on gives node automate nodes only for validating s3 backup config
-func runCheckForS3Config(nodeIps []string, log logger.Logger, port string, path string, nodeType string, method string, reqBody models.S3ConfigRequest) []models.CheckTriggerResponse {
+// runCheckForS3Config triggers the API on gives node automate nodes only for validating s3 backup config
+func runCheckForS3Config(nodeIps []string, log logger.Logger, port string, method string, reqBody models.S3ConfigRequest) []models.CheckTriggerResponse {
 	log.Debugf("Triggering the api call for automate nodes only for s3 backup config")
 	outputCh := make(chan models.CheckTriggerResponse)
 	for _, ip := range nodeIps {
-		log.Debugf("Triggering api %s for the node %s", path, ip)
-		endpoint := checkutils.PrepareEndPoint(ip, port, path)
-		go trigger.TriggerCheckAPI(endpoint, ip, nodeType, method, outputCh, reqBody)
+		log.Debugf("Triggering api %s for the node %s", constants.S3_BACKUP_CHECK_API_PATH, ip)
+		endpoint := checkutils.PrepareEndPoint(ip, port, constants.S3_BACKUP_CHECK_API_PATH)
+		go trigger.TriggerCheckAPI(endpoint, ip, constants.AUTOMATE, method, outputCh, reqBody)
 	}
 
 	response := getResultFromOutputChan(len(nodeIps), outputCh)
@@ -42,7 +42,7 @@ func runCheckForS3Config(nodeIps []string, log logger.Logger, port string, path 
 	return response
 }
 
-//getResultFromOutputChan gets the result from output channel
+// getResultFromOutputChan gets the result from output channel
 func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerResponse) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 
