@@ -1,6 +1,7 @@
 package externalpostgresqlchecktrigger
 
 import (
+	"net"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -23,10 +24,10 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 }
 
 func (epc *ExternalPostgresCheck) Run(config models.Config) []models.CheckTriggerResponse {
-	return runCheckForPostgresql(config, constants.EXTERNAL_POSTGRESQL_API_PATH, epc.port, epc.log)
+	return runCheckForPostgresql(config, epc.port, epc.log)
 }
 
-func runCheckForPostgresql(config models.Config, path string, port string, log logger.Logger) []models.CheckTriggerResponse {
+func runCheckForPostgresql(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Postgresql check for automate and chef server nodes")
 	req := getPostgresRequest(config.ExternalPG)
 	var result, result2 []models.CheckTriggerResponse
@@ -35,14 +36,14 @@ func runCheckForPostgresql(config models.Config, path string, port string, log l
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		log.Debugf("Trigger Postgresql check for automate ip %s", ip)
 		count++
-		endPoint := checkutils.PrepareEndPoint(ip, port, path)
+		endPoint := checkutils.PrepareEndPoint(ip, port, constants.EXTERNAL_POSTGRESQL_API_PATH)
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 		log.Debugf("Trigger Postgresql check for chefserver ip %s", ip)
 		count++
-		endPoint := checkutils.PrepareEndPoint(ip, port, path)
+		endPoint := checkutils.PrepareEndPoint(ip, port, constants.EXTERNAL_POSTGRESQL_API_PATH)
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
 
 	}
@@ -63,14 +64,14 @@ func runCheckForPostgresql(config models.Config, path string, port string, log l
 }
 
 func getPostgresRequest(details models.ExternalPG) models.ExternalPgRequest {
+	host, port, _ := net.SplitHostPort(details.PGInstanceURL)
 	return models.ExternalPgRequest{
-		PostgresqlInstanceUrl:       details.PGInstanceURL,
-		PostgresqlInstancePort:      details.PGPort,
+		PostgresqlInstanceUrl:       host,
+		PostgresqlInstancePort:      port,
 		PostgresqlSuperUserUserName: details.PGSuperuserName,
 		PostgresqlSuperUserPassword: details.PGSuperuserPassword,
 		PostgresqlDbUserUserName:    details.PGDbUserName,
 		PostgresqlDbUserPassword:    details.PGDbUserPassword,
 		PostgresqlRootCert:          details.PGRootCert,
 	}
-
 }

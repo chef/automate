@@ -57,7 +57,6 @@ type ExternalOS struct {
 
 type ExternalPG struct {
 	PGInstanceURL       string `json:"postgresql_instance_url"`
-	PGPort              string `json:"postgresql_instance_port"`
 	PGSuperuserName     string `json:"postgresql_superuser_username"`
 	PGSuperuserPassword string `json:"postgresql_superuser_password"`
 	PGDbUserName        string `json:"postgresql_dbuser_username"`

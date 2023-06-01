@@ -23,30 +23,24 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 }
 
 func (eoc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTriggerResponse {
-	return runCheckForOpensearch(config, constants.EXTERNAL_OPENSEARCH_API_PATH, eoc.port, eoc.log)
+	return runCheckForOpensearch(config, eoc.port, eoc.log)
 }
 
-func runCheckForOpensearch(config models.Config, path string, port string, log logger.Logger) []models.CheckTriggerResponse {
+func runCheckForOpensearch(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Opensearch check for automate and chef server nodes")
-	req := models.ExternalOS{
-		OSDomainName:   config.ExternalOS.OSDomainName,
-		OSDomainURL:    config.ExternalOS.OSDomainURL,
-		OSUsername:     config.ExternalOS.OSUsername,
-		OSUserPassword: config.ExternalOS.OSUserPassword,
-		OSCert:         config.ExternalOS.OSCert,
-	}
+	req := getOpensearchRequest(config.ExternalOS)
 	var resultA2, resultCS []models.CheckTriggerResponse
 	outCh := make(chan models.CheckTriggerResponse)
 	count := 0
 	for _, ip := range config.Hardware.AutomateNodeIps {
 		log.Debugf("Trigger Opensearch check for automate ip %s", ip)
-		endPoint := checkutils.PrepareEndPoint(ip, port, path)
+		endPoint := checkutils.PrepareEndPoint(ip, port, constants.EXTERNAL_OPENSEARCH_API_PATH)
 		count++
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outCh, req)
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		endPoint := checkutils.PrepareEndPoint(ip, port, path)
+		endPoint := checkutils.PrepareEndPoint(ip, port, constants.EXTERNAL_OPENSEARCH_API_PATH)
 		log.Debugf("Trigger Opensearch check for chef-infra-server ip %s", ip)
 		count++
 		go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outCh, req)
@@ -65,5 +59,16 @@ func runCheckForOpensearch(config models.Config, path string, port string, log l
 
 	close(outCh)
 	return resultA2
+
+}
+
+func getOpensearchRequest(details models.ExternalOS) models.ExternalOS {
+	return models.ExternalOS{
+		OSDomainName:   details.OSDomainName,
+		OSDomainURL:    details.OSDomainURL,
+		OSUsername:     details.OSUsername,
+		OSUserPassword: details.OSUserPassword,
+		OSCert:         details.OSCert,
+	}
 
 }

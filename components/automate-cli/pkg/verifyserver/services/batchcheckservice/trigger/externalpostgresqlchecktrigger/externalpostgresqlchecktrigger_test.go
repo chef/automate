@@ -3,6 +3,7 @@ package externalpostgresqlchecktrigger
 import (
 	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -203,8 +204,7 @@ const (
 		}
 	}
 	]`
-	postgresqlInstanceUrl       = "https://abc.com"
-	postgresqlInstancePort      = "5432"
+	postgresqlInstanceUrl       = "https://abc.com:5432"
 	postgresqlSuperUserUserName = "postgres"
 	postgresqlSuperUserPassword = "Chefautomate"
 	postgresqlDbUserUserName    = "postgres"
@@ -213,9 +213,10 @@ const (
 )
 
 func getRequest() models.ExternalPgRequest {
+	host, port, _ := net.SplitHostPort(postgresqlInstanceUrl)
 	return models.ExternalPgRequest{
-		PostgresqlInstanceUrl:       postgresqlInstanceUrl,
-		PostgresqlInstancePort:      postgresqlInstancePort,
+		PostgresqlInstanceUrl:       host,
+		PostgresqlInstancePort:      port,
 		PostgresqlSuperUserUserName: postgresqlSuperUserUserName,
 		PostgresqlSuperUserPassword: postgresqlSuperUserPassword,
 		PostgresqlDbUserUserName:    postgresqlDbUserUserName,
@@ -251,7 +252,6 @@ func TestPostgresCheck_Run(t *testing.T) {
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
-						PGPort:              postgresqlInstancePort,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
 						PGDbUserName:        postgresqlDbUserUserName,
@@ -276,7 +276,6 @@ func TestPostgresCheck_Run(t *testing.T) {
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
-						PGPort:              postgresqlInstancePort,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
 						PGDbUserName:        postgresqlDbUserUserName,
@@ -300,7 +299,6 @@ func TestPostgresCheck_Run(t *testing.T) {
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
-						PGPort:              postgresqlInstancePort,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
 						PGDbUserName:        postgresqlDbUserUserName,
@@ -324,7 +322,6 @@ func TestPostgresCheck_Run(t *testing.T) {
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
-						PGPort:              postgresqlInstancePort,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
 						PGDbUserName:        postgresqlDbUserUserName,
@@ -359,9 +356,14 @@ func TestPostgresCheck_Run(t *testing.T) {
 
 			if tt.isError {
 				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, got[0].Result.Error.Code, tt.httpStatusCode)
+				assert.Equal(t, constants.LOCAL_HOST, got[0].Host)
+				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+				assert.Equal(t, tt.httpStatusCode, got[0].Result.Error.Code)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
+				assert.Nil(t, got[0].Result.Error)
+				assert.Equal(t, constants.LOCAL_HOST, got[0].Host)
+				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 				assert.Equal(t, want, got)
 			}
 
@@ -381,7 +383,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 			wantReq := getRequest()
 
 			assert.NotNil(t, got)
-			assert.Equal(t, got, wantReq)
+			assert.Equal(t, wantReq, got)
 			if r.URL.Path == constants.EXTERNAL_POSTGRESQL_API_PATH {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)
