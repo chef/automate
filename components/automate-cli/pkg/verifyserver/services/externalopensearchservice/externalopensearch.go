@@ -14,7 +14,7 @@ import (
 )
 
 type IExternalOpensearchService interface {
-	GetExternalOpensearchDetails(models.ExternalOS, int) models.ExternalOpensearchResponse
+	GetExternalOpensearchDetails(models.ExternalOSRequest, int) models.ExternalOpensearchResponse
 }
 
 type ExternalOpensearchService struct {
@@ -29,7 +29,7 @@ func NewExternalOpensearchService(log logger.Logger, timeout time.Duration) IExt
 	}
 }
 
-func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalOS, port int) models.ExternalOpensearchCheck {
+func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalOSRequest, port int) models.ExternalOpensearchCheck {
 	eos.log.Debug("Checking External Opensearch Reachability")
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM([]byte(reqBody.OSCert))
@@ -51,7 +51,7 @@ func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalO
 	return createExternalOpensearchCheck(true, constants.EXTERNAL_OPENSEARCH_SUCCESS_TITLE, constants.STATUS_PASS, constants.EXTERNAL_OPENSEARCH_SUCCESS_MSG, "", "", "")
 }
 
-func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOS, port int, client *http.Client) string {
+func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOSRequest, port int, client *http.Client) string {
 	// Create a new request with basic authentication
 	url := fmt.Sprintf("https://%s:%d", reqBody.OSDomainURL, port)
 	eos.log.Debug("URL: ", url)
@@ -83,7 +83,7 @@ func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOS, 
 	return ""
 }
 
-func (eos *ExternalOpensearchService) GetExternalOpensearchDetails(reqBody models.ExternalOS, port int) models.ExternalOpensearchResponse {
+func (eos *ExternalOpensearchService) GetExternalOpensearchDetails(reqBody models.ExternalOSRequest, port int) models.ExternalOpensearchResponse {
 	result := models.ExternalOpensearchResponse{}
 
 	reachableCheck := eos.checkReachability(reqBody, port)

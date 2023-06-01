@@ -229,13 +229,13 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 	assert.NotNil(t, eos)
 	tests := []struct {
 		TestName     string
-		ReqBody      models.ExternalOS
+		ReqBody      models.ExternalOSRequest
 		ResponseBody models.ExternalOpensearchResponse
 		Port         int
 	}{
 		{
 			TestName: "Correct url, username, password and root_ca",
-			ReqBody: models.ExternalOS{
+			ReqBody: models.ExternalOSRequest{
 				OSDomainName:   "Test",
 				OSDomainURL:    LOCALHOST,
 				OSUsername:     "admin",
@@ -260,7 +260,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 		},
 		{
 			TestName: "Correct url, username and password but wrong root_ca",
-			ReqBody: models.ExternalOS{
+			ReqBody: models.ExternalOSRequest{
 				OSDomainName:   "Test",
 				OSDomainURL:    LOCALHOST,
 				OSUsername:     "admin",
@@ -285,7 +285,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 		},
 		{
 			TestName: "Correct url, username and password but different server root_ca",
-			ReqBody: models.ExternalOS{
+			ReqBody: models.ExternalOSRequest{
 				OSDomainName:   "Test",
 				OSDomainURL:    LOCALHOST,
 				OSUsername:     "admin",
@@ -310,7 +310,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 		},
 		{
 			TestName: "Correct root_ca and url but wrong username and password",
-			ReqBody: models.ExternalOS{
+			ReqBody: models.ExternalOSRequest{
 				OSDomainName:   "Test",
 				OSDomainURL:    LOCALHOST,
 				OSUsername:     "admin",
@@ -336,7 +336,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 
 		{
 			TestName: "Wrong Format IP",
-			ReqBody: models.ExternalOS{
+			ReqBody: models.ExternalOSRequest{
 				OSDomainName:   "Test",
 				OSDomainURL:    "\t", // Passing "\t" for failing the http.NewRequest() method. You can also pass "%%"
 				OSUsername:     "admin",

@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) ExternalOpensearch(c *fiber.Ctx) error {
-	reqBody := models.ExternalOS{}
+	reqBody := models.ExternalOSRequest{}
 	if err := c.BodyParser(&reqBody); err != nil {
 		h.Logger.Error(err.Error())
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
