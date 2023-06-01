@@ -623,8 +623,11 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			stopServicesOnNodeFunc: func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+			stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 				return nil
+			},
+			calculateTotalInstanceCountFunc: func() (int, error) {
+				return 0, nil
 			},
 		},
 		CONFIG_TOML_PATH_AWS,
@@ -699,8 +702,11 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			stopServicesOnNodeFunc: func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+			stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 				return nil
+			},
+			calculateTotalInstanceCountFunc: func() (int, error) {
+				return 0, nil
 			},
 		},
 		CONFIG_TOML_PATH_AWS,

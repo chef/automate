@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -183,7 +184,7 @@ func TestIsFinalInstanceCountAllowed(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
 	assert.NoError(t, err)
@@ -195,7 +196,7 @@ func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
 	dir := t.TempDir()
 
 	err := os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
@@ -207,7 +208,7 @@ func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
 	dir := t.TempDir()
 
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
@@ -220,7 +221,7 @@ func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
 }
 
 func TestModifyTfArchFile(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
@@ -233,7 +234,7 @@ func TestModifyTfArchFile(t *testing.T) {
 }
 
 func TestModifyTfArchFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
 	dir := t.TempDir()
 	err := nodeUtil.modifyTfArchFile(dir)
 	assert.Error(t, err)
@@ -256,12 +257,8 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, infra, &MockSSHUtilsImpl{
-		getSSHConfigFunc: func() *SSHConfig {
-			return &SSHConfig{}
-		},
-	})
+	}, command.NewMockExecutor(t))
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, EXISTING_INFRA_MODE, infra)
 	assert.NoError(t, err)
 }
 func TestStopServicesOnNodeCS(t *testing.T) {
@@ -281,12 +278,8 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, infra, &MockSSHUtilsImpl{
-		getSSHConfigFunc: func() *SSHConfig {
-			return &SSHConfig{}
-		},
-	})
+	}, command.NewMockExecutor(t))
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, AWS_MODE, infra)
 	assert.NoError(t, err)
 }
 func TestStopServicesOnNodePG(t *testing.T) {
@@ -306,18 +299,16 @@ func TestStopServicesOnNodePG(t *testing.T) {
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 			return nil, nil
 		},
-	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, POSTGRESQL, infra, &MockSSHUtilsImpl{
-		getSSHConfigFunc: func() *SSHConfig {
-			return &SSHConfig{}
-		},
-	})
+	}, command.NewMockExecutor(t))
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, POSTGRESQL, EXISTING_INFRA_MODE, infra)
 	assert.NoError(t, err)
 }
 func TestStopServicesOnNodeOS(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-			return nil, &SSHConfig{}, nil
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
 		},
 	}
 
@@ -329,13 +320,19 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 			return nil, nil
 		},
 		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-			return nil, nil
-		},
-	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, infra, &MockSSHUtilsImpl{
-		getSSHConfigFunc: func() *SSHConfig {
-			return &SSHConfig{}
-		},
-	})
+			//return dummy result
+			return map[string][]*CmdResult{
+				TEST_IP_1: {
+					{
+						ScriptName:  "",
+						HostIP:      "",
+						OutputFiles: []string{},
+						Output:      "",
+						Error:       nil,
+					},
+				},
+			}, nil
+		}}, command.NewMockExecutor(t))
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, AWS_MODE, infra)
 	assert.NoError(t, err)
 }

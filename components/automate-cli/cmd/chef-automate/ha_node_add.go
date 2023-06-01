@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -64,13 +65,13 @@ func haAddNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deployer
 	switch deployerType {
 	case EXISTING_INFRA_MODE:
 		if !addDeleteNodeHACmdFlags.awsMode {
-			hamd = NewAddNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer)), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+			hamd = NewAddNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor()), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
 			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
 		}
 	case AWS_MODE:
 		if !addDeleteNodeHACmdFlags.onPremMode {
-			hamd = NewAddNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer)), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+			hamd = NewAddNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor()), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
 			err = fmt.Errorf("Flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
 		}

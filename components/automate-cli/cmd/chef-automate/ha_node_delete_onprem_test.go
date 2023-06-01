@@ -494,8 +494,11 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		stopServicesOnNodeFunc: func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			return 0, nil
 		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
@@ -564,8 +567,11 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		stopServicesOnNodeFunc: func(ip, nodeType string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
 			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			return 0, nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

@@ -90,6 +90,11 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 
+	previousCount, err := dna.nodeUtils.calculateTotalInstanceCount()
+	if err != nil {
+		return err
+	}
+
 	err = dna.prepare()
 	if err != nil {
 		return err
@@ -97,10 +102,19 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 
 	err = dna.runDeploy()
 	if err != nil {
-		return err
+		fmt.Println("Error occurred while deploying: ", err)
 	}
 
-	return dna.stopNodes()
+	currentCount, newErr := dna.nodeUtils.calculateTotalInstanceCount()
+	if newErr != nil {
+		return newErr
+	}
+
+	if currentCount == previousCount-1 {
+		return dna.stopNodes()
+	}
+
+	return err
 }
 
 func (dna *DeleteNodeAWSImpl) modifyConfig() error {
@@ -367,7 +381,7 @@ func (dna *DeleteNodeAWSImpl) stopNodes() error {
 		return err
 	}
 
-	err = dna.nodeUtils.stopServicesOnNode(dna.ipToDelete, dna.nodeType, infra, dna.sshUtil)
+	err = dna.nodeUtils.stopServicesOnNode(dna.ipToDelete, dna.nodeType, AWS_MODE, infra)
 	if err != nil {
 		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
 	}

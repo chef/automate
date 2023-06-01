@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/spf13/cobra"
 )
@@ -98,7 +99,7 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 // certShowCmdFunc is the main function for the cert show command
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer)), NewSSHUtil(&SSHConfig{}), writer)
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor()), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args)
 	}
 }

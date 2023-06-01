@@ -76,15 +76,14 @@ const (
 	STOP_BE_SERVICES_CMD = `sudo systemctl stop hab-sup`
 
 	EXCLUDE_OPENSEARCH_NODE_REQUEST = `
-	curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
+	curl --location --request PUT 'http://localhost:10144/_cluster/settings' \
 	--header 'Content-Type: application/json' \
 	--data-raw '{
-	  "transient" :{
+	  "persistent" :{
 		  "cluster.routing.allocation.exclude._ip" : "%s"
 	   }
-	}' -k \
-	--cacert /hab/svc/automate-ha-opensearch/config/certificates/root-ca.pem \
-	--key /hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem \
-	--cert /hab/svc/automate-ha-opensearch/config/certificates/admin.pem
+	}'
 	`
+
+	GET_OPENSEARCH_CLUSTER_SETTINGS = `curl --location --request GET 'http://localhost:10144/_cluster/settings'`
 )

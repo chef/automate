@@ -76,6 +76,11 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		}
 	}
 
+	previousCount, err := dni.nodeUtils.calculateTotalInstanceCount()
+	if err != nil {
+		return err
+	}
+
 	err = dni.prepare()
 	if err != nil {
 		return err
@@ -83,10 +88,19 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 
 	err = dni.runDeploy()
 	if err != nil {
-		return err
+		fmt.Println("Error occurred while deploying: ", err)
 	}
 
-	return dni.stopNodes()
+	currentCount, newErr := dni.nodeUtils.calculateTotalInstanceCount()
+	if newErr != nil {
+		return newErr
+	}
+
+	if currentCount == previousCount-1 {
+		return dni.stopNodes()
+	}
+
+	return err
 }
 
 func (dni *DeleteNodeOnPremImpl) prepare() error {
@@ -263,7 +277,7 @@ func (dni *DeleteNodeOnPremImpl) stopNodes() error {
 		return err
 	}
 
-	err = dni.nodeUtils.stopServicesOnNode(dni.ipToDelete, dni.nodeType, infra, dni.sshUtil)
+	err = dni.nodeUtils.stopServicesOnNode(dni.ipToDelete, dni.nodeType, EXISTING_INFRA_MODE, infra)
 	if err != nil {
 		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
 	}
