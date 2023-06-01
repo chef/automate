@@ -23,14 +23,15 @@ type keydetails struct {
 }
 
 func validateRequiredNumberField(value string, fieldName string, errorList *list.List) {
-	if len(value) > 0 {
-		if _, err := strconv.Atoi(value); err != nil {
-			errorList.PushBack(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
-		}
-	} else {
+	if len(value) == 0 {
 		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return
+	}
+	if _, err := strconv.Atoi(value); err != nil {
+		errorList.PushBack(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 	}
 }
+
 func validateNumberField(value string, fieldName string, errorList *list.List) {
 	if len(value) > 0 {
 		if _, err := strconv.Atoi(value); err != nil {
@@ -60,24 +61,36 @@ func validateStringBasedBoolean(value interface{}, fieldName string, errorList *
 }
 
 func validateRequiredPathField(value string, fieldName string, errorList *list.List) {
-	if len(value) > 0 {
-		if _, err := os.Stat(value); err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				errorList.PushBack(fmt.Sprintf("Invalid %s: %s (path does not exist)", fieldName, value))
-			} else {
-				errorList.PushBack(fmt.Sprintf("Invalid %s: %s (%v)", fieldName, value, err))
-			}
-		}
-	} else {
+	if len(value) == 0 {
 		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return
+	}
+	if _, err := os.Stat(value); err != nil {
+		errorList.PushBack(fmt.Sprintf("Invalid %s: %s (%v)", fieldName, value, err))
 	}
 }
 
-func validateRequiredStringTypeField(value interface{}, fieldName string, errorList *list.List) {
+func validateRequiredStringTypeField(value interface{}, fieldName string, errorList *list.List, expectedValues ...string) {
 	strValue, ok := value.(string)
 	if !ok || len(strings.TrimSpace(strValue)) < 1 {
 		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return
 	}
+	if len(expectedValues) > 0 {
+		if !contains(expectedValues, strValue) {
+			expectedValuesStr := strings.Join(expectedValues, ", ")
+			errorList.PushBack(fmt.Sprintf("Invalid value '%s' for field '%s'. Expected values are: %s", strValue, fieldName, expectedValuesStr))
+		}
+	}
+}
+
+func contains(slice []string, value string) bool {
+	for _, v := range slice {
+		if v == value {
+			return true
+		}
+	}
+	return false
 }
 
 func validateStringTypeField(value interface{}, fieldName string, errorList *list.List) {
@@ -93,14 +106,6 @@ func validateStringTypeField(value interface{}, fieldName string, errorList *lis
 func validateRequiredStringListField(value []string, fieldName string, errorList *list.List) {
 	if len(value) < 1 {
 		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
-	}
-}
-
-func validateBackupMount(mount string, errorList *list.List) {
-	if len(mount) < 1 {
-		errorList.PushBack("Invalid or empty backup_mount")
-	} else if mount != "/mnt/automate_backups" {
-		errorList.PushBack("backup_mount has to be /mnt/automate_backups")
 	}
 }
 
@@ -216,16 +221,16 @@ func checkCertValid(keys []keydetails) *list.List {
 		block, _ := pem.Decode([]byte(el.key))
 		if block == nil {
 			errorList.PushBack("Invalid format. Failed to decode " + el.certtype + " for " + el.svc)
-		} else {
-			switch el.certtype {
-			case rootCa:
-				err := validateRootCACertificate(block.Bytes, el.svc, errorList)
-				if err != nil {
-					errorList.PushBack(err.Error())
-				}
-			default:
-				errorList.PushBack("Unknown certificate type: " + el.certtype + " for " + el.svc)
+			continue
+		}
+		switch el.certtype {
+		case rootCa:
+			err := validateRootCACertificate(block.Bytes, el.svc, errorList)
+			if err != nil {
+				errorList.PushBack(err.Error())
 			}
+		default:
+			continue
 		}
 	}
 	return errorList
@@ -275,20 +280,18 @@ func validateOpensearchCerts(opensearchSettings *ConfigOpensearchSettings, error
 }
 
 func isExternalDb(hadeployConfig *HaDeployConfig) bool {
-	if hadeployConfig.External == nil {
-		return false
-	}
-	if hadeployConfig.External.Database == nil {
-		return false
-	}
-	return hadeployConfig.External.Database.Type == "aws" || hadeployConfig.External.Database.Type == "self-managed"
+	return hadeployConfig.External != nil && hadeployConfig.External.Database != nil &&
+		(hadeployConfig.External.Database.Type == "aws" || hadeployConfig.External.Database.Type == "self-managed")
 }
 
 func isExternalDbSelfManaged(hadeployConfig *HaDeployConfig) bool {
-	if isExternalDb(hadeployConfig) {
-		return hadeployConfig.External.Database.Type == "self-managed"
-	}
-	return false
+	return isExternalDb(hadeployConfig) && hadeployConfig.External.Database.Type == "self-managed"
+}
+
+func isAwsExternalOsConfigured(hadeployConfig *HaDeployConfig) bool {
+	return hadeployConfig.External != nil && hadeployConfig.External.Database != nil &&
+		hadeployConfig.External.Database.OpenSearch != nil && hadeployConfig.External.Database.OpenSearch.Aws != nil &&
+		hadeployConfig.External.Database.OpenSearch.Aws.AwsOsSnapshotRoleArn != ""
 }
 
 func validateIPList(ipList []string, prefix string, errorList *list.List) {

@@ -16,7 +16,7 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 	// Parse the config file
 	haDeployConfig, err := c.Parse(configFile)
 	if err != nil {
-		errorList.PushBack(err.Error())
+		return errors.New(err.Error())
 	} else {
 		c = haDeployConfig
 	}
@@ -30,13 +30,6 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 		c.verifyConfigInitials(haDeployConfig.Architecture.ExistingInfra, errorList)
 		c.validateExistingInfraBackupConfig(errorList)
 		c.verifyExistingInfraSettings(haDeployConfig.ExistingInfra.Config, errorList)
-
-		// on prem aws or self-managed
-		if isExternalDb(haDeployConfig) {
-			c.verifyExternalPgSettings(haDeployConfig.External.Database.PostgreSQL, errorList)
-			c.verifyExternalOsSettings(haDeployConfig.External.Database.OpenSearch, errorList)
-			c.verifyAwsExternalOsSettings(haDeployConfig.External.Database.OpenSearch.Aws, errorList)
-		}
 	}
 
 	// Validate Aws
@@ -59,24 +52,25 @@ func (c *HaDeployConfig) Verify(configFile string) error {
 func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials, errorList *list.List) {
 	validateRequiredStringTypeField(configInitials.SecretsKeyFile, "secrets_key_file", errorList)
 	validateRequiredStringTypeField(configInitials.SecretsStoreFile, "secrets_store_file", errorList)
-	validateRequiredStringTypeField(configInitials.Architecture, "Architecture", errorList)
-	validateRequiredStringTypeField(configInitials.WorkspacePath, "workspace_path", errorList)
+	validateRequiredStringTypeField(configInitials.Architecture, "architecture", errorList, "aws", "existing_nodes")
+	validateRequiredStringTypeField(configInitials.WorkspacePath, "workspace_path", errorList, "/hab/a2_deploy_workspace")
 	validateRequiredStringTypeField(configInitials.SSHUser, "ssh_user", errorList)
 	validateRequiredPathField(configInitials.SSHKeyFile, "ssh_key_file", errorList)
 	validateStringTypeField(configInitials.SSHGroupName, "ssh_group_name", errorList)
 	validateStringTypeField(configInitials.LoggingMonitoringManagement, "logging_monitoring_management", errorList)
 	validateStringTypeField(configInitials.HabitatUIDGid, "habitat_uid_gid", errorList)
-	validateBackupMount(configInitials.BackupMount, errorList)
+	validateRequiredStringTypeField(configInitials.BackupMount, "backup_mount", errorList, "/mnt/automate_backups")
 }
 
 func (c *HaDeployConfig) validateExistingInfraBackupConfig(errorList *list.List) {
 	// validate existing infra backup config
-	if c.Architecture.ExistingInfra.BackupConfig == "object_storage" {
-		c.verifyObjectStorage(c.ObjectStorage.Config, errorList)
-	} else if c.Architecture.ExistingInfra.BackupConfig == "file_system" {
-		// no check needed
-	} else {
+	backupConfig := c.Architecture.ExistingInfra.BackupConfig
+	if backupConfig != "object_storage" && backupConfig != "file_system" {
 		errorList.PushBack("Invalid or empty backup_config")
+		return
+	}
+	if backupConfig == "object_storage" {
+		c.verifyObjectStorage(c.ObjectStorage.Config, errorList)
 	}
 }
 
@@ -164,6 +158,12 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 		// validate postgresql Ips
 		validateRequiredStringListField(existingInfraSettings.PostgresqlPrivateIps, "postgresql_private_ips", errorList)
 		validateIPList(existingInfraSettings.PostgresqlPrivateIps, "postgresql private ip", errorList)
+		// on prem aws or self-managed
+		c.verifyExternalPgSettings(c.External.Database.PostgreSQL, errorList)
+		c.verifyExternalOsSettings(c.External.Database.OpenSearch, errorList)
+		if isAwsExternalOsConfigured(c) {
+			c.verifyAwsExternalOsSettings(c.External.Database.OpenSearch.Aws, errorList)
+		}
 	}
 }
 
