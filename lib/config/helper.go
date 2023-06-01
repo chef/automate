@@ -25,7 +25,7 @@ type keydetails struct {
 func validateRequiredNumberField(value string, fieldName string, errorList *list.List) {
 	if len(value) > 0 {
 		if _, err := strconv.Atoi(value); err != nil {
-			errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
+			errorList.PushBack(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 		}
 	} else {
 		errorList.PushBack(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
@@ -34,7 +34,7 @@ func validateRequiredNumberField(value string, fieldName string, errorList *list
 func validateNumberField(value string, fieldName string, errorList *list.List) {
 	if len(value) > 0 {
 		if _, err := strconv.Atoi(value); err != nil {
-			errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
+			errorList.PushBack(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 		}
 	}
 }
@@ -42,7 +42,7 @@ func validateNumberField(value string, fieldName string, errorList *list.List) {
 func validateRequiredBooleanField(value interface{}, fieldName string, errorList *list.List) {
 	_, ok := value.(bool)
 	if !ok {
-		errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
+		errorList.PushBack(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 	}
 }
 
@@ -52,7 +52,7 @@ func validateStringBasedBoolean(value interface{}, fieldName string, errorList *
 		// Check if the string represents a valid boolean value
 		_, err := strconv.ParseBool(v)
 		if err != nil {
-			errorList.PushBack(fmt.Sprintf("Invalid %s: %s", fieldName, value))
+			errorList.PushBack(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 		}
 	default:
 		errorList.PushBack(fmt.Sprintf("Invalid %s: %v", fieldName, value))
