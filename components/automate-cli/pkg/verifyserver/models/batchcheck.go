@@ -163,6 +163,5 @@ type FqdnRequest struct {
 	RootCert          string   `json:"root_cert"`
 	IsAfterDeployment bool     `json:"is_after_deployment"`
 	Nodes             []string `json:"nodes"`
-	ApiToken          string   `json:"api_token"`
 	NodeType          string   `json:"node_type"`
 }
