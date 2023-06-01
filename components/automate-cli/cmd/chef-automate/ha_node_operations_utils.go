@@ -502,7 +502,7 @@ func createCmdInputs(ip string, cmd string) *Cmd {
 			NodeIps:                  []string{ip},
 			Single:                   true,
 			NodeType:                 true,
-			SkipPrintOutput:          false,
+			SkipPrintOutput:          true,
 			HideSSHConnectionMessage: true,
 		},
 	}

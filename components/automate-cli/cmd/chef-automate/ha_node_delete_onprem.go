@@ -99,6 +99,11 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		}
 	}
 
+	// If the node is successfully remove, delete the machine
+	if err == nil {
+		dni.writer.Println("Node is successfully removed from the cluster. Please delete the machine manually.")
+	}
+
 	return err
 }
 
