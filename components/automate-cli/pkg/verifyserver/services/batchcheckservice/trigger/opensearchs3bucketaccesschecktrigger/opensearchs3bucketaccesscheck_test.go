@@ -188,11 +188,13 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				assert.NotNil(t, got[0].Result.Error.Error)
 				assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 				assert.Equal(t, tt.httpResponseCode, got[0].Result.Error.Code)
+				assert.Equal(t, "open-search-url", got[0].Host)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
 				assert.Equal(t, want, got)
 				assert.NotNil(t, got)
 				assert.Nil(t, got[0].Result.Error)
+				assert.Equal(t, "open-search-url", got[0].Host)
 			}
 
 		})
@@ -254,5 +256,43 @@ func getS3BackupOSRequest() models.S3BackupDetails {
 		SecretKey:  s3Properties.SecretKey,
 		AWSRegion:  s3Properties.AWSRegion,
 		AWSRoleArn: externalOs.OSRoleArn,
+	}
+}
+
+func Test_setHostAsOpensearchInResponse(t *testing.T) {
+	type args struct {
+		response      []models.CheckTriggerResponse
+		osExternalUrl string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{
+		{
+			name: "correct host",
+			args: args{
+				osExternalUrl: "test",
+				response: []models.CheckTriggerResponse{
+					{
+						Status:   "Passed",
+						NodeType: constants.OPENSEARCH,
+					},
+				},
+			},
+			want: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					NodeType: constants.OPENSEARCH,
+					Host:     "test",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := setHostAsOpensearchInResponse(tt.args.response, tt.args.osExternalUrl)
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }

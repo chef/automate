@@ -47,8 +47,8 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.Che
 
 // setHostAsOpensearchInResponse sets the Host as external OS endpoint as this will help us in mapping the result correctly
 func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExternalUrl string) []models.CheckTriggerResponse {
-	for _, resp := range response {
-		resp.Host = osExternalUrl
+	for i := range response {
+		response[i].Host = osExternalUrl
 
 	}
 	return response
