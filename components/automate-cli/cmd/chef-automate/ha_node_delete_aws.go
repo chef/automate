@@ -101,17 +101,16 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	}
 
 	err = dna.runDeploy()
-	if err != nil {
-		fmt.Println("Error occurred while deploying: ", err)
-	}
-
 	currentCount, newErr := dna.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
-		return newErr
+		return errors.Wrap(err, newErr.Error())
 	}
 
 	if currentCount == previousCount-1 {
-		return dna.stopNodes()
+		stopErr := dna.stopNodes()
+		if stopErr != nil {
+			return errors.Wrap(err, stopErr.Error())
+		}
 	}
 
 	return err

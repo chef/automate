@@ -87,17 +87,16 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 	}
 
 	err = dni.runDeploy()
-	if err != nil {
-		fmt.Println("Error occurred while deploying: ", err)
-	}
-
 	currentCount, newErr := dni.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
-		return newErr
+		return errors.Wrap(err, newErr.Error())
 	}
 
 	if currentCount == previousCount-1 {
-		return dni.stopNodes()
+		stopErr := dni.stopNodes()
+		if stopErr != nil {
+			return errors.Wrap(err, stopErr.Error())
+		}
 	}
 
 	return err
