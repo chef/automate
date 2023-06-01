@@ -142,32 +142,8 @@ func validateUrl(value string, keyName string, errorList *list.List) {
 	}
 }
 
-func validateConfigFile(configFile string, errorList *list.List) {
-	if configFile != "configs/automate.toml" {
-		errorList.PushBack("invalid config_file value it has to be configs/automate.toml")
-	}
-}
-
-func checkForS3BackupConfig(c *HaDeployConfig, errorList *list.List) {
-	if c.Architecture.Aws.BackupConfig == "s3" {
-		checkForValidS3Bucket(c.Architecture.Aws, errorList)
-	}
-}
-
-func checkManagedServicesBackupConfig(c *HaDeployConfig, errorList *list.List) {
-	if c.Architecture.Aws.BackupConfig != "s3" {
-		errorList.PushBack("Invalid backup_config. Only 's3' is supported.")
-	}
-}
-
-func checkNonManagedServicesBackupConfig(c *HaDeployConfig, errorList *list.List) {
-	if c.Architecture.Aws.BackupConfig != "efs" && c.Architecture.Aws.BackupConfig != "s3" {
-		errorList.PushBack("Invalid backup_config. It should be 'efs' or 's3'.")
-	}
-}
-
-func checkForValidS3Bucket(configInitials *ConfigInitials, errorList *list.List) {
-	if configInitials.BackupConfig == "s3" && len(strings.TrimSpace(configInitials.S3BucketName)) < 1 {
+func checkForValidS3Bucket(c *HaDeployConfig, errorList *list.List) {
+	if c.Architecture.Aws.BackupConfig == "s3" && len(strings.TrimSpace(c.Architecture.Aws.S3BucketName)) < 1 {
 		errorList.PushBack("Invalid or empty s3_bucketName.")
 	}
 }

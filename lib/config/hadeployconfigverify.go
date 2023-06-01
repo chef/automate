@@ -76,11 +76,11 @@ func (c *HaDeployConfig) validateExistingInfraBackupConfig(errorList *list.List)
 
 func (c *HaDeployConfig) validateAwsBackupConfig(errorList *list.List) {
 	// validate aws backup config
-	checkForS3BackupConfig(c, errorList)
+	checkForValidS3Bucket(c, errorList)
 	if c.Aws.Config.SetupManagedServices {
-		checkManagedServicesBackupConfig(c, errorList)
+		validateRequiredStringTypeField(c.Architecture.Aws.BackupConfig, "backup_config", errorList, "s3")
 	} else {
-		checkNonManagedServicesBackupConfig(c, errorList)
+		validateRequiredStringTypeField(c.Architecture.Aws.BackupConfig, "backup_config", errorList, "s3", "efs")
 	}
 }
 
@@ -98,7 +98,7 @@ func (c *HaDeployConfig) verifyAutomateSettings(errorList *list.List) {
 	validateAutomateAdminPassword(automateSettings, errorList)
 	validateRequiredNumberField(automateSettings.InstanceCount, "automate instance_count", errorList)
 	validateRequiredBooleanField(automateSettings.EnableCustomCerts, "automate enable_custom_certs", errorList)
-	validateConfigFile(automateSettings.ConfigFile, errorList)
+	validateRequiredStringTypeField(automateSettings.ConfigFile, "config_file", errorList, "configs/automate.toml")
 	validateNumberField(automateSettings.TeamsPort, "teams_port", errorList)
 	if automateSettings.EnableCustomCerts {
 		validateAutomateCerts(automateSettings, errorList)
