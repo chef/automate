@@ -348,13 +348,13 @@ func TestOpensearchCheck_Run(t *testing.T) {
 
 			if tt.isError {
 				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, constants.LOCAL_HOST, got[0].Host)
+				assert.Equal(t, constants.LOCALHOST, got[0].Host)
 				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 				assert.Equal(t, tt.httpStatusCode, got[0].Result.Error.Code)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
 				assert.Nil(t, got[0].Result.Error)
-				assert.Equal(t, constants.LOCAL_HOST, got[0].Host)
+				assert.Equal(t, constants.LOCALHOST, got[0].Host)
 				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 				assert.Equal(t, want, got)
 			}

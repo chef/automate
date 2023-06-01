@@ -152,3 +152,17 @@ type FirewallRequest struct {
 	Key                        string `json:"key"`
 	RootCert                   string `json:"root_cert"`
 }
+
+type NFSMountCheckResponse struct {
+	Status string             `json:"status"`
+	Result []NFSMountResponse `json:"result"`
+}
+
+type FqdnRequest struct {
+	Fqdn              string   `json:"fqdn"`
+	RootCert          string   `json:"root_cert"`
+	IsAfterDeployment bool     `json:"is_after_deployment"`
+	Nodes             []string `json:"nodes"`
+	ApiToken          string   `json:"api_token"`
+	NodeType          string   `json:"node_type"`
+}
