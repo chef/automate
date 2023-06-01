@@ -12,4 +12,5 @@ const (
 	postgreSql          = "postgresql"
 	INVALID_EMPTY_VALUE = "Invalid or empty %s"
 	INVALID_STRING_TYPE = "	invalid string type %s"
+	INVALID_FIELD_VALUE = "Invalid %s: %s"
 )
