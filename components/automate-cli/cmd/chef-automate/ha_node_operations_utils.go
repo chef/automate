@@ -402,6 +402,11 @@ func (nu *NodeUtilsImpl) excludeOpenSearchNode(ipToDelete string, infra *Automat
 	if err != nil {
 		return err
 	}
+
+	if strings.Contains(existingIps, ipToDelete) {
+		return errors.New("Node is already excluded from the cluster")
+	}
+
 	if existingIps != "" {
 		ipToDelete = existingIps + "," + ipToDelete
 	}
@@ -424,13 +429,20 @@ func (nu *NodeUtilsImpl) excludeOpenSearchNode(ipToDelete string, infra *Automat
 
 func (nu *NodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
 	nodeMap := &NodeTypeAndCmd{
-		Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
-		Automate:   createCmdInputs(automateIp, GET_OPENSEARCH_CLUSTER_SETTINGS),
+		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate: &Cmd{CmdInputs: &CmdInputs{
+			Cmd:                      GET_OPENSEARCH_CLUSTER_SETTINGS,
+			NodeIps:                  []string{automateIp},
+			Single:                   true,
+			NodeType:                 true,
+			SkipPrintOutput:          true,
+			HideSSHConnectionMessage: true}},
 		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
 		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
 		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
 		Infra:      infra,
 	}
+
 	out, err := nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
 	if err != nil {
 		return "", err
