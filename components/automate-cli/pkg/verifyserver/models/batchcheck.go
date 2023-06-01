@@ -1,6 +1,8 @@
 package models
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 type BatchCheckRequest struct {
 	Checks []string `json:"checks"`
@@ -164,4 +166,9 @@ type FqdnRequest struct {
 	IsAfterDeployment bool     `json:"is_after_deployment"`
 	Nodes             []string `json:"nodes"`
 	NodeType          string   `json:"node_type"`
+}
+type CheckAndType struct {
+	CheckType string `json:"check_type"`
+	CheckName string `json:"check_name"`
+	CheckMsg  string `json:"check_msg"`
 }

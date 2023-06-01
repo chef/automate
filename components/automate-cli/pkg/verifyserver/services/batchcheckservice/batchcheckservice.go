@@ -40,9 +40,13 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		}
 		defer close(bastionCheckResultChan)
 	}
+
 	if len(remoteChecks) > 0 {
 		for _, check := range remoteChecks {
 			resp := ss.RunRemoteCheck(check, config)
+			for ind, _ := range resp {
+				resp[ind].CheckType = check
+			}
 			checkTriggerRespMap[check] = resp
 		}
 	}
@@ -181,5 +185,80 @@ func checkMsg(check string) string {
 		return constants.NFS_BACKUP_CONFIG_MSG
 	default:
 		return ""
+	}
+}
+
+func CheckAndTypeInit(cType string) []models.CheckAndType {
+	if cType == "bastion" {
+		return []models.CheckAndType{
+			{
+				CheckType: "bastion",
+				CheckName: constants.HARDWARE_RESOURCE_COUNT,
+				CheckMsg:  constants.HARDWARE_RESOURCE_COUNT_MSG,
+			},
+			{
+				CheckType: "bastion",
+				CheckName: constants.CERTIFICATE,
+				CheckMsg:  constants.CERTIFICATE_MSG,
+			},
+			{
+				CheckType: "bastion",
+				CheckName: constants.SSH_USER,
+				CheckMsg:  constants.SSH_USER_MSG,
+			},
+		}
+	}
+
+	return []models.CheckAndType{
+		{
+			CheckType: "remote",
+			CheckName: constants.SYSTEM_RESOURCES,
+			CheckMsg:  constants.SYSTEM_RESOURCES_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.SOFTWARE_VERSIONS,
+			CheckMsg:  constants.SOFTWARE_VERSIONS_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.SYSTEM_USER,
+			CheckMsg:  constants.SYSTEM_USER_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.S3_BACKUP_CONFIG,
+			CheckMsg:  constants.S3_BACKUP_CONFIG_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.FQDN,
+			CheckMsg:  constants.FQDN_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.FIREWALL,
+			CheckMsg:  constants.FIREWALL_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.EXTERNAL_OPENSEARCH,
+			CheckMsg:  constants.EXTERNAL_OPENSEARCH_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+			CheckMsg:  constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.EXTERNAL_POSTGRESQL,
+			CheckMsg:  constants.EXTERNAL_POSTGRESQL_MSG,
+		},
+		{
+			CheckType: "remote",
+			CheckName: constants.NFS_BACKUP_CONFIG,
+			CheckMsg:  constants.NFS_BACKUP_CONFIG_MSG,
+		},
 	}
 }
