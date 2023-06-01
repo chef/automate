@@ -35,7 +35,7 @@ const (
 		}
 	}`
 
-	externalPostgresqlResponseSuccessExpected = `[
+	externalPostgresqlResponseSuccessAutomateExpected = `[
 		{
 			"status": "SUCCESS",
 			"node_type" :"automate",
@@ -57,42 +57,6 @@ const (
 		{
 			"status": "SUCCESS",
 			"node_type" :"automate",
-			"result": {
-			  "passed": true,
-			  "checks": [
-				{
-				  "title": "Connection successfully tested",
-				  "passed": true,
-				  "status": "PASS",
-				  "success_msg": "Machine is able to connect with External Managed Postgres",
-				  "error_msg": "",
-				  "resolution_msg": "",
-				  "debug_msg": ""
-				}
-			  ]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"node_type" :"chef-infra-server",
-			"result": {
-			  "passed": true,
-			  "checks": [
-				{
-				  "title": "Connection successfully tested",
-				  "passed": true,
-				  "status": "PASS",
-				  "success_msg": "Machine is able to connect with External Managed Postgres",
-				  "error_msg": "",
-				  "resolution_msg": "",
-				  "debug_msg": ""
-				}
-			  ]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"node_type" :"chef-infra-server",
 			"result": {
 			  "passed": true,
 			  "checks": [
@@ -110,6 +74,43 @@ const (
 		}
 		]
 	  `
+	externalPostgresqlResponseSuccessChefServerExpected = `[
+	  {
+		  "status": "SUCCESS",
+		  "node_type" :"chef-infra-server",
+		  "result": {
+			"passed": true,
+			"checks": [
+			  {
+				"title": "Connection successfully tested",
+				"passed": true,
+				"status": "PASS",
+				"success_msg": "Machine is able to connect with External Managed Postgres",
+				"error_msg": "",
+				"resolution_msg": "",
+				"debug_msg": ""
+			  }
+			]
+		  }
+	  },
+	  {
+		  "status": "SUCCESS",
+		  "node_type" :"chef-infra-server",
+		  "result": {
+			"passed": true,
+			"checks": [
+			  {
+				"title": "Connection successfully tested",
+				"passed": true,
+				"status": "PASS",
+				"success_msg": "Machine is able to connect with External Managed Postgres",
+				"error_msg": "",
+				"resolution_msg": "",
+				"debug_msg": ""
+			  }
+			]
+		  }
+	  }]`
 	externalPostgresqlResponseFailure = `
 	{
 		"status": "SUCCESS",
@@ -130,7 +131,7 @@ const (
 	}
 	
 	`
-	externalPostgresqlResponseFailureExpected = `[
+	externalPostgresqlResponseFailureAutomateExpected = `[
 	{
 		"status": "SUCCESS",
 		"node_type" :"automate",
@@ -152,42 +153,6 @@ const (
 	{
 		"status": "SUCCESS",
 		"node_type" :"automate",
-		"result": {
-		  "passed": false,
-		  "checks": [
-			{
-			  "title": "Postgres Connection failed",
-			  "passed": false,
-			  "status": "PASS",
-			  "success_msg": "",
-			  "error_msg": "Machine is unable to connect with External Managed Postgres",
-			  "resolution_msg": "Ensure that the Postgres configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
-			  "debug_msg": ""
-			}
-		  ]
-		}
-	},
-	{
-		"status": "SUCCESS",
-		"node_type" :"chef-infra-server",
-		"result": {
-		  "passed": false,
-		  "checks": [
-			{
-			  "title": "Postgres Connection failed",
-			  "passed": false,
-			  "status": "PASS",
-			  "success_msg": "",
-			  "error_msg": "Machine is unable to connect with External Managed Postgres",
-			  "resolution_msg": "Ensure that the Postgres configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
-			  "debug_msg": ""
-			}
-		  ]
-		}
-	},
-	{
-		"status": "SUCCESS",
-		"node_type" :"chef-infra-server",
 		"result": {
 		  "passed": false,
 		  "checks": [
@@ -204,6 +169,44 @@ const (
 		}
 	}
 	]`
+
+	externalPostgresqlResponseFailureChefServerExpected = `[
+	{
+		"status": "SUCCESS",
+		"node_type" :"chef-infra-server",
+		"result": {
+		  "passed": false,
+		  "checks": [
+			{
+			  "title": "Postgres Connection failed",
+			  "passed": false,
+			  "status": "PASS",
+			  "success_msg": "",
+			  "error_msg": "Machine is unable to connect with External Managed Postgres",
+			  "resolution_msg": "Ensure that the Postgres configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
+			  "debug_msg": ""
+			}
+		  ]
+		}
+	},
+	{
+		"status": "SUCCESS",
+		"node_type" :"chef-infra-server",
+		"result": {
+		  "passed": false,
+		  "checks": [
+			{
+			  "title": "Postgres Connection failed",
+			  "passed": false,
+			  "status": "PASS",
+			  "success_msg": "",
+			  "error_msg": "Machine is unable to connect with External Managed Postgres",
+			  "resolution_msg": "Ensure that the Postgres configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
+			  "debug_msg": ""
+			}
+		  ]
+		}
+	}]`
 	postgresqlInstanceUrl       = "https://abc.com:5432"
 	postgresqlSuperUserUserName = "postgres"
 	postgresqlSuperUserPassword = "Chefautomate"
@@ -226,7 +229,7 @@ func getRequest() models.ExternalPgRequest {
 
 }
 
-func TestPostgresCheck_Run(t *testing.T) {
+func TestPostgresCheckAutomate_Run(t *testing.T) {
 	type args struct {
 		config models.Config
 	}
@@ -247,8 +250,7 @@ func TestPostgresCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
@@ -260,7 +262,7 @@ func TestPostgresCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: externalPostgresqlResponseSuccessExpected,
+			response: externalPostgresqlResponseSuccessAutomateExpected,
 		},
 
 		{
@@ -271,8 +273,7 @@ func TestPostgresCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
@@ -284,7 +285,7 @@ func TestPostgresCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: externalPostgresqlResponseFailureExpected,
+			response: externalPostgresqlResponseFailureAutomateExpected,
 		},
 		{
 			name:           "Internal Server Error",
@@ -294,8 +295,7 @@ func TestPostgresCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
@@ -317,8 +317,7 @@ func TestPostgresCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalPG: models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
@@ -345,7 +344,6 @@ func TestPostgresCheck_Run(t *testing.T) {
 			)
 
 			tt.args.config.Hardware.AutomateNodeIps = []string{host, host}
-			tt.args.config.Hardware.ChefInfraServerNodeIps = []string{host, host}
 
 			json.Unmarshal([]byte(tt.response), &want)
 			for i := range want {
@@ -369,6 +367,99 @@ func TestPostgresCheck_Run(t *testing.T) {
 
 		})
 	}
+}
+
+func TestForChefserverPostgres(t *testing.T) {
+	t.Run("ChefServer Postgres check pass", func(t *testing.T) {
+		var want []models.CheckTriggerResponse
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				ChefInfraServerNodeCount: 2,
+			},
+			ExternalPG: models.ExternalPG{
+				PGInstanceURL:       postgresqlInstanceUrl,
+				PGSuperuserName:     postgresqlSuperUserUserName,
+				PGSuperuserPassword: postgresqlSuperUserPassword,
+				PGDbUserName:        postgresqlDbUserUserName,
+				PGDbUserPassword:    postgresqlDbUserPassword,
+				PGRootCert:          postgresqlRootCert,
+			},
+		}
+		isError := false
+		server, host, port := createDummyServer(t, http.StatusOK, true)
+		defer server.Close()
+		svc := NewExternalPostgresCheck(
+			logger.NewLogrusStandardLogger(),
+			port,
+		)
+		config.Hardware.ChefInfraServerNodeIps = []string{host, host}
+
+		json.Unmarshal([]byte(externalPostgresqlResponseSuccessChefServerExpected), &want)
+		for i := range want {
+			want[i].Host = host
+		}
+
+		got := svc.Run(config)
+		isError = false
+		if isError {
+			assert.NotNil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, http.StatusOK, got[0].Result.Error.Code)
+			assert.Equal(t, externalPostgresqlResponseSuccessChefServerExpected, got[0].Result.Error.Error())
+		} else {
+			assert.Nil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, want, got)
+		}
+	})
+	t.Run("ChefServer Postgres check fail", func(t *testing.T) {
+		var want []models.CheckTriggerResponse
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				ChefInfraServerNodeCount: 2,
+			},
+			ExternalPG: models.ExternalPG{
+				PGInstanceURL:       postgresqlInstanceUrl,
+				PGSuperuserName:     postgresqlSuperUserUserName,
+				PGSuperuserPassword: postgresqlSuperUserPassword,
+				PGDbUserName:        postgresqlDbUserUserName,
+				PGDbUserPassword:    postgresqlDbUserPassword,
+				PGRootCert:          postgresqlRootCert,
+			},
+		}
+		isError := false
+		server, host, port := createDummyServer(t, http.StatusOK, false)
+		defer server.Close()
+		svc := NewExternalPostgresCheck(
+			logger.NewLogrusStandardLogger(),
+			port,
+		)
+		config.Hardware.ChefInfraServerNodeIps = []string{host, host}
+
+		json.Unmarshal([]byte(externalPostgresqlResponseFailureChefServerExpected), &want)
+		for i := range want {
+			want[i].Host = host
+		}
+
+		got := svc.Run(config)
+		isError = false
+		if isError {
+			assert.NotNil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, http.StatusOK, got[0].Result.Error.Code)
+			assert.Equal(t, externalPostgresqlResponseFailureChefServerExpected, got[0].Result.Error.Error())
+		} else {
+			assert.Nil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, want, got)
+		}
+	})
 }
 
 // Helper function to create a dummy server

@@ -30,7 +30,7 @@ func (epc *ExternalPostgresCheck) Run(config models.Config) []models.CheckTrigge
 func runCheckForPostgresql(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Postgresql check for automate and chef server nodes")
 	req := getPostgresRequest(config.ExternalPG)
-	var result, result2 []models.CheckTriggerResponse
+	var result []models.CheckTriggerResponse
 	outputCh := make(chan models.CheckTriggerResponse)
 	count := 0
 	for _, ip := range config.Hardware.AutomateNodeIps {
@@ -50,13 +50,8 @@ func runCheckForPostgresql(config models.Config, port string, log logger.Logger)
 
 	for i := 0; i < count; i++ {
 		res := <-outputCh
-		if res.NodeType == "automate" {
-			result = append(result, res)
-		} else if res.NodeType == "chef-infra-server" {
-			result2 = append(result2, res)
-		}
+		result = append(result, res)
 	}
-	result = append(result, result2...)
 
 	close(outputCh)
 	return result

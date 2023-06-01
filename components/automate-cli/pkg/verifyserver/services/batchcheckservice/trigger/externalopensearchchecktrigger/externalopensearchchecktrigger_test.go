@@ -34,7 +34,7 @@ const (
 		}
 	  }`
 
-	externalOpensearchResponseSuccessExpected = `[
+	externalOpensearchResponseSuccessAutomateExpected = `[
 		{
 			"status": "SUCCESS",
 			"node_type" :"automate",
@@ -56,42 +56,6 @@ const (
 		{
 			"status": "SUCCESS",
 			"node_type" :"automate",
-			"result": {
-			  "passed": true,
-			  "checks": [
-				{
-				  "title": "Connection successfully tested",
-				  "passed": true,
-				  "status": "PASS",
-				  "success_msg": "Machine is able to connect with External Managed OpenSeach",
-				  "error_msg": "",
-				  "resolution_msg": "",
-				  "debug_msg": ""
-				}
-			  ]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"node_type" :"chef-infra-server",
-			"result": {
-			  "passed": true,
-			  "checks": [
-				{
-				  "title": "Connection successfully tested",
-				  "passed": true,
-				  "status": "PASS",
-				  "success_msg": "Machine is able to connect with External Managed OpenSeach",
-				  "error_msg": "",
-				  "resolution_msg": "",
-				  "debug_msg": ""
-				}
-			  ]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"node_type" :"chef-infra-server",
 			"result": {
 			  "passed": true,
 			  "checks": [
@@ -109,6 +73,44 @@ const (
 		}
 		]
 	  `
+
+	externalOpensearchResponseSuccessChefServerExpected = `[
+	{
+		"status": "SUCCESS",
+		"node_type" :"chef-infra-server",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{
+			  "title": "Connection successfully tested",
+			  "passed": true,
+			  "status": "PASS",
+			  "success_msg": "Machine is able to connect with External Managed OpenSeach",
+			  "error_msg": "",
+			  "resolution_msg": "",
+			  "debug_msg": ""
+			}
+		  ]
+		}
+	},
+	{
+		"status": "SUCCESS",
+		"node_type" :"chef-infra-server",
+		"result": {
+		  "passed": true,
+		  "checks": [
+			{
+			  "title": "Connection successfully tested",
+			  "passed": true,
+			  "status": "PASS",
+			  "success_msg": "Machine is able to connect with External Managed OpenSeach",
+			  "error_msg": "",
+			  "resolution_msg": "",
+			  "debug_msg": ""
+			}
+		  ]
+		}
+	}]`
 	externalOpensearchResponseFailure = `
 	{
 		"status": "SUCCESS",
@@ -129,7 +131,7 @@ const (
 	}
 	
 	`
-	externalOpensearchResponseFailureExpected = `[
+	externalOpensearchResponseFailureAutomateExpected = `[
 		{
 			"status": "SUCCESS",
 			"node_type" :"automate",
@@ -151,42 +153,6 @@ const (
 		{
 			"status": "SUCCESS",
 			"node_type" :"automate",
-			"result": {
-			  "passed": false,
-			  "checks": [
-				{
-				  "title": "OpenSearch Connection failed",
-				  "passed": false,
-				  "status": "PASS",
-				  "success_msg": "",
-				  "error_msg": "Machine is unable to connect with External Managed OpenSeach",
-				  "resolution_msg": "Ensure that the OpenSearch configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
-				  "debug_msg": ""
-				}
-			  ]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"node_type" :"chef-infra-server",
-			"result": {
-			  "passed": false,
-			  "checks": [
-				{
-				  "title": "OpenSearch Connection failed",
-				  "passed": false,
-				  "status": "PASS",
-				  "success_msg": "",
-				  "error_msg": "Machine is unable to connect with External Managed OpenSeach",
-				  "resolution_msg": "Ensure that the OpenSearch configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
-				  "debug_msg": ""
-				}
-			  ]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"node_type" :"chef-infra-server",
 			"result": {
 			  "passed": false,
 			  "checks": [
@@ -203,6 +169,44 @@ const (
 			}
 		}
 	]`
+
+	externalOpensearchResponseFailureChefServerExpected = `[
+	{
+		"status": "SUCCESS",
+		"node_type" :"chef-infra-server",
+		"result": {
+		  "passed": false,
+		  "checks": [
+			{
+			  "title": "OpenSearch Connection failed",
+			  "passed": false,
+			  "status": "PASS",
+			  "success_msg": "",
+			  "error_msg": "Machine is unable to connect with External Managed OpenSeach",
+			  "resolution_msg": "Ensure that the OpenSearch configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
+			  "debug_msg": ""
+			}
+		  ]
+		}
+	},
+	{
+		"status": "SUCCESS",
+		"node_type" :"chef-infra-server",
+		"result": {
+		  "passed": false,
+		  "checks": [
+			{
+			  "title": "OpenSearch Connection failed",
+			  "passed": false,
+			  "status": "PASS",
+			  "success_msg": "",
+			  "error_msg": "Machine is unable to connect with External Managed OpenSeach",
+			  "resolution_msg": "Ensure that the OpenSearch configuration provided is correct. Review security group or firewall settings as well on the infrastructure",
+			  "debug_msg": ""
+			}
+		  ]
+		}
+	}]`
 
 	osDomainName   = "opensearch_managed"
 	osDomainURL    = "https://opensearchdomain.com"
@@ -243,8 +247,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalOS: models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -255,7 +258,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: externalOpensearchResponseSuccessExpected,
+			response: externalOpensearchResponseSuccessAutomateExpected,
 		},
 
 		{
@@ -266,8 +269,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalOS: models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -278,7 +280,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: externalOpensearchResponseFailureExpected,
+			response: externalOpensearchResponseFailureAutomateExpected,
 		},
 		{
 			name:           "Internal Server Error",
@@ -288,8 +290,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalOS: models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -310,8 +311,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
-						AutomateNodeCount:        2,
-						ChefInfraServerNodeCount: 2,
+						AutomateNodeCount: 2,
 					},
 					ExternalOS: models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -337,7 +337,6 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			)
 
 			tt.args.config.Hardware.AutomateNodeIps = []string{host, host}
-			tt.args.config.Hardware.ChefInfraServerNodeIps = []string{host, host}
 
 			json.Unmarshal([]byte(tt.response), &want)
 			for i := range want {
@@ -361,6 +360,95 @@ func TestOpensearchCheck_Run(t *testing.T) {
 
 		})
 	}
+}
+
+func TestForChefserverOpensearch(t *testing.T) {
+	t.Run("ChefServer Opensearch check pass", func(t *testing.T) {
+		var want []models.CheckTriggerResponse
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				ChefInfraServerNodeCount: 2,
+			},
+			ExternalOS: models.ExternalOS{
+				OSDomainName:   osDomainName,
+				OSDomainURL:    osDomainURL,
+				OSUsername:     osUsername,
+				OSUserPassword: osUserPassword,
+				OSCert:         osCert,
+			},
+		}
+		isError := false
+		server, host, port := createDummyServer(t, http.StatusOK, true)
+		defer server.Close()
+		svc := NewExternalOpensearchCheck(
+			logger.NewLogrusStandardLogger(),
+			port,
+		)
+		config.Hardware.ChefInfraServerNodeIps = []string{host, host}
+
+		json.Unmarshal([]byte(externalOpensearchResponseSuccessChefServerExpected), &want)
+		for i := range want {
+			want[i].Host = host
+		}
+
+		got := svc.Run(config)
+		if isError {
+			assert.NotNil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, http.StatusOK, got[0].Result.Error.Code)
+			assert.Equal(t, externalOpensearchResponseSuccessChefServerExpected, got[0].Result.Error.Error())
+		} else {
+			assert.Nil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, want, got)
+		}
+	})
+	t.Run("ChefServer Opensearch check fail", func(t *testing.T) {
+		var want []models.CheckTriggerResponse
+
+		config := models.Config{
+			Hardware: models.Hardware{
+				ChefInfraServerNodeCount: 2,
+			},
+			ExternalOS: models.ExternalOS{
+				OSDomainName:   osDomainName,
+				OSDomainURL:    osDomainURL,
+				OSUsername:     osUsername,
+				OSUserPassword: osUserPassword,
+				OSCert:         osCert,
+			},
+		}
+		isError := false
+		server, host, port := createDummyServer(t, http.StatusOK, false)
+		defer server.Close()
+		svc := NewExternalOpensearchCheck(
+			logger.NewLogrusStandardLogger(),
+			port,
+		)
+		config.Hardware.ChefInfraServerNodeIps = []string{host, host}
+
+		json.Unmarshal([]byte(externalOpensearchResponseFailureChefServerExpected), &want)
+		for i := range want {
+			want[i].Host = host
+		}
+
+		got := svc.Run(config)
+		if isError {
+			assert.NotNil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, http.StatusOK, got[0].Result.Error.Code)
+			assert.Equal(t, externalOpensearchResponseFailureChefServerExpected, got[0].Result.Error.Error())
+		} else {
+			assert.Nil(t, got[0].Result.Error)
+			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
+			assert.Equal(t, want, got)
+		}
+	})
 }
 
 // Helper function to create a dummy server

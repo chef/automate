@@ -29,7 +29,7 @@ func (eoc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTrig
 func runCheckForOpensearch(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Opensearch check for automate and chef server nodes")
 	req := getOpensearchRequest(config.ExternalOS)
-	var resultA2, resultCS []models.CheckTriggerResponse
+	var resultChan []models.CheckTriggerResponse
 	outCh := make(chan models.CheckTriggerResponse)
 	count := 0
 	for _, ip := range config.Hardware.AutomateNodeIps {
@@ -49,16 +49,11 @@ func runCheckForOpensearch(config models.Config, port string, log logger.Logger)
 
 	for i := 0; i < count; i++ {
 		result := <-outCh
-		if result.NodeType == "automate" {
-			resultA2 = append(resultA2, result)
-		} else if result.NodeType == "chef-infra-server" {
-			resultCS = append(resultCS, result)
-		}
+		resultChan = append(resultChan, result)
 	}
-	resultA2 = append(resultA2, resultCS...)
 
 	close(outCh)
-	return resultA2
+	return resultChan
 
 }
 
