@@ -21,4 +21,5 @@ const (
 	EXTERNAL_OPENSEARCH_API_PATH             = "/api/v1/checks/external-opensearch"
 	EXTERNAL_POSTGRESQL_API_PATH             = "/api/v1/checks/external-postgresql"
 	STATUS_API_PATH                          = "/status"
+	START_MOCK_SERVER                        = "/api/v1/start/mock-server"
 )

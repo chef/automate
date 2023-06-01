@@ -19,7 +19,7 @@ import (
 
 func SetupMockBatchCheckService() batchcheckservice.IBatchCheckService {
 	return &batchcheckservice.MockBatchCheckService{
-		BatchCheckFunc: func(checks []string, config models.Config) models.BatchCheckResponse {
+		BatchCheckFunc: func(checks []string, config models.Config) (models.BatchCheckResponse, error) {
 			return models.BatchCheckResponse{
 				Status: "SUCCESS",
 				Result: []models.BatchCheckResult{
@@ -64,7 +64,7 @@ func SetupMockBatchCheckService() batchcheckservice.IBatchCheckService {
 						},
 					},
 				},
-			}
+			}, nil
 		},
 	}
 }

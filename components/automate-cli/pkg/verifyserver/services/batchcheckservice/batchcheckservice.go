@@ -3,6 +3,8 @@ package batchcheckservice
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -14,24 +16,36 @@ import (
 )
 
 type IBatchCheckService interface {
-	BatchCheck(checks []string, config models.Config) models.BatchCheckResponse
+	BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error)
+}
+
+type IStartMockServer interface {
+	StartMockServerOnHostAndPort(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error)
 }
 
 type BatchCheckService struct {
-	CheckTrigger trigger.CheckTrigger
-	port         string
-	log          logger.Logger
+	CheckTrigger     trigger.CheckTrigger
+	port             string
+	log              logger.Logger
+	mockServerClient IStartMockServer
+}
+
+type MockServerClient struct{}
+
+func NewMockServerClient() *MockServerClient {
+	return &MockServerClient{}
 }
 
 func NewBatchCheckService(trigger trigger.CheckTrigger, log logger.Logger, port string) *BatchCheckService {
 	return &BatchCheckService{
-		CheckTrigger: trigger,
-		port:         port,
-		log:          log,
+		CheckTrigger:     trigger,
+		port:             port,
+		log:              log,
+		mockServerClient: NewMockServerClient(),
 	}
 }
 
-func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) models.BatchCheckResponse {
+func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error) {
 	//batchApisResultMap := make(map[string][]models.ApiResult)
 	var bastionChecks = stringutils.SliceIntersection(checks, constants.GetBastionChecks())
 	var remoteChecks = stringutils.SliceIntersection(checks, constants.GetRemoteChecks())
@@ -43,62 +57,119 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 	}
 
 	if len(remoteChecks) > 0 {
-    		nodeTypePortMap := map[string]map[string][]int{
-    			constants.AUTOMATE: {
-    				constants.TCP:   []int{},
-    				constants.UDP:   []int{},
-    				constants.HTTPS: []int{},
-    			},
-    			constants.CHEF_INFRA_SERVER: {
-    				constants.TCP:   []int{},
-    				constants.UDP:   []int{},
-    				constants.HTTPS: []int{},
-    			},
-    			constants.POSTGRESQL: {
-    				constants.TCP:   []int{},
-    				constants.UDP:   []int{},
-    				constants.HTTPS: []int{},
-    			},
-    			constants.OPENSEARCH: {
-    				constants.TCP:   []int{},
-    				constants.UDP:   []int{},
-    				constants.HTTPS: []int{},
-    			},
-    		}
-    		for _, check := range remoteChecks {
-    			deploymentState, err := ss.GetDeploymentState()
-    			if err != nil {
-    				ss.log.Error("Error while calling status api from batch check service:", err)
-    			}
-    			startMockServer := shouldStartMockServer(deploymentState)
-    			if startMockServer {
-    				resp := ss.GetPortsToOpenForCheck(check)
-    				if len(resp) != 0 {
-    					constructUniquePortMap(resp, &nodeTypePortMap)
-    				}
-    			}
-    		}
-    	}
+		startMockServer, err := ss.shouldStartMockServer(remoteChecks)
+		if err != nil {
+			return models.BatchCheckResponse{}, err
+		}
+		if startMockServer {
+			ss.startMockServer(remoteChecks, config.Hardware)
+		}
+	}
 
-	// Get remote check trigger resp and append to checkTriggerRespMap (keys and values)
 	if len(remoteChecks) > 0 {
-		for key, value := range getRemoteCheckResp(ss, remoteChecks, config) {
-			checkTriggerRespMap[key] = value
+		for _, check := range remoteChecks {
+			resp := ss.RunRemoteCheck(check, config)
+			checkTriggerRespMap[check] = resp
 		}
 	}
 	// stop mock services
-	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...))
+	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...)), nil
+}
+
+func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string) (bool, error) {
+	deploymentState, err := ss.GetDeploymentState()
+	if err != nil {
+		ss.log.Error("Error while calling status api from batch check service:", err)
+		return false, err
+	}
+	return deploymentState == "pre_deploy", nil
+}
+
+func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDetails models.Hardware) {
+	nodeTypePortMap := map[string]map[string][]int{
+		constants.AUTOMATE: {
+			constants.TCP:   []int{},
+			constants.UDP:   []int{},
+			constants.HTTPS: []int{},
+		},
+		constants.CHEF_INFRA_SERVER: {
+			constants.TCP:   []int{},
+			constants.UDP:   []int{},
+			constants.HTTPS: []int{},
+		},
+		constants.POSTGRESQL: {
+			constants.TCP:   []int{},
+			constants.UDP:   []int{},
+			constants.HTTPS: []int{},
+		},
+		constants.OPENSEARCH: {
+			constants.TCP:   []int{},
+			constants.UDP:   []int{},
+			constants.HTTPS: []int{},
+		},
+	}
+	for _, check := range remoteChecks {
+		resp := ss.GetPortsToOpenForCheck(check)
+		if len(resp) != 0 {
+			constructUniquePortMap(resp, &nodeTypePortMap)
+		}
+	}
+	ipMap := map[string][]string{
+		constants.AUTOMATE:          hardwareDetails.AutomateNodeIps,
+		constants.CHEF_INFRA_SERVER: hardwareDetails.ChefInfraServerNodeIps,
+		constants.POSTGRESQL:        hardwareDetails.PostgresqlNodeIps,
+		constants.OPENSEARCH:        hardwareDetails.OpenSearchNodeIps,
+	}
+
+	nodeTypeAndIpWithPortProtocolMap := make(map[string]map[string][]int)
+	for nodeType, ipArray := range ipMap {
+		for _, ip := range ipArray {
+			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip] = make(map[string][]int)
+			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.TCP] = nodeTypePortMap[nodeType][constants.TCP]
+			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.UDP] = nodeTypePortMap[nodeType][constants.UDP]
+			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.HTTPS] = nodeTypePortMap[nodeType][constants.HTTPS]
+		}
+	}
+
+	fmt.Println(nodeTypeAndIpWithPortProtocolMap)
+
+	ipPortProtocolMap := make(map[string]bool)
+	//startMockServerChannel := make(chan []models.CheckTriggerResponse, len(bastionChecks))
+	for nodeTypeWithIp, protocolMap := range nodeTypeAndIpWithPortProtocolMap {
+		if len(protocolMap[constants.TCP]) != 0 {
+			for _, port := range protocolMap[constants.TCP] {
+				startMockServerRequestBody := models.StartMockServerRequestBody{
+					Port:     port,
+					Protocol: constants.TCP,
+					Cert:     "",
+					Key:      "",
+				}
+				host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
+				key := fmt.Sprint(host, "_", constants.TCP, "_", port)
+
+				if !ipPortProtocolMap[key] {
+					fmt.Println("Request triggered for", key)
+					go ss.mockServerClient.StartMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody)
+					ipPortProtocolMap[key] = true
+				}
+			}
+		}
+	}
+}
+
+func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) string {
+	return nodeTypeWithIp[strings.Index(nodeTypeWithIp, "_")+1:]
 }
 
 func constructUniquePortMap(resp map[string]map[string][]int, nodeTypePortMap *map[string]map[string][]int) {
-	nodeTypeMape := []string{
+	nodeTypeMap := []string{
 		constants.AUTOMATE,
 		constants.CHEF_INFRA_SERVER,
 		constants.POSTGRESQL,
 		constants.OPENSEARCH,
 	}
 
-	for _, nodeType := range nodeTypeMape {
+	for _, nodeType := range nodeTypeMap {
 		if resp[nodeType] != nil {
 			if resp[nodeType][constants.TCP] != nil {
 				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.TCP], (*nodeTypePortMap)[nodeType][constants.TCP])
@@ -114,13 +185,6 @@ func constructUniquePortMap(resp map[string]map[string][]int, nodeTypePortMap *m
 			}
 		}
 	}
-}
-
-func shouldStartMockServer(deploymentState string) bool {
-	if deploymentState == "pre_deploy" {
-		return true
-	}
-	return false
 }
 
 func getIndexOfCheck(checks []string, check string) (int, error) {
@@ -141,7 +205,7 @@ func (ss *BatchCheckService) GetPortsToOpenForCheck(check string) map[string]map
 
 func (ss *BatchCheckService) GetDeploymentState() (string, error) {
 	url := fmt.Sprintf("%s:%s%s", constants.LOCAL_HOST_URL, ss.port, constants.STATUS_API_PATH)
-	resp, err := httputils.MakeRequest("GET", url, nil)
+	resp, err := httputils.MakeRequest(http.MethodGet, url, nil)
 	if err != nil {
 		ss.log.Error("Error while calling status api from batch check service:", err)
 		return "", err
@@ -155,9 +219,23 @@ func (ss *BatchCheckService) GetDeploymentState() (string, error) {
 	if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
 		return "pre_deploy", nil
 	}
-	ss.log.Info("outside if")
 	return "post_deploy", nil
+}
 
+func (ss *MockServerClient) StartMockServerOnHostAndPort(host, port string, startMockServerRequestBody models.StartMockServerRequestBody) (string, error) {
+	fmt.Println("Received request to run mock server on host", host, "with body", startMockServerRequestBody)
+	url := fmt.Sprintf("%s%s:%s%s", "http://", host, port, constants.START_MOCK_SERVER)
+	fmt.Println("url for request", url)
+	resp, err := httputils.MakeRequest(http.MethodPost, url, startMockServerRequestBody)
+	if err != nil {
+		fmt.Println("error for request", err)
+		//ss.log.Error("Error while calling status api from batch check service:", err)
+		return "", err
+	}
+	if resp.StatusCode == http.StatusOK {
+		return "success", nil
+	}
+	return "failure", nil
 }
 
 func (ss *BatchCheckService) RunRemoteCheck(check string, config models.Config) []models.CheckTriggerResponse {
@@ -199,7 +277,7 @@ func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 
 func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTriggerResponse, checks []string) models.BatchCheckResponse {
 	ipMap := make(map[string][]models.CheckTriggerResponse)
-	
+
 	//Construct map with unique ip+nodeType keys to segregate the response
 	for checkName, checkResponses := range checkTriggerRespMap {
 		for _, checkResponse := range checkResponses {
@@ -217,7 +295,7 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		}
 	}
 
-	// Arranging the per map values in order in which we got the checks input. 
+	// Arranging the per map values in order in which we got the checks input.
 	// Example if certificate check is passed first as input then in final response certificate will come up then other checks
 	for k, v := range ipMap {
 		arr := []models.CheckTriggerResponse{}

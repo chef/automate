@@ -7,11 +7,19 @@ import (
 )
 
 type MockBatchCheckService struct {
-	BatchCheckFunc func([]string, models.Config) models.BatchCheckResponse
+	BatchCheckFunc func([]string, models.Config) (models.BatchCheckResponse, error)
 }
 
-func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Config) models.BatchCheckResponse {
+func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error) {
 	return mss.BatchCheckFunc(checks, config)
+}
+
+type MockStartServerBatchCheckService struct {
+	StartMockServerOnHostAndPortFunc func(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error)
+}
+
+func (mss *MockStartServerBatchCheckService) StartMockServerOnHostAndPort(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error) {
+	return mss.StartMockServerOnHostAndPortFunc(host, port, mockServerRequestBody)
 }
 
 type MockHardwareResourceCountCheck struct {

@@ -53,6 +53,22 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 			constants.TCP: []int{9200, 9300, 22, 9631, 9638},
 		},
 	}
+
+	// nodeTypePortMap := map[string]map[string][]int{
+	// 	constants.AUTOMATE: {
+	// 		constants.TCP: []int{9633},
+	// 	},
+	// 	constants.CHEF_INFRA_SERVER: {
+	// 		constants.TCP: []int{},
+	// 	},
+	// 	constants.POSTGRESQL: {
+	// 		constants.TCP: []int{},
+	// 		constants.UDP: []int{},
+	// 	},
+	// 	constants.OPENSEARCH: {
+	// 		constants.TCP: []int{},
+	// 	},
+	// }
 	return nodeTypePortMap
 }
 

@@ -2,14 +2,28 @@ package batchcheckservice
 
 import (
 	"encoding/json"
+	"fmt"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
+
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
+
+func SetupMockStartServerBatchCheckService() IStartMockServer {
+	return &MockStartServerBatchCheckService{
+		StartMockServerOnHostAndPortFunc: func(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error) {
+			return "hello", nil
+		},
+	}
+}
 
 func TestBatchCheckService(t *testing.T) {
 	tests := []struct {
@@ -20,16 +34,122 @@ func TestBatchCheckService(t *testing.T) {
 		externalOpenSearchMockedResponse []models.CheckTriggerResponse
 		externalPostgresMockedResponse   []models.CheckTriggerResponse
 		chefServerIpArray                []string
+		statusApiResponse                string
+		avoidSuccessResponse             bool
+		checkForError                    bool
 		expectedResponseForAutomateIp    string
 		expectedResponseFromChefServerIp string
 		expectedResponseForPostgresIp1   string
 		expectedResponseForPostgresIp2   string
 		expectedResponseForOpenSearchIp1 string
 		expectedResponseForOpenSearchIp2 string
+		mockServerPort                   string
 	}{
 		{
-			description:       "Batch check server success with automate and chef-server on same IP",
-			totalIpsCount:     6,
+			description:          "Batch check service returns error when status api fails",
+			totalIpsCount:        6,
+			chefServerIpArray:    []string{"1.2.3.4"},
+			avoidSuccessResponse: true,
+			checkForError:        true,
+			mockServerPort:       "1212",
+			statusApiResponse:    `{}`,
+			externalPostgresMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.7",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-1",
+							},
+							{
+								Title: "external-postgresql-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.8",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			description:          "Batch check service returns error when status api response body parse fails",
+			totalIpsCount:        6,
+			chefServerIpArray:    []string{"1.2.3.4"},
+			avoidSuccessResponse: true,
+			checkForError:        true,
+			mockServerPort:       "1234",
+			statusApiResponse:    `invalid JSON`,
+			externalPostgresMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.7",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-1",
+							},
+							{
+								Title: "external-postgresql-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.8",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			description:   "Batch check server success with automate and chef-server on same IP",
+			totalIpsCount: 6,
+			statusApiResponse: `{
+				"status": "SUCCESS",
+				"result": {
+					"status": "OK",
+					"services": [],
+					"error": "error getting services from hab svc status"
+				}
+			}`,
 			chefServerIpArray: []string{"1.2.3.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -526,10 +646,361 @@ func TestBatchCheckService(t *testing.T) {
 			expectedResponseForOpenSearchIp1: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.5\",\"tests\":[{\"passed\":false,\"msg\":\"External Opensearch Check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
 			expectedResponseForOpenSearchIp2: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.6\",\"tests\":[{\"passed\":true,\"msg\":\"External Opensearch Check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
 		},
+		{
+			description:       "Batch check server success with nodes on different ip",
+			totalIpsCount:     7,
+			chefServerIpArray: []string{"1.2.8.4"},
+			statusApiResponse: `{
+				"status": "SUCCESS",
+				"result": {
+					"status": "OK",
+					"services": [],
+					"error": "error getting services from hab svc status"
+				}
+			}`,
+			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.4",
+					NodeType: "automate",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   "hardware-resource-count",
+						Message: "Hardware Resource Count Check",
+						Checks: []models.Checks{
+							{
+								Title: "hardware-resource-check-1",
+							},
+							{
+								Title: "hardware-resource-check-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.8.4",
+					NodeType: "chef-infra-server",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   "hardware-resource-count",
+						Message: "Hardware Resource Count Check",
+						Checks: []models.Checks{
+							{
+								Title: "hardware-resource-check-1",
+							},
+							{
+								Title: "hardware-resource-check-2",
+							},
+						},
+					},
+				},
+			},
+			sshUserCheckMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.4",
+					NodeType: "automate",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.SSH_USER,
+						Message: "ssh-user-check",
+						Checks: []models.Checks{
+							{
+								Title: "ssh-user-check-1",
+							},
+							{
+								Title: "ssh-user-check-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.8.4",
+					NodeType: "chef-infra-server",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.SSH_USER,
+						Message: "ssh-user-check",
+						Checks: []models.Checks{
+							{
+								Title: "ssh-user-check-1",
+							},
+							{
+								Title: "ssh-user-check-2",
+							},
+						},
+					},
+				},
+			},
+			externalOpenSearchMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.5",
+					NodeType: "opensearch",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.EXTERNAL_OPENSEARCH,
+						Message: "external-opensearch-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-opensearch-1",
+							},
+							{
+								Title: "external-opensearch-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.6",
+					NodeType: "opensearch",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.EXTERNAL_OPENSEARCH,
+						Message: "external-opensearch-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-opensearch-check-1",
+							},
+							{
+								Title: "external-opensearch-check-2",
+							},
+						},
+					},
+				},
+			},
+			externalPostgresMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.7",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-1",
+							},
+							{
+								Title: "external-postgresql-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.8",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			},
+			expectedResponseForAutomateIp:    "{\"node_type\":\"automate\",\"ip\":\"1.2.3.4\",\"tests\":[{\"passed\":false,\"msg\":\"ssh-user-check\",\"check\":\"ssh-user\",\"checks\":[{\"title\":\"ssh-user-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"ssh-user-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]},{\"passed\":true,\"msg\":\"Hardware Resource Count Check\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"hardware-resource-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]},{\"passed\":false,\"msg\":\"certificate-check\",\"check\":\"certificate\",\"checks\":[{\"title\":\"certificate-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"certificate-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseFromChefServerIp: "{\"node_type\":\"chef-infra-server\",\"ip\":\"1.2.8.4\",\"tests\":[{\"passed\":true,\"msg\":\"ssh-user-check\",\"check\":\"ssh-user\",\"checks\":[{\"title\":\"ssh-user-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"ssh-user-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]},{\"passed\":true,\"msg\":\"Hardware Resource Count Check\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"hardware-resource-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForPostgresIp1:   "{\"node_type\":\"postgresql\",\"ip\":\"1.2.3.7\",\"tests\":[{\"passed\":false,\"msg\":\"external-postgresql-check\",\"check\":\"external-postgresql\",\"checks\":[{\"title\":\"external-postgresql-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-postgresql-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForPostgresIp2:   "{\"node_type\":\"postgresql\",\"ip\":\"1.2.3.8\",\"tests\":[{\"passed\":true,\"msg\":\"external-postgresql-check\",\"check\":\"external-postgresql\",\"checks\":[{\"title\":\"external-postgresql-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-postgresql-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForOpenSearchIp1: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.5\",\"tests\":[{\"passed\":false,\"msg\":\"external-opensearch-check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForOpenSearchIp2: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.6\",\"tests\":[{\"passed\":true,\"msg\":\"external-opensearch-check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+		},
+		{
+			description:       "Batch check server success with error on some nodes",
+			totalIpsCount:     7,
+			chefServerIpArray: []string{"1.2.8.4"},
+			statusApiResponse: `{
+				"status": "SUCCESS",
+				"result": {
+					"status": "OK",
+					"services": [],
+					"error": "error getting services from hab svc status"
+				}
+			}`,
+			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Failed",
+					Host:     "1.2.3.4",
+					NodeType: "automate",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   "hardware-resource-count",
+						Message: "Hardware Resource Count Check",
+						Checks:  []models.Checks{},
+						Error:   fiber.NewError(fiber.StatusServiceUnavailable, "Error while Performing Hardware resource count check from batch Check API"),
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.8.4",
+					NodeType: "chef-infra-server",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   "hardware-resource-count",
+						Message: "Hardware Resource Count Check",
+						Checks: []models.Checks{
+							{
+								Title: "hardware-resource-check-1",
+							},
+							{
+								Title: "hardware-resource-check-2",
+							},
+						},
+					},
+				},
+			},
+			sshUserCheckMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.4",
+					NodeType: "automate",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.SSH_USER,
+						Message: "ssh-user-check",
+						Checks: []models.Checks{
+							{
+								Title: "ssh-user-check-1",
+							},
+							{
+								Title: "ssh-user-check-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.8.4",
+					NodeType: "chef-infra-server",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.SSH_USER,
+						Message: "ssh-user-check",
+						Checks: []models.Checks{
+							{
+								Title: "ssh-user-check-1",
+							},
+							{
+								Title: "ssh-user-check-2",
+							},
+						},
+					},
+				},
+			},
+			externalOpenSearchMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.5",
+					NodeType: "opensearch",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.EXTERNAL_OPENSEARCH,
+						Message: "external-opensearch-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-opensearch-1",
+							},
+							{
+								Title: "external-opensearch-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.6",
+					NodeType: "opensearch",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.EXTERNAL_OPENSEARCH,
+						Message: "external-opensearch-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-opensearch-check-1",
+							},
+							{
+								Title: "external-opensearch-check-2",
+							},
+						},
+					},
+				},
+			},
+			externalPostgresMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.7",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  false,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-1",
+							},
+							{
+								Title: "external-postgresql-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.8",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed:  true,
+						Check:   constants.EXTERNAL_POSTGRESQL,
+						Message: "external-postgresql-check",
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			},
+			expectedResponseForAutomateIp:    "{\"node_type\":\"automate\",\"ip\":\"1.2.3.4\",\"tests\":[{\"passed\":false,\"msg\":\"ssh-user-check\",\"check\":\"ssh-user\",\"checks\":[{\"title\":\"ssh-user-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"ssh-user-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]},{\"passed\":true,\"msg\":\"Hardware Resource Count Check\",\"check\":\"hardware-resource-count\",\"checks\":[],\"error\":{\"code\":503,\"message\":\"Error while Performing Hardware resource count check from batch Check API\"}},{\"passed\":false,\"msg\":\"certificate-check\",\"check\":\"certificate\",\"checks\":[{\"title\":\"certificate-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"certificate-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseFromChefServerIp: "{\"node_type\":\"chef-infra-server\",\"ip\":\"1.2.8.4\",\"tests\":[{\"passed\":true,\"msg\":\"ssh-user-check\",\"check\":\"ssh-user\",\"checks\":[{\"title\":\"ssh-user-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"ssh-user-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]},{\"passed\":true,\"msg\":\"Hardware Resource Count Check\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"hardware-resource-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForPostgresIp1:   "{\"node_type\":\"postgresql\",\"ip\":\"1.2.3.7\",\"tests\":[{\"passed\":false,\"msg\":\"external-postgresql-check\",\"check\":\"external-postgresql\",\"checks\":[{\"title\":\"external-postgresql-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-postgresql-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForPostgresIp2:   "{\"node_type\":\"postgresql\",\"ip\":\"1.2.3.8\",\"tests\":[{\"passed\":true,\"msg\":\"external-postgresql-check\",\"check\":\"external-postgresql\",\"checks\":[{\"title\":\"external-postgresql-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-postgresql-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForOpenSearchIp1: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.5\",\"tests\":[{\"passed\":false,\"msg\":\"external-opensearch-check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+			expectedResponseForOpenSearchIp2: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.6\",\"tests\":[{\"passed\":true,\"msg\":\"external-opensearch-check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
+			SetupMockStartServerBatchCheckService()
+			mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/status" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(test.statusApiResponse))
+				}
+			}))
+			port := "1234"
+			if test.mockServerPort != "" {
+				port = test.mockServerPort
+			}
+			err := startMockServerOnCustomPort(mockServer, port)
+			assert.NoError(t, err)
+			defer mockServer.Close()
+
 			ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck(test.hardwareCheckMockedResponse),
 				SetupMockSshUserAccessCheck(test.sshUserCheckMockedResponse),
 				SetupMockCertificateCheck(),
@@ -544,7 +1015,10 @@ func TestBatchCheckService(t *testing.T) {
 				SetupMockSystemResourceCheck(),
 				SetupMockSystemUserCheck(),
 			), logger.NewTestLogger(), "1234")
-			resp := ss.BatchCheck([]string{
+
+			ss.mockServerClient = SetupMockStartServerBatchCheckService()
+
+			resp, err := ss.BatchCheck([]string{
 				constants.FIREWALL,
 				constants.FQDN,
 				constants.SSH_USER,
@@ -570,14 +1044,20 @@ func TestBatchCheckService(t *testing.T) {
 				},
 			})
 
-			assert.Equal(t, resp.Status, "SUCCESS")
-			assert.Equal(t, len(resp.Result), test.totalIpsCount)
-			assert.Equal(t, test.expectedResponseForAutomateIp, getResponseForIp(resp.Result, "1.2.3.4", "automate"))
-			assert.Equal(t, test.expectedResponseFromChefServerIp, getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server"))
-			assert.Equal(t, test.expectedResponseForPostgresIp1, getResponseForIp(resp.Result, "1.2.3.7", "postgresql"))
-			assert.Equal(t, test.expectedResponseForPostgresIp2, getResponseForIp(resp.Result, "1.2.3.8", "postgresql"))
-			assert.Equal(t, test.expectedResponseForOpenSearchIp1, getResponseForIp(resp.Result, "1.2.3.5", "opensearch"))
-			assert.Equal(t, test.expectedResponseForOpenSearchIp2, getResponseForIp(resp.Result, "1.2.3.6", "opensearch"))
+			if test.checkForError {
+				assert.NotEqual(t, err, nil)
+			}
+
+			if !test.avoidSuccessResponse {
+				assert.Equal(t, resp.Status, "SUCCESS")
+				assert.Equal(t, len(resp.Result), test.totalIpsCount)
+				assert.Equal(t, test.expectedResponseForAutomateIp, getResponseForIp(resp.Result, "1.2.3.4", "automate"))
+				assert.Equal(t, test.expectedResponseFromChefServerIp, getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server"))
+				assert.Equal(t, test.expectedResponseForPostgresIp1, getResponseForIp(resp.Result, "1.2.3.7", "postgresql"))
+				assert.Equal(t, test.expectedResponseForPostgresIp2, getResponseForIp(resp.Result, "1.2.3.8", "postgresql"))
+				assert.Equal(t, test.expectedResponseForOpenSearchIp1, getResponseForIp(resp.Result, "1.2.3.5", "opensearch"))
+				assert.Equal(t, test.expectedResponseForOpenSearchIp2, getResponseForIp(resp.Result, "1.2.3.6", "opensearch"))
+			}
 		})
 	}
 
@@ -591,6 +1071,16 @@ func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string
 		}
 	}
 	return ""
+}
+
+func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error {
+	l, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%s", port))
+	if err != nil {
+		return err
+	}
+	mockServer.Listener = l
+	mockServer.Start()
+	return nil
 }
 
 func TestConstructResult(t *testing.T) {
