@@ -40,7 +40,6 @@ func TestBatchCheckService(t *testing.T) {
 					NodeType: "opensearch",
 					Result: models.ApiResult{
 						Passed: true,
-						Check:  constants.HARDWARE_RESOURCE_COUNT,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-count-check-1",
@@ -56,9 +55,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.HARDWARE_RESOURCE_COUNT,
-						Message: "hardware-resource-count-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-count-check-1",
@@ -74,9 +71,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.7",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.HARDWARE_RESOURCE_COUNT,
-						Message: "hardware-resource-count-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-count-check-1",
@@ -92,9 +87,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "chef-infra-server",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.HARDWARE_RESOURCE_COUNT,
-						Message: "hardware-resource-count-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-count-check-1",
@@ -110,9 +103,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.8",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.HARDWARE_RESOURCE_COUNT,
-						Message: "hardware-resource-count-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-count-check-1",
@@ -128,9 +119,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.5",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.HARDWARE_RESOURCE_COUNT,
-						Message: "hardware-resource-count-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-count-check-1",
@@ -148,9 +137,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "ssh-user-check-1",
@@ -166,9 +153,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "chef-infra-server",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "ssh-user-check-1",
@@ -186,9 +171,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.5",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.EXTERNAL_OPENSEARCH,
-						Message: "external-opensearch-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "external-opensearch-1",
@@ -204,9 +187,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.6",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.EXTERNAL_OPENSEARCH,
-						Message: "external-opensearch-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "external-opensearch-check-1",
@@ -224,9 +205,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.7",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.EXTERNAL_POSTGRESQL,
-						Message: "external-postgresql-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "external-postgresql-1",
@@ -242,9 +221,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.8",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.EXTERNAL_POSTGRESQL,
-						Message: "external-postgresql-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "external-postgresql-check-1",
@@ -273,9 +250,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   "hardware-resource-count",
-						Message: "Hardware Resource Count Check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-check-1",
@@ -291,9 +266,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.8.4",
 					NodeType: "chef-infra-server",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   "hardware-resource-count",
-						Message: "Hardware Resource Count Check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-check-1",
@@ -311,9 +284,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "ssh-user-check-1",
@@ -329,9 +300,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.8.4",
 					NodeType: "chef-infra-server",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "ssh-user-check-1",
@@ -349,9 +318,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.5",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.EXTERNAL_OPENSEARCH,
-						Message: "external-opensearch-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "external-opensearch-1",
@@ -367,9 +334,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.6",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.EXTERNAL_OPENSEARCH,
-						Message: "external-opensearch-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "external-opensearch-check-1",
@@ -387,9 +352,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.7",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.EXTERNAL_POSTGRESQL,
-						Message: "external-postgresql-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "external-postgresql-1",
@@ -405,9 +368,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.8",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.EXTERNAL_POSTGRESQL,
-						Message: "external-postgresql-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "external-postgresql-check-1",
@@ -436,11 +397,9 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   "hardware-resource-count",
-						Message: "Hardware Resource Count Check",
-						Checks:  []models.Checks{},
-						Error:   fiber.NewError(fiber.StatusServiceUnavailable, "Error while Performing Hardware resource count check from batch Check API"),
+						Passed: true,
+						Checks: []models.Checks{},
+						Error:  fiber.NewError(fiber.StatusServiceUnavailable, "Error while Performing Hardware resource count check from batch Check API"),
 					},
 				},
 				{
@@ -448,9 +407,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.8.4",
 					NodeType: "chef-infra-server",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   "hardware-resource-count",
-						Message: "Hardware Resource Count Check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "hardware-resource-check-1",
@@ -468,9 +425,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "ssh-user-check-1",
@@ -486,9 +441,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.8.4",
 					NodeType: "chef-infra-server",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.SSH_USER,
-						Message: "ssh-user-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "ssh-user-check-1",
@@ -506,9 +459,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.5",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.EXTERNAL_OPENSEARCH,
-						Message: "external-opensearch-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "external-opensearch-1",
@@ -524,9 +475,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.6",
 					NodeType: "opensearch",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.EXTERNAL_OPENSEARCH,
-						Message: "external-opensearch-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "external-opensearch-check-1",
@@ -544,9 +493,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.7",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  false,
-						Check:   constants.EXTERNAL_POSTGRESQL,
-						Message: "external-postgresql-check",
+						Passed: false,
 						Checks: []models.Checks{
 							{
 								Title: "external-postgresql-1",
@@ -562,9 +509,7 @@ func TestBatchCheckService(t *testing.T) {
 					Host:     "1.2.3.8",
 					NodeType: "postgresql",
 					Result: models.ApiResult{
-						Passed:  true,
-						Check:   constants.EXTERNAL_POSTGRESQL,
-						Message: "external-postgresql-check",
+						Passed: true,
 						Checks: []models.Checks{
 							{
 								Title: "external-postgresql-check-1",
