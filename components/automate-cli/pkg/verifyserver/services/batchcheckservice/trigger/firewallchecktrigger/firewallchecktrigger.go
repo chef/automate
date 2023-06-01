@@ -19,7 +19,7 @@ type FirewallCheck struct {
 func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 	return &FirewallCheck{
 		log:  log,
-		host: constants.LOCAL_HOST,
+		host: constants.LOCALHOST,
 		port: port,
 	}
 }
@@ -214,7 +214,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 		//Dest Chef Infra server
 		for _, port := range a2CsTCPPorts {
 			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCAL_HOST,
+				SourceNodeIP:               constants.LOCALHOST,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
@@ -226,7 +226,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 	for _, destNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		for _, port := range a2CsTCPPorts {
 			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCAL_HOST,
+				SourceNodeIP:               constants.LOCALHOST,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
@@ -241,7 +241,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 	for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 		for _, port := range postgresBastionPorts {
 			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCAL_HOST,
+				SourceNodeIP:               constants.LOCALHOST,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
@@ -253,7 +253,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 	for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
 		for _, port := range ossBastionPorts {
 			reqBody := models.FirewallRequest{
-				SourceNodeIP:               constants.LOCAL_HOST,
+				SourceNodeIP:               constants.LOCALHOST,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
