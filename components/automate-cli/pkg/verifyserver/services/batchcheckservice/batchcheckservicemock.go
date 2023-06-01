@@ -15,11 +15,11 @@ func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Conf
 }
 
 type MockStartServerBatchCheckService struct {
-	StartMockServerOnHostAndPortFunc func(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error)
+	TriggerRequest func(url string, mockServerRequestBody models.StartMockServerRequestBody) models.StartMockServerFromBatchServiceResponse
 }
 
-func (mss *MockStartServerBatchCheckService) StartMockServerOnHostAndPort(host, port string, mockServerRequestBody models.StartMockServerRequestBody) (string, error) {
-	return mss.StartMockServerOnHostAndPortFunc(host, port, mockServerRequestBody)
+func (mss *MockStartServerBatchCheckService) StartMockServerOnHostAndPort(url string, mockServerRequestBody models.StartMockServerRequestBody) models.StartMockServerFromBatchServiceResponse {
+	return mss.TriggerRequest(url, mockServerRequestBody)
 }
 
 type MockHardwareResourceCountCheck struct {

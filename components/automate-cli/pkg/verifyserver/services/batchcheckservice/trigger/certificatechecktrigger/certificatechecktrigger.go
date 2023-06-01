@@ -69,9 +69,3 @@ func (ss *CertificateCheck) GetPortsForMockServer() map[string]map[string][]int 
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
 }
-
-
-func (ss *CertificateCheck) Rishabh() map[string]map[string][]int {
-	nodeTypePortMap := make(map[string]map[string][]int)
-	return nodeTypePortMap
-}

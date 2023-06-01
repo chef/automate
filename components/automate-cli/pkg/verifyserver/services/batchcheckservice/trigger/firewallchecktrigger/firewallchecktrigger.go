@@ -40,35 +40,19 @@ func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse
 func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
-			constants.TCP: []int{9631, 9638, 22, 443, 80},
+			constants.TCP: []int{9631, 9638, 443, 80},
 		},
 		constants.CHEF_INFRA_SERVER: {
-			constants.TCP: []int{9631, 9638, 22, 443, 80},
+			constants.TCP: []int{9631, 9638, 443, 80},
 		},
 		constants.POSTGRESQL: {
-			constants.TCP: []int{7432, 9631, 5432, 6432, 9638, 22},
+			constants.TCP: []int{7432, 9631, 5432, 6432, 9638},
 			constants.UDP: []int{9638},
 		},
 		constants.OPENSEARCH: {
-			constants.TCP: []int{9200, 9300, 22, 9631, 9638},
+			constants.TCP: []int{9200, 9300, 9631, 9638},
 		},
 	}
-
-	// nodeTypePortMap := map[string]map[string][]int{
-	// 	constants.AUTOMATE: {
-	// 		constants.TCP: []int{9633},
-	// 	},
-	// 	constants.CHEF_INFRA_SERVER: {
-	// 		constants.TCP: []int{},
-	// 	},
-	// 	constants.POSTGRESQL: {
-	// 		constants.TCP: []int{},
-	// 		constants.UDP: []int{},
-	// 	},
-	// 	constants.OPENSEARCH: {
-	// 		constants.TCP: []int{},
-	// 	},
-	// }
 	return nodeTypePortMap
 }
 
