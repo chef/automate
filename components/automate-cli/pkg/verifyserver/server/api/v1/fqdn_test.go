@@ -199,7 +199,7 @@ func TestCheckFqdn(t *testing.T) {
 		},
 	}
 
-	fqdnCheckEndpoint := constants.FQDN_API_PATH
+	fqdnCheckEndpoint := constants.FQDN_LOAD_BALANCER_CHECK
 	// Setup the app as it is done in the main function
 	app, err := SetupFqdnHandlers(SetupMockFqdnService())
 	assert.NoError(t, err)
