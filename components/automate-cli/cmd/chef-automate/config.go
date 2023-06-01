@@ -220,7 +220,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 
 		chefServer := &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:        frontendCommand,
+				Cmd:         frontendCommand,
 				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
@@ -357,7 +357,14 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 
 		configFile := args[0]
-		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFile, dateFormat)
+		configFileRenamed := configFile
+		if strings.Contains(configFile, "/") {
+			filePath := strings.Split(configFile, "/")
+			lastFileidx := len(filePath) - 1
+			configFileRenamed = filePath[lastFileidx]
+		}
+
+		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFileRenamed, dateFormat)
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -368,9 +375,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.frontend,
+				SourceConfig:             configFile,
+				DestinationConfig:        "frontend" + "_" + timestamp + "_" + configFileRenamed,
 			},
 		}
-		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFile, dateFormat)
+		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFileRenamed, dateFormat)
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -381,10 +390,12 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.automate,
+				SourceConfig:             configFile,
+				DestinationConfig:        "automate" + "_" + timestamp + "_" + configFileRenamed,
 			},
 		}
 
-		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFile, dateFormat)
+		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFileRenamed, dateFormat)
 		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -395,10 +406,12 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.chef_server,
+				SourceConfig:             configFile,
+				DestinationConfig:        "chef_server" + "_" + timestamp + "_" + configFileRenamed,
 			},
 		}
 
-		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFile)
+		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFileRenamed)
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
@@ -409,9 +422,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.postgresql,
+				SourceConfig:             configFile,
+				DestinationConfig:        "postgresql" + "_" + timestamp + "_" + configFileRenamed,
 			},
 		}
-		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFile)
+		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFileRenamed)
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
@@ -422,6 +437,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.opensearch,
+				SourceConfig:             configFile,
+				DestinationConfig:        "opensearch" + "_" + timestamp + "_" + configFileRenamed,
 			},
 		}
 

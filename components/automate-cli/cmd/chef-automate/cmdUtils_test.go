@@ -43,7 +43,7 @@ func TestExecute(t *testing.T) {
 
 	nodeFlagFalse := &Cmd{
 		CmdInputs: &CmdInputs{
-			NodeType: false,
+			NodeType:        false,
 			SkipPrintOutput: true,
 		},
 	}
@@ -52,7 +52,7 @@ func TestExecute(t *testing.T) {
 			return errors.New(errorForPreExec)
 		},
 		CmdInputs: &CmdInputs{
-			NodeType: true,
+			NodeType:        true,
 			SkipPrintOutput: true,
 		},
 	}
@@ -396,6 +396,63 @@ func TestExecuteCmdOnNode(t *testing.T) {
 				Error:       errors.Errorf("Error: patch failed"),
 			},
 			isError: true,
+		},
+	}
+
+	for _, testCase := range testCases {
+		new := &remoteCmdExecutor{}
+		new.executeCmdOnNode(testCase.command, "", testCase.inputFiles, testCase.outputFiles, testCase.remoteService, true, testCase.newSSHUtil, testCase.resultChan)
+		result := <-resultChan
+
+		if testCase.isError {
+			assert.Error(t, result.Error)
+			assert.EqualError(t, testCase.expectedOutput.Error, result.Error.Error())
+			assert.Equal(t, testCase.expectedOutput.Output, result.Output)
+		} else {
+			assert.NoError(t, result.Error)
+			assert.Equal(t, testCase.expectedOutput.Output, result.Output)
+		}
+	}
+}
+
+func TestExecuteCmdOnNode_PatchWithCustomPath(t *testing.T) {
+
+	timestamp := time.Now().Format("20060102150405")
+	file := file
+	resultChan := make(chan CmdResult, 1)
+
+	testCases := []struct {
+		testCaseName      string
+		command           string
+		inputFiles        map[string]string
+		outputFiles       []string
+		configFile        string
+		remoteService     string
+		newSSHUtil        SSHUtil
+		resultChan        chan CmdResult
+		expectedOutput    CmdResult
+		isError           bool
+		sourceConfig      string
+		destinationConfig string
+	}{
+		{
+			testCaseName: "Successful Copy file to Remote and Execution of command on remote",
+			command:      patchCommand,
+			inputFiles: map[string]string{
+				file: "/usr/a2ra/config.toml",
+			},
+			outputFiles:   []string{},
+			remoteService: "automate",
+			newSSHUtil:    GetMockSSHUtil(&SSHConfig{hostIP: ip1}, nil, "config patch operation completed", nil, "", nil),
+			resultChan:    resultChan,
+			expectedOutput: CmdResult{
+				HostIP: ip1,
+				Output: "config patch operation completed",
+				Error:  nil,
+			},
+			isError:           false,
+			sourceConfig:      "/usr/a2ra/config.toml",
+			destinationConfig: "frontend" + "_" + timestamp + "_config.toml",
 		},
 	}
 
