@@ -106,7 +106,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 
 	switch true {
 	case nodeMap.Frontend.CmdInputs.NodeType:
-		const remoteService string = CONST_FRONTEND
+		const remoteService string = FRONTEND
 		nodeIps, err := preCmdExecCheck(nodeMap.Frontend, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
@@ -114,7 +114,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
 	case nodeMap.Automate.CmdInputs.NodeType:
-		const remoteService string = CONST_AUTOMATE
+		const remoteService string = AUTOMATE
 		nodeIps, err := preCmdExecCheck(nodeMap.Automate, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
@@ -123,7 +123,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
 	case nodeMap.ChefServer.CmdInputs.NodeType:
-		const remoteService string = CONST_CHEF_SERVER
+		const remoteService string = CHEF_SERVER
 		nodeIps, err := preCmdExecCheck(nodeMap.ChefServer, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
@@ -132,7 +132,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
 	case nodeMap.Postgresql.CmdInputs.NodeType:
-		const remoteService string = CONST_POSTGRESQL
+		const remoteService string = POSTGRESQL
 		nodeIps, err := preCmdExecCheck(nodeMap.Postgresql, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
@@ -141,7 +141,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
 		return output, nil
 	case nodeMap.Opensearch.CmdInputs.NodeType:
-		const remoteService string = CONST_OPENSEARCH
+		const remoteService string = OPENSEARCH
 		nodeIps, err := preCmdExecCheck(nodeMap.Opensearch, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
 		if err != nil {
 			return cmdResult, err
@@ -325,15 +325,15 @@ func getSshDetails(infra *AutomateHAInfraDetails) *SSHConfig {
 func getNodeIPs(single bool, ip string, infra *AutomateHAInfraDetails, remoteService string) ([]string, error) {
 	nodeIps := []string{}
 	switch {
-	case remoteService == CONST_OPENSEARCH:
+	case remoteService == OPENSEARCH:
 		nodeIps = infra.Outputs.OpensearchPrivateIps.Value
-	case remoteService == CONST_POSTGRESQL:
+	case remoteService == POSTGRESQL:
 		nodeIps = infra.Outputs.PostgresqlPrivateIps.Value
-	case remoteService == CONST_CHEF_SERVER:
+	case remoteService == CHEF_SERVER:
 		nodeIps = infra.Outputs.ChefServerPrivateIps.Value
-	case remoteService == CONST_AUTOMATE:
+	case remoteService == AUTOMATE:
 		nodeIps = infra.Outputs.AutomatePrivateIps.Value
-	case remoteService == CONST_FRONTEND:
+	case remoteService == FRONTEND:
 		nodeIps = append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
 	}
 	if ip != "" {

@@ -109,16 +109,16 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 	// Get the node type and ip address of the node to be deleted
 	if len(automateIpList) > 0 {
 		dni.ipToDelete = automateIpList[0]
-		dni.nodeType = CONST_AUTOMATE
+		dni.nodeType = AUTOMATE
 	} else if len(chefServerIpList) > 0 {
 		dni.ipToDelete = chefServerIpList[0]
-		dni.nodeType = CONST_CHEF_SERVER
+		dni.nodeType = CHEF_SERVER
 	} else if len(postgresqlIpList) > 0 {
 		dni.ipToDelete = postgresqlIpList[0]
-		dni.nodeType = CONST_POSTGRESQL
+		dni.nodeType = POSTGRESQL
 	} else if len(opensearchIpList) > 0 {
 		dni.ipToDelete = opensearchIpList[0]
-		dni.nodeType = CONST_OPENSEARCH
+		dni.nodeType = OPENSEARCH
 	} else {
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
@@ -134,7 +134,7 @@ func (dni *DeleteNodeOnPremImpl) validate() error {
 	dni.config = *updatedConfig
 	dni.copyConfigForUserPrompt = dni.config
 	if dni.nodeUtils.isManagedServicesOn() {
-		if dni.nodeType == CONST_POSTGRESQL || dni.nodeType == CONST_OPENSEARCH {
+		if dni.nodeType == POSTGRESQL || dni.nodeType == OPENSEARCH {
 			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
 		}
 	}
@@ -149,28 +149,28 @@ func (dni *DeleteNodeOnPremImpl) modifyConfig() error {
 	var err error
 
 	switch dni.nodeType {
-	case CONST_AUTOMATE:
+	case AUTOMATE:
 		err = modifyConfigForDeleteNode(
 			&dni.config.Automate.Config.InstanceCount,
 			&dni.config.ExistingInfra.Config.AutomatePrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Automate.Config.CertsByIP,
 		)
-	case CONST_CHEF_SERVER:
+	case CHEF_SERVER:
 		err = modifyConfigForDeleteNode(
 			&dni.config.ChefServer.Config.InstanceCount,
 			&dni.config.ExistingInfra.Config.ChefServerPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.ChefServer.Config.CertsByIP,
 		)
-	case CONST_POSTGRESQL:
+	case POSTGRESQL:
 		err = modifyConfigForDeleteNode(
 			&dni.config.Postgresql.Config.InstanceCount,
 			&dni.config.ExistingInfra.Config.PostgresqlPrivateIps,
 			[]string{dni.ipToDelete},
 			&dni.config.Postgresql.Config.CertsByIP,
 		)
-	case CONST_OPENSEARCH:
+	case OPENSEARCH:
 		err = modifyConfigForDeleteNode(
 			&dni.config.Opensearch.Config.InstanceCount,
 			&dni.config.ExistingInfra.Config.OpensearchPrivateIps,
@@ -222,19 +222,19 @@ func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
 	var existingIplist []string
 
 	switch dni.nodeType {
-	case CONST_AUTOMATE:
+	case AUTOMATE:
 		instanceCount = dni.config.Automate.Config.InstanceCount
 		minCount = AUTOMATE_MIN_INSTANCE_COUNT
 		existingIplist = dni.config.ExistingInfra.Config.AutomatePrivateIps
-	case CONST_CHEF_SERVER:
+	case CHEF_SERVER:
 		instanceCount = dni.config.ChefServer.Config.InstanceCount
 		minCount = CHEF_SERVER_MIN_INSTANCE_COUNT
 		existingIplist = dni.config.ExistingInfra.Config.ChefServerPrivateIps
-	case CONST_POSTGRESQL:
+	case POSTGRESQL:
 		instanceCount = dni.config.Postgresql.Config.InstanceCount
 		minCount = POSTGRESQL_MIN_INSTANCE_COUNT
 		existingIplist = dni.config.ExistingInfra.Config.PostgresqlPrivateIps
-	case CONST_OPENSEARCH:
+	case OPENSEARCH:
 		instanceCount = dni.config.Opensearch.Config.InstanceCount
 		minCount = OPENSEARCH_MIN_INSTANCE_COUNT
 		existingIplist = dni.config.ExistingInfra.Config.OpensearchPrivateIps

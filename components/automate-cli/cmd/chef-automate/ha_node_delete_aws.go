@@ -109,22 +109,22 @@ func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 	var err error
 
 	switch dna.nodeType {
-	case CONST_AUTOMATE:
+	case AUTOMATE:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Automate.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 		)
-	case CONST_CHEF_SERVER:
+	case CHEF_SERVER:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.ChefServer.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 		)
-	case CONST_POSTGRESQL:
+	case POSTGRESQL:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Postgresql.Config.InstanceCount,
 			[]string{dna.ipToDelete},
 		)
-	case CONST_OPENSEARCH:
+	case OPENSEARCH:
 		err = modifyConfigForDeleteNodeForAWS(
 			&dna.config.Opensearch.Config.InstanceCount,
 			[]string{dna.ipToDelete},
@@ -195,16 +195,16 @@ func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
 	var instanceType string
 	var configNodeIpList []string
 	switch dna.nodeType {
-	case CONST_AUTOMATE:
+	case AUTOMATE:
 		instanceType = "chef_automate"
 		configNodeIpList = dna.configAutomateIpList
-	case CONST_CHEF_SERVER:
+	case CHEF_SERVER:
 		instanceType = "chef_server"
 		configNodeIpList = dna.configChefServerIpList
-	case CONST_POSTGRESQL:
+	case POSTGRESQL:
 		instanceType = "chef_automate_postgresql"
 		configNodeIpList = dna.configPostgresqlIpList
-	case CONST_OPENSEARCH:
+	case OPENSEARCH:
 		instanceType = "chef_automate_opensearch"
 		configNodeIpList = dna.configOpensearchIpList
 	default:
@@ -249,16 +249,16 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 	// Get the node type and ip address of the node to be deleted
 	if len(automateIpList) > 0 {
 		dna.ipToDelete = automateIpList[0]
-		dna.nodeType = CONST_AUTOMATE
+		dna.nodeType = AUTOMATE
 	} else if len(chefServerIpList) > 0 {
 		dna.ipToDelete = chefServerIpList[0]
-		dna.nodeType = CONST_CHEF_SERVER
+		dna.nodeType = CHEF_SERVER
 	} else if len(postgresqlIpList) > 0 {
 		dna.ipToDelete = postgresqlIpList[0]
-		dna.nodeType = CONST_POSTGRESQL
+		dna.nodeType = POSTGRESQL
 	} else if len(opensearchIpList) > 0 {
 		dna.ipToDelete = opensearchIpList[0]
-		dna.nodeType = CONST_OPENSEARCH
+		dna.nodeType = OPENSEARCH
 	} else {
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
 	}
@@ -273,7 +273,7 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 	}
 	dna.config = *updatedConfig
 	if dna.nodeUtils.isManagedServicesOn() {
-		if dna.nodeType == CONST_POSTGRESQL || dna.nodeType == CONST_OPENSEARCH {
+		if dna.nodeType == POSTGRESQL || dna.nodeType == OPENSEARCH {
 			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
 		}
 	}
@@ -292,19 +292,19 @@ func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 	var configIpList []string
 
 	switch dna.nodeType {
-	case CONST_AUTOMATE:
+	case AUTOMATE:
 		instanceCount = dna.config.Automate.Config.InstanceCount
 		minCount = AUTOMATE_MIN_INSTANCE_COUNT
 		configIpList = dna.configAutomateIpList
-	case CONST_CHEF_SERVER:
+	case CHEF_SERVER:
 		instanceCount = dna.config.ChefServer.Config.InstanceCount
 		minCount = CHEF_SERVER_MIN_INSTANCE_COUNT
 		configIpList = dna.configChefServerIpList
-	case CONST_POSTGRESQL:
+	case POSTGRESQL:
 		instanceCount = dna.config.Postgresql.Config.InstanceCount
 		minCount = POSTGRESQL_MIN_INSTANCE_COUNT
 		configIpList = dna.configPostgresqlIpList
-	case CONST_OPENSEARCH:
+	case OPENSEARCH:
 		instanceCount = dna.config.Opensearch.Config.InstanceCount
 		minCount = OPENSEARCH_MIN_INSTANCE_COUNT
 		configIpList = dna.configOpensearchIpList

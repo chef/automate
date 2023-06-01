@@ -43,7 +43,7 @@ func TestExecute(t *testing.T) {
 
 	nodeFlagFalse := &Cmd{
 		CmdInputs: &CmdInputs{
-			NodeType: false,
+			NodeType:        false,
 			SkipPrintOutput: true,
 		},
 	}
@@ -52,7 +52,7 @@ func TestExecute(t *testing.T) {
 			return errors.New(errorForPreExec)
 		},
 		CmdInputs: &CmdInputs{
-			NodeType: true,
+			NodeType:        true,
 			SkipPrintOutput: true,
 		},
 	}
@@ -616,7 +616,7 @@ func TestPrintOutput(t *testing.T) {
 		{
 			name: "Print Success message and combine output files in one",
 			args: args{
-				remoteService: CONST_AUTOMATE,
+				remoteService: AUTOMATE,
 				result: CmdResult{
 					HostIP:      ip7,
 					OutputFiles: []string{out},
@@ -630,7 +630,7 @@ func TestPrintOutput(t *testing.T) {
 		{
 			name: "Print Success message and file combinations failed",
 			args: args{
-				remoteService: CONST_AUTOMATE,
+				remoteService: AUTOMATE,
 				result: CmdResult{
 					HostIP:      ip7,
 					OutputFiles: []string{fail},
@@ -644,7 +644,7 @@ func TestPrintOutput(t *testing.T) {
 		{
 			name: "Print Error message",
 			args: args{
-				remoteService: CONST_AUTOMATE,
+				remoteService: AUTOMATE,
 				result: CmdResult{
 					HostIP:      ip7,
 					OutputFiles: []string{},

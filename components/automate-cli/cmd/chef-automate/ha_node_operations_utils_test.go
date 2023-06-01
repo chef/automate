@@ -257,7 +257,7 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 			return nil, nil
 		},
 	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_AUTOMATE, infra, &MockSSHUtilsImpl{
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, infra, &MockSSHUtilsImpl{
 		getSSHConfigFunc: func() *SSHConfig {
 			return &SSHConfig{}
 		},
@@ -282,7 +282,7 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 			return nil, nil
 		},
 	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_CHEF_SERVER, infra, &MockSSHUtilsImpl{
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, infra, &MockSSHUtilsImpl{
 		getSSHConfigFunc: func() *SSHConfig {
 			return &SSHConfig{}
 		},
@@ -307,7 +307,7 @@ func TestStopServicesOnNodePG(t *testing.T) {
 			return nil, nil
 		},
 	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_POSTGRESQL, infra, &MockSSHUtilsImpl{
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, POSTGRESQL, infra, &MockSSHUtilsImpl{
 		getSSHConfigFunc: func() *SSHConfig {
 			return &SSHConfig{}
 		},
@@ -332,7 +332,7 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 			return nil, nil
 		},
 	})
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CONST_OPENSEARCH, infra, &MockSSHUtilsImpl{
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, infra, &MockSSHUtilsImpl{
 		getSSHConfigFunc: func() *SSHConfig {
 			return &SSHConfig{}
 		},

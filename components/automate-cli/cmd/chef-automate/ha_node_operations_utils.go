@@ -336,13 +336,13 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType string, infra *Automate
 	opensearchCmd := &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
 
 	switch nodeType {
-	case CONST_AUTOMATE:
+	case AUTOMATE:
 		automateCmd = createCmdInputs(ip, STOP_FE_SERVICES_CMD)
-	case CONST_CHEF_SERVER:
+	case CHEF_SERVER:
 		chefServerCmd = createCmdInputs(ip, STOP_FE_SERVICES_CMD)
-	case CONST_POSTGRESQL:
+	case POSTGRESQL:
 		postgresqlCmd = createCmdInputs(ip, STOP_BE_SERVICES_CMD)
-	case CONST_OPENSEARCH:
+	case OPENSEARCH:
 		cmd := fmt.Sprintf(EXCLUDE_OPENSEARCH_NODE_REQUEST, ip) + STOP_BE_SERVICES_CMD
 		opensearchCmd = createCmdInputs(ip, cmd)
 	default:
