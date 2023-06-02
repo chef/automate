@@ -58,7 +58,7 @@ successfullyStartedMockServers := []models.StartMockServerFromBatchServiceRespon
 			return models.BatchCheckResponse{}, err
 		}
 		if startMockServer {
-			successfullyStartedMockServers, notStartedMockServers = ss.startMockServer(remoteChecks, config.Hardware)
+			successfullyStartedMockServers, notStartedMockServers = ss.StartMockServer(remoteChecks, config.Hardware)
 		}
 		if len(notStartedMockServers) > 0 {
 			for _, successfullyStartedMockServer := range successfullyStartedMockServers {
@@ -93,7 +93,7 @@ func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string) (bool,
 	return false, nil
 }
 
-func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDetails models.Hardware) ([]models.StartMockServerFromBatchServiceResponse, []models.StartMockServerFromBatchServiceResponse) {
+func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDetails models.Hardware) ([]models.StartMockServerFromBatchServiceResponse, []models.StartMockServerFromBatchServiceResponse) {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
 			constants.TCP:   []int{},
@@ -129,6 +129,7 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 		constants.OPENSEARCH:        hardwareDetails.OpenSearchNodeIps,
 	}
 
+	// construct a map that holds list of ports to start on a particular ip
 	nodeTypeAndIpWithPortProtocolMap := make(map[string]map[string][]int)
 	for nodeType, ipArray := range ipMap {
 		for _, ip := range ipArray {
@@ -139,63 +140,20 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 		}
 	}
 
+	// iterrate over each port for an ip and make request to start server.
 	ipPortProtocolMap := make(map[string]bool)
 	startMockServerChannel := make(chan models.StartMockServerFromBatchServiceResponse)
 	totalReq := 0
 	for nodeTypeWithIp, protocolMap := range nodeTypeAndIpWithPortProtocolMap {
+		host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
 		if len(protocolMap[constants.TCP]) != 0 {
-			for _, port := range protocolMap[constants.TCP] {
-				startMockServerRequestBody := models.MockServerRequestBody{
-					Port:     port,
-					Protocol: constants.TCP,
-					Cert:     "",
-					Key:      "",
-				}
-				host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
-				key := fmt.Sprint(host, "_", constants.TCP, "_", port)
-
-				if !ipPortProtocolMap[key] {
-					go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
-					totalReq = totalReq + 1
-					ipPortProtocolMap[key] = true
-				}
-			}
+			ss.constructRequestForStatingMockServer(protocolMap, host, constants.TCP, startMockServerChannel, &ipPortProtocolMap, &totalReq)
 		}
 		if len(protocolMap[constants.UDP]) != 0 {
-			for _, port := range protocolMap[constants.UDP] {
-				startMockServerRequestBody := models.MockServerRequestBody{
-					Port:     port,
-					Protocol: constants.UDP,
-					Cert:     "",
-					Key:      "",
-				}
-				host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
-				key := fmt.Sprint(host, "_", constants.UDP, "_", port)
-
-				if !ipPortProtocolMap[key] {
-					go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
-					totalReq = totalReq + 1
-					ipPortProtocolMap[key] = true
-				}
-			}
+			ss.constructRequestForStatingMockServer(protocolMap, host, constants.UDP, startMockServerChannel, &ipPortProtocolMap, &totalReq)
 		}
 		if len(protocolMap[constants.HTTPS]) != 0 {
-			for _, port := range protocolMap[constants.HTTPS] {
-				startMockServerRequestBody := models.MockServerRequestBody{
-					Port:     port,
-					Protocol: constants.HTTPS,
-					Cert:     "",
-					Key:      "",
-				}
-				host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
-				key := fmt.Sprint(host, "_", constants.HTTPS, "_", port)
-
-				if !ipPortProtocolMap[key] {
-					go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
-					totalReq = totalReq + 1
-					ipPortProtocolMap[key] = true
-				}
-			}
+			ss.constructRequestForStatingMockServer(protocolMap, host, constants.HTTPS, startMockServerChannel, &ipPortProtocolMap, &totalReq)
 		}
 	}
 
@@ -212,6 +170,24 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 	}
 	defer close(startMockServerChannel)
 	return successfullyStartedMockServers, notStartedMockServers
+}
+
+func (ss *BatchCheckService) constructRequestForStatingMockServer(protocolMap map[string][]int, host, protocolType string, startMockServerChannel chan models.StartMockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int) {
+	for _, port := range protocolMap[protocolType] {
+		startMockServerRequestBody := models.MockServerRequestBody{
+			Port:     port,
+			Protocol: protocolType,
+			Cert:     "",
+			Key:      "",
+		}
+		key := fmt.Sprint(host, "_", protocolType, "_", port)
+
+		if !(*ipPortProtocolMap)[key] {
+			go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
+			*totalReq = *totalReq + 1
+			(*ipPortProtocolMap)[key] = true
+		}
+	}
 }
 
 func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) string {

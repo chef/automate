@@ -1413,6 +1413,60 @@ func TestBatchCheckService(t *testing.T) {
 
 }
 
+func TestStartMockServer(t *testing.T) {
+	ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck([]models.CheckTriggerResponse{}),
+		SetupMockSshUserAccessCheck([]models.CheckTriggerResponse{}),
+		SetupMockCertificateCheck(),
+		SetupMockExternalOpenSearchCheck([]models.CheckTriggerResponse{}),
+		SetupMockExternalPostgresCheck([]models.CheckTriggerResponse{}),
+		SetupMockFirewallCheck(),
+		SetupMockFqdnCheck(),
+		SetupMockNfsBackupConfigCheck(),
+		SetupMockOpenSearchS3BucketAccessCheck(),
+		SetupMockS3BackupConfigCheck(),
+		SetupMockSoftwareVersionCheck(),
+		SetupMockSystemResourceCheck(),
+		SetupMockSystemUserCheck(),
+	), logger.NewTestLogger(), "1234")
+
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [],
+			"error": "error getting services from hab svc status"
+		}
+	}`, nil, false)
+	startedServers, failedServers := ss.StartMockServer([]string{constants.FIREWALL, constants.FQDN},
+		models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	)
+	totalA := 0
+	totalP := 0
+	totalO := 0
+	for _, resp := range startedServers {
+		if resp.Host == "1.2.3.4" {
+			totalA +=1
+		}
+		if resp.Host == "1.2.3.7" ||  resp.Host == "1.2.3.8"{
+			totalP +=1
+		}
+		if resp.Host == "1.2.3.5" ||  resp.Host == "1.2.3.6"{
+			totalO +=1
+		}
+	}
+	assert.Equal(t, len(startedServers), 24)
+	assert.Equal(t, len(failedServers), 0)
+}
+
 func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string) string {
 	for _, res := range resp {
 		if res.Ip == ip && res.NodeType == nodeType {
