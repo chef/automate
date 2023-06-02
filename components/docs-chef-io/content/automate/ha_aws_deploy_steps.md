@@ -105,7 +105,7 @@ Run the following steps on Bastion Host Machine:
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
    - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`
-   - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
+   - If `backup_config` is `s3` then uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
    - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
@@ -113,7 +113,7 @@ Run the following steps on Bastion Host Machine:
      - Set `profile`, by default `profile` is `"default"`
      - Set `region`, by default `region` is `"us-east-1"`
      - Set `aws_vpc_id`, which you had created as Prerequisite step. Example: `"vpc12318h"`
-     - Set `private_custom_subnets` and `public_custom_subnets`: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
+     - Set `private_custom_subnets` to the 3 private subnets we created in prerequisites step and set `public_custom_subnets` to the 3 public subnets we created in prerequisites step: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
      - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequisite. This value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
      - Set `setup_managed_services` as `false`, As these deployment steps are for Non-Managed Services AWS Deployment. Default value is `false`.
      - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
