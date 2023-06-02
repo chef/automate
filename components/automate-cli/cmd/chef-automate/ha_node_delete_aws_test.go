@@ -648,79 +648,94 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 }
 
 func TestDeletenodeAWSExecuteNoError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "192.0.0.1",
-	}
 	var ipAddres, filewritten, executeCommands, autoFileMoved, tfArchModified bool
-
-	nodeDelete := NewDeleteNodeAWS(
-		w.CliWriter,
-		flags,
-		&MockNodeUtilsImpl{
-			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-				return nil, &SSHConfig{}, nil
-			},
-			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
-				return nil
-			},
-			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
-				filewritten = true
-				return nil
-			},
-			getModeFromConfigFunc: func(path string) (string, error) {
-				return EXISTING_INFRA_MODE, nil
-			},
-			isManagedServicesOnFunc: func() bool {
-				return false
-			},
-			pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
-			isA2HARBFileExistFunc: func() bool {
-				return true
-			},
-			taintTerraformFunc: func(path string) error {
-				return nil
-			},
-			getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
-				ipAddres = true
-				return &AWSConfigIp{
-					configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
-					configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
-					configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
-					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
-				}, nil
-			},
-			executeShellCommandFunc: func() error {
-				executeCommands = true
-				return nil
-			},
-			moveAWSAutoTfvarsFileFunc: func(path string) error {
-				autoFileMoved = true
-				return nil
-			},
-			modifyTfArchFileFunc: func(path string) error {
-				tfArchModified = true
-				return nil
-			},
-			stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
-				return nil
-			},
-			calculateTotalInstanceCountFunc: func() (int, error) {
-				return 0, nil
-			},
+	mnu := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
 		},
-		CONFIG_TOML_PATH_AWS,
-		&fileutils.MockFileSystemUtils{},
-		&MockSSHUtilsImpl{
-			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-				return "", nil
-			},
-		})
-	err := nodeDelete.Execute(nil, nil)
-	assert.NoError(t, err)
-	assert.True(t, tfArchModified)
-	assert.True(t, ipAddres)
-	assert.True(t, filewritten)
-	assert.True(t, executeCommands)
-	assert.True(t, autoFileMoved)
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
+			return nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			ipAddres = true
+			return &AWSConfigIp{
+				configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+				configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+				configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+				configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+			}, nil
+		},
+		executeShellCommandFunc: func() error {
+			executeCommands = true
+			return nil
+		},
+		moveAWSAutoTfvarsFileFunc: func(path string) error {
+			autoFileMoved = true
+			return nil
+		},
+		modifyTfArchFileFunc: func(path string) error {
+			tfArchModified = true
+			return nil
+		},
+		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			return 0, nil
+		},
+	}
+	flagsArr := []AddDeleteNodeHACmdFlags{
+		{
+			automateIp: "192.0.0.1",
+		},
+		{
+			chefServerIp: "192.0.1.1",
+		},
+		{
+			postgresqlIp: "192.0.3.1",
+		},
+		{
+			opensearchIp: "192.0.2.1",
+		},
+	}
+
+	for _, flags := range flagsArr {
+		w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+		nodeDelete := NewDeleteNodeAWS(
+			w.CliWriter,
+			flags,
+			mnu,
+			CONFIG_TOML_PATH_AWS,
+			&fileutils.MockFileSystemUtils{},
+			&MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			})
+		err := nodeDelete.Execute(nil, nil)
+		assert.NoError(t, err)
+		assert.True(t, tfArchModified)
+		assert.True(t, ipAddres)
+		assert.True(t, filewritten)
+		assert.True(t, executeCommands)
+		assert.True(t, autoFileMoved)
+	}
+
 }
