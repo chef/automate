@@ -50,6 +50,8 @@ func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalO
 		eos.log.Error(err)
 		return createExternalOpensearchCheck(false, constants.EXTERNAL_OPENSEARCH_FAILED_TITLE, constants.STATUS_FAIL, "", constants.EXTERNAL_OPENSEARCH_ERROR_MSG, constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG, err.Error())
 	}
+
+	eos.log.Debug("External Opensearch is reachable")
 	return createExternalOpensearchCheck(true, constants.EXTERNAL_OPENSEARCH_SUCCESS_TITLE, constants.STATUS_PASS, constants.EXTERNAL_OPENSEARCH_SUCCESS_MSG, "", "", "")
 }
 
@@ -79,7 +81,7 @@ func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOSRe
 
 	eos.log.Debugf("Response Body: `%s` and Status code: %d", string(respBody), resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("response body: `%s` and status code: %d", string(respBody), resp.StatusCode)
+		return errors.New("external opensearch is not reachable")
 	}
 
 	return nil

@@ -327,7 +327,7 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 						SuccessMsg:    "",
 						ErrorMsg:      constants.EXTERNAL_OPENSEARCH_ERROR_MSG,
 						ResolutionMsg: constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG,
-						DebugMsg:      fmt.Sprintf("response body: `Unauthorized\n` and status code: %d", http.StatusUnauthorized),
+						DebugMsg:      "external opensearch is not reachable",
 					},
 				},
 			},
