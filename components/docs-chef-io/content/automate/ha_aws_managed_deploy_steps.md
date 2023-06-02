@@ -108,7 +108,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Give `ssh_key_file` path, downloaded from **AWS SSH Key Pair**, which you want to use to create all the VMs. This will let you access all the VMs.
    - We support only private key authentication.
    - Set `backup_config` to `"s3"` or `efs`.
-   - If `backup_config` is `s3`, uncomment and add the value for following `s3_bucketName` attribute.
+   - If `backup_config` is `s3`, uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
    - Don't set `fqdn` for the AWS deployment.
    - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *Postgresql*, *OpenSearch*.

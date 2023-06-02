@@ -115,7 +115,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs.
    - We support only private key authentication.
    - Provide `backup_config` based on the type of backup storage you have. This field can be optionally left empty during deployment and can be patched at later point. Allowed values are `object_storage` and `file_system`.
-   - If `backup_config` is `object_storage`, make sure to fill values under `[object_storage.config]`
+   - If `backup_config` is `object_storage`, make sure to fill values under `[object_storage.config]`. User must create the bucket themselves and make sure to assign correct [policy for bucket access](/automate/backup/#aws-s3-permissions).
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 

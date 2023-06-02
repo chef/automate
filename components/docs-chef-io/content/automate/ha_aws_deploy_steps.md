@@ -105,7 +105,7 @@ Run the following steps on Bastion Host Machine:
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
    - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`
-   - If `backup_config` is `s3` then uncomment and add the value for following `s3_bucketName` attribute.
+   - If `backup_config` is `s3` then uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
    - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
