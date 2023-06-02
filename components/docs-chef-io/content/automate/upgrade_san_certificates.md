@@ -1,14 +1,14 @@
 +++
-title = "Upgrade to Non-SAN Certificates"
+title = "Update Non-SAN Certificates for 4.7.x Version"
 date = 2023-05-29T12:02:46-08:00
 draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Upgrade to Non-SAN Certificates"
-    identifier = "automate/upgrade/upgrade_san_certificates.md Upgrade to Non-SAN Certificates"
+    title = "Update Non-SAN Certificates for 4.7.x Version"
+    identifier = "automate/upgrade/upgrade_san_certificates.md Update Non-SAN Certificates for 4.7.x Version"
     parent = "automate/upgrade"
-    weight = 30
+    weight = 40
 +++
 
 ## Overview
