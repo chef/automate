@@ -357,14 +357,15 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 
 		configFile := args[0]
-		configFileRenamed := configFile
+		sourceConfigFileName := configFile
 		if strings.Contains(configFile, "/") {
 			filePath := strings.Split(configFile, "/")
 			lastFileidx := len(filePath) - 1
-			configFileRenamed = filePath[lastFileidx]
+			sourceConfigFileName = filePath[lastFileidx]
 		}
 
-		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFileRenamed, dateFormat)
+		frontendConfigFileName := fmt.Sprintf("frontend_%s_%s", timestamp, sourceConfigFileName)
+		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendConfigFileName, dateFormat)
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -372,14 +373,15 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   false,
 				Args:                     args,
-				InputFiles:               []string{configFile},
+				InputFiles:               []string{},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.frontend,
 				SourceConfig:             configFile,
-				DestinationConfig:        "frontend" + "_" + timestamp + "_" + configFileRenamed,
+				DestinationConfig:        frontendConfigFileName,
 			},
 		}
-		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFileRenamed, dateFormat)
+		automateConfigFileName := fmt.Sprintf("automate%s_%s", timestamp, sourceConfigFileName)
+		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, automateConfigFileName, dateFormat)
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -387,15 +389,15 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   false,
 				Args:                     args,
-				InputFiles:               []string{configFile},
+				InputFiles:               []string{},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.automate,
 				SourceConfig:             configFile,
-				DestinationConfig:        "automate" + "_" + timestamp + "_" + configFileRenamed,
+				DestinationConfig:        automateConfigFileName,
 			},
 		}
-
-		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFileRenamed, dateFormat)
+		chefserverConfigFileName := fmt.Sprintf("chef_server%s_%s", timestamp, sourceConfigFileName)
+		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, chefserverConfigFileName, dateFormat)
 		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -403,15 +405,15 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   false,
 				Args:                     args,
-				InputFiles:               []string{configFile},
+				InputFiles:               []string{},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.chef_server,
 				SourceConfig:             configFile,
-				DestinationConfig:        "chef_server" + "_" + timestamp + "_" + configFileRenamed,
+				DestinationConfig:        chefserverConfigFileName,
 			},
 		}
-
-		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFileRenamed)
+		postgresqlConfigFileName := fmt.Sprintf("postgresql%s_%s", timestamp, sourceConfigFileName)
+		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", postgresqlConfigFileName)
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
@@ -419,14 +421,15 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				Args:                     args,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   true,
-				InputFiles:               []string{configFile},
+				InputFiles:               []string{},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.postgresql,
 				SourceConfig:             configFile,
-				DestinationConfig:        "postgresql" + "_" + timestamp + "_" + configFileRenamed,
+				DestinationConfig:        postgresqlConfigFileName,
 			},
 		}
-		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFileRenamed)
+		opensearchConfigFileName := fmt.Sprintf("postgresql%s_%s", timestamp, sourceConfigFileName)
+		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", opensearchConfigFileName)
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
@@ -434,11 +437,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				Args:                     args,
 				WaitTimeout:              configCmdFlags.waitTimeout,
 				Single:                   true,
-				InputFiles:               []string{configFile},
+				InputFiles:               []string{},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.opensearch,
 				SourceConfig:             configFile,
-				DestinationConfig:        "opensearch" + "_" + timestamp + "_" + configFileRenamed,
+				DestinationConfig:        opensearchConfigFileName,
 			},
 		}
 
