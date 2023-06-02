@@ -168,7 +168,7 @@ type FqdnRequest struct {
 	NodeType          string   `json:"node_type"`
 }
 type CheckAndType struct {
-	CheckType string `json:"check_type"`
 	CheckName string `json:"check_name"`
+	CheckType string `json:"check_type"`
 	CheckMsg  string `json:"check_msg"`
 }

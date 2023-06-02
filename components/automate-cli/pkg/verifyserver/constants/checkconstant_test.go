@@ -8,7 +8,7 @@ import (
 
 func TestGetBastionChecks(t *testing.T) {
 	resp := GetBastionChecks()
-	assert.Equal(t, len(resp), 3)
+	assert.Equal(t, 3, len(resp))
 	assert.Contains(t, resp, HARDWARE_RESOURCE_COUNT)
 	assert.Contains(t, resp, CERTIFICATE)
 	assert.Contains(t, resp, SSH_USER)
@@ -32,17 +32,17 @@ func TestGetRemoteChecks(t *testing.T) {
 
 func TestGetCheckByType(t *testing.T) {
 	t.Run("Get NFS_BACKUP_CONFIG_MSG ", func(t *testing.T) {
-		resp := GetCheckByType(NFS_BACKUP_CONFIG)
+		resp := GetCheckMessageByType(NFS_BACKUP_CONFIG)
 		assert.Equal(t, resp, NFS_BACKUP_CONFIG_MSG)
 	})
 
 	t.Run("Get FIREWALL_MSG", func(t *testing.T) {
-		resp := GetCheckByType(FIREWALL)
+		resp := GetCheckMessageByType(FIREWALL)
 		assert.Equal(t, resp, FIREWALL_MSG)
 	})
 
-	t.Run("Get FIREWALL_MSG", func(t *testing.T) {
-		resp := GetCheckByType("random-string")
+	t.Run("Get Empty MSG", func(t *testing.T) {
+		resp := GetCheckMessageByType("random-string")
 		assert.Equal(t, resp, "")
 		assert.Empty(t, resp)
 	})

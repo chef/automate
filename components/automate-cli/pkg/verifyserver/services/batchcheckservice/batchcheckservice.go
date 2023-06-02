@@ -146,7 +146,7 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		result[resultIndex].NodeType = v[0].NodeType
 		resultArray := []models.ApiResult{}
 		for _, checkResult := range v {
-			checkResult.Result.Message = constants.GetCheckByType(checkResult.CheckType)
+			checkResult.Result.Message = constants.GetCheckMessageByType(checkResult.CheckType)
 			checkResult.Result.Check = checkResult.CheckType
 			resultArray = append(resultArray, checkResult.Result)
 		}
