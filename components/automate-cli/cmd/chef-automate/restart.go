@@ -15,7 +15,7 @@ import (
 const (
 	RESTART_FRONTEND_COMMAND    = `sudo chef-automate restart-services`
 	RESTART_BACKEND_COMMAND     = `sudo systemctl restart hab-sup`
-	DEFAULT_TIMEOUT_FOR_RESTART = 1500
+	DEFAULT_TIMEOUT_FOR_RESTART = 1000000000 // 1s
 )
 
 var restartCmdFlags = struct {
@@ -23,6 +23,7 @@ var restartCmdFlags = struct {
 	chefServer  bool
 	opensearch  bool
 	postgresql  bool
+	node        string
 	timeout     int
 	waitTimeout int
 }{}
@@ -46,6 +47,7 @@ func init() {
 	restartServicesCmd.PersistentFlags().BoolVar(&restartCmdFlags.opensearch, "os", false, "restart hab-sup service on opensearch nodes[DUPLICATE]")
 	restartServicesCmd.PersistentFlags().BoolVarP(&restartCmdFlags.postgresql, "postgresql", "p", false, "restart hab-sup service on postgresql nodes")
 	restartServicesCmd.PersistentFlags().BoolVar(&restartCmdFlags.postgresql, "pg", false, "restart hab-sup service on postgresql nodes[DUPLICATE]")
+	restartServicesCmd.PersistentFlags().StringVar(&restartCmdFlags.node, "node", "", "Node Ip address")
 	restartServicesCmd.PersistentFlags().IntVar(&restartCmdFlags.timeout, "wait-timeout", DEFAULT_TIMEOUT_FOR_RESTART, "This flag sets the operation timeout duration (in seconds) for each individual node during the certificate rotation process")
 	RootCmd.AddCommand(restartServicesCmd)
 }
@@ -56,84 +58,26 @@ func runRestartServices(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		frontend := &Cmd{
-			CmdInputs: &CmdInputs{
-				NodeType: false,
-			},
-		}
 
-		automate := &Cmd{
-			PreExec: nil,
-			CmdInputs: &CmdInputs{
-				Cmd:                      RESTART_FRONTEND_COMMAND,
-				WaitTimeout:              restartCmdFlags.waitTimeout,
-				Single:                   false,
-				Args:                     args,
-				ErrorCheckEnableInOutput: true,
-				//SkipPrintOutput:          true,
-				NodeType:                 restartCmdFlags.automate,
-			},
-		}
-
-		chefServer := &Cmd{
-			PreExec: nil,
-			CmdInputs: &CmdInputs{
-				Cmd:                      RESTART_FRONTEND_COMMAND,
-				WaitTimeout:              restartCmdFlags.waitTimeout,
-				Single:                   false,
-				Args:                     args,
-				ErrorCheckEnableInOutput: true,
-				//SkipPrintOutput:          true,
-				NodeType:                 restartCmdFlags.chefServer,
-			},
-		}
-
-		postgresql := &Cmd{
-			PreExec: nil,
-			CmdInputs: &CmdInputs{
-				Cmd:                      RESTART_BACKEND_COMMAND,
-				WaitTimeout:              restartCmdFlags.waitTimeout,
-				Single:                   false,
-				Args:                     args,
-				ErrorCheckEnableInOutput: true,
-				NodeType:                 restartCmdFlags.postgresql,
-			},
-		}
-		opensearch := &Cmd{
-			PreExec: nil,
-			CmdInputs: &CmdInputs{
-				Cmd:                      RESTART_BACKEND_COMMAND,
-				WaitTimeout:              restartCmdFlags.waitTimeout,
-				Single:                   false,
-				Args:                     args,
-				ErrorCheckEnableInOutput: true,
-				NodeType:                 restartCmdFlags.opensearch,
-			},
-		}
-		nodeMap := &NodeTypeAndCmd{
-			Frontend:   frontend,
-			Automate:   automate,
-			ChefServer: chefServer,
-			Postgresql: postgresql,
-			Opensearch: opensearch,
-			Infra:      infra,
-		}
 		if restartCmdFlags.timeout < DEFAULT_TIMEOUT_FOR_RESTART {
 			return errors.Errorf("The operation timeout duration for each individual node during the services restart should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT_FOR_RESTART)
 		}
+
 		sshConfig := getSshDetails(infra)
 		sshConfig.timeout = restartCmdFlags.timeout
 		sshUtil := NewSSHUtil(sshConfig)
-		//sshUtil.setSSHConfig(sshConfig)
-
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
 		if restartCmdFlags.automate || restartCmdFlags.chefServer || restartCmdFlags.postgresql || restartCmdFlags.opensearch {
+			nodeMap := constructEachNodeMap(infra)
+			cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
+			_, err = cmdUtil.Execute()
+		} else if  !restartCmdFlags.automate && !restartCmdFlags.chefServer && !restartCmdFlags.postgresql && !restartCmdFlags.opensearch && restartCmdFlags.node == "" {
+			nodeMap := constructAllNodeMap(infra)
+			cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 			_, err = cmdUtil.Execute()
 		} else {
 			writer.Println(cmd.UsageString())
 		}
-
 		return err
 	}
 	connection, err := client.Connection(client.DefaultClientTimeout)
@@ -161,4 +105,108 @@ func runRestartServices(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func constructEachNodeMap(infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+	nodeMap := &NodeTypeAndCmd{
+		Frontend: &Cmd{
+			CmdInputs: &CmdInputs{
+				NodeType: false,
+			},
+		},
+		Automate: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_FRONTEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 restartCmdFlags.automate,
+			},
+		},
+		ChefServer: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_FRONTEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 restartCmdFlags.chefServer,
+			},
+		},
+		Postgresql: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_BACKEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 restartCmdFlags.postgresql,
+			},
+		},
+		Opensearch: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_BACKEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 restartCmdFlags.opensearch,
+			},
+		},
+		Infra: infra,
+	}
+	return nodeMap
+}
+
+func constructAllNodeMap(infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+	nodeMap := &NodeTypeAndCmd{
+		Frontend: &Cmd{
+			CmdInputs: &CmdInputs{
+				NodeType: false,
+			},
+		},
+		Automate: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_FRONTEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 true,
+			},
+		},
+		ChefServer: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_FRONTEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 true,
+			},
+		},
+		Postgresql: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_BACKEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 true,
+			},
+		},
+		Opensearch: &Cmd{
+			CmdInputs: &CmdInputs{
+				Cmd:                      RESTART_BACKEND_COMMAND,
+				WaitTimeout:              restartCmdFlags.waitTimeout,
+				ErrorCheckEnableInOutput: true,
+				Single:                   false,
+				NodeIps:                  []string{restartCmdFlags.node},
+				NodeType:                 true,
+			},
+		},
+		Infra: infra,
+	}
+	return nodeMap
 }
