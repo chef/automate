@@ -56,7 +56,8 @@ func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalO
 func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOSRequest, port int, client *http.Client) error {
 	eos.log.Debug("Triggering Request...")
 	// Create a new request with basic authentication
-	url := fmt.Sprintf("https://%s:%d", reqBody.OSDomainURL, port)
+	// hitting /_cat/indices API of opensearch just to make sure there is OS running or not
+	url := fmt.Sprintf("https://%s:%d/_cat/indices", reqBody.OSDomainURL, port)
 	eos.log.Debug("URL: ", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
