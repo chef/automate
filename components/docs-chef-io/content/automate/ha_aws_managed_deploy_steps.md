@@ -107,7 +107,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Give `ssh_port` if your AMI runs on custom **ssh port**. The default value is 22.
    - Give `ssh_key_file` path, downloaded from **AWS SSH Key Pair**, which you want to use to create all the VMs. This will let you access all the VMs.
    - We support only private key authentication.
-   - Set `backup_config` to `"s3"`. If `backup_config` is `s3`, set `s3_bucketName`.
+   - Set `backup_config` to `"s3"` or `efs`.
+   - If `backup_config` is `s3`, uncomment and add the value for following `s3_bucketName` attribute.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
    - Don't set `fqdn` for the AWS deployment.
    - Set `instance_count` for *Chef Automate*, *Chef Infra Server*, *Postgresql*, *OpenSearch*.
@@ -115,7 +116,7 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `profile`. The default value of `profile` is `"default"`.
       - Set `region`. The  default value of `region` is `"us-east-1"`.
       - Set `aws_vpc_id`, created in the Prerequisites step. Example: `"vpc12318h"`.
-      - If AWS VPC uses Subnet, set `private_custom_subnets` and `public_custom_subnets`. For example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`.
+      - If AWS VPC uses Subnet, set `private_custom_subnets` to the 3 private subnets we created in prerequisites step and `public_custom_subnets` to the 3 public subnets we created in prerequisites step. For example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`.
       - Set `ssh_key_pair_name`, an SSH Key Pair created as a Prerequisite. The pair value should be the name of the AWS SSH Key Pair without a `.pem` extension. The ssh key content should be the same as the content of `ssh_key_file`.
       - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. The default value is `false`, which should be changed.
         - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the **Managed AWS OpenSearch** created in the Prerequisite steps.

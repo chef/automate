@@ -273,7 +273,7 @@ For AWS managed services, map the snapshot role to the OpenSearch dashboard. It 
     # AWS environment variables or through the shared AWS config files.
     access_key = "<access_key>"
     secret_key = "<secret_key>"
-    session_key = "<session_key>"
+    session_token = "<session_token>"
     [global.v1.backups.s3.ssl]
     # root_cert (optional): The root certificate used for SSL validation.
     # For S3 compatible APIs, you can set the SSL root cert if needed
