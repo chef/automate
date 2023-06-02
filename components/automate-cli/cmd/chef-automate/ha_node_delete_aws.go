@@ -119,7 +119,6 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 
-	// If the node is successfully remove, delete the machine
 	if err == nil {
 		dna.writer.Println("Node is successfully deleted from the cluster.")
 	}

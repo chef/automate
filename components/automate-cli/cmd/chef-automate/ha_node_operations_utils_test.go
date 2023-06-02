@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -362,4 +363,67 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 		}}, command.NewMockExecutor(t))
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, AWS_MODE, infra)
 	assert.NoError(t, err)
+}
+
+func TestCalculateTotalInstanceCount(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, &command.MockExecutorImpl{
+		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
+			return "8\n", nil
+		},
+	})
+	count, err := nodeUtil.calculateTotalInstanceCount()
+	assert.NoError(t, err)
+	assert.Equal(t, 8, count)
+}
+
+func TestCalculateTotalInstanceCountCombineOutputError(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, &command.MockExecutorImpl{
+		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
+			return "", errors.New("random error")
+		},
+	})
+	count, err := nodeUtil.calculateTotalInstanceCount()
+	assert.ErrorContains(t, err, "error")
+	assert.Equal(t, -1, count)
+}
+
+func TestCalculateTotalInstanceCountAtoiError(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, &command.MockExecutorImpl{
+		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
+			return "abc", nil
+		},
+	})
+	count, err := nodeUtil.calculateTotalInstanceCount()
+	assert.ErrorContains(t, err, "invalid syntax")
+	assert.Equal(t, -1, count)
+}
+
+func TestGetIPsFromOSClusterResponsePersistent(t *testing.T) {
+	input := `{"persistent":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":"192.0.2.11"}}}},"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, TEST_IP_1, out)
+}
+
+func TestGetIPsFromOSClusterResponsePersistentMultiple(t *testing.T) {
+	input := `{"persistent":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":"192.0.2.11,192.0.2.12,192.0.2.13"}}}},"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, "192.0.2.11,192.0.2.12,192.0.2.13", out)
+}
+
+func TestGetIPsFromOSClusterResponseTransient(t *testing.T) {
+	input := `{"persistent":{"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":"192.0.2.11"}}}}}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, TEST_IP_1, out)
+}
+
+func TestGetIPsFromOSClusterResponseTransientEmpty(t *testing.T) {
+	input := `{"persistent":{"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":""}}}}}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, "", out)
+}
+
+func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
+	input := `{"persistent":{"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, "", out)
 }

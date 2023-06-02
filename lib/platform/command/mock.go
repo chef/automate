@@ -49,6 +49,29 @@ type ExpectedCommand struct {
 	Stdout           io.Writer
 }
 
+type MockExecutorImpl struct {
+	RunFunc            func(string, ...Opt) error
+	StartFunc          func(string, ...Opt) (WaitFunc, error)
+	OutputFunc         func(string, ...Opt) (string, error)
+	CombinedOutputFunc func(string, ...Opt) (string, error)
+}
+
+func (m *MockExecutorImpl) Run(cmd string, opts ...Opt) error {
+	return m.RunFunc(cmd, opts...)
+}
+
+func (m *MockExecutorImpl) Start(cmd string, opts ...Opt) (WaitFunc, error) {
+	return m.StartFunc(cmd, opts...)
+}
+
+func (m *MockExecutorImpl) Output(cmd string, opts ...Opt) (string, error) {
+	return m.OutputFunc(cmd, opts...)
+}
+
+func (m *MockExecutorImpl) CombinedOutput(cmd string, opts ...Opt) (string, error) {
+	return m.CombinedOutputFunc(cmd, opts...)
+}
+
 // Return sets the return value for an expectation
 func (e *Expectation) Return(vals ...interface{}) *Expectation {
 	e.retVals = vals
