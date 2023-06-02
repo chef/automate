@@ -256,7 +256,7 @@ func (nm *NfsServiceImp) getMountDetails(mountLocation string) *models.NFSMountL
 	// we can't list mount info
 	diskPartition, err := nm.SystemResourceInfo.GetDiskPartitions(true)
 	if err != nil {
-		nm.log.Error("Error getting disk partions")
+		nm.log.Error("Error getting disk partions: " + err.Error())
 		return &models.NFSMountLocResponse{
 			Address:       "",
 			Nfs:           "",
@@ -267,7 +267,7 @@ func (nm *NfsServiceImp) getMountDetails(mountLocation string) *models.NFSMountL
 		if partition.Mountpoint == mountLocation {
 			usageStat, err := nm.SystemResourceInfo.GetDiskSpaceInfo(mountLocation)
 			if err != nil {
-				nm.log.Error("Failed to retrieve disk usage:")
+				nm.log.Error("Failed to retrieve disk usage: " + err.Error())
 				return &models.NFSMountLocResponse{
 					Address:       "",
 					Nfs:           "",
@@ -279,7 +279,7 @@ func (nm *NfsServiceImp) getMountDetails(mountLocation string) *models.NFSMountL
 				Nfs:                partition.Device,
 				MountLocation:      mountLocation,
 				StorageCapacity:    nm.SystemResourceInfo.FormatBytes(usageStat.Total),
-				AvailableFreeSpace: nm.SystemResourceInfo.FormatBytes(usageStat.Total),
+				AvailableFreeSpace: nm.SystemResourceInfo.FormatBytes(usageStat.Free),
 			}
 		}
 	}

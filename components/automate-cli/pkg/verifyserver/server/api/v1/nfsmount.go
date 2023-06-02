@@ -37,5 +37,8 @@ func (h *Handler) NFSMountLoc(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Mount Location cannot be empty")
 	}
 	nfsMountLoc := h.NFSMountService.GetNFSMountLoc(reqBody)
+	if nfsMountLoc.Address == "" && nfsMountLoc.MountLocation != "" {
+		return fiber.NewError(http.StatusNotFound, "Failed to get NFS mount location")
+	}
 	return c.JSON(response.BuildSuccessResponse(nfsMountLoc))
 }

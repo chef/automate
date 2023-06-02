@@ -20,7 +20,8 @@ import (
 var (
 	nfsErrorBodyParser = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Invalid Body Request\"}}"
 	errorMountLocEmpty = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":400,\"message\":\"Mount Location cannot be empty\"}}"
-	successMsg         = "{\"status\":\"SUCCESS\",\"result\":{\"address\":\"\",\"mount_location\":\"/data\",\"nfs\":\"\",\"storage_capacity\":\"\",\"Available_free_space\":\"\"}}"
+	nfsNotFoundMsg     = "{\"status\":\"FAILED\",\"result\":null,\"error\":{\"code\":404,\"message\":\"Failed to get NFS mount location\"}}"
+	successMsg         = "{\"status\":\"SUCCESS\",\"result\":{\"address\":\"127.0.0.1\",\"mount_location\":\"/data\",\"nfs\":\"127.0.0.1:/\",\"storage_capacity\":\"9.5 GB\",\"available_free_space\":\"7.7 GB\"}}"
 )
 
 func SetupNFSMountHandler(nm nfsmountservice.NFSService) (*fiber.App, error) {
@@ -600,7 +601,53 @@ func TestNFSMount(t *testing.T) {
 	}
 }
 
-func TestNFSMountLocation(t *testing.T) {
+func TestNFSMountLocationSuccess(t *testing.T) {
+	tests := []struct {
+		TestName     string
+		ExpectedCode int
+		ExpectedBody string
+		RequestBody  string
+	}{
+		{
+			TestName:     "200:Success",
+			ExpectedCode: 200,
+			ExpectedBody: successMsg,
+			RequestBody: `{
+				"mount_location":"/nfs"
+			}`,
+		},
+	}
+
+	NFSMounLoctEndpoint := constants.NFS_MOUNT_LOC_API_PATH
+
+	app, err := SetupNFSMountHandler(&nfsmountservice.MockNFSMountService{
+		GetNFSMountLocFunc: func(reqBody models.NFSMountLocRequest) *models.NFSMountLocResponse {
+			return &models.NFSMountLocResponse{
+				Address:            "127.0.0.1",
+				Nfs:                "127.0.0.1:/",
+				MountLocation:      "/data",
+				StorageCapacity:    "9.5 GB",
+				AvailableFreeSpace: "7.7 GB",
+			}
+		},
+	})
+	assert.NoError(t, err)
+
+	for _, test := range tests {
+		t.Run(test.TestName, func(t *testing.T) {
+			req := httptest.NewRequest("POST", NFSMounLoctEndpoint, strings.NewReader(test.RequestBody))
+			req.Header.Add("Content-Type", "application/json")
+			res, err := app.Test(req, -1)
+			assert.NoError(t, err)
+			body, err := ioutil.ReadAll(res.Body)
+			assert.NoError(t, err, test.TestName)
+			assert.Contains(t, string(body), test.ExpectedBody)
+			assert.Equal(t, test.ExpectedCode, res.StatusCode)
+		})
+	}
+}
+
+func TestNFSMountLocationFailure(t *testing.T) {
 	tests := []struct {
 		TestName     string
 		ExpectedCode int
@@ -625,9 +672,9 @@ func TestNFSMountLocation(t *testing.T) {
 			}`,
 		},
 		{
-			TestName:     "200:Success",
-			ExpectedCode: 200,
-			ExpectedBody: successMsg,
+			TestName:     "404:Nfs not found",
+			ExpectedCode: 404,
+			ExpectedBody: nfsNotFoundMsg,
 			RequestBody: `{
 				"mount_location":"/data"
 			}`,

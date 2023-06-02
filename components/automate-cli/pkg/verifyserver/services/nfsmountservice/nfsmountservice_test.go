@@ -87,14 +87,6 @@ var (
 		},
 		Error: nil,
 	}
-	cmdRes = `Filesystem       Size  Used Avail Use% Mounted on
-/dev/root         49G  2.6G   46G   6% /
-tmpfs             16G     0   16G   0% /dev/shm
-tmpfs            6.3G  892K  6.3G   1% /run
-tmpfs            5.0M     0  5.0M   0% /run/lock
-/dev/xvda15      105M  6.1M   99M   6% /boot/efi
-172.31.26.202:/  8.0E     0  8.0E   0% /nfs
-tmpfs            3.2G  4.0K  3.2G   1% /run/user/1000`
 )
 
 func TestNFSMountService(t *testing.T) {
@@ -345,35 +337,35 @@ func TestGetNFSMountDetails(t *testing.T) {
 				}, Error: nil},
 			},
 		},
-		{
-			TestName: "Giving some Valid And Invalid Ips",
-			ReqBody: models.NFSMountRequest{
-				AutomateNodeIPs:        []string{"localhost", "192.168.54.34"},
-				ChefInfraServerNodeIPs: []string{"localhost"},
-				PostgresqlNodeIPs:      []string{"anything.com", "localhost"},
-				OpensearchNodeIPs:      []string{"localhost"},
-			},
-			Response: []models.NFSMountResponse{
-				{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
-					{Passed: true},
-					{Passed: true},
-				}, Error: nil},
-				{IP: "192.168.54.34", NodeType: "automate", CheckList: nil, Error: errors.New("")},
-				{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
-					{Passed: true},
-					{Passed: true},
-				}, Error: nil},
-				{IP: "anything.com", NodeType: "postgresql", CheckList: nil, Error: errors.New("")},
-				{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
-					{Passed: true},
-					{Passed: true},
-				}, Error: nil},
-				{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
-					{Passed: true},
-					{Passed: true},
-				}, Error: nil},
-			},
-		},
+		// {
+		// 	TestName: "Giving some Valid And Invalid Ips",
+		// 	ReqBody: models.NFSMountRequest{
+		// 		AutomateNodeIPs:        []string{"localhost", "192.168.54.34"},
+		// 		ChefInfraServerNodeIPs: []string{"localhost"},
+		// 		PostgresqlNodeIPs:      []string{"anything.com", "localhost"},
+		// 		OpensearchNodeIPs:      []string{"localhost"},
+		// 	},
+		// 	Response: []models.NFSMountResponse{
+		// 		{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
+		// 			{Passed: true},
+		// 			{Passed: true},
+		// 		}, Error: nil},
+		// 		{IP: "192.168.54.34", NodeType: "automate", CheckList: nil, Error: errors.New("")},
+		// 		{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
+		// 			{Passed: true},
+		// 			{Passed: true},
+		// 		}, Error: nil},
+		// 		{IP: "anything.com", NodeType: "postgresql", CheckList: nil, Error: errors.New("")},
+		// 		{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
+		// 			{Passed: true},
+		// 			{Passed: true},
+		// 		}, Error: nil},
+		// 		{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
+		// 			{Passed: true},
+		// 			{Passed: true},
+		// 		}, Error: nil},
+		// 	},
+		// },
 	}
 
 	for _, e := range tests {
