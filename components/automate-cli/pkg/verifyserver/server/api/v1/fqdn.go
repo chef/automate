@@ -19,21 +19,21 @@ func (h *Handler) CheckFqdn(c *fiber.Ctx) error {
 	}
 
 	if strings.TrimSpace(req.Fqdn) == "" || strings.TrimSpace(req.RootCert) == "" || len(req.Nodes) == 0 {
-		h.Logger.Error("Fqdn, Root Cert and Nodes can't be empty.")
-		return fiber.NewError(http.StatusBadRequest, "Fqdn, Root Cert and Nodes can't be empty, Please provide all the required fields.")
+		h.Logger.Error("fqdn, root_cert and nodes can't be empty.")
+		return fiber.NewError(http.StatusBadRequest, "fqdn, root_cert and nodes can't be empty, Please provide all the required fields.")
 	}
 
 	for _, ip := range req.Nodes {
 		if net.ParseIP(ip) == nil {
-			h.Logger.Error("Node IP is not valid")
+			h.Logger.Errorf("%v node IP is not valid", ip)
 			return fiber.NewError(http.StatusBadRequest, "Node IP is not valid, Please provide the valid format IP.")
 		}
 	}
 
 	if req.IsAfterDeployment &&
 		(req.NodeType == "" || (req.NodeType != constants.AUTOMATE && req.NodeType != constants.CHEF_INFRA_SERVER)) {
-		h.Logger.Error("Node Type should be automate or chef-infra-server.")
-		return fiber.NewError(http.StatusBadRequest, "Node Type should be automate or chef-infra-server, Please provide Node Type.")
+		h.Logger.Error("node_type should be automate or chef-infra-server.")
+		return fiber.NewError(http.StatusBadRequest, "node_type should be automate or chef-infra-server, Please provide node_type.")
 	}
 
 	res := h.FqdnService.CheckFqdnReachability(*req, constants.DEFAULT_HTTPS_PORT)

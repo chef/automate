@@ -26,7 +26,7 @@ type FqdnService struct {
 	timeout time.Duration
 }
 
-func NewFqdnService(log logger.Logger, timeout time.Duration) *FqdnService {
+func NewFqdnService(log logger.Logger, timeout time.Duration) IFqdnService {
 	return &FqdnService{
 		log:     log,
 		timeout: timeout,
@@ -119,6 +119,7 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 
 	fq.log.Debug("Status Code: ", res.StatusCode)
 	if res.StatusCode != 200 {
+		fq.log.Debug("Fqdn is not reachable.")
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
 	}
 	fq.log.Debug("Fqdn is Reachable.")
@@ -194,8 +195,12 @@ func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
 
 	currentTime := time.Now()
 	if currentTime.After(certificate.NotAfter) || !certificate.IsCA || len(certificate.DNSNames) == 0 {
+		fq.log.Debug("Certificate is Invalid.")
+		fq.log.Debugf("Expiry: %v, CA: %v, SAN: %v", certificate.NotAfter, certificate.IsCA, certificate.DNSNames)
 		return createCheck(constants.CERTIFICATE_TITLE, false, "", constants.CERTIFICATE_ERROR_MESSAGE, constants.CERTIFICATE_RESOLUTION_MESSAGE)
 	}
+
+	fq.log.Debug("Certificate is valid")
 	return createCheck(constants.CERTIFICATE_TITLE, true, constants.CERTIFICATE_SUCCESS_MESSAGE, "", "")
 }
 
