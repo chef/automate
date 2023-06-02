@@ -3,7 +3,6 @@ package main
 const (
 	AWS_MODE            = "AWS_MODE"
 	EXISTING_INFRA_MODE = "EXISTING_INFRA_MODE"
-	AUTOMATE            = "AUTOMATE"
 	HA_MODE             = "HA_MODE"
 )
 
@@ -72,4 +71,19 @@ const (
 	`
 
 	SUDO_PASSWORD_CMD = `echo "%s" | sudo -S bash -c "`
+
+	STOP_FE_SERVICES_CMD = `sudo systemctl stop chef-automate`
+	STOP_BE_SERVICES_CMD = `sudo systemctl stop hab-sup`
+
+	EXCLUDE_OPENSEARCH_NODE_REQUEST = `
+	curl --location --request PUT 'http://localhost:10144/_cluster/settings' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{
+	  "persistent" :{
+		  "cluster.routing.allocation.exclude._ip" : "%s"
+	   }
+	}'
+	`
+
+	GET_OPENSEARCH_CLUSTER_SETTINGS = `curl --location --request GET 'http://localhost:10144/_cluster/settings'`
 )

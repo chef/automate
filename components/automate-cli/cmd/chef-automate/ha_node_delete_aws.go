@@ -9,30 +9,22 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-type SvcDetails struct {
-	ipList         []string
-	configIpList   []string
-	instanceCount  string
-	minInstanceCnt int
-	name           string
-}
 type DeleteNodeAWSImpl struct {
-	config           AwsConfigToml
-	automateIpList   []string
-	chefServerIpList []string
-	opensearchIpList []string
-	postgresqlIpList []string
-	nodeUtils        NodeOpUtils
-	flags            AddDeleteNodeHACmdFlags
-	configpath       string
-	terraformPath    string
-	writer           *cli.Writer
-	fileUtils        fileutils.FileUtils
-	sshUtil          SSHUtil
+	config        AwsConfigToml
+	ipToDelete    string
+	nodeType      string
+	nodeUtils     NodeOpUtils
+	flags         AddDeleteNodeHACmdFlags
+	configpath    string
+	terraformPath string
+	writer        *cli.Writer
+	fileUtils     fileutils.FileUtils
+	sshUtil       SSHUtil
 	AWSConfigIp
 }
 
@@ -57,18 +49,14 @@ var (
 
 func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
 	return &DeleteNodeAWSImpl{
-		config:           AwsConfigToml{},
-		automateIpList:   []string{},
-		chefServerIpList: []string{},
-		opensearchIpList: []string{},
-		postgresqlIpList: []string{},
-		nodeUtils:        nodeUtils,
-		flags:            flags,
-		configpath:       filepath.Join(haDirPath, "config.toml"),
-		terraformPath:    filepath.Join(haDirPath, "terraform"),
-		writer:           writer,
-		fileUtils:        fileutils,
-		sshUtil:          sshUtil,
+		config:        AwsConfigToml{},
+		nodeUtils:     nodeUtils,
+		flags:         flags,
+		configpath:    filepath.Join(haDirPath, "config.toml"),
+		terraformPath: filepath.Join(haDirPath, "terraform"),
+		writer:        writer,
+		fileUtils:     fileutils,
+		sshUtil:       sshUtil,
 	}
 }
 
@@ -101,40 +89,82 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 			return nil
 		}
 	}
-	dna.prepare()
 
-	return dna.runDeploy()
+	previousCount, err := dna.nodeUtils.calculateTotalInstanceCount()
+	if err != nil {
+		return err
+	}
+
+	err = dna.prepare()
+	if err != nil {
+		return err
+	}
+
+	err = dna.runDeploy()
+	currentCount, newErr := dna.nodeUtils.calculateTotalInstanceCount()
+	if newErr != nil {
+		if err != nil {
+			return errors.Wrap(err, newErr.Error())
+		}
+		return newErr
+	}
+
+	if currentCount == previousCount-1 {
+		stopErr := dna.stopNodes()
+		if stopErr != nil {
+			if err != nil {
+				return errors.Wrap(err, stopErr.Error())
+			}
+			return stopErr
+		}
+	} else {
+		if err != nil {
+			return errors.Wrap(err, "Error in deleting node")
+		}
+		return errors.New("Error in deleting node")
+	}
+
+	if err == nil {
+		dna.writer.Println("Node is successfully deleted from the cluster.")
+	}
+
+	return err
 }
+
 func (dna *DeleteNodeAWSImpl) modifyConfig() error {
 	dna.config.Architecture.ConfigInitials.Architecture = "aws"
-	err := modifyConfigForDeleteNodeForAWS(
-		&dna.config.Automate.Config.InstanceCount,
-		dna.automateIpList,
-	)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
+
+	var err error
+
+	switch dna.nodeType {
+	case AUTOMATE:
+		err = modifyConfigForDeleteNodeForAWS(
+			&dna.config.Automate.Config.InstanceCount,
+			[]string{dna.ipToDelete},
+		)
+	case CHEF_SERVER:
+		err = modifyConfigForDeleteNodeForAWS(
+			&dna.config.ChefServer.Config.InstanceCount,
+			[]string{dna.ipToDelete},
+		)
+	case POSTGRESQL:
+		err = modifyConfigForDeleteNodeForAWS(
+			&dna.config.Postgresql.Config.InstanceCount,
+			[]string{dna.ipToDelete},
+		)
+	case OPENSEARCH:
+		err = modifyConfigForDeleteNodeForAWS(
+			&dna.config.Opensearch.Config.InstanceCount,
+			[]string{dna.ipToDelete},
+		)
+	default:
+		return errors.New("Invalid node type")
 	}
-	err = modifyConfigForDeleteNodeForAWS(
-		&dna.config.ChefServer.Config.InstanceCount,
-		dna.chefServerIpList,
-	)
+
 	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
+		return status.Wrap(err, status.ConfigError, "Error modifying "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" instance count")
 	}
-	err = modifyConfigForDeleteNodeForAWS(
-		&dna.config.Opensearch.Config.InstanceCount,
-		dna.opensearchIpList,
-	)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
-	}
-	err = modifyConfigForDeleteNodeForAWS(
-		&dna.config.Postgresql.Config.InstanceCount,
-		dna.postgresqlIpList,
-	)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")
-	}
+
 	return nil
 }
 
@@ -150,22 +180,13 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	dna.writer.Println("OpenSearch => " + strings.Join(dna.AWSConfigIp.configOpensearchIpList, ", "))
 	dna.writer.Println("Postgresql => " + strings.Join(dna.AWSConfigIp.configPostgresqlIpList, ", "))
 	dna.writer.Println("")
-	dna.writer.Println("Nodes to be deleted:")
+	dna.writer.Println("Node to be deleted:")
 	dna.writer.Println("================================================")
-	if len(dna.automateIpList) > 0 {
-		dna.writer.Println("Automate => " + strings.Join(dna.automateIpList, ", "))
-	}
-	if len(dna.chefServerIpList) > 0 {
-		dna.writer.Println("Chef-Server => " + strings.Join(dna.chefServerIpList, ", "))
-	}
-	if len(dna.opensearchIpList) > 0 {
-		dna.writer.Println("OpenSearch => " + strings.Join(dna.opensearchIpList, ", "))
-	}
-	if len(dna.postgresqlIpList) > 0 {
-		dna.writer.Println("Postgresql => " + strings.Join(dna.postgresqlIpList, ", "))
-	}
-	dna.writer.Println("Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.")
-	return dna.writer.Confirm("This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue?")
+
+	dna.writer.Println(fmt.Sprintf("%s => %s", stringutils.TitleReplace(dna.nodeType, "_", "-"), dna.ipToDelete))
+
+	dna.writer.Println("Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.")
+	return dna.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
@@ -198,34 +219,38 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 }
 
 func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
-	err := dna.removeNodeIfExists("chef_automate", dna.automateIpList, dna.configAutomateIpList)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error removing automate node")
+
+	var instanceType string
+	var configNodeIpList []string
+	switch dna.nodeType {
+	case AUTOMATE:
+		instanceType = "chef_automate"
+		configNodeIpList = dna.configAutomateIpList
+	case CHEF_SERVER:
+		instanceType = "chef_server"
+		configNodeIpList = dna.configChefServerIpList
+	case POSTGRESQL:
+		instanceType = "chef_automate_postgresql"
+		configNodeIpList = dna.configPostgresqlIpList
+	case OPENSEARCH:
+		instanceType = "chef_automate_opensearch"
+		configNodeIpList = dna.configOpensearchIpList
+	default:
+		status.New(status.InvalidCommandArgsError, "Invalid node type")
 	}
 
-	err = dna.removeNodeIfExists("chef_server", dna.chefServerIpList, dna.configChefServerIpList)
+	err := dna.removeNodeIfExists(instanceType, dna.ipToDelete, configNodeIpList)
 	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error removing chef server node")
+		return status.Wrap(err, status.ConfigError, "Error removing "+stringutils.TitleReplace(dna.nodeType, "_", "-")+" node")
 	}
 
-	err = dna.removeNodeIfExists("chef_automate_opensearch", dna.opensearchIpList, dna.configOpensearchIpList)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error removing opensearch node")
-	}
-
-	err = dna.removeNodeIfExists("chef_automate_postgresql", dna.postgresqlIpList, dna.configPostgresqlIpList)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Error removing postgresql node")
-	}
 	return nil
 }
 
-func (dna *DeleteNodeAWSImpl) removeNodeIfExists(nodeType string, nodeIpList, configNodeIpList []string) error {
-	if len(nodeIpList) == 1 {
-		for i := 0; i < len(configNodeIpList); i++ {
-			if configNodeIpList[i] == nodeIpList[0] {
-				return dna.removeNodeFromAws(nodeType, i, len(configNodeIpList)-1)
-			}
+func (dna *DeleteNodeAWSImpl) removeNodeIfExists(nodeType, ipToDelete string, configNodeIpList []string) error {
+	for i := 0; i < len(configNodeIpList); i++ {
+		if configNodeIpList[i] == ipToDelete {
+			return dna.removeNodeFromAws(nodeType, i, len(configNodeIpList)-1)
 		}
 	}
 	return nil
@@ -236,25 +261,47 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error getting AWS instance Ip")
 	}
-	dna.automateIpList, dna.chefServerIpList, dna.opensearchIpList, dna.postgresqlIpList = splitIPCSV(
+
+	automateIpList, chefServerIpList, opensearchIpList, postgresqlIpList := splitIPCSV(
 		dna.flags.automateIp,
 		dna.flags.chefServerIp,
 		dna.flags.opensearchIp,
 		dna.flags.postgresqlIp,
 	)
-	var exceptionIps []string
-	exceptionIps = append(exceptionIps, dna.automateIpList...)
-	exceptionIps = append(exceptionIps, dna.chefServerIpList...)
-	exceptionIps = append(exceptionIps, dna.opensearchIpList...)
-	exceptionIps = append(exceptionIps, dna.postgresqlIpList...)
 
-	updatedConfig, err := dna.nodeUtils.pullAndUpdateConfigAws(&dna.sshUtil, exceptionIps)
+	// Check if only one node is being deleted
+	if (len(automateIpList) + len(chefServerIpList) + len(opensearchIpList) + len(postgresqlIpList)) != 1 {
+		return status.New(status.InvalidCommandArgsError, "Only one node can be deleted at a time")
+	}
+
+	// Get the node type and ip address of the node to be deleted
+	if len(automateIpList) > 0 {
+		dna.ipToDelete = automateIpList[0]
+		dna.nodeType = AUTOMATE
+	} else if len(chefServerIpList) > 0 {
+		dna.ipToDelete = chefServerIpList[0]
+		dna.nodeType = CHEF_SERVER
+	} else if len(postgresqlIpList) > 0 {
+		dna.ipToDelete = postgresqlIpList[0]
+		dna.nodeType = POSTGRESQL
+	} else if len(opensearchIpList) > 0 {
+		dna.ipToDelete = opensearchIpList[0]
+		dna.nodeType = OPENSEARCH
+	} else {
+		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to delete")
+	}
+
+	if !isValidIPFormat(dna.ipToDelete) {
+		return status.New(status.InvalidCommandArgsError, "Invalid IP address "+dna.ipToDelete)
+	}
+
+	updatedConfig, err := dna.nodeUtils.pullAndUpdateConfigAws(&dna.sshUtil, []string{dna.ipToDelete})
 	if err != nil {
 		return err
 	}
 	dna.config = *updatedConfig
 	if dna.nodeUtils.isManagedServicesOn() {
-		if len(dna.opensearchIpList) > 0 || len(dna.postgresqlIpList) > 0 {
+		if dna.nodeType == POSTGRESQL || dna.nodeType == OPENSEARCH {
 			return status.New(status.ConfigError, fmt.Sprintf(TYPE_ERROR, "remove"))
 		}
 	}
@@ -267,31 +314,41 @@ func (dna *DeleteNodeAWSImpl) validate() error {
 
 func (dna *DeleteNodeAWSImpl) validateCmdArgs() *list.List {
 	errorList := list.New()
-	services := []SvcDetails{
-		{dna.automateIpList, dna.configAutomateIpList, dna.config.Automate.Config.InstanceCount, AUTOMATE_MIN_INSTANCE_COUNT, "Automate"},
-		{dna.chefServerIpList, dna.configChefServerIpList, dna.config.ChefServer.Config.InstanceCount, CHEF_SERVER_MIN_INSTANCE_COUNT, "Chef-Server"},
+
+	var minCount int
+	var instanceCount string
+	var configIpList []string
+
+	switch dna.nodeType {
+	case AUTOMATE:
+		instanceCount = dna.config.Automate.Config.InstanceCount
+		minCount = AUTOMATE_MIN_INSTANCE_COUNT
+		configIpList = dna.configAutomateIpList
+	case CHEF_SERVER:
+		instanceCount = dna.config.ChefServer.Config.InstanceCount
+		minCount = CHEF_SERVER_MIN_INSTANCE_COUNT
+		configIpList = dna.configChefServerIpList
+	case POSTGRESQL:
+		instanceCount = dna.config.Postgresql.Config.InstanceCount
+		minCount = POSTGRESQL_MIN_INSTANCE_COUNT
+		configIpList = dna.configPostgresqlIpList
+	case OPENSEARCH:
+		instanceCount = dna.config.Opensearch.Config.InstanceCount
+		minCount = OPENSEARCH_MIN_INSTANCE_COUNT
+		configIpList = dna.configOpensearchIpList
+	default:
+		errorList.PushBack("Invalid node type")
 	}
-	if !dna.nodeUtils.isManagedServicesOn() {
-		services = append(services, []SvcDetails{
-			{dna.opensearchIpList, dna.configOpensearchIpList, dna.config.Opensearch.Config.InstanceCount, OPENSEARCH_MIN_INSTANCE_COUNT, "OpenSearch"},
-			{dna.postgresqlIpList, dna.configPostgresqlIpList, dna.config.Postgresql.Config.InstanceCount, POSTGRESQL_MIN_INSTANCE_COUNT, "Postgresql"},
-		}...)
+
+	allowed, finalCount, err := isFinalInstanceCountAllowed(instanceCount, -1, minCount)
+	if err != nil {
+		errorList.PushBack(fmt.Sprintf("Error occurred in calculating %s final instance count", stringutils.TitleReplace(dna.nodeType, "_", "-")))
 	}
-	for _, service := range services {
-		if len(service.ipList) > 1 {
-			errorList.PushBack(fmt.Sprintf("Only one %s is allowed to delete for AWS deployment type", service.name))
-		} else if len(service.ipList) == 1 {
-			allowed, finalCount, err := isFinalInstanceCountAllowed(service.instanceCount, -len(service.ipList), service.minInstanceCnt)
-			if err != nil {
-				errorList.PushBack(fmt.Sprintf("Error occurred in calculating %s final instance count", service.name))
-				continue
-			}
-			if !allowed {
-				errorList.PushBack(fmt.Sprintf("Unable to remove node. %s instance count cannot be less than %d. Final count %d not allowed.", service.name, service.minInstanceCnt, finalCount))
-			}
-			errorList.PushBackList(checkIfPresentInPrivateIPList(service.configIpList, service.ipList, service.name))
-		}
+	if !allowed {
+		errorList.PushBack(fmt.Sprintf("Unable to remove node. %s instance count cannot be less than %d. Final count %d not allowed.", stringutils.TitleReplace(dna.nodeType, "_", "-"), minCount, finalCount))
 	}
+	errorList.PushBackList(checkIfPresentInPrivateIPList(configIpList, []string{dna.ipToDelete}, stringutils.TitleReplace(dna.nodeType, "_", "-")))
+
 	return errorList
 }
 
@@ -327,5 +384,20 @@ func (dna *DeleteNodeAWSImpl) getAwsHAIp() error {
 		return err
 	}
 	dna.AWSConfigIp = *ConfigIp
+	return nil
+}
+
+// Stop all services on the node to be deleted
+func (dna *DeleteNodeAWSImpl) stopNodes() error {
+
+	infra, _, err := dna.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+
+	err = dna.nodeUtils.stopServicesOnNode(dna.ipToDelete, dna.nodeType, AWS_MODE, infra)
+	if err != nil {
+		return status.Wrap(err, status.CommandExecutionError, "Error stopping services on node")
+	}
 	return nil
 }

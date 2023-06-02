@@ -14,11 +14,15 @@ func Title(s string) string {
 
 // TitleSplit splits the string s by sep and returns a copy of the string s with all Unicode letters that begin words mapped to their title case.
 func TitleSplit(s string, sep string) string {
+	return TitleReplace(s, sep, " ")
+}
+
+func TitleReplace(s string, sep string, rep string) string {
 	split := strings.Split(s, sep)
 	for i, v := range split {
 		split[i] = Title(v)
 	}
-	return strings.Join(split, " ")
+	return strings.Join(split, rep)
 }
 
 func IsNumeric(word string) bool {

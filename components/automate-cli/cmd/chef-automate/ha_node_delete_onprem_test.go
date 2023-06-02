@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	multipleNodeError = `Only one node can be deleted at a time`
+)
+
 func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
 	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 	if err != nil {
@@ -27,9 +31,9 @@ func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
 }
 
 func TestDeleteNodeValidateError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp: "10.2.1.67,ewewedw",
+		automateIp: "192.0.2.2",
 	}
 	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -49,17 +53,14 @@ func TestDeleteNodeValidateError(t *testing.T) {
 	})
 	err := nodedelete.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(),
-		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.`)
+	assert.Contains(t, err.Error(), `
+Automate Ip 192.0.2.2 is not present in existing list of ip addresses. Please use a different private ip.`)
 }
 
 func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
-		automateIp:   "10.2.1.67,ewewedw",
-		chefServerIp: "10.2.1.637,ewewedw",
-		postgresqlIp: "10.2.1.657,ewewedw",
-		opensearchIp: "10.2.1.61,ewewedw",
+		automateIp: "10.2.1.67,10.2.1.637",
 	}
 	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -80,14 +81,11 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
-		`Unable to remove node. Automate instance count cannot be less than 1. Final count 0 not allowed.
-Unable to remove node. Chef-Server instance count cannot be less than 1. Final count -1 not allowed.
-Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.
-Unable to remove node. Postgresql instance count cannot be less than 3. Final count 1 not allowed.`)
+		multipleNodeError)
 }
 
 func TestDeleteNodeModifyAutomate(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "192.0.2.0",
 	}
@@ -111,14 +109,14 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).automateIpList[0])
+	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "1", nodedelete.(*DeleteNodeOnPremImpl).config.Automate.Config.InstanceCount)
 	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeOnPremImpl).config.Automate.Config.CertsByIP))
 	assert.Equal(t, 1, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.AutomatePrivateIps))
 }
 
 func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		postgresqlIp: TEST_IP_1,
 	}
@@ -150,7 +148,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 }
 
 func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: TEST_IP_1,
 		automateIp:   TEST_IP_2,
@@ -179,11 +177,11 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 	})
 	err := nodeAdd.validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), fmt.Sprintf(TYPE_ERROR, "remove"))
+	assert.Contains(t, err.Error(), multipleNodeError)
 }
 
 func TestDeleteNodeModifyInfra(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		chefServerIp: "192.0.2.2",
 	}
@@ -209,14 +207,14 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 	// even though validation will fail still we check if modify config is working as expected or not
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.chefServerIp, nodedelete.(*DeleteNodeOnPremImpl).chefServerIpList[0])
+	assert.Equal(t, flags.chefServerIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "0", nodedelete.(*DeleteNodeOnPremImpl).config.ChefServer.Config.InstanceCount)
 	assert.Equal(t, 0, len(nodedelete.(*DeleteNodeOnPremImpl).config.ChefServer.Config.CertsByIP))
 	assert.Equal(t, 0, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.ChefServerPrivateIps))
 }
 
 func TestDeletenodeModifyOpensearch(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
 	}
@@ -240,14 +238,14 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).opensearchIpList[0])
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "3", nodedelete.(*DeleteNodeOnPremImpl).config.Opensearch.Config.InstanceCount)
 	assert.Equal(t, 3, len(nodedelete.(*DeleteNodeOnPremImpl).config.Opensearch.Config.CertsByIP))
 	assert.Equal(t, 3, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.OpensearchPrivateIps))
 }
 
 func TestDeletenodeModifyPostgresql(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		postgresqlIp: "192.0.2.9",
 	}
@@ -273,7 +271,7 @@ func TestDeletenodeModifyPostgresql(t *testing.T) {
 	// even though validation will fail still we check if modify config is working as expected or not
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).postgresqlIp[0])
+	assert.Equal(t, flags.postgresqlIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	assert.Equal(t, "2", nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.InstanceCount)
 	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeOnPremImpl).config.Postgresql.Config.CertsByIP))
 	assert.Equal(t, 2, len(nodedelete.(*DeleteNodeOnPremImpl).config.ExistingInfra.Config.PostgresqlPrivateIps))
@@ -304,7 +302,7 @@ func TestDeleteNodePrompt(t *testing.T) {
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).automateIpList[0])
+	assert.Equal(t, flags.automateIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
@@ -315,11 +313,11 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
 Automate => 192.0.2.0
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 }
 
 func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
@@ -356,7 +354,7 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).opensearchIpList[0])
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
@@ -367,11 +365,11 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
-OpenSearch => 192.0.2.3
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Opensearch => 192.0.2.3
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodedelete.runDeploy()
 	assert.NoError(t, err)
 	assert.Equal(t, true, filewritten)
@@ -379,7 +377,7 @@ This will delete the above nodes from your existing setup. It might take a while
 }
 
 func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.3,192.0.2.5",
 	}
@@ -408,7 +406,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 	err := nodedelete.validate()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(),
-		`Unable to remove node. OpenSearch instance count cannot be less than 3. Final count 2 not allowed.`)
+		multipleNodeError)
 }
 
 func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
@@ -442,7 +440,7 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 	assert.NoError(t, err)
 	err = nodedelete.modifyConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).opensearchIpList[0])
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
 	res, err := nodedelete.promptUserConfirmation()
 	assert.Equal(t, true, res)
 	assert.NoError(t, err)
@@ -453,17 +451,18 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
-OpenSearch => 192.0.2.3
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Opensearch => 192.0.2.3
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	err = nodedelete.runDeploy()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "random")
 }
 
 func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
+	count := 10
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
@@ -495,6 +494,13 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		},
 		isManagedServicesOnFunc: func() bool {
 			return false
+		},
+		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			count = count - 1
+			return count, nil
 		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
@@ -521,16 +527,17 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
-OpenSearch => 192.0.2.6
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Opensearch => 192.0.2.6
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
 }
 
 func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
+	count := 10
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
@@ -563,6 +570,13 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
+		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			count = count - 1
+			return count, nil
+		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
@@ -578,11 +592,11 @@ Chef-Server => 192.0.2.2
 OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
 Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
 
-Nodes to be deleted:
+Node to be deleted:
 ================================================
-OpenSearch => 192.0.2.6
-Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
-This will delete the above nodes from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+Opensearch => 192.0.2.6
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
 	assert.Equal(t, true, filewritten)
 	assert.Equal(t, true, deployed)
 }

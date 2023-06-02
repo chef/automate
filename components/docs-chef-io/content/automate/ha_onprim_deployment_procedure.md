@@ -503,7 +503,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 It's essential to ensure that the IP address of the nodes you are trying to add has sufficient resources and is reachable from the bastion host.
 {{< /warning >}}
 
-## Remove Any Nodes From Frontend Cluster OnPrem Deployment
+## Remove Single Node From Cluster on OnPrem Deployment
 
 {{< warning >}}
 
@@ -513,51 +513,39 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 
 - Below process can be done for `chef-server` and `automate`.
 
+- Only one node can be removed at a time irrespective of node type.
+
 {{< /warning >}}
 
-The commands require some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP addresses of the nodes you want to remove as comma-separate values with no spaces in between.
+The command requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove.
 
 For example,
 
-- if you want to remove nodes with IP 10.1.2.23 to automate, you have to run the:
+- If you want to remove node of automate, you have to run the:
 
     ```sh
-    chef-automate node remove --automate-ip 10.1.2.23
+    chef-automate node remove --automate-ip "<automate-ip-address>"
     ```
 
-- If you want to remove nodes with IP 10.1.2.23 and 10.0.1.42 to chef-server you have to run the:
+- If you want to remove node of chef-server, you have to run the:
 
     ```sh
-    chef-automate node remove --chef-server-ip 10.1.2.23,10.0.1.42
+    chef-automate node remove --chef-server-ip "<chef-server-ip-address>"
     ```
 
-- If you want to remove nodes with IP 10.1.2.23 and 10.0.1.42 to OpenSearch, you have to run:
+- If you want to remove node of OpenSearch, you have to run the:
 
     ```sh
-    chef-automate node remove --opensearch-ip 10.1.2.23,10.0.1.42
+    chef-automate node remove --opensearch-ip "<opensearch-ip-address>"
     ```
 
-  - If you want to remove nodes with IP 10.1.2.23, 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
+- If you want to remove node of PostgreSQL you have to run:
 
     ```sh
-    chef-automate node remove --postgresql-ip 10.1.2.23,10.0.1.42,10.0.1.54
+    chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
-You can mix and match different services to remove nodes across various services.
-
-- If you want to remove nodes with IP 10.1.2.23 to automate and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL, you have to run:
-
-    ```sh
-    chef-automate node remove --automate-ip 10.1.2.23 --postgresql-ip 10.0.1.42,10.0.1.54
-    ```
-
-- If you want to remove nodes with IP 10.1.2.23 to automate, nodes with IP 10.1.0.36 and 10.0.1.233 to chef-server, and nodes with IP 10.0.1.54 and 10.0.1.42 to PostgreSQL you have to run:
-
-    ```sh
-    chef-automate node remove --automate-ip 10.1.2.23 --chef-server-ip 10.1.0.36,10.0.1.233  --postgresql-ip 10.0.1.42,10.0.1.54
-    ```
-
-Once the command executes, it will remove the supplied nodes from your automate setup. The changes might take a while.
+Once the command executes, it will remove the supplied node from your HA setup. The changes might take a while.
 
 - Make sure to remove the ip address of the deleted node from your loadbalancer configuration. For reference check [Load Balancer Configuration page](/automate/loadbalancer_configuration/)
 
@@ -575,7 +563,7 @@ Once the command executes, it will remove the supplied nodes from your automate 
 - First Add a New Node follow [this](#add-more-nodes-to-the-onprem-deployment).
 - Stop the Habitat Supervisior on the node .i.e going to be removed, use `systemctl stop hab-sup` command to stop the
   habitat supervisior.
-- Remove a Existing Node follow [this](#remove-any-nodes-from-frontend-cluster-onprem-deployment).
+- Remove a Existing Node follow [this](#remove-single-node-from-cluster-on-onprem-deployment).
 
 ## Uninstall chef automate HA
 

@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/spf13/cobra"
 )
@@ -68,16 +69,16 @@ func init() {
 		},
 	}
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Show Automate Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.automate, AUTOMATE, "a", false, "Show Automate Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Show Automate Certificates")
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CONST_CHEF_SERVER, "c", false, "Show Chef Server Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CHEF_SERVER, "c", false, "Show Chef Server Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Show Chef Server Certificates")
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.postgresql, CONST_POSTGRESQL, "p", false, "Show Postgres Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.postgresql, POSTGRESQL, "p", false, "Show Postgres Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.postgresql, "pg", false, "Show Postgres Certificates")
 
-	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, CONST_OPENSEARCH, "o", false, "Show Opensearch Certificates")
+	certShowCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, OPENSEARCH, "o", false, "Show Opensearch Certificates")
 	certShowCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "Show Opensearch Certificates")
 
 	certShowCmd.PersistentFlags().StringVarP(&flagsObj.node, "node", "n", "", "Service cluster's node IP address to show certificates, if not provided then all nodes certificates will be shown")
@@ -98,7 +99,7 @@ func NewCertShowImpl(flags certShowFlags, nodeUtils NodeOpUtils, sshUtil SSHUtil
 // certShowCmdFunc is the main function for the cert show command
 func certShowCmdFunc(flagsObj *certShowFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(), NewSSHUtil(&SSHConfig{}), writer)
+		cs := NewCertShowImpl(*flagsObj, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), NewSSHUtil(&SSHConfig{}), writer)
 		return cs.certShow(cmd, args)
 	}
 }
@@ -155,32 +156,32 @@ func (c *certShowImpl) fetchCurrentCerts() (*certShowCertificates, error) {
 
 func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certInfo *certShowCertificates) error {
 	switch remoteService {
-	case CONST_AUTOMATE:
-		if err := c.validateNode(certInfo.AutomateCertsByIP, CONST_AUTOMATE); err != nil {
+	case AUTOMATE:
+		if err := c.validateNode(certInfo.AutomateCertsByIP, AUTOMATE); err != nil {
 			return err
 		}
-		c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(CONST_AUTOMATE))
-	case CONST_CHEF_SERVER:
-		if err := c.validateNode(certInfo.ChefServerCertsByIP, CONST_CHEF_SERVER); err != nil {
+		c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(AUTOMATE))
+	case CHEF_SERVER:
+		if err := c.validateNode(certInfo.ChefServerCertsByIP, CHEF_SERVER); err != nil {
 			return err
 		}
-		c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"))
-	case CONST_POSTGRESQL:
+		c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CHEF_SERVER, "_"))
+	case POSTGRESQL:
 		if c.nodeUtils.isManagedServicesOn() {
 			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
 		}
-		if err := c.validateNode(certInfo.PostgresqlCertsByIP, CONST_POSTGRESQL); err != nil {
+		if err := c.validateNode(certInfo.PostgresqlCertsByIP, POSTGRESQL); err != nil {
 			return err
 		}
-		c.printPostgresqlAndOSCertificates(certInfo.PostgresqlRootCert, "", "", certInfo.PostgresqlCertsByIP, stringutils.Title(CONST_POSTGRESQL))
-	case CONST_OPENSEARCH:
+		c.printPostgresqlAndOSCertificates(certInfo.PostgresqlRootCert, "", "", certInfo.PostgresqlCertsByIP, stringutils.Title(POSTGRESQL))
+	case OPENSEARCH:
 		if c.nodeUtils.isManagedServicesOn() {
 			return status.New(status.InvalidCommandArgsError, "This command is not supported in Managed Services")
 		}
-		if err := c.validateNode(certInfo.OpensearchCertsByIP, CONST_OPENSEARCH); err != nil {
+		if err := c.validateNode(certInfo.OpensearchCertsByIP, OPENSEARCH); err != nil {
 			return err
 		}
-		c.printPostgresqlAndOSCertificates(certInfo.OpensearchRootCert, certInfo.OpensearchAdminKey, certInfo.OpensearchAdminCert, certInfo.OpensearchCertsByIP, stringutils.Title(CONST_OPENSEARCH))
+		c.printPostgresqlAndOSCertificates(certInfo.OpensearchRootCert, certInfo.OpensearchAdminKey, certInfo.OpensearchAdminCert, certInfo.OpensearchCertsByIP, stringutils.Title(OPENSEARCH))
 	default:
 		c.printAllCertificates(certInfo)
 	}
@@ -225,12 +226,12 @@ func (c *certShowImpl) getCerts(config interface{}) (*certShowCertificates, erro
 
 // printAllCertificates prints all certificates
 func (c *certShowImpl) printAllCertificates(certInfo *certShowCertificates) {
-	c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(CONST_AUTOMATE))
-	c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CONST_CHEF_SERVER, "_"))
+	c.printAutomateAndCSCertificates(certInfo.AutomateRootCert, certInfo.AutomateCertsByIP, stringutils.Title(AUTOMATE))
+	c.printAutomateAndCSCertificates("", certInfo.ChefServerCertsByIP, stringutils.TitleSplit(CHEF_SERVER, "_"))
 
 	if !c.nodeUtils.isManagedServicesOn() {
-		c.printPostgresqlAndOSCertificates(certInfo.PostgresqlRootCert, "", "", certInfo.PostgresqlCertsByIP, stringutils.Title(CONST_POSTGRESQL))
-		c.printPostgresqlAndOSCertificates(certInfo.OpensearchRootCert, certInfo.OpensearchAdminKey, certInfo.OpensearchAdminCert, certInfo.OpensearchCertsByIP, stringutils.Title(CONST_OPENSEARCH))
+		c.printPostgresqlAndOSCertificates(certInfo.PostgresqlRootCert, "", "", certInfo.PostgresqlCertsByIP, stringutils.Title(POSTGRESQL))
+		c.printPostgresqlAndOSCertificates(certInfo.OpensearchRootCert, certInfo.OpensearchAdminKey, certInfo.OpensearchAdminCert, certInfo.OpensearchCertsByIP, stringutils.Title(OPENSEARCH))
 	}
 }
 
@@ -239,7 +240,7 @@ func (c *certShowImpl) printAutomateAndCSCertificates(rootCA string, certsByIP [
 	c.writer.Title(fmt.Sprintf("%s Certificates", remoteServiceName))
 	c.writer.HR()
 
-	if remoteServiceName == stringutils.Title(CONST_AUTOMATE) {
+	if remoteServiceName == stringutils.Title(AUTOMATE) {
 		c.writer.Println("========================Automate Root CA========================")
 		if len(strings.TrimSpace(rootCA)) == 0 {
 			c.writer.Println("No Automate root certificate found")
@@ -277,7 +278,7 @@ func (c *certShowImpl) printPostgresqlAndOSCertificates(rootCA, adminKey, adminC
 		c.writer.Println(rootCA)
 	}
 
-	if remoteServiceName == stringutils.Title(CONST_OPENSEARCH) {
+	if remoteServiceName == stringutils.Title(OPENSEARCH) {
 		c.writer.Println("\n======================Opensearch Admin Key======================")
 		if len(strings.TrimSpace(adminKey)) == 0 {
 			c.writer.Println("No admin key found")
@@ -372,13 +373,13 @@ func (c *certShowImpl) isCommonCerts(certs []CertByIP) bool {
 // getRemoteService returns the remote service name based on the flags
 func (c *certShowImpl) getRemoteService() string {
 	if c.flags.automate {
-		return CONST_AUTOMATE
+		return AUTOMATE
 	} else if c.flags.chefserver {
-		return CONST_CHEF_SERVER
+		return CHEF_SERVER
 	} else if c.flags.postgresql {
-		return CONST_POSTGRESQL
+		return POSTGRESQL
 	} else if c.flags.opensearch {
-		return CONST_OPENSEARCH
+		return OPENSEARCH
 	} else {
 		return ""
 	}
