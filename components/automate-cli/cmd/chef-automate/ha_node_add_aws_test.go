@@ -13,7 +13,7 @@ import (
 const CONFIG_TOML_PATH_AWS = "../../pkg/testfiles/aws"
 
 func TestAddnodeAWSValidateError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{automateCount: 0}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -37,7 +37,7 @@ func TestAddnodeAWSValidateError(t *testing.T) {
 }
 
 func TestAddnodeAWSValidate(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -61,7 +61,7 @@ func TestAddnodeAWSValidate(t *testing.T) {
 }
 
 func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{opensearchCount: 1}
 	nodeAdd := NewAddNodeAWS(w.CliWriter, flags, &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -85,7 +85,7 @@ func TestAddnodeAWSValidateErrorIsManagedServicesOn(t *testing.T) {
 }
 
 func TestAddnodeModifyAws(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		chefServerCount: 1,
 	}

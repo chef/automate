@@ -31,7 +31,7 @@ func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
 }
 
 func TestDeleteNodeValidateError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "192.0.2.2",
 	}
@@ -58,7 +58,7 @@ Automate Ip 192.0.2.2 is not present in existing list of ip addresses. Please us
 }
 
 func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "10.2.1.67,10.2.1.637",
 	}
@@ -85,7 +85,7 @@ func TestDeleteNodeValidateErrorMultiple(t *testing.T) {
 }
 
 func TestDeleteNodeModifyAutomate(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		automateIp: "192.0.2.0",
 	}
@@ -116,7 +116,7 @@ func TestDeleteNodeModifyAutomate(t *testing.T) {
 }
 
 func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		postgresqlIp: TEST_IP_1,
 	}
@@ -148,7 +148,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 }
 
 func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: TEST_IP_1,
 		automateIp:   TEST_IP_2,
@@ -181,7 +181,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 }
 
 func TestDeleteNodeModifyInfra(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		chefServerIp: "192.0.2.2",
 	}
@@ -214,7 +214,7 @@ func TestDeleteNodeModifyInfra(t *testing.T) {
 }
 
 func TestDeletenodeModifyOpensearch(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
 	}
@@ -245,7 +245,7 @@ func TestDeletenodeModifyOpensearch(t *testing.T) {
 }
 
 func TestDeletenodeModifyPostgresql(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		postgresqlIp: "192.0.2.9",
 	}
@@ -377,7 +377,7 @@ This will delete the above node from your existing setup. It might take a while.
 }
 
 func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.3,192.0.2.5",
 	}
@@ -462,6 +462,7 @@ This will delete the above node from your existing setup. It might take a while.
 }
 
 func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
+	count := 10
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
@@ -498,7 +499,8 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			return nil
 		},
 		calculateTotalInstanceCountFunc: func() (int, error) {
-			return 0, nil
+			count = count - 1
+			return count, nil
 		},
 		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")

@@ -117,6 +117,11 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 			}
 			return stopErr
 		}
+	} else {
+		if err != nil {
+			return errors.Wrap(err, "Error in deleting node")
+		}
+		return errors.New("Error in deleting node")
 	}
 
 	if err == nil {
