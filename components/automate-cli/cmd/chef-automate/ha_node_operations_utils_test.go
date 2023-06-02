@@ -254,6 +254,12 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
 			return infra, &SSHConfig{}, nil
 		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
 	}
 
 	infra, _, err := mockUtil.getHaInfraDetails()
@@ -277,12 +283,19 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, EXISTING_INFRA_MODE, infra)
 	assert.NoError(t, err)
 }
-func TestStopServicesOnNodeCS(t *testing.T) {
+
+func TestStopServicesOnNodeA2AWS(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			infra := &AutomateHAInfraDetails{}
 			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
 			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
 		},
 	}
 
@@ -304,7 +317,44 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 			}
 		},
 	}, command.NewMockExecutor(t), MockWriter.CliWriter)
-	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, AWS_MODE, infra)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, AWS_MODE, infra)
+	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeCS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, EXISTING_INFRA_MODE, infra)
 	assert.NoError(t, err)
 }
 func TestStopServicesOnNodePG(t *testing.T) {
@@ -313,6 +363,12 @@ func TestStopServicesOnNodePG(t *testing.T) {
 			infra := &AutomateHAInfraDetails{}
 			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
 			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
 		},
 	}
 
@@ -344,6 +400,60 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
 			return infra, &SSHConfig{}, nil
 		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			//return dummy result
+			return map[string][]*CmdResult{
+				TEST_IP_1: {
+					{
+						ScriptName:  "",
+						HostIP:      "",
+						OutputFiles: []string{},
+						Output:      "",
+						Error:       nil,
+					},
+				},
+			}, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, EXISTING_INFRA_MODE, infra)
+	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeOSAWS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
 	}
 
 	infra, _, err := mockUtil.getHaInfraDetails()
@@ -369,6 +479,13 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 		}}, command.NewMockExecutor(t), MockWriter.CliWriter)
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, AWS_MODE, infra)
 	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeInvalidNodeType(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err := nodeUtil.stopServicesOnNode(TEST_IP_1, "invalid", EXISTING_INFRA_MODE, &AutomateHAInfraDetails{})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Invalid node type")
 }
 
 func TestCalculateTotalInstanceCount(t *testing.T) {
