@@ -166,7 +166,7 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	}
 	if !a.config.Aws.Config.SetupManagedServices {
 		if len(a.config.Opensearch.Config.InstanceCount) < 1 {
-			errorList.PushBack("Invalid or empty elastic-search instance_count")
+			errorList.PushBack("Invalid or empty open-search instance_count")
 		}
 		if len(a.config.Postgresql.Config.InstanceCount) < 1 {
 			errorList.PushBack("Invalid or empty postgres-sql instance_count")
