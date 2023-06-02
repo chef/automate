@@ -69,3 +69,19 @@ func TestGetMemory(t *testing.T) {
 		assert.NotZero(t, memory)
 	}
 }
+
+func TestFormatBytes(t *testing.T) {
+	systemresource := systemresource.NewSystemResourceInfoImpl()
+
+	size := systemresource.FormatBytes(1024 * 1024 * 1024)
+	assert.Equal(t, "1.0 GB", size)
+}
+
+func TestGetDiskPartitions(t *testing.T) {
+	systemresource := systemresource.NewSystemResourceInfoImpl()
+
+	listPartition, err := systemresource.GetDiskPartitions(false)
+	assert.NoError(t, err)
+	assert.True(t, len(listPartition) > 0)
+
+}

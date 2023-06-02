@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -16,15 +17,18 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/systemresource"
 )
 
-type INFSService interface {
+type NFSService interface {
 	GetNFSMountDetails(models.NFSMountRequest) *[]models.NFSMountResponse
+	GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse
 }
 
-type NFSMountService struct {
-	port string
-	log  logger.Logger
+type NfsServiceImp struct {
+	SystemResourceInfo systemresource.SystemResourceInfo
+	port               string
+	log                logger.Logger
 }
 
 type TempResponse struct {
@@ -32,14 +36,15 @@ type TempResponse struct {
 	MountResp   models.NFSMountResponse
 }
 
-func NewNFSMountService(log logger.Logger, port string) *NFSMountService {
-	return &NFSMountService{
-		port: port,
-		log:  log,
+func NewNFSMountService(log logger.Logger, port string, sysResInfo systemresource.SystemResourceInfo) *NfsServiceImp {
+	return &NfsServiceImp{
+		port:               port,
+		log:                log,
+		SystemResourceInfo: sysResInfo,
 	}
 }
 
-func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
+func (nm *NfsServiceImp) GetNFSMountDetails(reqBody models.NFSMountRequest) *[]models.NFSMountResponse {
 	respBody := new([]models.NFSMountResponse)
 	// For storing the output of go routine temporary in nfsMountResultMap
 	nfsMountResultMap := make(map[string]models.NFSMountResponse)
@@ -98,12 +103,17 @@ func (nm *NFSMountService) GetNFSMountDetails(reqBody models.NFSMountRequest) *[
 	return respBody
 }
 
+func (nm *NfsServiceImp) GetNFSMountLoc(req models.NFSMountLocRequest) *models.NFSMountLocResponse {
+	mounts := nm.getMountDetails(req.MountLocation)
+	return mounts
+}
+
 func prettyMap(mp map[string]models.NFSMountResponse) string {
 	b, _ := json.MarshalIndent(mp, "", "  ")
 	return string(b)
 }
 
-func (nm *NFSMountService) makeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
+func (nm *NfsServiceImp) makeConcurrentCall(ip string, nodeType string, mountLocation string, respChan chan map[string]TempResponse, key string) {
 	res, err := nm.doAPICall(ip, mountLocation)
 	nm.log.Debugf("result got from /nfs-mount-loc API for %s: %v", ip, res)
 
@@ -120,7 +130,7 @@ func (nm *NFSMountService) makeConcurrentCall(ip string, nodeType string, mountL
 	respChan <- respMap
 }
 
-func (nm *NFSMountService) doAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
+func (nm *NfsServiceImp) doAPICall(ip string, mountLocation string) (*models.NFSMountLocResponse, error) {
 	reqURL := fmt.Sprintf("http://%s:%s%s", ip, nm.port, constants.NFS_MOUNT_LOC_API_PATH)
 	nm.log.Debug("Request URL: ", reqURL)
 
@@ -137,7 +147,7 @@ func (nm *NFSMountService) doAPICall(ip string, mountLocation string) (*models.N
 	return nm.getResultStructFromRespBody(resp.Body)
 }
 
-func (nm *NFSMountService) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
+func (nm *NfsServiceImp) getResultStructFromRespBody(respBody io.Reader) (*models.NFSMountLocResponse, error) {
 	body, err := ioutil.ReadAll(respBody) // nosemgrep
 	if err != nil {
 		nm.log.Error(err.Error())
@@ -238,5 +248,43 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 		SuccessMsg:    successMsg,
 		ErrorMsg:      errorMsg,
 		ResolutionMsg: resolutionMsg,
+	}
+}
+
+func (nm *NfsServiceImp) getMountDetails(mountLocation string) *models.NFSMountLocResponse {
+	// If we make disk partitions as false,
+	// we can't list mount info
+	diskPartition, err := nm.SystemResourceInfo.GetDiskPartitions(true)
+	if err != nil {
+		nm.log.Error("Error getting disk partions: " + err.Error())
+		return &models.NFSMountLocResponse{
+			Address:       "",
+			Nfs:           "",
+			MountLocation: mountLocation,
+		}
+	}
+	for _, partition := range diskPartition {
+		if partition.Mountpoint == mountLocation {
+			usageStat, err := nm.SystemResourceInfo.GetDiskSpaceInfo(mountLocation)
+			if err != nil {
+				nm.log.Error("Failed to retrieve disk usage: " + err.Error())
+				return &models.NFSMountLocResponse{
+					Address:       "",
+					Nfs:           "",
+					MountLocation: mountLocation,
+				}
+			}
+			return &models.NFSMountLocResponse{
+				Address:            strings.Split(partition.Device, ":")[0],
+				Nfs:                partition.Device,
+				MountLocation:      mountLocation,
+				StorageCapacity:    nm.SystemResourceInfo.FormatBytes(usageStat.Total),
+				AvailableFreeSpace: nm.SystemResourceInfo.FormatBytes(usageStat.Free),
+			}
+		}
+	}
+	nm.log.Debug("Mount location Not found")
+	return &models.NFSMountLocResponse{
+		MountLocation: mountLocation,
 	}
 }

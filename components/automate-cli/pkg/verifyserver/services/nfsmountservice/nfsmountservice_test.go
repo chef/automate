@@ -12,6 +12,8 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/systemresource"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -89,7 +91,7 @@ var (
 
 func TestNFSMountService(t *testing.T) {
 	testPort := "1234"
-	nm := NewNFSMountService(logger.NewTestLogger(), testPort)
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{})
 	assert.NotNil(t, nm)
 	nmDetails := nm.GetNFSMountDetails(models.NFSMountRequest{})
 	assert.Equal(t, new([]models.NFSMountResponse), nmDetails)
@@ -212,7 +214,7 @@ func TestGetResultStructFromRespBody(t *testing.T) {
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
 			testPort := "1234"
-			res, err := NewNFSMountService(logger.NewTestLogger(), testPort).getResultStructFromRespBody(e.Body)
+			res, err := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{}).getResultStructFromRespBody(e.Body)
 			if e.ExpectedErr != nil {
 				assert.Error(t, err)
 			} else {
@@ -272,7 +274,7 @@ func TestDoAPICall(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			nm := NewNFSMountService(logger.NewTestLogger(), e.Port)
+			nm := NewNFSMountService(logger.NewTestLogger(), e.Port, &systemresource.MockSystemResourceInfoImpl{})
 			resp, err := nm.doAPICall(e.URL, "/mount-location")
 			if e.ExpectedError != nil {
 				assert.Error(t, err)
@@ -368,7 +370,7 @@ func TestGetNFSMountDetails(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
-			nm := NewNFSMountService(logger.NewTestLogger(), Testport)
+			nm := NewNFSMountService(logger.NewTestLogger(), Testport, &systemresource.MockSystemResourceInfoImpl{})
 			resp := nm.GetNFSMountDetails(e.ReqBody)
 			for index, te := range *resp {
 				if e.Response[index].Error != nil {
@@ -466,4 +468,119 @@ func TestMakeRespBody(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetNFSMountLoc(t *testing.T) {
+	tests := []struct {
+		TestName     string
+		Request      models.NFSMountLocRequest
+		ExpectedBody *models.NFSMountLocResponse
+		CmdRes       bool
+	}{
+		{
+			TestName: "Nfs not found",
+			Request: models.NFSMountLocRequest{
+				MountLocation: "/data",
+			},
+			ExpectedBody: &models.NFSMountLocResponse{
+				Address:            "",
+				Nfs:                "",
+				MountLocation:      "/data",
+				StorageCapacity:    "",
+				AvailableFreeSpace: "",
+			},
+			CmdRes: false,
+		},
+		{
+			TestName: "Nfs found",
+			Request: models.NFSMountLocRequest{
+				MountLocation: "/nfs",
+			},
+			ExpectedBody: &models.NFSMountLocResponse{
+				Address:            "172.31.26.202",
+				Nfs:                "172.31.26.202:/",
+				MountLocation:      "/nfs",
+				StorageCapacity:    "8.0EB",
+				AvailableFreeSpace: "8.0EB",
+			},
+			CmdRes: true,
+		},
+	}
+	for _, e := range tests {
+		t.Run(e.TestName, func(t *testing.T) {
+			testPort := "1234"
+			nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{
+				GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
+					return disk.UsageStat{
+						Total: 1,
+						Free:  1,
+					}, nil
+				},
+				GetDiskPartitionsFunc: func(all bool) ([]disk.PartitionStat, error) {
+					return []disk.PartitionStat{{Device: "172.31.26.202:/", Mountpoint: "/nfs"}}, nil
+				},
+				FormatBytesFunc: func(bytes uint64) string {
+					return "8.0EB"
+				},
+			})
+			resp := nm.GetNFSMountLoc(e.Request)
+			assert.Equal(t, e.ExpectedBody, resp)
+		})
+	}
+}
+
+func TestGetNFSMountLocGetDiskSpaceInfoError(t *testing.T) {
+	testPort := "1234"
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{
+		GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
+			return disk.UsageStat{
+				Total: 1,
+				Free:  1,
+			}, errors.New("")
+		},
+		GetDiskPartitionsFunc: func(all bool) ([]disk.PartitionStat, error) {
+			return []disk.PartitionStat{{Device: "172.31.26.202:/", Mountpoint: "/nfs"}}, nil
+		},
+		FormatBytesFunc: func(bytes uint64) string {
+			return "8.0EB"
+		},
+	})
+	resp := nm.GetNFSMountLoc(models.NFSMountLocRequest{
+		MountLocation: "/nfs",
+	})
+	assert.Equal(t, &models.NFSMountLocResponse{
+		Address:            "",
+		Nfs:                "",
+		MountLocation:      "/nfs",
+		StorageCapacity:    "",
+		AvailableFreeSpace: "",
+	}, resp)
+}
+
+func TestGetNFSMountLocGetDiskPartitionsError(t *testing.T) {
+	testPort := "1234"
+	nm := NewNFSMountService(logger.NewTestLogger(), testPort, &systemresource.MockSystemResourceInfoImpl{
+		GetDiskSpaceInfoFunc: func(s string) (disk.UsageStat, error) {
+			return disk.UsageStat{
+				Total: 1,
+				Free:  1,
+			}, nil
+		},
+		GetDiskPartitionsFunc: func(all bool) ([]disk.PartitionStat, error) {
+			return []disk.PartitionStat{{Device: "172.31.26.202:/", Mountpoint: "/"}}, errors.New("")
+		},
+		FormatBytesFunc: func(bytes uint64) string {
+			return "8.0EB"
+		},
+	})
+	resp := nm.GetNFSMountLoc(models.NFSMountLocRequest{
+		MountLocation: "/nfs",
+	})
+	assert.Equal(t, &models.NFSMountLocResponse{
+		Address:            "",
+		Nfs:                "",
+		MountLocation:      "/nfs",
+		StorageCapacity:    "",
+		AvailableFreeSpace: "",
+	}, resp)
 }
