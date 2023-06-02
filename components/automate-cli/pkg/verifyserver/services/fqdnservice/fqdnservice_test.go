@@ -2,6 +2,7 @@ package fqdnservice_test
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -136,36 +137,26 @@ Vm7y9nw2ib8nIGcH/2EKulEyDWxvHTTBjuQXytHU+oubDz3a1eFr5IkgLwusYn1P
 2QTvRmA7J/8Qj/wMN/W5ve4akoHzS1Zzfiphq5rSh+WrhUSWpL3bKzVrGEpT
 -----END CERTIFICATE-----`
 	INVALID_BLOCK_CA_CERT = `INVALID`
-	NOT_SAN_CA_CERT       = `-----BEGIN CERTIFICATE-----
-MIIFVDCCAzwCCQCikKZwyLN4gDANBgkqhkiG9w0BAQsFADBsMQswCQYDVQQGEwJJ
-TjESMBAGA1UECAwJS2FybmF0YWthMRIwEAYDVQQHDAlCZW5nYWx1cnUxFjAUBgNV
-BAoMDVByb2dyZXNzLXRlc3QxDDAKBgNVBAsMA09yZzEPMA0GA1UEAwwGUm9vdENB
-MB4XDTIzMDUyMjEyMDEzNFoXDTI4MDUyMDEyMDEzNFowbDELMAkGA1UEBhMCSU4x
-EjAQBgNVBAgMCUthcm5hdGFrYTESMBAGA1UEBwwJQmVuZ2FsdXJ1MRYwFAYDVQQK
-DA1Qcm9ncmVzcy10ZXN0MQwwCgYDVQQLDANPcmcxDzANBgNVBAMMBlJvb3RDQTCC
-AiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANTskS0D2anCGLiQhL73aGj3
-3HRxkYCxKKrv/yN7jldSDYFruXyGFuAmgDB4Lvk9pJz/V5b1Ke3hU1tmTsrrBdhE
-c0H6JpM5OmPWpwpcW19oXCqmOWjhopEDV5DxzyXbDGY+b0w0M/BTigyAVdH+QRV7
-PZPJsqoeHEPvIZ5uamkml6fg3krhvRKzshPdfMBb9n88O5t785YxUxcpAe0rQcoh
-3jK95zJWd43mpgi0XGtCfhjx3BBgi0zBXAx674iQPi/2Ljy7/i1KboBdN3b0b4oZ
-Gt+rVJgZSFhsk+Opm6DZYoi0G5TRE1mlSXH1P1ANniO6vbG4ylHWr6JJifMso2oU
-PMeN0vDPPjLrdIRUdVxQ1kEkkG5u+PeWNgoa86bgc6suP6V/3SgMn6Lu+MchjOqi
-sbmvblaQY0gcMuoovxcHjlGF7pyb1WrrsLpLgDVteAzku2QLz4JiyTmsb05kazJT
-2oyH5le4bePUGY2fTbGzhHaFDaxKE7Bnj5OfSZZWx6Q3RGmYKuMOHkAcDxDiAKmL
-+52oCa4TA1FYHME8JXpTVDmVdlwDGiZh5wT2v8QF8cxIHzL6Oh8C7waqNuxU8WSr
-AYU/0YTU1XpcgmB3xUpPa4PSubWcCFFrqw2NnPb75KqG7QIujAgoasrbBR44EQHP
-QDJHzNn+i+odTM4x3zpBAgMBAAEwDQYJKoZIhvcNAQELBQADggIBAIY7ucgzNtwR
-TZR5x6afTWeRST0L/can076PSoBowq1vqDQw0Me9mCYj5pofS5e8nTcZc4REzS8S
-2gMAgjYkhvXgaofIl62DKgnwvyZ6MJFI3/zb3SpKHEFoSUee0dT//amKvh33ilJU
-74VtyTxaV0zj1Z5X1C6l+lGcO8PkoUWg+0y/3RDiZGg2B21IHi32cPHS0XHD4iW4
-Tm+LcNmOiQzAPdOd+7kWpaRg9lX/9osGueIRy/Jy0t3RLmRiH4DefubI7Ya6vb1R
-Ewniu1foX+97JJjQeDhBrD8a0vWEtpRAbp1oYBHVT39wJzMe8K4uUYT6G9f7FEWO
-llwh/4CahbQKjjlGLuPXY0GYkkBxpIDE3IhwAXqBGLxWO/MmGuPDpgQK3vmY6htU
-i/vipc8zHWFRaro1mL2sL+tZOk6zIJkA7YO2vux0DyDA+TTpyiooWfNLnDJ+TeBB
-sP1Xn6H6U/++nPEP6ZHGu4CGRrJPkCbrc3AD8XMQrJqNt1MbpwqSJCT6dlW2tCrP
-D+YLStm+V/xzmcSdd7h9zfZstJGXQmcAqoStfdBuRH1u3Wu97ory4+e0OsqkhNhS
-gAvv7gUqzOym7L1rQqaJo3h2oBmE9OVmyGVyyrAhd5VwH+ve+cEyOwXUqSH4CTlT
-cDO0rxyp16R84JLEj2vtqK/E5tp8Ew52
+	NON_CA_CERT           = `-----BEGIN CERTIFICATE-----
+MIIDbDCCAlQCCQDDfzhxYrhWVDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJJ
+TjERMA8GA1UECAwIS2FybmF0a2ExEjAQBgNVBAcMCUJlbmdhbHVydTERMA8GA1UE
+CgwIUHJvZ3Jlc3MxDTALBgNVBAsMBHRlc3QxIDAeBgkqhkiG9w0BCQEWEXRlc3RA
+cHJvZ3Jlc3MuY29tMB4XDTIzMDYwMjE0MDgyMVoXDTIzMDcwMjE0MDgyMVoweDEL
+MAkGA1UEBhMCSU4xETAPBgNVBAgMCEthcm5hdGthMRIwEAYDVQQHDAlCZW5nYWx1
+cnUxETAPBgNVBAoMCFByb2dyZXNzMQ0wCwYDVQQLDAR0ZXN0MSAwHgYJKoZIhvcN
+AQkBFhF0ZXN0QHByb2dyZXNzLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBAKtqz3RteZSLkC19zCHNKrw8BMNeTodGgSib25LPor3cJPpegSie+TdK
+syRMagrjEOjjJ1Vr/YKuS4/5JJuEtddxH0GvVqPIkia/lUWOTHoylYgcnN+XzfkL
+qxUYklBrZA3RQQ5/Gqhhnfn4jfvPOl82j4U/yD0bgz8vk44qohryP9+081+qB32W
+dIQVgeS0U9L8cPWebV3fSFLO0BSXxTbGv2T1XBKyPBlMXAb0pLDVAiQvTqUm4jpu
+OaMaQZplvrXM5cYb7fVQCfg9Ab7jpiZwz81NrOheN+2IICXVp11yptIuAF1pP4Of
+SeN6xMZd7zwQN4ACB4WGJ32cjYuHDkcCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEA
+RmFFfBaTUKYqb1QmzwuyhgWN2qilSboAC2AOMQ5s9L1K6B8fkqsw2v5DvuuJN63N
+KK0hEcVHNlBzruqAf9CfwMwKHLR6ow7666BcoQhokF5eiFL8yAZRpc3qHAq06DOr
+eH3y6yWn5t4EKNT6GHfk0EgEi6XdpAmiYThpKFOO5yz2k/5QC1G2wv1VuaO7M40S
+oQU6hzxXXnaCCeN+2yLfNz1fJRkmXCXd88FJIXy0M42FLXBYysgPWPdRL5vBmNli
+Gc99pBaktsaH4rAwZZVVOkMRpl3DgL8Z1oNTGgv+iTFS4kXMLRKpmI58aELyHhnS
+iIfhYvIBaIG7Urz+it5WPA==
 -----END CERTIFICATE-----`
 	INVALID_CA_CERT = `-----BEGIN CERTIFICATE-----
 MIIBmTCCAQKgAwIBAgIJANsPlZp1G0g6MAoGCCqGSM49BAMCMIGzMQswCQYDVQQG
@@ -241,7 +232,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 			w.Write([]byte("OK"))
 		case "/_status":
 			w.WriteHeader(http.StatusOK)
-		case "check_status":
+		case "/check_status":
 			w.Header().Set("x-server-ip", "9baa99b32b43b7fc1aa1488bbc06348f")
 			w.WriteHeader(http.StatusOK)
 		default:
@@ -285,6 +276,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
 						SuccessMsg:    constants.FQDN_TITLE,
@@ -295,13 +293,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 						Title:         constants.NODE_TITLE,
 						Passed:        true,
 						SuccessMsg:    constants.NODE_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -324,6 +315,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
@@ -336,13 +334,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 						SuccessMsg:    "",
 						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
-					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
 					},
 				},
 			},
@@ -363,6 +354,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
 						SuccessMsg:    constants.FQDN_TITLE,
@@ -375,13 +373,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 						SuccessMsg:    "",
 						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.3]"),
 						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
-					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
 					},
 				},
 			},
@@ -402,6 +393,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.CERTIFICATE_ERROR_MESSAGE,
+						ResolutionMsg: constants.CERTIFICATE_RESOLUTION_MESSAGE,
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
@@ -415,23 +413,16 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
 					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      constants.CERTIFICATE_ERROR_MESSAGE,
-						ResolutionMsg: constants.CERTIFICATE_RESOLUTION_MESSAGE,
-					},
 				},
 			},
 			httpsSuccessPort,
 		},
 		{
-			"Case is Before Deployment, FQDN and Nodes are not reachable, Certicate is not SAN based",
+			"Case is Before Deployment, FQDN and Nodes are not reachable, Certicate is non CA",
 			models.FqdnRequest{
 				Fqdn:              LOCALHOST,
 				NodeType:          constants.CHEF_INFRA_SERVER,
-				RootCert:          NOT_SAN_CA_CERT,
+				RootCert:          NON_CA_CERT,
 				IsAfterDeployment: false,
 				Nodes: []string{
 					"172.154.0.2",
@@ -441,6 +432,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.CERTIFICATE_ERROR_MESSAGE,
+						ResolutionMsg: constants.CERTIFICATE_RESOLUTION_MESSAGE,
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
@@ -453,13 +451,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 						SuccessMsg:    "",
 						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
-					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      constants.CERTIFICATE_ERROR_MESSAGE,
-						ResolutionMsg: constants.CERTIFICATE_RESOLUTION_MESSAGE,
 					},
 				},
 			},
@@ -480,6 +471,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      constants.CERTIFICATE_ERROR_MESSAGE,
+						ResolutionMsg: constants.CERTIFICATE_RESOLUTION_MESSAGE,
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
@@ -492,13 +490,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 						SuccessMsg:    "",
 						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
-					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      constants.CERTIFICATE_ERROR_MESSAGE,
-						ResolutionMsg: constants.CERTIFICATE_RESOLUTION_MESSAGE,
 					},
 				},
 			},
@@ -711,6 +702,13 @@ func TestCheckFqdnReachability(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
@@ -724,13 +722,6 @@ func TestCheckFqdnReachability(t *testing.T) {
 						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.2]"),
 						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
 					},
-					{
-						Title:         constants.CERTIFICATE_TITLE,
-						Passed:        true,
-						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
 				},
 			},
 			httpsFailedServerPort,
@@ -743,4 +734,16 @@ func TestCheckFqdnReachability(t *testing.T) {
 			assert.Equal(t, e.ResponseBody, res)
 		})
 	}
+}
+
+func TestMakeConcurrentCalls(t *testing.T) {
+	fq := fqdnservice.NewFqdnService(logger.NewTestLogger(), time.Duration(TIMEOUT))
+	assert.NotNil(t, fq)
+	client := &http.Client{
+		Transport: &http.Transport{},
+		Timeout:   2 * time.Second,
+	}
+	url := fmt.Sprintf("https://%v:6574", LOCALHOST2)
+	res := fq.MakeConcurrentCalls(url, client, make(map[string]int))
+	assert.Equal(t, errors.New("nodes are not reachable"), res)
 }

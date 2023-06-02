@@ -27,7 +27,7 @@ type FqdnService struct {
 	timeout time.Duration
 }
 
-func NewFqdnService(log logger.Logger, timeout time.Duration) IFqdnService {
+func NewFqdnService(log logger.Logger, timeout time.Duration) *FqdnService {
 	return &FqdnService{
 		log:     log,
 		timeout: timeout,
@@ -67,8 +67,7 @@ func createErrorMessage(setNodes map[string]int, reqnodes []string, isAfterDeplo
 			val = k
 		}
 
-		_, ok := setNodes[val]
-		if ok {
+		if _, ok := setNodes[val]; ok {
 			temp += k
 			temp += ", "
 		}
@@ -101,7 +100,7 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 }
 
 // makeConcurrentCalls function is making 50 concurrent calls for checking node reachability.
-func (fq *FqdnService) makeConcurrentCalls(url string, client *http.Client, setNodes map[string]int) error {
+func (fq *FqdnService) MakeConcurrentCalls(url string, client *http.Client, setNodes map[string]int) error {
 	fq.log.Debug("Making Concurrent Calls...")
 	fqdnResultChan := make(chan string)
 	for i := 0; i < constants.MIN_NUMBER_OF_CALLS; i++ {
@@ -188,7 +187,7 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, i
 
 	client := fq.createClient(rootCert)
 
-	err = fq.makeConcurrentCalls(url, client, setNodes)
+	err = fq.MakeConcurrentCalls(url, client, setNodes)
 	if err != nil {
 		fq.log.Debug("All nodes are not reachable")
 		errorMessage := createErrorMessage(setNodes, reqNodes, isAfterDeployment)
@@ -215,9 +214,9 @@ func (fq *FqdnService) validateCertificate(rootCert string) models.Checks {
 	}
 
 	currentTime := time.Now()
-	if currentTime.After(certificate.NotAfter) || !certificate.IsCA || len(certificate.DNSNames) == 0 {
+	if currentTime.After(certificate.NotAfter) || !certificate.IsCA {
 		fq.log.Debug("Certificate is Invalid.")
-		fq.log.Debugf("Expiry: %v, CA: %v, SAN: %v", certificate.NotAfter, certificate.IsCA, certificate.DNSNames)
+		fq.log.Debugf("Expiry: %v, CA: %v", certificate.NotAfter, certificate.IsCA)
 		return createCheck(constants.CERTIFICATE_TITLE, false, "", constants.CERTIFICATE_ERROR_MESSAGE, constants.CERTIFICATE_RESOLUTION_MESSAGE)
 	}
 
@@ -237,17 +236,31 @@ func createCheck(title string, passed bool, successMsg, errorMsg, resolutionMsg 
 
 func (fq *FqdnService) CheckFqdnReachability(req models.FqdnRequest, port string) models.FqdnResponse {
 	var response = models.FqdnResponse{}
+	var check models.Checks
 
-	check := fq.fqdnReachable(req.Fqdn, req.RootCert, req.NodeType, req.IsAfterDeployment, port)
-	response.Checks = append(response.Checks, check)
-
-	check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, req.IsAfterDeployment, port)
-	response.Checks = append(response.Checks, check)
+	certificateValidityCheck := true
+	fqdnReachabilityCheck := true
 
 	if !req.IsAfterDeployment {
-		check = fq.validateCertificate(req.RootCert)
+		check := fq.validateCertificate(req.RootCert)
+		certificateValidityCheck = check.Passed
 		response.Checks = append(response.Checks, check)
 	}
+
+	if certificateValidityCheck {
+		check = fq.fqdnReachable(req.Fqdn, req.RootCert, req.NodeType, req.IsAfterDeployment, port)
+	} else {
+		check = createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
+	}
+	fqdnReachabilityCheck = check.Passed
+	response.Checks = append(response.Checks, check)
+
+	if fqdnReachabilityCheck {
+		check = fq.nodeReachable(req.Fqdn, req.RootCert, req.Nodes, req.IsAfterDeployment, port)
+	} else {
+		check = createCheck(constants.NODE_TITLE, false, "", fmt.Sprintf(constants.NODE_ERROR_MESSAGE, req.Nodes), constants.NODE_RESOLUTION_MESSAGE)
+	}
+	response.Checks = append(response.Checks, check)
 
 	flag := true
 	for _, k := range response.Checks {
