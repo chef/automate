@@ -1,19 +1,26 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/stretchr/testify/assert"
 )
 
-const TEST_IP_2 = "192.0.2.12"
-const TEST_IP_3 = "192.0.2.13"
-const TEST_IP_4 = "192.0.2.14"
-const TEST_IP_5 = "192.0.2.15"
-const TEST_IP_6 = "192.0.2.16"
+const (
+	TEST_IP_2 = "192.0.2.12"
+	TEST_IP_3 = "192.0.2.13"
+	TEST_IP_4 = "192.0.2.14"
+	TEST_IP_5 = "192.0.2.15"
+	TEST_IP_6 = "192.0.2.16"
+)
+
+var MockWriter = majorupgrade_utils.NewCustomWriterWithInputs("y")
 
 func TestTrimSliceSpace(t *testing.T) {
 	testArr := []string{TEST_IP_1 + " ", " " + TEST_IP_3 + " "}
@@ -183,7 +190,8 @@ func TestIsFinalInstanceCountAllowed(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
 	assert.NoError(t, err)
@@ -195,7 +203,7 @@ func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 
 	err := os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
@@ -207,7 +215,7 @@ func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
@@ -220,7 +228,7 @@ func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
 }
 
 func TestModifyTfArchFile(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
@@ -233,8 +241,312 @@ func TestModifyTfArchFile(t *testing.T) {
 }
 
 func TestModifyTfArchFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils()
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 	err := nodeUtil.modifyTfArchFile(dir)
 	assert.Error(t, err)
+}
+
+func TestStopServicesOnNodeA2(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, EXISTING_INFRA_MODE, infra)
+	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeA2AWS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, AWS_MODE, infra)
+	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeCS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, EXISTING_INFRA_MODE, infra)
+	assert.NoError(t, err)
+}
+func TestStopServicesOnNodePG(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, POSTGRESQL, EXISTING_INFRA_MODE, infra)
+	assert.NoError(t, err)
+}
+func TestStopServicesOnNodeOS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			//return dummy result
+			return map[string][]*CmdResult{
+				TEST_IP_1: {
+					{
+						ScriptName:  "",
+						HostIP:      "",
+						OutputFiles: []string{},
+						Output:      "",
+						Error:       nil,
+					},
+				},
+			}, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, EXISTING_INFRA_MODE, infra)
+	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeOSAWS(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			//return dummy result
+			return map[string][]*CmdResult{
+				TEST_IP_1: {
+					{
+						ScriptName:  "",
+						HostIP:      "",
+						OutputFiles: []string{},
+						Output:      "",
+						Error:       nil,
+					},
+				},
+			}, nil
+		}}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, AWS_MODE, infra)
+	assert.NoError(t, err)
+}
+
+func TestStopServicesOnNodeInvalidNodeType(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, command.NewMockExecutor(t), MockWriter.CliWriter)
+	err := nodeUtil.stopServicesOnNode(TEST_IP_1, "invalid", EXISTING_INFRA_MODE, &AutomateHAInfraDetails{})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Invalid node type")
+}
+
+func TestCalculateTotalInstanceCount(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, &command.MockExecutorImpl{
+		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
+			return "8\n", nil
+		},
+	}, MockWriter.CliWriter)
+	count, err := nodeUtil.calculateTotalInstanceCount()
+	assert.NoError(t, err)
+	assert.Equal(t, 8, count)
+}
+
+func TestCalculateTotalInstanceCountCombineOutputError(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, &command.MockExecutorImpl{
+		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
+			return "", errors.New("random error")
+		},
+	}, MockWriter.CliWriter)
+	count, err := nodeUtil.calculateTotalInstanceCount()
+	assert.ErrorContains(t, err, "error")
+	assert.Equal(t, -1, count)
+}
+
+func TestCalculateTotalInstanceCountAtoiError(t *testing.T) {
+	nodeUtil := NewNodeUtils(nil, &command.MockExecutorImpl{
+		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
+			return "abc", nil
+		},
+	}, MockWriter.CliWriter)
+	count, err := nodeUtil.calculateTotalInstanceCount()
+	assert.ErrorContains(t, err, "invalid syntax")
+	assert.Equal(t, -1, count)
+}
+
+func TestGetIPsFromOSClusterResponsePersistent(t *testing.T) {
+	input := `{"persistent":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":"192.0.2.11"}}}},"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, TEST_IP_1, out)
+}
+
+func TestGetIPsFromOSClusterResponsePersistentMultiple(t *testing.T) {
+	input := `{"persistent":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":"192.0.2.11,192.0.2.12,192.0.2.13"}}}},"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, "192.0.2.11,192.0.2.12,192.0.2.13", out)
+}
+
+func TestGetIPsFromOSClusterResponseTransient(t *testing.T) {
+	input := `{"persistent":{"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":"192.0.2.11"}}}}}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, TEST_IP_1, out)
+}
+
+func TestGetIPsFromOSClusterResponseTransientEmpty(t *testing.T) {
+	input := `{"persistent":{"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{"cluster":{"routing":{"allocation":{"exclude":{"_ip":""}}}}}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, "", out)
+}
+
+func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
+	input := `{"persistent":{"plugins":{"index_state_management":{"template_migration":{"control":"-1"}}}},"transient":{}}`
+	out := getIPsFromOSClusterResponse(input)
+	assert.Equal(t, "", out)
 }

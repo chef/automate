@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/pkg/errors"
@@ -165,13 +166,13 @@ func init() {
 		},
 	}
 
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, CONST_AUTOMATE, "a", false, "Automate Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.automate, AUTOMATE, "a", false, "Automate Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.automate, "a2", false, "Automate Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CONST_CHEF_SERVER, "c", false, "Chef Infra Server Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.chefserver, CHEF_SERVER, "c", false, "Chef Infra Server Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.chefserver, "cs", false, "Chef Infra Server Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, CONST_POSTGRESQL, "p", false, "Postgres Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.postgres, POSTGRESQL, "p", false, "Postgres Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.postgres, "pg", false, "Postgres Certificate Rotation")
-	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, CONST_OPENSEARCH, "o", false, "OS Certificate Rotation")
+	certRotateCmd.PersistentFlags().BoolVarP(&flagsObj.opensearch, OPENSEARCH, "o", false, "OS Certificate Rotation")
 	certRotateCmd.PersistentFlags().BoolVar(&flagsObj.opensearch, "os", false, "OS Certificate Rotation")
 
 	certRotateCmd.PersistentFlags().StringVar(&flagsObj.privateCertPath, "private-cert", "", "Private certificate")
@@ -216,7 +217,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 
 		sshConfig := c.getSshDetails(infra)
 		sshUtil := NewSSHUtil(sshConfig)
-		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(), sshUtil, writer)
+		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), sshUtil, writer)
 		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
 
 		if err != nil {
@@ -262,9 +263,9 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 	var remoteService string
 
 	if flagsObj.automate {
-		remoteService = CONST_AUTOMATE
+		remoteService = AUTOMATE
 	} else if flagsObj.chefserver {
-		remoteService = CONST_CHEF_SERVER
+		remoteService = CHEF_SERVER
 	}
 	//get ips to exclude
 	skipIpsList := c.compareCurrentCertsWithNewCerts(remoteService, certs, flagsObj, currentCertsInfo)
@@ -296,8 +297,8 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 
 	// If we pass root-ca flag in automate then we need to update root-ca in the ChefServer to maintain the connection
 	if flagsObj.automate {
-		skipIpsList := c.getFrontEndIpsForSkippingRootCAPatching(CONST_AUTOMATE, certs.rootCA, infra, currentCertsInfo)
-		c.skipMessagePrinter(CONST_CHEF_SERVER, SKIP_FRONT_END_IPS_MSG_A2, "", skipIpsList)
+		skipIpsList := c.getFrontEndIpsForSkippingRootCAPatching(AUTOMATE, certs.rootCA, infra, currentCertsInfo)
+		c.skipMessagePrinter(CHEF_SERVER, SKIP_FRONT_END_IPS_MSG_A2, "", skipIpsList)
 		err = c.patchRootCAinCS(sshUtil, certs.rootCA, timestamp, infra, flagsObj, skipIpsList)
 		if err != nil {
 			return err
@@ -309,11 +310,11 @@ func (c *certRotateFlow) certRotateFrontend(sshUtil SSHUtil, certs *certificates
 // certRotatePG will rotate the certificates of Postgres.
 func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, CONST_POSTGRESQL)
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, POSTGRESQL)
 	}
 	fileName := "cert-rotate-pg.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := CONST_POSTGRESQL
+	remoteService := POSTGRESQL
 
 	// Creating and patching the required configurations.
 	var config string
@@ -372,11 +373,11 @@ func (c *certRotateFlow) certRotatePG(sshUtil SSHUtil, certs *certificates, infr
 // certRotateOS will rotate the certificates of OpenSearch.
 func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) error {
 	if isManagedServicesOn() {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, CONST_OPENSEARCH)
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_DB_CERT_ROTATE, OPENSEARCH)
 	}
 	fileName := "cert-rotate-os.toml"
 	timestamp := time.Now().Format("20060102150405")
-	remoteService := CONST_OPENSEARCH
+	remoteService := OPENSEARCH
 
 	var adminDn pkix.Name
 	var err error
@@ -449,8 +450,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	if err != nil {
 		return err
 	}
-	
-	oldCn:=getOldCn(automatesConfig)
+
+	oldCn := getOldCn(automatesConfig)
 
 	// Patching root-ca to frontend-nodes for maintaining the connection.
 	cn := nodesCn
@@ -548,9 +549,9 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 
 	// Defining set of commands which run on particular remoteservice nodes
 	var scriptCommands string
-	if param.remoteService == CONST_AUTOMATE || param.remoteService == CONST_CHEF_SERVER || param.remoteService == "frontend" {
+	if param.remoteService == AUTOMATE || param.remoteService == CHEF_SERVER || param.remoteService == "frontend" {
 		scriptCommands = fmt.Sprintf(FRONTEND_COMMAND, PATCH, param.remoteService+param.timestamp, dateFormat)
-	} else if param.remoteService == CONST_POSTGRESQL || param.remoteService == CONST_OPENSEARCH {
+	} else if param.remoteService == POSTGRESQL || param.remoteService == OPENSEARCH {
 		scriptCommands = fmt.Sprintf(COPY_USER_CONFIG, param.remoteService+param.timestamp, param.remoteService)
 	}
 	err = c.copyAndExecute(filteredIps, param.sshUtil, param.timestamp, param.remoteService, param.fileName, scriptCommands, param.flagsObj)
@@ -564,7 +565,7 @@ func (c *certRotateFlow) patchConfig(param *patchFnParameters) error {
 func (c *certRotateFlow) patchRootCAinCS(sshUtil SSHUtil, rootCA, timestamp string, infra *AutomateHAInfraDetails, flagsObj *certRotateFlags, skipIpsList []string) error {
 
 	fileName := "rotate-root_CA.toml"
-	remoteService := CONST_CHEF_SERVER
+	remoteService := CHEF_SERVER
 	cmd := `sudo chef-automate config show | grep fqdn | awk '{print $3}' | tr -d '"'`
 	ips := c.getIps(remoteService, infra)
 	if len(ips) == 0 {
@@ -653,13 +654,13 @@ func (c *certRotateFlow) getSshDetails(infra *AutomateHAInfraDetails) *SSHConfig
 
 // getIps will return the Ips based on the given remote service.
 func (c *certRotateFlow) getIps(remoteService string, infra *AutomateHAInfraDetails) []string {
-	if remoteService == CONST_AUTOMATE {
+	if remoteService == AUTOMATE {
 		return infra.Outputs.AutomatePrivateIps.Value
-	} else if remoteService == CONST_CHEF_SERVER {
+	} else if remoteService == CHEF_SERVER {
 		return infra.Outputs.ChefServerPrivateIps.Value
-	} else if remoteService == CONST_POSTGRESQL {
+	} else if remoteService == POSTGRESQL {
 		return infra.Outputs.PostgresqlPrivateIps.Value
-	} else if remoteService == CONST_OPENSEARCH {
+	} else if remoteService == OPENSEARCH {
 		return infra.Outputs.OpensearchPrivateIps.Value
 	} else if remoteService == "frontend" {
 		return append(infra.Outputs.AutomatePrivateIps.Value, infra.Outputs.ChefServerPrivateIps.Value...)
@@ -686,7 +687,7 @@ func (c *certRotateFlow) getAllIPs(infra *AutomateHAInfraDetails) []string {
 	return ips
 }
 
-//getFilteredIps will return ips on which cert-rotation need to perform.
+// getFilteredIps will return ips on which cert-rotation need to perform.
 func (c *certRotateFlow) getFilteredIps(serviceIps, skipIpsList []string) []string {
 	filteredIps := []string{}
 	for _, ip := range serviceIps {
@@ -697,11 +698,11 @@ func (c *certRotateFlow) getFilteredIps(serviceIps, skipIpsList []string) []stri
 	return filteredIps
 }
 
-//compareCurrentCertsWithNewCerts compare current certs and new certs and returns ips to skip cert-rotation.
+// compareCurrentCertsWithNewCerts compare current certs and new certs and returns ips to skip cert-rotation.
 func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, newCerts *certificates, flagsObj *certRotateFlags, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 	isCertsSame := true
-	if remoteService == CONST_AUTOMATE {
+	if remoteService == AUTOMATE {
 		if flagsObj.node == "" {
 			isCertsSame = strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newCerts.rootCA
 		}
@@ -709,12 +710,12 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 		return skipIpsList
 	}
 
-	if remoteService == CONST_CHEF_SERVER {
+	if remoteService == CHEF_SERVER {
 		skipIpsList = c.comparePublicCertAndPrivateCert(newCerts, currentCertsInfo.ChefServerCertsByIP, isCertsSame, flagsObj)
 		return skipIpsList
 	}
 
-	if remoteService == CONST_OPENSEARCH {
+	if remoteService == OPENSEARCH {
 		if flagsObj.node == "" {
 			isCertsSame = strings.TrimSpace(currentCertsInfo.OpensearchRootCert) == newCerts.rootCA
 			isCertsSame = (strings.TrimSpace(currentCertsInfo.OpensearchAdminCert) == newCerts.adminCert) && isCertsSame
@@ -724,7 +725,7 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 		return skipIpsList
 	}
 
-	if remoteService == CONST_POSTGRESQL {
+	if remoteService == POSTGRESQL {
 		if flagsObj.node == "" {
 			isCertsSame = strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newCerts.rootCA
 		}
@@ -734,7 +735,7 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 	return skipIpsList
 }
 
-//comparePublicCertAndPrivateCert compare new public-cert and private cert with current public-cert and private-cert and returns ips to skip cert-rotation.
+// comparePublicCertAndPrivateCert compare new public-cert and private cert with current public-cert and private-cert and returns ips to skip cert-rotation.
 func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
 	skipIpsList := []string{}
 	for _, currentCerts := range certByIpList {
@@ -753,26 +754,26 @@ func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates,
 	return skipIpsList
 }
 
-//getFrontEndIpsForSkippingRootCAPatching compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
+// getFrontEndIpsForSkippingRootCAPatching compare new root-ca and current root-ca of remoteService and returns ips to skip root-ca patching.
 func (c *certRotateFlow) getFrontEndIpsForSkippingRootCAPatching(remoteService string, newRootCA string, infra *AutomateHAInfraDetails, currentCertsInfo *certShowCertificates) []string {
 	skipIpsList := []string{}
 
-	if remoteService == CONST_POSTGRESQL {
+	if remoteService == POSTGRESQL {
 		if strings.TrimSpace(currentCertsInfo.PostgresqlRootCert) == newRootCA {
 			skipIpsList = append(skipIpsList, c.getIps("frontend", infra)...)
 		}
 	}
 
-	if remoteService == CONST_AUTOMATE {
+	if remoteService == AUTOMATE {
 		if strings.TrimSpace(currentCertsInfo.AutomateRootCert) == newRootCA {
-			skipIpsList = append(skipIpsList, c.getIps(CONST_CHEF_SERVER, infra)...)
+			skipIpsList = append(skipIpsList, c.getIps(CHEF_SERVER, infra)...)
 		}
 	}
 
 	return skipIpsList
 }
 
-//getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
+// getFrontEndIpsForSkippingCnAndRootCaPatching compare new root-ca and new cn with current root-ca and cn and returns ips to skip root-ca patching.
 func (c *certRotateFlow) getFrontEndIpsForSkippingCnAndRootCaPatching(newRootCA, newCn, oldCn, node string, currentCertsInfo *certShowCertificates, infra *AutomateHAInfraDetails) []string {
 	isRootCaSame := false
 
@@ -1015,7 +1016,7 @@ func (c *certRotateFlow) getMerger(fileName string, timestamp string, remoteType
 		dest interface{}
 		err1 error
 	)
-	if remoteType == CONST_OPENSEARCH {
+	if remoteType == OPENSEARCH {
 		dest, err1 = getMergedOpensearchInterface(rawOutput, fileName, remoteType)
 	} else {
 		dest, err1 = getMergedPostgresqlInterface(rawOutput, fileName, remoteType)

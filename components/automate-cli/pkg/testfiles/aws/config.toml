@@ -44,7 +44,7 @@ private_key = "test_pri_key"
 [chef_server.config]
 ## === INPUT NEEDED ===
 # No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
-instance_count = "1"
+instance_count = "2"
 # Add Chef Server load balancer root-ca and keys
 enable_custom_certs = true
 public_key = "test_pub_key"
@@ -56,7 +56,7 @@ private_key = "test_pri_key"
 [opensearch.config]
 ## === INPUT NEEDED ===
 # No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
-instance_count = "3"
+instance_count = "6"
 # Add OpenSearch load balancer root-ca and keys
 enable_custom_certs = true
 root_ca = "test_root_ca"

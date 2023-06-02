@@ -387,7 +387,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
   Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
 {{< /warning >}}
 
-## Delete single node In AWS Deployment post deployment
+## Remove Single Node From Cluster on AWS Deployment
 
 {{< warning >}}
 
@@ -399,10 +399,10 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 {{< /warning >}}
 
-The commands require some arguments so that it can determine which types of nodes you want to remove to your HA setup from your bastion host. It needs the ip address of the node you want to remove as as argument when you run the command.
+The command requires some arguments so that it can determine which types of nodes you want to remove from your HA setup from your bastion host. It needs the IP address of the node you want to remove as an argument when you run the command.
 For example,
 
-- if you want to remove node of automate, you have to run the:
+- If you want to remove node of automate, you have to run the:
 
     ```sh
     chef-automate node remove --automate-ip "<automate-ip-address>"
@@ -426,7 +426,7 @@ For example,
     chef-automate node remove --postgresql-ip "<postgresql-ip-address>"
     ```
 
-Once the command executes, it will remove nodes to your HA setup
+Once the command executes, it will remove the supplied node from your HA setup. The changes might take a while.
 
 ## Uninstall chef automate HA
 

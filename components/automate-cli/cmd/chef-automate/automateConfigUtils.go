@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"path/filepath"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
@@ -29,12 +30,12 @@ func getModeFromConfig(configPath string) (string, error) {
 		} else if config.Get("architecture.aws") != nil {
 			return AWS_MODE, nil
 		} else {
-			return AUTOMATE, nil
+			return strings.ToUpper(AUTOMATE), nil
 		}
 	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
 		return HA_MODE, nil
 	} else {
-		return AUTOMATE, nil
+		return strings.ToUpper(AUTOMATE), nil
 	}
 }
 

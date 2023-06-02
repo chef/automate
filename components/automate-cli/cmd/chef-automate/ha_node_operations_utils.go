@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
@@ -56,6 +59,10 @@ type MockNodeUtilsImpl struct {
 	moveAWSAutoTfvarsFileFunc                 func(path string) error
 	modifyTfArchFileFunc                      func(path string) error
 	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
+	stopServicesOnNodeFunc                    func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
+	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
+	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
+	calculateTotalInstanceCountFunc           func() (int, error)
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -114,6 +121,18 @@ func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
 func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
 	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
 }
+func (mnu *MockNodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
+	return mnu.stopServicesOnNodeFunc(ip, nodeType, deploymentType, infra)
+}
+func (mnu *MockNodeUtilsImpl) excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error {
+	return mnu.excludeOpenSearchNodeFunc(ipToDelete, infra)
+}
+func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+	return mnu.checkExistingExcludedOSNodesFunc(automateIp, infra)
+}
+func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
+	return mnu.calculateTotalInstanceCountFunc()
+}
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
@@ -134,12 +153,24 @@ type NodeOpUtils interface {
 	moveAWSAutoTfvarsFile(string) error
 	modifyTfArchFile(string) error
 	getAWSConfigIp() (*AWSConfigIp, error)
+	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
+	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
+	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
+	calculateTotalInstanceCount() (int, error)
 }
 
-type NodeUtilsImpl struct{}
+type NodeUtilsImpl struct {
+	cmdUtil RemoteCmdExecutor
+	exec    command.Executor
+	writer  *cli.Writer
+}
 
-func NewNodeUtils() NodeOpUtils {
-	return &NodeUtilsImpl{}
+func NewNodeUtils(cmdUtil RemoteCmdExecutor, exec command.Executor, writer *cli.Writer) NodeOpUtils {
+	return &NodeUtilsImpl{
+		cmdUtil: cmdUtil,
+		exec:    exec,
+		writer:  writer,
+	}
 }
 
 func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
@@ -226,9 +257,6 @@ func (nu *NodeUtilsImpl) taintTerraform(path string) error {
 	return executeShellCommand("/bin/sh", []string{"-c", TAINT_TERRAFORM}, path)
 }
 
-func (nu *NodeUtilsImpl) readConfig(path string) (ExistingInfraConfigToml, error) {
-	return readConfig(path)
-}
 func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs, true)
 }
@@ -319,6 +347,174 @@ func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
 		"-c",
 		command,
 	}, path)
+}
+
+// Stop services on node
+func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
+
+	if nodeType == OPENSEARCH {
+		err := nu.excludeOpenSearchNode(ip, infra)
+		if err != nil {
+			return err
+		}
+		nu.writer.Println(fmt.Sprintf("OpenSearch node %s excluded from the cluster.", ip))
+	}
+
+	// If deployment type is AWS, then we don't need to stop services on node
+	if deploymentType == AWS_MODE {
+		return nil
+	}
+
+	var cmd string
+	switch nodeType {
+	case AUTOMATE:
+		cmd = STOP_FE_SERVICES_CMD
+	case CHEF_SERVER:
+		cmd = STOP_FE_SERVICES_CMD
+	case POSTGRESQL:
+		cmd = STOP_BE_SERVICES_CMD
+	case OPENSEARCH:
+		cmd = STOP_BE_SERVICES_CMD
+	default:
+		return errors.New("Invalid node type")
+	}
+
+	sshUtil := nu.cmdUtil.GetSshUtil()
+
+	sshUtil.setSSHConfig(&SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+		hostIP:     ip,
+	})
+
+	_, err := sshUtil.connectAndExecuteCommandOnRemote(cmd, false)
+	if err != nil {
+		return err
+	}
+
+	nu.writer.Println(fmt.Sprintf("Services stopped on the node %s.", ip))
+
+	return nil
+}
+
+func (nu *NodeUtilsImpl) excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error {
+
+	automateIp := infra.Outputs.AutomatePrivateIps.Value[0]
+
+	existingIps, err := nu.checkExistingExcludedOSNodes(automateIp, infra)
+	if err != nil {
+		return err
+	}
+
+	if strings.Contains(existingIps, ipToDelete) {
+		return errors.New("Node is already excluded from the cluster")
+	}
+
+	if existingIps != "" {
+		ipToDelete = existingIps + "," + ipToDelete
+	}
+
+	nodeMap := &NodeTypeAndCmd{
+		Frontend:   &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate:   createCmdInputs(automateIp, fmt.Sprintf(EXCLUDE_OPENSEARCH_NODE_REQUEST, ipToDelete)),
+		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      infra,
+	}
+
+	_, err = nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (nu *NodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+	nodeMap := &NodeTypeAndCmd{
+		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Automate: &Cmd{CmdInputs: &CmdInputs{
+			Cmd:                      GET_OPENSEARCH_CLUSTER_SETTINGS,
+			NodeIps:                  []string{automateIp},
+			NodeType:                 true,
+			SkipPrintOutput:          true,
+			HideSSHConnectionMessage: true}},
+		ChefServer: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Postgresql: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Opensearch: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
+		Infra:      infra,
+	}
+
+	out, err := nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
+	if err != nil {
+		return "", err
+	}
+
+	var res *CmdResult
+	val, ok := out[automateIp]
+	if !ok {
+		return "", errors.New("Failed to get the response from the node")
+	}
+	if len(val) > 0 {
+		res = val[0]
+	}
+
+	if res.Error != nil {
+		return "", res.Error
+	}
+
+	return getIPsFromOSClusterResponse(res.Output), nil
+}
+
+// Calculate total instance count
+func (nu *NodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
+	cmd := `
+        a2csCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module.automate|module.bootstrap_automate|module.chef_server" | wc -l)
+        pgosCount=$(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep -E "module.opensearch|module.postgresql" | wc -l)
+        echo $(($a2csCount/2 + $pgosCount))
+    `
+
+	out, err := nu.exec.CombinedOutput("/bin/sh", command.Args("-c", cmd))
+	if err != nil {
+		return -1, err
+	}
+
+	count, err := strconv.Atoi(strings.TrimSuffix(out, "\n"))
+	if err != nil {
+		return -1, err
+	}
+
+	return count, nil
+}
+
+func getIPsFromOSClusterResponse(output string) string {
+	// Regular expression pattern to match the IP addresses
+	pattern := `"_ip":"((?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?:,\s*\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})*)"`
+
+	// Compile the regular expression pattern
+	reg := regexp.MustCompile(pattern)
+
+	// Find all matches of the pattern in the string
+	matches := reg.FindAllStringSubmatch(output, -1)
+
+	if len(matches) > 0 {
+		// Extract the IP addresses from the first match
+		return strings.TrimSpace(matches[0][1])
+	}
+	return ""
+}
+
+func createCmdInputs(ip string, cmd string) *Cmd {
+	return &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      cmd,
+			NodeIps:                  []string{ip},
+			NodeType:                 true,
+			SkipPrintOutput:          true,
+			HideSSHConnectionMessage: true,
+		},
+	}
 }
 
 func trimSliceSpace(slc []string) []string {
