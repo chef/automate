@@ -217,7 +217,7 @@ func (c *certRotateFlow) certRotate(cmd *cobra.Command, args []string, flagsObj 
 
 		sshConfig := c.getSshDetails(infra)
 		sshUtil := NewSSHUtil(sshConfig)
-		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor()), sshUtil, writer)
+		certShowFlow := NewCertShowImpl(certShowFlags{}, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), sshUtil, writer)
 		currentCertsInfo, err := certShowFlow.fetchCurrentCerts()
 
 		if err != nil {

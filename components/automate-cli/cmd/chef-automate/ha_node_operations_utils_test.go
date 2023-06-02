@@ -7,15 +7,20 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/stretchr/testify/assert"
 )
 
-const TEST_IP_2 = "192.0.2.12"
-const TEST_IP_3 = "192.0.2.13"
-const TEST_IP_4 = "192.0.2.14"
-const TEST_IP_5 = "192.0.2.15"
-const TEST_IP_6 = "192.0.2.16"
+const (
+	TEST_IP_2 = "192.0.2.12"
+	TEST_IP_3 = "192.0.2.13"
+	TEST_IP_4 = "192.0.2.14"
+	TEST_IP_5 = "192.0.2.15"
+	TEST_IP_6 = "192.0.2.16"
+)
+
+var MockWriter = majorupgrade_utils.NewCustomWriterWithInputs("y")
 
 func TestTrimSliceSpace(t *testing.T) {
 	testArr := []string{TEST_IP_1 + " ", " " + TEST_IP_3 + " "}
@@ -185,7 +190,8 @@ func TestIsFinalInstanceCountAllowed(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
+
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
 	assert.NoError(t, err)
@@ -197,7 +203,7 @@ func TestMoveAWSAutoTfvarsFileAllExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 
 	err := os.MkdirAll(filepath.Join(dir, DESTROY_AWS_FOLDER), os.ModePerm)
@@ -209,7 +215,7 @@ func TestMoveAWSAutoTfvarsFileNotExist(t *testing.T) {
 }
 
 func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 
 	_, err := os.Create(filepath.Join(dir, AWS_AUTO_TFVARS))
@@ -222,7 +228,7 @@ func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
 }
 
 func TestModifyTfArchFile(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 	_, err := os.Create(filepath.Join(dir, TF_ARCH_FILE))
 	assert.NoError(t, err)
@@ -235,7 +241,7 @@ func TestModifyTfArchFile(t *testing.T) {
 }
 
 func TestModifyTfArchFileNotExist(t *testing.T) {
-	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewMockExecutor(t))
+	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
 	err := nodeUtil.modifyTfArchFile(dir)
 	assert.Error(t, err)
@@ -267,7 +273,7 @@ func TestStopServicesOnNodeA2(t *testing.T) {
 				},
 			}
 		},
-	}, command.NewMockExecutor(t))
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, AUTOMATE, EXISTING_INFRA_MODE, infra)
 	assert.NoError(t, err)
 }
@@ -297,7 +303,7 @@ func TestStopServicesOnNodeCS(t *testing.T) {
 				},
 			}
 		},
-	}, command.NewMockExecutor(t))
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, CHEF_SERVER, AWS_MODE, infra)
 	assert.NoError(t, err)
 }
@@ -327,7 +333,7 @@ func TestStopServicesOnNodePG(t *testing.T) {
 				},
 			}
 		},
-	}, command.NewMockExecutor(t))
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, POSTGRESQL, EXISTING_INFRA_MODE, infra)
 	assert.NoError(t, err)
 }
@@ -360,7 +366,7 @@ func TestStopServicesOnNodeOS(t *testing.T) {
 					},
 				},
 			}, nil
-		}}, command.NewMockExecutor(t))
+		}}, command.NewMockExecutor(t), MockWriter.CliWriter)
 	err = nodeUtil.stopServicesOnNode(TEST_IP_1, OPENSEARCH, AWS_MODE, infra)
 	assert.NoError(t, err)
 }
@@ -370,7 +376,7 @@ func TestCalculateTotalInstanceCount(t *testing.T) {
 		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
 			return "8\n", nil
 		},
-	})
+	}, MockWriter.CliWriter)
 	count, err := nodeUtil.calculateTotalInstanceCount()
 	assert.NoError(t, err)
 	assert.Equal(t, 8, count)
@@ -381,7 +387,7 @@ func TestCalculateTotalInstanceCountCombineOutputError(t *testing.T) {
 		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
 			return "", errors.New("random error")
 		},
-	})
+	}, MockWriter.CliWriter)
 	count, err := nodeUtil.calculateTotalInstanceCount()
 	assert.ErrorContains(t, err, "error")
 	assert.Equal(t, -1, count)
@@ -392,7 +398,7 @@ func TestCalculateTotalInstanceCountAtoiError(t *testing.T) {
 		CombinedOutputFunc: func(cmd string, opts ...command.Opt) (string, error) {
 			return "abc", nil
 		},
-	})
+	}, MockWriter.CliWriter)
 	count, err := nodeUtil.calculateTotalInstanceCount()
 	assert.ErrorContains(t, err, "invalid syntax")
 	assert.Equal(t, -1, count)
