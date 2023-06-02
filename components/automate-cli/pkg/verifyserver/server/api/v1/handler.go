@@ -4,6 +4,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/fqdnservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
@@ -36,6 +37,7 @@ type Handler struct {
 	SystemResourceService        systemresourceservice.SystemResourcesService
 	ExternalOpensearchService    externalopensearchservice.IExternalOpensearchService
 	FqdnService                  fqdnservice.IFqdnService
+	FirewallService              firewallservice.IFirewallService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -113,5 +115,10 @@ func (h *Handler) AddSystemResourceService(srs systemresourceservice.SystemResou
 
 func (h *Handler) AddExternalOpensearchService(eos externalopensearchservice.IExternalOpensearchService) *Handler {
 	h.ExternalOpensearchService = eos
+	return h
+}
+
+func (h *Handler) AddFirewallService(fw firewallservice.IFirewallService) *Handler {
+	h.FirewallService = fw
 	return h
 }
