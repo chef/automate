@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/imdario/mergo"
 )
@@ -220,7 +221,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 
 		chefServer := &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:        frontendCommand,
+				Cmd:         frontendCommand,
 				WaitTimeout: configCmdFlags.waitTimeout,
 				Single:      false,
 				InputFiles:  []string{},
@@ -357,7 +358,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 
 		configFile := args[0]
-		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+configFile, dateFormat)
+		configFileName := stringutils.GetFileName(configFile)
+		frontendPrefix := "frontend" + "_" + timestamp + "_"
+		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+configFileName, dateFormat)
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -368,9 +371,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.frontend,
+				InputFilesPrefix:         frontendPrefix,
 			},
 		}
-		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "automate"+"_"+timestamp+"_"+configFile, dateFormat)
+		automatePrefix := "automate" + "_" + timestamp + "_"
+		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, automatePrefix+configFileName, dateFormat)
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -383,8 +388,8 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				NodeType:                 configCmdFlags.automate,
 			},
 		}
-
-		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "chef_server"+"_"+timestamp+"_"+configFile, dateFormat)
+		chefserverPrefix := "chef_server" + "_" + timestamp + "_"
+		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, chefserverPrefix+configFileName, dateFormat)
 		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -395,10 +400,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.chef_server,
+				InputFilesPrefix:         chefserverPrefix,
 			},
 		}
-
-		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+configFile)
+		postgresqlPrefix := "postgresql" + "_" + timestamp + "_"
+		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", postgresqlPrefix+configFileName)
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
@@ -409,9 +415,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.postgresql,
+				InputFilesPrefix:         postgresqlPrefix,
 			},
 		}
-		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+configFile)
+		opensearchPrefix := "opensearch" + "_" + timestamp + "_"
+		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", opensearchPrefix+configFileName)
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
@@ -422,6 +430,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.opensearch,
+				InputFilesPrefix:         opensearchPrefix,
 			},
 		}
 
@@ -461,7 +470,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 }
 
 // prePatchCheckForFrontendNodes patches the configuration for front end nodes in Automate HA
-func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	srcPath, err := parseAndRemoveRestrictedKeysFromSrcFile(inputs.Args[0])
 	if err != nil {
 		return err
@@ -473,7 +482,7 @@ func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Au
 }
 
 // prePatchCheckForPostgresqlNodes patches the config for postgresql nodes in Automate HA
-func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "Postgresql")
 	}
@@ -520,7 +529,7 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 }
 
 // prePatchCheckForOpensearch patches the config for open-search nodes in Automate HA
-func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 	if isManagedServicesOn() {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_SELF_MANAGED_CONFIG_PATCH, "OpenSearch")
 	}
