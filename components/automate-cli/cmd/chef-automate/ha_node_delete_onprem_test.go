@@ -535,6 +535,7 @@ This will delete the above node from your existing setup. It might take a while.
 }
 
 func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
+	count := 10
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
 		opensearchIp: "192.0.2.6",
@@ -571,7 +572,8 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 			return nil
 		},
 		calculateTotalInstanceCountFunc: func() (int, error) {
-			return 0, nil
+			count = count - 1
+			return count, nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

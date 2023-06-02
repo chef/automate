@@ -392,7 +392,7 @@ func (dna *DeleteNodeAWSImpl) stopNodes() error {
 
 	err = dna.nodeUtils.stopServicesOnNode(dna.ipToDelete, dna.nodeType, AWS_MODE, infra)
 	if err != nil {
-		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
+		return status.Wrap(err, status.CommandExecutionError, "Error stopping services on node")
 	}
 	return nil
 }

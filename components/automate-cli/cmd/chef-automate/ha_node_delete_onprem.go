@@ -288,7 +288,7 @@ func (dni *DeleteNodeOnPremImpl) stopNodes() error {
 
 	err = dni.nodeUtils.stopServicesOnNode(dni.ipToDelete, dni.nodeType, EXISTING_INFRA_MODE, infra)
 	if err != nil {
-		return status.Wrap(err, status.CommandExecutionError, "Error stoping services on node")
+		return status.Wrap(err, status.CommandExecutionError, "Error stopping services on node")
 	}
 	return nil
 }

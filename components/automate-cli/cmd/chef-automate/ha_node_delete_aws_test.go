@@ -648,6 +648,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 }
 
 func TestDeletenodeAWSExecuteNoError(t *testing.T) {
+	count := 10
 	var ipAddres, filewritten, executeCommands, autoFileMoved, tfArchModified bool
 	mnu := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -698,7 +699,8 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			return nil
 		},
 		calculateTotalInstanceCountFunc: func() (int, error) {
-			return 0, nil
+			count = count - 1
+			return count, nil
 		},
 	}
 	flagsArr := []AddDeleteNodeHACmdFlags{
