@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
@@ -161,12 +162,14 @@ type NodeOpUtils interface {
 type NodeUtilsImpl struct {
 	cmdUtil RemoteCmdExecutor
 	exec    command.Executor
+	writer  *cli.Writer
 }
 
-func NewNodeUtils(cmdUtil RemoteCmdExecutor, exec command.Executor) NodeOpUtils {
+func NewNodeUtils(cmdUtil RemoteCmdExecutor, exec command.Executor, writer *cli.Writer) NodeOpUtils {
 	return &NodeUtilsImpl{
 		cmdUtil: cmdUtil,
 		exec:    exec,
+		writer:  writer,
 	}
 }
 
@@ -354,6 +357,7 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string,
 		if err != nil {
 			return err
 		}
+		nu.writer.Println(fmt.Sprintf("OpenSearch node %s excluded from the cluster.", ip))
 	}
 
 	// If deployment type is AWS, then we don't need to stop services on node
@@ -388,6 +392,8 @@ func (nu *NodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string,
 	if err != nil {
 		return err
 	}
+
+	nu.writer.Println(fmt.Sprintf("Services stopped on the node %s.", ip))
 
 	return nil
 }
@@ -446,7 +452,14 @@ func (nu *NodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *
 		return "", err
 	}
 
-	res := out[automateIp][0]
+	var res *CmdResult
+	val, ok := out[automateIp]
+	if !ok {
+		return "", errors.New("Failed to get the response from the node")
+	}
+	if len(val) > 0 {
+		res = val[0]
+	}
 
 	if res.Error != nil {
 		return "", res.Error
