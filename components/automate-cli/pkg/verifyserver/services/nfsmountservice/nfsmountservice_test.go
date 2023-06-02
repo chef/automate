@@ -337,35 +337,35 @@ func TestGetNFSMountDetails(t *testing.T) {
 				}, Error: nil},
 			},
 		},
-		// {
-		// 	TestName: "Giving some Valid And Invalid Ips",
-		// 	ReqBody: models.NFSMountRequest{
-		// 		AutomateNodeIPs:        []string{"localhost", "192.168.54.34"},
-		// 		ChefInfraServerNodeIPs: []string{"localhost"},
-		// 		PostgresqlNodeIPs:      []string{"anything.com", "localhost"},
-		// 		OpensearchNodeIPs:      []string{"localhost"},
-		// 	},
-		// 	Response: []models.NFSMountResponse{
-		// 		{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
-		// 			{Passed: true},
-		// 			{Passed: true},
-		// 		}, Error: nil},
-		// 		{IP: "192.168.54.34", NodeType: "automate", CheckList: nil, Error: errors.New("")},
-		// 		{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
-		// 			{Passed: true},
-		// 			{Passed: true},
-		// 		}, Error: nil},
-		// 		{IP: "anything.com", NodeType: "postgresql", CheckList: nil, Error: errors.New("")},
-		// 		{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
-		// 			{Passed: true},
-		// 			{Passed: true},
-		// 		}, Error: nil},
-		// 		{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
-		// 			{Passed: true},
-		// 			{Passed: true},
-		// 		}, Error: nil},
-		// 	},
-		// },
+		{
+			TestName: "Giving some Valid And Invalid Ips",
+			ReqBody: models.NFSMountRequest{
+				AutomateNodeIPs:        []string{"localhost", "192.168.54.34"},
+				ChefInfraServerNodeIPs: []string{"localhost"},
+				PostgresqlNodeIPs:      []string{"anything.com", "localhost"},
+				OpensearchNodeIPs:      []string{"localhost"},
+			},
+			Response: []models.NFSMountResponse{
+				{IP: "localhost", NodeType: "automate", CheckList: []models.Checks{
+					{Passed: true},
+					{Passed: true},
+				}, Error: nil},
+				{IP: "192.168.54.34", NodeType: "automate", CheckList: nil, Error: errors.New("")},
+				{IP: "localhost", NodeType: "chef-infra-server", CheckList: []models.Checks{
+					{Passed: true},
+					{Passed: true},
+				}, Error: nil},
+				{IP: "anything.com", NodeType: "postgresql", CheckList: nil, Error: errors.New("")},
+				{IP: "localhost", NodeType: "postgresql", CheckList: []models.Checks{
+					{Passed: true},
+					{Passed: true},
+				}, Error: nil},
+				{IP: "localhost", NodeType: "opensearch", CheckList: []models.Checks{
+					{Passed: true},
+					{Passed: true},
+				}, Error: nil},
+			},
+		},
 	}
 
 	for _, e := range tests {
