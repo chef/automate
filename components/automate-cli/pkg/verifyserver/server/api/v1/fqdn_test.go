@@ -208,12 +208,12 @@ func TestCheckFqdn(t *testing.T) {
 		t.Run(test.TestName, func(t *testing.T) {
 			bodyReader := strings.NewReader(test.RequestBody)
 			req := httptest.NewRequest("POST", fqdnCheckEndpoint, bodyReader)
-			req.Header.Add("Content-type", "application/json")
+			req.Header.Add(constants.CONTENT_TYPE, constants.TYPE_JSON)
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
 			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.TestName)
-			assert.JSONEq(t, string(body), test.ExpectedBody)
+			assert.JSONEq(t, test.ExpectedBody, string(body))
 			assert.Equal(t, test.ExpectedCode, res.StatusCode)
 		})
 	}

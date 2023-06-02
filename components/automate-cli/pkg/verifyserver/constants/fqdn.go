@@ -13,6 +13,8 @@ const (
 	CERTIFICATE_SUCCESS_MESSAGE    = "FQDN has with valid certificates"
 	CERTIFICATE_ERROR_MESSAGE      = "FQDN certificate is not valid."
 	CERTIFICATE_RESOLUTION_MESSAGE = "Generate new valid certificates and provide those."
-	IP_TO_HASH_FAIL_MESSAGE        = "Failed to hash the ips."
+	IP_TO_HASH_FAIL_MESSAGE        = "Failed to hash the IP."
 	DEFAULT_HTTPS_PORT             = "443"
+	SERVER_IP_HEADER_KEY           = "x-server-ip"
+	CHAN_RESULT_ERROR_MESSAGE      = "error recieved"
 )

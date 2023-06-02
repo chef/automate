@@ -349,6 +349,45 @@ func TestCheckFqdnReachability(t *testing.T) {
 			httpsSuccessPort,
 		},
 		{
+			"Case is Before Deployment, FQDN is reachable, Nodes are not reachable, Certicate is valid",
+			models.FqdnRequest{
+				Fqdn:              LOCALHOST,
+				NodeType:          constants.CHEF_INFRA_SERVER,
+				RootCert:          CA_CERT,
+				IsAfterDeployment: false,
+				Nodes: []string{
+					"172.154.0.3",
+				},
+			},
+			models.FqdnResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.FQDN_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.NODE_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.NODE_ERROR_MESSAGE, "[172.154.0.3]"),
+						ResolutionMsg: constants.NODE_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
+			httpsSuccessPort,
+		},
+		{
 			"Case is Before Deployment, FQDN and Nodes are not reachable, Certificate block type is wrong",
 			models.FqdnRequest{
 				Fqdn:              LOCALHOST,

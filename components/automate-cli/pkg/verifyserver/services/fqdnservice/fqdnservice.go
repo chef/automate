@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -98,6 +99,55 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 	return setNodes, nil
 }
 
+// makeConcurrentCalls function is making 50 concurrent calls for checking node reachability.
+func (fq *FqdnService) makeConcurrentCalls(url string, client *http.Client, setNodes map[string]int) error {
+	fq.log.Debug("Making Concurrent Calls...")
+	fqdnResultChan := make(chan string)
+	for i := 0; i < 50; i++ {
+		go func(fqdnResultChan chan string) {
+			res, err := client.Get(url)
+			if err != nil {
+				fq.log.Error(err.Error())
+				fqdnResultChan <- constants.CHAN_RESULT_ERROR_MESSAGE
+				return
+			}
+			nodeIP := res.Header.Get(constants.SERVER_IP_HEADER_KEY)
+			fqdnResultChan <- nodeIP
+		}(fqdnResultChan)
+	}
+
+	for i := 0; i < 50; i++ {
+		chanResult := <-fqdnResultChan
+		if chanResult == constants.CHAN_RESULT_ERROR_MESSAGE {
+			continue
+		}
+		delete(setNodes, chanResult)
+		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
+		if len(setNodes) == 0 {
+			fq.log.Debug("All nodes are reachable.")
+			return nil
+		}
+	}
+	return errors.New("nodes are not reachable")
+}
+
+func (fq *FqdnService) triggerRequest(client *http.Client, url string) error {
+	res, err := client.Get(url)
+	if err != nil {
+		fq.log.Error(err.Error())
+		return err
+	}
+
+	fq.log.Debug("Status Code: ", res.StatusCode)
+	if res.StatusCode != 200 {
+		fq.log.Debugf("%v is not reachable.", url)
+		return errors.New("fqdn is not reachable")
+	}
+
+	fq.log.Debug("Fqdn is Reachable.")
+	return nil
+}
+
 // fqdnReachable function will check that are we able to hit the load balancer fqdn or not.
 func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDeployment bool, port string) models.Checks {
 	fq.log.Debug("Checking Fqdn Reachability...")
@@ -111,18 +161,11 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 	}
 	fq.log.Debug("URL: ", url)
 
-	res, err := client.Get(url)
+	err := fq.triggerRequest(client, url)
 	if err != nil {
-		fq.log.Error(err.Error())
-		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
-	}
 
-	fq.log.Debug("Status Code: ", res.StatusCode)
-	if res.StatusCode != 200 {
-		fq.log.Debug("Fqdn is not reachable.")
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
 	}
-	fq.log.Debug("Fqdn is Reachable.")
 	return createCheck(constants.FQDN_TITLE, true, constants.FQDN_SUCCESS_MESSAGE, "", "")
 }
 
@@ -144,37 +187,15 @@ func (fq *FqdnService) nodeReachable(fqdn, rootCert string, reqNodes []string, i
 	fq.log.Debug("URL: ", url)
 
 	client := fq.createClient(rootCert)
-	fqdnResultChan := make(chan string)
 
-	fq.log.Debug("Making Concurrent Calls...")
-	for i := 0; i < 50; i++ {
-		go func(fqdnResultChan chan string) {
-			res, err := client.Get(url)
-			if err != nil {
-				fq.log.Error(err.Error())
-				fqdnResultChan <- "got error"
-				return
-			}
-			nodeIP := res.Header.Get("x-server-ip")
-			fqdnResultChan <- nodeIP
-		}(fqdnResultChan)
+	err = fq.makeConcurrentCalls(url, client, setNodes)
+	if err != nil {
+		fq.log.Debug("All nodes are not reachable")
+		errorMessage := createErrorMessage(setNodes, reqNodes, isAfterDeployment)
+		return createCheck(constants.NODE_TITLE, false, "", errorMessage, constants.NODE_RESOLUTION_MESSAGE)
 	}
 
-	for i := 0; i < 50; i++ {
-		chanResult := <-fqdnResultChan
-		if chanResult == "got error" {
-			continue
-		}
-		delete(setNodes, chanResult)
-		//if setNodes becomes empty, that means we are able to reach all the nodes given in the request body.
-		if len(setNodes) == 0 {
-			fq.log.Debug("All nodes are reachable.")
-			return createCheck(constants.NODE_TITLE, true, constants.NODE_SUCCESS_MESSAGE, "", "")
-		}
-	}
-
-	errorMessage := createErrorMessage(setNodes, reqNodes, isAfterDeployment)
-	return createCheck(constants.NODE_TITLE, false, "", errorMessage, constants.NODE_RESOLUTION_MESSAGE)
+	return createCheck(constants.NODE_TITLE, true, constants.NODE_SUCCESS_MESSAGE, "", "")
 }
 
 // validateCertificate will check that if our root certificate is valid or not.
