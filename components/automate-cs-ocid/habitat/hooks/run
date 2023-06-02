@@ -18,6 +18,14 @@ source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
 # Setup environment specific configurations for integration with erchef
 source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
 
+# Registering oauth applications
+export OAUTH_APPLICATIONS_JSON='{{toJson cfg.ocid.oauth_applications}}'
+bundle exec bin/rake oauth_application:register
+
+# Saving registered oauth application details in a file
+export REGISTERED_OAUTH_APPS_FILE_PATH="{{pkg.svc_config_path}}/registered_oauth_applications.yaml"
+bundle exec bin/rake oauth_application:save_registered_app_details_to_file
+
 # NOTE: Please keep this statement just before running
 # any environment specific command e.g. starting rails server.
 # The running server will follow the configurations that are
