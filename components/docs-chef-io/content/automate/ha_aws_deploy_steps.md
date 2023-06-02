@@ -105,7 +105,7 @@ Run the following steps on Bastion Host Machine:
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
    - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`
-   - If `backup_config` is `s3` then uncomment and add the value for following `s3_bucketName` attribute.
+   - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
    - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
    - Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
@@ -113,7 +113,7 @@ Run the following steps on Bastion Host Machine:
      - Set `profile`, by default `profile` is `"default"`
      - Set `region`, by default `region` is `"us-east-1"`
      - Set `aws_vpc_id`, which you had created as Prerequisite step. Example: `"vpc12318h"`
-     - Set `private_custom_subnets` to the 3 private subnets we created in prerequisites step and set `public_custom_subnets` to the 3 public subnets we created in prerequisites step: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
+     - Set `private_custom_subnets` and `public_custom_subnets`: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
      - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequisite. This value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
      - Set `setup_managed_services` as `false`, As these deployment steps are for Non-Managed Services AWS Deployment. Default value is `false`.
      - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
@@ -211,6 +211,8 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 - Following config will create s3 bucket for backup.
 
+- To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
+
 {{< /note >}}
 
 ```config
@@ -231,36 +233,42 @@ backup_mount = "/mnt/automate_backups"
 [automate.config]
 admin_password = "MY-AUTOMATE-UI-PASSWORD"
 fqdn = ""
-instance_count = "1"
+instance_count = "2"
 config_file = "configs/automate.toml"
 enable_custom_certs = false
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+
+# Add Automate Load Balancer root-ca
+# root_ca = """root_ca_contents"""
+
+# Add Automate node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [chef_server.config]
-instance_count = "1"
+instance_count = "2"
 enable_custom_certs = false
-# Add Chef Server load balancer root-ca and keys
-# private_key = ""
-# public_key = ""
+
+# Add Chef Server node internal public and private keys
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [opensearch.config]
 instance_count = "3"
 enable_custom_certs = false
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+# Add OpenSearch root-ca and keys
+# root_ca = """root_ca_contents"""
+# admin_key = """admin_private_key_contents"""
+# admin_cert = """admin_public_key_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [postgresql.config]
 instance_count = "3"
 enable_custom_certs = false
-# Add Postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+# Add Postgresql root-ca and keys
+# root_ca = """root_ca_contents"""
+# private_key = """private_key_contents"""
+# public_key = """public_key_contents"""
 
 [aws.config]
 profile = "default"
