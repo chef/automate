@@ -2,6 +2,7 @@ package v1_test
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
