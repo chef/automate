@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 )
 
@@ -179,12 +180,7 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 	timeout := input.WaitTimeout
 	inputFileToOutputFileMap := map[string]string{}
 	for _, file := range inputFiles {
-		destinationFile := inputFilesPrefix + "_" + file
-		if strings.Contains(file, "/") {
-			filePath := strings.Split(file, "/")
-			lastFileidx := len(filePath) - 1
-			destinationFile = filePath[lastFileidx]
-		}
+		destinationFile := inputFilesPrefix + stringutils.GetFileName(file)
 		inputFileToOutputFileMap[file] = destinationFile
 	}
 
@@ -258,7 +254,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 
 	if len(outputFiles) != 0 {
 		for _, file := range outputFiles {
-			outFile := sshUtil.getSSHConfig().hostIP + "_" + file
+			outFile := sshUtil.getSSHConfig().hostIP + "_" + stringutils.GetFileName(file)
 			destFileName, err := sshUtil.copyFileFromRemote(file, outFile)
 			if err != nil {
 				rc.Error = err

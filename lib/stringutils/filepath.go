@@ -1,6 +1,8 @@
 package stringutils
 
-import "strings"
+import (
+	"strings"
+)
 
 func GetFileName(path string) string {
 	if strings.Contains(path, "/") {

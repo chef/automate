@@ -386,6 +386,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 				InputFiles:               []string{configFile},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 configCmdFlags.automate,
+				InputFilesPrefix:         automatePrefix,
 			},
 		}
 		chefserverPrefix := "chef_server" + "_" + timestamp + "_"
