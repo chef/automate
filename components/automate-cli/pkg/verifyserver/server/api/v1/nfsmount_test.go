@@ -613,7 +613,7 @@ func TestNFSMountLocationSuccess(t *testing.T) {
 			ExpectedCode: 200,
 			ExpectedBody: successMsg,
 			RequestBody: `{
-				"mount_location":"/nfs"
+				"mount_location":"/data"
 			}`,
 		},
 	}
