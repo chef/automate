@@ -287,7 +287,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.FQDN_TITLE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -365,7 +365,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.FQDN_TITLE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -521,7 +521,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.FQDN_TITLE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -585,7 +585,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.FQDN_TITLE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -649,7 +649,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.FQDN_TITLE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -681,7 +681,7 @@ func TestCheckFqdnReachability(t *testing.T) {
 					{
 						Title:         constants.FQDN_TITLE,
 						Passed:        true,
-						SuccessMsg:    constants.FQDN_SUCCESS_MESSAGE,
+						SuccessMsg:    constants.FQDN_TITLE,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},

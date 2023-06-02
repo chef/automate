@@ -67,7 +67,8 @@ func createErrorMessage(setNodes map[string]int, reqnodes []string, isAfterDeplo
 			val = k
 		}
 
-		if setNodes[val] > 0 {
+		_, ok := setNodes[val]
+		if ok {
 			temp += k
 			temp += ", "
 		}
@@ -90,9 +91,9 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 			if err != nil {
 				return nil, err
 			}
-			setNodes[hex.EncodeToString(hasher.Sum(nil))] += 1
+			setNodes[hex.EncodeToString(hasher.Sum(nil))] = 0
 		} else {
-			setNodes[k] += 1
+			setNodes[k] = 0
 		}
 	}
 
@@ -103,7 +104,7 @@ func makeSet(reqNodes []string, isAfterDeployment bool) (map[string]int, error) 
 func (fq *FqdnService) makeConcurrentCalls(url string, client *http.Client, setNodes map[string]int) error {
 	fq.log.Debug("Making Concurrent Calls...")
 	fqdnResultChan := make(chan string)
-	for i := 0; i < 50; i++ {
+	for i := 0; i < constants.MIN_NUMBER_OF_CALLS; i++ {
 		go func(fqdnResultChan chan string) {
 			res, err := client.Get(url)
 			if err != nil {
@@ -116,7 +117,7 @@ func (fq *FqdnService) makeConcurrentCalls(url string, client *http.Client, setN
 		}(fqdnResultChan)
 	}
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < constants.MIN_NUMBER_OF_CALLS; i++ {
 		chanResult := <-fqdnResultChan
 		if chanResult == constants.CHAN_RESULT_ERROR_MESSAGE {
 			continue
@@ -163,10 +164,9 @@ func (fq *FqdnService) fqdnReachable(fqdn, rootCert, nodeType string, isAfterDep
 
 	err := fq.triggerRequest(client, url)
 	if err != nil {
-
 		return createCheck(constants.FQDN_TITLE, false, "", constants.FQDN_ERROR_MESSAGE, constants.FQDN_RESOLUTION_MESSAGE)
 	}
-	return createCheck(constants.FQDN_TITLE, true, constants.FQDN_SUCCESS_MESSAGE, "", "")
+	return createCheck(constants.FQDN_TITLE, true, constants.FQDN_TITLE, "", "")
 }
 
 // nodeReachable function will check that our load balancer will correctly redirecting to all the nodes or not.

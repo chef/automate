@@ -2,7 +2,6 @@ package constants
 
 const (
 	FQDN_TITLE                     = "FQDN is reachable"
-	FQDN_SUCCESS_MESSAGE           = "FQDN is reachable"
 	FQDN_ERROR_MESSAGE             = "FQDN is not reachable"
 	FQDN_RESOLUTION_MESSAGE        = "Ensure your Port 443 is open and load balancer is able to reach to the machine on port 443. Review security group or firewall settings."
 	NODE_TITLE                     = "Nodes are reachable"
@@ -17,4 +16,5 @@ const (
 	DEFAULT_HTTPS_PORT             = "443"
 	SERVER_IP_HEADER_KEY           = "x-server-ip"
 	CHAN_RESULT_ERROR_MESSAGE      = "error recieved"
+	MIN_NUMBER_OF_CALLS            = 50
 )
