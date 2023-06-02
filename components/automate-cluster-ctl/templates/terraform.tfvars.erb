@@ -93,7 +93,9 @@ chef_ebs_volume_size = "<%= config.aws.chef_ebs_volume_size %>"
 chef_ebs_volume_type = "<%= config.aws.chef_ebs_volume_type %>"
 <% end %>
 
+<% if config.aws.opensearch_server_instance_type %>
 opensearch_server_instance_type = "<%= config.aws.opensearch_server_instance_type %>"
+<% end %>
 
 <% if config.aws.opensearch_ebs_volume_iops %>
 opensearch_ebs_volume_iops = "<%= config.aws.opensearch_ebs_volume_iops %>"
@@ -107,7 +109,9 @@ opensearch_ebs_volume_size = "<%= config.aws.opensearch_ebs_volume_size %>"
 opensearch_ebs_volume_type = "<%= config.aws.opensearch_ebs_volume_type %>"
 <% end %>
 
+<% if config.aws.postgresql_server_instance_type %>
 postgresql_server_instance_type = "<%= config.aws.postgresql_server_instance_type %>"
+<% end %>
 
 <% if config.aws.postgresql_ebs_volume_iops %>
 postgresql_ebs_volume_iops = "<%= config.aws.postgresql_ebs_volume_iops %>"

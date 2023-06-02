@@ -149,12 +149,6 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.ChefServer.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty chef-server instance_count")
 	}
-	if len(e.config.Opensearch.Config.InstanceCount) < 1 {
-		errorList.PushBack("Invalid or empty open-search instance_count")
-	}
-	if len(e.config.Postgresql.Config.InstanceCount) < 1 {
-		errorList.PushBack("Invalid or empty postgres-sql instance_count")
-	}
 
 	if len(e.config.ExistingInfra.Config.AutomatePrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty automate_private_ips")
@@ -164,6 +158,13 @@ func (e *existingInfra) validateConfigFields() *list.List {
 		errorList.PushBack("Invalid or empty chef_server_private_ips")
 	}
 	if (e.config.ExternalDB.Database.Type != "aws") && (e.config.ExternalDB.Database.Type != "self-managed") {
+		if len(e.config.Opensearch.Config.InstanceCount) < 1 {
+			errorList.PushBack("Invalid or empty open-search instance_count")
+		}
+		if len(e.config.Postgresql.Config.InstanceCount) < 1 {
+			errorList.PushBack("Invalid or empty postgres-sql instance_count")
+		}
+
 		if len(e.config.ExistingInfra.Config.OpensearchPrivateIps) < 1 {
 			errorList.PushBack("Invalid or empty opensearch_private_ips")
 		}

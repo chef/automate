@@ -164,11 +164,13 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	if len(a.config.ChefServer.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty chef-server instance_count")
 	}
-	if len(a.config.Opensearch.Config.InstanceCount) < 1 {
-		errorList.PushBack("Invalid or empty elastic-search instance_count")
-	}
-	if len(a.config.Postgresql.Config.InstanceCount) < 1 {
-		errorList.PushBack("Invalid or empty postgres-sql instance_count")
+	if !a.config.Aws.Config.SetupManagedServices {
+		if len(a.config.Opensearch.Config.InstanceCount) < 1 {
+			errorList.PushBack("Invalid or empty open-search instance_count")
+		}
+		if len(a.config.Postgresql.Config.InstanceCount) < 1 {
+			errorList.PushBack("Invalid or empty postgres-sql instance_count")
+		}
 	}
 	errorList.PushBackList(a.validateEnvFields())
 	errorList.PushBackList(a.validateCerts())
@@ -195,12 +197,6 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.ChefServerInstanceType) < 1 {
 		errorList.PushBack("Invalid or empty aws chef_server_instance_type")
 	}
-	if len(a.config.Aws.Config.OpensearchServerInstanceType) < 1 {
-		errorList.PushBack("Invalid or empty aws opensearch_server_instance_type")
-	}
-	if len(a.config.Aws.Config.PostgresqlServerInstanceType) < 1 {
-		errorList.PushBack("Invalid or empty aws postgresql_server_instance_type")
-	}
 	if len(a.config.Aws.Config.AutomateLbCertificateArn) < 1 {
 		errorList.PushBack("Invalid or empty aws automate_lb_certificate_arn")
 	}
@@ -226,6 +222,12 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 		errorList.PushBack("Invalid or empty aws chef_ebs_volume_type")
 	}
 	if !a.config.Aws.Config.SetupManagedServices {
+		if len(a.config.Aws.Config.OpensearchServerInstanceType) < 1 {
+			errorList.PushBack("Invalid or empty aws opensearch_server_instance_type")
+		}
+		if len(a.config.Aws.Config.PostgresqlServerInstanceType) < 1 {
+			errorList.PushBack("Invalid or empty aws postgresql_server_instance_type")
+		}
 		if len(a.config.Aws.Config.OpensearchEbsVolumeIops) < 1 {
 			errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_iops")
 		}
