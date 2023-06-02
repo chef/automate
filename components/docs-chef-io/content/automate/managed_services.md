@@ -561,8 +561,8 @@ To store backups in an existing AWS S3 bucket, add the following to your `config
   # AWS environment variables or through the shared AWS config files.
   access_key = "<access_key>"
   secret_key = "<secret_key>"
-  # session_key (optional)
-  session_key = "<session_key>"
+  # session_token (optional)
+  session_token = "<session_token>"
 
 [global.v1.backups.s3.ssl]
   # root_cert (optional): The root certificate used for SSL validation.
