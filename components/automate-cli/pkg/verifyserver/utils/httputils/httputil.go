@@ -44,10 +44,10 @@ func MakeRequest(requestMethod string, url string, body interface{}) (*http.Resp
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	if err == nil && resp.StatusCode != 200 {
-		return nil, errors.New(resp.Status)
+		return resp, errors.New(resp.Status)
 	}
 	return resp, nil
 }

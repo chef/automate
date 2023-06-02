@@ -2,6 +2,7 @@ package batchcheckservice
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -49,48 +50,50 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
+successfullyStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+	notStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
 	if len(remoteChecks) > 0 {
 		startMockServer, err := ss.shouldStartMockServer(remoteChecks)
 		if err != nil {
 			return models.BatchCheckResponse{}, err
 		}
 		if startMockServer {
-			arr = ss.startMockServer(remoteChecks, config.Hardware)
+			successfullyStartedMockServers, notStartedMockServers = ss.startMockServer(remoteChecks, config.Hardware)
 		}
-	}
-
-	if len(remoteChecks) > 0 {
+		if len(notStartedMockServers) > 0 {
+			for _, successfullyStartedMockServer := range successfullyStartedMockServers {
+				ss.stopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
+			}
+			return models.BatchCheckResponse{}, errors.New("mock server not started successfull on some nodes")
+		}
 		for _, check := range remoteChecks {
 			resp := ss.RunRemoteCheck(check, config)
 			checkTriggerRespMap[check] = resp
 		}
 	}
 
-	if len(arr) > 0 {
-		for _, req := range arr {
-			stopMockServerRequestBody := models.MockServerRequestBody{
-				Port:     req.Port,
-				Protocol: constants.TCP,
-				Cert:     "",
-				Key:      "",
-			}
-			ss.stopMockServerOnHostAndPort(req.Host, ss.port, stopMockServerRequestBody)
+	if len(successfullyStartedMockServers) > 0 {
+		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
+			ss.stopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
 		}
 	}
-	// stop mock services
+
 	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...)), nil
 }
 
 func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string) (bool, error) {
-	deploymentState, err := ss.getDeploymentState()
-	if err != nil {
-		ss.log.Error("Error while calling status api from batch check service:", err)
-		return false, err
+	if stringutils.SliceContains(remoteChecks, constants.FIREWALL) || stringutils.SliceContains(remoteChecks, constants.FQDN) {
+		deploymentState, err := ss.getDeploymentState()
+		if err != nil {
+			ss.log.Error("Error while calling status api from batch check service:", err)
+			return false, err
+		}
+		return deploymentState == constants.PRE_DEPLOY, nil
 	}
-	return deploymentState == "pre_deploy", nil
+	return false, nil
 }
 
-func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDetails models.Hardware) []models.StartMockServerFromBatchServiceResponse {
+func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDetails models.Hardware) ([]models.StartMockServerFromBatchServiceResponse, []models.StartMockServerFromBatchServiceResponse) {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
 			constants.TCP:   []int{},
@@ -170,7 +173,6 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 				key := fmt.Sprint(host, "_", constants.UDP, "_", port)
 
 				if !ipPortProtocolMap[key] {
-					fmt.Println("Request triggered for", key)
 					go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
 					totalReq = totalReq + 1
 					ipPortProtocolMap[key] = true
@@ -189,7 +191,6 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 				key := fmt.Sprint(host, "_", constants.HTTPS, "_", port)
 
 				if !ipPortProtocolMap[key] {
-					fmt.Println("Request triggered for", key)
 					go ss.startMockServerOnHostAndPort(host, ss.port, startMockServerRequestBody, startMockServerChannel)
 					totalReq = totalReq + 1
 					ipPortProtocolMap[key] = true
@@ -198,14 +199,19 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, hardwareDeta
 		}
 	}
 
-	arr := []models.StartMockServerFromBatchServiceResponse{}
+	successfullyStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+	notStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
 	for i := 0; i < totalReq; i++ {
 		result := <-startMockServerChannel
-		arr = append(arr, result)
+		if result.Error == nil {
+			successfullyStartedMockServers = append(successfullyStartedMockServers, result)
+		} else {
+			notStartedMockServers = append(notStartedMockServers, result)
+		}
+
 	}
 	defer close(startMockServerChannel)
-	fmt.Println("reponse of all trigger", arr)
-	return arr
+	return successfullyStartedMockServers, notStartedMockServers
 }
 
 func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) string {
@@ -268,15 +274,13 @@ func (ss *BatchCheckService) getDeploymentState() (string, error) {
 		return "", err
 	}
 	if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
-		return "pre_deploy", nil
+		return constants.PRE_DEPLOY, nil
 	}
-	return "post_deploy", nil
+	return constants.POST_DEPLOY, nil
 }
 
 func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, startMockServerRequestBody models.MockServerRequestBody, respChan chan models.StartMockServerFromBatchServiceResponse) {
-	fmt.Println("Received request to run mock server on host", host, "with body", startMockServerRequestBody)
 	url := fmt.Sprintf("%s%s:%s%s", "http://", host, port, constants.START_MOCK_SERVER)
-	fmt.Println("url for request", url)
 	resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, startMockServerRequestBody)
 	if err != nil {
 		ss.log.Error("Error occurred while starting mock server: ", err.Error())
@@ -291,10 +295,12 @@ func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, sta
 	respChan <- chanResponse
 }
 
-func (ss *BatchCheckService) stopMockServerOnHostAndPort(host, port string, stopMockServerRequestBody models.MockServerRequestBody) {
-	fmt.Println("Received request to run mock server on host", host, "with body", stopMockServerRequestBody)
-	url := fmt.Sprintf("%s%s:%s%s", "http://", host, port, constants.STOP_MOCK_SERVER)
-	fmt.Println("url for request", url)
+func (ss *BatchCheckService) stopMockServerOnHostAndPort(host, protocol string, port int) {
+	stopMockServerRequestBody := models.MockServerRequestBody{
+		Port:     port,
+		Protocol: protocol,
+	}
+	url := fmt.Sprintf("%s%s:%s%s", "http://", host, ss.port, constants.STOP_MOCK_SERVER)
 	_, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, stopMockServerRequestBody)
 	if err != nil {
 		ss.log.Error("Error occurred while starting mock server: ", err.Error())

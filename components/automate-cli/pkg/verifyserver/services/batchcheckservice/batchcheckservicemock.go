@@ -13,6 +13,7 @@ type MockBatchCheckService struct {
 func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error) {
 	return mss.BatchCheckFunc(checks, config)
 }
+
 type MockHardwareResourceCountCheck struct {
 	HardwareResourceCountCheckFunc func(config models.Config) []models.CheckTriggerResponse
 	GetPortsForMockServerFunc      func() map[string]map[string][]int
@@ -198,17 +199,19 @@ func SetupMockFirewallCheck() trigger.ICheck {
 		GetPortsForMockServerFunc: func() map[string]map[string][]int {
 			nodeTypePortMap := map[string]map[string][]int{
 				constants.AUTOMATE: {
-					constants.TCP: []int{9631, 9638, 22, 443, 80},
+					constants.TCP:   []int{9631, 9638, 80},
+					constants.HTTPS: []int{443},
 				},
 				constants.CHEF_INFRA_SERVER: {
-					constants.TCP: []int{9631, 9638, 22, 443, 80},
+					constants.TCP:   []int{9631, 9638, 80},
+					constants.HTTPS: []int{443},
 				},
 				constants.POSTGRESQL: {
-					constants.TCP: []int{7432, 9631, 5432, 6432, 9638, 22},
+					constants.TCP: []int{7432, 9631, 5432, 6432, 9638},
 					constants.UDP: []int{9638},
 				},
 				constants.OPENSEARCH: {
-					constants.TCP: []int{9200, 9300, 22, 9631, 9638},
+					constants.TCP: []int{9200, 9300, 9631, 9638},
 				},
 			}
 			return nodeTypePortMap
@@ -236,8 +239,15 @@ func SetupMockFqdnCheck() trigger.ICheck {
 			return m
 		},
 		GetPortsForMockServerFunc: func() map[string]map[string][]int {
-			m := make(map[string]map[string][]int)
-			return m
+			nodeTypePortMap := map[string]map[string][]int{
+				constants.AUTOMATE: {
+					constants.HTTPS: []int{443},
+				},
+				constants.CHEF_INFRA_SERVER: {
+					constants.HTTPS: []int{443},
+				},
+			}
+			return nodeTypePortMap
 		},
 	}
 }
