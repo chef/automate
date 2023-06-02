@@ -45,6 +45,11 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.Che
 
 }
 
+func (ss *OpensearchS3BucketAccessCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
 // setHostAsOpensearchInResponse sets the Host as external OS endpoint as this will help us in mapping the result correctly
 func setHostAsOpensearchInResponse(response []models.CheckTriggerResponse, osExternalUrl string) []models.CheckTriggerResponse {
 	for i := range response {
