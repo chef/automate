@@ -437,7 +437,6 @@ func (nu *NodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *
 		Automate: &Cmd{CmdInputs: &CmdInputs{
 			Cmd:                      GET_OPENSEARCH_CLUSTER_SETTINGS,
 			NodeIps:                  []string{automateIp},
-			Single:                   true,
 			NodeType:                 true,
 			SkipPrintOutput:          true,
 			HideSSHConnectionMessage: true}},
@@ -511,7 +510,6 @@ func createCmdInputs(ip string, cmd string) *Cmd {
 		CmdInputs: &CmdInputs{
 			Cmd:                      cmd,
 			NodeIps:                  []string{ip},
-			Single:                   true,
 			NodeType:                 true,
 			SkipPrintOutput:          true,
 			HideSSHConnectionMessage: true,
