@@ -26,3 +26,19 @@ func (h *Handler) NFSMount(c *fiber.Ctx) error {
 	nfsMountDetails := h.NFSMountService.GetNFSMountDetails(reqBody)
 	return c.JSON(response.BuildSuccessResponse(nfsMountDetails))
 }
+
+func (h *Handler) NFSMountLoc(c *fiber.Ctx) error {
+	reqBody := models.NFSMountLocRequest{}
+	if err := c.BodyParser(&reqBody); err != nil {
+		h.Logger.Error(err.Error())
+		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
+	}
+	if reqBody.MountLocation == "" {
+		return fiber.NewError(http.StatusBadRequest, "Mount Location cannot be empty")
+	}
+	nfsMountLoc := h.NFSMountService.GetNFSMountLoc(reqBody)
+	if nfsMountLoc.Address == "" && nfsMountLoc.MountLocation != "" {
+		return fiber.NewError(http.StatusNotFound, "Failed to get NFS mount location")
+	}
+	return c.JSON(response.BuildSuccessResponse(nfsMountLoc))
+}
