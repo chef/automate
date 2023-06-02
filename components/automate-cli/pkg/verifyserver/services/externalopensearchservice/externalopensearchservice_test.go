@@ -374,7 +374,6 @@ func TestGetExternalOpensearchDetails(t *testing.T) {
 				assert.Equal(t, e.ResponseBody.Checks[index].ResolutionMsg, check.ResolutionMsg)
 				assert.Contains(t, check.DebugMsg, e.ResponseBody.Checks[index].DebugMsg)
 			}
-
 		})
 	}
 }

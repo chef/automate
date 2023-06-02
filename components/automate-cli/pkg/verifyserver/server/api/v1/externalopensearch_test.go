@@ -143,7 +143,7 @@ func TestExternalOpensearch(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.TestName)
-			assert.JSONEq(t, string(body), test.ExpectedBody)
+			assert.JSONEq(t, test.ExpectedBody, string(body))
 			assert.Equal(t, test.ExpectedCode, res.StatusCode)
 		})
 	}
