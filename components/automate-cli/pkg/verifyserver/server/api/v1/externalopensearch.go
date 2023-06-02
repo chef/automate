@@ -22,7 +22,8 @@ func (h *Handler) ExternalOpensearch(c *fiber.Ctx) error {
 		strings.TrimSpace(reqBody.OSUsername) == "" ||
 		strings.TrimSpace(reqBody.OSUserPassword) == "" ||
 		strings.TrimSpace(reqBody.OSCert) == "" {
-		return fiber.NewError(http.StatusBadRequest, "OSDomainName, OSDomainURL, OSUsername, OSUserPassword or OSCert cannot be empty")
+		h.Logger.Error("opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty")
+		return fiber.NewError(http.StatusBadRequest, "opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty")
 	}
 
 	externalOpensearchResult := h.ExternalOpensearchService.GetExternalOpensearchDetails(reqBody, constants.HTTPS_PORT)

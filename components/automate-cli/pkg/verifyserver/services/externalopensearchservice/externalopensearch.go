@@ -3,6 +3,7 @@ package externalopensearchservice
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -44,43 +45,43 @@ func (eos *ExternalOpensearchService) checkReachability(reqBody models.ExternalO
 		},
 	}
 
-	errorMsg := eos.triggerRequest(reqBody, port, client)
-	if errorMsg != "" {
-		return createExternalOpensearchCheck(false, constants.EXTERNAL_OPENSEARCH_FAILED_TITLE, constants.STATUS_FAIL, "", constants.EXTERNAL_OPENSEARCH_ERROR_MSG, constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG, errorMsg)
+	err := eos.triggerRequest(reqBody, port, client)
+	if err != nil {
+		eos.log.Error(err)
+		return createExternalOpensearchCheck(false, constants.EXTERNAL_OPENSEARCH_FAILED_TITLE, constants.STATUS_FAIL, "", constants.EXTERNAL_OPENSEARCH_ERROR_MSG, constants.EXTERNAL_OPENSEARCH_RESOLUTION_MSG, err.Error())
 	}
 	return createExternalOpensearchCheck(true, constants.EXTERNAL_OPENSEARCH_SUCCESS_TITLE, constants.STATUS_PASS, constants.EXTERNAL_OPENSEARCH_SUCCESS_MSG, "", "", "")
 }
 
-func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOSRequest, port int, client *http.Client) string {
+func (eos *ExternalOpensearchService) triggerRequest(reqBody models.ExternalOSRequest, port int, client *http.Client) error {
+	eos.log.Debug("Triggering Request...")
 	// Create a new request with basic authentication
 	url := fmt.Sprintf("https://%s:%d", reqBody.OSDomainURL, port)
 	eos.log.Debug("URL: ", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		eos.log.Debug("Failed to create request:", err)
-		return fmt.Sprintf("Failed to create request: %v", err)
+		return errors.New("Failed to create request: " + err.Error())
 	}
 	req.SetBasicAuth(reqBody.OSUsername, reqBody.OSUserPassword)
 	eos.log.Debug("Basic Authentication Added")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		eos.log.Debug("Failed to connect to OpenSearch:", err)
-		return fmt.Sprintf("Failed to connect to OpenSearch: %v", err)
+		return errors.New("Failed to connect to OpenSearch: " + err.Error())
 	}
 	defer resp.Body.Close()
+
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		eos.log.Debug("Failed to read response body:", err)
-		return fmt.Sprintf("Failed to read response body: %v", err)
-	}
-	eos.log.Debugf("Response Body: `%s` and Status code: %d", string(respBody), resp.StatusCode)
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Sprintf("Response Body: `%s` and Status code: %d", string(respBody), resp.StatusCode)
+		return errors.New("Failed to read response body: " + err.Error())
 	}
 
-	// in case there is no error
-	return ""
+	eos.log.Debugf("Response Body: `%s` and Status code: %d", string(respBody), resp.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("response body: `%s` and status code: %d", string(respBody), resp.StatusCode)
+	}
+
+	return nil
 }
 
 func (eos *ExternalOpensearchService) GetExternalOpensearchDetails(reqBody models.ExternalOSRequest, port int) models.ExternalOpensearchResponse {

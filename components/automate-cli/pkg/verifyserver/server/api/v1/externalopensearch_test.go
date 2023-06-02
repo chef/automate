@@ -79,7 +79,7 @@ func TestExternalOpensearch(t *testing.T) {
 							"title": "Connection successfully tested",
 							"passed": true,
 							"status": "PASS",
-							"success_msg": "Machine is able to connect with External Managed OpenSeach",
+							"success_msg": "Machine is able to connect with External Managed OpenSearch",
 							"error_msg": "",
 							"resolution_msg": "",
 							"debug_msg": ""
@@ -116,7 +116,7 @@ func TestExternalOpensearch(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "OSDomainName, OSDomainURL, OSUsername, OSUserPassword or OSCert cannot be empty"
+					"message": "opensearch_domain_name, opensearch_domain_url, opensearch_username, opensearch_user_password or opensearch_root_cert cannot be empty"
 				}
 			}`,
 			RequestBody: `{
