@@ -207,7 +207,7 @@ func TestFirewallCheck(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "root_cert value is mandatory for protocol destination_service_protocol"
+					"message": "root_cert value is mandatory for protocol https"
 				}
 			}`,
 		},
