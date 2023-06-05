@@ -262,12 +262,6 @@ func validateOpensearchCerts(opensearchSettings *ConfigOpensearchSettings) error
 	})
 }
 
-func isAwsExternalOsConfigured(hadeployConfig *HaDeployConfig) bool {
-	return hadeployConfig.External != nil && hadeployConfig.External.Database != nil &&
-		hadeployConfig.External.Database.OpenSearch != nil && hadeployConfig.External.Database.OpenSearch.Aws != nil &&
-		hadeployConfig.External.Database.OpenSearch.Aws.AwsOsSnapshotRoleArn != ""
-}
-
 func validateIPList(ipList []string, prefix string) error {
 	errorList := list.New()
 	for _, element := range ipList {
