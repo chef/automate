@@ -189,7 +189,7 @@ To upgrade to 3.0.x, follow the steps below:
     ```sh
     sudo ./chef-automate config show
     ```
-    Reference to change [upgrade strategy]({{< relref "postgres_external_upgrade.md#upgrade-strategy" >}})
+    Reference to change [upgrade strategy]({{< relref "install.md#disable-automatic-upgrades" >}})
 
 2. Upgrade using new AIB and Chef Automate CLI:
 
@@ -251,7 +251,7 @@ To upgrade to 3.0.x, follow the steps below:
     ```sh
     sudo ./chef-automate config show
     ```
-    Reference to change [upgrade strategy]({{< relref "postgres_external_upgrade.md#upgrade-strategy" >}})
+    Reference to change [upgrade strategy]({{< relref "install.md#disable-automatic-upgrades" >}})
 2. Upgrade your external PostgreSQL database v9.6 to v13.5 manually. See the [external PostgreSQL upgrade]({{< relref "postgres_external_upgrade.md" >}}) documentation. If you have configured *Host*, *Port*, or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
 3. Upgrade using new AIB and Chef Automate CLI:
 
