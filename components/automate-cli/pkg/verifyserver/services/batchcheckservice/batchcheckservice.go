@@ -33,6 +33,10 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		}
 		for i := 0; i < len(bastionChecks); i++ {
 			result := <-bastionCheckResultChan
+			for i, _ := range result {
+				result[i].Result.Check = result[i].CheckType
+				result[i].Result.Message = constants.GetCheckMessageByType(result[i].Result.Check)
+			}
 			if len(result) > 0 {
 				checkTriggerRespMap[result[0].CheckType] = result
 			}
@@ -46,6 +50,8 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 			resp := ss.RunRemoteCheck(check, config)
 			for ind, _ := range resp {
 				resp[ind].CheckType = check
+				resp[ind].Result.Check = check
+				resp[ind].Result.Message = constants.GetCheckMessageByType(check)
 			}
 			checkTriggerRespMap[check] = resp
 		}
@@ -146,8 +152,6 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		result[resultIndex].NodeType = v[0].NodeType
 		resultArray := []models.ApiResult{}
 		for _, checkResult := range v {
-			checkResult.Result.Message = constants.GetCheckMessageByType(checkResult.CheckType)
-			checkResult.Result.Check = checkResult.CheckType
 			resultArray = append(resultArray, checkResult.Result)
 		}
 		result[resultIndex].Tests = resultArray
