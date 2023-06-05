@@ -1414,21 +1414,7 @@ func TestBatchCheckService(t *testing.T) {
 }
 
 func TestStartMockServer(t *testing.T) {
-	ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck([]models.CheckTriggerResponse{}),
-		SetupMockSshUserAccessCheck([]models.CheckTriggerResponse{}),
-		SetupMockCertificateCheck(),
-		SetupMockExternalOpenSearchCheck([]models.CheckTriggerResponse{}),
-		SetupMockExternalPostgresCheck([]models.CheckTriggerResponse{}),
-		SetupMockFirewallCheck(),
-		SetupMockFqdnCheck(),
-		SetupMockNfsBackupConfigCheck(),
-		SetupMockOpenSearchS3BucketAccessCheck(),
-		SetupMockS3BackupConfigCheck(),
-		SetupMockSoftwareVersionCheck(),
-		SetupMockSystemResourceCheck(),
-		SetupMockSystemUserCheck(),
-	), logger.NewTestLogger(), "1234")
-
+	ss := getBatchCheckServiceInstance()
 	ss.httpRequestClient = SetupMockHttpRequestClient(`{
 		"status": "SUCCESS",
 		"result": {
@@ -1454,17 +1440,68 @@ func TestStartMockServer(t *testing.T) {
 	totalO := 0
 	for _, resp := range startedServers {
 		if resp.Host == "1.2.3.4" {
-			totalA +=1
+			totalA += 1
 		}
-		if resp.Host == "1.2.3.7" ||  resp.Host == "1.2.3.8"{
-			totalP +=1
+		if resp.Host == "1.2.3.7" || resp.Host == "1.2.3.8" {
+			totalP += 1
 		}
-		if resp.Host == "1.2.3.5" ||  resp.Host == "1.2.3.6"{
-			totalO +=1
+		if resp.Host == "1.2.3.5" || resp.Host == "1.2.3.6" {
+			totalO += 1
 		}
 	}
 	assert.Equal(t, len(startedServers), 24)
 	assert.Equal(t, len(failedServers), 0)
+}
+
+func TestGetDeploymentStatePostDeploy(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), false)
+	ss.StopMockServerOnHostAndPort("1.2.3.4", "tcp", 1234)
+	assert.NotNil(t, ss.log)
+}
+
+func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [{"service_name": "deployment-service", "status": "OK", "version": "version-1"}],
+			"error": ""
+		}
+	}`, nil, false)
+	deployState, _ := ss.GetDeploymentState()
+	assert.Equal(t, "post-deploy", deployState)
+}
+
+func TestStopMockServerOnHostAndPortPostDeployWhenServicesStopped(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [],
+			"error": ""
+		}
+	}`, nil, false)
+	deployState, _ := ss.GetDeploymentState()
+	assert.Equal(t, "post-deploy", deployState)
+}
+
+func TestShouldStartMockServer(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [{"service_name": "deployment-service", "status": "OK", "version": "version-1"}],
+			"error": ""
+		}
+	}`, nil, false)
+	shouldStartMockServer, _ := ss.ShouldStartMockServer([]string{"abc"})
+	assert.Equal(t, false, shouldStartMockServer)
 }
 
 func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string) string {
@@ -1477,14 +1514,21 @@ func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string
 	return ""
 }
 
-func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error {
-	l, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%s", port))
-	if err != nil {
-		return err
-	}
-	mockServer.Listener = l
-	mockServer.Start()
-	return nil
+func getBatchCheckServiceInstance() *BatchCheckService {
+	return NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck([]models.CheckTriggerResponse{}),
+		SetupMockSshUserAccessCheck([]models.CheckTriggerResponse{}),
+		SetupMockCertificateCheck(),
+		SetupMockExternalOpenSearchCheck([]models.CheckTriggerResponse{}),
+		SetupMockExternalPostgresCheck([]models.CheckTriggerResponse{}),
+		SetupMockFirewallCheck(),
+		SetupMockFqdnCheck(),
+		SetupMockNfsBackupConfigCheck(),
+		SetupMockOpenSearchS3BucketAccessCheck(),
+		SetupMockS3BackupConfigCheck(),
+		SetupMockSoftwareVersionCheck(),
+		SetupMockSystemResourceCheck(),
+		SetupMockSystemUserCheck(),
+	), logger.NewTestLogger(), "1234")
 }
 
 func TestConstructResult(t *testing.T) {
