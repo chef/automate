@@ -78,34 +78,28 @@ func (c *HaDeployConfig) ParseAndVerify(configFile string) error {
 func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials) error {
 	errorList := list.New()
 
-	if err := validateRequiredStringTypeField(configInitials.SecretsKeyFile, "secrets_key_file"); err != nil {
+	if err := validateRequiredString(configInitials.SecretsKeyFile, "secrets_key_file"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(configInitials.SecretsStoreFile, "secrets_store_file"); err != nil {
+	if err := validateRequiredString(configInitials.SecretsStoreFile, "secrets_store_file"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(configInitials.Architecture, "architecture", "aws", "existing_nodes"); err != nil {
+	if err := validateRequiredString(configInitials.Architecture, "architecture", "aws", "existing_nodes"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(configInitials.WorkspacePath, "workspace_path", "/hab/a2_deploy_workspace"); err != nil {
+	if err := validateRequiredString(configInitials.WorkspacePath, "workspace_path", "/hab/a2_deploy_workspace"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(configInitials.SSHUser, "ssh_user"); err != nil {
+	if err := validateRequiredString(configInitials.SSHUser, "ssh_user"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validatePort(configInitials.SSHPort, "ssh_port", false); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateRequiredPathField(configInitials.SSHKeyFile, "ssh_key_file"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateStringTypeField(configInitials.SSHGroupName, "ssh_group_name"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateStringTypeField(configInitials.LoggingMonitoringManagement, "logging_monitoring_management"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateStringTypeField(configInitials.HabitatUIDGid, "habitat_uid_gid"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredStringTypeField(configInitials.BackupMount, "backup_mount"); err != nil {
+	if err := validateRequiredString(configInitials.BackupMount, "backup_mount"); err != nil {
 		errorList.PushBack(err)
 	}
 	return getSingleErrorFromList(errorList)
@@ -133,11 +127,11 @@ func (c *HaDeployConfig) validateAwsBackupConfig() error {
 		return err
 	}
 	if c.Aws.Config.SetupManagedServices {
-		if err := validateRequiredStringTypeField(c.Architecture.Aws.BackupConfig, "backup_config", "s3"); err != nil {
+		if err := validateRequiredString(c.Architecture.Aws.BackupConfig, "backup_config", "s3"); err != nil {
 			return err
 		}
 	} else {
-		if err := validateRequiredStringTypeField(c.Architecture.Aws.BackupConfig, "backup_config", "s3", "efs"); err != nil {
+		if err := validateRequiredString(c.Architecture.Aws.BackupConfig, "backup_config", "s3", "efs"); err != nil {
 			return err
 		}
 	}
@@ -146,16 +140,16 @@ func (c *HaDeployConfig) validateAwsBackupConfig() error {
 
 func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage) error {
 	errorList := list.New()
-	if err := validateRequiredStringTypeField(objectStorage.AccessKey, "access_key"); err != nil {
+	if err := validateRequiredString(objectStorage.AccessKey, "access_key"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(objectStorage.SecretKey, "secret_key"); err != nil {
+	if err := validateRequiredString(objectStorage.SecretKey, "secret_key"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(objectStorage.BucketName, "bucket_name"); err != nil {
+	if err := validateRequiredString(objectStorage.BucketName, "bucket_name"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(objectStorage.Endpoint, "endpoint"); err != nil {
+	if err := validateRequiredString(objectStorage.Endpoint, "endpoint"); err != nil {
 		errorList.PushBack(err)
 	}
 	return getSingleErrorFromList(errorList)
@@ -171,16 +165,13 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 	if err := validateAutomateAdminPassword(automateSettings); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredNumberField(automateSettings.InstanceCount, "automate instance_count"); err != nil {
+	if err := validateNumberField(automateSettings.InstanceCount, "automate instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredBooleanField(automateSettings.EnableCustomCerts, "automate enable_custom_certs"); err != nil {
+	if err := validateRequiredString(automateSettings.ConfigFile, "config_file", "configs/automate.toml"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(automateSettings.ConfigFile, "config_file", "configs/automate.toml"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateNumberField(automateSettings.TeamsPort, "teams_port"); err != nil {
+	if err := validatePort(automateSettings.TeamsPort, "teams_port", false); err != nil {
 		errorList.PushBack(err)
 	}
 	if automateSettings.EnableCustomCerts {
@@ -199,10 +190,7 @@ func (c *HaDeployConfig) verifyChefServerSettings() error {
 	chefServerSettings := c.ChefServer.Config
 	errorList := list.New()
 
-	if err := validateRequiredNumberField(chefServerSettings.InstanceCount, "chef server instance_count"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredBooleanField(chefServerSettings.EnableCustomCerts, "chef server enable_custom_certs"); err != nil {
+	if err := validateNumberField(chefServerSettings.InstanceCount, "chef server instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
 	if chefServerSettings.EnableCustomCerts {
@@ -221,10 +209,7 @@ func (c *HaDeployConfig) verifyOpensearchSettings() error {
 	opensearchSettings := c.Opensearch.Config
 	errorList := list.New()
 
-	if err := validateRequiredNumberField(opensearchSettings.InstanceCount, "opensearch instance_count"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredBooleanField(opensearchSettings.EnableCustomCerts, "opensearch enable_custom_certs"); err != nil {
+	if err := validateNumberField(opensearchSettings.InstanceCount, "opensearch instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
 	if opensearchSettings.EnableCustomCerts {
@@ -243,10 +228,7 @@ func (c *HaDeployConfig) verifyPostgresqlSettings() error {
 	postgresqlSettings := c.Postgresql.Config
 	errorList := list.New()
 
-	if err := validateRequiredNumberField(postgresqlSettings.InstanceCount, "postgresql instance_count"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredBooleanField(postgresqlSettings.EnableCustomCerts, "postgresql enable_custom_certs"); err != nil {
+	if err := validateNumberField(postgresqlSettings.InstanceCount, "postgresql instance_count", true); err != nil {
 		errorList.PushBack(err)
 	}
 	if postgresqlSettings.EnableCustomCerts {
@@ -320,40 +302,34 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 func (c *HaDeployConfig) verifyExternalPgSettings(externalPostgresqlSettings *ExternalPgSettings) error {
 	errorList := list.New()
 
-	err := validateRequiredStringTypeField(externalPostgresqlSettings.DbuserUsername, "dbuser_username")
+	err := validateRequiredString(externalPostgresqlSettings.DbuserUsername, "dbuser_username")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(externalPostgresqlSettings.DbuserPassword, "dbuser_password")
+	err = validateRequiredString(externalPostgresqlSettings.DbuserPassword, "dbuser_password")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(externalPostgresqlSettings.InstanceURL, "instance_url")
+	err = validateUrl(externalPostgresqlSettings.InstanceURL, "instance_url")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateStringTypeField(externalPostgresqlSettings.PostgreSQLCertificate, "postgresql_certificate")
-	if err != nil {
-		errorList.PushBack(err)
-	}
-
-	// In the case of AWS-managed RDS, it can be nil
 	if c.IsExternalDbSelfManaged() {
-		err = validateRequiredStringTypeField(externalPostgresqlSettings.PostgresqlRootCert, "postgresql_root_cert")
+		err = validateRequiredString(externalPostgresqlSettings.PostgresqlRootCert, "postgresql_root_cert")
 		if err != nil {
 			errorList.PushBack(err)
 		}
 	}
 
-	err = validateRequiredStringTypeField(externalPostgresqlSettings.SuperuserPassword, "superuser_password")
+	err = validateRequiredString(externalPostgresqlSettings.SuperuserPassword, "superuser_password")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(externalPostgresqlSettings.SuperuserUsername, "superuser_username")
+	err = validateRequiredString(externalPostgresqlSettings.SuperuserUsername, "superuser_username")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -364,12 +340,7 @@ func (c *HaDeployConfig) verifyExternalPgSettings(externalPostgresqlSettings *Ex
 func (c *HaDeployConfig) verifyExternalOsSettings(externalOpensearchSettings *ExternalOsSettings) error {
 	errorList := list.New()
 
-	err := validateStringTypeField(externalOpensearchSettings.OpensearchCertificate, "opensearch_certificate")
-	if err != nil {
-		errorList.PushBack(err)
-	}
-
-	err = validateRequiredStringTypeField(externalOpensearchSettings.OpensearchDomainName, "opensearch_domain_name")
+	err := validateRequiredString(externalOpensearchSettings.OpensearchDomainName, "opensearch_domain_name")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -379,20 +350,19 @@ func (c *HaDeployConfig) verifyExternalOsSettings(externalOpensearchSettings *Ex
 		errorList.PushBack(err)
 	}
 
-	// In the case of AWS-managed Opensearch, it can be nil
 	if c.IsExternalDbSelfManaged() {
-		err = validateRequiredStringTypeField(externalOpensearchSettings.OpensearchRootCert, "opensearch_root_cert")
+		err = validateRequiredString(externalOpensearchSettings.OpensearchRootCert, "opensearch_root_cert")
 		if err != nil {
 			errorList.PushBack(err)
 		}
 	}
 
-	err = validateRequiredStringTypeField(externalOpensearchSettings.OpensearchUserPassword, "opensearch_user_password")
+	err = validateRequiredString(externalOpensearchSettings.OpensearchUserPassword, "opensearch_user_password")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(externalOpensearchSettings.OpensearchUsername, "opensearch_username")
+	err = validateRequiredString(externalOpensearchSettings.OpensearchUsername, "opensearch_username")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -403,17 +373,17 @@ func (c *HaDeployConfig) verifyExternalOsSettings(externalOpensearchSettings *Ex
 func (c *HaDeployConfig) verifyAwsExternalOsSettings(awsExternalOpensearchSettings *AwsExternalOsSettings) error {
 	errorList := list.New()
 
-	err := validateRequiredStringTypeField(awsExternalOpensearchSettings.AwsOsSnapshotRoleArn, "aws_os_snapshot_role_arn")
+	err := validateRequiredString(awsExternalOpensearchSettings.AwsOsSnapshotRoleArn, "aws_os_snapshot_role_arn")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(awsExternalOpensearchSettings.OsSnapshotUserAccessKeyID, "os_snapshot_user_access_key_id")
+	err = validateRequiredString(awsExternalOpensearchSettings.OsSnapshotUserAccessKeyID, "os_snapshot_user_access_key_id")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(awsExternalOpensearchSettings.OsSnapshotUserAccessKeySecret, "os_snapshot_user_access_key_secret")
+	err = validateRequiredString(awsExternalOpensearchSettings.OsSnapshotUserAccessKeySecret, "os_snapshot_user_access_key_secret")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -471,32 +441,32 @@ func (c *HaDeployConfig) IsExternalDbSelfManaged() bool {
 func validateAwsOsPgConfig(aws *ConfigAwsSettings) error {
 	errorList := list.New()
 
-	err := validateRequiredNumberField(aws.OpensearchEbsVolumeIops, "aws opensearch_ebs_volume_iops")
+	err := validateNumberField(aws.OpensearchEbsVolumeIops, "aws opensearch_ebs_volume_iops", true)
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredNumberField(aws.OpensearchEbsVolumeSize, "aws opensearch_ebs_volume_size")
+	err = validateNumberField(aws.OpensearchEbsVolumeSize, "aws opensearch_ebs_volume_size", true)
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(aws.OpensearchEbsVolumeType, "aws opensearch_ebs_volume_type")
+	err = validateRequiredString(aws.OpensearchEbsVolumeType, "aws opensearch_ebs_volume_type")
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredNumberField(aws.PostgresqlEbsVolumeIops, "aws postgresql_ebs_volume_iops")
+	err = validateNumberField(aws.PostgresqlEbsVolumeIops, "aws postgresql_ebs_volume_iops", true)
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredNumberField(aws.PostgresqlEbsVolumeSize, "aws postgresql_ebs_volume_size")
+	err = validateNumberField(aws.PostgresqlEbsVolumeSize, "aws postgresql_ebs_volume_size", true)
 	if err != nil {
 		errorList.PushBack(err)
 	}
 
-	err = validateRequiredStringTypeField(aws.PostgresqlEbsVolumeType, "aws postgresql_ebs_volume_type")
+	err = validateRequiredString(aws.PostgresqlEbsVolumeType, "aws postgresql_ebs_volume_type")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -507,46 +477,31 @@ func validateAwsOsPgConfig(aws *ConfigAwsSettings) error {
 func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 	errorList := list.New()
 
-	if err := validateStringTypeField(aws.ManagedOpensearchCertificate, "aws managed_opensearch_certificate"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredStringTypeField(aws.ManagedOpensearchDomainName, "aws managed_opensearch_domain_name"); err != nil {
+	if err := validateRequiredString(aws.ManagedOpensearchDomainName, "aws managed_opensearch_domain_name"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateUrl(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(aws.ManagedOpensearchUserPassword, "aws managed_opensearch_user_password"); err != nil {
+	if err := validateRequiredString(aws.ManagedOpensearchUserPassword, "aws managed_opensearch_user_password"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(aws.ManagedOpensearchUsername, "aws managed_opensearch_username"); err != nil {
+	if err := validateRequiredString(aws.ManagedOpensearchUsername, "aws managed_opensearch_username"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateStringTypeField(aws.ManagedRdsCertificate, "aws managed_rds_certificate"); err != nil {
+	if err := validateRequiredString(aws.ManagedRdsDbuserPassword, "aws managed_rds_dbuser_password"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(aws.ManagedRdsDbuserPassword, "aws managed_rds_dbuser_password"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateRequiredStringTypeField(aws.ManagedRdsDbuserUsername, "aws managed_rds_dbuser_username"); err != nil {
+	if err := validateRequiredString(aws.ManagedRdsDbuserUsername, "aws managed_rds_dbuser_username"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateUrl(aws.ManagedRdsInstanceURL, "aws managed_rds_instance_url"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(aws.ManagedRdsSuperuserPassword, "aws managed_rds_superuser_password"); err != nil {
+	if err := validateRequiredString(aws.ManagedRdsSuperuserPassword, "aws managed_rds_superuser_password"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredStringTypeField(aws.ManagedRdsSuperuserUsername, "aws managed_rds_superuser_username"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateStringTypeField(aws.AwsOsSnapshotRoleArn, "aws aws_os_snapshot_role_arn"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateStringTypeField(aws.OsSnapshotUserAccessKeyID, "aws os_snapshot_user_access_key_id"); err != nil {
-		errorList.PushBack(err)
-	}
-	if err := validateStringTypeField(aws.OsSnapshotUserAccessKeySecret, "aws os_snapshot_user_access_key_secret"); err != nil {
+	if err := validateRequiredString(aws.ManagedRdsSuperuserUsername, "aws managed_rds_superuser_username"); err != nil {
 		errorList.PushBack(err)
 	}
 
@@ -560,15 +515,15 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	errorList := list.New()
 
-	if err := validateRequiredStringTypeField(aws.Profile, "aws profile name"); err != nil {
+	if err := validateRequiredString(aws.Profile, "aws profile name"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.Region, "aws region"); err != nil {
+	if err := validateRequiredString(aws.Region, "aws region"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.AwsVpcID, "aws aws_vpc_id"); err != nil {
+	if err := validateRequiredString(aws.AwsVpcID, "aws aws_vpc_id"); err != nil {
 		errorList.PushBack(err)
 	}
 
@@ -582,67 +537,59 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 		}
 	}
 
-	if err := validateRequiredStringTypeField(aws.SSHKeyPairName, "aws ssh_key_pair_name"); err != nil {
+	if err := validateRequiredString(aws.SSHKeyPairName, "aws ssh_key_pair_name"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateStringBasedBoolean(aws.LbAccessLogs, "aws lb_access_logs"); err != nil {
+	if err := validateStringBasedBoolean(aws.LbAccessLogs, "aws lb_access_logs", true); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredBooleanField(aws.DeleteOnTermination, "aws delete_on_termination"); err != nil {
+	if err := validateRequiredString(aws.AutomateServerInstanceType, "aws automate_server_instance_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.AutomateServerInstanceType, "aws automate_server_instance_type"); err != nil {
+	if err := validateRequiredString(aws.ChefServerInstanceType, "aws chef_server_instance_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.ChefServerInstanceType, "aws chef_server_instance_type"); err != nil {
+	if err := validateRequiredString(aws.OpensearchServerInstanceType, "aws opensearch_server_instance_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.OpensearchServerInstanceType, "aws opensearch_server_instance_type"); err != nil {
+	if err := validateRequiredString(aws.PostgresqlServerInstanceType, "aws postgresql_server_instance_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.PostgresqlServerInstanceType, "aws postgresql_server_instance_type"); err != nil {
+	if err := validateRequiredString(aws.AutomateLbCertificateArn, "aws automate_lb_certificate_arn"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.AutomateLbCertificateArn, "aws automate_lb_certificate_arn"); err != nil {
+	if err := validateRequiredString(aws.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn"); err != nil {
+	if err := validateNumberField(aws.AutomateEbsVolumeIops, "aws automate_ebs_volume_iops", true); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredNumberField(aws.AutomateEbsVolumeIops, "aws automate_ebs_volume_iops"); err != nil {
+	if err := validateNumberField(aws.AutomateEbsVolumeSize, "aws automate_ebs_volume_size", true); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredNumberField(aws.AutomateEbsVolumeSize, "aws automate_ebs_volume_size"); err != nil {
+	if err := validateRequiredString(aws.AutomateEbsVolumeType, "aws automate_ebs_volume_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredStringTypeField(aws.AutomateEbsVolumeType, "aws automate_ebs_volume_type"); err != nil {
+	if err := validateNumberField(aws.ChefEbsVolumeIops, "aws chef_ebs_volume_iops", true); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredNumberField(aws.ChefEbsVolumeIops, "aws chef_ebs_volume_iops"); err != nil {
+	if err := validateNumberField(aws.ChefEbsVolumeSize, "aws chef_ebs_volume_size", true); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredNumberField(aws.ChefEbsVolumeSize, "aws chef_ebs_volume_size"); err != nil {
-		errorList.PushBack(err)
-	}
-
-	if err := validateRequiredStringTypeField(aws.ChefEbsVolumeType, "aws chef_ebs_volume_type"); err != nil {
-		errorList.PushBack(err)
-	}
-
-	if err := validateRequiredBooleanField(aws.SetupManagedServices, "aws setup_managed_services"); err != nil {
+	if err := validateRequiredString(aws.ChefEbsVolumeType, "aws chef_ebs_volume_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
