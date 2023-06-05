@@ -601,3 +601,118 @@ func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string
 	}
 	return ""
 }
+
+func TestConstructResult(t *testing.T) {
+	// Test case 1: Empty input map
+	ipMap := make(map[string][]models.CheckTriggerResponse)
+	result := constructResult(ipMap)
+	assert.Empty(t, result, "Result should be empty for an empty input map")
+
+	// Test case 2: Input map with one item
+	ipMap = make(map[string][]models.CheckTriggerResponse)
+	ipMap["key1"] = []models.CheckTriggerResponse{
+		{
+			Status: "status1",
+			Result: models.ApiResult{
+				Passed:  true,
+				Message: "Test message 1",
+				Check:   "check1",
+				Checks: []models.Checks{
+					{
+						Title:         "Title 1",
+						Passed:        true,
+						SuccessMsg:    "Success 1",
+						ErrorMsg:      "Error 1",
+						ResolutionMsg: "Resolution 1",
+					},
+				},
+			},
+			Host:      "host1",
+			NodeType:  "nodeType1",
+			CheckType: "checkType1",
+		},
+	}
+	result = constructResult(ipMap)
+	assert.Len(t, result, 1, "Result should have one item")
+	assert.Equal(t, "host1", result[0].Ip, "IP should be 'host1'")
+	assert.Equal(t, "nodeType1", result[0].NodeType, "NodeType should be 'nodeType1'")
+	assert.Len(t, result[0].Tests, 1, "Tests should have one item")
+	assert.Equal(t, true, result[0].Tests[0].Passed, "Passed should be true")
+	assert.Equal(t, "Test message 1", result[0].Tests[0].Message, "Message should be 'Test message 1'")
+
+	// Test case 3: Input map with multiple items
+	ipMap = make(map[string][]models.CheckTriggerResponse)
+	ipMap["key1"] = []models.CheckTriggerResponse{
+		{
+			Status: "status1",
+			Result: models.ApiResult{
+				Passed:  true,
+				Message: "Test message 1",
+				Check:   "check1",
+				Checks: []models.Checks{
+					{
+						Title:         "Title 1",
+						Passed:        true,
+						SuccessMsg:    "Success 1",
+						ErrorMsg:      "Error 1",
+						ResolutionMsg: "Resolution 1",
+					},
+				},
+			},
+			Host:      "host1",
+			NodeType:  "nodeType1",
+			CheckType: "checkType1",
+		},
+	}
+	ipMap["key2"] = []models.CheckTriggerResponse{
+		{
+			Status: "status2",
+			Result: models.ApiResult{
+				Passed:  true,
+				Message: "Test message 2",
+				Check:   "check2",
+				Checks: []models.Checks{
+					{
+						Title:         "Title 2",
+						Passed:        true,
+						SuccessMsg:    "Success 2",
+						ErrorMsg:      "Error 2",
+						ResolutionMsg: "Resolution 2",
+					},
+				},
+			},
+			Host:      "host2",
+			NodeType:  "nodeType2",
+			CheckType: "checkType2",
+		},
+	}
+	result = constructResult(ipMap)
+	assert.Len(t, result, 2, "Result should have two items")
+
+	for _, v := range result {
+		if v.NodeType == "nodeType1" {
+			// Check the first item in the result
+			assert.Equal(t, "host1", result[0].Ip, "IP should be 'host1'")
+			assert.Len(t, result[0].Tests, 1, "Tests should have one item")
+			assert.Equal(t, true, result[0].Tests[0].Passed, "Passed should be true")
+			assert.Equal(t, "Test message 1", result[0].Tests[0].Message, "Message should be 'Test message 1'")
+		} else {
+			// Check the second item in the result
+			assert.Equal(t, "host2", result[1].Ip, "IP should be 'host2'")
+			assert.Equal(t, "nodeType2", result[1].NodeType, "NodeType should be 'nodeType2'")
+			assert.Len(t, result[1].Tests, 1, "Tests should have one item")
+			assert.Equal(t, true, result[1].Tests[0].Passed, "Passed should be true")
+			assert.Equal(t, "Test message 2", result[1].Tests[0].Message, "Message should be 'Test message 2'")
+		}
+
+	}
+
+	// Test case 4: Input map with an empty list
+	ipMap = make(map[string][]models.CheckTriggerResponse)
+	ipMap["key1"] = []models.CheckTriggerResponse{} // Empty list
+	result = constructResult(ipMap)
+	assert.Empty(t, result[0].Ip)
+	assert.Empty(t, result[0].NodeType)
+	assert.Empty(t, result[0].Tests)
+	assert.Len(t, result, 1)
+}

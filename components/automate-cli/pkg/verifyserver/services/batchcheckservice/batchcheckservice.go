@@ -142,7 +142,17 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 	}
 
 	// Constructing response which is needed by the handler
+	result := constructResult(ipMap)
+
+	return models.BatchCheckResponse{
+		Status: "SUCCESS",
+		Result: result,
+	}
+}
+
+func constructResult(ipMap map[string][]models.CheckTriggerResponse) []models.BatchCheckResult {
 	var result = make([]models.BatchCheckResult, len(ipMap))
+
 	var resultIndex = 0
 	for _, v := range ipMap {
 		if len(v) == 0 {
@@ -158,8 +168,5 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 		resultIndex = resultIndex + 1
 	}
 
-	return models.BatchCheckResponse{
-		Status: "SUCCESS",
-		Result: result,
-	}
+	return result
 }
