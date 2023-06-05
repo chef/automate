@@ -72,6 +72,4 @@ do_install() {
 
   # tmp directory is required for storage of sessions
   mkdir -p tmp && chmod 777 -R tmp
-
-  return 0
 }
