@@ -5,16 +5,16 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 )
 
 type Cmd struct {
-	PreExec   func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error
+	PreExec   func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error
 	CmdInputs *CmdInputs
 }
 
@@ -25,6 +25,7 @@ type CmdInputs struct {
 	Single                   bool
 	NodeIps                  []string
 	InputFiles               []string
+	InputFilesPrefix         string
 	Outputfiles              []string
 	ErrorCheckEnableInOutput bool
 	NodeType                 bool
@@ -108,7 +109,6 @@ func (c *remoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {
 }
 
 func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-	timestamp := time.Now().Format("20060102150405")
 	cmdResult := map[string][]*CmdResult{}
 
 	sshConfig := getSshDetails(nodeMap.Infra)
@@ -117,47 +117,47 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 	switch true {
 	case nodeMap.Frontend.CmdInputs.NodeType:
 		const remoteService string = FRONTEND
-		nodeIps, err := preCmdExecCheck(nodeMap.Frontend, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Frontend, c.SshUtil, nodeMap.Infra, remoteService, writer)
 		if err != nil {
 			return cmdResult, err
 		}
-		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, nodeMap.Frontend.CmdInputs.InputFilesPrefix, writer)
 		return output, nil
 	case nodeMap.Automate.CmdInputs.NodeType:
 		const remoteService string = AUTOMATE
-		nodeIps, err := preCmdExecCheck(nodeMap.Automate, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Automate, c.SshUtil, nodeMap.Infra, remoteService, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Automate.CmdInputs, nodeIps, remoteService, nodeMap.Automate.CmdInputs.InputFilesPrefix, writer)
 		return output, nil
 	case nodeMap.ChefServer.CmdInputs.NodeType:
 		const remoteService string = CHEF_SERVER
-		nodeIps, err := preCmdExecCheck(nodeMap.ChefServer, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.ChefServer, c.SshUtil, nodeMap.Infra, remoteService, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.ChefServer.CmdInputs, nodeIps, remoteService, nodeMap.ChefServer.CmdInputs.InputFilesPrefix, writer)
 		return output, nil
 	case nodeMap.Postgresql.CmdInputs.NodeType:
 		const remoteService string = POSTGRESQL
-		nodeIps, err := preCmdExecCheck(nodeMap.Postgresql, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Postgresql, c.SshUtil, nodeMap.Infra, remoteService, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Postgresql.CmdInputs, nodeIps, remoteService, nodeMap.Postgresql.CmdInputs.InputFilesPrefix, writer)
 		return output, nil
 	case nodeMap.Opensearch.CmdInputs.NodeType:
 		const remoteService string = OPENSEARCH
-		nodeIps, err := preCmdExecCheck(nodeMap.Opensearch, c.SshUtil, nodeMap.Infra, remoteService, timestamp, writer)
+		nodeIps, err := preCmdExecCheck(nodeMap.Opensearch, c.SshUtil, nodeMap.Infra, remoteService, writer)
 		if err != nil {
 			return cmdResult, err
 		}
 
-		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, timestamp, writer)
+		output := c.executeCmdOnGivenNodes(nodeMap.Opensearch.CmdInputs, nodeIps, remoteService, nodeMap.Opensearch.CmdInputs.InputFilesPrefix, writer)
 		return output, nil
 	default:
 		return cmdResult, errors.New("Missing or Unsupported flag")
@@ -165,7 +165,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 }
 
 // executeCmdOnGivenNodes executes given command/commands on all given nodes concurrently.
-func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) map[string][]*CmdResult {
+func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []string, remoteService string, inputFilesPrefix string, cliWriter *cli.Writer) map[string][]*CmdResult {
 	command := make(map[string]string)
 	resultChan := make(chan CmdResult, len(nodeIps))
 	ouputJsonResult := map[string][]*CmdResult{}
@@ -180,12 +180,7 @@ func (c *remoteCmdExecutor) executeCmdOnGivenNodes(input *CmdInputs, nodeIps []s
 	timeout := input.WaitTimeout
 	inputFileToOutputFileMap := map[string]string{}
 	for _, file := range inputFiles {
-		destinationFile := remoteService + "_" + timestamp + "_" + file
-		if strings.Contains(file, "/") {
-			filePath := strings.Split(file, "/")
-			lastFileidx := len(filePath) - 1
-			destinationFile = filePath[lastFileidx]
-		}
+		destinationFile := inputFilesPrefix + stringutils.GetFileName(file)
 		inputFileToOutputFileMap[file] = destinationFile
 	}
 
@@ -259,7 +254,7 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 
 	if len(outputFiles) != 0 {
 		for _, file := range outputFiles {
-			outFile := sshUtil.getSSHConfig().hostIP + "_" + file
+			outFile := sshUtil.getSSHConfig().hostIP + "_" + stringutils.GetFileName(file)
 			destFileName, err := sshUtil.copyFileFromRemote(file, outFile)
 			if err != nil {
 				rc.Error = err
@@ -290,11 +285,11 @@ func checkIfErrorPresentInOutput(errorCheckEnableInOutput bool, output string) e
 }
 
 // preCmdExecCheck will check and execute PreExec function. Also returns nodeips for given remoteservice with error if any.
-func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) ([]string, error) {
+func preCmdExecCheck(node *Cmd, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) ([]string, error) {
 	var nodeIps []string
 	var err error
 	if (node.PreExec) != nil {
-		err = node.PreExec(node.CmdInputs, sshUtil, infra, remoteService, timestamp, writer)
+		err = node.PreExec(node.CmdInputs, sshUtil, infra, remoteService, writer)
 		if err != nil {
 			return nodeIps, err
 		}
