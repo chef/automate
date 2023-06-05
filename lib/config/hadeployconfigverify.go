@@ -279,7 +279,8 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 		errorList.PushBack(err)
 	}
 
-	if c.IsExternalDb() {
+	// existing infra
+	if !c.IsExternalDb() {
 		// validate opensearch IPs
 		if err := validateRequiredStringListField(existingInfraSettings.OpensearchPrivateIps, "opensearch_private_ips"); err != nil {
 			errorList.PushBack(err)
@@ -295,7 +296,9 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 		if err := validateIPList(existingInfraSettings.PostgresqlPrivateIps, "postgresql private ip"); err != nil {
 			errorList.PushBack(err)
 		}
+	}
 
+	if c.IsExternalDb() {
 		// on-prem, AWS, or self-managed
 		if err := c.verifyExternalPgSettings(c.External.Database.PostgreSQL); err != nil {
 			errorList.PushBack(err)
@@ -304,7 +307,7 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 			errorList.PushBack(err)
 		}
 
-		if isAwsExternalOsConfigured(c) {
+		if c.IsAwsExternalOsConfigured() {
 			if err := c.verifyAwsExternalOsSettings(c.External.Database.OpenSearch.Aws); err != nil {
 				errorList.PushBack(err)
 			}
@@ -453,6 +456,12 @@ func (c *HaDeployConfig) IsAws() bool {
 func (c *HaDeployConfig) IsExternalDb() bool {
 	return c.External != nil && c.External.Database != nil &&
 		(c.External.Database.Type == "aws" || c.External.Database.Type == "self-managed")
+}
+
+func (c *HaDeployConfig) IsAwsExternalOsConfigured() bool {
+	return c.External != nil && c.External.Database != nil &&
+		c.External.Database.OpenSearch != nil && c.External.Database.OpenSearch.Aws != nil &&
+		c.External.Database.OpenSearch.Aws.AwsOsSnapshotRoleArn != ""
 }
 
 func (c *HaDeployConfig) IsExternalDbSelfManaged() bool {

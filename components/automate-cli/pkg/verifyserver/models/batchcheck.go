@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -78,6 +79,55 @@ type Config struct {
 	APIToken        string      `json:"api_token"`
 }
 
+func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
+	err := haConfig.Verify()
+	if err != nil {
+		return err
+	}
+
+	c.SSHUser.Username = haConfig.GetSSHUser()
+	c.SSHUser.PrivateKey = haConfig.GetSSHKeyFile()
+	c.SSHUser.SudoPassword = haConfig.GetSudoPassword()
+	c.Arch = haConfig.GetArchitecture()
+	c.Backup.FileSystem.MountLocation = haConfig.GetBackupMount()
+	c.Backup.ObjectStorage.BucketName = haConfig.GetS3BucketName()
+	c.Backup.ObjectStorage.AWSRegion = haConfig.GetObjectStorageRegion()
+	c.Backup.ObjectStorage.AccessKey = haConfig.GetObjectStorageAccessKey()
+	c.Backup.ObjectStorage.SecretKey = haConfig.GetObjectStorageSecretKey()
+	c.Backup.ObjectStorage.Endpoint = haConfig.GetObjectStorageEndpoint()
+	c.Hardware.AutomateNodeCount = haConfig.GetAutomateNodeCount()
+	c.Hardware.ChefInfraServerNodeCount = haConfig.GetChefServerNodeCount()
+	c.Hardware.PostgresqlNodeCount = haConfig.GetPostgresqlNodeCount()
+	c.Hardware.OpenSearchNodeCount = haConfig.GetOpenSearchNodeCount()
+	c.Hardware.AutomateNodeIps = haConfig.GetAutomateNodeIps()
+	c.Hardware.ChefInfraServerNodeIps = haConfig.GetChefServerNodeIps()
+	c.Hardware.PostgresqlNodeIps = haConfig.GetPostgresqlNodeIps()
+	c.Hardware.OpenSearchNodeIps = haConfig.GetOpenSearchNodeIps()
+	c.Certificate.AutomateFqdn = haConfig.GetAutomateConfig().Fqdn
+	// chef_server_config is not provided in config
+	c.Certificate.ChefServerFqdn = ""
+	// root_ca of which node?
+	c.Certificate.RootCert = haConfig.GetAutomateConfig().RootCA
+	// c.Certificate.Nodes =
+	c.ExternalPG.PGDbUserName = haConfig.GetExternalPgConfig().DbuserUsername
+	c.ExternalPG.PGDbUserPassword = haConfig.GetExternalPgConfig().DbuserPassword
+	c.ExternalPG.PGInstanceURL = haConfig.GetExternalPgConfig().InstanceURL
+	c.ExternalPG.PGRootCert = haConfig.GetExternalPgConfig().PostgresqlRootCert
+	c.ExternalPG.PGSuperuserName = haConfig.GetExternalPgConfig().SuperuserUsername
+	c.ExternalPG.PGSuperuserPassword = haConfig.GetExternalPgConfig().SuperuserPassword
+	c.ExternalOS.OSDomainName = haConfig.GetExternalOsConfig().OpensearchDomainName
+	c.ExternalOS.OSDomainURL = haConfig.GetExternalOsConfig().OpensearchDomainURL
+	c.ExternalOS.OSRoleArn = haConfig.GetExternalOsConfig().Aws.AwsOsSnapshotRoleArn
+	c.ExternalOS.OSUserPassword = haConfig.GetExternalOsConfig().OpensearchUserPassword
+	c.ExternalOS.OSUsername = haConfig.GetExternalOsConfig().OpensearchUsername
+
+	// not available in config
+	c.DeploymentState = ""
+	c.APIToken = ""
+
+	return nil
+}
+
 type BatchCheckResponse struct {
 	Status string             `json:"status"`
 	Result []BatchCheckResult `json:"result"`
@@ -111,6 +161,7 @@ type Checks struct {
 	ResolutionMsg string `json:"resolution_msg"`
 }
 
+// is this supposed to be cert_by_ip? this struct needs modifiation
 type NodeCert struct {
 	IP        string `json:"ip"`
 	Cert      string `json:"cert"`
