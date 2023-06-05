@@ -1,15 +1,12 @@
 package main
 
 import (
-	"context"
+	"os"
 
-	"github.com/gofrs/uuid"
-	"github.com/spf13/cobra"
-
-	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	"github.com/chef/automate/components/automate-cli/pkg/infrastructure"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/spf13/cobra"
 )
 
 func init() {
@@ -19,9 +16,10 @@ func init() {
 }
 
 var infrastructureCmd = &cobra.Command{
-	Use:   "infrastructure COMMAND",
-	Short: "Chef Automate infrastructure",
-	Long:  "Commands for automation infrastructure management, for data related to chef-client runs and chef-server actions.",
+	Use:               "infrastructure COMMAND",
+	Short:             "Chef Automate infrastructure",
+	Long:              "Commands for automation infrastructure management, for data related to chef-client runs and chef-server actions.",
+	PersistentPreRunE: preInfrastructureCmd,
 	Annotations: map[string]string{
 		docs.Tag: docs.Automate,
 	},
@@ -39,36 +37,25 @@ var nodeDeleteCmd = &cobra.Command{
 }
 
 func runDeleteNodeCmd(cmd *cobra.Command, args []string) error {
-	connection, err := client.Connection(client.DefaultClientTimeout)
-
+	ifw, err := infrastructure.NewDeleteNode(writer)
 	if err != nil {
 		return err
 	}
-
-	defer func() {
-		_ = connection.Close()
-	}()
-
-	nodeID := args[0]
-	if !isValidUUID(nodeID) {
-		return status.New(status.InvalidCommandArgsError, "argument in not a valid node UUID")
-	}
-	deleteReq := &api.InfrastructureNodeDeleteRequest{NodeId: nodeID}
-
-	_, err = connection.InfrastructureNodeDelete(context.Background(), deleteReq)
-	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to delete node failed",
-		)
-	}
-
-	writer.Println("Node successfully deleted")
-	return nil
+	return ifw.RunDeleteNode(args[0])
 }
 
-func isValidUUID(id string) bool {
-	_, err := uuid.FromString(id)
-	return err == nil
+func preInfrastructureCmd(cmd *cobra.Command, args []string) error {
+	err := commandPrePersistent(cmd)
+	if err != nil {
+		return status.Wrap(err, status.CommandExecutionError, "unable to set command parent settings")
+	}
+	if isA2HARBFileExist() {
+		err = RunCmdOnSingleAutomateNode(cmd, args)
+		if err != nil {
+			return err
+		}
+		// NOTE: used os.exit as need to stop next lifecycle method to execute
+		os.Exit(1)
+	}
+	return nil
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -204,7 +205,7 @@ func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	}
 
 	if len(nodeIDs) == 0 {
-		return &response.ProcessNodeDeleteResponse{}, nil
+		return &response.ProcessNodeDeleteResponse{}, errors.New("NodeId not found")
 	}
 
 	for _, nodeID := range nodeIDs {
