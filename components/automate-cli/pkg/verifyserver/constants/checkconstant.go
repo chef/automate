@@ -41,7 +41,7 @@ const (
 	REMOTE_CHECK  = "remote"
 )
 
-var checkAPIMap map[string]models.CheckAndType = map[string]models.CheckAndType{
+var checkMap map[string]models.CheckAndType = map[string]models.CheckAndType{
 	HARDWARE_RESOURCE_COUNT: {
 		CheckName: BASTION_CHECK,
 		CheckType: HARDWARE_RESOURCE_COUNT,
@@ -110,7 +110,7 @@ var checkAPIMap map[string]models.CheckAndType = map[string]models.CheckAndType{
 }
 
 func GetCheckMessageByType(checkType string) string {
-	val, ok := checkAPIMap[checkType]
+	val, ok := checkMap[checkType]
 	if !ok {
 		return ""
 	}
@@ -119,7 +119,7 @@ func GetCheckMessageByType(checkType string) string {
 
 func GetBastionChecks() []string {
 	var checks []string
-	for k, v := range checkAPIMap {
+	for k, v := range checkMap {
 		if v.CheckName == BASTION_CHECK {
 			checks = append(checks, k)
 		}
@@ -129,7 +129,7 @@ func GetBastionChecks() []string {
 
 func GetRemoteChecks() []string {
 	var checks []string
-	for k, v := range checkAPIMap {
+	for k, v := range checkMap {
 		if v.CheckName == REMOTE_CHECK {
 			checks = append(checks, k)
 		}
