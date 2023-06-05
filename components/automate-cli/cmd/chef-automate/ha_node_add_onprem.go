@@ -284,10 +284,10 @@ func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile [
 func SaveConfigInBastion() error {
 
 	nodeObjects := []*NodeObject{
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, CONST_AUTOMATE),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, CONST_CHEF_SERVER),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, CONST_POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, CONST_POSTGRESQL),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, CONST_OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, CONST_OPENSEARCH),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, AUTOMATE),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, CHEF_SERVER),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, POSTGRESQL),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, OPENSEARCH),
 	}
 	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
@@ -305,10 +305,10 @@ func syncConfigToAllNodes() error {
 	fmt.Println("postgresql: ", postgresql)
 	fmt.Println("opensearch: ", opensearch)
 	nodeObjects := []*NodeObject{
-		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, CONST_AUTOMATE),
-		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, CONST_CHEF_SERVER),
-		NewNodeObjectWithOutputFile(postgresql, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + POSTGRESQL_TOML}, CONST_POSTGRESQL),
-		NewNodeObjectWithOutputFile(opensearch, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + OPENSEARCH_TOML}, CONST_OPENSEARCH),
+		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, AUTOMATE),
+		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, CHEF_SERVER),
+		NewNodeObjectWithOutputFile(postgresql, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + POSTGRESQL_TOML}, POSTGRESQL),
+		NewNodeObjectWithOutputFile(opensearch, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + OPENSEARCH_TOML}, OPENSEARCH),
 	}
 	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
 }
