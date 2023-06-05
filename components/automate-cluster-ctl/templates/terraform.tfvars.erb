@@ -269,12 +269,10 @@ opensearch_custom_certs_enabled = <%= config.opensearch.enable_custom_certs %>
 
 opensearch_admin_dn = "<%= config.opensearch.admin_dn %>"
 opensearch_nodes_dn = "<%= config.opensearch.nodes_dn %>"
-<% if config.architecture == 'existing_nodes' %>
 automate_certs_by_ip = <%= config.automate.certs_by_ip %>
 chef_server_certs_by_ip = <%= config.chef_server.certs_by_ip %>
 postgresql_certs_by_ip = <%= config.postgresql.certs_by_ip %>
 opensearch_certs_by_ip = <%= config.opensearch.certs_by_ip %>
-<% end %>
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
