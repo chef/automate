@@ -21,7 +21,7 @@ var infrastructureCmd = &cobra.Command{
 	Long:              "Commands for automation infrastructure management, for data related to chef-client runs and chef-server actions.",
 	PersistentPreRunE: preInfrastructureCmd,
 	Annotations: map[string]string{
-		docs.Tag: docs.Automate,
+		docs.Tag: docs.BastionHost,
 	},
 }
 
@@ -32,7 +32,7 @@ var nodeDeleteCmd = &cobra.Command{
 	RunE:  runDeleteNodeCmd,
 	Args:  cobra.ExactArgs(1),
 	Annotations: map[string]string{
-		docs.Tag: docs.Automate,
+		docs.Tag: docs.BastionHost,
 	},
 }
 
