@@ -48,7 +48,7 @@ func TestExecute(t *testing.T) {
 		},
 	}
 	preExecFailed := &Cmd{
-		PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+		PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 			return errors.New(errorForPreExec)
 		},
 		CmdInputs: &CmdInputs{
@@ -71,7 +71,7 @@ func TestExecute(t *testing.T) {
 			fields: fields{
 				NodeMap: &NodeTypeAndCmd{
 					Frontend: &Cmd{
-						PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+						PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 							return nil
 						},
 						CmdInputs: &CmdInputs{
@@ -437,7 +437,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Success: single opensearch node ip",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return nil
 					},
 					CmdInputs: &CmdInputs{
@@ -448,7 +448,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         infra,
 				remoteService: "opensearch",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{ip1},
@@ -459,7 +458,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Success: given opensearch node ip",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return nil
 					},
 					CmdInputs: &CmdInputs{
@@ -470,7 +469,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         infra,
 				remoteService: "opensearch",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:    []string{ip2},
@@ -480,7 +478,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Failed: no ips found ",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return nil
 					},
 					CmdInputs: &CmdInputs{},
@@ -488,7 +486,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         infra,
 				remoteService: "abcd",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{},
@@ -499,7 +496,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Failed: given opensearch node ip not found",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return nil
 					},
 					CmdInputs: &CmdInputs{
@@ -510,7 +507,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         infra,
 				remoteService: "opensearch",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{},
@@ -521,7 +517,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Failed: given opensearch node ip invalid",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return nil
 					},
 					CmdInputs: &CmdInputs{
@@ -532,7 +528,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         infra,
 				remoteService: "opensearch",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{},
@@ -543,7 +538,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Failed: single opensearch node ip",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return nil
 					},
 					CmdInputs: &CmdInputs{
@@ -554,7 +549,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         &AutomateHAInfraDetails{},
 				remoteService: "opensearch",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{},
@@ -565,7 +559,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 			name: "Failed: preExec function execution",
 			args: args{
 				node: &Cmd{
-					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, timestamp string, writer *cli.Writer) error {
+					PreExec: func(cmdInputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
 						return errors.New(errorForPreExec)
 					},
 					CmdInputs: &CmdInputs{
@@ -576,7 +570,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 				sshUtil:       GetMockSSHUtil(&SSHConfig{}, nil, completedMessage, nil, "", nil),
 				infra:         infra,
 				remoteService: "opensearch",
-				timestamp:     "20060102150405",
 				writer:        getMockWriterImpl(),
 			},
 			want:        []string{},
@@ -586,7 +579,7 @@ func TestPreCmdExecCheck(t *testing.T) {
 	}
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			got, err := preCmdExecCheck(testCase.args.node, testCase.args.sshUtil, testCase.args.infra, testCase.args.remoteService, testCase.args.timestamp, testCase.args.writer)
+			got, err := preCmdExecCheck(testCase.args.node, testCase.args.sshUtil, testCase.args.infra, testCase.args.remoteService, testCase.args.writer)
 			if testCase.wantErr {
 				assert.Error(t, err)
 				assert.EqualError(t, testCase.expectedErr, err.Error())
