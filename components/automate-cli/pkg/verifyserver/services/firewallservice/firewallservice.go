@@ -34,6 +34,58 @@ func NewFirewallService(log logger.Logger, timeout time.Duration, port string) I
 	}
 }
 
+func (fw *FirewallService) GetFirewallDetails(reqBody models.FirewallRequest) models.FirewallResponse {
+	resp := models.FirewallResponse{}
+
+	reachableCheck := fw.checkReachability(reqBody)
+	resp.Checks = append(resp.Checks, reachableCheck)
+
+	resp.Passed = true
+	for _, check := range resp.Checks {
+		if !check.Passed {
+			resp.Passed = false
+			break
+		}
+	}
+
+	return resp
+}
+
+func (fw *FirewallService) checkReachability(req models.FirewallRequest) models.Checks {
+	client := &http.Client{
+		Timeout: fw.timeout * time.Second,
+	}
+
+	respBody, err := fw.triggerRequest(req, client)
+	if err != nil || !respBody.Passed {
+		if err != nil {
+			// this means while triggering the request we encountered some error
+			fw.log.Error("Error: ", err)
+		} else {
+			// this means we successfully made the call. but the port-reachable api returns that the port is not reachable
+			// hence from firewall api we are returning the same
+			fw.log.Error(respBody)
+			fw.log.Error("port-reachable api result: ", respBody.Passed)
+		}
+		return models.Checks{
+			Title:         constants.FIREWALL_TITLE,
+			Passed:        false,
+			SuccessMsg:    "",
+			ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, req.DestinationServiceProtocol, req.DestinationNodeIP, req.DestinationServicePort, req.SourceNodeIP),
+			ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, req.DestinationServicePort, req.DestinationNodeIP, req.SourceNodeIP),
+		}
+	}
+	fw.log.Debug("Response From port-reachable API: ", respBody)
+	return models.Checks{
+		Title:         constants.FIREWALL_TITLE,
+		Passed:        true,
+		SuccessMsg:    fmt.Sprintf(constants.FIREWALL_SUCCESS_MESSAGE, req.DestinationServiceProtocol, req.DestinationNodeIP, req.DestinationServicePort, req.SourceNodeIP),
+		ErrorMsg:      "",
+		ResolutionMsg: "",
+	}
+
+}
+
 func (fw *FirewallService) triggerRequest(req models.FirewallRequest, client *http.Client) (*models.Checks, error) {
 	fw.log.Debug("triggerRequest Called...")
 	url := fmt.Sprintf("http://%s:%s%s", req.SourceNodeIP, fw.port, constants.PORT_REACHABLE_API_PATH)
@@ -100,50 +152,4 @@ func (fw *FirewallService) getResultStructFromRespBody(respBody io.Reader) (*mod
 	}
 
 	return resultField, nil
-}
-
-func (fw *FirewallService) checkReachability(req models.FirewallRequest) models.Checks {
-	client := &http.Client{
-		Timeout: fw.timeout * time.Second,
-	}
-	respBody, err := fw.triggerRequest(req, client)
-	if err != nil || !respBody.Passed {
-		if err != nil {
-			fw.log.Error("Error: ", err)
-		} else {
-			fw.log.Error("port-reachable api result: ", respBody.Passed)
-		}
-		return models.Checks{
-			Title:         constants.FIREWALL_TITLE,
-			Passed:        false,
-			SuccessMsg:    "",
-			ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, req.DestinationServiceProtocol, req.DestinationNodeIP, req.DestinationServicePort, req.SourceNodeIP),
-			ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, req.DestinationServicePort, req.DestinationNodeIP, req.SourceNodeIP),
-		}
-	}
-	fw.log.Debug("Response From port-reachable API: ", respBody)
-	return models.Checks{
-		Title:         constants.FIREWALL_TITLE,
-		Passed:        true,
-		SuccessMsg:    fmt.Sprintf(constants.FIREWALL_SUCCESS_MESSAGE, req.DestinationServiceProtocol, req.DestinationNodeIP, req.DestinationServicePort, req.SourceNodeIP),
-		ErrorMsg:      "",
-		ResolutionMsg: "",
-	}
-
-}
-func (fw *FirewallService) GetFirewallDetails(reqBody models.FirewallRequest) models.FirewallResponse {
-	resp := models.FirewallResponse{}
-
-	reachableCheck := fw.checkReachability(reqBody)
-	resp.Checks = append(resp.Checks, reachableCheck)
-
-	resp.Passed = true
-	for _, check := range resp.Checks {
-		if !check.Passed {
-			resp.Passed = false
-			break
-		}
-	}
-
-	return resp
 }

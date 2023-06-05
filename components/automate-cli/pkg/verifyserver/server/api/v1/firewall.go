@@ -17,32 +17,44 @@ func (h *Handler) FirewallCheck(c *fiber.Ctx) error {
 		h.Logger.Error(err.Error())
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
+
+	// If any field is empty or contains only space
 	if strings.TrimSpace(reqBody.SourceNodeIP) == "" ||
 		strings.TrimSpace(reqBody.DestinationNodeIP) == "" ||
 		strings.TrimSpace(reqBody.DestinationServicePort) == "" ||
 		strings.TrimSpace(reqBody.DestinationServiceProtocol) == "" {
-		return fiber.NewError(http.StatusBadRequest, "source_node_ip, destination_node_ip, destination_service_port, destination_service_protocol, cert, key or root_cert cannot be empty")
+		return fiber.NewError(http.StatusBadRequest, "source_node_ip, destination_node_ip, destination_service_port or destination_service_protocol cannot be empty")
 	}
 
-	port, err := strconv.Atoi(reqBody.DestinationServicePort)
+	// port number is not a integer
+	port, err := strconv.Atoi(strings.TrimSpace(reqBody.DestinationServicePort))
 	if err != nil {
 		h.Logger.Error(err)
-		return fiber.NewError(http.StatusBadRequest, "Invalid port number")
+		return fiber.NewError(http.StatusBadRequest, "Invalid destination_service_port number")
 	}
 
-	// If port number is invalid
+	// port number is invalid
 	err = validatePortRange(port, h)
 	if err != nil {
 		h.Logger.Error(err)
-		return fiber.NewError(http.StatusBadRequest, "Invalid port range")
+		return fiber.NewError(http.StatusBadRequest, "Invalid destination_service_port range")
 	}
 
-	if reqBody.DestinationServiceProtocol == constants.HTTPS && reqBody.RootCert == "" {
-		return fiber.NewError(http.StatusBadRequest, "RootCA value is mandatory for protocol HTTPS")
+	// sourceIp is same as destinationIP
+	if strings.TrimSpace(reqBody.SourceNodeIP) == strings.TrimSpace(reqBody.DestinationNodeIP) {
+		return fiber.NewError(http.StatusBadRequest, "source_node_ip and destination_node_ip cannot be same")
 	}
-	if reqBody.DestinationServiceProtocol != constants.TCP && reqBody.DestinationServiceProtocol != constants.UDP && reqBody.DestinationServiceProtocol != constants.HTTPS {
+
+	// For https protocol root_ca is mandatory
+	if strings.TrimSpace(reqBody.DestinationServiceProtocol) == constants.HTTPS && strings.TrimSpace(reqBody.RootCert) == "" {
+		return fiber.NewError(http.StatusBadRequest, "root_cert value is mandatory for protocol destination_service_protocol")
+	}
+
+	// Supported protocol check
+	if strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.TCP && strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.UDP && strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.HTTPS {
 		return fiber.NewError(http.StatusBadRequest, "Please Give Valid Protocol i.e tcp, udp or https")
 	}
+
 	firewallDetails := h.FirewallService.GetFirewallDetails(reqBody)
 	return c.JSON(response.BuildSuccessResponse(firewallDetails))
 }
