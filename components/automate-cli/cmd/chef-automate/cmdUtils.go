@@ -18,6 +18,10 @@ type Cmd struct {
 	CmdInputs *CmdInputs
 }
 
+func NewCmd() *Cmd {
+	return &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+}
+
 type CmdInputs struct {
 	Cmd                      string
 	Args                     []string
@@ -41,6 +45,16 @@ type NodeTypeAndCmd struct {
 	Postgresql *Cmd
 	Opensearch *Cmd
 	Infra      *AutomateHAInfraDetails
+}
+
+func NewNodeTypeAndCmd() *NodeTypeAndCmd {
+	return &NodeTypeAndCmd{
+		Frontend:   NewCmd(),
+		Automate:   NewCmd(),
+		ChefServer: NewCmd(),
+		Opensearch: NewCmd(),
+		Postgresql: NewCmd(),
+	}
 }
 
 type CmdResult struct {
@@ -480,4 +494,82 @@ func checkResultOutputForError(output string) error {
 		return errors.New(output)
 	}
 	return nil
+}
+
+// Execute custom command in All the node
+/*
+Input: []*NodeObject{
+
+}
+*/
+func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+
+	for _, nodeObject := range nodeObjects {
+		outFiles := nodeObject.OutputFile
+		err := ExecuteCustomCmdInServiceNode(outFiles, nodeObject.InputFile, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		if err != nil {
+			return err
+		}
+		if len(outFiles) > 0 {
+			if err = fileutils.Rename(outFiles[0], outputDirectory, ""); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Execute 'config show' command in specific service and fetch the output file to bastion
+func ExecuteCustomCmdInServiceNode(outputFiles []string, inputFiles []string, service string, cmdString string, singleNode bool) error {
+
+	nodeMap := NewNodeTypeAndCmd()
+	cmd := ServiceNodeConstructor(nodeMap, cmdString, outputFiles, singleNode)
+	if service == POSTGRESQL {
+		cmd.CmdInputs.Args = inputFiles
+		cmd.PreExec = prePatchCheckForPostgresqlNodes
+	} else if service == OPENSEARCH {
+		cmd.CmdInputs.Args = inputFiles
+		cmd.PreExec = prePatchCheckForOpensearch
+	} else {
+		cmd.CmdInputs.Args = inputFiles
+		cmd.PreExec = prePatchCheckForFrontendNodes
+	}
+	switch service {
+	case AUTOMATE:
+		nodeMap.Automate = cmd
+	case CHEF_SERVER:
+		nodeMap.ChefServer = cmd
+	case POSTGRESQL:
+		nodeMap.Postgresql = cmd
+	case OPENSEARCH:
+		nodeMap.Opensearch = cmd
+	}
+	infra, err := getAutomateHAInfraDetails()
+	if err != nil {
+		return err
+	}
+	nodeMap.Infra = infra
+
+	sshUtil := NewSSHUtil(&SSHConfig{})
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
+
+	_, err = cmdUtil.Execute()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Create *Cmd struct instance with 'cmdString' and 'outputFiles' params
+func ServiceNodeConstructor(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []string, singleNode bool) *Cmd {
+	return &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      cmdString,
+			Single:                   singleNode,
+			InputFiles:               []string{},
+			Outputfiles:              outputFiles,
+			NodeType:                 true,
+			HideSSHConnectionMessage: true,
+		},
+	}
 }

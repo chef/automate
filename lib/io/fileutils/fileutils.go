@@ -72,6 +72,10 @@ func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
 	return DeleteFile(filePath)
 }
 
+func (fsu *FileSystemUtils) Rename(sourceFile string, destinationDir string, renamedFileName string) error {
+	return Rename(sourceFile, destinationDir, renamedFileName)
+}
+
 // LogCLose closes the given io.Closer, logging any error.
 func LogClose(c io.Closer, log logrus.FieldLogger, msg string) {
 	if err := c.Close(); err != nil {
@@ -174,4 +178,20 @@ func CreateTempFile(content string, filename string) (string, error) {
 
 func DeleteFile(filePath string) error {
 	return os.Remove(filePath)
+}
+
+// Moves file from current/source directory to destination directory.
+// Creates the directory, if not already exists
+//
+// Example usage:
+// err := fileutils.Rename("file.txt", "/path/to/my/dir/", "");
+// Incase of retriving the old file name, leave renamedFileName as empty
+func Rename(sourceFile string, destinationDir string, renamedFileName string) error {
+	if err := os.MkdirAll(destinationDir, os.ModePerm); err != nil {
+		return err
+	}
+	if renamedFileName != "" {
+		return os.Rename(sourceFile, destinationDir+renamedFileName)
+	}
+	return os.Rename(sourceFile, destinationDir+sourceFile)
 }

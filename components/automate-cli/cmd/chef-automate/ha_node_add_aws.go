@@ -60,7 +60,7 @@ func (ani *AddNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 			return nil
 		}
 	}
-	ani.prepare()
+	// ani.prepare()
 	return ani.runDeploy()
 }
 
@@ -132,7 +132,13 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {
-	err := ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
+	err := SaveConfigInBastion()
+	if err != nil {
+		return err
+	}
+
+	return nil
+	err = ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
 	if err != nil {
 		return err
 	}
@@ -149,5 +155,18 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	// return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	// defer patch or sync-up
+	/*
+		Do delta check, remove tls & patch config
+
+		Testing: Adding a node, new node should be at the end
+	*/
+
+	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
