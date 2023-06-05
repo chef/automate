@@ -25,13 +25,13 @@ type CmdInputs struct {
 	Single                   bool
 	NodeIps                  []string
 	InputFiles               []string
+	InputFilesPrefix         string
 	Outputfiles              []string
 	ErrorCheckEnableInOutput bool
 	NodeType                 bool
 	SkipPrintOutput          bool
 	HideSSHConnectionMessage bool
 	MutipleCmdWithArgs       map[string]string
-	InputFilesPrefix         string
 }
 
 type NodeTypeAndCmd struct {
