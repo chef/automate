@@ -40,7 +40,9 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
 
 {{< note >}} If your Elasticsearch contains older indexes of version 5, please [re-index](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html) them to version 6 with the same name, before proceeding with the upgrade. {{< /note >}}
 
-- **Plan your downtime:** This upgrade requires downtime. Before upgrading, set the environment to handle the downtime.
+{{< warning >}} If you are planning to move 4.7.x or above, [verify and update](/automate/upgrade_san_certificates) non-SAN based public certificates with SAN certificates. This step is not applicable if you are planning to upgrade to a version 4.5.177 or below. {{< /warning >}}
+
+- **Plan your downtime:** This upgrade requires downtime. Before upgrading, set the environment to handle the downtime. 
 - **Backup Chef Automate database:** This Chef Automate version upgrades ElasticSearch. [Backup](/automate/backup/) your data before upgrading.
 - **Current version should be 3.0.49:** If you are not on *3.0.49* version, do regular upgrades according to your topology.
 - **Download latest chef-automate cli:**
