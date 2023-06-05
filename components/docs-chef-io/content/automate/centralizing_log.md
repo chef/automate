@@ -162,5 +162,5 @@ This requires Automate HA to do the following steps to set up the log location a
   - To set up `logrotate` on Automate `sudo chef-automate config patch <patch_conf.toml> --a`
   - To set up `logrotate` on Chef Server `sudo chef-automate config patch <patch_conf.toml> --cs`
   - To set up `logrotate` on OpenSearch `sudo chef-automate config patch <patch_conf.toml> --os`
-  - To set up `logrotate` on Postgres `sudo chef-automate config patch <patch_conf.toml> --pg`
+  - To set up `logrotate` on PostgreSQL `sudo chef-automate config patch <patch_conf.toml> --pg`
 - Check if all the node logs are shown in a single log file.

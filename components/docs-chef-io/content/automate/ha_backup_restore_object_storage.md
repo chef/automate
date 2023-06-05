@@ -1,5 +1,5 @@
 +++
-title = "On-Premise Deployment using Object Storage"
+title = "On-Premises Deployment using Object Storage"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-Premise Deployment using Object Storage"
+    title = "On-Premises Deployment using Object Storage"
     identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Object Storage"
     parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 220
@@ -64,7 +64,7 @@ The final output after running the curl command on all nodes is given below:
 }
 ```
 
-#### Configuration for Opensearch Node from Provision Host
+#### Configuration for OpenSearch Node from Provision Host
 
 1. To override the existing default endpoint:
 
@@ -93,7 +93,7 @@ The final output after running the curl command on all nodes is given below:
     chef-automate config patch --opensearch os_config.toml
     ```
 
-This will update the configuration in Opensearch node.
+This will update the configuration in OpenSearch node.
 
 #### Healthcheck commands
 

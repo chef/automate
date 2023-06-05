@@ -42,7 +42,7 @@ Here is a benchmark test summary report run on
 
 - Instance Type: **16 vCPU, 30 GB memory**
 - Number of Compliance Targets: **20K**
-- **OpenSearch** and **Postgres** are deployed internally
+- **OpenSearch** and **PostgreSQL** are deployed internally
 
 | Report Size | Supported Concurrency |
 | --- | --- |

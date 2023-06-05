@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 {{< note >}}
 
-- All the nodes will apply the Frontend patch/set wherever the Postgresql and OpenSearch changes will be used to only one cluster node.
+- All the nodes will apply the Frontend patch/set wherever the PostgreSQL and OpenSearch changes will be used to only one cluster node.
 - After patching/setting, some services will restart. So the health status will take up to 2 minutes to show healthy.
 
 {{< /note >}}
@@ -55,9 +55,9 @@ chef-automate config show -c
 chef-automate config show --cs
 ```
 
-### Show Configuration for Postgresql cluster
+### Show Configuration for PostgreSQL cluster
 
-To show the configuration for the Postgresql cluster, run the following command:
+To show the configuration for the PostgreSQL cluster, run the following command:
 
 ```bash
 chef-automate config show --postgresql
@@ -119,9 +119,9 @@ chef-automate config patch path/to/chef_server-config.toml -c
 chef-automate config patch path/to/chef_server-config.toml --cs
 ```
 
-### Patch Configuration for Postgresql cluster
+### Patch Configuration for PostgreSQL cluster
 
-To patch the configuration for the Postgresql cluster, run the following command:
+To patch the configuration for the PostgreSQL cluster, run the following command:
 
 ```bash
 chef-automate config patch path/to/postgresql-config.toml --postgresql
@@ -171,9 +171,9 @@ chef-automate config set path/to/chef_server-config.toml -c
 chef-automate config set path/to/chef_server-config.toml --cs
 ```
 
-### Set Configuration for Postgresql cluster
+### Set Configuration for PostgreSQL cluster
 
-To set the configuration for the Postgresql cluster, run the following command:
+To set the configuration for the PostgreSQL cluster, run the following command:
 
 ```bash
 chef-automate config set path/to/postgresql-config.toml --postgresql

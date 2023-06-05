@@ -104,12 +104,12 @@ Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > p
 1. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
 
     ```bash
-    sudo chef-automate config show > current_config.toml 
+    sudo chef-automate config show > current_config.toml
     ```
 
 1. Add the OpenSearch credentials to the applied config.
 
-    - If using Chef Managed Opensearch, add the config below into `current_config.toml` (without any changes).  
+    - If using Chef Managed OpenSearch, add the config below into `current_config.toml` (without any changes).
 
         ```bash
         [global.v1.external.opensearch.auth.basic_auth]
@@ -152,25 +152,26 @@ Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > p
     ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
-2. Stop the Service in all the frontend nodes with the below command.
+
+1. Stop the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate stop
     ```
 
-3. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
+1. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of the Chef Automate HA cluster:
 
     ```cmd
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-4. After successfully executing the restore, you will see the below message:
+1. After successfully executing the restore, you will see the below message:
 
     ```bash
     Success: Restored backup 20210622065515
     ```
 
-5. Start the Service in all the frontend nodes with the below command.
+1. Start the Service in all the frontend nodes with the below command.
 
     ``` bash
     sudo chef-automate start

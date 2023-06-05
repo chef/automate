@@ -108,7 +108,7 @@ Run the following steps on Bastion Host Machine:
    - If `backup_config` is `s3` then uncomment and set the value for following `s3_bucketName` attribute to your bucket name. If the bucket name does not exist, it will be created for you automatically.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
    - If you don't have a custom FQDN leave `fqdn` as empty for this AWS deployment. By default, AWS Application load balancer will be used as `fqdn`.
-   - Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
+   - Set `instance_count` for Chef Automate, Chef Infra Server, PostgreSQL, OpenSearch.
    - Set AWS Config Details:
      - Set `profile`, by default `profile` is `"default"`
      - Set `region`, by default `region` is `"us-east-1"`
@@ -121,7 +121,7 @@ Run the following steps on Bastion Host Machine:
      - Set Instance Type for Chef Automate in `automate_server_instance_type`.
      - Set Instance Type for Chef Infra Server in `chef_server_instance_type`.
      - Set Instance Type for OpenSearch in `opensearch_server_instance_type`.
-     - Set Instance Type for Postgresql in `postgresql_server_instance_type`.
+     - Set Instance Type for PostgreSQL in `postgresql_server_instance_type`.
      - Set `automate_lb_certificate_arn` with the arn value of the Certificate created in AWS ACM for DNS entry of `chefautomate.example.com`.
      - Set `chef_server_lb_certificate_arn` with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
      - Set `automate_ebs_volume_iops`, `automate_ebs_volume_size` based on your load needs.
@@ -201,7 +201,7 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 
 {{< note >}}
 
-- Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+- Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for PostgreSQL, 3 for OpenSearch)
 
 {{< /note >}}
 
@@ -265,7 +265,7 @@ enable_custom_certs = false
 [postgresql.config]
 instance_count = "3"
 enable_custom_certs = false
-# Add Postgresql root-ca and keys
+# Add PostgreSQL root-ca and keys
 # root_ca = """root_ca_contents"""
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
@@ -378,7 +378,7 @@ Once the command executes, it will add the supplied number of nodes to your auto
 {{< note >}}
 
 - If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
-For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
 - The new node will be configured with the certificates which were already configured in your HA setup.
 
 {{< /note >}}
@@ -393,7 +393,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 - We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
 
-- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
+- Removal of nodes for PostgreSQL or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete PostgreSQL or OpenSearch nodes.
 
 - Below process can be done for `chef-server` and `automate`.
 

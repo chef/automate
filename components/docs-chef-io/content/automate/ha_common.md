@@ -104,37 +104,37 @@ You can generate the required certificates on your own or you can use the existi
 Follow these steps to rotate your certificates that are to be used in Chef Automate High Availability (HA):
 
 1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
-2. Type the command, `./scripts/credentials set ssl --rotate all` and press **Enter**. This command rotates all the certificates of your organization.
+1. Type the command, `./scripts/credentials set ssl --rotate all` and press **Enter**. This command rotates all the certificates of your organization.
 
-{{< note >}}
+    {{< note >}}
 
-When you run this command first time, a series of certificates are created and saved in `/hab/a2_deploy_workspace/certs` location. You need to identify the appropriate certificates. For example, to rotate certificates for PostgreSQL, use certificate values into *pg_ssl_private.key*,  *pg_ssl_public.pem*, and *ca_root.pem*. Likewise, to rotate certificates for ElasticSearch, use certificate values into *ca_root.pem*, *es_admin_ssl_private.key*, *es_admin_ssl_public.pem*, *es_ssl_private.key*, *es_ssl_public.pem*, *kibana_ssl_private.key*, *kibana_ssl_public.pem*.
+    When you run this command first time, a series of certificates are created and saved in `/hab/a2_deploy_workspace/certs` location. You need to identify the appropriate certificates. For example, to rotate certificates for PostgreSQL, use certificate values into *pg_ssl_private.key*,  *pg_ssl_public.pem*, and *ca_root.pem*. Likewise, to rotate certificates for ElasticSearch, use certificate values into *ca_root.pem*, *es_admin_ssl_private.key*, *es_admin_ssl_public.pem*, *es_ssl_private.key*, *es_ssl_public.pem*, *kibana_ssl_private.key*, *kibana_ssl_public.pem*.
 
-{{< /note >}}
+    {{< /note >}}
 
-3. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
+1. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
 
-4. For rotating the Elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
+1. For rotating the ElasticSearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
 
-<!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
+    <!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
 
-<!-- - Place your root certificate into `ca_root.pem file`. -->
+    <!-- - Place your root certificate into `ca_root.pem file`. -->
 
-<!-- - Place your intermediate CA into the `pem` file. -->
+    <!-- - Place your intermediate CA into the `pem` file. -->
 
-5. If your organization issues certificate from an intermediate CA, then place the respective certificate after the server certificate as per order listed. For example, in `certs/pg_ssl_public.pem`, paste it as them as listed:
+1. If your organization issues certificate from an intermediate CA, then place the respective certificate after the server certificate as per order listed. For example, in `certs/pg_ssl_public.pem`, paste it as them as listed:
 
-- Server Certificate
-- Intermediate CA Certificate 1
-- Intermediate CA Certificate n
+    - Server Certificate
+    - Intermediate CA Certificate 1
+    - Intermediate CA Certificate n
 
-6. Type the command, `./scripts/credentials set ssl` (with the appropriate options) and press **Enter**. This command deploys the nodes.
+1. Type the command, `./scripts/credentials set ssl` (with the appropriate options) and press **Enter**. This command deploys the nodes.
 
-7. Type the command, `./scripts/credentials set ssl  --help` and press **Enter**. This command provides you information and list of commands related to certificate rotation.
+1. Type the command, `./scripts/credentials set ssl  --help` and press **Enter**. This command provides you information and list of commands related to certificate rotation.
 
-8. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
+1. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
 
-9. For rotating the Elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
+1. For rotating the ElasticSearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
 
 ### What are Self Signed Certificates?
 
@@ -370,7 +370,7 @@ The default limit to create a VPC in a region is *5*. However, if the VPCs used 
 
 {{< note >}}
 
-You require a minimum of three node clusters for ElaticSearcg and Postgres-sql instances.
+You require a minimum of three node clusters for ElasticSearch and PostgreSQL instances.
 
 {{< /note >}}
 

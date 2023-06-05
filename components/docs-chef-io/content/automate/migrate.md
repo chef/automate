@@ -131,20 +131,21 @@ To migrate to Chef Automate 2 without these features, invoke the migration with 
 
 These flags enable you to migrate by skipping preflight checks for unsupported features.
 
-### External Elasticsearch Cluster
+### External ElasticSearch Cluster
 
-The Chef Automate 2 migration process requires manual intervention to migrate a Chef Automate 1 installation that uses external Elasticsearch.
+The Chef Automate 2 migration process requires manual intervention to migrate a Chef Automate 1 installation that uses external ElasticSearch.
 
-To migrate an external Elasticsearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
+To migrate an external ElasticSearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
 
 ### New Data Paths
 
 Chef Automate 2 stores its data in directories named `/hab/svc/$service-name/data`. In particular:
 
-* Elasticsearch data is stored in `/hab/svc/automate-elasticsearch/data/`
+* ElasticSearch data is stored in `/hab/svc/automate-elasticsearch/data/`
 * PostgreSQL data is stored in `/hab/svc/automate-postgresql/data/`
 
 If you use dedicated disks or partitions for either of these applications in Chef Automate 1, you must modify your disk mount configuration to make these disks/partitions available to Chef Automate 2.
+
 ### Chef Automate 2 License
 
 Login to Chef Automate to start a trial.

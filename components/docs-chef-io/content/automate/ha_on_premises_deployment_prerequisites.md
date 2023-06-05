@@ -30,8 +30,8 @@ We recommend using 11 node cluster for standard Automate HA on-premises deployme
 |-------------------|-------|
 | Chef Automate     | 2     |
 | Chef Infra Server | 2     |
-| Postgresql DB     | 3     |
-| Opensearch DB     | 3     |
+| PostgreSQL DB     | 3     |
+| OpenSearch DB     | 3     |
 | Bastion Machine   | 1     |
 
 Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
@@ -99,8 +99,8 @@ The machine requirements based on the above assumptions are listed below:
 |-------------------|-------|------|-----|------------------- |------------------|------------------|
 | Chef Automate     | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
 | Chef Infra Server | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
-| Postgresql DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
-| Opensearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
+| PostgreSQL DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+| OpenSearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
 | Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
 
 {{< note >}}
@@ -123,7 +123,7 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
-|               | Chef Automate  | Chef Infra Server | Postgresql                          | OpenSearch                           | Bastion | Load Balancer |
+|               | Chef Automate  | Chef Infra Server | PostgreSQL                          | OpenSearch                           | Bastion | Load Balancer |
 |---------------|----------------|-------------------|-------------------------------------|--------------------------------------|---------| ------------- |
 | Chef Automate |                |                   | 7432                                | 9200                                 |         |               |
 | Infra Server  | 443            |                   | 7432                                | 9200                                 |         |               |
@@ -145,8 +145,8 @@ The first column in the table below represents the source of the connection. The
 | TCP      | 9200        | OpenSearch API HTTPS Access                              |
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster |
 | TCP/UDP  | 9638        | Habitat gossip (UDP)                                     |
-| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader            |
-| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down  |
+| TCP      | 7432        | HAProxy, which redirects to PostgreSQL Leader            |
+| TCP      | 6432        | Re-elect PostgreSQL Leader if PostgreSQL leader is down  |
 
 ## Certificates
 

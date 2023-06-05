@@ -1,5 +1,5 @@
 +++
-title = "On-Premise Deployment"
+title = "On-Premises Deployment"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-Premise Deployment"
+    title = "On-Premises Deployment"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-Premise Deployment"
+    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-Premises Deployment"
     weight = 200
 +++
 
@@ -17,7 +17,7 @@ gh_repo = "automate"
 {{% automate/ha-warn %}}
 {{< /warning >}}
 
-This section will discuss the steps to deploy Chef Automate HA on-premise machines or on existing VMs. The steps are as follows:
+This section will discuss the steps to deploy Chef Automate HA on-premises machines or on existing VMs. The steps are as follows:
 
 ## Install Chef Automate HA
 
@@ -104,9 +104,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    vi config.toml
    ```
 
-   - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
+   - Add No. of machines for each Service: Chef Automate, Chef Infra Server, PostgreSQL, OpenSearch
    - Add the IP address of each machine in the relevant service section; multiple IPs should be in double quotes (`"`) and separated with a comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
-      - If we want to use the same machine for OpenSearch and Postgresql, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and Postgresql. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and Postgresql on all three machines.
+      - If we want to use the same machine for OpenSearch and PostgreSQL, then provide the same IP for both config fields. This means overall; there will be three machines or VMs running both OpenSearch and PostgreSQL. A reduced performance should be expected with this. Use a minimum of 3 VMs or Machines for Both OpenSearch and PostgreSQL on all three machines.
       - Also, you can use the same machines for Chef Automate and Chef Infra Server. This means overall, there will be two machines or VMs running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VMs or Machines will be used by both Chef Automate and Chef Infra Server on both machines.
       - Thus, the overall minimum number of machines needed will be 5.
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
@@ -143,7 +143,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 {{< note >}}
 
-- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for PostgreSQL, 3 for OpenSearch)
 - Following config will by default leave the backup configuration empty
 - To provide multiline certificates use triple quotes like `"""multiline certificate contents"""`
 
@@ -234,7 +234,7 @@ enable_custom_certs = false
 instance_count = "3"
 # Set enable_custom_certs = true to provide custom certificates during deployment
 enable_custom_certs = false
-# Add Postgresql root-ca and keys
+# Add PostgreSQL root-ca and keys
 # root_ca = """root_ca_contents"""
 # private_key = """private_key_contents"""
 # public_key = """public_key_contents"""
@@ -254,7 +254,7 @@ opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
 postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ```
 
-#### Minimum changes to be made for On-Premise Deployment
+#### Minimum changes to be made for On-Premises Deployment
 
 - Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 - Give the `ssh_key_file` path; this key should have access to all the Machines or VMs. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
@@ -267,13 +267,13 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
   - For **Object Storage** - `backup_config = "object_storage"`. Other variables to be filled - in are `bucket_name`, `access_key`,`secret_key`, `endpoint`, and `region`.
   - For **File System** - `backup_config = "file_system"`.
 
-## On-Premise Setup with AWS Managed Services
+## On-Premises Setup with AWS Managed Services
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites) to know more.
-- This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
-- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
+- Follow the Prerequisites for On-Premises deployment. Click [here](#prerequisites) to know more.
+- This deployment excludes the installation for PostgreSQL and OpenSearch as we are using the AWS Managed Services.
+- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS PostgreSQL.
 - Set up AWS OpenSearch 1.3. Click [here](/automate/create_amazon_opensearch/) to know more.
 - For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
 - Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
@@ -287,13 +287,13 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
 
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
   - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
-  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps. 
-    - The master username value which you used while creating AWS RDS Postgresql can be used for both `superuser_username` and `dbuser_username`
-    - The master password value which you used while creating AWS RDS Postgresql can be used for both `superuser_password` and `dbuser_password`
+  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS PostgreSQL** created in the Prerequisite steps.
+    - The master username value which you used while creating AWS RDS PostgreSQL can be used for both `superuser_username` and `dbuser_username`
+    - The master password value which you used while creating AWS RDS PostgreSQL can be used for both `superuser_password` and `dbuser_password`
   - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
   - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for the **Managed AWS OpenSearch** created in the Prerequisite steps.
   - Set `opensearch_domain_url` as the URL without Port No. For example: `"vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"`.
-  - Leave postgresql_root_cert and opensearch_root_cert blank in case of On-Premise with AWS Managed Services.
+  - Leave postgresql_root_cert and opensearch_root_cert blank in case of On-Premises with AWS Managed Services.
   - For backup and restore configuration set `managed_opensearch_certificate`, `aws_os_snapshot_role_arn`, `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret`.  [Refer this document](/automate/managed_services/#enabling-opensearch-backup-restore) to create them and get their values.
 
 Continue with the deployment after updating the config:
@@ -312,7 +312,7 @@ Continue with the deployment after updating the config:
    "
 ```
 
-### Sample config to setup On-Premise Deployment with AWS Managed Services
+### Sample config to setup On-Premises Deployment with AWS Managed Services
 
 ```config
 # ============== External Database Services ======================
@@ -357,12 +357,12 @@ os_snapshot_user_access_key_id = ""
 os_snapshot_user_access_key_secret = ""
 ```
 
-## On-Premise Setup with Self-Managed Services
+## On-Premises Setup with Self-Managed Services
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites).
-- This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
+- Follow the Prerequisites for On-Premises deployment. Click [here](#prerequisites).
+- This deployment excludes the installation for PostgreSQL and OpenSearch as we are using the Self Managed services.
 
 See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
@@ -375,7 +375,7 @@ Update Config with relevant data. Click [here](#sample-config-to-setup-on-premis
     - You can use the same values for both `superuser_username` and `dbuser_username` too
     - You can use the same values for both `superuser_password` and `dbuser_password` too
   - Set `instance_url` as the URL with Port No. For example: `"10.1.2.189:7432"`.
-  - Provide the Root ca value of Postgresql `postgresql_root_cert`.
+  - Provide the Root ca value of PostgreSQL `postgresql_root_cert`.
   - Set `opensearch_domain_name`, `opensearch_domain_url`, `opensearch_username`, `opensearch_user_password` for your Self Managed OpenSearch.
   - Set `opensearch_domain_url` as the URL with Port No. For example: `"10.1.2.234:9200"`.
   - Provide the Root ca value of OpenSearch `opensearch_root_cert`.
@@ -397,7 +397,7 @@ Continue with the deployment after updating the config:
    "
 ```
 
-### Sample config to setup On-Premise Deployment with Self Managed Services
+### Sample config to setup On-Premises Deployment with Self Managed Services
 
 ```config
 # ============== External Database Services ======================
@@ -492,7 +492,7 @@ Once the command executes, it will add the supplied nodes to your automate setup
 {{< note >}}
 
 - If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
-For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
 - The new node will be configured with the certificates which were already configured in your HA setup.
 - If you had applied unique certificates per node, then the certificates of one of the nodes have been applied by default on the new nodes.
 - If you want to change the certificates for the new nodes, you can manually run the `chef-automate cert-rotate [options]` command.
@@ -509,7 +509,7 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 
 - We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for the reference.
 
-- Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
+- Removal of nodes for PostgreSQL or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete PostgreSQL or OpenSearch nodes.
 
 - Below process can be done for `chef-server` and `automate`.
 
@@ -555,7 +555,7 @@ Once the command executes, it will remove the supplied node from your HA setup. 
 - Automate instance count cannot be less than 1.
 - Chef Server instance count cannot be less than 1.
 - Open search instance count cannot be less than 3.
-- Postgresql instance count cannot be less than 3.
+- PostgreSQL instance count cannot be less than 3.
  {{< /note >}}
 
 ## Replace Node in Automate HA Cluster

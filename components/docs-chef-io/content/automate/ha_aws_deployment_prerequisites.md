@@ -27,8 +27,8 @@ We recommend using 11 node cluster for standard Automate HA AWS deployment, as d
 |-------------------|-------|
 | Chef Automate     | 2     |
 | Chef Infra Server | 2     |
-| Postgresql DB     | 3     |
-| Opensearch DB     | 3     |
+| PostgreSQL DB     | 3     |
+| OpenSearch DB     | 3     |
 | Bastion Machine   | 1     |
 
 Additionally, this topology requires two load balancers and 2 DNS entries with certificates. Refer to the [architectural page](/automate/ha/#chef-automate-ha-architecture/) for further guidance.
@@ -104,7 +104,7 @@ The machine requirements based on the above assumptions are listed below:
 |-------------------|-------|------|-----|------------------- |------------------|------------------|
 | Chef Automate     | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
 | Chef Infra Server | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
-| Postgresql DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+| PostgreSQL DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
 | OpenSearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
 | Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
 
@@ -130,7 +130,7 @@ The Chef Automate HA cluster requires multiple ports for the frontend and backen
 
 The first column in the table below represents the source of the connection. The table's other columns represent the destination with the matrix value as a port number. The specified port numbers need to be opened on the origin and destination.
 
-|               | Chef Automate  | Chef Infra Server | Postgresql                          | OpenSearch                           | Bastion | Load Balancer |
+|               | Chef Automate  | Chef Infra Server | PostgreSQL                          | OpenSearch                           | Bastion | Load Balancer |
 |---------------|----------------|-------------------|-------------------------------------|--------------------------------------|---------| ------------- |
 | Chef Automate |                |                   | 7432                                | 9200                                 |         |               |
 | Infra Server  | 443            |                   | 7432                                | 9200                                 |         |               |
@@ -153,8 +153,8 @@ The first column in the table below represents the source of the connection. The
 | TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
 | TCP/UDP  | 9638        | Habitat gossip (UDP) |
-| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
-| TCP      | 6432        | Re-elect Postgresql Leader if Postgresql leader is down |
+| TCP      | 7432        | HAProxy, which redirects to PostgreSQL Leader |
+| TCP      | 6432        | Re-elect PostgreSQL Leader if PostgreSQL leader is down |
 
 ## Certificates
 
@@ -178,7 +178,7 @@ The AWS deployment specific pre-requisites are as follows:
 - It is recommended to create a new VPC.
 - Bastion must be in the same VPC for deployment.
 - **In AWS Managed Services:**
-  - Setup [AWS RDS Postgresql](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
+  - Setup [AWS RDS PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) 13.5 in the same VPC.
   - Setup [AWS OpenSearch](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) of version 1.3 in the same VPC.
 
 ### Infra Server
@@ -272,7 +272,7 @@ To know more about the AWS deployment disaster recovery, visit our [Disaster Rec
 | Chef Automate | [Standalone](/automate/install/) | Automate 2020XXXXXX |    | To migrate to Managed OpenSearch Automate HA cluster, the current standalone Chef Automate version should be at most 4.3.0. |
 | Chef Backend | [Chef Backend Cluster](/server/install_server_ha/) | Backend 2.X and Infra Server 14.X | Chef Infra Server 15.4.0 | Chef Backend using PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
 | Chef Infra Server | [Standalone](/server/install_server/#standalone)<br />[Tiered](/server/install_server_tiered/) | Infra server 14.XXX | Chef Infra Server 15.4.0 | Chef Manage, or Private Chef Supermarket with Chef Backend should not migrate to Automate HA. Automate HA does not support supermarket authentication with chef-server user credentials. <br />Chef Infra Server using PostgreSQL storage for Cookbooks should only migrate to Automate HA. |
-| A2HA | PS Lead A2HA On-Premise Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
+| A2HA | PS Lead A2HA On-Premises Deployment |Chef Automate version 20201230192246 | Chef Automate Version 20220223121207 | The A2HA cluster-mounted backup file system should also be attached to Automate HA cluster.<br />In case of In-Place migration, the volume having `/hab` should have more than 60% free space on each node. |
 
 {{< note >}}
 

@@ -21,43 +21,41 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 ## Frequently Asked Questions
 
 ### How to check logs For automate nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname a2`
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit chef-automate` 
+- To view the logs please do ssh to the respective node by running the command from bastion node `./chef-automate ssh --hostname a2`
+
+- choose the Instace based on the output. To view the logs run the command `journalctl --follow --unit chef-automate`
 
 ### How to check logs For Chef Infra Server nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname cs`
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit chef-automate` 
+- To view the logs please do ssh to the respective node by running the command from bastion node `./chef-automate ssh --hostname cs`
 
-### How to check logs For Postgres nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname pg`
+- choose the Instace based on the output. To view the logs run the command `journalctl --follow --unit chef-automate`
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit hab-sup` 
+### How to check logs For PostgreSQL nodes?
 
-### How to check logs For Opensearch nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+- To view the logs please do ssh to the respective node by running the command from bastion node `./chef-automate ssh --hostname pg`
+
+- choose the Instace based on the output. To view the logs run the command `journalctl --follow --unit hab-sup`
+
+### How to check logs For OpenSearch nodes?
+
+- To view the logs please do ssh to the respective node by running the command from bastion node
 `./chef-automate ssh --hostname os`
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit hab-sup` 
+- choose the Instace based on the output. To view the logs run the command
+`journalctl --follow --unit hab-sup`
 
 ### How to Pass the custom config for the Frontend node (Automate / ChefInfraServer)?
+
 - Create a file with say `customconfig.toml`, pass the absolute path `config_file=/ABSOLUTE_PATH/customconfig.toml`
 
+### How to Add more nodes In AWS Deployment, post deployment
 
-
-### How to Add more nodes In AWS Deployment, post deployment. 
 The commands require some arguments so that it can determine which types of nodes you want to add to your HA setup from your bastion host. It needs the count of the nodes you want to add as as argument when you run the command.
 For example,
 
-- if you want to add 2 nodes to automate, you have to run the:
+- If you want to add 2 nodes to automate, you have to run the:
 
     ```sh
     chef-automate node add --automate-count 2
@@ -100,40 +98,38 @@ Once the command executes, it will add the supplied number of nodes to your auto
 {{< note >}}
 
 - If you have patched some external config to any of the existing services then make sure you apply the same on the new nodes as well.
-For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, Postgresql, and OpenSearch.
+For example, if you have patched any external configurations like SAML or LDAP, or any other done manually post-deployment in automate nodes, make sure to patch those configurations on the new automate nodes. The same must be followed for services like Chef-Server, PostgreSQL, and OpenSearch.
 - The new node will be configured with the certificates which were already configured in your HA setup.
 
 {{< /note >}}
-
 
 {{< warning >}}
   Downgrading the number of instance_count for the backend nodes will result in data loss. We do not recommend downgrading the backend nodes.
 {{< /warning >}}
 
-### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
- - No, Automate HA support https connection only with Managed services. 
+### Is Automate HA supports unencrypted traffic with managed service like AWS-OpenSearch / RDS ?
 
+- No, Automate HA support https connection only with Managed services.
 
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
 
-
 ### How to perform infrastructure cleanup for on-premises nodes
 
-Execute the following commands from bastion host as per your deployment to perfom infrastructure cleanup
+Execute the following commands from bastion host as per your deployment to perform infrastructure cleanup
 
-for AWS deployment
+For AWS deployment:
+
 ```bash
 chef-automate cleanup --aws-deployment
 ```
 
-for on premises deployment
+For on premises deployment:
+
 ```bash
 chef-automate cleanup --onprem-deployment
 ```
-
-
 
 ## HA Health Check Commands
 

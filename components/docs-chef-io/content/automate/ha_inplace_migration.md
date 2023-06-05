@@ -22,7 +22,6 @@ weight = 200
 
 {{< /warning >}}
 
-
 This page explains the In-Place migration of A2HA to Automate HA. This migration involves the following steps:
 
 ## Prerequisites
@@ -37,7 +36,7 @@ In order to verify the migration is completed successfully we'll need to capture
 
 Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > pre_migration_infra_counts.log`
 
-    ```bash
+```bash
     #!/usr/bin/bash
 
     for i in `chef-server-ctl org-list`; do
@@ -53,9 +52,7 @@ Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > p
         knife list / -R -s $org | wc -l
         echo "----------------"
     done
-    ```
-
-
+```
 
 ## Taking Backup and clean up of instances
 
@@ -95,14 +92,15 @@ Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > p
     ```
 
     Rename `/hab` dir to something else like `/hab-old`.
- 
-    Remove the following files 
+
+    Remove the following files:
+
     * `/bin/chef-automate`
     * `/bin/hab`
     * `/bin/hab-launch`
     * `/bin/hab-sup`
 
-1. Unload services from each of the Postgresql Nodes:
+1. Unload services from each of the PostgreSQL Nodes:
 
     ```cmd
     sudo hab svc unload chef/automate-backend-postgresql
@@ -114,7 +112,7 @@ Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > p
 
     Check the status using the `hab svc status` command. None of the services should be running. Once checked, stop the habitat supervisor with the command `systemctl stop hab-sup`. Rename /hab dir to something else like /hab-old.
 
-1. Unload services from each of the Elasticsearch Nodes
+1. Unload services from each of the ElasticSearch Nodes
 
     ```cmd
     sudo hab svc unload chef/automate-backend-elasticsidecar
@@ -136,10 +134,11 @@ Follow Automate HA installation documentation. Click [here](/automate/ha_onprim_
 **provide** the same IPs and backup config in config.toml as in the  `a2ha.rb` file.
 
 ## File System backup configuration
+
 In case the backup configuration was skipped in the deployment config.toml, the User needs to configure EFS backup manually in Automate HA please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
 
 {{<note>}}
-While configuring the backup configuration provide the path of **Elasticsearch** instead of **Opensearch** as A2HA backup was in Elasticsearch directory 
+While configuring the backup configuration provide the path of **ElasticSearch** instead of **OpenSearch** as A2HA backup was in ElasticSearch directory
 like instead of `/mnt/automate_backups/opensearch/` it will be `/mnt/automate_backups/elasticsearch/`
 {{</note>}}
 
@@ -200,12 +199,13 @@ chef-automate config set applied_config.toml
 
 {{< /note >}}
 
-
 Click [here](/automate/ha_backup_restore_object_storage/) to know more about the usage of S3 backup.
 
 {{< note >}}
+
 1. Once Automate HA is up and running with restored data, We can remove old backed-up directories sudo `rm -rf hab-old`, freeing up acquired space.
-1. Reset the backup configuration path to Opensearch so that new backups will be stored in Opensearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
+1. Reset the backup configuration path to OpenSearch so that new backups will be stored in OpenSearch directory, please click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
+
 {{< /note >}}
 
 ## Validate successful migration
@@ -248,9 +248,11 @@ Click [here](/automate/ha_backup_restore_object_storage/) to know more about the
 1. While installing the new Automate HA, if PostgreSQL is having any issues in starting, and in PostgreSQL instance `hab svc status` shows a secret key mismatch error, then try the cleanup command with new Automate HA cli `chef-automate cleanup --onprem-deployment` and then remove `/bin/chef-automate` from all frontend nodes, now try the installation again.
 
 1. Click [here](/automate/ha_existing_a2ha_to_automate_ha/#troubleshooting) to know more if you encounter an error while restoring related to the ElasticSearch snapshot.
-2. While restoring the backup if an error related to backup directory occurs like 
-> **Error in Automate node:** failed to create snapshot repository: Elasticsearch repository create request failed for repo**
+1. While restoring the backup if an error related to backup directory occurs like:
+
+> **Error in Automate Node:** failed to create snapshot repository: ElasticSearch repository create request failed for repo**
 > OR
-> **Error in Opensearch node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
+
+> **Error in OpenSearch Node:** /mnt/automate_backups/backups/automate-elasticsearch-data/chef-automate-*-service] doesn't match any of the locations specified by path.repo
 
 please re-check your EFS backup configuration for the Automate and OpenSearch node, click [here](/automate/ha_backup_restore_file_system/#configuration-for-automate-node-from-provision-host) to know more.
