@@ -29,7 +29,7 @@ type FileUtils interface {
 	ReadFile(filename string) ([]byte, error)
 	WriteFile(filepath string, data []byte, perm os.FileMode) error
 	CreateTempFile(content string, filename string) (string, error)
-	DeleteTempFile(tempFile string) error
+	DeleteFile(fileName string) error
 }
 
 type FileSystemUtils struct{}
@@ -68,8 +68,8 @@ func (fsu *FileSystemUtils) WriteFile(filepath string, data []byte, perm os.File
 func (fsu *FileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
 	return CreateTempFile(content, filename)
 }
-func (fsu *FileSystemUtils) DeleteTempFile(tempFile string) error {
-	return DeleteTempFile(tempFile)
+func (fsu *FileSystemUtils) DeleteFile(tempFile string) error {
+	return DeleteFile(tempFile)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -172,6 +172,6 @@ func CreateTempFile(content string, filename string) (string, error) {
 	return tempFile.Name(), nil
 }
 
-func DeleteTempFile(tempFile string) error {
+func DeleteFile(tempFile string) error {
 	return os.Remove(tempFile)
 }

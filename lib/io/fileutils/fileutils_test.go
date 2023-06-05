@@ -77,7 +77,7 @@ func TestDeleteTempFile(t *testing.T) {
 	}
 	defer tempFile.Close()
 
-	err = fileutils.DeleteTempFile(tempFile.Name())
+	err = fileutils.DeleteFile(tempFile.Name())
 	if err != nil {
 		return
 	}

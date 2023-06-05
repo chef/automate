@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 
 	"github.com/gofiber/fiber/v2"
@@ -1471,7 +1472,7 @@ func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	deployState, _ := ss.GetDeploymentState()
+	deployState, _ := ss.getDeploymentState()
 	assert.Equal(t, "post-deploy", deployState)
 }
 
@@ -1485,7 +1486,7 @@ func TestStopMockServerOnHostAndPortPostDeployWhenServicesStopped(t *testing.T) 
 			"error": ""
 		}
 	}`, nil, false)
-	deployState, _ := ss.GetDeploymentState()
+	deployState, _ := ss.getDeploymentState()
 	assert.Equal(t, "post-deploy", deployState)
 }
 
@@ -1500,8 +1501,36 @@ func TestShouldStartMockServer(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	shouldStartMockServer, _ := ss.ShouldStartMockServer([]string{"abc"})
+	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"})
 	assert.Equal(t, false, shouldStartMockServer)
+}
+
+func TestShouldGenerateRootCaAndPrivateKeyForHostLogErrorForCert(t *testing.T) {
+	tests := []struct {
+		description string
+		fileName    string
+	}{
+		{
+			description: "Test error for reading certificate pem file",
+			fileName:    "certificate.pem",
+		},
+		{
+			description: "Test error for reading private_key pem file",
+			fileName:    "private_key.pem",
+		},
+	}
+
+	ss := getBatchCheckServiceInstance()
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ss.fileUtils = mockFileUtils(test.fileName, true)
+
+			ss.generateRootCaAndPrivateKeyForHost("abc", &models.MockServerRequestBody{})
+			fileutils.DeleteFile("certificate.pem")
+			fileutils.DeleteFile("private_key.pem")
+			assert.NotNil(t, ss.log)
+		})
+	}
 }
 
 func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string) string {
@@ -1529,6 +1558,23 @@ func getBatchCheckServiceInstance() *BatchCheckService {
 		SetupMockSystemResourceCheck(),
 		SetupMockSystemUserCheck(),
 	), logger.NewTestLogger(), "1234")
+}
+
+func mockFileUtils(fileName string, shouldReturnError bool) *fileutils.MockFileSystemUtils {
+	return &fileutils.MockFileSystemUtils{
+		ReadFileFunc: func(filename string) ([]byte, error) {
+			if filename == fileName && shouldReturnError {
+				return []byte{}, errors.New("Error occurred")
+			}
+			if filename == fileName && shouldReturnError {
+				return []byte{}, errors.New("Error occurred")
+			}
+			return []byte{}, nil
+		},
+		DeleteTempFileFunc: func(filename string) error {
+			return nil
+		},
+	}
 }
 
 func TestConstructResult(t *testing.T) {
