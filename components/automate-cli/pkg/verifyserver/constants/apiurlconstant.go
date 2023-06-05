@@ -18,4 +18,6 @@ const (
 	FQDN_LOAD_BALANCER_CHECK                 = "/api/v1/checks/fqdn"
 	AWS_OPENSEARCH_S3_BUCKET_ACCESS_API_PATH = "/api/v1/checks/aws-opensearch-s3-bucket-access"
 	PORT_REACHABLE_API_PATH                  = "/api/v1/checks/port-reachable"
+	EXTERNAL_OPENSEARCH_API_PATH             = "/api/v1/checks/external-opensearch"
+	EXTERNAL_POSTGRESQL_API_PATH             = "/api/v1/checks/external-postgresql"
 )
