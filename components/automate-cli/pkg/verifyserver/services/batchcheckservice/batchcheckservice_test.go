@@ -690,14 +690,16 @@ func TestConstructResult(t *testing.T) {
 	assert.Len(t, result, 2, "Result should have two items")
 
 	for _, v := range result {
+		// Check the nodeType1
 		if v.NodeType == "nodeType1" {
-			// Check the first item in the result
 			assert.Equal(t, "host1", result[0].Ip, "IP should be 'host1'")
 			assert.Len(t, result[0].Tests, 1, "Tests should have one item")
 			assert.Equal(t, true, result[0].Tests[0].Passed, "Passed should be true")
 			assert.Equal(t, "Test message 1", result[0].Tests[0].Message, "Message should be 'Test message 1'")
-		} else {
-			// Check the second item in the result
+		}
+
+		// Check the nodeType2
+		if v.NodeType == "nodeType2" {
 			assert.Equal(t, "host2", result[1].Ip, "IP should be 'host2'")
 			assert.Equal(t, "nodeType2", result[1].NodeType, "NodeType should be 'nodeType2'")
 			assert.Len(t, result[1].Tests, 1, "Tests should have one item")

@@ -26,25 +26,13 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 	var bastionChecks = stringutils.SliceIntersection(checks, constants.GetBastionChecks())
 	var remoteChecks = stringutils.SliceIntersection(checks, constants.GetRemoteChecks())
 	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
-	if len(bastionChecks) > 0 {
-		bastionCheckResultChan := make(chan []models.CheckTriggerResponse, len(bastionChecks))
-		for _, check := range bastionChecks {
-			go ss.RunBastionCheck(check, config, bastionCheckResultChan)
-		}
-		for i := 0; i < len(bastionChecks); i++ {
-			result := <-bastionCheckResultChan
-			for i, _ := range result {
-				result[i].Result.Check = result[i].CheckType
-				result[i].Result.Message = constants.GetCheckMessageByType(result[i].Result.Check)
-			}
-			if len(result) > 0 {
-				checkTriggerRespMap[result[0].CheckType] = result
-			}
 
-		}
-		defer close(bastionCheckResultChan)
+	// Get bastion check trigger resp
+	if len(bastionChecks) > 0 {
+		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
+	// Get remote check trigger resp
 	if len(remoteChecks) > 0 {
 		for _, check := range remoteChecks {
 			resp := ss.RunRemoteCheck(check, config)
@@ -169,4 +157,30 @@ func constructResult(ipMap map[string][]models.CheckTriggerResponse) []models.Ba
 	}
 
 	return result
+}
+
+func getBastionCheckResp(ss *BatchCheckService, bastionChecks []string, config models.Config) map[string][]models.CheckTriggerResponse {
+	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
+	bastionCheckResultChan := make(chan []models.CheckTriggerResponse, len(bastionChecks))
+
+	// Trigger the routine
+	for _, check := range bastionChecks {
+		go ss.RunBastionCheck(check, config, bastionCheckResultChan)
+	}
+
+	// iterate over the chan and take the value out and populate checkTriggerRespMap
+	for i := 0; i < len(bastionChecks); i++ {
+		result := <-bastionCheckResultChan
+		for i, _ := range result {
+			result[i].Result.Check = result[i].CheckType
+			result[i].Result.Message = constants.GetCheckMessageByType(result[i].Result.Check)
+		}
+		if len(result) > 0 {
+			checkTriggerRespMap[result[0].CheckType] = result
+		}
+
+	}
+	defer close(bastionCheckResultChan)
+
+	return checkTriggerRespMap
 }
