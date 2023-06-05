@@ -1,6 +1,7 @@
 package v1_test
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http/httptest"
 	"strings"
@@ -593,7 +594,7 @@ func TestNFSMount(t *testing.T) {
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body) //nosemgrep
+			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.TestName)
 			assert.JSONEq(t, string(body), test.ExpectedBody)
 			assert.Equal(t, test.ExpectedCode, res.StatusCode)

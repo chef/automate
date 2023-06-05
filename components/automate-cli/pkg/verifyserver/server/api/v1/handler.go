@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
@@ -32,6 +33,7 @@ type Handler struct {
 	ExternalPostgresqlService    externalpostgresqlservice.ExternalPostgresqlService
 	SystemUserService            systemuserservice.SystemUserService
 	SystemResourceService        systemresourceservice.SystemResourcesService
+	ExternalOpensearchService    externalopensearchservice.IExternalOpensearchService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -99,5 +101,10 @@ func (h *Handler) AddExternalPostgresqlService(pg externalpostgresqlservice.Exte
 
 func (h *Handler) AddSystemResourceService(srs systemresourceservice.SystemResourcesService) *Handler {
 	h.SystemResourceService = srs
+	return h
+}
+
+func (h *Handler) AddExternalOpensearchService(eos externalopensearchservice.IExternalOpensearchService) *Handler {
+	h.ExternalOpensearchService = eos
 	return h
 }

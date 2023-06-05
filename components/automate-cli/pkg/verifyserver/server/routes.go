@@ -21,6 +21,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Post("/external-postgresql", vs.Handler.CheckExternalPostgresql)
 	apiChecksGroup.Get("/system-user", vs.Handler.CheckSystemUser)
 	apiChecksGroup.Get("/system-resource", vs.Handler.GetSystemResource)
+	apiChecksGroup.Post("/external-opensearch", vs.Handler.ExternalOpensearch)
 
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)
