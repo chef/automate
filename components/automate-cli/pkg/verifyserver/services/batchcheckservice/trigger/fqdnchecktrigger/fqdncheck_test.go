@@ -482,7 +482,6 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 
 			assert.NotNil(t, got)
 			assert.Equal(t, got.RootCert, wantReq.RootCert)
-			assert.Equal(t, got.ApiToken, wantReq.ApiToken)
 			assert.NotNil(t, got.Nodes)
 			assert.Equal(t, got.Fqdn, wantReq.Fqdn)
 
@@ -524,6 +523,5 @@ func getRequest() models.FqdnRequest {
 	return models.FqdnRequest{
 		Fqdn:     certificate.AutomateFqdn,
 		RootCert: certificate.RootCert,
-		ApiToken: token,
 	}
 }

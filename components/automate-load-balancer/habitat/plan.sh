@@ -8,9 +8,17 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 nginx_version="1.21.3"
 headers_more_version="0.33"
+ngx_devel_kit_version="0.3.2"
+set_misc_version="0.33"
 headers_more_filename="headers-more-nginx-module-${headers_more_version}.tar.gz"
 headers_more_source="https://github.com/openresty/headers-more-nginx-module/archive/v${headers_more_version}.tar.gz"
 headers_more_shasum=7c1f7bb13e79433ee930c597d272a64bc6e30c356a48524f38fd34fa88d62473
+ngx_devel_kit_filename="ngx_devel_kit-${ngx_devel_kit_version}.tar.gz"
+ngx_devel_kit_source="https://github.com/vision5/ngx_devel_kit/archive/v${ngx_devel_kit_version}.tar.gz"
+ngx_devel_kit_shasum=aa961eafb8317e0eb8da37eb6e2c9ff42267edd18b56947384e719b85188f58b
+set_misc_filename="set-misc-nginx-module-${set_misc_version}.tar.gz"
+set_misc_source="https://github.com/openresty/set-misc-nginx-module/archive/v${set_misc_version}.tar.gz"
+set_misc_shasum=cd5e2cc834bcfa30149e7511f2b5a2183baf0b70dc091af717a89a64e44a2985
 pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
 pkg_dirname="nginx-${nginx_version}"
 pkg_upstream_url="https://www.chef.io/automate"
@@ -56,12 +64,17 @@ pkg_binds_optional=(
 )
 
 do_download() {
-  cp -f cacert.pem /hab/pkgs/core/cacerts/2020.01.01/20200306005234/ssl/certs/cacert.pem
+  cp -f cacert.pem /hab/pkgs/core/cacerts/2021.10.26/20220311110931/ssl/certs/cacert.pem
   do_default_download
   pushd "${HAB_CACHE_SRC_PATH}" || return 1
   download_file "${headers_more_source}" "${headers_more_filename}" "${headers_more_shasum}"
-
   tar zxvf ${headers_more_filename}
+
+  download_file "${set_misc_source}" "${set_misc_filename}" "${set_misc_shasum}"
+  tar zxvf ${set_misc_filename}
+
+  download_file "${ngx_devel_kit_source}" "${ngx_devel_kit_filename}" "${ngx_devel_kit_shasum}"
+  tar zxvf ${ngx_devel_kit_filename}
   popd || return 1
 }
 
@@ -102,7 +115,9 @@ do_build() {
     --with-http_slice_module \
     --with-cc-opt="${CFLAGS}" \
     --with-ld-opt="${LDFLAGS}" \
-    --add-module=${HAB_CACHE_SRC_PATH}/headers-more-nginx-module-${headers_more_version}
+    --add-module=${HAB_CACHE_SRC_PATH}/headers-more-nginx-module-${headers_more_version} \
+    --add-module=${HAB_CACHE_SRC_PATH}/ngx_devel_kit-${ngx_devel_kit_version} \
+    --add-module=${HAB_CACHE_SRC_PATH}/set-misc-nginx-module-${set_misc_version}
 
   make
 }

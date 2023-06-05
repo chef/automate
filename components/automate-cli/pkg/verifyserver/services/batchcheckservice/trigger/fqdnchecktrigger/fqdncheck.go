@@ -82,7 +82,6 @@ func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAf
 		IsAfterDeployment: isAfterDeployment,
 		Nodes:             []string{ip},
 		NodeType:          nodeType,
-		ApiToken:          apiToken,
 	}
 
 	return fqdnReq
