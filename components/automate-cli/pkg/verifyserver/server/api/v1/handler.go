@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/sshusercheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
@@ -40,6 +41,7 @@ type Handler struct {
 	FqdnService                  fqdnservice.IFqdnService
 	FirewallService              firewallservice.IFirewallService
 	ValidateCertificateService   certificatevalidation.IValidateCertificateService
+	SshUserCheckService          sshusercheckservice.SshUsercheckService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -127,5 +129,10 @@ func (h *Handler) AddFirewallService(fw firewallservice.IFirewallService) *Handl
 
 func (h *Handler) AddCertificateValidation(vc certificatevalidation.IValidateCertificateService) *Handler {
 	h.ValidateCertificateService = vc
+	return h
+}
+
+func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUsercheckService) *Handler {
+	h.SshUserCheckService = ssu
 	return h
 }
