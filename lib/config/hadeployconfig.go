@@ -219,7 +219,7 @@ func (c *HaDeployConfig) Parse(configFile string) error {
 	if err != nil {
 		return fmt.Errorf("error reading config TOML file: %w", err)
 	}
-	err = ptoml.Unmarshal(templateBytes, &c)
+	err = ptoml.Unmarshal(templateBytes, c) // Pass pointer to c
 	if err != nil {
 		return fmt.Errorf("error unmarshalling config TOML file: %w", err)
 	}

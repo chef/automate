@@ -67,9 +67,12 @@ func (c *HaDeployConfig) ParseAndVerify(configFile string) error {
 	// Parse the config file
 	err := c.Parse(configFile)
 	if err != nil {
-		return errors.New(err.Error())
+		return err
 	}
-	return c.Verify()
+	if err := c.Verify(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials) error {
@@ -112,7 +115,7 @@ func (c *HaDeployConfig) validateExistingInfraBackupConfig() error {
 	// validate existing infra backup config
 	backupConfig := c.Architecture.ExistingInfra.BackupConfig
 	if backupConfig != "object_storage" && backupConfig != "file_system" {
-		return errors.New("Invalid or empty backup_config")
+		return errors.New("invalid or empty backup_config")
 	}
 
 	if backupConfig == "object_storage" {
@@ -126,14 +129,16 @@ func (c *HaDeployConfig) validateExistingInfraBackupConfig() error {
 
 func (c *HaDeployConfig) validateAwsBackupConfig() error {
 	// validate aws backup config
-	checkForValidS3Bucket(c)
+	if err := checkForValidS3Bucket(c); err != nil {
+		return err
+	}
 	if c.Aws.Config.SetupManagedServices {
 		if err := validateRequiredStringTypeField(c.Architecture.Aws.BackupConfig, "backup_config", "s3"); err != nil {
-			return errors.New(err.Error())
+			return err
 		}
 	} else {
 		if err := validateRequiredStringTypeField(c.Architecture.Aws.BackupConfig, "backup_config", "s3", "efs"); err != nil {
-			errors.New(err.Error())
+			return err
 		}
 	}
 	return nil

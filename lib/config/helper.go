@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -24,11 +23,11 @@ type keydetails struct {
 
 func validateRequiredNumberField(value string, fieldName string) error {
 	if len(value) == 0 {
-		return errors.New(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return fmt.Errorf(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 
 	}
 	if _, err := strconv.Atoi(value); err != nil {
-		return errors.New(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
+		return fmt.Errorf(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 	}
 	return nil
 }
@@ -36,7 +35,7 @@ func validateRequiredNumberField(value string, fieldName string) error {
 func validateNumberField(value string, fieldName string) error {
 	if len(value) > 0 {
 		if _, err := strconv.Atoi(value); err != nil {
-			return errors.New(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
+			return fmt.Errorf(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 		}
 	}
 	return nil
@@ -45,7 +44,7 @@ func validateNumberField(value string, fieldName string) error {
 func validateRequiredBooleanField(value interface{}, fieldName string) error {
 	_, ok := value.(bool)
 	if !ok {
-		return errors.New(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
+		return fmt.Errorf(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 	}
 	return nil
 }
@@ -56,32 +55,32 @@ func validateStringBasedBoolean(value interface{}, fieldName string) error {
 		// Check if the string represents a valid boolean value
 		_, err := strconv.ParseBool(v)
 		if err != nil {
-			return errors.New(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
+			return fmt.Errorf(fmt.Sprintf(INVALID_FIELD_VALUE, fieldName, value))
 		}
 	default:
-		return errors.New(fmt.Sprintf("Invalid %s: %v", fieldName, value))
+		return fmt.Errorf(fmt.Sprintf("Invalid %s: %v", fieldName, value))
 	}
 	return nil
 }
 
 func validateRequiredPathField(value string, fieldName string) error {
 	if len(value) == 0 {
-		return errors.New(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return fmt.Errorf(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 	if _, err := os.Stat(value); err != nil {
-		return errors.New(fmt.Sprintf("Invalid %s: %s (%v)", fieldName, value, err))
+		return fmt.Errorf(fmt.Sprintf("Invalid %s: %s (%v)", fieldName, value, err))
 	}
 	return nil
 }
 
 func validateRequiredStringTypeField(value string, fieldName string, expectedValues ...string) error {
 	if len(strings.TrimSpace(value)) < 1 {
-		return errors.New(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return fmt.Errorf(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 	if len(expectedValues) > 0 {
 		if !contains(expectedValues, value) {
 			expectedValuesStr := strings.Join(expectedValues, ", ")
-			return errors.New(fmt.Sprintf("Invalid value '%s' for field '%s'. Expected values are: %s", value, fieldName, expectedValuesStr))
+			return fmt.Errorf(fmt.Sprintf("Invalid value '%s' for field '%s'. Expected values are: %s", value, fieldName, expectedValuesStr))
 		}
 	}
 	return nil
@@ -102,14 +101,14 @@ func validateStringTypeField(value interface{}, fieldName string) error {
 	}
 	_, ok := value.(string)
 	if !ok {
-		return errors.New(fmt.Sprintf(INVALID_STRING_TYPE, fieldName))
+		return fmt.Errorf(fmt.Sprintf(INVALID_STRING_TYPE, fieldName))
 	}
 	return nil
 }
 
 func validateRequiredStringListField(value []string, fieldName string) error {
 	if len(value) < 1 {
-		return errors.New(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
+		return fmt.Errorf(fmt.Sprintf(INVALID_EMPTY_VALUE, fieldName))
 	}
 	return nil
 }
@@ -118,7 +117,14 @@ func getSingleErrorFromList(errorList *list.List) error {
 	if errorList.Len() > 0 {
 		var errorMsgs []string
 		for e := errorList.Front(); e != nil; e = e.Next() {
-			errorMsgs = append(errorMsgs, e.Value.(string))
+			switch value := e.Value.(type) {
+			case error:
+				errorMsgs = append(errorMsgs, value.Error())
+			case string:
+				errorMsgs = append(errorMsgs, value)
+			default:
+				errorMsgs = append(errorMsgs, fmt.Sprintf("Unknown error type: %v", value))
+			}
 		}
 		return fmt.Errorf(strings.Join(errorMsgs, "\n"))
 	}
@@ -127,27 +133,27 @@ func getSingleErrorFromList(errorList *list.List) error {
 
 func validateUrl(value string, keyName string) error {
 	if len(value) < 1 {
-		return errors.New("Invalid or empty URL: " + keyName)
+		return fmt.Errorf("Invalid or empty URL: " + keyName)
 	}
 	if strings.Contains(value, " ") {
-		return errors.New("Domain name cannot contain spaces: " + keyName)
+		return fmt.Errorf("Domain name cannot contain spaces: " + keyName)
 	}
 	// Check for "http://" or "https://" in the URL
 	if strings.HasPrefix(value, "http://") || strings.HasPrefix(value, "https://") {
-		return errors.New("URL should not include the protocol (http:// or https://): " + keyName)
+		return fmt.Errorf("URL should not include the protocol (http:// or https://): " + keyName)
 	}
 	// Regular expression to validate URLs with or without port number
 	regex := `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(:\d+)?$`
 	match, _ := regexp.MatchString(regex, value)
 	if !match {
-		return errors.New("Invalid URL format: " + keyName)
+		return fmt.Errorf("Invalid URL format: " + keyName)
 	}
 	return nil
 }
 
 func checkForValidS3Bucket(c *HaDeployConfig) error {
 	if c.Architecture.Aws.BackupConfig == "s3" && len(strings.TrimSpace(c.Architecture.Aws.S3BucketName)) < 1 {
-		return errors.New("Invalid or empty s3_bucketName.")
+		return fmt.Errorf("invalid or empty s3_bucketName")
 	}
 	return nil
 }
@@ -156,11 +162,11 @@ func validateAutomateAdminPassword(automateSettings *ConfigAutomateSettings) err
 	if len(automateSettings.AdminPassword) > 0 {
 		val, err := password.NewValidator()
 		if err != nil {
-			return errors.New(err.Error())
+			return fmt.Errorf(err.Error())
 		}
 		passvalErr := val.Validate(automateSettings.AdminPassword)
 		if passvalErr != nil {
-			return errors.New(passvalErr.Error())
+			return fmt.Errorf(passvalErr.Error())
 		}
 	}
 	return nil
@@ -170,7 +176,7 @@ func validateAutomateCerts(automateSettings *ConfigAutomateSettings) error {
 	if len(strings.TrimSpace(automateSettings.RootCA)) < 1 ||
 		len(strings.TrimSpace(automateSettings.PrivateKey)) < 1 ||
 		len(strings.TrimSpace(automateSettings.PublicKey)) < 1 {
-		return errors.New("Automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		return fmt.Errorf("automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 	}
 
 	return checkCertValid([]keydetails{
@@ -183,7 +189,7 @@ func validateAutomateCerts(automateSettings *ConfigAutomateSettings) error {
 func validateChefServerCerts(chefServerSettings *ConfigSettings) error {
 	if len(strings.TrimSpace(chefServerSettings.PrivateKey)) < 1 ||
 		len(strings.TrimSpace(chefServerSettings.PublicKey)) < 1 {
-		return errors.New("ChefServer public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		return fmt.Errorf("chefServer public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 	}
 
 	return checkCertValid([]keydetails{
@@ -228,7 +234,7 @@ func validatePostgresqlCerts(postgresqlSettings *ConfigSettings) error {
 	if len(strings.TrimSpace(postgresqlSettings.RootCA)) < 1 ||
 		len(strings.TrimSpace(postgresqlSettings.PrivateKey)) < 1 ||
 		len(strings.TrimSpace(postgresqlSettings.PublicKey)) < 1 {
-		return errors.New("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		return fmt.Errorf("postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 	}
 
 	return checkCertValid([]keydetails{
@@ -244,7 +250,7 @@ func validateOpensearchCerts(opensearchSettings *ConfigOpensearchSettings) error
 		len(strings.TrimSpace(opensearchSettings.AdminCert)) < 1 ||
 		len(strings.TrimSpace(opensearchSettings.PrivateKey)) < 1 ||
 		len(strings.TrimSpace(opensearchSettings.PublicKey)) < 1 {
-		return errors.New("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+		return fmt.Errorf("opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 	}
 
 	return checkCertValid([]keydetails{
@@ -281,7 +287,7 @@ func validateCertsByIP(certsByIpList *[]CertByIP, nodeType string) error {
 		if len(strings.TrimSpace(element.IP)) < 1 ||
 			len(strings.TrimSpace(element.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(element.PublicKey)) < 1 {
-			return errors.New(nodeType + "root_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false.")
+			return fmt.Errorf(nodeType + "root_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false")
 		}
 		if checkIPAddress(element.IP) != nil {
 			errorList.PushBack(nodeType + " " + element.IP + " for certs is not valid")
@@ -296,7 +302,7 @@ func validateCertsByIP(certsByIpList *[]CertByIP, nodeType string) error {
 
 func checkIPAddress(ip string) error {
 	if net.ParseIP(ip) == nil {
-		return errors.New("ip Address is invalid")
+		return fmt.Errorf("ip Address is invalid")
 	}
 	return nil
 }
