@@ -213,16 +213,15 @@ type AwsExternalOsSettings struct {
 	OsSnapshotUserAccessKeySecret string `toml:"os_snapshot_user_access_key_secret,omitempty"`
 }
 
-func (c *HaDeployConfig) Parse(configFile string) (*HaDeployConfig, error) {
+func (c *HaDeployConfig) Parse(configFile string) error {
 	fileUtils := &fileutils.FileSystemUtils{}
 	templateBytes, err := fileUtils.ReadFile(configFile)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config TOML file: %w", err)
+		return fmt.Errorf("error reading config TOML file: %w", err)
 	}
-	config := HaDeployConfig{}
-	err = ptoml.Unmarshal(templateBytes, &config)
+	err = ptoml.Unmarshal(templateBytes, &c)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling config TOML file: %w", err)
+		return fmt.Errorf("error unmarshalling config TOML file: %w", err)
 	}
-	return &config, nil
+	return nil
 }

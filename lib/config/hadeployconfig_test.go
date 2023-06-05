@@ -834,15 +834,12 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := HaDeployConfig{}
-			got, err := config.Parse(tt.args.configFile)
+			err := config.Parse(tt.args.configFile)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
 			// Compare the actual and expected configuration structs
-			// if !reflect.DeepEqual(got, tt.want) {
-			// 	t.Errorf("got %v, want %v", got, tt.want)
-			// }
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want, config)
 		})
 	}
 }

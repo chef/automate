@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerify(t *testing.T) {
+func TestParseAndVerify(t *testing.T) {
 	type args struct {
 		configFile string
 	}
@@ -69,7 +69,7 @@ func TestVerify(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := HaDeployConfig{}
-			err := config.Verify(tt.args.configFile)
+			err := config.ParseAndVerify(tt.args.configFile)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			} else {
