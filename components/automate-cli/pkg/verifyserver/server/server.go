@@ -6,6 +6,8 @@ import (
 
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/fqdnservice"
+
 	v1 "github.com/chef/automate/components/automate-cli/pkg/verifyserver/server/api/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
@@ -115,7 +117,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
 		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
-		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT))
+		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
+		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT))
 
 	vs := &VerifyServer{
 		Port:    port,

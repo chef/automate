@@ -11,7 +11,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiGroup := vs.App.Group("/api")
 	apiV1Group := apiGroup.Group("/v1")
 	apiChecksGroup := apiV1Group.Group("/checks")
-	apiChecksGroup.Get("/fqdn", vs.Handler.CheckFqdn)
+	apiChecksGroup.Post("/fqdn", vs.Handler.CheckFqdn)
 	apiChecksGroup.Post("/batch-checks", vs.Handler.BatchCheck)
 	apiChecksGroup.Post("/nfs-mount", vs.Handler.NFSMount)
 	apiChecksGroup.Post("/hardware-resource-count", vs.Handler.HardwareResourceCount)
