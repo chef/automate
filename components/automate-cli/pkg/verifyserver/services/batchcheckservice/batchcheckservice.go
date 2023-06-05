@@ -32,16 +32,10 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) m
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
-	// Get remote check trigger resp
+	// Get remote check trigger resp and append to checkTriggerRespMap (keys and values)
 	if len(remoteChecks) > 0 {
-		for _, check := range remoteChecks {
-			resp := ss.RunRemoteCheck(check, config)
-			for ind, _ := range resp {
-				resp[ind].CheckType = check
-				resp[ind].Result.Check = check
-				resp[ind].Result.Message = constants.GetCheckMessageByType(check)
-			}
-			checkTriggerRespMap[check] = resp
+		for key, value := range getRemoteCheckResp(ss, remoteChecks, config) {
+			checkTriggerRespMap[key] = value
 		}
 	}
 	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...))
@@ -182,5 +176,19 @@ func getBastionCheckResp(ss *BatchCheckService, bastionChecks []string, config m
 	}
 	defer close(bastionCheckResultChan)
 
+	return checkTriggerRespMap
+}
+
+func getRemoteCheckResp(ss *BatchCheckService, remoteChecks []string, config models.Config) map[string][]models.CheckTriggerResponse {
+	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
+	for _, check := range remoteChecks {
+		resp := ss.RunRemoteCheck(check, config)
+		for ind, _ := range resp {
+			resp[ind].CheckType = check
+			resp[ind].Result.Check = check
+			resp[ind].Result.Message = constants.GetCheckMessageByType(check)
+		}
+		checkTriggerRespMap[check] = resp
+	}
 	return checkTriggerRespMap
 }
