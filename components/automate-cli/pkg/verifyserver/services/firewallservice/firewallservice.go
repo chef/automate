@@ -26,7 +26,7 @@ type FirewallService struct {
 	port    string
 }
 
-func NewFirewallService(log logger.Logger, timeout time.Duration, port string) IFirewallService {
+func NewFirewallService(log logger.Logger, timeout time.Duration, port string) *FirewallService {
 	return &FirewallService{
 		log:     log,
 		timeout: timeout,
