@@ -48,7 +48,7 @@ func (h *Handler) StartMockServer(c *fiber.Ctx) error {
 func validatePortRange(requestBodyPort int, h *Handler) error {
 	if requestBodyPort < 0 || requestBodyPort > 65535 {
 		errString := "start mock-server request body contains invalid port number"
-		fmt.Print(errString)
+		h.Logger.Error(errString)
 		return errors.New(errString)
 	}
 	return nil

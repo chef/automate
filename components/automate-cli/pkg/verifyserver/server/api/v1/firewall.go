@@ -46,12 +46,15 @@ func (h *Handler) FirewallCheck(c *fiber.Ctx) error {
 	}
 
 	// For https protocol root_ca is mandatory
-	if strings.TrimSpace(reqBody.DestinationServiceProtocol) == constants.HTTPS && strings.TrimSpace(reqBody.RootCert) == "" {
+	if strings.TrimSpace(reqBody.DestinationServiceProtocol) == constants.HTTPS &&
+		strings.TrimSpace(reqBody.RootCert) == "" {
 		return fiber.NewError(http.StatusBadRequest, "root_cert value is mandatory for protocol https")
 	}
 
 	// Supported protocol check
-	if strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.TCP && strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.UDP && strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.HTTPS {
+	if strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.TCP &&
+		strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.UDP &&
+		strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.HTTPS {
 		return fiber.NewError(http.StatusBadRequest, "Please Give Valid Protocol i.e tcp, udp or https")
 	}
 

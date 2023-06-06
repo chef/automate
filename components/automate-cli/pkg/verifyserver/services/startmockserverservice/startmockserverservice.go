@@ -184,7 +184,6 @@ func (s *MockServerService) StartHTTPSServer(port int, cert string, key string) 
 	m.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		privateIP := GetPrivateIP()
 
-		// fmt.Println(privateIP)
 		rw.Header().Set("x-server-ip", privateIP)
 		response := models.HTTPSServerResponse{
 			Status: "ok",
