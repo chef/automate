@@ -54,8 +54,9 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
-successfullyStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+	successfullyStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
 	notStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+
 	if len(remoteChecks) > 0 {
 		startMockServer, err := ss.shouldStartMockServer(remoteChecks)
 		if err != nil {
@@ -70,9 +71,8 @@ successfullyStartedMockServers := []models.StartMockServerFromBatchServiceRespon
 			}
 			return models.BatchCheckResponse{}, errors.New("mock server not started successfull on some nodes")
 		}
-		for _, check := range remoteChecks {
-			resp := ss.RunRemoteCheck(check, config)
-			checkTriggerRespMap[check] = resp
+		for key, value := range getRemoteCheckResp(ss, remoteChecks, config) {
+			checkTriggerRespMap[key] = value
 		}
 	}
 
