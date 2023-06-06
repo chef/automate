@@ -97,21 +97,25 @@ func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDeta
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
 			constants.TCP:   []int{},
+			constants.HTTP:  []int{},
 			constants.UDP:   []int{},
 			constants.HTTPS: []int{},
 		},
 		constants.CHEF_INFRA_SERVER: {
 			constants.TCP:   []int{},
+			constants.HTTP:  []int{},
 			constants.UDP:   []int{},
 			constants.HTTPS: []int{},
 		},
 		constants.POSTGRESQL: {
 			constants.TCP:   []int{},
+			constants.HTTP:  []int{},
 			constants.UDP:   []int{},
 			constants.HTTPS: []int{},
 		},
 		constants.OPENSEARCH: {
 			constants.TCP:   []int{},
+			constants.HTTP:  []int{},
 			constants.UDP:   []int{},
 			constants.HTTPS: []int{},
 		},
@@ -135,6 +139,7 @@ func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDeta
 		for _, ip := range ipArray {
 			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip] = make(map[string][]int)
 			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.TCP] = nodeTypePortMap[nodeType][constants.TCP]
+			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.HTTP] = nodeTypePortMap[nodeType][constants.HTTP]
 			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.UDP] = nodeTypePortMap[nodeType][constants.UDP]
 			nodeTypeAndIpWithPortProtocolMap[nodeType+"_"+ip][constants.HTTPS] = nodeTypePortMap[nodeType][constants.HTTPS]
 		}
@@ -153,6 +158,10 @@ func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDeta
 		}
 		if len(protocolMap[constants.UDP]) != 0 {
 			startMockServerRequestBody.Protocol = constants.UDP
+			ss.constructRequestForStatingMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
+		}
+		if len(protocolMap[constants.HTTP]) != 0 {
+			startMockServerRequestBody.Protocol = constants.HTTP
 			ss.constructRequestForStatingMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
 		}
 		if len(protocolMap[constants.HTTPS]) != 0 {
@@ -240,6 +249,10 @@ func constructUniquePortMap(resp map[string]map[string][]int, nodeTypePortMap *m
 			if resp[nodeType][constants.UDP] != nil {
 				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.UDP], (*nodeTypePortMap)[nodeType][constants.UDP])
 				(*nodeTypePortMap)[nodeType][constants.UDP] = append((*nodeTypePortMap)[nodeType][constants.UDP], newPortsToBeAdded...)
+			}
+			if resp[nodeType][constants.HTTP] != nil {
+				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.HTTP], (*nodeTypePortMap)[nodeType][constants.HTTP])
+				(*nodeTypePortMap)[nodeType][constants.HTTP] = append((*nodeTypePortMap)[nodeType][constants.HTTP], newPortsToBeAdded...)
 			}
 			if resp[nodeType][constants.HTTPS] != nil {
 				newPortsToBeAdded := arrayutils.SliceDifference(resp[nodeType][constants.HTTPS], (*nodeTypePortMap)[nodeType][constants.HTTPS])

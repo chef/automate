@@ -634,9 +634,9 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 4, len(resp))
-	assert.Equal(t, 3, len(resp["automate"]["tcp"]))
+	assert.Equal(t, 2, len(resp["automate"]["tcp"]))
 	assert.Equal(t, 1, len(resp["automate"]["https"]))
-	assert.Equal(t, 3, len(resp["chef-infra-server"]["tcp"]))
+	assert.Equal(t, 2, len(resp["chef-infra-server"]["tcp"]))
 	assert.Equal(t, 1, len(resp["chef-infra-server"]["https"]))
 	assert.Equal(t, 5, len(resp["postgresql"]["tcp"]))
 	assert.Equal(t, 1, len(resp["postgresql"]["udp"]))
