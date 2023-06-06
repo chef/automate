@@ -1,7 +1,9 @@
 package firewallservice_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -79,60 +82,56 @@ func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error
 	return nil
 }
 
+func createDummyServer(t *testing.T, SuccessResponse, FailedResponse, ErrorResponse, InvalidResponse, UnexpectedResponse bool, port string) *httptest.Server {
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == constants.PORT_REACHABLE_API_PATH {
+			body, err := io.ReadAll(r.Body)
+			assert.NoError(t, err)
+
+			var req models.PortReachableRequest
+			err = json.Unmarshal(body, &req)
+			require.NoError(t, err)
+			require.NotZero(t, req)
+			require.NotEmpty(t, req)
+
+			w.WriteHeader(http.StatusOK)
+			if SuccessResponse {
+				w.Write([]byte(PORT_REACHABLE_SUCCESS_RESPONSE))
+			} else if FailedResponse {
+				w.Write([]byte(PORT_REACHABLE_FAILED_RESPONSE))
+			} else if ErrorResponse {
+				w.Write([]byte(PORT_REACHABLE_ERROR_RESPONSE))
+			} else if InvalidResponse {
+				w.Write([]byte(PORT_REACHABLE_INVALID_RESPONSE))
+			} else if UnexpectedResponse {
+				w.Write([]byte(PORT_REACHABLE_UNEXPECTED_RESULT_STRUCT_RESPONSE))
+			}
+		}
+	}))
+	err := startMockServerOnCustomPort(server, port)
+	assert.NoError(t, err)
+	return server
+}
 func TestGetFirewallDetails(t *testing.T) {
 	PortReachablePassServerPort := "3074"
 	PortReachableFailedResponseServerPort := "3075"
 	PortReachableErrorResponseServerPort := "3076"
 	PortReachableInvalidResponseServerPort := "3077"
 	PortReachableUnexpectedResultStructResponseServerPort := "3078"
-	VerifyServerNotRunningPort := "3079"
+	VerifyServerNotRunningPort := "3079" // we are using this port when we don't need to start our mock server
+	// otherwise for some cases even it will fail in the beginning still it will create mock server for that case also
 	httpsTestPort := "3080"
 
-	PortReachablePassMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(PORT_REACHABLE_SUCCESS_RESPONSE))
-	}))
-	err := startMockServerOnCustomPort(PortReachablePassMockServer, PortReachablePassServerPort)
-	assert.NoError(t, err)
-	defer PortReachablePassMockServer.Close()
-
-	portReachableFailedMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(PORT_REACHABLE_FAILED_RESPONSE))
-	}))
-	err = startMockServerOnCustomPort(portReachableFailedMockServer, PortReachableFailedResponseServerPort)
-	assert.NoError(t, err)
-	defer portReachableFailedMockServer.Close()
-
-	portReachableInvalidMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(PORT_REACHABLE_INVALID_RESPONSE))
-	}))
-	err = startMockServerOnCustomPort(portReachableInvalidMockServer, PortReachableInvalidResponseServerPort)
-	assert.NoError(t, err)
-	defer portReachableInvalidMockServer.Close()
-
-	portReachableUnexpectedResultStructMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(PORT_REACHABLE_UNEXPECTED_RESULT_STRUCT_RESPONSE))
-	}))
-	err = startMockServerOnCustomPort(portReachableUnexpectedResultStructMockServer, PortReachableUnexpectedResultStructResponseServerPort)
-	assert.NoError(t, err)
-	defer portReachableUnexpectedResultStructMockServer.Close()
-
-	portReachableErrorMockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(PORT_REACHABLE_ERROR_RESPONSE))
-	}))
-	err = startMockServerOnCustomPort(portReachableErrorMockServer, PortReachableErrorResponseServerPort)
-	assert.NoError(t, err)
-	defer portReachableErrorMockServer.Close()
-
 	tests := []struct {
-		TestName         string
-		ReqBody          models.FirewallRequest
-		VerifyServerPort string
-		ExpectedRespBody models.FirewallResponse
+		TestName           string
+		ReqBody            models.FirewallRequest
+		VerifyServerPort   string
+		ExpectedRespBody   models.FirewallResponse
+		SuccessResponse    bool
+		FailedResponse     bool
+		ErrorResponse      bool
+		InvalidResponse    bool
+		UnexpectedResponse bool
 	}{
 		{
 			TestName: "Destination IP is reachable from source Node for given port",
@@ -150,15 +149,16 @@ func TestGetFirewallDetails(t *testing.T) {
 					{
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        true,
-						SuccessMsg:    fmt.Sprintf(constants.FIREWALL_SUCCESS_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
+						SuccessMsg:    firewallservice.GetFirewallSuccessMsg(constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 				},
 			},
+			SuccessResponse: true,
 		},
 		{
-			TestName: "Destination IP is not reachable from source Node for given port because verify server not running there",
+			TestName: "Destination IP is not reachable from source Node for given port because verify server not running",
 			ReqBody: models.FirewallRequest{
 				SourceNodeIP:               LOCALHOST,
 				DestinationNodeIP:          VALID_IP,
@@ -174,8 +174,8 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, httpsTestPort, VALID_IP, LOCALHOST),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, httpsTestPort, LOCALHOST),
 					},
 				},
 			},
@@ -197,11 +197,12 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, httpsTestPort, VALID_IP, LOCALHOST),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, httpsTestPort, LOCALHOST),
 					},
 				},
 			},
+			FailedResponse: true,
 		},
 		{
 			TestName: "Destination IP is not reachable from source Node for given port because port-reachable API giving Error Response",
@@ -220,11 +221,12 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, httpsTestPort, VALID_IP, LOCALHOST),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, httpsTestPort, LOCALHOST),
 					},
 				},
 			},
+			ErrorResponse: true,
 		},
 		{
 			TestName: "Destination IP is not reachable from source Node for given port because port-reachable API giving Invalid Response",
@@ -243,11 +245,12 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, httpsTestPort, VALID_IP, LOCALHOST),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, httpsTestPort, LOCALHOST),
 					},
 				},
 			},
+			InvalidResponse: true,
 		},
 		{
 			TestName: "Destination IP is not reachable from source Node for given port because port-reachable API giving Unexpected Result Struct Value Response",
@@ -266,11 +269,12 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, httpsTestPort, VALID_IP, LOCALHOST),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, httpsTestPort, LOCALHOST),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, httpsTestPort, LOCALHOST),
 					},
 				},
 			},
+			UnexpectedResponse: true,
 		},
 		{
 			TestName: "Destination IP is not reachable from source Node for given port because Source Node IP is not correct",
@@ -281,7 +285,7 @@ func TestGetFirewallDetails(t *testing.T) {
 				DestinationServiceProtocol: constants.HTTPS,
 				RootCert:                   "CA_CERT",
 			},
-			VerifyServerPort: PortReachableUnexpectedResultStructResponseServerPort,
+			VerifyServerPort: VerifyServerNotRunningPort,
 			ExpectedRespBody: models.FirewallResponse{
 				Passed: false,
 				Checks: []models.Checks{
@@ -289,8 +293,8 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, httpsTestPort, "%%"),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, httpsTestPort, VALID_IP, "%%"),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, httpsTestPort, "%%"),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, httpsTestPort, "%%"),
 					},
 				},
 			},
@@ -304,7 +308,7 @@ func TestGetFirewallDetails(t *testing.T) {
 				DestinationServiceProtocol: constants.HTTPS,
 				RootCert:                   "CA_CERT",
 			},
-			VerifyServerPort: PortReachableUnexpectedResultStructResponseServerPort,
+			VerifyServerPort: VerifyServerNotRunningPort,
 			ExpectedRespBody: models.FirewallResponse{
 				Passed: false,
 				Checks: []models.Checks{
@@ -312,8 +316,8 @@ func TestGetFirewallDetails(t *testing.T) {
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.FIREWALL_ERROR_MESSAGE, constants.HTTPS, VALID_IP, INVALID_PORT_NUMBER, LOCALHOST),
-						ResolutionMsg: fmt.Sprintf(constants.FIREWALL_RESOLUTION_MESSAGE, INVALID_PORT_NUMBER, VALID_IP, LOCALHOST),
+						ErrorMsg:      firewallservice.GetFirewallErrorMsg(constants.HTTPS, VALID_IP, INVALID_PORT_NUMBER, LOCALHOST),
+						ResolutionMsg: firewallservice.GetFirewallResolutionMsg(VALID_IP, INVALID_PORT_NUMBER, LOCALHOST),
 					},
 				},
 			},
@@ -322,6 +326,10 @@ func TestGetFirewallDetails(t *testing.T) {
 
 	for _, e := range tests {
 		t.Run(e.TestName, func(t *testing.T) {
+			if e.VerifyServerPort != VerifyServerNotRunningPort {
+				server := createDummyServer(t, e.SuccessResponse, e.FailedResponse, e.ErrorResponse, e.InvalidResponse, e.UnexpectedResponse, e.VerifyServerPort)
+				defer server.Close()
+			}
 			fw := firewallservice.NewFirewallService(logger.NewTestLogger(), time.Duration(TIMEOUT), e.VerifyServerPort)
 			assert.NotNil(t, fw)
 			resp := fw.GetFirewallDetails(e.ReqBody)

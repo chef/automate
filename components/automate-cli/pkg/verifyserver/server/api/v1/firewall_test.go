@@ -1,7 +1,6 @@
 package v1_test
 
 import (
-	"fmt"
 	"io"
 	"net/http/httptest"
 	"strings"
@@ -49,7 +48,7 @@ func SetupMockFirewallService() firewallservice.IFirewallService {
 					{
 						Title:         constants.FIREWALL_TITLE,
 						Passed:        true,
-						SuccessMsg:    fmt.Sprintf(constants.FIREWALL_SUCCESS_MESSAGE, constants.TCP, "13.39.148.115", "7432", "15.237.128.20"),
+						SuccessMsg:    firewallservice.GetFirewallSuccessMsg(constants.TCP, "13.39.148.115", "7432", "15.237.128.20"),
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
