@@ -97,15 +97,11 @@ func (c *Config) appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, option
 	if certsByIP != nil {
 		for _, certByIP := range *certsByIP {
 			nodeCert := NodeCert{
-				IP:   certByIP.IP,
-				Key:  certByIP.PublicKey,
-				Cert: rootCA,
-			}
-			if adminKey != "" {
-				nodeCert.AdminKey = adminKey
-			}
-			if adminCert != "" {
-				nodeCert.AdminCert = adminCert
+				IP:        certByIP.IP,
+				Key:       certByIP.PublicKey,
+				Cert:      rootCA,
+				AdminKey:  adminKey,
+				AdminCert: adminCert,
 			}
 			c.Certificate.Nodes = append(c.Certificate.Nodes, nodeCert)
 		}
