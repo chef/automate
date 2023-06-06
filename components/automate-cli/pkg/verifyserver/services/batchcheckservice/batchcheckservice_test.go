@@ -3,6 +3,7 @@ package batchcheckservice
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"errors"
 	"io/ioutil"
@@ -103,6 +104,23 @@ func TestBatchCheckService(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			description:                          "Batch check service returns error when mock server not started on some nodes",
+			totalIpsCount:                        6,
+			chefServerIpArray:                    []string{"1.2.3.4"},
+			avoidSuccessResponse:                 true,
+			shouldStartMockServerOnSomeNodesOnly: true,
+			checkForError:                        true,
+			mockServerPort:                       "1234",
+			statusApiResponse: `{
+				"status": "SUCCESS",
+				"result": {
+					"status": "OK",
+					"services": [],
+					"error": "error getting services from hab svc status"
+				}
+			}`,
 		},
 		{
 			description:          "Batch check service returns error when status api response body parse fails",
@@ -726,6 +744,10 @@ func TestBatchCheckService(t *testing.T) {
 			if len(test.checksToExecute) > 0 {
 				checksToExecute = test.checksToExecute
 			}
+
+			if test.description == "Batch check service returns error when mock server not started on some nodes" {
+				fmt.Println("hello")
+			}
 			resp, err := ss.BatchCheck(checksToExecute, models.Config{
 				Hardware: models.Hardware{
 					AutomateNodeCount:        1,
@@ -798,12 +820,38 @@ func TestStartMockServer(t *testing.T) {
 	assert.Equal(t, len(failedServers), 0)
 }
 
-func TestGetDeploymentStatePostDeploy(t *testing.T) {
+func TestStopMockServerOnHostAndPort(t *testing.T) {
 	ss := getBatchCheckServiceInstance()
 
 	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), false)
 	ss.StopMockServerOnHostAndPort("1.2.3.4", "tcp", 1234)
 	assert.NotNil(t, ss.log)
+}
+
+func TestGetDeploymentStateReturnsErrorWhenAutomateNotReachable(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
+	_, err := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount: 2,
+			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
+		},
+	})
+	assert.NotNil(t, "received no response for status api from any automate nodes", err.Error())
+}
+
+func TestGetDeploymentStateReturnsErrorNoAutomateNodePresent(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
+	_, err := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount: 0,
+			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
+		},
+	})
+	assert.NotNil(t, "automate nodes not present", err.Error())
 }
 
 func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
@@ -816,7 +864,18 @@ func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	deployState, _ := ss.getDeploymentState()
+	deployState, _ := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
 	assert.Equal(t, "post-deploy", deployState)
 }
 
@@ -830,7 +889,18 @@ func TestStopMockServerOnHostAndPortPostDeployWhenServicesStopped(t *testing.T) 
 			"error": ""
 		}
 	}`, nil, false)
-	deployState, _ := ss.getDeploymentState()
+	deployState, _ := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
 	assert.Equal(t, "post-deploy", deployState)
 }
 
@@ -845,7 +915,18 @@ func TestShouldStartMockServer(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"})
+	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"}, models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
 	assert.Equal(t, false, shouldStartMockServer)
 }
 

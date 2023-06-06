@@ -22,10 +22,6 @@ type IBatchCheckService interface {
 	BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error)
 }
 
-type IStartMockServer interface {
-	TriggerRequest(url string, mockServerRequestBody models.MockServerRequestBody) models.StartMockServerFromBatchServiceResponse
-}
-
 type BatchCheckService struct {
 	CheckTrigger      trigger.CheckTrigger
 	port              string
@@ -58,7 +54,7 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 	notStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
 
 	if len(remoteChecks) > 0 {
-		startMockServer, err := ss.shouldStartMockServer(remoteChecks)
+		startMockServer, err := ss.shouldStartMockServer(remoteChecks, config)
 		if err != nil {
 			return models.BatchCheckResponse{}, err
 		}
@@ -85,9 +81,9 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...)), nil
 }
 
-func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string) (bool, error) {
+func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string, config models.Config) (bool, error) {
 	if stringutils.SliceContains(remoteChecks, constants.FIREWALL) || stringutils.SliceContains(remoteChecks, constants.FQDN) {
-		deploymentState, err := ss.getDeploymentState()
+		deploymentState, err := ss.getDeploymentState(config)
 		if err != nil {
 			ss.log.Error("Error while calling status api from batch check service:", err)
 			return false, err
@@ -205,24 +201,26 @@ func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host string, sta
 		ss.log.Error(err)
 		return
 	}
-	cert, err := ss.fileUtils.ReadFile("certificate.pem")
+	certificateFileName := "certificate.pem"
+	privateKeyFileName := "private_key.pem"
+	cert, err := ss.fileUtils.ReadFile(certificateFileName)
 	if err != nil {
 		ss.log.Error("Unable to read certificate.pem file", err)
-		defer ss.fileUtils.DeleteFile("certificate.pem")
+		defer ss.fileUtils.DeleteFile(certificateFileName)
 		return
 	}
 	rootCA := string(cert[:])
 	startMockServerRequestBody.Cert = rootCA
-	defer ss.fileUtils.DeleteFile("certificate.pem")
-	key, err := ss.fileUtils.ReadFile("private_key.pem")
+	defer ss.fileUtils.DeleteFile(certificateFileName)
+	key, err := ss.fileUtils.ReadFile(privateKeyFileName)
 	if err != nil {
 		ss.log.Error("Unable to read private_key.pem file", err)
-		defer ss.fileUtils.DeleteFile("private_key.pem")
+		defer ss.fileUtils.DeleteFile(privateKeyFileName)
 		return
 	}
 	privateKey := string(key[:])
 	startMockServerRequestBody.Key = privateKey
-	defer ss.fileUtils.DeleteFile("private_key.pem")
+	defer ss.fileUtils.DeleteFile(privateKeyFileName)
 }
 
 func constructUniquePortMap(resp map[string]map[string][]int, nodeTypePortMap *map[string]map[string][]int) {
@@ -267,23 +265,33 @@ func (ss *BatchCheckService) GetPortsToOpenForCheck(check string) map[string]map
 	return ss.getCheckInstance(check).GetPortsForMockServer()
 }
 
-func (ss *BatchCheckService) getDeploymentState() (string, error) {
-	url := fmt.Sprintf("%s:%s%s", constants.LOCAL_HOST_URL, ss.port, constants.STATUS_API_PATH)
-	resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
-	if err != nil {
-		ss.log.Error("Error while calling status api from batch check service:", err)
-		return "", err
+func (ss *BatchCheckService) getDeploymentState(config models.Config) (string, error) {
+	if config.Hardware.AutomateNodeCount > 0 {
+		for index, ip := range config.Hardware.AutomateNodeIps {
+			url := fmt.Sprintf("http://%s:%s%s", ip, ss.port, constants.STATUS_API_PATH)
+			resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
+			if err != nil && index < len(config.Hardware.AutomateNodeIps)-1 {
+				ss.log.Error("Error while calling status api from batch check service:", err)
+				continue
+			}
+			if err != nil && index == len(config.Hardware.AutomateNodeIps)-1 {
+				errMsg := "received no response for status api from any automate nodes"
+				ss.log.Error(errMsg)
+				return "", errors.New(errMsg)
+			}
+			var statusApiResponse models.StatusApiResponse
+			err = json.NewDecoder(resp.Body).Decode(&statusApiResponse)
+			if err != nil {
+				ss.log.Error("Error while reading unmarshalling response of status api from batch check service:", err)
+				return "", err
+			}
+			if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
+				return constants.PRE_DEPLOY, nil
+			}
+			return constants.POST_DEPLOY, nil
+		}
 	}
-	var statusApiResponse models.StatusApiResponse
-	err = json.NewDecoder(resp.Body).Decode(&statusApiResponse)
-	if err != nil {
-		ss.log.Error("Error while reading unmarshalling response of status api from batch check service:", err)
-		return "", err
-	}
-	if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
-		return constants.PRE_DEPLOY, nil
-	}
-	return constants.POST_DEPLOY, nil
+	return "", errors.New("automate nodes not present")
 }
 
 func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, startMockServerRequestBody models.MockServerRequestBody, respChan chan models.StartMockServerFromBatchServiceResponse) {
