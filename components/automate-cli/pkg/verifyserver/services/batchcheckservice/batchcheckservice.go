@@ -154,6 +154,7 @@ func constructResult(ipMap map[string][]models.CheckTriggerResponse) []models.Ba
 }
 
 func getBastionCheckResp(ss *BatchCheckService, bastionChecks []string, config models.Config) map[string][]models.CheckTriggerResponse {
+
 	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
 	bastionCheckResultChan := make(chan []models.CheckTriggerResponse, len(bastionChecks))
 
@@ -164,11 +165,18 @@ func getBastionCheckResp(ss *BatchCheckService, bastionChecks []string, config m
 
 	// iterate over the chan and take the value out and populate checkTriggerRespMap
 	for i := 0; i < len(bastionChecks); i++ {
+		var message string
 		result := <-bastionCheckResultChan
+
+		if len(result) > 0 {
+			message = constants.GetCheckMessageByName(result[0].CheckType)
+		}
+
 		for i, _ := range result {
 			result[i].Result.Check = result[i].CheckType
-			result[i].Result.Message = constants.GetCheckMessageByType(result[i].Result.Check)
+			result[i].Result.Message = message
 		}
+
 		if len(result) > 0 {
 			checkTriggerRespMap[result[0].CheckType] = result
 		}
@@ -184,7 +192,7 @@ func getRemoteCheckResp(ss *BatchCheckService, remoteChecks []string, config mod
 	for _, check := range remoteChecks {
 		resp := ss.RunRemoteCheck(check, config)
 
-		message := constants.GetCheckMessageByType(check)
+		message := constants.GetCheckMessageByName(check)
 
 		for ind, _ := range resp {
 			resp[ind].CheckType = check

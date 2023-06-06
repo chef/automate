@@ -109,7 +109,7 @@ var checkMap map[string]models.CheckAndType = map[string]models.CheckAndType{
 	},
 }
 
-func GetCheckMessageByType(CheckName string) string {
+func GetCheckMessageByName(CheckName string) string {
 	val, ok := checkMap[CheckName]
 	if !ok {
 		return ""
