@@ -628,3 +628,18 @@ func TestFirewallCheck_Run(t *testing.T) {
 
 	}
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewFirewallCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 4, len(resp))
+	assert.Equal(t, 3, len(resp["automate"]["tcp"]))
+	assert.Equal(t, 1, len(resp["automate"]["https"]))
+	assert.Equal(t, 3, len(resp["chef-infra-server"]["tcp"]))
+	assert.Equal(t, 1, len(resp["chef-infra-server"]["https"]))
+	assert.Equal(t, 5, len(resp["postgresql"]["tcp"]))
+	assert.Equal(t, 1, len(resp["postgresql"]["udp"]))
+	assert.Equal(t, 4, len(resp["opensearch"]["tcp"]))
+	assert.Equal(t, true, true)
+}

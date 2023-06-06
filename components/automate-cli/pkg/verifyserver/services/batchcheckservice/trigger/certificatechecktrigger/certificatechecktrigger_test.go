@@ -484,3 +484,10 @@ func TestCertificateCheck_Run(t *testing.T) {
 	})
 
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}

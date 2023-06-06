@@ -26,6 +26,11 @@ func (eoc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTrig
 	return runCheckForOpensearch(config, eoc.port, eoc.log)
 }
 
+func (ss *ExternalOpensearchCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
 func runCheckForOpensearch(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Opensearch check for automate and chef server nodes")
 	req := getOpensearchRequest(config.ExternalOS)

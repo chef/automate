@@ -296,3 +296,10 @@ func Test_setHostAsOpensearchInResponse(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewOpensearchS3BucketAccessCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}

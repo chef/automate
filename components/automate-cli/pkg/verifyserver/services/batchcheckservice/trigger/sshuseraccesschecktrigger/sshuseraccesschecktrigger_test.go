@@ -300,3 +300,10 @@ func GetSshRequest() models.SShUserRequest {
 	}
 	return request
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}

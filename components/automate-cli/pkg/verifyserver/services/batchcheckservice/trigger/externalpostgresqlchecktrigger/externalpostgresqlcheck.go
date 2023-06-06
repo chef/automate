@@ -27,6 +27,11 @@ func (epc *ExternalPostgresCheck) Run(config models.Config) []models.CheckTrigge
 	return runCheckForPostgresql(config, epc.port, epc.log)
 }
 
+func (ss *ExternalPostgresCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
 func runCheckForPostgresql(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Postgresql check for automate and chef server nodes")
 	req := getPostgresRequest(config.ExternalPG)

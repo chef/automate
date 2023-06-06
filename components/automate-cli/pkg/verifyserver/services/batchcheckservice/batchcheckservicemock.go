@@ -199,11 +199,11 @@ func SetupMockFirewallCheck() trigger.ICheck {
 		GetPortsForMockServerFunc: func() map[string]map[string][]int {
 			nodeTypePortMap := map[string]map[string][]int{
 				constants.AUTOMATE: {
-					constants.TCP:   []int{9631, 9638, 80},
+					constants.TCP:   []int{9631, 9638},
 					constants.HTTPS: []int{443},
 				},
 				constants.CHEF_INFRA_SERVER: {
-					constants.TCP:   []int{9631, 9638, 80},
+					constants.TCP:   []int{9631, 9638},
 					constants.HTTPS: []int{443},
 				},
 				constants.POSTGRESQL: {

@@ -525,3 +525,13 @@ func getRequest() models.FqdnRequest {
 		RootCert: certificate.RootCert,
 	}
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewFqdnCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 2, len(resp))
+	assert.Equal(t, 1, len(resp["automate"]["https"]))
+	assert.Equal(t, 1, len(resp["chef-infra-server"]["https"]))
+	assert.Equal(t, true, true)
+}
