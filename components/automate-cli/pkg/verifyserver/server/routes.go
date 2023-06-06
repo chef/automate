@@ -19,6 +19,8 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Post("/s3-config", vs.Handler.GetS3Config)
 	apiChecksGroup.Post("/port-reachable", vs.Handler.PortReachable)
 	apiChecksGroup.Post("/external-postgresql", vs.Handler.CheckExternalPostgresql)
+	apiChecksGroup.Post("/certificate", vs.Handler.ValidateCertificate)
+
 	apiChecksGroup.Get("/system-user", vs.Handler.CheckSystemUser)
 	apiChecksGroup.Get("/system-resource", vs.Handler.GetSystemResource)
 	apiChecksGroup.Post("/external-opensearch", vs.Handler.ExternalOpensearch)

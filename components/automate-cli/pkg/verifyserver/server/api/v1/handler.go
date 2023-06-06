@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/certificatevalidation"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
@@ -38,6 +39,7 @@ type Handler struct {
 	ExternalOpensearchService    externalopensearchservice.IExternalOpensearchService
 	FqdnService                  fqdnservice.IFqdnService
 	FirewallService              firewallservice.IFirewallService
+	ValidateCertificateService   certificatevalidation.IValidateCertificateService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -120,5 +122,10 @@ func (h *Handler) AddExternalOpensearchService(eos externalopensearchservice.IEx
 
 func (h *Handler) AddFirewallService(fw firewallservice.IFirewallService) *Handler {
 	h.FirewallService = fw
+	return h
+}
+
+func (h *Handler) AddCertificateValidation(vc certificatevalidation.IValidateCertificateService) *Handler {
+	h.ValidateCertificateService = vc
 	return h
 }
