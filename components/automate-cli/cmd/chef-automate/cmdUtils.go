@@ -478,7 +478,7 @@ func appendChildFileToParentFile(hostIp, parent, child string) (string, error) {
 	}
 
 	fileContent := string(output)
-	start := fmt.Sprintf("Output for Host IP %s : \n%s\n", hostIp, fileContent)
+	start := fmt.Sprintf("%s\n", fileContent)
 
 	_, err = f.WriteString(start)
 
@@ -507,7 +507,7 @@ func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode b
 
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
-		err := ExecuteCustomCmdInServiceNode(outFiles, nodeObject.InputFile, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		err := ExecuteCustomCmdInServiceNode(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
 		if err != nil {
 			return err
 		}
@@ -521,19 +521,29 @@ func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode b
 }
 
 // Execute 'config show' command in specific service and fetch the output file to bastion
-func ExecuteCustomCmdInServiceNode(outputFiles []string, inputFiles []string, service string, cmdString string, singleNode bool) error {
+func ExecuteCustomCmdInServiceNode(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
 
 	nodeMap := NewNodeTypeAndCmd()
+	fmt.Println("inputFiles: ", inputFiles)
 	cmd := ServiceNodeConstructor(nodeMap, cmdString, outputFiles, singleNode)
 	if service == POSTGRESQL {
 		cmd.CmdInputs.Args = inputFiles
-		cmd.PreExec = prePatchCheckForPostgresqlNodes
+		if len(inputFiles) > 0 {
+			cmd.PreExec = prePatchCheckForPostgresqlNodes
+			cmd.CmdInputs.InputFilesPrefix = inputFilesPrefix
+		}
 	} else if service == OPENSEARCH {
 		cmd.CmdInputs.Args = inputFiles
-		cmd.PreExec = prePatchCheckForOpensearch
+		if len(inputFiles) > 0 {
+			cmd.PreExec = prePatchCheckForOpensearch
+			cmd.CmdInputs.InputFilesPrefix = inputFilesPrefix
+		}
 	} else {
 		cmd.CmdInputs.Args = inputFiles
-		cmd.PreExec = prePatchCheckForFrontendNodes
+		if len(inputFiles) > 0 {
+			cmd.PreExec = prePatchCheckForFrontendNodes
+			cmd.CmdInputs.InputFilesPrefix = inputFilesPrefix
+		}
 	}
 	switch service {
 	case AUTOMATE:

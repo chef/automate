@@ -192,21 +192,20 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	// err := SaveConfigInBastion()
-	// if err != nil {
-	// 	return err
-	// }
-	// // return nil
-	// err = ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
-	// if err != nil {
-	// 	return err
-	// }
-	// argsdeploy := []string{"-y"}
-	// err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	// if err != nil {
-	// 	return err
-	// }
-	err := syncConfigToAllNodes()
+	err := SaveConfigInBastion()
+	if err != nil {
+		return err
+	}
+	err = ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
+	if err != nil {
+		return err
+	}
+	argsdeploy := []string{"-y"}
+	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	if err != nil {
+		return err
+	}
+	err = syncConfigToAllNodes()
 	if err != nil {
 		return err
 	}
@@ -270,24 +269,25 @@ func (ani *AddNodeOnPremImpl) validateConnection(ip string) error {
 }
 
 type NodeObject struct {
-	CmdString  string
-	OutputFile []string
-	InputFile  []string
-	NodeType   string
+	CmdString       string
+	OutputFile      []string
+	InputFile       []string
+	InputFilePrefix string
+	NodeType        string
 }
 
-func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile []string, nodeType string) *NodeObject {
-	return &NodeObject{cmdString, outFile, inputFile, nodeType}
+func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile []string, inputFilePrefix string, nodeType string) *NodeObject {
+	return &NodeObject{cmdString, outFile, inputFile, inputFilePrefix, nodeType}
 }
 
 // Save all config from each services to Bastion server annd move it to WORKSPACE dir
 func SaveConfigInBastion() error {
 
 	nodeObjects := []*NodeObject{
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, AUTOMATE),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, CHEF_SERVER),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, POSTGRESQL),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, OPENSEARCH),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, "", AUTOMATE),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, "", CHEF_SERVER),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, "", POSTGRESQL),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, "", OPENSEARCH),
 	}
 	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
@@ -295,20 +295,13 @@ func SaveConfigInBastion() error {
 func syncConfigToAllNodes() error {
 	timestamp := time.Now().Format("20060102150405")
 	fmt.Println("====================================================================")
-	fmt.Println("syncConfigToAllNodes")
-	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+AUTOMATE_TOML, DATE_FORMAT)
-	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, "frontend"+"_"+timestamp+"_"+CHEF_SERVER_TOML, DATE_FORMAT)
-	postgresql := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, "postgresql", "%s", "postgresql"+"_"+timestamp+"_"+POSTGRESQL_TOML)
-	opensearch := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, "opensearch", "%s", "opensearch"+"_"+timestamp+"_"+OPENSEARCH_TOML)
-	fmt.Println("frontend: ", frontend)
-	fmt.Println("chefserver: ", chefserver)
-	fmt.Println("postgresql: ", postgresql)
-	fmt.Println("opensearch: ", opensearch)
+	fmt.Println("sync Config to all frontend nodes")
+	frontendPrefix := "frontend" + "_" + timestamp + "_"
+	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
+	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
 	nodeObjects := []*NodeObject{
-		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, AUTOMATE),
-		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, CHEF_SERVER),
-		NewNodeObjectWithOutputFile(postgresql, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + POSTGRESQL_TOML}, POSTGRESQL),
-		NewNodeObjectWithOutputFile(opensearch, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + OPENSEARCH_TOML}, OPENSEARCH),
+		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, frontendPrefix, AUTOMATE),
+		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, frontendPrefix, CHEF_SERVER),
 	}
 	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
 }
