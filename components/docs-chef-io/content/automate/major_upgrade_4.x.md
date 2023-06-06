@@ -746,27 +746,28 @@ To restore your Air-Gapped bundle, run the following command:
 sudo chef-automate backup restore  --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
 ```
 
-Click [here](/automate/restore/) to know more about the Restore methods.
+For more information, see [Restore Methods](/automate/restore/).
 
 To start the upgrade, use the **backup ID** from the backup created. In case the restore fails even after upgrading the Chef Automate version, follow the steps given below:
 
 1. Uninstall Chef Automate.
 
-```sh
-sudo chef-automate uninstall
-```
+    ```sh
+    sudo chef-automate uninstall
+    ```
 
-2. Install the last major version (`3.0.49`) using the [air-gapped installation](/automate/airgapped_installation/) process.
+1. Install the last major version (`3.0.49`) using the [air-gapped installation](/automate/airgapped_installation/) process.
 
-3. Restore the backup:
+1. Restore the backup:
 
-```sh
-sudo chef-automate backup restore <backup_id>
-```
+    ```sh
+    sudo chef-automate backup restore <backup_id>
+    ```
 
 Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
 
 ### Adding Custom Configuration to optimize OpenSearch performance
+
 To add custom configurations or optimizing OpenSearch performance please refer to [Custom OpenSearch configuration docs](/automate/opensearch/#configure-embedded-opensearch).

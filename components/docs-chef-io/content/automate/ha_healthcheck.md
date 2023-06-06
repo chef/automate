@@ -132,12 +132,12 @@ sorthands for --postgresql is --pg and -p
 
 {{< warning >}}
 
-- For certificate rotation, don't use config patch. Instead, the cert-rotate command can be used. To learn more about certificate rotation, click [here](/automate/ha_cert_rotaion)
+- For certificate rotation, don't use config patch. Instead, the cert-rotate command can be used. To learn more about certificate rotation, see [Certificate Rotation](/automate/ha_cert_rotation).
 - While patching the same from **the provision host**, structures such as TLS from OpenSearch configuration toml file and SSL from PostgreQL configuration toml file will be ignored.
 
 {{< /warning >}}
 
-- Collect the Gatherlogs for Automate HA cluster, and run the command from the bastion node.  
+- Collect the Gatherlogs for Automate HA cluster, and run the command from the bastion node.
   - logs are collected at `/var/tmp`
 
 ```cmd

@@ -68,4 +68,4 @@ The list of parameters are as follows:
 | bookshelf['aws_secret_key']                    |                                       |                                 | ```[bookshelf.v1.sys.bookshelf]```<br>```aws_secret_key=""```      |
 | oc_chef_wm['health_ping_timeout']               | 400                                       | 400                                 | ```[erchef.v1.sys.health]```<br>```health_ping_timeout=400```         |
 
-Click [here](https://docs.chef.io/server/config_rb_server_optional_settings/) for the detailed description of a above parameters.
+To know more about the above parameters, see [chef-server.rb Optional Settings](https://docs.chef.io/server/config_rb_server_optional_settings/).

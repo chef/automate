@@ -29,7 +29,7 @@ To view the logs, run the following command:
 journalctl -u chef-automate -f
 ```
 
-Click [here](/automate/log_management) to learn more about Log Management.
+For more information, see [Log Management](/automate/log_management).
 
 ## Prerequisites
 
@@ -143,7 +143,7 @@ Restart your splunk forwarder using the following command:
 [system@ABC]# ./splunk restart
 ```
 
-The above step will let you view the `automate.log` file in your splunk forwarder. Click [here](https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html) to know about the Splunk Forwarder.
+The above step will let you view the `automate.log` file in your splunk forwarder. For more information, see [Splunk Forwarder](https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html) page.
 
 ## Log File
 

@@ -52,7 +52,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 {{< warning >}}
 
-- PLEASE DONOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
+- PLEASE DO NOT MODIFY THE WORKSPACE PATH it should always be "/hab/a2_deploy_workspace"
 - We currently don't support AD managed users in nodes. We only support local linux users.
 - If you have configured sudo password for the user, then you need to create an environment variable `sudo_password` and set the password as the value of the variable. Example: `export sudo_password=<password>`. And then run all sudo commands with `sudo -E or --preserve-env` option. Example: `sudo -E ./chef-automate deploy config.toml --airgap-bundle automate.aib`. This is required for the `chef-automate` CLI to run the commands with sudo privileges. Please refer [this](/automate/ha_sudo_password/) for details.
 
@@ -93,7 +93,7 @@ Run the following steps on Bastion Host Machine:
 
    {{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever. {{< /note >}}
 
-1. Update Config with relevant data. Click [here](#sample-config) for sample config
+1. Update Config with relevant data. To know more, see [Sample Config](#sample-config)
 
    ```bash
    vi config.toml
@@ -130,7 +130,7 @@ Run the following steps on Bastion Host Machine:
      - Set `postgresql_ebs_volume_iops`, `postgresql_ebs_volume_size` based on your load needs.
      - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`, `opensearch_ebs_volume_type`, `postgresql_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-   {{< note >}} Click [here](/automate/ha_cert_deployment) to know more on adding certificates for services during deployment. {{< /note >}}
+   {{< note >}} To know more on above deployment procedure, see [Add Custom Certificate During Deployment](/automate/ha_cert_deployment). {{< /note >}}
 
 1. Continue with the provisioning the infra after updating config:
 
@@ -391,7 +391,7 @@ For example, if you have patched any external configurations like SAML or LDAP, 
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) for the reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, refer to [Replace Node in Automate HA Cluster](/automate/ha_onprim_deployment_procedure/#replace-node-in-automate-ha-cluster) section for reference.
 
 - Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 

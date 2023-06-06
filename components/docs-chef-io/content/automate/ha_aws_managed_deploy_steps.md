@@ -27,11 +27,11 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 - If you want to use Default VPC, then you have to create Public and Private Subnet, if subnet are not available. Please refer [this](https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html)
 - We need 3 private and 3 public subnet in a vpc (1 subnet for each AZ). As of now we support dedicate subnet for each AZ.
 - We recommend to create a new VPC. And Bastion should be in the same VPC.
-- Setup AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node going to be created. Click [here](/automate/create_amazon_rds/) to know more.
-- Setup AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node going to be created. Click [here](/automate/create_amazon_opensearch/) to know more.
+- Setup AWS RDS PostgreSQL 13.5-R1 in the same VPC where we have the basion and automate ha node going to be created. To know more, see [Creating and connecting to a PostgreSQL DB instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) page.
+- Setup AWS OpenSearch 1.3 in the same VPC where we have the basion and automate ha node going to be created. To know more, see [Creating and managing Amazon OpenSearch Service domains](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) page.
 - For Backup with Managed Service we have only one option which is `Amazon S3`.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#enabling-opensearch-backup-restore) to know more.
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to know more on how to create IAM Users.
+- For Backup and Restore with Managed Service. For more information, see [Enabling OpenSearch Backup restore](/automate/managed_services/#enabling-opensearch-backup-restore) section.
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`. For more information, see [IAM Users](/automate/ha_iam_user/) page.
 - Preferred key type will be ed25519
 - Make sure your linux has `sysctl` utility available in all nodes.
 

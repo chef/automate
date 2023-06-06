@@ -98,7 +98,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
     "
     ```
 
-1. Update Config with relevant data. Click [here](#sample-config) for sample config
+1. Update Config with relevant data. For more information, see [Sample Config](#sample-config).
 
    ```bash
    vi config.toml
@@ -119,7 +119,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
-   {{< note >}} Click [here](/automate/ha_cert_deployment) to learn more about adding certificates for services during deployment. {{< /note >}}
+   {{< note >}} To know more, see [adding certificates for services during deployment page](/automate/ha_cert_deployment). {{< /note >}}
 
 1. Continue with the deployment after updating the config:
 
@@ -271,23 +271,23 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites) to know more.
+- Follow the [Prerequisites](#prerequisites) for On-Premise deployment.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the AWS Managed Services.
-- Set up AWS RDS PostgreSQL 13.5-R1. Click [here](/automate/create_amazon_rds/) to know more. Open the required port in Security Groups while creating AWS RDS Postgresql.
-- Set up AWS OpenSearch 1.3. Click [here](/automate/create_amazon_opensearch/) to know more.
-- For Backup and Restore with Managed Service. Click [here](/automate/managed_services/#prerequisites) to know more.
-- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. Click [here](/automate/ha_vpc_setup/) to learn more about VPC and CIDR creation.
-- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. Click [here](/automate/ha_iam_user/) to learn more about creating IAM Users.
+- Set up AWS RDS PostgreSQL 13.5-R1. For more information, see [Create Amazon RDS](/automate/create_amazon_rds/). Open the required port in Security Groups while creating AWS RDS Postgresql.
+- Set up AWS OpenSearch 1.3. For more information, see [Create Amazon OpenSearch](/automate/create_amazon_opensearch/).
+- For Backup and Restore with Managed Service. For more information, check the [Managed Services Prerequisites](/automate/managed_services/#prerequisites).
+- Create the Virtual Private Cloud (VPC) in AWS before starting or using default. For more information, see [VPC and CIDR Setup](/automate/ha_vpc_setup/).
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) with privileges like: `AmazonS3FullAccess` and `AdministratorAccess`. For more information, see [Creating IAM Users](/automate/ha_iam_user/).
 
 See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services) for sample config of AWS Managed Services.
+Update Config with relevant data. For more information on sample config, see [AWS Managed Services](#sample-config-to-setup-on-premise-deployment-with-aws-managed-services).
 
 - Set AWS Config Details:
 
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
   - Set `type` as `aws`, as these deployment steps are for Managed Services AWS Deployment. The default value is blank, which should change.
-  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps. 
+  - Set `instance_url`, `superuser_username`, `superuser_password`, `dbuser_username`, `dbuser_password` for the **Managed AWS RDS Postgresql** created in the Prerequisite steps.
     - The master username value which you used while creating AWS RDS Postgresql can be used for both `superuser_username` and `dbuser_username`
     - The master password value which you used while creating AWS RDS Postgresql can be used for both `superuser_password` and `dbuser_password`
   - Set `instance_url` as the URL with Port No. For example: `"database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"`
@@ -361,12 +361,12 @@ os_snapshot_user_access_key_secret = ""
 
 ### Prerequisites
 
-- Follow the Prerequisites for On-Premise deployment. Click [here](#prerequisites).
+- Follow the [Prerequisites](#prerequisites) for On-Premise deployment.
 - This deployment excludes the installation for Postgresql and OpenSearch as we are using the Self Managed services.
 
 See the steps [here](#run-these-steps-on-bastion-host-machine) to run on Bastion to download the latest Automate CLI and Airgapped Bundle.
 
-Update Config with relevant data. Click [here](#sample-config-to-setup-on-premise-deployment-with-self-managed-services) for sample config for Self Managed Services.
+Update Config with relevant data. For more information, see [Self Managed Services](#sample-config-to-setup-on-premise-deployment-with-self-managed-services).
 
 - Set Self-Managed Config Details:
   - Provide instance count as `0` for both [opensearch.config] and [postgresql.config] and leave the values of opensearch_private_ips and postgresql_private_ips as an empty array.
@@ -507,7 +507,7 @@ It's essential to ensure that the IP address of the nodes you are trying to add 
 
 {{< warning >}}
 
-- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, click [here](#replace-node-in-automate-ha-cluster) for the reference.
+- We do not recommend the removal of any node from the backend cluster, but replacing the node is recommended. For the replacement of a node, see [replace node in Automate HA cluster](#replace-node-in-automate-ha-cluster) section.
 
 - Removal of nodes for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch nodes.
 
