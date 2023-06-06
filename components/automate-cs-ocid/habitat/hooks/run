@@ -19,12 +19,17 @@ source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
 source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
 
 # Registering oauth applications
-export OAUTH_APPLICATIONS_JSON='{{toJson cfg.ocid.oauth_applications}}'
-bundle exec bin/rake oauth_application:register
-
-# Saving registered oauth application details in a file
-export REGISTERED_OAUTH_APPS_FILE_PATH="{{pkg.svc_config_path}}/registered_oauth_applications.yaml"
-bundle exec bin/rake oauth_application:save_registered_app_details_to_file
+export OAUTH_APPS='{{cfg.ocid.oauth_applications}}'
+if [ -n "$OAUTH_APPS" ]; then
+    echo "Oauth application present."
+    export OAUTH_APPLICATIONS_JSON='{{toJson cfg.ocid.oauth_applications}}'
+    bundle exec bin/rake oauth_application:register
+    # Saving registered oauth application details in a file
+    export REGISTERED_OAUTH_APPS_FILE_PATH="{{pkg.svc_config_path}}/registered_oauth_applications.yaml"
+    bundle exec bin/rake oauth_application:save_registered_app_details_to_file
+else
+    echo "No oauth application present."
+fi
 
 # NOTE: Please keep this statement just before running
 # any environment specific command e.g. starting rails server.
