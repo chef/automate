@@ -3,7 +3,6 @@ package batchcheckservice
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"errors"
 	"io/ioutil"
@@ -122,6 +121,7 @@ func TestBatchCheckService(t *testing.T) {
 				}
 			}`,
 		},
+
 		{
 			description:          "Batch check service returns error when status api response body parse fails",
 			totalIpsCount:        6,
@@ -169,13 +169,13 @@ func TestBatchCheckService(t *testing.T) {
 			description:   "Batch check server success with automate and chef-server on same IP",
 			totalIpsCount: 6,
 			statusApiResponse: `{
-				"status": "SUCCESS",
-				"result": {
-					"status": "OK",
-					"services": [],
-					"error": "error getting services from hab svc status"
-				}
-			}`,
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 			chefServerIpArray: []string{"1.2.3.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -388,13 +388,13 @@ func TestBatchCheckService(t *testing.T) {
 			description:   "Batch check server success with nodes on different ip",
 			totalIpsCount: 7,
 			statusApiResponse: `{
-				"status": "SUCCESS",
-				"result": {
-					"status": "OK",
-					"services": [],
-					"error": "error getting services from hab svc status"
-				}
-			}`,
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 			chefServerIpArray: []string{"1.2.8.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -548,25 +548,25 @@ func TestBatchCheckService(t *testing.T) {
 			mockServerPort:                       "1234",
 			shouldStartMockServerOnSomeNodesOnly: true,
 			statusApiResponse: `{
-				"status": "SUCCESS",
-				"result": {
-					"status": "OK",
-					"services": [],
-					"error": "error getting services from hab svc status"
-				}
-			}`,
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 		},
 		{
 			description:   "Batch check server success with error on some nodes",
 			totalIpsCount: 7,
 			statusApiResponse: `{
-				"status": "SUCCESS",
-				"result": {
-					"status": "OK",
-					"services": [],
-					"error": "error getting services from hab svc status"
-				}
-			}`,
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 			chefServerIpArray: []string{"1.2.8.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -743,10 +743,6 @@ func TestBatchCheckService(t *testing.T) {
 
 			if len(test.checksToExecute) > 0 {
 				checksToExecute = test.checksToExecute
-			}
-
-			if test.description == "Batch check service returns error when mock server not started on some nodes" {
-				fmt.Println("hello")
 			}
 			resp, err := ss.BatchCheck(checksToExecute, models.Config{
 				Hardware: models.Hardware{
@@ -956,6 +952,26 @@ func TestShouldGenerateRootCaAndPrivateKeyForHostLogErrorForCert(t *testing.T) {
 			assert.NotNil(t, ss.log)
 		})
 	}
+}
+
+func TestStartMockServerIfNeeded(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{}`, errors.New("error occurred"), false)
+	resp, _, err := ss.startMockServerIfNeeded([]string{"firewall"}, models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
+	assert.Equal(t, "received no response for status api from any automate nodes", err.Error())
+	assert.Equal(t, 0, len(resp))
 }
 
 func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string) string {

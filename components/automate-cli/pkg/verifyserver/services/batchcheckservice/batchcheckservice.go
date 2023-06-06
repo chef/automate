@@ -50,23 +50,22 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
-	successfullyStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
-	notStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+	successfullyStartedMockServers, notStartedMockServers, err := ss.startMockServerIfNeeded(remoteChecks, config)
+	if err != nil {
+		ss.log.Error("Error occurred while starting mock server")
+		return models.BatchCheckResponse{}, err
+	}
 
-	if len(remoteChecks) > 0 {
-		startMockServer, err := ss.shouldStartMockServer(remoteChecks, config)
-		if err != nil {
-			return models.BatchCheckResponse{}, err
-		}
-		if startMockServer {
-			successfullyStartedMockServers, notStartedMockServers = ss.StartMockServer(remoteChecks, config.Hardware)
-		}
-		if len(notStartedMockServers) > 0 {
-			for _, successfullyStartedMockServer := range successfullyStartedMockServers {
+	if len(notStartedMockServers) > 0 {
+		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
+			if successfullyStartedMockServer.Host != "" {
 				ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
 			}
-			return models.BatchCheckResponse{}, errors.New("mock server not started successfull on some nodes")
+
 		}
+		return models.BatchCheckResponse{}, errors.New("mock server not started successfull on some nodes")
+	}
+	if len(remoteChecks) > 0 {
 		for key, value := range getRemoteCheckResp(ss, remoteChecks, config) {
 			checkTriggerRespMap[key] = value
 		}
@@ -79,6 +78,22 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 	}
 
 	return constructBatchCheckResponse(checkTriggerRespMap, append(bastionChecks, remoteChecks...)), nil
+}
+
+func (ss *BatchCheckService) startMockServerIfNeeded(remoteChecks []string, config models.Config) ([]models.StartMockServerFromBatchServiceResponse, []models.StartMockServerFromBatchServiceResponse, error) {
+	successfullyStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+	notStartedMockServers := []models.StartMockServerFromBatchServiceResponse{}
+
+	if len(remoteChecks) > 0 {
+		startMockServer, err := ss.shouldStartMockServer(remoteChecks, config)
+		if err != nil {
+			return successfullyStartedMockServers, notStartedMockServers, err
+		}
+		if startMockServer {
+			successfullyStartedMockServers, notStartedMockServers = ss.StartMockServer(remoteChecks, config.Hardware)
+		}
+	}
+	return successfullyStartedMockServers, notStartedMockServers, nil
 }
 
 func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string, config models.Config) (bool, error) {
@@ -310,6 +325,11 @@ func (ss *BatchCheckService) getDeploymentState(config models.Config) (string, e
 func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, startMockServerRequestBody models.MockServerRequestBody, respChan chan models.StartMockServerFromBatchServiceResponse) {
 	url := fmt.Sprintf("%s%s:%s%s", "http://", host, port, constants.START_MOCK_SERVER)
 	resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, startMockServerRequestBody)
+	if err != nil && resp == nil {
+		ss.log.Error(err.Error())
+		respChan <- models.StartMockServerFromBatchServiceResponse{}
+		return
+	}
 	if err != nil {
 		ss.log.Error("Error occurred while starting mock server: ", err.Error())
 	}
