@@ -178,8 +178,10 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 		if err := validateAutomateCerts(automateSettings); err != nil {
 			errorList.PushBack(err)
 		}
-		if err := validateCertsByIP(automateSettings.CertsByIP, "automate ip"); err != nil {
-			errorList.PushBack(err)
+		if c.IsExistingInfra() {
+			if err := validateCertsByIP(automateSettings.CertsByIP, "automate ip"); err != nil {
+				errorList.PushBack(err)
+			}
 		}
 	}
 
@@ -197,8 +199,10 @@ func (c *HaDeployConfig) verifyChefServerSettings() error {
 		if err := validateChefServerCerts(chefServerSettings); err != nil {
 			errorList.PushBack(err)
 		}
-		if err := validateCertsByIP(chefServerSettings.CertsByIP, "chef server ip"); err != nil {
-			errorList.PushBack(err)
+		if c.IsExistingInfra() {
+			if err := validateCertsByIP(chefServerSettings.CertsByIP, "chef server ip"); err != nil {
+				errorList.PushBack(err)
+			}
 		}
 	}
 
@@ -216,8 +220,10 @@ func (c *HaDeployConfig) verifyOpensearchSettings() error {
 		if err := validateOpensearchCerts(opensearchSettings); err != nil {
 			errorList.PushBack(err)
 		}
-		if err := validateCertsByIP(opensearchSettings.CertsByIP, "opensearch ip"); err != nil {
-			errorList.PushBack(err)
+		if c.IsExistingInfra() {
+			if err := validateCertsByIP(opensearchSettings.CertsByIP, "opensearch ip"); err != nil {
+				errorList.PushBack(err)
+			}
 		}
 	}
 
@@ -235,8 +241,10 @@ func (c *HaDeployConfig) verifyPostgresqlSettings() error {
 		if err := validatePostgresqlCerts(postgresqlSettings); err != nil {
 			errorList.PushBack(err)
 		}
-		if err := validateCertsByIP(postgresqlSettings.CertsByIP, "postgresql ip"); err != nil {
-			errorList.PushBack(err)
+		if c.IsExistingInfra() {
+			if err := validateCertsByIP(postgresqlSettings.CertsByIP, "postgresql ip"); err != nil {
+				errorList.PushBack(err)
+			}
 		}
 	}
 	return getSingleErrorFromList(errorList)
@@ -505,10 +513,6 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
-	if err := validateAwsOsPgConfig(aws); err != nil {
-		errorList.PushBack(err)
-	}
-
 	return getSingleErrorFromList(errorList)
 }
 
@@ -528,11 +532,15 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	}
 
 	if aws.AwsCidrBlockAddr == "" {
-		if err := validateRequiredStringListField(aws.PrivateCustomSubnets, "aws private_custom_subnets"); err != nil {
+		if err := validateRequiredStringListField(aws.PrivateCustomSubnets, "aws private_custom_subnets", 3); err != nil {
 			errorList.PushBack(err)
 		}
 
-		if err := validateRequiredStringListField(aws.PublicCustomSubnets, "aws public_custom_subnets"); err != nil {
+		if err := validateRequiredStringListField(aws.PublicCustomSubnets, "aws public_custom_subnets", 3); err != nil {
+			errorList.PushBack(err)
+		}
+	} else {
+		if err := validateRequiredString(aws.AwsCidrBlockAddr, "aws aws_cidr_block_addr"); err != nil {
 			errorList.PushBack(err)
 		}
 	}
@@ -542,6 +550,10 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	}
 
 	if err := validateStringBasedBoolean(aws.LbAccessLogs, "aws lb_access_logs", true); err != nil {
+		errorList.PushBack(err)
+	}
+
+	if err := validateRequiredString(aws.AmiID, "aws ami_id"); err != nil {
 		errorList.PushBack(err)
 	}
 

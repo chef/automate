@@ -96,10 +96,15 @@ func validatePort(value string, fieldName string, isRequired bool) error {
 	return nil
 }
 
-func validateRequiredStringListField(value []string, fieldName string) error {
+func validateRequiredStringListField(value []string, fieldName string, minNumber ...int) error {
 	if len(value) < 1 {
 		return fmt.Errorf(INVALID_EMPTY_VALUE, fieldName)
 	}
+
+	if len(minNumber) > 0 && len(value) < minNumber[0] {
+		return fmt.Errorf("minimum number of %s required is %d", fieldName, minNumber[0])
+	}
+
 	return nil
 }
 
