@@ -183,10 +183,13 @@ func getRemoteCheckResp(ss *BatchCheckService, remoteChecks []string, config mod
 	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
 	for _, check := range remoteChecks {
 		resp := ss.RunRemoteCheck(check, config)
+
+		message := constants.GetCheckMessageByType(check)
+
 		for ind, _ := range resp {
 			resp[ind].CheckType = check
 			resp[ind].Result.Check = check
-			resp[ind].Result.Message = constants.GetCheckMessageByType(check)
+			resp[ind].Result.Message = message
 		}
 		checkTriggerRespMap[check] = resp
 	}

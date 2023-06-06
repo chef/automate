@@ -43,74 +43,74 @@ const (
 
 var checkMap map[string]models.CheckAndType = map[string]models.CheckAndType{
 	HARDWARE_RESOURCE_COUNT: {
-		CheckName: BASTION_CHECK,
-		CheckType: HARDWARE_RESOURCE_COUNT,
+		CheckType: BASTION_CHECK,
+		CheckName: HARDWARE_RESOURCE_COUNT,
 		CheckMsg:  HARDWARE_RESOURCE_COUNT_MSG,
 	},
 	CERTIFICATE: {
-		CheckName: BASTION_CHECK,
-		CheckType: CERTIFICATE,
+		CheckType: BASTION_CHECK,
+		CheckName: CERTIFICATE,
 		CheckMsg:  CERTIFICATE_MSG,
 	},
 	SSH_USER: {
-		CheckName: BASTION_CHECK,
-		CheckType: SSH_USER,
+		CheckType: BASTION_CHECK,
+		CheckName: SSH_USER,
 		CheckMsg:  SSH_USER_MSG,
 	},
 	SYSTEM_RESOURCES: {
-		CheckName: REMOTE_CHECK,
-		CheckType: SYSTEM_RESOURCES,
+		CheckType: REMOTE_CHECK,
+		CheckName: SYSTEM_RESOURCES,
 		CheckMsg:  SYSTEM_RESOURCES_MSG,
 	},
 	SOFTWARE_VERSIONS: {
-		CheckName: REMOTE_CHECK,
-		CheckType: SOFTWARE_VERSIONS,
+		CheckType: REMOTE_CHECK,
+		CheckName: SOFTWARE_VERSIONS,
 		CheckMsg:  SOFTWARE_VERSIONS_MSG,
 	},
 	SYSTEM_USER: {
-		CheckName: REMOTE_CHECK,
-		CheckType: SYSTEM_USER,
+		CheckType: REMOTE_CHECK,
+		CheckName: SYSTEM_USER,
 		CheckMsg:  SYSTEM_USER_MSG,
 	},
 	S3_BACKUP_CONFIG: {
-		CheckName: REMOTE_CHECK,
-		CheckType: S3_BACKUP_CONFIG,
+		CheckType: REMOTE_CHECK,
+		CheckName: S3_BACKUP_CONFIG,
 		CheckMsg:  S3_BACKUP_CONFIG_MSG,
 	},
 	FQDN: {
-		CheckName: REMOTE_CHECK,
-		CheckType: FQDN,
+		CheckType: REMOTE_CHECK,
+		CheckName: FQDN,
 		CheckMsg:  FQDN_MSG,
 	},
 	FIREWALL: {
-		CheckName: REMOTE_CHECK,
-		CheckType: FIREWALL,
+		CheckType: REMOTE_CHECK,
+		CheckName: FIREWALL,
 		CheckMsg:  FIREWALL_MSG,
 	},
 	EXTERNAL_OPENSEARCH: {
-		CheckName: REMOTE_CHECK,
-		CheckType: EXTERNAL_OPENSEARCH,
+		CheckType: REMOTE_CHECK,
+		CheckName: EXTERNAL_OPENSEARCH,
 		CheckMsg:  EXTERNAL_OPENSEARCH_MSG,
 	},
 	AWS_OPENSEARCH_S3_BUCKET_ACCESS: {
-		CheckName: REMOTE_CHECK,
-		CheckType: AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+		CheckType: REMOTE_CHECK,
+		CheckName: AWS_OPENSEARCH_S3_BUCKET_ACCESS,
 		CheckMsg:  AWS_OPENSEARCH_S3_BUCKET_ACCESS_MSG,
 	},
 	EXTERNAL_POSTGRESQL: {
-		CheckName: REMOTE_CHECK,
-		CheckType: EXTERNAL_POSTGRESQL,
+		CheckType: REMOTE_CHECK,
+		CheckName: EXTERNAL_POSTGRESQL,
 		CheckMsg:  EXTERNAL_POSTGRESQL_MSG,
 	},
 	NFS_BACKUP_CONFIG: {
-		CheckName: REMOTE_CHECK,
-		CheckType: NFS_BACKUP_CONFIG,
+		CheckType: REMOTE_CHECK,
+		CheckName: NFS_BACKUP_CONFIG,
 		CheckMsg:  NFS_BACKUP_CONFIG_MSG,
 	},
 }
 
-func GetCheckMessageByType(checkType string) string {
-	val, ok := checkMap[checkType]
+func GetCheckMessageByType(CheckName string) string {
+	val, ok := checkMap[CheckName]
 	if !ok {
 		return ""
 	}
@@ -120,7 +120,7 @@ func GetCheckMessageByType(checkType string) string {
 func GetBastionChecks() []string {
 	var checks []string
 	for k, v := range checkMap {
-		if v.CheckName == BASTION_CHECK {
+		if v.CheckType == BASTION_CHECK {
 			checks = append(checks, k)
 		}
 	}
@@ -130,7 +130,7 @@ func GetBastionChecks() []string {
 func GetRemoteChecks() []string {
 	var checks []string
 	for k, v := range checkMap {
-		if v.CheckName == REMOTE_CHECK {
+		if v.CheckType == REMOTE_CHECK {
 			checks = append(checks, k)
 		}
 	}
