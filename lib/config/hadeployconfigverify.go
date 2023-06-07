@@ -164,7 +164,7 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 	automateSettings := c.Automate.Config
 	errorList := list.New()
 
-	if err := validateUrl(automateSettings.Fqdn, "automate fqdn"); err != nil {
+	if err := validateFQDN(automateSettings.Fqdn, "automate fqdn"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateAutomateAdminPassword(automateSettings); err != nil {
@@ -325,7 +325,7 @@ func (c *HaDeployConfig) verifyExternalPgSettings(externalPostgresqlSettings *Ex
 		errorList.PushBack(err)
 	}
 
-	err = validateUrl(externalPostgresqlSettings.InstanceURL, "instance_url")
+	err = validateUrlWithPort(externalPostgresqlSettings.InstanceURL, "instance_url")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -358,7 +358,7 @@ func (c *HaDeployConfig) verifyExternalOsSettings(externalOpensearchSettings *Ex
 		errorList.PushBack(err)
 	}
 
-	err = validateUrl(externalOpensearchSettings.OpensearchDomainURL, "opensearch_domain_url")
+	err = validateUrlWithPort(externalOpensearchSettings.OpensearchDomainURL, "opensearch_domain_url")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -493,7 +493,7 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 	if err := validateRequiredString(aws.ManagedOpensearchDomainName, "aws managed_opensearch_domain_name"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateUrl(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url"); err != nil {
+	if err := validateUrlWithPort(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateRequiredString(aws.ManagedOpensearchUserPassword, "aws managed_opensearch_user_password"); err != nil {
@@ -508,7 +508,7 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 	if err := validateRequiredString(aws.ManagedRdsDbuserUsername, "aws managed_rds_dbuser_username"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateUrl(aws.ManagedRdsInstanceURL, "aws managed_rds_instance_url"); err != nil {
+	if err := validateUrlWithPort(aws.ManagedRdsInstanceURL, "aws managed_rds_instance_url"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateRequiredString(aws.ManagedRdsSuperuserPassword, "aws managed_rds_superuser_password"); err != nil {

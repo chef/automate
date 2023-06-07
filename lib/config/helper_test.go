@@ -199,7 +199,7 @@ func TestGetSingleErrorFromList(t *testing.T) {
 	}
 }
 
-func TestValidateUrl(t *testing.T) {
+func TestValidateFQDN(t *testing.T) {
 	// Valid URLs
 	validURLs := []string{
 		"example.com",
@@ -209,14 +209,14 @@ func TestValidateUrl(t *testing.T) {
 		"subdomain.example.com:8080",
 	}
 	for _, url := range validURLs {
-		err := validateUrl(url, "url")
+		err := validateFQDN(url, "url")
 		if err != nil {
 			t.Errorf("Test failed for URL: %s. Expected no error, got: %v", url, err)
 		}
 	}
 
 	// Empty URL
-	err := validateUrl("", "url")
+	err := validateFQDN("", "url")
 	expectedError := "invalid or empty URL: url"
 	if err == nil {
 		t.Errorf("Test failed for empty URL. Expected error: %s, got nil", expectedError)
@@ -225,7 +225,7 @@ func TestValidateUrl(t *testing.T) {
 	}
 
 	// URL with spaces
-	err = validateUrl("example .com", "url")
+	err = validateFQDN("example .com", "url")
 	expectedError = "domain name cannot contain spaces: url"
 	if err == nil {
 		t.Errorf("Test failed for URL with spaces. Expected error: %s, got nil", expectedError)
@@ -234,7 +234,7 @@ func TestValidateUrl(t *testing.T) {
 	}
 
 	// URL with protocol
-	err = validateUrl("http://example.com", "url")
+	err = validateFQDN("http://example.com", "url")
 	expectedError = "url should not include the protocol (http:// or https://): url"
 	if err == nil {
 		t.Errorf("Test failed for URL with protocol. Expected error: %s, got nil", expectedError)
@@ -250,7 +250,38 @@ func TestValidateUrl(t *testing.T) {
 		"test..com:80",
 	}
 	for _, url := range invalidURLs {
-		err := validateUrl(url, "url")
+		err := validateFQDN(url, "url")
+		expectedError := "invalid URL format: url"
+		if err == nil {
+			t.Errorf("Test failed for invalid URL: %s. Expected error: %s, got nil", url, expectedError)
+		} else if err.Error() != expectedError {
+			t.Errorf("Test failed for invalid URL: %s. Expected error: %s, got: %v", url, expectedError, err)
+		}
+	}
+}
+
+func TestValidateUrlWithPort(t *testing.T) {
+	// Valid URLs
+	validURLs := []string{
+		"example.com:8080",
+		"subdomain.example.com:8080",
+	}
+	for _, url := range validURLs {
+		err := validateUrlWithPort(url, "url")
+		if err != nil {
+			t.Errorf("Test failed for URL: %s. Expected no error, got: %v", url, err)
+		}
+	}
+
+	// Invalid URL format
+	invalidURLs := []string{
+		"example.com",
+		"8081",
+		".com",
+		"test..com:80",
+	}
+	for _, url := range invalidURLs {
+		err := validateUrlWithPort(url, "url")
 		expectedError := "invalid URL format: url"
 		if err == nil {
 			t.Errorf("Test failed for invalid URL: %s. Expected error: %s, got nil", url, expectedError)

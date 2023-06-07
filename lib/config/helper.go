@@ -127,7 +127,7 @@ func getSingleErrorFromList(errorList *list.List) error {
 	return nil
 }
 
-func validateUrl(value string, keyName string) error {
+func commonFqdnValidation(value string, keyName string) error {
 	if len(value) < 1 {
 		return fmt.Errorf("invalid or empty URL: " + keyName)
 	}
@@ -138,13 +138,36 @@ func validateUrl(value string, keyName string) error {
 	if strings.HasPrefix(value, "http://") || strings.HasPrefix(value, "https://") {
 		return fmt.Errorf("url should not include the protocol (http:// or https://): " + keyName)
 	}
-	// Regular expression to validate URLs with or without port number
+	return nil
+}
+
+func validateFQDN(value string, keyName string) error {
+
+	if err := commonFqdnValidation(value, keyName); err != nil {
+		return err
+	}
+	// Regular expression to validate FQDN with or without port number
 	regex := `^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(?::\d+)?$`
 	match, _ := regexp.MatchString(regex, value)
 	if !match {
 		return fmt.Errorf("invalid URL format: " + keyName)
 	}
 	return nil
+}
+
+func validateUrlWithPort(value string, keyName string) error {
+
+	if err := commonFqdnValidation(value, keyName); err != nil {
+		return err
+	}
+	// Regular expression to validate Url with port number
+	regex := `^(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)$`
+	match, _ := regexp.MatchString(regex, value)
+	if !match {
+		return fmt.Errorf("invalid URL format: " + keyName)
+	}
+	return nil
+
 }
 
 func checkForValidS3Bucket(c *HaDeployConfig) error {
