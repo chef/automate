@@ -161,7 +161,7 @@ func TestValidateCertificate(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "Invalid Body Request"
+					"message": "Invalid Request Body"
 				}
 			}`,
 		},

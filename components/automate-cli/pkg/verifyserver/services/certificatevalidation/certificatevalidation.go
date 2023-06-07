@@ -56,7 +56,7 @@ func createErrorMessage(expiredCerts, aboutToExpireCerts string) string {
 
 func decodeAndParseCertificate(certificate, key string) (*x509.Certificate, error) {
 	block, _ := pem.Decode([]byte(certificate))
-	if block == nil || block.Type != "CERTIFICATE" {
+	if block == nil || block.Type != constants.CERTIFICATE_BLOCK_TYPE {
 		return nil, fmt.Errorf("failed to decode %s certificate", key)
 	}
 
@@ -72,15 +72,14 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 	vc.log.Debug("Validating Certificates Expiry...")
 	expiredCerts := ""
 	aboutToExpireCerts := ""
-	keys := []string{"Root", "Node", "Admin"}
+	keys := []string{constants.ROOT, constants.NODE, constants.ADMIN}
 
 	for _, key := range keys {
 		cert := certificates[key]
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
-			expiredCerts += key
-			expiredCerts += ", "
+			expiredCerts += key + ", "
 			continue
 		}
 
@@ -88,8 +87,7 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		currentTime := time.Now()
 		if currentTime.Before(certificate.NotBefore) || currentTime.After(certificate.NotAfter) {
 			vc.log.Debugf("%s certificate is expired", key)
-			expiredCerts += key
-			expiredCerts += ", "
+			expiredCerts += key + ", "
 			continue
 		}
 
@@ -97,8 +95,7 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 		expirationDate := time.Now().AddDate(0, 0, 365)
 		if certificate.NotAfter.Before(expirationDate) {
 			vc.log.Debugf("%s certificate is going to expire in next 365 days", key)
-			aboutToExpireCerts += key
-			aboutToExpireCerts += ", "
+			aboutToExpireCerts += key + ", "
 			continue
 		}
 	}
@@ -115,23 +112,21 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 func (vc *ValidateCertificateService) validateCertificateFormat(certificates map[string]string) models.Checks {
 	vc.log.Debug("Validating Certificates Format...")
 	invalidFormatCerts := ""
-	keys := []string{"Root", "Node", "Admin"}
+	keys := []string{constants.ROOT, constants.NODE, constants.ADMIN}
 
 	for _, key := range keys {
 		cert := certificates[key]
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
-			invalidFormatCerts += key
-			invalidFormatCerts += ", "
+			invalidFormatCerts += key + ", "
 			continue
 		}
 
 		// this is for checking that our certificates are of x509 V3 format or not.
-		if certificate.SignatureAlgorithm == x509.UnknownSignatureAlgorithm || certificate.Version != 3 {
+		if certificate.SignatureAlgorithm == x509.UnknownSignatureAlgorithm || certificate.Version != constants.X509_VERSION {
 			vc.log.Debugf("%s certificate is not in x509 V3 format", key)
-			invalidFormatCerts += key
-			invalidFormatCerts += ", "
+			invalidFormatCerts += key + ", "
 			continue
 		}
 	}
@@ -148,15 +143,14 @@ func (vc *ValidateCertificateService) validateCertificateFormat(certificates map
 func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]string) models.Checks {
 	vc.log.Debug("Validating Keys Format...")
 	invalidFormatKeys := ""
-	keys := []string{"Node-Key", "Admin-Key"}
+	keys := []string{constants.NODE_KEY, constants.ADMIN_KEY}
 
 	for _, key := range keys {
 		cert := privateKeys[key]
 		block, _ := pem.Decode([]byte(cert))
 		if block == nil {
 			vc.log.Errorf("Failed to decode %s", key)
-			invalidFormatKeys += key
-			invalidFormatKeys += ", "
+			invalidFormatKeys += key + ", "
 			continue
 		}
 
@@ -164,8 +158,7 @@ func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]s
 		_, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 		if err != nil {
 			vc.log.Debugf("%s is not in PKCS8 format", key)
-			invalidFormatKeys += key
-			invalidFormatKeys += ", "
+			invalidFormatKeys += key + ", "
 			continue
 		}
 	}
@@ -182,15 +175,14 @@ func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]s
 func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates map[string]string) models.Checks {
 	vc.log.Debug("Validating Certificates Hashing Algorithm...")
 	invalidAlgoCerts := ""
-	keys := []string{"Root", "Node", "Admin"}
+	keys := []string{constants.ROOT, constants.NODE, constants.ADMIN}
 
 	for _, key := range keys {
 		cert := certificates[key]
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
-			invalidAlgoCerts += key
-			invalidAlgoCerts += ", "
+			invalidAlgoCerts += key + ", "
 			continue
 		}
 
@@ -201,8 +193,7 @@ func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates 
 			(certificate.PublicKeyAlgorithm != x509.RSA || certificate.PublicKey.(*rsa.PublicKey).N.BitLen() != 2048) &&
 			signatureAlgorithm.String() != "PBE-SHA1-3DES" {
 			vc.log.Debugf("%s certificate is not hashed using either of PBE-SHA1-3DES, RSA (2048), SHA-256 algorithms", key)
-			invalidAlgoCerts += key
-			invalidAlgoCerts += ", "
+			invalidAlgoCerts += key + ", "
 			continue
 		}
 	}
@@ -222,31 +213,23 @@ func (vc *ValidateCertificateService) CertificateValidation(req models.Certifica
 	certificates := make(map[string]string)
 	privateKeys := make(map[string]string)
 
-	certificates["Root"] = req.RootCertificate
-	certificates["Node"] = req.NodeCertificate
-	certificates["Admin"] = req.AdminCertificate
-	privateKeys["Node-Key"] = req.PrivateKey
-	privateKeys["Admin-Key"] = req.AdminPrivateKey
+	certificates[constants.ROOT] = req.RootCertificate
+	certificates[constants.NODE] = req.NodeCertificate
+	certificates[constants.ADMIN] = req.AdminCertificate
+	privateKeys[constants.NODE_KEY] = req.PrivateKey
+	privateKeys[constants.ADMIN_KEY] = req.AdminPrivateKey
 
-	checks := vc.validateCertificateExpiry(certificates)
-	response.Checks = append(response.Checks, checks)
+	response.Checks = append(response.Checks, vc.validateCertificateExpiry(certificates))
+	response.Checks = append(response.Checks, vc.validateCertificateFormat(certificates))
+	response.Checks = append(response.Checks, vc.validateKeyFormat(privateKeys))
+	response.Checks = append(response.Checks, vc.validateCertificateAlgorithm(certificates))
 
-	checks = vc.validateCertificateFormat(certificates)
-	response.Checks = append(response.Checks, checks)
-
-	checks = vc.validateKeyFormat(privateKeys)
-	response.Checks = append(response.Checks, checks)
-
-	checks = vc.validateCertificateAlgorithm(certificates)
-	response.Checks = append(response.Checks, checks)
-
-	flag := true
+	response.Passed = true
 	for _, k := range response.Checks {
 		if !k.Passed {
-			flag = false
+			response.Passed = false
 			break
 		}
 	}
-	response.Passed = flag
 	return response
 }

@@ -13,7 +13,7 @@ func (h *Handler) ValidateCertificate(c *fiber.Ctx) error {
 	req := new(models.CertificateCheckRequest)
 	if err := c.BodyParser(req); err != nil {
 		h.Logger.Error(err.Error())
-		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
+		return fiber.NewError(http.StatusBadRequest, "Invalid Request Body")
 	}
 
 	if strings.TrimSpace(req.RootCertificate) == "" ||

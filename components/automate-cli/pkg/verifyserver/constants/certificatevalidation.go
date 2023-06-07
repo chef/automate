@@ -18,4 +18,11 @@ const (
 	KEY_FORMAT_SUCCESS_MESSAGE               = "The private keys are of PKCS8 format"
 	KEY_FORMAT_ERROR_MESSAGE                 = "The %v private key(s) are not of PKCS8 format"
 	KEY_FORMAT_RESOLUTION_MESSAGE            = "Generate and provide %v private key of PKCS8 format"
+	CERTIFICATE_BLOCK_TYPE                   = "CERTIFICATE"
+	X509_VERSION                             = 3
+	ROOT                                     = "Root"
+	NODE                                     = "Node"
+	ADMIN                                    = "Admin"
+	NODE_KEY                                 = "Node-Key"
+	ADMIN_KEY                                = "Admin-Key"
 )

@@ -173,7 +173,7 @@ M8hhfcvF8pXjfrIEaU2oXFV+NfH6suewJtO5Mzzhm2WhcYzXeIcOVr699eHakSzr
 LUV1BxbSsLDq7A==
 -----END CERTIFICATE-----`
 
-	ROOT_CERT_WITH_INVALID_FORMAT_HASH_ALGO = `-----BEGIN CERTIFICATE-----
+	CERT_WITH_INVALID_FORMAT_HASH_ALGO = `-----BEGIN CERTIFICATE-----
 MIIFTjCCAzYCCQD4TjazM2YSczANBgkqhkiG9w0BAQwFADBpMQswCQYDVQQGEwJJ
 bjELMAkGA1UECAwCa3QxCzAJBgNVBAcMAmJuMREwDwYDVQQKDAhwcm9ncmVzczEL
 MAkGA1UECwwCaXQxIDAeBgkqhkiG9w0BCQEWEXRlc3RAcHJvZ3Jlc3MuY29tMB4X
@@ -297,7 +297,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Root Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo and Node Certificate is expired.",
 			ReqBody: models.CertificateCheckRequest{
-				RootCertificate:  ROOT_CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+				RootCertificate:  CERT_WITH_INVALID_FORMAT_HASH_ALGO,
 				PrivateKey:       PRIVATE_KEY,
 				NodeCertificate:  EXPIRED_NODE_CERTIFICATE,
 				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
@@ -310,14 +310,14 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprint(fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, "Node") + "; " + fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, "Root")),
+						ErrorMsg:      fmt.Sprint(fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.NODE) + "; " + fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ROOT)),
 						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.CERTIFICATE_FORMAT_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, "Root, Node"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, fmt.Sprintf("%s, %s", constants.ROOT, constants.NODE)),
 						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
 					},
 					{
@@ -331,8 +331,94 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, "Root"),
-						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Node Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  ROOT_CERTIFICATE,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.NODE),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.NODE),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.NODE),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.NODE),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Admin Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  ROOT_CERTIFICATE,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ADMIN),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ADMIN),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ADMIN),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ADMIN),
 					},
 				},
 			},
@@ -353,14 +439,14 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.ROOT),
 						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.CERTIFICATE_FORMAT_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ROOT),
 						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
 					},
 					{
@@ -374,8 +460,8 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, "Root"),
-						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
 					},
 				},
 			},
@@ -396,14 +482,14 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.ROOT),
 						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
 					},
 					{
 						Title:         constants.CERTIFICATE_FORMAT_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ROOT),
 						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
 					},
 					{
@@ -417,8 +503,8 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, "Root"),
-						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, "Root"),
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
 					},
 				},
 			},
@@ -453,8 +539,8 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.KEY_FORMAT_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, "Node-Key"),
-						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, "Node-Key"),
+						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
+						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
 					},
 					{
 						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
@@ -496,8 +582,8 @@ func TestCertificateValidation(t *testing.T) {
 						Title:         constants.KEY_FORMAT_TITLE,
 						Passed:        false,
 						SuccessMsg:    "",
-						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, "Node-Key"),
-						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, "Node-Key"),
+						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
+						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
 					},
 					{
 						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
