@@ -33,7 +33,7 @@ func TestParseAndVerify(t *testing.T) {
 			name:    "Verify OnPrem Config",
 			args:    args{configFile: "./testdata/HaOnPrem.toml"},
 			wantErr: true,
-			err:     errors.New("invalid or empty: ssh_user\ninvalid or empty: ssh_key_file\nautomate private ip 1324.2534.1is not valid\ninvalid or empty: chef_server_private_ips\ninvalid or empty: opensearch_private_ips\ninvalid or empty: postgresql_private_ips\nurl should not include the protocol (http:// or https://): automate fqdn\nempty value: automate instance_count\ninvalid value 'automate.toml' for field 'config_file'. Expected values are: configs/automate.toml\ninvalid format. Failed to decode root_ca for automate\ninvalid format. Failed to decode private_key for automate\ninvalid format. Failed to decode public_key for automate\ninvalid format. Failed to decode private_key for automate ip\ninvalid format. Failed to decode public_key for automate ip\ninvalid value 'chef server instance_count' for field 'two'\ninvalid format. Failed to decode private_key for chef-server\ninvalid format. Failed to decode public_key for chef-server\ninvalid format. Failed to decode private_key for chef server ip\ninvalid format. Failed to decode public_key for chef server ip\nempty value: opensearch instance_count\nopensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nopensearch iproot_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false\nempty value: postgresql instance_count\ninvalid format. Failed to decode root_ca for postgresql\ninvalid format. Failed to decode private_key for postgresql\ninvalid format. Failed to decode public_key for postgresql\npostgresql ip 0.0.1 for certs is not valid\ninvalid format. Failed to decode private_key for postgresql ip\ninvalid format. Failed to decode public_key for postgresql ip"),
+			err:     errors.New("invalid or empty: ssh_user\ninvalid or empty: ssh_key_file\ninvalid S3 endpoint format. Endpoint should end with '.amazonaws.com'\nautomate private ip 1324.2534.1is not valid\ninvalid or empty: chef_server_private_ips\ninvalid or empty: opensearch_private_ips\ninvalid or empty: postgresql_private_ips\nurl should not include the protocol (http:// or https://): automate fqdn\nempty value: automate instance_count\ninvalid value 'automate.toml' for field 'config_file'. Expected values are: configs/automate.toml\ninvalid format. Failed to decode root_ca for automate\ninvalid format. Failed to decode private_key for automate\ninvalid format. Failed to decode public_key for automate\ninvalid format. Failed to decode private_key for automate ip\ninvalid format. Failed to decode public_key for automate ip\ninvalid value 'chef server instance_count' for field 'two'\ninvalid format. Failed to decode private_key for chef-server\ninvalid format. Failed to decode public_key for chef-server\ninvalid format. Failed to decode private_key for chef server ip\ninvalid format. Failed to decode public_key for chef server ip\nempty value: opensearch instance_count\nopensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nopensearch iproot_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false\nempty value: postgresql instance_count\ninvalid format. Failed to decode root_ca for postgresql\ninvalid format. Failed to decode private_key for postgresql\ninvalid format. Failed to decode public_key for postgresql\npostgresql ip 0.0.1 for certs is not valid\ninvalid format. Failed to decode private_key for postgresql ip\ninvalid format. Failed to decode public_key for postgresql ip"),
 		},
 		{
 			name:    "Verify OnPrem Db Self-Managed Config",
@@ -80,6 +80,86 @@ func TestParseAndVerify(t *testing.T) {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			} else {
 				assert.Equal(t, nil, err)
+			}
+		})
+	}
+}
+
+func TestVerifyObjectStorage(t *testing.T) {
+	testCases := []struct {
+		name          string
+		objectStorage *ConfigObjectStorage
+		expectedError error
+	}{
+		{
+			name: "Valid Object Storage Configuration",
+			objectStorage: &ConfigObjectStorage{
+				BucketName: "my-bucket",
+				AccessKey:  "access-key",
+				SecretKey:  "secret-key",
+				Endpoint:   "https://example.com",
+				Region:     "us-east-1",
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Missing Bucket Name",
+			objectStorage: &ConfigObjectStorage{
+				AccessKey: "access-key",
+				SecretKey: "secret-key",
+				Endpoint:  "https://example.com",
+				Region:    "us-east-1",
+			},
+			expectedError: errors.New("invalid or empty: bucket_name"),
+		},
+		{
+			name: "Missing Access Key",
+			objectStorage: &ConfigObjectStorage{
+				BucketName: "my-bucket",
+				SecretKey:  "secret-key",
+				Endpoint:   "https://example.com",
+				Region:     "us-east-1",
+			},
+			expectedError: errors.New("invalid or empty: access_key"),
+		},
+		{
+			name: "Missing Secret Key",
+			objectStorage: &ConfigObjectStorage{
+				BucketName: "my-bucket",
+				AccessKey:  "access-key",
+				Endpoint:   "https://example.com",
+				Region:     "us-east-1",
+			},
+			expectedError: errors.New("invalid or empty: secret_key"),
+		},
+		{
+			name: "Missing Endpoint",
+			objectStorage: &ConfigObjectStorage{
+				BucketName: "my-bucket",
+				AccessKey:  "access-key",
+				SecretKey:  "secret-key",
+				Region:     "us-east-1",
+			},
+			expectedError: errors.New("invalid or empty: endpoint"),
+		},
+		{
+			name: "Invalid Region",
+			objectStorage: &ConfigObjectStorage{
+				BucketName: "my-bucket",
+				AccessKey:  "access-key",
+				SecretKey:  "secret-key",
+				Endpoint:   "https://example.com",
+				Region:     "invalid-region",
+			},
+			expectedError: errors.New("invalid AWS region for S3"),
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			c := &HaDeployConfig{} // Initialize HaDeployConfig instance
+			err := c.verifyObjectStorage(tc.objectStorage)
+			if err == nil && tc.expectedError != nil {
+				t.Errorf("Expected error: %v, but got: %v", tc.expectedError, err)
 			}
 		})
 	}

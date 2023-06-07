@@ -2,8 +2,14 @@ package config
 
 import (
 	"container/list"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
+	"math/big"
 	"testing"
+	"time"
 )
 
 func TestValidateStringBasedBoolean(t *testing.T) {
@@ -170,32 +176,56 @@ func TestValidateRequiredStringListField(t *testing.T) {
 }
 
 func TestGetSingleErrorFromList(t *testing.T) {
-	errorList := list.New()
-
-	// Empty error list should return nil
-	err := getSingleErrorFromList(errorList)
-	if err != nil {
-		t.Errorf("Test failed. Expected nil, got error: %v", err)
+	testCases := []struct {
+		name          string
+		errorList     *list.List
+		expectedError error
+	}{
+		{
+			name:          "Empty Error List",
+			errorList:     list.New(),
+			expectedError: nil,
+		},
+		{
+			name: "Error List with Single Error",
+			errorList: func() *list.List {
+				l := list.New()
+				l.PushBack(fmt.Errorf("first error"))
+				return l
+			}(),
+			expectedError: fmt.Errorf("first error"),
+		},
+		{
+			name: "Error List with Multiple Errors",
+			errorList: func() *list.List {
+				l := list.New()
+				l.PushBack(fmt.Errorf("first error"))
+				l.PushBack(fmt.Errorf("second error"))
+				l.PushBack(fmt.Errorf("third error"))
+				return l
+			}(),
+			expectedError: fmt.Errorf("first error\nsecond error\nthird error"),
+		},
+		{
+			name: "Error List with Mixed Types",
+			errorList: func() *list.List {
+				l := list.New()
+				l.PushBack(fmt.Errorf("first error"))
+				l.PushBack("second error")
+				l.PushBack(123) // unknown error type
+				return l
+			}(),
+			expectedError: fmt.Errorf("first error\nsecond error\nunknown error type: 123"),
+		},
 	}
 
-	// Error list with single error message
-	errorList.PushBack(fmt.Errorf("error message 1"))
-	err = getSingleErrorFromList(errorList)
-	if err == nil {
-		t.Error("Test failed. Expected error, got nil")
-	} else if err.Error() != "error message 1" {
-		t.Errorf("Test failed. Expected error message: 'error message 1', got: '%v'", err.Error())
-	}
-
-	// Error list with multiple error messages
-	errorList.PushBack("error message 2")
-	errorList.PushBack(fmt.Errorf("error message 3"))
-	err = getSingleErrorFromList(errorList)
-	expectedErrorMessage := "error message 1\nerror message 2\nerror message 3"
-	if err == nil {
-		t.Error("Test failed. Expected error, got nil")
-	} else if err.Error() != expectedErrorMessage {
-		t.Errorf("Test failed. Expected error message: '%s', got: '%v'", expectedErrorMessage, err.Error())
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := getSingleErrorFromList(tc.errorList)
+			if (err == nil && tc.expectedError != nil) || (err != nil && err.Error() != tc.expectedError.Error()) {
+				t.Errorf("Expected error: %v, but got: %v", tc.expectedError, err)
+			}
+		})
 	}
 }
 
@@ -324,4 +354,85 @@ func TestValidateS3AWSRegion(t *testing.T) {
 			t.Errorf("Expected region %s to be invalid, but got no error", region)
 		}
 	}
+}
+
+func TestValidateS3Endpoint(t *testing.T) {
+	testCases := []struct {
+		name          string
+		endpoint      string
+		expectedError bool
+	}{
+		{
+			name:          "Valid Endpoint",
+			endpoint:      "s3-external-1.amazonaws.com",
+			expectedError: false,
+		},
+		{
+			name:          "Valid Endpoint with HTTPS",
+			endpoint:      "https://s3.amazonaws.com",
+			expectedError: true,
+		},
+		{
+			name:          "Valid Endpoint without HTTP/HTTPS",
+			endpoint:      "s3.amazonaws.com",
+			expectedError: false,
+		},
+		{
+			name:          "Invalid Endpoint (Invalid Format)",
+			endpoint:      "example.com",
+			expectedError: true,
+		},
+		{
+			name:          "Invalid Endpoint (Missing .amazonaws.com)",
+			endpoint:      "s3.dualstack.us-east-1",
+			expectedError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := validateS3Endpoint(tc.endpoint)
+			if (err != nil && !tc.expectedError) || (err == nil && tc.expectedError) {
+				t.Errorf("Expected error: %v, but got: %v", tc.expectedError, err)
+			}
+		})
+	}
+}
+
+func TestValidateRootCACertificate(t *testing.T) {
+
+	svc := "example_service"
+	// Test case: Invalid root CA certificate (failed parsing)
+	invalidCert := []byte("invalid_certificate")
+	err := validateRootCACertificate(invalidCert, svc)
+	expectedError := fmt.Errorf("failed to parse root_ca for %s:", svc)
+	if err == nil || err.Error()[:len(expectedError.Error())] != expectedError.Error() {
+		t.Errorf("Expected error '%s' for invalid root CA certificate, got: %v", expectedError, err)
+	}
+
+	// Test case: Expired root CA certificate
+	expiredCert := generateExpiredCert()
+	err = validateRootCACertificate(expiredCert, svc)
+	expectedError = fmt.Errorf("root_ca for %s has expired", svc)
+	if err == nil || err.Error() != expectedError.Error() {
+		t.Errorf("Expected error '%s' for expired root CA certificate, got: %v", expectedError, err)
+	}
+}
+
+// Helper function to generate an expired certificate for testing
+func generateExpiredCert() []byte {
+	template := &x509.Certificate{
+		NotBefore:    time.Now().Add(-time.Hour),        // Set NotBefore to 1 hour ago
+		NotAfter:     time.Now().Add(-30 * time.Minute), // Set NotAfter to 30 minutes ago (expired)
+		SerialNumber: big.NewInt(123),                   // Random serial number
+		Subject: pkix.Name{
+			CommonName: "Example Root CA",
+		},
+	}
+
+	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	publicKey := privateKey.PublicKey
+
+	derBytes, _ := x509.CreateCertificate(rand.Reader, template, template, &publicKey, privateKey)
+	return derBytes
 }
