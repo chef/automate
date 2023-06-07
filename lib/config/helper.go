@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -294,4 +295,43 @@ func checkIPAddress(ip string) error {
 		return fmt.Errorf("ip address is invalid")
 	}
 	return nil
+}
+
+func validateS3AWSRegion(region string) error {
+	// List of AWS regions that support S3
+	// Reference: https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
+	supportedRegions := []string{
+		"us-east-1",
+		"us-east-2",
+		"us-west-1",
+		"us-west-2",
+		"af-south-1",
+		"ap-east-1",
+		"ap-south-1",
+		"ap-northeast-1",
+		"ap-northeast-2",
+		"ap-northeast-3",
+		"ap-southeast-1",
+		"ap-southeast-2",
+		"ca-central-1",
+		"cn-north-1",
+		"cn-northwest-1",
+		"eu-central-1",
+		"eu-west-1",
+		"eu-west-2",
+		"eu-south-1",
+		"eu-west-3",
+		"eu-north-1",
+		"me-south-1",
+		"sa-east-1",
+	}
+
+	// Convert the provided region and supported regions to lowercase for case-insensitive comparison
+	region = strings.ToLower(region)
+	for _, supportedRegion := range supportedRegions {
+		if region == supportedRegion {
+			return nil
+		}
+	}
+	return errors.New("invalid AWS region for S3")
 }

@@ -259,3 +259,37 @@ func TestValidateUrl(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateS3AWSRegion(t *testing.T) {
+	validRegions := []string{
+		"us-east-1",
+		"us-west-2",
+		"ap-southeast-1",
+		"eu-central-1",
+		"sa-east-1",
+		"US-EAST-2",
+	}
+
+	invalidRegions := []string{
+		"us-west-3",
+		"ap-north-1",
+		"eu-west-4",
+		"sa-south-1",
+	}
+
+	// Test valid regions
+	for _, region := range validRegions {
+		err := validateS3AWSRegion(region)
+		if err != nil {
+			t.Errorf("Expected region %s to be valid, but got error: %s", region, err.Error())
+		}
+	}
+
+	// Test invalid regions
+	for _, region := range invalidRegions {
+		err := validateS3AWSRegion(region)
+		if err == nil {
+			t.Errorf("Expected region %s to be invalid, but got no error", region)
+		}
+	}
+}

@@ -152,6 +152,11 @@ func (c *HaDeployConfig) verifyObjectStorage(objectStorage *ConfigObjectStorage)
 	if err := validateRequiredString(objectStorage.Endpoint, "endpoint"); err != nil {
 		errorList.PushBack(err)
 	}
+	if objectStorage.Region != "" {
+		if err := validateS3AWSRegion(objectStorage.Region); err != nil {
+			errorList.PushBack(err)
+		}
+	}
 	return getSingleErrorFromList(errorList)
 }
 
