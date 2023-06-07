@@ -2,9 +2,9 @@ package sshusercheckservice
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
+	"github.com/bmizerany/assert"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
@@ -21,6 +21,7 @@ const (
 	FailureTitle        = "Sudo password invalid"
 	FailureSSHUser      = "SSH user unaccessible"
 	SuccessResponse     = "SSH user is accessible for the node: 1.1.1.1"
+	SuccessSudoResponse = "SSH user sudo password is valid for the node: 1.1.1.1"
 )
 
 func TestCheckSshUserDetails(t *testing.T) {
@@ -69,14 +70,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 					{
 						Title:         SuccessTitle,
 						Passed:        true,
-						SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+						SuccessMsg:    SuccessResponse,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
 						Title:         SuccessSudoPassword,
 						Passed:        true,
-						SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
+						SuccessMsg:    SuccessSudoResponse,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -109,7 +110,7 @@ func TestCheckSshUserDetails(t *testing.T) {
 					{
 						Title:         SuccessTitle,
 						Passed:        true,
-						SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+						SuccessMsg:    SuccessResponse,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -128,9 +129,8 @@ func TestCheckSshUserDetails(t *testing.T) {
 		ssu.sshUtil = tt.args.MockSSHUtil
 		t.Run(tt.description, func(t *testing.T) {
 			ssu.sshUtil = tt.args.MockSSHUtil
-			if got, _ := ssu.CheckSshUserDetails(tt.args.req); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SshUserServiceImpl.GetSudoPasswordDetails() = %v, want %v", got, tt.want)
-			}
+			got, _ := ssu.CheckSshUserDetails(tt.args.req)
+			assert.Equal(t, got, tt.want)
 		})
 	}
 }
@@ -174,7 +174,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 			want: &models.Checks{
 				Title:         SuccessTitle,
 				Passed:        true,
-				SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+				SuccessMsg:    SuccessResponse,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
@@ -209,9 +209,8 @@ func TestGetSshConnectionDetails(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			ssu.sshUtil = tt.args.MockSSHUtil
-			if got := ssu.GetSshConnectionDetails(tt.args.SSHConfig, tt.args.ip); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SshUserServiceImpl.GetSudoPasswordDetails() = %v, want %v", got, tt.want)
-			}
+			got := ssu.GetSshConnectionDetails(tt.args.SSHConfig, tt.args.ip)
+			assert.Equal(t, got, tt.want)
 		})
 	}
 
@@ -255,7 +254,7 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 			want: &models.Checks{
 				Title:         SuccessSudoPassword,
 				Passed:        true,
-				SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
+				SuccessMsg:    SuccessSudoResponse,
 				ErrorMsg:      "",
 				ResolutionMsg: "",
 			},
@@ -290,9 +289,8 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			ssu.sshUtil = tt.args.MockSSHUtil
-			if got := ssu.GetSudoPasswordDetails(tt.args.SSHConfig, tt.args.ip, tt.args.sudoPassword); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SshUserServiceImpl.GetSudoPasswordDetails() = %v, want %v", got, tt.want)
-			}
+			got := ssu.GetSudoPasswordDetails(tt.args.SSHConfig, tt.args.ip, tt.args.sudoPassword)
+			assert.Equal(t, got, tt.want)
 		})
 	}
 }
