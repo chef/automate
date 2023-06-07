@@ -14,30 +14,14 @@ func (c *HaDeployConfig) Verify() error {
 
 	// Validate ExistingInfra (on prem)
 	if c.IsExistingInfra() {
-		if err := c.verifyConfigInitials(c.Architecture.ExistingInfra); err != nil {
-			errorList.PushBack(err)
-		}
-
-		if err := c.validateExistingInfraBackupConfig(); err != nil {
-			errorList.PushBack(err)
-		}
-
-		if err := c.verifyExistingInfraSettings(c.ExistingInfra.Config); err != nil {
+		if err := c.verifyExistingInfra(); err != nil {
 			errorList.PushBack(err)
 		}
 	}
 
 	// Validate Aws
 	if c.IsAws() {
-		if err := c.verifyConfigInitials(c.Architecture.Aws); err != nil {
-			errorList.PushBack(err)
-		}
-
-		if err := c.validateAwsBackupConfig(); err != nil {
-			errorList.PushBack(err)
-		}
-
-		if err := c.validateAwsSettings(c.Aws.Config); err != nil {
+		if err := c.verifyAws(); err != nil {
 			errorList.PushBack(err)
 		}
 	}
@@ -57,6 +41,38 @@ func (c *HaDeployConfig) Verify() error {
 	}
 
 	return getSingleErrorFromList(errorList)
+}
+
+func (c *HaDeployConfig) verifyExistingInfra() error {
+	if err := c.verifyConfigInitials(c.Architecture.ExistingInfra); err != nil {
+		return err
+	}
+
+	if err := c.validateExistingInfraBackupConfig(); err != nil {
+		return err
+	}
+
+	if err := c.verifyExistingInfraSettings(c.ExistingInfra.Config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *HaDeployConfig) verifyAws() error {
+	if err := c.verifyConfigInitials(c.Architecture.Aws); err != nil {
+		return err
+	}
+
+	if err := c.validateAwsBackupConfig(); err != nil {
+		return err
+	}
+
+	if err := c.validateAwsSettings(c.Aws.Config); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *HaDeployConfig) ParseAndVerify(configFile string) error {
@@ -276,39 +292,55 @@ func (c *HaDeployConfig) verifyExistingInfraSettings(existingInfraSettings *Conf
 
 	// existing infra
 	if !c.IsExternalDb() {
-		// validate opensearch IPs
-		if err := validateRequiredStringListField(existingInfraSettings.OpensearchPrivateIps, "opensearch_private_ips"); err != nil {
-			errorList.PushBack(err)
-		}
-		if err := validateIPList(existingInfraSettings.OpensearchPrivateIps, "opensearch private ip"); err != nil {
-			errorList.PushBack(err)
-		}
-
-		// validate postgresql IPs
-		if err := validateRequiredStringListField(existingInfraSettings.PostgresqlPrivateIps, "postgresql_private_ips"); err != nil {
-			errorList.PushBack(err)
-		}
-		if err := validateIPList(existingInfraSettings.PostgresqlPrivateIps, "postgresql private ip"); err != nil {
+		if err := c.verifyNonExternalDb(existingInfraSettings); err != nil {
 			errorList.PushBack(err)
 		}
 	}
 
 	if c.IsExternalDb() {
-		// on-prem, AWS, or self-managed
-		if err := c.verifyExternalPgSettings(c.External.Database.PostgreSQL); err != nil {
+		if err := c.verifyExternalDb(existingInfraSettings); err != nil {
 			errorList.PushBack(err)
-		}
-		if err := c.verifyExternalOsSettings(c.External.Database.OpenSearch); err != nil {
-			errorList.PushBack(err)
-		}
-
-		if c.IsAwsExternalOsConfigured() {
-			if err := c.verifyAwsExternalOsSettings(c.External.Database.OpenSearch.Aws); err != nil {
-				errorList.PushBack(err)
-			}
 		}
 	}
 
+	return getSingleErrorFromList(errorList)
+}
+
+func (c *HaDeployConfig) verifyExternalDb(existingInfraSettings *ConfigExistingInfraSettings) error {
+	errorList := list.New()
+	// on-prem, AWS, or self-managed
+	if err := c.verifyExternalPgSettings(c.External.Database.PostgreSQL); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := c.verifyExternalOsSettings(c.External.Database.OpenSearch); err != nil {
+		errorList.PushBack(err)
+	}
+
+	if c.IsAwsExternalOsConfigured() {
+		if err := c.verifyAwsExternalOsSettings(c.External.Database.OpenSearch.Aws); err != nil {
+			errorList.PushBack(err)
+		}
+	}
+	return getSingleErrorFromList(errorList)
+}
+
+func (c *HaDeployConfig) verifyNonExternalDb(existingInfraSettings *ConfigExistingInfraSettings) error {
+	errorList := list.New()
+	// validate opensearch IPs
+	if err := validateRequiredStringListField(existingInfraSettings.OpensearchPrivateIps, "opensearch_private_ips"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateIPList(existingInfraSettings.OpensearchPrivateIps, "opensearch private ip"); err != nil {
+		errorList.PushBack(err)
+	}
+
+	// validate postgresql IPs
+	if err := validateRequiredStringListField(existingInfraSettings.PostgresqlPrivateIps, "postgresql_private_ips"); err != nil {
+		errorList.PushBack(err)
+	}
+	if err := validateIPList(existingInfraSettings.PostgresqlPrivateIps, "postgresql private ip"); err != nil {
+		errorList.PushBack(err)
+	}
 	return getSingleErrorFromList(errorList)
 }
 
@@ -358,7 +390,7 @@ func (c *HaDeployConfig) verifyExternalOsSettings(externalOpensearchSettings *Ex
 		errorList.PushBack(err)
 	}
 
-	err = validateUrlWithPort(externalOpensearchSettings.OpensearchDomainURL, "opensearch_domain_url")
+	err = validateFQDN(externalOpensearchSettings.OpensearchDomainURL, "opensearch_domain_url")
 	if err != nil {
 		errorList.PushBack(err)
 	}
@@ -493,7 +525,7 @@ func validateAwsManagedServices(aws *ConfigAwsSettings) error {
 	if err := validateRequiredString(aws.ManagedOpensearchDomainName, "aws managed_opensearch_domain_name"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateUrlWithPort(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url"); err != nil {
+	if err := validateFQDN(aws.ManagedOpensearchDomainURL, "aws managed_opensearch_domain_url"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateRequiredString(aws.ManagedOpensearchUserPassword, "aws managed_opensearch_user_password"); err != nil {
@@ -562,11 +594,11 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredString(aws.AutomateServerInstanceType, "aws automate_server_instance_type"); err != nil {
+	if err := awsAutomateSettings(aws); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredString(aws.ChefServerInstanceType, "aws chef_server_instance_type"); err != nil {
+	if err := awsChefSettings(aws); err != nil {
 		errorList.PushBack(err)
 	}
 
@@ -578,11 +610,17 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredString(aws.AutomateLbCertificateArn, "aws automate_lb_certificate_arn"); err != nil {
+	return getSingleErrorFromList(errorList)
+}
+
+func awsAutomateSettings(aws *ConfigAwsSettings) error {
+	errorList := list.New()
+
+	if err := validateRequiredString(aws.AutomateServerInstanceType, "aws automate_server_instance_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
-	if err := validateRequiredString(aws.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn"); err != nil {
+	if err := validateRequiredString(aws.AutomateLbCertificateArn, "aws automate_lb_certificate_arn"); err != nil {
 		errorList.PushBack(err)
 	}
 
@@ -598,6 +636,13 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
+	return getSingleErrorFromList(errorList)
+
+}
+
+func awsChefSettings(aws *ConfigAwsSettings) error {
+	errorList := list.New()
+
 	if err := validateNumberField(aws.ChefEbsVolumeIops, "aws chef_ebs_volume_iops", true); err != nil {
 		errorList.PushBack(err)
 	}
@@ -607,6 +652,14 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	}
 
 	if err := validateRequiredString(aws.ChefEbsVolumeType, "aws chef_ebs_volume_type"); err != nil {
+		errorList.PushBack(err)
+	}
+
+	if err := validateRequiredString(aws.ChefServerInstanceType, "aws chef_server_instance_type"); err != nil {
+		errorList.PushBack(err)
+	}
+
+	if err := validateRequiredString(aws.ChefServerLbCertificateArn, "aws chef_server_lb_certificate_arn"); err != nil {
 		errorList.PushBack(err)
 	}
 
