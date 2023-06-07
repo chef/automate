@@ -93,7 +93,7 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 			return nil
 		}
 	}
-	// ani.prepare()
+	ani.prepare()
 	return ani.runDeploy()
 }
 
