@@ -24,6 +24,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/sshuseraccesschecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemresourcechecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/certificatevalidation"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
@@ -120,7 +121,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
-		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port))
+		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
+		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l))
 
 	vs := &VerifyServer{
 		Port:    port,
