@@ -161,7 +161,7 @@ func validateUrlWithPort(value string, keyName string) error {
 		return err
 	}
 	// Regular expression to validate Url with port number
-	regex := `^(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)$`
+	regex := `^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*:\d{2,5}$`
 	match, _ := regexp.MatchString(regex, value)
 	if !match {
 		return fmt.Errorf("invalid URL format: " + keyName)

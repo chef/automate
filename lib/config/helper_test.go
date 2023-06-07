@@ -265,6 +265,7 @@ func TestValidateUrlWithPort(t *testing.T) {
 	validURLs := []string{
 		"example.com:8080",
 		"subdomain.example.com:8080",
+		"managed-rds-db.cww4poze5gkx.ap-northeast-1.rds.amazonaws.com:5432",
 	}
 	for _, url := range validURLs {
 		err := validateUrlWithPort(url, "url")

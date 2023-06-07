@@ -44,35 +44,37 @@ func (c *HaDeployConfig) Verify() error {
 }
 
 func (c *HaDeployConfig) verifyExistingInfra() error {
+	errorList := list.New()
 	if err := c.verifyConfigInitials(c.Architecture.ExistingInfra); err != nil {
-		return err
+		errorList.PushBack(err)
 	}
 
 	if err := c.validateExistingInfraBackupConfig(); err != nil {
-		return err
+		errorList.PushBack(err)
 	}
 
 	if err := c.verifyExistingInfraSettings(c.ExistingInfra.Config); err != nil {
-		return err
+		errorList.PushBack(err)
 	}
 
-	return nil
+	return getSingleErrorFromList(errorList)
 }
 
 func (c *HaDeployConfig) verifyAws() error {
+	errorList := list.New()
 	if err := c.verifyConfigInitials(c.Architecture.Aws); err != nil {
-		return err
+		errorList.PushBack(err)
 	}
 
 	if err := c.validateAwsBackupConfig(); err != nil {
-		return err
+		errorList.PushBack(err)
 	}
 
 	if err := c.validateAwsSettings(c.Aws.Config); err != nil {
-		return err
+		errorList.PushBack(err)
 	}
 
-	return nil
+	return getSingleErrorFromList(errorList)
 }
 
 func (c *HaDeployConfig) ParseAndVerify(configFile string) error {
