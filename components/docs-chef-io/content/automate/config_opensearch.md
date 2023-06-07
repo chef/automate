@@ -18,7 +18,7 @@ gh_repo = "automate"
 
 The OpenSearch node in Automate HA provides various configuration options that can be patched to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
 
-The detailed document about how these individual properties affect the system can be lerant from the [Official OpenSearch docs](https://opensearch.org/docs/1.3/)
+The detailed document about how these individual properties affect the system could be found at [Official OpenSearch docs](https://opensearch.org/docs/1.3/)
 
 The below configurations can be patched to OpenSearch nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --os` from bastion node.
 

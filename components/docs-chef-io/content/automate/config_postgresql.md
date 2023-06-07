@@ -18,7 +18,7 @@ gh_repo = "automate"
 
 The PostgreSQL node in Automate HA provides various configuration options that can be patched to customize its behavior and meet specific requirements. This guide documents all the configurations that you can patch.
 
-The detailed document about how these individual properties affect the system can be lerant from the [Official PostgreSQL docs](https://www.postgresql.org/docs/13/)
+The detailed document about how these individual properties affect the system could be found at [Official PostgreSQL docs](https://www.postgresql.org/docs/13/)
 
 The below configurations can be patched to PostgreSQL nodes. Please add the values you want to patch to a `config.toml` file and run `chef-automate config patch config.toml --pg` from bastion.
 
