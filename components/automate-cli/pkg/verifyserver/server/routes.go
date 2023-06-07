@@ -22,6 +22,7 @@ func (vs *VerifyServer) SetupRoutes() {
 	apiChecksGroup.Get("/system-user", vs.Handler.CheckSystemUser)
 	apiChecksGroup.Get("/system-resource", vs.Handler.GetSystemResource)
 	apiChecksGroup.Post("/external-opensearch", vs.Handler.ExternalOpensearch)
+	apiChecksGroup.Post("/firewall", vs.Handler.FirewallCheck)
 
 	apiStartGroup := apiV1Group.Group("/start")
 	apiStartGroup.Post("/mock-server", vs.Handler.StartMockServer)

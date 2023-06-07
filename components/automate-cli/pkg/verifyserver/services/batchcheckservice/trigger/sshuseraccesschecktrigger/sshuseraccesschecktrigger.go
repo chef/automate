@@ -47,7 +47,6 @@ func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerRes
 		finalResult = append(finalResult, resp)
 	}
 	close(outputCh)
-	fmt.Println(finalResult)
 
 	return finalResult
 }

@@ -150,8 +150,6 @@ type FirewallRequest struct {
 	DestinationNodeIP          string `json:"destination_node_ip"`
 	DestinationServicePort     string `json:"destination_service_port"`
 	DestinationServiceProtocol string `json:"destination_service_protocol"`
-	Cert                       string `json:"cert"`
-	Key                        string `json:"key"`
 	RootCert                   string `json:"root_cert"`
 }
 
