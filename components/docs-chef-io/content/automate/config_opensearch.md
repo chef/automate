@@ -56,7 +56,7 @@ minimum_master_nodes = 2
 ping_unicast_hosts = ["Os Node IP 1", "Os Node IP 2"]
 ```
 - This section configures discovery settings. It sets the minimum number of master-eligible nodes required to form a cluster, specifies the unicast hosts for node discovery, and sets the ping timeout.
-- Set `ping_unicast_hosts` to pass an initial list of hosts to perform discovery when new node is started. The default list of hosts is ["127.0.0.1", "[::1]"]
+- Set `ping_unicast_hosts` to pass an initial list of hosts to perform discovery when a new node is started. The default list of hosts is ["127.0.0.1", "[::1]"]
 - Set `minimum_master_nodes` to prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
 
 ### Gateway
@@ -85,7 +85,7 @@ name = ""
 - Use `max_local_storage_nodes` to disable starting multiple nodes on a single system:
 - Use a descriptive name for the node by setting `name` field
 
-### Opensearch Auth
+### OpenSearch Auth
 
 ```toml
 [opensearch_auth]
@@ -93,7 +93,7 @@ admin_password = "admin"
 admin_username = "admin"
 hashed_password = "<your-hashed-password>"
 ```
-This section configures OpenSearch authentication settings. It sets the admin username and password, and provides a hashed version of the password.
+This section configures OpenSearch authentication settings. It sets the admin username and password and provides a hashed version of the password.
 
 ### Path
 
@@ -103,8 +103,8 @@ data = ""
 logs = "logs"
 repo = ""
 ```
-- Use `data` to set path to directory where to store the data (separate multiple locations by comma)
-- Use `logs` to set path to you log files
+- Use `data` to set the path to the directory where to store the data (separate multiple locations by comma)
+- Use `logs` to set the path to your log files
 - Use `repo` to register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location in the path.repo setting on all master and data nodes.
 
 ### Plugin Security
@@ -333,14 +333,14 @@ port = 9300
 
 To increase max heap size:
 
-- Create a heap.toml file with below contents on bastion:
+- Create a heap.toml file with the below contents on bastion:
 
-    ```toml
-    [runtime]
-    maxHeapsize = "2g"
-    ```
+```toml
+[runtime]
+maxHeapsize = "2g"
+```
 
-- Run patch command `chef-automate config patch log.toml --os` to apply the patch.
+- Run the patch command `chef-automate config patch log.toml --os` to apply the patch.
 
 ### Centralized Logs
 
