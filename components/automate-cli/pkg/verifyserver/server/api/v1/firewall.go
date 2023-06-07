@@ -33,10 +33,9 @@ func (h *Handler) FirewallCheck(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Invalid destination_service_port number")
 	}
 
-	// port number is invalid
-	err = validatePortRange(port, h)
-	if err != nil {
-		h.Logger.Error(err)
+	// If port number is invalid
+	if !isValidPort(port) {
+		h.Logger.Error("Request body contains invalid port number")
 		return fiber.NewError(http.StatusBadRequest, "Invalid destination_service_port range")
 	}
 
