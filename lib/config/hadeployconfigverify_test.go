@@ -48,6 +48,12 @@ func TestParseAndVerify(t *testing.T) {
 			err:     nil,
 		},
 		{
+			name:    "Verify Aws Chef Managed Config",
+			args:    args{configFile: "./testdata/HaAwsChefManaged.toml"},
+			wantErr: true,
+			err:     errors.New("invalid value '1234567' for field 'ssh_port' port number must be between 1 and 65535\ninvalid or empty: ssh_key_file\ninvalid or empty: aws profile name\ninvalid or empty: aws region\ninvalid or empty: aws aws_vpc_id\nminimum number of aws private_custom_subnets required is 3\ninvalid or empty: aws public_custom_subnets\ninvalid or empty: aws ssh_key_pair_name\ninvalid or empty: aws ami_id\ninvalid or empty: aws automate_server_instance_type\ninvalid or empty: aws automate_lb_certificate_arn\nempty value: aws automate_ebs_volume_iops\nempty value: aws automate_ebs_volume_size\ninvalid or empty: aws automate_ebs_volume_type\nempty value: aws chef_ebs_volume_iops\nempty value: aws chef_ebs_volume_size\ninvalid or empty: aws chef_ebs_volume_type\ninvalid or empty: aws chef_server_instance_type\ninvalid or empty: aws chef_server_lb_certificate_arn\ninvalid or empty: aws opensearch_server_instance_type\ninvalid or empty: aws postgresql_server_instance_type\nempty value: aws opensearch_ebs_volume_iops\nempty value: aws opensearch_ebs_volume_size\ninvalid or empty: aws opensearch_ebs_volume_type\nempty value: aws postgresql_ebs_volume_iops\nempty value: aws postgresql_ebs_volume_size\ninvalid or empty: aws postgresql_ebs_volume_type\ninvalid or empty URL: automate fqdn\npassword is too short (must be at least 8 characters)\nempty value: automate instance_count\nautomate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nempty value: chef server instance_count\nchefServer public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nempty value: opensearch instance_count\nopensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false\nempty value: postgresql instance_count\npostgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false"),
+		},
+		{
 			name:    "Invalid Architecture toml file",
 			args:    args{configFile: "./testdata/InvalidArchitecture.toml"},
 			wantErr: true,
