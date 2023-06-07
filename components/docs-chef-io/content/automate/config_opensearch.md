@@ -23,6 +23,7 @@ The below configurations can be patched to OpenSearch nodes. Please add the valu
 ### Sample Config for OpenSearch node
 
 ```toml
+[action]
 destructive_requires_name = "true"
 [bootstrap]
 memory_lock = false
