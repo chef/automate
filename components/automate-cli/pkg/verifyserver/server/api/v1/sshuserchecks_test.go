@@ -23,7 +23,7 @@ const (
 	SshUserResponseErrorBodyParser           = `{"status":"FAILED","result":null,"error":{"code":400,"message":"invalid character '}' looking for beginning of object key string"}}`
 )
 
-func SetupMockSshUserChecksService(responseBody *models.SshUserChecksResponse, err error) sshusercheckservice.SshUsercheckService {
+func SetupMockSshUserChecksService(responseBody *models.SshUserChecksResponse, err error) sshusercheckservice.SshUserCheckService {
 	return &sshusercheckservice.MockSshUserCheckService{
 		CheckSshUserDetailsFunc: func(*models.SshUserChecksRequest) (*models.SshUserChecksResponse, error) {
 			return responseBody, err
@@ -31,7 +31,7 @@ func SetupMockSshUserChecksService(responseBody *models.SshUserChecksResponse, e
 	}
 }
 
-func SetUpSshUserCheckHandlers(ssu sshusercheckservice.SshUsercheckService) (*fiber.App, error) {
+func SetUpSshUserCheckHandlers(ssu sshusercheckservice.SshUserCheckService) (*fiber.App, error) {
 	log, _ := logger.NewLogger("text", "debug")
 	fconf := fiber.Config{
 		ServerHeader: server.SERVICE,

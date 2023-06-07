@@ -13,8 +13,14 @@ import (
 )
 
 const (
-	testPrivateKey  = `----- BEGIN PRIVATE RSA KEY ------`
-	testPemFilePath = "./testfiles/ssh"
+	testPemFilePath     = "./testfiles/ssh"
+	nodeIp              = "1.1.1.1"
+	SuccessTitle        = "SSH user accessible"
+	SuccessSudoPassword = "Sudo password valid"
+	FailureSudoPassword = "Sudo password invalid"
+	FailureTitle        = "Sudo password invalid"
+	FailureSSHUser      = "SSH user unaccessible"
+	SuccessResponse     = "SSH user is accessible for the node: 1.1.1.1"
 )
 
 func TestCheckSshUserDetails(t *testing.T) {
@@ -41,7 +47,7 @@ func TestCheckSshUserDetails(t *testing.T) {
 			description: "SSH User has correct access and correct password",
 			args: args{
 				req: &models.SshUserChecksRequest{
-					Ip:            "1.1.1.1",
+					Ip:            nodeIp,
 					User_Name:     "ubuntu",
 					Port:          "22",
 					Private_Key:   testPemFilePath,
@@ -61,14 +67,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "SSH user accessible",
+						Title:         SuccessTitle,
 						Passed:        true,
 						SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Sudo password valid",
+						Title:         SuccessSudoPassword,
 						Passed:        true,
 						SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
 						ErrorMsg:      "",
@@ -81,7 +87,7 @@ func TestCheckSshUserDetails(t *testing.T) {
 			description: "If the user is able to SSH but password provied is not supported",
 			args: args{
 				req: &models.SshUserChecksRequest{
-					Ip:            "1.1.1.1",
+					Ip:            nodeIp,
 					User_Name:     "ubuntu",
 					Port:          "22",
 					Private_Key:   testPemFilePath,
@@ -101,14 +107,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 				Passed: false,
 				Checks: []models.Checks{
 					{
-						Title:         "SSH user accessible",
+						Title:         SuccessTitle,
 						Passed:        true,
 						SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Sudo password invalid",
+						Title:         FailureSudoPassword,
 						Passed:        false,
 						SuccessMsg:    "",
 						ErrorMsg:      "SSH user sudo password is invalid for the node with IP 1.1.1.1",
@@ -138,7 +144,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 	}, &sshutils.SSHUtilImpl{})
 
 	type args struct {
-		SSHConfig   sshutils.SSHConfig
+		SSHConfig   *sshutils.SSHConfig
 		ip          string
 		MockSSHUtil sshutils.SSHUtil
 	}
@@ -150,11 +156,11 @@ func TestGetSshConnectionDetails(t *testing.T) {
 		{
 			description: "If the SSH Connection with the user is successfull",
 			args: args{
-				SSHConfig: sshutils.SSHConfig{
+				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
-					HostIP:     "1.1.1.1",
+					HostIP:     nodeIp,
 					Timeout:    150,
 				},
 				ip: "1.1.1.1",
@@ -166,7 +172,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 				},
 			},
 			want: &models.Checks{
-				Title:         "SSH user accessible",
+				Title:         SuccessTitle,
 				Passed:        true,
 				SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
 				ErrorMsg:      "",
@@ -176,11 +182,11 @@ func TestGetSshConnectionDetails(t *testing.T) {
 		{
 			description: "If the SSH Connection failed",
 			args: args{
-				SSHConfig: sshutils.SSHConfig{
+				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
-					HostIP:     "1.1.1.1",
+					HostIP:     nodeIp,
 					Timeout:    150,
 				},
 				ip: "1.1.1.1",
@@ -192,7 +198,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 				},
 			},
 			want: &models.Checks{
-				Title:         "SSH user unaccessible",
+				Title:         FailureSSHUser,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "SSH user is unaccessible for the node with IP 1.1.1.1",
@@ -218,7 +224,7 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 		},
 	}, &sshutils.SSHUtilImpl{})
 	type args struct {
-		SSHConfig    sshutils.SSHConfig
+		SSHConfig    *sshutils.SSHConfig
 		ip           string
 		sudoPassword string
 		MockSSHUtil  sshutils.SSHUtil
@@ -231,14 +237,14 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 		{
 			description: "",
 			args: args{
-				SSHConfig: sshutils.SSHConfig{
+				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
-					HostIP:     "1.1.1.1",
+					HostIP:     nodeIp,
 					Timeout:    150,
 				},
-				ip:           "1.1.1.1",
+				ip:           nodeIp,
 				sudoPassword: "123456",
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
@@ -247,7 +253,7 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 				},
 			},
 			want: &models.Checks{
-				Title:         "Sudo password valid",
+				Title:         SuccessSudoPassword,
 				Passed:        true,
 				SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
 				ErrorMsg:      "",
@@ -257,14 +263,14 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 		{
 			description: "",
 			args: args{
-				SSHConfig: sshutils.SSHConfig{
+				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
-					HostIP:     "1.1.1.1",
+					HostIP:     nodeIp,
 					Timeout:    150,
 				},
-				ip:           "1.1.1.1",
+				ip:           nodeIp,
 				sudoPassword: "12345",
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
@@ -273,7 +279,7 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 				},
 			},
 			want: &models.Checks{
-				Title:         "Sudo password invalid",
+				Title:         FailureSudoPassword,
 				Passed:        false,
 				SuccessMsg:    "",
 				ErrorMsg:      "SSH user sudo password is invalid for the node with IP 1.1.1.1",

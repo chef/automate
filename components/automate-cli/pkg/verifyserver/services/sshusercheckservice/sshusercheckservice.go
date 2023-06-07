@@ -9,7 +9,7 @@ import (
 	"github.com/chef/automate/lib/sshutils"
 )
 
-type SshUsercheckService interface {
+type SshUserCheckService interface {
 	CheckSshUserDetails(*models.SshUserChecksRequest) (*models.SshUserChecksResponse, error)
 }
 
@@ -45,9 +45,9 @@ func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequ
 		ssu.logger.Debug("Error in getting the SSHConfig for SSH connection: ", err)
 		return nil, err
 	}
-	checkSshConnectionResponse := ssu.GetSshConnectionDetails(sshConfig, req.Ip)
+	checkSshConnectionResponse := ssu.GetSshConnectionDetails(&sshConfig, req.Ip)
 
-	checkSudoResponse := ssu.GetSudoPasswordDetails(sshConfig, req.Ip, req.Sudo_Password)
+	checkSudoResponse := ssu.GetSudoPasswordDetails(&sshConfig, req.Ip, req.Sudo_Password)
 
 	if !checkSshConnectionResponse.Passed || !checkSudoResponse.Passed {
 		serviceResponse.Passed = false
@@ -62,11 +62,13 @@ func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequ
 	return serviceResponse, nil
 }
 
-func (ssu *SshUserServiceImpl) GetSshConnectionDetails(sshConfig sshutils.SSHConfig, ip string) *models.Checks {
-	ssu.logger.Debug("The config for the sshutils: ", sshConfig, SUDO_PASSWORD_CMD)
-	ssu.sshUtil.SetSSHConfig(&sshConfig)
+func (ssu *SshUserServiceImpl) GetSshConnectionDetails(sshConfig *sshutils.SSHConfig, ip string) *models.Checks {
+	ssu.sshUtil.SetSSHConfig(sshConfig)
+
 	sshCheckResponse, err := ssu.sshUtil.GetConnection()
-	ssu.logger.Debug("The connection establishment was successfull:", sshCheckResponse)
+
+	ssu.logger.Debug("The connection establishment was successfully:", sshCheckResponse)
+
 	if err != nil {
 		ssu.logger.Error("Error while establishing the connection on the remote host: ", err)
 		return failureResponse("SSH user unaccessible", "SSH user is unaccessible for the node with IP "+fmt.Sprintf("%v", ip), "Give SSH access to the user with the given key on the node: "+fmt.Sprintf("%v", ip))
@@ -74,9 +76,10 @@ func (ssu *SshUserServiceImpl) GetSshConnectionDetails(sshConfig sshutils.SSHCon
 	return successResponse("SSH user accessible", "SSH user is accessible for the node: "+fmt.Sprintf("%v", ip))
 }
 
-func (ssu *SshUserServiceImpl) GetSudoPasswordDetails(sshConfig sshutils.SSHConfig, ip string, sudoPassword string) *models.Checks {
-	sudoCheckResponse, err := ssu.sshUtil.ConnectAndExecuteCommandOnRemoteWithSudoPassword(&sshConfig, sudoPassword, SUDO_PASSWORD_CMD)
-	ssu.logger.Debug("The response for sudo cammand execution on the host: ", sudoCheckResponse)
+func (ssu *SshUserServiceImpl) GetSudoPasswordDetails(sshConfig *sshutils.SSHConfig, ip string, sudoPassword string) *models.Checks {
+	sudoCheckResponse, err := ssu.sshUtil.ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig, sudoPassword, SUDO_PASSWORD_CMD)
+	
+	ssu.logger.Debug("The sudo execution on Remote response:", sudoCheckResponse)
 	if err != nil {
 		return failureResponse("Sudo password invalid", "SSH user sudo password is invalid for the node with IP "+fmt.Sprintf("%v", ip), "Ensure you have provided the correct sudo password and the user has sudo access on the node: "+fmt.Sprintf("%v", ip))
 	}
@@ -90,14 +93,14 @@ func (ssu *SshUserServiceImpl) getConfig(ip string, privateKey string, userName 
 		return "Error while creating key file", sshutils.SSHConfig{}, err
 	}
 	ssu.logger.Debug("File Creation on the given path was successfull")
-	sshConfig := sshutils.SSHConfig{
+	sshConfig := &sshutils.SSHConfig{
 		SshUser:    userName,
 		SshPort:    port,
 		SshKeyFile: filePath,
 		HostIP:     ip,
 		Timeout:    150,
 	}
-	return filePath, sshConfig, nil
+	return filePath, *sshConfig, nil
 }
 
 func successResponse(title string, successMsg string) *models.Checks {

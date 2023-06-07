@@ -125,7 +125,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
 		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
-		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(&sshutils.SSHConfig{}, sshutils.NewSshPkgDeps(), l)))
+		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(&sshutils.SSHConfig{}, sshutils.NewSshClient(),l)))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

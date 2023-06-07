@@ -2,8 +2,6 @@ package sshutils
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -25,49 +23,80 @@ type SSHConfig struct {
 
 type SSHUtilImpl struct {
 	SshConfig *SSHConfig
+	SshClient ISshClient
 	logger    logger.Logger
-	Ssh       *SshPkgDeps
-}
-
-type SshPkgDeps struct {
-	Dial            func(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error)
-	HostKeyCallback func(func(hostname string, remote net.Addr, key ssh.PublicKey) error)
-	ParsePrivateKey func(pemBytes []byte) (ssh.Signer, error)
-	NewSession      func() (*ssh.Session, error)
-	PublicKey       func(signers ...ssh.Signer) ssh.AuthMethod
-	Normalize       func(address string) string
-	New             func(files ...string) (ssh.HostKeyCallback, error)
 }
 
 type SSHUtil interface {
 	getClientConfig() (*ssh.ClientConfig, error)
-	GetSSHConfig() *SSHConfig
 	SetSSHConfig(sshConfig *SSHConfig)
 	GetConnection() (*ssh.Client, error)
-	ConnectAndExecuteCommandOnRemoteWithSudoPassword(*SSHConfig, string, string) (bool, error)
 	checkKnownHosts() (ssh.HostKeyCallback, error)
-	createKnownHosts()
+	createKnownHosts() error
+	ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig *SSHConfig, sudoPassword string, sudoPasswordCmd string) (bool, error)
 	addHostKey(string, net.Addr, ssh.PublicKey) error
 }
 
-func NewSshPkgDeps() *SshPkgDeps {
-	return &SshPkgDeps{
-		Dial:            ssh.Dial,
-		ParsePrivateKey: ssh.ParsePrivateKey,
-		PublicKey:       ssh.PublicKeys,
-		NewSession:      ssh.NewSession(),
-		Normalize:       knownhosts.Normalize,
-		New:             knownhosts.New,
-	}
+type ISshClient interface {
+	Dial(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error)
+	NewSession(*ssh.Client) (*ssh.Session, error)
+	ParsePrivateKey(pemBytes []byte) (ssh.Signer, error)
+	PublicKey(signers ssh.Signer) ssh.AuthMethod
+	CombinedOutput(cmd string, session *ssh.Session) ([]byte, error)
+	Close(*ssh.Session) error
+	Normalize(address string) string
+	New(files ...string) (ssh.HostKeyCallback, error)
 }
 
-func NewSSHUtil(sshconfig *SSHConfig, ssh *SshPkgDeps, logger logger.Logger) SSHUtil {
+type sshClient struct{}
+
+func NewSshClient() ISshClient {
+	return &sshClient{}
+}
+
+func (sc *sshClient) Dial(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+	conn, err := ssh.Dial(network, addr, config)
+	return conn, err
+}
+
+func (sc *sshClient) NewSession(conn *ssh.Client) (*ssh.Session, error) {
+	session, err := conn.NewSession()
+	return session, err
+}
+
+func (sc *sshClient) ParsePrivateKey(pemBytes []byte) (ssh.Signer, error) {
+	return ssh.ParsePrivateKey(pemBytes)
+}
+
+func (sc *sshClient) PublicKey(signers ssh.Signer) ssh.AuthMethod {
+	return ssh.PublicKeys(signers)
+}
+
+func (sc *sshClient) CombinedOutput(cmd string, session *ssh.Session) ([]byte, error) {
+	output, err := session.CombinedOutput(cmd)
+	return output, err
+}
+
+func (sc *sshClient) Close(session *ssh.Session) error {
+	return session.Close()
+}
+
+func (sc *sshClient) Normalize(address string) string {
+	return knownhosts.Normalize(address)
+}
+
+func (sc *sshClient) New(files ...string) (ssh.HostKeyCallback, error) {
+	kn, err := knownhosts.New(files...)
+	return kn, err
+}
+
+func NewSSHUtil(sshconfig *SSHConfig, sshclient ISshClient, logger logger.Logger) *SSHUtilImpl {
 	// Check if timeout is set, if not set it to default value.
 	checkTimeout(sshconfig)
 	return &SSHUtilImpl{
 		SshConfig: sshconfig,
+		SshClient: sshclient,
 		logger:    logger,
-		Ssh:       ssh,
 	}
 }
 
@@ -75,10 +104,6 @@ func checkTimeout(sshConfig *SSHConfig) {
 	if sshConfig.Timeout == 0 {
 		sshConfig.Timeout = 150
 	}
-}
-
-func (s *SSHUtilImpl) GetSSHConfig() *SSHConfig {
-	return s.SshConfig
 }
 
 func (s *SSHUtilImpl) SetSSHConfig(sshConfig *SSHConfig) {
@@ -90,9 +115,9 @@ func (s *SSHUtilImpl) SetSSHConfig(sshConfig *SSHConfig) {
 func (s *SSHUtilImpl) GetConnection() (*ssh.Client, error) {
 	config, err := s.getClientConfig()
 	if err != nil {
+		s.logger.Error("Error while generating the client config:", err)
 		return nil, err
 	}
-	log.Println("Config:", config)
 	// Open connection
 	addr := s.SshConfig.HostIP
 	if len(strings.TrimSpace(s.SshConfig.SshPort)) > 0 {
@@ -100,100 +125,97 @@ func (s *SSHUtilImpl) GetConnection() (*ssh.Client, error) {
 	} else {
 		addr = addr + ":22"
 	}
-	log.Println("Address:", addr)
-	conn, err := s.Ssh.Dial("tcp", addr, config)
+	conn, err := s.SshClient.Dial("tcp", addr, config)
 	if conn == nil || err != nil {
-		log.Printf("dial failed:%v\n", err)
+		s.logger.Error("dial failed:%v\n", err)
 		return nil, err
 	}
-	log.Print("The connetion Details: ", conn)
 	return conn, err
 }
 
 func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
-	pemBytes, err := ioutil.ReadFile(s.SshConfig.SshKeyFile) //nosemgrep
+	pemBytes, err := os.ReadFile(s.SshConfig.SshKeyFile)
 	if err != nil {
 		s.logger.Error("Unable to read private key: %v", err)
 		return nil, err
 	}
-	signer, err := ssh.ParsePrivateKey(pemBytes)
+	signer, err := s.SshClient.ParsePrivateKey(pemBytes)
 	if err != nil {
 		s.logger.Errorf("Parsing key failed: %v", err)
 		return nil, err
 	}
-	var (
-		keyErr *knownhosts.KeyError
-	)
 	// Client config
 	return &ssh.ClientConfig{
-		User: s.SshConfig.SshUser,
-		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
-			kh, err := s.checkKnownHosts()
-			if err != nil {
-				s.logger.Errorf("Error while getting the list of knows Host:", err)
-			}
-			hErr := kh(host, remote, pubKey)
-			// Reference: https://blog.golang.org/go1.13-errors
-			// To understand what errors.As is.
-			if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
-				// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
-				// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
-				// and if host is known then there is key mismatch the connection is then rejected.
-				s.logger.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
-				return keyErr
-			} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
-				// host key not found in known_hosts then give a warning and continue to connect.
-				// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
-				return s.addHostKey(host, remote, pubKey)
-			}
-			// writer.Printf("Pub key exists for %s.\n", host)
-			return nil
-		}),
+		User:            s.SshConfig.SshUser,
+		Auth:            []ssh.AuthMethod{s.SshClient.PublicKey(signer)},
+		HostKeyCallback: s.HostKeyCallback,
 	}, nil
 }
-
-func (s *SSHUtilImpl) ConnectAndExecuteCommandOnRemoteWithSudoPassword(SSHConfig *SSHConfig, sudoPassword string, SUDO_PASSWORD_CMD string) (bool, error) {
-	//Setting the SSH Config received
-	s.SetSSHConfig(SSHConfig)
-
-	// Creating a SSH connection with the Config provided
+func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+	var keyErr *knownhosts.KeyError
+	kh, err := s.checkKnownHosts()
+	if err != nil {
+		s.logger.Error("Error while getting the list of knows Host:", err)
+		return err
+	}
+	hErr := kh(host, remote, pubkey)
+	// Reference: https://blog.golang.org/go1.13-errors
+	// To understand what errors.As is.
+	if errors.As(hErr, &keyErr) && len(keyErr.Want) > 0 {
+		// Reference: https://www.godoc.org/golang.org/x/crypto/ssh/knownhosts#KeyError
+		// if keyErr.Want slice is empty then host is unknown, if keyErr.Want is not empty
+		// and if host is known then there is key mismatch the connection is then rejected.
+		s.logger.Printf("WARNING: Given hostkeystring is not a key of %s, either a MiTM attack or %s has reconfigured the host pub key.", host, host)
+		return keyErr
+	} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
+		// host key not found in known_hosts then give a warning and continue to connect.
+		// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
+		return s.addHostKey(host, remote, pubkey)
+	}
+	// writer.Printf("Pub key exists for %s.\n", host)
+	return nil
+}
+func (s *SSHUtilImpl) ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig *SSHConfig, sudoPassword string, sudoPasswordCmd string) (bool, error) {
+	//Ran the command using the sudoPassword provided
+	s.SetSSHConfig(sshConfig)
 	conn, err := s.GetConnection()
 	if err != nil {
 		return false, err
 	}
-	// Creating a session for the cammand execution
-	session, err := conn.NewSession()
+	session, err := s.SshClient.NewSession(conn)
 	if err != nil {
-		s.logger.Error("Session Creation failed:%v\n", err)
+		s.logger.Error("Session Creation failed:", err)
 		return false, err
 	}
-	defer session.Close()
-	//Ran the command using the sudoPassword provided
-	remoteCommands := fmt.Sprintf(SUDO_PASSWORD_CMD, sudoPassword)
-	output, err := session.CombinedOutput(remoteCommands)
+	remoteCommands := fmt.Sprintf(sudoPasswordCmd, sudoPassword)
+	output, err := s.SshClient.CombinedOutput(remoteCommands, session)
+	s.logger.Debug("The output for the execution of the command : ", output)
 	if err != nil {
-		s.logger.Error("Error while running cammand:", err)
+		s.logger.Error("Error while executing command on the remote host:", err)
 		return false, err
 	}
 	s.logger.Debug("The output from the session:", output)
+	defer s.SshClient.Close(session)
 	return true, nil
 }
 
-func (s *SSHUtilImpl) createKnownHosts() {
+func (s *SSHUtilImpl) createKnownHosts() error {
 	f, fErr := os.OpenFile(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"), os.O_CREATE, 0600)
 	if fErr != nil {
-		s.logger.Errorf("%v", fErr)
-		return
+		return fErr
 	}
 	f.Close()
+	return nil
 }
 
 func (s *SSHUtilImpl) checkKnownHosts() (ssh.HostKeyCallback, error) {
-	s.createKnownHosts()
-	kh, e := s.Ssh.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
+	err := s.createKnownHosts()
+	if err != nil {
+		return nil, err
+	}
+	kh, e := s.SshClient.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
 	if e != nil {
-		s.logger.Error("%v", e)
+		s.logger.Error("Error while getting the known host: %v", e)
 		return nil, e
 	}
 	return kh, nil
@@ -206,11 +228,11 @@ func (s *SSHUtilImpl) addHostKey(host string, remote net.Addr, pubKey ssh.Public
 
 	f, fErr := os.OpenFile(khFilePath, os.O_APPEND|os.O_WRONLY, 0600)
 	if fErr != nil {
+		s.logger.Error("Error while opening file on the given path:", fErr)
 		return fErr
 	}
 	defer f.Close()
-
-	knownHosts := s.Ssh.Normalize(remote.String())
+	knownHosts := s.SshClient.Normalize(remote.String())
 	_, fileErr := f.WriteString(knownhosts.Line([]string{knownHosts}, pubKey))
 	f.WriteString("\n")
 	return fileErr

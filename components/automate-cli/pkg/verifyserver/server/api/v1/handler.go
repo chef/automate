@@ -41,7 +41,7 @@ type Handler struct {
 	FqdnService                  fqdnservice.IFqdnService
 	FirewallService              firewallservice.IFirewallService
 	ValidateCertificateService   certificatevalidation.IValidateCertificateService
-	SshUserCheckService          sshusercheckservice.SshUsercheckService
+	SshUserCheckService          sshusercheckservice.SshUserCheckService
 }
 
 func NewHandler(logger logger.Logger) *Handler {
@@ -132,7 +132,7 @@ func (h *Handler) AddCertificateValidation(vc certificatevalidation.IValidateCer
 	return h
 }
 
-func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUsercheckService) *Handler {
+func (h *Handler) AddSshUserCheckService(ssu sshusercheckservice.SshUserCheckService) *Handler {
 	h.SshUserCheckService = ssu
 	return h
 }
