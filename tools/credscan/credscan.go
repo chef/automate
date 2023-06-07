@@ -144,6 +144,9 @@ var a2Config = config{
 		// Exclude test file for portreachableservice with uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/portreachableservice/portreachable_test.go`},
 
+		// Exclude test file for certificatevalidation with uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/services/certificatevalidation/certificatevalidation_test.go`},
+
 		// Test data for hadeployconfig
 		{regex: `lib/config/testdata/.*\.toml`},
 		{regex: `lib/config/hadeployconfig_test.go`},
