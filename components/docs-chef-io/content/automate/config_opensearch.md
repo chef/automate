@@ -38,7 +38,7 @@ destructive_requires_name = "true"
 [bootstrap]
 memory_lock = false
 ```
-- Disables swapping (along with memlock). Swapping can dramatically decrease performance and stability, so you should ensure it is disabled on production clusters.
+Disables swapping (along with memlock). Swapping can dramatically decrease performance and stability, so you should ensure it is disabled on production clusters.
 
 ### Cluster
 
@@ -46,7 +46,7 @@ memory_lock = false
 [cluster]
 name = "opensearch"
 ```
-- This section configures cluster settings. It sets the name of the OpenSearch cluster to "opensearch".
+This section configures cluster settings. It sets the name of the OpenSearch cluster to "opensearch".
 
 ### Discovery
 
@@ -65,7 +65,7 @@ ping_unicast_hosts = ["Os Node IP 1", "Os Node IP 2"]
 [gateway]
 recover_after_nodes = ""
 ```
-- Set `recover_after_nodes` to block initial recovery after a full cluster restart until N nodes are started.
+Set `recover_after_nodes` to block initial recovery after a full cluster restart until N nodes are started.
 
 ### Logger
 
@@ -73,7 +73,7 @@ recover_after_nodes = ""
 [logger]
 level = "info"
 ```
-- This section configures logger settings. Allowed levels are trace, debug, info, warn, error, and fatal.
+This section configures logger settings. Allowed levels are trace, debug, info, warn, error, and fatal.
 
 ### Node
 
@@ -93,7 +93,7 @@ admin_password = "admin"
 admin_username = "admin"
 hashed_password = "<your-hashed-password>"
 ```
-- This section configures OpenSearch authentication settings. It sets the admin username and password, and provides a hashed version of the password.
+This section configures OpenSearch authentication settings. It sets the admin username and password, and provides a hashed version of the password.
 
 ### Path
 
@@ -117,7 +117,7 @@ check_snapshot_restore_write_privileges = true
 enable_snapshot_restore_privilege = true
 nodes_dn = "- <Common Name of Public Key>"
 ```
-- This section configures security plugin settings. It allows the default initialization of the security index, allows unsafe demo certificates, checks snapshot and restore write privileges, enables snapshot and restore privileges, and specifies the distinguished names (DNs) of the nodes.
+This section configures security plugin settings. It allows the default initialization of the security index, allows unsafe demo certificates, checks snapshot and restore write privileges, enables snapshot and restore privileges, and specifies the distinguished names (DNs) of the nodes.
 
 ### Plugin Security Audit
 
@@ -125,7 +125,7 @@ nodes_dn = "- <Common Name of Public Key>"
 [plugins.security.audit]
 type = "internal_opensearch"
 ```
-- This section configures security audit settings. It specifies the type of audit logging as "internal_opensearch".
+This section configures security audit settings. It specifies the type of audit logging as "internal_opensearch".
 
 ### Plugin Security Authcz
 
@@ -133,7 +133,7 @@ type = "internal_opensearch"
 [plugins.security.authcz]
 admin_dn = "- <Common Name of Admin Public Key>"
 ```
-- This section specifies the distinguished name (DN) of the admin user.
+This section specifies the distinguished name (DN) of the admin user.
 
 ### Plugin Security Restapi
 
@@ -141,7 +141,7 @@ admin_dn = "- <Common Name of Admin Public Key>"
 [plugins.security.restapi]
 roles_enabled = "[\"all_access\", \"security_rest_api_access\"]"
 ```
-- This section configures security REST API settings. It enables certain roles, such as "all_access" and "security_rest_api_access".
+This section configures security REST API settings. It enables certain roles, such as "all_access" and "security_rest_api_access".
 
 ### Plugin Security SSL HTTP
 
@@ -152,7 +152,7 @@ pemcert_filepath = "certificates/node1.pem"
 pemkey_filepath = "certificates/node1-key.pem"
 pemtrustedcas_filepath = "certificates/root-ca.pem"
 ```
-- This section configures SSL/TLS settings for HTTP. It enables SSL/TLS, specifies the file paths for the certificate, private key, and trusted CA certificates.
+This section configures SSL/TLS settings for HTTP. It enables SSL/TLS, specifies the file paths for the certificate, private key, and trusted CA certificates.
 
 ### Plugin Security SSL Transport
 
@@ -164,7 +164,7 @@ pemkey_filepath = "certificates/node1-key.pem"
 pemtrustedcas_filepath = "certificates/root-ca.pem"
 resolve_hostname = false
 ```
-- This section configures SSL/TLS settings for transport layer communication. It disables hostname verification, specifies the file paths for the certificate, private key, and trusted CA certificates, and disables hostname resolution.
+This section configures SSL/TLS settings for transport layer communication. It disables hostname verification, specifies the file paths for the certificate, private key, and trusted CA certificates, and disables hostname resolution.
 
 ### Plugin Security System Indices
 
@@ -176,7 +176,7 @@ indices = "[\".opendistro-alerting-config\", \".opendistro-alerting-alert*\", \"
 
 opendistro-anomaly-checkpoints\", \".opendistro-anomaly-detection-state\", \".opendistro-reports-*\", \".opendistro-notifications-*\", \".opendistro-notebooks\", \".opensearch-observability\", \".opendistro-asynchronous-search-response*\", \".replication-metadata-store\"]"
 ```
-- This section configures system indices for the security plugin. It specifies the system indices that are enabled for various functionalities.
+This section configures system indices for the security plugin. It specifies the system indices that are enabled for various functionalities.
 
 ### Runtime
 
@@ -191,7 +191,7 @@ max_locked_memory = "unlimited"
 max_open_files = ""
 minHeapsize = "2g"
 ```
-- This section configures runtime settings. It specifies various Java runtime options and heap sizes.
+This section configures runtime settings. It specifies various Java runtime options and heap sizes.
 
 ### S3 Client Default
 
@@ -203,7 +203,7 @@ protocol = "https"
 read_timeout = "60s"
 use_throttle_retries = true
 ```
-- This section configures the default S3 client settings. It specifies the S3 endpoint, the maximum number of retries, the protocol (HTTPS), the read timeout, and whether to use throttle retries.
+This section configures the default S3 client settings. It specifies the S3 endpoint, the maximum number of retries, the protocol (HTTPS), the read timeout, and whether to use throttle retries.
 
 ### TLS
 
@@ -215,7 +215,7 @@ rootCA = "----Enter Root CA----"
 ssl_cert = "----Enter Public Key----"
 ssl_key = "Enter Private Key----"
 ```
-- This section configures TLS settings. It specifies the file paths for the admin certificate, admin private key, root CA certificate, SSL certificate, and SSL private key.
+This section configures TLS settings. It specifies the file paths for the admin certificate, admin private key, root CA certificate, SSL certificate, and SSL private key.
 
 
 ### Full config for OpenSearch node
