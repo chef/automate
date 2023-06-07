@@ -218,7 +218,7 @@ func (vc *ValidateCertificateService) CertificateValidation(req models.Certifica
 	certificates[constants.NODE] = req.NodeCertificate
 	privateKeys[constants.NODE_KEY] = req.PrivateKey
 
-	if req.NodeType == constants.OPENSEARCH {
+	if strings.TrimSpace(req.AdminCertificate) != "" && strings.TrimSpace(req.AdminPrivateKey) != "" {
 		certificates[constants.ADMIN] = req.AdminCertificate
 		privateKeys[constants.ADMIN_KEY] = req.AdminPrivateKey
 		certKeys = append(certKeys, constants.ADMIN)
