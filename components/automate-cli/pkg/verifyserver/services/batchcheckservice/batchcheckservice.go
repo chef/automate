@@ -61,7 +61,6 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 			if successfullyStartedMockServer.Host != "" {
 				ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
 			}
-
 		}
 		return models.BatchCheckResponse{}, errors.New("mock server not started successfull on some nodes")
 	}
