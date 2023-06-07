@@ -42,16 +42,17 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 	for _, node := range certificate.Nodes {
 		nodeTypes := hostMap[node.IP]
 		//construct the request for Certificate Check API
-		requestBody := models.CertificateCheckRequest{
-			RootCertificate:  certificate.RootCert,
-			PrivateKey:       node.Key,
-			NodeCertificate:  node.Cert,
-			AdminPrivateKey:  node.AdminKey,
-			AdminCertificate: node.AdminCert,
-		}
 
 		for i := 0; i < len(nodeTypes); i++ {
 			count++
+			requestBody := models.CertificateCheckRequest{
+				NodeType:         nodeTypes[i],
+				RootCertificate:  certificate.RootCert,
+				PrivateKey:       node.Key,
+				NodeCertificate:  node.Cert,
+				AdminPrivateKey:  node.AdminKey,
+				AdminCertificate: node.AdminCert,
+			}
 			go trigger.TriggerCheckAPI(url, node.IP, nodeTypes[i], http.MethodPost, outputCh, requestBody)
 		}
 	}

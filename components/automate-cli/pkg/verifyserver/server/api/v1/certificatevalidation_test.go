@@ -89,6 +89,7 @@ func TestValidateCertificate(t *testing.T) {
 		{
 			TestName: "200:success",
 			RequestBody: `{
+				"node_type": "opensearch",
 				"root_certificate": "VALID CERTIFICATE",
 				"private_key": "VALID CERTIFICATE",
 				"node_certificate": "VALID CERTIFICATE",
@@ -136,7 +137,26 @@ func TestValidateCertificate(t *testing.T) {
 		{
 			TestName: "400: Failure Root Certificate is empty",
 			RequestBody: `{
+				"node_type":"automate",
 				"root_certificate": "",
+				"private_key": "VALID CERTIFICATE",
+				"node_certificate": "VALID CERTIFICATE"
+			  }`,
+			ExpectedCode: 400,
+			ExpectedResult: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "root_certificate, private_key, node_certificate can't be empty, Please provide all the fields."
+				}
+			}`,
+		},
+		{
+			TestName: "400: Node Type is empty",
+			RequestBody: `{
+				"node_type":"",
+				"root_certificate": "VALID CERTIFICATE",
 				"private_key": "VALID CERTIFICATE",
 				"node_certificate": "VALID CERTIFICATE",
 				"admin_private_key": "VALID CERTIFICATE",
@@ -148,7 +168,47 @@ func TestValidateCertificate(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "root_certificate, private_key, node_certificate, admin_private_key and admin_certificate can't be empty, Please provide all the fields."
+					"message": "node_type should be automate, chef-infra-server, opensearch or postgresql. Please provide node_type."
+				}
+			}`,
+		},
+		{
+			TestName: "400: For Opensearch Admin Certificate is empty",
+			RequestBody: `{
+				"node_type":"opensearch",
+				"root_certificate": "VALID CERTIFICATE",
+				"private_key": "VALID CERTIFICATE",
+				"node_certificate": "VALID CERTIFICATE",
+				"admin_private_key": "VALID CERTIFICATE",
+				"admin_certificate": ""
+			  }`,
+			ExpectedCode: 400,
+			ExpectedResult: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "admin_private_key and admin_certificate can't be empty. Please provide all the fields."
+				}
+			}`,
+		},
+		{
+			TestName: "400: Node Type is unexpected",
+			RequestBody: `{
+				"node_type":"abc",
+				"root_certificate": "VALID CERTIFICATE",
+				"private_key": "VALID CERTIFICATE",
+				"node_certificate": "VALID CERTIFICATE",
+				"admin_private_key": "VALID CERTIFICATE",
+				"admin_certificate": "VALID CERTIFICATE"
+			  }`,
+			ExpectedCode: 400,
+			ExpectedResult: `{
+				"status": "FAILED",
+				"result": null,
+				"error": {
+					"code": 400,
+					"message": "node_type should be automate, chef-infra-server, opensearch or postgresql. Please provide node_type."
 				}
 			}`,
 		},

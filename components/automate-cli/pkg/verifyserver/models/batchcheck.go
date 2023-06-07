@@ -131,6 +131,7 @@ type HardwareResourceCountApiResult struct {
 }
 
 type CertificateCheckRequest struct {
+	NodeType         string `json:"node_type"`
 	RootCertificate  string `json:"root_certificate"`
 	PrivateKey       string `json:"private_key"`
 	NodeCertificate  string `json:"node_certificate"`

@@ -235,6 +235,7 @@ func GetRequestJson() models.Config {
 
 func GetCertificateRequest() models.CertificateCheckRequest {
 	req := models.CertificateCheckRequest{
+		NodeType:         "opensearch",
 		AdminPrivateKey:  "---- VALID ADMIN PRIVATE KEY ----",
 		PrivateKey:       "---- VALID PRIVATE KEY ----",
 		NodeCertificate:  "---- VALID NODE CERT ----",

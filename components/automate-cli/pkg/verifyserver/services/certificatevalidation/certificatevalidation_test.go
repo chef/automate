@@ -254,6 +254,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "All Certificates are valid",
 			ReqBody: models.CertificateCheckRequest{
+				NodeType:         constants.OPENSEARCH,
 				RootCertificate:  ROOT_CERTIFICATE,
 				PrivateKey:       PRIVATE_KEY,
 				NodeCertificate:  NODE_CERTIFICATE,
@@ -297,11 +298,10 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Root Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo and Node Certificate is expired.",
 			ReqBody: models.CertificateCheckRequest{
-				RootCertificate:  CERT_WITH_INVALID_FORMAT_HASH_ALGO,
-				PrivateKey:       PRIVATE_KEY,
-				NodeCertificate:  EXPIRED_NODE_CERTIFICATE,
-				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-				AdminCertificate: ADMIN_CERTIFICATE,
+				NodeType:        constants.AUTOMATE,
+				RootCertificate: CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+				PrivateKey:      PRIVATE_KEY,
+				NodeCertificate: EXPIRED_NODE_CERTIFICATE,
 			},
 			ExpectedResBody: models.CertificateCheckResponse{
 				Passed: false,
@@ -340,6 +340,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Node Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
 			ReqBody: models.CertificateCheckRequest{
+				NodeType:         constants.OPENSEARCH,
 				RootCertificate:  ROOT_CERTIFICATE,
 				PrivateKey:       PRIVATE_KEY,
 				NodeCertificate:  CERT_WITH_INVALID_FORMAT_HASH_ALGO,
@@ -383,6 +384,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Admin Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
 			ReqBody: models.CertificateCheckRequest{
+				NodeType:         constants.OPENSEARCH,
 				RootCertificate:  ROOT_CERTIFICATE,
 				PrivateKey:       PRIVATE_KEY,
 				NodeCertificate:  NODE_CERTIFICATE,
@@ -426,11 +428,10 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Invalid Block Root Certificate",
 			ReqBody: models.CertificateCheckRequest{
-				RootCertificate:  INVALID_BLOCK,
-				PrivateKey:       PRIVATE_KEY,
-				NodeCertificate:  NODE_CERTIFICATE,
-				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-				AdminCertificate: ADMIN_CERTIFICATE,
+				NodeType:        constants.CHEF_INFRA_SERVER,
+				RootCertificate: INVALID_BLOCK,
+				PrivateKey:      PRIVATE_KEY,
+				NodeCertificate: NODE_CERTIFICATE,
 			},
 			ExpectedResBody: models.CertificateCheckResponse{
 				Passed: false,
@@ -469,6 +470,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Failed to Parse Root Certificate",
 			ReqBody: models.CertificateCheckRequest{
+				NodeType:         constants.OPENSEARCH,
 				RootCertificate:  INVALID_ROOT_CERTIFICATE,
 				PrivateKey:       PRIVATE_KEY,
 				NodeCertificate:  NODE_CERTIFICATE,
@@ -512,6 +514,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Invalid Block for Private Key",
 			ReqBody: models.CertificateCheckRequest{
+				NodeType:         constants.OPENSEARCH,
 				RootCertificate:  ROOT_CERTIFICATE,
 				PrivateKey:       INVALID_BLOCK,
 				NodeCertificate:  NODE_CERTIFICATE,
@@ -555,6 +558,7 @@ func TestCertificateValidation(t *testing.T) {
 		{
 			TestName: "Private Key is not in PKCS8 format",
 			ReqBody: models.CertificateCheckRequest{
+				NodeType:         constants.OPENSEARCH,
 				RootCertificate:  ROOT_CERTIFICATE,
 				PrivateKey:       INVALID_KEY_FORMAT,
 				NodeCertificate:  NODE_CERTIFICATE,

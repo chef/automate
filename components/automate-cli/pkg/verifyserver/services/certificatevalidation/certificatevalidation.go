@@ -68,11 +68,10 @@ func decodeAndParseCertificate(certificate, key string) (*x509.Certificate, erro
 	return parsedCertificate, nil
 }
 
-func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map[string]string) models.Checks {
+func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map[string]string, keys []string) models.Checks {
 	vc.log.Debug("Validating Certificates Expiry...")
 	expiredCerts := ""
 	aboutToExpireCerts := ""
-	keys := []string{constants.ROOT, constants.NODE, constants.ADMIN}
 
 	for _, key := range keys {
 		cert := certificates[key]
@@ -109,10 +108,9 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 	return createCheck(constants.CERTIFICATE_EXPIRY_TITLE, false, "", errorMessage, constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE)
 }
 
-func (vc *ValidateCertificateService) validateCertificateFormat(certificates map[string]string) models.Checks {
+func (vc *ValidateCertificateService) validateCertificateFormat(certificates map[string]string, keys []string) models.Checks {
 	vc.log.Debug("Validating Certificates Format...")
 	invalidFormatCerts := ""
-	keys := []string{constants.ROOT, constants.NODE, constants.ADMIN}
 
 	for _, key := range keys {
 		cert := certificates[key]
@@ -140,10 +138,9 @@ func (vc *ValidateCertificateService) validateCertificateFormat(certificates map
 	return createCheck(constants.CERTIFICATE_FORMAT_TITLE, false, "", fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, invalidFormatCerts), constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE)
 }
 
-func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]string) models.Checks {
+func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]string, keys []string) models.Checks {
 	vc.log.Debug("Validating Keys Format...")
 	invalidFormatKeys := ""
-	keys := []string{constants.NODE_KEY, constants.ADMIN_KEY}
 
 	for _, key := range keys {
 		cert := privateKeys[key]
@@ -172,10 +169,9 @@ func (vc *ValidateCertificateService) validateKeyFormat(privateKeys map[string]s
 	return createCheck(constants.KEY_FORMAT_TITLE, false, "", fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, invalidFormatKeys), fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, invalidFormatKeys))
 }
 
-func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates map[string]string) models.Checks {
+func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates map[string]string, keys []string) models.Checks {
 	vc.log.Debug("Validating Certificates Hashing Algorithm...")
 	invalidAlgoCerts := ""
-	keys := []string{constants.ROOT, constants.NODE, constants.ADMIN}
 
 	for _, key := range keys {
 		cert := certificates[key]
@@ -210,19 +206,29 @@ func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates 
 func (vc *ValidateCertificateService) CertificateValidation(req models.CertificateCheckRequest) models.CertificateCheckResponse {
 	var response = models.CertificateCheckResponse{}
 
-	certificates := make(map[string]string)
-	privateKeys := make(map[string]string)
+	// certKeys and keys arrays are required to maintain the order of correct response messages.
+	certKeys := []string{constants.ROOT, constants.NODE}
+	keys := []string{constants.NODE_KEY}
 
+	// certificates map is used for storing Root Certificate, Node Certificate and if it is a case of opensearch then Admin Certificate.
+	certificates := make(map[string]string)
+	// privateKeys map is used for storing Private Key and if it is a case of opensearch then Admin Private Key.
+	privateKeys := make(map[string]string)
 	certificates[constants.ROOT] = req.RootCertificate
 	certificates[constants.NODE] = req.NodeCertificate
-	certificates[constants.ADMIN] = req.AdminCertificate
 	privateKeys[constants.NODE_KEY] = req.PrivateKey
-	privateKeys[constants.ADMIN_KEY] = req.AdminPrivateKey
 
-	response.Checks = append(response.Checks, vc.validateCertificateExpiry(certificates))
-	response.Checks = append(response.Checks, vc.validateCertificateFormat(certificates))
-	response.Checks = append(response.Checks, vc.validateKeyFormat(privateKeys))
-	response.Checks = append(response.Checks, vc.validateCertificateAlgorithm(certificates))
+	if req.NodeType == constants.OPENSEARCH {
+		certificates[constants.ADMIN] = req.AdminCertificate
+		privateKeys[constants.ADMIN_KEY] = req.AdminPrivateKey
+		certKeys = append(certKeys, constants.ADMIN)
+		keys = append(keys, constants.ADMIN_KEY)
+	}
+
+	response.Checks = append(response.Checks, vc.validateCertificateExpiry(certificates, certKeys))
+	response.Checks = append(response.Checks, vc.validateCertificateFormat(certificates, certKeys))
+	response.Checks = append(response.Checks, vc.validateKeyFormat(privateKeys, keys))
+	response.Checks = append(response.Checks, vc.validateCertificateAlgorithm(certificates, certKeys))
 
 	response.Passed = true
 	for _, k := range response.Checks {
