@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger/systemuserchecktrigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalopensearchservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/externalpostgresqlservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/firewallservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/hardwareresourcecount"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/nfsmountservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/opensearchbackupservice"
@@ -118,7 +119,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
-		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT))
+		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
+		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port))
 
 	vs := &VerifyServer{
 		Port:    port,

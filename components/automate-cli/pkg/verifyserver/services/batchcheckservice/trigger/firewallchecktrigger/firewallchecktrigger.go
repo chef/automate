@@ -46,18 +46,6 @@ func makeRequests(config models.Config, reqMap map[string][]models.FirewallReque
 	reqMap[constants.BASTION] = getRequestAsBastionSource(config)
 }
 
-func getCertForNodeFromConfig(config models.Config, ip string) models.NodeCert {
-	var nodeCert models.NodeCert
-	for _, node := range config.Certificate.Nodes {
-		if node.IP == ip {
-			nodeCert = node
-			break
-		}
-	}
-	return nodeCert
-
-}
-
 // getRequestsForAutomateAsSource gives the requests for all the ports and types automate as source
 func getRequestsForAutomateAsSource(config models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
@@ -96,14 +84,11 @@ func getRequestsForChefServerAsSource(config models.Config) []models.FirewallReq
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		//Dest Automate
 		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
-			nodeCert := getCertForNodeFromConfig(config, destNodeIP)
 			reqBody := models.FirewallRequest{
 				SourceNodeIP:               sourceNodeIP,
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "443",
 				DestinationServiceProtocol: "https",
-				Cert:                       nodeCert.Cert,
-				Key:                        nodeCert.Key,
 				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
@@ -230,8 +215,6 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
-				Cert:                       config.Certificate.Nodes[0].Cert,
-				Key:                        config.Certificate.Nodes[0].Key,
 				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
