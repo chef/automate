@@ -9,7 +9,7 @@ import (
 
 type BatchCheckRequest struct {
 	Checks []string `json:"checks"`
-	Config Config   `json:"config"`
+	Config *Config  `json:"config"`
 }
 
 type MockServerFromBatchServiceResponse struct {
@@ -49,15 +49,15 @@ type ObjectStorage struct {
 	AWSRegion  string `json:"aws_region"`
 }
 type Backup struct {
-	FileSystem    FileSystem    `json:"file_system"`
-	ObjectStorage ObjectStorage `json:"object_storage"`
+	FileSystem    *FileSystem    `json:"file_system"`
+	ObjectStorage *ObjectStorage `json:"object_storage"`
 }
 
 type Certificate struct {
-	Fqdn         string     `json:"fqdn"`
-	FqdnRootCert string     `json:"fqdn_root_ca"`
-	NodeType     string     `json:"node_type"`
-	Nodes        []NodeCert `json:"nodes"`
+	AutomateFqdn   string      `json:"automate_fqdn"`
+	ChefServerFqdn string      `json:"cs_fqdn"`
+	RootCert       string      `json:"root_cert"`
+	Nodes          []*NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -79,15 +79,15 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SSHUser         SSHUser       `json:"ssh_user"`
-	Arch            string        `json:"arch"`
-	Backup          Backup        `json:"backup"`
-	Hardware        Hardware      `json:"hardware"`
-	Certificate     []Certificate `json:"certificate"`
-	ExternalOS      ExternalOS    `json:"external_opensearch"`
-	ExternalPG      ExternalPG    `json:"external_postgresql"`
-	DeploymentState string        `json:"deployment_state"`
-	APIToken        string        `json:"api_token"`
+	SSHUser         *SSHUser     `json:"ssh_user"`
+	Arch            string       `json:"arch"`
+	Backup          *Backup      `json:"backup"`
+	Hardware        *Hardware    `json:"hardware"`
+	Certificate     *Certificate `json:"certificate"`
+	ExternalOS      *ExternalOS  `json:"external_opensearch"`
+	ExternalPG      *ExternalPG  `json:"external_postgresql"`
+	DeploymentState string       `json:"deployment_state"`
+	APIToken        string       `json:"api_token"`
 }
 
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []NodeCert {

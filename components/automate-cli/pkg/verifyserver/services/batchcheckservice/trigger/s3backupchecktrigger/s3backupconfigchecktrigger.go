@@ -22,7 +22,7 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 	}
 }
 
-func (svc *S3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
 }
@@ -59,7 +59,7 @@ func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerRespo
 	return result
 }
 
-func getS3CheckRequest(object models.ObjectStorage) models.S3ConfigRequest {
+func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
 	return models.S3ConfigRequest{
 		Endpoint:   object.Endpoint,
 		BucketName: object.BucketName,

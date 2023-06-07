@@ -746,8 +746,8 @@ func TestBatchCheckService(t *testing.T) {
 			if len(test.checksToExecute) > 0 {
 				checksToExecute = test.checksToExecute
 			}
-			resp, err := ss.BatchCheck(checksToExecute, models.Config{
-				Hardware: models.Hardware{
+			resp, err := ss.BatchCheck(checksToExecute, &models.Config{
+				Hardware: &models.Hardware{
 					AutomateNodeCount:        1,
 					AutomateNodeIps:          []string{"1.2.3.4"},
 					ChefInfraServerNodeCount: 1,
@@ -789,8 +789,8 @@ func TestStartMockServer(t *testing.T) {
 		}
 	}`, nil, false)
 	startedServers, failedServers := ss.startMockServer([]string{constants.FIREWALL, constants.FQDN},
-		models.Config{
-			Hardware: models.Hardware{
+		&models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount:        1,
 				AutomateNodeIps:          []string{"1.2.3.4"},
 				ChefInfraServerNodeCount: 1,
@@ -825,7 +825,7 @@ func TestGetDeploymentStateReturnsErrorWhenAutomateNotReachable(t *testing.T) {
 
 	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
 	_, err := ss.getDeploymentState(models.Config{
-		Hardware: models.Hardware{
+		Hardware: &models.Hardware{
 			AutomateNodeCount: 2,
 			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
 		},
@@ -838,7 +838,7 @@ func TestGetDeploymentStateReturnsErrorNoAutomateNodePresent(t *testing.T) {
 
 	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
 	_, err := ss.getDeploymentState(models.Config{
-		Hardware: models.Hardware{
+		Hardware: &models.Hardware{
 			AutomateNodeCount: 0,
 			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
 		},
@@ -857,7 +857,7 @@ func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
 		}
 	}`, nil, false)
 	deployState, _ := ss.getDeploymentState(models.Config{
-		Hardware: models.Hardware{
+		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
 			ChefInfraServerNodeCount: 1,
@@ -882,7 +882,7 @@ func TestStopMockServerOnHostAndPortPostDeployWhenServicesStopped(t *testing.T) 
 		}
 	}`, nil, false)
 	deployState, _ := ss.getDeploymentState(models.Config{
-		Hardware: models.Hardware{
+		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
 			ChefInfraServerNodeCount: 1,
@@ -907,8 +907,8 @@ func TestShouldStartMockServer(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"}, models.Config{
-		Hardware: models.Hardware{
+	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"}, &models.Config{
+		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
 			ChefInfraServerNodeCount: 1,
@@ -965,8 +965,8 @@ func TestStartMockServerIfNeeded(t *testing.T) {
 	ss := getBatchCheckServiceInstance()
 
 	ss.httpRequestClient = SetupMockHttpRequestClient(`{}`, errors.New("error occurred"), false)
-	resp, _, err := ss.startMockServerIfNeeded([]string{"firewall"}, models.Config{
-		Hardware: models.Hardware{
+	resp, _, err := ss.startMockServerIfNeeded([]string{"firewall"}, &models.Config{
+		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
 			ChefInfraServerNodeCount: 1,

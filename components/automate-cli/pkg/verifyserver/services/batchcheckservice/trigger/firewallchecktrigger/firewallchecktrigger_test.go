@@ -38,7 +38,7 @@ var (
 		Key:      "test-key",
 	}
 
-	nodes = []models.NodeCert{nodeCert}
+	nodes = []*models.NodeCert{nodeCert}
 )
 
 const (
@@ -485,7 +485,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 func TestFirewallCheck_Run(t *testing.T) {
 
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
 		name                 string
@@ -499,8 +499,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Automate Pg Passed",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -513,8 +513,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Automate Pg failure",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -528,8 +528,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Internal Server Error For automate and other nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -544,8 +544,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Error in parsing the response",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -559,8 +559,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		}, {
 			name: "Status Bad Request",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},

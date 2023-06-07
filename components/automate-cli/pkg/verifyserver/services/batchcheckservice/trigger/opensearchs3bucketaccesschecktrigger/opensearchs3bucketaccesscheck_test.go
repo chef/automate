@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	externalOs = models.ExternalOS{
+	externalOs = &models.ExternalOS{
 		OSDomainName:   "Name of the domain",
 		OSDomainURL:    "open-search-url",
 		OSRoleArn:      "Role-ARN",
@@ -23,7 +23,7 @@ var (
 		OSUserPassword: "password",
 	}
 
-	s3Properties = models.ObjectStorage{
+	s3Properties = &models.ObjectStorage{
 		Endpoint:   "s3-url-com",
 		BucketName: "test",
 		BasePath:   "tt.com",
@@ -116,7 +116,7 @@ const (
 func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
 		name             string
@@ -129,9 +129,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 		{
 			name: "Success Response",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					ExternalOS: externalOs,
-					Backup: models.Backup{
+					Backup: &models.Backup{
 						ObjectStorage: s3Properties,
 					},
 				},
@@ -144,9 +144,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 		{
 			name: "Failure Response",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					ExternalOS: externalOs,
-					Backup: models.Backup{
+					Backup: &models.Backup{
 						ObjectStorage: s3Properties,
 					},
 				},
@@ -159,9 +159,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 		{
 			name: "Internal Server Error",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					ExternalOS: externalOs,
-					Backup: models.Backup{
+					Backup: &models.Backup{
 						ObjectStorage: s3Properties,
 					},
 				},

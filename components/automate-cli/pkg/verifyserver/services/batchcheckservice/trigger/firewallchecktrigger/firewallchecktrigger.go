@@ -25,7 +25,7 @@ func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 	}
 }
 
-func (fc *FirewallCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	fc.log.Info("Performing Firewall check from batch check ")
 
 	requestMap := make(map[string][]models.FirewallRequest)
@@ -62,7 +62,7 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 }
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
-func makeRequests(config models.Config, reqMap map[string][]models.FirewallRequest) {
+func makeRequests(config *models.Config, reqMap map[string][]models.FirewallRequest) {
 	reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
 	reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
 	reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
@@ -71,7 +71,7 @@ func makeRequests(config models.Config, reqMap map[string][]models.FirewallReque
 }
 
 // getRequestsForAutomateAsSource gives the requests for all the ports and types automate as source
-func getRequestsForAutomateAsSource(config models.Config) []models.FirewallRequest {
+func getRequestsForAutomateAsSource(config *models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 
 	for _, sourceNodeIP := range config.Hardware.AutomateNodeIps {
@@ -116,7 +116,7 @@ func getRootCertForNodeWithNodeTypeAndIP(certMap map[string]models.Certificate, 
 }
 
 // getRequestsForChefServerAsSource gives the requests for all the ports where chefserver is the source
-func getRequestsForChefServerAsSource(config models.Config) []models.FirewallRequest {
+func getRequestsForChefServerAsSource(config *models.Config) []models.FirewallRequest {
 
 	var reqBodies []models.FirewallRequest
 	certMap := configutils.GetCertificateMap(config.Certificate)
@@ -161,7 +161,7 @@ func getRequestsForChefServerAsSource(config models.Config) []models.FirewallReq
 }
 
 // getRequestsForPostgresAsSource gives the requests for all the ports where postgres is source
-func getRequestsForPostgresAsSource(config models.Config) []models.FirewallRequest {
+func getRequestsForPostgresAsSource(config *models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.PostgresqlNodeIps {
 		//Dest Other postgres nodes
@@ -196,7 +196,7 @@ func getRequestsForPostgresAsSource(config models.Config) []models.FirewallReque
 }
 
 // getRequestsForOpensearchAsSource gives the requests for all the ports where opensearch is source
-func getRequestsForOpensearchAsSource(config models.Config) []models.FirewallRequest {
+func getRequestsForOpensearchAsSource(config *models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.OpenSearchNodeIps {
 		//other postgres nodes
@@ -231,7 +231,7 @@ func getRequestsForOpensearchAsSource(config models.Config) []models.FirewallReq
 	return reqBodies
 }
 
-func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
+func getRequestAsBastionSource(config *models.Config) []models.FirewallRequest {
 	var reqBodies []models.FirewallRequest
 
 	for _, destNodeIP := range config.Hardware.AutomateNodeIps {
@@ -287,7 +287,7 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 }
 
 // triggerMultipleRequests triggers multiple requests for firewall api on bastion host
-func triggerMultipleRequests(config models.Config, log logger.Logger, endPoint, method string, requestsMap map[string][]models.FirewallRequest) []models.CheckTriggerResponse {
+func triggerMultipleRequests(config *models.Config, log logger.Logger, endPoint, method string, requestsMap map[string][]models.FirewallRequest) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	outputCh := make(chan models.CheckTriggerResponse)
 	reqCount := 0

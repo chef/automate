@@ -24,7 +24,7 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 	}
 }
 
-func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	s3OpensearchBackupRequest := models.S3BackupDetails{
 		Endpoint:   config.ExternalOS.OSDomainURL,
 		Username:   config.ExternalOS.OSUsername,

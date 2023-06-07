@@ -9,13 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	root_ca = "root_ca"
-	cert    = "test_cert"
-	key     = "test_key"
-)
-
-func GetRequestJson() models.Hardware {
+func GetRequestJson() *models.Hardware {
 	ipConfig := models.Hardware{}
 
 	json.Unmarshal([]byte(` {
@@ -37,7 +31,7 @@ func GetRequestJson() models.Hardware {
 			]
 		  }
 		`), &ipConfig)
-	return ipConfig
+	return &ipConfig
 }
 func TestGetIps(t *testing.T) {
 	config := GetRequestJson()
@@ -67,7 +61,7 @@ func TestGetNodeTypeMap(t *testing.T) {
 	assert.Equal(t, expected, GetNodeTypeMap(GetRequestJson()))
 
 	config := models.Config{
-		Hardware: models.Hardware{
+		Hardware: &models.Hardware{
 			AutomateNodeIps:        []string{"192.168.1.1"},
 			ChefInfraServerNodeIps: []string{"192.168.1.1"},
 			OpenSearchNodeIps:      []string{"192.168.1.3"},

@@ -183,7 +183,7 @@ func getRequest() models.S3ConfigRequest {
 
 func TestS3BackupConfigCheck_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 
 	tests := []struct {
@@ -200,12 +200,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -224,12 +224,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 1,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -248,12 +248,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusInternalServerError,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -272,12 +272,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusGatewayTimeout,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,

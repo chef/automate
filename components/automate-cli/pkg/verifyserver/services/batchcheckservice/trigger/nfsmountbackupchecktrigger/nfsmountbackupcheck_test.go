@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	hardware = models.Hardware{
+	hardware = &models.Hardware{
 		AutomateNodeCount:        1,
 		AutomateNodeIps:          []string{"172.154.0.1"},
 		ChefInfraServerNodeCount: 1,
@@ -618,7 +618,7 @@ const (
 
 func TestNfsBackupConfigCheck_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
 		name                  string
@@ -634,10 +634,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Passed Response for chef-server,automate,opensearch and postgresql",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -653,10 +653,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Failure Mount Response for chef-server,automate,opensearch and postgresql",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -673,10 +673,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Recived Internal Server Error From the API",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -692,10 +692,10 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Invalid Response from service",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					Hardware: hardware,
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},
@@ -712,15 +712,15 @@ func TestNfsBackupConfigCheck_Run(t *testing.T) {
 		{
 			name: "Checking for Same Front end Nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:        hardware.AutomateNodeIps,
 						ChefInfraServerNodeIps: hardware.AutomateNodeIps,
 						PostgresqlNodeIps:      hardware.PostgresqlNodeIps,
 						OpenSearchNodeIps:      hardware.OpenSearchNodeIps,
 					},
-					Backup: models.Backup{
-						FileSystem: models.FileSystem{
+					Backup: &models.Backup{
+						FileSystem: &models.FileSystem{
 							MountLocation: mountLocation,
 						},
 					},

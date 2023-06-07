@@ -292,8 +292,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 1,
 				ChefInfraServerNodeIps:   []string{host},
 			},
@@ -317,8 +317,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -342,8 +342,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				PostgresqlNodeCount: 1,
 				PostgresqlNodeIps:   []string{host},
 				OpenSearchNodeCount: 1,
@@ -425,8 +425,8 @@ func Test_RunCheck(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},

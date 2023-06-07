@@ -27,7 +27,7 @@ func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigChe
 	}
 }
 
-func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 
 	nfsMountReq := models.NFSMountRequest{
 		AutomateNodeIPs:        config.Hardware.AutomateNodeIps,
@@ -73,7 +73,7 @@ func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMount
 }
 
 // constructErrorResult constructs the error response when recived from the API
-func constructErrorResult(config models.Config, err error) []models.CheckTriggerResponse {
+func constructErrorResult(config *models.Config, err error) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)

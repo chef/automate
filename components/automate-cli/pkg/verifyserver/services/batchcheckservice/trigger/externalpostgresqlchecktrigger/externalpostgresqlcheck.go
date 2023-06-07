@@ -23,7 +23,7 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 	}
 }
 
-func (epc *ExternalPostgresCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	return runCheckForPostgresql(config, epc.port, epc.log)
 }
 
@@ -32,7 +32,7 @@ func (ss *ExternalPostgresCheck) GetPortsForMockServer() map[string]map[string][
 	return nodeTypePortMap
 }
 
-func runCheckForPostgresql(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
+func runCheckForPostgresql(config *models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Postgresql check for automate and chef server nodes")
 	req := getPostgresRequest(config.ExternalPG)
 	var result []models.CheckTriggerResponse
@@ -63,7 +63,7 @@ func runCheckForPostgresql(config models.Config, port string, log logger.Logger)
 
 }
 
-func getPostgresRequest(details models.ExternalPG) models.ExternalPgRequest {
+func getPostgresRequest(details *models.ExternalPG) models.ExternalPgRequest {
 	host, port, _ := net.SplitHostPort(details.PGInstanceURL)
 	return models.ExternalPgRequest{
 		PostgresqlInstanceUrl:       host,

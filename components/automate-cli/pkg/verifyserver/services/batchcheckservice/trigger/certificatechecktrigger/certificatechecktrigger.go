@@ -24,7 +24,7 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 	}
 }
 
-func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
 
 	count := 0

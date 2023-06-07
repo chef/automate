@@ -231,7 +231,7 @@ func getRequest() models.ExternalPgRequest {
 
 func TestPostgresCheckAutomate_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 
 	tests := []struct {
@@ -248,11 +248,11 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -271,11 +271,11 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -293,11 +293,11 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusInternalServerError,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -315,11 +315,11 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusGatewayTimeout,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -373,11 +373,11 @@ func TestForChefserverPostgres(t *testing.T) {
 	t.Run("ChefServer Postgres check pass", func(t *testing.T) {
 		var want []models.CheckTriggerResponse
 
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 2,
 			},
-			ExternalPG: models.ExternalPG{
+			ExternalPG: &models.ExternalPG{
 				PGInstanceURL:       postgresqlInstanceUrl,
 				PGSuperuserName:     postgresqlSuperUserUserName,
 				PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -418,11 +418,11 @@ func TestForChefserverPostgres(t *testing.T) {
 	t.Run("ChefServer Postgres check fail", func(t *testing.T) {
 		var want []models.CheckTriggerResponse
 
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 2,
 			},
-			ExternalPG: models.ExternalPG{
+			ExternalPG: &models.ExternalPG{
 				PGInstanceURL:       postgresqlInstanceUrl,
 				PGSuperuserName:     postgresqlSuperUserUserName,
 				PGSuperuserPassword: postgresqlSuperUserPassword,

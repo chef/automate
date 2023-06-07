@@ -197,7 +197,7 @@ func GetRequestJsonWithSameFrontEnd() models.Config {
 	return ipConfig
 }
 
-func GetRequestJson() models.Config {
+func GetRequestJson() *models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{

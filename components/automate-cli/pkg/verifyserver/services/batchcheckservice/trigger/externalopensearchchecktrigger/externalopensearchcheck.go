@@ -22,7 +22,7 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 	}
 }
 
-func (eoc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	return runCheckForOpensearch(config, eoc.port, eoc.log)
 }
 
@@ -31,7 +31,7 @@ func (ss *ExternalOpensearchCheck) GetPortsForMockServer() map[string]map[string
 	return nodeTypePortMap
 }
 
-func runCheckForOpensearch(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
+func runCheckForOpensearch(config *models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Opensearch check for automate and chef server nodes")
 	req := getOpensearchRequest(config.ExternalOS)
 	var resultChan []models.CheckTriggerResponse
@@ -62,7 +62,7 @@ func runCheckForOpensearch(config models.Config, port string, log logger.Logger)
 
 }
 
-func getOpensearchRequest(details models.ExternalOS) models.ExternalOS {
+func getOpensearchRequest(details *models.ExternalOS) models.ExternalOS {
 	return models.ExternalOS{
 		OSDomainName:   details.OSDomainName,
 		OSDomainURL:    details.OSDomainURL,

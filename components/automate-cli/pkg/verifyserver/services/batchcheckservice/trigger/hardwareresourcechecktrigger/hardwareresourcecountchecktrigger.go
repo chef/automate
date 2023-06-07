@@ -28,7 +28,7 @@ func NewHardwareResourceCountCheck(log logger.Logger, port string) *HardwareReso
 	}
 }
 
-func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (ss *HardwareResourceCountCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Hardware Resource count check from batch check ")
 
 	var finalResult []models.CheckTriggerResponse

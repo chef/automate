@@ -160,7 +160,7 @@ const (
 	  }`
 )
 
-func GetRequestJson() models.Config {
+func GetRequestJson() *models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
@@ -194,7 +194,7 @@ func GetRequestJson() models.Config {
 			]
 		  }
 		}`), &ipConfig)
-	return ipConfig
+	return &ipConfig
 }
 
 // mockTransport is a mock implementation of the http.RoundTripper interface

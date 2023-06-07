@@ -228,7 +228,7 @@ func getRequest() models.ExternalOS {
 
 func TestOpensearchCheck_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 
 	tests := []struct {
@@ -245,11 +245,11 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalOS: models.ExternalOS{
+					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
 						OSDomainURL:    osDomainURL,
 						OSUsername:     osUsername,
@@ -267,11 +267,11 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalOS: models.ExternalOS{
+					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
 						OSDomainURL:    osDomainURL,
 						OSUsername:     osUsername,
@@ -288,11 +288,11 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusInternalServerError,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalOS: models.ExternalOS{
+					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
 						OSDomainURL:    osDomainURL,
 						OSUsername:     osUsername,
@@ -309,11 +309,11 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusGatewayTimeout,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					ExternalOS: models.ExternalOS{
+					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
 						OSDomainURL:    osDomainURL,
 						OSUsername:     osUsername,
@@ -366,11 +366,11 @@ func TestForChefserverOpensearch(t *testing.T) {
 	t.Run("ChefServer Opensearch check pass", func(t *testing.T) {
 		var want []models.CheckTriggerResponse
 
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 2,
 			},
-			ExternalOS: models.ExternalOS{
+			ExternalOS: &models.ExternalOS{
 				OSDomainName:   osDomainName,
 				OSDomainURL:    osDomainURL,
 				OSUsername:     osUsername,
@@ -409,11 +409,11 @@ func TestForChefserverOpensearch(t *testing.T) {
 	t.Run("ChefServer Opensearch check fail", func(t *testing.T) {
 		var want []models.CheckTriggerResponse
 
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 2,
 			},
-			ExternalOS: models.ExternalOS{
+			ExternalOS: &models.ExternalOS{
 				OSDomainName:   osDomainName,
 				OSDomainURL:    osDomainURL,
 				OSUsername:     osUsername,

@@ -25,7 +25,7 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 	}
 }
 
-func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 
 	ss.log.Info("Performing SSH user access check from batch check ")
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
@@ -51,7 +51,7 @@ func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerRes
 	return finalResult
 }
 
-func getSShUserAPIRquest(ip string, sshUser models.SSHUser) models.SShUserRequest {
+func getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
 
 	return models.SShUserRequest{
 		IP:           ip,
