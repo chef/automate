@@ -467,7 +467,9 @@ paths = [
   "lib/userutils/*",
   "lib/uuid4/*",
   "lib/verification/*",
-  "lib/version/*"
+  "lib/version/*",
+  "lib/arrayutils/*",
+  "lib/certgenerateutils/*"
 ]
 
 [deployment-service]
