@@ -412,7 +412,7 @@ func handleManagedServiceError(flags *statusCmdFlags) error {
 		return status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, OPENSEARCH)
 	}
 
-	return status.Errorf(status.InvalidCommandArgsError, "Please provide supported flag")
+	return nil
 }
 
 func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {

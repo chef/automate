@@ -59,7 +59,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 		},
 		{
 			flags:          &statusCmdFlags{},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, "Please provide supported flag"),
+			errorExepected: nil,
 		},
 		{
 			flags: &statusCmdFlags{
