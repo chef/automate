@@ -42,8 +42,5 @@ func (h *Handler) StartMockServer(c *fiber.Ctx) error {
 }
 
 func isValidPort(requestBodyPort int) bool {
-	if requestBodyPort < 0 || requestBodyPort > 65535 {
-		return false
-	}
-	return true
+	return requestBodyPort >= 0 && requestBodyPort <= 65535
 }

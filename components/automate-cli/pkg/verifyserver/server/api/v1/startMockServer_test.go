@@ -85,7 +85,7 @@ func TestStartMockServer(t *testing.T) {
 		}`,
 		},
 		{
-			description:  "409:port alread in use",
+			description:  "409:port already in use",
 			expectedCode: 409,
 			protocol:     "tcp",
 			reqBody: `{
@@ -96,12 +96,12 @@ func TestStartMockServer(t *testing.T) {
 		}`,
 		},
 		{
-			description:  "409:port alread in use",
-			expectedCode: 409,
+			description:  "400:port invalid",
+			expectedCode: 400,
 			protocol:     "http",
 			reqBody: `{
-				"port": 3000,
-				"protocol": "tcp",
+				"port": 65536,
+				"protocol": "http",
 				"key": "",
 				"cert": ""
 		}`,
@@ -111,7 +111,7 @@ func TestStartMockServer(t *testing.T) {
 			expectedCode: 400,
 			protocol:     "udp",
 			reqBody: `{
-				"port": 300000,
+				"port": -1,
 				"key": "",
 				"cert": ""
 		}`,
