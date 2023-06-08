@@ -723,7 +723,10 @@ func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode b
 			return err
 		}
 		if len(outFiles) > 0 {
-
+			err = removeOutputHeaderInConfigFile(outFiles[0])
+			if err != nil {
+				return errors.Wrap(err, "error on removing output header in fetched config")
+			}
 			if err = fileutils.Move(outFiles[0], outputDirectory+outFiles[0]); err != nil {
 				return err
 			}
@@ -732,9 +735,8 @@ func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode b
 	return nil
 }
 
-func removeOutputHeaderInConfigFile(outputFiles []string) ([]string, error) {
-
-	return outputFiles, nil
+func removeOutputHeaderInConfigFile(filePath string) error {
+	return fileutils.RemoveFirstLine(filePath)
 }
 
 func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {

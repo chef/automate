@@ -1,6 +1,7 @@
 package fileutils
 
 import (
+	"bufio"
 	"io"
 	"io/ioutil"
 	"os"
@@ -31,6 +32,8 @@ type FileUtils interface {
 	WriteFile(filepath string, data []byte, perm os.FileMode) error
 	CreateTempFile(content string, filename string) (string, error)
 	DeleteFile(fileName string) error
+	Move(sourceFile string, destinationFile string) error
+	RemoveFirstLine(filePath string) error
 }
 
 type FileSystemUtils struct{}
@@ -73,8 +76,11 @@ func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
 	return DeleteFile(filePath)
 }
 
-func (fsu *FileSystemUtils) Rename(sourceFile string, destinationFile string) error {
+func (fsu *FileSystemUtils) Move(sourceFile string, destinationFile string) error {
 	return Move(sourceFile, destinationFile)
+}
+func (fsu *FileSystemUtils) RemoveFirstLine(filePath string) error {
+	return RemoveFirstLine(filePath)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -213,5 +219,48 @@ func Move(sourceFile string, destinationFile string) error {
 		}
 		return err
 	}
+	return nil
+}
+
+func RemoveFirstLine(filePath string) error {
+	// Open the file for reading
+	file, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Create a temporary file to write the updated content
+	tempFile, err := os.CreateTemp("", "temp")
+	if err != nil {
+		return err
+	}
+	defer tempFile.Close()
+
+	// Create a scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+
+	// Skip the first line
+	scanner.Scan()
+
+	// Write the remaining lines to the temporary file
+	for scanner.Scan() {
+		line := scanner.Text()
+		_, err := tempFile.WriteString(line + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
+	// Close the files
+	file.Close()
+	tempFile.Close()
+
+	// Replace the original file with the temporary file
+	err = os.Rename(tempFile.Name(), filePath)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

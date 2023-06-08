@@ -16,6 +16,8 @@ type MockFileSystemUtils struct {
 	WriteFileFunc              func(filepath string, data []byte, perm os.FileMode) error
 	CreateTempFileFunc         func(content string, filename string) (string, error)
 	DeleteTempFileFunc         func(tempFile string) error
+	MoveFunc                   func(sourceFile string, destinationFile string) error
+	RemoveFirstLineFunc        func(filePath string) error
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -50,4 +52,10 @@ func (fsu *MockFileSystemUtils) CreateTempFile(content string, filename string) 
 }
 func (fsu *MockFileSystemUtils) DeleteFile(tempFile string) error {
 	return fsu.DeleteTempFileFunc(tempFile)
+}
+func (fsu *MockFileSystemUtils) Move(sourceFile string, destinationFile string) error {
+	return fsu.MoveFunc(sourceFile, destinationFile)
+}
+func (fsu *MockFileSystemUtils) RemoveFirstLine(filePath string) error {
+	return fsu.RemoveFirstLineFunc(filePath)
 }
