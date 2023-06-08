@@ -82,3 +82,44 @@ func TestDeleteTempFile(t *testing.T) {
 		return
 	}
 }
+
+func TestMove(t *testing.T) {
+	content := "abc"
+	filename := "file-name"
+	destFileDir := "destination/"
+	t.Run("Move a file to new directory", func(t *testing.T) {
+		res, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, res, "file-name")
+		require.NoError(t, err)
+		err = fileutils.Move(res, destFileDir+filename)
+		defer fileutils.DeleteTempFile(destFileDir + filename)
+		require.NoError(t, err)
+		fileExists, err := fileutils.PathExists(destFileDir + filename)
+		require.NoError(t, err)
+		assert.True(t, fileExists)
+		defer os.Remove(filename)
+	})
+
+	t.Run("Move a file to a directory and overwrite the existing file", func(t *testing.T) {
+		res, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, res, "file-name")
+		require.NoError(t, err)
+		err = fileutils.Move(res, destFileDir+filename)
+		defer fileutils.DeleteTempFile(destFileDir + filename)
+		require.NoError(t, err)
+		fileExists, err := fileutils.PathExists(destFileDir + filename)
+		require.NoError(t, err)
+		assert.True(t, fileExists)
+
+		res2, err := fileutils.CreateTempFile(content, filename)
+		require.NoError(t, err)
+
+		err = fileutils.Move(res2, destFileDir+filename)
+		defer fileutils.DeleteTempFile(destFileDir + filename)
+		require.NoError(t, err)
+		fileExists, err = fileutils.PathExists(destFileDir + filename)
+		require.NoError(t, err)
+		assert.True(t, fileExists)
+		defer os.Remove(destFileDir)
+	})
+}

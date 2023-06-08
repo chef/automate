@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -72,8 +73,8 @@ func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
 	return DeleteFile(filePath)
 }
 
-func (fsu *FileSystemUtils) Rename(sourceFile string, destinationDir string, renamedFileName string) error {
-	return Rename(sourceFile, destinationDir, renamedFileName)
+func (fsu *FileSystemUtils) Rename(sourceFile string, destinationFile string) error {
+	return Move(sourceFile, destinationFile)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -184,14 +185,33 @@ func DeleteFile(filePath string) error {
 // Creates the directory, if not already exists
 //
 // Example usage:
-// err := fileutils.Rename("file.txt", "/path/to/my/dir/", "");
+// err := fileutils.Move("file.txt", "/path/to/my/dir/", "");
 // Incase of retriving the old file name, leave renamedFileName as empty
-func Rename(sourceFile string, destinationDir string, renamedFileName string) error {
+func Move(sourceFile string, destinationFile string) error {
+	destinationDir, fileName := filepath.Split(destinationFile)
+
 	if err := os.MkdirAll(destinationDir, os.ModePerm); err != nil {
 		return err
 	}
-	if renamedFileName != "" {
-		return os.Rename(sourceFile, destinationDir+renamedFileName)
+	err := os.Rename(sourceFile, destinationFile)
+	if err != nil {
+		// Checks if the error is of type *os.LinkError
+		if linkErr, ok := err.(*os.LinkError); ok {
+			// Checks the underlying error code
+			if linkErr.Err.Error() == "file exists" {
+				// Handles the "file exists" error
+				err = os.Remove(destinationFile)
+				if err != nil {
+					return err
+				}
+				// Retrys the rename operation
+				err = os.Rename(sourceFile, destinationDir+fileName)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return err
 	}
-	return os.Rename(sourceFile, destinationDir+sourceFile)
+	return nil
 }
