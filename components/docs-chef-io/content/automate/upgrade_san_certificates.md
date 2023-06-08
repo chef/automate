@@ -1,12 +1,12 @@
 +++
-title = "Update Non-SAN Certificates for 4.7.x Version"
+title = "Update Non-SAN Certificates for 4.7.52 Version"
 date = 2023-05-29T12:02:46-08:00
 draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Update Non-SAN Certificates for 4.7.x Version"
-    identifier = "automate/upgrade/upgrade_san_certificates.md Update Non-SAN Certificates for 4.7.x Version"
+    title = "Update Non-SAN Certificates for 4.7.52 Version"
+    identifier = "automate/upgrade/upgrade_san_certificates.md Update Non-SAN Certificates for 4.7.52 Version"
     parent = "automate/upgrade"
     weight = 40
 +++
@@ -17,7 +17,7 @@ gh_repo = "automate"
 
 Automate is moving the product builds from Golang version 1.15 to 1.19 to keep the language features up to date. The change in the Golang version will impact the custom certificates used for interaction with external systems. The common name field of X.509 certificates will no longer be considered the hostname when the Subject Alternative Name (SAN) is absent. Refer to [Go 1.15 Release Notes](https://go.dev/doc/go1.15#commonname) and our [blog](https://www.chef.io/blog/upgrading-golang-version-in-the-early-june-23-automate-release) for more information.
 
-From version 4.7.x onwards, Chef Automate requires public certificates as SAN certificates. Automate or Automate HA may stop working if you upgrade to this version with certificates that don't contain the SAN field.
+From version 4.7.52 onwards, Chef Automate requires public certificates as SAN certificates. Automate or Automate HA may stop working if you upgrade to this version with certificates that don't contain the SAN field.
 
 Update non-SAN Certificates involves:
 
