@@ -46,5 +46,3 @@ func (msu *MockSSHUtilsImpl) createKnownHosts() error {
 func (msu *MockSSHUtilsImpl) addHostKey(host string, remote net.Addr, pubKey ssh.PublicKey) error {
 	return msu.addHostKeyfunc(host, remote, pubKey)
 }
-
-

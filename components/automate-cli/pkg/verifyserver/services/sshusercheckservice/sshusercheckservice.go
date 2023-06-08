@@ -35,7 +35,7 @@ const (
 )
 
 func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequest) (*models.SshUserChecksResponse, error) {
-	ssu.logger.Debug("The Request Value for the SSH User Check: ", req)
+	ssu.logger.Debug("The Request Value for the SSH User Check: ", req.Ip, req.Port, req.UserName)
 	
 	filePath, err := ssu.fileUtils.CreateTempFile(req.PrivateKey, PEM_FILE_NAME)
 	if err != nil {
@@ -44,7 +44,7 @@ func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequ
 	}
 	sshConfig, err := ssu.getConfig(req, filePath)
 	if err != nil {
-		ssu.logger.Debug("Error in getting the SSHConfig for SSH connection: ", err)
+		ssu.logger.Error("Error in getting the SSHConfig for SSH connection: ", err)
 		return nil, err
 	}
 	checkSshConnectionResponse := ssu.GetSshConnectionDetails(&sshConfig, req.Ip)
