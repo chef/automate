@@ -158,6 +158,10 @@ var a2Config = config{
 		{regex: `lib/config/testdata/.*\.pem`},
 		{regex: `lib/config/hadeployconfig_test.go`},
 
+		//Test data for PopulateWith in batchcheck models
+		{regex: `components/automate-cli/pkg/verifyserver/models/testdata/.*\.toml`},
+		{regex: `components/automate-cli/pkg/verifyserver/models/testdata/.*\.pem`},
+
 		// Exclude test file for externalopensearchservice with uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/externalopensearchservice/externalopensearchservice_test.go`},
 
