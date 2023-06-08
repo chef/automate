@@ -78,7 +78,7 @@ func (ssu *SshUserServiceImpl) GetSshConnectionDetails(sshConfig *sshutils.SSHCo
 func (ssu *SshUserServiceImpl) GetSudoPasswordDetails(sshConfig *sshutils.SSHConfig, ip string, sudoPassword string) *models.Checks {
 	sudoCheckResponse, err := ssu.sshUtil.ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig, sudoPassword, SUDO_PASSWORD_CMD)
 
-	ssu.logger.Debug("The sudo execution on Remote response:", sudoCheckResponse)
+	ssu.logger.Debug("The sudo command execution on Remote response:", sudoCheckResponse)
 	if err != nil {
 		return failureResponse("Sudo password invalid", "SSH user sudo password is invalid for the node with IP "+fmt.Sprintf("%v", ip), "Ensure you have provided the correct sudo password and the user has sudo access on the node: "+fmt.Sprintf("%v", ip))
 	}
