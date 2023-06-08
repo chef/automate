@@ -439,7 +439,9 @@ paths = [
   "components/automate-grpc/*",
   "components/es-sidecar-service/*",
   "components/local-user-service/*",
+  "lib/arrayutils/*",
   "lib/cereal/*",
+  "lib/certgenerateutils/*",
   "lib/config/*",
   "lib/config_parser/*",
   "lib/db/*",
@@ -467,9 +469,7 @@ paths = [
   "lib/userutils/*",
   "lib/uuid4/*",
   "lib/verification/*",
-  "lib/version/*",
-  "lib/arrayutils/*",
-  "lib/certgenerateutils/*"
+  "lib/version/*"
 ]
 
 [deployment-service]

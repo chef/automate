@@ -59,7 +59,7 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 	if len(notStartedMockServers) > 0 {
 		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
 			if successfullyStartedMockServer.Host != "" {
-				ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
+				go ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
 			}
 		}
 		return models.BatchCheckResponse{}, errors.New("mock server not started successfull on some nodes")
@@ -72,7 +72,7 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 
 	if len(successfullyStartedMockServers) > 0 {
 		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
-			ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
+			go ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port)
 		}
 	}
 
