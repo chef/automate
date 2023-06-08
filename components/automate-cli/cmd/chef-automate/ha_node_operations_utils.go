@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -63,6 +64,7 @@ type MockNodeUtilsImpl struct {
 	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCountFunc           func() (int, error)
+	ExecuteCmdInAllNodeAndCaptureOutputFunc   func([]*NodeObject, bool, string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -133,6 +135,9 @@ func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, in
 func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
+func (mnu *MockNodeUtilsImpl) ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+	return mnu.ExecuteCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
+}
 
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
@@ -156,6 +161,7 @@ type NodeOpUtils interface {
 	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
+	ExecuteCmdInAllNodeAndCaptureOutput([]*NodeObject, bool, string) error
 	calculateTotalInstanceCount() (int, error)
 }
 
@@ -334,6 +340,9 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 	return infra, sshconfig, nil
 }
 
+func (nu *NodeUtilsImpl) ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
+}
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 	return isManagedServicesOn()
 }
@@ -702,4 +711,57 @@ func readConfigAWS(path string) (AwsConfigToml, error) {
 		return AwsConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}
 	return config, nil
+}
+
+// Execute custom command in one node of all the each node-type
+func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+
+	for _, nodeObject := range nodeObjects {
+		outFiles := nodeObject.OutputFile
+		err := ExecuteCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		if err != nil {
+			return err
+		}
+		if len(outFiles) > 0 {
+
+			if err = fileutils.Move(outFiles[0], outputDirectory+outFiles[0]); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func removeOutputHeaderInConfigFile(outputFiles []string) ([]string, error) {
+
+	return outputFiles, nil
+}
+
+func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
+	nodeObjects := []*NodeObject{
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, "", AUTOMATE),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, "", CHEF_SERVER),
+	}
+	if !isManagedServicesOn() {
+		backendNodeObjects := []*NodeObject{
+			NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, "", POSTGRESQL),
+			NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, "", OPENSEARCH),
+		}
+		nodeObjects = append(nodeObjects, backendNodeObjects...)
+	}
+	return nodeObjects
+}
+
+func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
+	timestamp := time.Now().Format("20060102150405")
+	fmt.Println("====================================================================")
+	fmt.Println("sync Config to all frontend nodes")
+	frontendPrefix := "frontend" + "_" + timestamp + "_"
+	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
+	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
+	nodeObjects := []*NodeObject{
+		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, frontendPrefix, AUTOMATE),
+		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, frontendPrefix, CHEF_SERVER),
+	}
+	return nodeObjects
 }

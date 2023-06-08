@@ -189,8 +189,22 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return dna.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
+func (dna *DeleteNodeAWSImpl) saveConfigToBation() error {
+	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	return dna.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
+func (dna *DeleteNodeAWSImpl) syncConfigToAllNodes() error {
+	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
+	return dna.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
-	err := dna.runRemoveNodeFromAws()
+	err := dna.saveConfigToBation()
+	if err != nil {
+		return fmt.Errorf("error on fetch configuration: %v", err)
+	}
+	err = dna.runRemoveNodeFromAws()
 	if err != nil {
 		return err
 	}
@@ -215,7 +229,19 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 		return err
 	}
 
-	return dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	if err != nil {
+		err = fmt.Errorf("error on deploying the infra: %v", err)
+	}
+	syncErr := dna.syncConfigToAllNodes()
+	if syncErr != nil {
+		err = fmt.Errorf("%v, error on applying config from bootstrap node to all nodes: %v", err, syncErr)
+	}
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {

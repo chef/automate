@@ -131,8 +131,18 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
+func (ani *AddNodeAWSImpl) saveConfigToBation() error {
+	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
+func (ani *AddNodeAWSImpl) syncConfigToAllNodes() error {
+	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
+	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
 func (ani *AddNodeAWSImpl) runDeploy() error {
-	err := SaveConfigInBastion()
+	err := ani.saveConfigToBation()
 	if err != nil {
 		return err
 	}
@@ -159,7 +169,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	err = syncConfigToAllNodes()
+	err = ani.syncConfigToAllNodes()
 	if err != nil {
 		return err
 	}

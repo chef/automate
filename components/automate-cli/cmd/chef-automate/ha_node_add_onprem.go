@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"errors"
 
@@ -191,21 +190,37 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
+func (ani *AddNodeOnPremImpl) saveConfigToBation() error {
+	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
+func (ani *AddNodeOnPremImpl) syncConfigToAllNodes() error {
+	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
+	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	err := SaveConfigInBastion()
+	err := ani.saveConfigToBation()
 	if err != nil {
-		return err
+		return fmt.Errorf("error on fetch configuration: %v", err)
 	}
 	err = ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
 	if err != nil {
-		return err
+		return fmt.Errorf("error on writing HA config file in workspace: %v", err)
 	}
 	argsdeploy := []string{"-y"}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 	if err != nil {
-		return err
+		err = fmt.Errorf("error on deploying the infra: %v", err)
 	}
-	err = syncConfigToAllNodes()
+
+	syncErr := ani.syncConfigToAllNodes()
+
+	if syncErr != nil {
+		err = fmt.Errorf("%v, error on applying config from bootstrap node to all nodes: %v", err, syncErr)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -281,27 +296,12 @@ func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile [
 }
 
 // Save all config from each services to Bastion server annd move it to WORKSPACE dir
-func SaveConfigInBastion() error {
+// func SaveConfigInBastion() error {
 
-	nodeObjects := []*NodeObject{
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, "", AUTOMATE),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, "", CHEF_SERVER),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, "", POSTGRESQL),
-		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, "", OPENSEARCH),
-	}
-	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
-}
+// }
 
-func syncConfigToAllNodes() error {
-	timestamp := time.Now().Format("20060102150405")
-	fmt.Println("====================================================================")
-	fmt.Println("sync Config to all frontend nodes")
-	frontendPrefix := "frontend" + "_" + timestamp + "_"
-	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
-	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
-	nodeObjects := []*NodeObject{
-		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, frontendPrefix, AUTOMATE),
-		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, frontendPrefix, CHEF_SERVER),
-	}
-	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
-}
+// func syncConfigToAllNodes() error {
+
+// 	NodeObject :=
+// 	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
+// }
