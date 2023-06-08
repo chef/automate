@@ -189,7 +189,7 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return dna.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dna *DeleteNodeAWSImpl) saveConfigToBation() error {
+func (dna *DeleteNodeAWSImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 	return dna.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
@@ -200,42 +200,42 @@ func (dna *DeleteNodeAWSImpl) syncConfigToAllNodes() error {
 }
 
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
-	err := dna.saveConfigToBation()
+	err := dna.saveConfigToBastion()
 	if err != nil {
-		return fmt.Errorf("error on fetch configuration: %v", err)
+		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
 	err = dna.runRemoveNodeFromAws()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error removing node from AWS")
 	}
 
 	err = dna.nodeUtils.moveAWSAutoTfvarsFile(dna.terraformPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error moving aws.auto.tfvars file")
 	}
 
 	err = dna.nodeUtils.modifyTfArchFile(dna.terraformPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error modifying tf_arch file")
 	}
 	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
 	}
 
 	argsdeploy := []string{"-y"}
 	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while provisioning resources")
 	}
 
 	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 	if err != nil {
-		err = fmt.Errorf("error on deploying the infra: %v", err)
+		return errors.Wrap(err, "error while deploying architecture")
 	}
 	syncErr := dna.syncConfigToAllNodes()
 	if syncErr != nil {
-		err = fmt.Errorf("%v, error on applying config from bootstrap node to all nodes: %v", err, syncErr)
+		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}
 
 	if err != nil {

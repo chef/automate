@@ -233,7 +233,7 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return dni.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dni *DeleteNodeOnPremImpl) saveConfigToBation() error {
+func (dni *DeleteNodeOnPremImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 	return dni.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
@@ -244,21 +244,26 @@ func (dni *DeleteNodeOnPremImpl) syncConfigToAllNodes() error {
 }
 
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {
-	err := dni.saveConfigToBation()
+	err := dni.saveConfigToBastion()
 	if err != nil {
-		return fmt.Errorf("error on fetch configuration: %v", err)
+		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
 
 	err = dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
 	}
 	argsdeploy := []string{"-y"}
 	err = dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	if err != nil {
+		err = errors.Wrap(err, "error while deploying architecture")
+	}
+
 	syncErr := dni.syncConfigToAllNodes()
 	if syncErr != nil {
-		err = fmt.Errorf("%v, error on applying config from bootstrap node to all nodes: %v", err, syncErr)
+		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}
+
 	if err != nil {
 		return err
 	}

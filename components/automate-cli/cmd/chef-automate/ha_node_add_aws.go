@@ -131,7 +131,7 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeAWSImpl) saveConfigToBation() error {
+func (ani *AddNodeAWSImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
@@ -142,34 +142,38 @@ func (ani *AddNodeAWSImpl) syncConfigToAllNodes() error {
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {
-	err := ani.saveConfigToBation()
+	err := ani.saveConfigToBastion()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
 
 	// return nil
 	err = ani.nodeUtils.moveAWSAutoTfvarsFile(ani.terraformPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error moving aws.auto.tfvars file")
 	}
 	err = ani.nodeUtils.modifyTfArchFile(ani.terraformPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error modifying tf_arch file")
 	}
 	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
 	}
 	argsdeploy := []string{"-y"}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while provisioning resources")
 	}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 	if err != nil {
-		return err
+		err = errors.Wrap(err, "error while deploying architecture")
 	}
-	err = ani.syncConfigToAllNodes()
+	syncErr := ani.syncConfigToAllNodes()
+	if syncErr != nil {
+		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
+	}
+
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	cli "github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -190,7 +190,7 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeOnPremImpl) saveConfigToBation() error {
+func (ani *AddNodeOnPremImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
@@ -201,24 +201,23 @@ func (ani *AddNodeOnPremImpl) syncConfigToAllNodes() error {
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	err := ani.saveConfigToBation()
+	err := ani.saveConfigToBastion()
 	if err != nil {
-		return fmt.Errorf("error on fetch configuration: %v", err)
+		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
 	err = ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
 	if err != nil {
-		return fmt.Errorf("error on writing HA config file in workspace: %v", err)
+		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
 	}
 	argsdeploy := []string{"-y"}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 	if err != nil {
-		err = fmt.Errorf("error on deploying the infra: %v", err)
+		err = errors.Wrap(err, "error while deploying architecture")
 	}
 
 	syncErr := ani.syncConfigToAllNodes()
-
 	if syncErr != nil {
-		err = fmt.Errorf("%v, error on applying config from bootstrap node to all nodes: %v", err, syncErr)
+		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}
 
 	if err != nil {
