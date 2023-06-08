@@ -17,7 +17,7 @@ type SshUserServiceImpl struct {
 	logger      logger.Logger
 	sshUtil     sshutils.SSHUtil
 	pemFileName string
-	fileutils   fileutils.FileUtils
+	fileUtils   fileutils.FileUtils
 }
 
 func NewSshUserCheckService(logger logger.Logger, fileutils fileutils.FileUtils, sshUtils sshutils.SSHUtil) *SshUserServiceImpl {
@@ -25,7 +25,7 @@ func NewSshUserCheckService(logger logger.Logger, fileutils fileutils.FileUtils,
 		logger:      logger,
 		sshUtil:     sshUtils,
 		pemFileName: PEM_FILE_NAME,
-		fileutils:   fileutils,
+		fileUtils:   fileutils,
 	}
 }
 
@@ -36,29 +36,28 @@ const (
 
 func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequest) (*models.SshUserChecksResponse, error) {
 	ssu.logger.Debug("The Request Value for the SSH User Check: ", req)
-	serviceResponseArray := []*models.Checks{}
-	serviceResponse := &models.SshUserChecksResponse{}
-	serviceResponse.Passed = true
-
-	filePath, sshConfig, err := ssu.getConfig(req.Ip, req.Private_Key, req.User_Name, req.Port, req.Sudo_Password)
+	
+	filePath, err := ssu.fileUtils.CreateTempFile(req.PrivateKey, PEM_FILE_NAME)
+	if err != nil {
+		ssu.logger.Error("Error while creating the key file on the desired file path: ", err)
+		return nil, err
+	}
+	sshConfig, err := ssu.getConfig(req, filePath)
 	if err != nil {
 		ssu.logger.Debug("Error in getting the SSHConfig for SSH connection: ", err)
 		return nil, err
 	}
 	checkSshConnectionResponse := ssu.GetSshConnectionDetails(&sshConfig, req.Ip)
 
-	checkSudoResponse := ssu.GetSudoPasswordDetails(&sshConfig, req.Ip, req.Sudo_Password)
+	checkSudoResponse := ssu.GetSudoPasswordDetails(&sshConfig, req.Ip, req.SudoPassword)
 
+	serviceResponse := &models.SshUserChecksResponse{}
+	serviceResponse.Passed = true
 	if !checkSshConnectionResponse.Passed || !checkSudoResponse.Passed {
 		serviceResponse.Passed = false
 	}
-	serviceResponseArray = append(serviceResponseArray, checkSshConnectionResponse, checkSudoResponse)
-	checks := make([]models.Checks, len(serviceResponseArray))
-	for i, svcResp := range serviceResponseArray {
-		checks[i] = *svcResp
-	}
-	serviceResponse.Checks = checks
-	ssu.fileutils.DeleteTempFile(filePath)
+	serviceResponse.Checks = append(serviceResponse.Checks, *checkSshConnectionResponse, *checkSudoResponse)
+	ssu.fileUtils.DeleteTempFile(filePath)
 	return serviceResponse, nil
 }
 
@@ -78,7 +77,7 @@ func (ssu *SshUserServiceImpl) GetSshConnectionDetails(sshConfig *sshutils.SSHCo
 
 func (ssu *SshUserServiceImpl) GetSudoPasswordDetails(sshConfig *sshutils.SSHConfig, ip string, sudoPassword string) *models.Checks {
 	sudoCheckResponse, err := ssu.sshUtil.ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig, sudoPassword, SUDO_PASSWORD_CMD)
-	
+
 	ssu.logger.Debug("The sudo execution on Remote response:", sudoCheckResponse)
 	if err != nil {
 		return failureResponse("Sudo password invalid", "SSH user sudo password is invalid for the node with IP "+fmt.Sprintf("%v", ip), "Ensure you have provided the correct sudo password and the user has sudo access on the node: "+fmt.Sprintf("%v", ip))
@@ -86,21 +85,15 @@ func (ssu *SshUserServiceImpl) GetSudoPasswordDetails(sshConfig *sshutils.SSHCon
 	return successResponse("Sudo password valid", "SSH user sudo password is valid for the node: "+fmt.Sprintf("%v", ip))
 }
 
-func (ssu *SshUserServiceImpl) getConfig(ip string, privateKey string, userName string, port string, sudoPassword string) (string, sshutils.SSHConfig, error) {
-	filePath, err := ssu.fileutils.CreateTempFile(privateKey, PEM_FILE_NAME)
-	if err != nil {
-		ssu.logger.Error("Error while creating the key file on the desired file path: ", err)
-		return "Error while creating key file", sshutils.SSHConfig{}, err
-	}
-	ssu.logger.Debug("File Creation on the given path was successfull")
+func (ssu *SshUserServiceImpl) getConfig(req *models.SshUserChecksRequest, filePath string) (sshutils.SSHConfig, error) {
 	sshConfig := &sshutils.SSHConfig{
-		SshUser:    userName,
-		SshPort:    port,
+		SshUser:    req.UserName,
+		SshPort:    req.Port,
 		SshKeyFile: filePath,
-		HostIP:     ip,
+		HostIP:     req.Ip,
 		Timeout:    150,
 	}
-	return filePath, *sshConfig, nil
+	return *sshConfig, nil
 }
 
 func successResponse(title string, successMsg string) *models.Checks {

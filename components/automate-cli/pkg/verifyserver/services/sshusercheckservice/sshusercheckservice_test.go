@@ -26,18 +26,12 @@ const (
 
 func TestCheckSshUserDetails(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	ssu := NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{
-		CreateTempFileFunc: func(content, filename string) (string, error) {
-			return "", nil
-		},
-		DeleteTempFileFunc: func(tempFile string) error {
-			return nil
-		},
-	}, &sshutils.SSHUtilImpl{})
+	ssu := NewSshUserCheckService(log, &fileutils.FileSystemUtils{}, &sshutils.SSHUtilImpl{})
 
 	type args struct {
-		req         *models.SshUserChecksRequest
-		MockSSHUtil sshutils.SSHUtil
+		req           *models.SshUserChecksRequest
+		MockSSHUtil   sshutils.SSHUtil
+		MockFileUtils fileutils.FileUtils
 	}
 	tests := []struct {
 		description string
@@ -45,14 +39,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 		want        *models.SshUserChecksResponse
 	}{
 		{
-			description: "SSH User has correct access and correct password",
+			description: "User has correct access and correct password",
 			args: args{
 				req: &models.SshUserChecksRequest{
-					Ip:            nodeIp,
-					User_Name:     "ubuntu",
-					Port:          "22",
-					Private_Key:   testPemFilePath,
-					Sudo_Password: "123456",
+					Ip:           nodeIp,
+					UserName:     "ubuntu",
+					Port:         "22",
+					PrivateKey:   testPemFilePath,
+					SudoPassword: "123456",
 				},
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 					SetSSHConfigfunc: func(sshConfig *sshutils.SSHConfig) {},
@@ -61,6 +55,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 					},
 					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
 						return true, nil
+					},
+				},
+				MockFileUtils: &fileutils.MockFileSystemUtils{
+					CreateTempFileFunc: func(content, filename string) (string, error) {
+						return "", nil
+					},
+					DeleteTempFileFunc: func(tempFile string) error {
+						return nil
 					},
 				},
 			},
@@ -85,14 +87,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 			},
 		},
 		{
-			description: "If the user is able to SSH but password provied is not supported",
+			description: "User is able to SSH but password provided is not supported",
 			args: args{
 				req: &models.SshUserChecksRequest{
-					Ip:            nodeIp,
-					User_Name:     "ubuntu",
-					Port:          "22",
-					Private_Key:   testPemFilePath,
-					Sudo_Password: "12345",
+					Ip:           nodeIp,
+					UserName:     "ubuntu",
+					Port:         "22",
+					PrivateKey:   testPemFilePath,
+					SudoPassword: "123456",
 				},
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 					SetSSHConfigfunc: func(sshConfig *sshutils.SSHConfig) {},
@@ -101,6 +103,14 @@ func TestCheckSshUserDetails(t *testing.T) {
 					},
 					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
 						return false, errors.New("Error while running cammand:Process exited with status 1")
+					},
+				},
+				MockFileUtils: &fileutils.MockFileSystemUtils{
+					CreateTempFileFunc: func(content, filename string) (string, error) {
+						return "", nil
+					},
+					DeleteTempFileFunc: func(tempFile string) error {
+						return nil
 					},
 				},
 			},
@@ -154,7 +164,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 		want        *models.Checks
 	}{
 		{
-			description: "If the SSH Connection with the user is successfull",
+			description: "SSH Connection with the user is successfull",
 			args: args{
 				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
@@ -180,7 +190,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 			},
 		},
 		{
-			description: "If the SSH Connection failed",
+			description: "SSH Connection failed with the given credentials",
 			args: args{
 				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
@@ -215,6 +225,7 @@ func TestGetSshConnectionDetails(t *testing.T) {
 	}
 
 }
+
 func TestGetSudoPasswordDetails(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	ssu := NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{
@@ -234,7 +245,7 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 		want        *models.Checks
 	}{
 		{
-			description: "",
+			description: "Sudo Password Entered has the access to the run sudo command on the host",
 			args: args{
 				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
@@ -260,7 +271,7 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 			},
 		},
 		{
-			description: "",
+			description: "Sudo password provided was incorrect for the sudo command execution",
 			args: args{
 				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",

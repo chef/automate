@@ -18,9 +18,14 @@ import (
 
 const (
 	SshUserSuccessMessageWithSudoPassword    = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"SSH user accessible","passed":true,"success_msg":"SSH user is accessible for the node: 1.1.1.1","error_msg":"","resolution_msg":""},{"title":"Sudo password valid","passed":true,"success_msg":"SSH user sudo password is valid for the node: 1.1.1.1","error_msg":"","resolution_msg":""}]}}`
-	SshUserSuccessMessageWithoutSudoPassword = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"SSH user accessible","passed":true,"success_msg":"SSH user is accessible for the node: 1.1.1.1","error_msg":"","resolution_msg":""}]}}`
+	SshUserSuccessMessageWithoutSudoPassword = `{"status":"SUCCESS","result":{"passed":true,"checks":[{"title":"SSH user accessible","passed":true,"success_msg":"SSH user is accessible for the node: 1.1.1.1","error_msg":"","resolution_msg":""},{"title":"Sudo password valid","passed":true,"success_msg":"SSH user sudo password is valid for the node: 1.1.1.1","error_msg":"","resolution_msg":""}]}}`
+	SshUserFailureMessageWithWrongPassword   = `{"status":"SUCCESS","result":{"passed":false,"checks":[{"title":"SSH user accessible","passed":true,"success_msg":"SSH user is accessible for the node: 1.1.1.1","error_msg":"","resolution_msg":""},{"title":"Sudo password invalid","passed":false,"success_msg":"","error_msg":"SSH user sudo password is invalid for the node with IP 1.1.1.1","resolution_msg":"Ensure you have provided the correct sudo password and the user has sudo access on the node: 1.1.1.1"}]}}`
 	SshUserResponseWithEmptyRequestBody      = `{"status":"FAILED","result":null,"error":{"code":400,"message":"Request Parameters that is 'ip', 'user_name', 'ssh_port' and 'private_key' cannot be empty"}}`
 	SshUserResponseErrorBodyParser           = `{"status":"FAILED","result":null,"error":{"code":400,"message":"invalid character '}' looking for beginning of object key string"}}`
+	SshUserSuccessTitle                      = `SSH user accessible`
+	SshUserSuccessMessage                    = `SSH user is accessible for the node: 1.1.1.1`
+	SudoSuccessTitle                         = `Sudo password valid`
+	SudoCheckSuccessMessage                  = `SSH user sudo password is valid for the node: 1.1.1.1`
 )
 
 func SetupMockSshUserChecksService(responseBody *models.SshUserChecksResponse, err error) sshusercheckservice.SshUserCheckService {
@@ -60,21 +65,21 @@ func TestCheckSshUser(t *testing.T) {
 		body          string
 	}{
 		{
-			description: "200:success status route with sudo password",
+			description: "200:Success status route with sudo password",
 			responseBody: &models.SshUserChecksResponse{
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "SSH user accessible",
+						Title:         SshUserSuccessTitle,
 						Passed:        true,
-						SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+						SuccessMsg:    SshUserSuccessMessage,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
 					{
-						Title:         "Sudo password valid",
+						Title:         SudoSuccessTitle,
 						Passed:        true,
-						SuccessMsg:    "SSH user sudo password is valid for the node: 1.1.1.1",
+						SuccessMsg:    SudoCheckSuccessMessage,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -91,14 +96,21 @@ func TestCheckSshUser(t *testing.T) {
 			}`,
 		},
 		{
-			description: "200: success route without sudopassword",
+			description: "200:Success route without sudopassword being set by the user",
 			responseBody: &models.SshUserChecksResponse{
 				Passed: true,
 				Checks: []models.Checks{
 					{
-						Title:         "SSH user accessible",
+						Title:         SshUserSuccessTitle,
 						Passed:        true,
-						SuccessMsg:    "SSH user is accessible for the node: 1.1.1.1",
+						SuccessMsg:    SshUserSuccessMessage,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         SudoSuccessTitle,
+						Passed:        true,
+						SuccessMsg:    SudoCheckSuccessMessage,
 						ErrorMsg:      "",
 						ResolutionMsg: "",
 					},
@@ -114,15 +126,82 @@ func TestCheckSshUser(t *testing.T) {
 			}`,
 		},
 		{
-			description:  "400: If one of the mandatory field is empty",
+			description: "200:Success route with sudopassword being set by the user and entered incorrectly",
+			responseBody: &models.SshUserChecksResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         SshUserSuccessTitle,
+						Passed:        true,
+						SuccessMsg:    SshUserSuccessMessage,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         "Sudo password invalid",
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      "SSH user sudo password is invalid for the node with IP 1.1.1.1",
+						ResolutionMsg: "Ensure you have provided the correct sudo password and the user has sudo access on the node: 1.1.1.1",
+					},
+				},
+			},
+			expectedCode: 200,
+			expectedBody: SshUserFailureMessageWithWrongPassword,
+			body: `{
+				"ip":"1.1.1.1",
+				"user_name": "admin",
+				"ssh_port": "22",
+				"private_key": "----- BEGIN PRIVATE RSA KEY ------",
+				"sudo_password":"12345"
+			}`,
+		},
+		{
+			description:  "400:One of the mandatory field is empty (ip)",
+			responseBody: nil,
+			expectedCode: 400,
+			expectedBody: SshUserResponseWithEmptyRequestBody,
+			body: `{
+				"ip":"",
+				"user_name":"admin",
+				"ssh_port": "22",
+				"private_key":"----- BEGIN PRIVATE RSA KEY ------"
+			}`,
+		},
+		{
+			description:  "400:One of the mandatory field is empty (username)",
 			responseBody: nil,
 			expectedCode: 400,
 			expectedBody: SshUserResponseWithEmptyRequestBody,
 			body: `{
 				"ip":"1.1.1.1",
-				"user_name":"admin",
+				"user_name":"",
+				"ssh_port": "22",
+				"private_key":"----- BEGIN PRIVATE RSA KEY ------"
+			}`,
+		},
+		{
+			description:  "400:One of the mandatory field is empty (privateKey)",
+			responseBody: nil,
+			expectedCode: 400,
+			expectedBody: SshUserResponseWithEmptyRequestBody,
+			body: `{
+				"ip":"1.1.1.1",
+				"user_name":"",
 				"ssh_port": "22",
 				"private_key":""
+			}`,
+		},
+		{
+			description:  "400:One of the mandatory field is empty (port)",
+			responseBody: nil,
+			expectedCode: 400,
+			expectedBody: SshUserResponseWithEmptyRequestBody,
+			body: `{
+				"ip":"1.1.1.1",
+				"user_name":"",
+				"ssh_port": "",
+				"private_key":"----- BEGIN PRIVATE RSA KEY ------"
 			}`,
 		},
 		{

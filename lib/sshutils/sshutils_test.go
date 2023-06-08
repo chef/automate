@@ -2,6 +2,7 @@ package sshutils
 
 import (
 	"errors"
+	"net"
 
 	"testing"
 
@@ -358,7 +359,9 @@ func TestCheckKnownHosts(t *testing.T) {
 			args: args{
 				MockSshClient: &MockSshClient{
 					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
-						return nil, nil
+						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+							return nil
+						}, nil
 					},
 				},
 			},
@@ -435,7 +438,9 @@ func TestAddHostKey(t *testing.T) {
 						return ""
 					},
 					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
-						return nil, nil
+						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+							return nil
+						}, nil
 					},
 				},
 			},
@@ -446,7 +451,54 @@ func TestAddHostKey(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
 			gotError := sshu.addHostKey(tt.args.host, tt.args.remote, tt.args.pubkey)
-			sshu.logger.Debug("The debug log = ", gotError)
+			assert.Equal(t, gotError, tt.wantErr)
+		})
+	}
+}
+
+func TestHostCallKeyBack(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	type args struct {
+		host          string
+		remote        *netAddressTest
+		pubkey        ssh.PublicKey
+		MockSshClient ISshClient
+	}
+	tests := []struct {
+		description string
+		args        args
+		wantErr     error
+	}{
+		{
+			description: "Client Config creation is a success",
+			args: args{
+				host: nodeIp,
+				remote: &netAddressTest{
+					Address: nodeIp,
+				},
+				pubkey: &sshPublicKeyTest{
+					key:  "",
+					data: nil,
+				},
+				MockSshClient: &MockSshClient{
+					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
+						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+							return nil
+						}, nil
+					},
+					Normalizefunc: func(address string) string {
+						return ""
+					},
+				},
+			},
+
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			sshu.SshClient = tt.args.MockSshClient
+			gotError := sshu.HostKeyCallback(tt.args.host, tt.args.remote, tt.args.pubkey)
 			assert.Equal(t, gotError, tt.wantErr)
 		})
 	}

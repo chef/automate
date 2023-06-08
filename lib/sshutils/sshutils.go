@@ -37,59 +37,6 @@ type SSHUtil interface {
 	addHostKey(string, net.Addr, ssh.PublicKey) error
 }
 
-type ISshClient interface {
-	Dial(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error)
-	NewSession(*ssh.Client) (*ssh.Session, error)
-	ParsePrivateKey(pemBytes []byte) (ssh.Signer, error)
-	PublicKey(signers ssh.Signer) ssh.AuthMethod
-	CombinedOutput(cmd string, session *ssh.Session) ([]byte, error)
-	Close(*ssh.Session) error
-	Normalize(address string) string
-	New(files ...string) (ssh.HostKeyCallback, error)
-}
-
-type sshClient struct{}
-
-func NewSshClient() ISshClient {
-	return &sshClient{}
-}
-
-func (sc *sshClient) Dial(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-	conn, err := ssh.Dial(network, addr, config)
-	return conn, err
-}
-
-func (sc *sshClient) NewSession(conn *ssh.Client) (*ssh.Session, error) {
-	session, err := conn.NewSession()
-	return session, err
-}
-
-func (sc *sshClient) ParsePrivateKey(pemBytes []byte) (ssh.Signer, error) {
-	return ssh.ParsePrivateKey(pemBytes)
-}
-
-func (sc *sshClient) PublicKey(signers ssh.Signer) ssh.AuthMethod {
-	return ssh.PublicKeys(signers)
-}
-
-func (sc *sshClient) CombinedOutput(cmd string, session *ssh.Session) ([]byte, error) {
-	output, err := session.CombinedOutput(cmd)
-	return output, err
-}
-
-func (sc *sshClient) Close(session *ssh.Session) error {
-	return session.Close()
-}
-
-func (sc *sshClient) Normalize(address string) string {
-	return knownhosts.Normalize(address)
-}
-
-func (sc *sshClient) New(files ...string) (ssh.HostKeyCallback, error) {
-	kn, err := knownhosts.New(files...)
-	return kn, err
-}
-
 func NewSSHUtil(sshconfig *SSHConfig, sshclient ISshClient, logger logger.Logger) *SSHUtilImpl {
 	// Check if timeout is set, if not set it to default value.
 	checkTimeout(sshconfig)
