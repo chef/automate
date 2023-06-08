@@ -392,6 +392,44 @@ function test_knife() {
   done
 }
 
+
+document "test_ocid" <<DOC
+  test OCID against the embedded Chef server
+DOC
+function test_ocid() {
+  check_if_deployinate_started || return 1
+  bootstrap_chef_user_data || return 1
+
+  test_if_webui_key_is_patched
+}
+
+test_if_webui_key_is_patched() {
+  # Extract webui_key from private-chef-secrets.json
+  ocid_secrets_file_path="$(hab pkg path chef/oc_id)/oc_id/config/private-chef-secrets.json"
+  ocid_webui_key="$(jq --arg variable_name "chef-server" -r '.[$variable_name]."webui_key"' < $ocid_secrets_file_path)"
+
+  # Create a temporary file with the ocid_webui_key content
+  echo "$ocid_webui_key" > temp_ocid_webui_key.pem
+
+  # Path for erchef webui_priv.pem file
+  erchef_webui_key_path="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
+
+  # Compare the temporary file with the erchef PEM file
+  output=$(diff "$erchef_webui_key_path" <(cat temp_ocid_webui_key.pem))
+
+  # Check if the output is empty, indicating a match
+  if [ -z "$output" ]; then
+    echo "The content of the PEM file matches."
+    return 1
+  else
+    echo "The content of the PEM file does not match."
+    return 0
+  fi
+
+  # Remove the temporary file
+  rm temp_ocid_webui_key.pem
+}
+
 document "ohai_time" <<DOC
   Gets ohai_time for a converged node. Assumes converge_chef_client has already run.
 DOC
