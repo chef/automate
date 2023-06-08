@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 Chef Automate upgrades from one minor version to another automatically, but you cannot directly upgrade to any major version of Chef Automate. Use the `--major` flag to upgrade from the latest to a major version. This section will talk about the major version upgrade of Chef Automate with its possible scenarios.
 
-{{< warning >}} Upgrade to the 4.7.x version requires SAN certificates, refer to [update non-SAN certificates](/automate/upgrade_san_certificates) for more details. {{< /warning >}}
+{{< warning >}} Upgrade to the 4.7.52 version requires SAN certificates, refer to [update non-SAN certificates](/automate/upgrade_san_certificates) for more details. {{< /warning >}}
 
 ## Release Channels
 
