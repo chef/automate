@@ -7,83 +7,221 @@ import (
 )
 
 func TestConstructNodeMapForEachNodeTpe(t *testing.T) {
-	var restartCmdFlags = restartCmdFlags{}
 	restartCmdFlags.automate = true
 	var infra AutomateHAInfraDetails
 
 	type ExpectedOutput struct {
-		automate    bool
-		chef_server bool
-		frontend    bool
+		Automate   bool
+		ChefServer bool
+		Postgresql bool
+		Opensearch bool
+		frontend   bool
 	}
 
 	type testCaseInfo struct {
 		testCaseDescription string
 		Automate            bool
-		ChefServer         bool
+		ChefServer          bool
+		Postgresql          bool
+		Opensearch          bool
 		frontend            bool
 		ExpectedOutput      ExpectedOutput
 	}
 
 	testCases := []testCaseInfo{
 		{
+			testCaseDescription: "should construct nodeMap for frontend when frontend flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			frontend:            true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+				frontend:   true,
+			},
+		},
+		{
 			testCaseDescription: "should construct nodeMap for automate when automate flag is passed",
 			Automate:            true,
-			ChefServer:         false,
-			frontend:            false,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			frontend:            true,
 			ExpectedOutput: ExpectedOutput{
-				Automate:    true,
-				ChefServer: false,
-
-				frontend:    false,
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+				frontend:   true,
 			},
 		},
 		{
 			testCaseDescription: "should construct nodeMap for chef-server when chef-server flag is passed",
-			Automate:            false,
-			ChefServer:         true,
-			frontend:            false,
-			ExpectedOutput: ExpectedOutput{
-				Automate:    false,
-				ChefServer: true,
-				frontend:    false,
-			},
-		},
-		{
-			testCaseDescription: "should construct nodeMap for automate when automate flag is passed",
 			Automate:            true,
-			ChefServer:         false,
-			frontend:            false,
-			ExpectedOutput: ExpectedOutput{
-				automate:    true,
-				chef_server: false,
-				frontend:    false,
-			},
-		},
-		{
-			testCaseDescription: "should construct nodeMap for frontend when frontend flag is passed",
-			Automate:            false,
-			ChefServer:         false,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
 			frontend:            true,
 			ExpectedOutput: ExpectedOutput{
-				automate:    false,
-				chef_server: false,
-				frontend:    true,
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+				frontend:   true,
+			},
+		},
+		{
+			testCaseDescription: "should construct nodeMap for postgresql when Postgresql flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			frontend:            true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+				frontend:   true,
+			},
+		},
+		{
+			testCaseDescription: "should construct nodeMap for opensearch when Opensearch flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			frontend:            true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+				frontend:   true,
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			preflightCmdFlags.automate = tc.Automate
-			preflightCmdFlags.chef_server = tc.ChefServer
-			preflightCmdFlags.frontend = tc.frontend
+			restartCmdFlags.automate = tc.Automate
+			restartCmdFlags.chefServer = tc.ChefServer
+			restartCmdFlags.postgresql = tc.Postgresql
+			restartCmdFlags.opensearch = tc.Opensearch
+			nodeMap := ConstructNodeMapForEachNodeTpe(&infra,&restartCmdFlags)
 
-			nodeMap := constructAndGetNodeMap(&infra)
+			assert.EqualValues(t, tc.ExpectedOutput.Automate, nodeMap.Automate.CmdInputs.NodeType)
+			assert.EqualValues(t, tc.ExpectedOutput.ChefServer, nodeMap.ChefServer.CmdInputs.NodeType)
+			assert.EqualValues(t, tc.ExpectedOutput.Postgresql, nodeMap.Postgresql.CmdInputs.NodeType)
+			assert.EqualValues(t, tc.ExpectedOutput.Opensearch, nodeMap.Opensearch.CmdInputs.NodeType)
+		})
+	}
+}
 
-			assert.EqualValues(t, nodeMap.Automate.CmdInputs.NodeType, tc.ExpectedOutput.automate)
-			assert.EqualValues(t, nodeMap.ChefServer.CmdInputs.NodeType, tc.ExpectedOutput.chef_server)
-			assert.EqualValues(t, nodeMap.Frontend.CmdInputs.NodeType, tc.ExpectedOutput.frontend)
+func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
+	restartCmdFlags.automate = true
+	var infra AutomateHAInfraDetails
+
+	type ExpectedOutput struct {
+		Automate   bool
+		ChefServer bool
+		Postgresql bool
+		Opensearch bool
+	}
+
+	type testCaseInfo struct {
+		testCaseDescription string
+		Automate            bool
+		ChefServer          bool
+		Postgresql          bool
+		Opensearch          bool
+		ExpectedOutput      ExpectedOutput
+	}
+
+	testCases := []testCaseInfo{
+		{
+			testCaseDescription: "should construct nodeMap for frontend when frontend flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+			},
+		},
+		{
+			testCaseDescription: "should construct nodeMap for automate when automate flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+			},
+		},
+		{
+			testCaseDescription: "should construct nodeMap for chef-server when chef-server flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+			},
+		},
+		{
+			testCaseDescription: "should construct nodeMap for postgresql when Postgresql flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+			},
+		},
+		{
+			testCaseDescription: "should construct nodeMap for opensearch when Opensearch flag is passed",
+			Automate:            true,
+			ChefServer:          true,
+			Postgresql:          true,
+			Opensearch:          true,
+			ExpectedOutput: ExpectedOutput{
+				Automate:   true,
+				ChefServer: true,
+				Postgresql: true,
+				Opensearch: true,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testCaseDescription, func(t *testing.T) {
+			restartCmdFlags.automate = tc.Automate
+			restartCmdFlags.chefServer = tc.ChefServer
+			restartCmdFlags.postgresql = tc.Postgresql
+			restartCmdFlags.opensearch = tc.Opensearch
+			nodeMap := constructNodeMapForAllNodeTypes(&restartCmdFlags,&infra)
+
+			assert.EqualValues(t, tc.ExpectedOutput.Automate, nodeMap.Automate.CmdInputs.NodeType)
+			assert.EqualValues(t, tc.ExpectedOutput.ChefServer, nodeMap.ChefServer.CmdInputs.NodeType)
+			assert.EqualValues(t, tc.ExpectedOutput.Postgresql, nodeMap.Postgresql.CmdInputs.NodeType)
+			assert.EqualValues(t, tc.ExpectedOutput.Opensearch, nodeMap.Opensearch.CmdInputs.NodeType)
 		})
 	}
 }
