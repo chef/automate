@@ -514,7 +514,6 @@ func TestHostCallKeyBack(t *testing.T) {
 	}
 }
 
-// ip string, port string, keyFile string, userName string, timeout int
 func TestNewSshConfigWithTimeout(t *testing.T) {
 	type args struct {
 		ip       string
