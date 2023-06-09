@@ -34,6 +34,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/portreachableservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/s3configservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/softwareversionservice"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/sshusercheckservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/startmockserverservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/statusservice"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/stopmockserverservice"
@@ -45,6 +46,7 @@ import (
 	"github.com/chef/automate/lib/executil"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/systemresource"
 	"github.com/chef/automate/lib/userutils"
 	"github.com/gofiber/fiber/v2"
@@ -122,8 +124,8 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
-		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l))
-
+		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
+		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l)))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,

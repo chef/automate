@@ -147,6 +147,15 @@ var a2Config = config{
 		// Exclude test file for certificatevalidation with uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/certificatevalidation/certificatevalidation_test.go`},
 
+		// Exclude test file for private key validation which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/services/sshusercheckservice/testfiles/ssh.pem`},
+
+		// Exclude test file for private key validation which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/verifyserver/server/api/v1/sshuserchecks_test.go`},
+
+		//Exclude test file for private key validation with uses RSA KEY for test cases
+		{regex: `lib/sshutils/testfiles/ssh`},
+
 		// Test data for hadeployconfig
 		{regex: `lib/config/testdata/.*\.toml`},
 		{regex: `lib/config/hadeployconfig_test.go`},
