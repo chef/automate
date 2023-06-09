@@ -1,7 +1,7 @@
 package httputils
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,7 +27,7 @@ func TestMakeRequest(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 				// Check that the request body is correct
 				expectedBody := "{\"org\":\"chef\"}"
-				requestBody, err := ioutil.ReadAll(req.Body)
+				requestBody, err := io.ReadAll(req.Body)
 				if err != nil {
 					t.Errorf("Unexpected error reading request body: %v", err)
 				}
@@ -62,7 +62,7 @@ func TestMakeRequest(t *testing.T) {
 			}
 			// Check that the response body is correct
 			expectedResponse := "{\"status\":\"OK\"}"
-			responseBody, err := ioutil.ReadAll(resp.Body)
+			responseBody, err := io.ReadAll(resp.Body)
 			if err != nil {
 				t.Errorf("Unexpected error reading response body: %v", err)
 			}

@@ -3,7 +3,7 @@ package hardwareresourcechecktrigger
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -58,8 +58,8 @@ func (ss *HardwareResourceCountCheck) Run(config models.Config) []models.CheckTr
 					Checks:  result.Checks,
 					Passed:  checkutils.IsPassed(result.Checks),
 				},
-				NodeType:  result.NodeType,
-				Host:      result.IP,
+				NodeType: result.NodeType,
+				Host:     result.IP,
 			})
 	}
 	return finalResult
@@ -74,7 +74,7 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 		ss.log.Error("Error while Performing Hardware resource count check from batch Check API : ", err)
 		return nil, err
 	}
-	respBody, err := ioutil.ReadAll(resp.Body) // nosemgrep
+	respBody, err := io.ReadAll(resp.Body) // nosemgrep
 	if err != nil {
 		ss.log.Error("Error while reading response of Hardware resource count check from batch Check API : ", err)
 		return nil, err

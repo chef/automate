@@ -3,7 +3,7 @@ package firewallchecktrigger
 import (
 	"encoding/json"
 
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -436,7 +436,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == constants.FIREWALL_API_PATH {
-				body, err := ioutil.ReadAll(r.Body)
+				body, err := io.ReadAll(r.Body)
 				require.NoError(t, err)
 
 				var req models.FirewallRequest

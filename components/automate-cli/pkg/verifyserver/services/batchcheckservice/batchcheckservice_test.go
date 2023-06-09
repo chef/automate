@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -21,7 +21,7 @@ import (
 )
 
 func SetupMockHttpRequestClient(responseJson string, err error, shouldStartMockServerOnSomeNodesOnly bool) httputils.IHttpRequestClient {
-	r := ioutil.NopCloser(bytes.NewReader([]byte(responseJson)))
+	r := io.NopCloser(bytes.NewReader([]byte(responseJson)))
 	return &httputils.MockHttpRequestClient{
 		MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
 			if shouldStartMockServerOnSomeNodesOnly && url == "http://1.2.3.4:1234/api/v1/start/mock-server" {
