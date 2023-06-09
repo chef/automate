@@ -58,6 +58,8 @@ type BeStatus []BeStatusValue
 
 const (
 	STATUS_ERROR_ON_SELF_MANAGED = "Showing the status for externally configured %s is not supported."
+	BACKEND_STATUS               = "sudo HAB_LICENSE=accept-no-persist hab svc status"
+	FRONTEND_STATUS              = "sudo chef-automate status"
 )
 
 func newStatusCmd() *cobra.Command {
@@ -417,15 +419,11 @@ func handleManagedServiceError(flags *statusCmdFlags) error {
 
 func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 	commandFrontEnd := buildFrontEndStatusCmd(flags)
-	commandBackEnd := "sudo HAB_LICENSE=accept-no-persist hab svc status"
 	nodeMap := &NodeTypeAndCmd{
 		Frontend: &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:                      commandFrontEnd,
-				ErrorCheckEnableInOutput: true,
 				WaitTimeout:              int(flags.waitTimeout),
-				Single:                   false,
-				NodeType:                 false,
 				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
@@ -433,9 +431,8 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 		Automate: &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:                      commandFrontEnd,
-				Single:                   false,
-				ErrorCheckEnableInOutput: true,
 				WaitTimeout:              int(flags.waitTimeout),
+				ErrorCheckEnableInOutput: true,
 				NodeIps:                  []string{flags.node},
 				NodeType:                 flags.automate,
 				SkipPrintOutput:          true,
@@ -446,7 +443,6 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 			CmdInputs: &CmdInputs{
 				Cmd:                      commandFrontEnd,
 				WaitTimeout:              int(flags.waitTimeout),
-				Single:                   false,
 				ErrorCheckEnableInOutput: true,
 				NodeIps:                  []string{flags.node},
 				NodeType:                 flags.chefServer,
@@ -456,9 +452,8 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 		},
 		Postgresql: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandBackEnd,
+				Cmd:                      BACKEND_STATUS,
 				NodeIps:                  []string{flags.node},
-				Single:                   false,
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.postgresql,
 				WaitTimeout:              600,
@@ -468,9 +463,8 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 		},
 		Opensearch: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandBackEnd,
+				Cmd:                      BACKEND_STATUS,
 				NodeIps:                  []string{flags.node},
-				Single:                   false,
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.opensearch,
 				WaitTimeout:              600,
@@ -484,7 +478,7 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 }
 
 func buildFrontEndStatusCmd(flags *statusCmdFlags) string {
-	command := "sudo chef-automate status"
+	command := FRONTEND_STATUS
 
 	if flags.waitForHealthy {
 		command += " -w"
