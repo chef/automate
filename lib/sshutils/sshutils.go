@@ -29,24 +29,31 @@ type SSHUtilImpl struct {
 
 type SSHUtil interface {
 	Execute(sshConfig SSHConfig, cmd string) (string, error)
-	NewSshConfig(ip string, port string, keyFile string, userName string) SSHConfig
 }
 
 func NewSSHUtil(sshclient ISshClient, logger logger.Logger) *SSHUtilImpl {
-	// Check if timeout is set, if not set it to default value.
 	return &SSHUtilImpl{
 		SshClient: sshclient,
 		logger:    logger,
 	}
 }
 
-func (s *SSHUtilImpl) NewSshConfig(ip string, port string, keyFile string, userName string) SSHConfig {
+func NewSshConfigWithTimeout(ip string, port string, keyFile string, userName string, timeout int) SSHConfig {
 	return SSHConfig{
 		SshUser:    userName,
 		SshPort:    port,
 		SshKeyFile: keyFile,
 		HostIP:     ip,
-		Timeout:    150,
+		Timeout:    timeout,
+	}
+}
+
+func NewSshConfig(ip string, port string, keyFile string, userName string) SSHConfig {
+	return SSHConfig{
+		SshUser:    userName,
+		SshPort:    port,
+		SshKeyFile: keyFile,
+		HostIP:     ip,
 	}
 }
 

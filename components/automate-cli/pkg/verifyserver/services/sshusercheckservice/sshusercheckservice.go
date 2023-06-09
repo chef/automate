@@ -40,7 +40,7 @@ func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequ
 		return nil, err
 	}
 
-	sshConfig := ssu.SshUtil.NewSshConfig(req.Ip, req.Port, filePath, req.UserName)
+	sshConfig := sshutils.NewSshConfig(req.Ip, req.Port, filePath, req.UserName)
 
 	sshCheckResponse, isCheckPassed := ssu.CheckSshConnection(sshConfig, req.Ip, req.SudoPassword)
 	serviceResponse := &models.ChecksResponse{}

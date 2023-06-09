@@ -19,6 +19,9 @@ const (
 	sudoPasswordCmd = `echo 123456 | sudo -S ls -l`
 	dialFailed      = `dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain`
 	nodeIp          = "1.1.1.1"
+	userName        = "ubuntu"
+	port            = "22"
+	timeout         = 150
 )
 
 var sshConfig = sshutils.SSHConfig{
@@ -350,6 +353,7 @@ func TestExecute(t *testing.T) {
 		})
 	}
 }
+
 func TestCheckKnownHosts(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
@@ -508,4 +512,54 @@ func TestHostCallKeyBack(t *testing.T) {
 			assert.Equal(t, gotError, tt.wantErr)
 		})
 	}
+}
+
+// ip string, port string, keyFile string, userName string, timeout int
+func TestNewSshConfigWithTimeout(t *testing.T) {
+	type args struct {
+		ip       string
+		port     string
+		keyfile  string
+		userName string
+		timeout  int
+	}
+	var arg args = args{
+		ip:       nodeIp,
+		port:     port,
+		keyfile:  testfile,
+		userName: userName,
+		timeout:  timeout,
+	}
+	want := sshutils.SSHConfig{
+		SshUser:    "ubuntu",
+		SshPort:    "22",
+		SshKeyFile: testfile,
+		HostIP:     "1.1.1.1",
+		Timeout:    150,
+	}
+	response := sshutils.NewSshConfigWithTimeout(arg.ip, arg.port, arg.keyfile, arg.userName, arg.timeout)
+	assert.Equal(t, response, want)
+}
+
+func TestNewSshConfig(t *testing.T) {
+	type args struct {
+		ip       string
+		port     string
+		keyfile  string
+		userName string
+	}
+	var arg args = args{
+		ip:       nodeIp,
+		port:     port,
+		keyfile:  testfile,
+		userName: userName,
+	}
+	want := sshutils.SSHConfig{
+		SshUser:    "ubuntu",
+		SshPort:    "22",
+		SshKeyFile: testfile,
+		HostIP:     "1.1.1.1",
+	}
+	response := sshutils.NewSshConfig(arg.ip, arg.port, arg.keyfile, arg.userName)
+	assert.Equal(t, response, want)
 }
