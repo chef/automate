@@ -7,7 +7,7 @@ type S3ConfigRequest struct {
 	BasePath   string `json:"base_path"`
 	AccessKey  string `json:"access_key"`
 	SecretKey  string `json:"secret_key"`
-	Region     string `json:"region`
+	Region     string `json:"region"`
 }
 type S3ConfigResponse struct {
 	Passed bool             `json:"passed"`
