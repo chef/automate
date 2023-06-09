@@ -22,9 +22,8 @@ func (h *Handler) PortReachable(c *fiber.Ctx) error {
 	}
 
 	// If port number is invalid
-	err := validatePortRange(reqBody.DestinationNodePort, h)
-	if err != nil {
-		h.Logger.Error(err)
+	if !isValidPort(reqBody.DestinationNodePort) {
+		h.Logger.Error("Request body contains invalid port number")
 		return fiber.NewError(http.StatusBadRequest, "Invalid port number")
 	}
 
