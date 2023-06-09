@@ -43,7 +43,7 @@ func newGatherLogsCmd() *cobra.Command {
 		RunE:  runGatherLogsCmd,
 		Args:  cobra.RangeArgs(0, 3),
 		Annotations: map[string]string{
-			docs.Tag: docs.FrontEnd,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
