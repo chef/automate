@@ -8,7 +8,3 @@ type SshUserChecksRequest struct {
 	SudoPassword string `json:"sudo_password"`
 }
 
-type SshUserChecksResponse struct {
-	Passed bool     `json:"passed"`
-	Checks []Checks `json:"checks"`
-}

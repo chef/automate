@@ -1,7 +1,6 @@
 package sshutils
 
 import (
-	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -28,13 +27,7 @@ type SSHUtilImpl struct {
 }
 
 type SSHUtil interface {
-	getClientConfig() (*ssh.ClientConfig, error)
-	SetSSHConfig(sshConfig *SSHConfig)
-	GetConnection() (*ssh.Client, error)
-	checkKnownHosts() (ssh.HostKeyCallback, error)
-	createKnownHosts() error
-	ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig *SSHConfig, sudoPassword string, sudoPasswordCmd string) (bool, error)
-	addHostKey(string, net.Addr, ssh.PublicKey) error
+	Execute(sshConfig *SSHConfig, cmd string) (string, error)
 }
 
 func NewSSHUtil(sshconfig *SSHConfig, sshclient ISshClient, logger logger.Logger) *SSHUtilImpl {
@@ -53,22 +46,16 @@ func checkTimeout(sshConfig *SSHConfig) {
 	}
 }
 
-func (s *SSHUtilImpl) SetSSHConfig(sshConfig *SSHConfig) {
-	// Check if timeout is set, if not set it to default value.
-	checkTimeout(sshConfig)
-	s.SshConfig = sshConfig
-}
-
-func (s *SSHUtilImpl) GetConnection() (*ssh.Client, error) {
-	config, err := s.getClientConfig()
+func (s *SSHUtilImpl) getConnection(sshConfig *SSHConfig) (*ssh.Client, error) {
+	config, err := s.getClientConfig(sshConfig)
 	if err != nil {
 		s.logger.Error("Error while generating the client config:", err)
 		return nil, err
 	}
 	// Open connection
-	addr := s.SshConfig.HostIP
-	if len(strings.TrimSpace(s.SshConfig.SshPort)) > 0 {
-		addr = addr + ":" + s.SshConfig.SshPort
+	addr := sshConfig.HostIP
+	if len(strings.TrimSpace(sshConfig.SshPort)) > 0 {
+		addr = addr + ":" + sshConfig.SshPort
 	} else {
 		addr = addr + ":22"
 	}
@@ -80,8 +67,8 @@ func (s *SSHUtilImpl) GetConnection() (*ssh.Client, error) {
 	return conn, err
 }
 
-func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
-	pemBytes, err := os.ReadFile(s.SshConfig.SshKeyFile)
+func (s *SSHUtilImpl) getClientConfig(sshConfig *SSHConfig) (*ssh.ClientConfig, error) {
+	pemBytes, err := os.ReadFile(sshConfig.SshKeyFile)
 	if err != nil {
 		s.logger.Error("Unable to read private key: %v", err)
 		return nil, err
@@ -93,12 +80,13 @@ func (s *SSHUtilImpl) getClientConfig() (*ssh.ClientConfig, error) {
 	}
 	// Client config
 	return &ssh.ClientConfig{
-		User:            s.SshConfig.SshUser,
+		User:            sshConfig.SshUser,
 		Auth:            []ssh.AuthMethod{s.SshClient.PublicKey(signer)},
-		HostKeyCallback: s.HostKeyCallback,
+		HostKeyCallback: s.hostKeyCallback,
 	}, nil
 }
-func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.PublicKey) error {
+
+func (s *SSHUtilImpl) hostKeyCallback(host string, remote net.Addr, pubkey ssh.PublicKey) error {
 	var keyErr *knownhosts.KeyError
 	kh, err := s.checkKnownHosts()
 	if err != nil {
@@ -116,34 +104,29 @@ func (s *SSHUtilImpl) HostKeyCallback(host string, remote net.Addr, pubkey ssh.P
 		return keyErr
 	} else if errors.As(hErr, &keyErr) && len(keyErr.Want) == 0 {
 		// host key not found in known_hosts then give a warning and continue to connect.
-		// writer.Printf("WARNING: %s is not trusted, adding this key to known_hosts file.\n", host)
 		return s.addHostKey(host, remote, pubkey)
 	}
-	// writer.Printf("Pub key exists for %s.\n", host)
 	return nil
 }
-func (s *SSHUtilImpl) ConnectAndExecuteCommandOnRemoteWithSudoPassword(sshConfig *SSHConfig, sudoPassword string, sudoPasswordCmd string) (bool, error) {
-	//Ran the command using the sudoPassword provided
-	s.SetSSHConfig(sshConfig)
-	conn, err := s.GetConnection()
+
+func (s *SSHUtilImpl) Execute(sshConfig *SSHConfig, cmd string) (string, error) {
+	conn, err := s.getConnection(sshConfig)
 	if err != nil {
-		return false, err
+		return "Connection creation failed", err
 	}
 	session, err := s.SshClient.NewSession(conn)
 	if err != nil {
-		s.logger.Error("Session Creation failed:", err)
-		return false, err
+		s.logger.Error("Session creation failed:", err)
+		return "Session creation failed", err
 	}
-	remoteCommands := fmt.Sprintf(sudoPasswordCmd, sudoPassword)
-	output, err := s.SshClient.CombinedOutput(remoteCommands, session)
-	s.logger.Debug("The output for the execution of the command : ", output)
+	output, err := s.SshClient.CombinedOutput(cmd, session)
+	s.logger.Debug("The output for the execution of the command:", string(output))
 	if err != nil {
 		s.logger.Error("Error while executing command on the remote host:", err)
-		return false, err
+		return string(output), err
 	}
-	s.logger.Debug("The output from the session:", output)
 	defer s.SshClient.Close(session)
-	return true, nil
+	return string(output), nil
 }
 
 func (s *SSHUtilImpl) createKnownHosts() error {

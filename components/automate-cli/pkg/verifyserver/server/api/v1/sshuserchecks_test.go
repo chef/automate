@@ -28,9 +28,9 @@ const (
 	SudoCheckSuccessMessage                  = `SSH user sudo password is valid for the node: 1.1.1.1`
 )
 
-func SetupMockSshUserChecksService(responseBody *models.SshUserChecksResponse, err error) sshusercheckservice.SshUserCheckService {
+func SetupMockSshUserChecksService(responseBody *models.ChecksResponse, err error) sshusercheckservice.SshUserCheckService {
 	return &sshusercheckservice.MockSshUserCheckService{
-		CheckSshUserDetailsFunc: func(*models.SshUserChecksRequest) (*models.SshUserChecksResponse, error) {
+		CheckSshUserDetailsFunc: func(sucr *models.SshUserChecksRequest) (*models.ChecksResponse, error) {
 			return responseBody, err
 		},
 	}
@@ -58,7 +58,7 @@ func SetUpSshUserCheckHandlers(ssu sshusercheckservice.SshUserCheckService) (*fi
 func TestCheckSshUser(t *testing.T) {
 	tests := []struct {
 		description   string
-		responseBody  *models.SshUserChecksResponse
+		responseBody  *models.ChecksResponse
 		expectedCode  int
 		expectedBody  string
 		expectedError error
@@ -66,7 +66,7 @@ func TestCheckSshUser(t *testing.T) {
 	}{
 		{
 			description: "200:Success status route with sudo password",
-			responseBody: &models.SshUserChecksResponse{
+			responseBody: &models.ChecksResponse{
 				Passed: true,
 				Checks: []models.Checks{
 					{
@@ -97,7 +97,7 @@ func TestCheckSshUser(t *testing.T) {
 		},
 		{
 			description: "200:Success route without sudopassword being set by the user",
-			responseBody: &models.SshUserChecksResponse{
+			responseBody: &models.ChecksResponse{
 				Passed: true,
 				Checks: []models.Checks{
 					{
@@ -127,7 +127,7 @@ func TestCheckSshUser(t *testing.T) {
 		},
 		{
 			description: "200:Success route with sudopassword being set by the user and entered incorrectly",
-			responseBody: &models.SshUserChecksResponse{
+			responseBody: &models.ChecksResponse{
 				Passed: false,
 				Checks: []models.Checks{
 					{

@@ -170,3 +170,8 @@ type CheckAndType struct {
 	CheckType string `json:"check_type"`
 	CheckMsg  string `json:"check_msg"`
 }
+
+type ChecksResponse struct {
+	Passed bool     `json:"passed"`
+	Checks []Checks `json:"checks"`
+}

@@ -9,12 +9,14 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/sshutils"
-	"golang.org/x/crypto/ssh"
 )
 
 const (
 	testPemFilePath     = "./testfiles/ssh"
 	nodeIp              = "1.1.1.1"
+	userName            = "ubuntu"
+	port                = "22"
+	sudoPassword        = "123456"
 	SuccessTitle        = "SSH user accessible"
 	SuccessSudoPassword = "Sudo password valid"
 	FailureSudoPassword = "Sudo password invalid"
@@ -30,32 +32,24 @@ func TestCheckSshUserDetails(t *testing.T) {
 
 	type args struct {
 		req           *models.SshUserChecksRequest
-		MockSSHUtil   sshutils.SSHUtil
 		MockFileUtils fileutils.FileUtils
+		MockSSHUtil   sshutils.SSHUtil
 	}
 	tests := []struct {
 		description string
 		args        args
-		want        *models.SshUserChecksResponse
+		want        *models.ChecksResponse
+		wantErr     error
 	}{
 		{
-			description: "User has correct access and correct password",
+			description: "SSH Connection and Sudo password is correct",
 			args: args{
 				req: &models.SshUserChecksRequest{
 					Ip:           nodeIp,
-					UserName:     "ubuntu",
-					Port:         "22",
+					UserName:     userName,
+					Port:         port,
 					PrivateKey:   testPemFilePath,
-					SudoPassword: "123456",
-				},
-				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					SetSSHConfigfunc: func(sshConfig *sshutils.SSHConfig) {},
-					GetConnectionfunc: func() (*ssh.Client, error) {
-						return &ssh.Client{}, nil
-					},
-					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
-						return true, nil
-					},
+					SudoPassword: sudoPassword,
 				},
 				MockFileUtils: &fileutils.MockFileSystemUtils{
 					CreateTempFileFunc: func(content, filename string) (string, error) {
@@ -65,8 +59,13 @@ func TestCheckSshUserDetails(t *testing.T) {
 						return nil
 					},
 				},
+				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+						return "", nil
+					},
+				},
 			},
-			want: &models.SshUserChecksResponse{
+			want: &models.ChecksResponse{
 				Passed: true,
 				Checks: []models.Checks{
 					{
@@ -85,154 +84,50 @@ func TestCheckSshUserDetails(t *testing.T) {
 					},
 				},
 			},
+			wantErr: nil,
 		},
 		{
-			description: "User is able to SSH but password provided is not supported",
+			description: "Temp file creation fails",
 			args: args{
 				req: &models.SshUserChecksRequest{
 					Ip:           nodeIp,
-					UserName:     "ubuntu",
-					Port:         "22",
+					UserName:     userName,
+					Port:         port,
 					PrivateKey:   testPemFilePath,
-					SudoPassword: "123456",
-				},
-				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					SetSSHConfigfunc: func(sshConfig *sshutils.SSHConfig) {},
-					GetConnectionfunc: func() (*ssh.Client, error) {
-						return &ssh.Client{}, nil
-					},
-					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
-						return false, errors.New("Error while running cammand:Process exited with status 1")
-					},
+					SudoPassword: sudoPassword,
 				},
 				MockFileUtils: &fileutils.MockFileSystemUtils{
 					CreateTempFileFunc: func(content, filename string) (string, error) {
-						return "", nil
+						return "", errors.New("file creation failed ")
 					},
 					DeleteTempFileFunc: func(tempFile string) error {
 						return nil
 					},
 				},
-			},
-			want: &models.SshUserChecksResponse{
-				Passed: false,
-				Checks: []models.Checks{
-					{
-						Title:         SuccessTitle,
-						Passed:        true,
-						SuccessMsg:    SuccessResponse,
-						ErrorMsg:      "",
-						ResolutionMsg: "",
-					},
-					{
-						Title:         FailureSudoPassword,
-						Passed:        false,
-						SuccessMsg:    "",
-						ErrorMsg:      "SSH user sudo password is invalid for the node with IP 1.1.1.1",
-						ResolutionMsg: "Ensure you have provided the correct sudo password and the user has sudo access on the node: 1.1.1.1",
-					},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		ssu.sshUtil = tt.args.MockSSHUtil
-		t.Run(tt.description, func(t *testing.T) {
-			ssu.sshUtil = tt.args.MockSSHUtil
-			got, _ := ssu.CheckSshUserDetails(tt.args.req)
-			assert.Equal(t, got, tt.want)
-		})
-	}
-}
-
-func TestGetSshConnectionDetails(t *testing.T) {
-	log, _ := logger.NewLogger("text", "debug")
-	ssu := NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{
-		CreateTempFileFunc: func(content, filename string) (string, error) {
-			return "", nil
-		},
-	}, &sshutils.SSHUtilImpl{})
-
-	type args struct {
-		SSHConfig   *sshutils.SSHConfig
-		ip          string
-		MockSSHUtil sshutils.SSHUtil
-	}
-	tests := []struct {
-		description string
-		args        args
-		want        *models.Checks
-	}{
-		{
-			description: "SSH Connection with the user is successfull",
-			args: args{
-				SSHConfig: &sshutils.SSHConfig{
-					SshUser:    "ubuntu",
-					SshPort:    "22",
-					SshKeyFile: testPemFilePath,
-					HostIP:     nodeIp,
-					Timeout:    150,
-				},
-				ip: "1.1.1.1",
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					SetSSHConfigfunc: func(sshConfig *sshutils.SSHConfig) {},
-					GetConnectionfunc: func() (*ssh.Client, error) {
-						return &ssh.Client{}, nil
+					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+						return "", nil
 					},
 				},
 			},
-			want: &models.Checks{
-				Title:         SuccessTitle,
-				Passed:        true,
-				SuccessMsg:    SuccessResponse,
-				ErrorMsg:      "",
-				ResolutionMsg: "",
-			},
-		},
-		{
-			description: "SSH Connection failed with the given credentials",
-			args: args{
-				SSHConfig: &sshutils.SSHConfig{
-					SshUser:    "ubuntu",
-					SshPort:    "22",
-					SshKeyFile: testPemFilePath,
-					HostIP:     nodeIp,
-					Timeout:    150,
-				},
-				ip: "1.1.1.1",
-				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					SetSSHConfigfunc: func(sshConfig *sshutils.SSHConfig) {},
-					GetConnectionfunc: func() (*ssh.Client, error) {
-						return nil, errors.New("dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain")
-					},
-				},
-			},
-			want: &models.Checks{
-				Title:         FailureSSHUser,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      "SSH user is unaccessible for the node with IP 1.1.1.1",
-				ResolutionMsg: "Give SSH access to the user with the given key on the node: 1.1.1.1",
-			},
+			want: nil,
+			wantErr: errors.New("file creation failed "),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
+			ssu.fileUtils = tt.args.MockFileUtils
 			ssu.sshUtil = tt.args.MockSSHUtil
-			got := ssu.GetSshConnectionDetails(tt.args.SSHConfig, tt.args.ip)
+			got, err := ssu.CheckSshUserDetails(tt.args.req)
 			assert.Equal(t, got, tt.want)
+			assert.Equal(t, err, tt.wantErr)
 		})
 	}
-
 }
-
-func TestGetSudoPasswordDetails(t *testing.T) {
+func TestCheckSshConnection(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	ssu := NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{
-		CreateTempFileFunc: func(content, filename string) (string, error) {
-			return "", nil
-		},
-	}, &sshutils.SSHUtilImpl{})
+	ssu := NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{}, &sshutils.SSHUtilImpl{})
+
 	type args struct {
 		SSHConfig    *sshutils.SSHConfig
 		ip           string
@@ -240,12 +135,13 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 		MockSSHUtil  sshutils.SSHUtil
 	}
 	tests := []struct {
-		description string
-		args        args
-		want        *models.Checks
+		description        string
+		args               args
+		want               []models.Checks
+		wantPassedResponse bool
 	}{
 		{
-			description: "Sudo Password Entered has the access to the run sudo command on the host",
+			description: "The connection and cammand execution passes on the Remote Host",
 			args: args{
 				SSHConfig: &sshutils.SSHConfig{
 					SshUser:    "ubuntu",
@@ -255,53 +151,112 @@ func TestGetSudoPasswordDetails(t *testing.T) {
 					Timeout:    150,
 				},
 				ip:           nodeIp,
-				sudoPassword: "123456",
+				sudoPassword: sudoPassword,
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
-						return true, nil
+					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+						return "", nil
 					},
 				},
 			},
-			want: &models.Checks{
-				Title:         SuccessSudoPassword,
-				Passed:        true,
-				SuccessMsg:    SuccessSudoResponse,
-				ErrorMsg:      "",
-				ResolutionMsg: "",
+			want: []models.Checks{
+				{
+					Title:         SuccessTitle,
+					Passed:        true,
+					SuccessMsg:    SuccessResponse,
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
+					Title:         SuccessSudoPassword,
+					Passed:        true,
+					SuccessMsg:    SuccessSudoResponse,
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
 			},
+			wantPassedResponse: true,
 		},
 		{
-			description: "Sudo password provided was incorrect for the sudo command execution",
+			description: "SSH Connection fails",
 			args: args{
 				SSHConfig: &sshutils.SSHConfig{
-					SshUser:    "ubuntu",
+					SshUser:    "wrongUsername",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
 					HostIP:     nodeIp,
 					Timeout:    150,
 				},
 				ip:           nodeIp,
-				sudoPassword: "12345",
+				sudoPassword: sudoPassword,
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					ConnectAndExecuteCommandOnRemoteWithSudoPasswordfunc: func(s1 *sshutils.SSHConfig, s2, s3 string) (bool, error) {
-						return false, errors.New("Error while running cammand:Process exited with status 1")
+					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+						return "Connection creation falied", errors.New("ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain")
 					},
 				},
 			},
-			want: &models.Checks{
-				Title:         FailureSudoPassword,
-				Passed:        false,
-				SuccessMsg:    "",
-				ErrorMsg:      "SSH user sudo password is invalid for the node with IP 1.1.1.1",
-				ResolutionMsg: "Ensure you have provided the correct sudo password and the user has sudo access on the node: 1.1.1.1",
+			want: []models.Checks{
+				{
+					Title:         FailureSSHUser,
+					Passed:        false,
+					SuccessMsg:    "",
+					ErrorMsg:      "SSH user is unaccessible for the node with IP: " + nodeIp,
+					ResolutionMsg: "Give SSH access to the user with the give key on the node: " + nodeIp,
+				},
+				{
+					Title:         FailureSudoPassword,
+					Passed:        false,
+					SuccessMsg:    "",
+					ErrorMsg:      "SSH connection failed on the node so unable to check the sudo password for the node with IP: " + nodeIp,
+					ResolutionMsg: "Ensure the correct credentials are provided for the SSH connection of node with IP: " + nodeIp,
+				},
 			},
+			wantPassedResponse: false,
+		},
+		{
+			description: "SSH Connecton was success but the session creation got failed",
+			args: args{
+				SSHConfig: &sshutils.SSHConfig{
+					SshUser:    "wrongUsername",
+					SshPort:    "22",
+					SshKeyFile: testPemFilePath,
+					HostIP:     nodeIp,
+					Timeout:    150,
+				},
+				ip:           nodeIp,
+				sudoPassword: sudoPassword,
+				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
+					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+						return "Session creation failed", errors.New("Session creation failed for the remote host")
+					},
+				},
+			},
+			want: []models.Checks{
+				{
+					Title:         SuccessTitle,
+					Passed:        true,
+					SuccessMsg:    SuccessResponse,
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
+					Title:         FailureSudoPassword,
+					Passed:        false,
+					SuccessMsg:    "",
+					ErrorMsg:      "SSH user sudo password is invalid for the node with IP: " + nodeIp,
+					ResolutionMsg: "Ensure you have provided the correct sudo password and the user has sudo access on the node: " + nodeIp,
+				},
+			},
+			wantPassedResponse: false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			ssu.sshUtil = tt.args.MockSSHUtil
-			got := ssu.GetSudoPasswordDetails(tt.args.SSHConfig, tt.args.ip, tt.args.sudoPassword)
+			got, passed := ssu.CheckSshConnection(tt.args.SSHConfig, tt.args.ip, tt.args.sudoPassword)
 			assert.Equal(t, got, tt.want)
+			assert.Equal(t, passed, tt.wantPassedResponse)
 		})
 	}
+
 }

@@ -15,10 +15,18 @@ import (
 const (
 	testfile        = `./testfiles/ssh`
 	sudoPassword    = "123456"
-	sudoPasswordCmd = `echo "%s" | sudo -S ls -l`
+	sudoPasswordCmd = `echo 123456 | sudo -S ls -l`
 	dialFailed      = `dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain`
 	nodeIp          = "1.1.1.1"
 )
+
+var sshConfig = SSHConfig{
+	SshUser:    "ubuntu",
+	SshPort:    "22",
+	SshKeyFile: testfile,
+	HostIP:     "1.1.1.1",
+	Timeout:    150,
+}
 
 type netAddressTest struct {
 	Address string
@@ -55,6 +63,7 @@ func TestGetConnection(t *testing.T) {
 		SshKeyFile: testfile,
 	}, &sshClient{}, log)
 	type args struct {
+		sshConfig     SSHConfig
 		MockSshClient ISshClient
 	}
 	tests := []struct {
@@ -65,6 +74,7 @@ func TestGetConnection(t *testing.T) {
 		{
 			description: "If the connection was successfully done",
 			args: args{
+				sshConfig: sshConfig,
 				MockSshClient: &MockSshClient{
 					Dialfunc: func(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return &ssh.Client{}, nil
@@ -82,6 +92,7 @@ func TestGetConnection(t *testing.T) {
 		{
 			description: "If the connection was not successfully done",
 			args: args{
+				sshConfig: sshConfig,
 				MockSshClient: &MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return nil, errors.New(dialFailed)
@@ -99,6 +110,7 @@ func TestGetConnection(t *testing.T) {
 		{
 			description: "If the Client Config was not generated as expected",
 			args: args{
+				sshConfig: sshConfig,
 				MockSshClient: &MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return nil, errors.New("Error while generating the client config: Unable to read private key: no such file or directory")
@@ -117,195 +129,17 @@ func TestGetConnection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			_, got := sshu.GetConnection()
+			_, got := sshu.getConnection(&tt.args.sshConfig)
 			assert.Equal(t, got, tt.wantErr)
-		})
-	}
-}
-
-func TestConnectAndExecuteCommandOnRemoteWithSudoPassword(t *testing.T) {
-	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{
-		SshUser:    "ubuntu",
-		SshPort:    "22",
-		SshKeyFile: testfile,
-		HostIP:     nodeIp,
-		Timeout:    120,
-	}, &sshClient{}, log)
-	type args struct {
-		sshConfig     *SSHConfig
-		sudoPass      string
-		sudoPassCmd   string
-		MockSshClient ISshClient
-	}
-	tests := []struct {
-		description    string
-		args           args
-		wantedResponse bool
-		wantedErr      error
-	}{
-		{
-			description: "If the connection was successfully",
-			args: args{
-				sshConfig: &SSHConfig{
-					SshUser:    "ubuntu",
-					SshPort:    "22",
-					SshKeyFile: testfile,
-					HostIP:     nodeIp,
-					Timeout:    150,
-				},
-				sudoPass:    sudoPassword,
-				sudoPassCmd: sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
-					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-						return &ssh.Client{}, nil
-					},
-					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
-						return nil, nil
-					},
-					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
-						return nil
-					},
-					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
-						return nil, nil
-					},
-					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
-						return nil, nil
-					},
-					Closefunc: func(session *ssh.Session) error {
-						return nil
-					},
-				},
-			},
-			wantedResponse: true,
-			wantedErr:      nil,
-		},
-		{
-			description: "If the connection with tcp gets interrupted",
-			args: args{
-				sshConfig: &SSHConfig{
-					SshUser:    "ubuntu",
-					SshPort:    "22",
-					SshKeyFile: testfile,
-					HostIP:     nodeIp,
-					Timeout:    150,
-				},
-				sudoPass:    sudoPassword,
-				sudoPassCmd: sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
-					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-						return nil, errors.New("dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain")
-					},
-					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
-						return nil, nil
-					},
-					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
-						return nil
-					},
-					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
-						return nil, nil
-					},
-					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
-						return nil, nil
-					},
-					Closefunc: func(session *ssh.Session) error {
-						return nil
-					},
-				},
-			},
-			wantedResponse: false,
-			wantedErr:      errors.New("dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain"),
-		},
-		{
-			description: "If the tcp connection was successsfull but creation of session got failed",
-			args: args{
-				sshConfig: &SSHConfig{
-					SshUser:    "ubuntu",
-					SshPort:    "22",
-					SshKeyFile: testfile,
-					HostIP:     nodeIp,
-					Timeout:    150,
-				},
-				sudoPass:    sudoPassword,
-				sudoPassCmd: sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
-					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-						return &ssh.Client{}, nil
-					},
-					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
-						return nil, nil
-					},
-					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
-						return nil
-					},
-					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
-						return nil, errors.New("Session Creation failed:")
-					},
-					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
-						return nil, nil
-					},
-					Closefunc: func(session *ssh.Session) error {
-						return nil
-					},
-				},
-			},
-			wantedResponse: false,
-			wantedErr:      errors.New("Session Creation failed:"),
-		},
-		{
-			description: "If the cammand execution on the Remote session fails",
-			args: args{
-				sshConfig: &SSHConfig{
-					SshUser:    "ubuntu",
-					SshPort:    "22",
-					SshKeyFile: testfile,
-					HostIP:     nodeIp,
-					Timeout:    150,
-				},
-				sudoPass:    sudoPassword,
-				sudoPassCmd: sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
-					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-						return &ssh.Client{}, nil
-					},
-					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
-						return nil, nil
-					},
-					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
-						return nil
-					},
-					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
-						return nil, nil
-					},
-					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
-						return nil, errors.New("Error while executing command on the remote host:")
-					},
-					Closefunc: func(session *ssh.Session) error {
-						return nil
-					},
-				},
-			},
-			wantedResponse: false,
-			wantedErr:      errors.New("Error while executing command on the remote host:"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			sshu.SshClient = tt.args.MockSshClient
-			gotResponse, gotError := sshu.ConnectAndExecuteCommandOnRemoteWithSudoPassword(tt.args.sshConfig, tt.args.sudoPass, tt.args.sudoPassCmd)
-			sshu.logger.Debug("the value of gotResponse = ", gotResponse)
-			assert.Equal(t, gotResponse, tt.wantedResponse)
-			assert.Equal(t, gotError, tt.wantedErr)
 		})
 	}
 }
 
 func TestGetClientConfig(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{
-		SshKeyFile: testfile,
-	}, &sshClient{}, log)
+	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
 	type args struct {
+		sshConfig     SSHConfig
 		MockSshClient ISshClient
 	}
 	tests := []struct {
@@ -316,6 +150,7 @@ func TestGetClientConfig(t *testing.T) {
 		{
 			description: "If the client config creation was successful",
 			args: args{
+				sshConfig: sshConfig,
 				MockSshClient: &MockSshClient{
 					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
 						return nil, nil
@@ -337,12 +172,154 @@ func TestGetClientConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			_, got := sshu.getClientConfig()
+			_, got := sshu.getClientConfig(&tt.args.sshConfig)
 			assert.Equal(t, got, tt.wantedErr)
 		})
 	}
 }
 
+func TestExecute(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+
+	type args struct {
+		sshConfig     SSHConfig
+		cmd           string
+		MockSshClient ISshClient
+	}
+
+	tests := []struct {
+		description string
+		args        args
+		want        string
+		wantErr     error
+	}{
+		{
+			description: "Connection got eastablish and sudo password pass the check",
+			args: args{
+				sshConfig: sshConfig,
+				cmd:       sudoPasswordCmd,
+				MockSshClient: &MockSshClient{
+					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+						return &ssh.Client{}, nil
+					},
+					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+						return nil, nil
+					},
+					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+						return nil
+					},
+					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+						return nil, nil
+					},
+					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+						return []byte("total 0"), nil
+					},
+					Closefunc: func(s *ssh.Session) error {
+						return nil
+					},
+				},
+			},
+			want:    "total 0",
+			wantErr: nil,
+		},
+		{
+			description: "SSH Connection fails",
+			args: args{
+				sshConfig: sshConfig,
+				cmd:       sudoPasswordCmd,
+				MockSshClient: &MockSshClient{
+					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+						return nil, errors.New("dial failed:ssh: handshake failed: ssh: unable to authenticate,attempted methods [none publickey], no supported methods remain")
+					},
+					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+						return nil, nil
+					},
+					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+						return nil
+					},
+					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+						return nil, nil
+					},
+					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+						return nil, nil
+					},
+					Closefunc: func(s *ssh.Session) error {
+						return nil
+					},
+				},
+			},
+			want:    "Connection creation failed",
+			wantErr: errors.New("dial failed:ssh: handshake failed: ssh: unable to authenticate,attempted methods [none publickey], no supported methods remain"),
+		},
+		{
+			description: "SSH Session Creation failed",
+			args: args{
+				sshConfig: sshConfig,
+				cmd: sudoPasswordCmd,
+				MockSshClient: &MockSshClient{
+					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+						return &ssh.Client{}, nil
+					},
+					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+						return nil, nil
+					},
+					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+						return nil
+					},
+					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+						return nil, errors.New("Session creation failed")
+					},
+					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+						return nil, nil
+					},
+					Closefunc: func(s *ssh.Session) error {
+						return nil
+					},
+				},
+			},
+			want: "Session creation failed",
+			wantErr: errors.New("Session creation failed"),
+		},
+		{
+			description: "Combined Output not able to produce the desired output",
+			args: args{
+				sshConfig: sshConfig,
+				cmd: sudoPassword,
+				MockSshClient: &MockSshClient{
+					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+						return &ssh.Client{}, nil
+					},
+					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+						return nil, nil
+					},
+					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+						return nil
+					},
+					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+						return nil, nil
+					},
+					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+						return []byte("Sorry try again"), errors.New("Error while executing command on the remote host:Process exited with status 1")
+					},
+					Closefunc: func(s *ssh.Session) error {
+						return nil
+					},
+				},
+			},
+			want: "Sorry try again",
+			wantErr: errors.New("Error while executing command on the remote host:Process exited with status 1"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			sshu.SshClient = tt.args.MockSshClient
+			got, gotError := sshu.Execute(&tt.args.sshConfig, tt.args.cmd)
+			assert.Equal(t, got, tt.want)
+			assert.Equal(t, gotError, tt.wantErr)
+		})
+	}
+}
 func TestCheckKnownHosts(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
 	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
@@ -492,13 +469,12 @@ func TestHostCallKeyBack(t *testing.T) {
 					},
 				},
 			},
-
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			gotError := sshu.HostKeyCallback(tt.args.host, tt.args.remote, tt.args.pubkey)
+			gotError := sshu.hostKeyCallback(tt.args.host, tt.args.remote, tt.args.pubkey)
 			assert.Equal(t, gotError, tt.wantErr)
 		})
 	}
