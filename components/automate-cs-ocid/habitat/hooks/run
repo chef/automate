@@ -9,15 +9,25 @@ pkg_svc_user=root
 pkg_svc_group=root
 pkg_svc_run="return 0"
 
+export HOME={{pkg.svc_var_path}}
+
 # moved logic from plan.sh
 source "{{pkg.svc_config_path}}/scripts/do_install.sh"
+
+echo "Path is now we need {{pkg.svc_var_path}}"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
+render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
 
-export DATABASE_URL="{{cfg.DATABASE_URL}}"
-
 export OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+
+source "{{pkg.svc_var_path}}/etc/pg.env"
+
+echo "Now the url is $DATABASE_URL"
 
 # Set webui key from erchef component
 source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
@@ -45,7 +55,7 @@ fi
 # pls make sure export happens after the file is updated.
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-bundle exec bin/rake db:create
+#bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
 bundle exec bin/unicorn -p "{{cfg.network.port}}"
 

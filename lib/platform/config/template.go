@@ -114,6 +114,8 @@ func (c *Config) LoadTemplates(funcs template.FuncMap, opts ...TemplateOpt) (*te
 	t := template.New("__empty__").Funcs(c.builtinFuncs(options)).Funcs(funcs)
 
 	templatesPath := c.TemplatesPath()
+
+	
 	err := filepath.Walk(templatesPath, func(p string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
