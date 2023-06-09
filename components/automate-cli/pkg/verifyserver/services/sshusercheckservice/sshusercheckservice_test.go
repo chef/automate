@@ -63,6 +63,15 @@ func TestCheckSshUserDetails(t *testing.T) {
 					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "", nil
 					},
+					NewSshConfigfunc: func(ip, port, keyFile, userName string) sshutils.SSHConfig {
+						return sshutils.SSHConfig{
+							SshUser: userName,
+							SshPort: port,
+							SshKeyFile: keyFile,
+							HostIP: ip,
+							Timeout: 150,
+						}
+					},
 				},
 			},
 			want: &models.ChecksResponse{
@@ -107,6 +116,15 @@ func TestCheckSshUserDetails(t *testing.T) {
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "", nil
+					},
+					NewSshConfigfunc: func(ip, port, keyFile, userName string) sshutils.SSHConfig {
+						return sshutils.SSHConfig{
+							SshUser: userName,
+							SshPort: port,
+							SshKeyFile: keyFile,
+							HostIP: ip,
+							Timeout: 150,
+						}
 					},
 				},
 			},

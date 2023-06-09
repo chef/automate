@@ -175,3 +175,20 @@ type ChecksResponse struct {
 	Passed bool     `json:"passed"`
 	Checks []Checks `json:"checks"`
 }
+
+func NewSuccessCheck(title string, successMsg string) *Checks {
+	return &Checks{
+		Title:         title,
+		Passed:        true,
+		SuccessMsg:    successMsg,
+	}
+}
+
+func NewFailureCheck(title string, errorMsg string, resolutionMsg string) *Checks {
+	return &Checks{
+		Title:         title,
+		Passed:        false,
+		ErrorMsg:      errorMsg,
+		ResolutionMsg: resolutionMsg,
+	}
+}
