@@ -38,6 +38,18 @@ else
     echo "No oauth application present."
 fi
 
+export HOME={{pkg.svc_var_path}}
+export DBNAME="{{cfg.sql.db_name}}"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
+render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
+
+pg-helper rename-if-exists opscode_chef "$DBNAME"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper create-extension "$DBNAME" "uuid-ossp"
+pg-helper fix-permissions "$DBNAME"
+
 # NOTE: Please keep this statement just before running
 # any environment specific command e.g. starting rails server.
 # The running server will follow the configurations that are
@@ -45,7 +57,9 @@ fi
 # pls make sure export happens after the file is updated.
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
 
-bundle exec bin/rake db:create
+source "{{pkg.svc_var_path}}/etc/pg.env"
+
+# bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
 bundle exec bin/unicorn -p "{{cfg.network.port}}"
 
