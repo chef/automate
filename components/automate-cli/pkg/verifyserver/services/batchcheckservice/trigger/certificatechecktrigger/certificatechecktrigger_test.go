@@ -102,63 +102,98 @@ func GetRequestJsonWithSameFrontEnd() models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
-		  "ssh_user": {
+		"ssh_user": {
 			"user_name": "ubuntu",
 			"private_key": "test_key",
 			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
+		},
+		"arch": "existing_nodes",
+		"backup": {
 			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
+				"mount_location": "/mnt/automate_backups"
 			}
-		  },
-		  "hardware": {
+		},
+		"hardware": {
 			"automate_node_count": 1,
 			"automate_node_ips": [
-			  "5.6.7.8"
+				"1.2.3.4"
 			],
 			"chef_infra_server_node_count": 1,
 			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
+				"5.6.7.8"
 			],
 			"postgresql_node_count": 1,
 			"postgresql_node_ips": [
-			  "9.10.11.12"
+				"9.10.11.12"
 			],
 			"opensearch_node_count": 1,
 			"opensearch_node_ips": [
-			  "14.15.16.17"
+				"14.15.16.17"
 			]
-		  },
-		  "certificate": {
-			"fqdn":"my_fqdn",
-			"root_cert":"---- VALID ROOT CA ----",
-			"nodes":[
-				{
-					"ip":"5.6.7.8",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"9.10.11.12",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"14.15.16.17",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				}
-			]
-		  }
-		}`), &ipConfig)
+		},
+		"certificate": [
+			{
+				"fqdn": "automate_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "automate",
+				"nodes": [
+					{
+						"ip": "5.6.7.8",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "chef_server_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "chef-infra-server",
+				"nodes": [
+					{
+						"ip": "5.6.7.8",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "postgresql",
+				"nodes": [
+					{
+						"ip": "9.10.11.12",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "opensearch",
+				"nodes": [
+					{
+						"ip": "14.15.16.17",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			}
+		]
+	}`), &ipConfig)
 	return ipConfig
 }
 
@@ -166,70 +201,98 @@ func GetRequestJson() models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
-		  "ssh_user": {
+		"ssh_user": {
 			"user_name": "ubuntu",
 			"private_key": "test_key",
 			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
+		},
+		"arch": "existing_nodes",
+		"backup": {
 			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
+				"mount_location": "/mnt/automate_backups"
 			}
-		  },
-		  "hardware": {
+		},
+		"hardware": {
 			"automate_node_count": 1,
 			"automate_node_ips": [
-			  "1.2.3.4"
+				"1.2.3.4"
 			],
 			"chef_infra_server_node_count": 1,
 			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
+				"5.6.7.8"
 			],
 			"postgresql_node_count": 1,
 			"postgresql_node_ips": [
-			  "9.10.11.12"
+				"9.10.11.12"
 			],
 			"opensearch_node_count": 1,
 			"opensearch_node_ips": [
-			  "14.15.16.17"
+				"14.15.16.17"
 			]
-		  },
-		  "certificate": {
-			"fqdn":"my_fqdn",
-			"root_cert":"---- VALID ROOT CA ----",
-			"nodes":[
-				{
-					"ip":"1.2.3.4",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"5.6.7.8",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"9.10.11.12",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				},
-				{
-					"ip":"14.15.16.17",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
-				}
-			]
-		  }
-		}`), &ipConfig)
+		},
+		"certificate": [
+			{
+				"fqdn": "automate_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "automate",
+				"nodes": [
+					{
+						"ip": "1.2.3.4",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "chef_server_fqdn",
+				"fqdn_root_ca": "---- VALID FQDN ROOT CA ----",
+				"node_type": "chef-infra-server",
+				"nodes": [
+					{
+						"ip": "5.6.7.8",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "postgresql",
+				"nodes": [
+					{
+						"ip": "9.10.11.12",
+						"cert": "---- VALID NODE CERT ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			},
+			{
+				"fqdn": "",
+				"fqdn_root_ca": "",
+				"node_type": "opensearch",
+				"nodes": [
+					{
+						"ip": "14.15.16.17",
+						"cert": "---- VALID NODE CERT ----",
+						"root_cert": "---- VALID ROOT CA ----",
+						"key": "---- VALID PRIVATE KEY ----",
+						"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+						"admin_cert": "---- VALID ADMIN CERT ----"
+					}
+				]
+			}
+		]
+	}`), &ipConfig)
 	return ipConfig
 }
 

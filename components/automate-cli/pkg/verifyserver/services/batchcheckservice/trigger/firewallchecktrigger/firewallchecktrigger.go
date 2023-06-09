@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -77,10 +78,25 @@ func getRequestsForAutomateAsSource(config models.Config) []models.FirewallReque
 
 }
 
+func getRootCertForNodeWithNodeTypeAndIP(certMap map[string]models.Certificate, nodeType string, nodeIp string) string {
+
+	nodesCert, found := certMap[nodeType]
+	if found {
+		for _, cert := range nodesCert.Nodes {
+			if cert.IP == nodeIp {
+				return cert.RootCert
+			}
+		}
+	}
+
+	return ""
+}
+
 // getRequestsForChefServerAsSource gives the requests for all the ports where chefserver is the source
 func getRequestsForChefServerAsSource(config models.Config) []models.FirewallRequest {
 
 	var reqBodies []models.FirewallRequest
+	certMap := configutils.GetCertificateMap(config.Certificate)
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
 		//Dest Automate
 		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
@@ -89,7 +105,7 @@ func getRequestsForChefServerAsSource(config models.Config) []models.FirewallReq
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     "443",
 				DestinationServiceProtocol: "https",
-				RootCert:                   config.Certificate.RootCert,
+				RootCert:                   getRootCertForNodeWithNodeTypeAndIP(certMap, constants.AUTOMATE, destNodeIP),
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}
@@ -215,7 +231,6 @@ func getRequestAsBastionSource(config models.Config) []models.FirewallRequest {
 				DestinationNodeIP:          destNodeIP,
 				DestinationServicePort:     port,
 				DestinationServiceProtocol: "tcp",
-				RootCert:                   config.Certificate.RootCert,
 			}
 			reqBodies = append(reqBodies, reqBody)
 		}

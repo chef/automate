@@ -32,3 +32,15 @@ func GetNodeTypeMap(hardware models.Hardware) map[string][]string {
 	}
 	return hostMap
 }
+
+func GetCertificateMap(certificateList []models.Certificate) map[string]models.Certificate {
+
+	certificateMap := make(map[string]models.Certificate)
+
+	for _, certificate := range certificateList {
+		certificateMap[certificate.NodeType] = certificate
+	}
+
+	return certificateMap
+
+}

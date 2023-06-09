@@ -18,15 +18,24 @@ import (
 
 var (
 	hardware = models.Hardware{
-		AutomateNodeIps:        []string{"10.0.0.1"},
+		AutomateNodeIps:        []string{"10.0.0.1", "10.0.0.2"},
 		PostgresqlNodeIps:      []string{"10.0.0.3", "10.0.0.6"},
 		OpenSearchNodeIps:      []string{"10.0.0.5", "10.0.0.10"},
 		ChefInfraServerNodeIps: []string{"10.0.0.7"},
 	}
 
+	certificatelist = []models.Certificate{
+		{
+			Fqdn:         "url",
+			FqdnRootCert: "",
+			NodeType:     constants.AUTOMATE,
+			Nodes:        nodes,
+		},
+	}
 	nodeCert = models.NodeCert{
-		IP:  "10.0.0.1",
-		Key: "test-key",
+		IP:       "10.0.0.1",
+		RootCert: "test-cert",
+		Key:      "test-key",
 	}
 
 	nodes = []models.NodeCert{nodeCert}
@@ -365,17 +374,8 @@ const (
 func TestMakeRequests(t *testing.T) {
 	// Create a sample configuration
 	config := models.Config{
-		Hardware: hardware,
-		Certificate: models.Certificate{
-
-			Nodes: []models.NodeCert{
-				{IP: "10.0.0.1",
-					Cert: "cert",
-					Key:  "key",
-				},
-			},
-			RootCert: "root_cert",
-		},
+		Hardware:    hardware,
+		Certificate: certificatelist,
 	}
 
 	// Define the expected result
@@ -412,11 +412,11 @@ func TestMakeRequests(t *testing.T) {
 	makeRequests(config, mapRequests)
 	requestsForautomate, ok := mapRequests[constants.AUTOMATE]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForautomate), 4)
+	assert.Equal(t, len(requestsForautomate), 8)
 
 	requestsForchefServer, ok := mapRequests[constants.CHEF_INFRA_SERVER]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForchefServer), 5)
+	assert.Equal(t, len(requestsForchefServer), 6)
 
 	//As there are two postgress nodes which needs to interact with eachother
 	requestsForPostgres, ok := mapRequests[constants.POSTGRESQL]
@@ -504,10 +504,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			response:       apiTriggerAutomatePgPass,
@@ -521,10 +518,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			isFailed:       true,
@@ -539,10 +533,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			response:             "error while connecting to the endpoint, received invalid status code",
@@ -558,10 +549,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			response:             "error while parsing the response data",
@@ -576,10 +564,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
-					Certificate: models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
-					},
+					Certificate: certificatelist,
 				},
 			},
 			response:             "error while connecting to the endpoint, received invalid status code",
