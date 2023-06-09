@@ -16,29 +16,29 @@ type SshUserCheckService interface {
 
 type SshUserServiceImpl struct {
 	logger      logger.Logger
-	sshUtil     sshutils.SSHUtil
+	SshUtil     sshutils.SSHUtil
 	pemFileName string
-	fileUtils   fileutils.FileUtils
+	FileUtils   fileutils.FileUtils
 }
 
 func NewSshUserCheckService(logger logger.Logger, fileutils fileutils.FileUtils, sshUtils sshutils.SSHUtil) *SshUserServiceImpl {
 	return &SshUserServiceImpl{
 		logger:      logger,
-		sshUtil:     sshUtils,
+		SshUtil:     sshUtils,
 		pemFileName: PEM_FILE_NAME,
-		fileUtils:   fileutils,
+		FileUtils:   fileutils,
 	}
 }
 
 const (
 	SUDO_PASSWORD_CMD = `echo "%s" | sudo -S ls -l`
-	PEM_FILE_NAME     = "private_key"
+	PEM_FILE_NAME     = "private_key.pem"
 )
 
 func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequest) (*models.ChecksResponse, error) {
 	ssu.logger.Debugf("The Request value entered by the user ip: %v, port: %v, userName: %v ", req.Ip, req.Port, req.UserName)
 
-	filePath, err := ssu.fileUtils.CreateTempFile(req.PrivateKey, PEM_FILE_NAME)
+	filePath, err := ssu.FileUtils.CreateTempFile(req.PrivateKey, PEM_FILE_NAME)
 	if err != nil {
 		ssu.logger.Error("Error while creating the key file on the desired file path: ", err)
 		return nil, err
@@ -46,19 +46,19 @@ func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequ
 
 	sshConfig := ssu.getConfig(req, filePath)
 
-	sshCheckResponse, passed := ssu.CheckSshConnection(&sshConfig, req.Ip, req.SudoPassword)
+	sshCheckResponse, isCheckPassed := ssu.CheckSshConnection(sshConfig, req.Ip, req.SudoPassword)
 	serviceResponse := &models.ChecksResponse{}
-	serviceResponse.Passed = passed
+	serviceResponse.Passed = isCheckPassed
 	serviceResponse.Checks = sshCheckResponse
 
-	ssu.fileUtils.DeleteTempFile(filePath)
+	ssu.FileUtils.DeleteTempFile(filePath)
 	return serviceResponse, nil
 }
 
-func (ssu *SshUserServiceImpl) CheckSshConnection(sshConfig *sshutils.SSHConfig, ip string, sudoPassword string) ([]models.Checks, bool) {
+func (ssu *SshUserServiceImpl) CheckSshConnection(sshConfig sshutils.SSHConfig, ip string, sudoPassword string) ([]models.Checks, bool) {
 	responseArray := []models.Checks{}
 	command := fmt.Sprintf(SUDO_PASSWORD_CMD, sudoPassword)
-	checkResponse, err := ssu.sshUtil.Execute(sshConfig, command)
+	checkResponse, err := ssu.SshUtil.Execute(sshConfig, command)
 	ssu.logger.Debug("The response after creating connection and executing command on the terminal: ", checkResponse)
 	if err != nil {
 		if strings.Contains(checkResponse, "Connection creation falied") {
@@ -80,14 +80,14 @@ func (ssu *SshUserServiceImpl) CheckSshConnection(sshConfig *sshutils.SSHConfig,
 }
 
 func (ssu *SshUserServiceImpl) getConfig(req *models.SshUserChecksRequest, filePath string) sshutils.SSHConfig {
-	sshConfig := &sshutils.SSHConfig{
+	sshConfig := sshutils.SSHConfig{
 		SshUser:    req.UserName,
 		SshPort:    req.Port,
 		SshKeyFile: filePath,
 		HostIP:     req.Ip,
 		Timeout:    150,
 	}
-	return *sshConfig
+	return sshConfig
 }
 
 func successResponse(title string, successMsg string) *models.Checks {

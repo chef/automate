@@ -1,4 +1,4 @@
-package sshusercheckservice
+package sshusercheckservice_test
 
 import (
 	"errors"
@@ -6,13 +6,14 @@ import (
 
 	"github.com/bmizerany/assert"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/sshusercheckservice"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/sshutils"
 )
 
 const (
-	testPemFilePath     = "./testfiles/ssh"
+	testPemFilePath     = "./testfiles/ssh.pem"
 	nodeIp              = "1.1.1.1"
 	userName            = "ubuntu"
 	port                = "22"
@@ -20,7 +21,6 @@ const (
 	SuccessTitle        = "SSH user accessible"
 	SuccessSudoPassword = "Sudo password valid"
 	FailureSudoPassword = "Sudo password invalid"
-	FailureTitle        = "Sudo password invalid"
 	FailureSSHUser      = "SSH user unaccessible"
 	SuccessResponse     = "SSH user is accessible for the node: 1.1.1.1"
 	SuccessSudoResponse = "SSH user sudo password is valid for the node: 1.1.1.1"
@@ -28,7 +28,7 @@ const (
 
 func TestCheckSshUserDetails(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	ssu := NewSshUserCheckService(log, &fileutils.FileSystemUtils{}, &sshutils.SSHUtilImpl{})
+	ssu := sshusercheckservice.NewSshUserCheckService(log, &fileutils.FileSystemUtils{}, &sshutils.SSHUtilImpl{})
 
 	type args struct {
 		req           *models.SshUserChecksRequest
@@ -60,7 +60,7 @@ func TestCheckSshUserDetails(t *testing.T) {
 					},
 				},
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "", nil
 					},
 				},
@@ -105,31 +105,32 @@ func TestCheckSshUserDetails(t *testing.T) {
 					},
 				},
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "", nil
 					},
 				},
 			},
-			want: nil,
+			want:    nil,
 			wantErr: errors.New("file creation failed "),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			ssu.fileUtils = tt.args.MockFileUtils
-			ssu.sshUtil = tt.args.MockSSHUtil
+			ssu.FileUtils = tt.args.MockFileUtils
+			ssu.SshUtil = tt.args.MockSSHUtil
 			got, err := ssu.CheckSshUserDetails(tt.args.req)
 			assert.Equal(t, got, tt.want)
 			assert.Equal(t, err, tt.wantErr)
 		})
 	}
 }
+
 func TestCheckSshConnection(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	ssu := NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{}, &sshutils.SSHUtilImpl{})
+	ssu := sshusercheckservice.NewSshUserCheckService(log, &fileutils.MockFileSystemUtils{}, &sshutils.SSHUtilImpl{})
 
 	type args struct {
-		SSHConfig    *sshutils.SSHConfig
+		SSHConfig    sshutils.SSHConfig
 		ip           string
 		sudoPassword string
 		MockSSHUtil  sshutils.SSHUtil
@@ -143,7 +144,7 @@ func TestCheckSshConnection(t *testing.T) {
 		{
 			description: "The connection and cammand execution passes on the Remote Host",
 			args: args{
-				SSHConfig: &sshutils.SSHConfig{
+				SSHConfig: sshutils.SSHConfig{
 					SshUser:    "ubuntu",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
@@ -153,7 +154,7 @@ func TestCheckSshConnection(t *testing.T) {
 				ip:           nodeIp,
 				sudoPassword: sudoPassword,
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "", nil
 					},
 				},
@@ -179,7 +180,7 @@ func TestCheckSshConnection(t *testing.T) {
 		{
 			description: "SSH Connection fails",
 			args: args{
-				SSHConfig: &sshutils.SSHConfig{
+				SSHConfig: sshutils.SSHConfig{
 					SshUser:    "wrongUsername",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
@@ -189,7 +190,7 @@ func TestCheckSshConnection(t *testing.T) {
 				ip:           nodeIp,
 				sudoPassword: sudoPassword,
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "Connection creation falied", errors.New("ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain")
 					},
 				},
@@ -215,7 +216,7 @@ func TestCheckSshConnection(t *testing.T) {
 		{
 			description: "SSH Connecton was success but the session creation got failed",
 			args: args{
-				SSHConfig: &sshutils.SSHConfig{
+				SSHConfig: sshutils.SSHConfig{
 					SshUser:    "wrongUsername",
 					SshPort:    "22",
 					SshKeyFile: testPemFilePath,
@@ -225,7 +226,7 @@ func TestCheckSshConnection(t *testing.T) {
 				ip:           nodeIp,
 				sudoPassword: sudoPassword,
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
-					Executefunc: func(sshConfig *sshutils.SSHConfig, cmd string) (string, error) {
+					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
 						return "Session creation failed", errors.New("Session creation failed for the remote host")
 					},
 				},
@@ -252,7 +253,7 @@ func TestCheckSshConnection(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			ssu.sshUtil = tt.args.MockSSHUtil
+			ssu.SshUtil = tt.args.MockSSHUtil
 			got, passed := ssu.CheckSshConnection(tt.args.SSHConfig, tt.args.ip, tt.args.sudoPassword)
 			assert.Equal(t, got, tt.want)
 			assert.Equal(t, passed, tt.wantPassedResponse)

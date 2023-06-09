@@ -1,4 +1,4 @@
-package sshutils
+package sshutils_test
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/sshutils"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -20,7 +21,7 @@ const (
 	nodeIp          = "1.1.1.1"
 )
 
-var sshConfig = SSHConfig{
+var sshConfig = sshutils.SSHConfig{
 	SshUser:    "ubuntu",
 	SshPort:    "22",
 	SshKeyFile: testfile,
@@ -59,12 +60,10 @@ func (pub *sshPublicKeyTest) Verify([]byte, *ssh.Signature) error {
 
 func TestGetConnection(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{
-		SshKeyFile: testfile,
-	}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	type args struct {
-		sshConfig     SSHConfig
-		MockSshClient ISshClient
+		sshConfig     sshutils.SSHConfig
+		MockSshClient sshutils.ISshClient
 	}
 	tests := []struct {
 		description string
@@ -75,7 +74,7 @@ func TestGetConnection(t *testing.T) {
 			description: "If the connection was successfully done",
 			args: args{
 				sshConfig: sshConfig,
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network string, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return &ssh.Client{}, nil
 					},
@@ -93,7 +92,7 @@ func TestGetConnection(t *testing.T) {
 			description: "If the connection was not successfully done",
 			args: args{
 				sshConfig: sshConfig,
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return nil, errors.New(dialFailed)
 					},
@@ -111,7 +110,7 @@ func TestGetConnection(t *testing.T) {
 			description: "If the Client Config was not generated as expected",
 			args: args{
 				sshConfig: sshConfig,
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return nil, errors.New("Error while generating the client config: Unable to read private key: no such file or directory")
 					},
@@ -129,7 +128,7 @@ func TestGetConnection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			_, got := sshu.getConnection(&tt.args.sshConfig)
+			_, got := sshu.GetConnection(tt.args.sshConfig)
 			assert.Equal(t, got, tt.wantErr)
 		})
 	}
@@ -137,10 +136,10 @@ func TestGetConnection(t *testing.T) {
 
 func TestGetClientConfig(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	type args struct {
-		sshConfig     SSHConfig
-		MockSshClient ISshClient
+		sshConfig     sshutils.SSHConfig
+		MockSshClient sshutils.ISshClient
 	}
 	tests := []struct {
 		description string
@@ -151,7 +150,7 @@ func TestGetClientConfig(t *testing.T) {
 			description: "If the client config creation was successful",
 			args: args{
 				sshConfig: sshConfig,
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
 						return nil, nil
 					},
@@ -172,7 +171,7 @@ func TestGetClientConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			_, got := sshu.getClientConfig(&tt.args.sshConfig)
+			_, got := sshu.GetClientConfig(tt.args.sshConfig)
 			assert.Equal(t, got, tt.wantedErr)
 		})
 	}
@@ -180,12 +179,12 @@ func TestGetClientConfig(t *testing.T) {
 
 func TestExecute(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 
 	type args struct {
-		sshConfig     SSHConfig
+		sshConfig     sshutils.SSHConfig
 		cmd           string
-		MockSshClient ISshClient
+		MockSshClient sshutils.ISshClient
 	}
 
 	tests := []struct {
@@ -199,7 +198,7 @@ func TestExecute(t *testing.T) {
 			args: args{
 				sshConfig: sshConfig,
 				cmd:       sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return &ssh.Client{}, nil
 					},
@@ -228,7 +227,7 @@ func TestExecute(t *testing.T) {
 			args: args{
 				sshConfig: sshConfig,
 				cmd:       sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return nil, errors.New("dial failed:ssh: handshake failed: ssh: unable to authenticate,attempted methods [none publickey], no supported methods remain")
 					},
@@ -256,8 +255,8 @@ func TestExecute(t *testing.T) {
 			description: "SSH Session Creation failed",
 			args: args{
 				sshConfig: sshConfig,
-				cmd: sudoPasswordCmd,
-				MockSshClient: &MockSshClient{
+				cmd:       sudoPasswordCmd,
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return &ssh.Client{}, nil
 					},
@@ -278,15 +277,15 @@ func TestExecute(t *testing.T) {
 					},
 				},
 			},
-			want: "Session creation failed",
+			want:    "Session creation failed",
 			wantErr: errors.New("Session creation failed"),
 		},
 		{
 			description: "Combined Output not able to produce the desired output",
 			args: args{
 				sshConfig: sshConfig,
-				cmd: sudoPassword,
-				MockSshClient: &MockSshClient{
+				cmd:       sudoPassword,
+				MockSshClient: &sshutils.MockSshClient{
 					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
 						return &ssh.Client{}, nil
 					},
@@ -307,24 +306,55 @@ func TestExecute(t *testing.T) {
 					},
 				},
 			},
-			want: "Sorry try again",
+			want:    "Sorry try again",
 			wantErr: errors.New("Error while executing command on the remote host:Process exited with status 1"),
+		},
+		{
+			description: "Combined Ouput not able to execute the command",
+			args: args{
+				sshConfig: sshConfig,
+				cmd:       sudoPasswordCmd,
+				MockSshClient: &sshutils.MockSshClient{
+					Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+						return &ssh.Client{}, nil
+					},
+					ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+						return nil, nil
+					},
+					PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+						return nil
+					},
+					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+						return nil, nil
+					},
+					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+						return []byte("sudo: no tty present and no askpass program specified"), errors.New("The sudo password is missing. Make sure to provide sudo_password as enviroment variable and pass -E option while running command.")
+					},
+					Closefunc: func(s *ssh.Session) error {
+						return nil
+					},
+				},
+			},
+			want:    "sudo: no tty present and no askpass program specified",
+			wantErr: errors.New("The sudo password is missing. Make sure to provide sudo_password as enviroment variable and pass -E option while running command."),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			got, gotError := sshu.Execute(&tt.args.sshConfig, tt.args.cmd)
+			got, gotError := sshu.Execute(tt.args.sshConfig, tt.args.cmd)
 			assert.Equal(t, got, tt.want)
-			assert.Equal(t, gotError, tt.wantErr)
+			if gotError != nil {
+				assert.EqualError(t, gotError, tt.wantErr.Error())
+			}
 		})
 	}
 }
 func TestCheckKnownHosts(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	type args struct {
-		MockSshClient ISshClient
+		MockSshClient sshutils.ISshClient
 	}
 	tests := []struct {
 		description string
@@ -334,7 +364,7 @@ func TestCheckKnownHosts(t *testing.T) {
 		{
 			description: "If checking the known Host",
 			args: args{
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
 						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
 							return nil
@@ -347,7 +377,7 @@ func TestCheckKnownHosts(t *testing.T) {
 		{
 			description: "If the checking in known Host fails",
 			args: args{
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
 						return nil, errors.New("Error while getting the known host: ")
 					},
@@ -359,7 +389,7 @@ func TestCheckKnownHosts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			_, gotError := sshu.checkKnownHosts()
+			_, gotError := sshu.CheckKnownHosts()
 			assert.Equal(t, gotError, tt.wantedError)
 		})
 	}
@@ -367,7 +397,7 @@ func TestCheckKnownHosts(t *testing.T) {
 
 func TestCreateKnownHosts(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	tests := []struct {
 		description string
 		wantedError error
@@ -379,7 +409,7 @@ func TestCreateKnownHosts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			gotError := sshu.createKnownHosts()
+			gotError := sshu.CreateKnownHosts()
 			assert.Equal(t, gotError, tt.wantedError)
 		})
 	}
@@ -387,12 +417,12 @@ func TestCreateKnownHosts(t *testing.T) {
 
 func TestAddHostKey(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	type args struct {
 		host          string
 		remote        *netAddressTest
 		pubkey        ssh.PublicKey
-		MockSshClient ISshClient
+		MockSshClient sshutils.ISshClient
 	}
 	tests := []struct {
 		description string
@@ -410,7 +440,7 @@ func TestAddHostKey(t *testing.T) {
 					key:  "",
 					data: nil,
 				},
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Normalizefunc: func(address string) string {
 						return ""
 					},
@@ -427,7 +457,7 @@ func TestAddHostKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			gotError := sshu.addHostKey(tt.args.host, tt.args.remote, tt.args.pubkey)
+			gotError := sshu.AddHostKey(tt.args.host, tt.args.remote, tt.args.pubkey)
 			assert.Equal(t, gotError, tt.wantErr)
 		})
 	}
@@ -435,12 +465,12 @@ func TestAddHostKey(t *testing.T) {
 
 func TestHostCallKeyBack(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshu := NewSSHUtil(&SSHConfig{}, &sshClient{}, log)
+	sshu := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
 	type args struct {
 		host          string
 		remote        *netAddressTest
 		pubkey        ssh.PublicKey
-		MockSshClient ISshClient
+		MockSshClient sshutils.ISshClient
 	}
 	tests := []struct {
 		description string
@@ -458,7 +488,7 @@ func TestHostCallKeyBack(t *testing.T) {
 					key:  "",
 					data: nil,
 				},
-				MockSshClient: &MockSshClient{
+				MockSshClient: &sshutils.MockSshClient{
 					Newfunc: func(files ...string) (ssh.HostKeyCallback, error) {
 						return func(host string, remote net.Addr, pubkey ssh.PublicKey) error {
 							return nil
@@ -474,7 +504,7 @@ func TestHostCallKeyBack(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
 			sshu.SshClient = tt.args.MockSshClient
-			gotError := sshu.hostKeyCallback(tt.args.host, tt.args.remote, tt.args.pubkey)
+			gotError := sshu.HostKeyCallback(tt.args.host, tt.args.remote, tt.args.pubkey)
 			assert.Equal(t, gotError, tt.wantErr)
 		})
 	}

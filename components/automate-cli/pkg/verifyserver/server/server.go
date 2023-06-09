@@ -119,13 +119,13 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddStopMockServerService(stopmockserverservice.NewStopMockServerService(l)).
 		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
 		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
-		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(),  fileutils.NewFileSystemUtils(),  l)).
+		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).
 		AddFirewallService(firewallservice.NewFirewallService(l, constants.TIMEOUT, port)).
 		AddCertificateValidation(certificatevalidation.NewValidateCertificateService(l)).
-		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(&sshutils.SSHConfig{}, sshutils.NewSshClient(),l)))
+		AddSshUserCheckService(sshusercheckservice.NewSshUserCheckService(l, fileutils.NewFileSystemUtils(), sshutils.NewSSHUtil(sshutils.NewSshClient(), l)))
 	vs := &VerifyServer{
 		Port:    port,
 		Log:     l,
