@@ -214,7 +214,7 @@ func (s *MockServersServiceImp) StartHTTPServer(port int) error {
 
 	m := http.NewServeMux()
 
-	// Create the HTTPS server
+	// Create the HTTP server
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: m,
@@ -236,7 +236,7 @@ func (s *MockServersServiceImp) StartHTTPServer(port int) error {
 		rw.Write(jsonData)
 	})
 	serverErr := make(chan error)
-	// Start the HTTPS server
+	// Start the HTTP server
 	go func(serverStarted chan error) {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.logger.Errorln("Error starting HTTP server: ", err)

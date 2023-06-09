@@ -135,7 +135,7 @@ var a2Config = config{
 		// Workaround for DST Root certificate expiry
 		{regex: `components/automate-load-balancer/habitat/cacert.pem`},
 
-		// Exclude test file for mockserver with uses RSA KEY for test cases
+		// Exclude test file for mockserver which uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/mockserverservice/mockserverservice_test.go`},
 
 		// Exclude test file for portreachableservice with uses RSA KEY for test cases
