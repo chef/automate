@@ -48,6 +48,8 @@ render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 pg-helper rename-if-exists opscode_chef "$DBNAME"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
+# pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
+# pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
 pg-helper fix-permissions "$DBNAME"
 
 # NOTE: Please keep this statement just before running
