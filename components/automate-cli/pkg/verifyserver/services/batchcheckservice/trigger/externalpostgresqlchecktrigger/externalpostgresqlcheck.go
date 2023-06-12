@@ -24,6 +24,10 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 }
 
 func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.ExternalPG == nil {
+		epc.log.Infof("External OS or PG nil")
+		return trigger.ExternalOSPGNillResp(config)
+	}
 	return runCheckForPostgresql(config, epc.port, epc.log)
 }
 

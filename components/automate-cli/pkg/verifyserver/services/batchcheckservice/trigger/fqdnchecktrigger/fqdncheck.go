@@ -26,6 +26,10 @@ func NewFqdnCheck(log logger.Logger, port string) *FqdnCheck {
 }
 
 func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.ExternalOS == nil || config.ExternalPG == nil {
+		fqc.log.Infof("External OS or PG nil")
+		return trigger.ExternalOSPGNillResp(config)
+	}
 
 	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 

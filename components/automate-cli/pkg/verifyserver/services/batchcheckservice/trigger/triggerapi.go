@@ -24,6 +24,11 @@ func RunCheck(config *models.Config, log logger.Logger, port string, path string
 
 	outputCh := make(chan models.CheckTriggerResponse)
 
+	if config.ExternalOS == nil || config.ExternalPG == nil {
+		log.Infof("******************* NIL External OS OR PG *******************")
+		return ExternalOSPGNillResp(config)
+	}
+
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
 		count = count + 1
@@ -182,4 +187,56 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 
 	}
 	return reader, nil
+}
+
+func ExternalOSPGNillResp(config *models.Config) []models.CheckTriggerResponse {
+	var triggerRsps []models.CheckTriggerResponse
+	count := 0
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		count++
+		ctr := models.CheckTriggerResponse{
+			NodeType: constants.AUTOMATE,
+			Result: models.ApiResult{
+				Skipped: true,
+			},
+			Host: ip,
+		}
+		triggerRsps = append(triggerRsps, ctr)
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		count++
+		ctr := models.CheckTriggerResponse{
+			NodeType: constants.AUTOMATE,
+			Result: models.ApiResult{
+				Skipped: true,
+			},
+			Host: ip,
+		}
+		triggerRsps = append(triggerRsps, ctr)
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		count++
+		ctr := models.CheckTriggerResponse{
+			NodeType: constants.AUTOMATE,
+			Result: models.ApiResult{
+				Skipped: true,
+			},
+			Host: ip,
+		}
+		triggerRsps = append(triggerRsps, ctr)
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		count++
+		ctr := models.CheckTriggerResponse{
+			NodeType: constants.AUTOMATE,
+			Result: models.ApiResult{
+				Skipped: true,
+			},
+			Host: ip,
+		}
+		triggerRsps = append(triggerRsps, ctr)
+	}
+
+	return triggerRsps
 }
