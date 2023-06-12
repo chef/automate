@@ -31,13 +31,13 @@ backup_config = "s3"
 # s3_bucketName = ""
 ## === ===
 
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-architecture = "aws"
-workspace_path = "/hab/a2_deploy_workspace"
+secrets_key_file = ""
+secrets_store_file = ""
+architecture = "awss"
+workspace_path = "/hab/a3_deploy_workspace"
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
-backup_mount = "/mnt/automate_backups"
+backup_mount = ""
 
 
 [automate.config]
@@ -130,7 +130,7 @@ region = ""
 
 # Provide vpcid and cidr block
 # Eg.: aws_vpc_id = "vpc12318h"
-aws_vpc_id  = ""
+aws_vpc_id  = "vpc12318h"
 
 # Eg.: aws_cidr_block_addr = "172.31.64.0"
 aws_cidr_block_addr  = ""
@@ -153,7 +153,7 @@ ssh_key_pair_name = ""
 # in case your are trying to deploy with aws managed 
 # RDS, and openseach, then make setup_managed_services = true, 
 # and modify other managed services settings.
-setup_managed_services = false
+setup_managed_services = true
 
 ## === ===
 
@@ -228,7 +228,7 @@ postgresql_ebs_volume_type = ""
 
 # Enabale/Disable load balancer logs
 # eg lb_access_logs = "false"
-lb_access_logs = "false"
+lb_access_logs = "fals"
 
 # ======================================================
 
