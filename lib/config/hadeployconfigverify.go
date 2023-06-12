@@ -87,10 +87,7 @@ func (c *HaDeployConfig) ParseAndVerify(configFile string) error {
 	if err != nil {
 		return err
 	}
-	if err := c.Verify(); err != nil {
-		return err
-	}
-	return nil
+	return c.Verify()
 }
 
 func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials) error {
