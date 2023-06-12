@@ -119,7 +119,7 @@ steps:
   #         path: secret/a2/license
   #         field: license
   #     executor:
-        docker:
+        # docker:
 
   # - label: ":semgrep: Custom"
   #   expeditor:
