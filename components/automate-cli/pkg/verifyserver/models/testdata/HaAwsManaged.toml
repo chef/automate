@@ -17,7 +17,7 @@ ssh_port = "22"
 
 # Private SSH key file path, which has access to all the instances.
 # Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
-ssh_key_file = "~/.ssh/central.pem"
+ssh_key_file = "./testdata/A2HA.pem"
 
 # Eg.: backup_config = "efs" or "s3"
 backup_config = "s3"
@@ -47,7 +47,7 @@ backup_mount = "/mnt/automate_backups"
 admin_password = "123456789"
 
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
-fqdn = ""
+fqdn = "chefautomate.example.com"
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = "2"

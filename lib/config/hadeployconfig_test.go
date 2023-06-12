@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +35,7 @@ func TestParse(t *testing.T) {
 						Architecture:                "aws",
 						WorkspacePath:               "/hab/a2_deploy_workspace",
 						BackupMount:                 "/mnt/automate_backups",
-						BackupConfig:                "",
+						BackupConfig:                "s3",
 						S3BucketName:                "",
 						HabitatUIDGid:               "",
 					},
@@ -554,7 +553,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						SSHUser:      "ubuntu",
 						SSHGroupName: "ubuntu",
 
-						SSHKeyFile:       "~/.ssh/A2HA.pem",
+						SSHKeyFile:       "./testdata/A2HA.pem",
 						SSHPort:          "22",
 						SecretsKeyFile:   "/hab/a2_deploy_workspace/secrets.key",
 						SecretsStoreFile: "/hab/a2_deploy_workspace/secrets.json",
@@ -746,26 +745,26 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						LoggingMonitoringManagement: "",
 						Architecture:                "existing_nodes",
 						WorkspacePath:               "/hab/a2_deploy_workspace",
-						BackupMount:                 "/mnt/automate_backups",
-						BackupConfig:                "",
+						BackupMount:                 "automate_backups",
+						BackupConfig:                "object_storage",
 						S3BucketName:                "",
 						HabitatUIDGid:               "",
 					},
 				},
 				ObjectStorage: &ObjectStorage{
 					Config: &ConfigObjectStorage{
-						BucketName: "",
-						AccessKey:  "",
-						SecretKey:  "",
-						Endpoint:   "",
+						BucketName: "test",
+						AccessKey:  "test_access_key",
+						SecretKey:  "test_secret_key",
+						Endpoint:   "s3_endpoint",
 						Region:     "",
 					},
 				},
 				Automate: &AutomateSettings{
 					Config: &ConfigAutomateSettings{
 						AdminPassword:     "",
-						Fqdn:              "",
-						ConfigFile:        "configs/automate.toml",
+						Fqdn:              "https://chefautomate.example.com",
+						ConfigFile:        "automate.toml",
 						TeamsPort:         "",
 						InstanceCount:     "",
 						EnableCustomCerts: true,
@@ -777,7 +776,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 				},
 				ChefServer: &ChefServerSettings{
 					Config: &ConfigSettings{
-						InstanceCount:     "",
+						InstanceCount:     "two",
 						EnableCustomCerts: true,
 						PrivateKey:        "cs_pvt_key",
 						PublicKey:         "cs_public_key",
@@ -791,9 +790,9 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						RootCA:            "os_cert",
 						PrivateKey:        "os_pvt_key",
 						PublicKey:         "os_public_key",
-						AdminCert:         "os_admin_cert",
+						AdminCert:         "",
 						AdminKey:          "os_admin_key",
-						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
+						CertsByIP:         &[]CertByIP{{IP: "", PrivateKey: "os_pvt_key", PublicKey: "os_public_key"}},
 					},
 				},
 				Postgresql: &PostgresqlSettings{
@@ -803,12 +802,12 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						RootCA:            "pg_cert",
 						PrivateKey:        "pg_pvt_key",
 						PublicKey:         "pg_pvt_key",
-						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "pg_pvt_key", PublicKey: "pg_pvt_key"}},
+						CertsByIP:         &[]CertByIP{{IP: "0.0.1", PrivateKey: "pg_pvt_key", PublicKey: "pg_pvt_key"}},
 					},
 				},
 				ExistingInfra: &ExistingInfraSettings{
 					Config: &ConfigExistingInfraSettings{
-						AutomatePrivateIps:   []string{},
+						AutomatePrivateIps:   []string{"1324.2534.1"},
 						ChefServerPrivateIps: []string{},
 						OpensearchPrivateIps: []string{},
 						PostgresqlPrivateIps: []string{},
@@ -820,29 +819,27 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 		}, {
 			name:    "Parse OnPrem Config file not found",
 			args:    args{configFile: "./testdata/OnPremConfig.toml"},
-			want:    nil,
+			want:    &HaDeployConfig{},
 			wantErr: true,
 			err:     errors.New("error reading config TOML file: open ./testdata/OnPremConfig.toml: no such file or directory"),
 		},
 		{
 			name:    "Error unmarshalling toml file",
 			args:    args{configFile: "./testdata/UnmarshalErr.toml"},
-			want:    nil,
+			want:    &HaDeployConfig{},
 			wantErr: true,
 			err:     errors.New("error unmarshalling config TOML file: (5, 2): unexpected token table key cannot contain ']', was expecting a table key"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := HaDeployConfig{}
-			got, err := config.Parse(tt.args.configFile)
+			config := &HaDeployConfig{}
+			err := config.Parse(tt.args.configFile)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
 			// Compare the actual and expected configuration structs
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("got %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, config)
 		})
 	}
 }

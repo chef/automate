@@ -197,10 +197,10 @@ opensearch_root_cert = "<cert_content>"
 [external.database.open_search.aws]
 
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
-aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
+aws_os_snapshot_role_arn = "asds"
 
 # eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
-os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
+os_snapshot_user_access_key_id = ""
 
 # eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
-os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
+os_snapshot_user_access_key_secret = ""

@@ -5,7 +5,7 @@
 [architecture.aws]
 ## === INPUT NEEDED ===
 # Eg.: ssh_user = "ubuntu"
-ssh_user = ""
+ssh_user = "ubuntu"
 
 # custom ssh group name, it will be defaulted to ssh_user
 # Eg.: ssh_group_name = "ubuntu"
@@ -13,14 +13,14 @@ ssh_group_name = ""
 
 # custom ssh port no to connect instances, default will be 22
 # Eg.: ssh_port = "22"
-ssh_port = ""
+ssh_port = "1234567"
 
 # Private SSH key file path, which has access to all the instances.
 # Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
 
 # Eg.: backup_config = "efs" or "s3"
-backup_config = "s3"
+backup_config = "efs"
 
 #    Note: 1. To create new bucket, make sure to give a unique name
 #          2. User can also add existing bucket 
@@ -28,7 +28,7 @@ backup_config = "s3"
 # If s3 is selected for backup_config,
 #     uncomment and add the value for following 's3_bucketName' attribute
 
-# s3_bucketName = ""
+s3_bucketName = "test"
 ## === ===
 
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
@@ -44,7 +44,7 @@ backup_mount = "/mnt/automate_backups"
 ## === INPUT NEEDED ===
 
 # Password for Automate UI for 'admin' user.
-admin_password = ""
+admin_password = "a1"
 
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
@@ -61,11 +61,11 @@ instance_count = ""
 config_file = "configs/automate.toml"
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
+enable_custom_certs = true
 # Add Automate load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+root_ca = ""
+private_key = ""
+public_key = ""
 
 
 [chef_server.config]
@@ -75,10 +75,10 @@ enable_custom_certs = false
 instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
+enable_custom_certs = true
 # Add Chef Server load balancer root-ca and keys
-# private_key = ""
-# public_key = ""
+private_key = ""
+public_key = ""
 
 ## === ===
 
@@ -90,13 +90,13 @@ enable_custom_certs = false
 instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
+enable_custom_certs = true
 # Add OpenSearch load balancer root-ca and keys
-# root_ca = ""
-# admin_key = ""
-# admin_cert = ""
-# private_key = ""
-# public_key = ""
+root_ca = ""
+admin_key = ""
+admin_cert = ""
+private_key = ""
+public_key = ""
 
 ## === ===
 
@@ -107,11 +107,11 @@ enable_custom_certs = false
 instance_count = ""
 
 # Set enable_custom_certs = true to provide custom certificates during deployment
-enable_custom_certs = false
+enable_custom_certs = true
 # Add Postgresql load balancer root-ca and keys
-# root_ca = ""
-# private_key = ""
-# public_key = ""
+root_ca = ""
+private_key = ""
+public_key = ""
 
 ## === ===
 
@@ -136,7 +136,7 @@ aws_vpc_id  = ""
 aws_cidr_block_addr  = ""
 
 # Eg.: private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
-private_custom_subnets = []
+private_custom_subnets = ["subnet-e556d512", "subnet-e556d513"]
 
 # Eg.: public_custom_subnets = ["subnet-p556d512", "subnet-p556d513", "subnet-p556d514"]
 public_custom_subnets = []
