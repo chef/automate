@@ -45,8 +45,7 @@ do_deploy() {
     docker_run "${_frontend1_container_name}"
     docker_run "${_frontend2_container_name}"
     #shellcheck disable=SC2154
-    docker exec -t "$_frontend1_container_name" \
-        "yum install systemd"
+    
     docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
     docker exec -t "$_frontend2_container_name" \
@@ -70,7 +69,6 @@ do_deploy() {
 
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" deploy config.toml \
-            --product chef-server \
             --hartifacts "$test_hartifacts_path" \
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
