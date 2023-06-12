@@ -65,13 +65,7 @@ func TestAppendCertsByIpToNodeCerts(t *testing.T) {
 
 	// Check if each expected element exists in the actual result
 	for _, expectedNode := range expected {
-		found := false
-		for _, actualNode := range c.Certificate.Nodes {
-			if reflect.DeepEqual(expectedNode, actualNode) {
-				found = true
-				break
-			}
-		}
+		found := containsElement(c.Certificate.Nodes, expectedNode)
 		if !found {
 			t.Errorf("Test case 1 failed: Expected node %+v not found in the result.", expectedNode)
 		}
@@ -100,17 +94,20 @@ func TestAppendCertsByIpToNodeCerts(t *testing.T) {
 
 	// Check if each expected element exists in the actual result
 	for _, expectedNode := range expected {
-		found := false
-		for _, actualNode := range c.Certificate.Nodes {
-			if reflect.DeepEqual(expectedNode, actualNode) {
-				found = true
-				break
-			}
-		}
+		found := containsElement(c.Certificate.Nodes, expectedNode)
 		if !found {
 			t.Errorf("Test case 2 failed: Expected node %+v not found in the result.", expectedNode)
 		}
 	}
+}
+
+func containsElement(nodes []NodeCert, targetNode NodeCert) bool {
+	for _, node := range nodes {
+		if reflect.DeepEqual(node, targetNode) {
+			return true
+		}
+	}
+	return false
 }
 
 func TestPopulateWith(t *testing.T) {
