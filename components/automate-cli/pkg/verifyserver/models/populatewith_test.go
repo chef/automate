@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/chef/automate/lib/config"
@@ -9,77 +10,74 @@ import (
 )
 
 func TestAppendCertsByIpToNodeCerts(t *testing.T) {
-	// Test case 1: Only rootCA provided
-	c := &Config{}
-	certsByIP := []config.CertByIP{
+	// Define test cases
+	testCases := []struct {
+		name          string
+		certsByIP     []config.CertByIP
+		privateKey    string
+		publicKey     string
+		adminKey      string
+		adminCert     string
+		expectedNodes []NodeCert
+	}{
 		{
-			IP:         "192.168.0.1",
-			PublicKey:  "public_key_1",
-			PrivateKey: "private_key_1",
-			NodesDn:    "nodes_dn_1",
+			name: "Valid input with multiple certs",
+			certsByIP: []config.CertByIP{
+				{IP: "192.168.0.1", PrivateKey: "key1_private.pem", PublicKey: "key1_public.pem"},
+				{IP: "192.168.0.2", PrivateKey: "key2_private.pem", PublicKey: "key2_public.pem"},
+			},
+			privateKey: "private.pem",
+			publicKey:  "public.pem",
+			adminKey:   "admin_key.pem",
+			adminCert:  "admin_cert.pem",
+			expectedNodes: []NodeCert{
+				{
+					IP:        "192.168.0.1",
+					Key:       "key1_private.pem",
+					Cert:      "key1_public.pem",
+					AdminKey:  "admin_key.pem",
+					AdminCert: "admin_cert.pem",
+				},
+				{
+					IP:        "192.168.0.2",
+					Key:       "key2_private.pem",
+					Cert:      "key2_public.pem",
+					AdminKey:  "admin_key.pem",
+					AdminCert: "admin_cert.pem",
+				},
+			},
 		},
 		{
-			IP:         "192.168.0.2",
-			PublicKey:  "public_key_2",
-			PrivateKey: "private_key_2",
-			NodesDn:    "nodes_dn_2",
-		},
-	}
-	rootCA := "root_ca_1"
-
-	c.appendCertsByIpToNodeCerts(&certsByIP, rootCA)
-
-	expectedNodes := []NodeCert{
-		{
-			IP:   "192.168.0.1",
-			Key:  "public_key_1",
-			Cert: "root_ca_1",
-		},
-		{
-			IP:   "192.168.0.2",
-			Key:  "public_key_2",
-			Cert: "root_ca_1",
-		},
-	}
-
-	assert.Equal(t, expectedNodes, c.Certificate.Nodes)
-
-	// Test case 2: rootCA, adminKey, and adminCert provided
-	c = &Config{}
-	certsByIP = []config.CertByIP{
-		{
-			IP:         "192.168.0.3",
-			PublicKey:  "public_key_3",
-			PrivateKey: "private_key_3",
-			NodesDn:    "nodes_dn_3",
-		},
-	}
-	rootCA = "root_ca_2"
-	adminKey := "admin_key_1"
-	adminCert := "admin_cert_1"
-
-	c.appendCertsByIpToNodeCerts(&certsByIP, rootCA, adminKey, adminCert)
-
-	expectedNodes = []NodeCert{
-		{
-			IP:        "192.168.0.3",
-			Key:       "public_key_3",
-			Cert:      "root_ca_2",
-			AdminKey:  "admin_key_1",
-			AdminCert: "admin_cert_1",
+			name:       "Valid input with a single cert",
+			certsByIP:  []config.CertByIP{{IP: "192.168.0.1", PrivateKey: "key1_private.pem", PublicKey: "key1_public.pem"}},
+			privateKey: "private.pem",
+			publicKey:  "public.pem",
+			adminKey:   "admin_key.pem",
+			adminCert:  "admin_cert.pem",
+			expectedNodes: []NodeCert{
+				{
+					IP:        "192.168.0.1",
+					Key:       "key1_private.pem",
+					Cert:      "key1_public.pem",
+					AdminKey:  "admin_key.pem",
+					AdminCert: "admin_cert.pem",
+				},
+			},
 		},
 	}
 
-	assert.Equal(t, expectedNodes, c.Certificate.Nodes)
+	// Perform tests
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			c := Config{}
+			c.appendCertsByIpToNodeCerts(&tc.certsByIP, tc.privateKey, tc.publicKey, tc.adminKey, tc.adminCert)
 
-	// Test case 3: certsByIP is nil
-	c = &Config{}
-	var nilCertsByIP *[]config.CertByIP
-	rootCA = "root_ca_3"
-
-	c.appendCertsByIpToNodeCerts(nilCertsByIP, rootCA)
-
-	assert.Empty(t, c.Certificate.Nodes)
+			// Verify the expected result
+			if !reflect.DeepEqual(c.Certificate.Nodes, tc.expectedNodes) {
+				t.Errorf("Unexpected node certificates. Expected: %v, Actual: %v", tc.expectedNodes, c.Certificate.Nodes)
+			}
+		})
+	}
 }
 
 func TestPopulateWith(t *testing.T) {

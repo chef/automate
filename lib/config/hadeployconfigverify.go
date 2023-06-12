@@ -117,17 +117,22 @@ func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials) er
 	if err := validateRequiredPathField(configInitials.SSHKeyFile, "ssh_key_file"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredString(configInitials.BackupMount, "backup_mount"); err != nil {
-		errorList.PushBack(err)
-	}
+
 	return getSingleErrorFromList(errorList)
 }
 
 func (c *HaDeployConfig) validateExistingInfraBackupConfig() error {
 	// validate existing infra backup config
 	backupConfig := c.Architecture.ExistingInfra.BackupConfig
-	if backupConfig != "object_storage" && backupConfig != "file_system" {
-		return errors.New("invalid or empty backup_config")
+
+	if err := validateRequiredString(backupConfig, "backup_config", "object_storage", "file_system"); err != nil {
+		return err
+	}
+
+	if backupConfig == "file_system" {
+		if err := validateRequiredString(c.Architecture.ExistingInfra.BackupMount, "backup_mount"); err != nil {
+			return err
+		}
 	}
 
 	if backupConfig == "object_storage" {

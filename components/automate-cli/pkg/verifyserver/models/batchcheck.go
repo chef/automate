@@ -81,30 +81,27 @@ type Config struct {
 	APIToken        string      `json:"api_token"`
 }
 
-func (c *Config) appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, optionalArgs ...string) {
-	var rootCA, adminKey, adminCert string
-
-	if len(optionalArgs) > 0 {
-		rootCA = optionalArgs[0]
-	}
-	if len(optionalArgs) > 1 {
-		adminKey = optionalArgs[1]
-	}
-	if len(optionalArgs) > 2 {
-		adminCert = optionalArgs[2]
-	}
-
+func (c *Config) appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, privateKey, publicKey, adminKey, adminCert string) {
 	if certsByIP != nil {
 		for _, certByIP := range *certsByIP {
 			nodeCert := NodeCert{
 				IP:        certByIP.IP,
-				Key:       certByIP.PublicKey,
-				Cert:      rootCA,
+				Key:       certByIP.PrivateKey,
+				Cert:      certByIP.PublicKey,
 				AdminKey:  adminKey,
 				AdminCert: adminCert,
 			}
 			c.Certificate.Nodes = append(c.Certificate.Nodes, nodeCert)
 		}
+	} else {
+		// no need of ip here since certs are common for all ip's
+		nodeCert := NodeCert{
+			Key:       privateKey,
+			Cert:      publicKey,
+			AdminKey:  adminKey,
+			AdminCert: adminCert,
+		}
+		c.Certificate.Nodes = append(c.Certificate.Nodes, nodeCert)
 	}
 }
 
@@ -113,6 +110,7 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 	if err != nil {
 		return err
 	}
+
 	if haConfig.GetConfigInitials() != nil {
 		configInitials := haConfig.GetConfigInitials()
 		c.SSHUser.Username = configInitials.SSHUser
@@ -131,19 +129,58 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 		c.Backup.ObjectStorage.Endpoint = objectStorageConfig.Endpoint
 	}
 
-	c.Hardware.AutomateNodeCount, _ = strconv.Atoi(haConfig.Automate.Config.InstanceCount)
-	c.Hardware.ChefInfraServerNodeCount, _ = strconv.Atoi(haConfig.ChefServer.Config.InstanceCount)
-	c.Hardware.PostgresqlNodeCount, _ = strconv.Atoi(haConfig.Postgresql.Config.InstanceCount)
-	c.Hardware.OpenSearchNodeCount, _ = strconv.Atoi(haConfig.Opensearch.Config.InstanceCount)
+	c.Hardware.AutomateNodeCount, err = strconv.Atoi(haConfig.Automate.Config.InstanceCount)
+	if err != nil {
+		return err
+	}
+
+	c.Hardware.ChefInfraServerNodeCount, err = strconv.Atoi(haConfig.ChefServer.Config.InstanceCount)
+	if err != nil {
+		return err
+	}
+
+	c.Hardware.PostgresqlNodeCount, err = strconv.Atoi(haConfig.Postgresql.Config.InstanceCount)
+	if err != nil {
+		return err
+	}
+
+	c.Hardware.OpenSearchNodeCount, err = strconv.Atoi(haConfig.Opensearch.Config.InstanceCount)
+	if err != nil {
+		return err
+	}
+
 	c.Certificate.RootCert = haConfig.Automate.Config.RootCA
 	c.Certificate.AutomateFqdn = haConfig.Automate.Config.Fqdn
 	// pre deploy state cs fqdn is same as automate fqdn
 	c.Certificate.ChefServerFqdn = haConfig.Automate.Config.Fqdn
 
+	// node Ip's in case of where CertsByIP is nil,
+	// can be found in Hardware struct
+	automateConfig := haConfig.Automate.Config
+	if automateConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(automateConfig.CertsByIP, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
+	}
+
+	chefserverConfig := haConfig.ChefServer.Config
+	if chefserverConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
+	}
+
+	postgresqlConfig := haConfig.Postgresql.Config
+	if postgresqlConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
+	}
+
+	openSearchConfig := haConfig.Opensearch.Config
+	if openSearchConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+	}
+
 	if haConfig.IsAws() {
 		if haConfig.Architecture.Aws.BackupConfig == "s3" {
 			c.Backup.ObjectStorage.BucketName = haConfig.Architecture.Aws.S3BucketName
 		}
+
 		if haConfig.Aws.Config.SetupManagedServices {
 			awsManagedServicesConfig := haConfig.Aws.Config
 			c.ExternalPG.PGDbUserName = awsManagedServicesConfig.ManagedRdsDbuserUsername
@@ -162,6 +199,7 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 			c.ExternalOS.OSCert = awsManagedServicesConfig.ManagedOpensearchCertificate
 			c.ExternalOS.OSUserPassword = awsManagedServicesConfig.ManagedOpensearchUserPassword
 			c.ExternalOS.OSUsername = awsManagedServicesConfig.ManagedOpensearchUsername
+			c.ExternalOS.OSRoleArn = awsManagedServicesConfig.AwsOsSnapshotRoleArn
 		}
 	}
 
@@ -169,25 +207,10 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 		existingInfraConfig := haConfig.ExistingInfra.Config
 		c.Hardware.AutomateNodeIps = existingInfraConfig.AutomatePrivateIps
 		c.Hardware.ChefInfraServerNodeIps = existingInfraConfig.ChefServerPrivateIps
-		automateConfig := haConfig.Automate.Config
-		if automateConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(automateConfig.CertsByIP, automateConfig.RootCA)
-		}
-		chefserverConfig := haConfig.ChefServer.Config
-		if chefserverConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP)
-		}
+
 		if !haConfig.IsExternalDb() {
 			c.Hardware.PostgresqlNodeIps = existingInfraConfig.PostgresqlPrivateIps
 			c.Hardware.OpenSearchNodeIps = existingInfraConfig.OpensearchPrivateIps
-			postgresqlConfig := haConfig.Postgresql.Config
-			if postgresqlConfig.EnableCustomCerts {
-				c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, postgresqlConfig.RootCA)
-			}
-			openSearchConfig := haConfig.Opensearch.Config
-			if openSearchConfig.EnableCustomCerts {
-				c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, openSearchConfig.RootCA, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
-			}
 		}
 
 		if haConfig.IsExternalDb() {
