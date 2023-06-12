@@ -68,8 +68,8 @@ func (fsu *FileSystemUtils) WriteFile(filepath string, data []byte, perm os.File
 func (fsu *FileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
 	return CreateTempFile(content, filename)
 }
-func (fsu *FileSystemUtils) DeleteFile(tempFile string) error {
-	return DeleteFile(tempFile)
+func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
+	return DeleteFile(filePath)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -172,6 +172,6 @@ func CreateTempFile(content string, filename string) (string, error) {
 	return tempFile.Name(), nil
 }
 
-func DeleteFile(tempFile string) error {
-	return os.Remove(tempFile)
+func DeleteFile(filePath string) error {
+	return os.Remove(filePath)
 }

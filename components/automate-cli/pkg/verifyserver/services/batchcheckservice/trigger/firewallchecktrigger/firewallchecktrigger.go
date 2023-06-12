@@ -42,11 +42,11 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 		constants.AUTOMATE: {
 			constants.TCP:   []int{9631, 9638},
 			constants.HTTPS: []int{443},
-			constants.HTTP:  []int{80},
+			constants.HTTP:  []int{},
 		},
 		constants.CHEF_INFRA_SERVER: {
 			constants.TCP:   []int{9631, 9638},
-			constants.HTTP:  []int{80},
+			constants.HTTP:  []int{},
 			constants.HTTPS: []int{443},
 		},
 		constants.POSTGRESQL: {

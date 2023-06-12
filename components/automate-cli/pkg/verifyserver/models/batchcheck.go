@@ -12,7 +12,7 @@ type BatchCheckRequest struct {
 	Config Config   `json:"config"`
 }
 
-type StartMockServerFromBatchServiceResponse struct {
+type MockServerFromBatchServiceResponse struct {
 	Host       string `json:"host"`
 	Protocol   string `json:"protocol"`
 	Port       int    `json:"port"`
