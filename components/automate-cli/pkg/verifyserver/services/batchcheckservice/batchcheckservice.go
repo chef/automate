@@ -107,7 +107,7 @@ func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string, config
 	return false, nil
 }
 
-func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDetails models.Hardware) ([]models.StartMockServerFromBatchServiceResponse, []models.StartMockServerFromBatchServiceResponse) {
+func (ss *BatchCheckService) createNodeTypeMap(remoteChecks []string) map[string]map[string][]int {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
 			constants.TCP:   []int{},
@@ -140,6 +140,11 @@ func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDeta
 			constructUniquePortMap(resp, &nodeTypePortMap)
 		}
 	}
+	return nodeTypePortMap
+}
+
+func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDetails models.Hardware) ([]models.StartMockServerFromBatchServiceResponse, []models.StartMockServerFromBatchServiceResponse) {
+	nodeTypePortMap := ss.createNodeTypeMap(remoteChecks)
 	ipMap := map[string][]string{
 		constants.AUTOMATE:          hardwareDetails.AutomateNodeIps,
 		constants.CHEF_INFRA_SERVER: hardwareDetails.ChefInfraServerNodeIps,
@@ -295,30 +300,40 @@ func (ss *BatchCheckService) GetPortsToOpenForCheck(check string) map[string]map
 func (ss *BatchCheckService) getDeploymentState(config models.Config) (string, error) {
 	if config.Hardware.AutomateNodeCount > 0 {
 		for index, ip := range config.Hardware.AutomateNodeIps {
-			url := fmt.Sprintf("http://%s:%s%s", ip, ss.port, constants.STATUS_API_PATH)
-			resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
-			if err != nil && index < len(config.Hardware.AutomateNodeIps)-1 {
-				ss.log.Error("Error while calling status api from batch check service:", err)
-				continue
-			}
+			result, err := ss.getStatusFromNode(ip)
 			if err != nil && index == len(config.Hardware.AutomateNodeIps)-1 {
 				errMsg := "received no response for status api from any automate nodes"
 				ss.log.Error(errMsg)
 				return "", errors.New(errMsg)
 			}
-			var statusApiResponse models.StatusApiResponse
-			err = json.NewDecoder(resp.Body).Decode(&statusApiResponse)
-			if err != nil {
-				ss.log.Error("Error while reading unmarshalling response of status api from batch check service:", err)
-				return "", err
+			if result != "" {
+				return result, nil
 			}
-			if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
-				return constants.PRE_DEPLOY, nil
-			}
-			return constants.POST_DEPLOY, nil
 		}
 	}
 	return "", errors.New("automate nodes not present")
+}
+
+func (ss *BatchCheckService) getStatusFromNode(ip string) (string, error) {
+	url := fmt.Sprintf("http://%s:%s%s", ip, ss.port, constants.STATUS_API_PATH)
+	resp, err := ss.httpRequestClient.MakeRequest(http.MethodGet, url, nil)
+	if err != nil {
+		ss.log.Error("Error while calling status API from batch check service:", err)
+		return "", err
+	}
+
+	var statusApiResponse models.StatusApiResponse
+	err = json.NewDecoder(resp.Body).Decode(&statusApiResponse)
+	if err != nil {
+		ss.log.Error("Error while unmarshalling response of status API from batch check service:", err)
+		return "", err
+	}
+
+	if len(*statusApiResponse.Result.Services) == 0 && statusApiResponse.Result.Error != "" {
+		return constants.PRE_DEPLOY, nil
+	}
+
+	return constants.POST_DEPLOY, nil
 }
 
 func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, startMockServerRequestBody models.MockServerRequestBody, respChan chan models.StartMockServerFromBatchServiceResponse) {
