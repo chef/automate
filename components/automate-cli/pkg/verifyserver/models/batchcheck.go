@@ -140,20 +140,54 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 	// pre deploy state cs fqdn is same as automate fqdn
 	c.Certificate.ChefServerFqdn = haConfig.Automate.Config.Fqdn
 
+	if haConfig.IsAws() {
+		if haConfig.Architecture.Aws.BackupConfig == "s3" {
+			c.Backup.ObjectStorage.BucketName = haConfig.Architecture.Aws.S3BucketName
+		}
+		if haConfig.Aws.Config.SetupManagedServices {
+			awsManagedServicesConfig := haConfig.Aws.Config
+			c.ExternalPG.PGDbUserName = awsManagedServicesConfig.ManagedRdsDbuserUsername
+			c.ExternalPG.PGDbUserPassword = awsManagedServicesConfig.ManagedRdsDbuserPassword
+			c.ExternalPG.PGInstanceURL = awsManagedServicesConfig.ManagedRdsInstanceURL
+
+			// pg root-ca might be nil in pre deploy state
+			c.ExternalPG.PGRootCert = awsManagedServicesConfig.ManagedRdsCertificate
+			c.ExternalPG.PGSuperuserName = awsManagedServicesConfig.ManagedRdsSuperuserUsername
+			c.ExternalPG.PGSuperuserPassword = awsManagedServicesConfig.ManagedRdsSuperuserPassword
+
+			c.ExternalOS.OSDomainName = awsManagedServicesConfig.ManagedOpensearchDomainName
+			c.ExternalOS.OSDomainURL = awsManagedServicesConfig.ManagedOpensearchDomainURL
+
+			// os root-ca might be nil in pre deploy state
+			c.ExternalOS.OSCert = awsManagedServicesConfig.ManagedOpensearchCertificate
+			c.ExternalOS.OSUserPassword = awsManagedServicesConfig.ManagedOpensearchUserPassword
+			c.ExternalOS.OSUsername = awsManagedServicesConfig.ManagedOpensearchUsername
+		}
+	}
+
 	if haConfig.IsExistingInfra() {
 		existingInfraConfig := haConfig.ExistingInfra.Config
 		c.Hardware.AutomateNodeIps = existingInfraConfig.AutomatePrivateIps
 		c.Hardware.ChefInfraServerNodeIps = existingInfraConfig.ChefServerPrivateIps
-		c.appendCertsByIpToNodeCerts(haConfig.Automate.Config.CertsByIP, haConfig.Automate.Config.RootCA)
-		c.appendCertsByIpToNodeCerts(haConfig.ChefServer.Config.CertsByIP)
-
+		automateConfig := haConfig.Automate.Config
+		if automateConfig.EnableCustomCerts {
+			c.appendCertsByIpToNodeCerts(automateConfig.CertsByIP, automateConfig.RootCA)
+		}
+		chefserverConfig := haConfig.ChefServer.Config
+		if chefserverConfig.EnableCustomCerts {
+			c.appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP)
+		}
 		if !haConfig.IsExternalDb() {
 			c.Hardware.PostgresqlNodeIps = existingInfraConfig.PostgresqlPrivateIps
 			c.Hardware.OpenSearchNodeIps = existingInfraConfig.OpensearchPrivateIps
 			postgresqlConfig := haConfig.Postgresql.Config
-			c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, postgresqlConfig.RootCA)
+			if postgresqlConfig.EnableCustomCerts {
+				c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, postgresqlConfig.RootCA)
+			}
 			openSearchConfig := haConfig.Opensearch.Config
-			c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, openSearchConfig.RootCA, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+			if openSearchConfig.EnableCustomCerts {
+				c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, openSearchConfig.RootCA, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+			}
 		}
 
 		if haConfig.IsExternalDb() {
@@ -291,9 +325,9 @@ type ChecksResponse struct {
 
 func NewSuccessCheck(title string, successMsg string) *Checks {
 	return &Checks{
-		Title:         title,
-		Passed:        true,
-		SuccessMsg:    successMsg,
+		Title:      title,
+		Passed:     true,
+		SuccessMsg: successMsg,
 	}
 }
 
