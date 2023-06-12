@@ -61,7 +61,7 @@ do_deploy() {
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
             --admin-password chefautomate \
-            --accept-terms-and-mlsa      
+            --accept-terms-and-mlsa    
 
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
