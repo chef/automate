@@ -416,10 +416,7 @@ func TestPopulateWith(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			haConfig := &config.HaDeployConfig{}
 			err := haConfig.Parse(tt.filePath)
-			if err != nil {
-				t.Errorf("Error parsing HaDeployConfig: %v", err)
-				return
-			}
+			assert.NoErrorf(t, err, "Error parsing HaDeployConfig: %v", err)
 			c := &Config{}
 			err = c.PopulateWith(haConfig)
 			if tt.wantErr {
