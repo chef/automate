@@ -56,12 +56,12 @@ do_deploy() {
 
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
-           "$cli_bin" deploy config.toml \     
+           "$cli_bin" deploy config.toml \   
             --hartifacts "$test_hartifacts_path" \
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
             --admin-password chefautomate \
-            --accept-terms-and-mlsa    
+            --accept-terms-and-mlsa
 
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
