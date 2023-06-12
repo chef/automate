@@ -300,7 +300,7 @@ func validateCertsByIP(certsByIpList *[]CertByIP, nodeType string) error {
 		if len(strings.TrimSpace(element.IP)) < 1 ||
 			len(strings.TrimSpace(element.PrivateKey)) < 1 ||
 			len(strings.TrimSpace(element.PublicKey)) < 1 {
-			return fmt.Errorf(nodeType + "root_ca and/or public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false")
+			return fmt.Errorf(nodeType + "public_key and/or private_key are missing in certs_by_ip. Otherwise set enable_custom_certs to false")
 		}
 		if checkIPAddress(element.IP) != nil {
 			errorList.PushBack(nodeType + " " + element.IP + " for certs is not valid")
