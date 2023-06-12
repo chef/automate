@@ -53,6 +53,9 @@ do_deploy() {
     frontend1_ip=$(container_ip "$_frontend1_container_name")
     frontend2_ip=$(container_ip "$_frontend2_container_name")
 
+docker exec -t "$_frontend1_container_name" \
+     "journalctl -u chef-automate -f &"
+
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
            "$cli_bin" deploy config.toml \      
@@ -61,10 +64,13 @@ do_deploy() {
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
             --admin-password chefautomate \
-            --accept-terms-and-mlsa & journalctl -u chef-automate -n 200     
+            --accept-terms-and-mlsa      
 
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
+
+     docker exec -t "$_frontend2_container_name" \
+     "journalctl -u chef-automate -f &"   
 
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" deploy config.toml \

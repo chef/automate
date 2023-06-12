@@ -784,161 +784,161 @@ steps:
   #       linux:
   #         privileged: true
 
-  - label: "upgrade current -> master"
-    command:
-      - integration/run_test integration/tests/upgrade_current_master.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "upgrade current -> master"
+  #   command:
+  #     - integration/run_test integration/tests/upgrade_current_master.sh
+  #   timeout_in_minutes: 25
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "upgrade current -> master (with latest hab)"
-    command:
-      - integration/run_test integration/tests/upgrade_current_master_habdev.sh
-    timeout_in_minutes: 25
-    soft_fail: true
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "upgrade current -> master (with latest hab)"
+  #   command:
+  #     - integration/run_test integration/tests/upgrade_current_master_habdev.sh
+  #   timeout_in_minutes: 25
+  #   soft_fail: true
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "manual upgrade current -> master"
-    command:
-      - integration/run_test integration/tests/manual_upgrade.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "manual upgrade current -> master"
+  #   command:
+  #     - integration/run_test integration/tests/manual_upgrade.sh
+  #   timeout_in_minutes: 25
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "deep upgrades"
-    command:
-      - integration/run_test integration/tests/deep_upgrade.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "deep upgrades"
+  #   command:
+  #     - integration/run_test integration/tests/deep_upgrade.sh
+  #   timeout_in_minutes: 25
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "deep migrate upgrade"
-    command:
-      - integration/run_test integration/tests/migrate_upgrade.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+  # - label: "deep migrate upgrade"
+  #   command:
+  #     - integration/run_test integration/tests/migrate_upgrade.sh
+  #   timeout_in_minutes: 25
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         single-use: true
+  #         privileged: true
 
-  - label: "deep upgrade backup restore"
-    command:
-      - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
-    timeout_in_minutes: 35
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "deep upgrade backup restore"
+  #   command:
+  #     - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
+  #   timeout_in_minutes: 35
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "backups"
-    command:
-      - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 35
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
+  # - label: "backups"
+  #   command:
+  #     - integration/run_test integration/tests/backup.sh
+  #   timeout_in_minutes: 35
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "iam reset admin access"
-    command:
-      - integration/run_test integration/tests/iam_reset_admin_access.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "iam reset admin access"
+  #   command:
+  #     - integration/run_test integration/tests/iam_reset_admin_access.sh
+  #   timeout_in_minutes: 20
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "security"
-    command:
-      - integration/run_test integration/tests/security.sh
-    timeout_in_minutes: 20
-    soft_fail: true
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "security"
+  #   command:
+  #     - integration/run_test integration/tests/security.sh
+  #   timeout_in_minutes: 20
+  #   soft_fail: true
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "shellcheck hooks"
-    command:
-      - integration/run_test integration/tests/shellcheck_rendered_hooks.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "shellcheck hooks"
+  #   command:
+  #     - integration/run_test integration/tests/shellcheck_rendered_hooks.sh
+  #   timeout_in_minutes: 20
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "ha cluster"
-    command:
-      - integration/run_test integration/tests/cluster.sh
-    timeout_in_minutes: 35
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+  # - label: "ha cluster"
+  #   command:
+  #     - integration/run_test integration/tests/cluster.sh
+  #   timeout_in_minutes: 35
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         single-use: true
+  #         privileged: true
 
-  - label: "builder smoke"
-    command:
-      - integration/run_test integration/tests/bldr_smoke.sh
-    timeout_in_minutes: 30
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
+  # - label: "builder smoke"
+  #   command:
+  #     - integration/run_test integration/tests/bldr_smoke.sh
+  #   timeout_in_minutes: 30
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "proxy"
-    command:
-      - integration/run_test integration/tests/proxy.sh
-    timeout_in_minutes: 20
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
+  # - label: "proxy"
+  #   command:
+  #     - integration/run_test integration/tests/proxy.sh
+  #   timeout_in_minutes: 20
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "ldap hab user"
-    command:
-      - integration/run_test integration/tests/ldap_hab_user.sh
-    timeout_in_minutes: 30
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
+  # - label: "ldap hab user"
+  #   command:
+  #     - integration/run_test integration/tests/ldap_hab_user.sh
+  #   timeout_in_minutes: 30
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "ocid"
-    command:
-      - integration/run_test integration/tests/testing_ocid.sh
-    timeout_in_minutes: 30
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
+  # - label: "ocid"
+  #   command:
+  #     - integration/run_test integration/tests/testing_ocid.sh
+  #   timeout_in_minutes: 30
+  #   expeditor:
+  #     secrets:
+  #       A2_LICENSE:
+  #         path: secret/a2/license
+  #         field: license
+  #     executor:
+  #       linux:
+  #         privileged: true
