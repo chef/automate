@@ -114,24 +114,55 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 		return err
 	}
 
+	if err = c.populateCommonConfig(haConfig); err != nil {
+		return err
+	}
+
 	if haConfig.GetConfigInitials() != nil {
-		configInitials := haConfig.GetConfigInitials()
-		c.SSHUser.Username = configInitials.SSHUser
-		c.SSHUser.PrivateKey = configInitials.SSHKeyFile
-		c.SSHUser.SudoPassword = configInitials.SudoPassword
-		c.Arch = configInitials.Architecture
-		c.Backup.FileSystem.MountLocation = configInitials.BackupMount
+		c.populateConfigInitials(haConfig)
 	}
 
 	if haConfig.GetObjectStorageConfig() != nil {
-		objectStorageConfig := haConfig.GetObjectStorageConfig()
-		c.Backup.ObjectStorage.BucketName = objectStorageConfig.BucketName
-		c.Backup.ObjectStorage.AWSRegion = objectStorageConfig.Region
-		c.Backup.ObjectStorage.AccessKey = objectStorageConfig.AccessKey
-		c.Backup.ObjectStorage.SecretKey = objectStorageConfig.SecretKey
-		c.Backup.ObjectStorage.Endpoint = objectStorageConfig.Endpoint
+		c.populateObjectStorageConfig(haConfig)
 	}
 
+	if haConfig.IsAws() {
+		c.populateAwsConfig(haConfig)
+	}
+
+	if haConfig.IsExistingInfra() {
+		c.populateExistingInfraConfig(haConfig)
+	}
+
+	// not available in config
+	c.DeploymentState = ""
+
+	return nil
+}
+
+func (c *Config) populateAwsConfig(haConfig *config.HaDeployConfig) {
+	c.populateAwsS3BucketName(haConfig)
+	c.populateAwsCerts(haConfig)
+
+	if haConfig.Aws.Config.SetupManagedServices {
+		c.populateAwsManagedServicesConfig(haConfig)
+	}
+}
+
+func (c *Config) populateExistingInfraConfig(haConfig *config.HaDeployConfig) {
+	c.populateExistingInfraCommonConfig(haConfig)
+
+	if !haConfig.IsExternalDb() {
+		c.populateNonExternalDbConfig(haConfig)
+	}
+
+	if haConfig.IsExternalDb() {
+		c.populateExternalDbConfig(haConfig)
+	}
+}
+
+func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
+	var err error
 	c.Hardware.AutomateNodeCount, err = strconv.Atoi(haConfig.Automate.Config.InstanceCount)
 	if err != nil {
 		return err
@@ -157,112 +188,129 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 	// pre deploy state cs fqdn is same as automate fqdn
 	c.Certificate.ChefServerFqdn = haConfig.Automate.Config.Fqdn
 
-	if haConfig.IsAws() {
-		if haConfig.Architecture.Aws.BackupConfig == "s3" {
-			c.Backup.ObjectStorage.BucketName = haConfig.Architecture.Aws.S3BucketName
-		}
-
-		automateConfig := haConfig.Automate.Config
-		if automateConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(nil, []string{""}, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
-		}
-
-		chefserverConfig := haConfig.ChefServer.Config
-		if chefserverConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
-		}
-
-		postgresqlConfig := haConfig.Postgresql.Config
-		if postgresqlConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
-		}
-
-		openSearchConfig := haConfig.Opensearch.Config
-		if openSearchConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(nil, []string{""}, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
-		}
-
-		if haConfig.Aws.Config.SetupManagedServices {
-			awsManagedServicesConfig := haConfig.Aws.Config
-			c.ExternalPG.PGDbUserName = awsManagedServicesConfig.ManagedRdsDbuserUsername
-			c.ExternalPG.PGDbUserPassword = awsManagedServicesConfig.ManagedRdsDbuserPassword
-			c.ExternalPG.PGInstanceURL = awsManagedServicesConfig.ManagedRdsInstanceURL
-
-			// pg root-ca might be nil in pre deploy state
-			c.ExternalPG.PGRootCert = awsManagedServicesConfig.ManagedRdsCertificate
-			c.ExternalPG.PGSuperuserName = awsManagedServicesConfig.ManagedRdsSuperuserUsername
-			c.ExternalPG.PGSuperuserPassword = awsManagedServicesConfig.ManagedRdsSuperuserPassword
-
-			c.ExternalOS.OSDomainName = awsManagedServicesConfig.ManagedOpensearchDomainName
-			c.ExternalOS.OSDomainURL = awsManagedServicesConfig.ManagedOpensearchDomainURL
-
-			// os root-ca might be nil in pre deploy state
-			c.ExternalOS.OSCert = awsManagedServicesConfig.ManagedOpensearchCertificate
-			c.ExternalOS.OSUserPassword = awsManagedServicesConfig.ManagedOpensearchUserPassword
-			c.ExternalOS.OSUsername = awsManagedServicesConfig.ManagedOpensearchUsername
-			c.ExternalOS.OSRoleArn = awsManagedServicesConfig.AwsOsSnapshotRoleArn
-		}
-	}
-
-	if haConfig.IsExistingInfra() {
-		existingInfraConfig := haConfig.ExistingInfra.Config
-		c.Hardware.AutomateNodeIps = existingInfraConfig.AutomatePrivateIps
-		c.Hardware.ChefInfraServerNodeIps = existingInfraConfig.ChefServerPrivateIps
-		automateConfig := haConfig.Automate.Config
-		if automateConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(automateConfig.CertsByIP, haConfig.ExistingInfra.Config.AutomatePrivateIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
-		}
-
-		chefserverConfig := haConfig.ChefServer.Config
-		if chefserverConfig.EnableCustomCerts {
-			c.appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
-		}
-
-		if !haConfig.IsExternalDb() {
-			c.Hardware.PostgresqlNodeIps = existingInfraConfig.PostgresqlPrivateIps
-			c.Hardware.OpenSearchNodeIps = existingInfraConfig.OpensearchPrivateIps
-			postgresqlConfig := haConfig.Postgresql.Config
-			if postgresqlConfig.EnableCustomCerts {
-				c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, haConfig.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
-			}
-
-			openSearchConfig := haConfig.Opensearch.Config
-			if openSearchConfig.EnableCustomCerts {
-				c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, haConfig.ExistingInfra.Config.OpensearchPrivateIps, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
-			}
-		}
-
-		if haConfig.IsExternalDb() {
-
-			externalPgConfig := haConfig.External.Database.PostgreSQL
-			c.ExternalPG.PGDbUserName = externalPgConfig.DbuserUsername
-			c.ExternalPG.PGDbUserPassword = externalPgConfig.DbuserPassword
-			c.ExternalPG.PGInstanceURL = externalPgConfig.InstanceURL
-
-			// pg root-ca might be nil in pre deploy state
-			c.ExternalPG.PGRootCert = externalPgConfig.PostgresqlRootCert
-			c.ExternalPG.PGSuperuserName = externalPgConfig.SuperuserUsername
-			c.ExternalPG.PGSuperuserPassword = externalPgConfig.SuperuserPassword
-
-			externalOsConfig := haConfig.External.Database.OpenSearch
-			c.ExternalOS.OSDomainName = externalOsConfig.OpensearchDomainName
-			c.ExternalOS.OSDomainURL = externalOsConfig.OpensearchDomainURL
-
-			// os root-ca might be nil in pre deploy state
-			c.ExternalOS.OSCert = externalOsConfig.OpensearchRootCert
-			c.ExternalOS.OSUserPassword = externalOsConfig.OpensearchUserPassword
-			c.ExternalOS.OSUsername = externalOsConfig.OpensearchUsername
-
-			if haConfig.IsAwsExternalOsConfigured() {
-				c.ExternalOS.OSRoleArn = externalOsConfig.Aws.AwsOsSnapshotRoleArn
-			}
-		}
-	}
-
-	// not available in config
-	c.DeploymentState = ""
-
 	return nil
+}
+
+func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
+	objectStorageConfig := haConfig.GetObjectStorageConfig()
+	c.Backup.ObjectStorage.BucketName = objectStorageConfig.BucketName
+	c.Backup.ObjectStorage.AWSRegion = objectStorageConfig.Region
+	c.Backup.ObjectStorage.AccessKey = objectStorageConfig.AccessKey
+	c.Backup.ObjectStorage.SecretKey = objectStorageConfig.SecretKey
+	c.Backup.ObjectStorage.Endpoint = objectStorageConfig.Endpoint
+}
+
+func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
+	configInitials := haConfig.GetConfigInitials()
+	c.SSHUser.Username = configInitials.SSHUser
+	c.SSHUser.PrivateKey = configInitials.SSHKeyFile
+	c.SSHUser.SudoPassword = configInitials.SudoPassword
+	c.Arch = configInitials.Architecture
+	c.Backup.FileSystem.MountLocation = configInitials.BackupMount
+}
+
+func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
+	if haConfig.Architecture.Aws.BackupConfig == "s3" {
+		c.Backup.ObjectStorage.BucketName = haConfig.Architecture.Aws.S3BucketName
+	}
+}
+
+func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
+	automateConfig := haConfig.Automate.Config
+	if automateConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(nil, []string{""}, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
+	}
+
+	chefserverConfig := haConfig.ChefServer.Config
+	if chefserverConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
+	}
+
+	postgresqlConfig := haConfig.Postgresql.Config
+	if postgresqlConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
+	}
+
+	openSearchConfig := haConfig.Opensearch.Config
+	if openSearchConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(nil, []string{""}, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+	}
+}
+
+func (c *Config) populateAwsManagedServicesConfig(haConfig *config.HaDeployConfig) {
+	awsManagedServicesConfig := haConfig.Aws.Config
+	c.ExternalPG.PGDbUserName = awsManagedServicesConfig.ManagedRdsDbuserUsername
+	c.ExternalPG.PGDbUserPassword = awsManagedServicesConfig.ManagedRdsDbuserPassword
+	c.ExternalPG.PGInstanceURL = awsManagedServicesConfig.ManagedRdsInstanceURL
+
+	// pg root-ca might be nil in pre deploy state
+	c.ExternalPG.PGRootCert = awsManagedServicesConfig.ManagedRdsCertificate
+	c.ExternalPG.PGSuperuserName = awsManagedServicesConfig.ManagedRdsSuperuserUsername
+	c.ExternalPG.PGSuperuserPassword = awsManagedServicesConfig.ManagedRdsSuperuserPassword
+
+	c.ExternalOS.OSDomainName = awsManagedServicesConfig.ManagedOpensearchDomainName
+	c.ExternalOS.OSDomainURL = awsManagedServicesConfig.ManagedOpensearchDomainURL
+
+	// os root-ca might be nil in pre deploy state
+	c.ExternalOS.OSCert = awsManagedServicesConfig.ManagedOpensearchCertificate
+	c.ExternalOS.OSUserPassword = awsManagedServicesConfig.ManagedOpensearchUserPassword
+	c.ExternalOS.OSUsername = awsManagedServicesConfig.ManagedOpensearchUsername
+	c.ExternalOS.OSRoleArn = awsManagedServicesConfig.AwsOsSnapshotRoleArn
+}
+
+func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConfig) {
+	existingInfraConfig := haConfig.ExistingInfra.Config
+	c.Hardware.AutomateNodeIps = existingInfraConfig.AutomatePrivateIps
+	c.Hardware.ChefInfraServerNodeIps = existingInfraConfig.ChefServerPrivateIps
+	automateConfig := haConfig.Automate.Config
+	if automateConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(automateConfig.CertsByIP, haConfig.ExistingInfra.Config.AutomatePrivateIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
+	}
+
+	chefserverConfig := haConfig.ChefServer.Config
+	if chefserverConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
+	}
+}
+
+func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
+	externalPgConfig := haConfig.External.Database.PostgreSQL
+	c.ExternalPG.PGDbUserName = externalPgConfig.DbuserUsername
+	c.ExternalPG.PGDbUserPassword = externalPgConfig.DbuserPassword
+	c.ExternalPG.PGInstanceURL = externalPgConfig.InstanceURL
+
+	// pg root-ca might be nil in pre deploy state
+	c.ExternalPG.PGRootCert = externalPgConfig.PostgresqlRootCert
+	c.ExternalPG.PGSuperuserName = externalPgConfig.SuperuserUsername
+	c.ExternalPG.PGSuperuserPassword = externalPgConfig.SuperuserPassword
+
+	externalOsConfig := haConfig.External.Database.OpenSearch
+	c.ExternalOS.OSDomainName = externalOsConfig.OpensearchDomainName
+	c.ExternalOS.OSDomainURL = externalOsConfig.OpensearchDomainURL
+
+	// os root-ca might be nil in pre deploy state
+	c.ExternalOS.OSCert = externalOsConfig.OpensearchRootCert
+	c.ExternalOS.OSUserPassword = externalOsConfig.OpensearchUserPassword
+	c.ExternalOS.OSUsername = externalOsConfig.OpensearchUsername
+
+	if haConfig.IsAwsExternalOsConfigured() {
+		c.ExternalOS.OSRoleArn = externalOsConfig.Aws.AwsOsSnapshotRoleArn
+	}
+}
+
+func (c *Config) populateNonExternalDbConfig(haConfig *config.HaDeployConfig) {
+	existingInfraConfig := haConfig.ExistingInfra.Config
+	c.Hardware.PostgresqlNodeIps = existingInfraConfig.PostgresqlPrivateIps
+	c.Hardware.OpenSearchNodeIps = existingInfraConfig.OpensearchPrivateIps
+	postgresqlConfig := haConfig.Postgresql.Config
+	if postgresqlConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, haConfig.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
+	}
+
+	openSearchConfig := haConfig.Opensearch.Config
+	if openSearchConfig.EnableCustomCerts {
+		c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, haConfig.ExistingInfra.Config.OpensearchPrivateIps, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+	}
 }
 
 type BatchCheckResponse struct {
