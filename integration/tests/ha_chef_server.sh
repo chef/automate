@@ -56,7 +56,7 @@ do_deploy() {
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" deploy config.toml \
-            --product chef-server \
+            --enable-chef-server  \
             --hartifacts "$test_hartifacts_path" \
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
@@ -68,7 +68,7 @@ do_deploy() {
 
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" deploy config.toml \
-            --product chef-server \
+            --enable-chef-server \
             --hartifacts "$test_hartifacts_path" \
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
