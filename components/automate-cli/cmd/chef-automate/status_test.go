@@ -80,3 +80,82 @@ func TestHandleManagedServiceError(t *testing.T) {
 		}
 	}
 }
+
+func TestConstructNodeMapForStatus(t *testing.T) {
+	type testCase struct {
+		flags           *statusCmdFlags
+		nodeMapExpected *NodeTypeAndCmd
+	}
+	infra := &AutomateHAInfraDetails{}
+
+	testCases := []testCase{
+		{
+			flags: &statusCmdFlags{
+				waitForHealthy:      false,
+				waitTimeout:         600,
+				waitRefreshInterval: 10,
+				automate:            true,
+			},
+			nodeMapExpected: &NodeTypeAndCmd{
+				Frontend: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo chef-automate status -r 10 -t 600",
+						WaitTimeout:              600,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Automate: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo chef-automate status -r 10 -t 600",
+						WaitTimeout:              600,
+						ErrorCheckEnableInOutput: true,
+						NodeIps:                  []string{""},
+						NodeType:                 true,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				ChefServer: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo chef-automate status -r 10 -t 600",
+						WaitTimeout:              600,
+						ErrorCheckEnableInOutput: true,
+						NodeIps:                  []string{""},
+						NodeType:                 false,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Postgresql: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      BACKEND_STATUS,
+						NodeIps:                  []string{""},
+						ErrorCheckEnableInOutput: true,
+						NodeType:                 false,
+						WaitTimeout:              600,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Opensearch: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      BACKEND_STATUS,
+						NodeIps:                  []string{""},
+						ErrorCheckEnableInOutput: true,
+						NodeType:                 false,
+						WaitTimeout:              600,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Infra: infra,
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		nodeMapGet := constructNodeMapForStatus(testCase.flags, infra)
+		assert.Equal(t, testCase.nodeMapExpected, nodeMapGet)
+	}
+}

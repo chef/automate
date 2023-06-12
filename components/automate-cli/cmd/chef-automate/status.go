@@ -289,6 +289,10 @@ func runStatusFromBastion(flags *statusCmdFlags) error {
 	}
 
 	if !flags.automate && !flags.chefServer && !flags.opensearch && !flags.postgresql {
+		if len(flags.node) != 0 {
+			return status.Errorf(status.InvalidCommandArgsError, "Please provide service flag")
+		}
+
 		flags.automate = true
 		flags.chefServer = true
 		flags.opensearch = true
@@ -390,7 +394,7 @@ func executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli
 
 func printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, nodeIps []string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
 	mutex.Lock()
-	writer.Printf("=====================================================%s=======================================================\n", "Status on "+remoteService)
+	writer.Printf("\n=====================================================%s=======================================================\n", "Status on "+remoteService)
 	for _, value := range cmdResult {
 		for _, cmdResult := range value {
 			printOutput(remoteService, *cmdResult, []string{}, writer)
