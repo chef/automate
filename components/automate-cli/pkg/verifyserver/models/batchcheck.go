@@ -261,7 +261,6 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 
 	// not available in config
 	c.DeploymentState = ""
-	c.APIToken = ""
 
 	return nil
 }
