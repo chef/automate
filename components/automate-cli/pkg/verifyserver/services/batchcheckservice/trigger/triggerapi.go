@@ -23,10 +23,11 @@ func RunCheck(config *models.Config, log logger.Logger, port string, path string
 		config.Hardware.OpenSearchNodeCount
 
 	outputCh := make(chan models.CheckTriggerResponse)
-
 	if config.ExternalOS == nil || config.ExternalPG == nil {
-		log.Infof("******************* NIL External OS OR PG *******************")
 		return ExternalOSPGNillResp(config)
+	}
+	if isEmptyExternalOS(config.ExternalOS) || isEmptyExternalPG(config.ExternalPG) {
+		return ExternalOSPGEmptyResp(config)
 	}
 
 	// added one for bastion node
@@ -189,54 +190,118 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 	return reader, nil
 }
 
+// func CheckEmptyOrNilExternalConfig(config *models.Config) []models.CheckTriggerResponse {
+// 	if config.ExternalOS == nil || config.ExternalPG == nil {
+// 		fmt.Printf("****************** OS PG is nil ******************")
+// 		return ExternalOSPGNillResp(config)
+// 	}
+// 	if isEmptyExternalOS(config.ExternalOS) || isEmptyExternalPG(config.ExternalPG) {
+// 		fmt.Printf("****************** OS PG is empty ******************")
+// 		return ExternalOSPGEmptyResp(config)
+// 	}
+// 	return nil
+// }
+
 func ExternalOSPGNillResp(config *models.Config) []models.CheckTriggerResponse {
-	var triggerRsps []models.CheckTriggerResponse
+	var triggerResps []models.CheckTriggerResponse
 	count := 0
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, createNilResponse(ip, constants.AUTOMATE))
 		count++
-		ctr := models.CheckTriggerResponse{
-			NodeType: constants.AUTOMATE,
-			Result: models.ApiResult{
-				Skipped: true,
-			},
-			Host: ip,
-		}
-		triggerRsps = append(triggerRsps, ctr)
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		count++
-		ctr := models.CheckTriggerResponse{
-			NodeType: constants.AUTOMATE,
-			Result: models.ApiResult{
-				Skipped: true,
-			},
-			Host: ip,
-		}
-		triggerRsps = append(triggerRsps, ctr)
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		count++
-		ctr := models.CheckTriggerResponse{
-			NodeType: constants.AUTOMATE,
-			Result: models.ApiResult{
-				Skipped: true,
-			},
-			Host: ip,
-		}
-		triggerRsps = append(triggerRsps, ctr)
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		count++
-		ctr := models.CheckTriggerResponse{
-			NodeType: constants.AUTOMATE,
-			Result: models.ApiResult{
-				Skipped: true,
-			},
-			Host: ip,
-		}
-		triggerRsps = append(triggerRsps, ctr)
 	}
 
-	return triggerRsps
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, createNilResponse(ip, constants.CHEF_INFRA_SERVER))
+		count++
+	}
+
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		triggerResps = append(triggerResps, createNilResponse(ip, constants.OPENSEARCH))
+		count++
+	}
+
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		triggerResps = append(triggerResps, createNilResponse(ip, constants.POSTGRESQL))
+		count++
+	}
+
+	if count == 0 {
+		triggerResps = append(triggerResps, createNilResponse("127.0.0.1", constants.BASTION))
+	}
+
+	return triggerResps
+}
+
+func createNilResponse(host, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType: constants.AUTOMATE,
+		Result: models.ApiResult{
+			Skipped: true,
+		},
+		Host: host,
+	}
+}
+
+func ExternalOSPGEmptyResp(config *models.Config) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+	count := 0
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, constants.AUTOMATE))
+		count++
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, constants.CHEF_INFRA_SERVER))
+		count++
+	}
+
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, constants.OPENSEARCH))
+		count++
+	}
+
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, constants.POSTGRESQL))
+		count++
+	}
+
+	if count == 0 {
+		triggerResps = append(triggerResps, createErrorResponse("127.0.0.1", constants.BASTION))
+	}
+
+	return triggerResps
+}
+
+func createErrorResponse(host, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:     host,
+		NodeType: nodeType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusInternalServerError,
+				Message: "External OS or PG configuration is missing",
+			},
+		},
+	}
+}
+
+func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
+	return externalOS.OSDomainName == "" ||
+		externalOS.OSDomainURL == "" ||
+		externalOS.OSUsername == "" ||
+		externalOS.OSUserPassword == "" ||
+		externalOS.OSCert == "" ||
+		externalOS.OSRoleArn == ""
+}
+
+func isEmptyExternalPG(externalPG *models.ExternalPG) bool {
+	return externalPG.PGInstanceURL == "" ||
+		externalPG.PGSuperuserName == "" ||
+		externalPG.PGSuperuserPassword == "" ||
+		externalPG.PGDbUserName == "" ||
+		externalPG.PGDbUserPassword == "" ||
+		externalPG.PGRootCert == ""
 }
