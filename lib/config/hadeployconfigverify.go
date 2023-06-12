@@ -474,7 +474,7 @@ func (c *HaDeployConfig) IsAws() bool {
 
 func (c *HaDeployConfig) IsExternalDb() bool {
 	return c.External != nil && c.External.Database != nil &&
-		(c.External.Database.Type == "aws" || c.External.Database.Type == "self-managed")
+		(c.External.Database.Type == AWS || c.External.Database.Type == SELF_MANAGED)
 }
 
 func (c *HaDeployConfig) IsAwsExternalOsConfigured() bool {
@@ -484,7 +484,7 @@ func (c *HaDeployConfig) IsAwsExternalOsConfigured() bool {
 }
 
 func (c *HaDeployConfig) IsExternalDbSelfManaged() bool {
-	return c.IsExternalDb() && c.External.Database.Type == "self-managed"
+	return c.IsExternalDb() && c.External.Database.Type == SELF_MANAGED
 }
 
 func validateAwsOsPgConfig(aws *ConfigAwsSettings) error {
