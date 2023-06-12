@@ -572,18 +572,8 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
-	if aws.AwsCidrBlockAddr == "" {
-		if err := validateRequiredStringListField(aws.PrivateCustomSubnets, "aws private_custom_subnets", 3); err != nil {
-			errorList.PushBack(err)
-		}
-
-		if err := validateRequiredStringListField(aws.PublicCustomSubnets, "aws public_custom_subnets", 3); err != nil {
-			errorList.PushBack(err)
-		}
-	} else {
-		if err := validateRequiredString(aws.AwsCidrBlockAddr, "aws aws_cidr_block_addr"); err != nil {
-			errorList.PushBack(err)
-		}
+	if err := validateAwsCidrBlockSettings(aws); err != nil {
+		errorList.PushBack(err)
 	}
 
 	if err := validateRequiredString(aws.SSHKeyPairName, "aws ssh_key_pair_name"); err != nil {
@@ -606,12 +596,39 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 		errorList.PushBack(err)
 	}
 
+	if err := validateAwsDbInstanceType(aws); err != nil {
+		errorList.PushBack(err)
+	}
+
+	return getSingleErrorFromList(errorList)
+}
+
+func validateAwsDbInstanceType(aws *ConfigAwsSettings) error {
+	errorList := list.New()
 	if err := validateRequiredString(aws.OpensearchServerInstanceType, "aws opensearch_server_instance_type"); err != nil {
 		errorList.PushBack(err)
 	}
 
 	if err := validateRequiredString(aws.PostgresqlServerInstanceType, "aws postgresql_server_instance_type"); err != nil {
 		errorList.PushBack(err)
+	}
+	return getSingleErrorFromList(errorList)
+}
+
+func validateAwsCidrBlockSettings(aws *ConfigAwsSettings) error {
+	errorList := list.New()
+	if aws.AwsCidrBlockAddr == "" {
+		if err := validateRequiredStringListField(aws.PrivateCustomSubnets, "aws private_custom_subnets", 3); err != nil {
+			errorList.PushBack(err)
+		}
+
+		if err := validateRequiredStringListField(aws.PublicCustomSubnets, "aws public_custom_subnets", 3); err != nil {
+			errorList.PushBack(err)
+		}
+	} else {
+		if err := validateRequiredString(aws.AwsCidrBlockAddr, "aws aws_cidr_block_addr"); err != nil {
+			errorList.PushBack(err)
+		}
 	}
 
 	return getSingleErrorFromList(errorList)
