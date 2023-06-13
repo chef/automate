@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
+	"sync"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -157,5 +160,128 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 	for _, testCase := range testCases {
 		nodeMapGet := constructNodeMapForStatus(testCase.flags, infra)
 		assert.Equal(t, testCase.nodeMapExpected, nodeMapGet)
+	}
+}
+
+func TestRunStatusFromBastion(t *testing.T) {
+	type testCase struct {
+		description         string
+		flags               *statusCmdFlags
+		mockStatusCmdHelper *MockStatusCmdFromBastionHelperImpl
+		errorWant           error
+	}
+
+	testCases := []testCase{
+		{
+			description: "No service flag provided and node flag is provided",
+			flags: &statusCmdFlags{
+				node: "1",
+			},
+			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+			},
+			errorWant: status.Errorf(status.InvalidCommandArgsError, "Please provide service flag"),
+		},
+		{
+			description: "Error while reading infra details",
+			flags:       &statusCmdFlags{},
+			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return nil, errors.New("Error occured while reading infra details")
+				},
+			},
+			errorWant: errors.New("Error occured while reading infra details"),
+		},
+		{
+			description: "Want status of all services",
+			flags:       &statusCmdFlags{},
+			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
+					wg.Done()
+				},
+			},
+			errorWant: nil,
+		},
+		{
+			description: "Want status of all services but error occured while remote execution",
+			flags:       &statusCmdFlags{},
+			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
+				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
+				},
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
+					wg.Done()
+				},
+			},
+			errorWant: errors.New("Some error occured while remote execution"),
+		},
+		{
+			description: "Want status of all services with managed services",
+			flags:       &statusCmdFlags{},
+			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return true
+				},
+				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
+					wg.Done()
+				},
+			},
+			errorWant: nil,
+		},
+		{
+			description: "Managed services and pg flag provided",
+			flags: &statusCmdFlags{
+				postgresql: true,
+			},
+			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return true
+				},
+				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
+					wg.Done()
+				},
+			},
+			errorWant: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL),
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.description, func(t *testing.T) {
+			err := runStatusFromBastion(testCase.flags, testCase.mockStatusCmdHelper)
+			if err != nil {
+				assert.EqualError(t, testCase.errorWant, err.Error())
+			} else {
+				assert.Nil(t, err)
+			}
+		})
 	}
 }
