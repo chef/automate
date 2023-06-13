@@ -60,7 +60,7 @@ func init() {
 	configCmd.AddCommand(showConfigCmd)
 	configCmd.AddCommand(patchConfigCmd)
 	configCmd.AddCommand(setConfigCmd)
-	// configCmd.AddCommand(ocIdShowAppCmd)
+	configCmd.AddCommand(ocIdShowAppCmd)
 
 	//config show flags
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "O", false, "Overwrite existing config.toml [Standalone]")
@@ -170,15 +170,15 @@ var setConfigCmd = &cobra.Command{
 	},
 }
 
-// var ocIdShowAppCmd = &cobra.Command{
-// 	Use:   "oc-id-show-app",
-// 	Short: "Get the details of the oauth applications registered with OC-ID",
-// 	Long:  "Get the details of the oauth applications registered with OC-ID",
-// 	RunE:  runOcIdShowAppCommand,
-// 	Annotations: map[string]string{
-// 		docs.Tag: docs.BastionHost,
-// 	},
-// }
+var ocIdShowAppCmd = &cobra.Command{
+	Use:   "oc-id-show-app",
+	Short: "Get the details of the oauth applications registered with OC-ID",
+	Long:  "Get the details of the oauth applications registered with OC-ID",
+	RunE:  runOcIdShowAppCommand,
+	Annotations: map[string]string{
+		docs.Tag: docs.BastionHost,
+	},
+}
 
 func runShowCmd(cmd *cobra.Command, args []string) error {
 
@@ -641,22 +641,22 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
-// 	if isA2HARBFileExist() {
-// 		// TODO: Once we test with HA setup we will work on it. Need to clarify with automate team.
-// 	} else {
-// 		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
-// 		content, err := ioutil.ReadFile(oauthAppDetailsFilePath)
-// 		if err != nil {
-// 			printErr := "Could not find the file with the registered application details. Pls restart OC-ID to generate it."
-// 			writer.Errorln(printErr)
-// 			return err
-// 		}
-// 		registeredAppDetails := string(content)
-// 		writer.Println(registeredAppDetails)
-// 	}
-// 	return nil
-// }
+func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		// TODO: Once we test with HA setup we will work on it. Need to clarify with automate team.
+	} else {
+		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
+		content, err := os.ReadFile(oauthAppDetailsFilePath)
+		if err != nil {
+			printErr := "Could not find the file with the registered application details. Pls restart OC-ID to generate it."
+			writer.Errorln(printErr)
+			return err
+		}
+		registeredAppDetails := string(content)
+		writer.Println(registeredAppDetails)
+	}
+	return nil
+}
 
 type ResultConfigSet struct {
 	HostIP string
