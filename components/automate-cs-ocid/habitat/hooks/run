@@ -1,30 +1,41 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash -e
-
+echo "--- 1"
 exec 2>&1
+echo "--- 2"
 
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+echo "--- 3"
 cd {{pkgPathFor "chef/oc_id"}}/oc_id
+echo "--- 4"
 
 pkg_svc_user=root
 pkg_svc_group=root
 pkg_svc_run="return 0"
 
+echo "--- 5"
 # moved logic from plan.sh
 source "{{pkg.svc_config_path}}/scripts/do_install.sh"
+
+echo "--- 6"
 
 export RAILS_ENV="{{cfg.rails_env}}"
 export RACK_ENV="{{cfg.rack_env}}"
 
+echo "--- 7"
+
 export OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
+
+echo "--- 8"
 
 # Set webui key from erchef component
 source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
-
+echo "--- 9"
 # Setup environment specific configurations for integration with erchef
 source "{{pkg.svc_config_path}}/scripts/set_env_vars.sh"
-
+echo "--- 10"
 # Registering oauth applications
 export OAUTH_APPS='{{cfg.ocid.oauth_applications}}'
+echo "--- 11"
 if [ -n "$OAUTH_APPS" ]; then
     echo "Oauth application present."
     export OAUTH_APPLICATIONS_JSON='{{toJson cfg.ocid.oauth_applications}}'
@@ -36,16 +47,30 @@ else
     echo "No oauth application present."
 fi
 
+echo "--- 12"
+
 export HOME={{pkg.svc_var_path}}
+
+echo "--- 13"
 export DBNAME="{{cfg.sql.db_name}}"
 
+echo "--- 14"
+
 mkdir -p "{{pkg.svc_var_path}}/etc"
+echo "--- 15"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
+echo "--- 16"
 
 pg-helper rename-if-exists oc_id "$DBNAME"
+
+echo "--- 17"
 pg-helper ensure-service-database "$DBNAME"
+echo "--- 18"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
+
+echo "--- 19"
 pg-helper fix-permissions "$DBNAME"
+echo "--- 20"
 
 # NOTE: Please keep this statement just before running
 # any environment specific command e.g. starting rails server.
@@ -53,11 +78,17 @@ pg-helper fix-permissions "$DBNAME"
 # exported from this JSON file. So if this file is getting updated
 # pls make sure export happens after the file is updated.
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
+echo "--- 21"
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
+echo "--- 22"
 
 # bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
+echo "--- 23"
 bundle exec bin/unicorn -p "{{cfg.network.port}}"
+echo "--- 24"
 
 secrets-helper generate oc_id.superuser_id 32 --if-not-exists
+
+echo "--- 25"
