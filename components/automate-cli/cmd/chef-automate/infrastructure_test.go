@@ -36,13 +36,6 @@ func Test_runpreInfrastructureCmd(t *testing.T) {
 			}
 			assert.Error(t, err)
 		})
-		t.Run(tt.testName, func(t *testing.T) {
-			err := preInfrastructureCmd(tt.cmd, tt.args)
-			if err == nil{
-				assert.NoError(t, err)
-			}
-			assert.Error(t, err)
-		})
 	}
 }
 
