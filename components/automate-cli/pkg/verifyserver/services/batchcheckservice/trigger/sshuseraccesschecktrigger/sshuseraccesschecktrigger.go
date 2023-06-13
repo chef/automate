@@ -26,8 +26,13 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 }
 
 func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-
 	ss.log.Info("Performing SSH user access check from batch check ")
+
+	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
+	if ok {
+		return resp
+	}
+
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
 		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 

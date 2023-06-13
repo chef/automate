@@ -24,7 +24,6 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 
 func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.ExternalOS == nil {
-		eoc.log.Infof("External OS or PG nil")
 		return trigger.ExternalOSPGNillResp(config)
 	}
 

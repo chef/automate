@@ -23,12 +23,6 @@ func RunCheck(config *models.Config, log logger.Logger, port string, path string
 		config.Hardware.OpenSearchNodeCount
 
 	outputCh := make(chan models.CheckTriggerResponse)
-	if config.ExternalOS == nil || config.ExternalPG == nil {
-		return ExternalOSPGNillResp(config)
-	}
-	if isEmptyExternalOS(config.ExternalOS) || isEmptyExternalPG(config.ExternalPG) {
-		return ExternalOSPGEmptyResp(config)
-	}
 
 	// added one for bastion node
 	if path == constants.SOFTWARE_VERSION_CHECK_API_PATH || path == constants.SYSTEM_RESOURCE_CHECK_API_PATH {
@@ -190,17 +184,29 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 	return reader, nil
 }
 
-// func CheckEmptyOrNilExternalConfig(config *models.Config) []models.CheckTriggerResponse {
-// 	if config.ExternalOS == nil || config.ExternalPG == nil {
-// 		fmt.Printf("****************** OS PG is nil ******************")
-// 		return ExternalOSPGNillResp(config)
-// 	}
-// 	if isEmptyExternalOS(config.ExternalOS) || isEmptyExternalPG(config.ExternalPG) {
-// 		fmt.Printf("****************** OS PG is empty ******************")
-// 		return ExternalOSPGEmptyResp(config)
-// 	}
-// 	return nil
-// }
+func CheckEmptyOrNilExternalConfig(config *models.Config) ([]models.CheckTriggerResponse, bool) {
+	if config.ExternalOS == nil {
+		fmt.Printf("****************** OS nil\n")
+		return ExternalOSPGNillResp(config), true
+	}
+
+	if config.ExternalPG == nil {
+		fmt.Printf("****************** PG nil\n")
+		return ExternalOSPGNillResp(config), true
+	}
+
+	if IsEmptyExternalOS(config.ExternalOS) {
+		fmt.Printf("****************** OS empty\n")
+		return ExternalOSPGEmptyResp(config), true
+	}
+
+	if IsEmptyExternalPG(config.ExternalPG) {
+		fmt.Printf("****************** PG empty\n")
+		return ExternalOSPGEmptyResp(config), true
+	}
+
+	return nil, false
+}
 
 func ExternalOSPGNillResp(config *models.Config) []models.CheckTriggerResponse {
 	var triggerResps []models.CheckTriggerResponse
@@ -288,7 +294,7 @@ func createErrorResponse(host, nodeType string) models.CheckTriggerResponse {
 	}
 }
 
-func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
+func IsEmptyExternalOS(externalOS *models.ExternalOS) bool {
 	return externalOS.OSDomainName == "" ||
 		externalOS.OSDomainURL == "" ||
 		externalOS.OSUsername == "" ||
@@ -297,7 +303,7 @@ func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
 		externalOS.OSRoleArn == ""
 }
 
-func isEmptyExternalPG(externalPG *models.ExternalPG) bool {
+func IsEmptyExternalPG(externalPG *models.ExternalPG) bool {
 	return externalPG.PGInstanceURL == "" ||
 		externalPG.PGSuperuserName == "" ||
 		externalPG.PGSuperuserPassword == "" ||

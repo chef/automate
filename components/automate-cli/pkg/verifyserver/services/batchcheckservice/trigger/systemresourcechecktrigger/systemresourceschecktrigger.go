@@ -20,6 +20,10 @@ func NewSystemResourceCheck(log logger.Logger, port string) *SystemResourceCheck
 }
 
 func (src *SystemResourceCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
+	if ok {
+		return resp
+	}
 	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, config.DeploymentState)
 }
 

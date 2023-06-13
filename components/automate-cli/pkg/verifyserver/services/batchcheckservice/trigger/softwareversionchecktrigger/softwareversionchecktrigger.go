@@ -20,6 +20,10 @@ func NewSoftwareVersionCheck(log logger.Logger, port string) *SoftwareVersionChe
 }
 
 func (svc *SoftwareVersionCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
+	if ok {
+		return resp
+	}
 	return trigger.RunCheck(config, svc.log, svc.port, constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
 }
 

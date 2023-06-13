@@ -27,9 +27,9 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
 
-	if config.ExternalOS == nil || config.ExternalPG == nil {
-		ss.log.Infof("External OS or PG nil")
-		return trigger.ExternalOSPGNillResp(config)
+	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
+	if ok {
+		return resp
 	}
 
 	count := 0
