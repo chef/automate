@@ -646,7 +646,7 @@ func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
 		// TODO: Once we test with HA setup we will work on it. Need to clarify with automate team.
 	} else {
 		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
-		content, err := ioutil.ReadFile(oauthAppDetailsFilePath)
+		content, err := os.ReadFile(oauthAppDetailsFilePath)
 		if err != nil {
 			printErr := "Could not find the file with the registered application details. Pls restart OC-ID to generate it."
 			writer.Errorln(printErr)
