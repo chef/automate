@@ -41,9 +41,12 @@ do_deploy() {
     cli_bin=$(command -v "chef-automate")
     #shellcheck disable=SC2154
     hab pkg install --channel="$test_channel" --binlink chef/automate-cs-nginx
-
     docker_run "${_frontend1_container_name}"
     docker_run "${_frontend2_container_name}"
+
+    echo "${_frontend1_container_name}"
+    echo "${_frontend2_container_name}"
+
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
@@ -56,7 +59,7 @@ do_deploy() {
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" deploy config.toml \
-            --enable-chef-server  \
+            --product chef-server  \
             --hartifacts "$test_hartifacts_path" \
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
@@ -68,7 +71,7 @@ do_deploy() {
 
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" deploy config.toml \
-            --enable-chef-server \
+            --product chef-server \
             --hartifacts "$test_hartifacts_path" \
             --override-origin "$HAB_ORIGIN" \
             --manifest-dir "$test_manifest_path" \
@@ -168,6 +171,20 @@ required_recipe_enabled false
 reindex_endpoint "https://127.0.0.1"
 internal_server "https://$frontend1_ip:10203"
 EOH
+}
+
+
+do_dump_logs() {
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "$tmpdir/_frontend1_container_name"
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "$tmpdir/_frontend2_container_name"
+
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "$tmpdir/*"
+        then
+            echo "Failed to frontend conatiner logs"
+        fi
+    fi
+    rm -r "$tmpdir"
 }
 
 do_test_deploy() {
