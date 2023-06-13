@@ -5,11 +5,12 @@ import (
 
 	"github.com/bmizerany/assert"
 	"github.com/chef/automate/lib/io/fileutils"
+	//"github.com/chef/automate/lib/io/fileutils"
 )
 
 func TestMakeRequest(t *testing.T) {
-	err := GenerateCert("54.169.203.144")
-	fileutils.DeleteFile("certificate.pem")
-	fileutils.DeleteFile("private_key.pem")
+	privateKeyFilePath, publicKeyFilePath, err := GenerateCert("54.169.203.144")
+	fileutils.DeleteFile(privateKeyFilePath)
+	fileutils.DeleteFile(publicKeyFilePath)
 	assert.Equal(t, nil, err)
 }

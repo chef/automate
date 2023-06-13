@@ -109,7 +109,7 @@ func (ss *BatchCheckService) startMockServerIfNeeded(remoteChecks []string, conf
 			return successfullyStartedMockServers, notStartedMockServers, err
 		}
 		if startMockServer {
-			successfullyStartedMockServers, notStartedMockServers = ss.StartMockServer(remoteChecks, config.Hardware)
+			successfullyStartedMockServers, notStartedMockServers = ss.StartMockServer(remoteChecks, config)
 		}
 	}
 	return successfullyStartedMockServers, notStartedMockServers, nil
@@ -163,7 +163,8 @@ func (ss *BatchCheckService) createNodeTypeMap(remoteChecks []string) map[string
 	return nodeTypePortMap
 }
 
-func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDetails models.Hardware) ([]models.MockServerFromBatchServiceResponse, []models.MockServerFromBatchServiceResponse) {
+func (ss *BatchCheckService) StartMockServer(remoteChecks []string, config models.Config) ([]models.MockServerFromBatchServiceResponse, []models.MockServerFromBatchServiceResponse) {
+	hardwareDetails := config.Hardware
 	nodeTypePortMap := ss.createNodeTypeMap(remoteChecks)
 	ipMap := map[string][]string{
 		constants.AUTOMATE:          hardwareDetails.AutomateNodeIps,
@@ -205,7 +206,7 @@ func (ss *BatchCheckService) StartMockServer(remoteChecks []string, hardwareDeta
 		}
 		if len(protocolMap[constants.HTTPS]) != 0 {
 			startMockServerRequestBody.Protocol = constants.HTTPS
-			ss.generateRootCaAndPrivateKeyForHost(host, &startMockServerRequestBody)
+			ss.generateRootCaAndPrivateKeyForHost(host, &startMockServerRequestBody, config)
 			ss.constructRequestForStartingMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
 		}
 	}
@@ -243,32 +244,41 @@ func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) string {
 	return nodeTypeWithIp[strings.Index(nodeTypeWithIp, "_")+1:]
 }
 
-func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host string, startMockServerRequestBody *models.MockServerRequestBody) {
-	err := certgenerateutils.GenerateCert(host)
+func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host string, startMockServerRequestBody *models.MockServerRequestBody, config models.Config) {
+	if len(config.Certificate.Nodes) > 0 {
+		nodes := config.Certificate.Nodes
+		for _, nodeData := range nodes {
+			if host == nodeData.IP {
+				startMockServerRequestBody.Cert = nodeData.Cert
+				startMockServerRequestBody.Key = nodeData.Key
+				break
+			}
+		}
+		return
+	}
+
+	privateKeyFilePath, certificateFilePath, err := certgenerateutils.GenerateCert(host)
 	if err != nil {
 		ss.log.Error(err)
 		return
 	}
-	certificateFileName := "certificate.pem"
-	privateKeyFileName := "private_key.pem"
-	cert, err := ss.fileUtils.ReadFile(certificateFileName)
+	defer ss.fileUtils.DeleteFile(certificateFilePath)
+	defer ss.fileUtils.DeleteFile(privateKeyFilePath)
+
+	cert, err := ss.fileUtils.ReadFile(certificateFilePath)
 	if err != nil {
-		ss.log.Error("Unable to read certificate.pem file", err)
-		defer ss.fileUtils.DeleteFile(certificateFileName)
+		ss.log.Error("Unable to read %s file", certificateFilePath, err)
 		return
 	}
-	rootCA := string(cert[:])
-	startMockServerRequestBody.Cert = rootCA
-	defer ss.fileUtils.DeleteFile(certificateFileName)
-	key, err := ss.fileUtils.ReadFile(privateKeyFileName)
+	publicKey := string(cert[:])
+	startMockServerRequestBody.Cert = publicKey
+	key, err := ss.fileUtils.ReadFile(privateKeyFilePath)
 	if err != nil {
-		ss.log.Error("Unable to read private_key.pem file", err)
-		defer ss.fileUtils.DeleteFile(privateKeyFileName)
+		ss.log.Error("Unable to read %s file", privateKeyFilePath, err)
 		return
 	}
 	privateKey := string(key[:])
 	startMockServerRequestBody.Key = privateKey
-	defer ss.fileUtils.DeleteFile(privateKeyFileName)
 }
 
 func constructUniquePortMap(resp map[string]map[string][]int, nodeTypePortMap *map[string]map[string][]int) {

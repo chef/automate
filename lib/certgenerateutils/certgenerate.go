@@ -31,18 +31,20 @@ func generateSerial() (*big.Int, error) {
 	return ret, nil
 }
 
-func GenerateCert(fqdn string) error {
+func GenerateCert(ip string) (string, string, error) {
 	// Generate a private key
+	privateKeyFilePath := ""
+	publicKeyFilePath := ""
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		fmt.Println("Failed to generate private key:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
 
 	serial, err := generateSerial()
 	if err != nil {
 		fmt.Println("Failed to generate serial:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
 
 	// Create a self-signed certificate
@@ -52,27 +54,28 @@ func GenerateCert(fqdn string) error {
 			Country:            []string{"US"},
 			Organization:       []string{"Chef Software"},
 			OrganizationalUnit: []string{"Chef Automate"},
-			CommonName:         fqdn,
+			CommonName:         ip,
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
-		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 		IsCA:                  true,
-		DNSNames:              []string{fqdn},
+		DNSNames:              []string{ip},
 	}
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, template, template, &privateKey.PublicKey, privateKey)
 	if err != nil {
 		fmt.Println("Failed to create certificate:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
 
 	// Save private key to file
-	privateKeyFile, err := os.Create("private_key.pem")
+	privateKeyFile, err := os.CreateTemp("", "private_key.pem")
 	if err != nil {
 		fmt.Println("Failed to create private key file:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
 	defer privateKeyFile.Close()
 
@@ -84,14 +87,14 @@ func GenerateCert(fqdn string) error {
 	err = pem.Encode(privateKeyFile, privateKeyBlock)
 	if err != nil {
 		fmt.Println("Failed to encode private key:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
 
 	// Save certificate to file
-	certFile, err := os.Create("certificate.pem")
+	certFile, err := os.CreateTemp("", "certificate.pem")
 	if err != nil {
 		fmt.Println("Failed to create certificate file:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
 	defer certFile.Close()
 
@@ -103,7 +106,9 @@ func GenerateCert(fqdn string) error {
 	err = pem.Encode(certFile, certBlock)
 	if err != nil {
 		fmt.Println("Failed to encode certificate:", err)
-		return err
+		return privateKeyFilePath, publicKeyFilePath, err
 	}
-	return nil
+	privateKeyFilePath = privateKeyFile.Name()
+	publicKeyFilePath = certFile.Name()
+	return privateKeyFilePath, publicKeyFilePath, nil
 }

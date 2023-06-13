@@ -789,15 +789,17 @@ func TestStartMockServer(t *testing.T) {
 		}
 	}`, nil, false)
 	startedServers, failedServers := ss.StartMockServer([]string{constants.FIREWALL, constants.FQDN},
-		models.Hardware{
-			AutomateNodeCount:        1,
-			AutomateNodeIps:          []string{"1.2.3.4"},
-			ChefInfraServerNodeCount: 1,
-			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
-			PostgresqlNodeCount:      1,
-			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
-			OpenSearchNodeCount:      1,
-			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		models.Config{
+			Hardware: models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"1.2.3.4"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+			},
 		},
 	)
 	totalA := 0
@@ -817,19 +819,6 @@ func TestStartMockServer(t *testing.T) {
 	assert.Equal(t, len(startedServers), 23)
 	assert.Equal(t, len(failedServers), 0)
 }
-
-// func TestStopMockServerOnHostAndPort(t *testing.T) {
-// 	ss := getBatchCheckServiceInstance()
-
-// 	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), false)
-// 	stopMockServerChannel := make(chan models.MockServerFromBatchServiceResponse)
-// 	ss.StopMockServerOnHostAndPort("1.2.3.4", "tcp", 1234, stopMockServerChannel)
-// 	for i := 0; i < 1; i++ {
-// 		result := <-stopMockServerChannel
-// 		fmt.Println(result)
-// 	}
-// 	assert.NotNil(t, ss.log)
-// }
 
 func TestGetDeploymentStateReturnsErrorWhenAutomateNotReachable(t *testing.T) {
 	ss := getBatchCheckServiceInstance()
@@ -953,7 +942,18 @@ func TestShouldGenerateRootCaAndPrivateKeyForHostLogErrorForCert(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ss.fileUtils = mockFileUtils(test.fileName, true)
 
-			ss.generateRootCaAndPrivateKeyForHost("abc", &models.MockServerRequestBody{})
+			ss.generateRootCaAndPrivateKeyForHost("abc", &models.MockServerRequestBody{}, models.Config{
+				Hardware: models.Hardware{
+					AutomateNodeCount:        1,
+					AutomateNodeIps:          []string{"1.2.3.4"},
+					ChefInfraServerNodeCount: 1,
+					ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+					PostgresqlNodeCount:      1,
+					PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+					OpenSearchNodeCount:      1,
+					OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+				},
+			})
 			fileutils.DeleteFile("certificate.pem")
 			fileutils.DeleteFile("private_key.pem")
 			assert.NotNil(t, ss.log)
