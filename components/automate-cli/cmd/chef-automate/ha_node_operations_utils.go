@@ -850,8 +850,8 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	}
 
 	// Remove cert values for "global.v1.frontend_tls"
-	if dest.Global != nil ||
-		dest.Global.V1 != nil ||
+	if dest.Global != nil &&
+		dest.Global.V1 != nil &&
 		len(dest.Global.V1.FrontendTls) != 0 {
 
 		writer.Warn(fmt.Sprintf(CERT_WARNING, "global.v1.frontend_tls"))
@@ -859,9 +859,9 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	}
 
 	// Remove cert values for "load_balancer.v1.sys.frontend_tls"
-	if dest.LoadBalancer != nil ||
-		dest.LoadBalancer.V1 != nil ||
-		dest.LoadBalancer.V1.Sys != nil ||
+	if dest.LoadBalancer != nil &&
+		dest.LoadBalancer.V1 != nil &&
+		dest.LoadBalancer.V1.Sys != nil &&
 		len(dest.LoadBalancer.V1.Sys.FrontendTls) != 0 {
 		writer.Warn(fmt.Sprintf(CERT_WARNING, "load_balancer.v1.sys.frontend_tls"))
 		dest.LoadBalancer.V1.Sys.FrontendTls = nil
