@@ -44,9 +44,8 @@ do_deploy() {
     docker_run "${_frontend1_container_name}"
     docker_run "${_frontend2_container_name}"
 
-    echo "${_frontend1_container_name}"
-    echo "${_frontend2_container_name}"
-
+    echo "name of first :${_frontend1_container_name}"
+    echo "name of second :${_frontend2_container_name}"
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
@@ -175,11 +174,14 @@ EOH
 
 
 do_dump_logs() {
-    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "$tmpdir/_frontend1_container_name"
-    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "$tmpdir/_frontend2_container_name"
+  do_dump_logs_default
+    
+
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend1_container_name"
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend2_container_name"
 
     if command -v buildkite-agent; then
-        if ! buildkite-agent artifact upload "$tmpdir/*"
+        if ! buildkite-agent artifact upload "logs/*"
         then
             echo "Failed to frontend conatiner logs"
         fi
