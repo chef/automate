@@ -11,6 +11,7 @@ do_deploy() {
 
 do_test_deploy() {
     do_test_deploy_default
+    test_knife
 }
 
 do_create_config() {
