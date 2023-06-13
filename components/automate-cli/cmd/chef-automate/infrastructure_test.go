@@ -25,17 +25,22 @@ func Test_runpreInfrastructureCmd(t *testing.T) {
 		testName string
 		cmd      *cobra.Command
 		args     []string
-		wantErr  bool
 	}{
-		{"Test node delete", nodeDelCmd, []string{"uuid of node"}, true},
+		{"Test node delete", nodeDelCmd, []string{"uuid of node"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
 			err := runDeleteNodeCmd(tt.cmd, tt.args)
+			if err == nil{
+				assert.NoError(t, err)
+			}
 			assert.Error(t, err)
 		})
 		t.Run(tt.testName, func(t *testing.T) {
 			err := preInfrastructureCmd(tt.cmd, tt.args)
+			if err == nil{
+				assert.NoError(t, err)
+			}
 			assert.Error(t, err)
 		})
 	}
