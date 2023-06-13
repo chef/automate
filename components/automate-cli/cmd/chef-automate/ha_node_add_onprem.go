@@ -190,14 +190,16 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
+// Save all config from each services to Bastion server and move it to WORKSPACE dir
 func (ani *AddNodeOnPremImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
 
+// Sync saved config from bastion to ALL nodes
 func (ani *AddNodeOnPremImpl) syncConfigToAllNodes() error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return ani.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
@@ -293,14 +295,3 @@ type NodeObject struct {
 func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile []string, inputFilePrefix string, nodeType string) *NodeObject {
 	return &NodeObject{cmdString, outFile, inputFile, inputFilePrefix, nodeType}
 }
-
-// Save all config from each services to Bastion server annd move it to WORKSPACE dir
-// func SaveConfigInBastion() error {
-
-// }
-
-// func syncConfigToAllNodes() error {
-
-// 	NodeObject :=
-// 	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
-// }

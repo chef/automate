@@ -191,12 +191,12 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 
 func (dna *DeleteNodeAWSImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return dna.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return dna.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
 }
 
 func (dna *DeleteNodeAWSImpl) syncConfigToAllNodes() error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return dna.nodeUtils.ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return dna.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
 }
 
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
