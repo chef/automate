@@ -3,6 +3,7 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -10,11 +11,13 @@ import (
 	"strings"
 	"time"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -135,7 +138,7 @@ func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, in
 func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
-func (mnu *MockNodeUtilsImpl) ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 	return mnu.ExecuteCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
 }
 
@@ -161,7 +164,7 @@ type NodeOpUtils interface {
 	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	ExecuteCmdInAllNodeAndCaptureOutput([]*NodeObject, bool, string) error
+	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
 	calculateTotalInstanceCount() (int, error)
 }
 
@@ -340,8 +343,9 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 	return infra, sshconfig, nil
 }
 
-func (nu *NodeUtilsImpl) ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
-	return ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
+func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+	infra, _, _ := nu.getHaInfraDetails()
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
 }
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 	return isManagedServicesOn()
@@ -714,11 +718,11 @@ func readConfigAWS(path string) (AwsConfigToml, error) {
 }
 
 // Execute custom command in one node of all the each node-type
-func ExecuteCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
-		err := ExecuteCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		err := executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, infra)
 		if err != nil {
 			return err
 		}
@@ -766,4 +770,117 @@ func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, frontendPrefix, CHEF_SERVER),
 	}
 	return nodeObjects
+}
+
+// Execute 'config show' command in specific service and fetch the output file to bastion
+func executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+
+	nodeMap := NewNodeTypeAndCmd()
+	cmd := NewNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
+	if service == POSTGRESQL {
+		cmd.CmdInputs.Args = inputFiles
+	} else if service == OPENSEARCH {
+		cmd.CmdInputs.Args = inputFiles
+	} else {
+		cmd.CmdInputs.Args = inputFiles
+		// Patch only incase of frontends node
+		if len(inputFiles) > 0 {
+			cmd.PreExec = prePatchForFrontendNodes
+			cmd.CmdInputs.InputFilesPrefix = inputFilesPrefix
+			cmd.CmdInputs.WaitTimeout = 300
+		}
+	}
+	switch service {
+	case AUTOMATE:
+		nodeMap.Automate = cmd
+	case CHEF_SERVER:
+		nodeMap.ChefServer = cmd
+	case POSTGRESQL:
+		nodeMap.Postgresql = cmd
+	case OPENSEARCH:
+		nodeMap.Opensearch = cmd
+	}
+
+	nodeMap.Infra = infra
+
+	sshUtil := NewSSHUtil(&SSHConfig{})
+	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
+
+	_, err := cmdUtil.Execute()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Create *Cmd struct instance with 'cmdString' and 'outputFiles' params
+func NewNodeTypeCmd(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []string, singleNode bool) *Cmd {
+	return &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      cmdString,
+			Single:                   singleNode,
+			InputFiles:               []string{},
+			Outputfiles:              outputFiles,
+			NodeType:                 true,
+			HideSSHConnectionMessage: true,
+		},
+	}
+}
+
+// prePatchForFrontendNodes parse frontend config before patch and remove cert related keys-values
+func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
+	srcPath, err := removeRestrictedKeysFromSrcFile(inputs.Args[0])
+	if err != nil {
+		return err
+	}
+
+	inputs.InputFiles = []string{srcPath}
+
+	return nil
+}
+
+// Remove TLS values used for frontend LB and product key in frontend nodes
+func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
+
+	tomlbyt, _ := ioutil.ReadFile(srcString) // nosemgrep
+	destString := string(tomlbyt)
+	var dest dc.AutomateConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		fmt.Println(err)
+	}
+
+	// Remove cert values for "global.v1.frontend_tls"
+	if dest.Global != nil ||
+		dest.Global.V1 != nil ||
+		len(dest.Global.V1.FrontendTls) != 0 {
+
+		writer.Warn(fmt.Sprintf(CERT_WARNING, "global.v1.frontend_tls"))
+		dest.Global.V1.FrontendTls = nil
+	}
+
+	// Remove cert values for "load_balancer.v1.sys.frontend_tls"
+	if dest.LoadBalancer != nil ||
+		dest.LoadBalancer.V1 != nil ||
+		dest.LoadBalancer.V1.Sys != nil ||
+		len(dest.LoadBalancer.V1.Sys.FrontendTls) != 0 {
+		writer.Warn(fmt.Sprintf(CERT_WARNING, "load_balancer.v1.sys.frontend_tls"))
+		dest.LoadBalancer.V1.Sys.FrontendTls = nil
+	}
+
+	if dest.Deployment == nil ||
+		dest.Deployment.V1 == nil ||
+		dest.Deployment.V1.Svc == nil ||
+		dest.Deployment.V1.Svc.Products == nil {
+		return srcString, nil
+	} else {
+		// Following are the unsupported or restricted key to patch via bastion
+		writer.Warn(PRODUCT_WARNING)
+		dest.Deployment.V1.Svc.Products = nil
+
+		srcString, err := fileutils.CreateTomlFileFromConfig(dest, srcString)
+		if err != nil {
+			return "", err
+		}
+		return srcString, nil
+	}
 }
