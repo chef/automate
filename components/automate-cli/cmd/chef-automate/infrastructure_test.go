@@ -31,14 +31,12 @@ func Test_runpreInfrastructureCmd(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
-			if err := runDeleteNodeCmd(tt.cmd, tt.args); (err != nil) != tt.wantErr {
-				t.Errorf("runDeleteNodeCmd() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err := runDeleteNodeCmd(tt.cmd, tt.args)
+			assert.Error(t, err)
 		})
 		t.Run(tt.testName, func(t *testing.T) {
-			if err := preInfrastructureCmd(tt.cmd, tt.args); (err != nil) != tt.wantErr {
-				t.Errorf("preInfrastructureCmd() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err := preInfrastructureCmd(tt.cmd, tt.args)
+			assert.Error(t, err)
 		})
 	}
 }
