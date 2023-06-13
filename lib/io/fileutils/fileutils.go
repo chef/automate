@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
 
@@ -263,4 +264,27 @@ func RemoveFirstLine(filePath string) error {
 	}
 
 	return nil
+}
+
+// createTomlFileFromConfig created a toml file where path and struct interface is provided
+func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, error) {
+	f, err := os.Create(tomlFile)
+
+	if err != nil {
+		// failed to create/open the file
+		errors.Wrap(err, "Failed to create/open the file, \n%v")
+		return "", err
+	}
+	if err := toml.NewEncoder(f).Encode(config); err != nil {
+		// failed to encode
+		errors.Wrap(err, "Failed to encode\n%v")
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		// failed to close the file
+		errors.Wrap(err, "Failed to close the file\n%v")
+		return "", err
+	}
+
+	return tomlFile, nil
 }
