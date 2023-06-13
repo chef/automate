@@ -20,7 +20,34 @@ var nodeDelCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 }
 
+var infrastructureCmdTest = &cobra.Command{
+    Use:               "infrastructure COMMAND",
+    Short:             "Chef Automate infrastructure",
+    Long:              "Test for infra cmd",
+    PersistentPreRunE: preInfrastructureCmd,
+}
+
+
 func Test_runpreInfrastructureCmd(t *testing.T) {
+    tests := []struct {
+        testName string
+        cmd      *cobra.Command
+        args     []string
+    }{
+        {"Test node delete", infrastructureCmdTest, []string{"uuid of node"}},
+    }
+    for _, tt := range tests {
+        t.Run(tt.testName, func(t *testing.T) {
+            err := preInfrastructureCmd(tt.cmd, tt.args)
+            if err == nil{
+				assert.NoError(t, err)
+			}
+			assert.Error(t, err)
+        })
+    }
+}
+
+func Test_runDeleteNodeCmd(t *testing.T) {
 	tests := []struct {
 		testName string
 		cmd      *cobra.Command
