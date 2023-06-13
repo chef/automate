@@ -345,6 +345,9 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -398,6 +401,9 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -431,6 +437,9 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -513,6 +522,9 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
 		},
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -578,6 +590,9 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 			return count, nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil

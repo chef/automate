@@ -185,6 +185,9 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -273,6 +276,9 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
@@ -334,6 +340,9 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		},
 		modifyTfArchFileFunc: func(path string) error {
 			tfArchModified = true
+			return nil
+		},
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

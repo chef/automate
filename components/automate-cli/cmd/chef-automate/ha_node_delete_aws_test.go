@@ -512,6 +512,9 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
+			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+				return nil
+			},
 		},
 		CONFIG_TOML_PATH_AWS,
 		&fileutils.MockFileSystemUtils{},
@@ -629,6 +632,9 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			calculateTotalInstanceCountFunc: func() (int, error) {
 				return 0, nil
 			},
+			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+				return nil
+			},
 		},
 		CONFIG_TOML_PATH_AWS,
 		&fileutils.MockFileSystemUtils{},
@@ -701,6 +707,9 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		calculateTotalInstanceCountFunc: func() (int, error) {
 			count = count - 1
 			return count, nil
+		},
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
 		},
 	}
 	flagsArr := []AddDeleteNodeHACmdFlags{

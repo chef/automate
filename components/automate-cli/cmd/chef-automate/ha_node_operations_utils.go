@@ -67,7 +67,7 @@ type MockNodeUtilsImpl struct {
 	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCountFunc           func() (int, error)
-	ExecuteCmdInAllNodeAndCaptureOutputFunc   func([]*NodeObject, bool, string) error
+	executeCmdInAllNodeAndCaptureOutputFunc   func([]*NodeObject, bool, string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -139,7 +139,7 @@ func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
 func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
-	return mnu.ExecuteCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
+	return mnu.executeCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
 }
 
 type NodeOpUtils interface {
@@ -849,21 +849,21 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		fmt.Println(err)
 	}
 
-	// Remove cert values for "global.v1.frontend_tls"
+	// Ignoring cert values for "global.v1.frontend_tls"
 	if dest.Global != nil &&
 		dest.Global.V1 != nil &&
 		len(dest.Global.V1.FrontendTls) != 0 {
 
-		writer.Warn(fmt.Sprintf(CERT_WARNING, "global.v1.frontend_tls"))
+		// writer.Warn(fmt.Sprintf(CERT_WARNING, "global.v1.frontend_tls"))
 		dest.Global.V1.FrontendTls = nil
 	}
 
-	// Remove cert values for "load_balancer.v1.sys.frontend_tls"
+	// Ignoring cert values for "load_balancer.v1.sys.frontend_tls"
 	if dest.LoadBalancer != nil &&
 		dest.LoadBalancer.V1 != nil &&
 		dest.LoadBalancer.V1.Sys != nil &&
 		len(dest.LoadBalancer.V1.Sys.FrontendTls) != 0 {
-		writer.Warn(fmt.Sprintf(CERT_WARNING, "load_balancer.v1.sys.frontend_tls"))
+		// writer.Warn(fmt.Sprintf(CERT_WARNING, "load_balancer.v1.sys.frontend_tls"))
 		dest.LoadBalancer.V1.Sys.FrontendTls = nil
 	}
 
@@ -874,7 +874,7 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		return srcString, nil
 	} else {
 		// Following are the unsupported or restricted key to patch via bastion
-		writer.Warn(PRODUCT_WARNING)
+		// writer.Warn(PRODUCT_WARNING)
 		dest.Deployment.V1.Svc.Products = nil
 
 		srcString, err := fileutils.CreateTomlFileFromConfig(dest, srcString)
