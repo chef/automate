@@ -70,7 +70,10 @@ func newStatusCmd() *cobra.Command {
 		Use:   "status",
 		Short: "Retrieve Chef Automate status",
 		Long:  "Retrieve Chef Automate status. Includes status of Automate services.",
-		RunE:  runStatusCmdGetter(&statusCmdFlag), //and call the function here which returs function
+		RunE:  runStatusCmdGetter(&statusCmdFlag),
+		Annotations: map[string]string{
+			docs.Tag: docs.BastionHost,
+		},
 	}
 
 	statusCmd.PersistentFlags().BoolVarP(
@@ -105,7 +108,7 @@ func newStatusCmd() *cobra.Command {
 	statusCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.opensearch, "os", false, "Shows status from OpenSearch node[DUPLICATE]")
 	statusCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().StringVar(&statusCmdFlag.node, "node", "", "Pass this flag to check status of perticular node node(HA)")
+	statusCmd.PersistentFlags().StringVar(&statusCmdFlag.node, "node", "", "Pass this flag to check status of perticular node in the cluster")
 	statusCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	statusCmd.AddCommand(newStatusSummaryCmd())
@@ -308,7 +311,7 @@ func runStatusFromBastion(flags *statusCmdFlags) error {
 			cmdResult, err := executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go printStatusOutput(cmdResult, AUTOMATE, infra.Outputs.AutomatePrivateIps.Value, wg, mutex, writer)
+			go printStatusOutput(cmdResult, AUTOMATE, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -323,7 +326,7 @@ func runStatusFromBastion(flags *statusCmdFlags) error {
 			cmdResult, err := executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go printStatusOutput(cmdResult, CHEF_SERVER, infra.Outputs.ChefServerPrivateIps.Value, wg, mutex, writer)
+			go printStatusOutput(cmdResult, CHEF_SERVER, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -353,7 +356,7 @@ func runStatusFromBastion(flags *statusCmdFlags) error {
 			cmdResult, err := executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go printStatusOutput(cmdResult, POSTGRESQL, infra.Outputs.PostgresqlPrivateIps.Value, wg, mutex, writer)
+			go printStatusOutput(cmdResult, POSTGRESQL, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -370,7 +373,7 @@ func runStatusFromBastion(flags *statusCmdFlags) error {
 			cmdResult, err := executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go printStatusOutput(cmdResult, OPENSEARCH, infra.Outputs.OpensearchPrivateIps.Value, wg, mutex, writer)
+			go printStatusOutput(cmdResult, OPENSEARCH, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -392,7 +395,7 @@ func executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli
 	return cmdResult, err
 }
 
-func printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, nodeIps []string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
+func printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
 	mutex.Lock()
 	writer.Printf("\n=====================================================%s=======================================================\n", "Status on "+remoteService)
 	for _, value := range cmdResult {
