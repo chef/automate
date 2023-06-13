@@ -191,7 +191,7 @@ func TestCheckSshConnection(t *testing.T) {
 				sudoPassword: sudoPassword,
 				MockSSHUtil: &sshutils.MockSSHUtilsImpl{
 					Executefunc: func(sshConfig sshutils.SSHConfig, cmd string) (string, error) {
-						return "Connection creation falied", errors.New("ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain")
+						return "Connection creation failed", errors.New("ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain")
 					},
 				},
 			},

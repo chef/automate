@@ -132,6 +132,7 @@ func TestPopulateWith(t *testing.T) {
 				SSHUser: SSHUser{
 					Username:     "ubuntu",
 					PrivateKey:   "./testdata/A2HA.pem",
+					Port:         "22",
 					SudoPassword: "",
 				},
 				Arch: "existing_nodes",
@@ -197,6 +198,7 @@ func TestPopulateWith(t *testing.T) {
 				SSHUser: SSHUser{
 					Username:     "ubuntu",
 					PrivateKey:   "./testdata/A2HA.pem",
+					Port:         "22",
 					SudoPassword: "",
 				},
 				Arch: "aws",
@@ -284,6 +286,7 @@ func TestPopulateWith(t *testing.T) {
 				SSHUser: SSHUser{
 					Username:     "ubuntu",
 					PrivateKey:   "./testdata/A2HA.pem",
+					Port:         "22",
 					SudoPassword: "",
 				},
 				Arch: "existing_nodes",

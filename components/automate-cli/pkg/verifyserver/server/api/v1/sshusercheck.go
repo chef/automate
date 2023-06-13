@@ -8,6 +8,7 @@ import (
 
 func (h *Handler) CheckSshUser(c *fiber.Ctx) error {
 	req := new(models.SshUserChecksRequest)
+	c.Request().Header.Set("Content-Type", "application/json")
 	if err := c.BodyParser(&req); err != nil {
 		h.Logger.Error("Ssh User Check request body parsing failed: ", err)
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())

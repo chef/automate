@@ -56,6 +56,7 @@ func getSShUserAPIRquest(ip string, sshUser models.SSHUser) models.SShUserReques
 	return models.SShUserRequest{
 		IP:           ip,
 		Username:     sshUser.Username,
+		Port:         sshUser.Port,
 		SudoPassword: sshUser.SudoPassword,
 		PrivateKey:   sshUser.PrivateKey,
 	}
