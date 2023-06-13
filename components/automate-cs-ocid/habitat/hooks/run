@@ -17,6 +17,22 @@ export RACK_ENV="{{cfg.rack_env}}"
 
 export OCID_CONFIG_FOLDER_PATH="{{pkgPathFor "chef/oc_id"}}/oc_id/config"
 
+export HOME={{pkg.svc_var_path}}
+export DBNAME="{{cfg.sql.db_name}}"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
+
+pg-helper rename-if-exists oc_id "$DBNAME"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper create-extension "$DBNAME" "uuid-ossp"
+pg-helper fix-permissions "$DBNAME"
+
+source "{{pkg.svc_var_path}}/etc/pg.env"
+
+echo ")))))))))))"
+echo $DATABASE_URL
+
 # Set webui key from erchef component
 source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
 
@@ -36,25 +52,12 @@ else
     echo "No oauth application present."
 fi
 
-export HOME={{pkg.svc_var_path}}
-export DBNAME="{{cfg.sql.db_name}}"
-
-mkdir -p "{{pkg.svc_var_path}}/etc"
-render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
-
-pg-helper rename-if-exists oc_id "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
-pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper fix-permissions "$DBNAME"
-
 # NOTE: Please keep this statement just before running
 # any environment specific command e.g. starting rails server.
 # The running server will follow the configurations that are
 # exported from this JSON file. So if this file is getting updated
 # pls make sure export happens after the file is updated.
 export CHEF_SECRETS_DATA=$(cat config/private-chef-secrets.json)
-
-source "{{pkg.svc_var_path}}/etc/pg.env"
 
 # bundle exec bin/rake db:create
 bundle exec bin/rake db:migrate
