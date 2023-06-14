@@ -24,6 +24,7 @@ type Hardware struct {
 }
 type SSHUser struct {
 	Username     string `json:"user_name"`
+	Port         string `json:"ssh_port"`
 	PrivateKey   string `json:"private_key"`
 	SudoPassword string `json:"sudo_password"`
 }
@@ -203,6 +204,7 @@ func (c *Config) populateObjectStorageConfig(haConfig *config.HaDeployConfig) {
 func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
 	configInitials := haConfig.GetConfigInitials()
 	c.SSHUser.Username = configInitials.SSHUser
+	c.SSHUser.Port = configInitials.SSHPort
 	c.SSHUser.PrivateKey = configInitials.SSHKeyFile
 	c.SSHUser.SudoPassword = configInitials.SudoPassword
 	c.Arch = configInitials.Architecture
@@ -377,6 +379,7 @@ type CertificateCheckRequest struct {
 type SShUserRequest struct {
 	IP           string `json:"ip"`
 	Username     string `json:"user_name"`
+	Port         string `json:"ssh_port"`
 	PrivateKey   string `json:"private_key"`
 	SudoPassword string `json:"sudo_password"`
 }

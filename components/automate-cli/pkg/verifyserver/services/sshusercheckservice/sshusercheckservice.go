@@ -57,7 +57,7 @@ func (ssu *SshUserServiceImpl) CheckSshConnection(sshConfig sshutils.SSHConfig, 
 	checkResponse, err := ssu.SshUtil.Execute(sshConfig, command)
 	ssu.logger.Debug("The response after creating connection and executing command on the terminal: ", checkResponse)
 	if err != nil {
-		if strings.Contains(checkResponse, "Connection creation falied") {
+		if strings.Contains(checkResponse, "Connection creation failed") {
 			sshCheckResponse := models.NewFailureCheck(constants.SSH_USER_FAILURE_TITLE, constants.SSH_USER_ERROR_MESSAGE+ip, constants.SSH_USER_RESOLUTION_MESSAGE+ip)
 			sudoPasswordCheckResponse := models.NewFailureCheck(constants.SUDO_PASSWORD_FAILURE_TITLE, constants.SUDO_PASSWORD_CONNECTION_ERROR_MESSAGE+ip, constants.SUDO_PASSWORD_CONNECTION_RESOLUTION_MESSAGE+ip)
 			responseArray = append(responseArray, *sshCheckResponse, *sudoPasswordCheckResponse)

@@ -98,6 +98,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	}
 
 	req, err := http.NewRequest(method, endPoint, reader)
+	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		output <- models.CheckTriggerResponse{
 			Host:     host,
