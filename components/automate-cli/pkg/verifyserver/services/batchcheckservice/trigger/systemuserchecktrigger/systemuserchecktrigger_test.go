@@ -38,6 +38,24 @@ const (
 	}`
 )
 
+var externalOS = &models.ExternalOS{
+	OSDomainName:   "example.com",
+	OSDomainURL:    "https://example.com",
+	OSUsername:     "username",
+	OSUserPassword: "password",
+	OSCert:         "certificate",
+	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
+}
+
+var externalPG = &models.ExternalPG{
+	PGInstanceURL:       "http://example.com",
+	PGSuperuserName:     "superuser",
+	PGSuperuserPassword: "superpassword",
+	PGDbUserName:        "dbuser",
+	PGDbUserPassword:    "dbpassword",
+	PGRootCert:          "rootcert",
+}
+
 func TestSystemUserCheck_Run(t *testing.T) {
 	t.Run("System User Check", func(t *testing.T) {
 		// Create a dummy server
@@ -50,6 +68,8 @@ func TestSystemUserCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
@@ -81,6 +101,8 @@ func TestSystemUserCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
@@ -90,6 +112,29 @@ func TestSystemUserCheck_Run(t *testing.T) {
 		require.NotNil(t, ctr[0].Result.Error)
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
+	})
+
+	t.Run("Empty OS or PG", func(t *testing.T) {
+		// Create a dummy server
+		server, host, port := createDummyServer(t, http.StatusInternalServerError)
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{host},
+			},
+			ExternalOS: externalOS,
+			ExternalPG: &models.ExternalPG{},
+		}
+
+		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 1)
+		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
+		assert.Equal(t, "External OS or PG configuration is missing", ctr[0].Result.Error.Error())
 	})
 }
 

@@ -186,22 +186,18 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 
 func CheckEmptyOrNilExternalConfig(config *models.Config) ([]models.CheckTriggerResponse, bool) {
 	if config.ExternalOS == nil {
-		fmt.Printf("****************** OS nil\n")
 		return ExternalOSPGNillResp(config), true
 	}
 
 	if config.ExternalPG == nil {
-		fmt.Printf("****************** PG nil\n")
 		return ExternalOSPGNillResp(config), true
 	}
 
 	if IsEmptyExternalOS(config.ExternalOS) {
-		fmt.Printf("****************** OS empty\n")
 		return ExternalOSPGEmptyResp(config), true
 	}
 
 	if IsEmptyExternalPG(config.ExternalPG) {
-		fmt.Printf("****************** PG empty\n")
 		return ExternalOSPGEmptyResp(config), true
 	}
 

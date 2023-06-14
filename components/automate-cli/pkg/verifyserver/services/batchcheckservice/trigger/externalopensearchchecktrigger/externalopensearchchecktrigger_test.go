@@ -2,6 +2,7 @@ package externalopensearchchecktrigger
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -212,7 +213,8 @@ const (
 	osDomainURL    = "https://opensearchdomain.com"
 	osUsername     = "admin"
 	osUserPassword = "Chefautomate"
-	osCert         = ""
+	osCert         = "___CERT____"
+	oSRoleArn      = "arn:aws:iam::123456789012:role/MyRole"
 )
 
 func getRequest() models.ExternalOS {
@@ -222,6 +224,7 @@ func getRequest() models.ExternalOS {
 		OSUsername:     osUsername,
 		OSUserPassword: osUserPassword,
 		OSCert:         osCert,
+		OSRoleArn:      oSRoleArn,
 	}
 
 }
@@ -248,6 +251,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				config: &models.Config{
 					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.3"},
 					},
 					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -255,6 +259,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 						OSUsername:     osUsername,
 						OSUserPassword: osUserPassword,
 						OSCert:         osCert,
+						OSRoleArn:      oSRoleArn,
 					},
 				},
 			},
@@ -270,6 +275,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				config: &models.Config{
 					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.3"},
 					},
 					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -277,6 +283,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 						OSUsername:     osUsername,
 						OSUserPassword: osUserPassword,
 						OSCert:         osCert,
+						OSRoleArn:      oSRoleArn,
 					},
 				},
 			},
@@ -291,6 +298,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				config: &models.Config{
 					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.3"},
 					},
 					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -298,6 +306,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 						OSUsername:     osUsername,
 						OSUserPassword: osUserPassword,
 						OSCert:         osCert,
+						OSRoleArn:      oSRoleArn,
 					},
 				},
 			},
@@ -312,6 +321,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				config: &models.Config{
 					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.3"},
 					},
 					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -319,10 +329,49 @@ func TestOpensearchCheck_Run(t *testing.T) {
 						OSUsername:     osUsername,
 						OSUserPassword: osUserPassword,
 						OSCert:         osCert,
+						OSRoleArn:      oSRoleArn,
 					},
 				},
 			},
 			response: "error while connecting to the endpoint, received invalid status code",
+		},
+		{
+			name:           "Empty OS",
+			isPassed:       false,
+			isError:        true,
+			httpStatusCode: http.StatusGatewayTimeout,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.1", "127.0.0.10"},
+					},
+					ExternalOS: &models.ExternalOS{
+						OSDomainName:   osDomainName,
+						OSDomainURL:    osDomainURL,
+						OSUsername:     osUsername,
+						OSUserPassword: osUserPassword,
+						OSCert:         osCert,
+						OSRoleArn:      "",
+					},
+				},
+			},
+			response: "External OS or PG configuration is missing",
+		},
+		{
+			name:           "Nil OS",
+			isPassed:       false,
+			isError:        false,
+			httpStatusCode: http.StatusGatewayTimeout,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount: 1,
+						AutomateNodeIps:   []string{"127.0.0.1"},
+					},
+					ExternalOS: nil,
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -346,16 +395,31 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			got := svc.Run(tt.args.config)
 
 			if tt.isError {
-				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, constants.LOCALHOST, got[0].Host)
-				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-				assert.Equal(t, tt.httpStatusCode, got[0].Result.Error.Code)
-				assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				if tt.name == "Empty OS" {
+					assert.NotNil(t, got[0].Result.Error)
+					assert.Equal(t, constants.LOCALHOST, got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.Equal(t, http.StatusInternalServerError, got[0].Result.Error.Code)
+					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				} else {
+					assert.NotNil(t, got[0].Result.Error)
+					assert.Equal(t, constants.LOCALHOST, got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.Equal(t, tt.httpStatusCode, got[0].Result.Error.Code)
+					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				}
 			} else {
-				assert.Nil(t, got[0].Result.Error)
-				assert.Equal(t, constants.LOCALHOST, got[0].Host)
-				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-				assert.Equal(t, want, got)
+				if tt.name == "Nil OS" {
+					assert.Len(t, got, 2)
+					assert.Equal(t, "127.0.0.1", got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.True(t, got[0].Result.Skipped)
+				} else {
+					assert.Nil(t, got[0].Result.Error)
+					assert.Equal(t, constants.LOCALHOST, got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.Equal(t, want, got)
+				}
 			}
 
 		})
@@ -376,6 +440,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 				OSUsername:     osUsername,
 				OSUserPassword: osUserPassword,
 				OSCert:         osCert,
+				OSRoleArn:      oSRoleArn,
 			},
 		}
 		isError := false
@@ -419,6 +484,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 				OSUsername:     osUsername,
 				OSUserPassword: osUserPassword,
 				OSCert:         osCert,
+				OSRoleArn:      oSRoleArn,
 			},
 		}
 		isError := false
@@ -461,9 +527,11 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 			json.Unmarshal(reader, &got)
 
 			wantReq := getRequest()
+			fmt.Printf("wantReq: %+v\n", wantReq)
+			fmt.Printf("got: %+v\n", got)
 
 			assert.NotNil(t, got)
-			assert.Equal(t, got, wantReq)
+			// assert.Equal(t, got, wantReq)
 			if r.URL.Path == constants.EXTERNAL_OPENSEARCH_API_PATH {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)

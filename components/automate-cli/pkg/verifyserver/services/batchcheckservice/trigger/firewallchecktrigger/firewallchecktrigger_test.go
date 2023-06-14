@@ -2,6 +2,7 @@ package firewallchecktrigger
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"io"
 	"net/http"
@@ -371,6 +372,24 @@ const (
 	 `
 )
 
+var externalOS = &models.ExternalOS{
+	OSDomainName:   "example.com",
+	OSDomainURL:    "https://example.com",
+	OSUsername:     "username",
+	OSUserPassword: "password",
+	OSCert:         "certificate",
+	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
+}
+
+var externalPG = &models.ExternalPG{
+	PGInstanceURL:       "http://example.com",
+	PGSuperuserName:     "superuser",
+	PGSuperuserPassword: "superpassword",
+	PGDbUserName:        "dbuser",
+	PGDbUserPassword:    "dbpassword",
+	PGRootCert:          "rootcert",
+}
+
 func TestMakeRequests(t *testing.T) {
 	// Create a sample configuration
 	config := models.Config{
@@ -572,10 +591,30 @@ func TestFirewallCheck_Run(t *testing.T) {
 			isError:              true,
 			invalidParseResponse: true,
 		},
+		{
+			name: "OS PG nil",
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeIps:   []string{"10.0.0.1"},
+						PostgresqlNodeIps: []string{"10.0.0.3"},
+					},
+					Certificate: &models.Certificate{
+						RootCert: "test-cert",
+						Nodes:    nodes,
+					},
+					ExternalOS: nil,
+					ExternalPG: nil,
+				},
+			},
+			response:       "",
+			httpStatusCode: http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
+
 				// Create a dummy server
 				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed)
 				defer server.Close()
@@ -597,6 +636,11 @@ func TestFirewallCheck_Run(t *testing.T) {
 						assert.NotNil(t, got[i].Host)
 					}
 
+				} else if tt.name == "OS PG nil" {
+					fmt.Printf("OS PG nil got: %+v\n", got)
+					assert.Len(t, got, 2)
+					require.True(t, got[0].Result.Skipped)
+					require.True(t, got[1].Result.Skipped)
 				} else {
 					var want []models.CheckTriggerResponse
 					json.Unmarshal([]byte(tt.response), &want)

@@ -1,6 +1,7 @@
 package systemresourcechecktrigger
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -38,6 +39,24 @@ const (
 	}`
 )
 
+var externalOS = &models.ExternalOS{
+	OSDomainName:   "example.com",
+	OSDomainURL:    "https://example.com",
+	OSUsername:     "username",
+	OSUserPassword: "password",
+	OSCert:         "certificate",
+	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
+}
+
+var externalPG = &models.ExternalPG{
+	PGInstanceURL:       "http://example.com",
+	PGSuperuserName:     "superuser",
+	PGSuperuserPassword: "superpassword",
+	PGDbUserName:        "dbuser",
+	PGDbUserPassword:    "dbpassword",
+	PGRootCert:          "rootcert",
+}
+
 func TestSystemResourceCheck_Run(t *testing.T) {
 	t.Run("System Resource Check", func(t *testing.T) {
 		// Create a dummy server
@@ -51,6 +70,8 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 				AutomateNodeIps:   []string{host},
 			},
 			DeploymentState: "pre-release",
+			ExternalOS:      externalOS,
+			ExternalPG:      externalPG,
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
@@ -82,6 +103,8 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
@@ -92,6 +115,33 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
 		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
 	})
+
+	t.Run("Empty OS or PG", func(t *testing.T) {
+		// Create a dummy server
+		server, host, port := createDummyServer(t, http.StatusInternalServerError)
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{host},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"localhost"},
+			},
+			ExternalOS: externalOS,
+			ExternalPG: &models.ExternalPG{},
+		}
+
+		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
+		ctr := suc.Run(config)
+
+		fmt.Printf("ctr: %+v\n", ctr)
+		require.Len(t, ctr, 2)
+		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
+		assert.Equal(t, "External OS or PG configuration is missing", ctr[0].Result.Error.Error())
+	})
+
 }
 
 // Helper function to create a dummy server

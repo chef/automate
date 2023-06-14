@@ -27,6 +27,10 @@ func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTri
 		return trigger.ExternalOSPGNillResp(config)
 	}
 
+	if trigger.IsEmptyExternalOS(config.ExternalOS) {
+		return trigger.ExternalOSPGEmptyResp(config)
+	}
+
 	return runCheckForOpensearch(config, eoc.port, eoc.log)
 }
 

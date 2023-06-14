@@ -27,6 +27,11 @@ func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTrigg
 	if config.ExternalPG == nil {
 		return trigger.ExternalOSPGNillResp(config)
 	}
+
+	if trigger.IsEmptyExternalPG(config.ExternalPG) {
+		return trigger.ExternalOSPGEmptyResp(config)
+	}
+
 	return runCheckForPostgresql(config, epc.port, epc.log)
 }
 

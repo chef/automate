@@ -74,70 +74,86 @@ func GetRequestJson() *models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
-		  "ssh_user": {
+		"ssh_user": {
 			"user_name": "ubuntu",
 			"private_key": "test_key",
 			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
+		},
+		"arch": "existing_nodes",
+		"backup": {
 			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
+				"mount_location": "/mnt/automate_backups"
 			}
-		  },
-		  "hardware": {
+		},
+		"hardware": {
 			"automate_node_count": 1,
 			"automate_node_ips": [
-			  "1.2.3.4"
+				"1.2.3.4"
 			],
 			"chef_infra_server_node_count": 1,
 			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
+				"5.6.7.8"
 			],
 			"postgresql_node_count": 1,
 			"postgresql_node_ips": [
-			  "9.10.11.12"
+				"9.10.11.12"
 			],
 			"opensearch_node_count": 1,
 			"opensearch_node_ips": [
-			  "14.15.16.17"
+				"14.15.16.17"
 			]
-		  },
-		  "certificate": {
-			"fqdn":"my_fqdn",
-			"root_cert":"---- VALID ROOT CA ----",
-			"nodes":[
+		},
+		"external_opensearch": {
+			"opensearch_domain_name": "test-url",
+			"opensearch_domain_url": "url",
+			"opensearch_username": "username",
+			"opensearch_user_password": "opensearch_user_password",
+			"opensearch_cert": "cdrt",
+			"opensearch_role_arn": "opensearch_role_arn"
+		},
+		"external_postgresql": {
+			"postgresql_instance_url": "test-url",
+			"postgresql_superuser_username": "root",
+			"postgresql_superuser_password": "pass",
+			"postgresql_dbuser_username": "root",
+			"postgresql_dbuser_password": "pass",
+			"postgresql_root_cert": "cert"
+		},
+		"certificate": {
+			"fqdn": "my_fqdn",
+			"root_cert": "---- VALID ROOT CA ----",
+			"nodes": [
 				{
-					"ip":"1.2.3.4",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "1.2.3.4",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				},
 				{
-					"ip":"5.6.7.8",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "5.6.7.8",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				},
 				{
-					"ip":"9.10.11.12",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "9.10.11.12",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				},
 				{
-					"ip":"14.15.16.17",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "14.15.16.17",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				}
 			]
-		  }
-		}`), &ipConfig)
+		}
+	}`), &ipConfig)
 	return &ipConfig
 }
 
@@ -184,7 +200,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		defer mockServer.Close()
 
 		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1124")
-
+		fmt.Printf("request: %+v\n", request)
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(finalResp))
@@ -274,6 +290,35 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		for _, resp := range finalResp {
 			assert.NotNil(t, resp.Result.Error)
 			assert.Empty(t, resp.Result.Checks)
+			assert.Equal(t, resp.Result.Passed, false)
+		}
+	})
+
+	t.Run("Empty OS or PG", func(t *testing.T) {
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{}`))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1236")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1236")
+		request := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{mockServer.URL},
+			},
+			ExternalOS: nil,
+			ExternalPG: &models.ExternalPG{},
+		}
+		finalResp := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(finalResp))
+
+		for _, resp := range finalResp {
+			assert.Nil(t, resp.Result.Error)
+			assert.True(t, resp.Result.Skipped)
 			assert.Equal(t, resp.Result.Passed, false)
 		}
 	})
