@@ -112,7 +112,7 @@ var preflightCheckCmd = &cobra.Command{
 	Long:  "Perform preflight check to verify host meets installation criteria.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
-		docs.Tag:                 docs.FrontEnd,
+		docs.Tag:                 docs.BastionHost,
 	},
 	RunE: runPreflightCheckCmd,
 }
