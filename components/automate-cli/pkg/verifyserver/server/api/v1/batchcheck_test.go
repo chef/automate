@@ -117,7 +117,7 @@ func TestBatchCheckAPI(t *testing.T) {
 				}
 			}`,
 			expectedCode: 200,
-			expectedBody: `{"status":"SUCCESS","result":[{"node_type":"automate","ip":"1.2.3.4","tests":[{"passed":true,"msg":"success","check":"hardware-resource-count","checks":[{"title":"hardware-resource-count-1","passed":true,"success_msg":"success","error_msg":"","resolution_msg":""},{"title":"hardware-resource-count-2","passed":true,"success_msg":"success","error_msg":"","resolution_msg":""}]},{"passed":true,"msg":"success","check":"ssh-user","checks":[{"title":"ssh-user-1","passed":true,"success_msg":"success","error_msg":"","resolution_msg":""},{"title":"ssh-user-2","passed":true,"success_msg":"success","error_msg":"","resolution_msg":""}]}]}]}`,
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":[{\"node_type\":\"automate\",\"ip\":\"1.2.3.4\",\"tests\":[{\"passed\":true,\"msg\":\"success\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-count-1\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"hardware-resource-count-2\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}],\"skipped\":false},{\"passed\":true,\"msg\":\"success\",\"check\":\"ssh-user\",\"checks\":[{\"title\":\"ssh-user-1\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"ssh-user-2\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}],\"skipped\":false}]}]}",
 		},
 		{
 			description: "400:failure batch check route",
@@ -192,6 +192,8 @@ func TestBatchCheckAPI(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
+			ioutil.WriteFile("expected.json", []byte(test.expectedBody), 0777)
+			ioutil.WriteFile("acctual.json", body, 0777)
 			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, test.expectedCode, res.StatusCode)
 		})
