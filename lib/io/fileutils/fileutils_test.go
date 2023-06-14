@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -88,11 +89,16 @@ func TestMove(t *testing.T) {
 	content := "abc"
 	filename := "file-name"
 	destFileDir := "destination/"
+	destinationDir := createTempDir(t)
+	defer os.RemoveAll(destinationDir)
+
+	srcFile, err := fileutils.CreateTempFile(content, filename)
+	assert.Contains(t, srcFile, "file-name")
+	require.NoError(t, err)
+	defer fileutils.DeleteTempFile(srcFile)
+
 	t.Run("Move a file to new directory", func(t *testing.T) {
-		res, err := fileutils.CreateTempFile(content, filename)
-		assert.Contains(t, res, "file-name")
-		require.NoError(t, err)
-		err = fileutils.Move(res, destFileDir+filename)
+		err = fileutils.Move(srcFile, destFileDir+filename)
 		defer fileutils.DeleteTempFile(destFileDir + filename)
 		require.NoError(t, err)
 		fileExists, err := fileutils.PathExists(destFileDir + filename)
@@ -102,27 +108,26 @@ func TestMove(t *testing.T) {
 	})
 
 	t.Run("Move a file to a directory and overwrite the existing file", func(t *testing.T) {
-		res, err := fileutils.CreateTempFile(content, filename)
-		assert.Contains(t, res, "file-name")
+		existingFile := filepath.Join(destinationDir, "existing.txt")
+		err := fileutils.WriteFile(existingFile, []byte("Existing File"), 0644)
 		require.NoError(t, err)
-		err = fileutils.Move(res, destFileDir+filename)
-		defer fileutils.DeleteTempFile(destFileDir + filename)
+		err = fileutils.Move(srcFile, existingFile)
 		require.NoError(t, err)
-		fileExists, err := fileutils.PathExists(destFileDir + filename)
-		require.NoError(t, err)
-		assert.True(t, fileExists)
-
-		res2, err := fileutils.CreateTempFile(content, filename)
-		require.NoError(t, err)
-
-		err = fileutils.Move(res2, destFileDir+filename)
-		defer fileutils.DeleteTempFile(destFileDir + filename)
-		require.NoError(t, err)
-		fileExists, err = fileutils.PathExists(destFileDir + filename)
-		require.NoError(t, err)
-		assert.True(t, fileExists)
-		defer os.Remove(destFileDir)
 	})
+
+	t.Run("Invalid destinationfile", func(t *testing.T) {
+		invalidSourceFile := "/path/to/invalid/source.txt"
+		err = fileutils.Move(invalidSourceFile, destFileDir+filename)
+		require.ErrorContains(t, err, "no such file or directory", "No such file or Directory")
+	})
+}
+
+func createTempDir(t *testing.T) string {
+	dir, err := ioutil.TempDir("", "destination_*")
+	if err != nil {
+		t.Fatalf("Failed to create temporary directory: %v", err)
+	}
+	return dir
 }
 
 func TestRemoveFirstLine(t *testing.T) {

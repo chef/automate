@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -551,46 +552,6 @@ func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
 	assert.Equal(t, "", out)
 }
 
-func TestExecuteCmdInAllNodeAndCaptureOutputWithOutputFile(t *testing.T) {
-	mockUtil := &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-			infra := &AutomateHAInfraDetails{}
-			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
-			return infra, &SSHConfig{}, nil
-		},
-		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
-			return nil
-		},
-		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
-			return "", nil
-		},
-	}
-
-	infra, _, err := mockUtil.getHaInfraDetails()
-	assert.NoError(t, err)
-
-	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
-		ExecuteFunc: func() (map[string][]*CmdResult, error) {
-			return nil, nil
-		},
-		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-			return nil, nil
-		},
-		GetSshUtilFunc: func() SSHUtil {
-			return &MockSSHUtilsImpl{
-				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-					return "", nil
-				},
-			}
-		},
-	}, command.NewMockExecutor(t), MockWriter.CliWriter)
-	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	singleNode := true
-	outputDirectory := ""
-	err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
-	assert.ErrorContains(t, err, "error on removing output header in fetched config")
-}
-
 func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -624,10 +585,35 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 			}
 		},
 	}, command.NewMockExecutor(t), MockWriter.CliWriter)
-	// nodeUtil.getHaInfraDetails()
-	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	singleNode := true
-	outputDirectory := ""
-	err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
-	assert.Error(t, err, "No ips found")
+
+	t.Run("Get node object with to patch command in all nodes", func(t *testing.T) {
+
+		nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
+		singleNode := true
+		outputDirectory := ""
+		err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+		assert.Error(t, err, "No ips found")
+	})
+
+	t.Run("Get node object with to fetch config in all nodes", func(t *testing.T) {
+
+		nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+		singleNode := true
+		outputDirectory := ""
+		err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+		assert.ErrorContains(t, err, "error on removing output header in fetched config")
+	})
+
+}
+
+func TestParseAndMoveConfigFilteToWorkspaceDir(t *testing.T) {
+	outDir := "/tmp/"
+	fileName, err := fileutils.CreateTempFile("Header\nabc", "file.txt")
+	require.NoError(t, err)
+	outFile := []string{fileName}
+	defer fileutils.DeleteTempFile(fileName)
+	t.Run("Move File to workspace directory", func(t *testing.T) {
+		err := parseAndMoveConfigFilteToWorkspaceDir(outFile, outDir)
+		require.NoError(t, err)
+	})
 }

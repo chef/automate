@@ -738,14 +738,22 @@ func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode b
 			return err
 		}
 		if len(outFiles) > 0 {
-			err = removeOutputHeaderInConfigFile(outFiles[0])
-			if err != nil {
-				return errors.Wrap(err, "error on removing output header in fetched config")
-			}
-			if err = fileutils.Move(outFiles[0], outputDirectory+outFiles[0]); err != nil {
+			if err = parseAndMoveConfigFilteToWorkspaceDir(outFiles, outputDirectory); err != nil {
 				return err
 			}
 		}
+	}
+	return nil
+}
+
+func parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
+
+	err := removeOutputHeaderInConfigFile(outFiles[0])
+	if err != nil {
+		return errors.Wrap(err, "error on removing output header in fetched config")
+	}
+	if err = fileutils.Move(outFiles[0], outputDirectory+outFiles[0]); err != nil {
+		return err
 	}
 	return nil
 }
