@@ -207,13 +207,11 @@ func Move(sourceFile string, destinationFile string) error {
 			// Checks the underlying error code
 			if linkErr.Err.Error() == "file exists" {
 				// Handles the "file exists" error
-				err = os.Remove(destinationFile)
-				if err != nil {
+				if err = os.Remove(destinationFile); err != nil {
 					return err
 				}
 				// Retrys the rename operation
-				err = os.Rename(sourceFile, destinationDir+fileName)
-				if err != nil {
+				if err = os.Rename(sourceFile, destinationDir+fileName); err != nil {
 					return err
 				}
 			}
@@ -258,8 +256,7 @@ func RemoveFirstLine(filePath string) error {
 	tempFile.Close()
 
 	// Replace the original file with the temporary file
-	err = os.Rename(tempFile.Name(), filePath)
-	if err != nil {
+	if err = os.Rename(tempFile.Name(), filePath); err != nil {
 		return err
 	}
 
@@ -281,7 +278,6 @@ func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 		return "", err
 	}
 	if err := f.Close(); err != nil {
-		// failed to close the file
 		errors.Wrap(err, "Failed to close the file\n%v")
 		return "", err
 	}

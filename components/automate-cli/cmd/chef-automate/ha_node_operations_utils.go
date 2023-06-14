@@ -873,7 +873,6 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		dest.Global.V1 != nil &&
 		len(dest.Global.V1.FrontendTls) != 0 {
 
-		// writer.Warn(fmt.Sprintf(CERT_WARNING, "global.v1.frontend_tls"))
 		dest.Global.V1.FrontendTls = nil
 	}
 
@@ -882,7 +881,6 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		dest.LoadBalancer.V1 != nil &&
 		dest.LoadBalancer.V1.Sys != nil &&
 		len(dest.LoadBalancer.V1.Sys.FrontendTls) != 0 {
-		// writer.Warn(fmt.Sprintf(CERT_WARNING, "load_balancer.v1.sys.frontend_tls"))
 		dest.LoadBalancer.V1.Sys.FrontendTls = nil
 	}
 
@@ -893,7 +891,6 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		return srcString, nil
 	} else {
 		// Following are the unsupported or restricted key to patch via bastion
-		// writer.Warn(PRODUCT_WARNING)
 		dest.Deployment.V1.Svc.Products = nil
 
 		srcString, err := fileutils.CreateTomlFileFromConfig(dest, srcString)
