@@ -72,6 +72,14 @@ echo $DATABASE_URL
 echo ")))))))))))"
 echo $DATABASE_URL
 
+echo "*******************bookshelf"
+cat /hab/user/automate-cs-bookshelf/config/user.toml
+
+
+echo "*******************ocid"
+cat /hab/user/automate-cs-ocid/config/user.toml
+
+
 # Set webui key from erchef component
 source "{{pkg.svc_config_path}}/scripts/set_webui_key.sh"
 

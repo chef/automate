@@ -353,7 +353,6 @@ func renameDBIfExists(_ *cobra.Command, args []string) error {
 // accounts for possible previous mistakes such as a database user
 // with a password or database tables not owned by the user.
 func createDB(_ *cobra.Command, args []string) error {
-	fmt.Println("createDB called*******")
 	pgsClient, ctx, cancel, err := pgsClient()
 	defer cancel()
 	if err != nil {
@@ -361,24 +360,15 @@ func createDB(_ *cobra.Command, args []string) error {
 	}
 
 	user := ""
-
-	fmt.Println("***************")
-	fmt.Println(len(args) == 2)
-	fmt.Println(args)
-	fmt.Println(user)
-
 	if len(args) == 2 {
 		user = args[1]
 	} else {
 		user = opts.Client.User
 	}
 
-
 	if user == "" {
 		return ErrUserRequired
 	}
-
-	fmt.Println("*****************2")
 
 	_, err = pgsClient.CreateDB(ctx, &pgs.CreateDBReq{
 		Db:   args[0],

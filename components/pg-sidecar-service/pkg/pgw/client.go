@@ -229,21 +229,13 @@ func (client *Client) Close() error {
 
 // CreateDB takes a database name and role and creates a database
 func (client *Client) CreateDB(db, role string) error {
-	fmt.Println("I am in client.go")
-	fmt.Println(role)
-	fmt.Println(db)
-
 	log := client.log().WithFields(logrus.Fields{
 		"action": "create_db",
 		"db":     db,
 		"role":   role,
 	})
 
-	fmt.Println("Check if not external PG")
-	fmt.Println(!client.platformConfig.IsExternalPG())
-
 	if !client.platformConfig.IsExternalPG() {
-		fmt.Println("It is not an external PG")
 		// We will not create roles and change passwords for external PG
 		if err := client.DB.CreateRole(role); err != nil {
 			log.WithError(err).Error("failed to create role")
@@ -262,10 +254,6 @@ func (client *Client) CreateDB(db, role string) error {
 	}
 
 	exists, err := client.DB.DatabaseExists(db)
-
-	fmt.Println("Database exists?")
-	fmt.Println(exists)
-	
 	if err != nil {
 		log.WithError(err).Error("failed to determine database existence")
 		return err
