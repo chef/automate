@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // mockTransport is a mock implementation of the http.RoundTripper interface
@@ -327,6 +328,24 @@ func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error
 	return nil
 }
 
+var externalOS = &models.ExternalOS{
+	OSDomainName:   "example.com",
+	OSDomainURL:    "https://example.com",
+	OSUsername:     "username",
+	OSUserPassword: "password",
+	OSCert:         "certificate",
+	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
+}
+
+var externalPG = &models.ExternalPG{
+	PGInstanceURL:       "http://example.com",
+	PGSuperuserName:     "superuser",
+	PGSuperuserPassword: "superpassword",
+	PGDbUserName:        "dbuser",
+	PGDbUserPassword:    "dbpassword",
+	PGRootCert:          "rootcert",
+}
+
 func TestCertificateCheck_Run(t *testing.T) {
 
 	t.Run("Returns OK", func(t *testing.T) {
@@ -546,6 +565,23 @@ func TestCertificateCheck_Run(t *testing.T) {
 		}
 	})
 
+	t.Run("Empty OS or PG", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{"12.12.1.2"},
+			},
+			ExternalOS: externalOS,
+			ExternalPG: &models.ExternalPG{},
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 1)
+		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
+		assert.Equal(t, "External OS or PG configuration is missing", ctr[0].Result.Error.Error())
+	})
 }
 
 func TestGetPortsForMockServer(t *testing.T) {
