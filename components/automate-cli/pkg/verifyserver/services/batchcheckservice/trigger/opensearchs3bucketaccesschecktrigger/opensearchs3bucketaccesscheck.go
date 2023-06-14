@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type OpensearchS3BucketAccessCheck struct {
@@ -25,11 +26,33 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 }
 
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	// TODO: Write a seperate chekc
-	// resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
-	// if ok {
-	// 	return resp
-	// }
+	if config.ExternalOS == nil {
+		return []models.CheckTriggerResponse{
+			{
+				NodeType: constants.OPENSEARCH,
+				Result: models.ApiResult{
+					Skipped: true,
+				},
+				Host: osb.host,
+			},
+		}
+	}
+
+	if trigger.IsEmptyExternalOS(config.ExternalOS) {
+		return []models.CheckTriggerResponse{
+			{
+				Host:     osb.host,
+				NodeType: constants.OPENSEARCH,
+				Result: models.ApiResult{
+					Passed: false,
+					Error: &fiber.Error{
+						Code:    http.StatusInternalServerError,
+						Message: "External OS or PG configuration is missing",
+					},
+				},
+			},
+		}
+	}
 
 	s3OpensearchBackupRequest := models.S3BackupDetails{
 		Endpoint:   config.ExternalOS.OSDomainURL,
