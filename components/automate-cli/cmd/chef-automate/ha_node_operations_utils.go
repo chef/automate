@@ -717,6 +717,18 @@ func readConfigAWS(path string) (AwsConfigToml, error) {
 	return config, nil
 }
 
+type NodeObject struct {
+	CmdString       string
+	OutputFile      []string
+	InputFile       []string
+	InputFilePrefix string
+	NodeType        string
+}
+
+func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile []string, inputFilePrefix string, nodeType string) *NodeObject {
+	return &NodeObject{cmdString, outFile, inputFile, inputFilePrefix, nodeType}
+}
+
 // Execute custom command in one node of all the each node-type
 func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 

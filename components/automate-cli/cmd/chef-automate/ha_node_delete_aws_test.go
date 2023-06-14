@@ -571,6 +571,95 @@ func TestDeletenodeWithExecuteA2haRbNotExist(t *testing.T) {
 	assert.Contains(t, err.Error(), `Invalid bastion, to run this command use automate bastion`)
 }
 
+func TestDeleteAWSNodeDeployWithSaveConfigToBastionError(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{
+		automateIp: "192.0.0.1",
+	}
+	// var ipAddres, filewritten, executeCommands, autoFileMoved, tfArchModified bool
+	nodeDelete := NewDeleteNodeAWS(
+		w.CliWriter,
+		flags,
+		&MockNodeUtilsImpl{
+			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+				return nil, &SSHConfig{}, nil
+			},
+			executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+				return nil
+			},
+			writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+				// filewritten = true
+				return nil
+			},
+			getModeFromConfigFunc: func(path string) (string, error) {
+				return EXISTING_INFRA_MODE, nil
+			},
+			isManagedServicesOnFunc: func() bool {
+				return false
+			},
+			pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+			isA2HARBFileExistFunc: func() bool {
+				return true
+			},
+			taintTerraformFunc: func(path string) error {
+				return nil
+			},
+			getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+				// ipAddres = true
+				return &AWSConfigIp{
+					configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+					configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+					configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+					configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+				}, nil
+			},
+			executeShellCommandFunc: func() error {
+				// executeCommands = true
+				return nil
+			},
+			moveAWSAutoTfvarsFileFunc: func(path string) error {
+				// autoFileMoved = true
+				return nil
+			},
+			modifyTfArchFileFunc: func(path string) error {
+				// tfArchModified = true
+				return nil
+			},
+			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+				return errors.New("error on removing output header in fetched config")
+			},
+		},
+		CONFIG_TOML_PATH_AWS,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
+	err := nodeDelete.validate()
+	assert.NoError(t, err)
+	err = nodeDelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, "4", nodeDelete.(*DeleteNodeAWSImpl).config.Automate.Config.InstanceCount)
+	res, err := nodeDelete.promptUserConfirmation()
+	assert.Equal(t, true, res)
+	assert.NoError(t, err)
+	assert.Contains(t, w.Output(), `Existing nodes:
+================================================
+Automate => 192.0.0.1, 192.0.0.2, 192.0.0.3, 192.0.0.4
+Chef-Server => 192.0.1.1, 192.0.1.2, 192.0.1.3, 192.0.1.4
+OpenSearch => 192.0.2.1, 192.0.2.2, 192.0.2.3, 192.0.2.4
+Postgresql => 192.0.3.1, 192.0.3.2, 192.0.3.3, 192.0.3.4
+
+Node to be deleted:
+================================================
+Automate => 192.0.0.1
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	err = nodeDelete.runDeploy()
+	assert.Error(t, err, "error on removing output header in fetched config")
+}
+
 func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	flags := AddDeleteNodeHACmdFlags{
