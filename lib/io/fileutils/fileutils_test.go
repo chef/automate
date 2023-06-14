@@ -88,37 +88,47 @@ func TestDeleteTempFile(t *testing.T) {
 func TestMove(t *testing.T) {
 	content := "abc"
 	filename := "file-name"
-	destFileDir := "destination/"
 	destinationDir := createTempDir(t)
 	defer os.RemoveAll(destinationDir)
 
-	srcFile, err := fileutils.CreateTempFile(content, filename)
-	assert.Contains(t, srcFile, "file-name")
-	require.NoError(t, err)
-	defer fileutils.DeleteTempFile(srcFile)
-
 	t.Run("Move a file to new directory", func(t *testing.T) {
-		err = fileutils.Move(srcFile, destFileDir+filename)
-		defer fileutils.DeleteTempFile(destFileDir + filename)
+		srcFile, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
-		fileExists, err := fileutils.PathExists(destFileDir + filename)
+		defer fileutils.DeleteTempFile(srcFile)
+
+		err = fileutils.Move(srcFile, destinationDir+filename)
+		defer fileutils.DeleteTempFile(destinationDir + filename)
+		require.NoError(t, err)
+		fileExists, err := fileutils.PathExists(destinationDir + filename)
 		require.NoError(t, err)
 		assert.True(t, fileExists)
-		defer os.Remove(filename)
 	})
 
 	t.Run("Move a file to a directory and overwrite the existing file", func(t *testing.T) {
+		srcFile, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, srcFile, "file-name")
+		require.NoError(t, err)
+		defer fileutils.DeleteTempFile(srcFile)
+
 		existingFile := filepath.Join(destinationDir, "existing.txt")
-		err := fileutils.WriteFile(existingFile, []byte("Existing File"), 0644)
+		err = fileutils.WriteFile(existingFile, []byte("Existing File"), 0644)
 		require.NoError(t, err)
 		err = fileutils.Move(srcFile, existingFile)
 		require.NoError(t, err)
 	})
 
 	t.Run("Invalid destinationfile", func(t *testing.T) {
+		srcFile, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, srcFile, "file-name")
+		require.NoError(t, err)
+		defer fileutils.DeleteTempFile(srcFile)
+
 		invalidSourceFile := "/path/to/invalid/source.txt"
-		err = fileutils.Move(invalidSourceFile, destFileDir+filename)
-		require.ErrorContains(t, err, "no such file or directory", "No such file or Directory")
+		err = fileutils.Move(invalidSourceFile, destinationDir+filename)
+		linkErr, _ := err.(*os.LinkError)
+		value := linkErr.Err.Error()
+		require.Contains(t, value, "no such file or directory", "No such file or Directory")
 	})
 }
 
