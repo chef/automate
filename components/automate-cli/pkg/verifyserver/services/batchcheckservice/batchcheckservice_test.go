@@ -788,7 +788,7 @@ func TestStartMockServer(t *testing.T) {
 			"error": "error getting services from hab svc status"
 		}
 	}`, nil, false)
-	startedServers, failedServers := ss.StartMockServer([]string{constants.FIREWALL, constants.FQDN},
+	startedServers, failedServers := ss.startMockServer([]string{constants.FIREWALL, constants.FQDN},
 		models.Config{
 			Hardware: models.Hardware{
 				AutomateNodeCount:        1,

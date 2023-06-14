@@ -83,7 +83,7 @@ func (ss *BatchCheckService) stopAllMockServers(successfullyStartedMockServers [
 		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
 			if successfullyStartedMockServer.Host != "" {
 				totalReq = totalReq + 1
-				go ss.StopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port, stopMockServerChannel)
+				go ss.stopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port, stopMockServerChannel)
 			}
 		}
 		for i := 0; i < totalReq; i++ {
@@ -109,7 +109,7 @@ func (ss *BatchCheckService) startMockServerIfNeeded(remoteChecks []string, conf
 			return successfullyStartedMockServers, notStartedMockServers, err
 		}
 		if startMockServer {
-			successfullyStartedMockServers, notStartedMockServers = ss.StartMockServer(remoteChecks, config)
+			successfullyStartedMockServers, notStartedMockServers = ss.startMockServer(remoteChecks, config)
 		}
 	}
 	return successfullyStartedMockServers, notStartedMockServers, nil
@@ -155,7 +155,7 @@ func (ss *BatchCheckService) createNodeTypeMap(remoteChecks []string) map[string
 		},
 	}
 	for _, check := range remoteChecks {
-		resp := ss.GetPortsToOpenForCheck(check)
+		resp := ss.getPortsToOpenForCheck(check)
 		if len(resp) != 0 {
 			constructUniquePortMap(resp, &nodeTypePortMap)
 		}
@@ -163,7 +163,7 @@ func (ss *BatchCheckService) createNodeTypeMap(remoteChecks []string) map[string
 	return nodeTypePortMap
 }
 
-func (ss *BatchCheckService) StartMockServer(remoteChecks []string, config models.Config) ([]models.MockServerFromBatchServiceResponse, []models.MockServerFromBatchServiceResponse) {
+func (ss *BatchCheckService) startMockServer(remoteChecks []string, config models.Config) ([]models.MockServerFromBatchServiceResponse, []models.MockServerFromBatchServiceResponse) {
 	hardwareDetails := config.Hardware
 	nodeTypePortMap := ss.createNodeTypeMap(remoteChecks)
 	ipMap := map[string][]string{
@@ -323,7 +323,7 @@ func (ss *BatchCheckService) RunBastionCheck(check string, config models.Config,
 	resultChan <- resp
 }
 
-func (ss *BatchCheckService) GetPortsToOpenForCheck(check string) map[string]map[string][]int {
+func (ss *BatchCheckService) getPortsToOpenForCheck(check string) map[string]map[string][]int {
 	return ss.getCheckInstance(check).GetPortsForMockServer()
 }
 
@@ -387,7 +387,7 @@ func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, sta
 	respChan <- chanResponse
 }
 
-func (ss *BatchCheckService) StopMockServerOnHostAndPort(host, protocol string, port int, stopMockServerChannel chan models.MockServerFromBatchServiceResponse) {
+func (ss *BatchCheckService) stopMockServerOnHostAndPort(host, protocol string, port int, stopMockServerChannel chan models.MockServerFromBatchServiceResponse) {
 	stopMockServerRequestBody := models.StopMockServerRequestBody{
 		Port:     port,
 		Protocol: protocol,
