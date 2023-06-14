@@ -23,7 +23,7 @@ type IBatchCheckService interface {
 }
 
 type BatchCheckService struct {
-	CheckTrigger      trigger.CheckTrigger
+	checkTrigger      trigger.CheckTrigger
 	port              string
 	log               logger.Logger
 	httpRequestClient httputils.IHttpRequestClient
@@ -32,7 +32,7 @@ type BatchCheckService struct {
 
 func NewBatchCheckService(trigger trigger.CheckTrigger, log logger.Logger, port string) *BatchCheckService {
 	return &BatchCheckService{
-		CheckTrigger:      trigger,
+		checkTrigger:      trigger,
 		port:              port,
 		log:               log,
 		httpRequestClient: httputils.NewHttpRequestClient(),
@@ -429,31 +429,31 @@ func (ss *BatchCheckService) RunRemoteCheck(check string, config models.Config) 
 func (ss *BatchCheckService) getCheckInstance(check string) trigger.ICheck {
 	switch check {
 	case constants.HARDWARE_RESOURCE_COUNT:
-		return ss.CheckTrigger.HardwareResourceCountCheck
+		return ss.checkTrigger.HardwareResourceCountCheck
 	case constants.CERTIFICATE:
-		return ss.CheckTrigger.CertificateCheck
+		return ss.checkTrigger.CertificateCheck
 	case constants.SSH_USER:
-		return ss.CheckTrigger.SshUserAccessCheck
+		return ss.checkTrigger.SshUserAccessCheck
 	case constants.SYSTEM_RESOURCES:
-		return ss.CheckTrigger.SystemResourceCheck
+		return ss.checkTrigger.SystemResourceCheck
 	case constants.SOFTWARE_VERSIONS:
-		return ss.CheckTrigger.SoftwareVersionCheck
+		return ss.checkTrigger.SoftwareVersionCheck
 	case constants.SYSTEM_USER:
-		return ss.CheckTrigger.SystemUserCheck
+		return ss.checkTrigger.SystemUserCheck
 	case constants.S3_BACKUP_CONFIG:
-		return ss.CheckTrigger.S3BackupConfigCheck
+		return ss.checkTrigger.S3BackupConfigCheck
 	case constants.FQDN:
-		return ss.CheckTrigger.FqdnCheck
+		return ss.checkTrigger.FqdnCheck
 	case constants.FIREWALL:
-		return ss.CheckTrigger.FirewallCheck
+		return ss.checkTrigger.FirewallCheck
 	case constants.EXTERNAL_OPENSEARCH:
-		return ss.CheckTrigger.ExternalOpensearchCheck
+		return ss.checkTrigger.ExternalOpensearchCheck
 	case constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS:
-		return ss.CheckTrigger.OpensearchS3BucketAccessCheck
+		return ss.checkTrigger.OpensearchS3BucketAccessCheck
 	case constants.EXTERNAL_POSTGRESQL:
-		return ss.CheckTrigger.ExternalPostgresCheck
+		return ss.checkTrigger.ExternalPostgresCheck
 	case constants.NFS_BACKUP_CONFIG:
-		return ss.CheckTrigger.NfsBackupConfigCheck
+		return ss.checkTrigger.NfsBackupConfigCheck
 	default:
 		return nil
 	}
