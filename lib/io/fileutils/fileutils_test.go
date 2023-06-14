@@ -1,6 +1,7 @@
 package fileutils_test
 
 import (
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -121,5 +122,66 @@ func TestMove(t *testing.T) {
 		require.NoError(t, err)
 		assert.True(t, fileExists)
 		defer os.Remove(destFileDir)
+	})
+}
+
+func TestRemoveFirstLine(t *testing.T) {
+	content := "HeaderToBeRemoved\nabc"
+	filename := "file-name"
+
+	t.Run("Remove first line", func(t *testing.T) {
+		res, err := fileutils.CreateTempFile(content, filename)
+		assert.Contains(t, res, "file-name")
+		require.NoError(t, err)
+		err = fileutils.RemoveFirstLine(res)
+		require.NoError(t, err)
+		fileContent, err := fileutils.ReadFile(res)
+		require.NoError(t, err)
+		assert.EqualValues(t, string(fileContent), "abc\n")
+	})
+
+	t.Run("Open file error", func(t *testing.T) {
+		err := fileutils.RemoveFirstLine(filename)
+		require.Error(t, err.(*fs.PathError), "No such file or directory")
+	})
+}
+
+func TestCreateTomlFileFromConfig(t *testing.T) {
+	tomlFilePath := "file-name"
+
+	user := struct {
+		Name string
+		Age  int
+	}{
+		Name: "John Doe",
+		Age:  30,
+	}
+
+	expectedContent := `Name = "John Doe"
+Age = 30
+`
+	defer os.Remove(tomlFilePath)
+
+	t.Run("Create toml file", func(t *testing.T) {
+		tomlFile, err := fileutils.CreateTomlFileFromConfig(user, tomlFilePath)
+		require.NoError(t, err)
+		fileByte, err := fileutils.ReadFile(tomlFile)
+		require.NoError(t, err)
+		assert.Contains(t, string(fileByte), expectedContent)
+		// err = fileutils.DeleteTempFile(tomlFile)
+		require.NoError(t, err)
+	})
+
+	invalidFile := "/path/to/invalid/file.toml"
+
+	t.Run("Open file error", func(t *testing.T) {
+		_, err := fileutils.CreateTomlFileFromConfig(user, invalidFile)
+		require.Error(t, err.(*fs.PathError), "No such file or directory")
+	})
+
+	t.Run("Error encoding the config", func(t *testing.T) {
+		var invalidConfig int
+		_, err := fileutils.CreateTomlFileFromConfig(invalidConfig, tomlFilePath)
+		require.Error(t, err, "Failed to encode")
 	})
 }
