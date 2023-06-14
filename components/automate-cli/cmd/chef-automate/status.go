@@ -76,39 +76,39 @@ func newStatusCmd() *cobra.Command {
 		},
 	}
 
-	statusCmd.PersistentFlags().BoolVarP(
+	statusCmd.Flags().BoolVarP(
 		&statusCmdFlag.waitForHealthy, "wait-for-healthy", "w", false,
 		"Wait until the status response is healthy or the timeout is reached",
 	)
 
-	statusCmd.PersistentFlags().Int64VarP(
+	statusCmd.Flags().Int64VarP(
 		&statusCmdFlag.waitTimeout, "wait-timeout", "t", 600,
 		"How many seconds to wait for the status to be healthy before returning an error",
 	)
 
-	statusCmd.PersistentFlags().Int64VarP(
+	statusCmd.Flags().Int64VarP(
 		&statusCmdFlag.waitRefreshInterval, "wait-refresh-interval", "r", 2,
 		"How many seconds to wait between polling for status updates",
 	)
 
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.automate, "automate", false, "Shows status from Automate node(HA)")
-	statusCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.chefServer, "chef_server", false, "Shows status from Chef-server node(HA)")
-	statusCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.postgresql, "postgresql", false, "Shows status from PostgresQL node")
-	statusCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.opensearch, "opensearch", false, "Shows status from OpenSearch node")
-	statusCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.automate, "a2", false, "Shows status from Automate node(HA)[DUPLICATE]")
-	statusCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.chefServer, "cs", false, "Shows status from Chef-server node(HA)[DUPLICATE]")
-	statusCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.postgresql, "pg", false, "Shows status from PostgresQL node[DUPLICATE]")
-	statusCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.opensearch, "os", false, "Shows status from OpenSearch node[DUPLICATE]")
-	statusCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.PersistentFlags().StringVar(&statusCmdFlag.node, "node", "", "Pass this flag to check status of perticular node in the cluster")
-	statusCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.automate, "automate", false, "Shows status from Automate node(HA)")
+	statusCmd.Flags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.chefServer, "chef_server", false, "Shows status from Chef-server node(HA)")
+	statusCmd.Flags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.postgresql, "postgresql", false, "Shows status from PostgresQL node")
+	statusCmd.Flags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.opensearch, "opensearch", false, "Shows status from OpenSearch node")
+	statusCmd.Flags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.automate, "a2", false, "Shows status from Automate node(HA)[DUPLICATE]")
+	statusCmd.Flags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.chefServer, "cs", false, "Shows status from Chef-server node(HA)[DUPLICATE]")
+	statusCmd.Flags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.postgresql, "pg", false, "Shows status from PostgresQL node[DUPLICATE]")
+	statusCmd.Flags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().BoolVar(&statusCmdFlag.opensearch, "os", false, "Shows status from OpenSearch node[DUPLICATE]")
+	statusCmd.Flags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
+	statusCmd.Flags().StringVar(&statusCmdFlag.node, "node", "", "Pass this flag to check status of perticular node in the cluster")
+	statusCmd.Flags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	statusCmd.AddCommand(newStatusSummaryCmd())
 	return statusCmd
