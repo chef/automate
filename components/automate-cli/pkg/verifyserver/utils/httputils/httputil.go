@@ -21,8 +21,7 @@ type IHttpRequestClient interface {
 }
 
 func (ht *HttpRequestClient) MakeRequest(requestMethod string, url string, body interface{}) (*http.Response, error) {
-	resp, err := MakeRequest(requestMethod, url, body)
-	return resp, err
+	return MakeRequest(requestMethod, url, body)
 }
 
 // Post - This function performs HTTP Post request to the given endpoint with the provided request body
