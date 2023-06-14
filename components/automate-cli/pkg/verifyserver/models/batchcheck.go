@@ -54,7 +54,7 @@ type Backup struct {
 }
 
 type Certificate struct {
-	Fqdn         string     `json:"automate_fqdn"`
+	Fqdn         string     `json:"fqdn"`
 	FqdnRootCert string     `json:"fqdn_root_ca"`
 	NodeType     string     `json:"node_type"`
 	Nodes        []NodeCert `json:"nodes"`
