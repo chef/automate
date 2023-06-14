@@ -3,7 +3,6 @@ package opensearchbackupservice
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -214,8 +213,7 @@ func TestCreateIndex(t *testing.T) {
 
 	resp, err := os.CreateTestIndex(client, &fiber.Ctx{}, "abc")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestCreateSnapShotRepo(t *testing.T) {
@@ -245,8 +243,7 @@ func TestCreateSnapShotRepo(t *testing.T) {
 
 	resp, err := os.CreateSnapshotRepo(client, &fiber.Ctx{}, s3Request, "abc")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestDeleteSnapShot(t *testing.T) {
@@ -269,8 +266,7 @@ func TestDeleteSnapShot(t *testing.T) {
 
 	resp, err := os.DeleteTestSnapshot(client, &fiber.Ctx{}, "repo", "snapshot")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestDeleteSnapShotRepo(t *testing.T) {
@@ -293,8 +289,7 @@ func TestDeleteSnapShotRepo(t *testing.T) {
 
 	resp, err := os.DeleteTestSnapshotRepo(client, &fiber.Ctx{}, "repo")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestDeleteIndex(t *testing.T) {
@@ -317,8 +312,7 @@ func TestDeleteIndex(t *testing.T) {
 
 	resp, err := os.DeleteTestIndex(client, &fiber.Ctx{}, "index")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, false)
 }
 
 func TestCreateSnapShot(t *testing.T) {
@@ -344,8 +338,7 @@ func TestCreateSnapShot(t *testing.T) {
 
 	resp, err := os.CreateSnapshot(client, &fiber.Ctx{}, "repo", "snapshot", "index")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, true)
 }
 
 func TestGetSnapshotStatus(t *testing.T) {
@@ -378,6 +371,5 @@ func TestGetSnapshotStatus(t *testing.T) {
 
 	resp, err := os.GetSnapshotStatus(client, &fiber.Ctx{}, "repo", "snapshot")
 	assert.NoError(t, err)
-
-	fmt.Println(resp)
+	assert.Equal(t, resp, "SUCCESS")
 }
