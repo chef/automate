@@ -22,7 +22,7 @@ func TestBuildFrontEndStatusCmd(t *testing.T) {
 				waitRefreshInterval: 2,
 				waitTimeout:         600,
 			},
-			expectedCommand: "sudo chef-automate status -r 2 -t 600",
+			expectedCommand: "sudo chef-automate status -r 2",
 		},
 		{
 			flags: &statusCmdFlags{
@@ -30,7 +30,7 @@ func TestBuildFrontEndStatusCmd(t *testing.T) {
 				waitTimeout:         600,
 				waitForHealthy:      true,
 			},
-			expectedCommand: "sudo chef-automate status -w -r 2 -t 600",
+			expectedCommand: "sudo chef-automate status -w -t 600 -r 2",
 		},
 	}
 
@@ -102,7 +102,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 			nodeMapExpected: &NodeTypeAndCmd{
 				Frontend: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo chef-automate status -r 10 -t 600",
+						Cmd:                      "sudo chef-automate status -r 10",
 						WaitTimeout:              600,
 						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
@@ -110,7 +110,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 				},
 				Automate: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo chef-automate status -r 10 -t 600",
+						Cmd:                      "sudo chef-automate status -r 10",
 						WaitTimeout:              600,
 						ErrorCheckEnableInOutput: true,
 						NodeIps:                  []string{""},
@@ -121,7 +121,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 				},
 				ChefServer: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo chef-automate status -r 10 -t 600",
+						Cmd:                      "sudo chef-automate status -r 10",
 						WaitTimeout:              600,
 						ErrorCheckEnableInOutput: true,
 						NodeIps:                  []string{""},

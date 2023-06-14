@@ -533,10 +533,10 @@ func buildFrontEndStatusCmd(flags *statusCmdFlags) string {
 
 	if flags.waitForHealthy {
 		command += " -w"
+		command += " -t" + " " + fmt.Sprintf("%v", flags.waitTimeout)
 	}
 
 	command += " -r" + " " + fmt.Sprintf("%v", flags.waitRefreshInterval)
-	command += " -t" + " " + fmt.Sprintf("%v", flags.waitTimeout)
 
 	return command
 }
