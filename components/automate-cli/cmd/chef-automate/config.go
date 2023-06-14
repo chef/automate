@@ -476,7 +476,7 @@ func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Au
 		return err
 	}
 
-	inputs.InputFiles = []string{srcPath}
+	inputs.InputFiles[0] = srcPath
 
 	return nil
 }
@@ -521,7 +521,7 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 			return err
 		}
 
-		inputs.InputFiles = []string{tomlFilePath}
+		inputs.InputFiles[0] = tomlFilePath
 	} else {
 		return errors.New("No changes in existing config on postgresql and provided config")
 	}
@@ -568,7 +568,7 @@ func prePatchCheckForOpensearch(inputs *CmdInputs, sshUtil SSHUtil, infra *Autom
 			return err
 		}
 
-		inputs.InputFiles = []string{tomlFilePath}
+		inputs.InputFiles[0] = tomlFilePath
 	} else {
 		return errors.New("No changes in existing config on opensearch and provided config")
 	}
