@@ -582,6 +582,9 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 					return "", nil
 				},
+				copyFileToRemoteFunc: func(srcFilePath string, destFileName string, removeFile bool) error {
+					return nil
+				},
 			}
 		},
 	}, command.NewMockExecutor(t), MockWriter.CliWriter)
