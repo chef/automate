@@ -73,7 +73,10 @@ func main() {
 		// it and use the values. Go's default values make this tricky so we'll
 		// have to assume that if you provided a config file then what's in it
 		// is the preferred source of configuration.
+
+		logrus.Info("Got the fillllee --------*******************", opts.Client)
 		if opts.CfgFile != "" {
+			logrus.Info("Got the fillllee --------*******************", opts.CfgFile)
 			viper.SetConfigFile(opts.CfgFile)
 
 			log := logrus.WithField("file", opts.CfgFile)
@@ -89,6 +92,7 @@ func main() {
 				log.WithError(err).Error("Failed to merge configuration from from")
 			}
 		} else {
+			logrus.Info("Inside the config foler ---***************************")
 			config, err := platform_config.ConfigFromEnvironment()
 			if err != nil {
 				if err == platform_config.ErrNoPlatformEnvironment {
@@ -96,9 +100,12 @@ func main() {
 				}
 				logrus.WithError(err).Fatal("Failed to load platform configuration")
 			}
+
+			logrus.Info("Inside the config foler ---***************************", config)
 			opts.Client.Host = config.GetPgSidecar().GetIp()
 			opts.Client.Port = int(config.GetPgSidecar().GetCfg().GetPort())
 			opts.Client.User, err = config.PGServiceUser()
+			logrus.Info("Inside the config user ---***************************", opts.Client.User)
 			if err != nil {
 				logrus.WithError(err).Fatal("Failed to load the pg user from the platform configuration")
 			}
