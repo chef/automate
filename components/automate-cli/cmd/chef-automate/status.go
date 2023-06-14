@@ -85,7 +85,7 @@ func newStatusCmd() *cobra.Command {
 		&statusCmdFlag.waitTimeout, "wait-timeout", "t", 600,
 		"How many seconds to wait for the status to be healthy before returning an error",
 	)
-	
+
 	statusCmd.PersistentFlags().Int64VarP(
 		&statusCmdFlag.waitRefreshInterval, "wait-refresh-interval", "r", 2,
 		"How many seconds to wait between polling for status updates",
@@ -506,7 +506,7 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.postgresql,
-				WaitTimeout:              600,
+				WaitTimeout:              int(flags.waitTimeout),
 				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
@@ -517,7 +517,7 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.opensearch,
-				WaitTimeout:              600,
+				WaitTimeout:              int(flags.waitTimeout),
 				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
