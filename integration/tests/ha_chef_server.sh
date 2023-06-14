@@ -9,6 +9,23 @@ source integration/services/common.sh
 _frontend1_container_name="$(service_container_name "cs1")"
 _frontend2_container_name="$(service_container_name "cs2")"
 
+
+# TODO - REMOVE LATER
+do_dump_logs() {
+  do_dump_logs_default
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend1_container_name"
+
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/_frontend2_container_name"
+
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "logs/*"
+        then
+            echo "Failed to frontend conatiner logs"
+        fi
+    fi
+    rm -r "$tmpdir"
+}
+
 do_setup() {
     do_setup_default
 
