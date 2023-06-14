@@ -191,19 +191,23 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 // Save all config from each services to Bastion server and move it to WORKSPACE dir
-func (ani *AddNodeOnPremImpl) saveConfigToBastion() error {
+func (ani *AddNodeOnPremImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
 }
 
 // Sync saved config from bastion to ALL nodes
-func (ani *AddNodeOnPremImpl) syncConfigToAllNodes() error {
+func (ani *AddNodeOnPremImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
+	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	err := ani.saveConfigToBastion()
+	infra, _, err := ani.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	err = ani.saveConfigToBastion(infra)
 	if err != nil {
 		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
@@ -217,7 +221,7 @@ func (ani *AddNodeOnPremImpl) runDeploy() error {
 		err = errors.Wrap(err, "error while deploying architecture")
 	}
 
-	syncErr := ani.syncConfigToAllNodes()
+	syncErr := ani.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}

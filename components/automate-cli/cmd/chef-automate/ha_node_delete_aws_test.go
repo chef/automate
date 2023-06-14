@@ -512,7 +512,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 				return nil
 			},
 		},
@@ -625,7 +625,7 @@ func TestDeleteAWSNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 				// tfArchModified = true
 				return nil
 			},
-			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 				return errors.New("error on removing output header in fetched config")
 			},
 		},
@@ -721,7 +721,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			calculateTotalInstanceCountFunc: func() (int, error) {
 				return 0, nil
 			},
-			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 				return nil
 			},
 		},
@@ -797,7 +797,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 			return nil
 		},
 	}

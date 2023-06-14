@@ -131,18 +131,22 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (ani *AddNodeAWSImpl) saveConfigToBastion() error {
+func (ani *AddNodeAWSImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
 }
 
-func (ani *AddNodeAWSImpl) syncConfigToAllNodes() error {
+func (ani *AddNodeAWSImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
+	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {
-	err := ani.saveConfigToBastion()
+	infra, _, err := ani.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	err = ani.saveConfigToBastion(infra)
 	if err != nil {
 		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
@@ -169,7 +173,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		err = errors.Wrap(err, "error while deploying architecture")
 	}
-	syncErr := ani.syncConfigToAllNodes()
+	syncErr := ani.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}

@@ -189,18 +189,22 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return dna.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dna *DeleteNodeAWSImpl) saveConfigToBastion() error {
+func (dna *DeleteNodeAWSImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return dna.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return dna.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
 }
 
-func (dna *DeleteNodeAWSImpl) syncConfigToAllNodes() error {
+func (dna *DeleteNodeAWSImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return dna.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
+	return dna.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
 }
 
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
-	err := dna.saveConfigToBastion()
+	infra, _, err := dna.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	err = dna.saveConfigToBastion(infra)
 	if err != nil {
 		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
@@ -233,7 +237,7 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return errors.Wrap(err, "error while deploying architecture")
 	}
-	syncErr := dna.syncConfigToAllNodes()
+	syncErr := dna.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}

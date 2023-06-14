@@ -394,7 +394,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
@@ -449,7 +449,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
@@ -526,7 +526,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -585,7 +585,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

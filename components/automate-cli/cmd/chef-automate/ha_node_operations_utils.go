@@ -67,7 +67,7 @@ type MockNodeUtilsImpl struct {
 	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCountFunc           func() (int, error)
-	executeCmdInAllNodeAndCaptureOutputFunc   func([]*NodeObject, bool, string) error
+	executeCmdInAllNodeAndCaptureOutputFunc   func([]*NodeObject, bool, string, *AutomateHAInfraDetails) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -138,8 +138,8 @@ func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, in
 func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
-func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
-	return mnu.executeCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
+func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+	return mnu.executeCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory, infra)
 }
 
 type NodeOpUtils interface {
@@ -164,7 +164,7 @@ type NodeOpUtils interface {
 	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
+	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error
 	calculateTotalInstanceCount() (int, error)
 }
 
@@ -343,8 +343,7 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 	return infra, sshconfig, nil
 }
 
-func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
-	infra, _, _ := nu.getHaInfraDetails()
+func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
 	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
 }
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {

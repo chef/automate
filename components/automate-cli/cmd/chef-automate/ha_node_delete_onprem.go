@@ -233,18 +233,22 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return dni.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dni *DeleteNodeOnPremImpl) saveConfigToBastion() error {
+func (dni *DeleteNodeOnPremImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return dni.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return dni.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
 }
 
-func (dni *DeleteNodeOnPremImpl) syncConfigToAllNodes() error {
+func (dni *DeleteNodeOnPremImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return dni.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
+	return dni.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
 }
 
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {
-	err := dni.saveConfigToBastion()
+	infra, _, err := dni.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	err = dni.saveConfigToBastion(infra)
 	if err != nil {
 		return errors.Wrap(err, "error saving node configuration to bastion")
 	}
@@ -259,7 +263,7 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 		err = errors.Wrap(err, "error while deploying architecture")
 	}
 
-	syncErr := dni.syncConfigToAllNodes()
+	syncErr := dni.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
 	}
