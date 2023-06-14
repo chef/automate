@@ -9,13 +9,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
 
 func getModeFromConfig(configPath string) (string, error) {
-	initConfigHAPath := initConfigHAPathFlags.path
+	initConfigHAPath := pgc.InitConfigHAPathFlags.Path
 	if len(configPath) > 0 {
 		initConfigHAPath = configPath
 	}
@@ -32,7 +33,7 @@ func getModeFromConfig(configPath string) (string, error) {
 		} else {
 			return strings.ToUpper(AUTOMATE), nil
 		}
-	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
+	} else if checkIfFileExist(filepath.Join(pgc.InitConfigHabA2HAPathFlag.A2haDirPath, "a2ha.rb")) {
 		return HA_MODE, nil
 	} else {
 		return strings.ToUpper(AUTOMATE), nil
@@ -47,12 +48,12 @@ func checkIPAddress(ip string) error {
 	}
 }
 
-func getExistingInfraConfig(configPath string) (*ExistingInfraConfigToml, error) {
+func getExistingInfraConfig(configPath string) (*pgc.ExistingInfraConfigToml, error) {
 	templateBytes, err := ioutil.ReadFile(configPath) // nosemgrep
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
-	config := ExistingInfraConfigToml{}
+	config := pgc.ExistingInfraConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
@@ -60,12 +61,12 @@ func getExistingInfraConfig(configPath string) (*ExistingInfraConfigToml, error)
 	return &config, nil
 }
 
-func getAwsConfig(configPath string) (*AwsConfigToml, error) {
+func getAwsConfig(configPath string) (*pgc.AwsConfigToml, error) {
 	templateBytes, err := ioutil.ReadFile(configPath) // nosemgrep
 	if err != nil {
 		return nil, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
-	config := AwsConfigToml{}
+	config := pgc.AwsConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
@@ -74,7 +75,7 @@ func getAwsConfig(configPath string) (*AwsConfigToml, error) {
 }
 
 func checkSharedConfigFile() bool {
-	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml")) {
+	if checkIfFileExist(filepath.Join(pgc.InitConfigHabA2HAPathFlag.A2haDirPath, "config.toml")) {
 		return true
 	}
 	return false

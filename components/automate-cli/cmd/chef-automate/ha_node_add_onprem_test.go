@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
@@ -123,7 +124,7 @@ func TestAddnodeReadfileError(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			return nil, errors.New("random")
 		},
 		isManagedServicesOnFunc: func() bool {
@@ -154,7 +155,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
@@ -187,7 +188,7 @@ func TestAddnodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
@@ -509,15 +510,15 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
 			}
-			cfg.Automate.Config.CertsByIP = []CertByIP{}
-			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
-			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
-			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
+			cfg.Automate.Config.CertsByIP = []pgc.CertByIP{}
+			cfg.ChefServer.Config.CertsByIP = []pgc.CertByIP{}
+			cfg.Postgresql.Config.CertsByIP = []pgc.CertByIP{}
+			cfg.Opensearch.Config.CertsByIP = []pgc.CertByIP{}
 			return &cfg, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

@@ -12,6 +12,7 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -453,7 +454,7 @@ func runChefServerChecks(u *a1upgrade.A1Upgrade) error {
 	return nil
 }
 
-func populateInfraDetails(config ExistingInfraConfigToml) *AutomateHAInfraDetails {
+func populateInfraDetails(config pgc.ExistingInfraConfigToml) *AutomateHAInfraDetails {
 
 	var infra AutomateHAInfraDetails
 	infra.Outputs.SSHKeyFile = InfraKeyValue{

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -15,7 +16,7 @@ import (
 )
 
 type DeleteNodeAWSImpl struct {
-	config        AwsConfigToml
+	config        pgc.AwsConfigToml
 	ipToDelete    string
 	nodeType      string
 	nodeUtils     NodeOpUtils
@@ -49,7 +50,7 @@ var (
 
 func NewDeleteNodeAWS(writer *cli.Writer, flags AddDeleteNodeHACmdFlags, nodeUtils NodeOpUtils, haDirPath string, fileutils fileutils.FileUtils, sshUtil SSHUtil) HAModifyAndDeploy {
 	return &DeleteNodeAWSImpl{
-		config:        AwsConfigToml{},
+		config:        pgc.AwsConfigToml{},
 		nodeUtils:     nodeUtils,
 		flags:         flags,
 		configpath:    filepath.Join(haDirPath, "config.toml"),

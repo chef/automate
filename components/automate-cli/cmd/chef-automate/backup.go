@@ -20,6 +20,7 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -1236,7 +1237,7 @@ func (ins *BackupFromBashtionImp) executeOnRemoteAndPoolStatus(commandString str
 	sshUtil.getSSHConfig().hostIP = automateIps[0]
 
 	// If managed service and filesystem backup, info: "we don't have support for this configurations"
-	config, err := getExistingHAConfig()
+	config, err := pgc.GetExistingHAConfig()
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}

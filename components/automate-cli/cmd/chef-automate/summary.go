@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/jedib0t/go-pretty/v5/table"
@@ -287,7 +288,10 @@ func (ss *Summary) getIpAddressesFromInfra(errorList *list.List) ([]string, []st
 }
 
 func (ss *Summary) prepareBEScript(serviceIps []string, nodeMap *NodeTypeAndCmd, serviceName, serviceType string) error {
-	getConfigJsonString := convTfvarToJson(a2haHabitatAutoTfvars)
+	getConfigJsonString, err := pgc.ConvTfvarToJson(a2haHabitatAutoTfvars)
+	if err != nil {
+		return err
+	}
 	authToken, err := ss.readA2haHabitatAutoTfvarsAuthToken(getConfigJsonString)
 	if err != nil {
 		return err

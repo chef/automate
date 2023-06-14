@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/local-user-service/password"
@@ -17,7 +18,7 @@ import (
 )
 
 type awsDeployment struct {
-	config     AwsConfigToml
+	config     pgc.AwsConfigToml
 	configPath string
 }
 
@@ -33,11 +34,11 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 		if err != nil {
 			return err
 		}
-		sharedConfigToml, err := getAwsHAConfig()
+		sharedConfigToml, err := pgc.GetAwsHAConfig()
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 		}
-		archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
+		archBytes, err := ioutil.ReadFile(filepath.Join(pgc.InitConfigHabA2HAPathFlag.A2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 		if err != nil {
 			writer.Errorf("%s", err.Error())
 			return err
@@ -48,7 +49,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 		}
-		err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
+		err = ioutil.WriteFile(filepath.Join(pgc.InitConfigHabA2HAPathFlag.A2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 		}
@@ -82,7 +83,7 @@ func (a *awsDeployment) generateConfig() error {
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
-	a.config = AwsConfigToml{}
+	a.config = pgc.AwsConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &a.config)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")

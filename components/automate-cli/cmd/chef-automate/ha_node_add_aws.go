@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -12,8 +13,8 @@ import (
 )
 
 type AddNodeAWSImpl struct {
-	config                  AwsConfigToml
-	copyConfigForUserPrompt AwsConfigToml
+	config                  pgc.AwsConfigToml
+	copyConfigForUserPrompt pgc.AwsConfigToml
 	automateIpList          []string
 	chefServerIpList        []string
 	opensearchIpList        []string

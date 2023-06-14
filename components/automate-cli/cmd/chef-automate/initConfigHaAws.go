@@ -4,11 +4,12 @@ import (
 	"io/ioutil"
 	"os"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
 func runInitConfigAwsHACmd() error {
-	initConfigHAPath := initConfigHAPathFlags.path
+	initConfigHAPath := pgc.InitConfigHAPathFlags.Path
 	if _, err := os.Stat(initConfigHAPath); err == nil {
 		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigHAPath)
 		return nil

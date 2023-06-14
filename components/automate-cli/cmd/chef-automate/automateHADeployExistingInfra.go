@@ -7,13 +7,14 @@ import (
 	"io/ioutil"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/stringutils"
 	ptoml "github.com/pelletier/go-toml"
 )
 
 type existingInfra struct {
-	config     ExistingInfraConfigToml
+	config     pgc.ExistingInfraConfigToml
 	configPath string
 }
 
@@ -50,7 +51,7 @@ func (e *existingInfra) generateConfig() error {
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
-	e.config = ExistingInfraConfigToml{}
+	e.config = pgc.ExistingInfraConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &e.config)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
@@ -243,7 +244,7 @@ func (e *existingInfra) validateExternalDbFields() *list.List {
 	return errorList
 }
 
-func extractIPsFromCertsByIP(certsByIp []CertByIP) []string {
+func extractIPsFromCertsByIP(certsByIp []pgc.CertByIP) []string {
 	ips := []string{}
 	for _, el := range certsByIp {
 		ips = append(ips, el.IP)

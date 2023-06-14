@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -48,12 +49,12 @@ type MockNodeUtilsImpl struct {
 	isA2HARBFileExistFunc                     func() bool
 	getModeFromConfigFunc                     func(path string) (string, error)
 	checkIfFileExistFunc                      func(path string) bool
-	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAwsFunc                func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error)
+	pullAndUpdateConfigAwsFunc                func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.AwsConfigToml, error)
 	isManagedServicesOnFunc                   func() bool
-	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getConfigPullerFunc                       func(sshUtil *SSHUtil) (pgc.PullConfigs, error)
+	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*pgc.ExistingInfraConfigToml, error)
+	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*pgc.AwsConfigToml, error)
 	getModeOfDeploymentFunc                   func() string
 	executeShellCommandFunc                   func() error
 	moveAWSAutoTfvarsFileFunc                 func(path string) error
@@ -90,19 +91,19 @@ func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
 func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
 	return mnu.checkIfFileExistFunc(path)
 }
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
 }
 func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
 	return mnu.isManagedServicesOnFunc()
 }
-func (mnu *MockNodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
+func (mnu *MockNodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (pgc.PullConfigs, error) {
 	return mnu.getConfigPullerFunc(sshUtil)
 }
-func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*pgc.ExistingInfraConfigToml, error) {
 	return mnu.getInfraConfigFunc(sshUtil)
 }
-func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*pgc.AwsConfigToml, error) {
 	return mnu.getAWSConfigFunc(sshUtil)
 }
 func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
@@ -118,7 +119,7 @@ func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
 func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
 	return mnu.modifyTfArchFileFunc(path)
 }
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*pgc.AwsConfigToml, error) {
 	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
 }
 func (mnu *MockNodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
@@ -142,12 +143,12 @@ type NodeOpUtils interface {
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
 	checkIfFileExist(path string) bool
-	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error)
+	pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*pgc.AwsConfigToml, error)
 	isManagedServicesOn() bool
-	getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getConfigPuller(sshUtil *SSHUtil) (pgc.PullConfigs, error)
+	getInfraConfig(sshUtil *SSHUtil) (*pgc.ExistingInfraConfigToml, error)
+	getAWSConfig(sshUtil *SSHUtil) (*pgc.AwsConfigToml, error)
 	getModeOfDeployment() string
 	executeShellCommand(command string, path string) error
 	moveAWSAutoTfvarsFile(string) error
@@ -186,53 +187,53 @@ func (nu *NodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
 	}, nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
 		return nil, err
 	}
 	if len(exceptionIps) > 0 {
-		configPuller.setExceptionIps(exceptionIps)
+		configPuller.SetExceptionIps(exceptionIps)
 	}
-	return configPuller.generateInfraConfig()
+	return configPuller.GenerateInfraConfig()
 }
 
-func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+func (nu *NodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*pgc.ExistingInfraConfigToml, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
 		return nil, err
 	}
-	return configPuller.fetchInfraConfig()
+	return configPuller.FetchInfraConfig()
 }
 
-func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*pgc.AwsConfigToml, error) {
 	configPuller, err := nu.getConfigPuller(sshUtil)
 	if err != nil {
 		return nil, err
 	}
-	return configPuller.fetchAwsConfig()
+	return configPuller.FetchAwsConfig()
 }
 
-func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
+func (nu *NodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (pgc.PullConfigs, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
 		return nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
-	return NewPullConfigs(infra, *sshUtil), nil
+	return pgc.NewPullConfigs(infra, *sshUtil), nil
 }
 
-func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
+func (nu *NodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*pgc.AwsConfigToml, error) {
 	infra, cfg, err := nu.getHaInfraDetails()
 	if err != nil {
 		return nil, err
 	}
 	(*sshUtil).setSSHConfig(cfg)
-	configPuller := NewPullConfigs(infra, *sshUtil)
+	configPuller := pgc.NewPullConfigs(infra, *sshUtil)
 	if len(exceptionIps) > 0 {
-		configPuller.setExceptionIps(exceptionIps)
+		configPuller.SetExceptionIps(exceptionIps)
 	}
-	return configPuller.generateAwsConfig()
+	return configPuller.GenerateAwsConfig()
 }
 
 func (nu *NodeUtilsImpl) checkIfFileExist(path string) bool {
@@ -248,7 +249,7 @@ func (nu *NodeUtilsImpl) isA2HARBFileExist() bool {
 }
 
 func (nu *NodeUtilsImpl) taintTerraform(path string) error {
-	modeOfDeployment := getModeOfDeployment()
+	modeOfDeployment := pgc.GetModeOfDeployment()
 	if modeOfDeployment == AWS_MODE {
 		if err := executeShellCommand("/bin/bash", []string{"-c", REMOVE_TERRAFORM_STATE}, filepath.Join(path, "destroy", "aws")); err != nil {
 			return err
@@ -340,7 +341,7 @@ func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 
 // GetModeOfDeployment returns the mode of deployment ie. EXISTING_INFRA_MODE or AWS_MODE using terraform.tf_arch file
 func (nu *NodeUtilsImpl) getModeOfDeployment() string {
-	return getModeOfDeployment()
+	return pgc.GetModeOfDeployment()
 }
 func (nu *NodeUtilsImpl) executeShellCommand(command, path string) error {
 	return executeShellCommand("/bin/sh", []string{
@@ -524,7 +525,7 @@ func trimSliceSpace(slc []string) []string {
 	return slc
 }
 
-func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]pgc.CertByIP) error {
 	if len(newIps) == 0 {
 		return nil
 	}
@@ -536,7 +537,7 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 	}
 	if len(*certsIp) > 0 {
 		for _, ip := range newIps {
-			c := CertByIP{
+			c := pgc.CertByIP{
 				IP:         ip,
 				PrivateKey: (*certsIp)[len(*certsIp)-1].PrivateKey,
 				PublicKey:  (*certsIp)[len(*certsIp)-1].PublicKey,
@@ -548,7 +549,7 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 	return nil
 }
 
-func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForDeleteNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]pgc.CertByIP) error {
 	if len(newIps) == 0 {
 		return nil
 	}
@@ -592,7 +593,7 @@ func difference(a, b []string) []string {
 	return diff
 }
 
-func findAndDelete(s []CertByIP, item string) []CertByIP {
+func findAndDelete(s []pgc.CertByIP, item string) []pgc.CertByIP {
 	index := 0
 	for _, i := range s {
 		if i.IP != item {
@@ -657,15 +658,15 @@ func checkIfPresentInPrivateIPList(existingIPArray []string, ips []string, error
 	return errorList
 }
 
-func readConfig(path string) (ExistingInfraConfigToml, error) {
+func readConfig(path string) (pgc.ExistingInfraConfigToml, error) {
 	templateBytes, err := fileutils.ReadFile(path)
 	if err != nil {
-		return ExistingInfraConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+		return pgc.ExistingInfraConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
-	config := ExistingInfraConfigToml{}
+	config := pgc.ExistingInfraConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
-		return ExistingInfraConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+		return pgc.ExistingInfraConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}
 	return config, nil
 }
@@ -678,9 +679,9 @@ func readAnyConfig(path string, configType string) (interface{}, error) {
 	var config interface{}
 	switch configType {
 	case EXISTING_INFRA_MODE:
-		config = &ExistingInfraConfigToml{}
+		config = &pgc.ExistingInfraConfigToml{}
 	case AWS_MODE:
-		config = &AwsConfigToml{}
+		config = &pgc.AwsConfigToml{}
 	default:
 		return nil, fmt.Errorf("invalid config type: %s", configType)
 	}
@@ -691,15 +692,15 @@ func readAnyConfig(path string, configType string) (interface{}, error) {
 	return config, nil
 }
 
-func readConfigAWS(path string) (AwsConfigToml, error) {
+func readConfigAWS(path string) (pgc.AwsConfigToml, error) {
 	templateBytes, err := fileutils.ReadFile(path) // nosemgrep
 	if err != nil {
-		return AwsConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+		return pgc.AwsConfigToml{}, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
-	config := AwsConfigToml{}
+	config := pgc.AwsConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &config)
 	if err != nil {
-		return AwsConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+		return pgc.AwsConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}
 	return config, nil
 }

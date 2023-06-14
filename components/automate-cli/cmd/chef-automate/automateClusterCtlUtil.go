@@ -20,6 +20,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -495,7 +496,7 @@ func generateChecksumFile(sourceFileName string, checksumFileName string) error 
 }
 
 func isA2HARBFileExist() bool {
-	return checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
+	return checkIfFileExist(filepath.Join(pgc.InitConfigHabA2HAPathFlag.A2haDirPath, "a2ha.rb"))
 }
 
 func checkIfFileExist(path string) bool {
@@ -577,7 +578,7 @@ func isManagedServicesOn() bool {
 
 func writeHAConfigFiles(templateName string, data interface{}) error {
 	finalTemplate := renderSettingsToA2HARBFile(templateName, data)
-	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
+	writeToA2HARBFile(finalTemplate, filepath.Join(pgc.InitConfigHabA2HAPathFlag.A2haDirPath, "a2ha.rb"))
 	config, err := toml.Marshal(data)
 	if err != nil {
 		return err

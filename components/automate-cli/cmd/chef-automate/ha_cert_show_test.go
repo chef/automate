@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
@@ -14,14 +15,14 @@ func TestIsCommonCerts(t *testing.T) {
 
 	type testCaseInfo struct {
 		testCaseDescription string
-		input               []CertByIP
+		input               []pgc.CertByIP
 		expected            bool
 	}
 
 	testCases := []testCaseInfo{
 		{
 			testCaseDescription: "Common certs",
-			input: []CertByIP{
+			input: []pgc.CertByIP{
 				{
 					IP:         ValidIP,
 					PrivateKey: "private_key_1",
@@ -39,7 +40,7 @@ func TestIsCommonCerts(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Uncommon certs",
-			input: []CertByIP{
+			input: []pgc.CertByIP{
 				{
 					IP:         ValidIP,
 					PrivateKey: "private_key_1",
@@ -73,7 +74,7 @@ func TestValidateNode(t *testing.T) {
 
 	type testCaseInfo struct {
 		testCaseDescription string
-		inputIPs            []CertByIP
+		inputIPs            []pgc.CertByIP
 		inputNode           string
 		inputRemoteService  string
 		expectedError       bool
@@ -82,7 +83,7 @@ func TestValidateNode(t *testing.T) {
 	testCases := []testCaseInfo{
 		{
 			testCaseDescription: "Node is part of cluster",
-			inputIPs: []CertByIP{
+			inputIPs: []pgc.CertByIP{
 				{
 					IP:         ValidIP,
 					PrivateKey: "private_key_1",
@@ -102,7 +103,7 @@ func TestValidateNode(t *testing.T) {
 		},
 		{
 			testCaseDescription: "Node is not part of cluster",
-			inputIPs: []CertByIP{
+			inputIPs: []pgc.CertByIP{
 				{
 					IP:         ValidIP,
 					PrivateKey: "private_key_1",
@@ -150,23 +151,23 @@ func getMockNodeUtilsImpl() *MockNodeUtilsImpl {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		getInfraConfigFunc: func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
+		getInfraConfigFunc: func(sshUtil *SSHUtil) (*pgc.ExistingInfraConfigToml, error) {
 			config, err := getMockReadAnyConfig(EXISTING_INFRA_MODE)
 			if err != nil {
 				return nil, err
 			}
-			infraConfig, ok := config.(*ExistingInfraConfigToml)
+			infraConfig, ok := config.(*pgc.ExistingInfraConfigToml)
 			if !ok {
 				return nil, errors.New("Failed to convert config to ExistingInfraConfigToml")
 			}
 			return infraConfig, nil
 		},
-		getAWSConfigFunc: func(sshUtil *SSHUtil) (*AwsConfigToml, error) {
+		getAWSConfigFunc: func(sshUtil *SSHUtil) (*pgc.AwsConfigToml, error) {
 			config, err := getMockReadAnyConfig(AWS_MODE)
 			if err != nil {
 				return nil, err
 			}
-			awsConfig, ok := config.(*AwsConfigToml)
+			awsConfig, ok := config.(*pgc.AwsConfigToml)
 			if !ok {
 				return nil, errors.New("Failed to convert config to AwsConfigToml")
 			}

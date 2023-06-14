@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
@@ -444,8 +445,8 @@ func (c *certRotateFlow) certRotateOS(sshUtil SSHUtil, certs *certificates, infr
 	}
 
 	//fetching server_name from automate
-	plgcng := NewPullConfigs(infra, sshUtil)
-	automatesConfig, err := plgcng.pullAutomateConfigs()
+	plgcng := pgc.NewPullConfigs(infra, sshUtil)
+	automatesConfig, err := plgcng.PullAutomateConfigs()
 
 	if err != nil {
 		return err
@@ -736,7 +737,7 @@ func (c *certRotateFlow) compareCurrentCertsWithNewCerts(remoteService string, n
 }
 
 // comparePublicCertAndPrivateCert compare new public-cert and private cert with current public-cert and private-cert and returns ips to skip cert-rotation.
-func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
+func (c *certRotateFlow) comparePublicCertAndPrivateCert(newCerts *certificates, certByIpList []pgc.CertByIP, isCertsSame bool, flagsObj *certRotateFlags) []string {
 	skipIpsList := []string{}
 	for _, currentCerts := range certByIpList {
 		isCertsSameTemp := false

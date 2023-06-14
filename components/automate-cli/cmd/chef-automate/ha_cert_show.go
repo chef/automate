@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/platform/command"
@@ -31,20 +32,20 @@ type certShowImpl struct {
 type certShowCertificates struct {
 	//Automate Cets
 	AutomateRootCert  string
-	AutomateCertsByIP []CertByIP
+	AutomateCertsByIP []pgc.CertByIP
 
 	//ChefServer Cets
-	ChefServerCertsByIP []CertByIP
+	ChefServerCertsByIP []pgc.CertByIP
 
 	//Postgresql Cets
 	PostgresqlRootCert  string
-	PostgresqlCertsByIP []CertByIP
+	PostgresqlCertsByIP []pgc.CertByIP
 
 	//Opensearch Cets
 	OpensearchRootCert  string
 	OpensearchAdminKey  string
 	OpensearchAdminCert string
-	OpensearchCertsByIP []CertByIP
+	OpensearchCertsByIP []pgc.CertByIP
 }
 
 func init() {
@@ -192,7 +193,7 @@ func (c *certShowImpl) validateAndPrintCertificates(remoteService string, certIn
 func (c *certShowImpl) getCerts(config interface{}) (*certShowCertificates, error) {
 	var values certShowCertificates
 	switch v := config.(type) {
-	case *ExistingInfraConfigToml:
+	case *pgc.ExistingInfraConfigToml:
 		values.AutomateRootCert = v.Automate.Config.RootCA
 		values.AutomateCertsByIP = v.Automate.Config.CertsByIP
 		values.ChefServerCertsByIP = v.ChefServer.Config.CertsByIP
@@ -205,7 +206,7 @@ func (c *certShowImpl) getCerts(config interface{}) (*certShowCertificates, erro
 			values.OpensearchAdminCert = v.Opensearch.Config.AdminCert
 			values.OpensearchCertsByIP = v.Opensearch.Config.CertsByIP
 		}
-	case *AwsConfigToml:
+	case *pgc.AwsConfigToml:
 		values.AutomateRootCert = v.Automate.Config.RootCA
 		values.AutomateCertsByIP = v.Automate.Config.CertsByIP
 		values.ChefServerCertsByIP = v.ChefServer.Config.CertsByIP
@@ -236,7 +237,7 @@ func (c *certShowImpl) printAllCertificates(certInfo *certShowCertificates) {
 }
 
 // printAutomateAndCSCertificates prints automate or chef server certificates
-func (c *certShowImpl) printAutomateAndCSCertificates(rootCA string, certsByIP []CertByIP, remoteServiceName string) {
+func (c *certShowImpl) printAutomateAndCSCertificates(rootCA string, certsByIP []pgc.CertByIP, remoteServiceName string) {
 	c.writer.Title(fmt.Sprintf("%s Certificates", remoteServiceName))
 	c.writer.HR()
 
@@ -267,7 +268,7 @@ func (c *certShowImpl) printAutomateAndCSCertificates(rootCA string, certsByIP [
 }
 
 // printPostgresqlAndOSCertificates prints the postgresql and opensearch certificates
-func (c *certShowImpl) printPostgresqlAndOSCertificates(rootCA, adminKey, adminCert string, certsByIP []CertByIP, remoteServiceName string) {
+func (c *certShowImpl) printPostgresqlAndOSCertificates(rootCA, adminKey, adminCert string, certsByIP []pgc.CertByIP, remoteServiceName string) {
 	c.writer.Title(fmt.Sprintf("%s Certificates", remoteServiceName))
 	c.writer.HR()
 
@@ -311,7 +312,7 @@ func (c *certShowImpl) printPostgresqlAndOSCertificates(rootCA, adminKey, adminC
 }
 
 // printPublicAndPrivateKeys prints the public and private keys for a given service
-func (c *certShowImpl) printPublicAndPrivateKeys(certs CertByIP, remoteService string, printNode bool) {
+func (c *certShowImpl) printPublicAndPrivateKeys(certs pgc.CertByIP, remoteService string, printNode bool) {
 	if c.flags.node != "" && c.flags.node != certs.IP {
 		return
 	}
@@ -336,7 +337,7 @@ func (c *certShowImpl) printPublicAndPrivateKeys(certs CertByIP, remoteService s
 }
 
 // validateNode validates if the node exists in the cluster
-func (c *certShowImpl) validateNode(certs []CertByIP, remoteService string) error {
+func (c *certShowImpl) validateNode(certs []pgc.CertByIP, remoteService string) error {
 	if c.flags.node != "" {
 		for _, cert := range certs {
 			if cert.IP == c.flags.node {
@@ -359,7 +360,7 @@ func (c *certShowImpl) isCertSame(certA string, CertB string) bool {
 }
 
 // isCommonCerts compares the certificates of all nodes in the cluster
-func (c *certShowImpl) isCommonCerts(certs []CertByIP) bool {
+func (c *certShowImpl) isCommonCerts(certs []pgc.CertByIP) bool {
 	for _, cert := range certs {
 		if c.isCertSame(cert.PublicKey, certs[0].PublicKey) && c.isCertSame(cert.PrivateKey, certs[0].PrivateKey) {
 			continue

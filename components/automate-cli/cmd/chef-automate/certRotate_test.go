@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -467,7 +468,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
 				AutomateRootCert: FileContent,
-				AutomateCertsByIP: []CertByIP{
+				AutomateCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP,
 						PublicKey:  FileContent,
@@ -493,7 +494,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
 				AutomateRootCert: FileContent,
-				AutomateCertsByIP: []CertByIP{
+				AutomateCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP,
 						PublicKey:  FileContent,
@@ -519,7 +520,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 				node: ValidIP1,
 			},
 			currentCertsInfo: &certShowCertificates{
-				AutomateCertsByIP: []CertByIP{
+				AutomateCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP,
 						PublicKey:  FileContent,
@@ -543,7 +544,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			},
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
-				ChefServerCertsByIP: []CertByIP{
+				ChefServerCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP2,
 						PublicKey:  FileContent,
@@ -567,7 +568,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			},
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
-				ChefServerCertsByIP: []CertByIP{
+				ChefServerCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP2,
 						PublicKey:  FileContent,
@@ -597,7 +598,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 				OpensearchAdminCert: FileContent,
 				OpensearchAdminKey:  FileContent,
 				OpensearchRootCert:  FileContent,
-				OpensearchCertsByIP: []CertByIP{
+				OpensearchCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP4,
 						PublicKey:  FileContent,
@@ -632,7 +633,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 				OpensearchAdminCert: FileContent,
 				OpensearchAdminKey:  FileContent,
 				OpensearchRootCert:  FileContent,
-				OpensearchCertsByIP: []CertByIP{
+				OpensearchCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP4,
 						PublicKey:  FileContent,
@@ -663,7 +664,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
 				PostgresqlRootCert: FileContent,
-				PostgresqlCertsByIP: []CertByIP{
+				PostgresqlCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP7,
 						PublicKey:  FileContent,
@@ -694,7 +695,7 @@ func TestCompareCurrentCertsWithNewCerts(t *testing.T) {
 			flagsObj: &certRotateFlags{},
 			currentCertsInfo: &certShowCertificates{
 				PostgresqlRootCert: FileContent,
-				PostgresqlCertsByIP: []CertByIP{
+				PostgresqlCertsByIP: []pgc.CertByIP{
 					{
 						IP:         ValidIP7,
 						PublicKey:  FileContent,

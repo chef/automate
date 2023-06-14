@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/spf13/cobra"
 )
 
@@ -139,14 +140,14 @@ func runCleanupCmd(cmd *cobra.Command, args []string) error {
 
 				appendString := ""
 
-				backup_config, err := getTheValueFromA2HARB("backup_config")
+				backup_config, err := pgc.GetTheValueFromA2HARB("backup_config")
 				if err != nil {
 					writer.Error("Error in getting backup_config")
 					return err
 				}
 
 				if backup_config == "s3" && cleanupFlags.force {
-					bucket_name, err := getTheValueFromA2HARB("s3_bucketName")
+					bucket_name, err := pgc.GetTheValueFromA2HARB("s3_bucketName")
 					if err != nil {
 						writer.Error("Error in getting bucket_name")
 						return err

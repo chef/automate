@@ -8,6 +8,7 @@ import (
 
 	"errors"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	cli "github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -37,8 +38,8 @@ type AddDeleteNodeHACmdFlags struct {
 }
 
 type AddNodeOnPremImpl struct {
-	config                  ExistingInfraConfigToml
-	copyConfigForUserPrompt ExistingInfraConfigToml
+	config                  pgc.ExistingInfraConfigToml
+	copyConfigForUserPrompt pgc.ExistingInfraConfigToml
 	automateIpList          []string
 	chefServerIpList        []string
 	opensearchIpList        []string

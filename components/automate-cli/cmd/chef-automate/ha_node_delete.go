@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/pkg/errors"
@@ -34,7 +35,7 @@ func deleteNodeHACmd() *cobra.Command {
 
 func runDeleteNodeHACmd(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags) func(c *cobra.Command, args []string) error {
 	return func(c *cobra.Command, args []string) error {
-		deployerType := getModeOfDeployment()
+		deployerType := pgc.GetModeOfDeployment()
 		nodeDeleter, err := haDeleteNodeFactory(addDeleteNodeHACmdFlags, deployerType)
 		if err != nil {
 			return err
@@ -52,13 +53,13 @@ func haDeleteNodeFactory(addDeleteNodeHACmdFlags *AddDeleteNodeHACmdFlags, deplo
 	switch deployerType {
 	case EXISTING_INFRA_MODE:
 		if !addDeleteNodeHACmdFlags.awsMode {
-			hamd = NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+			hamd = NewDeleteNodeOnPrem(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), pgc.InitConfigHabA2HAPathFlag.A2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
 			err = fmt.Errorf("flag given does not match with the current deployment type %s. Try with --onprem-mode flag", deployerType)
 		}
 	case AWS_MODE:
 		if !addDeleteNodeHACmdFlags.onPremMode {
-			hamd = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), initConfigHabA2HAPathFlag.a2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
+			hamd = NewDeleteNodeAWS(writer, *addDeleteNodeHACmdFlags, NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), writer), command.NewExecExecutor(), writer), pgc.InitConfigHabA2HAPathFlag.A2haDirPath, &fileutils.FileSystemUtils{}, NewSSHUtil(&SSHConfig{}))
 		} else {
 			err = fmt.Errorf("flag given does not match with the current deployment type %s. Try with --aws-mode flag", deployerType)
 		}

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/platform/command"
@@ -33,7 +34,7 @@ func TestModifyConfigForAddNewNode(t *testing.T) {
 	incount := "2"
 	existingIps := []string{TEST_IP_2, TEST_IP_3}
 	newIps := []string{TEST_IP_4}
-	certs := []CertByIP{
+	certs := []pgc.CertByIP{
 		{
 			IP:         TEST_IP_2,
 			PrivateKey: "private",
@@ -49,7 +50,7 @@ func TestModifyConfigForAddNewNode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "3", incount)
 	assert.Equal(t, []string{TEST_IP_2, TEST_IP_3, TEST_IP_4}, existingIps)
-	assert.Equal(t, CertByIP{
+	assert.Equal(t, pgc.CertByIP{
 		IP:         TEST_IP_4,
 		PrivateKey: "private",
 		PublicKey:  "public",
@@ -60,7 +61,7 @@ func TestModifyConfigForDeleteNode(t *testing.T) {
 	incount := "2"
 	existingIps := []string{TEST_IP_2, TEST_IP_3}
 	newIps := []string{TEST_IP_3}
-	certs := []CertByIP{
+	certs := []pgc.CertByIP{
 		{
 			IP:         TEST_IP_2,
 			PrivateKey: "private",
@@ -101,7 +102,7 @@ func TestDifferenceIfNoMatch(t *testing.T) {
 }
 
 func TestFindAndDelete(t *testing.T) {
-	certs := []CertByIP{
+	certs := []pgc.CertByIP{
 		{
 			IP:         TEST_IP_2,
 			PrivateKey: "private",
@@ -115,7 +116,7 @@ func TestFindAndDelete(t *testing.T) {
 	}
 	b := TEST_IP_3
 	arr := findAndDelete(certs, b)
-	assert.Equal(t, []CertByIP{
+	assert.Equal(t, []pgc.CertByIP{
 		{
 			IP:         TEST_IP_2,
 			PrivateKey: "private",
@@ -125,7 +126,7 @@ func TestFindAndDelete(t *testing.T) {
 }
 
 func TestFindAndDeleteIfNoMatch(t *testing.T) {
-	certs := []CertByIP{
+	certs := []pgc.CertByIP{
 		{
 			IP:         TEST_IP_2,
 			PrivateKey: "private",
@@ -142,7 +143,7 @@ func TestFindAndDeleteIfNoMatch(t *testing.T) {
 	}
 	b := TEST_IP_1
 	arr := findAndDelete(certs, b)
-	assert.Equal(t, []CertByIP{
+	assert.Equal(t, []pgc.CertByIP{
 		{
 			IP:         TEST_IP_2,
 			PrivateKey: "private",

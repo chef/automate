@@ -1,4 +1,4 @@
-package main
+package pullandgenerateconfig
 
 import (
 	"encoding/json"

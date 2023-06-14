@@ -15,6 +15,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorv4"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
@@ -398,7 +399,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return errors.New("canceled upgrade")
 		}
 	}
-	modeOfDeployment := getModeOfDeployment()
+	modeOfDeployment := pgc.GetModeOfDeployment()
 	if modeOfDeployment == EXISTING_INFRA_MODE {
 
 		infra, err := getAutomateHAInfraDetails()
@@ -411,13 +412,13 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			sshPort:    infra.Outputs.SSHPort.Value,
 		}
 		sshUtil := NewSSHUtil(sshConfig)
-		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateInfraConfig()
+		configPuller := pgc.NewPullConfigs(infra, sshUtil)
+		config, err := configPuller.GenerateInfraConfig()
 		if err != nil {
 			return err
 		}
 		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
-		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writeToA2HARBFile(finalTemplate, pgc.InitConfigHabA2HAPathFlag.A2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	} else if modeOfDeployment == AWS_MODE {
 
@@ -431,13 +432,13 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			sshPort:    infra.Outputs.SSHPort.Value,
 		}
 		sshUtil := NewSSHUtil(sshConfig)
-		configPuller := NewPullConfigs(infra, sshUtil)
-		config, err := configPuller.generateAwsConfig()
+		configPuller := pgc.NewPullConfigs(infra, sshUtil)
+		config, err := configPuller.GenerateAwsConfig()
 		if err != nil {
 			return err
 		}
 		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, config)
-		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writeToA2HARBFile(finalTemplate, pgc.InitConfigHabA2HAPathFlag.A2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	}
 

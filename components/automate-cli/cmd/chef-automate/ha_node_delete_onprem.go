@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -22,8 +23,8 @@ const (
 )
 
 type DeleteNodeOnPremImpl struct {
-	config                  ExistingInfraConfigToml
-	copyConfigForUserPrompt ExistingInfraConfigToml
+	config                  pgc.ExistingInfraConfigToml
+	copyConfigForUserPrompt pgc.ExistingInfraConfigToml
 	ipToDelete              string
 	nodeType                string
 	nodeUtils               NodeOpUtils

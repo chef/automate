@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	pgc "github.com/chef/automate/components/automate-cli/pkg/pullandgenerateconfig"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
@@ -14,7 +15,7 @@ const (
 	multipleNodeError = `Only one node can be deleted at a time`
 )
 
-func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, error) {
+func PullConfFunc(sshUtil *SSHUtil, ex []string) (*pgc.ExistingInfraConfigToml, error) {
 	cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 	if err != nil {
 		return nil, err
@@ -22,7 +23,7 @@ func PullConfFunc(sshUtil *SSHUtil, ex []string) (*ExistingInfraConfigToml, erro
 	return &cfg, nil
 }
 
-func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*AwsConfigToml, error) {
+func PullAwsConfFunc(sshUtil *SSHUtil, ex []string) (*pgc.AwsConfigToml, error) {
 	cfg, err := readConfigAWS(CONFIG_TOML_PATH_AWS + "/config.toml")
 	if err != nil {
 		return nil, err
@@ -130,7 +131,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
@@ -163,7 +164,7 @@ func TestRemovenodeValidateTypeAwsOrSelfManaged2(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return true
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
@@ -502,15 +503,15 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
-		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*pgc.ExistingInfraConfigToml, error) {
 			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
 			if err != nil {
 				return nil, err
 			}
-			cfg.Automate.Config.CertsByIP = []CertByIP{}
-			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
-			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
-			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
+			cfg.Automate.Config.CertsByIP = []pgc.CertByIP{}
+			cfg.ChefServer.Config.CertsByIP = []pgc.CertByIP{}
+			cfg.Postgresql.Config.CertsByIP = []pgc.CertByIP{}
+			cfg.Opensearch.Config.CertsByIP = []pgc.CertByIP{}
 			return &cfg, nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
