@@ -295,14 +295,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -316,14 +318,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -337,14 +341,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -358,14 +364,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -379,14 +387,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -400,14 +410,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -421,14 +433,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -442,14 +456,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -463,14 +479,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null
@@ -484,14 +502,16 @@ func TestNFSMount(t *testing.T) {
 								"passed": true,
 								"success_msg": "NFS mount location found",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "NFS Mount",
 								"passed": true,
 								"success_msg": "NFS mount location is shared across given nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						],
 						"error": null

@@ -84,7 +84,8 @@ func TestFirewallCheck(t *testing.T) {
 							"passed": true,
 							"success_msg": "The tcp service running at 13.39.148.115:7432 is reachable from 15.237.128.20",
 							"error_msg": "",
-							"resolution_msg": ""
+							"resolution_msg": "",
+							"skipped":false
 						}
 					]
 				}

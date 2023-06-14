@@ -71,7 +71,8 @@ func TestPortReachable(t *testing.T) {
 					"passed": true,
 					"success_msg": "The udp service running at 13.37.213.16:1234 is reachable",
 					"error_msg": "",
-					"resolution_msg": ""
+					"resolution_msg": "",
+					"skipped":false
 				}
 			}`,
 			RequestBody: `{
