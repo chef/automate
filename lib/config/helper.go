@@ -212,8 +212,8 @@ func validateChefServerCerts(chefServerSettings *ConfigSettings) error {
 	}
 
 	return checkCertValid([]keydetails{
-		{key: chefServerSettings.PrivateKey, certtype: PRIVATE_KEY, svc: CHEFSEVER},
-		{key: chefServerSettings.PublicKey, certtype: PUBLIC_KEY, svc: CHEFSEVER},
+		{key: chefServerSettings.PrivateKey, certtype: PRIVATE_KEY, svc: CHEFSERVER},
+		{key: chefServerSettings.PublicKey, certtype: PUBLIC_KEY, svc: CHEFSERVER},
 	})
 }
 

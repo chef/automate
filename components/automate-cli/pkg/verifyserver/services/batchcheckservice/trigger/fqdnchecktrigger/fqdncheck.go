@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -44,20 +45,26 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 		isAfterDeployment = true
 	}
 
-	if config.Certificate.AutomateFqdn != "" {
+	certMap := configutils.GetCertificateMap(config.Certificate)
+
+	automateFqdnCert, found := certMap[constants.AUTOMATE]
+
+	if found && automateFqdnCert.Fqdn != "" {
 		for _, ip := range config.Hardware.AutomateNodeIps {
 			log.Debugf("Trigger FQDN check for automate ip %s", ip)
 			reqCount++
-			req := getFqdnCheckRequest(ip, constants.AUTOMATE, config.Certificate.RootCert, config.Certificate.AutomateFqdn, isAfterDeployment, config.APIToken)
+			req := getFqdnCheckRequest(ip, constants.AUTOMATE, automateFqdnCert.FqdnRootCert, automateFqdnCert.Fqdn, isAfterDeployment)
 			go trigger.TriggerCheckAPI(endPoint, ip, constants.AUTOMATE, http.MethodPost, outputCh, req)
 		}
 	}
 
-	if config.Certificate.ChefServerFqdn != "" {
+	chefServerFqdnCert, found := certMap[constants.CHEF_INFRA_SERVER]
+
+	if found && chefServerFqdnCert.Fqdn != "" {
 		for _, ip := range config.Hardware.ChefInfraServerNodeIps {
 			log.Debugf("Trigger FQDN check for chefserver ip %s", ip)
 			reqCount++
-			req := getFqdnCheckRequest(ip, constants.CHEF_INFRA_SERVER, config.Certificate.RootCert, config.Certificate.ChefServerFqdn, isAfterDeployment, config.APIToken)
+			req := getFqdnCheckRequest(ip, constants.CHEF_INFRA_SERVER, chefServerFqdnCert.FqdnRootCert, chefServerFqdnCert.Fqdn, isAfterDeployment)
 			go trigger.TriggerCheckAPI(endPoint, ip, constants.CHEF_INFRA_SERVER, http.MethodPost, outputCh, req)
 
 		}
@@ -74,7 +81,7 @@ func triggerFqdnCheck(config *models.Config, endPoint string, log logger.Logger)
 }
 
 // getFqdnCheckRequest creates req list for all the node ips with their fqdn
-func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAfterDeployment bool, apiToken string) models.FqdnRequest {
+func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAfterDeployment bool) models.FqdnRequest {
 
 	fqdnReq := models.FqdnRequest{
 		Fqdn:              fqdn,
