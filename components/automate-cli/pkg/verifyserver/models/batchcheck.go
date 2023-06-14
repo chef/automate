@@ -20,13 +20,6 @@ type MockServerFromBatchServiceResponse struct {
 	StatusCode int    `json:"status_code"`
 }
 
-type MockServerRequestBody struct {
-	Port     int
-	Protocol string
-	Cert     string
-	Key      string
-}
-
 type Hardware struct {
 	AutomateNodeCount        int      `json:"automate_node_count"`
 	AutomateNodeIps          []string `json:"automate_node_ips"`

@@ -1,6 +1,6 @@
 package arrayutils
 
-// This method is used to return uncommon elements between the two slices. It returns (A-B) operation
+// This method is used to find the difference between the two slices and return the uncommon elements in the first set. It returns (A-B) operation
 func SliceDifference(first, second []int) []int {
 	mb := make(map[int]struct{}, len(second))
 	for _, x := range second {
