@@ -80,17 +80,16 @@ func newStatusCmd() *cobra.Command {
 		&statusCmdFlag.waitForHealthy, "wait-for-healthy", "w", false,
 		"Wait until the status response is healthy or the timeout is reached",
 	)
-	statusCmd.PersistentFlags().SetAnnotation("wait-for-healthy", docs.Compatibility, []string{docs.CompatiblewithStandalone})
+
 	statusCmd.PersistentFlags().Int64VarP(
 		&statusCmdFlag.waitTimeout, "wait-timeout", "t", 600,
 		"How many seconds to wait for the status to be healthy before returning an error",
 	)
-	statusCmd.PersistentFlags().SetAnnotation("wait-timeout", docs.Compatibility, []string{docs.CompatiblewithStandalone})
+	
 	statusCmd.PersistentFlags().Int64VarP(
 		&statusCmdFlag.waitRefreshInterval, "wait-refresh-interval", "r", 2,
 		"How many seconds to wait between polling for status updates",
 	)
-	statusCmd.PersistentFlags().SetAnnotation("wait-refresh-interval", docs.Compatibility, []string{docs.CompatiblewithStandalone})
 
 	statusCmd.PersistentFlags().BoolVar(&statusCmdFlag.automate, "automate", false, "Shows status from Automate node(HA)")
 	statusCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
