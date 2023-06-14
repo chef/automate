@@ -262,7 +262,7 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 	if err != nil {
 		err = errors.Wrap(err, "error while deploying architecture")
 	}
-
+	infra, _, _ = dni.nodeUtils.getHaInfraDetails()
 	syncErr := dni.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)

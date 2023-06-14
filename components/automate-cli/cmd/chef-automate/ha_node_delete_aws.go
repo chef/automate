@@ -237,6 +237,7 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return errors.Wrap(err, "error while deploying architecture")
 	}
+	infra, _, _ = dna.nodeUtils.getHaInfraDetails()
 	syncErr := dna.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)

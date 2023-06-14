@@ -173,6 +173,7 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		err = errors.Wrap(err, "error while deploying architecture")
 	}
+	infra, _, _ = ani.nodeUtils.getHaInfraDetails()
 	syncErr := ani.syncConfigToAllNodes(infra)
 	if syncErr != nil {
 		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
