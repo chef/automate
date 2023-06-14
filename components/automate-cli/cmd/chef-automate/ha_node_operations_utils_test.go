@@ -551,6 +551,46 @@ func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
 	assert.Equal(t, "", out)
 }
 
+func TestExecuteCmdInAllNodeAndCaptureOutputWithOutputFile(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+			return "", nil
+		},
+	}
+
+	infra, _, err := mockUtil.getHaInfraDetails()
+	assert.NoError(t, err)
+
+	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	singleNode := true
+	outputDirectory := ""
+	err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+	assert.ErrorContains(t, err, "error on removing output header in fetched config")
+}
+
 func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 	mockUtil := &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -590,5 +630,4 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 	outputDirectory := ""
 	err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
 	assert.Error(t, err, "No ips found")
-
 }

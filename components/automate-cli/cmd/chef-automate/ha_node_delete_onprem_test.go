@@ -485,6 +485,67 @@ This will delete the above node from your existing setup. It might take a while.
 	assert.Equal(t, false, deployed)
 }
 
+func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	flags := AddDeleteNodeHACmdFlags{
+		opensearchIp: "192.0.2.3",
+	}
+	var filewritten, deployed bool
+	nodedelete := NewDeleteNodeOnPrem(w.CliWriter, flags, &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		}, executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			deployed = false
+			return errors.New("Invalid or empty command")
+		},
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			filewritten = true
+			return nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		pullAndUpdateConfigFunc: PullConfFunc,
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
+		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+			return "", nil
+		},
+	},
+	)
+	err := nodedelete.validate()
+	assert.NoError(t, err)
+	err = nodedelete.modifyConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
+	res, err := nodedelete.promptUserConfirmation()
+	assert.Equal(t, true, res)
+	assert.NoError(t, err)
+	assert.Contains(t, w.Output(), `Existing nodes:
+================================================
+Automate => 192.0.2.0, 192.0.2.1
+Chef-Server => 192.0.2.2
+OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
+Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
+
+Node to be deleted:
+================================================
+Opensearch => 192.0.2.3
+Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
+This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
+	err = nodedelete.runDeploy()
+	assert.Error(t, err, "Invalid or empty command")
+	assert.Equal(t, true, filewritten)
+	assert.Equal(t, false, deployed)
+	// err = nodedelete.(*DeleteNodeOnPremImpl).syncConfigToAllNodes(nil)
+	// assert.ErrorContains(t, err, "error syncing config to all nodes")
+}
+
 func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriter()
 	flags := AddDeleteNodeHACmdFlags{
