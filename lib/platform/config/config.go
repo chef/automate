@@ -118,6 +118,9 @@ func (c *Config) PGServiceUser() (string, error) {
 			passwordAuth := auth.GetPassword()
 			user := passwordAuth.GetDbuser().GetUsername().GetValue()
 
+			fmt.Println("^^^^^^^^^^^^^^")
+			fmt.Println(user)
+
 			if user == "" {
 				return "", errors.New("External postgres password auth missing user")
 			}
@@ -128,6 +131,10 @@ func (c *Config) PGServiceUser() (string, error) {
 	}
 
 	svcUser := c.GetService().GetName()
+
+	fmt.Println("^^^^^^^^^printing svc user")
+	fmt.Println(svcUser)
+
 	if c.SvcDBUser != "" {
 		// We allow the service to export A2_SVC_DB_USER in cases where
 		// patterns diverge in picking the database user. For example,

@@ -21,8 +21,12 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
+echo "*********db check - 1"
+
 pg-helper rename-if-exists opscode_chef "$DBNAME"
+echo "*********db check - 2"
 pg-helper ensure-service-database "$DBNAME"
+echo "*********db check - 3"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
 pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"

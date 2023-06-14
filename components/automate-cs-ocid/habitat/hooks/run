@@ -48,6 +48,8 @@ pg-helper rename-if-exists oc_id "$DBNAME"
 
 echo "test-8"
 echo $DATABASE_URL
+echo "ensure called"
+
 pg-helper ensure-service-database "$DBNAME"
 
 echo "test-9"
