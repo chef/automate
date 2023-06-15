@@ -185,7 +185,10 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -276,7 +279,10 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -342,7 +348,10 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH_AWS, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

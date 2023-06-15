@@ -193,13 +193,13 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 // Save all config from each services to Bastion server and move it to WORKSPACE dir
 func (ani *AddNodeOnPremImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra, ani.nodeUtils)
 }
 
 // Sync saved config from bastion to ALL nodes
 func (ani *AddNodeOnPremImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra, ani.nodeUtils)
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {

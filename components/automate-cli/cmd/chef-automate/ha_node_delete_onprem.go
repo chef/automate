@@ -235,12 +235,12 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 
 func (dni *DeleteNodeOnPremImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return dni.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra, dni.nodeUtils)
 }
 
 func (dni *DeleteNodeOnPremImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return dni.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra, dni.nodeUtils)
 }
 
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {

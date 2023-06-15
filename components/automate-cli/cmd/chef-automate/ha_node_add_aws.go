@@ -133,12 +133,12 @@ func (ani *AddNodeAWSImpl) promptUserConfirmation() (bool, error) {
 
 func (ani *AddNodeAWSImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra, ani.nodeUtils)
 }
 
 func (ani *AddNodeAWSImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return ani.nodeUtils.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra, ani.nodeUtils)
 }
 
 func (ani *AddNodeAWSImpl) runDeploy() error {

@@ -512,7 +512,10 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+				return nil
+			},
+			parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 				return nil
 			},
 		},
@@ -625,7 +628,10 @@ func TestDeleteAWSNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 				// tfArchModified = true
 				return nil
 			},
-			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+				return nil
+			},
+			parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 				return errors.New("error on removing output header in fetched config")
 			},
 		},
@@ -721,7 +727,10 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			calculateTotalInstanceCountFunc: func() (int, error) {
 				return 0, nil
 			},
-			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+			executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+				return nil
+			},
+			parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 				return nil
 			},
 		},
@@ -797,7 +806,10 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}

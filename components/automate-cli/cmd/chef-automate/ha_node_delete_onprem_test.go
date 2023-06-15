@@ -345,7 +345,11 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -391,11 +395,21 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			return nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return errors.New("error on removing output header in fetched config")
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -451,7 +465,11 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -509,7 +527,11 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -568,7 +590,11 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -604,7 +630,11 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -689,7 +719,11 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
 		},
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -757,7 +791,11 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 			return count, nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
+
+		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{

@@ -67,7 +67,8 @@ type MockNodeUtilsImpl struct {
 	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCountFunc           func() (int, error)
-	executeCmdInAllNodeAndCaptureOutputFunc   func([]*NodeObject, bool, string, *AutomateHAInfraDetails) error
+	executeCustomCmdOnEachNodeTypeFunc        func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error
+	parseAndMoveConfigFilteToWorkspaceDirFunc func(outFiles []string, outputDirectory string) error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -138,8 +139,11 @@ func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, in
 func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
-func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
-	return mnu.executeCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory, infra)
+func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+}
+func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
+	return mnu.parseAndMoveConfigFilteToWorkspaceDirFunc(outFiles, outputDirectory)
 }
 
 type NodeOpUtils interface {
@@ -164,8 +168,9 @@ type NodeOpUtils interface {
 	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error
+	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error
 	calculateTotalInstanceCount() (int, error)
+	parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error
 }
 
 type NodeUtilsImpl struct {
@@ -343,9 +348,27 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 	return infra, sshconfig, nil
 }
 
-func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+	return executeCustomCmdOnEachNodeType(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
 }
+
+// Execute custom command in one node of all the each node-type
+func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails, nu NodeOpUtils) error {
+	for _, nodeObject := range nodeObjects {
+		outFiles := nodeObject.OutputFile
+		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, infra)
+		if err != nil {
+			return err
+		}
+		if len(outFiles) > 0 {
+			if err = nu.parseAndMoveConfigFilteToWorkspaceDir(outFiles, outputDirectory); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
 	return isManagedServicesOn()
 }
@@ -728,25 +751,7 @@ func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile [
 	return &NodeObject{cmdString, outFile, inputFile, inputFilePrefix, nodeType}
 }
 
-// Execute custom command in one node of all the each node-type
-func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails) error {
-
-	for _, nodeObject := range nodeObjects {
-		outFiles := nodeObject.OutputFile
-		err := executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, infra)
-		if err != nil {
-			return err
-		}
-		if len(outFiles) > 0 {
-			if err = parseAndMoveConfigFilteToWorkspaceDir(outFiles, outputDirectory); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
+func (nu *NodeUtilsImpl) parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
 
 	err := removeOutputHeaderInConfigFile(outFiles[0])
 	if err != nil {
