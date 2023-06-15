@@ -21,6 +21,13 @@ const (
 	ERROR_ON_MANAGED_SERVICES   = "Restarting services on managed %s is not supported."
 )
 
+type restartFromBastion interface {
+	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
+	isManagedServicesOn() bool
+	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
+	printRestartCmdOutput(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
+}
+
 type RestartCmdFlags struct {
 	automate   bool
 	chefServer bool
@@ -95,13 +102,6 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 	}
 
 	return nil
-}
-
-type restartFromBastion interface {
-	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
-	isManagedServicesOn() bool
-	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printRestartCmdOutput(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
 }
 
 type restartFromBastionImpl struct{}
