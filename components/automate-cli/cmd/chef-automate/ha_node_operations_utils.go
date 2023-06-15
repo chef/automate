@@ -67,8 +67,9 @@ type NodeOpUtils interface {
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCount() (int, error)
-	parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error
+	parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error
 	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
+	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
 	saveConfigToBastion() error
 	syncConfigToAllNodes() error
 }
@@ -267,7 +268,7 @@ func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*Node
 			return err
 		}
 		if len(outFiles) > 0 {
-			if err = nu.parseAndMoveConfigFilteToWorkspaceDir(outFiles, outputDirectory); err != nil {
+			if err = nu.parseAndMoveConfigFileToWorkspaceDir(outFiles, outputDirectory); err != nil {
 				return err
 			}
 		}
@@ -678,7 +679,7 @@ func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile [
 	return &NodeObject{cmdString, outFile, inputFile, inputFilePrefix, nodeType}
 }
 
-func (nu *NodeUtilsImpl) parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
+func (nu *NodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error {
 
 	err := removeOutputHeaderInConfigFile(outFiles[0])
 	if err != nil {

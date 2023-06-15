@@ -25,6 +25,7 @@ type MockNodeUtilsImpl struct {
 	calculateTotalInstanceCountFunc           func() (int, error)
 	parseAndMoveConfigFileToWorkspaceDirFunc  func(outFiles []string, outputDirectory string) error
 	executeCmdInAllNodeAndCaptureOutputFunc   func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
+	executeCustomCmdOnEachNodeTypeFunc        func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
 	saveConfigToBastionFunc                   func() error
 	syncConfigToAllNodesFunc                  func() error
 }
@@ -98,12 +99,16 @@ func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
 
-func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
+func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error {
 	return mnu.parseAndMoveConfigFileToWorkspaceDirFunc(outFiles, outputDirectory)
 }
 
 func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 	return mnu.executeCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
+}
+
+func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
+	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode)
 }
 
 func (mnu *MockNodeUtilsImpl) saveConfigToBastion() error {

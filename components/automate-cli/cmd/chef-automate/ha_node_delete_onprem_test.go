@@ -409,35 +409,21 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		saveConfigToBastionFunc: func() error {
 			return errors.New("error on removing output header in fetched config")
+		},
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
 		connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
 			return "", nil
 		},
 	})
-	err := nodedelete.validate()
-	assert.NoError(t, err)
-	err = nodedelete.modifyConfig()
-	assert.NoError(t, err)
-	assert.Equal(t, flags.opensearchIp, nodedelete.(*DeleteNodeOnPremImpl).ipToDelete)
-	res, err := nodedelete.promptUserConfirmation()
-	assert.Equal(t, true, res)
-	assert.NoError(t, err)
-	assert.Contains(t, w.Output(), `Existing nodes:
-================================================
-Automate => 192.0.2.0, 192.0.2.1
-Chef-Server => 192.0.2.2
-OpenSearch => 192.0.2.3, 192.0.2.4, 192.0.2.5, 192.0.2.6
-Postgresql => 192.0.2.7, 192.0.2.8, 192.0.2.9
-
-Node to be deleted:
-================================================
-Opensearch => 192.0.2.3
-Removal of node for Postgresql or OpenSearch is at your own risk and may result to data loss. Consult your database administrator before trying to delete Postgresql or OpenSearch node.
-This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue? (y/n)`)
-	err = nodedelete.runDeploy()
+	err := nodedelete.Execute(nil, nil)
 	assert.Error(t, err, "error on removing output header in fetched config")
 }
 
