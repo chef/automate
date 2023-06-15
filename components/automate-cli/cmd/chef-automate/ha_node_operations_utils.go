@@ -44,108 +44,6 @@ type HAModifyAndDeploy interface {
 	runDeploy() error
 }
 
-type MockNodeUtilsImpl struct {
-	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
-	getHaInfraDetailsfunc                     func() (*AutomateHAInfraDetails, *SSHConfig, error)
-	writeHAConfigFilesFunc                    func(templateName string, data interface{}) error
-	taintTerraformFunc                        func(path string) error
-	isA2HARBFileExistFunc                     func() bool
-	getModeFromConfigFunc                     func(path string) (string, error)
-	checkIfFileExistFunc                      func(path string) bool
-	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAwsFunc                func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
-	isManagedServicesOnFunc                   func() bool
-	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
-	getModeOfDeploymentFunc                   func() string
-	executeShellCommandFunc                   func() error
-	moveAWSAutoTfvarsFileFunc                 func(path string) error
-	modifyTfArchFileFunc                      func(path string) error
-	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
-	stopServicesOnNodeFunc                    func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
-	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
-	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	calculateTotalInstanceCountFunc           func() (int, error)
-	executeCustomCmdOnEachNodeTypeFunc        func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error
-	parseAndMoveConfigFilteToWorkspaceDirFunc func(outFiles []string, outputDirectory string) error
-}
-
-func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
-	return mnu.executeAutomateClusterCtlCommandAsyncfunc(command, args, helpDocs)
-}
-func (mnu *MockNodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
-	return mnu.getAWSConfigIpFunc()
-}
-func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
-	return mnu.getHaInfraDetailsfunc()
-}
-func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
-	return mnu.writeHAConfigFilesFunc(templateName, data)
-}
-func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
-	return mnu.taintTerraformFunc(path)
-}
-
-func (mnu *MockNodeUtilsImpl) isA2HARBFileExist() bool {
-	return mnu.isA2HARBFileExistFunc()
-}
-func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
-	return mnu.getModeFromConfigFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
-	return mnu.checkIfFileExistFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
-	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
-}
-func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
-	return mnu.isManagedServicesOnFunc()
-}
-func (mnu *MockNodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
-	return mnu.getConfigPullerFunc(sshUtil)
-}
-func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
-	return mnu.getInfraConfigFunc(sshUtil)
-}
-func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
-	return mnu.getAWSConfigFunc(sshUtil)
-}
-func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
-	return mnu.getModeOfDeploymentFunc()
-}
-func (mnu *MockNodeUtilsImpl) executeShellCommand(command, path string) error {
-	return mnu.executeShellCommandFunc()
-}
-
-func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
-	return mnu.moveAWSAutoTfvarsFileFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
-	return mnu.modifyTfArchFileFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
-	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
-}
-func (mnu *MockNodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
-	return mnu.stopServicesOnNodeFunc(ip, nodeType, deploymentType, infra)
-}
-func (mnu *MockNodeUtilsImpl) excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error {
-	return mnu.excludeOpenSearchNodeFunc(ipToDelete, infra)
-}
-func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
-	return mnu.checkExistingExcludedOSNodesFunc(automateIp, infra)
-}
-func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
-	return mnu.calculateTotalInstanceCountFunc()
-}
-func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
-	return mnu.executeCustomCmdOnEachNodeTypeFunc(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
-}
-func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error {
-	return mnu.parseAndMoveConfigFilteToWorkspaceDirFunc(outFiles, outputDirectory)
-}
-
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error)
@@ -168,9 +66,11 @@ type NodeOpUtils interface {
 	stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error
 	calculateTotalInstanceCount() (int, error)
 	parseAndMoveConfigFilteToWorkspaceDir(outFiles []string, outputDirectory string) error
+	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
+	saveConfigToBastion() error
+	syncConfigToAllNodes() error
 }
 
 type NodeUtilsImpl struct {
@@ -348,15 +248,21 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 	return infra, sshconfig, nil
 }
 
-func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
-	return executeCustomCmdOnEachNodeType(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+func (nu *NodeUtilsImpl) saveConfigToBastion() error {
+	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	return nu.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+}
+
+func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
+	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
+	return nu.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
 }
 
 // Execute custom command in one node of all the each node-type
-func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, infra *AutomateHAInfraDetails, nu NodeOpUtils) error {
+func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
-		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode, infra)
+		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
 		if err != nil {
 			return err
 		}
@@ -367,6 +273,27 @@ func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode b
 		}
 	}
 	return nil
+}
+
+// Execute 'config show' command in specific service and fetch the output file to bastion
+func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
+
+	infra, _, err := nu.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+
+	sshUtil := nu.cmdUtil.GetSshUtil()
+
+	sshUtil.setSSHConfig(&SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	})
+
+	_, err = nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
+	return err
 }
 
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
@@ -796,8 +723,7 @@ func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 	return nodeObjects
 }
 
-// Execute 'config show' command in specific service and fetch the output file to bastion
-func executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 
 	nodeMap := NewNodeTypeAndCmd()
 	cmd := NewNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
@@ -827,14 +753,7 @@ func executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, i
 
 	nodeMap.Infra = infra
 
-	sshUtil := NewSSHUtil(&SSHConfig{})
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-	_, err := cmdUtil.Execute()
-	if err != nil {
-		return err
-	}
-	return nil
+	return nodeMap
 }
 
 // Create *Cmd struct instance with 'cmdString' and 'outputFiles' params

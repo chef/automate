@@ -76,6 +76,11 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		}
 	}
 
+	err = dni.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	previousCount, err := dni.nodeUtils.calculateTotalInstanceCount()
 	if err != nil {
 		return err
@@ -87,6 +92,16 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 	}
 
 	err = dni.runDeploy()
+
+	syncErr := dni.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			err = errors.Wrap(err, syncErr.Error())
+		} else {
+			err = syncErr
+		}
+	}
+
 	currentCount, newErr := dni.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
 		if err != nil {
@@ -233,45 +248,13 @@ func (dni *DeleteNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return dni.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dni *DeleteNodeOnPremImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
-	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra, dni.nodeUtils)
-}
-
-func (dni *DeleteNodeOnPremImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
-	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra, dni.nodeUtils)
-}
-
 func (dni *DeleteNodeOnPremImpl) runDeploy() error {
-	infra, _, err := dni.nodeUtils.getHaInfraDetails()
+	err := dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config)
 	if err != nil {
 		return err
-	}
-	err = dni.saveConfigToBastion(infra)
-	if err != nil {
-		return errors.Wrap(err, "error saving node configuration to bastion")
-	}
-
-	err = dni.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, dni.config)
-	if err != nil {
-		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
 	}
 	argsdeploy := []string{"-y"}
-	err = dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	if err != nil {
-		err = errors.Wrap(err, "error while deploying architecture")
-	}
-	infra, _, _ = dni.nodeUtils.getHaInfraDetails()
-	syncErr := dni.syncConfigToAllNodes(infra)
-	if syncErr != nil {
-		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
-	}
-
-	if err != nil {
-		return err
-	}
-	return nil
+	return dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 }
 
 func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {

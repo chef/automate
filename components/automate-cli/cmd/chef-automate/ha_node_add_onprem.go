@@ -83,6 +83,12 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	err = ani.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	if !ani.flags.autoAccept {
 		res, err := ani.promptUserConfirmation()
 		if err != nil {
@@ -93,7 +99,15 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 	ani.prepare()
-	return ani.runDeploy()
+	err = ani.runDeploy()
+
+	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+	}
+	return syncErr
 }
 
 func (ani *AddNodeOnPremImpl) prepare() error {
@@ -190,47 +204,14 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 	return ani.writer.Confirm("This will add the new nodes to your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-// Save all config from each services to Bastion server and move it to WORKSPACE dir
-func (ani *AddNodeOnPremImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
-	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra, ani.nodeUtils)
-}
-
-// Sync saved config from bastion to ALL nodes
-func (ani *AddNodeOnPremImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
-	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra, ani.nodeUtils)
-}
-
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	infra, _, err := ani.nodeUtils.getHaInfraDetails()
+	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
 	if err != nil {
 		return err
-	}
-	err = ani.saveConfigToBastion(infra)
-	if err != nil {
-		return errors.Wrap(err, "error saving node configuration to bastion")
-	}
-	err = ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
-	if err != nil {
-		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
 	}
 	argsdeploy := []string{"-y"}
-	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	if err != nil {
-		err = errors.Wrap(err, "error while deploying architecture")
-	}
+	return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 
-	infra, _, _ = ani.nodeUtils.getHaInfraDetails()
-	syncErr := ani.syncConfigToAllNodes(infra)
-	if syncErr != nil {
-		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
-	}
-
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (ani *AddNodeOnPremImpl) validateCmdArgs() *list.List {

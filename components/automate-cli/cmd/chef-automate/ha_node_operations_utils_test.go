@@ -552,28 +552,25 @@ func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
 }
 
 func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
-	mockUtil := &MockNodeUtilsImpl{
-		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-			infra := &AutomateHAInfraDetails{}
-			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
-			return infra, &SSHConfig{}, nil
-		},
-		excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
-			return nil
-		},
-		checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
-			return "", nil
-		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
-			return nil
-		},
-		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
-			return nil
-		},
-	}
-
-	infra, _, err := mockUtil.getHaInfraDetails()
-	assert.NoError(t, err)
+	// mockUtil := &MockNodeUtilsImpl{
+	// 	getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+	// 		infra := &AutomateHAInfraDetails{}
+	// 		infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+	// 		return infra, &SSHConfig{}, nil
+	// 	},
+	// 	excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
+	// 		return nil
+	// 	},
+	// 	checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
+	// 		return "", nil
+	// 	},
+	// 	executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+	// 		return nil
+	// 	},
+	// 	parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+	// 		return nil
+	// 	},
+	// }
 
 	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
@@ -599,7 +596,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
 		singleNode := true
 		outputDirectory := ""
-		err = executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra, nodeUtil)
+		err := nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -610,7 +607,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		}
 		singleNode := true
 		outputDirectory := ""
-		err = executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra, nodeUtil)
+		err := nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -621,7 +618,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		}
 		singleNode := true
 		outputDirectory := ""
-		err = executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra, nodeUtil)
+		err := nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -630,9 +627,10 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 		singleNode := true
 		outputDirectory := ""
-		err = executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra, nodeUtil)
+		err := nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
 		assert.ErrorContains(t, err, "error on removing output header in fetched config")
 	})
+
 	// t.Run("No output file", func(t *testing.T) {
 
 	// 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
@@ -650,11 +648,8 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 // func TestParseAndMoveConfigFilteToWorkspaceDir(t *testing.T) {
 // 	outDir := "/tmp/"
 // 	fileName, err := fileutils.CreateTempFile("Header\nabc", "file.txt")
-// 	require.NoError(t, err)
+// 	assert.NoError(t, err)
 // 	outFile := []string{fileName}
 // 	defer fileutils.DeleteTempFile(fileName)
-// 	t.Run("Move File to workspace directory", func(t *testing.T) {
-// 		err := parseAndMoveConfigFilteToWorkspaceDir(outFile, outDir)
-// 		require.NoError(t, err)
-// 	})
+
 // }

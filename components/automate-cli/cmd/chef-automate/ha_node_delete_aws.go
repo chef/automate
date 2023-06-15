@@ -80,6 +80,12 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	err = dna.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	if !dna.flags.autoAccept {
 		res, err := dna.promptUserConfirmation()
 		if err != nil {
@@ -101,6 +107,16 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	}
 
 	err = dna.runDeploy()
+
+	syncErr := dna.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			err = errors.Wrap(err, syncErr.Error())
+		} else {
+			err = syncErr
+		}
+	}
+
 	currentCount, newErr := dna.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
 		if err != nil {
@@ -189,64 +205,33 @@ func (dna *DeleteNodeAWSImpl) promptUserConfirmation() (bool, error) {
 	return dna.writer.Confirm("This will delete the above node from your existing setup. It might take a while. Are you sure you want to continue?")
 }
 
-func (dna *DeleteNodeAWSImpl) saveConfigToBastion(infra *AutomateHAInfraDetails) error {
-	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, infra, dna.nodeUtils)
-}
-
-func (dna *DeleteNodeAWSImpl) syncConfigToAllNodes(infra *AutomateHAInfraDetails) error {
-	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", infra, dna.nodeUtils)
-}
-
 func (dna *DeleteNodeAWSImpl) runDeploy() error {
-	infra, _, err := dna.nodeUtils.getHaInfraDetails()
+	err := dna.runRemoveNodeFromAws()
 	if err != nil {
 		return err
-	}
-	err = dna.saveConfigToBastion(infra)
-	if err != nil {
-		return errors.Wrap(err, "error saving node configuration to bastion")
-	}
-	err = dna.runRemoveNodeFromAws()
-	if err != nil {
-		return errors.Wrap(err, "error removing node from AWS")
 	}
 
 	err = dna.nodeUtils.moveAWSAutoTfvarsFile(dna.terraformPath)
 	if err != nil {
-		return errors.Wrap(err, "error moving aws.auto.tfvars file")
+		return err
 	}
 
 	err = dna.nodeUtils.modifyTfArchFile(dna.terraformPath)
 	if err != nil {
-		return errors.Wrap(err, "error modifying tf_arch file")
+		return err
 	}
 	err = dna.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, dna.config)
 	if err != nil {
-		return errors.Wrap(err, "error writing HA config.toml in workspace directory")
+		return err
 	}
 
 	argsdeploy := []string{"-y"}
 	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
 	if err != nil {
-		return errors.Wrap(err, "error while provisioning resources")
-	}
-
-	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-	if err != nil {
-		return errors.Wrap(err, "error while deploying architecture")
-	}
-	infra, _, _ = dna.nodeUtils.getHaInfraDetails()
-	syncErr := dna.syncConfigToAllNodes(infra)
-	if syncErr != nil {
-		err = errors.Wrapf(syncErr, "error syncing config to all nodes. \n%v", err)
-	}
-
-	if err != nil {
 		return err
 	}
-	return nil
+
+	return dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
 }
 
 func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {

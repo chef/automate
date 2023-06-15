@@ -394,10 +394,10 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
@@ -452,10 +452,10 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
@@ -532,10 +532,16 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
 		},
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -594,10 +600,16 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) error {
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFilteToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
