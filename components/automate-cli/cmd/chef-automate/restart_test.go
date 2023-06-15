@@ -115,7 +115,6 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 	}
 }
 
-
 func TestRunRestartFromBastion(t *testing.T) {
 	type testCase struct {
 		description         string
@@ -206,5 +205,47 @@ func TestRunRestartFromBastion(t *testing.T) {
 				assert.Nil(t, err)
 			}
 		})
+	}
+}
+
+func TestHandleManagedServiceError(t *testing.T) {
+
+	testCases := []struct {
+		flags          *RestartCmdFlags
+		errorExepected error
+	}{
+		{
+			flags: &RestartCmdFlags{
+				postgresql: true,
+			},
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
+		},
+		{
+			flags: &RestartCmdFlags{
+				opensearch: true,
+			},
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
+		},
+		{
+			flags:          &RestartCmdFlags{},
+			errorExepected: nil,
+		},
+		{
+			flags: &RestartCmdFlags{
+				postgresql: true,
+				opensearch: true,
+			},
+			errorExepected: nil,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := handleManagedServiceError(testCase.flags)
+
+		if testCase.errorExepected != nil {
+			assert.EqualError(t, err, testCase.errorExepected.Error())
+		} else {
+			assert.Nil(t, err)
+		}
 	}
 }

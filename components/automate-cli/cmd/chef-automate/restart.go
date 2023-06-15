@@ -15,10 +15,10 @@ import (
 )
 
 const (
-	RESTART_FRONTEND_COMMAND     = `sudo chef-automate restart-services`
-	RESTART_BACKEND_COMMAND      = `sudo systemctl restart hab-sup`
-	DEFAULT_TIMEOUT_FOR_RESTART  = 1200
-	STATUS_ERROR_ON_SELF_MANAGED = "Restart for externally configured %s is not supported."
+	RESTART_FRONTEND_COMMAND    = `sudo chef-automate restart-services`
+	RESTART_BACKEND_COMMAND     = `sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup`
+	DEFAULT_TIMEOUT_FOR_RESTART = 1200
+	ERROR_ON_MANAGED_SERVICES   = "Restarting services on managed %s is not supported."
 )
 
 type RestartCmdFlags struct {
@@ -37,25 +37,30 @@ func init() {
 		Use:   "restart-services",
 		Short: "restart deployment services",
 		Long:  "Restart services for a deployment",
-		RunE:  runRestartServicess(&restartCmdFlags),
+		RunE:  runRestartServicesCmd(&restartCmdFlags),
 		Annotations: map[string]string{
 			docs.Tag: docs.BastionHost,
 		},
 	}
 	restartServicesCmd.PersistentFlags().BoolVarP(&restartCmdFlags.automate, "automate", "a", false, "restart chef automate service on automate nodes")
 	restartServicesCmd.PersistentFlags().BoolVar(&restartCmdFlags.automate, "a2", false, "restart chef automate service on automate nodes[DUPLICATE]")
+	restartServicesCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
 	restartServicesCmd.PersistentFlags().BoolVarP(&restartCmdFlags.chefServer, "chef_server", "c", false, "restart chef automate service on chef-server nodes")
 	restartServicesCmd.PersistentFlags().BoolVar(&restartCmdFlags.chefServer, "cs", false, "restart chef automate service on chef-server nodes[DUPLICATE]")
+	restartServicesCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
 	restartServicesCmd.PersistentFlags().BoolVarP(&restartCmdFlags.opensearch, "opensearch", "o", false, "restart hab-sup service on opensearch nodes")
 	restartServicesCmd.PersistentFlags().BoolVar(&restartCmdFlags.opensearch, "os", false, "restart hab-sup service on opensearch nodes[DUPLICATE]")
+	restartServicesCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
 	restartServicesCmd.PersistentFlags().BoolVarP(&restartCmdFlags.postgresql, "postgresql", "p", false, "restart hab-sup service on postgresql nodes")
 	restartServicesCmd.PersistentFlags().BoolVar(&restartCmdFlags.postgresql, "pg", false, "restart hab-sup service on postgresql nodes[DUPLICATE]")
+	restartServicesCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 	restartServicesCmd.PersistentFlags().StringVar(&restartCmdFlags.node, "node", "", "Node Ip address")
+	restartServicesCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	restartServicesCmd.PersistentFlags().IntVar(&restartCmdFlags.timeout, "wait-timeout", DEFAULT_TIMEOUT_FOR_RESTART, "This flag sets the operation timeout duration (in seconds) for each individual node during the restart services")
 	RootCmd.AddCommand(restartServicesCmd)
 }
 
-func runRestartServicess(flags *RestartCmdFlags) func(cmd *cobra.Command, args []string) error {
+func runRestartServicesCmd(flags *RestartCmdFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		return runRestartServices(cmd, args, flags)
 	}
@@ -94,7 +99,7 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 
 type restartFromBastion interface {
 	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
-	//isManagedServicesOn() bool
+	isManagedServicesOn() bool
 	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
 	printRestartCmdOutput(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
 }
@@ -109,29 +114,14 @@ func (rs *restartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraD
 	return getAutomateHAInfraDetails()
 }
 
+func (st *restartFromBastionImpl) isManagedServicesOn() bool {
+	return isManagedServicesOn()
+}
+
 func (rs *restartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
 	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
 	cmdResult, err := remoteExecutor.Execute()
 	return cmdResult, err
-}
-
-type MockrestartFromBastionImpl struct {
-	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
-	executeRemoteExecutorFunc func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printRestartCmdOutputFunc func(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
-}
-
-func (mrs *MockrestartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return mrs.getAutomateHAInfraDetailsFunc()
-}
-
-
-func (mrs *MockrestartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	return mrs.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
-}
-
-func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
-	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, wg, mutex, writer)
 }
 
 func (rs *restartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
@@ -144,6 +134,29 @@ func (rs *restartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*
 	}
 	mutex.Unlock()
 	wg.Done()
+}
+
+type MockrestartFromBastionImpl struct {
+	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
+	isManagedServicesOnFunc       func() bool
+	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
+	printRestartCmdOutputFunc     func(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
+}
+
+func (mrs *MockrestartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+	return mrs.getAutomateHAInfraDetailsFunc()
+}
+
+func (mrs *MockrestartFromBastionImpl) isManagedServicesOn() bool {
+	return mrs.isManagedServicesOnFunc()
+}
+
+func (mrs *MockrestartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
+	return mrs.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
+}
+
+func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
+	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, wg, mutex, writer)
 }
 
 func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error {
@@ -196,47 +209,54 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 		errChan <- nil
 	}
 
-	if !isManagedServicesOn() {
-		if flags.postgresql {
-			go func(flags RestartCmdFlags, errChan chan<- error) {
-				writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-				sshUtil := NewSSHUtil(&SSHConfig{})
-				flags.automate = false
-				flags.chefServer = false
-				flags.opensearch = false
-				nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-				cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-				errChan <- err
-				wg.Add(1)
-				go rs.printRestartCmdOutput(cmdResult, POSTGRESQL, wg, mutex, writer)
-			}(*flags, errChan)
-		} else {
-			errChan <- nil
+	if rs.isManagedServicesOn() {
+		errChan <- nil
+		errChan <- nil
+		for i := 0; i < 4; i++ {
+			errVal := <-errChan
+			if errVal != nil {
+				return errVal
+			}
 		}
-
-		if flags.opensearch {
-			go func(flags RestartCmdFlags, errChan chan<- error) {
-				writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-				sshUtil := NewSSHUtil(&SSHConfig{})
-				flags.automate = false
-				flags.chefServer = false
-				flags.postgresql = false
-				nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-				cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-				errChan <- err
-				wg.Add(1)
-				go rs.printRestartCmdOutput(cmdResult, OPENSEARCH, wg, mutex, writer)
-			}(*flags, errChan)
-		} else {
-			errChan <- nil
-		}
+		wg.Wait()
+		return handleManagedServiceError(flags)
 	}
 
-	n := 4
-	if isManagedServicesOn() {
-		n = 2
+	if flags.postgresql {
+		go func(flags RestartCmdFlags, errChan chan<- error) {
+			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+			sshUtil := NewSSHUtil(&SSHConfig{})
+			flags.automate = false
+			flags.chefServer = false
+			flags.opensearch = false
+			nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
+			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
+			errChan <- err
+			wg.Add(1)
+			go rs.printRestartCmdOutput(cmdResult, POSTGRESQL, wg, mutex, writer)
+		}(*flags, errChan)
+	} else {
+		errChan <- nil
 	}
-	for i := 0; i < n; i++ {
+
+	if flags.opensearch {
+		go func(flags RestartCmdFlags, errChan chan<- error) {
+			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+			sshUtil := NewSSHUtil(&SSHConfig{})
+			flags.automate = false
+			flags.chefServer = false
+			flags.postgresql = false
+			nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
+			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
+			errChan <- err
+			wg.Add(1)
+			go rs.printRestartCmdOutput(cmdResult, OPENSEARCH, wg, mutex, writer)
+		}(*flags, errChan)
+	} else {
+		errChan <- nil
+	}
+
+	for i := 0; i < 4; i++ {
 		errVal := <-errChan
 		if errVal != nil {
 			return errVal
@@ -246,13 +266,28 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 	return nil
 }
 
+func handleManagedServiceError(flags *RestartCmdFlags) error {
+
+	if flags.postgresql && flags.opensearch {
+		return nil
+	}
+
+	if flags.postgresql {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL)
+	}
+
+	if flags.opensearch {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH)
+	}
+
+	return nil
+}
+
 func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
-	commandFrontEnd := RESTART_FRONTEND_COMMAND
-	commandBackEnd := "sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup"
 	nodeMap := &NodeTypeAndCmd{
 		Frontend: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandFrontEnd,
+				Cmd:                      RESTART_FRONTEND_COMMAND,
 				ErrorCheckEnableInOutput: true,
 				WaitTimeout:              int(flags.timeout),
 				Single:                   false,
@@ -263,7 +298,7 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		},
 		Automate: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandFrontEnd,
+				Cmd:                      RESTART_FRONTEND_COMMAND,
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
 				WaitTimeout:              int(flags.timeout),
@@ -275,7 +310,7 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		},
 		ChefServer: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandFrontEnd,
+				Cmd:                      RESTART_FRONTEND_COMMAND,
 				WaitTimeout:              int(flags.timeout),
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
@@ -287,7 +322,7 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		},
 		Postgresql: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandBackEnd,
+				Cmd:                      RESTART_BACKEND_COMMAND,
 				NodeIps:                  []string{flags.node},
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
@@ -298,7 +333,7 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		},
 		Opensearch: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      commandBackEnd,
+				Cmd:                      RESTART_BACKEND_COMMAND,
 				NodeIps:                  []string{flags.node},
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
