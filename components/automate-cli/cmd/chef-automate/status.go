@@ -91,13 +91,13 @@ func newStatusCmd() *cobra.Command {
 		"How many seconds to wait between polling for status updates",
 	)
 
-	statusCmd.Flags().BoolVar(&statusCmdFlag.automate, "automate", false, "Shows status from Automate node(HA)")
+	statusCmd.Flags().BoolVarP(&statusCmdFlag.automate, "automate", "a", false, "Shows status from Automate node(HA)")
 	statusCmd.Flags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.Flags().BoolVar(&statusCmdFlag.chefServer, "chef_server", false, "Shows status from Chef-server node(HA)")
+	statusCmd.Flags().BoolVarP(&statusCmdFlag.chefServer, "chef_server", "c", false, "Shows status from Chef-server node(HA)")
 	statusCmd.Flags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.Flags().BoolVar(&statusCmdFlag.postgresql, "postgresql", false, "Shows status from PostgresQL node")
+	statusCmd.Flags().BoolVarP(&statusCmdFlag.postgresql, "postgresql", "p", false, "Shows status from PostgresQL node")
 	statusCmd.Flags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
-	statusCmd.Flags().BoolVar(&statusCmdFlag.opensearch, "opensearch", false, "Shows status from OpenSearch node")
+	statusCmd.Flags().BoolVarP(&statusCmdFlag.opensearch, "opensearch", "o", false, "Shows status from OpenSearch node")
 	statusCmd.Flags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
 	statusCmd.Flags().BoolVar(&statusCmdFlag.automate, "a2", false, "Shows status from Automate node(HA)[DUPLICATE]")
 	statusCmd.Flags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
