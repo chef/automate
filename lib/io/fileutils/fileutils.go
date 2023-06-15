@@ -204,9 +204,8 @@ func Move(sourceFile string, destinationFile string) error {
 	if err != nil {
 		// Checks if the error is of type *os.LinkError
 		if linkErr, ok := err.(*os.LinkError); ok {
-			// Checks the underlying error code
+			// Checks the underlying error code & Handles the "file exists" error
 			if linkErr.Err.Error() == "file exists" {
-				// Handles the "file exists" error
 				if err = os.Remove(destinationFile); err != nil {
 					return err
 				}
@@ -278,8 +277,7 @@ func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 		return "", err
 	}
 	if err := f.Close(); err != nil {
-		errors.Wrap(err, "Failed to close the file\n%v")
-		return "", err
+		return "", errors.Wrap(err, "Failed to close the file\n%v")
 	}
 
 	return tomlFile, nil
