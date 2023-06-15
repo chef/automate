@@ -230,9 +230,8 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 	batchCheckConfig := &models.Config{}
 	batchCheckConfig.PopulateWith(v.Config)
 
-	// Check if automate-verify service is already running on bastion,
-	// else add automate-verify service to systemd and start the automate-verify service,
-	// upgrade if needed.
+	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
+
 	err = v.checkAutomateVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
 		return err
@@ -300,7 +299,6 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig mo
 		if err != nil {
 			return err
 		}
-		//TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
 		v.Writer.Printf("Response for batch-check API on Bastion: \n%s\n", string(resultBytes))
 	}
 	v.Writer.Println("Batch-check API call for bastion completed")
