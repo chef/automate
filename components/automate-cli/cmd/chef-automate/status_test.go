@@ -10,6 +10,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type MockStatusCmdFromBastionHelperImpl struct {
+	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
+	isManagedServicesOnFunc       func() bool
+	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
+	printStatusOutputFunc         func(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
+}
+
+func (mst *MockStatusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+	return mst.getAutomateHAInfraDetailsFunc()
+}
+
+func (mst *MockStatusCmdFromBastionHelperImpl) isManagedServicesOn() bool {
+	return mst.isManagedServicesOnFunc()
+}
+
+func (mst *MockStatusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
+	return mst.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
+}
+
+func (mst *MockStatusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
+	mst.printStatusOutputFunc(cmdResult, remoteService, mutex, writer)
+}
+
 func TestBuildFrontEndStatusCmd(t *testing.T) {
 	type testCase struct {
 		flags           *statusCmdFlags
@@ -161,29 +184,6 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 		nodeMapGet := constructNodeMapForStatus(testCase.flags, infra)
 		assert.Equal(t, testCase.nodeMapExpected, nodeMapGet)
 	}
-}
-
-type MockStatusCmdFromBastionHelperImpl struct {
-	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
-	isManagedServicesOnFunc       func() bool
-	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printStatusOutputFunc         func(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return mst.getAutomateHAInfraDetailsFunc()
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) isManagedServicesOn() bool {
-	return mst.isManagedServicesOnFunc()
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	return mst.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
-	mst.printStatusOutputFunc(cmdResult, remoteService, mutex, writer)
 }
 
 func TestRunStatusFromBastion(t *testing.T) {

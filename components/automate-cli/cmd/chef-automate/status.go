@@ -19,6 +19,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type statusCmdFromBastionHelper interface {
+	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
+	isManagedServicesOn() bool
+	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
+	printStatusOutput(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
+}
+
+type statusCmdFromBastionHelperImpl struct{}
 type statusCmdFlags struct {
 	waitForHealthy      bool
 	waitTimeout         int64
@@ -53,6 +61,7 @@ type BeStatusValue struct {
 	upTime      string
 	role        string
 }
+
 type FeStatus []FeStatusValue
 type BeStatus []BeStatusValue
 
@@ -61,6 +70,35 @@ const (
 	BACKEND_STATUS               = "sudo HAB_LICENSE=accept-no-persist hab svc status"
 	FRONTEND_STATUS              = "sudo chef-automate status"
 )
+
+func NewStatusCmdFromBastionHelperImpl() *statusCmdFromBastionHelperImpl {
+	return &statusCmdFromBastionHelperImpl{}
+}
+
+func (st *statusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+	return getAutomateHAInfraDetails()
+}
+
+func (st *statusCmdFromBastionHelperImpl) isManagedServicesOn() bool {
+	return isManagedServicesOn()
+}
+
+func (st *statusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
+	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
+	cmdResult, err := remoteExecutor.Execute()
+	return cmdResult, err
+}
+
+func (st *statusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
+	mutex.Lock()
+	writer.Printf("\n=====================================================%s=======================================================\n", "Status on "+remoteService)
+	for _, value := range cmdResult {
+		for _, cmdResult := range value {
+			printOutput(remoteService, *cmdResult, []string{}, writer)
+		}
+	}
+	mutex.Unlock()
+}
 
 func newStatusCmd() *cobra.Command {
 
@@ -280,44 +318,6 @@ func runStatusCmdFlowExecutor(cmd *cobra.Command, args []string, flags *statusCm
 	}
 }
 
-type statusCmdFromBastionHelper interface {
-	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
-	isManagedServicesOn() bool
-	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printStatusOutput(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
-}
-
-type statusCmdFromBastionHelperImpl struct{}
-
-func NewStatusCmdFromBastionHelperImpl() *statusCmdFromBastionHelperImpl {
-	return &statusCmdFromBastionHelperImpl{}
-}
-
-func (st *statusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return getAutomateHAInfraDetails()
-}
-
-func (st *statusCmdFromBastionHelperImpl) isManagedServicesOn() bool {
-	return isManagedServicesOn()
-}
-
-func (st *statusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
-	cmdResult, err := remoteExecutor.Execute()
-	return cmdResult, err
-}
-
-func (st *statusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
-	mutex.Lock()
-	writer.Printf("\n=====================================================%s=======================================================\n", "Status on "+remoteService)
-	for _, value := range cmdResult {
-		for _, cmdResult := range value {
-			printOutput(remoteService, *cmdResult, []string{}, writer)
-		}
-	}
-	mutex.Unlock()
-}
-
 func runStatusFromBastion(flags *statusCmdFlags, st statusCmdFromBastionHelper) error {
 
 	var mutex = &sync.Mutex{}
@@ -359,32 +359,14 @@ func runStatusFromBastion(flags *statusCmdFlags, st statusCmdFromBastionHelper) 
 func runStatusCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *statusCmdFlags, st statusCmdFromBastionHelper, mutex *sync.Mutex, errChan chan error) {
 
 	if flags.automate {
-		go func(flags statusCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			nodeMap := constructNodeMapForStatus(&flags, infra)
-			cmdResult, err := st.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			if err == nil {
-				st.printStatusOutput(cmdResult, AUTOMATE, mutex, writer)
-			}
-			errChan <- err
-		}(*flags, errChan)
+		nodeStatus(flags, AUTOMATE, infra, st, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
 
 	if flags.chefServer {
-		go func(flags statusCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			flags.automate = false
-			nodeMap := constructNodeMapForStatus(&flags, infra)
-			cmdResult, err := st.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			if err == nil {
-				st.printStatusOutput(cmdResult, CHEF_SERVER, mutex, writer)
-			}
-			errChan <- err
-		}(*flags, errChan)
+		flags.automate = false
+		nodeStatus(flags, CHEF_SERVER, infra, st, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
@@ -393,40 +375,34 @@ func runStatusCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *statusCmdFlag
 func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *statusCmdFlags, st statusCmdFromBastionHelper, mutex *sync.Mutex, errChan chan error) {
 
 	if flags.postgresql {
-		go func(flags statusCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			flags.automate = false
-			flags.chefServer = false
-			flags.opensearch = false
-			nodeMap := constructNodeMapForStatus(&flags, infra)
-			cmdResult, err := st.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			if err == nil {
-				st.printStatusOutput(cmdResult, POSTGRESQL, mutex, writer)
-			}
-			errChan <- err
-		}(*flags, errChan)
+		flags.automate = false
+		flags.chefServer = false
+		nodeStatus(flags, POSTGRESQL, infra, st, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
 
 	if flags.opensearch {
-		go func(flags statusCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			flags.automate = false
-			flags.chefServer = false
-			flags.postgresql = false
-			nodeMap := constructNodeMapForStatus(&flags, infra)
-			cmdResult, err := st.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			if err == nil {
-				st.printStatusOutput(cmdResult, OPENSEARCH, mutex, writer)
-			}
-			errChan <- err
-		}(*flags, errChan)
+		flags.automate = false
+		flags.chefServer = false
+		flags.postgresql = false
+		nodeStatus(flags, OPENSEARCH, infra, st, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
+}
+
+func nodeStatus(flags *statusCmdFlags, nodeType string, infra *AutomateHAInfraDetails, st statusCmdFromBastionHelper, mutex *sync.Mutex, errChan chan<- error) {
+	go func(flags statusCmdFlags, errChan chan<- error) {
+		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		nodeMap := constructNodeMapForStatus(&flags, infra)
+		cmdResult, err := st.executeRemoteExecutor(nodeMap, sshUtil, writer)
+		if err == nil {
+			st.printStatusOutput(cmdResult, nodeType, mutex, writer)
+		}
+		errChan <- err
+	}(*flags, errChan)
 }
 
 func getValueFromChannel(errChan chan error) error {
