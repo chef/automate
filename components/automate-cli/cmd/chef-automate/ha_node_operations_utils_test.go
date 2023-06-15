@@ -598,6 +598,28 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		assert.Error(t, err, "No ips found")
 	})
 
+	t.Run("Get node object with to patch command for PG node", func(t *testing.T) {
+
+		nodeObjects := []*NodeObject{
+			NewNodeObjectWithOutputFile("", nil, nil, "", POSTGRESQL),
+		}
+		singleNode := true
+		outputDirectory := ""
+		err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+		assert.Error(t, err, "No ips found")
+	})
+
+	t.Run("Get node object with to patch command for OS node", func(t *testing.T) {
+
+		nodeObjects := []*NodeObject{
+			NewNodeObjectWithOutputFile("", nil, nil, "", OPENSEARCH),
+		}
+		singleNode := true
+		outputDirectory := ""
+		err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+		assert.Error(t, err, "No ips found")
+	})
+
 	t.Run("Get node object with to fetch config in all nodes", func(t *testing.T) {
 
 		nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
@@ -606,6 +628,17 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
 		assert.ErrorContains(t, err, "error on removing output header in fetched config")
 	})
+	// t.Run("No output file", func(t *testing.T) {
+
+	// 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	// 	singleNode := true
+	// 	outputDirectory := ""
+	// 	for _, nodeObject := range nodeObjects {
+	// 		nodeObject.OutputFile = []string{}
+	// 	}
+	// 	err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
+	// 	assert.ErrorContains(t, err, "error on removing output header in fetched config")
+	// })
 
 }
 
