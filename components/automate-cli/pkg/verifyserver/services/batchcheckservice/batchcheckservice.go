@@ -77,15 +77,19 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config models.Config) (
 
 func (ss *BatchCheckService) stopAllMockServers(successfullyStartedMockServers []models.MockServerFromBatchServiceResponse) bool {
 	if len(successfullyStartedMockServers) > 0 {
-		stopMockServerChannel := make(chan models.MockServerFromBatchServiceResponse)
-		defer close(stopMockServerChannel)
 		totalReq := 0
-		mockServersStoppedSuccessfully := true
 		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
 			if successfullyStartedMockServer.Host != "" {
 				totalReq = totalReq + 1
-				go ss.stopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port, stopMockServerChannel)
 			}
+		}
+		stopMockServerChannel := make(chan models.MockServerFromBatchServiceResponse, totalReq)
+		defer close(stopMockServerChannel)
+		mockServersStoppedSuccessfully := true
+		for _, successfullyStartedMockServer := range successfullyStartedMockServers {
+
+			go ss.stopMockServerOnHostAndPort(successfullyStartedMockServer.Host, successfullyStartedMockServer.Protocol, successfullyStartedMockServer.Port, stopMockServerChannel)
+
 		}
 		for i := 0; i < totalReq; i++ {
 			result := <-stopMockServerChannel
@@ -371,7 +375,7 @@ func (ss *BatchCheckService) startMockServerOnHostAndPort(host, port string, sta
 	url := fmt.Sprintf("%s%s:%s%s", "http://", host, port, constants.START_MOCK_SERVER)
 	resp, err := ss.httpRequestClient.MakeRequest(http.MethodPost, url, startMockServerRequestBody)
 	if err != nil && resp == nil {
-		ss.log.Error("Error occurred while starting mock server", err.Error())
+		ss.log.Error("Error occurred while making request to start mock server", err.Error())
 		respChan <- models.MockServerFromBatchServiceResponse{
 			Host:       host,
 			Error:      err,
