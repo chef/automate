@@ -11,107 +11,75 @@ import (
 )
 
 func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
-	var restartRestartCmdFlags = RestartCmdFlags{}
-	restartRestartCmdFlags.automate = true
-	var infra AutomateHAInfraDetails
-
-	type ExpectedOutput struct {
-		Automate   bool
-		ChefServer bool
-		Postgresql bool
-		Opensearch bool
+	type testCase struct {
+		flags           *RestartCmdFlags
+		nodeMapExpected *NodeTypeAndCmd
 	}
+	infra := &AutomateHAInfraDetails{}
 
-	type testCaseInfo struct {
-		testCaseDescription string
-		Automate            bool
-		ChefServer          bool
-		Postgresql          bool
-		Opensearch          bool
-		ExpectedOutput      ExpectedOutput
-	}
+	testCases := []testCase{
+		{
+			flags: &RestartCmdFlags{
+				automate: true,
+			},
+			nodeMapExpected: &NodeTypeAndCmd{
+				Frontend: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo chef-automate restart-services",
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Automate: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo chef-automate restart-services",
+						ErrorCheckEnableInOutput: true,
+						NodeIps:                  []string{""},
+						NodeType:                 true,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				ChefServer: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo chef-automate restart-services",
+						ErrorCheckEnableInOutput: true,
+						NodeIps:                  []string{""},
+						NodeType:                 false,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Postgresql: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup",
+						NodeIps:                  []string{""},
+						ErrorCheckEnableInOutput: true,
+						NodeType:                 false,
 
-	testCases := []testCaseInfo{
-		{
-			testCaseDescription: "should construct nodeMap for frontend when frontend flag is passed",
-			Automate:            true,
-			ChefServer:          true,
-			Postgresql:          true,
-			Opensearch:          true,
-			ExpectedOutput: ExpectedOutput{
-				Automate:   true,
-				ChefServer: true,
-				Postgresql: true,
-				Opensearch: true,
-			},
-		},
-		{
-			testCaseDescription: "should construct nodeMap for automate when automate flag is passed",
-			Automate:            true,
-			ChefServer:          true,
-			Postgresql:          true,
-			Opensearch:          true,
-			ExpectedOutput: ExpectedOutput{
-				Automate:   true,
-				ChefServer: true,
-				Postgresql: true,
-				Opensearch: true,
-			},
-		},
-		{
-			testCaseDescription: "should construct nodeMap for chef-server when chef-server flag is passed",
-			Automate:            true,
-			ChefServer:          true,
-			Postgresql:          true,
-			Opensearch:          true,
-			ExpectedOutput: ExpectedOutput{
-				Automate:   true,
-				ChefServer: true,
-				Postgresql: true,
-				Opensearch: true,
-			},
-		},
-		{
-			testCaseDescription: "should construct nodeMap for postgresql when Postgresql flag is passed",
-			Automate:            true,
-			ChefServer:          true,
-			Postgresql:          true,
-			Opensearch:          true,
-			ExpectedOutput: ExpectedOutput{
-				Automate:   true,
-				ChefServer: true,
-				Postgresql: true,
-				Opensearch: true,
-			},
-		},
-		{
-			testCaseDescription: "should construct nodeMap for opensearch when Opensearch flag is passed",
-			Automate:            true,
-			ChefServer:          true,
-			Postgresql:          true,
-			Opensearch:          true,
-			ExpectedOutput: ExpectedOutput{
-				Automate:   true,
-				ChefServer: true,
-				Postgresql: true,
-				Opensearch: true,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Opensearch: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      "sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup",
+						NodeIps:                  []string{""},
+						ErrorCheckEnableInOutput: true,
+						NodeType:                 false,
+
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Infra: infra,
 			},
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			restartRestartCmdFlags.automate = tc.Automate
-			restartRestartCmdFlags.chefServer = tc.ChefServer
-			restartRestartCmdFlags.postgresql = tc.Postgresql
-			restartRestartCmdFlags.opensearch = tc.Opensearch
-			nodeMap := constructNodeMapForAllNodeTypes(&restartRestartCmdFlags, &infra)
-
-			assert.EqualValues(t, tc.ExpectedOutput.Automate, nodeMap.Automate.CmdInputs.NodeType)
-			assert.EqualValues(t, tc.ExpectedOutput.ChefServer, nodeMap.ChefServer.CmdInputs.NodeType)
-			assert.EqualValues(t, tc.ExpectedOutput.Postgresql, nodeMap.Postgresql.CmdInputs.NodeType)
-			assert.EqualValues(t, tc.ExpectedOutput.Opensearch, nodeMap.Opensearch.CmdInputs.NodeType)
-		})
+	for _, testCase := range testCases {
+		nodeMapGet := constructNodeMapForAllNodeTypes(testCase.flags, infra)
+		assert.Equal(t, testCase.nodeMapExpected, nodeMapGet)
 	}
 }
 
@@ -153,6 +121,9 @@ func TestRunRestartFromBastion(t *testing.T) {
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
@@ -169,6 +140,9 @@ func TestRunRestartFromBastion(t *testing.T) {
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
+				isManagedServicesOnFunc: func() bool {
+					return false
+				},
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
 				},
@@ -184,6 +158,9 @@ func TestRunRestartFromBastion(t *testing.T) {
 			mockStatusCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return false
 				},
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil

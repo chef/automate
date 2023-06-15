@@ -288,8 +288,6 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		Frontend: &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:                      RESTART_FRONTEND_COMMAND,
-				ErrorCheckEnableInOutput: true,
-				WaitTimeout:              int(flags.timeout),
 				Single:                   false,
 				NodeType:                 false,
 				SkipPrintOutput:          true,
