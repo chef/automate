@@ -268,13 +268,11 @@ func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 
 	if err != nil {
 		// failed to create/open the file
-		errors.Wrap(err, "Failed to create/open the file, \n%v")
-		return "", err
+		return "", errors.Wrap(err, "Failed to create/open the file, \n%v")
 	}
 	if err := toml.NewEncoder(f).Encode(config); err != nil {
 		// failed to encode
-		errors.Wrap(err, "Failed to encode\n%v")
-		return "", err
+		return "", errors.Wrap(err, "Failed to encode\n%v")
 	}
 	if err := f.Close(); err != nil {
 		return "", errors.Wrap(err, "Failed to close the file\n%v")

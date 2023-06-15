@@ -211,7 +211,6 @@ func (ani *AddNodeOnPremImpl) runDeploy() error {
 	}
 	argsdeploy := []string{"-y"}
 	return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
-
 }
 
 func (ani *AddNodeOnPremImpl) validateCmdArgs() *list.List {

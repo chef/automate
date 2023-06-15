@@ -95,10 +95,10 @@ func TestMove(t *testing.T) {
 		srcFile, err := fileutils.CreateTempFile(content, filename)
 		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
-		defer fileutils.DeleteTempFile(srcFile)
+		defer fileutils.DeleteFile(srcFile)
 
 		err = fileutils.Move(srcFile, destinationDir+filename)
-		defer fileutils.DeleteTempFile(destinationDir + filename)
+		defer fileutils.DeleteFile(destinationDir + filename)
 		require.NoError(t, err)
 		fileExists, err := fileutils.PathExists(destinationDir + filename)
 		require.NoError(t, err)
@@ -109,7 +109,7 @@ func TestMove(t *testing.T) {
 		srcFile, err := fileutils.CreateTempFile(content, filename)
 		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
-		defer fileutils.DeleteTempFile(srcFile)
+		defer fileutils.DeleteFile(srcFile)
 
 		existingFile := filepath.Join(destinationDir, "existing.txt")
 		err = fileutils.WriteFile(existingFile, []byte("Existing File"), 0644)
@@ -122,7 +122,7 @@ func TestMove(t *testing.T) {
 		srcFile, err := fileutils.CreateTempFile(content, filename)
 		assert.Contains(t, srcFile, "file-name")
 		require.NoError(t, err)
-		defer fileutils.DeleteTempFile(srcFile)
+		defer fileutils.DeleteFile(srcFile)
 
 		invalidSourceFile := "/path/to/invalid/source.txt"
 		err = fileutils.Move(invalidSourceFile, destinationDir+filename)

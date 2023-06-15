@@ -727,7 +727,7 @@ func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
 func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 
 	nodeMap := NewNodeTypeAndCmd()
-	cmd := NewNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
+	cmd := newNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
 	if service == POSTGRESQL {
 		cmd.CmdInputs.Args = inputFiles
 	} else if service == OPENSEARCH {
@@ -758,7 +758,7 @@ func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix s
 }
 
 // Create *Cmd struct instance with 'cmdString' and 'outputFiles' params
-func NewNodeTypeCmd(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []string, singleNode bool) *Cmd {
+func newNodeTypeCmd(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []string, singleNode bool) *Cmd {
 	return &Cmd{
 		CmdInputs: &CmdInputs{
 			Cmd:                      cmdString,
