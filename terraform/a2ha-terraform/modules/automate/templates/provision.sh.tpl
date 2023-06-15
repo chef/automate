@@ -203,7 +203,11 @@ rm ${automate_custom_config}
 if [[ "${automate_role}" != "bootstrap_automate" ]]; then
   DEPLOY_BUNDLES="--airgap-bundle ${frontend_aib_file} --bootstrap-bundle ${tmp_path}/bootstrap.abb"
 else
-  DEPLOY_BUNDLES="--airgap-bundle ${frontend_aib_file}"
+  if [ -f ${tmp_path}/bootstrap.abb ]; then
+    DEPLOY_BUNDLES="--airgap-bundle ${frontend_aib_file} --bootstrap-bundle ${tmp_path}/bootstrap.abb"
+  else
+    DEPLOY_BUNDLES="--airgap-bundle ${frontend_aib_file}"
+  fi
 fi
 
 if [ -e "/hab/user/deployment-service/config/user.toml" ]; then

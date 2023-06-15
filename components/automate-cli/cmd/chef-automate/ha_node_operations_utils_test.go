@@ -45,7 +45,7 @@ func TestModifyConfigForAddNewNode(t *testing.T) {
 			PublicKey:  "public",
 		},
 	}
-	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs)
+	err := modifyConfigForAddNewNode(&incount, &existingIps, newIps, &certs, &SSHConfig{})
 	assert.NoError(t, err)
 	assert.Equal(t, "3", incount)
 	assert.Equal(t, []string{TEST_IP_2, TEST_IP_3, TEST_IP_4}, existingIps)

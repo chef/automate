@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	t "github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/toml"
 	"github.com/imdario/mergo"
@@ -171,7 +172,6 @@ var setConfigCmd = &cobra.Command{
 }
 
 func runShowCmd(cmd *cobra.Command, args []string) error {
-
 	if isA2HARBFileExist() {
 
 		if isManagedServicesOn() {
@@ -269,6 +269,15 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 
 		if configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
 			_, err = cmdUtil.Execute()
+			if err != nil {
+				return err
+			}
+
+			time.Sleep(2 * time.Second)
+			err = updateConfig(cmd, infra, sshUtil)
+			if err != nil {
+				return errors.New("Failed to Update the config: " + err.Error())
+			}
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -452,6 +461,12 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
+
+			time.Sleep(2 * time.Second)
+			err = updateConfig(cmd, infra, sshUtil)
+			if err != nil {
+				return errors.New("Failed to Update the config: " + err.Error())
+			}
 		} else {
 			writer.Println(cmd.UsageString())
 		}
@@ -466,6 +481,79 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		}
 		writer.Success("Configuration patched")
 	}
+	return nil
+}
+
+func updateConfig(cmd *cobra.Command, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+	var err error
+	if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server || configCmdFlags.postgresql || configCmdFlags.opensearch {
+		if configCmdFlags.frontend {
+			err = pullAndWriteFirstNodeConfig(AUTOMATE_CONFIG_FILENAME, AUTOMATE, infra, sshUtil)
+			if err != nil {
+				return err
+			}
+			err = pullAndWriteFirstNodeConfig(CHEFSERVER_CONFIG_FILENAME, CHEF_SERVER, infra, sshUtil)
+		} else if configCmdFlags.automate {
+			err = pullAndWriteFirstNodeConfig(AUTOMATE_CONFIG_FILENAME, AUTOMATE, infra, sshUtil)
+		} else if configCmdFlags.chef_server {
+			err = pullAndWriteFirstNodeConfig(CHEFSERVER_CONFIG_FILENAME, CHEF_SERVER, infra, sshUtil)
+		} else if configCmdFlags.postgresql {
+			err = pullAndWriteFirstNodeConfig(POSTGRESQL_CONFIG_FILENAME, POSTGRESQL, infra, sshUtil)
+		} else if configCmdFlags.opensearch {
+			err = pullAndWriteFirstNodeConfig(OPENSEARCH_CONFIG_FILENAME, OPENSEARCH, infra, sshUtil)
+		}
+		if err != nil {
+			return err
+		}
+	} else {
+		writer.Println(cmd.UsageString())
+	}
+	return nil
+}
+
+func pullAndWriteFirstNodeConfig(fileName, remoteService string, infra *AutomateHAInfraDetails, sshUtil SSHUtil) error {
+	pullcfg := NewPullConfigs(infra, sshUtil)
+	var config interface{}
+	var err error
+	if remoteService == AUTOMATE {
+		config, err = pullcfg.pullFirstAutomateNodeConfig()
+	} else if remoteService == CHEF_SERVER {
+		config, err = pullcfg.pullFirstChefserverNodeConfig()
+	} else if remoteService == POSTGRESQL {
+		config, err = pullcfg.pullFirstPGNodeConfig()
+	} else if remoteService == OPENSEARCH {
+		config, err = pullcfg.pullFirstOSNodeConfig()
+	} else {
+		config, err = nil, errors.New("Unknown Type")
+	}
+	if err != nil {
+		return err
+	}
+	err = createAndWriteToFile(fileName, config)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func createAndWriteToFile(fileName string, config interface{}) error {
+	file, err := os.Create(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, fileName))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Marshal the struct into a byte slice
+	data, err := t.Marshal(config)
+	if err != nil {
+		return err
+	}
+
+	// Write the byte slice to the file
+	_, err = file.Write(data)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -478,7 +566,6 @@ func prePatchCheckForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Au
 	}
 
 	inputs.InputFiles[0] = srcPath
-
 	return nil
 }
 
@@ -509,7 +596,7 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 
 	//Implementing the config if there is some change in the database configuration
 	isConfigChangedDatabase := isConfigChanged(existConfig, reqConfig)
-
+	fmt.Println("config Changed: ", isConfigChangedDatabase)
 	if isConfigChangedDatabase {
 		if reqConfig.Ssl != nil {
 			writer.Warn(fmt.Sprintf(CERT_WARNING, "ssl"))
@@ -518,6 +605,8 @@ func prePatchCheckForPostgresqlNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *
 
 		tomlFile := args[0]
 		tomlFilePath, err := createTomlFileFromConfig(&reqConfig, tomlFile)
+		fmt.Println("Hola")
+		fmt.Println(tomlFilePath)
 		if err != nil {
 			return err
 		}

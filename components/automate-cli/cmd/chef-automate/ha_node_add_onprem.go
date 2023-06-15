@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"errors"
@@ -34,6 +35,7 @@ type AddDeleteNodeHACmdFlags struct {
 	onPremMode      bool
 	awsMode         bool
 	autoAccept      bool
+	force           bool
 }
 
 type AddNodeOnPremImpl struct {
@@ -75,14 +77,24 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		c.Help()
 		return status.New(status.InvalidCommandArgsError, "Please provide service name and ip address of the node which you want to add")
 	}
+
 	err := ani.validate()
 	if err != nil {
 		return err
 	}
+	fmt.Println("Validation done")
+
+	ani.removeUnreachableIPs()
+	fmt.Println("Removed Unreachable IPs of Automate(before adding new nodes): ", ani.config.ExistingInfra.Config.AutomatePrivateIps)
+
+	fmt.Println("Remove Done")
 	err = ani.modifyConfig()
 	if err != nil {
 		return err
 	}
+	fmt.Println("(After adding new nodes): ", ani.config.ExistingInfra.Config.AutomatePrivateIps)
+
+	fmt.Println("Modify Done")
 	if !ani.flags.autoAccept {
 		res, err := ani.promptUserConfirmation()
 		if err != nil {
@@ -124,13 +136,49 @@ func (ani *AddNodeOnPremImpl) validate() error {
 	}
 	return nil
 }
+func (ani *AddNodeOnPremImpl) removeUnreachableIPs() {
+	if len(ani.automateIpList) > 0 {
+		reachableIps := ani.getReachableIps(ani.config.ExistingInfra.Config.AutomatePrivateIps)
+		ani.config.ExistingInfra.Config.AutomatePrivateIps = reachableIps
+		ani.config.Automate.Config.InstanceCount = strconv.Itoa(len(reachableIps))
+	}
+	if len(ani.chefServerIpList) > 0 {
+		reachableIps := ani.getReachableIps(ani.config.ExistingInfra.Config.ChefServerPrivateIps)
+		ani.config.ExistingInfra.Config.ChefServerPrivateIps = reachableIps
+		ani.config.ChefServer.Config.InstanceCount = strconv.Itoa(len(reachableIps))
+	}
+	// if len(ani.opensearchIpList) > 0 {
+	// 	updatedIps, _ := ani.removeUnreachableIps(ani.config.ExistingInfra.Config.OpensearchPrivateIps)
+	// 	ani.config.ExistingInfra.Config.OpensearchPrivateIps = updatedIps
+	// 	ani.config.Opensearch.Config.InstanceCount = strconv.Itoa(len(updatedIps))
+	// }
+	// if len(ani.postgresqlIp) > 0 {
+	// 	updatedIps, _ := ani.removeUnreachableIps(ani.config.ExistingInfra.Config.PostgresqlPrivateIps)
+	// 	ani.config.ExistingInfra.Config.PostgresqlPrivateIps = updatedIps
+	// 	ani.config.Postgresql.Config.InstanceCount = strconv.Itoa(len(updatedIps))
+	// }
+}
+func (ani *AddNodeOnPremImpl) getReachableIps(ips []string) []string {
+	var reachableIps []string
+	for _, ip := range ips {
+		if ani.validateConnection(ip) == nil {
+			reachableIps = append(reachableIps, ip)
+		}
+	}
+	return reachableIps
+}
 
 func (ani *AddNodeOnPremImpl) modifyConfig() error {
-	err := modifyConfigForAddNewNode(
+	_, sshConfig, err := ani.nodeUtils.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	err = modifyConfigForAddNewNode(
 		&ani.config.Automate.Config.InstanceCount,
 		&ani.config.ExistingInfra.Config.AutomatePrivateIps,
 		ani.automateIpList,
 		&ani.config.Automate.Config.CertsByIP,
+		sshConfig,
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying automate instance count")
@@ -140,6 +188,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig() error {
 		&ani.config.ExistingInfra.Config.ChefServerPrivateIps,
 		ani.chefServerIpList,
 		&ani.config.ChefServer.Config.CertsByIP,
+		sshConfig,
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying chef-server instance count")
@@ -149,6 +198,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig() error {
 		&ani.config.ExistingInfra.Config.OpensearchPrivateIps,
 		ani.opensearchIpList,
 		&ani.config.Opensearch.Config.CertsByIP,
+		sshConfig,
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying opensearch instance count")
@@ -158,6 +208,7 @@ func (ani *AddNodeOnPremImpl) modifyConfig() error {
 		&ani.config.ExistingInfra.Config.PostgresqlPrivateIps,
 		ani.postgresqlIp,
 		&ani.config.Postgresql.Config.CertsByIP,
+		sshConfig,
 	)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Error modifying postgresql instance count")
@@ -223,11 +274,13 @@ func (ani *AddNodeOnPremImpl) validateIPAddresses(ips []string, errorPrefix stri
 		prefixAdder = " "
 	}
 	for _, ip := range ips {
-		if stringutils.SliceContains(ani.config.ExistingInfra.Config.AutomatePrivateIps, ip) ||
-			stringutils.SliceContains(ani.config.ExistingInfra.Config.ChefServerPrivateIps, ip) ||
-			stringutils.SliceContains(ani.config.ExistingInfra.Config.OpensearchPrivateIps, ip) ||
-			stringutils.SliceContains(ani.config.ExistingInfra.Config.PostgresqlPrivateIps, ip) {
-			errorList.PushBack(fmt.Sprintf("%s%sIp %s is already configured for a node. Please use a different private ip.", errorPrefix, prefixAdder, ip))
+		if !ani.flags.force {
+			if stringutils.SliceContains(ani.config.ExistingInfra.Config.AutomatePrivateIps, ip) ||
+				stringutils.SliceContains(ani.config.ExistingInfra.Config.ChefServerPrivateIps, ip) ||
+				stringutils.SliceContains(ani.config.ExistingInfra.Config.OpensearchPrivateIps, ip) ||
+				stringutils.SliceContains(ani.config.ExistingInfra.Config.PostgresqlPrivateIps, ip) {
+				errorList.PushBack(fmt.Sprintf("%s%sIp %s is already configured for a node. Please use a different private ip.", errorPrefix, prefixAdder, ip))
+			}
 		}
 		err := checkIPAddress(ip)
 		if err != nil {
@@ -243,6 +296,8 @@ func (ani *AddNodeOnPremImpl) validateIPAddresses(ips []string, errorPrefix stri
 
 func (ani *AddNodeOnPremImpl) validateConnection(ip string) error {
 	_, sshConfig, err := ani.nodeUtils.getHaInfraDetails()
+	// setting this timeout for testing purpose
+	sshConfig.timeout = 5
 	if err != nil {
 		return err
 	}
