@@ -247,3 +247,64 @@ func TestStopCmd(t *testing.T) {
 		})
 	}
 }
+
+func TestFlagEnabled(t *testing.T) {
+	tests := []struct {
+		testName        string
+		isForAutomate   bool
+		isForChefServer bool
+		isForPG         bool
+		isForOS         bool
+		node            string
+		isErrorExpected bool
+		errorMessage    string
+	}{
+		{
+			testName:        "test_valid_Flags",
+			isForAutomate:   true,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         false,
+			node:            "",
+			isErrorExpected: false,
+			errorMessage:    "",
+		},
+		{
+			testName:        "test_empty_service_and_node_flag",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         false,
+			node:            "",
+			isErrorExpected: true,
+			errorMessage:    "No flag is enabled. Please provide any flag",
+		},
+		{
+			testName:        "test_empty_service_but_given_node_flag",
+			isForAutomate:   false,
+			isForChefServer: false,
+			isForPG:         false,
+			isForOS:         false,
+			node:            "1.2.3.4",
+			isErrorExpected: true,
+			errorMessage:    "Please provide service flag",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.testName, func(t *testing.T) {
+			stopCmdFlags.automate = tc.isForAutomate
+			stopCmdFlags.chef_server = tc.isForChefServer
+			stopCmdFlags.opensearch = tc.isForOS
+			stopCmdFlags.postgresql = tc.isForPG
+			stopCmdFlags.node = tc.node
+			err := isFlagEnabled(&cobra.Command{})
+			if tc.isErrorExpected {
+				assert.Error(t, err)
+				assert.EqualError(t, err, tc.errorMessage)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}

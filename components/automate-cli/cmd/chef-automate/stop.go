@@ -65,14 +65,9 @@ func init() {
 
 func runStopCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		if !stopCmdFlags.automate && !stopCmdFlags.chef_server && !stopCmdFlags.opensearch && !stopCmdFlags.postgresql {
-			if stopCmdFlags.node != "" {
-				writer.Println("Please Provide service flag")
-			}
-			writer.Println(cmd.UsageString())
-			return nil
+		if err := isFlagEnabled(cmd); err != nil {
+			return err
 		}
-
 		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
@@ -296,4 +291,16 @@ func getFlagCount() int {
 		count++
 	}
 	return count
+}
+
+func isFlagEnabled(cmd *cobra.Command) error {
+	if !stopCmdFlags.automate && !stopCmdFlags.chef_server && !stopCmdFlags.opensearch && !stopCmdFlags.postgresql {
+		if stopCmdFlags.node != "" {
+			writer.Println("Please Provide service flag")
+			return errors.New("Please provide service flag")
+		}
+		writer.Println(cmd.UsageString())
+		return errors.New("No flag is enabled. Please provide any flag")
+	}
+	return nil
 }
