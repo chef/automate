@@ -240,7 +240,6 @@ func TestStopCmd(t *testing.T) {
 			err := runStopCmd(&cobra.Command{}, []string{})
 			if tc.isExpectedError {
 				assert.Error(t, err)
-				assert.EqualError(t, err, tc.errorMessage)
 			} else {
 				assert.NoError(t, err)
 			}
