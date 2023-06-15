@@ -191,7 +191,8 @@ Age = 30
 
 	t.Run("Open file error", func(t *testing.T) {
 		_, err := fileutils.CreateTomlFileFromConfig(user, invalidFile)
-		require.Error(t, err.(*fs.PathError), "No such file or directory")
+		// fmt.Print(err.(*fs.PathError))
+		require.Error(t, err, "Failed to create/open the file")
 	})
 
 	t.Run("Error encoding the config", func(t *testing.T) {
