@@ -21,6 +21,7 @@ export HOME={{pkg.svc_var_path}}
 export DBNAME="{{cfg.sql.db_name}}"
 
 mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
 pg-helper rename-if-exists oc_id "$DBNAME"
