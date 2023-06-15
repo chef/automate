@@ -59,6 +59,7 @@ EOF
     insertAfter "${pkg_prefix}/hooks/run" 1 "source {{pkg.svc_config_path}}/_a2_platform_environment"
 
     build_line "Adding Platform JSON"
+    build_line "what is the config ----****, cfg"
     cat << EOF > "${pkg_prefix}/config/_a2_platform.json"
 {
 "package": {
