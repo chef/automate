@@ -83,6 +83,29 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 	}
 }
 
+type MockrestartFromBastionImpl struct {
+	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
+	isManagedServicesOnFunc       func() bool
+	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
+	printRestartCmdOutputFunc     func(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
+}
+
+func (mrs *MockrestartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+	return mrs.getAutomateHAInfraDetailsFunc()
+}
+
+func (mrs *MockrestartFromBastionImpl) isManagedServicesOn() bool {
+	return mrs.isManagedServicesOnFunc()
+}
+
+func (mrs *MockrestartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
+	return mrs.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
+}
+
+func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
+	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, wg, mutex, writer)
+}
+
 func TestRunRestartFromBastion(t *testing.T) {
 	type testCase struct {
 		description         string
