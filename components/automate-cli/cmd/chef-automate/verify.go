@@ -1,15 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
-	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/response"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/server"
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
-	verification "github.com/chef/automate/lib/verification"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/config"
+	"github.com/chef/automate/lib/httputils"
+	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/version"
 	"github.com/spf13/cobra"
 )
 
@@ -20,23 +30,24 @@ const (
 )
 
 type verifyCmdFlags struct {
-	file                      string
-	haAWSProvision            bool
-	haAWSManagedProvision     bool
-	haOnpremDeploy            bool
-	haOnPremAWSManagedDeploy  bool
-	haOnPremCustManagedDeploy bool
-	haAWSDeploy               bool
-	haAWSManagedDeploy        bool
-	standaloneDeploy          bool
-	certificates              bool
-	debug                     bool
+	config string
+	debug  bool
 }
 
 type verifyCmdFlow struct {
-	Verification      verification.Verification
-	A2HARBFileExist   bool
-	ManagedServicesOn bool
+	Client               httputils.HTTPClient
+	CreateSystemdService *verifysystemdcreate.CreateSystemdService
+	Config               *config.HaDeployConfig
+	Writer               *cli.Writer
+}
+
+func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService *verifysystemdcreate.CreateSystemdService, config *config.HaDeployConfig, writer *cli.Writer) *verifyCmdFlow {
+	return &verifyCmdFlow{
+		Client:               client,
+		CreateSystemdService: createSystemdService,
+		Config:               config,
+		Writer:               writer,
+	}
 }
 
 type verifyServeCmdFlow struct{}
@@ -87,63 +98,27 @@ func init() {
 		RunE: verifySystemdCreateFunc(&flagsObj),
 	}
 
-	// flags for Verify Command
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSProvision,
-		"ha-aws-provision",
-		false,
-		"Use this flag to verify the AWS Provision config")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSManagedProvision,
-		"ha-aws-managed-provision",
-		false,
-		"Use this flag to verify the AWS Provision config with Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haOnpremDeploy,
-		"ha-onprem-deploy",
-		false,
-		"Use this flag to verify the On-Premise setup and config with Chef Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haOnPremAWSManagedDeploy,
-		"ha-onprem-aws-deploy",
-		false,
-		"Use this flag to verify the On-Premise setup and config with AWS Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haOnPremCustManagedDeploy,
-		"ha-onprem-customer-deploy",
-		false,
-		"Use this flag to verify the On-Premise setup and config with Customer Managed services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSDeploy,
-		"ha-aws-deploy",
-		false,
-		"Use this flag to verify the AWS Deployment setup and config")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.haAWSManagedDeploy,
-		"ha-aws-managed-deploy",
-		false,
-		"Use this flag to verify the AWS Deployment setup and config with Managed Services")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.standaloneDeploy,
-		"standalone-deploy",
-		false,
-		"Use this flag to verify the Automate standalone setup and config")
-	verifyCmd.PersistentFlags().BoolVar(
-		&flagsObj.certificates,
-		"certificates",
-		false,
-		"Use this flag to verify the certificates provided in the file")
-	verifyCmd.PersistentFlags().StringVar(
-		&flagsObj.file,
-		"file",
+	verifyCmd.PersistentFlags().StringVarP(
+		&flagsObj.config,
+		"config",
+		"c",
 		"",
 		"Config file that needs to be verified")
+
+	verifyCmd.Flags().BoolVarP(
+		&flagsObj.debug,
+		"debug",
+		"d",
+		false,
+		"enable debugging")
+
 	verifyServeCmd.Flags().BoolVarP(
 		&flagsObj.debug,
 		"debug",
 		"d",
 		false,
 		"enable debugging")
+
 	verifySystemdServiceCreateCmd.Flags().BoolVarP(
 		&flagsObj.debug,
 		"debug",
@@ -165,13 +140,7 @@ func verifyServeCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args 
 }
 
 func (v *verifyServeCmdFlow) runVerifyServeCmd(cmd *cobra.Command, args []string, debug bool) error {
-	port := server.DEFAULT_PORT
-	env_port := os.Getenv(VERIFY_SERVER_PORT)
-	if env_port != "" {
-		if _, err := strconv.Atoi(env_port); err == nil {
-			port = env_port
-		}
-	}
+	port := getPort()
 	writer.Println("Using port " + port)
 	vs, err := server.NewVerifyServer(port, debug)
 	if err != nil {
@@ -204,126 +173,154 @@ func (v *verifySystemdCreateFlow) runVerifySystemdCreateCmd(cmd *cobra.Command, 
 
 func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		c := verifyCmdFlow{
-			Verification:      &verification.VerificationModule{},
-			A2HARBFileExist:   isA2HARBFileExist(),
-			ManagedServicesOn: isManagedServicesOn(),
+		defaultLevel := "info"
+		if flagsObj.debug {
+			defaultLevel = "debug"
 		}
+
+		l, err := logger.NewLogger("text", defaultLevel)
+		if err != nil {
+			return err
+		}
+
+		createSystemdServiceWithBinary, err := verifysystemdcreate.NewCreateSystemdService(
+			verifysystemdcreate.NewSystemdCreateUtilsImpl(),
+			BINARY_DESTINATION_FOLDER,
+			SYSTEMD_PATH,
+			flagsObj.debug,
+			writer,
+		)
+		if err != nil {
+			return err
+		}
+
+		c := NewVerifyCmdFlow(httputils.NewClient(l), createSystemdServiceWithBinary, config.NewHaDeployConfig(), writer)
 		return c.runVerifyCmd(cmd, args, flagsObj)
 	}
 }
 
 func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj *verifyCmdFlags) error {
 	var configPath = ""
-	if len(args) > 0 {
-		configPath = args[0]
+
+	// TODO : config flag is optional for now. Need to handle the default config path
+	if len(strings.TrimSpace(flagsObj.config)) > 0 {
+		configPath = flagsObj.config
 	}
 
-	switch true {
-	case flagsObj.haAWSProvision:
-		err := v.verifyHaAWSProvision(configPath)
+	err := v.Config.ParseAndVerify(configPath)
+	if err != nil {
 		return err
-	case flagsObj.haAWSManagedProvision:
-		err := v.verifyHaAWSManagedProvision(configPath)
-		return err
-	case flagsObj.haAWSDeploy:
-		err := v.verifyHaAWSDeploy(configPath)
-		return err
-	case flagsObj.haAWSManagedDeploy:
-		err := v.verifyHaAWSManagedDeploy(configPath)
-		return err
-	case flagsObj.standaloneDeploy:
-		err := v.verifyStandaloneDeploy(configPath)
-		return err
-	case flagsObj.haOnpremDeploy:
-		err := v.verifyHaOnpremDeploy(configPath)
-		return err
-	case flagsObj.haOnPremAWSManagedDeploy:
-		err := v.verifyHaOnPremAWSManagedDeploy(configPath)
-		return err
-	case flagsObj.haOnPremCustManagedDeploy:
-		err := v.verifyHaOnPremCustManagedDeploy(configPath)
-		return err
-	case flagsObj.certificates:
-		err := v.Verification.VerifyCertificates("")
-		return err
-	default:
-		fmt.Println(cmd.UsageString())
-		return nil
 	}
 
-}
+	// Get config required for batch-check API call
+	batchCheckConfig := &models.Config{}
+	batchCheckConfig.PopulateWith(v.Config)
 
-func (v *verifyCmdFlow) verifyHaAWSProvision(configPath string) error {
-	if err := v.Verification.VerifyHAAWSProvision(configPath); err != nil {
-		return status.Annotate(err, status.ConfigError)
+	// Check if automate-verify service is already running on bastion,
+	// else add automate-verify service to systemd and start the automate-verify service,
+	// upgrade if needed.
+	err = v.checkAutomateVerifyServiceOnBastion(*batchCheckConfig)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (v *verifyCmdFlow) verifyHaAWSManagedProvision(configPath string) error {
-	if err := v.Verification.VerifyHAAWSManagedProvision(configPath); err != nil {
-		return status.Annotate(err, status.ConfigError)
-	}
-
-	return nil
-}
-
-func (v *verifyCmdFlow) verifyHaAWSDeploy(configPath string) error {
-	if !v.ManagedServicesOn {
-		if v.A2HARBFileExist {
-			if err := v.Verification.VerifyHAAWSDeployment(configPath); err != nil {
-				return status.Annotate(err, status.ConfigError)
-			}
-			return nil
+func (v *verifyCmdFlow) checkAutomateVerifyServiceOnBastion(batchCheckConfig models.Config) error {
+	port := getPort()
+	res, err := v.Client.MakeRequest("GET", fmt.Sprintf("http://localhost:%s/status", port), nil)
+	if err != nil {
+		v.Writer.Println(fmt.Sprintf("error while checking automate-verify service on bastion: %v\n", err))
+		v.Writer.Println("Adding automate-verify service to systemd and starting the service")
+		err := v.CreateSystemdService.Create()
+		if err != nil {
+			return err
 		}
-		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
-	}
-	return status.New(status.InvalidCommandArgsError, "This flag will not verify the Managed Services Setup. Please use the --ha-aws-managed-deploy flag.")
-}
-
-func (v *verifyCmdFlow) verifyHaAWSManagedDeploy(configPath string) error {
-	if v.ManagedServicesOn {
-		if v.A2HARBFileExist {
-			if err := v.Verification.VerifyHAAWSManagedDeployment(configPath); err != nil {
-				return status.Annotate(err, status.ConfigError)
-			}
-			return nil
+		// Wait for 2 seconds for the service to start
+		time.Sleep(2 * time.Second)
+	} else {
+		resultBytes, err := getResultFromResponseBody(res.Body)
+		if err != nil {
+			return err
 		}
-		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
-	}
-	return status.New(status.InvalidCommandArgsError, "Managed Services flag is not set. Cannot verify the config.")
-}
 
-func (v *verifyCmdFlow) verifyStandaloneDeploy(configPath string) error {
-	if v.A2HARBFileExist {
-		return status.New(status.InvalidCommandArgsError, "Deployment type does not match with the requested flag.")
-	}
-	if err := v.Verification.VerifyStandaloneDeployment(configPath); err != nil {
-		return status.Annotate(err, status.ConfigError)
+		var result models.StatusDetails
+
+		if err := json.Unmarshal(resultBytes, &result); err != nil {
+			return fmt.Errorf("failed to unmarshal Result field: %v", err)
+		}
+
+		// Upgrade if latest CLI version is greater than the current CLI version on bastion
+		latestCLIVersion := version.BuildTime
+		if latestCLIVersion > result.CliVersion {
+			v.Writer.Println(fmt.Sprintf("Upgrading from CLI %s to latest %s on bastion", result.CliVersion, latestCLIVersion))
+			err := v.CreateSystemdService.Create()
+			if err != nil {
+				return err
+			}
+			v.Writer.Println("Automate CLI Upgrade completed on bastion")
+			// Wait for 2 seconds for the service to start
+			time.Sleep(2 * time.Second)
+		}
 	}
 
+	// Running batch-check API call for bastion
+
+	batchCheckBastionReq := models.BatchCheckRequest{
+		Checks: []string{constants.HARDWARE_RESOURCE_COUNT, constants.CERTIFICATE, constants.SSH_USER},
+		Config: batchCheckConfig,
+	}
+
+	// reqJson, err := json.Marshal(batchCheckBastionReq)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to marshal Request field: %v", err)
+	// }
+	// fmt.Println("Request Body: ", string(reqJson))
+
+	batchCheckBastionRes, err := v.Client.MakeRequest("POST", fmt.Sprintf("http://localhost:%s/api/v1/checks/batch-checks", port), batchCheckBastionReq)
+	if err != nil {
+		return fmt.Errorf("error while doing batch-check API call for bastion: %v", err)
+	} else {
+		resultBytes, err := getResultFromResponseBody(batchCheckBastionRes.Body)
+		if err != nil {
+			return err
+		}
+		//TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
+		v.Writer.Println(fmt.Sprintf("Response for batch-check API on Bastion: %s", string(resultBytes)))
+	}
 	return nil
 }
 
-func (v *verifyCmdFlow) verifyHaOnpremDeploy(configPath string) error {
-	if err := v.Verification.VerifyOnPremDeployment(configPath); err != nil {
-		return status.Annotate(err, status.ConfigError)
+func getResultFromResponseBody(body io.ReadCloser) ([]byte, error) {
+	// Read the response body
+	responseBody, err := io.ReadAll(body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %v", err)
 	}
-	return nil
+
+	// Unmarshal the response body into the ResponseBody struct
+	var responseBodyStruct response.ResponseBody
+	if err := json.Unmarshal(responseBody, &responseBodyStruct); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response body: %v", err)
+	}
+
+	// Marshal the Result field into a byte slice
+	resultBytes, err := json.Marshal(responseBodyStruct.Result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal Result field: %v", err)
+	}
+
+	return resultBytes, nil
 }
 
-func (v *verifyCmdFlow) verifyHaOnPremAWSManagedDeploy(configPath string) error {
-	if err := v.Verification.VerifyOnPremAWSManagedDeployment(configPath); err != nil {
-		return status.Annotate(err, status.ConfigError)
+func getPort() string {
+	port := server.DEFAULT_PORT
+	env_port := os.Getenv(VERIFY_SERVER_PORT)
+	if env_port != "" {
+		if _, err := strconv.Atoi(env_port); err == nil {
+			port = env_port
+		}
 	}
-	return nil
-}
-
-func (v *verifyCmdFlow) verifyHaOnPremCustManagedDeploy(configPath string) error {
-	if err := v.Verification.VerifyOnPremCustManagedDeployment(configPath); err != nil {
-		return status.Annotate(err, status.ConfigError)
-	}
-	return nil
+	return port
 }

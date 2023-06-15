@@ -124,7 +124,20 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 // Enable and start the systemd service.
 func (css *CreateSystemdService) enableSystemdService() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
-	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
+
+	// TODO: Check if status is active and then stop the service.
+	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"status", service})
+	if err == nil {
+		css.Logger.Debugln("Status of service is active")
+		err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"stop", service})
+		if err != nil {
+			return errors.Wrap(err, "Error stopping service")
+		}
+		css.Logger.Debugln("Stopped the service successfully")
+	}
+	css.Logger.Debugln("Checked status of service successfully")
+
+	err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
 	if err != nil {
 		return errors.Wrap(err, "Error reloading systemd daemon")
 	}
@@ -162,7 +175,10 @@ func (css *CreateSystemdService) Create() error {
 
 	err = css.isSystemdEnabled()
 	if err == nil {
-		return errors.New(fmt.Sprintf("Service %[1]v already exists on this node, use systemctl start/stop/status %[1]v", SERVICE_NAME))
+		err = css.enableSystemdService()
+		if err != nil {
+			return err
+		}
 	}
 	css.Logger.Debugf("Service %s is not running on this system", SERVICE_NAME)
 
@@ -173,7 +189,7 @@ func (css *CreateSystemdService) Create() error {
 		return err
 	}
 
-	css.Writer.Printf("Binary copied to %s\n", fullBinaryDestination)
+	css.Writer.Printf("Binary copied from %s to %s\n", currentBinaryPath, fullBinaryDestination)
 
 	err = css.createSystemdServiceFile()
 	if err != nil {
