@@ -26,7 +26,7 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
-pg-helper rename-if-exists oc_id "$DBNAME
+pg-helper rename-if-exists oc_id "$DBNAME"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper fix-permissions "$DBNAME"
