@@ -301,18 +301,18 @@ func TestPopulateWith(t *testing.T) {
 			name:     "PopulateWith OnPrem Db Aws Managed Config",
 			filePath: "./testdata/HaOnPremDbAwsManaged.toml",
 			want: &Config{
-				SSHUser: SSHUser{
+				SSHUser: &SSHUser{
 					Username:     "ubuntu",
 					PrivateKey:   "./testdata/A2HA.pem",
 					Port:         "22",
 					SudoPassword: "",
 				},
 				Arch: "existing_nodes",
-				Backup: Backup{
-					FileSystem: FileSystem{
+				Backup: &Backup{
+					FileSystem: &FileSystem{
 						MountLocation: "/mnt/automate_backups",
 					},
-					ObjectStorage: ObjectStorage{
+					ObjectStorage: &ObjectStorage{
 						Endpoint:   "",
 						BucketName: "",
 						BasePath:   "",
@@ -321,7 +321,7 @@ func TestPopulateWith(t *testing.T) {
 						AWSRegion:  "us-west-1",
 					},
 				},
-				Hardware: Hardware{
+				Hardware: &Hardware{
 					AutomateNodeCount: 2,
 					AutomateNodeIps: []string{
 						"192.0.0.11", "192.0.0.12",
@@ -348,7 +348,7 @@ func TestPopulateWith(t *testing.T) {
 						Nodes:        nil,
 					},
 				},
-				ExternalOS: ExternalOS{
+				ExternalOS: &ExternalOS{
 					OSDomainName:   "managed-services-os",
 					OSDomainURL:    "search-managed-services-os.us-east-1.es.amazonaws.com",
 					OSUsername:     "admin",
@@ -356,7 +356,7 @@ func TestPopulateWith(t *testing.T) {
 					OSCert:         "<cert_content>",
 					OSRoleArn:      "arn:aws:iam::1127583934333:role/managed-services",
 				},
-				ExternalPG: ExternalPG{
+				ExternalPG: &ExternalPG{
 					PGInstanceURL:       "managed-rds-db.c5gkx.ap-northeast-1.rds.amazonaws.com:5432",
 					PGSuperuserName:     "postgres",
 					PGSuperuserPassword: "Progress123",
@@ -374,18 +374,18 @@ func TestPopulateWith(t *testing.T) {
 			name:     "PopulateWith AWS Managed Config",
 			filePath: "./testdata/HaAwsManaged.toml",
 			want: &Config{
-				SSHUser: SSHUser{
+				SSHUser: &SSHUser{
 					Username:     "ubuntu",
 					PrivateKey:   "./testdata/A2HA.pem",
 					Port:         "22",
 					SudoPassword: "",
 				},
 				Arch: "aws",
-				Backup: Backup{
-					FileSystem: FileSystem{
+				Backup: &Backup{
+					FileSystem: &FileSystem{
 						MountLocation: "/mnt/automate_backups",
 					},
-					ObjectStorage: ObjectStorage{
+					ObjectStorage: &ObjectStorage{
 						Endpoint:   "",
 						BucketName: "automate-test",
 						BasePath:   "",
@@ -394,7 +394,7 @@ func TestPopulateWith(t *testing.T) {
 						AWSRegion:  "",
 					},
 				},
-				Hardware: Hardware{
+				Hardware: &Hardware{
 					AutomateNodeCount:        2,
 					AutomateNodeIps:          nil,
 					ChefInfraServerNodeCount: 2,
@@ -413,7 +413,7 @@ func TestPopulateWith(t *testing.T) {
 					OSCert:         "",
 					OSRoleArn:      "arn:aws:iam::1127583934333:role/managed-services",
 				},
-				ExternalPG: ExternalPG{
+				ExternalPG: &ExternalPG{
 					PGInstanceURL:       "managed-rds-db.cww4poze5gkx.ap-northeast-1.rds.amazonaws.com:5432",
 					PGSuperuserName:     "postgres",
 					PGSuperuserPassword: "chefautomate",
@@ -431,18 +431,18 @@ func TestPopulateWith(t *testing.T) {
 			name:     "PopulateWith OnPrem Config",
 			filePath: "./testdata/HaOnPrem.toml",
 			want: &Config{
-				SSHUser: SSHUser{
+				SSHUser: &SSHUser{
 					Username:     "ubuntu",
 					PrivateKey:   "./testdata/A2HA.pem",
 					Port:         "22",
 					SudoPassword: "",
 				},
 				Arch: "existing_nodes",
-				Backup: Backup{
-					FileSystem: FileSystem{
+				Backup: &Backup{
+					FileSystem: &FileSystem{
 						MountLocation: "automate_backups",
 					},
-					ObjectStorage: ObjectStorage{
+					ObjectStorage: &ObjectStorage{
 						Endpoint:   "s3.amazonaws.com",
 						BucketName: "test",
 						BasePath:   "",
@@ -451,7 +451,7 @@ func TestPopulateWith(t *testing.T) {
 						AWSRegion:  "us-west-1",
 					},
 				},
-				Hardware: Hardware{
+				Hardware: &Hardware{
 					AutomateNodeCount: 2,
 					AutomateNodeIps: []string{
 						"192.0.0.1", "192.0.0.2",
@@ -478,7 +478,7 @@ func TestPopulateWith(t *testing.T) {
 					OSCert:         "",
 					OSRoleArn:      "",
 				},
-				ExternalPG: ExternalPG{
+				ExternalPG: &ExternalPG{
 					PGInstanceURL:       "",
 					PGSuperuserName:     "",
 					PGSuperuserPassword: "",
