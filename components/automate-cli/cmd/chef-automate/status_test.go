@@ -167,7 +167,7 @@ type MockStatusCmdFromBastionHelperImpl struct {
 	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
 	isManagedServicesOnFunc       func() bool
 	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printStatusOutputFunc         func(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
+	printStatusOutputFunc         func(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
 }
 
 func (mst *MockStatusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
@@ -182,8 +182,8 @@ func (mst *MockStatusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *No
 	return mst.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
 }
 
-func (mst *MockStatusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
-	mst.printStatusOutputFunc(cmdResult, remoteService, wg, mutex, writer)
+func (mst *MockStatusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
+	mst.printStatusOutputFunc(cmdResult, remoteService, mutex, writer)
 }
 
 func TestRunStatusFromBastion(t *testing.T) {
@@ -230,8 +230,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: nil,
@@ -249,8 +248,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: errors.New("Some error occured while remote execution"),
@@ -268,8 +266,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: nil,
@@ -289,8 +286,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL),
