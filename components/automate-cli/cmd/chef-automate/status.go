@@ -341,6 +341,32 @@ func runStatusFromBastion(flags *statusCmdFlags, st statusCmdFromBastionHelper) 
 	}
 	errChan := make(chan error, 4)
 
+	runStatusCmdForFrontEnd(infra, flags, st, wg, mutex, errChan)
+
+	if st.isManagedServicesOn() {
+		errChan <- nil
+		errChan <- nil
+		err = getValueFromChannel(errChan)
+		if err != nil {
+			return err
+		}
+		wg.Wait()
+		return handleManagedServiceError(flags)
+	}
+
+	runStatusCmdForBackend(infra, flags, st, wg, mutex, errChan)
+
+	err = getValueFromChannel(errChan)
+	if err != nil {
+		return err
+	}
+
+	wg.Wait()
+	return nil
+}
+
+func runStatusCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *statusCmdFlags, st statusCmdFromBastionHelper, wg *sync.WaitGroup, mutex *sync.Mutex, errChan chan error) {
+
 	if flags.automate {
 		go func(flags statusCmdFlags, errChan chan<- error) {
 			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
@@ -369,19 +395,9 @@ func runStatusFromBastion(flags *statusCmdFlags, st statusCmdFromBastionHelper) 
 	} else {
 		errChan <- nil
 	}
+}
 
-	if st.isManagedServicesOn() {
-		errChan <- nil
-		errChan <- nil
-		for i := 0; i < 4; i++ {
-			errVal := <-errChan
-			if errVal != nil {
-				return errVal
-			}
-		}
-		wg.Wait()
-		return handleManagedServiceError(flags)
-	}
+func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *statusCmdFlags, st statusCmdFromBastionHelper, wg *sync.WaitGroup, mutex *sync.Mutex, errChan chan error) {
 
 	if flags.postgresql {
 		go func(flags statusCmdFlags, errChan chan<- error) {
@@ -416,14 +432,15 @@ func runStatusFromBastion(flags *statusCmdFlags, st statusCmdFromBastionHelper) 
 	} else {
 		errChan <- nil
 	}
+}
 
+func getValueFromChannel(errChan chan error) error {
 	for i := 0; i < 4; i++ {
 		errVal := <-errChan
 		if errVal != nil {
 			return errVal
 		}
 	}
-	wg.Wait()
 	return nil
 }
 
