@@ -197,24 +197,7 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, config model
 	defer close(startMockServerChannel)
 	for nodeTypeWithIp, protocolMap := range nodeTypeAndIpWithPortProtocolMap {
 		host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
-		startMockServerRequestBody := models.StartMockServerRequestBody{}
-		if len(protocolMap[constants.TCP]) != 0 {
-			startMockServerRequestBody.Protocol = constants.TCP
-			ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
-		}
-		if len(protocolMap[constants.UDP]) != 0 {
-			startMockServerRequestBody.Protocol = constants.UDP
-			ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
-		}
-		if len(protocolMap[constants.HTTP]) != 0 {
-			startMockServerRequestBody.Protocol = constants.HTTP
-			ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
-		}
-		if len(protocolMap[constants.HTTPS]) != 0 {
-			startMockServerRequestBody.Protocol = constants.HTTPS
-			ss.generateRootCaAndPrivateKeyForHost(host, &startMockServerRequestBody, config)
-			ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, &ipPortProtocolMap, &totalReq)
-		}
+		ss.constructAndStartMockServerForAvailableProtocals(protocolMap, host, startMockServerChannel, &ipPortProtocolMap, &totalReq, config)
 	}
 
 	successfullyStartedMockServers := []models.MockServerFromBatchServiceResponse{}
@@ -229,6 +212,27 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, config model
 
 	}
 	return successfullyStartedMockServers, notStartedMockServers
+}
+
+func (ss *BatchCheckService) constructAndStartMockServerForAvailableProtocals(protocolMap map[string][]int, host string, startMockServerChannel chan models.MockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int, config models.Config) {
+	startMockServerRequestBody := models.StartMockServerRequestBody{}
+	if len(protocolMap[constants.TCP]) != 0 {
+		startMockServerRequestBody.Protocol = constants.TCP
+		ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, ipPortProtocolMap, totalReq)
+	}
+	if len(protocolMap[constants.UDP]) != 0 {
+		startMockServerRequestBody.Protocol = constants.UDP
+		ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, ipPortProtocolMap, totalReq)
+	}
+	if len(protocolMap[constants.HTTP]) != 0 {
+		startMockServerRequestBody.Protocol = constants.HTTP
+		ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, ipPortProtocolMap, totalReq)
+	}
+	if len(protocolMap[constants.HTTPS]) != 0 {
+		startMockServerRequestBody.Protocol = constants.HTTPS
+		ss.generateRootCaAndPrivateKeyForHost(host, &startMockServerRequestBody, config)
+		ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, ipPortProtocolMap, totalReq)
+	}
 }
 
 func (ss *BatchCheckService) constructRequestAndStartMockServer(protocolMap map[string][]int, host string, startMockServerRequestBody models.StartMockServerRequestBody, startMockServerChannel chan models.MockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int) {
