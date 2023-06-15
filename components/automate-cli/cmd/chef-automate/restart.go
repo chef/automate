@@ -188,6 +188,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 
 	if rs.isManagedServicesOn() {
 		errChan <- nil
+		errChan <- nil
 		for i := 0; i < 4; i++ {
 			errVal := <-errChan
 			if errVal != nil {
