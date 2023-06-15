@@ -319,29 +319,6 @@ func (st *statusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string
 	wg.Done()
 }
 
-type MockStatusCmdFromBastionHelperImpl struct {
-	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
-	isManagedServicesOnFunc       func() bool
-	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printStatusOutputFunc         func(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return mst.getAutomateHAInfraDetailsFunc()
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) isManagedServicesOn() bool {
-	return mst.isManagedServicesOnFunc()
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	return mst.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
-	mst.printStatusOutputFunc(cmdResult, remoteService, wg, mutex, writer)
-}
-
 func runStatusFromBastion(flags *statusCmdFlags, st statusCmdFromBastionHelper) error {
 
 	var wg = &sync.WaitGroup{}
