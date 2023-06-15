@@ -25,21 +25,12 @@ var (
 		ChefInfraServerNodeIps: []string{"10.0.0.7"},
 	}
 
-	certificatelist = []models.Certificate{
-		{
-			Fqdn:         "url",
-			FqdnRootCert: "",
-			NodeType:     constants.AUTOMATE,
-			Nodes:        nodes,
-		},
-	}
 	nodeCert = models.NodeCert{
-		IP:       "10.0.0.1",
-		RootCert: "test-cert",
-		Key:      "test-key",
+		IP:  "10.0.0.1",
+		Key: "test-key",
 	}
 
-	nodes = []*models.NodeCert{nodeCert}
+	nodes = []models.NodeCert{nodeCert}
 )
 
 const (

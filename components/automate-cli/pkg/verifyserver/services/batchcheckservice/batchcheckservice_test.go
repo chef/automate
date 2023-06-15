@@ -1114,7 +1114,7 @@ func TestConstructResult(t *testing.T) {
 
 	for _, v := range result {
 		// Check the nodeType1
-		if v.NodeType == "nodeType1" {
+		if v.Ip == "host1" {
 			assert.Equal(t, "host1", result[0].Ip, "IP should be 'host1'")
 			assert.Len(t, result[0].Tests, 1, "Tests should have one item")
 			assert.Equal(t, true, result[0].Tests[0].Passed, "Passed should be true")
@@ -1122,7 +1122,7 @@ func TestConstructResult(t *testing.T) {
 		}
 
 		// Check the nodeType2
-		if v.NodeType == "nodeType2" {
+		if v.Ip == "host2" {
 			assert.Equal(t, "host2", result[1].Ip, "IP should be 'host2'")
 			assert.Equal(t, "nodeType2", result[1].NodeType, "NodeType should be 'nodeType2'")
 			assert.Len(t, result[1].Tests, 1, "Tests should have one item")

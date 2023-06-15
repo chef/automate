@@ -54,10 +54,10 @@ type Backup struct {
 }
 
 type Certificate struct {
-	AutomateFqdn   string      `json:"automate_fqdn"`
-	ChefServerFqdn string      `json:"cs_fqdn"`
-	RootCert       string      `json:"root_cert"`
-	Nodes          []*NodeCert `json:"nodes"`
+	AutomateFqdn   string     `json:"automate_fqdn"`
+	ChefServerFqdn string     `json:"cs_fqdn"`
+	RootCert       string     `json:"root_cert"`
+	Nodes          []NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
