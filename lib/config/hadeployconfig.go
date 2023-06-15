@@ -69,7 +69,7 @@ type ConfigAutomateSettings struct {
 	Fqdn              string      `toml:"fqdn,omitempty"`
 	ConfigFile        string      `toml:"config_file,omitempty"`
 	TeamsPort         string      `toml:"teams_port,omitempty"`
-	RootCA            string      `toml:"root_ca,omitempty"`
+	FqdnRootCA        string      `toml:"root_ca,omitempty"`
 	InstanceCount     string      `toml:"instance_count,omitempty"`
 	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`
 	PrivateKey        string      `toml:"private_key,omitempty"`
@@ -102,6 +102,7 @@ type ConfigOpensearchSettings struct {
 }
 
 type ConfigSettings struct {
+	ChefServerFqdn    string      `toml:"fqdn,omitempty"`
 	RootCA            string      `toml:"root_ca,omitempty"`
 	InstanceCount     string      `toml:"instance_count,omitempty"`
 	EnableCustomCerts bool        `toml:"enable_custom_certs,omitempty"`

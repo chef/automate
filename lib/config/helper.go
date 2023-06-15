@@ -192,14 +192,14 @@ func validateAutomateAdminPassword(automateSettings *ConfigAutomateSettings) err
 }
 
 func validateAutomateCerts(automateSettings *ConfigAutomateSettings) error {
-	if len(strings.TrimSpace(automateSettings.RootCA)) < 1 ||
+	if len(strings.TrimSpace(automateSettings.FqdnRootCA)) < 1 ||
 		len(strings.TrimSpace(automateSettings.PrivateKey)) < 1 ||
 		len(strings.TrimSpace(automateSettings.PublicKey)) < 1 {
 		return fmt.Errorf("automate root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false")
 	}
 
 	return checkCertValid([]keydetails{
-		{key: automateSettings.RootCA, certtype: ROOT_CA, svc: AUTOMATE},
+		{key: automateSettings.FqdnRootCA, certtype: ROOT_CA, svc: AUTOMATE},
 		{key: automateSettings.PrivateKey, certtype: PRIVATE_KEY, svc: AUTOMATE},
 		{key: automateSettings.PublicKey, certtype: PUBLIC_KEY, svc: AUTOMATE},
 	})

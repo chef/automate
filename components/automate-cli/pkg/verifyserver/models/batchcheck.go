@@ -159,11 +159,6 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 		c.populateExistingInfraConfig(haConfig)
 	}
 
-	//Adding fqdn details if certs are not provided
-	if len(c.Certificate) == 0 {
-		c.Certificate = append(c.Certificate, addCertificatesInConfig(haConfig.Automate.Config.Fqdn, "", config.AUTOMATE))
-	}
-
 	// not available in config
 	c.DeploymentState = ""
 
@@ -243,18 +238,19 @@ func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
 
 func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 	automateConfig := haConfig.Automate.Config
-	cert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.RootCA, config.AUTOMATE)
+	cert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.FqdnRootCA, config.AUTOMATE)
 	if automateConfig.EnableCustomCerts {
 		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
-		c.Certificate = append(c.Certificate, cert)
+	}
+	c.Certificate = append(c.Certificate, cert)
+	chefserverConfig := haConfig.ChefServer.Config
+	//We can populate this later as well in config
+	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
+	if chefserverConfig.EnableCustomCerts {
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
 	}
 
-	chefserverConfig := haConfig.ChefServer.Config
-	if chefserverConfig.EnableCustomCerts {
-		cert = addCertificatesInConfig("", "", config.CHEFSERVER)
-		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
-		c.Certificate = append(c.Certificate, cert)
-	}
+	c.Certificate = append(c.Certificate, cert)
 
 	postgresqlConfig := haConfig.Postgresql.Config
 	if postgresqlConfig.EnableCustomCerts {
@@ -299,21 +295,20 @@ func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConf
 
 	//Adding Certificate for automate FQDN and nodes certificates
 	automateConfig := haConfig.Automate.Config
-	automateFqdnCert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.RootCA, config.AUTOMATE)
+	cert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.FqdnRootCA, config.AUTOMATE)
 	if automateConfig.EnableCustomCerts {
 		//Adding ip node certs
-		automateFqdnCert.Nodes = appendCertsByIpToNodeCerts(automateConfig.CertsByIP, haConfig.ExistingInfra.Config.AutomatePrivateIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
-		c.Certificate = append(c.Certificate, automateFqdnCert)
+		cert.Nodes = appendCertsByIpToNodeCerts(automateConfig.CertsByIP, haConfig.ExistingInfra.Config.AutomatePrivateIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
 	}
+	c.Certificate = append(c.Certificate, cert)
 
 	//Adding Certificates for chef server FQDN and nodes certificates
 	chefserverConfig := haConfig.ChefServer.Config
+	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
 	if chefserverConfig.EnableCustomCerts {
-		//As we dont have chef server FQDN adding currently, not adding it.
-		chefServerFqdnCert := addCertificatesInConfig("", "", config.CHEFSERVER)
-		chefServerFqdnCert.Nodes = appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
-		c.Certificate = append(c.Certificate, chefServerFqdnCert)
+		cert.Nodes = appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
 	}
+	c.Certificate = append(c.Certificate, cert)
 }
 
 func addCertificatesInConfig(fqdn, rootCA, nodeType string) Certificate {

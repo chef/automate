@@ -341,6 +341,12 @@ func TestPopulateWith(t *testing.T) {
 					NodeType:     config.AUTOMATE,
 					Nodes:        nil,
 				},
+					{
+						Fqdn:         "",
+						FqdnRootCert: "",
+						NodeType:     config.CHEFSERVER,
+						Nodes:        nil,
+					},
 				},
 				ExternalOS: ExternalOS{
 					OSDomainName:   "managed-services-os",
