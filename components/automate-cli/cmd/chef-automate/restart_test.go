@@ -10,79 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
-	type testCase struct {
-		flags           *RestartCmdFlags
-		nodeMapExpected *NodeTypeAndCmd
-	}
-	infra := &AutomateHAInfraDetails{}
-
-	testCases := []testCase{
-		{
-			flags: &RestartCmdFlags{
-				automate: true,
-			},
-			nodeMapExpected: &NodeTypeAndCmd{
-				Frontend: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo chef-automate restart-services",
-						SkipPrintOutput:          true,
-						HideSSHConnectionMessage: true,
-					},
-				},
-				Automate: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo chef-automate restart-services",
-						ErrorCheckEnableInOutput: true,
-						NodeIps:                  []string{""},
-						NodeType:                 true,
-						SkipPrintOutput:          true,
-						HideSSHConnectionMessage: true,
-					},
-				},
-				ChefServer: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo chef-automate restart-services",
-						ErrorCheckEnableInOutput: true,
-						NodeIps:                  []string{""},
-						NodeType:                 false,
-						SkipPrintOutput:          true,
-						HideSSHConnectionMessage: true,
-					},
-				},
-				Postgresql: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup",
-						NodeIps:                  []string{""},
-						ErrorCheckEnableInOutput: true,
-						NodeType:                 false,
-
-						SkipPrintOutput:          true,
-						HideSSHConnectionMessage: true,
-					},
-				},
-				Opensearch: &Cmd{
-					CmdInputs: &CmdInputs{
-						Cmd:                      "sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup",
-						NodeIps:                  []string{""},
-						ErrorCheckEnableInOutput: true,
-						NodeType:                 false,
-
-						SkipPrintOutput:          true,
-						HideSSHConnectionMessage: true,
-					},
-				},
-				Infra: infra,
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		nodeMapGet := constructNodeMapForAllNodeTypes(testCase.flags, infra)
-		assert.Equal(t, testCase.nodeMapExpected, nodeMapGet)
-	}
-}
-
 type MockrestartFromBastionImpl struct {
 	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
 	isManagedServicesOnFunc       func() bool
@@ -104,6 +31,76 @@ func (mrs *MockrestartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAn
 
 func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
 	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, wg, mutex, writer)
+}
+func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
+	type testCase struct {
+		flags           *RestartCmdFlags
+		nodeMapExpected *NodeTypeAndCmd
+	}
+	infra := &AutomateHAInfraDetails{}
+
+	testCases := []testCase{
+		{
+			flags: &RestartCmdFlags{
+				automate: true,
+			},
+			nodeMapExpected: &NodeTypeAndCmd{
+				Frontend: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      RESTART_FRONTEND_COMMAND,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Automate: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      RESTART_FRONTEND_COMMAND,
+						ErrorCheckEnableInOutput: true,
+						NodeIps:                  []string{""},
+						NodeType:                 true,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				ChefServer: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      RESTART_FRONTEND_COMMAND,
+						ErrorCheckEnableInOutput: true,
+						NodeIps:                  []string{""},
+						NodeType:                 false,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Postgresql: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      RESTART_BACKEND_COMMAND,
+						NodeIps:                  []string{""},
+						ErrorCheckEnableInOutput: true,
+						NodeType:                 false,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Opensearch: &Cmd{
+					CmdInputs: &CmdInputs{
+						Cmd:                      RESTART_BACKEND_COMMAND,
+						NodeIps:                  []string{""},
+						ErrorCheckEnableInOutput: true,
+						NodeType:                 false,
+						SkipPrintOutput:          true,
+						HideSSHConnectionMessage: true,
+					},
+				},
+				Infra: infra,
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		nodeMapGet := constructNodeMapForAllNodeTypes(testCase.flags, infra)
+		assert.Equal(t, testCase.nodeMapExpected, nodeMapGet)
+	}
 }
 
 func TestRunRestartFromBastion(t *testing.T) {

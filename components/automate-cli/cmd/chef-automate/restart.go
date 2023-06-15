@@ -165,7 +165,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go rs.printRestartCmdOutput(cmdResult, AUTOMATE, wg, mutex, writer)
+			rs.printRestartCmdOutput(cmdResult, AUTOMATE, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -180,7 +180,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go rs.printRestartCmdOutput(cmdResult, CHEF_SERVER, wg, mutex, writer)
+			rs.printRestartCmdOutput(cmdResult, CHEF_SERVER, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -210,7 +210,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go rs.printRestartCmdOutput(cmdResult, POSTGRESQL, wg, mutex, writer)
+			rs.printRestartCmdOutput(cmdResult, POSTGRESQL, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
@@ -227,7 +227,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
 			errChan <- err
 			wg.Add(1)
-			go rs.printRestartCmdOutput(cmdResult, OPENSEARCH, wg, mutex, writer)
+			rs.printRestartCmdOutput(cmdResult, OPENSEARCH, wg, mutex, writer)
 		}(*flags, errChan)
 	} else {
 		errChan <- nil
