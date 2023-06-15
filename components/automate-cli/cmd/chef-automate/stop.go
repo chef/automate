@@ -37,28 +37,29 @@ func init() {
 		Long:  "Stop a running deployment of Automate.",
 		RunE:  runStopCmd,
 		Annotations: map[string]string{
-			docs.Tag: docs.FrontEnd,
+			docs.Tag: docs.BastionHost,
 		},
 	}
 
-	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.automate, "automate", "a", false, "Stop services of automate node")
+	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.automate, "automate", "a", false, "Stop chef automate services of automate nodes")
 	stopCmd.PersistentFlags().SetAnnotation("automate", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.automate, "a2", false, "Stop services of automate node")
+	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.automate, "a2", false, "Stop chef automate services of automate nodes")
 	stopCmd.PersistentFlags().SetAnnotation("a2", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.chef_server, "chef_server", "c", false, "Stop services of chef_server node")
+	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.chef_server, "chef_server", "c", false, "Stop chef automate services of chef_server nodes")
 	stopCmd.PersistentFlags().SetAnnotation("chef_server", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.chef_server, "cs", false, "Stop services of chef_server node")
+	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.chef_server, "cs", false, "Stop chef automate services of chef_server nodes")
 	stopCmd.PersistentFlags().SetAnnotation("cs", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.opensearch, "opensearch", "o", false, "Stop services of opensearch node")
+	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.opensearch, "opensearch", "o", false, "Stop hab-sup service of opensearch nodes")
 	stopCmd.PersistentFlags().SetAnnotation("opensearch", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.opensearch, "os", false, "Stop services of opensearch node")
+	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.opensearch, "os", false, "Stop hab-sup service of opensearch nodes")
 	stopCmd.PersistentFlags().SetAnnotation("os", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.postgresql, "postgresql", "p", false, "Stop services of postgresql node")
+	stopCmd.PersistentFlags().BoolVarP(&stopCmdFlags.postgresql, "postgresql", "p", false, "Stop hab-sup service of postgresql nodes")
 	stopCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
-	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.postgresql, "pg", false, "Stop services of postgresql node")
+	stopCmd.PersistentFlags().BoolVar(&stopCmdFlags.postgresql, "pg", false, "Stop hab-sup service of postgresql nodes")
 	stopCmd.PersistentFlags().SetAnnotation("pg", docs.Compatibility, []string{docs.CompatiblewithHA})
 
 	stopCmd.PersistentFlags().StringVar(&stopCmdFlags.node, "node", "", "Node Ip address")
+	stopCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(stopCmd)
 }
 
