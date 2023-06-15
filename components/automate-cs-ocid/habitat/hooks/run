@@ -24,7 +24,7 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
 pg-helper rename-if-exists oc_id "$DBNAME"
-pg-helper ensure-service-database "$DBNAME"
+pg-helper ensure-service-database "$DBNAME" "ocid"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper fix-permissions "$DBNAME"
 
