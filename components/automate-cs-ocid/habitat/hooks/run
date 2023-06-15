@@ -8,6 +8,8 @@ cd {{pkgPathFor "chef/oc_id"}}/oc_id
 pkg_svc_user=root
 pkg_svc_group=root
 pkg_svc_run="return 0"
+export A2_SVC_DB_USER="ocid"
+
 
 # moved logic from plan.sh
 source "{{pkg.svc_config_path}}/scripts/do_install.sh"
@@ -24,7 +26,7 @@ mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 
-pg-helper rename-if-exists oc_id "$DBNAME"
+pg-helper rename-if-exists oc_id "$DBNAME
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper fix-permissions "$DBNAME"
