@@ -189,7 +189,7 @@ func (css *CreateSystemdService) Create() error {
 		return err
 	}
 
-	css.Writer.Printf("Binary copied from %s to %s\n", currentBinaryPath, fullBinaryDestination)
+	css.Logger.Debugf("Binary copied from %s to %s\n", currentBinaryPath, fullBinaryDestination)
 
 	err = css.createSystemdServiceFile()
 	if err != nil {
