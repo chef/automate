@@ -108,7 +108,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 				softwareversionchecktrigger.NewSoftwareVersionCheck(l, port),
 				systemresourcechecktrigger.NewSystemResourceCheck(l, port),
 				systemuserchecktrigger.NewSystemUserCheck(l, port),
-			))).
+			), l, port)).
 		AddNFSMountService(nfsmountservice.NewNFSMountService(l, port, systemresource.NewSystemResourceInfoImpl())).
 		AddHardwareResourceCountService(hardwareresourcecount.NewHardwareResourceCountService(l)).
 		AddSoftwareVersionService(softwareversionservice.NewSoftwareVersionService(l, fiberutils.CheckPath)).
@@ -117,7 +117,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
 		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
-		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
+		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(),  fileutils.NewFileSystemUtils(),  l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).

@@ -1,36 +1,182 @@
 package batchcheckservice
 
 import (
+	"bytes"
 	"encoding/json"
-	"testing"
 
-	"github.com/gofiber/fiber/v2"
+	"errors"
+	"io"
+	"net/http"
+	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/stretchr/testify/assert"
 )
 
+func SetupMockHttpRequestClient(responseJson string, err error, shouldStartMockServerOnSomeNodesOnly bool) httputils.IHttpRequestClient {
+	r := io.NopCloser(bytes.NewReader([]byte(responseJson)))
+	return &httputils.MockHttpRequestClient{
+		MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+			if shouldStartMockServerOnSomeNodesOnly && url == "http://1.2.3.4:1234/api/v1/start/mock-server" {
+				return &http.Response{
+					StatusCode: 500,
+				}, errors.New("Error occurred")
+			}
+			return &http.Response{
+				StatusCode: 200,
+				Body:       r,
+			}, err
+		},
+	}
+}
+
 func TestBatchCheckService(t *testing.T) {
 	tests := []struct {
-		description                      string
-		totalIpsCount                    int
-		hardwareCheckMockedResponse      []models.CheckTriggerResponse
-		sshUserCheckMockedResponse       []models.CheckTriggerResponse
-		externalOpenSearchMockedResponse []models.CheckTriggerResponse
-		externalPostgresMockedResponse   []models.CheckTriggerResponse
-		chefServerIpArray                []string
-		expectedResponseForAutomateIp    string
-		expectedResponseFromChefServerIp string
-		expectedResponseForPostgresIp1   string
-		expectedResponseForPostgresIp2   string
-		expectedResponseForOpenSearchIp1 string
-		expectedResponseForOpenSearchIp2 string
+		description                          string
+		totalIpsCount                        int
+		hardwareCheckMockedResponse          []models.CheckTriggerResponse
+		sshUserCheckMockedResponse           []models.CheckTriggerResponse
+		externalOpenSearchMockedResponse     []models.CheckTriggerResponse
+		externalPostgresMockedResponse       []models.CheckTriggerResponse
+		checksToExecute                      []string
+		chefServerIpArray                    []string
+		statusApiResponse                    string
+		statusApiError                       error
+		avoidSuccessResponse                 bool
+		checkForError                        bool
+		expectedError                        error
+		shouldStartMockServerOnSomeNodesOnly bool
+		expectedResponseForAutomateIp        string
+		expectedResponseFromChefServerIp     string
+		expectedResponseForPostgresIp1       string
+		expectedResponseForPostgresIp2       string
+		expectedResponseForOpenSearchIp1     string
+		expectedResponseForOpenSearchIp2     string
+		mockServerPort                       string
 	}{
 		{
-			description:       "Batch check server success with automate and chef-server on same IP",
-			totalIpsCount:     6,
+			description:          "Batch check service returns error when status api fails",
+			totalIpsCount:        6,
+			chefServerIpArray:    []string{"1.2.3.4"},
+			avoidSuccessResponse: true,
+			checkForError:        true,
+			mockServerPort:       "1212",
+			statusApiResponse:    `{}`,
+			statusApiError:       errors.New("Invalid request"),
+			externalPostgresMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.7",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed: false,
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-1",
+							},
+							{
+								Title: "external-postgresql-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.8",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed: true,
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			description:                          "Batch check service returns error when mock server not started on some nodes",
+			totalIpsCount:                        6,
+			chefServerIpArray:                    []string{"1.2.3.4"},
+			avoidSuccessResponse:                 true,
+			shouldStartMockServerOnSomeNodesOnly: true,
+			checkForError:                        true,
+			expectedError:                        errors.New("mock server stop failed on some nodes"),
+			mockServerPort:                       "1234",
+			statusApiResponse: `{
+				"status": "SUCCESS",
+				"result": {
+					"status": "OK",
+					"services": [],
+					"error": "error getting services from hab svc status"
+				}
+			}`,
+		},
+		{
+			description:          "Batch check service returns error when status api response body parse fails",
+			totalIpsCount:        6,
+			chefServerIpArray:    []string{"1.2.3.4"},
+			avoidSuccessResponse: true,
+			checkForError:        true,
+			mockServerPort:       "1234",
+			statusApiResponse:    `invalid JSON`,
+			externalPostgresMockedResponse: []models.CheckTriggerResponse{
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.7",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed: false,
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-1",
+							},
+							{
+								Title: "external-postgresql-2",
+							},
+						},
+					},
+				},
+				{
+					Status:   "Passed",
+					Host:     "1.2.3.8",
+					NodeType: "postgresql",
+					Result: models.ApiResult{
+						Passed: true,
+						Checks: []models.Checks{
+							{
+								Title: "external-postgresql-check-1",
+							},
+							{
+								Title: "external-postgresql-check-2",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			description:   "Batch check server success with automate and chef-server on same IP",
+			totalIpsCount: 6,
+			statusApiResponse: `{
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 			chefServerIpArray: []string{"1.2.3.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -240,8 +386,16 @@ func TestBatchCheckService(t *testing.T) {
 			expectedResponseForOpenSearchIp2: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.6\",\"tests\":[{\"passed\":true,\"msg\":\"Hardware Resource Count Check\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-count-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"hardware-resource-count-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]},{\"passed\":true,\"msg\":\"External Opensearch Check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
 		},
 		{
-			description:       "Batch check server success with nodes on different ip",
-			totalIpsCount:     7,
+			description:   "Batch check server success with nodes on different ip",
+			totalIpsCount: 7,
+			statusApiResponse: `{
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 			chefServerIpArray: []string{"1.2.8.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -387,8 +541,34 @@ func TestBatchCheckService(t *testing.T) {
 			expectedResponseForOpenSearchIp2: "{\"node_type\":\"opensearch\",\"ip\":\"1.2.3.6\",\"tests\":[{\"passed\":true,\"msg\":\"External Opensearch Check\",\"check\":\"external-opensearch\",\"checks\":[{\"title\":\"external-opensearch-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"},{\"title\":\"external-opensearch-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}]}",
 		},
 		{
-			description:       "Batch check server success with error on some nodes",
-			totalIpsCount:     7,
+			description:                          "Batch check service returns error mock server in not started successfully on all nodes",
+			totalIpsCount:                        6,
+			chefServerIpArray:                    []string{"1.2.3.4"},
+			avoidSuccessResponse:                 true,
+			checkForError:                        true,
+			expectedError:                        errors.New("mock server start failed on some nodes"),
+			mockServerPort:                       "1234",
+			shouldStartMockServerOnSomeNodesOnly: true,
+			statusApiResponse: `{
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
+		},
+		{
+			description:   "Batch check server success with error on some nodes",
+			totalIpsCount: 7,
+			statusApiResponse: `{
+					"status": "SUCCESS",
+					"result": {
+						"status": "OK",
+						"services": [],
+						"error": "error getting services from hab svc status"
+					}
+				}`,
 			chefServerIpArray: []string{"1.2.8.4"},
 			hardwareCheckMockedResponse: []models.CheckTriggerResponse{
 				{
@@ -544,8 +724,10 @@ func TestBatchCheckService(t *testing.T) {
 				SetupMockSoftwareVersionCheck(),
 				SetupMockSystemResourceCheck(),
 				SetupMockSystemUserCheck(),
-			))
-			resp := ss.BatchCheck([]string{
+			), logger.NewTestLogger(), "1234")
+
+			ss.httpRequestClient = SetupMockHttpRequestClient(test.statusApiResponse, test.statusApiError, test.shouldStartMockServerOnSomeNodesOnly)
+			checksToExecute := []string{
 				constants.FIREWALL,
 				constants.FQDN,
 				constants.SSH_USER,
@@ -558,7 +740,13 @@ func TestBatchCheckService(t *testing.T) {
 				constants.SOFTWARE_VERSIONS,
 				constants.SYSTEM_RESOURCES,
 				constants.SYSTEM_USER,
-				constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS}, models.Config{
+				constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+			}
+
+			if len(test.checksToExecute) > 0 {
+				checksToExecute = test.checksToExecute
+			}
+			resp, err := ss.BatchCheck(checksToExecute, models.Config{
 				Hardware: models.Hardware{
 					AutomateNodeCount:        1,
 					AutomateNodeIps:          []string{"1.2.3.4"},
@@ -571,23 +759,226 @@ func TestBatchCheckService(t *testing.T) {
 				},
 			})
 
-			assert.Equal(t, resp.Status, "SUCCESS")
-			assert.Equal(t, len(resp.Result), test.totalIpsCount)
-			res := getResponseForIp(resp.Result, "1.2.3.4", "automate")
-			res1 := getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server")
-			res2 := getResponseForIp(resp.Result, "1.2.3.7", "postgresql")
-			res3 := getResponseForIp(resp.Result, "1.2.3.8", "postgresql")
-			res4 := getResponseForIp(resp.Result, "1.2.3.5", "opensearch")
-			res5 := getResponseForIp(resp.Result, "1.2.3.6", "opensearch")
-			assert.Equal(t, test.expectedResponseForAutomateIp, res)
-			assert.Equal(t, test.expectedResponseFromChefServerIp, res1)
-			assert.Equal(t, test.expectedResponseForPostgresIp1, res2)
-			assert.Equal(t, test.expectedResponseForPostgresIp2, res3)
-			assert.Equal(t, test.expectedResponseForOpenSearchIp1, res4)
-			assert.Equal(t, test.expectedResponseForOpenSearchIp2, res5)
+			if test.checkForError {
+				assert.NotEqual(t, err.Error(), test.expectedError)
+			}
+
+			if !test.avoidSuccessResponse {
+				assert.Equal(t, resp.Status, "SUCCESS")
+				assert.Equal(t, len(resp.Result), test.totalIpsCount)
+				assert.Equal(t, test.expectedResponseForAutomateIp, getResponseForIp(resp.Result, "1.2.3.4", "automate"))
+				assert.Equal(t, test.expectedResponseFromChefServerIp, getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server"))
+				assert.Equal(t, test.expectedResponseForPostgresIp1, getResponseForIp(resp.Result, "1.2.3.7", "postgresql"))
+				assert.Equal(t, test.expectedResponseForPostgresIp2, getResponseForIp(resp.Result, "1.2.3.8", "postgresql"))
+				assert.Equal(t, test.expectedResponseForOpenSearchIp1, getResponseForIp(resp.Result, "1.2.3.5", "opensearch"))
+				assert.Equal(t, test.expectedResponseForOpenSearchIp2, getResponseForIp(resp.Result, "1.2.3.6", "opensearch"))
+			}
 		})
 	}
 
+}
+
+func TestStartMockServer(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [],
+			"error": "error getting services from hab svc status"
+		}
+	}`, nil, false)
+	startedServers, failedServers := ss.startMockServer([]string{constants.FIREWALL, constants.FQDN},
+		models.Config{
+			Hardware: models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"1.2.3.4"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+			},
+		},
+	)
+	totalA := 0
+	totalP := 0
+	totalO := 0
+	for _, resp := range startedServers {
+		if resp.Host == "1.2.3.4" {
+			totalA += 1
+		}
+		if resp.Host == "1.2.3.7" || resp.Host == "1.2.3.8" {
+			totalP += 1
+		}
+		if resp.Host == "1.2.3.5" || resp.Host == "1.2.3.6" {
+			totalO += 1
+		}
+	}
+	assert.Equal(t, len(startedServers), 23)
+	assert.Equal(t, len(failedServers), 0)
+}
+
+func TestGetDeploymentStateReturnsErrorWhenAutomateNotReachable(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
+	_, err := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount: 2,
+			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
+		},
+	})
+	assert.NotNil(t, "received no response for status api from any automate nodes", err.Error())
+}
+
+func TestGetDeploymentStateReturnsErrorNoAutomateNodePresent(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
+	_, err := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount: 0,
+			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
+		},
+	})
+	assert.NotNil(t, "automate nodes not present", err.Error())
+}
+
+func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [{"service_name": "deployment-service", "status": "OK", "version": "version-1"}],
+			"error": ""
+		}
+	}`, nil, false)
+	deployState, _ := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
+	assert.Equal(t, "post-deploy", deployState)
+}
+
+func TestStopMockServerOnHostAndPortPostDeployWhenServicesStopped(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [],
+			"error": ""
+		}
+	}`, nil, false)
+	deployState, _ := ss.getDeploymentState(models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
+	assert.Equal(t, "post-deploy", deployState)
+}
+
+func TestShouldStartMockServer(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{
+		"status": "SUCCESS",
+		"result": {
+			"status": "OK",
+			"services": [{"service_name": "deployment-service", "status": "OK", "version": "version-1"}],
+			"error": ""
+		}
+	}`, nil, false)
+	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"}, models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
+	assert.Equal(t, false, shouldStartMockServer)
+}
+
+func TestShouldGenerateRootCaAndPrivateKeyForHostLogErrorForCert(t *testing.T) {
+	tests := []struct {
+		description string
+		fileName    string
+	}{
+		{
+			description: "Test error for reading certificate pem file",
+			fileName:    "certificate.pem",
+		},
+		{
+			description: "Test error for reading private_key pem file",
+			fileName:    "private_key.pem",
+		},
+	}
+
+	ss := getBatchCheckServiceInstance()
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ss.fileUtils = mockFileUtils(test.fileName, true)
+
+			ss.generateRootCaAndPrivateKeyForHost("abc", &models.StartMockServerRequestBody{}, models.Config{
+				Hardware: models.Hardware{
+					AutomateNodeCount:        1,
+					AutomateNodeIps:          []string{"1.2.3.4"},
+					ChefInfraServerNodeCount: 1,
+					ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+					PostgresqlNodeCount:      1,
+					PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+					OpenSearchNodeCount:      1,
+					OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+				},
+			})
+			fileutils.DeleteFile("certificate.pem")
+			fileutils.DeleteFile("private_key.pem")
+			assert.NotNil(t, ss.log)
+		})
+	}
+}
+
+func TestStartMockServerIfNeeded(t *testing.T) {
+	ss := getBatchCheckServiceInstance()
+
+	ss.httpRequestClient = SetupMockHttpRequestClient(`{}`, errors.New("error occurred"), false)
+	resp, _, err := ss.startMockServerIfNeeded([]string{"firewall"}, models.Config{
+		Hardware: models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+			ChefInfraServerNodeCount: 1,
+			ChefInfraServerNodeIps:   []string{"1.2.3.4"},
+			PostgresqlNodeCount:      1,
+			PostgresqlNodeIps:        []string{"1.2.3.7", "1.2.3.8"},
+			OpenSearchNodeCount:      1,
+			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
+		},
+	})
+	assert.Equal(t, "received no response for status api from any automate nodes", err.Error())
+	assert.Equal(t, 0, len(resp))
 }
 
 func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string) string {
@@ -598,6 +989,40 @@ func getResponseForIp(resp []models.BatchCheckResult, ip string, nodeType string
 		}
 	}
 	return ""
+}
+
+func getBatchCheckServiceInstance() *BatchCheckService {
+	return NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck([]models.CheckTriggerResponse{}),
+		SetupMockSshUserAccessCheck([]models.CheckTriggerResponse{}),
+		SetupMockCertificateCheck(),
+		SetupMockExternalOpenSearchCheck([]models.CheckTriggerResponse{}),
+		SetupMockExternalPostgresCheck([]models.CheckTriggerResponse{}),
+		SetupMockFirewallCheck(),
+		SetupMockFqdnCheck(),
+		SetupMockNfsBackupConfigCheck(),
+		SetupMockOpenSearchS3BucketAccessCheck(),
+		SetupMockS3BackupConfigCheck(),
+		SetupMockSoftwareVersionCheck(),
+		SetupMockSystemResourceCheck(),
+		SetupMockSystemUserCheck(),
+	), logger.NewTestLogger(), "1234")
+}
+
+func mockFileUtils(fileName string, shouldReturnError bool) *fileutils.MockFileSystemUtils {
+	return &fileutils.MockFileSystemUtils{
+		ReadFileFunc: func(filename string) ([]byte, error) {
+			if filename == fileName && shouldReturnError {
+				return []byte{}, errors.New("Error occurred")
+			}
+			if filename == fileName && shouldReturnError {
+				return []byte{}, errors.New("Error occurred")
+			}
+			return []byte{}, nil
+		},
+		DeleteTempFileFunc: func(filename string) error {
+			return nil
+		},
+	}
 }
 
 func TestConstructResult(t *testing.T) {

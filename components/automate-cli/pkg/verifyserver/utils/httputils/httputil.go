@@ -10,7 +10,21 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 )
 
-//Post - This function performs HTTP Post request to the given endpoint with the provided request body
+type HttpRequestClient struct{}
+
+func NewHttpRequestClient() *HttpRequestClient {
+	return &HttpRequestClient{}
+}
+
+type IHttpRequestClient interface {
+	MakeRequest(requestMethod, url string, body interface{}) (*http.Response, error)
+}
+
+func (ht *HttpRequestClient) MakeRequest(requestMethod string, url string, body interface{}) (*http.Response, error) {
+	return MakeRequest(requestMethod, url, body)
+}
+
+// Post - This function performs HTTP Post request to the given endpoint with the provided request body
 func MakeRequest(requestMethod string, url string, body interface{}) (*http.Response, error) {
 	var reader io.Reader
 	if body != nil {
@@ -29,10 +43,10 @@ func MakeRequest(requestMethod string, url string, body interface{}) (*http.Resp
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	if err == nil && resp.StatusCode != 200 {
-		return nil, errors.New(resp.Status)
+		return resp, errors.New(resp.Status)
 	}
 	return resp, nil
 }

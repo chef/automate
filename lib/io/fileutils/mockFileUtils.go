@@ -48,6 +48,6 @@ func (fsu *MockFileSystemUtils) WriteFile(filepath string, data []byte, perm os.
 func (fsu *MockFileSystemUtils) CreateTempFile(content string, filename string) (string, error) {
 	return fsu.CreateTempFileFunc(content, filename)
 }
-func (fsu *MockFileSystemUtils) DeleteTempFile(tempFile string) error {
+func (fsu *MockFileSystemUtils) DeleteFile(tempFile string) error {
 	return fsu.DeleteTempFileFunc(tempFile)
 }

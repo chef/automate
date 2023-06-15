@@ -3,7 +3,7 @@ package hardwareresourcechecktrigger
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -74,7 +74,7 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 		ss.log.Error("Error while Performing Hardware resource count check from batch Check API : ", err)
 		return nil, err
 	}
-	respBody, err := ioutil.ReadAll(resp.Body) // nosemgrep
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		ss.log.Error("Error while reading response of Hardware resource count check from batch Check API : ", err)
 		return nil, err
@@ -86,4 +86,9 @@ func (ss *HardwareResourceCountCheck) TriggerHardwareResourceCountCheck(body int
 		return nil, err
 	}
 	return &response, nil
+}
+
+func (ss *HardwareResourceCountCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
 }

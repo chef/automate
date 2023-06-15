@@ -22,3 +22,8 @@ func NewSystemResourceCheck(log logger.Logger, port string) *SystemResourceCheck
 func (src *SystemResourceCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return trigger.RunCheck(config, src.log, src.port, constants.SYSTEM_RESOURCE_CHECK_API_PATH, config.DeploymentState)
 }
+
+func (ss *SystemResourceCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}

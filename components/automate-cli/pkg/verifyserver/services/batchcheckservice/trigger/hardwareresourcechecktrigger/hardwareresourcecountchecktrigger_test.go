@@ -316,3 +316,10 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		require.Nil(t, resp)
 	})
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewHardwareResourceCountCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}

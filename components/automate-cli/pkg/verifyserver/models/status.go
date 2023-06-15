@@ -11,3 +11,8 @@ type StatusDetails struct {
 	Services *[]ServiceDetails `json:"services"`
 	Error    string            `json:"error"`
 }
+
+type StatusApiResponse struct {
+	Status string        `json:"status"`
+	Result StatusDetails `json:"result"`
+}

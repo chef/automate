@@ -110,3 +110,8 @@ func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTri
 
 	return result
 }
+
+func (ss *NfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}

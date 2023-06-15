@@ -22,3 +22,8 @@ func NewSoftwareVersionCheck(log logger.Logger, port string) *SoftwareVersionChe
 func (svc *SoftwareVersionCheck) Run(config models.Config) []models.CheckTriggerResponse {
 	return trigger.RunCheck(config, svc.log, svc.port, constants.SOFTWARE_VERSION_CHECK_API_PATH, "")
 }
+
+func (ss *SoftwareVersionCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}

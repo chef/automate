@@ -47,7 +47,7 @@ func (ssu *SshUserServiceImpl) CheckSshUserDetails(req *models.SshUserChecksRequ
 	serviceResponse.Passed = isCheckPassed
 	serviceResponse.Checks = sshCheckResponse
 
-	ssu.FileUtils.DeleteTempFile(filePath)
+	ssu.FileUtils.DeleteFile(filePath)
 	return serviceResponse, nil
 }
 

@@ -5,3 +5,8 @@ type StopMockServerRequestBody struct {
 	Port     int
 	Protocol string
 }
+
+type StopMockServerResponse struct {
+	Status string `json:"status"`
+	Result string `json:"result"`
+}

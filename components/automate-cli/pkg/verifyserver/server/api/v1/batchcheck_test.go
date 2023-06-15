@@ -1,7 +1,8 @@
 package v1_test
 
 import (
-	"io/ioutil"
+	"errors"
+	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -17,9 +18,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupMockBatchCheckService() batchcheckservice.IBatchCheckService {
+func SetupMockBatchCheckService(errorFromBatchCheck bool) batchcheckservice.IBatchCheckService {
 	return &batchcheckservice.MockBatchCheckService{
-		BatchCheckFunc: func(checks []string, config models.Config) models.BatchCheckResponse {
+		BatchCheckFunc: func(checks []string, config models.Config) (models.BatchCheckResponse, error) {
+			if errorFromBatchCheck {
+				return models.BatchCheckResponse{}, errors.New("error occurred in batch check service")
+			}
 			return models.BatchCheckResponse{
 				Status: "SUCCESS",
 				Result: []models.BatchCheckResult{
@@ -64,7 +68,7 @@ func SetupMockBatchCheckService() batchcheckservice.IBatchCheckService {
 						},
 					},
 				},
-			}
+			}, nil
 		},
 	}
 }
@@ -93,10 +97,11 @@ func SetupHandlers(ss batchcheckservice.IBatchCheckService) (*fiber.App, error) 
 
 func TestBatchCheckAPI(t *testing.T) {
 	tests := []struct {
-		description  string
-		expectedCode int
-		expectedBody string
-		requestBody  string
+		description         string
+		expectedCode        int
+		expectedBody        string
+		requestBody         string
+		errorFromBatchCheck bool
 	}{
 		{
 			description: "200:success batch check route",
@@ -155,20 +160,37 @@ func TestBatchCheckAPI(t *testing.T) {
 			expectedCode: 400,
 			expectedBody: "\"batch check request body parsing failed: unexpected end of JSON input\"",
 		},
+		{
+			description: "Batch check service returns error",
+			requestBody: `{
+				"checks": ["hardware-resource-count", "ssh-user"],
+				"config":{
+					"ssh_user":{
+						"user_name": "ubuntu",
+						"private_key": "",
+						"sudo_password": ""
+						}
+					}
+				}`,
+			expectedCode:        500,
+			errorFromBatchCheck: true,
+
+			expectedBody: "\"error occurred in batch check service\"",
+		},
 	}
 	batchCheckEndpoint := "/api/v1/checks/batch-checks"
 	// Setup the app as it is done in the main function
-	app, err := SetupHandlers(SetupMockBatchCheckService())
-	assert.NoError(t, err)
-
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
+			app, err := SetupHandlers(SetupMockBatchCheckService(test.errorFromBatchCheck))
+			assert.NoError(t, err)
+
 			bodyReader := strings.NewReader(test.requestBody)
 			req := httptest.NewRequest("POST", batchCheckEndpoint, bodyReader)
 			req.Header.Add("Content-Type", "application/json")
 			res, err := app.Test(req, -1)
 			assert.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
 			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, test.expectedCode, res.StatusCode)

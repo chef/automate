@@ -60,5 +60,9 @@ func getSShUserAPIRquest(ip string, sshUser models.SSHUser) models.SShUserReques
 		SudoPassword: sshUser.SudoPassword,
 		PrivateKey:   sshUser.PrivateKey,
 	}
+}
 
+func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
 }

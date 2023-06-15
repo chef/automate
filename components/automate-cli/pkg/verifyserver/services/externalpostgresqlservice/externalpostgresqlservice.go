@@ -55,7 +55,7 @@ func (pg *ExternalPostgresqlServiceImpl) GetPgConnection(req *models.ExternalPgR
 	}
 
 	// delete the file when its done
-	defer pg.fileUtils.DeleteTempFile(rootcert)
+	defer pg.fileUtils.DeleteFile(rootcert)
 
 	return resp, nil
 }

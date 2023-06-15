@@ -827,3 +827,10 @@ func getRequest() models.NFSMountRequest {
 		MountLocation:          mountLocation,
 	}
 }
+
+func TestGetPortsForMockServer(t *testing.T) {
+	fwc := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "1234")
+	resp := fwc.GetPortsForMockServer()
+
+	assert.Equal(t, 0, len(resp))
+}

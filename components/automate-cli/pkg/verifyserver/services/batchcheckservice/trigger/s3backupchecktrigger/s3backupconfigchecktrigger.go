@@ -27,6 +27,11 @@ func (svc *S3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerR
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
 }
 
+func (ss *S3BackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := make(map[string]map[string][]int)
+	return nodeTypePortMap
+}
+
 // runCheckForS3Config triggers the API on gives node automate nodes only for validating s3 backup config
 func runCheckForS3Config(nodeIps []string, log logger.Logger, port string, method string, reqBody models.S3ConfigRequest) []models.CheckTriggerResponse {
 	log.Debugf("Triggering the api call for automate nodes only for s3 backup config")

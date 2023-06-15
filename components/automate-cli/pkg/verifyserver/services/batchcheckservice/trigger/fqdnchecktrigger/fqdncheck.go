@@ -86,3 +86,15 @@ func getFqdnCheckRequest(ip, nodeType string, rootcert string, fqdn string, isAf
 
 	return fqdnReq
 }
+
+func (ss *FqdnCheck) GetPortsForMockServer() map[string]map[string][]int {
+	nodeTypePortMap := map[string]map[string][]int{
+		constants.AUTOMATE: {
+			constants.HTTPS: []int{443},
+		},
+		constants.CHEF_INFRA_SERVER: {
+			constants.HTTPS: []int{443},
+		},
+	}
+	return nodeTypePortMap
+}
