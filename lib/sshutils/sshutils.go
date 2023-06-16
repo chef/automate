@@ -3,13 +3,13 @@ package sshutils
 import (
 	"net"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
@@ -26,6 +26,7 @@ type SSHConfig struct {
 type SSHUtilImpl struct {
 	SshClient ISshClient
 	logger    logger.Logger
+	Exec      command.Executor
 }
 
 type SSHUtil interface {
@@ -45,6 +46,14 @@ func NewSSHUtil(sshclient ISshClient, logger logger.Logger) *SSHUtilImpl {
 	return &SSHUtilImpl{
 		SshClient: sshclient,
 		logger:    logger,
+	}
+}
+
+func NewSSHUtilWithCommandExecutor(sshclient ISshClient, logger logger.Logger, exec command.Executor) *SSHUtilImpl {
+	return &SSHUtilImpl{
+		SshClient: sshclient,
+		logger:    logger,
+		Exec:      exec,
 	}
 }
 
@@ -228,8 +237,8 @@ func (s *SSHUtilImpl) ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostI
 
 func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool) error {
 	cmd := "scp"
-	exec_args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, sshConfig.SshUser + "@" + sshConfig.HostIP + ":/tmp/" + destFileName}
-	if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+	args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, sshConfig.SshUser + "@" + sshConfig.HostIP + ":/tmp/" + destFileName}
+	if err := s.Exec.Run(cmd, command.Args(args...)); err != nil {
 		s.logger.Errorf("Failed to copy file %s to remote with error: %v\n", srcFilePath, err)
 		if srcFilePath == "/usr/bin/chef-automate" {
 			s.logger.Errorln("Please copy your chef-automate binary to /usr/bin")
@@ -238,8 +247,8 @@ func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, 
 	}
 	if removeFile {
 		cmd := "rm"
-		exec_args := []string{"-rf", srcFilePath}
-		if err := exec.Command(cmd, exec_args...).Run(); err != nil {
+		args := []string{"-rf", srcFilePath}
+		if err := s.Exec.Run(cmd, command.Args(args...)); err != nil {
 			s.logger.Errorf("Failed to remove source file with error: %v\n", err)
 			return err
 		}

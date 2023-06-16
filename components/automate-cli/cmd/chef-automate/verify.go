@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ import (
 	"github.com/chef/automate/lib/config"
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
@@ -29,6 +31,11 @@ const (
 	VERIFY_SERVER_PORT        = "VERIFY_SERVER_PORT"
 	BINARY_DESTINATION_FOLDER = "/etc/automate-verify"
 	SYSTEMD_PATH              = "/etc/systemd/system"
+)
+
+var (
+	statusAPIEndpoint     = fmt.Sprintf("http://localhost:%s/status", getPort())
+	batchCheckAPIEndpoint = fmt.Sprintf("http://localhost:%s/api/v1/checks/batch-checks", getPort())
 )
 
 type verifyCmdFlags struct {
@@ -116,7 +123,7 @@ func init() {
 		"debug",
 		"d",
 		false,
-		"enable debugging")
+		"enable debugging for verify command")
 
 	verifyCmd.Flags().BoolVarP(
 		&flagsObj.prettyPrint,
@@ -130,14 +137,14 @@ func init() {
 		"debug",
 		"d",
 		false,
-		"enable debugging")
+		"enable debugging for verify serve command")
 
 	verifySystemdServiceCreateCmd.Flags().BoolVarP(
 		&flagsObj.debug,
 		"debug",
 		"d",
 		false,
-		"enable debugging")
+		"enable debugging for verify systemd-service create command")
 
 	verifySystemdServiceCmd.AddCommand(verifySystemdServiceCreateCmd)
 	verifyCmd.AddCommand(verifySystemdServiceCmd)
@@ -206,7 +213,7 @@ func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []str
 			return err
 		}
 
-		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, config.NewHaDeployConfig(), sshutils.NewSSHUtil(sshutils.NewSshClient(), log), writer)
+		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer)
 		return c.runVerifyCmd(cmd, args, flagsObj)
 	}
 }
@@ -247,7 +254,8 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 
 func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig models.Config) error {
 	v.Writer.Println("Checking automate-verify service on bastion")
-	res, err := v.Client.MakeRequest("GET", fmt.Sprintf("http://localhost:%s/status", getPort()), nil)
+	//Call status API to check if automate-verify service is running on bastion
+	res, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
 	if err != nil {
 		v.Writer.Println(fmt.Sprintf("error while checking automate-verify service on bastion: %v\n", err))
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service")
@@ -256,6 +264,7 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig mo
 			return err
 		}
 		// Wait for 2 seconds for the service to start
+		// TODO: Do retry logic to check if the service is up and running
 		time.Sleep(2 * time.Second)
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service completed")
 	} else {
@@ -291,7 +300,8 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig mo
 		Config: batchCheckConfig,
 	}
 	v.Writer.Println("Doing batch-check API call for bastion")
-	batchCheckBastionRes, err := v.Client.MakeRequest("POST", fmt.Sprintf("http://localhost:%s/api/v1/checks/batch-checks", getPort()), batchCheckBastionReq)
+	// Call batch-check API to run checks on bastion
+	batchCheckBastionRes, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, batchCheckBastionReq)
 	if err != nil {
 		return fmt.Errorf("error while doing batch-check API call for bastion: %v", err)
 	} else {
@@ -372,7 +382,8 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForRemote(batchCheckConfig mod
 	}
 
 	v.Writer.Println("Doing batch-check API call for remote nodes")
-	batchCheckRemoteRes, err := v.Client.MakeRequest("POST", fmt.Sprintf("http://localhost:%s/api/v1/checks/batch-checks", getPort()), batchCheckRemoteReq)
+	// Call batch-check API to run checks on remote nodes
+	batchCheckRemoteRes, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, batchCheckRemoteReq)
 	if err != nil {
 		return fmt.Errorf("error while doing batch-check API call for remote: %v", err)
 	} else {
@@ -418,10 +429,10 @@ func (v *verifyCmdFlow) GetResultFromResponseBody(body io.ReadCloser) ([]byte, e
 
 func getPort() string {
 	port := server.DEFAULT_PORT
-	env_port := os.Getenv(VERIFY_SERVER_PORT)
-	if env_port != "" {
-		if _, err := strconv.Atoi(env_port); err == nil {
-			port = env_port
+	envPort := os.Getenv(VERIFY_SERVER_PORT)
+	if envPort != "" {
+		if _, err := strconv.Atoi(envPort); err == nil {
+			port = envPort
 		}
 	}
 	return port

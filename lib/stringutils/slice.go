@@ -96,7 +96,7 @@ func SliceReject(haystack []string, needle string) []string {
 	return res
 }
 
-func ConcatSlice[T any](first []T, second []T) []T {
+func ConcatSlice(first, second []string) []string {
 	n := len(first)
 	return append(first[:n:n], second...)
 }
