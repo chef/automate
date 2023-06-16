@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeRequest_SuccessfulRequest(t *testing.T) {
+func TestMakeRequestSuccessfulRequest(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -59,7 +59,7 @@ func TestMakeRequest_SuccessfulRequest(t *testing.T) {
 	assert.Equal(t, expectedResponseBody, string(responseBody))
 }
 
-func TestMakeRequest_ErrorResponse(t *testing.T) {
+func TestMakeRequestErrorResponse(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Internal Server Error"))
@@ -74,11 +74,11 @@ func TestMakeRequest_ErrorResponse(t *testing.T) {
 	resp, err := client.MakeRequest(http.MethodGet, url, nil)
 
 	assert.Error(t, err)
-	assert.Nil(t, resp)
+	assert.NotNil(t, resp)
 	assert.Contains(t, err.Error(), "unexpected response status")
 }
 
-func TestMakeRequest_RequestBodyError(t *testing.T) {
+func TestMakeRequestRequestBodyError(t *testing.T) {
 	logger, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	client := httputils.NewClient(logger)
@@ -90,7 +90,7 @@ func TestMakeRequest_RequestBodyError(t *testing.T) {
 	assert.Contains(t, err.Error(), "failed to marshal request body")
 }
 
-func TestMakeRequest_RequestError(t *testing.T) {
+func TestMakeRequestRequestError(t *testing.T) {
 	logger, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 	client := httputils.NewClient(logger)
@@ -102,7 +102,7 @@ func TestMakeRequest_RequestError(t *testing.T) {
 	assert.Contains(t, err.Error(), "failed to make HTTP request")
 }
 
-func TestMakeRequest_ConnectionError(t *testing.T) {
+func TestMakeRequestConnectionError(t *testing.T) {
 	logger, err := logger.NewLogger("text", "debug")
 	assert.NoError(t, err)
 

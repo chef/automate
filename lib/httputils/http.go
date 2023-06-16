@@ -66,7 +66,7 @@ func (c *Client) MakeRequest(requestMethod, url string, body interface{}) (*http
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected response status: %s", resp.Status)
+		return resp, fmt.Errorf("unexpected response status: %s", resp.Status)
 	}
 
 	return resp, nil
