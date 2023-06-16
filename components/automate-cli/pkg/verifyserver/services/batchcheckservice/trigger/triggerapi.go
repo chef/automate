@@ -229,7 +229,7 @@ func ExternalOSPGNillResp(config *models.Config) []models.CheckTriggerResponse {
 	}
 
 	if count == 0 {
-		triggerResps = append(triggerResps, createNilResponse("127.0.0.1", constants.BASTION))
+		triggerResps = append(triggerResps, createNilResponse(constants.LOCALHOST, constants.BASTION))
 	}
 
 	return triggerResps
@@ -270,7 +270,7 @@ func ExternalOSPGEmptyResp(config *models.Config) []models.CheckTriggerResponse 
 	}
 
 	if count == 0 {
-		triggerResps = append(triggerResps, createErrorResponse("127.0.0.1", constants.BASTION))
+		triggerResps = append(triggerResps, createErrorResponse(constants.LOCALHOST, constants.BASTION))
 	}
 
 	return triggerResps
