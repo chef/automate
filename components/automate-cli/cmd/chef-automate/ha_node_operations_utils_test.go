@@ -630,7 +630,7 @@ func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
 	assert.Equal(t, "", out)
 }
 
-func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
+func TestSyncConfigToAllNodes(t *testing.T) {
 	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
 			return nil, nil
@@ -816,7 +816,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 	})
 }
 
-func TestParseAndMoveConfigFileToWorkspaceDir_1(t *testing.T) {
+func TestExecuteCmdInAllNodeAndCaptureOutputToSaveConfigInBastionBeforeNodeModify(t *testing.T) {
 
 	t.Run("save config in bastion", func(t *testing.T) {
 
@@ -925,6 +925,7 @@ func TestPrePatchForFrontendNodes(t *testing.T) {
 
 	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML)
 	assert.NoError(t, err)
+	defer fileutils.DeleteFile(filePath)
 
 	t.Run("with empty toml", func(t *testing.T) {
 		cmpInput := &CmdInputs{
@@ -953,5 +954,68 @@ func TestPrePatchForFrontendNodes(t *testing.T) {
 		}
 		err = prePatchForFrontendNodes(cmpInput, NewSSHUtil(&SSHConfig{}), nil, "", nil)
 		assert.Error(t, err, "expected '.' or ']'")
+	})
+}
+
+func TestParseAndMoveConfigFileToWorkspaceDir(t *testing.T) {
+	mnu := NewNodeUtils(&MockRemoteCmdExecutor{
+		ExecuteFunc: func() (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+			return nil, nil
+		},
+		GetSshUtilFunc: func() SSHUtil {
+			return &MockSSHUtilsImpl{
+				connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+					return "", nil
+				},
+				copyFileToRemoteFunc: func(srcFilePath string, destFileName string, removeFile bool) error {
+					return nil
+				},
+			}
+		},
+	}, command.NewMockExecutor(t), MockWriter.CliWriter)
+
+	tomlFileContent := `Output of IP a.b.c.d:
+[deployment]
+  [deployment.v1]
+    [deployment.v1.svc]
+      channel = "current"
+      upgrade_strategy = "none"
+      deployment_type = "local"
+      products = ["automate", "chef-server"]
+			[[global.v1.frontend_tls]]
+      cert=""
+			[[load_balancer.v1.sys.frontend_tls]]
+			cert = ""
+`
+	finalTomlFileContent := `[deployment]
+  [deployment.v1]
+    [deployment.v1.svc]
+      channel = "current"
+      upgrade_strategy = "none"
+      deployment_type = "local"
+      products = ["automate", "chef-server"]
+			[[global.v1.frontend_tls]]
+      cert=""
+			[[load_balancer.v1.sys.frontend_tls]]
+			cert = ""
+`
+
+	filePath, err := fileutils.CreateTempFile(tomlFileContent, AUTOMATE_TOML)
+	assert.NoError(t, err)
+	defer fileutils.DeleteFile(filePath)
+
+	t.Run("No error", func(t *testing.T) {
+		err = mnu.parseAndMoveConfigFileToWorkspaceDir([]string{filePath}, "")
+		assert.NoError(t, err)
+		contentByte, err := fileutils.ReadFile(filePath)
+		assert.NoError(t, err)
+		assert.Equal(t, finalTomlFileContent, string(contentByte))
+	})
+	t.Run("error on removing output header", func(t *testing.T) {
+		err = mnu.parseAndMoveConfigFileToWorkspaceDir([]string{AUTOMATE_TOML}, "")
+		assert.Error(t, err, "error on removing output header in fetched config")
 	})
 }
