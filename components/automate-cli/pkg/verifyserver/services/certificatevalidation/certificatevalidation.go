@@ -75,6 +75,9 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 
 	for _, key := range keys {
 		cert := certificates[key]
+		if key == constants.ROOT && cert == "" {
+			continue
+		}
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
@@ -114,6 +117,9 @@ func (vc *ValidateCertificateService) validateCertificateFormat(certificates map
 
 	for _, key := range keys {
 		cert := certificates[key]
+		if key == constants.ROOT && cert == "" {
+			continue
+		}
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
@@ -175,6 +181,10 @@ func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates 
 
 	for _, key := range keys {
 		cert := certificates[key]
+
+		if key == constants.ROOT && cert == "" {
+			continue
+		}
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)

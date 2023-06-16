@@ -255,7 +255,7 @@ func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 	postgresqlConfig := haConfig.Postgresql.Config
 	if postgresqlConfig.EnableCustomCerts {
 		cert = addCertificatesInConfig("", "", config.POSTGRESQL)
-		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", "")
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", postgresqlConfig.RootCA)
 		c.Certificate = append(c.Certificate, cert)
 	}
 
@@ -353,7 +353,7 @@ func (c *Config) populateNonExternalDbConfig(haConfig *config.HaDeployConfig) {
 	postgresqlConfig := haConfig.Postgresql.Config
 	if postgresqlConfig.EnableCustomCerts {
 		postgresqlCert := addCertificatesInConfig("", "", config.POSTGRESQL)
-		postgresqlCert.Nodes = appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, haConfig.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", "")
+		postgresqlCert.Nodes = appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, haConfig.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", postgresqlConfig.RootCA)
 		c.Certificate = append(c.Certificate, postgresqlCert)
 
 	}
