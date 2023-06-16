@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/arrayutils"
 	"github.com/chef/automate/lib/certgenerateutils"
@@ -196,8 +197,9 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, config model
 	totalReq := 0
 	defer close(startMockServerChannel)
 	for nodeTypeWithIp, protocolMap := range nodeTypeAndIpWithPortProtocolMap {
-		host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)
-		ss.constructAndStartMockServerForAvailableProtocals(protocolMap, host, startMockServerChannel, &ipPortProtocolMap, &totalReq, config)
+		nodeType := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)[0]
+		host := getHostFromNodeTypeAndIpCombination(nodeTypeWithIp)[1]
+		ss.constructAndStartMockServerForAvailableProtocals(protocolMap, host, nodeType, startMockServerChannel, &ipPortProtocolMap, &totalReq, config)
 	}
 
 	successfullyStartedMockServers := []models.MockServerFromBatchServiceResponse{}
@@ -214,7 +216,7 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, config model
 	return successfullyStartedMockServers, notStartedMockServers
 }
 
-func (ss *BatchCheckService) constructAndStartMockServerForAvailableProtocals(protocolMap map[string][]int, host string, startMockServerChannel chan models.MockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int, config models.Config) {
+func (ss *BatchCheckService) constructAndStartMockServerForAvailableProtocals(protocolMap map[string][]int, host, nodeType string, startMockServerChannel chan models.MockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int, config models.Config) {
 	startMockServerRequestBody := models.StartMockServerRequestBody{}
 	if len(protocolMap[constants.TCP]) != 0 {
 		startMockServerRequestBody.Protocol = constants.TCP
@@ -230,7 +232,7 @@ func (ss *BatchCheckService) constructAndStartMockServerForAvailableProtocals(pr
 	}
 	if len(protocolMap[constants.HTTPS]) != 0 {
 		startMockServerRequestBody.Protocol = constants.HTTPS
-		ss.generateRootCaAndPrivateKeyForHost(host, &startMockServerRequestBody, config)
+		ss.generateRootCaAndPrivateKeyForHost(host, nodeType, &startMockServerRequestBody, config)
 		ss.constructRequestAndStartMockServer(protocolMap, host, startMockServerRequestBody, startMockServerChannel, ipPortProtocolMap, totalReq)
 	}
 }
@@ -249,13 +251,20 @@ func (ss *BatchCheckService) constructRequestAndStartMockServer(protocolMap map[
 	}
 }
 
-func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) string {
-	return nodeTypeWithIp[strings.Index(nodeTypeWithIp, "_")+1:]
+func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) []string {
+	fmt.Println("NodeTypeWithIP", nodeTypeWithIp)
+	return strings.Split(nodeTypeWithIp, "_")
 }
 
-func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host string, startMockServerRequestBody *models.StartMockServerRequestBody, config models.Config) {
-	if len(config.Certificate.Nodes) > 0 {
-		nodes := config.Certificate.Nodes
+func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host, nodeType string, startMockServerRequestBody *models.StartMockServerRequestBody, config models.Config) {
+	var certMap map[string]models.Certificate
+	if len(config.Certificate) > 0 {
+		certMap = configutils.GetCertificateMap(config.Certificate)
+	}
+
+	certificateNodes, ok := certMap[nodeType]
+	if ok && len(certificateNodes.Nodes) > 0 {
+		nodes := config.Certificate[0].Nodes
 		for _, nodeData := range nodes {
 			if host == nodeData.IP {
 				startMockServerRequestBody.Cert = nodeData.Cert
@@ -326,7 +335,7 @@ func getIndexOfCheck(checks []string, check string) (int, error) {
 
 func (ss *BatchCheckService) RunBastionCheck(check string, config models.Config, resultChan chan []models.CheckTriggerResponse) {
 	resp := ss.getCheckInstance(check).Run(config)
-	for i, _ := range resp {
+	for i := range resp {
 		resp[i].CheckType = check
 	}
 	resultChan <- resp
@@ -555,7 +564,7 @@ func getBastionCheckResp(ss *BatchCheckService, bastionChecks []string, config m
 			message = constants.GetCheckMessageByName(result[0].CheckType)
 		}
 
-		for i, _ := range result {
+		for i := range result {
 			result[i].Result.Check = result[i].CheckType
 			result[i].Result.Message = message
 		}
@@ -577,7 +586,7 @@ func getRemoteCheckResp(ss *BatchCheckService, remoteChecks []string, config mod
 
 		message := constants.GetCheckMessageByName(check)
 
-		for ind, _ := range resp {
+		for ind := range resp {
 			resp[ind].CheckType = check
 			resp[ind].Result.Check = check
 			resp[ind].Result.Message = message
