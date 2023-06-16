@@ -779,6 +779,17 @@ func TestDeletenodeDeploy(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	mockNodeUtil := newMockNodeUtilsImplForDeleteAWS()
 
+	t.Run("With save config error", func(t *testing.T) {
+
+		mockNodeUtil.saveConfigToBastionFunc = func() error {
+			return errors.New("error removing header from output file")
+		}
+		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
+
+		err := nodeDelete.Execute(nil, nil)
+		assert.Error(t, err, "error removing header from output file")
+	})
+
 	t.Run("With sync config error", func(t *testing.T) {
 
 		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
