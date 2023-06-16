@@ -283,25 +283,6 @@ func TestSaveConfigToBastion(t *testing.T) {
 			return nil
 		},
 	}
-	// infra, _, err := mockUtil.getHaInfraDetails()
-	// assert.NoError(t, err)
-
-	// nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
-	// 	ExecuteFunc: func() (map[string][]*CmdResult, error) {
-	// 		return nil, nil
-	// 	},
-	// 	ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
-	// 		return nil, nil
-	// 	},
-	// 	GetSshUtilFunc: func() SSHUtil {
-	// 		return &MockSSHUtilsImpl{
-	// 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
-	// 				return "", nil
-	// 			},
-	// 		}
-	// 	},
-	// }, command.NewMockExecutor(t), MockWriter.CliWriter)
-
 	err := mockUtil.saveConfigToBastion()
 	assert.NoError(t, err)
 }
