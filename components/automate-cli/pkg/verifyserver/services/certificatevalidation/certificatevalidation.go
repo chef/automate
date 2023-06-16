@@ -217,12 +217,11 @@ func (vc *ValidateCertificateService) CertificateValidation(req models.Certifica
 		certificates[constants.ROOT] = req.RootCertificate
 		certKeys = append(certKeys, constants.ROOT)
 	}
+	certificates[constants.NODE] = req.NodeCertificate
 	certKeys = append(certKeys, constants.NODE)
 
 	//keys array are required to maintain the order of correct response messages.
 	keys := []string{constants.NODE_KEY}
-
-	certificates[constants.NODE] = req.NodeCertificate
 	privateKeys[constants.NODE_KEY] = req.PrivateKey
 
 	if strings.TrimSpace(req.AdminCertificate) != "" && strings.TrimSpace(req.AdminPrivateKey) != "" {
