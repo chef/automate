@@ -25,7 +25,6 @@ type restartFromBastion interface {
 	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
 	isManagedServicesOn() bool
 	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printRestartCmdOutput(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
 }
 
 type restartFromBastionImpl struct{}
@@ -55,17 +54,6 @@ func (rs *restartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd,
 	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
 	cmdResult, err := remoteExecutor.Execute()
 	return cmdResult, err
-}
-
-func (rs *restartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
-	mutex.Lock()
-	writer.Printf("=====================================================\n")
-	for _, value := range cmdResult {
-		for _, cmdResult := range value {
-			printOutput(remoteService, *cmdResult, []string{}, writer)
-		}
-	}
-	mutex.Unlock()
 }
 
 func init() {
@@ -135,6 +123,11 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 	return nil
 }
 
+type ResultWithError struct {
+    result interface{}
+    err     error
+}
+
 func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error {
 	var mutex = &sync.Mutex{}
 	infra, err := rs.getAutomateHAInfraDetails()
@@ -151,46 +144,46 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 		flags.opensearch = true
 		flags.postgresql = true
 	}
-	errChan := make(chan error, 4)
+	errChan := make(chan *ResultWithError, 4)
 	runRestartCmdForFrontEnd(infra, flags, rs, mutex, errChan)
 
 	if rs.isManagedServicesOn() {
-		errChan <- nil
-		errChan <- nil
-		err = getValueFromChannel(errChan)
+		errChan <- &ResultWithError{}
+		errChan <- &ResultWithError{}
+		err = getChannelValue(errChan)
 		if err != nil {
 			return err
 		}
-		return handleManagedServiceError(flags)
+		return handleManagedServices(flags)
 	}
 
 	runRestartCmdForBackend(infra, flags, rs, mutex, errChan)
 
-	return getValueFromChannel(errChan)
+	return getChannelValue(errChan)
 }
 
-func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan error) {
+func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan *ResultWithError) {
 	if flags.automate {
 		restartOnGivenNode(flags, AUTOMATE, infra, rs, mutex, errChan)
 	} else {
-		errChan <- nil
+		errChan <- &ResultWithError{}
 	}
 
 	if flags.chefServer {
 		flags.automate = false
 		restartOnGivenNode(flags, CHEF_SERVER, infra, rs, mutex, errChan)
 	} else {
-		errChan <- nil
+		errChan <- &ResultWithError{}
 	}
 }
 
-func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan error) {
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan *ResultWithError) {
 	if flags.postgresql {
 		flags.automate = false
 		flags.chefServer = false
 		restartOnGivenNode(flags, POSTGRESQL, infra, rs, mutex, errChan)
 	} else {
-		errChan <- nil
+		errChan <- &ResultWithError{}
 	}
 
 	if flags.opensearch {
@@ -199,34 +192,32 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 		flags.postgresql = false
 		restartOnGivenNode(flags, OPENSEARCH, infra, rs, mutex, errChan)
 	} else {
-		errChan <- nil
+		errChan <- &ResultWithError{}
 	}
 }
 
-func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs restartFromBastion, mutex *sync.Mutex, errChan chan<- error) {
-	go func(flags RestartCmdFlags, errChan chan<- error) {
+func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs restartFromBastion, mutex *sync.Mutex, resultErrChan chan *ResultWithError) {
+	go func(flags RestartCmdFlags, resultErrChan chan *ResultWithError) {
 		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
 		cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-		if err == nil {
-			rs.printRestartCmdOutput(cmdResult, nodeType, mutex, writer)
-		}
-		errChan <- err
-	}(*flags, errChan)
+		ResultWithError := &ResultWithError{result:cmdResult,err:err }
+		resultErrChan <-ResultWithError
+	}(*flags, resultErrChan)
 }
 
-func getValueFromChannel(errChan chan error) error {
+func getChannelValue(errChan chan *ResultWithError) error {
 	for i := 0; i < 4; i++ {
 		errVal := <-errChan
-		if errVal != nil {
-			return errVal
+		if errVal.err != nil {
+			return errVal.err
 		}
 	}
 	return nil
 }
 
-func handleManagedServiceError(flags *RestartCmdFlags) error {
+func handleManagedServices(flags *RestartCmdFlags) error {
 	if flags.postgresql && flags.opensearch {
 		return nil
 	}
@@ -246,7 +237,6 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 				Cmd:                      RESTART_FRONTEND_COMMAND,
 				Single:                   false,
 				NodeType:                 false,
-				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
 		},
@@ -258,7 +248,6 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 				WaitTimeout:              int(flags.timeout),
 				NodeIps:                  []string{flags.node},
 				NodeType:                 flags.automate,
-				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
 		},
@@ -270,7 +259,6 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 				ErrorCheckEnableInOutput: true,
 				NodeIps:                  []string{flags.node},
 				NodeType:                 flags.chefServer,
-				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
 		},
@@ -281,7 +269,6 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.postgresql,
-				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
 		},
@@ -292,7 +279,6 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.opensearch,
-				SkipPrintOutput:          true,
 				HideSSHConnectionMessage: true,
 			},
 		},

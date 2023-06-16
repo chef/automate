@@ -1,7 +1,6 @@
 package main
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -14,7 +13,6 @@ type MockrestartFromBastionImpl struct {
 	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
 	isManagedServicesOnFunc       func() bool
 	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printRestartCmdOutputFunc     func(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
 }
 
 func (mrs *MockrestartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
@@ -29,9 +27,6 @@ func (mrs *MockrestartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAn
 	return mrs.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
 }
 
-func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
-	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, mutex, writer)
-}
 func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 	type testCase struct {
 		flags           *RestartCmdFlags
@@ -48,7 +43,6 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 				Frontend: &Cmd{
 					CmdInputs: &CmdInputs{
 						Cmd:                      RESTART_FRONTEND_COMMAND,
-						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -58,7 +52,6 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						ErrorCheckEnableInOutput: true,
 						NodeIps:                  []string{""},
 						NodeType:                 true,
-						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -68,7 +61,6 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						ErrorCheckEnableInOutput: true,
 						NodeIps:                  []string{""},
 						NodeType:                 false,
-						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -78,7 +70,6 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
-						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -88,7 +79,6 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
-						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -147,8 +137,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, m2 *sync.Mutex, w *cli.Writer) {
-				},
 			},
 			errorWant: nil,
 		},
@@ -165,8 +153,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
 				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, m2 *sync.Mutex, w *cli.Writer) {
-				},
 			},
 			errorWant: errors.New("Some error occured while remote execution"),
 		},
@@ -182,8 +168,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				},
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
-				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, m2 *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: nil,
@@ -203,8 +187,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
-				},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
 		},
@@ -222,8 +204,6 @@ func TestRunRestartFromBastion(t *testing.T) {
 				},
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
-				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
@@ -274,7 +254,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		err := handleManagedServiceError(testCase.flags)
+		err := handleManagedServices(testCase.flags)
 
 		if testCase.errorExepected != nil {
 			assert.EqualError(t, err, testCase.errorExepected.Error())
