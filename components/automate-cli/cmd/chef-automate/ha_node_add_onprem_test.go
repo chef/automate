@@ -667,6 +667,24 @@ func TestAddnodeExecuteSyncConfigToAllNodes(t *testing.T) {
 	})
 }
 
+func TestAddnodeExecuteSaveConfigFromAllNodeType(t *testing.T) {
+
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	mockNodeUtil := newMockNodeUtilsImplForAddOnprem()
+
+	t.Run("With save config error", func(t *testing.T) {
+
+		mockNodeUtil.saveConfigToBastionFunc = func() error {
+			return errors.New("error fetching config")
+		}
+		mockNodeUtil.pullAndUpdateConfigFunc = PullConfFunc
+		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
+
+		err := nodeAdd.Execute(nil, nil)
+		assert.Error(t, err, "error fetching config")
+	})
+}
+
 func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 	return &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
