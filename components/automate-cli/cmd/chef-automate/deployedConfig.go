@@ -41,7 +41,7 @@ func PopulateHaCommonConfig() (*config.HaDeployConfig, error) {
 	return nil, errors.New("deployed config was not found")
 }
 
-func CopyCertsByIP(existing []CertByIP, haDeploy *[]config.CertByIP) {
+func CopyCertsByIP(haDeploy *[]config.CertByIP, existing []CertByIP) {
 	for _, certByIP := range existing {
 		haCertByIP := config.CertByIP{
 			IP:         certByIP.IP,
@@ -75,20 +75,20 @@ func CopyExternalOsSettings(haDeployExternalOsSettings *config.ExternalOsSetting
 	haDeployExternalOsSettings.OpensearchUsername = existingInfraExternalOsSettings.OpensearchSuperUserName
 
 	if existingInfraExternalOsSettings.AWS.AwsOsSnapshotRoleArn != "" {
-		haDeployExternalOsSettings.Aws.AwsOsSnapshotRoleArn = existingInfraExternalOsSettings.AWS.AwsOsSnapshotRoleArn
-		haDeployExternalOsSettings.Aws.OsSnapshotUserAccessKeyID = existingInfraExternalOsSettings.AWS.OsUserAccessKeyId
-		haDeployExternalOsSettings.Aws.OsSnapshotUserAccessKeySecret = existingInfraExternalOsSettings.AWS.OsUserAccessKeySecret
+		haDeployExternalOsSettings.Aws = &config.AwsExternalOsSettings{
+			AwsOsSnapshotRoleArn:          existingInfraExternalOsSettings.AWS.AwsOsSnapshotRoleArn,
+			OsSnapshotUserAccessKeyID:     existingInfraExternalOsSettings.AWS.OsUserAccessKeyId,
+			OsSnapshotUserAccessKeySecret: existingInfraExternalOsSettings.AWS.OsUserAccessKeySecret,
+		}
 	}
 }
 
-func CopyExistingInfraSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyExistingInfraSettings(haDeployExistingInfraSettings *config.ConfigExistingInfraSettings, existingInfraConfig *ExistingInfraConfigToml) {
 	existingInfraSettings := existingInfraConfig.ExistingInfra.Config
-	haDeployExistingInfraSettings := haDeployConfig.ExistingInfra.Config
-
 	haDeployExistingInfraSettings.AutomatePrivateIps = existingInfraSettings.AutomatePrivateIps
 	haDeployExistingInfraSettings.ChefServerPrivateIps = existingInfraSettings.ChefServerPrivateIps
 
-	if !haDeployConfig.IsExternalDb() {
+	if !IsExternalDb(existingInfraConfig) {
 		haDeployExistingInfraSettings.PostgresqlPrivateIps = existingInfraSettings.PostgresqlPrivateIps
 		haDeployExistingInfraSettings.OpensearchPrivateIps = existingInfraSettings.OpensearchPrivateIps
 	}
@@ -97,7 +97,7 @@ func CopyExistingInfraSettings(haDeployConfig *config.HaDeployConfig, existingIn
 func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
 
 	if awsConfig != nil {
-		awsConfigOpensearchSettings := existingInfraConfig.Opensearch.Config
+		awsConfigOpensearchSettings := awsConfig.Opensearch.Config
 		awshaDeployOpensearchSettings := haDeployOpensearchSettings
 
 		awshaDeployOpensearchSettings.AdminCert = awsConfigOpensearchSettings.AdminCert
@@ -109,11 +109,6 @@ func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchS
 		awshaDeployOpensearchSettings.PrivateKey = awsConfigOpensearchSettings.PrivateKey
 		awshaDeployOpensearchSettings.PublicKey = awsConfigOpensearchSettings.PublicKey
 		awshaDeployOpensearchSettings.RootCA = awsConfigOpensearchSettings.RootCA
-
-		// CertsByIP
-		if awsConfigOpensearchSettings.CertsByIP != nil {
-			CopyCertsByIP(awsConfigOpensearchSettings.CertsByIP, awshaDeployOpensearchSettings.CertsByIP)
-		}
 		return
 	}
 
@@ -131,7 +126,8 @@ func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchS
 
 	// CertsByIP
 	if existingInfraOpensearchSettings.CertsByIP != nil {
-		CopyCertsByIP(existingInfraOpensearchSettings.CertsByIP, haDeployOpensearchSettings.CertsByIP)
+		haDeployOpensearchSettings.CertsByIP = &[]config.CertByIP{}
+		CopyCertsByIP(haDeployOpensearchSettings.CertsByIP, existingInfraOpensearchSettings.CertsByIP)
 	}
 }
 
@@ -143,13 +139,9 @@ func CopyPostgresqlSettings(haDeployPostgresqlSettings *config.ConfigSettings, e
 
 		awshaDeployPostgresqlSettings.EnableCustomCerts = awsConfigPostgresqlSettings.EnableCustomCerts
 		awshaDeployPostgresqlSettings.InstanceCount = awsConfigPostgresqlSettings.InstanceCount
-		awshaDeployPostgresqlSettings.PrivateKey = awsConfigPostgresqlSettings.PublicKey
+		awshaDeployPostgresqlSettings.PrivateKey = awsConfigPostgresqlSettings.PrivateKey
+		awshaDeployPostgresqlSettings.PublicKey = awsConfigPostgresqlSettings.PublicKey
 		awshaDeployPostgresqlSettings.RootCA = awsConfigPostgresqlSettings.RootCA
-
-		// CertsByIP
-		if awsConfigPostgresqlSettings.CertsByIP != nil {
-			CopyCertsByIP(awsConfigPostgresqlSettings.CertsByIP, awshaDeployPostgresqlSettings.CertsByIP)
-		}
 		return
 	}
 
@@ -157,12 +149,14 @@ func CopyPostgresqlSettings(haDeployPostgresqlSettings *config.ConfigSettings, e
 
 	haDeployPostgresqlSettings.EnableCustomCerts = existingInfraPostgresqlSettings.EnableCustomCerts
 	haDeployPostgresqlSettings.InstanceCount = existingInfraPostgresqlSettings.InstanceCount
-	haDeployPostgresqlSettings.PrivateKey = existingInfraPostgresqlSettings.PublicKey
+	haDeployPostgresqlSettings.PrivateKey = existingInfraPostgresqlSettings.PrivateKey
+	haDeployPostgresqlSettings.PublicKey = existingInfraPostgresqlSettings.PublicKey
 	haDeployPostgresqlSettings.RootCA = existingInfraPostgresqlSettings.RootCA
 
 	// CertsByIP
 	if existingInfraPostgresqlSettings.CertsByIP != nil {
-		CopyCertsByIP(existingInfraPostgresqlSettings.CertsByIP, haDeployPostgresqlSettings.CertsByIP)
+		haDeployPostgresqlSettings.CertsByIP = &[]config.CertByIP{}
+		CopyCertsByIP(haDeployPostgresqlSettings.CertsByIP, existingInfraPostgresqlSettings.CertsByIP)
 	}
 }
 
@@ -176,11 +170,6 @@ func CopyChefServerSettings(haDeployChefServerSettings *config.ConfigSettings, e
 		awshaDeployChefServerSettings.InstanceCount = awsConfigChefServerSettings.InstanceCount
 		awshaDeployChefServerSettings.PrivateKey = awsConfigChefServerSettings.PrivateKey
 		awshaDeployChefServerSettings.PublicKey = awsConfigChefServerSettings.PublicKey
-
-		// CertsByIP
-		if awsConfigChefServerSettings.CertsByIP != nil {
-			CopyCertsByIP(awsConfigChefServerSettings.CertsByIP, awshaDeployChefServerSettings.CertsByIP)
-		}
 		return
 	}
 
@@ -193,35 +182,27 @@ func CopyChefServerSettings(haDeployChefServerSettings *config.ConfigSettings, e
 
 	// CertsByIP
 	if existingInfraChefServerSettings.CertsByIP != nil {
-		CopyCertsByIP(existingInfraChefServerSettings.CertsByIP, haDeployChefServerSettings.CertsByIP)
+		haDeployChefServerSettings.CertsByIP = &[]config.CertByIP{}
+		CopyCertsByIP(haDeployChefServerSettings.CertsByIP, existingInfraChefServerSettings.CertsByIP)
 	}
 }
 
 func CopyAutomateSettings(haDeployConfigAutomateSettings *config.ConfigAutomateSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
-
 	if awsConfig != nil {
 		awsConfigAutomateSettings := awsConfig.Automate.Config
-		awshaDeployConfigAutomateSettings := haDeployConfigAutomateSettings
-
-		awshaDeployConfigAutomateSettings.AdminPassword = awsConfigAutomateSettings.AdminPassword
-		awshaDeployConfigAutomateSettings.ConfigFile = awsConfigAutomateSettings.ConfigFile
-		awshaDeployConfigAutomateSettings.EnableCustomCerts = awsConfigAutomateSettings.EnableCustomCerts
-		awshaDeployConfigAutomateSettings.Fqdn = awsConfigAutomateSettings.Fqdn
-		awshaDeployConfigAutomateSettings.InstanceCount = awsConfigAutomateSettings.InstanceCount
-		awshaDeployConfigAutomateSettings.PrivateKey = awsConfigAutomateSettings.PrivateKey
-		awshaDeployConfigAutomateSettings.PublicKey = awsConfigAutomateSettings.PublicKey
-		awshaDeployConfigAutomateSettings.RootCA = awsConfigAutomateSettings.RootCA
-		awshaDeployConfigAutomateSettings.TeamsPort = awsConfigAutomateSettings.TeamsPort
-
-		// CertsByIP
-		if awsConfigAutomateSettings.CertsByIP != nil {
-			CopyCertsByIP(awsConfigAutomateSettings.CertsByIP, awshaDeployConfigAutomateSettings.CertsByIP)
-		}
+		haDeployConfigAutomateSettings.AdminPassword = awsConfigAutomateSettings.AdminPassword
+		haDeployConfigAutomateSettings.ConfigFile = awsConfigAutomateSettings.ConfigFile
+		haDeployConfigAutomateSettings.EnableCustomCerts = awsConfigAutomateSettings.EnableCustomCerts
+		haDeployConfigAutomateSettings.Fqdn = awsConfigAutomateSettings.Fqdn
+		haDeployConfigAutomateSettings.InstanceCount = awsConfigAutomateSettings.InstanceCount
+		haDeployConfigAutomateSettings.PrivateKey = awsConfigAutomateSettings.PrivateKey
+		haDeployConfigAutomateSettings.PublicKey = awsConfigAutomateSettings.PublicKey
+		haDeployConfigAutomateSettings.RootCA = awsConfigAutomateSettings.RootCA
+		haDeployConfigAutomateSettings.TeamsPort = awsConfigAutomateSettings.TeamsPort
 		return
 	}
 
 	existingInfraConfigAutomateSettings := existingInfraConfig.Automate.Config
-
 	haDeployConfigAutomateSettings.AdminPassword = existingInfraConfigAutomateSettings.AdminPassword
 	haDeployConfigAutomateSettings.ConfigFile = existingInfraConfigAutomateSettings.ConfigFile
 	haDeployConfigAutomateSettings.EnableCustomCerts = existingInfraConfigAutomateSettings.EnableCustomCerts
@@ -234,9 +215,9 @@ func CopyAutomateSettings(haDeployConfigAutomateSettings *config.ConfigAutomateS
 
 	// CertsByIP
 	if existingInfraConfigAutomateSettings.CertsByIP != nil {
-		CopyCertsByIP(existingInfraConfigAutomateSettings.CertsByIP, haDeployConfigAutomateSettings.CertsByIP)
+		haDeployConfigAutomateSettings.CertsByIP = &[]config.CertByIP{}
+		CopyCertsByIP(haDeployConfigAutomateSettings.CertsByIP, existingInfraConfigAutomateSettings.CertsByIP)
 	}
-
 }
 
 func CopyConfigObjectStorage(haDeployConfigObjectStorageConfig *config.ConfigObjectStorage, existingInfraConfig *ExistingInfraConfigToml) {
@@ -314,10 +295,10 @@ func CopyExistingInfra(haConfig *config.HaDeployConfig, existingInfraConfig *Exi
 	// ExistingInfraSettings
 	haConfig.External.Database.Type = existingInfraConfig.ExternalDB.Database.Type
 
-	CopyExistingInfraSettings(haConfig, existingInfraConfig)
+	CopyExistingInfraSettings(haConfig.ExistingInfra.Config, existingInfraConfig)
 
 	// ExternalDbSettings
-	if haConfig.IsExternalDb() {
+	if IsExternalDb(existingInfraConfig) {
 		// ExternalPgSettings
 		CopyExternalPgSettings(haConfig.External.Database.PostgreSQL, existingInfraConfig)
 		// ExternalOsSettings
@@ -329,7 +310,8 @@ func CopyExistingInfra(haConfig *config.HaDeployConfig, existingInfraConfig *Exi
 
 func CopyAws(haConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	// ConfigInitials
-	CopyConfigInitials(haConfig.Architecture.ExistingInfra, nil, awsConfig)
+
+	CopyConfigInitials(haConfig.Architecture.Aws, nil, awsConfig)
 
 	// ConfigAutomateSettings
 	CopyAutomateSettings(haConfig.Automate.Config, nil, awsConfig)
@@ -425,4 +407,8 @@ func CopyEc2InstanceConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *Aws
 	haConfigAws.PostgresqlEbsVolumeType = awsConfigSetting.PostgresqlEbsVolumeType
 
 	haConfigAws.LbAccessLogs = awsConfigSetting.LBAccessLogs
+}
+
+func IsExternalDb(existingInfraConfig *ExistingInfraConfigToml) bool {
+	return existingInfraConfig.ExternalDB.Database.Type == AWS || existingInfraConfig.ExternalDB.Database.Type == TYPE_SELF_MANAGED
 }
