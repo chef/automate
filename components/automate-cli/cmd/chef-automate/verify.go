@@ -425,19 +425,16 @@ func (v *verifyCmdFlow) StartServiceOnRemoteNodes(destFileName string, sshConfig
 
 // Returns result field from response body
 func (v *verifyCmdFlow) getResultFromResponseBody(body io.ReadCloser) ([]byte, error) {
-	// Read the response body
 	responseBody, err := io.ReadAll(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %v", err)
 	}
 
-	// Unmarshal the response body into the ResponseBody struct
 	var responseBodyStruct response.ResponseBody
 	if err := json.Unmarshal(responseBody, &responseBodyStruct); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response body: %v", err)
 	}
 
-	// Marshal the Result field into a byte slice
 	var resultBytes []byte
 	if v.prettyPrint {
 		resultBytes, err = json.MarshalIndent(responseBodyStruct.Result, "", "    ")
