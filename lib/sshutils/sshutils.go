@@ -203,12 +203,14 @@ func (s *SSHUtilImpl) ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostI
 			output, err := s.Execute(sshConfig, cmd)
 			if err != nil {
 				rc.Error = err
+				rc.Output = output
 				resultChan <- rc
 				return
 			}
 
 			if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
 				rc.Error = errors.New(output)
+				rc.Output = output
 				resultChan <- rc
 				return
 			}
@@ -224,9 +226,9 @@ func (s *SSHUtilImpl) ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostI
 		result := <-resultChan
 
 		if result.Error != nil {
-			s.logger.Errorf("Remote executation failed on node : %s with error: %v\n", result.HostIP, result.Error)
+			s.logger.Errorf("Remote execution failed on node : %s with error: %v\n", result.HostIP, result.Error)
 		} else {
-			s.logger.Debugf("Remote executation is completed. Output for Host IP %s : \n%s\n", result.HostIP, result.Output)
+			s.logger.Debugf("Remote execution is completed. Output for Host IP %s : \n%s\n", result.HostIP, result.Output)
 		}
 
 		results = append(results, result)

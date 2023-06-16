@@ -30,6 +30,7 @@ const (
 	srcFilePath                = "/some/file/path"
 	destFileName               = "abc.txt"
 	remoteCopyError            = "error while copying file to remote"
+	outputWithError            = "some error output"
 )
 
 var sshConfig = sshutils.SSHConfig{
@@ -450,14 +451,14 @@ func TestExecuteConcurrently(t *testing.T) {
 					return nil, nil
 				},
 				CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
-					return []byte("some error output"), nil
+					return []byte(outputWithError), nil
 				},
 				Closefunc: func(s *ssh.Session) error {
 					return nil
 				},
 			},
-			want:    "",
-			wantErr: errors.New("some error output"),
+			want:    outputWithError,
+			wantErr: errors.New(outputWithError),
 		},
 	}
 

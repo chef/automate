@@ -122,7 +122,7 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 }
 
 // Check if status is active and then stop the service.
-func (css *CreateSystemdService) stopIfExistSystemdService() error {
+func (css *CreateSystemdService) stopIfSystemdServiceIsActive() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
 	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"status", service})
 	if err == nil {
@@ -180,7 +180,7 @@ func (css *CreateSystemdService) Create() error {
 	//If service is already running, stop it and then create it again.
 	err = css.isSystemdEnabled()
 	if err == nil {
-		err = css.stopIfExistSystemdService()
+		err = css.stopIfSystemdServiceIsActive()
 		if err != nil {
 			return err
 		}
