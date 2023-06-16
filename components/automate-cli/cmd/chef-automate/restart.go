@@ -25,8 +25,10 @@ type restartFromBastion interface {
 	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
 	isManagedServicesOn() bool
 	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printRestartCmdOutput(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
+	printRestartCmdOutput(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
 }
+
+type restartFromBastionImpl struct{}
 
 type RestartCmdFlags struct {
 	automate   bool
@@ -35,6 +37,35 @@ type RestartCmdFlags struct {
 	postgresql bool
 	node       string
 	timeout    int
+}
+
+func NewRestartFromBastionImpl() *restartFromBastionImpl {
+	return &restartFromBastionImpl{}
+}
+
+func (rs *restartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
+	return getAutomateHAInfraDetails()
+}
+
+func (st *restartFromBastionImpl) isManagedServicesOn() bool {
+	return isManagedServicesOn()
+}
+
+func (rs *restartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
+	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
+	cmdResult, err := remoteExecutor.Execute()
+	return cmdResult, err
+}
+
+func (rs *restartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
+	mutex.Lock()
+	writer.Printf("=====================================================\n")
+	for _, value := range cmdResult {
+		for _, cmdResult := range value {
+			printOutput(remoteService, *cmdResult, []string{}, writer)
+		}
+	}
+	mutex.Unlock()
 }
 
 func init() {
@@ -104,41 +135,7 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 	return nil
 }
 
-type restartFromBastionImpl struct{}
-
-func NewRestartFromBastionImpl() *restartFromBastionImpl {
-	return &restartFromBastionImpl{}
-}
-
-func (rs *restartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return getAutomateHAInfraDetails()
-}
-
-func (st *restartFromBastionImpl) isManagedServicesOn() bool {
-	return isManagedServicesOn()
-}
-
-func (rs *restartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
-	cmdResult, err := remoteExecutor.Execute()
-	return cmdResult, err
-}
-
-func (rs *restartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
-	mutex.Lock()
-	writer.Printf("=====================================================\n")
-	for _, value := range cmdResult {
-		for _, cmdResult := range value {
-			printOutput(remoteService, *cmdResult, []string{}, writer)
-		}
-	}
-	mutex.Unlock()
-	wg.Done()
-}
-
 func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error {
-
-	var wg = &sync.WaitGroup{}
 	var mutex = &sync.Mutex{}
 	infra, err := rs.getAutomateHAInfraDetails()
 	if err != nil {
@@ -149,114 +146,96 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 		if len(flags.node) != 0 {
 			return status.Errorf(status.InvalidCommandArgsError, "Please provide service flag")
 		}
-
 		flags.automate = true
 		flags.chefServer = true
 		flags.opensearch = true
 		flags.postgresql = true
 	}
 	errChan := make(chan error, 4)
+	runRestartCmdForFrontEnd(infra, flags, rs, mutex, errChan)
 
+	if rs.isManagedServicesOn() {
+		errChan <- nil
+		errChan <- nil
+		err = getValueFromChannel(errChan)
+		if err != nil {
+			return err
+		}
+		return handleManagedServiceError(flags)
+	}
+
+	runRestartCmdForBackend(infra, flags, rs, mutex, errChan)
+
+	return getValueFromChannel(errChan)
+}
+
+func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan error) {
 	if flags.automate {
-		go func(flags RestartCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			errChan <- err
-			wg.Add(1)
-			rs.printRestartCmdOutput(cmdResult, AUTOMATE, wg, mutex, writer)
-		}(*flags, errChan)
+		restartOnGivenNode(flags, AUTOMATE, infra, rs, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
 
 	if flags.chefServer {
-		go func(flags RestartCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			flags.automate = false
-			nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			errChan <- err
-			wg.Add(1)
-			rs.printRestartCmdOutput(cmdResult, CHEF_SERVER, wg, mutex, writer)
-		}(*flags, errChan)
+		flags.automate = false
+		restartOnGivenNode(flags, CHEF_SERVER, infra, rs, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
+}
 
-	if rs.isManagedServicesOn() {
-		errChan <- nil
-		errChan <- nil
-		for i := 0; i < 4; i++ {
-			errVal := <-errChan
-			if errVal != nil {
-				return errVal
-			}
-		}
-		wg.Wait()
-		return handleManagedServiceError(flags)
-	}
-
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan error) {
 	if flags.postgresql {
-		go func(flags RestartCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			flags.automate = false
-			flags.chefServer = false
-			flags.opensearch = false
-			nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			errChan <- err
-			wg.Add(1)
-			rs.printRestartCmdOutput(cmdResult, POSTGRESQL, wg, mutex, writer)
-		}(*flags, errChan)
+		flags.automate = false
+		flags.chefServer = false
+		restartOnGivenNode(flags, POSTGRESQL, infra, rs, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
 
 	if flags.opensearch {
-		go func(flags RestartCmdFlags, errChan chan<- error) {
-			writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-			sshUtil := NewSSHUtil(&SSHConfig{})
-			flags.automate = false
-			flags.chefServer = false
-			flags.postgresql = false
-			nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-			cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-			errChan <- err
-			wg.Add(1)
-			rs.printRestartCmdOutput(cmdResult, OPENSEARCH, wg, mutex, writer)
-		}(*flags, errChan)
+		flags.automate = false
+		flags.chefServer = false
+		flags.postgresql = false
+		restartOnGivenNode(flags, OPENSEARCH, infra, rs, mutex, errChan)
 	} else {
 		errChan <- nil
 	}
+}
 
+func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs restartFromBastion, mutex *sync.Mutex, errChan chan<- error) {
+	go func(flags RestartCmdFlags, errChan chan<- error) {
+		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
+		cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
+		if err == nil {
+			rs.printRestartCmdOutput(cmdResult, nodeType, mutex, writer)
+		}
+		errChan <- err
+	}(*flags, errChan)
+}
+
+func getValueFromChannel(errChan chan error) error {
 	for i := 0; i < 4; i++ {
 		errVal := <-errChan
 		if errVal != nil {
 			return errVal
 		}
 	}
-	wg.Wait()
 	return nil
 }
 
 func handleManagedServiceError(flags *RestartCmdFlags) error {
-
 	if flags.postgresql && flags.opensearch {
 		return nil
 	}
-
 	if flags.postgresql {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL)
 	}
-
 	if flags.opensearch {
 		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH)
 	}
-
 	return nil
 }
 

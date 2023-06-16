@@ -14,7 +14,7 @@ type MockrestartFromBastionImpl struct {
 	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
 	isManagedServicesOnFunc       func() bool
 	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printRestartCmdOutputFunc     func(map[string][]*CmdResult, string, *sync.WaitGroup, *sync.Mutex, *cli.Writer)
+	printRestartCmdOutputFunc     func(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
 }
 
 func (mrs *MockrestartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
@@ -29,8 +29,8 @@ func (mrs *MockrestartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAn
 	return mrs.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
 }
 
-func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, wg *sync.WaitGroup, mutex *sync.Mutex, writer *cli.Writer) {
-	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, wg, mutex, writer)
+func (mrs *MockrestartFromBastionImpl) printRestartCmdOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
+	mrs.printRestartCmdOutputFunc(cmdResult, remoteService, mutex, writer)
 }
 func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 	type testCase struct {
@@ -107,7 +107,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 	type testCase struct {
 		description         string
 		flags               *RestartCmdFlags
-		mockStatusCmdHelper *MockrestartFromBastionImpl
+		mockRestartCmdHelper *MockrestartFromBastionImpl
 		errorWant           error
 	}
 
@@ -117,7 +117,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 			flags: &RestartCmdFlags{
 				node: "1",
 			},
-			mockStatusCmdHelper: &MockrestartFromBastionImpl{
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
@@ -127,7 +127,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 		{
 			description: "Error while reading infra details",
 			flags:       &RestartCmdFlags{},
-			mockStatusCmdHelper: &MockrestartFromBastionImpl{
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return nil, errors.New("Error occured while reading infra details")
 				},
@@ -137,7 +137,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 		{
 			description: "Restart all node-types",
 			flags:       &RestartCmdFlags{},
-			mockStatusCmdHelper: &MockrestartFromBastionImpl{
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
@@ -147,8 +147,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, m2 *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: nil,
@@ -156,7 +155,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 		{
 			description: "Error when restarting all node-types with remote execution ",
 			flags:       &RestartCmdFlags{},
-			mockStatusCmdHelper: &MockrestartFromBastionImpl{
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
@@ -166,8 +165,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
 				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, m2 *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: errors.New("Some error occured while remote execution"),
@@ -175,27 +173,66 @@ func TestRunRestartFromBastion(t *testing.T) {
 		{
 			description: "Restarting all services with managed Infra",
 			flags:       &RestartCmdFlags{},
-			mockStatusCmdHelper: &MockrestartFromBastionImpl{
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return false
+					return true
 				},
 				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, wg *sync.WaitGroup, m2 *sync.Mutex, w *cli.Writer) {
-					wg.Done()
+				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, m2 *sync.Mutex, w *cli.Writer) {
 				},
 			},
 			errorWant: nil,
+		},
+		{
+			description: "Restarting Opensearch with managed services",
+			flags: &RestartCmdFlags{
+				opensearch: true,
+			},
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return true
+				},
+				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
+				},
+			},
+			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
+		},
+		{
+			description: "Restarting Postgresql with managed services",
+			flags: &RestartCmdFlags{
+				postgresql: true,
+			},
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				isManagedServicesOnFunc: func() bool {
+					return true
+				},
+				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+					return map[string][]*CmdResult{}, nil
+				},
+				printRestartCmdOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
+				},
+			},
+			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			err := runRestartFromBastion(testCase.flags, testCase.mockStatusCmdHelper)
+			err := runRestartFromBastion(testCase.flags, testCase.mockRestartCmdHelper)
 			if err != nil {
 				assert.EqualError(t, testCase.errorWant, err.Error())
 			} else {
