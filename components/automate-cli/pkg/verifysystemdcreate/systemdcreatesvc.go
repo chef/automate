@@ -121,11 +121,9 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 	return nil
 }
 
-// Enable and start the systemd service.
-func (css *CreateSystemdService) enableSystemdService() error {
+// Check if status is active and then stop the service.
+func (css *CreateSystemdService) stopIfExistSystemdService() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
-
-	// TODO: Check if status is active and then stop the service.
 	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"status", service})
 	if err == nil {
 		css.Logger.Debugln("Status of service is active")
@@ -136,8 +134,14 @@ func (css *CreateSystemdService) enableSystemdService() error {
 		css.Logger.Debugln("Stopped the service successfully")
 	}
 	css.Logger.Debugln("Checked status of service successfully")
+	return nil
+}
 
-	err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
+// Enable and start the systemd service.
+func (css *CreateSystemdService) enableSystemdService() error {
+	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
+
+	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
 	if err != nil {
 		return errors.Wrap(err, "Error reloading systemd daemon")
 	}
@@ -159,7 +163,8 @@ func (css *CreateSystemdService) isSystemdEnabled() error {
 	return css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"is-enabled", fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)})
 }
 
-// Create and start the systemd service.
+// Create and start the systemd service for automate-verify if not exist.
+// Else replace the existing service and restart it.
 func (css *CreateSystemdService) Create() error {
 
 	currentBinaryPath, err := css.SystemdCreateUtils.GetBinaryPath()
@@ -173,8 +178,13 @@ func (css *CreateSystemdService) Create() error {
 	}
 	css.Logger.Debugln("Systemd is found on this system")
 
+	//If service is already running, stop it and then create it again.
 	err = css.isSystemdEnabled()
 	if err == nil {
+		err = css.stopIfExistSystemdService()
+		if err != nil {
+			return err
+		}
 		err = css.enableSystemdService()
 		if err != nil {
 			return err
