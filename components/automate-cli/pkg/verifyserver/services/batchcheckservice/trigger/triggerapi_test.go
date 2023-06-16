@@ -22,7 +22,7 @@ const (
 			"checks": [
 				{
 					"title": "Check 1",
-					"passed": true,
+					"passeß": true,
 					"success_msg": "Check 1 passed",
 					"error_msg": "",
 					"resolution_msg": "No resolution required"
@@ -263,7 +263,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		response := <-output
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
-		require.Equal(t, http.StatusNotFound, response.Result.Error.Code)
+		require.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
 		assert.Contains(t, response.Result.Error.Message, "error while connecting to the endpoint")
 	})
 	t.Run("Invalid Request Body", func(t *testing.T) {

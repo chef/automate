@@ -498,13 +498,23 @@ func TestPopulateWith(t *testing.T) {
 			haConfig := &config.HaDeployConfig{}
 			err := haConfig.Parse(tt.filePath)
 			assert.NoErrorf(t, err, "Error parsing HaDeployConfig: %v", err)
-			c := &Config{}
+			c := &Config{
+				Hardware:    &Hardware{},
+				Certificate: &Certificate{},
+				SSHUser:     &SSHUser{},
+				Backup: &Backup{
+					FileSystem:    &FileSystem{},
+					ObjectStorage: &ObjectStorage{},
+				},
+				ExternalOS: &ExternalOS{},
+				ExternalPG: &ExternalPG{},
+			}
 			err = c.PopulateWith(haConfig)
 			if tt.wantErr {
 				assert.Equal(t, tt.err.Error(), err.Error())
 			}
 
-			assert.Equal(t, tt.want, c)
+			assert.Equal(t, tt.want, c, tt.name)
 		})
 	}
 }

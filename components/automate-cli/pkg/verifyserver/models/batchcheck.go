@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/chef/automate/lib/config"
@@ -187,7 +188,12 @@ func (c *Config) populateExistingInfraConfig(haConfig *config.HaDeployConfig) {
 }
 
 func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
-	var err error
+	err := errors.New("haConfig is nil")
+
+	if haConfig == nil {
+		return err
+	}
+
 	c.Hardware.AutomateNodeCount, err = strconv.Atoi(haConfig.Automate.Config.InstanceCount)
 	if err != nil {
 		return err
