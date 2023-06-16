@@ -105,7 +105,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return nil, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -127,7 +127,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return nil, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -148,7 +148,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return nil, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -169,7 +169,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return nil, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -190,7 +190,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return nil, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
