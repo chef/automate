@@ -35,8 +35,7 @@ func PopulateHaCommonConfig() (*config.HaDeployConfig, error) {
 	}
 
 	if awsConfig != nil {
-		// haConfig.PopulateWithAwsConfig(awsConfig)
-		return haConfig, nil
+		return CopyAws(haConfig, awsConfig), nil
 	}
 
 	return nil, errors.New("deployed config was not found")
@@ -95,7 +94,29 @@ func CopyExistingInfraSettings(haDeployConfig *config.HaDeployConfig, existingIn
 	}
 }
 
-func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+
+	if awsConfig != nil {
+		awsConfigOpensearchSettings := existingInfraConfig.Opensearch.Config
+		awshaDeployOpensearchSettings := haDeployOpensearchSettings
+
+		awshaDeployOpensearchSettings.AdminCert = awsConfigOpensearchSettings.AdminCert
+		awshaDeployOpensearchSettings.AdminDn = awsConfigOpensearchSettings.AdminDn
+		awshaDeployOpensearchSettings.AdminKey = awsConfigOpensearchSettings.AdminKey
+		awshaDeployOpensearchSettings.EnableCustomCerts = awsConfigOpensearchSettings.EnableCustomCerts
+		awshaDeployOpensearchSettings.InstanceCount = awsConfigOpensearchSettings.InstanceCount
+		awshaDeployOpensearchSettings.NodesDn = awsConfigOpensearchSettings.NodesDn
+		awshaDeployOpensearchSettings.PrivateKey = awsConfigOpensearchSettings.PrivateKey
+		awshaDeployOpensearchSettings.PublicKey = awsConfigOpensearchSettings.PublicKey
+		awshaDeployOpensearchSettings.RootCA = awsConfigOpensearchSettings.RootCA
+
+		// CertsByIP
+		if awsConfigOpensearchSettings.CertsByIP != nil {
+			CopyCertsByIP(awsConfigOpensearchSettings.CertsByIP, awshaDeployOpensearchSettings.CertsByIP)
+		}
+		return
+	}
+
 	existingInfraOpensearchSettings := existingInfraConfig.Opensearch.Config
 
 	haDeployOpensearchSettings.AdminCert = existingInfraOpensearchSettings.AdminCert
@@ -114,7 +135,24 @@ func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchS
 	}
 }
 
-func CopyPostgresqlSettings(haDeployPostgresqlSettings *config.ConfigSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyPostgresqlSettings(haDeployPostgresqlSettings *config.ConfigSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+
+	if awsConfig != nil {
+		awsConfigPostgresqlSettings := awsConfig.Postgresql.Config
+		awshaDeployPostgresqlSettings := haDeployPostgresqlSettings
+
+		awshaDeployPostgresqlSettings.EnableCustomCerts = awsConfigPostgresqlSettings.EnableCustomCerts
+		awshaDeployPostgresqlSettings.InstanceCount = awsConfigPostgresqlSettings.InstanceCount
+		awshaDeployPostgresqlSettings.PrivateKey = awsConfigPostgresqlSettings.PublicKey
+		awshaDeployPostgresqlSettings.RootCA = awsConfigPostgresqlSettings.RootCA
+
+		// CertsByIP
+		if awsConfigPostgresqlSettings.CertsByIP != nil {
+			CopyCertsByIP(awsConfigPostgresqlSettings.CertsByIP, awshaDeployPostgresqlSettings.CertsByIP)
+		}
+		return
+	}
+
 	existingInfraPostgresqlSettings := existingInfraConfig.Postgresql.Config
 
 	haDeployPostgresqlSettings.EnableCustomCerts = existingInfraPostgresqlSettings.EnableCustomCerts
@@ -128,7 +166,24 @@ func CopyPostgresqlSettings(haDeployPostgresqlSettings *config.ConfigSettings, e
 	}
 }
 
-func CopyChefServerSettings(haDeployChefServerSettings *config.ConfigSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyChefServerSettings(haDeployChefServerSettings *config.ConfigSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+
+	if awsConfig != nil {
+		awsConfigChefServerSettings := awsConfig.ChefServer.Config
+		awshaDeployChefServerSettings := haDeployChefServerSettings
+
+		awshaDeployChefServerSettings.EnableCustomCerts = awsConfigChefServerSettings.EnableCustomCerts
+		awshaDeployChefServerSettings.InstanceCount = awsConfigChefServerSettings.InstanceCount
+		awshaDeployChefServerSettings.PrivateKey = awsConfigChefServerSettings.PrivateKey
+		awshaDeployChefServerSettings.PublicKey = awsConfigChefServerSettings.PublicKey
+
+		// CertsByIP
+		if awsConfigChefServerSettings.CertsByIP != nil {
+			CopyCertsByIP(awsConfigChefServerSettings.CertsByIP, awshaDeployChefServerSettings.CertsByIP)
+		}
+		return
+	}
+
 	existingInfraChefServerSettings := existingInfraConfig.ChefServer.Config
 
 	haDeployChefServerSettings.EnableCustomCerts = existingInfraChefServerSettings.EnableCustomCerts
@@ -142,7 +197,29 @@ func CopyChefServerSettings(haDeployChefServerSettings *config.ConfigSettings, e
 	}
 }
 
-func CopyAutomateSettings(haDeployConfigAutomateSettings *config.ConfigAutomateSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyAutomateSettings(haDeployConfigAutomateSettings *config.ConfigAutomateSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+
+	if awsConfig != nil {
+		awsConfigAutomateSettings := awsConfig.Automate.Config
+		awshaDeployConfigAutomateSettings := haDeployConfigAutomateSettings
+
+		awshaDeployConfigAutomateSettings.AdminPassword = awsConfigAutomateSettings.AdminPassword
+		awshaDeployConfigAutomateSettings.ConfigFile = awsConfigAutomateSettings.ConfigFile
+		awshaDeployConfigAutomateSettings.EnableCustomCerts = awsConfigAutomateSettings.EnableCustomCerts
+		awshaDeployConfigAutomateSettings.Fqdn = awsConfigAutomateSettings.Fqdn
+		awshaDeployConfigAutomateSettings.InstanceCount = awsConfigAutomateSettings.InstanceCount
+		awshaDeployConfigAutomateSettings.PrivateKey = awsConfigAutomateSettings.PrivateKey
+		awshaDeployConfigAutomateSettings.PublicKey = awsConfigAutomateSettings.PublicKey
+		awshaDeployConfigAutomateSettings.RootCA = awsConfigAutomateSettings.RootCA
+		awshaDeployConfigAutomateSettings.TeamsPort = awsConfigAutomateSettings.TeamsPort
+
+		// CertsByIP
+		if awsConfigAutomateSettings.CertsByIP != nil {
+			CopyCertsByIP(awsConfigAutomateSettings.CertsByIP, awshaDeployConfigAutomateSettings.CertsByIP)
+		}
+		return
+	}
+
 	existingInfraConfigAutomateSettings := existingInfraConfig.Automate.Config
 
 	haDeployConfigAutomateSettings.AdminPassword = existingInfraConfigAutomateSettings.AdminPassword
@@ -172,7 +249,31 @@ func CopyConfigObjectStorage(haDeployConfigObjectStorageConfig *config.ConfigObj
 	haDeployConfigObjectStorageConfig.SecretKey = existingInfraConfigObjectStorageConfig.SecretKey
 }
 
-func CopyConfigInitials(haDeployConfigConfigInitials *config.ConfigInitials, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyConfigInitials(haDeployConfigConfigInitials *config.ConfigInitials, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+
+	if awsConfig != nil {
+		awsConfigConfigInitials := awsConfig.Architecture.ConfigInitials
+		awshaDeployConfigConfigInitials := haDeployConfigConfigInitials
+
+		awshaDeployConfigConfigInitials.SSHUser = awsConfigConfigInitials.SSHUser
+		awshaDeployConfigConfigInitials.Architecture = awsConfigConfigInitials.Architecture
+		awshaDeployConfigConfigInitials.BackupConfig = awsConfigConfigInitials.BackupConfig
+		//Backup config
+		awshaDeployConfigConfigInitials.S3BucketName = awsConfigConfigInitials.S3BucketName
+		awshaDeployConfigConfigInitials.BackupMount = awsConfigConfigInitials.BackupMount
+		awshaDeployConfigConfigInitials.HabitatUIDGid = awsConfigConfigInitials.HabitatUIDGid
+		awshaDeployConfigConfigInitials.LoggingMonitoringManagement = awsConfigConfigInitials.LoggingMonitoringManagement
+		awshaDeployConfigConfigInitials.SSHGroupName = awsConfigConfigInitials.SSHGroupName
+		awshaDeployConfigConfigInitials.SSHKeyFile = awsConfigConfigInitials.SSHKeyFile
+		awshaDeployConfigConfigInitials.SSHPort = awsConfigConfigInitials.SSHPort
+		awshaDeployConfigConfigInitials.SSHUser = awsConfigConfigInitials.SSHUser
+		awshaDeployConfigConfigInitials.SecretsKeyFile = awsConfigConfigInitials.SecretsKeyFile
+		awshaDeployConfigConfigInitials.SecretsStoreFile = awsConfigConfigInitials.SecretsStoreFile
+		awshaDeployConfigConfigInitials.WorkspacePath = awsConfigConfigInitials.WorkspacePath
+		awshaDeployConfigConfigInitials.SudoPassword = "" // not fetched
+		return
+	}
+
 	existingInfraConfigConfigInitials := existingInfraConfig.Architecture.ConfigInitials
 
 	haDeployConfigConfigInitials.SSHUser = existingInfraConfigConfigInitials.SSHUser
@@ -193,22 +294,22 @@ func CopyConfigInitials(haDeployConfigConfigInitials *config.ConfigInitials, exi
 
 func CopyExistingInfra(haConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 	// ConfigInitials
-	CopyConfigInitials(haConfig.Architecture.ExistingInfra, existingInfraConfig)
+	CopyConfigInitials(haConfig.Architecture.ExistingInfra, existingInfraConfig, nil)
 
 	// ConfigObjectStorage
 	CopyConfigObjectStorage(haConfig.ObjectStorage.Config, existingInfraConfig)
 
 	// ConfigAutomateSettings
-	CopyAutomateSettings(haConfig.Automate.Config, existingInfraConfig)
+	CopyAutomateSettings(haConfig.Automate.Config, existingInfraConfig, nil)
 
 	// ChefServerSettings
-	CopyChefServerSettings(haConfig.ChefServer.Config, existingInfraConfig)
+	CopyChefServerSettings(haConfig.ChefServer.Config, existingInfraConfig, nil)
 
 	// PostgresqlSettings
-	CopyPostgresqlSettings(haConfig.Postgresql.Config, existingInfraConfig)
+	CopyPostgresqlSettings(haConfig.Postgresql.Config, existingInfraConfig, nil)
 
 	// OpensearchSettings
-	CopyOpensearchSettings(haConfig.Opensearch.Config, existingInfraConfig)
+	CopyOpensearchSettings(haConfig.Opensearch.Config, existingInfraConfig, nil)
 
 	// ExistingInfraSettings
 	haConfig.External.Database.Type = existingInfraConfig.ExternalDB.Database.Type
@@ -224,4 +325,104 @@ func CopyExistingInfra(haConfig *config.HaDeployConfig, existingInfraConfig *Exi
 	}
 
 	return haConfig
+}
+
+func CopyAws(haConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
+	// ConfigInitials
+	CopyConfigInitials(haConfig.Architecture.ExistingInfra, nil, awsConfig)
+
+	// ConfigAutomateSettings
+	CopyAutomateSettings(haConfig.Automate.Config, nil, awsConfig)
+
+	// ChefServerSettings
+	CopyChefServerSettings(haConfig.ChefServer.Config, nil, awsConfig)
+
+	// PostgresqlSettings
+	CopyPostgresqlSettings(haConfig.Postgresql.Config, nil, awsConfig)
+
+	// OpensearchSettings
+	CopyOpensearchSettings(haConfig.Opensearch.Config, nil, awsConfig)
+
+	CopyAwsConfig(haConfig.Aws.Config, awsConfig)
+
+	return haConfig
+}
+
+func CopyAwsConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+	awsConfigSetting := awsConfig.Aws.Config
+
+	// AWS Network Config
+	CopyAwsNetworkConfig(haConfigAws, awsConfig)
+
+	// Managed Services
+	haConfigAws.SetupManagedServices = awsConfigSetting.SetupManagedServices
+	if awsConfigSetting.SetupManagedServices {
+		CopyManagedServices(haConfigAws, awsConfig)
+	}
+
+	// EC2 Instance Config
+	CopyEc2InstanceConfig(haConfigAws, awsConfig)
+}
+
+func CopyAwsNetworkConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+	awsConfigSetting := awsConfig.Aws.Config
+
+	haConfigAws.Profile = awsConfigSetting.Profile
+	haConfigAws.Region = awsConfigSetting.Region
+	haConfigAws.AwsVpcID = awsConfigSetting.AwsVpcId
+	haConfigAws.AwsCidrBlockAddr = awsConfigSetting.AwsCidrBlockAddr
+	haConfigAws.PrivateCustomSubnets = awsConfigSetting.PrivateCustomSubnets
+	haConfigAws.PublicCustomSubnets = awsConfigSetting.PublicCustomSubnets
+	haConfigAws.SSHKeyPairName = awsConfigSetting.SSHKeyPairName
+}
+
+func CopyManagedServices(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+	awsConfigSetting := awsConfig.Aws.Config
+
+	haConfigAws.ManagedOpensearchDomainName = awsConfigSetting.OpensearchDomainName
+	haConfigAws.ManagedOpensearchDomainURL = awsConfigSetting.OpensearchDomainUrl
+	haConfigAws.ManagedOpensearchUserPassword = awsConfigSetting.OpensearchUserPassword
+	haConfigAws.ManagedOpensearchUsername = awsConfigSetting.OpensearchUsername
+	haConfigAws.ManagedOpensearchCertificate = awsConfigSetting.OpensearchCertificate
+
+	haConfigAws.OsSnapshotUserAccessKeyID = awsConfigSetting.OsUserAccessKeyId
+	haConfigAws.OsSnapshotUserAccessKeySecret = awsConfigSetting.OsUserAccessKeySecret
+	haConfigAws.AwsOsSnapshotRoleArn = awsConfigSetting.AwsOsSnapshotRoleArn
+
+	haConfigAws.ManagedRdsCertificate = awsConfigSetting.RDSCertificate
+	haConfigAws.ManagedRdsDbuserPassword = awsConfigSetting.RDSDBUserPassword
+	haConfigAws.ManagedRdsDbuserUsername = awsConfigSetting.RDSDBUserName
+	haConfigAws.ManagedRdsInstanceURL = awsConfigSetting.RDSInstanceUrl
+	haConfigAws.ManagedRdsSuperuserPassword = awsConfigSetting.RDSSuperUserPassword
+	haConfigAws.ManagedRdsSuperuserUsername = awsConfigSetting.RDSSuperUserName
+}
+
+func CopyEc2InstanceConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+	awsConfigSetting := awsConfig.Aws.Config
+
+	haConfigAws.AmiID = awsConfigSetting.AmiID
+	haConfigAws.DeleteOnTermination = awsConfigSetting.DeleteOnTermination
+
+	haConfigAws.AutomateServerInstanceType = awsConfigSetting.AutomateServerInstanceType
+	haConfigAws.ChefServerInstanceType = awsConfigSetting.ChefServerInstanceType
+	haConfigAws.PostgresqlServerInstanceType = awsConfigSetting.PostgresqlServerInstanceType
+	haConfigAws.OpensearchServerInstanceType = awsConfigSetting.OpensearchServerInstanceType
+
+	haConfigAws.AutomateLbCertificateArn = awsConfigSetting.AutomateLbCertificateArn
+	haConfigAws.ChefServerLbCertificateArn = awsConfigSetting.ChefServerLbCertificateArn
+
+	haConfigAws.AutomateEbsVolumeIops = awsConfigSetting.AutomateEbsVolumeIops
+	haConfigAws.AutomateEbsVolumeSize = awsConfigSetting.AutomateEbsVolumeSize
+	haConfigAws.AutomateEbsVolumeType = awsConfigSetting.AutomateEbsVolumeType
+	haConfigAws.ChefEbsVolumeIops = awsConfigSetting.ChefEbsVolumeIops
+	haConfigAws.ChefEbsVolumeSize = awsConfigSetting.ChefEbsVolumeSize
+	haConfigAws.ChefEbsVolumeType = awsConfigSetting.ChefEbsVolumeType
+	haConfigAws.OpensearchEbsVolumeIops = awsConfigSetting.OpensearchEbsVolumeIops
+	haConfigAws.OpensearchEbsVolumeSize = awsConfigSetting.OpensearchEbsVolumeSize
+	haConfigAws.OpensearchEbsVolumeType = awsConfigSetting.OpensearchEbsVolumeType
+	haConfigAws.PostgresqlEbsVolumeIops = awsConfigSetting.PostgresqlEbsVolumeIops
+	haConfigAws.PostgresqlEbsVolumeSize = awsConfigSetting.PostgresqlEbsVolumeSize
+	haConfigAws.PostgresqlEbsVolumeType = awsConfigSetting.PostgresqlEbsVolumeType
+
+	haConfigAws.LbAccessLogs = awsConfigSetting.LBAccessLogs
 }
