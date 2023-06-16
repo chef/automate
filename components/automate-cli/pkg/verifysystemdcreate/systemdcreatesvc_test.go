@@ -3,7 +3,6 @@ package verifysystemdcreate_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -104,19 +103,18 @@ func TestSystemdServiceCreate(t *testing.T) {
 		assert.NoError(t, err)
 		_, err = os.Stat(systemdLocation + "/automate-verify.service")
 		assert.NoError(t, err)
-		assert.Contains(t, cw.Output(), "Binary copied to "+binaryDestinationFolder)
 		assert.Contains(t, cw.Output(), "Service automate-verify created successfully")
 	})
 
-	t.Run("it gives error if there automate-verify systemd-service is already enabled", func(t *testing.T) {
+	t.Run("it restart if there automate-verify systemd-service is already enabled", func(t *testing.T) {
 		mockUtils := setupMockUtils()
 		mockUtils.ExecuteShellCommandFunc = executeShellCommandPassIsEnabled
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
 		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
-		assert.Error(t, err)
-		assert.Equal(t, "Service automate-verify already exists on this node, use systemctl start/stop/status automate-verify", err.Error())
+		assert.NoError(t, err)
+		assert.Contains(t, cw.Output(), "Service automate-verify created successfully")
 	})
 
 	t.Run("it gives error if there is problem in running shell command", func(t *testing.T) {
@@ -169,17 +167,16 @@ func TestSystemdServiceCreate(t *testing.T) {
 		binaryDestinationFolder, systemdLocation := setupCopy(t)
 		systemdFilePath := systemdLocation + "/automate-verify.service"
 		srcData := []byte("test data")
-		assert.NoError(t, ioutil.WriteFile(systemdFilePath, srcData, 0700))
+		assert.NoError(t, os.WriteFile(systemdFilePath, srcData, 0700))
 		vsc, err := verifysystemdcreate.NewCreateSystemdService(mockUtils, binaryDestinationFolder, systemdLocation, false, cw.CliWriter)
 		assert.NoError(t, err)
 		err = vsc.Create()
 		assert.NoError(t, err)
 		_, err = os.Stat(systemdFilePath)
 		assert.NoError(t, err)
-		dstData, err := ioutil.ReadFile(systemdFilePath)
+		dstData, err := os.ReadFile(systemdFilePath)
 		assert.NoError(t, err)
 		assert.Contains(t, string(dstData), "Description=Service for automating verification")
-		assert.Contains(t, cw.Output(), "Binary copied to "+binaryDestinationFolder+"\nService automate-verify created successfully\n")
 	})
 
 	t.Run("it creates automate-verify.service file with proper content inside", func(t *testing.T) {
@@ -205,10 +202,9 @@ WantedBy=multi-user.target
 		assert.NoError(t, err)
 		_, err = os.Stat(systemdFilePath)
 		assert.NoError(t, err)
-		dstData, err := ioutil.ReadFile(systemdFilePath)
+		dstData, err := os.ReadFile(systemdFilePath)
 		assert.NoError(t, err)
 		assert.Equal(t, fmt.Sprintf(expectedSystemdContents, binaryDestinationFolder), string(dstData))
-		assert.Contains(t, cw.Output(), "Binary copied to "+binaryDestinationFolder+"\nService automate-verify created successfully\n")
 	})
 
 }

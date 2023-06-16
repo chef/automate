@@ -140,7 +140,6 @@ func (css *CreateSystemdService) stopIfExistSystemdService() error {
 // Enable and start the systemd service.
 func (css *CreateSystemdService) enableSystemdService() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
-
 	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
 	if err != nil {
 		return errors.Wrap(err, "Error reloading systemd daemon")
