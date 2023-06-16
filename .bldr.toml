@@ -260,6 +260,7 @@ paths = [
   "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
+  "lib/logger/*",
   "lib/platform/command/*",
   "lib/platform/sys/*",
   "lib/proc/*",
@@ -443,7 +444,6 @@ paths = [
   "lib/cereal/*",
   "lib/certgenerateutils/*",
   "lib/config/*",
-  "lib/config_parser/*",
   "lib/db/*",
   "lib/executil/*",
   "lib/grpc/*",
@@ -458,7 +458,6 @@ paths = [
   "lib/proc/*",
   "lib/product/*",
   "lib/proxy/*",
-  "lib/reporting/*",
   "lib/secrets/*",
   "lib/sshutils/*",
   "lib/stringutils/*",
@@ -468,7 +467,6 @@ paths = [
   "lib/user/*",
   "lib/userutils/*",
   "lib/uuid4/*",
-  "lib/verification/*",
   "lib/version/*"
 ]
 
@@ -558,6 +556,7 @@ paths = [
   "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
+  "lib/logger/*",
   "lib/majorupgrade_utils/*",
   "lib/platform/command/*",
   "lib/platform/config/*",
