@@ -246,7 +246,8 @@ func (c *remoteCmdExecutor) executeCmdOnNode(command, scriptName string, inputFi
 	}
 
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(command, false)
-	if err != nil && len(output) == 0 {
+	if err != nil {
+		rc.Output = output
 		rc.Error = err
 		resultChan <- rc
 		return
@@ -386,7 +387,9 @@ func isValidIPFormat(ip string) bool {
 func printOutput(remoteService string, result CmdResult, outputFiles []string, cliWriter *cli.Writer) {
 	var resultFiles []string
 	var err error
-	if result.Error != nil {
+	if result.Error != nil && len(strings.TrimSpace(result.Output)) != 0 {
+		printErrorMessage(remoteService, result.HostIP, cliWriter, result.Output)
+	} else if result.Error != nil {
 		printErrorMessage(remoteService, result.HostIP, cliWriter, result.Error.Error())
 	} else {
 		printSuccessMessage(remoteService, result.HostIP, cliWriter, result.Output)
@@ -463,9 +466,7 @@ func appendChildFileToParentFile(hostIp, parent, child string) (string, error) {
 
 // checkResultOutputForError checks If the output contains the word "error" then return error
 func checkResultOutputForError(output string) error {
-	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") &&
-		!strings.Contains(strings.ToUpper(strings.TrimSpace(output)),
-			strings.ToUpper("PreflightError: One or more preflight checks failed")) {
+	if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
 		return errors.New(output)
 	}
 	return nil

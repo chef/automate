@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,6 +23,7 @@ const (
 	showCommand      = "sudo chef-automate config show"
 	file             = "new.toml"
 	completedMessage = "config show operation completed"
+	errorMessage     = "DeploymentServiceCallError: A request to the deployment-service failed"
 	errorForPreExec  = "PreExec function failed"
 )
 
@@ -423,7 +425,6 @@ func TestPreCmdExecCheck(t *testing.T) {
 		sshUtil       SSHUtil
 		infra         *AutomateHAInfraDetails
 		remoteService string
-		timestamp     string
 		writer        *cli.Writer
 	}
 	tests := []struct {
@@ -600,11 +601,12 @@ func TestPrintOutput(t *testing.T) {
 		remoteService string
 		result        CmdResult
 		outputFiles   []string
-		cliWriter     *cli.Writer
 	}
 	tests := []struct {
-		name string
-		args args
+		name           string
+		args           args
+		expectedOutput string
+		wantErr        bool
 	}{
 		{
 			name: "Print Success message and combine output files in one",
@@ -617,8 +619,8 @@ func TestPrintOutput(t *testing.T) {
 					Error:       nil,
 				},
 				outputFiles: []string{result},
-				cliWriter:   getMockWriterImpl(),
 			},
+			expectedOutput: fmt.Sprintf("Output file: %v", result),
 		},
 		{
 			name: "Print Success message and file combinations failed",
@@ -631,8 +633,8 @@ func TestPrintOutput(t *testing.T) {
 					Error:       nil,
 				},
 				outputFiles: []string{result},
-				cliWriter:   getMockWriterImpl(),
 			},
+			expectedOutput: completedMessage,
 		},
 		{
 			name: "Print Error message",
@@ -645,13 +647,35 @@ func TestPrintOutput(t *testing.T) {
 					Error:       errors.New("Patch failed"),
 				},
 				outputFiles: []string{},
-				cliWriter:   getMockWriterImpl(),
 			},
+			expectedOutput: "Patch failed",
+			wantErr:        true,
+		},
+		{
+			name: "Print Error message when output is not empty",
+			args: args{
+				remoteService: AUTOMATE,
+				result: CmdResult{
+					HostIP:      ip7,
+					OutputFiles: []string{},
+					Output:      errorMessage,
+					Error:       errors.New("Patch failed"),
+				},
+				outputFiles: []string{},
+			},
+			expectedOutput: errorMessage,
+			wantErr:        true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			printOutput(tt.args.remoteService, tt.args.result, tt.args.outputFiles, tt.args.cliWriter)
+			cw := majorupgrade_utils.NewCustomWriter()
+			printOutput(tt.args.remoteService, tt.args.result, tt.args.outputFiles, cw.CliWriter)
+			if tt.wantErr {
+				assert.Contains(t, cw.ErrorBuffer.String(), tt.expectedOutput)
+			} else {
+				assert.Contains(t, cw.Output(), tt.expectedOutput)
+			}
 		})
 	}
 }
