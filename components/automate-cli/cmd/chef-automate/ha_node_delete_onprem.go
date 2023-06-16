@@ -92,16 +92,6 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 	}
 
 	err = dni.runDeploy()
-
-	syncErr := dni.nodeUtils.syncConfigToAllNodes()
-	if syncErr != nil {
-		if err != nil {
-			err = errors.Wrap(err, syncErr.Error())
-		} else {
-			err = syncErr
-		}
-	}
-
 	currentCount, newErr := dni.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
 		if err != nil {
@@ -254,7 +244,15 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 		return err
 	}
 	argsdeploy := []string{"-y"}
-	return dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	syncErr := dni.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }
 
 func (dni *DeleteNodeOnPremImpl) validateCmdArgs() *list.List {
