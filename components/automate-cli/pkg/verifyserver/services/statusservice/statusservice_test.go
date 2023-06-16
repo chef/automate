@@ -379,11 +379,6 @@ func TestParseChefAutomateStatus(t *testing.T) {
 }
 
 func TestParseHabSvcStatus(t *testing.T) {
-	log, err := logger.NewLogger("text", "debug")
-	assert.NoError(t, err)
-	ss := statusservice.NewStatusService(func(cmd string) ([]byte, error) {
-		return nil, nil
-	}, log)
 
 	type testCaseInfo struct {
 		testCaseDescription string
@@ -433,7 +428,7 @@ func TestParseHabSvcStatus(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.testCaseDescription, func(t *testing.T) {
-			out, err := ss.ParseHabSvcStatus(tc.input)
+			out, err := statusservice.ParseHabSvcStatus(tc.input)
 			if tc.isError {
 				assert.Error(t, err)
 				assert.Equal(t, tc.errorMsg, err.Error())
