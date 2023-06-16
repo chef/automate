@@ -73,13 +73,13 @@ func TestStatusAPI(t *testing.T) {
 			description:  "200:success status route",
 			expectedCode: 200,
 			isError:      false,
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}],\"error\":\"\"}}",
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[{\"service_name\":\"deployment-service\",\"status\":\"OK\",\"version\":\"chef/deployment-service/0.1.0/20230502070345\"}],\"cli_version\":\"unknown\",\"error\":\"\"}}",
 		},
 		{
 			description:  "200:with error status route",
 			expectedCode: 200,
 			isError:      true,
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[],\"error\":\"some error occurred\"}}",
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"status\":\"OK\",\"services\":[],\"cli_version\":\"unknown\",\"error\":\"some error occurred\"}}",
 		},
 	}
 	statusEndpoint := "/status"
