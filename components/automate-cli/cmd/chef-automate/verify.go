@@ -31,6 +31,9 @@ const (
 	VERIFY_SERVER_PORT        = "VERIFY_SERVER_PORT"
 	BINARY_DESTINATION_FOLDER = "/etc/automate-verify"
 	SYSTEMD_PATH              = "/etc/systemd/system"
+	REMOTE_NODES              = "remote nodes"
+	BASTION                   = "bastion"
+	SLEEP_DURATION            = 2 * time.Second
 )
 
 var (
@@ -241,12 +244,12 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 
 	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
 
-	err = v.checkAutomateVerifyServiceForBastion(*batchCheckConfig)
+	err = v.runVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
 
-	err = v.checkAutomateVerifyServiceForRemote(*batchCheckConfig)
+	err = v.runVerifyServiceForRemote(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
@@ -254,23 +257,25 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 	return nil
 }
 
-func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig models.Config) error {
+// Runs automate-verify service on bastion
+func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Config) error {
 	v.Writer.Println("Checking automate-verify service on bastion")
+
 	//Call status API to check if automate-verify service is running on bastion
 	res, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
 	if err != nil {
 		v.Writer.Println(fmt.Sprintf("error while checking automate-verify service on bastion: %v\n", err))
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service")
-		err := v.CreateSystemdService.Create()
+
+		// create systemd service with current CLI binary
+		err = v.createSystemdOnBastion()
 		if err != nil {
 			return err
 		}
-		// Wait for 2 seconds for the service to start
-		// TODO: Do retry logic to check if the service is up and running
-		time.Sleep(2 * time.Second)
+
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service completed")
 	} else {
-		resultBytes, err := v.GetResultFromResponseBody(res.Body)
+		resultBytes, err := v.getResultFromResponseBody(res.Body)
 		if err != nil {
 			return err
 		}
@@ -281,17 +286,16 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig mo
 			return fmt.Errorf("failed to unmarshal Result field: %v", err)
 		}
 
-		// Upgrade if latest CLI version is greater than the current CLI version on bastion
+		// Upgrade if current CLI is latest version than the existing CLI on bastion
 		latestCLIVersion := version.BuildTime
 		if latestCLIVersion > result.CliVersion {
 			v.Writer.Println(fmt.Sprintf("Upgrading from CLI %s to latest %s on bastion", result.CliVersion, latestCLIVersion))
-			err := v.CreateSystemdService.Create()
+			// create systemd service with current CLI binary
+			err = v.createSystemdOnBastion()
 			if err != nil {
 				return err
 			}
 			v.Writer.Println("Upgrading from CLI completed on bastion")
-			// Wait for 2 seconds for the service to start
-			time.Sleep(2 * time.Second)
 		}
 	}
 	v.Writer.Println("Checking automate-verify service on bastion completed")
@@ -301,78 +305,41 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForBastion(batchCheckConfig mo
 		Checks: constants.GetBastionChecks(),
 		Config: batchCheckConfig,
 	}
-	v.Writer.Println("Doing batch-check API call for bastion")
-	// Call batch-check API to run checks on bastion
-	batchCheckBastionRes, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, batchCheckBastionReq)
-	if err != nil {
-		return fmt.Errorf("error while doing batch-check API call for bastion: %v", err)
-	} else {
-		resultBytes, err := v.GetResultFromResponseBody(batchCheckBastionRes.Body)
-		if err != nil {
-			return err
-		}
-		v.Writer.Printf("Response for batch-check API on Bastion: \n%s\n", string(resultBytes))
-	}
-	v.Writer.Println("Batch-check API call for bastion completed")
 
-	return nil
+	return v.makeBatchCheckAPICall(batchCheckBastionReq, BASTION)
 }
 
-func (v *verifyCmdFlow) checkAutomateVerifyServiceForRemote(batchCheckConfig models.Config) error {
+// Runs automate-verify service on remote nodes
+func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config) error {
 
 	// TODO: Need to check if automate-verify service is already running on remote nodes and upgrade if needed.
 	var port, keyFile, userName string
 	var hostIPs []string
 
 	if v.Config.IsExistingInfra() {
-		port = v.Config.Architecture.ExistingInfra.SSHPort
-		keyFile = v.Config.Architecture.ExistingInfra.SSHKeyFile
-		userName = v.Config.Architecture.ExistingInfra.SSHUser
-
-		hostIPs = stringutils.ConcatSlice(hostIPs, v.Config.ExistingInfra.Config.AutomatePrivateIps)
-		hostIPs = stringutils.ConcatSlice(hostIPs, v.Config.ExistingInfra.Config.ChefServerPrivateIps)
-		hostIPs = stringutils.ConcatSlice(hostIPs, v.Config.ExistingInfra.Config.PostgresqlPrivateIps)
-		hostIPs = stringutils.ConcatSlice(hostIPs, v.Config.ExistingInfra.Config.OpensearchPrivateIps)
+		port, keyFile, userName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
+		hostIPs = v.getHostIPs(
+			v.Config.ExistingInfra.Config.AutomatePrivateIps,
+			v.Config.ExistingInfra.Config.ChefServerPrivateIps,
+			v.Config.ExistingInfra.Config.PostgresqlPrivateIps,
+			v.Config.ExistingInfra.Config.OpensearchPrivateIps,
+		)
 
 		sshConfig := sshutils.NewSshConfig("", port, keyFile, userName)
 
 		destFileName := "chef-automate"
 
-		currentBinaryPath, err := v.SystemdCreateUtils.GetBinaryPath()
+		// Copying CLI binary to remote nodes
+		err := v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPs)
 		if err != nil {
 			return err
 		}
 
-		v.Writer.Println("Copying automate-verify CLI to remote nodes")
-		copyResults := v.SSHUtil.CopyFileToRemoteConcurrently(sshConfig, currentBinaryPath, destFileName, false, hostIPs)
-		isError := false
-		for _, result := range copyResults {
-			if result.Error != nil {
-				v.Writer.Errorf("Remote copying automate-verify CLI failed on node : %s with error: %v\n", result.HostIP, result.Error)
-				isError = true
-			}
+		// Starting automate-verify service on remote nodes
+		err = v.StartServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
+		if err != nil {
+			return err
 		}
-		if isError {
-			return fmt.Errorf("remote copying failed")
-		}
-		v.Writer.Println("Copying automate-verify CLI to remote nodes completed")
-
-		v.Writer.Println("Creating automate-verify service on remote nodes")
-		cmd := fmt.Sprintf("sudo /tmp/%s verify systemd-service create", destFileName)
-		excuteResults := v.SSHUtil.ExecuteConcurrently(sshConfig, cmd, hostIPs)
-		isError = false
-		for _, result := range excuteResults {
-			if result.Error != nil {
-				v.Writer.Errorf("Remote execution of cmd '%s' automate-verify CLI failed on node : %s with error: %v\n", cmd, result.HostIP, result.Error)
-				isError = true
-			}
-		}
-		if isError {
-			return fmt.Errorf("remote execution failed")
-		}
-		// Wait for 2 seconds for the service to start
-		time.Sleep(2 * time.Second)
-		v.Writer.Println("Creating automate-verify service on remote nodes completed")
 	}
 
 	//TODO: Need to handle the case for AWS
@@ -382,26 +349,82 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForRemote(batchCheckConfig mod
 		Checks: constants.GetRemoteChecks(),
 		Config: batchCheckConfig,
 	}
+	return v.makeBatchCheckAPICall(batchCheckRemoteReq, REMOTE_NODES)
+}
 
-	v.Writer.Println("Doing batch-check API call for remote nodes")
-	// Call batch-check API to run checks on remote nodes
-	batchCheckRemoteRes, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, batchCheckRemoteReq)
+// Creates systemd service with current CLI binary
+func (v *verifyCmdFlow) createSystemdOnBastion() error {
+	err := v.CreateSystemdService.Create()
 	if err != nil {
-		return fmt.Errorf("error while doing batch-check API call for remote: %v", err)
-	} else {
-		resultBytes, err := v.GetResultFromResponseBody(batchCheckRemoteRes.Body)
-		if err != nil {
-			return err
-		}
-		//TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
-		v.Writer.Printf("Response for batch-check API for Remote: \n%s\n", string(resultBytes))
+		return err
 	}
-	v.Writer.Println("Batch-check API call for remote nodes completed")
-
+	// Wait for given seconds for the service to start
+	time.Sleep(SLEEP_DURATION)
 	return nil
 }
 
-func (v *verifyCmdFlow) GetResultFromResponseBody(body io.ReadCloser) ([]byte, error) {
+// Makes batch-check API call
+func (v *verifyCmdFlow) makeBatchCheckAPICall(batchCheckReq models.BatchCheckRequest, nodeType string) error {
+	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
+	batchCheckBastionRes, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, batchCheckReq)
+	if err != nil {
+		return fmt.Errorf("error while doing batch-check API call for %s: %v", nodeType, err)
+	} else {
+		resultBytes, err := v.getResultFromResponseBody(batchCheckBastionRes.Body)
+		if err != nil {
+			return err
+		}
+		v.Writer.Printf("Response for batch-check API on %s: \n%s\n", nodeType, string(resultBytes))
+	}
+	v.Writer.Printf("Batch-check API call for %s completed\n", nodeType)
+	return nil
+}
+
+// Copies CLI binary to remote nodes
+func (v *verifyCmdFlow) copyCLIOnRemoteNodes(destFileName string, sshConfig sshutils.SSHConfig, hostIPs []string) error {
+	v.Writer.Println("Copying automate-verify CLI to remote nodes")
+	currentBinaryPath, err := v.SystemdCreateUtils.GetBinaryPath()
+	if err != nil {
+		return err
+	}
+	copyResults := v.SSHUtil.CopyFileToRemoteConcurrently(sshConfig, currentBinaryPath, destFileName, false, hostIPs)
+	isError := false
+	for _, result := range copyResults {
+		if result.Error != nil {
+			v.Writer.Errorf("Remote copying automate-verify CLI failed on node : %s with error: %v\n", result.HostIP, result.Error)
+			isError = true
+		}
+	}
+	if isError {
+		return fmt.Errorf("remote copying failed")
+	}
+	v.Writer.Println("Copying automate-verify CLI to remote nodes completed")
+	return nil
+}
+
+// Starts automate-verify service on remote nodes
+func (v *verifyCmdFlow) StartServiceOnRemoteNodes(destFileName string, sshConfig sshutils.SSHConfig, hostIPs []string) error {
+	v.Writer.Println("Creating automate-verify service on remote nodes")
+	cmd := fmt.Sprintf("sudo /tmp/%s verify systemd-service create", destFileName)
+	excuteResults := v.SSHUtil.ExecuteConcurrently(sshConfig, cmd, hostIPs)
+	isError := false
+	for _, result := range excuteResults {
+		if result.Error != nil {
+			v.Writer.Errorf("Remote execution of cmd '%s' automate-verify CLI failed on node : %s with error: %v\n", cmd, result.HostIP, result.Error)
+			isError = true
+		}
+	}
+	if isError {
+		return fmt.Errorf("remote execution failed")
+	}
+	// Wait for given seconds for the service to start
+	time.Sleep(SLEEP_DURATION)
+	v.Writer.Println("Creating automate-verify service on remote nodes completed")
+	return nil
+}
+
+// Returns result field from response body
+func (v *verifyCmdFlow) getResultFromResponseBody(body io.ReadCloser) ([]byte, error) {
 	// Read the response body
 	responseBody, err := io.ReadAll(body)
 	if err != nil {
@@ -429,6 +452,22 @@ func (v *verifyCmdFlow) GetResultFromResponseBody(body io.ReadCloser) ([]byte, e
 	return resultBytes, nil
 }
 
+// Returns port, keyFile, userName
+func (v *verifyCmdFlow) getSSHConfig(config *config.ConfigInitials) (string, string, string) {
+	return config.SSHPort, config.SSHKeyFile, config.SSHUser
+}
+
+// Returns concatenated list of automatePrivateIps, chefServerPrivateIps, postgresqlPrivateIps, opensearchPrivateIps
+func (v *verifyCmdFlow) getHostIPs(automatePrivateIps, chefServerPrivateIps, postgresqlPrivateIps, opensearchPrivateIps []string) []string {
+	var hostIPs []string
+	hostIPs = stringutils.ConcatSlice(hostIPs, automatePrivateIps)
+	hostIPs = stringutils.ConcatSlice(hostIPs, chefServerPrivateIps)
+	hostIPs = stringutils.ConcatSlice(hostIPs, postgresqlPrivateIps)
+	hostIPs = stringutils.ConcatSlice(hostIPs, opensearchPrivateIps)
+	return hostIPs
+}
+
+// Returns port
 func getPort() string {
 	port := server.DEFAULT_PORT
 	envPort := os.Getenv(VERIFY_SERVER_PORT)
