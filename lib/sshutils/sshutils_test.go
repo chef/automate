@@ -558,7 +558,7 @@ func TestCopyFileToRemote(t *testing.T) {
 
 func TestCopyFileToRemoteConcurrently(t *testing.T) {
 	log, _ := logger.NewLogger("text", "debug")
-	sshUtil := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
+	sshUtil := sshutils.NewSSHUtilWithCommandExecutor(&sshutils.SshClient{}, log, command.NewMockExecutor(t))
 
 	tests := []struct {
 		description  string
