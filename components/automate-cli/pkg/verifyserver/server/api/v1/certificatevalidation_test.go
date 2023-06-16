@@ -137,7 +137,7 @@ func TestValidateCertificate(t *testing.T) {
 			TestName: "400: Failure Root Certificate is empty",
 			RequestBody: `{
 				"root_certificate": "",
-				"private_key": "VALID CERTIFICATE",
+				"private_key": "",
 				"node_certificate": "VALID CERTIFICATE",
 				"admin_private_key": "VALID CERTIFICATE",
 				"admin_certificate": "VALID CERTIFICATE"
@@ -148,7 +148,7 @@ func TestValidateCertificate(t *testing.T) {
 				"result": null,
 				"error": {
 					"code": 400,
-					"message": "root_certificate, private_key, node_certificate can't be empty, Please provide all the fields."
+					"message": "private_key, node_certificate can't be empty, Please provide all the fields."
 				}
 			}`,
 		},
