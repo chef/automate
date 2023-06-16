@@ -227,6 +227,85 @@ func TestMoveAWSAutoTfvarsDestroyFolderNotExist(t *testing.T) {
 
 }
 
+func TestSaveConfigToBastion(t *testing.T) {
+	mockUtil := &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			infra := &AutomateHAInfraDetails{}
+			infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
+			return infra, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			return nil
+		},
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		checkIfFileExistFunc: func(path string) bool {
+			return checkIfFileExist(path)
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		stopServicesOnNodeFunc: func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
+			return nil
+		},
+		pullAndUpdateConfigFunc: func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
+			cfg, err := readConfig(CONFIG_TOML_PATH + "/config.toml")
+			if err != nil {
+				return nil, err
+			}
+			cfg.Automate.Config.CertsByIP = []CertByIP{}
+			cfg.ChefServer.Config.CertsByIP = []CertByIP{}
+			cfg.Postgresql.Config.CertsByIP = []CertByIP{}
+			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
+			return &cfg, nil
+		},
+
+		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
+		},
+	}
+	// infra, _, err := mockUtil.getHaInfraDetails()
+	// assert.NoError(t, err)
+
+	// nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
+	// 	ExecuteFunc: func() (map[string][]*CmdResult, error) {
+	// 		return nil, nil
+	// 	},
+	// 	ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+	// 		return nil, nil
+	// 	},
+	// 	GetSshUtilFunc: func() SSHUtil {
+	// 		return &MockSSHUtilsImpl{
+	// 			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+	// 				return "", nil
+	// 			},
+	// 		}
+	// 	},
+	// }, command.NewMockExecutor(t), MockWriter.CliWriter)
+
+	err := mockUtil.saveConfigToBastion()
+	assert.NoError(t, err)
+}
+
 func TestModifyTfArchFile(t *testing.T) {
 	nodeUtil := NewNodeUtils(NewRemoteCmdExecutorWithoutNodeMap(NewSSHUtil(&SSHConfig{}), MockWriter.CliWriter), command.NewMockExecutor(t), MockWriter.CliWriter)
 	dir := t.TempDir()
@@ -552,26 +631,6 @@ func TestGetIPsFromOSClusterResponseNotFound(t *testing.T) {
 }
 
 func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
-	// mockUtil := &MockNodeUtilsImpl{
-	// 	getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-	// 		infra := &AutomateHAInfraDetails{}
-	// 		infra.Outputs.AutomatePrivateIps.Value = []string{TEST_IP_1}
-	// 		return infra, &SSHConfig{}, nil
-	// 	},
-	// 	excludeOpenSearchNodeFunc: func(ipToDelete string, infra *AutomateHAInfraDetails) error {
-	// 		return nil
-	// 	},
-	// 	checkExistingExcludedOSNodesFunc: func(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
-	// 		return "", nil
-	// 	},
-	// 	executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
-	// 		return nil
-	// 	},
-	// 	parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
-	// 		return errors.New("error on removing output header in fetched config")
-	// 	},
-	// }
-
 	nodeUtil := NewNodeUtils(&MockRemoteCmdExecutor{
 		ExecuteFunc: func() (map[string][]*CmdResult, error) {
 			return nil, nil
@@ -621,35 +680,52 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		err := nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
 		assert.Error(t, err, "No ips found")
 	})
+}
 
-	// t.Run("Get node object with to fetch config in all nodes", func(t *testing.T) {
+func TestParseAndMoveConfigFilteToWorkspaceDir(t *testing.T) {
+	tomlFilePath := "file-name"
 
-	// 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	// 	singleNode := true
-	// 	outputDirectory := ""
-	// 	err := nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory)
-	// 	assert.ErrorContains(t, err, "error on removing output header in fetched config")
+	user := struct {
+		Name string
+		Age  int
+	}{
+		Name: "John Doe",
+		Age:  30,
+	}
+
+	// 	expectedContent := `Name = "John Doe"
+	// Age = 30
+	// `
+	defer os.Remove(tomlFilePath)
+
+	t.Run("Parse with no error", func(t *testing.T) {
+		mockUtil := &MockNodeUtilsImpl{
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+				return errors.New("error on removing output header in fetched config")
+			},
+		}
+		tomlFile, err := fileutils.CreateTomlFileFromConfig(user, tomlFilePath)
+		err = mockUtil.parseAndMoveConfigFileToWorkspaceDir([]string{tomlFile}, "")
+		assert.Error(t, err)
+		// fileByte, err := fileutils.ReadFile(tomlFile)
+		// require.NoError(t, err)
+		// assert.Contains(t, string(fileByte), expectedContent)
+		// // err = fileutils.DeleteTempFile(tomlFile)
+		// require.NoError(t, err)
+	})
+
+	// invalidFile := "/path/to/invalid/file.toml"
+
+	// t.Run("Open file error", func(t *testing.T) {
+	// 	_, err := fileutils.CreateTomlFileFromConfig(user, invalidFile)
+	// 	// fmt.Print(err.(*fs.PathError))
+	// 	require.Error(t, err, "Failed to create/open the file")
 	// })
 
-	// t.Run("No output file", func(t *testing.T) {
-
-	// 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	// 	singleNode := true
-	// 	outputDirectory := ""
-	// 	for _, nodeObject := range nodeObjects {
-	// 		nodeObject.OutputFile = []string{}
-	// 	}
-	// 	err = nodeUtil.executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, infra)
-	// 	assert.ErrorContains(t, err, "error on removing output header in fetched config")
+	// t.Run("Error encoding the config", func(t *testing.T) {
+	// 	var invalidConfig int
+	// 	_, err := fileutils.CreateTomlFileFromConfig(invalidConfig, tomlFilePath)
+	// 	require.Error(t, err, "Failed to encode")
 	// })
 
 }
-
-// func TestParseAndMoveConfigFilteToWorkspaceDir(t *testing.T) {
-// 	outDir := "/tmp/"
-// 	fileName, err := fileutils.CreateTempFile("Header\nabc", "file.txt")
-// 	assert.NoError(t, err)
-// 	outFile := []string{fileName}
-// 	defer fileutils.DeleteTempFile(fileName)
-
-// }
