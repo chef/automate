@@ -99,15 +99,7 @@ func (ani *AddNodeOnPremImpl) Execute(c *cobra.Command, args []string) error {
 		}
 	}
 	ani.prepare()
-	err = ani.runDeploy()
-
-	syncErr := ani.nodeUtils.syncConfigToAllNodes()
-	if syncErr != nil {
-		if err != nil {
-			return errors.Wrap(err, syncErr.Error())
-		}
-	}
-	return syncErr
+	return ani.runDeploy()
 }
 
 func (ani *AddNodeOnPremImpl) prepare() error {
@@ -210,7 +202,14 @@ func (ani *AddNodeOnPremImpl) runDeploy() error {
 		return err
 	}
 	argsdeploy := []string{"-y"}
-	return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+	}
+	return syncErr
 }
 
 func (ani *AddNodeOnPremImpl) validateCmdArgs() *list.List {

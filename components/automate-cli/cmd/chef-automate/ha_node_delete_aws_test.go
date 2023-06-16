@@ -777,7 +777,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 
 func TestDeletenodeDeploy(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	mockNodeUtil := newMockNodeUtilsImpl()
+	mockNodeUtil := newMockNodeUtilsImplForDeleteAWS()
 
 	t.Run("With sync config error", func(t *testing.T) {
 
@@ -808,7 +808,7 @@ func TestDeletenodeDeploy(t *testing.T) {
 	})
 }
 
-func newMockNodeUtilsImpl() *MockNodeUtilsImpl {
+func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 	return &MockNodeUtilsImpl{
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 			return nil, &SSHConfig{}, nil
