@@ -22,6 +22,15 @@ type Client struct {
 	Logger logger.Logger
 }
 
+// MockHTTPClient is a mock implementation of HTTPClient.
+type MockHTTPClient struct {
+	MakeRequestFunc func(requestMethod, url string, body interface{}) (*http.Response, error)
+}
+
+func (m *MockHTTPClient) MakeRequest(requestMethod, url string, body interface{}) (*http.Response, error) {
+	return m.MakeRequestFunc(requestMethod, url, body)
+}
+
 // NewClient returns a new Client with sane defaults.
 func NewClient(logger logger.Logger) *Client {
 	return &Client{

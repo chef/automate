@@ -46,17 +46,19 @@ type verifyCmdFlags struct {
 
 type verifyCmdFlow struct {
 	Client               httputils.HTTPClient
-	CreateSystemdService *verifysystemdcreate.CreateSystemdService
+	CreateSystemdService verifysystemdcreate.CreateSystemdService
+	SystemdCreateUtils   verifysystemdcreate.SystemdCreateUtils
 	Config               *config.HaDeployConfig
 	SSHUtil              sshutils.SSHUtil
 	Writer               *cli.Writer
 	prettyPrint          bool
 }
 
-func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService *verifysystemdcreate.CreateSystemdService, config *config.HaDeployConfig, sshutil sshutils.SSHUtil, writer *cli.Writer) *verifyCmdFlow {
+func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService verifysystemdcreate.CreateSystemdService, systemdCreateUtils verifysystemdcreate.SystemdCreateUtils, config *config.HaDeployConfig, sshutil sshutils.SSHUtil, writer *cli.Writer) *verifyCmdFlow {
 	return &verifyCmdFlow{
 		Client:               client,
 		CreateSystemdService: createSystemdService,
+		SystemdCreateUtils:   systemdCreateUtils,
 		Config:               config,
 		SSHUtil:              sshutil,
 		Writer:               writer,
@@ -213,7 +215,7 @@ func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []str
 			return err
 		}
 
-		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer)
+		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, verifysystemdcreate.NewSystemdCreateUtilsImpl(), config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer)
 		return c.runVerifyCmd(cmd, args, flagsObj)
 	}
 }
@@ -336,7 +338,7 @@ func (v *verifyCmdFlow) checkAutomateVerifyServiceForRemote(batchCheckConfig mod
 
 		destFileName := "chef-automate"
 
-		currentBinaryPath, err := v.CreateSystemdService.SystemdCreateUtils.GetBinaryPath()
+		currentBinaryPath, err := v.SystemdCreateUtils.GetBinaryPath()
 		if err != nil {
 			return err
 		}
