@@ -205,17 +205,23 @@ func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates 
 
 func (vc *ValidateCertificateService) CertificateValidation(req models.CertificateCheckRequest) models.CertificateCheckResponse {
 	var response = models.CertificateCheckResponse{}
-
-	// certKeys and keys arrays are required to maintain the order of correct response messages.
-	certKeys := []string{constants.ROOT, constants.NODE}
-	keys := []string{constants.NODE_KEY}
-
+	// certKeys are required to maintain the order of correct response messages.
+	var certKeys []string
 	// certificates map is used for storing Root Certificate, Node Certificate and if it is a case of opensearch then Admin Certificate.
 	certificates := make(map[string]string)
+
 	// privateKeys map is used for storing Private Key and if it is a case of opensearch then Admin Private Key.
 	privateKeys := make(map[string]string)
-	certificates[constants.ROOT] = req.RootCertificate
+
+	if strings.TrimSpace(req.RootCertificate) != "" {
+		certificates[constants.ROOT] = req.RootCertificate
+		certKeys = append(certKeys, constants.ROOT)
+	}
 	certificates[constants.NODE] = req.NodeCertificate
+	certKeys = append(certKeys, constants.NODE)
+
+	//keys array are required to maintain the order of correct response messages.
+	keys := []string{constants.NODE_KEY}
 	privateKeys[constants.NODE_KEY] = req.PrivateKey
 
 	if strings.TrimSpace(req.AdminCertificate) != "" && strings.TrimSpace(req.AdminPrivateKey) != "" {

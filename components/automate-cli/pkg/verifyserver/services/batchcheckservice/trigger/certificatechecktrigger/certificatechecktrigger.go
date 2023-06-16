@@ -7,7 +7,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -35,25 +34,22 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 	//This map will hold the Response against each IP
 	var finalResult []models.CheckTriggerResponse
 
-	certificate := config.Certificate
-
-	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.CERTIFICATE_CHECK_API_PATH)
-	for _, node := range certificate.Nodes {
-		nodeTypes := hostMap[node.IP]
-		//construct the request for Certificate Check API
-		requestBody := models.CertificateCheckRequest{
-			RootCertificate:  certificate.RootCert,
-			PrivateKey:       node.Key,
-			NodeCertificate:  node.Cert,
-			AdminPrivateKey:  node.AdminKey,
-			AdminCertificate: node.AdminCert,
+	for _, certificate := range config.Certificate {
+		for _, node := range certificate.Nodes {
+			//construct the request for Certificate Check API
+			requestBody := models.CertificateCheckRequest{
+				RootCertificate:  node.RootCert,
+				PrivateKey:       node.Key,
+				NodeCertificate:  node.Cert,
+				AdminPrivateKey:  node.AdminKey,
+				AdminCertificate: node.AdminCert,
+			}
+
+			count++
+			go trigger.TriggerCheckAPI(url, node.IP, certificate.NodeType, http.MethodPost, outputCh, requestBody)
 		}
 
-		for i := 0; i < len(nodeTypes); i++ {
-			count++
-			go trigger.TriggerCheckAPI(url, node.IP, nodeTypes[i], http.MethodPost, outputCh, requestBody)
-		}
 	}
 
 	//Read response from output channel

@@ -15,10 +15,22 @@ import (
 )
 
 var (
-	certificate = models.Certificate{
-		AutomateFqdn:   "www.example.com",
-		ChefServerFqdn: "www.example.com",
-		RootCert:       "rootcert",
+	fqdn                = "www.example.com"
+	rootCert            = "rootcert"
+	certificateAutomate = []models.Certificate{{
+		Fqdn:         fqdn,
+		FqdnRootCert: rootCert,
+		Nodes:        nil,
+		NodeType:     constants.AUTOMATE,
+	},
+	}
+
+	certificateChefServer = []models.Certificate{{
+		Fqdn:         fqdn,
+		FqdnRootCert: rootCert,
+		Nodes:        nil,
+		NodeType:     constants.CHEF_INFRA_SERVER,
+	},
 	}
 )
 
@@ -301,14 +313,14 @@ func TestFqdnCheck_Run(t *testing.T) {
 		isError    bool
 	}{
 		{
-			// 	name: "Passed Automate Node Check",
+			name: "Passed Automate Node Check",
 			args: args{
 				config: models.Config{
 					Hardware: models.Hardware{
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: certificate,
+					Certificate: certificateAutomate,
 					APIToken:    token,
 				},
 			},
@@ -325,7 +337,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate: certificate,
+					Certificate: certificateAutomate,
 					APIToken:    token,
 				},
 			},
@@ -342,7 +354,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    "test-token",
 				},
 			},
@@ -359,7 +371,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
@@ -376,7 +388,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8", "5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
@@ -393,7 +405,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
@@ -410,7 +422,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"5.6.7.8"},
 					},
-					Certificate: certificate,
+					Certificate: certificateChefServer,
 					APIToken:    token,
 				},
 			},
@@ -427,7 +439,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						AutomateNodeCount: 1,
 						AutomateNodeIps:   []string{"1.2.3.4"},
 					},
-					Certificate:     certificate,
+					Certificate:     certificateAutomate,
 					DeploymentState: "post-deploy",
 					APIToken:        token,
 				},
@@ -521,8 +533,8 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 func getRequest() models.FqdnRequest {
 
 	return models.FqdnRequest{
-		Fqdn:     certificate.AutomateFqdn,
-		RootCert: certificate.RootCert,
+		Fqdn:     fqdn,
+		RootCert: rootCert,
 	}
 }
 

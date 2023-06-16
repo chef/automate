@@ -9,6 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	root_ca = "root_ca"
+	cert    = "test_cert"
+	key     = "test_key"
+)
+
 func GetRequestJson() models.Hardware {
 	ipConfig := models.Hardware{}
 
@@ -76,4 +82,132 @@ func TestGetNodeTypeMap(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedNew, GetNodeTypeMap(config.Hardware))
+}
+
+func TestGetCertificateMap(t *testing.T) {
+	tests := []struct {
+		name            string
+		certificateList []models.Certificate
+		want            map[string]models.Certificate
+	}{
+		{
+			name: "Adding Certificate Config with automate,chef-server,opensearch,postgresql",
+			certificateList: []models.Certificate{
+				{
+					Fqdn:         "Automate_FQDN",
+					NodeType:     constants.AUTOMATE,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "1.2.3.4",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+				{
+					Fqdn:         "Chef_server_fqdn",
+					NodeType:     constants.CHEF_INFRA_SERVER,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "5.6.7.8",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+				{
+					Fqdn:         "",
+					NodeType:     constants.OPENSEARCH,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "10.12.13.14",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+				{
+					Fqdn:         "",
+					NodeType:     constants.POSTGRESQL,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "10.12.13.14",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+			},
+			want: map[string]models.Certificate{
+				constants.AUTOMATE: {
+					Fqdn:         "Automate_FQDN",
+					NodeType:     constants.AUTOMATE,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "1.2.3.4",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+
+				constants.CHEF_INFRA_SERVER: {
+					Fqdn:         "Chef_server_fqdn",
+					NodeType:     constants.CHEF_INFRA_SERVER,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "5.6.7.8",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+
+				constants.OPENSEARCH: {
+					Fqdn:         "",
+					NodeType:     constants.OPENSEARCH,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "10.12.13.14",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+
+				constants.POSTGRESQL: {
+					Fqdn:         "",
+					NodeType:     constants.POSTGRESQL,
+					FqdnRootCert: root_ca,
+					Nodes: []models.NodeCert{
+						{
+							IP:   "10.12.13.14",
+							Cert: cert,
+							Key:  key,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:            "Having blank certificate list",
+			certificateList: []models.Certificate{},
+			want:            map[string]models.Certificate{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := GetCertificateMap(tt.certificateList)
+
+			assert.Equal(t, tt.want, got)
+
+		})
+	}
 }

@@ -153,7 +153,7 @@ func TestParse(t *testing.T) {
 						ConfigFile:        "configs/automate.toml",
 						InstanceCount:     "2",
 						EnableCustomCerts: true,
-						RootCA: `-----BEGIN CERTIFICATE-----
+						FqdnRootCA: `-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
 U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
@@ -768,7 +768,7 @@ Dv6bUUXSsZF4fb1diLIBpmD1hh8OGNY65LUPpzAxJeZvo5w=
 						TeamsPort:         "",
 						InstanceCount:     "",
 						EnableCustomCerts: true,
-						RootCA:            "a2_cert",
+						FqdnRootCA:        "a2_cert",
 						PrivateKey:        "a2_pvt_key",
 						PublicKey:         "a2_public_key",
 						CertsByIP:         &[]CertByIP{{IP: "127.0.0.1", PrivateKey: "a2_pvt_key", PublicKey: "a2_public_key"}},

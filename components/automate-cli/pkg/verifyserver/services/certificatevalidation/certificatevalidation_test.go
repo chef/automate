@@ -593,6 +593,49 @@ func TestCertificateValidation(t *testing.T) {
 				},
 			},
 		},
+		{
+			TestName: "There is no root certificate",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  "",
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: true,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
+		},
 	}
 
 	for _, e := range tests {

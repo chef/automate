@@ -16,11 +16,10 @@ func (h *Handler) ValidateCertificate(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Invalid Request Body")
 	}
 
-	if strings.TrimSpace(req.RootCertificate) == "" ||
-		strings.TrimSpace(req.PrivateKey) == "" ||
+	if strings.TrimSpace(req.PrivateKey) == "" ||
 		strings.TrimSpace(req.NodeCertificate) == "" {
-		h.Logger.Error("root_certificate, private_key, node_certificate can't be empty.")
-		return fiber.NewError(http.StatusBadRequest, "root_certificate, private_key, node_certificate can't be empty, Please provide all the fields.")
+		h.Logger.Error("private_key, node_certificate can't be empty.")
+		return fiber.NewError(http.StatusBadRequest, "private_key, node_certificate can't be empty, Please provide all the fields.")
 	}
 
 	res := h.ValidateCertificateService.CertificateValidation(*req)

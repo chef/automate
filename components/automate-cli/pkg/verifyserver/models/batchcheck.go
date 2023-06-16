@@ -54,10 +54,10 @@ type Backup struct {
 }
 
 type Certificate struct {
-	AutomateFqdn   string     `json:"automate_fqdn"`
-	ChefServerFqdn string     `json:"cs_fqdn"`
-	RootCert       string     `json:"root_cert"`
-	Nodes          []NodeCert `json:"nodes"`
+	Fqdn         string     `json:"fqdn"`
+	FqdnRootCert string     `json:"fqdn_root_ca"`
+	NodeType     string     `json:"node_type"`
+	Nodes        []NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -79,42 +79,58 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SSHUser         SSHUser     `json:"ssh_user"`
-	Arch            string      `json:"arch"`
-	Backup          Backup      `json:"backup"`
-	Hardware        Hardware    `json:"hardware"`
-	Certificate     Certificate `json:"certificate"`
-	ExternalOS      ExternalOS  `json:"external_opensearch"`
-	ExternalPG      ExternalPG  `json:"external_postgresql"`
-	DeploymentState string      `json:"deployment_state"`
-	APIToken        string      `json:"api_token"`
+	SSHUser         SSHUser       `json:"ssh_user"`
+	Arch            string        `json:"arch"`
+	Backup          Backup        `json:"backup"`
+	Hardware        Hardware      `json:"hardware"`
+	Certificate     []Certificate `json:"certificate"`
+	ExternalOS      ExternalOS    `json:"external_opensearch"`
+	ExternalPG      ExternalPG    `json:"external_postgresql"`
+	DeploymentState string        `json:"deployment_state"`
+	APIToken        string        `json:"api_token"`
 }
 
-func (c *Config) appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert string) {
-
+func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []NodeCert {
+	nodeCertsList := make([]NodeCert, 0)
+	certByIpMap := createMapforCertByIp(certsByIP)
 	for _, ip := range ipList {
-		nodeCert := NodeCert{
-			IP:        ip,
-			Key:       privateKey,
-			Cert:      publicKey,
-			AdminKey:  adminKey,
-			AdminCert: adminCert,
-		}
-		c.Certificate.Nodes = append(c.Certificate.Nodes, nodeCert)
-	}
-
-	if certsByIP != nil {
-		for _, certByIP := range *certsByIP {
-			nodeCert := NodeCert{
+		certByIP, ok := certByIpMap[ip]
+		var nodeCert NodeCert
+		if ok {
+			nodeCert = NodeCert{
 				IP:        certByIP.IP,
 				Key:       certByIP.PrivateKey,
 				Cert:      certByIP.PublicKey,
 				AdminKey:  adminKey,
 				AdminCert: adminCert,
+				RootCert:  nodeRootCa,
 			}
-			c.Certificate.Nodes = append(c.Certificate.Nodes, nodeCert)
+		} else {
+			nodeCert = NodeCert{
+				IP:        ip,
+				Key:       privateKey,
+				Cert:      publicKey,
+				AdminKey:  adminKey,
+				AdminCert: adminCert,
+				RootCert:  nodeRootCa,
+			}
 		}
+		nodeCertsList = append(nodeCertsList, nodeCert)
 	}
+
+	return nodeCertsList
+
+}
+
+func createMapforCertByIp(certsByIP *[]config.CertByIP) map[string]*config.CertByIP {
+	certByIPMap := make(map[string]*config.CertByIP)
+	if certsByIP != nil {
+		for _, cert := range *certsByIP {
+			certByIPMap[cert.IP] = &cert
+		}
+
+	}
+	return certByIPMap
 }
 
 func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
@@ -192,11 +208,6 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 		return err
 	}
 
-	c.Certificate.RootCert = haConfig.Automate.Config.RootCA
-	c.Certificate.AutomateFqdn = haConfig.Automate.Config.Fqdn
-	// pre deploy state cs fqdn is same as automate fqdn
-	c.Certificate.ChefServerFqdn = haConfig.Automate.Config.Fqdn
-
 	return nil
 }
 
@@ -227,23 +238,32 @@ func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
 
 func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 	automateConfig := haConfig.Automate.Config
+	cert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.FqdnRootCA, config.AUTOMATE)
 	if automateConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(nil, []string{""}, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
+	}
+	c.Certificate = append(c.Certificate, cert)
+	chefserverConfig := haConfig.ChefServer.Config
+	//We can populate this later as well in config
+	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
+	if chefserverConfig.EnableCustomCerts {
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
 	}
 
-	chefserverConfig := haConfig.ChefServer.Config
-	if chefserverConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(nil, []string{""}, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
-	}
+	c.Certificate = append(c.Certificate, cert)
 
 	postgresqlConfig := haConfig.Postgresql.Config
 	if postgresqlConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
+		cert = addCertificatesInConfig("", "", config.POSTGRESQL)
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", postgresqlConfig.RootCA)
+		c.Certificate = append(c.Certificate, cert)
 	}
 
 	openSearchConfig := haConfig.Opensearch.Config
 	if openSearchConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(nil, []string{""}, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+		cert = addCertificatesInConfig("", "", config.OPENSEARCH)
+		cert.Nodes = appendCertsByIpToNodeCerts(nil, []string{""}, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert, openSearchConfig.RootCA)
+		c.Certificate = append(c.Certificate, cert)
 	}
 }
 
@@ -272,15 +292,33 @@ func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConf
 	existingInfraConfig := haConfig.ExistingInfra.Config
 	c.Hardware.AutomateNodeIps = existingInfraConfig.AutomatePrivateIps
 	c.Hardware.ChefInfraServerNodeIps = existingInfraConfig.ChefServerPrivateIps
+
+	//Adding Certificate for automate FQDN and nodes certificates
 	automateConfig := haConfig.Automate.Config
+	cert := addCertificatesInConfig(automateConfig.Fqdn, automateConfig.FqdnRootCA, config.AUTOMATE)
 	if automateConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(automateConfig.CertsByIP, haConfig.ExistingInfra.Config.AutomatePrivateIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "")
+		//Adding ip node certs
+		cert.Nodes = appendCertsByIpToNodeCerts(automateConfig.CertsByIP, haConfig.ExistingInfra.Config.AutomatePrivateIps, automateConfig.PrivateKey, automateConfig.PublicKey, "", "", "")
+	}
+	c.Certificate = append(c.Certificate, cert)
+
+	//Adding Certificates for chef server FQDN and nodes certificates
+	chefserverConfig := haConfig.ChefServer.Config
+	cert = addCertificatesInConfig(chefserverConfig.ChefServerFqdn, chefserverConfig.RootCA, config.CHEFSERVER)
+	if chefserverConfig.EnableCustomCerts {
+		cert.Nodes = appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "", "")
+	}
+	c.Certificate = append(c.Certificate, cert)
+}
+
+func addCertificatesInConfig(fqdn, rootCA, nodeType string) Certificate {
+	cert := Certificate{
+		Fqdn:         fqdn,
+		FqdnRootCert: rootCA,
+		NodeType:     nodeType,
 	}
 
-	chefserverConfig := haConfig.ChefServer.Config
-	if chefserverConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(chefserverConfig.CertsByIP, haConfig.ExistingInfra.Config.ChefServerPrivateIps, chefserverConfig.PrivateKey, chefserverConfig.PublicKey, "", "")
-	}
+	return cert
 }
 
 func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
@@ -314,12 +352,18 @@ func (c *Config) populateNonExternalDbConfig(haConfig *config.HaDeployConfig) {
 	c.Hardware.OpenSearchNodeIps = existingInfraConfig.OpensearchPrivateIps
 	postgresqlConfig := haConfig.Postgresql.Config
 	if postgresqlConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, haConfig.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "")
+		postgresqlCert := addCertificatesInConfig("", "", config.POSTGRESQL)
+		postgresqlCert.Nodes = appendCertsByIpToNodeCerts(postgresqlConfig.CertsByIP, haConfig.ExistingInfra.Config.PostgresqlPrivateIps, postgresqlConfig.PrivateKey, postgresqlConfig.PublicKey, "", "", postgresqlConfig.RootCA)
+		c.Certificate = append(c.Certificate, postgresqlCert)
+
 	}
 
 	openSearchConfig := haConfig.Opensearch.Config
+	//As their is no FQDN for opensearch but we have fqdn root ca
 	if openSearchConfig.EnableCustomCerts {
-		c.appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, haConfig.ExistingInfra.Config.OpensearchPrivateIps, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert)
+		openSearchCertConfig := addCertificatesInConfig("", "", config.OPENSEARCH)
+		openSearchCertConfig.Nodes = appendCertsByIpToNodeCerts(openSearchConfig.CertsByIP, haConfig.ExistingInfra.Config.OpensearchPrivateIps, openSearchConfig.PrivateKey, openSearchConfig.PublicKey, openSearchConfig.AdminKey, openSearchConfig.AdminCert, openSearchConfig.RootCA)
+		c.Certificate = append(c.Certificate, openSearchCertConfig)
 	}
 }
 
@@ -359,6 +403,7 @@ type Checks struct {
 // is this supposed to be cert_by_ip? this struct needs modifiation
 type NodeCert struct {
 	IP        string `json:"ip"`
+	RootCert  string `json:"root_cert"`
 	Cert      string `json:"cert"`
 	Key       string `json:"key"`
 	AdminKey  string `json:"admin_key"`
