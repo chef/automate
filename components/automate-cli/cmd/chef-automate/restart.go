@@ -21,14 +21,6 @@ const (
 	ERROR_ON_MANAGED_SERVICES   = "Restarting services on managed %s is not supported."
 )
 
-type restartFromBastion interface {
-	getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error)
-	isManagedServicesOn() bool
-	executeRemoteExecutor(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-}
-
-type restartFromBastionImpl struct{}
-
 type RestartCmdFlags struct {
 	automate   bool
 	chefServer bool
@@ -36,24 +28,6 @@ type RestartCmdFlags struct {
 	postgresql bool
 	node       string
 	timeout    int
-}
-
-func NewRestartFromBastionImpl() *restartFromBastionImpl {
-	return &restartFromBastionImpl{}
-}
-
-func (rs *restartFromBastionImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return getAutomateHAInfraDetails()
-}
-
-func (st *restartFromBastionImpl) isManagedServicesOn() bool {
-	return isManagedServicesOn()
-}
-
-func (rs *restartFromBastionImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	remoteExecutor := NewRemoteCmdExecutor(nodemap, sshUtil, writer)
-	cmdResult, err := remoteExecutor.Execute()
-	return cmdResult, err
 }
 
 func init() {
@@ -94,7 +68,9 @@ func runRestartServicesCmd(flags *RestartCmdFlags) func(cmd *cobra.Command, args
 
 func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlags) error {
 	if isA2HARBFileExist() {
-		return runRestartFromBastion(flags, NewRestartFromBastionImpl())
+		NodeOpUtils := &NodeUtilsImpl{}
+		remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
+		return runRestartFromBastion(flags, remoteExcecutor, NodeOpUtils)
 	}
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
@@ -124,12 +100,12 @@ func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlag
 }
 
 type ResultWithError struct {
-    result interface{}
-    err     error
+	result interface{}
+	err    error
 }
 
-func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error {
-	infra, err := rs.getAutomateHAInfraDetails()
+func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu NodeOpUtils) error {
+	infra, _, err := nu.getHaInfraDetails()
 	if err != nil {
 		return err
 	}
@@ -148,7 +124,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 	errChan := make(chan *ResultWithError, 4)
 	runRestartCmdForFrontEnd(infra, flags, rs, errChan)
 
-	if rs.isManagedServicesOn() {
+	if nu.isManagedServicesOn() {
 		errChan <- &ResultWithError{}
 		errChan <- &ResultWithError{}
 		err = getChannelValue(errChan)
@@ -163,7 +139,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 	return getChannelValue(errChan)
 }
 
-func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, errChan chan *ResultWithError) {
+func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, errChan chan *ResultWithError) {
 	if flags.automate {
 		restartOnGivenNode(flags, AUTOMATE, infra, rs, errChan)
 	} else {
@@ -178,7 +154,7 @@ func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFl
 	}
 }
 
-func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, errChan chan *ResultWithError) {
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, errChan chan *ResultWithError) {
 	if flags.postgresql {
 		flags.automate = false
 		flags.chefServer = false
@@ -197,14 +173,12 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 	}
 }
 
-func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs restartFromBastion, resultErrChan chan *ResultWithError) {
+func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs RemoteCmdExecutor, resultErrChan chan *ResultWithError) {
 	go func(flags RestartCmdFlags, resultErrChan chan *ResultWithError) {
-		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-		sshUtil := NewSSHUtil(&SSHConfig{})
 		nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
-		cmdResult, err := rs.executeRemoteExecutor(nodeMap, sshUtil, writer)
-		ResultWithError := &ResultWithError{result:cmdResult,err:err }
-		resultErrChan <-ResultWithError
+		cmdResult, err := rs.ExecuteWithNodeMap(nodeMap)
+		ResultWithError := &ResultWithError{result: cmdResult, err: err}
+		resultErrChan <- ResultWithError
 	}(*flags, resultErrChan)
 }
 
