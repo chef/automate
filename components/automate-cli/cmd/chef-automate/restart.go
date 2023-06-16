@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"os"
-	"sync"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -129,12 +129,13 @@ type ResultWithError struct {
 }
 
 func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error {
-	var mutex = &sync.Mutex{}
 	infra, err := rs.getAutomateHAInfraDetails()
 	if err != nil {
 		return err
 	}
-
+	if flags.timeout < DEFAULT_TIMEOUT_FOR_RESTART {
+		return errors.Errorf("The operation timeout duration for each individual node during the restart should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT_FOR_RESTART)
+	}
 	if !flags.automate && !flags.chefServer && !flags.opensearch && !flags.postgresql {
 		if len(flags.node) != 0 {
 			return status.Errorf(status.InvalidCommandArgsError, "Please provide service flag")
@@ -145,7 +146,7 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 		flags.postgresql = true
 	}
 	errChan := make(chan *ResultWithError, 4)
-	runRestartCmdForFrontEnd(infra, flags, rs, mutex, errChan)
+	runRestartCmdForFrontEnd(infra, flags, rs, errChan)
 
 	if rs.isManagedServicesOn() {
 		errChan <- &ResultWithError{}
@@ -157,31 +158,31 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs restartFromBastion) error 
 		return handleManagedServices(flags)
 	}
 
-	runRestartCmdForBackend(infra, flags, rs, mutex, errChan)
+	runRestartCmdForBackend(infra, flags, rs, errChan)
 
 	return getChannelValue(errChan)
 }
 
-func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan *ResultWithError) {
+func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, errChan chan *ResultWithError) {
 	if flags.automate {
-		restartOnGivenNode(flags, AUTOMATE, infra, rs, mutex, errChan)
+		restartOnGivenNode(flags, AUTOMATE, infra, rs, errChan)
 	} else {
 		errChan <- &ResultWithError{}
 	}
 
 	if flags.chefServer {
 		flags.automate = false
-		restartOnGivenNode(flags, CHEF_SERVER, infra, rs, mutex, errChan)
+		restartOnGivenNode(flags, CHEF_SERVER, infra, rs, errChan)
 	} else {
 		errChan <- &ResultWithError{}
 	}
 }
 
-func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, mutex *sync.Mutex, errChan chan *ResultWithError) {
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs restartFromBastion, errChan chan *ResultWithError) {
 	if flags.postgresql {
 		flags.automate = false
 		flags.chefServer = false
-		restartOnGivenNode(flags, POSTGRESQL, infra, rs, mutex, errChan)
+		restartOnGivenNode(flags, POSTGRESQL, infra, rs, errChan)
 	} else {
 		errChan <- &ResultWithError{}
 	}
@@ -190,13 +191,13 @@ func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFla
 		flags.automate = false
 		flags.chefServer = false
 		flags.postgresql = false
-		restartOnGivenNode(flags, OPENSEARCH, infra, rs, mutex, errChan)
+		restartOnGivenNode(flags, OPENSEARCH, infra, rs, errChan)
 	} else {
 		errChan <- &ResultWithError{}
 	}
 }
 
-func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs restartFromBastion, mutex *sync.Mutex, resultErrChan chan *ResultWithError) {
+func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs restartFromBastion, resultErrChan chan *ResultWithError) {
 	go func(flags RestartCmdFlags, resultErrChan chan *ResultWithError) {
 		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 		sshUtil := NewSSHUtil(&SSHConfig{})
@@ -265,6 +266,7 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		Postgresql: &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:                      RESTART_BACKEND_COMMAND,
+				WaitTimeout:              int(flags.timeout),
 				NodeIps:                  []string{flags.node},
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,
@@ -275,6 +277,7 @@ func constructNodeMapForAllNodeTypes(flags *RestartCmdFlags, infra *AutomateHAIn
 		Opensearch: &Cmd{
 			CmdInputs: &CmdInputs{
 				Cmd:                      RESTART_BACKEND_COMMAND,
+				WaitTimeout:              int(flags.timeout),
 				NodeIps:                  []string{flags.node},
 				Single:                   false,
 				ErrorCheckEnableInOutput: true,

@@ -93,20 +93,45 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 	}
 }
 
+func newDefaultRestartCmdFlag() *RestartCmdFlags {
+	return &RestartCmdFlags{
+		automate:   false,
+		chefServer: false,
+		postgresql: false,
+		opensearch: false,
+		node:       "",
+		timeout:    DEFAULT_TIMEOUT_FOR_RESTART,
+	}
+}
 func TestRunRestartFromBastion(t *testing.T) {
 	type testCase struct {
-		description         string
-		flags               *RestartCmdFlags
+		description          string
+		flags                *RestartCmdFlags
 		mockRestartCmdHelper *MockrestartFromBastionImpl
-		errorWant           error
+		errorWant            error
 	}
-
 	testCases := []testCase{
 		{
-			description: "No service flag provided and node flag is provided",
-			flags: &RestartCmdFlags{
-				node: "1",
+			description: "Error when wait timeout is less than default timeout",
+			flags: func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				restartCmdFlags.timeout=120
+				return restartCmdFlags
+			  } (),
+			mockRestartCmdHelper: &MockrestartFromBastionImpl{
+				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
 			},
+			errorWant: status.Errorf(status.InvalidCommandArgsError, "The operation timeout duration for each individual node during the restart should be set to a value greater than %v seconds.",DEFAULT_TIMEOUT_FOR_RESTART),
+		},
+		{
+			description: "No service flag provided and node flag is provided",
+			flags: func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				restartCmdFlags.node="1"
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
@@ -116,7 +141,10 @@ func TestRunRestartFromBastion(t *testing.T) {
 		},
 		{
 			description: "Error while reading infra details",
-			flags:       &RestartCmdFlags{},
+			flags:      func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return nil, errors.New("Error occured while reading infra details")
@@ -126,7 +154,10 @@ func TestRunRestartFromBastion(t *testing.T) {
 		},
 		{
 			description: "Restart all node-types",
-			flags:       &RestartCmdFlags{},
+			flags:   func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
@@ -142,7 +173,10 @@ func TestRunRestartFromBastion(t *testing.T) {
 		},
 		{
 			description: "Error when restarting all node-types with remote execution ",
-			flags:       &RestartCmdFlags{},
+			flags:  func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
@@ -158,7 +192,10 @@ func TestRunRestartFromBastion(t *testing.T) {
 		},
 		{
 			description: "Restarting all services with managed Infra",
-			flags:       &RestartCmdFlags{},
+			flags:   func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
@@ -174,9 +211,11 @@ func TestRunRestartFromBastion(t *testing.T) {
 		},
 		{
 			description: "Restarting Opensearch with managed services",
-			flags: &RestartCmdFlags{
-				opensearch: true,
-			},
+			flags: func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				restartCmdFlags.opensearch = true
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
@@ -192,9 +231,11 @@ func TestRunRestartFromBastion(t *testing.T) {
 		},
 		{
 			description: "Restarting Postgresql with managed services",
-			flags: &RestartCmdFlags{
-				postgresql: true,
-			},
+			flags: func ()*RestartCmdFlags{
+				restartCmdFlags := newDefaultRestartCmdFlag()
+				restartCmdFlags.postgresql = true
+				return restartCmdFlags
+			  } (),
 			mockRestartCmdHelper: &MockrestartFromBastionImpl{
 				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
 					return &AutomateHAInfraDetails{}, nil
