@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ExternalOpensearchCheck struct {
@@ -23,12 +24,16 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 }
 
 func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	// Check for nil or empty req body
+	if config.Hardware == nil {
+		return trigger.NilRespForA2CS(constants.EXTERNAL_OPENSEARCH)
+	}
 	if config.ExternalOS == nil {
-		return trigger.ExternalOSPGNillResp(config)
+		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH)
 	}
 
-	if trigger.IsEmptyExternalOS(config.ExternalOS) {
-		return trigger.ExternalOSPGEmptyResp(config)
+	if isEmptyExternalOS(config.ExternalOS) {
+		return externalOSEmptyResp(config, constants.EXTERNAL_OPENSEARCH)
 	}
 
 	return runCheckForOpensearch(config, eoc.port, eoc.log)
@@ -79,4 +84,71 @@ func getOpensearchRequest(details *models.ExternalOS) models.ExternalOS {
 		OSCert:         details.OSCert,
 	}
 
+}
+
+func externalOSNillResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+
+	return triggerResps
+}
+
+func GetSkippedTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+		},
+		Host: ip,
+	}
+}
+
+func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
+	return externalOS.OSDomainName == "" ||
+		externalOS.OSDomainURL == "" ||
+		externalOS.OSUsername == "" ||
+		externalOS.OSUserPassword == "" ||
+		externalOS.OSCert == "" ||
+		externalOS.OSRoleArn == ""
+}
+
+func externalOSEmptyResp(config *models.Config, checkType string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+	count := 0
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.AUTOMATE))
+		count++
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.CHEF_INFRA_SERVER))
+		count++
+	}
+
+	return triggerResps
+}
+
+func createErrorResponse(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: "OS configuration is missing",
+			},
+		},
+	}
 }

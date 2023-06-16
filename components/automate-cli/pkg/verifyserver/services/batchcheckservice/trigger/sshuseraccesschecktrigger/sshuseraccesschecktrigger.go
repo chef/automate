@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type SshUserAccessCheck struct {
@@ -28,9 +29,15 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing SSH user access check from batch check ")
 
-	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
-	if ok {
-		return resp
+	// Check if certificate is empty or nil
+	if config.Hardware == nil {
+		return trigger.NilRespForA2CSOSPG(constants.SSH_USER)
+	}
+	if config.SSHUser == nil {
+		return nilSSHUserResp(config, constants.SSH_USER)
+	}
+	if IsSSHUserEmpty(config.SSHUser) {
+		return emptySSHUserResp(config, constants.SSH_USER)
 	}
 
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
@@ -70,4 +77,73 @@ func getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserReque
 func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
+}
+
+func nilSSHUserResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+	}
+
+	return resps
+}
+
+func GetSkippedTriggerCheckResp(ip, checktype string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  constants.AUTOMATE,
+		CheckType: checktype,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+		},
+		Host: ip,
+	}
+}
+
+func IsSSHUserEmpty(sshUser *models.SSHUser) bool {
+	return (sshUser.Username == "" || sshUser.Port == "" || sshUser.PrivateKey == "" || sshUser.SudoPassword == "")
+}
+
+func emptySSHUserResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
+}
+
+func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: "SSH credentials is missing",
+			},
+			Check: checkType,
+		},
+	}
 }

@@ -28,9 +28,8 @@ func NewFirewallCheck(log logger.Logger, port string) *FirewallCheck {
 func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	fc.log.Info("Performing Firewall check from batch check ")
 
-	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
-	if ok {
-		return resp
+	if config.Hardware == nil {
+		return trigger.NilRespForAllInstances(constants.FIREWALL)
 	}
 
 	requestMap := make(map[string][]models.FirewallRequest)

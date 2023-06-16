@@ -119,27 +119,27 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
 	})
 
-	t.Run("Empty OS or PG", func(t *testing.T) {
+	t.Run("Nil Hardware", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusInternalServerError)
+		server, _, port := createDummyServer(t, http.StatusInternalServerError)
 		defer server.Close()
 
 		// Test data
 		config := &models.Config{
-			Hardware: &models.Hardware{
-				AutomateNodeCount: 1,
-				AutomateNodeIps:   []string{host},
-			},
-			ExternalOS: nil,
-			ExternalPG: &models.ExternalPG{},
+			Hardware: nil,
 		}
 
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
 		ctr := suc.Run(config)
 
 		fmt.Printf("ctr: %+v\n", ctr)
-		require.Len(t, ctr, 1)
-		require.True(t, ctr[0].Result.Skipped)
+		require.Len(t, ctr, 5)
+		require.True(t, ctr[3].Result.Skipped)
+		assert.Equal(t, constants.UNKNONHOST, ctr[2].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, ctr[1].NodeType)
+		assert.Equal(t, constants.SOFTWARE_VERSIONS, ctr[3].CheckType)
+		assert.Equal(t, constants.SOFTWARE_VERSIONS, ctr[3].Result.Check)
+		assert.True(t, ctr[0].Result.Skipped)
 	})
 
 }

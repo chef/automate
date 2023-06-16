@@ -336,15 +336,16 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			response: "error while connecting to the endpoint, received invalid status code",
 		},
 		{
-			name:           "Empty OS",
-			isPassed:       false,
-			isError:        true,
-			httpStatusCode: http.StatusGatewayTimeout,
+			name:     "Empty OS",
+			isPassed: false,
+			isError:  true,
 			args: args{
 				config: &models.Config{
 					Hardware: &models.Hardware{
-						AutomateNodeCount: 2,
-						AutomateNodeIps:   []string{"127.0.0.1", "127.0.0.10"},
+						AutomateNodeCount:        2,
+						AutomateNodeIps:          []string{"127.0.0.1", "127.0.0.10"},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
 					},
 					ExternalOS: &models.ExternalOS{
 						OSDomainName:   osDomainName,
@@ -356,7 +357,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 					},
 				},
 			},
-			response: "External OS or PG configuration is missing",
+			response: "OS configuration is missing",
 		},
 		{
 			name:           "Nil OS",
@@ -366,8 +367,10 @@ func TestOpensearchCheck_Run(t *testing.T) {
 			args: args{
 				config: &models.Config{
 					Hardware: &models.Hardware{
-						AutomateNodeCount: 1,
-						AutomateNodeIps:   []string{"127.0.0.1"},
+						AutomateNodeCount:        1,
+						AutomateNodeIps:          []string{"127.0.0.1"},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
 					},
 					ExternalOS: nil,
 				},
@@ -396,10 +399,11 @@ func TestOpensearchCheck_Run(t *testing.T) {
 
 			if tt.isError {
 				if tt.name == "Empty OS" {
+					assert.Len(t, got, 3)
 					assert.NotNil(t, got[0].Result.Error)
 					assert.Equal(t, constants.LOCALHOST, got[0].Host)
 					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-					assert.Equal(t, http.StatusInternalServerError, got[0].Result.Error.Code)
+					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
 					assert.Equal(t, tt.response, got[0].Result.Error.Error())
 				} else {
 					assert.NotNil(t, got[0].Result.Error)
@@ -410,7 +414,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 				}
 			} else {
 				if tt.name == "Nil OS" {
-					assert.Len(t, got, 2)
+					assert.Len(t, got, 3)
 					assert.Equal(t, "127.0.0.1", got[0].Host)
 					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 					assert.True(t, got[0].Result.Skipped)
@@ -570,4 +574,22 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))
+}
+
+func TestRunCheck(t *testing.T) {
+	t.Run("name", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: nil,
+		}
+
+		newOS := NewExternalOpensearchCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 2)
+		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.EXTERNAL_OPENSEARCH, got[1].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+
+	})
 }

@@ -116,30 +116,27 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
 	})
 
-	t.Run("Empty OS or PG", func(t *testing.T) {
+	t.Run("Nil Hardware", func(t *testing.T) {
 		// Create a dummy server
-		server, host, port := createDummyServer(t, http.StatusInternalServerError)
+		server, _, port := createDummyServer(t, http.StatusInternalServerError)
 		defer server.Close()
 
 		// Test data
 		config := &models.Config{
-			Hardware: &models.Hardware{
-				AutomateNodeCount:        1,
-				AutomateNodeIps:          []string{host},
-				ChefInfraServerNodeCount: 1,
-				ChefInfraServerNodeIps:   []string{"localhost"},
-			},
+			Hardware:   nil,
 			ExternalOS: externalOS,
 			ExternalPG: &models.ExternalPG{},
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
-		ctr := suc.Run(config)
+		got := suc.Run(config)
 
-		fmt.Printf("ctr: %+v\n", ctr)
-		require.Len(t, ctr, 2)
-		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
-		assert.Equal(t, "External OS or PG configuration is missing", ctr[0].Result.Error.Error())
+		fmt.Printf("ctr: %+v\n", got)
+		require.Len(t, got, 5)
+		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.SYSTEM_RESOURCES, got[1].CheckType)
+		assert.True(t, got[0].Result.Skipped)
 	})
 
 }

@@ -76,8 +76,9 @@ func GetRequestJson() *models.Config {
 	json.Unmarshal([]byte(`{
 		"ssh_user": {
 			"user_name": "ubuntu",
-			"private_key": "test_key",
-			"sudo_password": "test@123"
+            "ssh_port": "1234",
+            "private_key": "test_key",
+            "sudo_password": "test@123"
 		},
 		"arch": "existing_nodes",
 		"backup": {
@@ -294,35 +295,69 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		}
 	})
 
-	t.Run("Empty OS or PG", func(t *testing.T) {
-		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{}`))
-		}))
-		err := startMockServerOnCustomPort(mockServer, "1236")
-		assert.NoError(t, err)
-		defer mockServer.Close()
-
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1236")
-		request := &models.Config{
-			Hardware: &models.Hardware{
-				AutomateNodeCount: 1,
-				AutomateNodeIps:   []string{mockServer.URL},
-			},
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
 			ExternalOS: nil,
-			ExternalPG: &models.ExternalPG{},
 		}
-		finalResp := cc.Run(request)
-		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
-		assert.Equal(t, totalIps, len(finalResp))
 
-		for _, resp := range finalResp {
-			assert.Nil(t, resp.Result.Error)
-			assert.True(t, resp.Result.Skipped)
-			assert.Equal(t, resp.Result.Passed, false)
-		}
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
+		assert.True(t, got[0].Result.Skipped)
 	})
+	t.Run("Nil SSHUser", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			SSHUser: nil,
+		}
 
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, "12.12.1.6", got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+	})
+	t.Run("Empty SSHUser", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			SSHUser: &models.SSHUser{},
+		}
+
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, "12.12.1.6", got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
+		assert.False(t, got[0].Result.Skipped)
+		assert.Equal(t, http.StatusBadRequest, got[1].Result.Error.Code)
+		assert.Equal(t, "SSH credentials is missing", got[1].Result.Error.Message)
+		assert.Equal(t, constants.SSH_USER, got[1].Result.Check)
+	})
 }
 
 func TestGetSShUserAPIRquest(t *testing.T) {
@@ -342,6 +377,7 @@ func GetSshRequest() models.SShUserRequest {
 		Username:     "ubuntu",
 		PrivateKey:   "test_key",
 		SudoPassword: "test@123",
+		Port:         "1234",
 	}
 	return request
 }

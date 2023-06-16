@@ -315,6 +315,23 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		require.Error(t, err)
 		require.Nil(t, resp)
 	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: nil,
+		}
+
+		newOS := NewHardwareResourceCountCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.HARDWARE_RESOURCE_COUNT, got[3].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+
+	})
+
 }
 
 func TestGetPortsForMockServer(t *testing.T) {

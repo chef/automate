@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
@@ -30,6 +31,10 @@ func NewHardwareResourceCountCheck(log logger.Logger, port string) *HardwareReso
 
 func (ss *HardwareResourceCountCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Hardware Resource count check from batch check ")
+
+	if config.Hardware == nil {
+		return trigger.NilRespForA2CSOSPG(constants.HARDWARE_RESOURCE_COUNT)
+	}
 
 	var finalResult []models.CheckTriggerResponse
 

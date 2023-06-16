@@ -184,126 +184,137 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 	return reader, nil
 }
 
-func CheckEmptyOrNilExternalConfig(config *models.Config) ([]models.CheckTriggerResponse, bool) {
-	if config.ExternalOS == nil {
-		return ExternalOSPGNillResp(config), true
+func IfHardwareEmpty(config models.Config) bool {
+	if config.Hardware.AutomateNodeCount == 0 && len(config.Hardware.AutomateNodeIps) == 0 &&
+		config.Hardware.ChefInfraServerNodeCount == 0 && len(config.Hardware.ChefInfraServerNodeIps) == 0 &&
+		config.Hardware.PostgresqlNodeCount == 0 && len(config.Hardware.PostgresqlNodeIps) == 0 &&
+		config.Hardware.OpenSearchNodeCount == 0 && len(config.Hardware.OpenSearchNodeIps) == 0 {
+		return true
 	}
-
-	if config.ExternalPG == nil {
-		return ExternalOSPGNillResp(config), true
-	}
-
-	if IsEmptyExternalOS(config.ExternalOS) {
-		return ExternalOSPGEmptyResp(config), true
-	}
-
-	if IsEmptyExternalPG(config.ExternalPG) {
-		return ExternalOSPGEmptyResp(config), true
-	}
-
-	return nil, false
+	return false
 }
 
-func ExternalOSPGNillResp(config *models.Config) []models.CheckTriggerResponse {
-	var triggerResps []models.CheckTriggerResponse
-	count := 0
-
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, createNilResponse(ip, constants.AUTOMATE))
-		count++
-	}
-
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, createNilResponse(ip, constants.CHEF_INFRA_SERVER))
-		count++
-	}
-
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		triggerResps = append(triggerResps, createNilResponse(ip, constants.OPENSEARCH))
-		count++
-	}
-
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		triggerResps = append(triggerResps, createNilResponse(ip, constants.POSTGRESQL))
-		count++
-	}
-
-	if count == 0 {
-		triggerResps = append(triggerResps, createNilResponse(constants.LOCALHOST, constants.BASTION))
-	}
-
-	return triggerResps
-}
-
-func createNilResponse(host, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		NodeType: constants.AUTOMATE,
-		Result: models.ApiResult{
-			Skipped: true,
-		},
-		Host: host,
-	}
-}
-
-func ExternalOSPGEmptyResp(config *models.Config) []models.CheckTriggerResponse {
-	var triggerResps []models.CheckTriggerResponse
-	count := 0
-
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, constants.AUTOMATE))
-		count++
-	}
-
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, constants.CHEF_INFRA_SERVER))
-		count++
-	}
-
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, constants.OPENSEARCH))
-		count++
-	}
-
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, constants.POSTGRESQL))
-		count++
-	}
-
-	if count == 0 {
-		triggerResps = append(triggerResps, createErrorResponse(constants.LOCALHOST, constants.BASTION))
-	}
-
-	return triggerResps
-}
-
-func createErrorResponse(host, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:     host,
-		NodeType: nodeType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusInternalServerError,
-				Message: "External OS or PG configuration is missing",
+func NilRespForAllInstances(checkType string) []models.CheckTriggerResponse {
+	return []models.CheckTriggerResponse{
+		{
+			NodeType:  constants.AUTOMATE,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
 			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.CHEF_INFRA_SERVER,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.OPENSEARCH,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.POSTGRESQL,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.BASTION,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.LOCALHOST,
 		},
 	}
 }
 
-func IsEmptyExternalOS(externalOS *models.ExternalOS) bool {
-	return externalOS.OSDomainName == "" ||
-		externalOS.OSDomainURL == "" ||
-		externalOS.OSUsername == "" ||
-		externalOS.OSUserPassword == "" ||
-		externalOS.OSCert == "" ||
-		externalOS.OSRoleArn == ""
+func NilRespForA2CS(checkType string) []models.CheckTriggerResponse {
+	return []models.CheckTriggerResponse{
+		{
+			NodeType:  constants.AUTOMATE,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.CHEF_INFRA_SERVER,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+	}
 }
 
-func IsEmptyExternalPG(externalPG *models.ExternalPG) bool {
-	return externalPG.PGInstanceURL == "" ||
-		externalPG.PGSuperuserName == "" ||
-		externalPG.PGSuperuserPassword == "" ||
-		externalPG.PGDbUserName == "" ||
-		externalPG.PGDbUserPassword == "" ||
-		externalPG.PGRootCert == ""
+func NilRespForA2CSOSPG(checkType string) []models.CheckTriggerResponse {
+	return []models.CheckTriggerResponse{
+		{
+			NodeType:  constants.AUTOMATE,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.CHEF_INFRA_SERVER,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.OPENSEARCH,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+		{
+			NodeType:  constants.POSTGRESQL,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNONHOST,
+		},
+	}
 }

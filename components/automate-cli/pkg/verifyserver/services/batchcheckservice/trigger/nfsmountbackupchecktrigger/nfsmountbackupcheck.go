@@ -7,10 +7,12 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type NfsBackupConfigCheck struct {
@@ -28,6 +30,15 @@ func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigChe
 }
 
 func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.Hardware == nil {
+		return trigger.NilRespForA2CSOSPG(constants.NFS_BACKUP_CONFIG)
+	}
+	if config.Backup.FileSystem == nil {
+		return nilNFSMountBackupResp(config, constants.NFS_BACKUP_CONFIG)
+	}
+	if isBackupEmpty(config.Backup) {
+		return emptyNFSMountBackupResp(config, constants.NFS_BACKUP_CONFIG)
+	}
 
 	nfsMountReq := models.NFSMountRequest{
 		AutomateNodeIPs:        config.Hardware.AutomateNodeIps,
@@ -114,4 +125,73 @@ func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTri
 func (ss *NfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
+}
+
+func isBackupEmpty(backup *models.Backup) bool {
+	return (backup.FileSystem.MountLocation == "")
+}
+
+func nilNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
+}
+
+func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checktype,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checktype,
+		},
+		Host: ip,
+	}
+}
+
+func emptyNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
+}
+
+func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: "MountLocation is missing",
+			},
+			Check: checkType,
+		},
+	}
 }

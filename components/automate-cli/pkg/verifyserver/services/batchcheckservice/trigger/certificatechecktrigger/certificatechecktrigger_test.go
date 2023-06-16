@@ -565,23 +565,74 @@ func TestCertificateCheck_Run(t *testing.T) {
 		}
 	})
 
-	t.Run("Empty OS or PG", func(t *testing.T) {
+	t.Run("Nil Cert", func(t *testing.T) {
 		config := &models.Config{
 			Hardware: &models.Hardware{
-				AutomateNodeCount: 1,
-				AutomateNodeIps:   []string{"12.12.1.2"},
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
 			},
-			ExternalOS: externalOS,
-			ExternalPG: &models.ExternalPG{},
+			Certificate: nil,
 		}
 
 		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
 		ctr := suc.Run(config)
 
-		require.Len(t, ctr, 1)
-		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
-		assert.Equal(t, "External OS or PG configuration is missing", ctr[0].Result.Error.Error())
+		require.Len(t, ctr, 4)
+		assert.Equal(t, "12.12.1.7", ctr[1].Host)
+		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
+		assert.Nil(t, ctr[0].Result.Error)
+		require.True(t, ctr[0].Result.Skipped)
 	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:    nil,
+			Certificate: nil,
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 4)
+
+		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
+		assert.Equal(t, constants.UNKNONHOST, ctr[0].Host)
+		require.True(t, ctr[0].Result.Skipped)
+	})
+
+	t.Run("Empty Cert", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.2"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.3"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.4"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.5"},
+			},
+			Certificate: &models.Certificate{},
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 4)
+
+		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
+		assert.Equal(t, "12.12.1.3", ctr[1].Host)
+		require.False(t, ctr[0].Result.Skipped)
+		require.Equal(t, http.StatusBadRequest, ctr[2].Result.Error.Code)
+		require.Equal(t, "Certificate is missing", ctr[3].Result.Error.Message)
+	})
+
 }
 
 func TestGetPortsForMockServer(t *testing.T) {

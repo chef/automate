@@ -346,6 +346,10 @@ func (ss *BatchCheckService) getPortsToOpenForCheck(check string) map[string]map
 }
 
 func (ss *BatchCheckService) getDeploymentState(config *models.Config) (string, error) {
+	if config.Hardware == nil {
+		return "", errors.New("automate nodes not present")
+	}
+
 	if config.Hardware.AutomateNodeCount > 0 {
 		for index, ip := range config.Hardware.AutomateNodeIps {
 			result, err := ss.getStatusFromNode(ip)

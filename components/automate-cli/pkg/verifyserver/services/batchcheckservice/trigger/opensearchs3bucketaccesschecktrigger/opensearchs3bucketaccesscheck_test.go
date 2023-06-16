@@ -176,36 +176,6 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			response:         "error while connecting to the endpoint, received invalid status code",
 			isError:          true,
 		},
-		{
-			name: "OS Nil",
-			args: args{
-				config: &models.Config{
-					ExternalOS: nil,
-					Backup: &models.Backup{
-						ObjectStorage: s3Properties,
-					},
-				},
-			},
-			httpResponseCode: http.StatusOK,
-			isPassed:         true,
-			response:         apiTriggerResponseSuccess,
-			isError:          false,
-		},
-		{
-			name: "OS empty",
-			args: args{
-				config: &models.Config{
-					ExternalOS: &models.ExternalOS{},
-					Backup: &models.Backup{
-						ObjectStorage: s3Properties,
-					},
-				},
-			},
-			httpResponseCode: http.StatusInternalServerError,
-			isPassed:         false,
-			response:         "External OS or PG configuration is missing",
-			isError:          true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -2,7 +2,6 @@ package firewallchecktrigger
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"io"
 	"net/http"
@@ -583,13 +582,10 @@ func TestFirewallCheck_Run(t *testing.T) {
 			invalidParseResponse: true,
 		},
 		{
-			name: "OS PG nil",
+			name: "Hardware Nil",
 			args: args{
 				config: &models.Config{
-					Hardware: &models.Hardware{
-						AutomateNodeIps:   []string{"10.0.0.1"},
-						PostgresqlNodeIps: []string{"10.0.0.3"},
-					},
+					Hardware: nil,
 					Certificate: &models.Certificate{
 						RootCert: "test-cert",
 						Nodes:    nodes,
@@ -627,9 +623,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 						assert.NotNil(t, got[i].Host)
 					}
 
-				} else if tt.name == "OS PG nil" {
-					fmt.Printf("OS PG nil got: %+v\n", got)
-					assert.Len(t, got, 2)
+				} else if tt.name == "Hardware Nil" {
+					assert.Len(t, got, 5)
 					require.True(t, got[0].Result.Skipped)
 					require.True(t, got[1].Result.Skipped)
 				} else {

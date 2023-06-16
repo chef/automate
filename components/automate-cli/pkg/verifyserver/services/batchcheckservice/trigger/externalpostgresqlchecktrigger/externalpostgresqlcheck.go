@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ExternalPostgresCheck struct {
@@ -24,12 +25,15 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 }
 
 func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	if config.ExternalPG == nil {
-		return trigger.ExternalOSPGNillResp(config)
+	// Check for nil or empty req body
+	if config.Hardware == nil {
+		return trigger.NilRespForA2CS(constants.EXTERNAL_POSTGRESQL)
 	}
-
-	if trigger.IsEmptyExternalPG(config.ExternalPG) {
-		return trigger.ExternalOSPGEmptyResp(config)
+	if config.ExternalPG == nil {
+		return externalPGNillResp(config, constants.EXTERNAL_POSTGRESQL)
+	}
+	if isEmptyExternalPG(config.ExternalPG) {
+		return externalPGEmptyResp(config, constants.EXTERNAL_POSTGRESQL)
 	}
 
 	return runCheckForPostgresql(config, epc.port, epc.log)
@@ -81,5 +85,73 @@ func getPostgresRequest(details *models.ExternalPG) models.ExternalPgRequest {
 		PostgresqlDbUserUserName:    details.PGDbUserName,
 		PostgresqlDbUserPassword:    details.PGDbUserPassword,
 		PostgresqlRootCert:          details.PGRootCert,
+	}
+}
+
+func externalPGNillResp(config *models.Config, checkType string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE))
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER))
+	}
+
+	return triggerResps
+}
+
+func GetSkippedTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+		},
+		Host: ip,
+	}
+}
+
+func isEmptyExternalPG(externalPG *models.ExternalPG) bool {
+	return externalPG.PGInstanceURL == "" ||
+		externalPG.PGSuperuserName == "" ||
+		externalPG.PGSuperuserPassword == "" ||
+		externalPG.PGDbUserName == "" ||
+		externalPG.PGDbUserPassword == "" ||
+		externalPG.PGRootCert == ""
+}
+
+func externalPGEmptyResp(config *models.Config, checkType string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+	count := 0
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.AUTOMATE))
+		count++
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.CHEF_INFRA_SERVER))
+		count++
+	}
+
+	return triggerResps
+}
+
+func createErrorResponse(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: "PG configuration is missing",
+			},
+			Check: checkType,
+		},
 	}
 }

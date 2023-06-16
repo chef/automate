@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type CertificateCheck struct {
@@ -26,10 +27,15 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 
 func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
-
-	resp, ok := trigger.CheckEmptyOrNilExternalConfig(config)
-	if ok {
-		return resp
+	if config.Hardware == nil {
+		return trigger.NilRespForA2CSOSPG(constants.CERTIFICATE)
+	}
+	// Check if certificate is empty or nil
+	if config.Certificate == nil {
+		return nilCertificateResp(config, constants.CERTIFICATE)
+	}
+	if IsCertificateEmpty(config.Certificate) {
+		return emptyCertificateResp(config, constants.CERTIFICATE)
 	}
 
 	count := 0
@@ -69,4 +75,73 @@ func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResp
 func (ss *CertificateCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
+}
+
+func nilCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
+}
+
+func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checktype,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checktype,
+		},
+		Host: ip,
+	}
+}
+
+func IsCertificateEmpty(certificate *models.Certificate) bool {
+	return (certificate.AutomateFqdn == "" || certificate.ChefServerFqdn == "" || certificate.RootCert == "" || len(certificate.Nodes) == 0)
+}
+
+func emptyCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
+}
+
+func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: "Certificate is missing",
+			},
+			Check: checkType,
+		},
+	}
 }

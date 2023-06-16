@@ -23,6 +23,8 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 }
 
 func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	// TODO: check here
+
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
 }

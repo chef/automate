@@ -834,3 +834,75 @@ func TestGetPortsForMockServer(t *testing.T) {
 
 	assert.Equal(t, 0, len(resp))
 }
+
+func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing.T) {
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: nil,
+		}
+
+		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+	})
+
+	t.Run("Nil FileSystem", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			Backup: &models.Backup{
+				FileSystem: nil,
+			},
+		}
+
+		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, "12.12.1.6", got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+	})
+	t.Run("Empty FileSystem", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			Backup: &models.Backup{
+				FileSystem: &models.FileSystem{},
+			},
+		}
+
+		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, "12.12.1.6", got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
+		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].Result.Check)
+		assert.Equal(t, http.StatusBadRequest, got[3].Result.Error.Code)
+		assert.Equal(t, "MountLocation is missing", got[3].Result.Error.Message)
+		assert.False(t, got[0].Result.Skipped)
+	})
+
+}
