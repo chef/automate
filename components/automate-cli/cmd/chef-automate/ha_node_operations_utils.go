@@ -524,9 +524,13 @@ func trimSliceSpace(slc []string) []string {
 	return slc
 }
 
-func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP) error {
+func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]string, newIps []string, certsIp *[]CertByIP, sshConfig *SSHConfig) error {
 	if len(newIps) == 0 {
 		return nil
+	}
+	var allNodesUnreachable bool
+	if len(*existingPrivateIPs) == 0 {
+		allNodesUnreachable = true
 	}
 	*existingPrivateIPs = append(*existingPrivateIPs, newIps...)
 	inc, err := modifyInstanceCount(*instanceCount, len(newIps))
@@ -543,6 +547,28 @@ func modifyConfigForAddNewNode(instanceCount *string, existingPrivateIPs *[]stri
 				NodesDn:    (*certsIp)[len(*certsIp)-1].NodesDn,
 			}
 			*certsIp = append(*certsIp, c)
+		}
+	}
+	if allNodesUnreachable {
+		// Making new node as our automate_bootstrap node
+		sshConfig.hostIP = newIps[0]
+		sshUtil := NewSSHUtil(sshConfig)
+		// Creating User, Group and then adding user into group.
+		// then creating directory and setting it's permission (hab:hab).
+		commands := `id -u hab &>/dev/null || sudo useradd hab
+sudo groupadd -f hab
+sudo usermod -a -G hab hab
+sudo mkdir -p /hab/var/automate-ha
+sudo chown hab:hab /hab/var/automate-ha
+		`
+		_, err = sshUtil.connectAndExecuteCommandOnRemote(commands, true)
+		if err != nil {
+			return err
+		}
+		// Copying old bootstrap.abb file from bastion to fresh first node
+		err = sshUtil.copyFileToRemote("/hab/a2_deploy_workspace/terraform/bootstrap*.abb", "/hab/var/automate-ha/bootstrap.abb", false)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

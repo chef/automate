@@ -41,6 +41,7 @@ func addNodeHACmd() *cobra.Command {
 	addNodeHACmd.PersistentFlags().BoolVar(&addDeleteNodeHACmdFlags.onPremMode, "onprem-mode", false, "Use this flag if the deployment type is on prem")
 	addNodeHACmd.PersistentFlags().BoolVar(&addDeleteNodeHACmdFlags.awsMode, "aws-mode", false, "Use this flag if the deployment type is AWS")
 	addNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.autoAccept, "auto-accept", "y", false, "auto-accept")
+	addNodeHACmd.PersistentFlags().BoolVarP(&addDeleteNodeHACmdFlags.force, "force", "f", false, "Use this flag if want to re-use already deployed nodes")
 
 	return addNodeHACmd
 }
