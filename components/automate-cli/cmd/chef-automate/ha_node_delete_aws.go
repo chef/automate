@@ -107,16 +107,6 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	}
 
 	err = dna.runDeploy()
-
-	syncErr := dna.nodeUtils.syncConfigToAllNodes()
-	if syncErr != nil {
-		if err != nil {
-			err = errors.Wrap(err, syncErr.Error())
-		} else {
-			err = syncErr
-		}
-	}
-
 	currentCount, newErr := dna.nodeUtils.calculateTotalInstanceCount()
 	if newErr != nil {
 		if err != nil {
@@ -231,7 +221,15 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 		return err
 	}
 
-	return dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	syncErr := dna.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }
 
 func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
