@@ -683,6 +683,18 @@ func TestAddnodeExecuteSaveConfigFromAllNodeType(t *testing.T) {
 		err := nodeAdd.Execute(nil, nil)
 		assert.Error(t, err, "error fetching config")
 	})
+
+	t.Run("no error", func(t *testing.T) {
+
+		mockNodeUtil.saveConfigToBastionFunc = func() error {
+			return nil
+		}
+		mockNodeUtil.pullAndUpdateConfigFunc = PullConfFunc
+		nodeAdd := createNewAddNodeOnprem(mockNodeUtil, nil, w)
+
+		err := nodeAdd.Execute(nil, nil)
+		assert.NoError(t, err)
+	})
 }
 
 func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {

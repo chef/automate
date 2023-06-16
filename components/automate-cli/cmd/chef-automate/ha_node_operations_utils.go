@@ -68,7 +68,6 @@ type NodeOpUtils interface {
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCount() (int, error)
 	parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error
-	executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
 	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
 	saveConfigToBastion() error
 	syncConfigToAllNodes() error
@@ -251,16 +250,16 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 
 func (nu *NodeUtilsImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return nu.executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR)
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
 }
 
 func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return nu.executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "")
+	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", nu)
 }
 
 // Execute custom command in one node of all the each node-type
-func (nu *NodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
 		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
@@ -790,14 +789,13 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 	destString := string(tomlbyt)
 	var dest dc.AutomateConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
 	// Ignoring cert values for "global.v1.frontend_tls"
 	if dest.Global != nil &&
 		dest.Global.V1 != nil &&
 		len(dest.Global.V1.FrontendTls) != 0 {
-
 		dest.Global.V1.FrontendTls = nil
 	}
 
