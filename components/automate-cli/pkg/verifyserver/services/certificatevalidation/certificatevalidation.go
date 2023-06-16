@@ -75,9 +75,6 @@ func (vc *ValidateCertificateService) validateCertificateExpiry(certificates map
 
 	for _, key := range keys {
 		cert := certificates[key]
-		if key == constants.ROOT && cert == "" {
-			continue
-		}
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
@@ -117,9 +114,6 @@ func (vc *ValidateCertificateService) validateCertificateFormat(certificates map
 
 	for _, key := range keys {
 		cert := certificates[key]
-		if key == constants.ROOT && cert == "" {
-			continue
-		}
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
@@ -181,10 +175,6 @@ func (vc *ValidateCertificateService) validateCertificateAlgorithm(certificates 
 
 	for _, key := range keys {
 		cert := certificates[key]
-
-		if key == constants.ROOT && cert == "" {
-			continue
-		}
 		certificate, err := decodeAndParseCertificate(cert, key)
 		if err != nil {
 			vc.log.Error(err)
@@ -217,14 +207,17 @@ func (vc *ValidateCertificateService) CertificateValidation(req models.Certifica
 	var response = models.CertificateCheckResponse{}
 
 	// certKeys and keys arrays are required to maintain the order of correct response messages.
-	certKeys := []string{constants.ROOT, constants.NODE}
+	certKeys := []string{constants.NODE}
 	keys := []string{constants.NODE_KEY}
 
 	// certificates map is used for storing Root Certificate, Node Certificate and if it is a case of opensearch then Admin Certificate.
 	certificates := make(map[string]string)
 	// privateKeys map is used for storing Private Key and if it is a case of opensearch then Admin Private Key.
 	privateKeys := make(map[string]string)
-	certificates[constants.ROOT] = req.RootCertificate
+	if strings.TrimSpace(req.RootCertificate) != "" {
+		certificates[constants.ROOT] = req.RootCertificate
+		certKeys = append(certKeys, constants.ROOT)
+	}
 	certificates[constants.NODE] = req.NodeCertificate
 	privateKeys[constants.NODE_KEY] = req.PrivateKey
 

@@ -1,6 +1,7 @@
 package certificatevalidation_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
@@ -250,348 +251,348 @@ func TestCertificateValidation(t *testing.T) {
 		ReqBody         models.CertificateCheckRequest
 		ExpectedResBody models.CertificateCheckResponse
 	}{
-		// {
-		// 	TestName: "All Certificates are valid",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  ROOT_CERTIFICATE,
-		// 		PrivateKey:       PRIVATE_KEY,
-		// 		NodeCertificate:  NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: ADMIN_CERTIFICATE,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: true,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Root Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo and Node Certificate is expired.",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  CERT_WITH_INVALID_FORMAT_HASH_ALGO,
-		// 		PrivateKey:       PRIVATE_KEY,
-		// 		NodeCertificate:  EXPIRED_NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: ADMIN_CERTIFICATE,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprint(fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.NODE) + "; " + fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ROOT)),
-		// 				ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, fmt.Sprintf("%s, %s", constants.ROOT, constants.NODE)),
-		// 				ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Node Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate: ROOT_CERTIFICATE,
-		// 		PrivateKey:      PRIVATE_KEY,
-		// 		NodeCertificate: CERT_WITH_INVALID_FORMAT_HASH_ALGO,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.NODE),
-		// 				ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.NODE),
-		// 				ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.NODE),
-		// 				ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.NODE),
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Admin Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  ROOT_CERTIFICATE,
-		// 		PrivateKey:       PRIVATE_KEY,
-		// 		NodeCertificate:  NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: CERT_WITH_INVALID_FORMAT_HASH_ALGO,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ADMIN),
-		// 				ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ADMIN),
-		// 				ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ADMIN),
-		// 				ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ADMIN),
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Invalid Block Root Certificate",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  INVALID_BLOCK,
-		// 		PrivateKey:       PRIVATE_KEY,
-		// 		NodeCertificate:  NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: ADMIN_CERTIFICATE,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Failed to Parse Root Certificate",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  INVALID_ROOT_CERTIFICATE,
-		// 		PrivateKey:       PRIVATE_KEY,
-		// 		NodeCertificate:  NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: ADMIN_CERTIFICATE,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
-		// 				ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Invalid Block for Private Key",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  ROOT_CERTIFICATE,
-		// 		PrivateKey:       INVALID_BLOCK,
-		// 		NodeCertificate:  NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: ADMIN_CERTIFICATE,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
-		// 				ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	TestName: "Private Key is not in PKCS8 format",
-		// 	ReqBody: models.CertificateCheckRequest{
-		// 		RootCertificate:  ROOT_CERTIFICATE,
-		// 		PrivateKey:       INVALID_KEY_FORMAT,
-		// 		NodeCertificate:  NODE_CERTIFICATE,
-		// 		AdminPrivateKey:  ADMIN_PRIVATE_KEY,
-		// 		AdminCertificate: ADMIN_CERTIFICATE,
-		// 	},
-		// 	ExpectedResBody: models.CertificateCheckResponse{
-		// 		Passed: false,
-		// 		Checks: []models.Checks{
-		// 			{
-		// 				Title:         constants.CERTIFICATE_EXPIRY_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_FORMAT_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 			{
-		// 				Title:         constants.KEY_FORMAT_TITLE,
-		// 				Passed:        false,
-		// 				SuccessMsg:    "",
-		// 				ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
-		// 				ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
-		// 			},
-		// 			{
-		// 				Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
-		// 				Passed:        true,
-		// 				SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
-		// 				ErrorMsg:      "",
-		// 				ResolutionMsg: "",
-		// 			},
-		// 		},
-		// 	},
-		// },
+		{
+			TestName: "All Certificates are valid",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  ROOT_CERTIFICATE,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: true,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
+		},
+		{
+			TestName: "Root Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo and Node Certificate is expired.",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  EXPIRED_NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprint(fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.NODE) + "; " + fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ROOT)),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, fmt.Sprintf("%s, %s", constants.ROOT, constants.NODE)),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Node Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate: ROOT_CERTIFICATE,
+				PrivateKey:      PRIVATE_KEY,
+				NodeCertificate: CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.NODE),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.NODE),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.NODE),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.NODE),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Admin Certificate is about to expire, not in x509 v3 format, uses incorrect Hash Algo",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  ROOT_CERTIFICATE,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: CERT_WITH_INVALID_FORMAT_HASH_ALGO,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_INVALID_EXPIRY_MESSAGE, constants.ADMIN),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ADMIN),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ADMIN),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ADMIN),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Invalid Block Root Certificate",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  INVALID_BLOCK,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Failed to Parse Root Certificate",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  INVALID_ROOT_CERTIFICATE,
+				PrivateKey:       PRIVATE_KEY,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_EXPIRY_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: constants.CERTIFICATE_EXPIRY_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_FORMAT_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: constants.CERTIFICATE_FORMAT_RESOLUTION_MESSAGE,
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.KEY_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_ERROR_MESSAGE, constants.ROOT),
+						ResolutionMsg: fmt.Sprintf(constants.CERTIFICATE_ALGORITHM_RESOLUTION_MESSAGE, constants.ROOT),
+					},
+				},
+			},
+		},
+		{
+			TestName: "Invalid Block for Private Key",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  ROOT_CERTIFICATE,
+				PrivateKey:       INVALID_BLOCK,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
+						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
+		},
+		{
+			TestName: "Private Key is not in PKCS8 format",
+			ReqBody: models.CertificateCheckRequest{
+				RootCertificate:  ROOT_CERTIFICATE,
+				PrivateKey:       INVALID_KEY_FORMAT,
+				NodeCertificate:  NODE_CERTIFICATE,
+				AdminPrivateKey:  ADMIN_PRIVATE_KEY,
+				AdminCertificate: ADMIN_CERTIFICATE,
+			},
+			ExpectedResBody: models.CertificateCheckResponse{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title:         constants.CERTIFICATE_EXPIRY_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_EXPIRY_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.CERTIFICATE_FORMAT_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_FORMAT_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+					{
+						Title:         constants.KEY_FORMAT_TITLE,
+						Passed:        false,
+						SuccessMsg:    "",
+						ErrorMsg:      fmt.Sprintf(constants.KEY_FORMAT_ERROR_MESSAGE, constants.NODE_KEY),
+						ResolutionMsg: fmt.Sprintf(constants.KEY_FORMAT_RESOLUTION_MESSAGE, constants.NODE_KEY),
+					},
+					{
+						Title:         constants.CERTIFICATE_ALGORITHM_TITLE,
+						Passed:        true,
+						SuccessMsg:    constants.CERTIFICATE_ALGORITHM_SUCCESS_MESSAGE,
+						ErrorMsg:      "",
+						ResolutionMsg: "",
+					},
+				},
+			},
+		},
 		{
 			TestName: "There is no root certificate",
 			ReqBody: models.CertificateCheckRequest{
