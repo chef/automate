@@ -7,10 +7,10 @@ import (
 )
 
 type MockBatchCheckService struct {
-	BatchCheckFunc func([]string, models.Config) (models.BatchCheckResponse, error)
+	BatchCheckFunc func([]string, *models.Config) (models.BatchCheckResponse, error)
 }
 
-func (mss *MockBatchCheckService) BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error) {
+func (mss *MockBatchCheckService) BatchCheck(checks []string, config *models.Config) (models.BatchCheckResponse, error) {
 	return mss.BatchCheckFunc(checks, config)
 }
 

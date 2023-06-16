@@ -824,7 +824,7 @@ func TestGetDeploymentStateReturnsErrorWhenAutomateNotReachable(t *testing.T) {
 	ss := getBatchCheckServiceInstance()
 
 	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
-	_, err := ss.getDeploymentState(models.Config{
+	_, err := ss.getDeploymentState(&models.Config{
 		Hardware: &models.Hardware{
 			AutomateNodeCount: 2,
 			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
@@ -837,7 +837,7 @@ func TestGetDeploymentStateReturnsErrorNoAutomateNodePresent(t *testing.T) {
 	ss := getBatchCheckServiceInstance()
 
 	ss.httpRequestClient = SetupMockHttpRequestClient("", errors.New("error occurred"), true)
-	_, err := ss.getDeploymentState(models.Config{
+	_, err := ss.getDeploymentState(&models.Config{
 		Hardware: &models.Hardware{
 			AutomateNodeCount: 0,
 			AutomateNodeIps:   []string{"1.2.3.4", "1,2,3.5"},
@@ -856,7 +856,7 @@ func TestStopMockServerOnHostAndPortPostDeploy(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	deployState, _ := ss.getDeploymentState(models.Config{
+	deployState, _ := ss.getDeploymentState(&models.Config{
 		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
@@ -881,7 +881,7 @@ func TestStopMockServerOnHostAndPortPostDeployWhenServicesStopped(t *testing.T) 
 			"error": ""
 		}
 	}`, nil, false)
-	deployState, _ := ss.getDeploymentState(models.Config{
+	deployState, _ := ss.getDeploymentState(&models.Config{
 		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},

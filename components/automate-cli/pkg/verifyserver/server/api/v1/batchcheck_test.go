@@ -3,6 +3,7 @@ package v1_test
 import (
 	"errors"
 	"io"
+	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -20,7 +21,7 @@ import (
 
 func SetupMockBatchCheckService(errorFromBatchCheck bool) batchcheckservice.IBatchCheckService {
 	return &batchcheckservice.MockBatchCheckService{
-		BatchCheckFunc: func(checks []string, config models.Config) (models.BatchCheckResponse, error) {
+		BatchCheckFunc: func(checks []string, config *models.Config) (models.BatchCheckResponse, error) {
 			if errorFromBatchCheck {
 				return models.BatchCheckResponse{}, errors.New("error occurred in batch check service")
 			}

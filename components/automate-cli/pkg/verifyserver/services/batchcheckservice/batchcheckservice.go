@@ -20,7 +20,7 @@ import (
 )
 
 type IBatchCheckService interface {
-	BatchCheck(checks []string, config models.Config) (models.BatchCheckResponse, error)
+	BatchCheck(checks []string, config *models.Config) (models.BatchCheckResponse, error)
 }
 
 type BatchCheckService struct {
@@ -345,7 +345,7 @@ func (ss *BatchCheckService) getPortsToOpenForCheck(check string) map[string]map
 	return ss.getCheckInstance(check).GetPortsForMockServer()
 }
 
-func (ss *BatchCheckService) getDeploymentState(config models.Config) (string, error) {
+func (ss *BatchCheckService) getDeploymentState(config *models.Config) (string, error) {
 	if config.Hardware.AutomateNodeCount > 0 {
 		for index, ip := range config.Hardware.AutomateNodeIps {
 			result, err := ss.getStatusFromNode(ip)

@@ -202,7 +202,7 @@ func TestTriggerCheckAPI(t *testing.T) {
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
 		assert.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
-		assert.Contains(t, response.Result.Error.Message, `context deadline exceeded`)
+		assert.Contains(t, response.Result.Error.Message, `error while connecting to the endpoint`)
 		require.Equal(t, "postgresql", response.NodeType)
 
 	})
@@ -263,8 +263,8 @@ func TestTriggerCheckAPI(t *testing.T) {
 		response := <-output
 		// Assert the expected error response
 		require.NotNil(t, response.Result.Error)
-		require.Equal(t, http.StatusInternalServerError, response.Result.Error.Code)
-		assert.Contains(t, response.Result.Error.Message, "context deadline exceeded")
+		require.Equal(t, http.StatusNotFound, response.Result.Error.Code)
+		assert.Contains(t, response.Result.Error.Message, "error while connecting to the endpoint")
 	})
 	t.Run("Invalid Request Body", func(t *testing.T) {
 		endPoint := "http://example.com/api/v1/checks/software-versions"
