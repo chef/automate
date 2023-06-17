@@ -110,11 +110,12 @@ func TestCopyCertsByIP(t *testing.T) {
 
 func TestCopyEc2InstanceConfig(t *testing.T) {
 	// Mock input values
-	var awsConfigSetting = &config.ConfigAwsSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
 
 	// Call the function
-	CopyEc2InstanceConfig(awsConfigSetting, awsEc2InstanceConfig)
+	haDeployConfig = CopyEc2InstanceConfig(haDeployConfig, awsEc2InstanceConfig)
 
+	awsConfigSetting := haDeployConfig.Aws.Config
 	// Verify the copied values
 	assert.Equal(t, awsConfigSetting.AmiID, awsEc2InstanceConfig.Aws.Config.AmiID)
 	assert.Equal(t, awsConfigSetting.DeleteOnTermination, awsEc2InstanceConfig.Aws.Config.DeleteOnTermination)
@@ -137,14 +138,15 @@ func TestCopyEc2InstanceConfig(t *testing.T) {
 	assert.Equal(t, awsConfigSetting.PostgresqlEbsVolumeSize, awsEc2InstanceConfig.Aws.Config.PostgresqlEbsVolumeSize)
 	assert.Equal(t, awsConfigSetting.PostgresqlEbsVolumeType, awsEc2InstanceConfig.Aws.Config.PostgresqlEbsVolumeType)
 	assert.Equal(t, awsConfigSetting.LbAccessLogs, awsEc2InstanceConfig.Aws.Config.LBAccessLogs)
+
 }
 
 func TestCopyManagedServices(t *testing.T) {
 
-	haConfigAws := &config.ConfigAwsSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
 
-	CopyManagedServices(haConfigAws, awsManagedServicesConfig)
-
+	haDeployConfig = CopyManagedServices(haDeployConfig, awsManagedServicesConfig)
+	haConfigAws := haDeployConfig.Aws.Config
 	// Assert the copied values
 	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchDomainName, haConfigAws.ManagedOpensearchDomainName)
 	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchDomainUrl, haConfigAws.ManagedOpensearchDomainURL)
@@ -160,13 +162,15 @@ func TestCopyManagedServices(t *testing.T) {
 	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSInstanceUrl, haConfigAws.ManagedRdsInstanceURL)
 	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSSuperUserPassword, haConfigAws.ManagedRdsSuperuserPassword)
 	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSSuperUserName, haConfigAws.ManagedRdsSuperuserUsername)
+
 }
 
 func TestCopyAwsNetworkConfig(t *testing.T) {
-	haConfigAws := &config.ConfigAwsSettings{}
 
-	CopyAwsNetworkConfig(haConfigAws, awsNetworkConfig)
+	haDeployConfig := &config.HaDeployConfig{}
 
+	haDeployConfig = CopyAwsNetworkConfig(haDeployConfig, awsNetworkConfig)
+	haConfigAws := haDeployConfig.Aws.Config
 	// Assert the copied values
 	assert.Equal(t, awsNetworkConfig.Aws.Config.Profile, haConfigAws.Profile)
 	assert.Equal(t, awsNetworkConfig.Aws.Config.Region, haConfigAws.Region)
@@ -178,16 +182,17 @@ func TestCopyAwsNetworkConfig(t *testing.T) {
 }
 
 func TestCopyAwsConfig(t *testing.T) {
-	haConfigAws := &config.ConfigAwsSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
 	// Test copying Managed Services
 	awsManagedServicesConfig.Aws.Config.SetupManagedServices = true
-	CopyAwsConfig(haConfigAws, awsManagedServicesConfig)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSSuperUserPassword, haConfigAws.ManagedRdsSuperuserPassword)
+	haDeployConfig = CopyAwsConfig(haDeployConfig, awsManagedServicesConfig)
+	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSSuperUserPassword, haDeployConfig.Aws.Config.ManagedRdsSuperuserPassword)
+
 }
 
 func TestCopyConfigInitials(t *testing.T) {
 	// Prepare test data
-	haDeployConfigConfigInitials := &config.ConfigInitials{}
+	haDeployConfig := &config.HaDeployConfig{}
 	existingInfraConfig := &ExistingInfraConfigToml{
 		Architecture: ExistingInfraArchitectureToml{
 			ConfigInitials: ExistingInfraConfigInitialsToml{
@@ -228,46 +233,48 @@ func TestCopyConfigInitials(t *testing.T) {
 	}
 
 	// Test when awsConfig is not nil
-	CopyConfigInitials(haDeployConfigConfigInitials, nil, awsConfig)
-
+	haDeployConfig = CopyConfigInitials(haDeployConfig, nil, awsConfig)
+	haDeployConfigConfigInitialsAws := haDeployConfig.Architecture.Aws
 	// Assert the copied values from awsConfig.ConfigInitials
-	assert.Equal(t, "aws-ssh-user", haDeployConfigConfigInitials.SSHUser)
-	assert.Equal(t, "aws-architecture", haDeployConfigConfigInitials.Architecture)
-	assert.Equal(t, "s3", haDeployConfigConfigInitials.BackupConfig)
-	assert.Equal(t, "aws-s3-bucket", haDeployConfigConfigInitials.S3BucketName)
-	assert.Equal(t, "/aws/backup/mount", haDeployConfigConfigInitials.BackupMount)
-	assert.Equal(t, "aws-habitat-uid-gid", haDeployConfigConfigInitials.HabitatUIDGid)
-	assert.Equal(t, "false", haDeployConfigConfigInitials.LoggingMonitoringManagement)
-	assert.Equal(t, "aws-ssh-group", haDeployConfigConfigInitials.SSHGroupName)
-	assert.Equal(t, "/aws/ssh/key/file", haDeployConfigConfigInitials.SSHKeyFile)
-	assert.Equal(t, "2222", haDeployConfigConfigInitials.SSHPort)
-	assert.Equal(t, "/aws/secrets/key/file", haDeployConfigConfigInitials.SecretsKeyFile)
-	assert.Equal(t, "/aws/secrets/store/file", haDeployConfigConfigInitials.SecretsStoreFile)
-	assert.Equal(t, "/aws/workspace/path", haDeployConfigConfigInitials.WorkspacePath)
-	assert.Equal(t, "", haDeployConfigConfigInitials.SudoPassword)
+	assert.Equal(t, "aws-ssh-user", haDeployConfigConfigInitialsAws.SSHUser)
+	assert.Equal(t, "aws-architecture", haDeployConfigConfigInitialsAws.Architecture)
+	assert.Equal(t, "s3", haDeployConfigConfigInitialsAws.BackupConfig)
+	assert.Equal(t, "aws-s3-bucket", haDeployConfigConfigInitialsAws.S3BucketName)
+	assert.Equal(t, "/aws/backup/mount", haDeployConfigConfigInitialsAws.BackupMount)
+	assert.Equal(t, "aws-habitat-uid-gid", haDeployConfigConfigInitialsAws.HabitatUIDGid)
+	assert.Equal(t, "false", haDeployConfigConfigInitialsAws.LoggingMonitoringManagement)
+	assert.Equal(t, "aws-ssh-group", haDeployConfigConfigInitialsAws.SSHGroupName)
+	assert.Equal(t, "/aws/ssh/key/file", haDeployConfigConfigInitialsAws.SSHKeyFile)
+	assert.Equal(t, "2222", haDeployConfigConfigInitialsAws.SSHPort)
+	assert.Equal(t, "/aws/secrets/key/file", haDeployConfigConfigInitialsAws.SecretsKeyFile)
+	assert.Equal(t, "/aws/secrets/store/file", haDeployConfigConfigInitialsAws.SecretsStoreFile)
+	assert.Equal(t, "/aws/workspace/path", haDeployConfigConfigInitialsAws.WorkspacePath)
+	assert.Equal(t, "", haDeployConfigConfigInitialsAws.SudoPassword)
 
 	// Test when awsConfig is nil
-	CopyConfigInitials(haDeployConfigConfigInitials, existingInfraConfig, nil)
-
+	haDeployConfig = CopyConfigInitials(haDeployConfig, existingInfraConfig, nil)
+	haDeployConfigConfigInitialsExistingInfra := haDeployConfig.Architecture.ExistingInfra
 	// Assert the copied values from existingInfraConfig.ConfigInitials
-	assert.Equal(t, "existing-ssh-user", haDeployConfigConfigInitials.SSHUser)
-	assert.Equal(t, "existing-architecture", haDeployConfigConfigInitials.Architecture)
-	assert.Equal(t, "object_storage", haDeployConfigConfigInitials.BackupConfig)
-	assert.Equal(t, "/existing/backup/mount", haDeployConfigConfigInitials.BackupMount)
-	assert.Equal(t, "existing-habitat-uid-gid", haDeployConfigConfigInitials.HabitatUIDGid)
-	assert.Equal(t, "true", haDeployConfigConfigInitials.LoggingMonitoringManagement)
-	assert.Equal(t, "existing-ssh-group", haDeployConfigConfigInitials.SSHGroupName)
-	assert.Equal(t, "/existing/ssh/key/file", haDeployConfigConfigInitials.SSHKeyFile)
-	assert.Equal(t, "22", haDeployConfigConfigInitials.SSHPort)
-	assert.Equal(t, "/existing/secrets/key/file", haDeployConfigConfigInitials.SecretsKeyFile)
-	assert.Equal(t, "/existing/secrets/store/file", haDeployConfigConfigInitials.SecretsStoreFile)
-	assert.Equal(t, "/existing/workspace/path", haDeployConfigConfigInitials.WorkspacePath)
-	assert.Equal(t, "", haDeployConfigConfigInitials.SudoPassword)
+	assert.Equal(t, "existing-ssh-user", haDeployConfigConfigInitialsExistingInfra.SSHUser)
+	assert.Equal(t, "existing-architecture", haDeployConfigConfigInitialsExistingInfra.Architecture)
+	assert.Equal(t, "object_storage", haDeployConfigConfigInitialsExistingInfra.BackupConfig)
+	assert.Equal(t, "/existing/backup/mount", haDeployConfigConfigInitialsExistingInfra.BackupMount)
+	assert.Equal(t, "existing-habitat-uid-gid", haDeployConfigConfigInitialsExistingInfra.HabitatUIDGid)
+	assert.Equal(t, "true", haDeployConfigConfigInitialsExistingInfra.LoggingMonitoringManagement)
+	assert.Equal(t, "existing-ssh-group", haDeployConfigConfigInitialsExistingInfra.SSHGroupName)
+	assert.Equal(t, "/existing/ssh/key/file", haDeployConfigConfigInitialsExistingInfra.SSHKeyFile)
+	assert.Equal(t, "22", haDeployConfigConfigInitialsExistingInfra.SSHPort)
+	assert.Equal(t, "/existing/secrets/key/file", haDeployConfigConfigInitialsExistingInfra.SecretsKeyFile)
+	assert.Equal(t, "/existing/secrets/store/file", haDeployConfigConfigInitialsExistingInfra.SecretsStoreFile)
+	assert.Equal(t, "/existing/workspace/path", haDeployConfigConfigInitialsExistingInfra.WorkspacePath)
+	assert.Equal(t, "", haDeployConfigConfigInitialsExistingInfra.SudoPassword)
+
 }
 
 func TestCopyConfigObjectStorage(t *testing.T) {
 	// Prepare test data
-	haDeployConfigObjectStorageConfig := &config.ConfigObjectStorage{}
+	haDeployConfig := &config.HaDeployConfig{}
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		ObjectStorage: ObjectStorageToml{
 			Config: ObjectStorageConfigToml{
@@ -281,19 +288,21 @@ func TestCopyConfigObjectStorage(t *testing.T) {
 	}
 
 	// Invoke the function
-	CopyConfigObjectStorage(haDeployConfigObjectStorageConfig, existingInfraConfig)
-
+	haDeployConfig = CopyConfigObjectStorage(haDeployConfig, existingInfraConfig)
+	haDeployConfigObjectStorageConfig := haDeployConfig.ObjectStorage.Config
 	// Assert the copied values
 	assert.Equal(t, "existing-access-key", haDeployConfigObjectStorageConfig.AccessKey)
 	assert.Equal(t, "existing-bucket", haDeployConfigObjectStorageConfig.BucketName)
 	assert.Equal(t, "existing-endpoint", haDeployConfigObjectStorageConfig.Endpoint)
 	assert.Equal(t, "existing-region", haDeployConfigObjectStorageConfig.Region)
 	assert.Equal(t, "existing-secret-key", haDeployConfigObjectStorageConfig.SecretKey)
+
 }
 
 func TestCopyAutomateSettings(t *testing.T) {
 	// Prepare test data
-	haDeployConfigAutomateSettings := &config.ConfigAutomateSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		Automate: AutomateToml{
 			Config: AutomateConfigToml{
@@ -335,45 +344,48 @@ func TestCopyAutomateSettings(t *testing.T) {
 	}
 
 	// Test when awsConfig is not nil
-	CopyAutomateSettings(haDeployConfigAutomateSettings, nil, awsConfig)
+	haDeployConfig = CopyAutomateSettings(haDeployConfig, nil, awsConfig)
 
+	haDeployConfigAutomateSettingsAws := haDeployConfig.Automate.Config
 	// Assert the copied values from awsConfig.Automate.Config
-	assert.Equal(t, "aws-admin-password", haDeployConfigAutomateSettings.AdminPassword)
-	assert.Equal(t, "/aws/config/file", haDeployConfigAutomateSettings.ConfigFile)
-	assert.Equal(t, false, haDeployConfigAutomateSettings.EnableCustomCerts)
-	assert.Equal(t, "aws-fqdn", haDeployConfigAutomateSettings.Fqdn)
-	assert.Equal(t, "5", haDeployConfigAutomateSettings.InstanceCount)
-	assert.Equal(t, "/aws/private/key", haDeployConfigAutomateSettings.PrivateKey)
-	assert.Equal(t, "/aws/public/key", haDeployConfigAutomateSettings.PublicKey)
-	assert.Equal(t, "/aws/root/ca", haDeployConfigAutomateSettings.RootCA)
-	assert.Equal(t, "9090", haDeployConfigAutomateSettings.TeamsPort)
+	assert.Equal(t, "aws-admin-password", haDeployConfigAutomateSettingsAws.AdminPassword)
+	assert.Equal(t, "/aws/config/file", haDeployConfigAutomateSettingsAws.ConfigFile)
+	assert.Equal(t, false, haDeployConfigAutomateSettingsAws.EnableCustomCerts)
+	assert.Equal(t, "aws-fqdn", haDeployConfigAutomateSettingsAws.Fqdn)
+	assert.Equal(t, "5", haDeployConfigAutomateSettingsAws.InstanceCount)
+	assert.Equal(t, "/aws/private/key", haDeployConfigAutomateSettingsAws.PrivateKey)
+	assert.Equal(t, "/aws/public/key", haDeployConfigAutomateSettingsAws.PublicKey)
+	assert.Equal(t, "/aws/root/ca", haDeployConfigAutomateSettingsAws.RootCA)
+	assert.Equal(t, "9090", haDeployConfigAutomateSettingsAws.TeamsPort)
 
 	// Test when awsConfig is nil
-	CopyAutomateSettings(haDeployConfigAutomateSettings, existingInfraConfig, nil)
+	haDeployConfig = CopyAutomateSettings(haDeployConfig, existingInfraConfig, nil)
+	haDeployConfigAutomateSettingsExistingInfra := haDeployConfig.Automate.Config
 
 	// Assert the copied values from existingInfraConfig.Automate.Config
-	assert.Equal(t, "existing-admin-password", haDeployConfigAutomateSettings.AdminPassword)
-	assert.Equal(t, "/existing/config/file", haDeployConfigAutomateSettings.ConfigFile)
-	assert.Equal(t, true, haDeployConfigAutomateSettings.EnableCustomCerts)
-	assert.Equal(t, "existing-fqdn", haDeployConfigAutomateSettings.Fqdn)
-	assert.Equal(t, "3", haDeployConfigAutomateSettings.InstanceCount)
-	assert.Equal(t, "/existing/private/key", haDeployConfigAutomateSettings.PrivateKey)
-	assert.Equal(t, "/existing/public/key", haDeployConfigAutomateSettings.PublicKey)
-	assert.Equal(t, "/existing/root/ca", haDeployConfigAutomateSettings.RootCA)
-	assert.Equal(t, "8080", haDeployConfigAutomateSettings.TeamsPort)
+	assert.Equal(t, "existing-admin-password", haDeployConfigAutomateSettingsExistingInfra.AdminPassword)
+	assert.Equal(t, "/existing/config/file", haDeployConfigAutomateSettingsExistingInfra.ConfigFile)
+	assert.Equal(t, true, haDeployConfigAutomateSettingsExistingInfra.EnableCustomCerts)
+	assert.Equal(t, "existing-fqdn", haDeployConfigAutomateSettingsExistingInfra.Fqdn)
+	assert.Equal(t, "3", haDeployConfigAutomateSettingsExistingInfra.InstanceCount)
+	assert.Equal(t, "/existing/private/key", haDeployConfigAutomateSettingsExistingInfra.PrivateKey)
+	assert.Equal(t, "/existing/public/key", haDeployConfigAutomateSettingsExistingInfra.PublicKey)
+	assert.Equal(t, "/existing/root/ca", haDeployConfigAutomateSettingsExistingInfra.RootCA)
+	assert.Equal(t, "8080", haDeployConfigAutomateSettingsExistingInfra.TeamsPort)
 
 	// Assert the copied CertsByIP values from existingInfraConfig.Automate.Config
-	assert.Len(t, (*haDeployConfigAutomateSettings.CertsByIP), 1)
-	assert.Equal(t, "10.0.0.1", (*haDeployConfigAutomateSettings.CertsByIP)[0].IP)
-	assert.Equal(t, "/existing/cert1/private/key", (*haDeployConfigAutomateSettings.CertsByIP)[0].PrivateKey)
-	assert.Equal(t, "/existing/cert1/public/key", (*haDeployConfigAutomateSettings.CertsByIP)[0].PublicKey)
-	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployConfigAutomateSettings.CertsByIP)[0].NodesDn)
+	assert.Len(t, (*haDeployConfigAutomateSettingsExistingInfra.CertsByIP), 1)
+	assert.Equal(t, "10.0.0.1", (*haDeployConfigAutomateSettingsExistingInfra.CertsByIP)[0].IP)
+	assert.Equal(t, "/existing/cert1/private/key", (*haDeployConfigAutomateSettingsExistingInfra.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/existing/cert1/public/key", (*haDeployConfigAutomateSettingsExistingInfra.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployConfigAutomateSettingsExistingInfra.CertsByIP)[0].NodesDn)
 
 }
 
 func TestCopyChefServerSettings(t *testing.T) {
 	// Prepare test data
-	haDeployChefServerSettings := &config.ConfigSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		ChefServer: ChefServerToml{
 			Config: ChefServerConfigToml{
@@ -405,34 +417,37 @@ func TestCopyChefServerSettings(t *testing.T) {
 	}
 
 	// Test when awsConfig is not nil
-	CopyChefServerSettings(haDeployChefServerSettings, nil, awsConfig)
+	haDeployConfig = CopyChefServerSettings(haDeployConfig, nil, awsConfig)
+	haDeployChefServerSettingsAws := haDeployConfig.ChefServer.Config
 
 	// Assert the copied values from awsConfig.ChefServer.Config
-	assert.Equal(t, false, haDeployChefServerSettings.EnableCustomCerts)
-	assert.Equal(t, "5", haDeployChefServerSettings.InstanceCount)
-	assert.Equal(t, "/aws/private/key", haDeployChefServerSettings.PrivateKey)
-	assert.Equal(t, "/aws/public/key", haDeployChefServerSettings.PublicKey)
+	assert.Equal(t, false, haDeployChefServerSettingsAws.EnableCustomCerts)
+	assert.Equal(t, "5", haDeployChefServerSettingsAws.InstanceCount)
+	assert.Equal(t, "/aws/private/key", haDeployChefServerSettingsAws.PrivateKey)
+	assert.Equal(t, "/aws/public/key", haDeployChefServerSettingsAws.PublicKey)
 
 	// Test when awsConfig is nil
-	CopyChefServerSettings(haDeployChefServerSettings, existingInfraConfig, nil)
-
+	haDeployConfig = CopyChefServerSettings(haDeployConfig, existingInfraConfig, nil)
+	haDeployChefServerSettingsExistingInfra := haDeployConfig.ChefServer.Config
 	// Assert the copied values from existingInfraConfig.ChefServer.Config
-	assert.Equal(t, true, haDeployChefServerSettings.EnableCustomCerts)
-	assert.Equal(t, "3", haDeployChefServerSettings.InstanceCount)
-	assert.Equal(t, "/existing/private/key", haDeployChefServerSettings.PrivateKey)
-	assert.Equal(t, "/existing/public/key", haDeployChefServerSettings.PublicKey)
+	assert.Equal(t, true, haDeployChefServerSettingsExistingInfra.EnableCustomCerts)
+	assert.Equal(t, "3", haDeployChefServerSettingsExistingInfra.InstanceCount)
+	assert.Equal(t, "/existing/private/key", haDeployChefServerSettingsExistingInfra.PrivateKey)
+	assert.Equal(t, "/existing/public/key", haDeployChefServerSettingsExistingInfra.PublicKey)
 
 	// Assert the copied CertsByIP values from existingInfraConfig.ChefServer.Config
-	assert.Len(t, *haDeployChefServerSettings.CertsByIP, 1)
-	assert.Equal(t, "10.0.0.1", (*haDeployChefServerSettings.CertsByIP)[0].IP)
-	assert.Equal(t, "/existing/cert1/private/key", (*haDeployChefServerSettings.CertsByIP)[0].PrivateKey)
-	assert.Equal(t, "/existing/cert1/public/key", (*haDeployChefServerSettings.CertsByIP)[0].PublicKey)
-	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployChefServerSettings.CertsByIP)[0].NodesDn)
+	assert.Len(t, *haDeployChefServerSettingsExistingInfra.CertsByIP, 1)
+	assert.Equal(t, "10.0.0.1", (*haDeployChefServerSettingsExistingInfra.CertsByIP)[0].IP)
+	assert.Equal(t, "/existing/cert1/private/key", (*haDeployChefServerSettingsExistingInfra.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/existing/cert1/public/key", (*haDeployChefServerSettingsExistingInfra.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployChefServerSettingsExistingInfra.CertsByIP)[0].NodesDn)
+
 }
 
 func TestCopyPostgresqlSettings(t *testing.T) {
 	// Prepare test data
-	haDeployPostgresqlSettings := &config.ConfigSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		Postgresql: PostgresqlToml{
 			Config: PgConfigToml{
@@ -466,36 +481,38 @@ func TestCopyPostgresqlSettings(t *testing.T) {
 	}
 
 	// Test when awsConfig is not nil
-	CopyPostgresqlSettings(haDeployPostgresqlSettings, nil, awsConfig)
-
+	haDeployConfig = CopyPostgresqlSettings(haDeployConfig, nil, awsConfig)
+	haDeployPostgresqlSettingsAws := haDeployConfig.Postgresql.Config
 	// Assert the copied values from awsConfig.Postgresql.Config
-	assert.Equal(t, false, haDeployPostgresqlSettings.EnableCustomCerts)
-	assert.Equal(t, "5", haDeployPostgresqlSettings.InstanceCount)
-	assert.Equal(t, "/aws/private/key", haDeployPostgresqlSettings.PrivateKey)
-	assert.Equal(t, "/aws/public/key", haDeployPostgresqlSettings.PublicKey)
-	assert.Equal(t, "/aws/root/ca", haDeployPostgresqlSettings.RootCA)
+	assert.Equal(t, false, haDeployPostgresqlSettingsAws.EnableCustomCerts)
+	assert.Equal(t, "5", haDeployPostgresqlSettingsAws.InstanceCount)
+	assert.Equal(t, "/aws/private/key", haDeployPostgresqlSettingsAws.PrivateKey)
+	assert.Equal(t, "/aws/public/key", haDeployPostgresqlSettingsAws.PublicKey)
+	assert.Equal(t, "/aws/root/ca", haDeployPostgresqlSettingsAws.RootCA)
 
 	// Test when awsConfig is nil
-	CopyPostgresqlSettings(haDeployPostgresqlSettings, existingInfraConfig, nil)
-
+	haDeployConfig = CopyPostgresqlSettings(haDeployConfig, existingInfraConfig, nil)
+	haDeployPostgresqlSettingsExistingInfra := haDeployConfig.Postgresql.Config
 	// Assert the copied values from existingInfraConfig.Postgresql.Config
-	assert.Equal(t, true, haDeployPostgresqlSettings.EnableCustomCerts)
-	assert.Equal(t, "3", haDeployPostgresqlSettings.InstanceCount)
-	assert.Equal(t, "/existing/private/key", haDeployPostgresqlSettings.PrivateKey)
-	assert.Equal(t, "/existing/public/key", haDeployPostgresqlSettings.PublicKey)
-	assert.Equal(t, "/existing/root/ca", haDeployPostgresqlSettings.RootCA)
+	assert.Equal(t, true, haDeployPostgresqlSettingsExistingInfra.EnableCustomCerts)
+	assert.Equal(t, "3", haDeployPostgresqlSettingsExistingInfra.InstanceCount)
+	assert.Equal(t, "/existing/private/key", haDeployPostgresqlSettingsExistingInfra.PrivateKey)
+	assert.Equal(t, "/existing/public/key", haDeployPostgresqlSettingsExistingInfra.PublicKey)
+	assert.Equal(t, "/existing/root/ca", haDeployPostgresqlSettingsExistingInfra.RootCA)
 
 	// Assert the copied CertsByIP values from existingInfraConfig.Postgresql.Config
-	assert.Len(t, *haDeployPostgresqlSettings.CertsByIP, 1)
-	assert.Equal(t, "10.0.0.1", (*haDeployPostgresqlSettings.CertsByIP)[0].IP)
-	assert.Equal(t, "/existing/cert1/private/key", (*haDeployPostgresqlSettings.CertsByIP)[0].PrivateKey)
-	assert.Equal(t, "/existing/cert1/public/key", (*haDeployPostgresqlSettings.CertsByIP)[0].PublicKey)
-	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployPostgresqlSettings.CertsByIP)[0].NodesDn)
+	assert.Len(t, *haDeployPostgresqlSettingsExistingInfra.CertsByIP, 1)
+	assert.Equal(t, "10.0.0.1", (*haDeployPostgresqlSettingsExistingInfra.CertsByIP)[0].IP)
+	assert.Equal(t, "/existing/cert1/private/key", (*haDeployPostgresqlSettingsExistingInfra.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/existing/cert1/public/key", (*haDeployPostgresqlSettingsExistingInfra.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployPostgresqlSettingsExistingInfra.CertsByIP)[0].NodesDn)
+
 }
 
 func TestCopyOpensearchSettings(t *testing.T) {
 	// Prepare test data
-	haDeployOpensearchSettings := &config.ConfigOpensearchSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		Opensearch: OpensearchToml{
 			Config: OsConfigToml{
@@ -537,43 +554,44 @@ func TestCopyOpensearchSettings(t *testing.T) {
 	}
 
 	// Test when awsConfig is not nil
-	CopyOpensearchSettings(haDeployOpensearchSettings, nil, awsConfig)
-
+	haDeployConfig = CopyOpensearchSettings(haDeployConfig, nil, awsConfig)
+	haDeployOpensearchSettingsAws := haDeployConfig.Opensearch.Config
 	// Assert the copied values from awsConfig.Opensearch.Config
-	assert.Equal(t, "/aws/admin/cert", haDeployOpensearchSettings.AdminCert)
-	assert.Equal(t, "/aws/admin/dn", haDeployOpensearchSettings.AdminDn)
-	assert.Equal(t, "/aws/admin/key", haDeployOpensearchSettings.AdminKey)
-	assert.Equal(t, false, haDeployOpensearchSettings.EnableCustomCerts)
-	assert.Equal(t, "5", haDeployOpensearchSettings.InstanceCount)
-	assert.Equal(t, "/aws/nodes/dn", haDeployOpensearchSettings.NodesDn)
-	assert.Equal(t, "/aws/private/key", haDeployOpensearchSettings.PrivateKey)
-	assert.Equal(t, "/aws/public/key", haDeployOpensearchSettings.PublicKey)
-	assert.Equal(t, "/aws/root/ca", haDeployOpensearchSettings.RootCA)
+	assert.Equal(t, "/aws/admin/cert", haDeployOpensearchSettingsAws.AdminCert)
+	assert.Equal(t, "/aws/admin/dn", haDeployOpensearchSettingsAws.AdminDn)
+	assert.Equal(t, "/aws/admin/key", haDeployOpensearchSettingsAws.AdminKey)
+	assert.Equal(t, false, haDeployOpensearchSettingsAws.EnableCustomCerts)
+	assert.Equal(t, "5", haDeployOpensearchSettingsAws.InstanceCount)
+	assert.Equal(t, "/aws/nodes/dn", haDeployOpensearchSettingsAws.NodesDn)
+	assert.Equal(t, "/aws/private/key", haDeployOpensearchSettingsAws.PrivateKey)
+	assert.Equal(t, "/aws/public/key", haDeployOpensearchSettingsAws.PublicKey)
+	assert.Equal(t, "/aws/root/ca", haDeployOpensearchSettingsAws.RootCA)
 
 	// Test when awsConfig is nil
-	CopyOpensearchSettings(haDeployOpensearchSettings, existingInfraConfig, nil)
-
+	haDeployConfig = CopyOpensearchSettings(haDeployConfig, existingInfraConfig, nil)
+	haDeployOpensearchSettingsExistingInfra := haDeployConfig.Opensearch.Config
 	// Assert the copied values from existingInfraConfig.Opensearch.Config
-	assert.Equal(t, "/existing/admin/cert", haDeployOpensearchSettings.AdminCert)
-	assert.Equal(t, "/existing/admin/dn", haDeployOpensearchSettings.AdminDn)
-	assert.Equal(t, "/existing/admin/key", haDeployOpensearchSettings.AdminKey)
-	assert.Equal(t, true, haDeployOpensearchSettings.EnableCustomCerts)
-	assert.Equal(t, "3", haDeployOpensearchSettings.InstanceCount)
-	assert.Equal(t, "/existing/nodes/dn", haDeployOpensearchSettings.NodesDn)
-	assert.Equal(t, "/existing/private/key", haDeployOpensearchSettings.PrivateKey)
-	assert.Equal(t, "/existing/public/key", haDeployOpensearchSettings.PublicKey)
-	assert.Equal(t, "/existing/root/ca", haDeployOpensearchSettings.RootCA)
+	assert.Equal(t, "/existing/admin/cert", haDeployOpensearchSettingsExistingInfra.AdminCert)
+	assert.Equal(t, "/existing/admin/dn", haDeployOpensearchSettingsExistingInfra.AdminDn)
+	assert.Equal(t, "/existing/admin/key", haDeployOpensearchSettingsExistingInfra.AdminKey)
+	assert.Equal(t, true, haDeployOpensearchSettingsExistingInfra.EnableCustomCerts)
+	assert.Equal(t, "3", haDeployOpensearchSettingsExistingInfra.InstanceCount)
+	assert.Equal(t, "/existing/nodes/dn", haDeployOpensearchSettingsExistingInfra.NodesDn)
+	assert.Equal(t, "/existing/private/key", haDeployOpensearchSettingsExistingInfra.PrivateKey)
+	assert.Equal(t, "/existing/public/key", haDeployOpensearchSettingsExistingInfra.PublicKey)
+	assert.Equal(t, "/existing/root/ca", haDeployOpensearchSettingsExistingInfra.RootCA)
 
 	// Assert the copied CertsByIP values from existingInfraConfig.Opensearch.Config
-	assert.Len(t, *haDeployOpensearchSettings.CertsByIP, 1)
-	assert.Equal(t, "10.0.0.1", (*haDeployOpensearchSettings.CertsByIP)[0].IP)
-	assert.Equal(t, "/existing/cert1/private/key", (*haDeployOpensearchSettings.CertsByIP)[0].PrivateKey)
-	assert.Equal(t, "/existing/cert1/public/key", (*haDeployOpensearchSettings.CertsByIP)[0].PublicKey)
-	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployOpensearchSettings.CertsByIP)[0].NodesDn)
+	assert.Len(t, *haDeployOpensearchSettingsExistingInfra.CertsByIP, 1)
+	assert.Equal(t, "10.0.0.1", (*haDeployOpensearchSettingsExistingInfra.CertsByIP)[0].IP)
+	assert.Equal(t, "/existing/cert1/private/key", (*haDeployOpensearchSettingsExistingInfra.CertsByIP)[0].PrivateKey)
+	assert.Equal(t, "/existing/cert1/public/key", (*haDeployOpensearchSettingsExistingInfra.CertsByIP)[0].PublicKey)
+	assert.Equal(t, "/existing/cert1/nodes/dn", (*haDeployOpensearchSettingsExistingInfra.CertsByIP)[0].NodesDn)
 }
 
 func TestCopyExistingInfraSettings(t *testing.T) {
 	// Create a sample existing infra configuration
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		ExistingInfra: ExistingInfraToml{
 			Config: ExistingInfraIpsToml{
@@ -583,43 +601,21 @@ func TestCopyExistingInfraSettings(t *testing.T) {
 				OpensearchPrivateIps: []string{"10.0.3.1", "10.0.3.2"},
 			},
 		},
-		ExternalDB: ExternalDBToml{
-			Database: ExternalDbToml{
-				Type: "aws",
-			},
-		},
 	}
-
-	// Create a sample HA deploy existing infra settings
-	haDeployExistingInfraSettings := &config.ConfigExistingInfraSettings{}
-
+	haDeployConfig := &config.HaDeployConfig{}
 	// Call the CopyExistingInfraSettings function
-	CopyExistingInfraSettings(haDeployExistingInfraSettings, existingInfraConfig)
-
+	haDeployConfig = CopyExistingInfraSettings(haDeployConfig, existingInfraConfig)
+	haDeployExistingInfraSettings := haDeployConfig.ExistingInfra.Config
 	// Verify the copied values
 	assert.Equal(t, []string{"10.0.0.1", "10.0.0.2"}, haDeployExistingInfraSettings.AutomatePrivateIps, "AutomatePrivateIps does not match")
 	assert.Equal(t, []string{"10.0.1.1", "10.0.1.2"}, haDeployExistingInfraSettings.ChefServerPrivateIps, "ChefServerPrivateIps does not match")
 	assert.Nil(t, haDeployExistingInfraSettings.PostgresqlPrivateIps, "PostgresqlPrivateIps should be nil")
 	assert.Nil(t, haDeployExistingInfraSettings.OpensearchPrivateIps, "OpensearchPrivateIps should be nil")
-
-	// Test case when ExternalDB is set to self-managed
-	existingInfraConfig.ExternalDB.Database.Type = "self-managed"
-	CopyExistingInfraSettings(haDeployExistingInfraSettings, existingInfraConfig)
-
-	// Verify that PostgresqlPrivateIps and OpensearchPrivateIps are not copied
-	assert.Nil(t, haDeployExistingInfraSettings.PostgresqlPrivateIps, "PostgresqlPrivateIps should be nil when ExternalDB is set to a different type")
-	assert.Nil(t, haDeployExistingInfraSettings.OpensearchPrivateIps, "OpensearchPrivateIps should be nil when ExternalDB is set to a different type")
-
-	// Reset ExternalDB type
-	existingInfraConfig.ExternalDB.Database.Type = ""
-	CopyExistingInfraSettings(haDeployExistingInfraSettings, existingInfraConfig)
-	// Verify the copied values
-	assert.Equal(t, []string{"10.0.2.1", "10.0.2.2"}, haDeployExistingInfraSettings.PostgresqlPrivateIps, "PostgresqlPrivateIps does not match")
-	assert.Equal(t, []string{"10.0.3.1", "10.0.3.2"}, haDeployExistingInfraSettings.OpensearchPrivateIps, "OpensearchPrivateIps does not match")
 }
 
 func TestCopyExternalOsSettings(t *testing.T) {
 	// Create a sample existing infra configuration
+
 	existingInfraConfig := &ExistingInfraConfigToml{
 		ExternalDB: ExternalDBToml{
 			Database: ExternalDbToml{
@@ -635,12 +631,10 @@ func TestCopyExternalOsSettings(t *testing.T) {
 		},
 	}
 
-	// Create a sample HA deploy external OS settings
-	haDeployExternalOsSettings := &config.ExternalOsSettings{}
-
 	// Call the CopyExternalOsSettings function
-	CopyExternalOsSettings(haDeployExternalOsSettings, existingInfraConfig)
-
+	haDeployConfig := &config.HaDeployConfig{}
+	haDeployConfig = CopyExternalOsSettings(haDeployConfig, existingInfraConfig)
+	haDeployExternalOsSettings := haDeployConfig.External.Database.OpenSearch
 	// Verify the copied values
 	assert.Equal(t, "root-cert", haDeployExternalOsSettings.OpensearchRootCert, "OpensearchRootCert does not match")
 	assert.Equal(t, "domain", haDeployExternalOsSettings.OpensearchDomainName, "OpensearchDomainName does not match")
@@ -669,12 +663,11 @@ func TestCopyExternalPgSettings(t *testing.T) {
 		},
 	}
 
-	// Create a sample HA deploy external PG settings
-	haDeployExternalPgSettings := &config.ExternalPgSettings{}
+	haDeployConfig := &config.HaDeployConfig{}
 
 	// Call the CopyExternalPgSettings function
-	CopyExternalPgSettings(haDeployExternalPgSettings, existingInfraConfig)
-
+	haDeployConfig = CopyExternalPgSettings(haDeployConfig, existingInfraConfig)
+	haDeployExternalPgSettings := haDeployConfig.External.Database.PostgreSQL
 	// Verify the copied values
 	assert.Equal(t, "dbuser-password", haDeployExternalPgSettings.DbuserPassword, "DbuserPassword does not match")
 	assert.Equal(t, "dbuser-name", haDeployExternalPgSettings.DbuserUsername, "DbuserUsername does not match")
@@ -682,11 +675,12 @@ func TestCopyExternalPgSettings(t *testing.T) {
 	assert.Equal(t, "root-cert", haDeployExternalPgSettings.PostgresqlRootCert, "PostgresqlRootCert does not match")
 	assert.Equal(t, "superuser-password", haDeployExternalPgSettings.SuperuserPassword, "SuperuserPassword does not match")
 	assert.Equal(t, "superuser-name", haDeployExternalPgSettings.SuperuserUsername, "SuperuserUsername does not match")
+
 }
 
 func TestCopyAws(t *testing.T) {
 	// Call the CopyAws function
-	var haConfig = &config.HaDeployConfig{}
+	haDeployConfig := &config.HaDeployConfig{}
 
 	awsConfig := &AwsConfigToml{
 		Architecture: AwsArchitectureToml{
@@ -749,12 +743,54 @@ func TestCopyAws(t *testing.T) {
 				RootCA:            "/existing/root/ca",
 			},
 		},
+		Aws: AwsToml{
+			Config: ConfigToml{
+				Profile:                      "my-profile",
+				Region:                       "us-west-2",
+				AwsVpcId:                     "vpc-12345",
+				AwsCidrBlockAddr:             "10.0.0.0/16",
+				PrivateCustomSubnets:         []string{"subnet-12345", "subnet-67890"},
+				PublicCustomSubnets:          []string{"subnet-54321", "subnet-09876"},
+				SSHKeyPairName:               "my-keypair",
+				AmiID:                        "ami-08d4ac5b634553e16",
+				DeleteOnTermination:          true,
+				AutomateServerInstanceType:   "t3.medium",
+				ChefServerInstanceType:       "t3.medium",
+				PostgresqlServerInstanceType: "m5.large",
+				OpensearchServerInstanceType: "m5.large",
+				AutomateLbCertificateArn:     "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
+				ChefServerLbCertificateArn:   "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
+				AutomateEbsVolumeIops:        "100",
+				AutomateEbsVolumeSize:        "50",
+				AutomateEbsVolumeType:        "gp3",
+				ChefEbsVolumeIops:            "100",
+				ChefEbsVolumeSize:            "50",
+				ChefEbsVolumeType:            "gp3",
+				OpensearchEbsVolumeIops:      "100",
+				OpensearchEbsVolumeSize:      "50",
+				OpensearchEbsVolumeType:      "gp3",
+				PostgresqlEbsVolumeIops:      "100",
+				PostgresqlEbsVolumeSize:      "50",
+				PostgresqlEbsVolumeType:      "gp3",
+				LBAccessLogs:                 "false",
+				OpensearchDomainName:         "opensearch-domain",
+				OpensearchDomainUrl:          "opensearch-url",
+				OpensearchUserPassword:       "opensearch-password",
+				OpensearchUsername:           "opensearch-username",
+				OpensearchCertificate:        "opensearch-certificate",
+				OsUserAccessKeyId:            "access-key-id",
+				OsUserAccessKeySecret:        "access-key-secret",
+				AwsOsSnapshotRoleArn:         "snapshot-role-arn",
+				RDSCertificate:               "rds-certificate",
+				RDSDBUserPassword:            "rds-db-password",
+				RDSDBUserName:                "rds-db-username",
+				RDSInstanceUrl:               "rds-instance-url",
+				RDSSuperUserPassword:         "rds-superuser-password",
+				RDSSuperUserName:             "rds-superuser-username",
+			},
+		},
 	}
 
-	result := CopyAws(haConfig, awsConfig)
-
-	// Verify the copied values
-	assert.Equal(t, result.Aws.Config.AmiID, awsConfig.Aws.Config.AmiID)
-	assert.Equal(t, result.Aws.Config.DeleteOnTermination, awsConfig.Aws.Config.DeleteOnTermination)
-	assert.Equal(t, result.Aws.Config.AutomateServerInstanceType, awsConfig.Aws.Config.AutomateServerInstanceType)
+	haDeployConfig = CopyAws(haDeployConfig, awsConfig)
+	assert.Equal(t, "awsConfig", haDeployConfig)
 }

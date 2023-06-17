@@ -53,360 +53,420 @@ func CopyCertsByIP(haDeploy *[]config.CertByIP, existing []CertByIP) {
 	}
 }
 
-func CopyExternalPgSettings(haDeployExternalPgSettings *config.ExternalPgSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyExternalPgSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 	existingInfraExternalPgSettings := existingInfraConfig.ExternalDB.Database.PostgreSQL
-
-	haDeployExternalPgSettings.DbuserPassword = existingInfraExternalPgSettings.PostgreSQLDBUserPassword
-	haDeployExternalPgSettings.DbuserUsername = existingInfraExternalPgSettings.PostgreSQLDBUserName
-	haDeployExternalPgSettings.InstanceURL = existingInfraExternalPgSettings.PostgreSQLInstanceURL
-	haDeployExternalPgSettings.PostgresqlRootCert = existingInfraExternalPgSettings.PostgreSQLRootCert
-	haDeployExternalPgSettings.SuperuserPassword = existingInfraExternalPgSettings.PostgreSQLSuperUserPassword
-	haDeployExternalPgSettings.SuperuserUsername = existingInfraExternalPgSettings.PostgreSQLSuperUserName
-
+	haDeployConfig.External = &config.ExternalSettings{
+		Database: &config.ExternalDBSettings{
+			PostgreSQL: &config.ExternalPgSettings{
+				DbuserPassword:     existingInfraExternalPgSettings.PostgreSQLDBUserPassword,
+				DbuserUsername:     existingInfraExternalPgSettings.PostgreSQLDBUserName,
+				InstanceURL:        existingInfraExternalPgSettings.PostgreSQLInstanceURL,
+				PostgresqlRootCert: existingInfraExternalPgSettings.PostgreSQLRootCert,
+				SuperuserPassword:  existingInfraExternalPgSettings.PostgreSQLSuperUserPassword,
+				SuperuserUsername:  existingInfraExternalPgSettings.PostgreSQLSuperUserName,
+			},
+		},
+	}
+	return haDeployConfig
 }
 
-func CopyExternalOsSettings(haDeployExternalOsSettings *config.ExternalOsSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyExternalOsSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 	existingInfraExternalOsSettings := existingInfraConfig.ExternalDB.Database.Opensearch
-
-	haDeployExternalOsSettings.OpensearchRootCert = existingInfraExternalOsSettings.OpensearchRootCert
-	haDeployExternalOsSettings.OpensearchDomainName = existingInfraExternalOsSettings.OpensearchDomainName
-	haDeployExternalOsSettings.OpensearchDomainURL = existingInfraExternalOsSettings.OpensearchInstanceURL
-	haDeployExternalOsSettings.OpensearchUserPassword = existingInfraExternalOsSettings.OpensearchSuperUserPassword
-	haDeployExternalOsSettings.OpensearchUsername = existingInfraExternalOsSettings.OpensearchSuperUserName
-
-	if existingInfraExternalOsSettings.AWS.AwsOsSnapshotRoleArn != "" {
-		haDeployExternalOsSettings.Aws = &config.AwsExternalOsSettings{
-			AwsOsSnapshotRoleArn:          existingInfraExternalOsSettings.AWS.AwsOsSnapshotRoleArn,
-			OsSnapshotUserAccessKeyID:     existingInfraExternalOsSettings.AWS.OsUserAccessKeyId,
-			OsSnapshotUserAccessKeySecret: existingInfraExternalOsSettings.AWS.OsUserAccessKeySecret,
-		}
+	haDeployConfig.External = &config.ExternalSettings{
+		Database: &config.ExternalDBSettings{
+			OpenSearch: &config.ExternalOsSettings{
+				OpensearchRootCert:     existingInfraExternalOsSettings.OpensearchRootCert,
+				OpensearchDomainName:   existingInfraExternalOsSettings.OpensearchDomainName,
+				OpensearchDomainURL:    existingInfraExternalOsSettings.OpensearchInstanceURL,
+				OpensearchUserPassword: existingInfraExternalOsSettings.OpensearchSuperUserPassword,
+				OpensearchUsername:     existingInfraExternalOsSettings.OpensearchSuperUserName,
+				Aws: &config.AwsExternalOsSettings{
+					AwsOsSnapshotRoleArn:          existingInfraExternalOsSettings.AWS.AwsOsSnapshotRoleArn,
+					OsSnapshotUserAccessKeyID:     existingInfraExternalOsSettings.AWS.OsUserAccessKeyId,
+					OsSnapshotUserAccessKeySecret: existingInfraExternalOsSettings.AWS.OsUserAccessKeySecret,
+				},
+			},
+		},
 	}
+	return haDeployConfig
 }
 
-func CopyExistingInfraSettings(haDeployExistingInfraSettings *config.ConfigExistingInfraSettings, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyExistingInfraSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 	existingInfraSettings := existingInfraConfig.ExistingInfra.Config
-	haDeployExistingInfraSettings.AutomatePrivateIps = existingInfraSettings.AutomatePrivateIps
-	haDeployExistingInfraSettings.ChefServerPrivateIps = existingInfraSettings.ChefServerPrivateIps
-
-	if !IsExternalDb(existingInfraConfig) {
-		haDeployExistingInfraSettings.PostgresqlPrivateIps = existingInfraSettings.PostgresqlPrivateIps
-		haDeployExistingInfraSettings.OpensearchPrivateIps = existingInfraSettings.OpensearchPrivateIps
+	haDeployConfig.ExistingInfra = &config.ExistingInfraSettings{
+		Config: &config.ConfigExistingInfraSettings{
+			AutomatePrivateIps:   existingInfraSettings.AutomatePrivateIps,
+			ChefServerPrivateIps: existingInfraSettings.ChefServerPrivateIps,
+			PostgresqlPrivateIps: existingInfraSettings.PostgresqlPrivateIps,
+			OpensearchPrivateIps: existingInfraSettings.OpensearchPrivateIps,
+		},
 	}
+	return haDeployConfig
 }
 
-func CopyOpensearchSettings(haDeployOpensearchSettings *config.ConfigOpensearchSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+func CopyOpensearchSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 
 	if awsConfig != nil {
 		awsConfigOpensearchSettings := awsConfig.Opensearch.Config
-		awshaDeployOpensearchSettings := haDeployOpensearchSettings
-
-		awshaDeployOpensearchSettings.AdminCert = awsConfigOpensearchSettings.AdminCert
-		awshaDeployOpensearchSettings.AdminDn = awsConfigOpensearchSettings.AdminDn
-		awshaDeployOpensearchSettings.AdminKey = awsConfigOpensearchSettings.AdminKey
-		awshaDeployOpensearchSettings.EnableCustomCerts = awsConfigOpensearchSettings.EnableCustomCerts
-		awshaDeployOpensearchSettings.InstanceCount = awsConfigOpensearchSettings.InstanceCount
-		awshaDeployOpensearchSettings.NodesDn = awsConfigOpensearchSettings.NodesDn
-		awshaDeployOpensearchSettings.PrivateKey = awsConfigOpensearchSettings.PrivateKey
-		awshaDeployOpensearchSettings.PublicKey = awsConfigOpensearchSettings.PublicKey
-		awshaDeployOpensearchSettings.RootCA = awsConfigOpensearchSettings.RootCA
-		return
+		haDeployConfig.Opensearch = &config.OpensearchSettings{
+			Config: &config.ConfigOpensearchSettings{
+				AdminCert:         awsConfigOpensearchSettings.AdminCert,
+				AdminDn:           awsConfigOpensearchSettings.AdminDn,
+				AdminKey:          awsConfigOpensearchSettings.AdminKey,
+				EnableCustomCerts: awsConfigOpensearchSettings.EnableCustomCerts,
+				InstanceCount:     awsConfigOpensearchSettings.InstanceCount,
+				NodesDn:           awsConfigOpensearchSettings.NodesDn,
+				PrivateKey:        awsConfigOpensearchSettings.PrivateKey,
+				PublicKey:         awsConfigOpensearchSettings.PublicKey,
+				RootCA:            awsConfigOpensearchSettings.RootCA,
+			},
+		}
 	}
 
-	existingInfraOpensearchSettings := existingInfraConfig.Opensearch.Config
+	if existingInfraConfig != nil {
+		existingInfraOpensearchSettings := existingInfraConfig.Opensearch.Config
+		haDeployConfig.Opensearch = &config.OpensearchSettings{
+			Config: &config.ConfigOpensearchSettings{
 
-	haDeployOpensearchSettings.AdminCert = existingInfraOpensearchSettings.AdminCert
-	haDeployOpensearchSettings.AdminDn = existingInfraOpensearchSettings.AdminDn
-	haDeployOpensearchSettings.AdminKey = existingInfraOpensearchSettings.AdminKey
-	haDeployOpensearchSettings.EnableCustomCerts = existingInfraOpensearchSettings.EnableCustomCerts
-	haDeployOpensearchSettings.InstanceCount = existingInfraOpensearchSettings.InstanceCount
-	haDeployOpensearchSettings.NodesDn = existingInfraOpensearchSettings.NodesDn
-	haDeployOpensearchSettings.PrivateKey = existingInfraOpensearchSettings.PrivateKey
-	haDeployOpensearchSettings.PublicKey = existingInfraOpensearchSettings.PublicKey
-	haDeployOpensearchSettings.RootCA = existingInfraOpensearchSettings.RootCA
-
-	// CertsByIP
-	if existingInfraOpensearchSettings.CertsByIP != nil {
-		haDeployOpensearchSettings.CertsByIP = &[]config.CertByIP{}
-		CopyCertsByIP(haDeployOpensearchSettings.CertsByIP, existingInfraOpensearchSettings.CertsByIP)
+				AdminCert:         existingInfraOpensearchSettings.AdminCert,
+				AdminDn:           existingInfraOpensearchSettings.AdminDn,
+				AdminKey:          existingInfraOpensearchSettings.AdminKey,
+				EnableCustomCerts: existingInfraOpensearchSettings.EnableCustomCerts,
+				InstanceCount:     existingInfraOpensearchSettings.InstanceCount,
+				NodesDn:           existingInfraOpensearchSettings.NodesDn,
+				PrivateKey:        existingInfraOpensearchSettings.PrivateKey,
+				PublicKey:         existingInfraOpensearchSettings.PublicKey,
+				RootCA:            existingInfraOpensearchSettings.RootCA,
+			},
+		}
+		// CertsByIP
+		if existingInfraOpensearchSettings.CertsByIP != nil {
+			haDeployConfig.Opensearch.Config.CertsByIP = &[]config.CertByIP{}
+			CopyCertsByIP(haDeployConfig.Opensearch.Config.CertsByIP, existingInfraOpensearchSettings.CertsByIP)
+		}
 	}
+	return haDeployConfig
 }
 
-func CopyPostgresqlSettings(haDeployPostgresqlSettings *config.ConfigSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
-
+func CopyPostgresqlSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	if awsConfig != nil {
 		awsConfigPostgresqlSettings := awsConfig.Postgresql.Config
-		awshaDeployPostgresqlSettings := haDeployPostgresqlSettings
 
-		awshaDeployPostgresqlSettings.EnableCustomCerts = awsConfigPostgresqlSettings.EnableCustomCerts
-		awshaDeployPostgresqlSettings.InstanceCount = awsConfigPostgresqlSettings.InstanceCount
-		awshaDeployPostgresqlSettings.PrivateKey = awsConfigPostgresqlSettings.PrivateKey
-		awshaDeployPostgresqlSettings.PublicKey = awsConfigPostgresqlSettings.PublicKey
-		awshaDeployPostgresqlSettings.RootCA = awsConfigPostgresqlSettings.RootCA
-		return
+		haDeployConfig.Postgresql = &config.PostgresqlSettings{
+			Config: &config.ConfigSettings{
+				EnableCustomCerts: awsConfigPostgresqlSettings.EnableCustomCerts,
+				InstanceCount:     awsConfigPostgresqlSettings.InstanceCount,
+				PrivateKey:        awsConfigPostgresqlSettings.PrivateKey,
+				PublicKey:         awsConfigPostgresqlSettings.PublicKey,
+				RootCA:            awsConfigPostgresqlSettings.RootCA,
+			},
+		}
 	}
 
-	existingInfraPostgresqlSettings := existingInfraConfig.Postgresql.Config
-
-	haDeployPostgresqlSettings.EnableCustomCerts = existingInfraPostgresqlSettings.EnableCustomCerts
-	haDeployPostgresqlSettings.InstanceCount = existingInfraPostgresqlSettings.InstanceCount
-	haDeployPostgresqlSettings.PrivateKey = existingInfraPostgresqlSettings.PrivateKey
-	haDeployPostgresqlSettings.PublicKey = existingInfraPostgresqlSettings.PublicKey
-	haDeployPostgresqlSettings.RootCA = existingInfraPostgresqlSettings.RootCA
-
-	// CertsByIP
-	if existingInfraPostgresqlSettings.CertsByIP != nil {
-		haDeployPostgresqlSettings.CertsByIP = &[]config.CertByIP{}
-		CopyCertsByIP(haDeployPostgresqlSettings.CertsByIP, existingInfraPostgresqlSettings.CertsByIP)
+	if existingInfraConfig != nil {
+		existingInfraPostgresqlSettings := existingInfraConfig.Postgresql.Config
+		haDeployConfig.Postgresql = &config.PostgresqlSettings{
+			Config: &config.ConfigSettings{
+				EnableCustomCerts: existingInfraPostgresqlSettings.EnableCustomCerts,
+				InstanceCount:     existingInfraPostgresqlSettings.InstanceCount,
+				PrivateKey:        existingInfraPostgresqlSettings.PrivateKey,
+				PublicKey:         existingInfraPostgresqlSettings.PublicKey,
+				RootCA:            existingInfraPostgresqlSettings.RootCA},
+		}
+		// CertsByIP
+		if existingInfraPostgresqlSettings.CertsByIP != nil {
+			haDeployConfig.Postgresql.Config.CertsByIP = &[]config.CertByIP{}
+			CopyCertsByIP(haDeployConfig.Postgresql.Config.CertsByIP, existingInfraPostgresqlSettings.CertsByIP)
+		}
 	}
+	return haDeployConfig
 }
 
-func CopyChefServerSettings(haDeployChefServerSettings *config.ConfigSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+func CopyChefServerSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 
 	if awsConfig != nil {
 		awsConfigChefServerSettings := awsConfig.ChefServer.Config
-		awshaDeployChefServerSettings := haDeployChefServerSettings
-
-		awshaDeployChefServerSettings.EnableCustomCerts = awsConfigChefServerSettings.EnableCustomCerts
-		awshaDeployChefServerSettings.InstanceCount = awsConfigChefServerSettings.InstanceCount
-		awshaDeployChefServerSettings.PrivateKey = awsConfigChefServerSettings.PrivateKey
-		awshaDeployChefServerSettings.PublicKey = awsConfigChefServerSettings.PublicKey
-		return
+		haDeployConfig.ChefServer = &config.ChefServerSettings{
+			Config: &config.ConfigSettings{
+				EnableCustomCerts: awsConfigChefServerSettings.EnableCustomCerts,
+				InstanceCount:     awsConfigChefServerSettings.InstanceCount,
+				PrivateKey:        awsConfigChefServerSettings.PrivateKey,
+				PublicKey:         awsConfigChefServerSettings.PublicKey,
+			},
+		}
 	}
 
-	existingInfraChefServerSettings := existingInfraConfig.ChefServer.Config
-
-	haDeployChefServerSettings.EnableCustomCerts = existingInfraChefServerSettings.EnableCustomCerts
-	haDeployChefServerSettings.InstanceCount = existingInfraChefServerSettings.InstanceCount
-	haDeployChefServerSettings.PrivateKey = existingInfraChefServerSettings.PrivateKey
-	haDeployChefServerSettings.PublicKey = existingInfraChefServerSettings.PublicKey
-
-	// CertsByIP
-	if existingInfraChefServerSettings.CertsByIP != nil {
-		haDeployChefServerSettings.CertsByIP = &[]config.CertByIP{}
-		CopyCertsByIP(haDeployChefServerSettings.CertsByIP, existingInfraChefServerSettings.CertsByIP)
+	if existingInfraConfig != nil {
+		existingInfraChefServerSettings := existingInfraConfig.ChefServer.Config
+		haDeployConfig.ChefServer = &config.ChefServerSettings{
+			Config: &config.ConfigSettings{
+				EnableCustomCerts: existingInfraChefServerSettings.EnableCustomCerts,
+				InstanceCount:     existingInfraChefServerSettings.InstanceCount,
+				PrivateKey:        existingInfraChefServerSettings.PrivateKey,
+				PublicKey:         existingInfraChefServerSettings.PublicKey,
+			},
+		}
+		// CertsByIP
+		if existingInfraChefServerSettings.CertsByIP != nil {
+			haDeployConfig.ChefServer.Config.CertsByIP = &[]config.CertByIP{}
+			CopyCertsByIP(haDeployConfig.ChefServer.Config.CertsByIP, existingInfraChefServerSettings.CertsByIP)
+		}
 	}
+
+	return haDeployConfig
 }
 
-func CopyAutomateSettings(haDeployConfigAutomateSettings *config.ConfigAutomateSettings, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
+func CopyAutomateSettings(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) *config.HaDeployConfig {
+
 	if awsConfig != nil {
 		awsConfigAutomateSettings := awsConfig.Automate.Config
-		haDeployConfigAutomateSettings.AdminPassword = awsConfigAutomateSettings.AdminPassword
-		haDeployConfigAutomateSettings.ConfigFile = awsConfigAutomateSettings.ConfigFile
-		haDeployConfigAutomateSettings.EnableCustomCerts = awsConfigAutomateSettings.EnableCustomCerts
-		haDeployConfigAutomateSettings.Fqdn = awsConfigAutomateSettings.Fqdn
-		haDeployConfigAutomateSettings.InstanceCount = awsConfigAutomateSettings.InstanceCount
-		haDeployConfigAutomateSettings.PrivateKey = awsConfigAutomateSettings.PrivateKey
-		haDeployConfigAutomateSettings.PublicKey = awsConfigAutomateSettings.PublicKey
-		haDeployConfigAutomateSettings.RootCA = awsConfigAutomateSettings.RootCA
-		haDeployConfigAutomateSettings.TeamsPort = awsConfigAutomateSettings.TeamsPort
-		return
+		haDeployConfig.Automate = &config.AutomateSettings{
+			Config: &config.ConfigAutomateSettings{
+				AdminPassword:     awsConfigAutomateSettings.AdminPassword,
+				ConfigFile:        awsConfigAutomateSettings.ConfigFile,
+				EnableCustomCerts: awsConfigAutomateSettings.EnableCustomCerts,
+				Fqdn:              awsConfigAutomateSettings.Fqdn,
+				InstanceCount:     awsConfigAutomateSettings.InstanceCount,
+				PrivateKey:        awsConfigAutomateSettings.PrivateKey,
+				PublicKey:         awsConfigAutomateSettings.PublicKey,
+				RootCA:            awsConfigAutomateSettings.RootCA,
+				TeamsPort:         awsConfigAutomateSettings.TeamsPort,
+			},
+		}
 	}
 
-	existingInfraConfigAutomateSettings := existingInfraConfig.Automate.Config
-	haDeployConfigAutomateSettings.AdminPassword = existingInfraConfigAutomateSettings.AdminPassword
-	haDeployConfigAutomateSettings.ConfigFile = existingInfraConfigAutomateSettings.ConfigFile
-	haDeployConfigAutomateSettings.EnableCustomCerts = existingInfraConfigAutomateSettings.EnableCustomCerts
-	haDeployConfigAutomateSettings.Fqdn = existingInfraConfigAutomateSettings.Fqdn
-	haDeployConfigAutomateSettings.InstanceCount = existingInfraConfigAutomateSettings.InstanceCount
-	haDeployConfigAutomateSettings.PrivateKey = existingInfraConfigAutomateSettings.PrivateKey
-	haDeployConfigAutomateSettings.PublicKey = existingInfraConfigAutomateSettings.PublicKey
-	haDeployConfigAutomateSettings.RootCA = existingInfraConfigAutomateSettings.RootCA
-	haDeployConfigAutomateSettings.TeamsPort = existingInfraConfigAutomateSettings.TeamsPort
-
-	// CertsByIP
-	if existingInfraConfigAutomateSettings.CertsByIP != nil {
-		haDeployConfigAutomateSettings.CertsByIP = &[]config.CertByIP{}
-		CopyCertsByIP(haDeployConfigAutomateSettings.CertsByIP, existingInfraConfigAutomateSettings.CertsByIP)
+	if existingInfraConfig != nil {
+		existingInfraConfigAutomateSettings := existingInfraConfig.Automate.Config
+		haDeployConfig.Automate = &config.AutomateSettings{
+			Config: &config.ConfigAutomateSettings{
+				AdminPassword:     existingInfraConfigAutomateSettings.AdminPassword,
+				ConfigFile:        existingInfraConfigAutomateSettings.ConfigFile,
+				EnableCustomCerts: existingInfraConfigAutomateSettings.EnableCustomCerts,
+				Fqdn:              existingInfraConfigAutomateSettings.Fqdn,
+				InstanceCount:     existingInfraConfigAutomateSettings.InstanceCount,
+				PrivateKey:        existingInfraConfigAutomateSettings.PrivateKey,
+				PublicKey:         existingInfraConfigAutomateSettings.PublicKey,
+				RootCA:            existingInfraConfigAutomateSettings.RootCA,
+				TeamsPort:         existingInfraConfigAutomateSettings.TeamsPort,
+			},
+		}
+		// CertsByIP
+		if existingInfraConfigAutomateSettings.CertsByIP != nil {
+			haDeployConfig.Automate.Config.CertsByIP = &[]config.CertByIP{}
+			CopyCertsByIP(haDeployConfig.Automate.Config.CertsByIP, existingInfraConfigAutomateSettings.CertsByIP)
+		}
 	}
+	return haDeployConfig
 }
 
-func CopyConfigObjectStorage(haDeployConfigObjectStorageConfig *config.ConfigObjectStorage, existingInfraConfig *ExistingInfraConfigToml) {
+func CopyConfigObjectStorage(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 	existingInfraConfigObjectStorageConfig := existingInfraConfig.ObjectStorage.Config
-
-	haDeployConfigObjectStorageConfig.AccessKey = existingInfraConfigObjectStorageConfig.AccessKey
-	haDeployConfigObjectStorageConfig.BucketName = existingInfraConfigObjectStorageConfig.BucketName
-	haDeployConfigObjectStorageConfig.Endpoint = existingInfraConfigObjectStorageConfig.Endpoint
-	haDeployConfigObjectStorageConfig.Region = existingInfraConfigObjectStorageConfig.Region
-	haDeployConfigObjectStorageConfig.SecretKey = existingInfraConfigObjectStorageConfig.SecretKey
+	haDeployConfig.ObjectStorage = &config.ObjectStorage{
+		Config: &config.ConfigObjectStorage{
+			AccessKey:  existingInfraConfigObjectStorageConfig.AccessKey,
+			BucketName: existingInfraConfigObjectStorageConfig.BucketName,
+			Endpoint:   existingInfraConfigObjectStorageConfig.Endpoint,
+			Region:     existingInfraConfigObjectStorageConfig.Region,
+			SecretKey:  existingInfraConfigObjectStorageConfig.SecretKey,
+		},
+	}
+	return haDeployConfig
 }
 
-func CopyConfigInitials(haDeployConfigConfigInitials *config.ConfigInitials, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) {
-
+func CopyConfigInitials(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	if awsConfig != nil {
 		awsConfigConfigInitials := awsConfig.Architecture.ConfigInitials
-		awshaDeployConfigConfigInitials := haDeployConfigConfigInitials
-
-		awshaDeployConfigConfigInitials.SSHUser = awsConfigConfigInitials.SSHUser
-		awshaDeployConfigConfigInitials.Architecture = awsConfigConfigInitials.Architecture
-		awshaDeployConfigConfigInitials.BackupConfig = awsConfigConfigInitials.BackupConfig
-		//Backup config
-		awshaDeployConfigConfigInitials.S3BucketName = awsConfigConfigInitials.S3BucketName
-		awshaDeployConfigConfigInitials.BackupMount = awsConfigConfigInitials.BackupMount
-		awshaDeployConfigConfigInitials.HabitatUIDGid = awsConfigConfigInitials.HabitatUIDGid
-		awshaDeployConfigConfigInitials.LoggingMonitoringManagement = awsConfigConfigInitials.LoggingMonitoringManagement
-		awshaDeployConfigConfigInitials.SSHGroupName = awsConfigConfigInitials.SSHGroupName
-		awshaDeployConfigConfigInitials.SSHKeyFile = awsConfigConfigInitials.SSHKeyFile
-		awshaDeployConfigConfigInitials.SSHPort = awsConfigConfigInitials.SSHPort
-		awshaDeployConfigConfigInitials.SSHUser = awsConfigConfigInitials.SSHUser
-		awshaDeployConfigConfigInitials.SecretsKeyFile = awsConfigConfigInitials.SecretsKeyFile
-		awshaDeployConfigConfigInitials.SecretsStoreFile = awsConfigConfigInitials.SecretsStoreFile
-		awshaDeployConfigConfigInitials.WorkspacePath = awsConfigConfigInitials.WorkspacePath
-		awshaDeployConfigConfigInitials.SudoPassword = "" // not fetched
-		return
+		haDeployConfig.Architecture = &config.Architecture{
+			Aws: &config.ConfigInitials{
+				SSHUser:                     awsConfigConfigInitials.SSHUser,
+				Architecture:                awsConfigConfigInitials.Architecture,
+				BackupConfig:                awsConfigConfigInitials.BackupConfig,
+				S3BucketName:                awsConfigConfigInitials.S3BucketName,
+				BackupMount:                 awsConfigConfigInitials.BackupMount,
+				HabitatUIDGid:               awsConfigConfigInitials.HabitatUIDGid,
+				LoggingMonitoringManagement: awsConfigConfigInitials.LoggingMonitoringManagement,
+				SSHGroupName:                awsConfigConfigInitials.SSHGroupName,
+				SSHKeyFile:                  awsConfigConfigInitials.SSHKeyFile,
+				SSHPort:                     awsConfigConfigInitials.SSHPort,
+				SecretsKeyFile:              awsConfigConfigInitials.SecretsKeyFile,
+				SecretsStoreFile:            awsConfigConfigInitials.SecretsStoreFile,
+				WorkspacePath:               awsConfigConfigInitials.WorkspacePath,
+				SudoPassword:                "", // not fetched
+			},
+		}
 	}
 
-	existingInfraConfigConfigInitials := existingInfraConfig.Architecture.ConfigInitials
+	if existingInfraConfig != nil {
+		existingInfraConfigConfigInitials := existingInfraConfig.Architecture.ConfigInitials
+		haDeployConfig.Architecture = &config.Architecture{
+			ExistingInfra: &config.ConfigInitials{
+				SSHUser:                     existingInfraConfigConfigInitials.SSHUser,
+				Architecture:                existingInfraConfigConfigInitials.Architecture,
+				BackupConfig:                existingInfraConfigConfigInitials.BackupConfig,
+				BackupMount:                 existingInfraConfigConfigInitials.BackupMount,
+				HabitatUIDGid:               existingInfraConfigConfigInitials.HabitatUIDGid,
+				LoggingMonitoringManagement: existingInfraConfigConfigInitials.LoggingMonitoringManagement,
+				SSHGroupName:                existingInfraConfigConfigInitials.SSHGroupName,
+				SSHKeyFile:                  existingInfraConfigConfigInitials.SSHKeyFile,
+				SSHPort:                     existingInfraConfigConfigInitials.SSHPort,
+				SecretsKeyFile:              existingInfraConfigConfigInitials.SecretsKeyFile,
+				SecretsStoreFile:            existingInfraConfigConfigInitials.SecretsStoreFile,
+				WorkspacePath:               existingInfraConfigConfigInitials.WorkspacePath,
+				SudoPassword:                "", // not fetched
+			},
+		}
+	}
 
-	haDeployConfigConfigInitials.SSHUser = existingInfraConfigConfigInitials.SSHUser
-	haDeployConfigConfigInitials.Architecture = existingInfraConfigConfigInitials.Architecture
-	haDeployConfigConfigInitials.BackupConfig = existingInfraConfigConfigInitials.BackupConfig
-	haDeployConfigConfigInitials.BackupMount = existingInfraConfigConfigInitials.BackupMount
-	haDeployConfigConfigInitials.HabitatUIDGid = existingInfraConfigConfigInitials.HabitatUIDGid
-	haDeployConfigConfigInitials.LoggingMonitoringManagement = existingInfraConfigConfigInitials.LoggingMonitoringManagement
-	haDeployConfigConfigInitials.SSHGroupName = existingInfraConfigConfigInitials.SSHGroupName
-	haDeployConfigConfigInitials.SSHKeyFile = existingInfraConfigConfigInitials.SSHKeyFile
-	haDeployConfigConfigInitials.SSHPort = existingInfraConfigConfigInitials.SSHPort
-	haDeployConfigConfigInitials.SSHUser = existingInfraConfigConfigInitials.SSHUser
-	haDeployConfigConfigInitials.SecretsKeyFile = existingInfraConfigConfigInitials.SecretsKeyFile
-	haDeployConfigConfigInitials.SecretsStoreFile = existingInfraConfigConfigInitials.SecretsStoreFile
-	haDeployConfigConfigInitials.WorkspacePath = existingInfraConfigConfigInitials.WorkspacePath
-	haDeployConfigConfigInitials.SudoPassword = "" // not fetched
+	return haDeployConfig
 }
 
-func CopyExistingInfra(haConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
+func CopyExistingInfra(haDeployConfig *config.HaDeployConfig, existingInfraConfig *ExistingInfraConfigToml) *config.HaDeployConfig {
 	// ConfigInitials
-	CopyConfigInitials(haConfig.Architecture.ExistingInfra, existingInfraConfig, nil)
+	haDeployConfig = CopyConfigInitials(haDeployConfig, existingInfraConfig, nil)
 
 	// ConfigObjectStorage
-	CopyConfigObjectStorage(haConfig.ObjectStorage.Config, existingInfraConfig)
+	haDeployConfig = CopyConfigObjectStorage(haDeployConfig, existingInfraConfig)
 
 	// ConfigAutomateSettings
-	CopyAutomateSettings(haConfig.Automate.Config, existingInfraConfig, nil)
+	haDeployConfig = CopyAutomateSettings(haDeployConfig, existingInfraConfig, nil)
 
 	// ChefServerSettings
-	CopyChefServerSettings(haConfig.ChefServer.Config, existingInfraConfig, nil)
+	haDeployConfig = CopyChefServerSettings(haDeployConfig, existingInfraConfig, nil)
 
 	// PostgresqlSettings
-	CopyPostgresqlSettings(haConfig.Postgresql.Config, existingInfraConfig, nil)
+	haDeployConfig = CopyPostgresqlSettings(haDeployConfig, existingInfraConfig, nil)
 
 	// OpensearchSettings
-	CopyOpensearchSettings(haConfig.Opensearch.Config, existingInfraConfig, nil)
+	haDeployConfig = CopyOpensearchSettings(haDeployConfig, existingInfraConfig, nil)
 
 	// ExistingInfraSettings
-	haConfig.External.Database.Type = existingInfraConfig.ExternalDB.Database.Type
+	haDeployConfig.External.Database.Type = existingInfraConfig.ExternalDB.Database.Type
 
-	CopyExistingInfraSettings(haConfig.ExistingInfra.Config, existingInfraConfig)
+	haDeployConfig = CopyExistingInfraSettings(haDeployConfig, existingInfraConfig)
 
 	// ExternalDbSettings
 	if IsExternalDb(existingInfraConfig) {
 		// ExternalPgSettings
-		CopyExternalPgSettings(haConfig.External.Database.PostgreSQL, existingInfraConfig)
+		haDeployConfig = CopyExternalPgSettings(haDeployConfig, existingInfraConfig)
 		// ExternalOsSettings
-		CopyExternalOsSettings(haConfig.External.Database.OpenSearch, existingInfraConfig)
+		haDeployConfig = CopyExternalOsSettings(haDeployConfig, existingInfraConfig)
 	}
 
-	return haConfig
+	return haDeployConfig
 }
 
-func CopyAws(haConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
+func CopyAws(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	// ConfigInitials
 
-	CopyConfigInitials(haConfig.Architecture.Aws, nil, awsConfig)
+	haDeployConfig = CopyConfigInitials(haDeployConfig, nil, awsConfig)
 
 	// ConfigAutomateSettings
-	CopyAutomateSettings(haConfig.Automate.Config, nil, awsConfig)
+	haDeployConfig = CopyAutomateSettings(haDeployConfig, nil, awsConfig)
 
 	// ChefServerSettings
-	CopyChefServerSettings(haConfig.ChefServer.Config, nil, awsConfig)
+	haDeployConfig = CopyChefServerSettings(haDeployConfig, nil, awsConfig)
 
 	// PostgresqlSettings
-	CopyPostgresqlSettings(haConfig.Postgresql.Config, nil, awsConfig)
+	haDeployConfig = CopyPostgresqlSettings(haDeployConfig, nil, awsConfig)
 
 	// OpensearchSettings
-	CopyOpensearchSettings(haConfig.Opensearch.Config, nil, awsConfig)
+	haDeployConfig = CopyOpensearchSettings(haDeployConfig, nil, awsConfig)
 
-	CopyAwsConfig(haConfig.Aws.Config, awsConfig)
+	haDeployConfig = CopyAwsConfig(haDeployConfig, awsConfig)
 
-	return haConfig
+	return haDeployConfig
 }
 
-func CopyAwsConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+func CopyAwsConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
+
 	awsConfigSetting := awsConfig.Aws.Config
 
 	// AWS Network Config
-	CopyAwsNetworkConfig(haConfigAws, awsConfig)
+	haDeployConfig = CopyAwsNetworkConfig(haDeployConfig, awsConfig)
 
 	// Managed Services
-	haConfigAws.SetupManagedServices = awsConfigSetting.SetupManagedServices
+	haDeployConfig.Aws.Config.SetupManagedServices = awsConfigSetting.SetupManagedServices
 	if awsConfigSetting.SetupManagedServices {
-		CopyManagedServices(haConfigAws, awsConfig)
+		haDeployConfig = CopyManagedServices(haDeployConfig, awsConfig)
 	}
 
 	// EC2 Instance Config
-	CopyEc2InstanceConfig(haConfigAws, awsConfig)
+	haDeployConfig = CopyEc2InstanceConfig(haDeployConfig, awsConfig)
+
+	return haDeployConfig
 }
 
-func CopyAwsNetworkConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+func CopyAwsNetworkConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	awsConfigSetting := awsConfig.Aws.Config
+	haDeployConfig.Aws = &config.AwsSettings{
+		Config: &config.ConfigAwsSettings{
+			Profile:              awsConfigSetting.Profile,
+			Region:               awsConfigSetting.Region,
+			AwsVpcID:             awsConfigSetting.AwsVpcId,
+			AwsCidrBlockAddr:     awsConfigSetting.AwsCidrBlockAddr,
+			PrivateCustomSubnets: awsConfigSetting.PrivateCustomSubnets,
+			PublicCustomSubnets:  awsConfigSetting.PublicCustomSubnets,
+			SSHKeyPairName:       awsConfigSetting.SSHKeyPairName,
+		},
+	}
 
-	haConfigAws.Profile = awsConfigSetting.Profile
-	haConfigAws.Region = awsConfigSetting.Region
-	haConfigAws.AwsVpcID = awsConfigSetting.AwsVpcId
-	haConfigAws.AwsCidrBlockAddr = awsConfigSetting.AwsCidrBlockAddr
-	haConfigAws.PrivateCustomSubnets = awsConfigSetting.PrivateCustomSubnets
-	haConfigAws.PublicCustomSubnets = awsConfigSetting.PublicCustomSubnets
-	haConfigAws.SSHKeyPairName = awsConfigSetting.SSHKeyPairName
+	return haDeployConfig
 }
 
-func CopyManagedServices(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+func CopyManagedServices(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	awsConfigSetting := awsConfig.Aws.Config
 
-	haConfigAws.ManagedOpensearchDomainName = awsConfigSetting.OpensearchDomainName
-	haConfigAws.ManagedOpensearchDomainURL = awsConfigSetting.OpensearchDomainUrl
-	haConfigAws.ManagedOpensearchUserPassword = awsConfigSetting.OpensearchUserPassword
-	haConfigAws.ManagedOpensearchUsername = awsConfigSetting.OpensearchUsername
-	haConfigAws.ManagedOpensearchCertificate = awsConfigSetting.OpensearchCertificate
-
-	haConfigAws.OsSnapshotUserAccessKeyID = awsConfigSetting.OsUserAccessKeyId
-	haConfigAws.OsSnapshotUserAccessKeySecret = awsConfigSetting.OsUserAccessKeySecret
-	haConfigAws.AwsOsSnapshotRoleArn = awsConfigSetting.AwsOsSnapshotRoleArn
-
-	haConfigAws.ManagedRdsCertificate = awsConfigSetting.RDSCertificate
-	haConfigAws.ManagedRdsDbuserPassword = awsConfigSetting.RDSDBUserPassword
-	haConfigAws.ManagedRdsDbuserUsername = awsConfigSetting.RDSDBUserName
-	haConfigAws.ManagedRdsInstanceURL = awsConfigSetting.RDSInstanceUrl
-	haConfigAws.ManagedRdsSuperuserPassword = awsConfigSetting.RDSSuperUserPassword
-	haConfigAws.ManagedRdsSuperuserUsername = awsConfigSetting.RDSSuperUserName
+	haDeployConfig.Aws = &config.AwsSettings{
+		Config: &config.ConfigAwsSettings{
+			ManagedOpensearchDomainName:   awsConfigSetting.OpensearchDomainName,
+			ManagedOpensearchDomainURL:    awsConfigSetting.OpensearchDomainUrl,
+			ManagedOpensearchUserPassword: awsConfigSetting.OpensearchUserPassword,
+			ManagedOpensearchUsername:     awsConfigSetting.OpensearchUsername,
+			ManagedOpensearchCertificate:  awsConfigSetting.OpensearchCertificate,
+			OsSnapshotUserAccessKeyID:     awsConfigSetting.OsUserAccessKeyId,
+			OsSnapshotUserAccessKeySecret: awsConfigSetting.OsUserAccessKeySecret,
+			AwsOsSnapshotRoleArn:          awsConfigSetting.AwsOsSnapshotRoleArn,
+			ManagedRdsCertificate:         awsConfigSetting.RDSCertificate,
+			ManagedRdsDbuserPassword:      awsConfigSetting.RDSDBUserPassword,
+			ManagedRdsDbuserUsername:      awsConfigSetting.RDSDBUserName,
+			ManagedRdsInstanceURL:         awsConfigSetting.RDSInstanceUrl,
+			ManagedRdsSuperuserPassword:   awsConfigSetting.RDSSuperUserPassword,
+			ManagedRdsSuperuserUsername:   awsConfigSetting.RDSSuperUserName,
+		},
+	}
+	return haDeployConfig
 }
 
-func CopyEc2InstanceConfig(haConfigAws *config.ConfigAwsSettings, awsConfig *AwsConfigToml) {
+func CopyEc2InstanceConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 	awsConfigSetting := awsConfig.Aws.Config
 
-	haConfigAws.AmiID = awsConfigSetting.AmiID
-	haConfigAws.DeleteOnTermination = awsConfigSetting.DeleteOnTermination
+	haDeployConfig.Aws = &config.AwsSettings{
+		Config: &config.ConfigAwsSettings{
+			AmiID:                        awsConfigSetting.AmiID,
+			DeleteOnTermination:          awsConfigSetting.DeleteOnTermination,
+			AutomateServerInstanceType:   awsConfigSetting.AutomateServerInstanceType,
+			ChefServerInstanceType:       awsConfigSetting.ChefServerInstanceType,
+			PostgresqlServerInstanceType: awsConfigSetting.PostgresqlServerInstanceType,
+			OpensearchServerInstanceType: awsConfigSetting.OpensearchServerInstanceType,
+			AutomateLbCertificateArn:     awsConfigSetting.AutomateLbCertificateArn,
+			ChefServerLbCertificateArn:   awsConfigSetting.ChefServerLbCertificateArn,
+			AutomateEbsVolumeIops:        awsConfigSetting.AutomateEbsVolumeIops,
+			AutomateEbsVolumeSize:        awsConfigSetting.AutomateEbsVolumeSize,
+			AutomateEbsVolumeType:        awsConfigSetting.AutomateEbsVolumeType,
+			ChefEbsVolumeIops:            awsConfigSetting.ChefEbsVolumeIops,
+			ChefEbsVolumeSize:            awsConfigSetting.ChefEbsVolumeSize,
+			ChefEbsVolumeType:            awsConfigSetting.ChefEbsVolumeType,
+			OpensearchEbsVolumeIops:      awsConfigSetting.OpensearchEbsVolumeIops,
+			OpensearchEbsVolumeSize:      awsConfigSetting.OpensearchEbsVolumeSize,
+			OpensearchEbsVolumeType:      awsConfigSetting.OpensearchEbsVolumeType,
+			PostgresqlEbsVolumeIops:      awsConfigSetting.PostgresqlEbsVolumeIops,
+			PostgresqlEbsVolumeSize:      awsConfigSetting.PostgresqlEbsVolumeSize,
+			PostgresqlEbsVolumeType:      awsConfigSetting.PostgresqlEbsVolumeType,
+			LbAccessLogs:                 awsConfigSetting.LBAccessLogs,
+		},
+	}
 
-	haConfigAws.AutomateServerInstanceType = awsConfigSetting.AutomateServerInstanceType
-	haConfigAws.ChefServerInstanceType = awsConfigSetting.ChefServerInstanceType
-	haConfigAws.PostgresqlServerInstanceType = awsConfigSetting.PostgresqlServerInstanceType
-	haConfigAws.OpensearchServerInstanceType = awsConfigSetting.OpensearchServerInstanceType
-
-	haConfigAws.AutomateLbCertificateArn = awsConfigSetting.AutomateLbCertificateArn
-	haConfigAws.ChefServerLbCertificateArn = awsConfigSetting.ChefServerLbCertificateArn
-
-	haConfigAws.AutomateEbsVolumeIops = awsConfigSetting.AutomateEbsVolumeIops
-	haConfigAws.AutomateEbsVolumeSize = awsConfigSetting.AutomateEbsVolumeSize
-	haConfigAws.AutomateEbsVolumeType = awsConfigSetting.AutomateEbsVolumeType
-	haConfigAws.ChefEbsVolumeIops = awsConfigSetting.ChefEbsVolumeIops
-	haConfigAws.ChefEbsVolumeSize = awsConfigSetting.ChefEbsVolumeSize
-	haConfigAws.ChefEbsVolumeType = awsConfigSetting.ChefEbsVolumeType
-	haConfigAws.OpensearchEbsVolumeIops = awsConfigSetting.OpensearchEbsVolumeIops
-	haConfigAws.OpensearchEbsVolumeSize = awsConfigSetting.OpensearchEbsVolumeSize
-	haConfigAws.OpensearchEbsVolumeType = awsConfigSetting.OpensearchEbsVolumeType
-	haConfigAws.PostgresqlEbsVolumeIops = awsConfigSetting.PostgresqlEbsVolumeIops
-	haConfigAws.PostgresqlEbsVolumeSize = awsConfigSetting.PostgresqlEbsVolumeSize
-	haConfigAws.PostgresqlEbsVolumeType = awsConfigSetting.PostgresqlEbsVolumeType
-
-	haConfigAws.LbAccessLogs = awsConfigSetting.LBAccessLogs
+	return haDeployConfig
 }
 
 func IsExternalDb(existingInfraConfig *ExistingInfraConfigToml) bool {
