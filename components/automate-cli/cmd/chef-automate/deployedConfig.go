@@ -385,7 +385,6 @@ func CopyAwsConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigTo
 	haDeployConfig = CopyAwsNetworkConfig(haDeployConfig, awsConfig)
 
 	// Managed Services
-	haDeployConfig.Aws.Config.SetupManagedServices = awsConfigSetting.SetupManagedServices
 	if awsConfigSetting.SetupManagedServices {
 		haDeployConfig = CopyManagedServices(haDeployConfig, awsConfig)
 	}
@@ -407,6 +406,7 @@ func CopyAwsNetworkConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsC
 			PrivateCustomSubnets: awsConfigSetting.PrivateCustomSubnets,
 			PublicCustomSubnets:  awsConfigSetting.PublicCustomSubnets,
 			SSHKeyPairName:       awsConfigSetting.SSHKeyPairName,
+			SetupManagedServices: awsConfigSetting.SetupManagedServices,
 		},
 	}
 
