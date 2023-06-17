@@ -7,6 +7,124 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// func TestPopulateHaCommonConfig(t *testing.T) {
+// 	// Mocking dependencies
+// 	getAutomateHAInfraDetails := func() (*AutomateHAInfraDetails, error) {
+// 		// Mocked implementation that returns sample infra details or an error
+// 		// Modify this function according to your test case scenario
+// 		return &AutomateHAInfraDetails{
+// 			// Populate the struct fields with sample data
+// 		}, nil
+// 	}
+
+// 	fetchInfraConfig := func() (*ExistingInfraConfigToml, error) {
+// 		// Mocked implementation that returns sample existing infra config or an error
+// 		// Modify this function according to your test case scenario
+// 		return &ExistingInfraConfigToml{
+// 			// Sample existing infra config fields
+// 		}, nil
+// 	}
+
+// 	fetchAwsConfig := func() (*AwsConfigToml, error) {
+// 		// Mocked implementation that returns sample AWS config or an error
+// 		// Modify this function according to your test case scenario
+// 		return &AwsConfigToml{
+// 			// Sample AWS config fields
+// 		}, nil
+// 	}
+
+// 	// Replace the original functions with the mocked implementations
+// 	originalGetAutomateHAInfraDetails := getAutomateHAInfraDetails
+// 	originalFetchInfraConfig := fetchInfraConfig
+// 	originalFetchAwsConfig := fetchAwsConfig
+
+// 	sshConfig := &SSHConfig{
+// 		sshUser:    infra.Outputs.SSHUser.Value,
+// 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+// 		sshPort:    infra.Outputs.SSHPort.Value,
+// 	}
+// 	sshUtil := NewSSHUtil(sshConfig)
+// 	configPuller := NewPullConfigs(infra, sshUtil)
+// 	defer func() {
+// 		getAutomateHAInfraDetails = originalGetAutomateHAInfraDetails
+// 		configPuller.fetchInfraConfig = originalFetchInfraConfig
+// 		configPuller.fetchAwsConfig = originalFetchAwsConfig
+// 	}()
+
+// 	// Mocked function to override the implementation of NewSSHUtil
+// 	newSSHUtil := func(config *config.SSHConfig) sshUtilInterface {
+// 		// Mocked implementation that returns a dummy SSHUtil or a custom mock
+// 		// Modify this function according to your test case scenario
+// 		return &dummySSHUtil{}
+// 	}
+
+// 	// Mocked function to override the implementation of CopyExistingInfra
+// 	copyExistingInfra := func(existingInfraConfig *config.ExistingInfraConfig) *config.HaDeployConfig {
+// 		// Mocked implementation that returns a dummy HaDeployConfig or a custom mock
+// 		// Modify this function according to your test case scenario
+// 		return &config.HaDeployConfig{}
+// 	}
+
+// 	// Mocked function to override the implementation of CopyAws
+// 	copyAws := func(awsConfig *config.AwsConfig) *config.HaDeployConfig {
+// 		// Mocked implementation that returns a dummy HaDeployConfig or a custom mock
+// 		// Modify this function according to your test case scenario
+// 		return &config.HaDeployConfig{}
+// 	}
+
+// 	// Replace the original functions with the mocked implementations
+// 	originalNewSSHUtil := newSSHUtil
+// 	originalCopyExistingInfra := copyExistingInfra
+// 	originalCopyAws := copyAws
+// 	defer func() {
+// 		NewSSHUtil = originalNewSSHUtil
+// 		CopyExistingInfra = originalCopyExistingInfra
+// 		CopyAws = originalCopyAws
+// 	}()
+
+// 	// Assign the mocked functions to the package-level variables
+// 	NewSSHUtil = newSSHUtil
+// 	CopyExistingInfra = copyExistingInfra
+// 	CopyAws = copyAws
+
+// 	// Test case: Existing Infra Config
+// 	getAutomateHAInfraDetails = func() (*infraDetails, error) {
+// 		// Mocked implementation that returns sample infra details or an error
+// 		return &infraDetails{}, nil
+// 	}
+
+// 	configPuller.fetchInfraConfig = fetchInfraConfig
+
+// 	haDeployConfig, err := PopulateHaCommonConfig()
+// 	assert.Nil(t, err)
+// 	assert.NotNil(t, haDeployConfig)
+// 	// Add assertions to verify the populated HaDeployConfig for the existing infra config scenario
+
+// 	// Test case: AWS Config
+// 	getAutomateHAInfraDetails = func() (*infraDetails, error) {
+// 		// Mocked implementation that returns sample infra details or an error
+// 		return &infraDetails{}, nil
+// 	}
+
+// 	configPuller.fetchAwsConfig = fetchAwsConfig
+
+// 	haDeployConfig, err = PopulateHaCommonConfig()
+// 	assert.Nil(t, err)
+// 	assert.NotNil(t, haDeployConfig)
+// 	// Add assertions to verify the populated HaDeployConfig for the AWS config scenario
+
+// 	// Test case: Deployed config not found
+// 	getAutomateHAInfraDetails = func() (*infraDetails, error) {
+// 		// Mocked implementation that returns an error indicating infra details not found
+// 		return nil, errors.New("infra details not found")
+// 	}
+
+// 	haDeployConfig, err = PopulateHaCommonConfig()
+// 	assert.NotNil(t, err)
+// 	assert.Nil(t, haDeployConfig)
+// 	// Add assertions to verify the error message and HaDeployConfig is nil for the deployed config not found scenario
+// }
+
 func TestCopyCertsByIP(t *testing.T) {
 	// Prepare test data
 	existing := []CertByIP{
