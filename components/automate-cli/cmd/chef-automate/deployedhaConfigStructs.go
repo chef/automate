@@ -218,7 +218,7 @@ type ExistingInfraConfigInitialsToml struct {
 	BackupConfig                string `toml:"backup_config,omitempty"`
 }
 
-type AutomateToml struct {
+type ExistingInfraAutomateToml struct {
 	Config struct {
 		AdminPassword     string     `toml:"admin_password"`
 		Fqdn              string     `toml:"fqdn"`
@@ -233,7 +233,7 @@ type AutomateToml struct {
 	} `toml:"config"`
 }
 
-type AutomateConfigToml struct {
+type ExistingInfraAutomateConfigToml struct {
 	AdminPassword     string     `toml:"admin_password"`
 	Fqdn              string     `toml:"fqdn"`
 	InstanceCount     string     `toml:"instance_count"`
