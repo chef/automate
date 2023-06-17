@@ -55,13 +55,13 @@ type Backup struct {
 }
 
 type Certificate struct {
-	Fqdn           string     `json:"fqdn"`
-	FqdnRootCert   string     `json:"fqdn_root_ca"`
-	NodeType       string     `json:"node_type"`
-	AutomateFqdn   string     `json:"automate_fqdn"`
-	ChefServerFqdn string     `json:"cs_fqdn"`
-	RootCert       string     `json:"root_cert"`
-	Nodes          []NodeCert `json:"nodes"`
+	Fqdn           string      `json:"fqdn"`
+	FqdnRootCert   string      `json:"fqdn_root_ca"`
+	NodeType       string      `json:"node_type"`
+	AutomateFqdn   string      `json:"automate_fqdn"`
+	ChefServerFqdn string      `json:"cs_fqdn"`
+	RootCert       string      `json:"root_cert"`
+	Nodes          []*NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -94,14 +94,14 @@ type Config struct {
 	APIToken        string         `json:"api_token"`
 }
 
-func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []NodeCert {
-	nodeCertsList := make([]NodeCert, 0)
+func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
+	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
 	for _, ip := range ipList {
 		certByIP, ok := certByIpMap[ip]
-		var nodeCert NodeCert
+		var nodeCert *NodeCert
 		if ok {
-			nodeCert = NodeCert{
+			nodeCert = &NodeCert{
 				IP:        certByIP.IP,
 				Key:       certByIP.PrivateKey,
 				Cert:      certByIP.PublicKey,
@@ -110,7 +110,7 @@ func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, p
 				RootCert:  nodeRootCa,
 			}
 		} else {
-			nodeCert = NodeCert{
+			nodeCert = &NodeCert{
 				IP:        ip,
 				Key:       privateKey,
 				Cert:      publicKey,

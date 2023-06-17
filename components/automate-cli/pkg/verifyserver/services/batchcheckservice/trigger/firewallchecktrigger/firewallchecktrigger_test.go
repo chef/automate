@@ -30,12 +30,12 @@ var (
 		},
 	}
 
-	nodeCert = models.NodeCert{
+	nodeCert = &models.NodeCert{
 		IP:  "10.0.0.1",
 		Key: "test-key",
 	}
 
-	nodes = []models.NodeCert{nodeCert}
+	nodes = []*models.NodeCert{nodeCert}
 )
 
 const (
