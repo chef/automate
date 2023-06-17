@@ -380,44 +380,16 @@ func CopyAws(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *c
 func CopyAwsConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
 
 	awsConfigSetting := awsConfig.Aws.Config
-
-	// AWS Network Config
-	haDeployConfig = CopyAwsNetworkConfig(haDeployConfig, awsConfig)
-
-	// Managed Services
-	if awsConfigSetting.SetupManagedServices {
-		haDeployConfig = CopyManagedServices(haDeployConfig, awsConfig)
-	}
-
-	// EC2 Instance Config
-	haDeployConfig = CopyEc2InstanceConfig(haDeployConfig, awsConfig)
-
-	return haDeployConfig
-}
-
-func CopyAwsNetworkConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
-	awsConfigSetting := awsConfig.Aws.Config
 	haDeployConfig.Aws = &config.AwsSettings{
 		Config: &config.ConfigAwsSettings{
-			Profile:              awsConfigSetting.Profile,
-			Region:               awsConfigSetting.Region,
-			AwsVpcID:             awsConfigSetting.AwsVpcId,
-			AwsCidrBlockAddr:     awsConfigSetting.AwsCidrBlockAddr,
-			PrivateCustomSubnets: awsConfigSetting.PrivateCustomSubnets,
-			PublicCustomSubnets:  awsConfigSetting.PublicCustomSubnets,
-			SSHKeyPairName:       awsConfigSetting.SSHKeyPairName,
-			SetupManagedServices: awsConfigSetting.SetupManagedServices,
-		},
-	}
-
-	return haDeployConfig
-}
-
-func CopyManagedServices(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
-	awsConfigSetting := awsConfig.Aws.Config
-
-	haDeployConfig.Aws = &config.AwsSettings{
-		Config: &config.ConfigAwsSettings{
+			Profile:                       awsConfigSetting.Profile,
+			Region:                        awsConfigSetting.Region,
+			AwsVpcID:                      awsConfigSetting.AwsVpcId,
+			AwsCidrBlockAddr:              awsConfigSetting.AwsCidrBlockAddr,
+			PrivateCustomSubnets:          awsConfigSetting.PrivateCustomSubnets,
+			PublicCustomSubnets:           awsConfigSetting.PublicCustomSubnets,
+			SSHKeyPairName:                awsConfigSetting.SSHKeyPairName,
+			SetupManagedServices:          awsConfigSetting.SetupManagedServices,
 			ManagedOpensearchDomainName:   awsConfigSetting.OpensearchDomainName,
 			ManagedOpensearchDomainURL:    awsConfigSetting.OpensearchDomainUrl,
 			ManagedOpensearchUserPassword: awsConfigSetting.OpensearchUserPassword,
@@ -432,37 +404,27 @@ func CopyManagedServices(haDeployConfig *config.HaDeployConfig, awsConfig *AwsCo
 			ManagedRdsInstanceURL:         awsConfigSetting.RDSInstanceUrl,
 			ManagedRdsSuperuserPassword:   awsConfigSetting.RDSSuperUserPassword,
 			ManagedRdsSuperuserUsername:   awsConfigSetting.RDSSuperUserName,
-		},
-	}
-	return haDeployConfig
-}
-
-func CopyEc2InstanceConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigToml) *config.HaDeployConfig {
-	awsConfigSetting := awsConfig.Aws.Config
-
-	haDeployConfig.Aws = &config.AwsSettings{
-		Config: &config.ConfigAwsSettings{
-			AmiID:                        awsConfigSetting.AmiID,
-			DeleteOnTermination:          awsConfigSetting.DeleteOnTermination,
-			AutomateServerInstanceType:   awsConfigSetting.AutomateServerInstanceType,
-			ChefServerInstanceType:       awsConfigSetting.ChefServerInstanceType,
-			PostgresqlServerInstanceType: awsConfigSetting.PostgresqlServerInstanceType,
-			OpensearchServerInstanceType: awsConfigSetting.OpensearchServerInstanceType,
-			AutomateLbCertificateArn:     awsConfigSetting.AutomateLbCertificateArn,
-			ChefServerLbCertificateArn:   awsConfigSetting.ChefServerLbCertificateArn,
-			AutomateEbsVolumeIops:        awsConfigSetting.AutomateEbsVolumeIops,
-			AutomateEbsVolumeSize:        awsConfigSetting.AutomateEbsVolumeSize,
-			AutomateEbsVolumeType:        awsConfigSetting.AutomateEbsVolumeType,
-			ChefEbsVolumeIops:            awsConfigSetting.ChefEbsVolumeIops,
-			ChefEbsVolumeSize:            awsConfigSetting.ChefEbsVolumeSize,
-			ChefEbsVolumeType:            awsConfigSetting.ChefEbsVolumeType,
-			OpensearchEbsVolumeIops:      awsConfigSetting.OpensearchEbsVolumeIops,
-			OpensearchEbsVolumeSize:      awsConfigSetting.OpensearchEbsVolumeSize,
-			OpensearchEbsVolumeType:      awsConfigSetting.OpensearchEbsVolumeType,
-			PostgresqlEbsVolumeIops:      awsConfigSetting.PostgresqlEbsVolumeIops,
-			PostgresqlEbsVolumeSize:      awsConfigSetting.PostgresqlEbsVolumeSize,
-			PostgresqlEbsVolumeType:      awsConfigSetting.PostgresqlEbsVolumeType,
-			LbAccessLogs:                 awsConfigSetting.LBAccessLogs,
+			AmiID:                         awsConfigSetting.AmiID,
+			DeleteOnTermination:           awsConfigSetting.DeleteOnTermination,
+			AutomateServerInstanceType:    awsConfigSetting.AutomateServerInstanceType,
+			ChefServerInstanceType:        awsConfigSetting.ChefServerInstanceType,
+			PostgresqlServerInstanceType:  awsConfigSetting.PostgresqlServerInstanceType,
+			OpensearchServerInstanceType:  awsConfigSetting.OpensearchServerInstanceType,
+			AutomateLbCertificateArn:      awsConfigSetting.AutomateLbCertificateArn,
+			ChefServerLbCertificateArn:    awsConfigSetting.ChefServerLbCertificateArn,
+			AutomateEbsVolumeIops:         awsConfigSetting.AutomateEbsVolumeIops,
+			AutomateEbsVolumeSize:         awsConfigSetting.AutomateEbsVolumeSize,
+			AutomateEbsVolumeType:         awsConfigSetting.AutomateEbsVolumeType,
+			ChefEbsVolumeIops:             awsConfigSetting.ChefEbsVolumeIops,
+			ChefEbsVolumeSize:             awsConfigSetting.ChefEbsVolumeSize,
+			ChefEbsVolumeType:             awsConfigSetting.ChefEbsVolumeType,
+			OpensearchEbsVolumeIops:       awsConfigSetting.OpensearchEbsVolumeIops,
+			OpensearchEbsVolumeSize:       awsConfigSetting.OpensearchEbsVolumeSize,
+			OpensearchEbsVolumeType:       awsConfigSetting.OpensearchEbsVolumeType,
+			PostgresqlEbsVolumeIops:       awsConfigSetting.PostgresqlEbsVolumeIops,
+			PostgresqlEbsVolumeSize:       awsConfigSetting.PostgresqlEbsVolumeSize,
+			PostgresqlEbsVolumeType:       awsConfigSetting.PostgresqlEbsVolumeType,
+			LbAccessLogs:                  awsConfigSetting.LBAccessLogs,
 		},
 	}
 

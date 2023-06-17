@@ -45,141 +45,6 @@ func TestCopyCertsByIP(t *testing.T) {
 	assert.Equal(t, "/existing/nodes/dn2", (*haDeploy)[1].NodesDn)
 }
 
-func TestCopyEc2InstanceConfig(t *testing.T) {
-	// Mock input values
-	haDeployConfig := &config.HaDeployConfig{}
-
-	awsEc2InstanceConfig := &AwsConfigToml{
-		Aws: AwsToml{
-			Config: ConfigToml{
-				AmiID:                        "ami-08d4ac5b634553e16",
-				DeleteOnTermination:          true,
-				AutomateServerInstanceType:   "t3.medium",
-				ChefServerInstanceType:       "t3.medium",
-				PostgresqlServerInstanceType: "m5.large",
-				OpensearchServerInstanceType: "m5.large",
-				AutomateLbCertificateArn:     "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
-				ChefServerLbCertificateArn:   "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
-				AutomateEbsVolumeIops:        "100",
-				AutomateEbsVolumeSize:        "50",
-				AutomateEbsVolumeType:        "gp3",
-				ChefEbsVolumeIops:            "100",
-				ChefEbsVolumeSize:            "50",
-				ChefEbsVolumeType:            "gp3",
-				OpensearchEbsVolumeIops:      "100",
-				OpensearchEbsVolumeSize:      "50",
-				OpensearchEbsVolumeType:      "gp3",
-				PostgresqlEbsVolumeIops:      "100",
-				PostgresqlEbsVolumeSize:      "50",
-				PostgresqlEbsVolumeType:      "gp3",
-				LBAccessLogs:                 "false",
-			},
-		},
-	}
-
-	// Call the function
-	haDeployConfig = CopyEc2InstanceConfig(haDeployConfig, awsEc2InstanceConfig)
-
-	awsConfigSetting := haDeployConfig.Aws.Config
-	// Verify the copied values
-	assert.Equal(t, awsConfigSetting.AmiID, awsEc2InstanceConfig.Aws.Config.AmiID)
-	assert.Equal(t, awsConfigSetting.DeleteOnTermination, awsEc2InstanceConfig.Aws.Config.DeleteOnTermination)
-	assert.Equal(t, awsConfigSetting.AutomateServerInstanceType, awsEc2InstanceConfig.Aws.Config.AutomateServerInstanceType)
-	assert.Equal(t, awsConfigSetting.ChefServerInstanceType, awsEc2InstanceConfig.Aws.Config.ChefServerInstanceType)
-	assert.Equal(t, awsConfigSetting.PostgresqlServerInstanceType, awsEc2InstanceConfig.Aws.Config.PostgresqlServerInstanceType)
-	assert.Equal(t, awsConfigSetting.OpensearchServerInstanceType, awsEc2InstanceConfig.Aws.Config.OpensearchServerInstanceType)
-	assert.Equal(t, awsConfigSetting.AutomateLbCertificateArn, awsEc2InstanceConfig.Aws.Config.AutomateLbCertificateArn)
-	assert.Equal(t, awsConfigSetting.ChefServerLbCertificateArn, awsEc2InstanceConfig.Aws.Config.ChefServerLbCertificateArn)
-	assert.Equal(t, awsConfigSetting.AutomateEbsVolumeIops, awsEc2InstanceConfig.Aws.Config.AutomateEbsVolumeIops)
-	assert.Equal(t, awsConfigSetting.AutomateEbsVolumeSize, awsEc2InstanceConfig.Aws.Config.AutomateEbsVolumeSize)
-	assert.Equal(t, awsConfigSetting.AutomateEbsVolumeType, awsEc2InstanceConfig.Aws.Config.AutomateEbsVolumeType)
-	assert.Equal(t, awsConfigSetting.ChefEbsVolumeIops, awsEc2InstanceConfig.Aws.Config.ChefEbsVolumeIops)
-	assert.Equal(t, awsConfigSetting.ChefEbsVolumeSize, awsEc2InstanceConfig.Aws.Config.ChefEbsVolumeSize)
-	assert.Equal(t, awsConfigSetting.ChefEbsVolumeType, awsEc2InstanceConfig.Aws.Config.ChefEbsVolumeType)
-	assert.Equal(t, awsConfigSetting.OpensearchEbsVolumeIops, awsEc2InstanceConfig.Aws.Config.OpensearchEbsVolumeIops)
-	assert.Equal(t, awsConfigSetting.OpensearchEbsVolumeSize, awsEc2InstanceConfig.Aws.Config.OpensearchEbsVolumeSize)
-	assert.Equal(t, awsConfigSetting.OpensearchEbsVolumeType, awsEc2InstanceConfig.Aws.Config.OpensearchEbsVolumeType)
-	assert.Equal(t, awsConfigSetting.PostgresqlEbsVolumeIops, awsEc2InstanceConfig.Aws.Config.PostgresqlEbsVolumeIops)
-	assert.Equal(t, awsConfigSetting.PostgresqlEbsVolumeSize, awsEc2InstanceConfig.Aws.Config.PostgresqlEbsVolumeSize)
-	assert.Equal(t, awsConfigSetting.PostgresqlEbsVolumeType, awsEc2InstanceConfig.Aws.Config.PostgresqlEbsVolumeType)
-	assert.Equal(t, awsConfigSetting.LbAccessLogs, awsEc2InstanceConfig.Aws.Config.LBAccessLogs)
-
-}
-
-func TestCopyManagedServices(t *testing.T) {
-
-	haDeployConfig := &config.HaDeployConfig{}
-
-	awsManagedServicesConfig := &AwsConfigToml{
-		Aws: AwsToml{
-			Config: ConfigToml{
-				OpensearchDomainName:   "opensearch-domain",
-				OpensearchDomainUrl:    "opensearch-url",
-				OpensearchUserPassword: "opensearch-password",
-				OpensearchUsername:     "opensearch-username",
-				OpensearchCertificate:  "opensearch-certificate",
-				OsUserAccessKeyId:      "access-key-id",
-				OsUserAccessKeySecret:  "access-key-secret",
-				AwsOsSnapshotRoleArn:   "snapshot-role-arn",
-				RDSCertificate:         "rds-certificate",
-				RDSDBUserPassword:      "rds-db-password",
-				RDSDBUserName:          "rds-db-username",
-				RDSInstanceUrl:         "rds-instance-url",
-				RDSSuperUserPassword:   "rds-superuser-password",
-				RDSSuperUserName:       "rds-superuser-username",
-			},
-		},
-	}
-
-	haDeployConfig = CopyManagedServices(haDeployConfig, awsManagedServicesConfig)
-	haConfigAws := haDeployConfig.Aws.Config
-	// Assert the copied values
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchDomainName, haConfigAws.ManagedOpensearchDomainName)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchDomainUrl, haConfigAws.ManagedOpensearchDomainURL)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchUserPassword, haConfigAws.ManagedOpensearchUserPassword)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchUsername, haConfigAws.ManagedOpensearchUsername)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OpensearchCertificate, haConfigAws.ManagedOpensearchCertificate)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OsUserAccessKeyId, haConfigAws.OsSnapshotUserAccessKeyID)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.OsUserAccessKeySecret, haConfigAws.OsSnapshotUserAccessKeySecret)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.AwsOsSnapshotRoleArn, haConfigAws.AwsOsSnapshotRoleArn)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSCertificate, haConfigAws.ManagedRdsCertificate)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSDBUserPassword, haConfigAws.ManagedRdsDbuserPassword)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSDBUserName, haConfigAws.ManagedRdsDbuserUsername)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSInstanceUrl, haConfigAws.ManagedRdsInstanceURL)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSSuperUserPassword, haConfigAws.ManagedRdsSuperuserPassword)
-	assert.Equal(t, awsManagedServicesConfig.Aws.Config.RDSSuperUserName, haConfigAws.ManagedRdsSuperuserUsername)
-
-}
-
-func TestCopyAwsNetworkConfig(t *testing.T) {
-
-	haDeployConfig := &config.HaDeployConfig{}
-	awsNetworkConfig := &AwsConfigToml{
-		Aws: AwsToml{
-			Config: ConfigToml{
-				Profile:              "my-profile",
-				Region:               "us-west-2",
-				AwsVpcId:             "vpc-12345",
-				AwsCidrBlockAddr:     "10.0.0.0/16",
-				PrivateCustomSubnets: []string{"subnet-12345", "subnet-67890"},
-				PublicCustomSubnets:  []string{"subnet-54321", "subnet-09876"},
-				SSHKeyPairName:       "my-keypair",
-			},
-		},
-	}
-
-	haDeployConfig = CopyAwsNetworkConfig(haDeployConfig, awsNetworkConfig)
-	haConfigAws := haDeployConfig.Aws.Config
-	// Assert the copied values
-	assert.Equal(t, awsNetworkConfig.Aws.Config.Profile, haConfigAws.Profile)
-	assert.Equal(t, awsNetworkConfig.Aws.Config.Region, haConfigAws.Region)
-	assert.Equal(t, awsNetworkConfig.Aws.Config.AwsVpcId, haConfigAws.AwsVpcID)
-	assert.Equal(t, awsNetworkConfig.Aws.Config.AwsCidrBlockAddr, haConfigAws.AwsCidrBlockAddr)
-	assert.Equal(t, awsNetworkConfig.Aws.Config.PrivateCustomSubnets, haConfigAws.PrivateCustomSubnets)
-	assert.Equal(t, awsNetworkConfig.Aws.Config.PublicCustomSubnets, haConfigAws.PublicCustomSubnets)
-	assert.Equal(t, awsNetworkConfig.Aws.Config.SSHKeyPairName, haConfigAws.SSHKeyPairName)
-}
-
 func TestCopyAwsConfig(t *testing.T) {
 	haDeployConfig := &config.HaDeployConfig{}
 	awsConfig := &AwsConfigToml{
@@ -233,49 +98,49 @@ func TestCopyAwsConfig(t *testing.T) {
 	}
 	haDeployConfig = CopyAwsConfig(haDeployConfig, awsConfig)
 
-	// aws := haDeployConfig.Aws.Config
-	// assert.Equal(t, "my-profile", aws.Profile)
-	// assert.Equal(t, "us-west-2", aws.Region)
-	// assert.Equal(t, "vpc-12345", aws.AwsVpcID)
-	// assert.Equal(t, "10.0.0.0/16", aws.AwsCidrBlockAddr)
-	// assert.Equal(t, []string{"subnet-12345", "subnet-67890"}, aws.PrivateCustomSubnets)
-	// assert.Equal(t, []string{"subnet-54321", "subnet-09876"}, aws.PublicCustomSubnets)
-	// assert.Equal(t, "my-keypair", aws.SSHKeyPairName)
-	// assert.Equal(t, "ami-08d4ac5b634553e16", aws.AmiID)
-	// assert.Equal(t, true, aws.DeleteOnTermination)
-	// assert.Equal(t, "t3.medium", aws.AutomateServerInstanceType)
-	// assert.Equal(t, "t3.medium", aws.ChefServerInstanceType)
-	// assert.Equal(t, "m5.large", aws.PostgresqlServerInstanceType)
-	// assert.Equal(t, "m5.large", aws.OpensearchServerInstanceType)
-	// assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.AutomateLbCertificateArn)
-	// assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.ChefServerLbCertificateArn)
-	// assert.Equal(t, "100", aws.AutomateEbsVolumeIops)
-	// assert.Equal(t, "50", aws.AutomateEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.AutomateEbsVolumeType)
-	// assert.Equal(t, "100", aws.ChefEbsVolumeIops)
-	// assert.Equal(t, "50", aws.ChefEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.ChefEbsVolumeType)
-	// assert.Equal(t, "100", aws.OpensearchEbsVolumeIops)
-	// assert.Equal(t, "50", aws.OpensearchEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.OpensearchEbsVolumeType)
-	// assert.Equal(t, "100", aws.PostgresqlEbsVolumeIops)
-	// assert.Equal(t, "50", aws.PostgresqlEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.PostgresqlEbsVolumeType)
-	// assert.Equal(t, "false", aws.LbAccessLogs)
-	// assert.Equal(t, "opensearch-domain", aws.ManagedOpensearchDomainName)
-	// assert.Equal(t, "opensearch-url", aws.ManagedOpensearchDomainURL)
-	// assert.Equal(t, "opensearch-password", aws.ManagedOpensearchUserPassword)
-	// assert.Equal(t, "opensearch-username", aws.ManagedOpensearchUsername)
-	// assert.Equal(t, "opensearch-certificate", aws.ManagedOpensearchCertificate)
-	// assert.Equal(t, "access-key-id", aws.OsSnapshotUserAccessKeyID)
-	// assert.Equal(t, "access-key-secret", aws.OsSnapshotUserAccessKeySecret)
-	// assert.Equal(t, "snapshot-role-arn", aws.AwsOsSnapshotRoleArn)
-	// assert.Equal(t, "rds-certificate", aws.ManagedRdsCertificate)
-	// assert.Equal(t, "rds-db-password", aws.ManagedRdsDbuserPassword)
-	// assert.Equal(t, "rds-db-username", aws.ManagedRdsDbuserUsername)
-	// assert.Equal(t, "rds-instance-url", aws.ManagedRdsInstanceURL)
-	// assert.Equal(t, "rds-superuser-password", aws.ManagedRdsSuperuserPassword)
-	// assert.Equal(t, "rds-superuser-username", aws.ManagedRdsSuperuserUsername)
+	aws := haDeployConfig.Aws.Config
+	assert.Equal(t, "my-profile", aws.Profile)
+	assert.Equal(t, "us-west-2", aws.Region)
+	assert.Equal(t, "vpc-12345", aws.AwsVpcID)
+	assert.Equal(t, "10.0.0.0/16", aws.AwsCidrBlockAddr)
+	assert.Equal(t, []string{"subnet-12345", "subnet-67890"}, aws.PrivateCustomSubnets)
+	assert.Equal(t, []string{"subnet-54321", "subnet-09876"}, aws.PublicCustomSubnets)
+	assert.Equal(t, "my-keypair", aws.SSHKeyPairName)
+	assert.Equal(t, "ami-08d4ac5b634553e16", aws.AmiID)
+	assert.Equal(t, true, aws.DeleteOnTermination)
+	assert.Equal(t, "t3.medium", aws.AutomateServerInstanceType)
+	assert.Equal(t, "t3.medium", aws.ChefServerInstanceType)
+	assert.Equal(t, "m5.large", aws.PostgresqlServerInstanceType)
+	assert.Equal(t, "m5.large", aws.OpensearchServerInstanceType)
+	assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.AutomateLbCertificateArn)
+	assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.ChefServerLbCertificateArn)
+	assert.Equal(t, "100", aws.AutomateEbsVolumeIops)
+	assert.Equal(t, "50", aws.AutomateEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.AutomateEbsVolumeType)
+	assert.Equal(t, "100", aws.ChefEbsVolumeIops)
+	assert.Equal(t, "50", aws.ChefEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.ChefEbsVolumeType)
+	assert.Equal(t, "100", aws.OpensearchEbsVolumeIops)
+	assert.Equal(t, "50", aws.OpensearchEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.OpensearchEbsVolumeType)
+	assert.Equal(t, "100", aws.PostgresqlEbsVolumeIops)
+	assert.Equal(t, "50", aws.PostgresqlEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.PostgresqlEbsVolumeType)
+	assert.Equal(t, "false", aws.LbAccessLogs)
+	assert.Equal(t, "opensearch-domain", aws.ManagedOpensearchDomainName)
+	assert.Equal(t, "opensearch-url", aws.ManagedOpensearchDomainURL)
+	assert.Equal(t, "opensearch-password", aws.ManagedOpensearchUserPassword)
+	assert.Equal(t, "opensearch-username", aws.ManagedOpensearchUsername)
+	assert.Equal(t, "opensearch-certificate", aws.ManagedOpensearchCertificate)
+	assert.Equal(t, "access-key-id", aws.OsSnapshotUserAccessKeyID)
+	assert.Equal(t, "access-key-secret", aws.OsSnapshotUserAccessKeySecret)
+	assert.Equal(t, "snapshot-role-arn", aws.AwsOsSnapshotRoleArn)
+	assert.Equal(t, "rds-certificate", aws.ManagedRdsCertificate)
+	assert.Equal(t, "rds-db-password", aws.ManagedRdsDbuserPassword)
+	assert.Equal(t, "rds-db-username", aws.ManagedRdsDbuserUsername)
+	assert.Equal(t, "rds-instance-url", aws.ManagedRdsInstanceURL)
+	assert.Equal(t, "rds-superuser-password", aws.ManagedRdsSuperuserPassword)
+	assert.Equal(t, "rds-superuser-username", aws.ManagedRdsSuperuserUsername)
 }
 
 func TestCopyConfigInitials(t *testing.T) {
@@ -933,47 +798,47 @@ func TestCopyAws(t *testing.T) {
 	assert.Equal(t, "/existing/public/key", opensearch.PublicKey)
 	assert.Equal(t, "/existing/root/ca", opensearch.RootCA)
 
-	// aws := haDeployConfig.Aws.Config
-	// assert.Equal(t, "my-profile", aws.Profile)
-	// assert.Equal(t, "us-west-2", aws.Region)
-	// assert.Equal(t, "vpc-12345", aws.AwsVpcID)
-	// assert.Equal(t, "10.0.0.0/16", aws.AwsCidrBlockAddr)
-	// assert.Equal(t, []string{"subnet-12345", "subnet-67890"}, aws.PrivateCustomSubnets)
-	// assert.Equal(t, []string{"subnet-54321", "subnet-09876"}, aws.PublicCustomSubnets)
-	// assert.Equal(t, "my-keypair", aws.SSHKeyPairName)
-	// assert.Equal(t, "ami-08d4ac5b634553e16", aws.AmiID)
-	// assert.Equal(t, true, aws.DeleteOnTermination)
-	// assert.Equal(t, "t3.medium", aws.AutomateServerInstanceType)
-	// assert.Equal(t, "t3.medium", aws.ChefServerInstanceType)
-	// assert.Equal(t, "m5.large", aws.PostgresqlServerInstanceType)
-	// assert.Equal(t, "m5.large", aws.OpensearchServerInstanceType)
-	// assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.AutomateLbCertificateArn)
-	// assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.ChefServerLbCertificateArn)
-	// assert.Equal(t, "100", aws.AutomateEbsVolumeIops)
-	// assert.Equal(t, "50", aws.AutomateEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.AutomateEbsVolumeType)
-	// assert.Equal(t, "100", aws.ChefEbsVolumeIops)
-	// assert.Equal(t, "50", aws.ChefEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.ChefEbsVolumeType)
-	// assert.Equal(t, "100", aws.OpensearchEbsVolumeIops)
-	// assert.Equal(t, "50", aws.OpensearchEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.OpensearchEbsVolumeType)
-	// assert.Equal(t, "100", aws.PostgresqlEbsVolumeIops)
-	// assert.Equal(t, "50", aws.PostgresqlEbsVolumeSize)
-	// assert.Equal(t, "gp3", aws.PostgresqlEbsVolumeType)
-	// assert.Equal(t, "false", aws.LbAccessLogs)
-	// assert.Equal(t, "opensearch-domain", aws.ManagedOpensearchDomainName)
-	// assert.Equal(t, "opensearch-url", aws.ManagedOpensearchDomainURL)
-	// assert.Equal(t, "opensearch-password", aws.ManagedOpensearchUserPassword)
-	// assert.Equal(t, "opensearch-username", aws.ManagedOpensearchUsername)
-	// assert.Equal(t, "opensearch-certificate", aws.ManagedOpensearchCertificate)
-	// assert.Equal(t, "access-key-id", aws.OsSnapshotUserAccessKeyID)
-	// assert.Equal(t, "access-key-secret", aws.OsSnapshotUserAccessKeySecret)
-	// assert.Equal(t, "snapshot-role-arn", aws.AwsOsSnapshotRoleArn)
-	// assert.Equal(t, "rds-certificate", aws.ManagedRdsCertificate)
-	// assert.Equal(t, "rds-db-password", aws.ManagedRdsDbuserPassword)
-	// assert.Equal(t, "rds-db-username", aws.ManagedRdsDbuserUsername)
-	// assert.Equal(t, "rds-instance-url", aws.ManagedRdsInstanceURL)
-	// assert.Equal(t, "rds-superuser-password", aws.ManagedRdsSuperuserPassword)
-	// assert.Equal(t, "rds-superuser-username", aws.ManagedRdsSuperuserUsername)
+	aws := haDeployConfig.Aws.Config
+	assert.Equal(t, "my-profile", aws.Profile)
+	assert.Equal(t, "us-west-2", aws.Region)
+	assert.Equal(t, "vpc-12345", aws.AwsVpcID)
+	assert.Equal(t, "10.0.0.0/16", aws.AwsCidrBlockAddr)
+	assert.Equal(t, []string{"subnet-12345", "subnet-67890"}, aws.PrivateCustomSubnets)
+	assert.Equal(t, []string{"subnet-54321", "subnet-09876"}, aws.PublicCustomSubnets)
+	assert.Equal(t, "my-keypair", aws.SSHKeyPairName)
+	assert.Equal(t, "ami-08d4ac5b634553e16", aws.AmiID)
+	assert.Equal(t, true, aws.DeleteOnTermination)
+	assert.Equal(t, "t3.medium", aws.AutomateServerInstanceType)
+	assert.Equal(t, "t3.medium", aws.ChefServerInstanceType)
+	assert.Equal(t, "m5.large", aws.PostgresqlServerInstanceType)
+	assert.Equal(t, "m5.large", aws.OpensearchServerInstanceType)
+	assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.AutomateLbCertificateArn)
+	assert.Equal(t, "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e", aws.ChefServerLbCertificateArn)
+	assert.Equal(t, "100", aws.AutomateEbsVolumeIops)
+	assert.Equal(t, "50", aws.AutomateEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.AutomateEbsVolumeType)
+	assert.Equal(t, "100", aws.ChefEbsVolumeIops)
+	assert.Equal(t, "50", aws.ChefEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.ChefEbsVolumeType)
+	assert.Equal(t, "100", aws.OpensearchEbsVolumeIops)
+	assert.Equal(t, "50", aws.OpensearchEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.OpensearchEbsVolumeType)
+	assert.Equal(t, "100", aws.PostgresqlEbsVolumeIops)
+	assert.Equal(t, "50", aws.PostgresqlEbsVolumeSize)
+	assert.Equal(t, "gp3", aws.PostgresqlEbsVolumeType)
+	assert.Equal(t, "false", aws.LbAccessLogs)
+	assert.Equal(t, "opensearch-domain", aws.ManagedOpensearchDomainName)
+	assert.Equal(t, "opensearch-url", aws.ManagedOpensearchDomainURL)
+	assert.Equal(t, "opensearch-password", aws.ManagedOpensearchUserPassword)
+	assert.Equal(t, "opensearch-username", aws.ManagedOpensearchUsername)
+	assert.Equal(t, "opensearch-certificate", aws.ManagedOpensearchCertificate)
+	assert.Equal(t, "access-key-id", aws.OsSnapshotUserAccessKeyID)
+	assert.Equal(t, "access-key-secret", aws.OsSnapshotUserAccessKeySecret)
+	assert.Equal(t, "snapshot-role-arn", aws.AwsOsSnapshotRoleArn)
+	assert.Equal(t, "rds-certificate", aws.ManagedRdsCertificate)
+	assert.Equal(t, "rds-db-password", aws.ManagedRdsDbuserPassword)
+	assert.Equal(t, "rds-db-username", aws.ManagedRdsDbuserUsername)
+	assert.Equal(t, "rds-instance-url", aws.ManagedRdsInstanceURL)
+	assert.Equal(t, "rds-superuser-password", aws.ManagedRdsSuperuserPassword)
+	assert.Equal(t, "rds-superuser-username", aws.ManagedRdsSuperuserUsername)
 }
