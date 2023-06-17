@@ -17,11 +17,17 @@ import (
 )
 
 var (
-	hardware = models.Hardware{
+	hardware = &models.Hardware{
 		AutomateNodeIps:        []string{"10.0.0.1", "10.0.0.2"},
 		PostgresqlNodeIps:      []string{"10.0.0.3", "10.0.0.6"},
 		OpenSearchNodeIps:      []string{"10.0.0.5", "10.0.0.10"},
 		ChefInfraServerNodeIps: []string{"10.0.0.7"},
+	}
+
+	certificatelist = []*models.Certificate{
+		{RootCert: "test-cert",
+			Nodes: nodes,
+		},
 	}
 
 	nodeCert = models.NodeCert{
@@ -382,7 +388,7 @@ var externalPG = &models.ExternalPG{
 
 func TestMakeRequests(t *testing.T) {
 	// Create a sample configuration
-	config := models.Config{
+	config := &models.Config{
 		Hardware:    hardware,
 		Certificate: certificatelist,
 	}
@@ -586,9 +592,10 @@ func TestFirewallCheck_Run(t *testing.T) {
 			args: args{
 				config: &models.Config{
 					Hardware: nil,
-					Certificate: &models.Certificate{
-						RootCert: "test-cert",
-						Nodes:    nodes,
+					Certificate: []*models.Certificate{
+						{RootCert: "test-cert",
+							Nodes: nodes,
+						},
 					},
 					ExternalOS: nil,
 					ExternalPG: nil,

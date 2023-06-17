@@ -9,8 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	root_ca = "root_ca"
+	cert    = "test_cert"
+	key     = "test_key"
+)
+
 func GetRequestJson() *models.Hardware {
-	ipConfig := models.Hardware{}
+	ipConfig := &models.Hardware{}
 
 	json.Unmarshal([]byte(` {
 			"automate_node_count": 1,
@@ -31,7 +37,7 @@ func GetRequestJson() *models.Hardware {
 			]
 		  }
 		`), &ipConfig)
-	return &ipConfig
+	return ipConfig
 }
 func TestGetIps(t *testing.T) {
 	config := GetRequestJson()
@@ -81,12 +87,12 @@ func TestGetNodeTypeMap(t *testing.T) {
 func TestGetCertificateMap(t *testing.T) {
 	tests := []struct {
 		name            string
-		certificateList []models.Certificate
-		want            map[string]models.Certificate
+		certificateList []*models.Certificate
+		want            map[string]*models.Certificate
 	}{
 		{
 			name: "Adding Certificate Config with automate,chef-server,opensearch,postgresql",
-			certificateList: []models.Certificate{
+			certificateList: []*models.Certificate{
 				{
 					Fqdn:         "Automate_FQDN",
 					NodeType:     constants.AUTOMATE,
@@ -136,7 +142,7 @@ func TestGetCertificateMap(t *testing.T) {
 					},
 				},
 			},
-			want: map[string]models.Certificate{
+			want: map[string]*models.Certificate{
 				constants.AUTOMATE: {
 					Fqdn:         "Automate_FQDN",
 					NodeType:     constants.AUTOMATE,
@@ -192,8 +198,8 @@ func TestGetCertificateMap(t *testing.T) {
 		},
 		{
 			name:            "Having blank certificate list",
-			certificateList: []models.Certificate{},
-			want:            map[string]models.Certificate{},
+			certificateList: []*models.Certificate{},
+			want:            map[string]*models.Certificate{},
 		},
 	}
 	for _, tt := range tests {

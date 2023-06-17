@@ -55,6 +55,9 @@ type Backup struct {
 }
 
 type Certificate struct {
+	Fqdn           string     `json:"fqdn"`
+	FqdnRootCert   string     `json:"fqdn_root_ca"`
+	NodeType       string     `json:"node_type"`
 	AutomateFqdn   string     `json:"automate_fqdn"`
 	ChefServerFqdn string     `json:"cs_fqdn"`
 	RootCert       string     `json:"root_cert"`
@@ -80,15 +83,15 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SSHUser         *SSHUser     `json:"ssh_user"`
-	Arch            string       `json:"arch"`
-	Backup          *Backup      `json:"backup"`
-	Hardware        *Hardware    `json:"hardware"`
-	Certificate     *Certificate `json:"certificate"`
-	ExternalOS      *ExternalOS  `json:"external_opensearch"`
-	ExternalPG      *ExternalPG  `json:"external_postgresql"`
-	DeploymentState string       `json:"deployment_state"`
-	APIToken        string       `json:"api_token"`
+	SSHUser         *SSHUser       `json:"ssh_user"`
+	Arch            string         `json:"arch"`
+	Backup          *Backup        `json:"backup"`
+	Hardware        *Hardware      `json:"hardware"`
+	Certificate     []*Certificate `json:"certificate"`
+	ExternalOS      *ExternalOS    `json:"external_opensearch"`
+	ExternalPG      *ExternalPG    `json:"external_postgresql"`
+	DeploymentState string         `json:"deployment_state"`
+	APIToken        string         `json:"api_token"`
 }
 
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []NodeCert {
@@ -317,8 +320,8 @@ func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConf
 	c.Certificate = append(c.Certificate, cert)
 }
 
-func addCertificatesInConfig(fqdn, rootCA, nodeType string) Certificate {
-	cert := Certificate{
+func addCertificatesInConfig(fqdn, rootCA, nodeType string) *Certificate {
+	cert := &Certificate{
 		Fqdn:         fqdn,
 		FqdnRootCert: rootCA,
 		NodeType:     nodeType,

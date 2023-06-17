@@ -105,7 +105,7 @@ func getRequestsForAutomateAsSource(config *models.Config) []models.FirewallRequ
 
 }
 
-func getRootCertForNodeWithNodeTypeAndIP(certMap map[string]models.Certificate, nodeType string, nodeIp string) string {
+func getRootCertForNodeWithNodeTypeAndIP(certMap map[string]*models.Certificate, nodeType string, nodeIp string) string {
 
 	nodesCert, found := certMap[nodeType]
 	if found {

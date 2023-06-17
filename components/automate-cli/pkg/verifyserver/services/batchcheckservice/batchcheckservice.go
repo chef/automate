@@ -216,7 +216,7 @@ func (ss *BatchCheckService) startMockServer(remoteChecks []string, config *mode
 	return successfullyStartedMockServers, notStartedMockServers
 }
 
-func (ss *BatchCheckService) constructAndStartMockServerForAvailableProtocals(protocolMap map[string][]int, host, nodeType string, startMockServerChannel chan models.MockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int, config models.Config) {
+func (ss *BatchCheckService) constructAndStartMockServerForAvailableProtocals(protocolMap map[string][]int, host, nodeType string, startMockServerChannel chan models.MockServerFromBatchServiceResponse, ipPortProtocolMap *map[string]bool, totalReq *int, config *models.Config) {
 	startMockServerRequestBody := models.StartMockServerRequestBody{}
 	if len(protocolMap[constants.TCP]) != 0 {
 		startMockServerRequestBody.Protocol = constants.TCP
@@ -256,8 +256,8 @@ func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) []string {
 	return strings.Split(nodeTypeWithIp, "_")
 }
 
-func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host, nodeType string, startMockServerRequestBody *models.StartMockServerRequestBody, config models.Config) {
-	var certMap map[string]models.Certificate
+func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host, nodeType string, startMockServerRequestBody *models.StartMockServerRequestBody, config *models.Config) {
+	var certMap map[string]*models.Certificate
 	if len(config.Certificate) > 0 {
 		certMap = configutils.GetCertificateMap(config.Certificate)
 	}

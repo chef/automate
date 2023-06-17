@@ -942,8 +942,8 @@ func TestShouldGenerateRootCaAndPrivateKeyForHostLogErrorForCert(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ss.fileUtils = mockFileUtils(test.fileName, true)
 
-			ss.generateRootCaAndPrivateKeyForHost("abc", "automate", &models.StartMockServerRequestBody{}, models.Config{
-				Hardware: models.Hardware{
+			ss.generateRootCaAndPrivateKeyForHost("abc", "automate", &models.StartMockServerRequestBody{}, &models.Config{
+				Hardware: &models.Hardware{
 					AutomateNodeCount:        1,
 					AutomateNodeIps:          []string{"1.2.3.4"},
 					ChefInfraServerNodeCount: 1,

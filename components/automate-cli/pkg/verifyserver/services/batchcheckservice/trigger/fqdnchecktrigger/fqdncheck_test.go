@@ -17,7 +17,7 @@ import (
 var (
 	fqdn                = "www.example.com"
 	rootCert            = "rootcert"
-	certificateAutomate = []models.Certificate{{
+	certificateAutomate = []*models.Certificate{{
 		Fqdn:         fqdn,
 		FqdnRootCert: rootCert,
 		Nodes:        nil,
@@ -25,7 +25,7 @@ var (
 	},
 	}
 
-	certificateChefServer = []models.Certificate{{
+	certificateChefServer = []*models.Certificate{{
 		Fqdn:         fqdn,
 		FqdnRootCert: rootCert,
 		Nodes:        nil,
@@ -455,7 +455,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 			args: args{
 				config: &models.Config{
 					Hardware:        nil,
-					Certificate:     certificate,
+					Certificate:     nil,
 					DeploymentState: "post-deploy",
 					APIToken:        token,
 				},
@@ -495,7 +495,7 @@ func TestFqdnCheck_Run(t *testing.T) {
 						ChefInfraServerNodeCount: 1,
 						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
 					},
-					Certificate:     &models.Certificate{},
+					Certificate:     []*models.Certificate{},
 					DeploymentState: "post-deploy",
 					APIToken:        token,
 				},

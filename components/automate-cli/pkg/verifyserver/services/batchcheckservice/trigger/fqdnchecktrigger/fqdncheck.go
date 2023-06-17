@@ -142,8 +142,8 @@ func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTrig
 	}
 }
 
-func IsCertificateEmpty(certificate *models.Certificate) bool {
-	return (certificate.AutomateFqdn == "" || certificate.ChefServerFqdn == "" || certificate.RootCert == "")
+func IsCertificateEmpty(certificate []*models.Certificate) bool {
+	return len(certificate) == 0
 }
 
 func emptyCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {

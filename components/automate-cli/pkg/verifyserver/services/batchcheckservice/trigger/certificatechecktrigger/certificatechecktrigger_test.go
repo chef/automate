@@ -199,7 +199,7 @@ func GetRequestJsonWithSameFrontEnd() models.Config {
 }
 
 func GetRequestJson() *models.Config {
-	ipConfig := models.Config{}
+	ipConfig := &models.Config{}
 
 	json.Unmarshal([]byte(`{
 		"ssh_user": {
@@ -618,7 +618,7 @@ func TestCertificateCheck_Run(t *testing.T) {
 				OpenSearchNodeCount:      1,
 				OpenSearchNodeIps:        []string{"12.12.1.5"},
 			},
-			Certificate: &models.Certificate{},
+			Certificate: []*models.Certificate{},
 		}
 
 		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
