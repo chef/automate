@@ -51,7 +51,7 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.Ch
 					Passed: false,
 					Error: &fiber.Error{
 						Code:    http.StatusBadRequest,
-						Message: "S3 backup detail is missing",
+						Message: "Objecr storage detail is missing",
 					},
 					Check: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
 				},
