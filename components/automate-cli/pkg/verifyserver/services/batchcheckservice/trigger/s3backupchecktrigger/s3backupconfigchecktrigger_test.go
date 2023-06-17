@@ -275,6 +275,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 				config: &models.Config{
 					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"1.1.1.1", "2.2.2.2"},
 					},
 					Backup: &models.Backup{
 						ObjectStorage: &models.ObjectStorage{
@@ -283,6 +284,7 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
+							AWSRegion:  "ap-south",
 						},
 					},
 				},
@@ -322,6 +324,51 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 
 		})
 	}
+}
+
+func TestRunS3BackupCheck(t *testing.T) {
+	t.Run("NIl Hardware", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: nil,
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, "unknown-host", got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+
+	})
+
+	t.Run("Empty Object storage", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{constants.LOCALHOST},
+			},
+			Backup: &models.Backup{
+				ObjectStorage: &models.ObjectStorage{},
+			},
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, constants.LOCALHOST, got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.False(t, got[0].Result.Skipped)
+	})
 }
 
 // Helper function to create a dummy server

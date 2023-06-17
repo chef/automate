@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type OpensearchS3BucketAccessCheck struct {
@@ -25,7 +26,38 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 }
 
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	// TODO: check here
+	if config.ExternalOS == nil || config.Backup.ObjectStorage == nil {
+		return []models.CheckTriggerResponse{
+			{
+				NodeType:  constants.OPENSEARCH,
+				CheckType: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+				Result: models.ApiResult{
+					Passed:  false,
+					Skipped: true,
+					Check:   constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+				},
+				Host: constants.UNKNONHOST,
+			},
+		}
+	}
+
+	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {
+		return []models.CheckTriggerResponse{
+			{
+				Host:      config.ExternalOS.OSDomainURL,
+				NodeType:  constants.OPENSEARCH,
+				CheckType: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+				Result: models.ApiResult{
+					Passed: false,
+					Error: &fiber.Error{
+						Code:    http.StatusBadRequest,
+						Message: "S3 backup detail is missing",
+					},
+					Check: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
+				},
+			},
+		}
+	}
 
 	s3OpensearchBackupRequest := models.S3BackupDetails{
 		Endpoint:   config.ExternalOS.OSDomainURL,
@@ -76,4 +108,19 @@ func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, metho
 
 	return result
 
+}
+
+func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
+	return externalOS.OSDomainURL == "" ||
+		externalOS.OSUsername == "" ||
+		externalOS.OSUserPassword == "" ||
+		externalOS.OSRoleArn == ""
+}
+
+func isObjectStorage(backup *models.Backup) bool {
+	return backup.ObjectStorage.BucketName == "" ||
+		backup.ObjectStorage.BasePath == "" ||
+		backup.ObjectStorage.AccessKey == "" ||
+		backup.ObjectStorage.SecretKey == "" ||
+		backup.ObjectStorage.AWSRegion == ""
 }

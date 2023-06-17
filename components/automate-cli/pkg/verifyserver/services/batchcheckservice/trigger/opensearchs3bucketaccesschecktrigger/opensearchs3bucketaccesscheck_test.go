@@ -30,6 +30,7 @@ var (
 		BasePath:   "tt.com",
 		AccessKey:  "access-kkey",
 		SecretKey:  "secret-key",
+		AWSRegion:  "ap-east",
 	}
 )
 
@@ -176,6 +177,33 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			response:         "error while connecting to the endpoint, received invalid status code",
 			isError:          true,
 		},
+		{
+			name: "Nil OS and Object storage",
+			args: args{
+				config: &models.Config{
+					ExternalOS: nil,
+					Backup: &models.Backup{
+						ObjectStorage: nil,
+					},
+				},
+			},
+			isError: false,
+		},
+		{
+			name: "Empty OS and Object storage",
+			args: args{
+				config: &models.Config{
+					ExternalOS: &models.ExternalOS{
+						OSDomainURL: "dave.com",
+					},
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{},
+					},
+				},
+			},
+			httpResponseCode: http.StatusBadRequest,
+			isError:          false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -189,26 +217,28 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 
 			got := osb.Run(tt.args.config)
 			if tt.isError {
-				if tt.name == "OS empty" {
-					assert.Len(t, got, 1)
-					assert.NotNil(t, got[0].Result.Error.Error)
-					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
-					assert.Equal(t, tt.httpResponseCode, got[0].Result.Error.Code)
-					assert.Equal(t, "127.0.0.1", got[0].Host)
-					assert.Equal(t, tt.response, got[0].Result.Error.Error())
-				} else {
-					assert.Len(t, got, 1)
-					assert.NotNil(t, got[0].Result.Error.Error)
-					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
-					assert.Equal(t, tt.httpResponseCode, got[0].Result.Error.Code)
-					assert.Equal(t, "open-search-url", got[0].Host)
-					assert.Equal(t, tt.response, got[0].Result.Error.Error())
-				}
+				assert.Len(t, got, 1)
+				assert.NotNil(t, got[0].Result.Error.Error)
+				assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
+				assert.Equal(t, tt.httpResponseCode, got[0].Result.Error.Code)
+				assert.Equal(t, "open-search-url", got[0].Host)
+				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
-				if tt.name == "OS Nil" {
-					assert.NotNil(t, got)
-					assert.Nil(t, got[0].Result.Error)
-					assert.Equal(t, "127.0.0.1", got[0].Host)
+				if tt.name == "Nil OS and Object storage" {
+					assert.Len(t, got, 1)
+					assert.Equal(t, "unknown-host", got[0].Host)
+					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
+					assert.True(t, got[0].Result.Skipped)
+				} else if tt.name == "Empty OS and Object storage" {
+					assert.Len(t, got, 1)
+					assert.Equal(t, "dave.com", got[0].Host)
+					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].Result.Check)
+					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+					assert.Equal(t, "S3 backup detail is missing", got[0].Result.Error.Message)
+					assert.False(t, got[0].Result.Skipped)
 				} else {
 					assert.Equal(t, want, got)
 					assert.NotNil(t, got)

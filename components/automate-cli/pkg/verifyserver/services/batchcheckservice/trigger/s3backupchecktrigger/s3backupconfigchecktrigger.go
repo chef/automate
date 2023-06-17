@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type S3BackupConfigCheck struct {
@@ -23,7 +24,24 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 }
 
 func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	// TODO: check here
+	if config.Hardware == nil || config.Backup.ObjectStorage == nil {
+		return []models.CheckTriggerResponse{
+			{
+				NodeType:  constants.AUTOMATE,
+				CheckType: constants.S3_BACKUP_CONFIG,
+				Result: models.ApiResult{
+					Passed:  false,
+					Skipped: true,
+					Check:   constants.S3_BACKUP_CONFIG,
+				},
+				Host: constants.UNKNONHOST,
+			},
+		}
+	}
+
+	if isObjectStorage(config.Backup) {
+		return emptyNFSMountBackupResp(config, constants.S3_BACKUP_CONFIG)
+	}
 
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
@@ -69,5 +87,38 @@ func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
 		AccessKey:  object.AccessKey,
 		SecretKey:  object.SecretKey,
 		Region:     object.AWSRegion,
+	}
+}
+
+func isObjectStorage(backup *models.Backup) bool {
+	return backup.ObjectStorage.BucketName == "" ||
+		backup.ObjectStorage.BasePath == "" ||
+		backup.ObjectStorage.AccessKey == "" ||
+		backup.ObjectStorage.SecretKey == "" ||
+		backup.ObjectStorage.AWSRegion == ""
+}
+
+func emptyNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+
+	return resps
+}
+
+func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: "S3 backup detail is missing",
+			},
+			Check: checkType,
+		},
 	}
 }
