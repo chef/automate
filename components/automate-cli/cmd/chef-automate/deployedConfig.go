@@ -65,6 +65,7 @@ func CopyExternalPgSettings(haDeployConfig *config.HaDeployConfig, existingInfra
 				SuperuserPassword:  existingInfraExternalPgSettings.PostgreSQLSuperUserPassword,
 				SuperuserUsername:  existingInfraExternalPgSettings.PostgreSQLSuperUserName,
 			},
+			Type: existingInfraConfig.ExternalDB.Database.Type,
 		},
 	}
 	return haDeployConfig
@@ -340,17 +341,11 @@ func CopyExistingInfra(haDeployConfig *config.HaDeployConfig, existingInfraConfi
 	haDeployConfig = CopyOpensearchSettings(haDeployConfig, existingInfraConfig, nil)
 
 	// ExistingInfraSettings
-	haDeployConfig.External.Database.Type = existingInfraConfig.ExternalDB.Database.Type
-
 	haDeployConfig = CopyExistingInfraSettings(haDeployConfig, existingInfraConfig)
-
-	// ExternalDbSettings
-	if IsExternalDb(existingInfraConfig) {
-		// ExternalPgSettings
-		haDeployConfig = CopyExternalPgSettings(haDeployConfig, existingInfraConfig)
-		// ExternalOsSettings
-		haDeployConfig = CopyExternalOsSettings(haDeployConfig, existingInfraConfig)
-	}
+	// ExternalPgSettings
+	haDeployConfig = CopyExternalPgSettings(haDeployConfig, existingInfraConfig)
+	// ExternalOsSettings
+	haDeployConfig = CopyExternalOsSettings(haDeployConfig, existingInfraConfig)
 
 	return haDeployConfig
 }
@@ -429,8 +424,4 @@ func CopyAwsConfig(haDeployConfig *config.HaDeployConfig, awsConfig *AwsConfigTo
 	}
 
 	return haDeployConfig
-}
-
-func IsExternalDb(existingInfraConfig *ExistingInfraConfigToml) bool {
-	return existingInfraConfig.ExternalDB.Database.Type == AWS || existingInfraConfig.ExternalDB.Database.Type == TYPE_SELF_MANAGED
 }
