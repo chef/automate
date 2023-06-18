@@ -609,3 +609,24 @@ func TestGetErrTriggerCheckResp(t *testing.T) {
 
 	assert.Equal(t, expected, result)
 }
+
+func TestGetSkippedTriggerCheckResp(t *testing.T) {
+	ip := "192.168.0.1"
+	checkType := "test_check"
+	nodeType := "test_node"
+
+	expected := models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checkType,
+		},
+		Host: ip,
+	}
+
+	result := GetSkippedTriggerCheckResp(ip, checkType, nodeType)
+
+	assert.Equal(t, expected, result)
+}

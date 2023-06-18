@@ -275,3 +275,16 @@ func GetErrTriggerCheckResp(ip, checkType, nodeType, msg string) models.CheckTri
 		},
 	}
 }
+
+func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checktype,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checktype,
+		},
+		Host: ip,
+	}
+}

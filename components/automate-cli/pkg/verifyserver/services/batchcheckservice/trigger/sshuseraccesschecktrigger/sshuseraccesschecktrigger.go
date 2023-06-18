@@ -81,31 +81,19 @@ func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]in
 func nilSSHUserResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
 	}
 
 	return resps
-}
-
-func GetSkippedTriggerCheckResp(ip, checktype string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		NodeType:  constants.AUTOMATE,
-		CheckType: checktype,
-		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-		},
-		Host: ip,
-	}
 }
 
 func IsSSHUserEmpty(sshUser *models.SSHUser) bool {

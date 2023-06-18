@@ -8,7 +8,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type OpensearchS3BucketAccessCheck struct {
@@ -28,34 +27,13 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.ExternalOS == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
-			{
-				NodeType:  constants.OPENSEARCH,
-				CheckType: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
-				Result: models.ApiResult{
-					Passed:  false,
-					Skipped: true,
-					Check:   constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
-				},
-				Host: constants.UNKNONHOST,
-			},
+			trigger.GetSkippedTriggerCheckResp(constants.UNKNONHOST, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
 		}
 	}
 
 	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {
 		return []models.CheckTriggerResponse{
-			{
-				Host:      config.ExternalOS.OSDomainURL,
-				NodeType:  constants.OPENSEARCH,
-				CheckType: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
-				Result: models.ApiResult{
-					Passed: false,
-					Error: &fiber.Error{
-						Code:    http.StatusBadRequest,
-						Message: "Object storage detail or OS detail is missing",
-					},
-					Check: constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS,
-				},
-			},
+			trigger.GetErrTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, "Object storage detail or OS detail is missing"),
 		}
 	}
 

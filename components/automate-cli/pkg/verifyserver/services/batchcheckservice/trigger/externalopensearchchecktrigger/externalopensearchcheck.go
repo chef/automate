@@ -89,26 +89,14 @@ func externalOSNillResp(config *models.Config, checktype string) []models.CheckT
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
 	}
 
 	return triggerResps
-}
-
-func GetSkippedTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-		},
-		Host: ip,
-	}
 }
 
 func isEmptyExternalOS(externalOS *models.ExternalOS) bool {

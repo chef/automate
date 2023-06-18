@@ -3,7 +3,6 @@ package v1_test
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -193,8 +192,6 @@ func TestBatchCheckAPI(t *testing.T) {
 			assert.NoError(t, err)
 			body, err := io.ReadAll(res.Body)
 			assert.NoError(t, err, test.description)
-			ioutil.WriteFile("expected.json", []byte(test.expectedBody), 0777)
-			ioutil.WriteFile("acctual.json", body, 0777)
 			assert.Contains(t, string(body), test.expectedBody)
 			assert.Equal(t, test.expectedCode, res.StatusCode)
 		})

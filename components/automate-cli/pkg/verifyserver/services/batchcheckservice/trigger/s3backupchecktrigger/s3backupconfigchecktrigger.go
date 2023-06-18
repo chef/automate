@@ -25,16 +25,7 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
-			{
-				NodeType:  constants.AUTOMATE,
-				CheckType: constants.S3_BACKUP_CONFIG,
-				Result: models.ApiResult{
-					Passed:  false,
-					Skipped: true,
-					Check:   constants.S3_BACKUP_CONFIG,
-				},
-				Host: constants.UNKNONHOST,
-			},
+			trigger.GetSkippedTriggerCheckResp(constants.UNKNONHOST, constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
 		}
 	}
 

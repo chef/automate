@@ -120,25 +120,13 @@ func (ss *FqdnCheck) GetPortsForMockServer() map[string]map[string][]int {
 func nilCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
 	}
 
 	return resps
-}
-
-func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		NodeType:  nodeType,
-		CheckType: checktype,
-		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-		},
-		Host: ip,
-	}
 }
 
 func IsCertificateEmpty(certificate []*models.Certificate) bool {

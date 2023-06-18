@@ -91,26 +91,14 @@ func externalPGNillResp(config *models.Config, checkType string) []models.CheckT
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.GetSkippedTriggerCheckResp(ip, checkType, constants.AUTOMATE))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, GetSkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.GetSkippedTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER))
 	}
 
 	return triggerResps
-}
-
-func GetSkippedTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-		},
-		Host: ip,
-	}
 }
 
 func isEmptyExternalPG(externalPG *models.ExternalPG) bool {

@@ -133,32 +133,19 @@ func isBackupEmpty(backup *models.Backup) bool {
 func nilNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
 	}
 
 	return resps
-}
-
-func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		NodeType:  nodeType,
-		CheckType: checktype,
-		Result: models.ApiResult{
-			Passed:  false,
-			Skipped: true,
-			Check:   checktype,
-		},
-		Host: ip,
-	}
 }
 
 func emptyNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
