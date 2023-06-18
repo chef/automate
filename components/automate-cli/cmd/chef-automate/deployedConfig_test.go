@@ -3,127 +3,359 @@ package main
 import (
 	"testing"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/lib/config"
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestPopulateHaCommonConfig(t *testing.T) {
-// 	// Mocking dependencies
-// 	getAutomateHAInfraDetails := func() (*AutomateHAInfraDetails, error) {
-// 		// Mocked implementation that returns sample infra details or an error
-// 		// Modify this function according to your test case scenario
-// 		return &AutomateHAInfraDetails{
-// 			// Populate the struct fields with sample data
-// 		}, nil
-// 	}
+var existingInfraConfig = &ExistingInfraConfigToml{
+	Architecture: ExistingInfraArchitectureToml{
+		ConfigInitials: ExistingInfraConfigInitialsToml{
+			SSHUser:                     "existing-ssh-user",
+			Architecture:                "existing-architecture",
+			BackupConfig:                "object_storage",
+			BackupMount:                 "/existing/backup/mount",
+			HabitatUIDGid:               "existing-habitat-uid-gid",
+			LoggingMonitoringManagement: "true",
+			SSHGroupName:                "existing-ssh-group",
+			SSHKeyFile:                  "/existing/ssh/key/file",
+			SSHPort:                     "22",
+			SecretsKeyFile:              "/existing/secrets/key/file",
+			SecretsStoreFile:            "/existing/secrets/store/file",
+			WorkspacePath:               "/existing/workspace/path",
+		},
+	},
+	Automate: ExistingInfraAutomateToml{
+		Config: ExistingInfraAutomateConfigToml{
+			AdminPassword:     "existing-admin-password",
+			ConfigFile:        "/existing/config/file",
+			EnableCustomCerts: true,
+			Fqdn:              "existing-fqdn",
+			InstanceCount:     "3",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+			RootCA:            "/existing/root/ca",
+			TeamsPort:         "8080",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/existing/cert1/private/key",
+					PublicKey:  "/existing/cert1/public/key",
+					NodesDn:    "/existing/cert1/nodes/dn",
+				},
+			},
+		},
+	},
+	ChefServer: ChefServerToml{
+		Config: ChefServerConfigToml{
+			EnableCustomCerts: true,
+			InstanceCount:     "3",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/existing/cert1/private/key",
+					PublicKey:  "/existing/cert1/public/key",
+					NodesDn:    "/existing/cert1/nodes/dn",
+				},
+			},
+		},
+	},
+	Postgresql: PostgresqlToml{
+		Config: PgConfigToml{
+			EnableCustomCerts: true,
+			InstanceCount:     "3",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+			RootCA:            "/existing/root/ca",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/existing/cert1/private/key",
+					PublicKey:  "/existing/cert1/public/key",
+					NodesDn:    "/existing/cert1/nodes/dn",
+				},
+			},
+		},
+	},
+	Opensearch: OpensearchToml{
+		Config: OsConfigToml{
+			AdminCert:         "/existing/admin/cert",
+			AdminDn:           "/existing/admin/dn",
+			AdminKey:          "/existing/admin/key",
+			EnableCustomCerts: true,
+			InstanceCount:     "3",
+			NodesDn:           "/existing/nodes/dn",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+			RootCA:            "/existing/root/ca",
+			CertsByIP: []CertByIP{
+				{
+					IP:         "10.0.0.1",
+					PrivateKey: "/existing/cert1/private/key",
+					PublicKey:  "/existing/cert1/public/key",
+					NodesDn:    "/existing/cert1/nodes/dn",
+				},
+			},
+		},
+	},
+	ExistingInfra: ExistingInfraToml{
+		Config: ExistingInfraIpsToml{
+			AutomatePrivateIps:   []string{"10.0.0.1", "10.0.0.2"},
+			ChefServerPrivateIps: []string{"10.0.1.1", "10.0.1.2"},
+			PostgresqlPrivateIps: []string{"10.0.2.1", "10.0.2.2"},
+			OpensearchPrivateIps: []string{"10.0.3.1", "10.0.3.2"},
+		},
+	},
+	ExternalDB: ExternalDBToml{
+		Database: ExternalDbToml{
+			Type: "aws",
+			Opensearch: ExternalOpensearchToml{
+				OpensearchRootCert:          "root-cert",
+				OpensearchDomainName:        "domain",
+				OpensearchInstanceURL:       "instance-url",
+				OpensearchSuperUserPassword: "superuser-password",
+				OpensearchSuperUserName:     "superuser-name",
+				AWS:                         ExternalAwsToml{AwsOsSnapshotRoleArn: "snapshot-role-arn", OsUserAccessKeyId: "access-key-id", OsUserAccessKeySecret: "access-key-secret"},
+			},
+			PostgreSQL: ExternalPostgreSQLToml{
+				PostgreSQLDBUserPassword:    "dbuser-password",
+				PostgreSQLDBUserName:        "dbuser-name",
+				PostgreSQLInstanceURL:       "instance-url",
+				PostgreSQLRootCert:          "root-cert",
+				PostgreSQLSuperUserPassword: "superuser-password",
+				PostgreSQLSuperUserName:     "superuser-name",
+			},
+		},
+	},
+	ObjectStorage: ObjectStorageToml{
+		Config: ObjectStorageConfigToml{
+			AccessKey:  "existing-access-key",
+			BucketName: "existing-bucket",
+			Endpoint:   "existing-endpoint",
+			Region:     "existing-region",
+			SecretKey:  "existing-secret-key",
+		},
+	},
+}
 
-// 	fetchInfraConfig := func() (*ExistingInfraConfigToml, error) {
-// 		// Mocked implementation that returns sample existing infra config or an error
-// 		// Modify this function according to your test case scenario
-// 		return &ExistingInfraConfigToml{
-// 			// Sample existing infra config fields
-// 		}, nil
-// 	}
+var awsConfig = &AwsConfigToml{
+	Architecture: AwsArchitectureToml{
+		ConfigInitials: AwsConfigInitialsToml{
+			SSHUser:                     "aws-ssh-user",
+			Architecture:                "aws-architecture",
+			BackupConfig:                "s3",
+			S3BucketName:                "aws-s3-bucket",
+			BackupMount:                 "/aws/backup/mount",
+			HabitatUIDGid:               "aws-habitat-uid-gid",
+			LoggingMonitoringManagement: "false",
+			SSHGroupName:                "aws-ssh-group",
+			SSHKeyFile:                  "/aws/ssh/key/file",
+			SSHPort:                     "2222",
+			SecretsKeyFile:              "/aws/secrets/key/file",
+			SecretsStoreFile:            "/aws/secrets/store/file",
+			WorkspacePath:               "/aws/workspace/path",
+		},
+	},
+	Automate: AwsAutomateToml{
+		Config: AwsAutomateConfigToml{
+			AdminPassword:     "aws-admin-password",
+			ConfigFile:        "/aws/config/file",
+			EnableCustomCerts: false,
+			Fqdn:              "aws-fqdn",
+			InstanceCount:     "5",
+			PrivateKey:        "/aws/private/key",
+			PublicKey:         "/aws/public/key",
+			RootCA:            "/aws/root/ca",
+			TeamsPort:         "9090",
+		},
+	},
+	ChefServer: ChefServerToml{
+		Config: ChefServerConfigToml{
+			EnableCustomCerts: true,
+			InstanceCount:     "3",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+		},
+	},
+	Postgresql: PostgresqlToml{
+		Config: PgConfigToml{
+			EnableCustomCerts: true,
+			InstanceCount:     "3",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+			RootCA:            "/existing/root/ca",
+		},
+	},
+	Opensearch: OpensearchToml{
+		Config: OsConfigToml{
+			AdminCert:         "/existing/admin/cert",
+			AdminDn:           "/existing/admin/dn",
+			AdminKey:          "/existing/admin/key",
+			EnableCustomCerts: true,
+			InstanceCount:     "3",
+			NodesDn:           "/existing/nodes/dn",
+			PrivateKey:        "/existing/private/key",
+			PublicKey:         "/existing/public/key",
+			RootCA:            "/existing/root/ca",
+		},
+	},
+	Aws: AwsToml{
+		Config: ConfigToml{
+			Profile:                      "my-profile",
+			Region:                       "us-west-2",
+			AwsVpcId:                     "vpc-12345",
+			AwsCidrBlockAddr:             "10.0.0.0/16",
+			PrivateCustomSubnets:         []string{"subnet-12345", "subnet-67890"},
+			PublicCustomSubnets:          []string{"subnet-54321", "subnet-09876"},
+			SSHKeyPairName:               "my-keypair",
+			AmiID:                        "ami-08d4ac5b634553e16",
+			DeleteOnTermination:          true,
+			SetupManagedServices:         true,
+			AutomateServerInstanceType:   "t3.medium",
+			ChefServerInstanceType:       "t3.medium",
+			PostgresqlServerInstanceType: "m5.large",
+			OpensearchServerInstanceType: "m5.large",
+			AutomateLbCertificateArn:     "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
+			ChefServerLbCertificateArn:   "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
+			AutomateEbsVolumeIops:        "100",
+			AutomateEbsVolumeSize:        "50",
+			AutomateEbsVolumeType:        "gp3",
+			ChefEbsVolumeIops:            "100",
+			ChefEbsVolumeSize:            "50",
+			ChefEbsVolumeType:            "gp3",
+			OpensearchEbsVolumeIops:      "100",
+			OpensearchEbsVolumeSize:      "50",
+			OpensearchEbsVolumeType:      "gp3",
+			PostgresqlEbsVolumeIops:      "100",
+			PostgresqlEbsVolumeSize:      "50",
+			PostgresqlEbsVolumeType:      "gp3",
+			LBAccessLogs:                 "false",
+			OpensearchDomainName:         "opensearch-domain",
+			OpensearchDomainUrl:          "opensearch-url",
+			OpensearchUserPassword:       "opensearch-password",
+			OpensearchUsername:           "opensearch-username",
+			OpensearchCertificate:        "opensearch-certificate",
+			OsUserAccessKeyId:            "access-key-id",
+			OsUserAccessKeySecret:        "access-key-secret",
+			AwsOsSnapshotRoleArn:         "snapshot-role-arn",
+			RDSCertificate:               "rds-certificate",
+			RDSDBUserPassword:            "rds-db-password",
+			RDSDBUserName:                "rds-db-username",
+			RDSInstanceUrl:               "rds-instance-url",
+			RDSSuperUserPassword:         "rds-superuser-password",
+			RDSSuperUserName:             "rds-superuser-username",
+		},
+	},
+}
 
-// 	fetchAwsConfig := func() (*AwsConfigToml, error) {
-// 		// Mocked implementation that returns sample AWS config or an error
-// 		// Modify this function according to your test case scenario
-// 		return &AwsConfigToml{
-// 			// Sample AWS config fields
-// 		}, nil
-// 	}
+type MockPullConfigs struct {
+	fetchInfraConfigFunc      func() (*ExistingInfraConfigToml, error)
+	fetchAwsConfigFunc        func() (*AwsConfigToml, error)
+	pullOpensearchConfigsFunc func() (map[string]*ConfigKeys, error)
+	pullPGConfigsFunc         func() (map[string]*ConfigKeys, error)
+	pullAutomateConfigsFunc   func() (map[string]*dc.AutomateConfig, error)
+	pullChefServerConfigsFunc func() (map[string]*dc.AutomateConfig, error)
+	generateInfraConfigFunc   func() (*ExistingInfraConfigToml, error)
+	generateAwsConfigFunc     func() (*AwsConfigToml, error)
+	getExceptionIpsFunc       func() []string
+	setExceptionIpsFunc       func(ips []string)
+	getOsCertsByIpFunc        func(map[string]*ConfigKeys) []CertByIP
+}
 
-// 	// Replace the original functions with the mocked implementations
-// 	originalGetAutomateHAInfraDetails := getAutomateHAInfraDetails
-// 	originalFetchInfraConfig := fetchInfraConfig
-// 	originalFetchAwsConfig := fetchAwsConfig
+func (m *MockPullConfigs) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
+	return m.fetchInfraConfigFunc()
+}
 
-// 	sshConfig := &SSHConfig{
-// 		sshUser:    infra.Outputs.SSHUser.Value,
-// 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
-// 		sshPort:    infra.Outputs.SSHPort.Value,
-// 	}
-// 	sshUtil := NewSSHUtil(sshConfig)
-// 	configPuller := NewPullConfigs(infra, sshUtil)
-// 	defer func() {
-// 		getAutomateHAInfraDetails = originalGetAutomateHAInfraDetails
-// 		configPuller.fetchInfraConfig = originalFetchInfraConfig
-// 		configPuller.fetchAwsConfig = originalFetchAwsConfig
-// 	}()
+func (m *MockPullConfigs) fetchAwsConfig() (*AwsConfigToml, error) {
+	return m.fetchAwsConfigFunc()
+}
 
-// 	// Mocked function to override the implementation of NewSSHUtil
-// 	newSSHUtil := func(config *config.SSHConfig) sshUtilInterface {
-// 		// Mocked implementation that returns a dummy SSHUtil or a custom mock
-// 		// Modify this function according to your test case scenario
-// 		return &dummySSHUtil{}
-// 	}
+func (m *MockPullConfigs) pullOpensearchConfigs() (map[string]*ConfigKeys, error) {
+	return m.pullOpensearchConfigsFunc()
+}
 
-// 	// Mocked function to override the implementation of CopyExistingInfra
-// 	copyExistingInfra := func(existingInfraConfig *config.ExistingInfraConfig) *config.HaDeployConfig {
-// 		// Mocked implementation that returns a dummy HaDeployConfig or a custom mock
-// 		// Modify this function according to your test case scenario
-// 		return &config.HaDeployConfig{}
-// 	}
+func (m *MockPullConfigs) pullPGConfigs() (map[string]*ConfigKeys, error) {
+	return m.pullPGConfigsFunc()
+}
 
-// 	// Mocked function to override the implementation of CopyAws
-// 	copyAws := func(awsConfig *config.AwsConfig) *config.HaDeployConfig {
-// 		// Mocked implementation that returns a dummy HaDeployConfig or a custom mock
-// 		// Modify this function according to your test case scenario
-// 		return &config.HaDeployConfig{}
-// 	}
+func (m *MockPullConfigs) pullAutomateConfigs() (map[string]*dc.AutomateConfig, error) {
+	return m.pullAutomateConfigsFunc()
+}
 
-// 	// Replace the original functions with the mocked implementations
-// 	originalNewSSHUtil := newSSHUtil
-// 	originalCopyExistingInfra := copyExistingInfra
-// 	originalCopyAws := copyAws
-// 	defer func() {
-// 		NewSSHUtil = originalNewSSHUtil
-// 		CopyExistingInfra = originalCopyExistingInfra
-// 		CopyAws = originalCopyAws
-// 	}()
+func (m *MockPullConfigs) pullChefServerConfigs() (map[string]*dc.AutomateConfig, error) {
+	return m.pullChefServerConfigsFunc()
+}
 
-// 	// Assign the mocked functions to the package-level variables
-// 	NewSSHUtil = newSSHUtil
-// 	CopyExistingInfra = copyExistingInfra
-// 	CopyAws = copyAws
+func (m *MockPullConfigs) generateInfraConfig() (*ExistingInfraConfigToml, error) {
+	return m.generateInfraConfigFunc()
+}
 
-// 	// Test case: Existing Infra Config
-// 	getAutomateHAInfraDetails = func() (*infraDetails, error) {
-// 		// Mocked implementation that returns sample infra details or an error
-// 		return &infraDetails{}, nil
-// 	}
+func (m *MockPullConfigs) generateAwsConfig() (*AwsConfigToml, error) {
+	return m.generateAwsConfigFunc()
+}
 
-// 	configPuller.fetchInfraConfig = fetchInfraConfig
+func (m *MockPullConfigs) getExceptionIps() []string {
+	return m.getExceptionIpsFunc()
+}
 
-// 	haDeployConfig, err := PopulateHaCommonConfig()
-// 	assert.Nil(t, err)
-// 	assert.NotNil(t, haDeployConfig)
-// 	// Add assertions to verify the populated HaDeployConfig for the existing infra config scenario
+func (m *MockPullConfigs) setExceptionIps(ips []string) {
+	m.setExceptionIpsFunc(ips)
+}
 
-// 	// Test case: AWS Config
-// 	getAutomateHAInfraDetails = func() (*infraDetails, error) {
-// 		// Mocked implementation that returns sample infra details or an error
-// 		return &infraDetails{}, nil
-// 	}
+func (m *MockPullConfigs) getOsCertsByIp(configKeysMap map[string]*ConfigKeys) []CertByIP {
+	return m.getOsCertsByIpFunc(configKeysMap)
+}
 
-// 	configPuller.fetchAwsConfig = fetchAwsConfig
+func TestPopulateHaCommonConfig_ExistingInfraConfig(t *testing.T) {
+	mockPullConfigs := &MockPullConfigs{
+		fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+			return existingInfraConfig, nil
+		},
+		fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+			return nil, nil
+		},
+	}
 
-// 	haDeployConfig, err = PopulateHaCommonConfig()
-// 	assert.Nil(t, err)
-// 	assert.NotNil(t, haDeployConfig)
-// 	// Add assertions to verify the populated HaDeployConfig for the AWS config scenario
+	haDeployConfig, err := PopulateHaCommonConfig(mockPullConfigs)
 
-// 	// Test case: Deployed config not found
-// 	getAutomateHAInfraDetails = func() (*infraDetails, error) {
-// 		// Mocked implementation that returns an error indicating infra details not found
-// 		return nil, errors.New("infra details not found")
-// 	}
+	assert.Nil(t, err)
+	assert.NotNil(t, haDeployConfig)
+}
 
-// 	haDeployConfig, err = PopulateHaCommonConfig()
-// 	assert.NotNil(t, err)
-// 	assert.Nil(t, haDeployConfig)
-// 	// Add assertions to verify the error message and HaDeployConfig is nil for the deployed config not found scenario
-// }
+func TestPopulateHaCommonConfig_AwsConfig(t *testing.T) {
+	// Create a mock instance of PullConfigs
+	mockPullConfigs := &MockPullConfigs{
+		fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+			return nil, nil
+		},
+		fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+			return awsConfig, nil
+		},
+	}
+
+	haDeployConfig, err := PopulateHaCommonConfig(mockPullConfigs)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, haDeployConfig)
+}
+
+func TestPopulateHaCommonConfig_NoConfigFound(t *testing.T) {
+	mockPullConfigs := &MockPullConfigs{
+		fetchInfraConfigFunc: func() (*ExistingInfraConfigToml, error) {
+			return nil, nil
+		},
+		fetchAwsConfigFunc: func() (*AwsConfigToml, error) {
+			return nil, nil
+		},
+	}
+
+	haDeployConfig, err := PopulateHaCommonConfig(mockPullConfigs)
+	assert.NotNil(t, err)
+	assert.Nil(t, haDeployConfig)
+	assert.EqualError(t, err, "deployed config was not found")
+}
 
 func TestCopyCertsByIP(t *testing.T) {
 	// Prepare test data
@@ -164,137 +396,7 @@ func TestCopyCertsByIP(t *testing.T) {
 }
 
 func TestCopyExistingInfra(t *testing.T) {
-	existingInfraConfig := &ExistingInfraConfigToml{
-		Architecture: ExistingInfraArchitectureToml{
-			ConfigInitials: ExistingInfraConfigInitialsToml{
-				SSHUser:                     "existing-ssh-user",
-				Architecture:                "existing-architecture",
-				BackupConfig:                "object_storage",
-				BackupMount:                 "/existing/backup/mount",
-				HabitatUIDGid:               "existing-habitat-uid-gid",
-				LoggingMonitoringManagement: "true",
-				SSHGroupName:                "existing-ssh-group",
-				SSHKeyFile:                  "/existing/ssh/key/file",
-				SSHPort:                     "22",
-				SecretsKeyFile:              "/existing/secrets/key/file",
-				SecretsStoreFile:            "/existing/secrets/store/file",
-				WorkspacePath:               "/existing/workspace/path",
-			},
-		},
-		Automate: ExistingInfraAutomateToml{
-			Config: ExistingInfraAutomateConfigToml{
-				AdminPassword:     "existing-admin-password",
-				ConfigFile:        "/existing/config/file",
-				EnableCustomCerts: true,
-				Fqdn:              "existing-fqdn",
-				InstanceCount:     "3",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-				RootCA:            "/existing/root/ca",
-				TeamsPort:         "8080",
-				CertsByIP: []CertByIP{
-					{
-						IP:         "10.0.0.1",
-						PrivateKey: "/existing/cert1/private/key",
-						PublicKey:  "/existing/cert1/public/key",
-						NodesDn:    "/existing/cert1/nodes/dn",
-					},
-				},
-			},
-		},
-		ChefServer: ChefServerToml{
-			Config: ChefServerConfigToml{
-				EnableCustomCerts: true,
-				InstanceCount:     "3",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-				CertsByIP: []CertByIP{
-					{
-						IP:         "10.0.0.1",
-						PrivateKey: "/existing/cert1/private/key",
-						PublicKey:  "/existing/cert1/public/key",
-						NodesDn:    "/existing/cert1/nodes/dn",
-					},
-				},
-			},
-		},
-		Postgresql: PostgresqlToml{
-			Config: PgConfigToml{
-				EnableCustomCerts: true,
-				InstanceCount:     "3",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-				RootCA:            "/existing/root/ca",
-				CertsByIP: []CertByIP{
-					{
-						IP:         "10.0.0.1",
-						PrivateKey: "/existing/cert1/private/key",
-						PublicKey:  "/existing/cert1/public/key",
-						NodesDn:    "/existing/cert1/nodes/dn",
-					},
-				},
-			},
-		},
-		Opensearch: OpensearchToml{
-			Config: OsConfigToml{
-				AdminCert:         "/existing/admin/cert",
-				AdminDn:           "/existing/admin/dn",
-				AdminKey:          "/existing/admin/key",
-				EnableCustomCerts: true,
-				InstanceCount:     "3",
-				NodesDn:           "/existing/nodes/dn",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-				RootCA:            "/existing/root/ca",
-				CertsByIP: []CertByIP{
-					{
-						IP:         "10.0.0.1",
-						PrivateKey: "/existing/cert1/private/key",
-						PublicKey:  "/existing/cert1/public/key",
-						NodesDn:    "/existing/cert1/nodes/dn",
-					},
-				},
-			},
-		},
-		ExistingInfra: ExistingInfraToml{
-			Config: ExistingInfraIpsToml{
-				AutomatePrivateIps:   []string{"10.0.0.1", "10.0.0.2"},
-				ChefServerPrivateIps: []string{"10.0.1.1", "10.0.1.2"},
-				PostgresqlPrivateIps: []string{"10.0.2.1", "10.0.2.2"},
-				OpensearchPrivateIps: []string{"10.0.3.1", "10.0.3.2"},
-			},
-		},
-		ExternalDB: ExternalDBToml{
-			Database: ExternalDbToml{
-				Type: "aws",
-				Opensearch: ExternalOpensearchToml{
-					OpensearchRootCert:          "root-cert",
-					OpensearchDomainName:        "domain",
-					OpensearchInstanceURL:       "instance-url",
-					OpensearchSuperUserPassword: "superuser-password",
-					OpensearchSuperUserName:     "superuser-name",
-					AWS:                         ExternalAwsToml{AwsOsSnapshotRoleArn: "snapshot-role-arn", OsUserAccessKeyId: "access-key-id", OsUserAccessKeySecret: "access-key-secret"},
-				},
-				PostgreSQL: ExternalPostgreSQLToml{
-					PostgreSQLDBUserPassword:    "dbuser-password",
-					PostgreSQLDBUserName:        "dbuser-name",
-					PostgreSQLInstanceURL:       "instance-url",
-					PostgreSQLRootCert:          "root-cert",
-					PostgreSQLSuperUserPassword: "superuser-password",
-					PostgreSQLSuperUserName:     "superuser-name",
-				},
-			},
-		},
-		ObjectStorage: ObjectStorageToml{
-			Config: ObjectStorageConfigToml{
-				AccessKey:  "existing-access-key",
-				BucketName: "existing-bucket",
-				Endpoint:   "existing-endpoint",
-				Region:     "existing-region",
-				SecretKey:  "existing-secret-key",
-			},
-		},
-	}
+
 	haDeployConfig := CopyExistingInfra(existingInfraConfig)
 
 	assert.Equal(t, "existing-ssh-user", haDeployConfig.Architecture.ExistingInfra.SSHUser)
@@ -387,115 +489,6 @@ func TestCopyExistingInfra(t *testing.T) {
 }
 
 func TestCopyAws(t *testing.T) {
-	awsConfig := &AwsConfigToml{
-		Architecture: AwsArchitectureToml{
-			ConfigInitials: AwsConfigInitialsToml{
-				SSHUser:                     "aws-ssh-user",
-				Architecture:                "aws-architecture",
-				BackupConfig:                "s3",
-				S3BucketName:                "aws-s3-bucket",
-				BackupMount:                 "/aws/backup/mount",
-				HabitatUIDGid:               "aws-habitat-uid-gid",
-				LoggingMonitoringManagement: "false",
-				SSHGroupName:                "aws-ssh-group",
-				SSHKeyFile:                  "/aws/ssh/key/file",
-				SSHPort:                     "2222",
-				SecretsKeyFile:              "/aws/secrets/key/file",
-				SecretsStoreFile:            "/aws/secrets/store/file",
-				WorkspacePath:               "/aws/workspace/path",
-			},
-		},
-		Automate: AwsAutomateToml{
-			Config: AwsAutomateConfigToml{
-				AdminPassword:     "aws-admin-password",
-				ConfigFile:        "/aws/config/file",
-				EnableCustomCerts: false,
-				Fqdn:              "aws-fqdn",
-				InstanceCount:     "5",
-				PrivateKey:        "/aws/private/key",
-				PublicKey:         "/aws/public/key",
-				RootCA:            "/aws/root/ca",
-				TeamsPort:         "9090",
-			},
-		},
-		ChefServer: ChefServerToml{
-			Config: ChefServerConfigToml{
-				EnableCustomCerts: true,
-				InstanceCount:     "3",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-			},
-		},
-		Postgresql: PostgresqlToml{
-			Config: PgConfigToml{
-				EnableCustomCerts: true,
-				InstanceCount:     "3",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-				RootCA:            "/existing/root/ca",
-			},
-		},
-		Opensearch: OpensearchToml{
-			Config: OsConfigToml{
-				AdminCert:         "/existing/admin/cert",
-				AdminDn:           "/existing/admin/dn",
-				AdminKey:          "/existing/admin/key",
-				EnableCustomCerts: true,
-				InstanceCount:     "3",
-				NodesDn:           "/existing/nodes/dn",
-				PrivateKey:        "/existing/private/key",
-				PublicKey:         "/existing/public/key",
-				RootCA:            "/existing/root/ca",
-			},
-		},
-		Aws: AwsToml{
-			Config: ConfigToml{
-				Profile:                      "my-profile",
-				Region:                       "us-west-2",
-				AwsVpcId:                     "vpc-12345",
-				AwsCidrBlockAddr:             "10.0.0.0/16",
-				PrivateCustomSubnets:         []string{"subnet-12345", "subnet-67890"},
-				PublicCustomSubnets:          []string{"subnet-54321", "subnet-09876"},
-				SSHKeyPairName:               "my-keypair",
-				AmiID:                        "ami-08d4ac5b634553e16",
-				DeleteOnTermination:          true,
-				SetupManagedServices:         true,
-				AutomateServerInstanceType:   "t3.medium",
-				ChefServerInstanceType:       "t3.medium",
-				PostgresqlServerInstanceType: "m5.large",
-				OpensearchServerInstanceType: "m5.large",
-				AutomateLbCertificateArn:     "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
-				ChefServerLbCertificateArn:   "arn:aws:acm:ap-southeast-2:112758395563:certificate/9b04-6513-4ac5-9332-2ce4e",
-				AutomateEbsVolumeIops:        "100",
-				AutomateEbsVolumeSize:        "50",
-				AutomateEbsVolumeType:        "gp3",
-				ChefEbsVolumeIops:            "100",
-				ChefEbsVolumeSize:            "50",
-				ChefEbsVolumeType:            "gp3",
-				OpensearchEbsVolumeIops:      "100",
-				OpensearchEbsVolumeSize:      "50",
-				OpensearchEbsVolumeType:      "gp3",
-				PostgresqlEbsVolumeIops:      "100",
-				PostgresqlEbsVolumeSize:      "50",
-				PostgresqlEbsVolumeType:      "gp3",
-				LBAccessLogs:                 "false",
-				OpensearchDomainName:         "opensearch-domain",
-				OpensearchDomainUrl:          "opensearch-url",
-				OpensearchUserPassword:       "opensearch-password",
-				OpensearchUsername:           "opensearch-username",
-				OpensearchCertificate:        "opensearch-certificate",
-				OsUserAccessKeyId:            "access-key-id",
-				OsUserAccessKeySecret:        "access-key-secret",
-				AwsOsSnapshotRoleArn:         "snapshot-role-arn",
-				RDSCertificate:               "rds-certificate",
-				RDSDBUserPassword:            "rds-db-password",
-				RDSDBUserName:                "rds-db-username",
-				RDSInstanceUrl:               "rds-instance-url",
-				RDSSuperUserPassword:         "rds-superuser-password",
-				RDSSuperUserName:             "rds-superuser-username",
-			},
-		},
-	}
 
 	haDeployConfig := CopyAws(awsConfig)
 

@@ -6,20 +6,7 @@ import (
 	"github.com/chef/automate/lib/config"
 )
 
-func PopulateHaCommonConfig() (*config.HaDeployConfig, error) {
-	infra, err := getAutomateHAInfraDetails()
-	if err != nil {
-		return nil, err
-	}
-
-	sshConfig := &SSHConfig{
-		sshUser:    infra.Outputs.SSHUser.Value,
-		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
-		sshPort:    infra.Outputs.SSHPort.Value,
-	}
-	sshUtil := NewSSHUtil(sshConfig)
-	configPuller := NewPullConfigs(infra, sshUtil)
-
+func PopulateHaCommonConfig(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
 	existingInfraConfig, err := configPuller.fetchInfraConfig()
 	if err != nil {
 		return nil, err
