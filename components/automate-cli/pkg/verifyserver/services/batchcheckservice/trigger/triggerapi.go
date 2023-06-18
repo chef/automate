@@ -194,8 +194,8 @@ func IfHardwareEmpty(config models.Config) bool {
 	return false
 }
 
-func NilRespForAllInstances(checkType string) []models.CheckTriggerResponse {
-	return []models.CheckTriggerResponse{
+func NilResp(checkType string, includeOPENSEARCH bool, includePOSTGRESQL bool, includeBASTION bool) []models.CheckTriggerResponse {
+	responses := []models.CheckTriggerResponse{
 		{
 			NodeType:  constants.AUTOMATE,
 			CheckType: checkType,
@@ -216,7 +216,10 @@ func NilRespForAllInstances(checkType string) []models.CheckTriggerResponse {
 			},
 			Host: constants.UNKNONHOST,
 		},
-		{
+	}
+
+	if includeOPENSEARCH {
+		responses = append(responses, models.CheckTriggerResponse{
 			NodeType:  constants.OPENSEARCH,
 			CheckType: checkType,
 			Result: models.ApiResult{
@@ -225,8 +228,11 @@ func NilRespForAllInstances(checkType string) []models.CheckTriggerResponse {
 				Check:   checkType,
 			},
 			Host: constants.UNKNONHOST,
-		},
-		{
+		})
+	}
+
+	if includePOSTGRESQL {
+		responses = append(responses, models.CheckTriggerResponse{
 			NodeType:  constants.POSTGRESQL,
 			CheckType: checkType,
 			Result: models.ApiResult{
@@ -235,8 +241,11 @@ func NilRespForAllInstances(checkType string) []models.CheckTriggerResponse {
 				Check:   checkType,
 			},
 			Host: constants.UNKNONHOST,
-		},
-		{
+		})
+	}
+
+	if includeBASTION {
+		responses = append(responses, models.CheckTriggerResponse{
 			NodeType:  constants.BASTION,
 			CheckType: checkType,
 			Result: models.ApiResult{
@@ -245,76 +254,24 @@ func NilRespForAllInstances(checkType string) []models.CheckTriggerResponse {
 				Check:   checkType,
 			},
 			Host: constants.LOCALHOST,
-		},
+		})
 	}
+
+	return responses
 }
 
-func NilRespForA2CS(checkType string) []models.CheckTriggerResponse {
-	return []models.CheckTriggerResponse{
-		{
-			NodeType:  constants.AUTOMATE,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
+func GetErrTriggerCheckResp(ip, checkType, nodeType, msg string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: msg,
 			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.CHEF_INFRA_SERVER,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-	}
-}
-
-func NilRespForA2CSOSPG(checkType string) []models.CheckTriggerResponse {
-	return []models.CheckTriggerResponse{
-		{
-			NodeType:  constants.AUTOMATE,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.CHEF_INFRA_SERVER,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.OPENSEARCH,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.POSTGRESQL,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
+			Check: checkType,
 		},
 	}
 }

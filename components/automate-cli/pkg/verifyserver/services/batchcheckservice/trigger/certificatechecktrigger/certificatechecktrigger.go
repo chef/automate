@@ -8,7 +8,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type CertificateCheck struct {
@@ -28,7 +27,7 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CSOSPG(constants.CERTIFICATE)
+		return trigger.NilResp(constants.CERTIFICATE, true, true, false)
 	}
 	// Check if certificate is empty or nil
 	if config.Certificate == nil {
@@ -115,33 +114,17 @@ func IsCertificateEmpty(certificate []*models.Certificate) bool {
 func emptyCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "Certificate is missing"))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "Certificate is missing"))
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, "Certificate is missing"))
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, "Certificate is missing"))
 	}
 
 	return resps
-}
-
-func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:      ip,
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: "Certificate is missing",
-			},
-			Check: checkType,
-		},
-	}
 }

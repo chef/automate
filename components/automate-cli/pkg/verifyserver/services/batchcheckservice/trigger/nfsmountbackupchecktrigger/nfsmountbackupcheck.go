@@ -12,7 +12,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type NfsBackupConfigCheck struct {
@@ -31,7 +30,7 @@ func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigChe
 
 func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CSOSPG(constants.NFS_BACKUP_CONFIG)
+		return trigger.NilResp(constants.NFS_BACKUP_CONFIG, true, true, false)
 	}
 	if config.Backup.FileSystem == nil {
 		return nilNFSMountBackupResp(config, constants.NFS_BACKUP_CONFIG)
@@ -165,33 +164,17 @@ func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTrig
 func emptyNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "MountLocation is missing"))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "MountLocation is missing"))
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, "MountLocation is missing"))
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, "MountLocation is missing"))
 	}
 
 	return resps
-}
-
-func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:      ip,
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: "MountLocation is missing",
-			},
-			Check: checkType,
-		},
-	}
 }

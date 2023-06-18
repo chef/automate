@@ -237,7 +237,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].Result.Check)
 					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
-					assert.Equal(t, "S3 backup detail is missing", got[0].Result.Error.Message)
+					assert.Equal(t, "Object storage detail or OS detail is missing", got[0].Result.Error.Message)
 					assert.False(t, got[0].Result.Skipped)
 				} else {
 					assert.Equal(t, want, got)

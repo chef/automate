@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -490,71 +491,11 @@ func createDummyServer() (*httptest.Server, string, string) {
 	return server, ip, port
 }
 
-func TestNilRespForAllInstances(t *testing.T) {
-	checkType := "exampleCheck"
+func TestNilResp(t *testing.T) {
+	checkType := "test_check"
 
-	expected := []models.CheckTriggerResponse{
-		{
-			NodeType:  constants.AUTOMATE,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.CHEF_INFRA_SERVER,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.OPENSEARCH,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.POSTGRESQL,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.BASTION,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.LOCALHOST,
-		},
-	}
-
-	result := NilRespForAllInstances(checkType)
-
-	assert.Equal(t, expected, result, "Response mismatch")
-}
-
-func TestNilRespForA2CS(t *testing.T) {
-	checkType := "exampleCheck"
-
-	expected := []models.CheckTriggerResponse{
+	// Test case 1: Only AUTOMATE and CHEF_INFRA_SERVER
+	expected1 := []models.CheckTriggerResponse{
 		{
 			NodeType:  constants.AUTOMATE,
 			CheckType: checkType,
@@ -577,60 +518,47 @@ func TestNilRespForA2CS(t *testing.T) {
 		},
 	}
 
-	result := NilRespForA2CS(checkType)
+	result1 := NilResp(checkType, false, false, false)
+	assert.Equal(t, expected1, result1)
 
-	assert.Equal(t, expected, result, "Response mismatch")
-}
-
-func TestNilRespForA2CSOSPG(t *testing.T) {
-	checkType := "exampleCheck"
-
-	expected := []models.CheckTriggerResponse{
-		{
-			NodeType:  constants.AUTOMATE,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
+	// Test case 2: Include OPENSEARCH
+	expected2 := append(expected1, models.CheckTriggerResponse{
+		NodeType:  constants.OPENSEARCH,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checkType,
 		},
-		{
-			NodeType:  constants.CHEF_INFRA_SERVER,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.OPENSEARCH,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-		{
-			NodeType:  constants.POSTGRESQL,
-			CheckType: checkType,
-			Result: models.ApiResult{
-				Passed:  false,
-				Skipped: true,
-				Check:   checkType,
-			},
-			Host: constants.UNKNONHOST,
-		},
-	}
+		Host: constants.UNKNONHOST,
+	})
 
-	result := NilRespForA2CSOSPG(checkType)
+	result2 := NilResp(checkType, true, false, false)
+	assert.Equal(t, expected2, result2)
 
-	assert.Equal(t, expected, result, "Response mismatch")
+	// Test case 3: Include POSTGRESQL and BASTION
+	expected3 := append(expected2, models.CheckTriggerResponse{
+		NodeType:  constants.POSTGRESQL,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checkType,
+		},
+		Host: constants.UNKNONHOST,
+	}, models.CheckTriggerResponse{
+		NodeType:  constants.BASTION,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checkType,
+		},
+		Host: constants.LOCALHOST,
+	})
+
+	result3 := NilResp(checkType, true, true, true)
+	assert.Equal(t, expected3, result3)
 }
 
 func TestIfHardwareEmpty(t *testing.T) {
@@ -655,4 +583,29 @@ func TestIfHardwareEmpty(t *testing.T) {
 	}
 	result = IfHardwareEmpty(config)
 	assert.False(t, result, "Expected hardware not to be empty")
+}
+
+func TestGetErrTriggerCheckResp(t *testing.T) {
+	ip := "192.168.0.1"
+	checkType := "test_check"
+	nodeType := "test_node"
+	errorMsg := "error message"
+
+	expected := models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: errorMsg,
+			},
+			Check: checkType,
+		},
+	}
+
+	result := GetErrTriggerCheckResp(ip, checkType, nodeType, errorMsg)
+
+	assert.Equal(t, expected, result)
 }

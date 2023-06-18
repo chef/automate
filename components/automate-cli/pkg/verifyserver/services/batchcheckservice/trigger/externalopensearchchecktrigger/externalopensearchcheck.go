@@ -8,7 +8,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type ExternalOpensearchCheck struct {
@@ -26,7 +25,7 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for nil or empty req body
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CS(constants.EXTERNAL_OPENSEARCH)
+		return trigger.NilResp(constants.EXTERNAL_OPENSEARCH, false, false, false)
 	}
 	if config.ExternalOS == nil {
 		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH)
@@ -126,29 +125,14 @@ func externalOSEmptyResp(config *models.Config, checkType string) []models.Check
 	count := 0
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.GetErrTriggerCheckResp(ip, checkType, constants.AUTOMATE, "OS configuration is missing"))
 		count++
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.GetErrTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, "OS configuration is missing"))
 		count++
 	}
 
 	return triggerResps
-}
-
-func createErrorResponse(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:      ip,
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: "OS configuration is missing",
-			},
-		},
-	}
 }

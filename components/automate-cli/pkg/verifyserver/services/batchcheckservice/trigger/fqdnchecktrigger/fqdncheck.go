@@ -9,7 +9,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type FqdnCheck struct {
@@ -28,7 +27,7 @@ func NewFqdnCheck(log logger.Logger, port string) *FqdnCheck {
 
 func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CS(constants.FQDN)
+		return trigger.NilResp(constants.FQDN, false, false, false)
 	}
 
 	// Check if certificate is empty or nil
@@ -149,27 +148,11 @@ func IsCertificateEmpty(certificate []*models.Certificate) bool {
 func emptyCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "Certificate is missing"))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "Certificate is missing"))
 	}
 
 	return resps
-}
-
-func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:      ip,
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: "Certificate is missing",
-			},
-			Check: checkType,
-		},
-	}
 }

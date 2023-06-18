@@ -33,7 +33,7 @@ func (ss *HardwareResourceCountCheck) Run(config *models.Config) []models.CheckT
 	ss.log.Info("Performing Hardware Resource count check from batch check ")
 
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CSOSPG(constants.HARDWARE_RESOURCE_COUNT)
+		return trigger.NilResp(constants.HARDWARE_RESOURCE_COUNT, true, true, false)
 	}
 
 	var finalResult []models.CheckTriggerResponse

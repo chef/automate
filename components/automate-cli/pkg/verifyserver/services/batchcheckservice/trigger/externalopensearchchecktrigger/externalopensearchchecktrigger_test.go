@@ -577,7 +577,7 @@ func TestGetPortsForMockServer(t *testing.T) {
 }
 
 func TestRunCheck(t *testing.T) {
-	t.Run("name", func(t *testing.T) {
+	t.Run("Nil Hardware", func(t *testing.T) {
 		config := &models.Config{
 			Hardware:   nil,
 			ExternalOS: nil,

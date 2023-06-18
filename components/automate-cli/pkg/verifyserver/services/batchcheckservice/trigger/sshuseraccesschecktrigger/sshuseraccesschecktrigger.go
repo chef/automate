@@ -9,7 +9,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type SshUserAccessCheck struct {
@@ -31,7 +30,7 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 
 	// Check if certificate is empty or nil
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CSOSPG(constants.SSH_USER)
+		return trigger.NilResp(constants.SSH_USER, true, true, false)
 	}
 	if config.SSHUser == nil {
 		return nilSSHUserResp(config, constants.SSH_USER)
@@ -117,33 +116,17 @@ func emptySSHUserResp(config *models.Config, checktype string) []models.CheckTri
 	resps := []models.CheckTriggerResponse{}
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "SSH credentials is missing"))
 	}
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "SSH credentials is missing"))
 	}
 	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, "SSH credentials is missing"))
 	}
 	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, "SSH credentials is missing"))
 	}
 
 	return resps
-}
-
-func GetErrTriggerCheckResp(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:      ip,
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: "SSH credentials is missing",
-			},
-			Check: checkType,
-		},
-	}
 }

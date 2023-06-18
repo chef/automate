@@ -9,7 +9,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/lib/logger"
-	"github.com/gofiber/fiber/v2"
 )
 
 type ExternalPostgresCheck struct {
@@ -27,7 +26,7 @@ func NewExternalPostgresCheck(log logger.Logger, port string) *ExternalPostgresC
 func (epc *ExternalPostgresCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for nil or empty req body
 	if config.Hardware == nil {
-		return trigger.NilRespForA2CS(constants.EXTERNAL_POSTGRESQL)
+		return trigger.NilResp(constants.EXTERNAL_POSTGRESQL, false, false, false)
 	}
 	if config.ExternalPG == nil {
 		return externalPGNillResp(config, constants.EXTERNAL_POSTGRESQL)
@@ -128,30 +127,14 @@ func externalPGEmptyResp(config *models.Config, checkType string) []models.Check
 	count := 0
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.GetErrTriggerCheckResp(ip, checkType, constants.AUTOMATE, "PG configuration is missing"))
 		count++
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, createErrorResponse(ip, checkType, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.GetErrTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, "PG configuration is missing"))
 		count++
 	}
 
 	return triggerResps
-}
-
-func createErrorResponse(ip, checkType, nodeType string) models.CheckTriggerResponse {
-	return models.CheckTriggerResponse{
-		Host:      ip,
-		NodeType:  nodeType,
-		CheckType: checkType,
-		Result: models.ApiResult{
-			Passed: false,
-			Error: &fiber.Error{
-				Code:    http.StatusBadRequest,
-				Message: "PG configuration is missing",
-			},
-			Check: checkType,
-		},
-	}
 }
