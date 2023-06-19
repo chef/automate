@@ -438,7 +438,13 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 	versionMap := make(map[string]string)
 
 	if isManagedServicesOn {
-		su, sp := getPgAuth(infra)
+		sshconfig := &SSHConfig{}
+		sshconfig.sshUser = infra.Outputs.SSHUser.Value
+		sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
+		sshconfig.sshPort = infra.Outputs.SSHPort.Value
+		sshconfig.hostIP = infra.Outputs.AutomatePrivateIps.Value[0]
+		sshUtil := NewSSHUtil(sshconfig)
+		su, sp := getPgAuth(sshUtil)
 		if su == "" || sp == "" {
 			return nil, errors.New("Couldn't get Super user password and name from config")
 		}
@@ -527,13 +533,7 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 	}
 }
 
-func getPgAuth(infra *AutomateHAInfraDetails) (string, string) {
-	sshconfig := &SSHConfig{}
-	sshconfig.sshUser = infra.Outputs.SSHUser.Value
-	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
-	sshconfig.sshPort = infra.Outputs.SSHPort.Value
-	sshconfig.hostIP = infra.Outputs.AutomatePrivateIps.Value[0]
-	sshUtil := NewSSHUtil(sshconfig)
+func getPgAuth(sshUtil SSHUtil) (string, string) {
 	output, err := sshUtil.connectAndExecuteCommandOnRemote(CONFIGSHOW, true)
 	if err != nil {
 		logrus.Error("Error in config show", err)

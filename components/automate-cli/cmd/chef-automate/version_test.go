@@ -3,11 +3,37 @@
 package main
 
 import (
+	"container/list"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/stretchr/testify/assert"
 )
+
+const configShow = `[global]
+[global.v1]
+  fqdn = "A2-6fdcfc05-automate-lb-355276303.sa-east-1.elb.amazonaws.com"
+  [global.v1.log]
+	redirect_sys_log = true
+	redirect_log_file_path = "/var/tmp/"
+	compress_rotated_logs = true
+	max_size_rotate_logs = "10M"
+	max_number_rotated_logs = 2
+  [global.v1.external]
+	[global.v1.external.postgresql]
+	  enable = true
+	  nodes = ["10.0.0.80:7432", "10.0.0.140:7432", "10.0.0.222:7432"]
+	  [global.v1.external.postgresql.backup]
+		enable = true
+	  [global.v1.external.postgresql.auth]
+		scheme = "password"
+		[global.v1.external.postgresql.auth.password]
+		  [global.v1.external.postgresql.auth.password.superuser]
+			username = "admin"
+			password = "admin"
+		  [global.v1.external.postgresql.auth.password.dbuser]
+			username = "admin"
+			password = "admin"`
 
 func Test_getChefAutomateVersion(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
@@ -145,5 +171,185 @@ func Test_getInfraServerVersion(t *testing.T) {
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
 		assert.Equal(t, "15.4.0", versionMap[TEST_IP_1])
+	})
+}
+
+func Test_getOpensearchVersion(t *testing.T) {
+	t.Run("Success Chef Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{
+					TEST_IP_1: {
+						{
+							ScriptName:  "",
+							HostIP:      TEST_IP_1,
+							OutputFiles: []string{},
+							Output: `package                                               type        desired  state  elapsed (s)  pid   group
+							chef/automate-ha-opensearch/1.3.7/20230223065900      standalone  up       up     975546       2872  automate-ha-opensearch.default
+							chef/automate-ha-elasticsidecar/0.1.0/20230223070538  standalone  up       up     975546       2949  automate-ha-elasticsidecar.default`,
+							Error: nil,
+						},
+					},
+				}, nil
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		automateIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getOpensearchVersion(automateIps, infra, false, mockCmdExecutor)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, versionMap)
+		assert.Contains(t, versionMap, TEST_IP_1)
+		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1])
+	})
+}
+
+func Test_getPostgresqlVersion(t *testing.T) {
+
+	t.Run("Success Chef Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{
+					TEST_IP_1: {
+						{
+							ScriptName:  "",
+							HostIP:      TEST_IP_1,
+							OutputFiles: []string{},
+							Output: `package                                            type        desired  state  elapsed (s)  pid   group
+							chef/automate-ha-postgresql/13.5.0/20230130151541  standalone  up       up     975746       3269  automate-ha-postgresql.default
+							chef/automate-ha-haproxy/2.2.14/20230130151541     standalone  up       up     975752       3137  automate-ha-haproxy.default
+							chef/automate-ha-pgleaderchk/0.1.0/20230130152444  standalone  up       up     975751       3146  automate-ha-pgleaderchk.default`,
+							Error: nil,
+						},
+					},
+				}, nil
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		automateIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getPostgresqlVersion(automateIps, infra, false, mockCmdExecutor)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, versionMap)
+		assert.Contains(t, versionMap, TEST_IP_1)
+		assert.Equal(t, "13.5.0", versionMap[TEST_IP_1])
+	})
+}
+
+func Test_splitIP(t *testing.T) {
+	t.Run("Single IP", func(t *testing.T) {
+		input := "192.168.0.1"
+		expectedOutput := []string{"192.168.0.1"}
+
+		output := splitIP(input)
+
+		assert.Equal(t, expectedOutput, output)
+	})
+
+	t.Run("Multiple IPs", func(t *testing.T) {
+		input := "192.168.0.1, 192.168.0.2, 192.168.0.3"
+		expectedOutput := []string{"192.168.0.1", "192.168.0.2", "192.168.0.3"}
+
+		output := splitIP(input)
+
+		assert.Equal(t, expectedOutput, output)
+	})
+
+	t.Run("Empty Input", func(t *testing.T) {
+		input := ""
+		expectedOutput := []string{""}
+
+		output := splitIP(input)
+
+		assert.Equal(t, expectedOutput, output)
+	})
+}
+
+func Test_getIPAddressesFromFlagOrInfra(t *testing.T) {
+	infra := &AutomateHAInfraDetails{}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+	infra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := getIPAddressesFromFlagOrInfra(infra)
+	assert.Equal(t, errList.Len(), 0)
+	assert.Equal(t, automateIps, []string{ValidIP, ValidIP1})
+	assert.Equal(t, chefServerIps, []string{ValidIP2, ValidIP3})
+	assert.Equal(t, opensearchIps, []string{ValidIP4, ValidIP5, ValidIP6})
+	assert.Equal(t, postgresqlIps, []string{ValidIP7, ValidIP8, ValidIP9})
+}
+
+func Test_getPgAuth(t *testing.T) {
+
+	sshUtil := GetMockSSHUtil(&SSHConfig{}, nil, configShow, nil, "", nil)
+
+	su, sp := getPgAuth(sshUtil)
+
+	assert.NotEmpty(t, su)
+	assert.NotEmpty(t, sp)
+	assert.Equal(t, "admin", su)
+	assert.Equal(t, "admin", sp)
+
+}
+
+func Test_validateIPAddresses(t *testing.T) {
+	t.Run("Valid IPs", func(t *testing.T) {
+		expectedIPFound := []string{"198.51.100.0", "198.51.100.1"}
+		expectedIPNotFound := []string{"198.51.100.2"}
+		expectedErrorList := list.New()
+
+		mockInfra := &AutomateHAInfraDetails{}
+		mockInfra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+		mockInfra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
+		mockInfra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+		mockInfra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+		errorList := list.New()
+
+		ipFound, ipNotFound, errorList := validateIPAddresses(errorList, []string{"198.51.100.0", "198.51.100.1", "198.51.100.2"}, "automate", "error message", mockInfra)
+
+		assert.ElementsMatch(t, expectedIPFound, ipFound)
+		assert.ElementsMatch(t, expectedIPNotFound, ipNotFound)
+		assert.Equal(t, expectedErrorList, errorList)
+	})
+
+	t.Run("Invalid IPs", func(t *testing.T) {
+		expectedErrorList := list.New()
+		expectedErrorList.PushBack("Incorrect automate IP, 192.168.0 error message")
+
+		mockInfra := &AutomateHAInfraDetails{}
+		mockInfra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+		mockInfra.Outputs.ChefServerPrivateIps.Value = []string{ValidIP2, ValidIP3}
+		mockInfra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+		mockInfra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+		errorList := list.New()
+
+		ipFound, ipNotFound, errorList := validateIPAddresses(errorList, []string{"192.168.0", "192.168.0.6"}, "automate", " error message", mockInfra)
+
+		assert.Empty(t, ipFound)
+		assert.ElementsMatch(t, []string{"192.168.0", "192.168.0.6"}, ipNotFound)
+		assert.Equal(t, expectedErrorList, errorList)
 	})
 }
