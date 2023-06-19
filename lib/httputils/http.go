@@ -59,6 +59,7 @@ func (c *Client) MakeRequest(requestMethod, url string, body interface{}) (*http
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal request body: %w", err)
 		}
+		c.Logger.Debugf("Request body for MakeRequest: %s\n", string(requestBody))
 		reader = bytes.NewReader(requestBody)
 	}
 
