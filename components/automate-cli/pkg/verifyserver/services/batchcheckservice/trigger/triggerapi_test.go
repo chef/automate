@@ -23,7 +23,7 @@ const (
 			"checks": [
 				{
 					"title": "Check 1",
-					"passeß": true,
+					"passed": true,
 					"success_msg": "Check 1 passed",
 					"error_msg": "",
 					"resolution_msg": "No resolution required"
