@@ -419,7 +419,7 @@ func TestCopyExistingInfra(t *testing.T) {
 	assert.Equal(t, "3", haDeployConfig.Automate.Config.InstanceCount)
 	assert.Equal(t, "/existing/private/key", haDeployConfig.Automate.Config.PrivateKey)
 	assert.Equal(t, "/existing/public/key", haDeployConfig.Automate.Config.PublicKey)
-	assert.Equal(t, "/existing/root/ca", haDeployConfig.Automate.Config.RootCA)
+	assert.Equal(t, "/existing/root/ca", haDeployConfig.Automate.Config.FqdnRootCA)
 	assert.Equal(t, "8080", haDeployConfig.Automate.Config.TeamsPort)
 	assert.Equal(t, "10.0.0.1", (*haDeployConfig.Automate.Config.CertsByIP)[0].IP)
 	assert.Equal(t, "/existing/cert1/private/key", (*haDeployConfig.Automate.Config.CertsByIP)[0].PrivateKey)
@@ -516,7 +516,7 @@ func TestCopyAws(t *testing.T) {
 	assert.Equal(t, "5", automate.InstanceCount)
 	assert.Equal(t, "/aws/private/key", automate.PrivateKey)
 	assert.Equal(t, "/aws/public/key", automate.PublicKey)
-	assert.Equal(t, "/aws/root/ca", automate.RootCA)
+	assert.Equal(t, "/aws/root/ca", automate.FqdnRootCA)
 	assert.Equal(t, "9090", automate.TeamsPort)
 
 	chefServer := haDeployConfig.ChefServer.Config
