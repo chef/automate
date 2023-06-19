@@ -15,6 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	CONFIG_FILE = "/config_valid_config_parser.toml"
+)
+
 func TestRunVerifyCmd(t *testing.T) {
 	tests := []struct {
 		description              string
@@ -65,7 +69,7 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 			},
-			configFile: CONFIG_TOML_PATH + "/config_valid_config_parser.toml",
+			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
 			wantErr:    nil,
 		},
 		{
@@ -111,7 +115,7 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 			},
-			configFile: CONFIG_TOML_PATH + "/config_valid_config_parser.toml",
+			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
 			wantErr:    nil,
 		},
 	}
@@ -145,7 +149,7 @@ func TestRunVerifyCmd(t *testing.T) {
 
 func TestVerifyCmdFunc(t *testing.T) {
 	flagsObj := &verifyCmdFlags{
-		config: CONFIG_TOML_PATH + "/config_valid_config_parser.toml",
+		config: CONFIG_TOML_PATH + CONFIG_FILE,
 	}
 
 	vf := verifyCmdFunc(flagsObj)
