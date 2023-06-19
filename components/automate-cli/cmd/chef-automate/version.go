@@ -7,9 +7,11 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/pelletier/go-toml"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -20,6 +22,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
+	"github.com/ttacon/chalk"
 )
 
 var versionCmd = &cobra.Command{
@@ -54,7 +57,7 @@ var VersionCommandFlags = struct {
 func runVersionCmd(cmd *cobra.Command, args []string) error {
 	// Check for bastion
 	if isA2HARBFileExist() {
-		writer.Println("Running command on bastion")
+		logrus.Debug("Running command on bastion")
 		runCommandOnBastion(args)
 		return nil
 	}
@@ -180,15 +183,12 @@ func runCommandOnBastion(args []string) error {
 	if err != nil {
 		return err
 	}
-	writer.Println("INFRA DONE")
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := getIPAddressesFromFlagOrInfra(infra)
-	writer.Println("IPS DONE")
 	if errList != nil && errList.Len() > 0 {
 		return status.Wrap(getSingleErrorFromList(errList), status.InvalidCommandArgsError, ipAddressError)
 	}
 
 	if len(automateIps) != 0 {
-		writer.Println("A2 IPs: " + strings.Join(automateIps[:], ","))
 		err := getChefAutomateVersion(automateIps, infra)
 		if err != nil {
 			return err
@@ -220,14 +220,6 @@ func runCommandOnBastion(args []string) error {
 }
 
 func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails) error {
-	// args := []string{"version"}
-	// if VersionCommandFlags.verbose {
-	// 	args = append(args, "-v")
-	// }
-	// version := GenerateOriginalAutomateCLICommand(
-	// 	&cobra.Command{
-	// 		Use: "chef-automate",
-	// 	}, args)
 	nodeMap := &NodeTypeAndCmd{
 		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
 		Automate: &Cmd{CmdInputs: &CmdInputs{
@@ -245,22 +237,22 @@ func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails)
 	sshUtil := NewSSHUtil(&SSHConfig{})
 	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-	writer.Println("EXECUTING")
 	cmdresult, err := cmdUtil.Execute()
 
 	if err != nil {
-		fmt.Print("ERROR", err)
+		logrus.Error("ERROR", err)
 		return err
 	}
-	writer.Println("DONE")
-	//output := make(map[string]string)
+
+	writer.Println("-----------------------------------------")
+	writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Automate")))
+	writer.Println("\n")
 
 	for ip, result := range cmdresult {
-		writer.Println(ip)
+		writer.Printf("Node IP : %s\n", ip)
 		writer.Println(result[0].Output)
 
 	}
-
 	return nil
 }
 
@@ -283,22 +275,27 @@ func getInfraServerVersion(chefServerIps []string, infra *AutomateHAInfraDetails
 	sshUtil := NewSSHUtil(&SSHConfig{})
 	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-	writer.Println("EXECUTING")
 	cmdresult, err := cmdUtil.Execute()
 
 	if err != nil {
-		fmt.Print("ERROR", err)
+		logrus.Error("ERROR", err)
 		return err
 	}
-	writer.Println("DONE")
-	//output := make(map[string]string)
+	writer.Println("-----------------------------------------")
+	writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Chef Server")))
+	writer.Println("\n")
 
 	for ip, result := range cmdresult {
-		writer.Println(ip)
-		writer.Println(result[0].Output)
 
+		v, err := extractVersion(result[0].Output, `(\d+\.\d+\.\d+)`)
+		if err != nil {
+			logrus.Error("ERROR", err)
+			return err
+		}
+		writer.Printf("Node IP : %s\n", ip)
+
+		writer.Printf("Version : %s\n\n", v)
 	}
-
 	return nil
 }
 
@@ -322,19 +319,31 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails)
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-		writer.Println("EXECUTING")
 		cmdresult, err := cmdUtil.Execute()
 
 		if err != nil {
-			fmt.Print("ERROR", err)
+			logrus.Error("ERROR", err)
 			return err
 		}
-		writer.Println("DONE")
-		//output := make(map[string]string)
 
-		for ip, result := range cmdresult {
-			writer.Println(ip)
-			writer.Println(result[0].Output)
+		writer.Println("-----------------------------------------")
+		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Opensearch")))
+		writer.Println("\n")
+
+		var v string
+		var err1 error
+		for _, result := range cmdresult {
+			v, err1 = extractVersion(result[0].Output, `(\d+\.\d+\.\d+)`)
+			if err1 != nil {
+				logrus.Error("ERROR", err)
+				return err1
+			}
+		}
+
+		for _, ip := range opensearchIps {
+			writer.Printf("Node IP : %s\n", ip)
+
+			writer.Printf("Version : %s\n\n", v)
 
 		}
 
@@ -357,19 +366,16 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails)
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-		writer.Println("EXECUTING")
 		cmdresult, err := cmdUtil.Execute()
 
 		if err != nil {
-			fmt.Print("ERROR", err)
+			logrus.Error("ERROR", err)
 			return err
 		}
-		writer.Println("DONE")
-		//output := make(map[string]string)
-
+		writer.Println("-----------------------------------------")
+		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Opensearch")))
+		writer.Println("\n")
 		for ip, result := range cmdresult {
-			writer.Println(ip)
-			writer.Println(result[0].Output)
 			servicedetails, err := statusservice.ParseHabSvcStatus(result[0].Output)
 			if err != nil {
 				fmt.Print("ERROR", err)
@@ -381,8 +387,15 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails)
 				fmt.Print("No os pkg found")
 				return nil
 			}
-			writer.Println("SERVICE NAME :: " + osPkg.ServiceName)
-			writer.Println("SERVICE VERSION ::" + osPkg.Version)
+
+			v, err := extractVersion(osPkg.Version, `(\d+\.\d+\.\d+)`)
+			if err != nil {
+				logrus.Error("ERROR", err)
+				return err
+			}
+			writer.Printf("Node IP : %s\n", ip)
+
+			writer.Printf("Version : %s\n\n", v)
 
 		}
 
@@ -394,11 +407,9 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails)
 func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails) error {
 
 	if isManagedServicesOn() {
-		writer.Println("MANAGE DONE")
 		su, sp := getPgAuth(infra)
 		automateIps := infra.Outputs.AutomatePrivateIps.Value
 		pgCommand := fmt.Sprintf("PGPASSWORD=%s  hab pkg exec core/postgresql13  psql -U %s -h localhost -p 10145 -d postgres --dbname postgres -tAc 'SELECT version()'", sp, su)
-		writer.Println("PGCOMMAND :: " + pgCommand)
 		nodeMap := &NodeTypeAndCmd{
 			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
 			Automate: &Cmd{CmdInputs: &CmdInputs{
@@ -416,20 +427,30 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails)
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-		writer.Println("EXECUTING")
 		cmdresult, err := cmdUtil.Execute()
 
 		if err != nil {
-			fmt.Print("ERROR", err)
+			logrus.Error("ERROR", err)
 			return err
 		}
-		writer.Println("DONE")
-		//output := make(map[string]string)
+		writer.Println("-----------------------------------------")
+		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Postgresql")))
+		writer.Println("\n")
 
-		for ip, result := range cmdresult {
-			writer.Println(ip)
-			writer.Println(result[0].Output)
+		var v string
+		var err1 error
+		for _, result := range cmdresult {
+			v, err1 = extractVersion(result[0].Output, `PostgreSQL (\d+\.\d+)`)
+			if err1 != nil {
+				logrus.Error("ERROR", err)
+				return err1
+			}
+		}
 
+		for _, ip := range postgresqlIps {
+			writer.Printf("Node IP : %s\n", ip)
+
+			writer.Printf("Version : %s\n\n", v)
 		}
 
 		return nil
@@ -451,32 +472,35 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails)
 		sshUtil := NewSSHUtil(&SSHConfig{})
 		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-		writer.Println("EXECUTING")
 		cmdresult, err := cmdUtil.Execute()
 
 		if err != nil {
-			fmt.Print("ERROR", err)
+			logrus.Error("ERROR", err)
 			return err
 		}
-		writer.Println("DONE")
-		//output := make(map[string]string)
-
+		writer.Println("-----------------------------------------")
+		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Postgresql")))
+		writer.Println("\n")
 		for ip, result := range cmdresult {
-			writer.Println(ip)
-			writer.Println(result[0].Output)
 			servicedetails, err := statusservice.ParseHabSvcStatus(result[0].Output)
 			if err != nil {
 				fmt.Print("ERROR", err)
 				return err
 			}
-			osPkg := filterPackage(servicedetails, "automate-ha-postgresql")
+			pgPkg := filterPackage(servicedetails, "automate-ha-postgresql")
 
-			if osPkg == nil {
+			if pgPkg == nil {
 				fmt.Print("No os pkg found")
 				return nil
 			}
-			writer.Println("SERVICE NAME :: " + osPkg.ServiceName)
-			writer.Println("SERVICE VERSION ::" + osPkg.Version)
+			v, err := extractVersion(pgPkg.Version, `(\d+\.\d+\.\d+)`)
+			if err != nil {
+				logrus.Error("ERROR", err)
+				return err
+			}
+			writer.Printf("Node IP : %s\n", ip)
+
+			writer.Printf("Version : %s\n\n", v)
 
 		}
 
@@ -486,7 +510,6 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails)
 }
 
 func getPgAuth(infra *AutomateHAInfraDetails) (string, string) {
-	writer.Printf("GETTING PG AUTH")
 	sshconfig := &SSHConfig{}
 	sshconfig.sshUser = infra.Outputs.SSHUser.Value
 	sshconfig.sshKeyFile = infra.Outputs.SSHKeyFile.Value
@@ -495,9 +518,8 @@ func getPgAuth(infra *AutomateHAInfraDetails) (string, string) {
 	sshUtil := NewSSHUtil(sshconfig)
 	output, err := sshUtil.connectAndExecuteCommandOnRemote("sudo chef-automate config show", true)
 	if err != nil {
-		writer.Println("Error in config show")
+		logrus.Error("Error in config show", err)
 	}
-	writer.Printf("OUTPUT :: %s", output)
 	config, _ := toml.Load(output)
 	// retrieve data directly
 	superUser := config.Get("global.v1.external.postgresql.auth.password.superuser").(*toml.Tree)
@@ -509,7 +531,6 @@ func getPgAuth(infra *AutomateHAInfraDetails) (string, string) {
 
 func filterPackage(services *[]models.ServiceDetails, packageName string) *models.ServiceDetails {
 	for _, service := range *services {
-		writer.Println(service.ServiceName)
 		if strings.HasPrefix(service.ServiceName, packageName) {
 			return &service
 		}
@@ -632,4 +653,22 @@ func validateIPAddresses(errorList *list.List, IpsFromcmd []string, nodeType, er
 		}
 	}
 	return ipFound, ipNotFound, errorList
+}
+
+func extractVersion(input string, pattern string) (string, error) {
+
+	regex, err := regexp.Compile(pattern)
+	if err != nil {
+		return "", err
+	}
+
+	// Find the match
+	match := regex.FindStringSubmatch(input)
+	if len(match) < 2 {
+		return "", fmt.Errorf("no version string found")
+	}
+
+	// Extract the version string
+	version := match[1]
+	return version, nil
 }
