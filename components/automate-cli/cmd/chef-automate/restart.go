@@ -68,9 +68,9 @@ func runRestartServicesCmd(flags *RestartCmdFlags) func(cmd *cobra.Command, args
 
 func runRestartServices(cmd *cobra.Command, args []string, flags *RestartCmdFlags) error {
 	if isA2HARBFileExist() {
-		NodeOpUtils := &NodeUtilsImpl{}
+		nodeOpUtils := &NodeUtilsImpl{}
 		remoteExcecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
-		return runRestartFromBastion(flags, remoteExcecutor, NodeOpUtils)
+		return runRestartFromBastion(flags, remoteExcecutor, nodeOpUtils)
 	}
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
@@ -155,17 +155,14 @@ func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFl
 }
 
 func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, errChan chan *ResultWithError) {
+	flags.automate = false
+	flags.chefServer = false
 	if flags.postgresql {
-		flags.automate = false
-		flags.chefServer = false
 		restartOnGivenNode(flags, POSTGRESQL, infra, rs, errChan)
 	} else {
 		errChan <- &ResultWithError{}
 	}
-
 	if flags.opensearch {
-		flags.automate = false
-		flags.chefServer = false
 		flags.postgresql = false
 		restartOnGivenNode(flags, OPENSEARCH, infra, rs, errChan)
 	} else {
@@ -177,8 +174,8 @@ func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *Automate
 	go func(flags RestartCmdFlags, resultErrChan chan *ResultWithError) {
 		nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
 		cmdResult, err := rs.ExecuteWithNodeMap(nodeMap)
-		ResultWithError := &ResultWithError{result: cmdResult, err: err}
-		resultErrChan <- ResultWithError
+		resultWithError := &ResultWithError{result: cmdResult, err: err}
+		resultErrChan <- resultWithError
 	}(*flags, resultErrChan)
 }
 
