@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source .studio/01_base.sh
-
 document "start_chef_server" <<DOC
   Reconfigures deployment service to enable the chef server collection. Deployment service must be running to use it.
 DOC
@@ -476,6 +474,22 @@ test_if_env_vars_are_configured() {
   else
     echo "ENV Vars configured correctly"
   fi
+}
+
+install_if_missing() {
+  if [ "$#" -ne 2 ]; then
+    error "Wrong number of arguments to ${FUNCNAME[0]}"
+    describe "${FUNCNAME[0]}"
+    return 1
+  fi
+
+  # Install the package if it is not installed
+  if [[ ! -d "/hab/pkgs/$1" ]]; then
+    hab pkg install "$1" > /dev/null
+  fi
+
+  # Ensure we are binlinking to the same version `hab pkg exec` would run
+  hab pkg binlink --force "$1" "$2" > /dev/null
 }
 
 document "test_if_webui_key_is_patched" <<DOC
