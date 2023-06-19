@@ -195,7 +195,7 @@ func checkNodeType(sshUtilMap map[string]SSHUtil, ips []string, remoteService st
 func stopFrontEndNodes(sshUtilMap map[string]SSHUtil, ips []string, remoteService string) error {
 	resultChan := make(chan Result, len(ips))
 	errorList := list.New()
-	scriptCommands := `sudo chef-automate stop`
+	scriptCommands := CHEF_AUTOMATE_STOP_FE_CMD
 	for _, hostIP := range ips {
 		sshUtil := sshUtilMap[hostIP]
 		go commandExecuteFrontEnd(scriptCommands, sshUtil, resultChan)
@@ -210,7 +210,7 @@ func stopFrontEndNodes(sshUtilMap map[string]SSHUtil, ips []string, remoteServic
 
 func stopBackEndNodes(sshUtilMap map[string]SSHUtil, ips []string, remoteService string) error {
 	resultChan := make(chan Result, len(ips))
-	scriptCommands := "sudo systemctl stop hab-sup"
+	scriptCommands := STOP_BE_SERVICES_CMD
 	errorList := list.New()
 	for _, hostIP := range ips {
 		sshUtil := sshUtilMap[hostIP]
