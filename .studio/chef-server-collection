@@ -401,17 +401,14 @@ document "test_if_login_working_with_correct_credentials" <<DOC
 DOC
 test_if_login_working_with_correct_credentials() {
   bootstrap_chef_user_data || return 1
-
   local url="https://${chef_server_hostname}/id/auth/chef/callback"
-  local username='admin@test.com'
-  local password='S3cur3!'
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
               --header 'x-requested-with: XMLHttpRequest' \
               --header 'Content-Type: application/x-www-form-urlencoded' \
               --data-urlencode 'utf8=✓' \
-              --data-urlencode "username=$username" \
-              --data-urlencode "password=$password" \
+              --data-urlencode "username=$chef_server_test_admin_user_email" \
+              --data-urlencode "password=$chef_server_test_user_password" \
               --data-urlencode 'commit=Sign+In')
 
   if [ $res_code == 200 ]; then
@@ -426,15 +423,15 @@ document "test_if_login_failing_with_incorrect_credentials" <<DOC
   login call returns 302 if creds are incorrect
 DOC
 test_if_login_failing_with_incorrect_credentials() {
-  local url='https://a2-dev.test/id/auth/chef/callback'
-  local username='admin@test.com'
+  bootstrap_chef_user_data || return 1
+  local url="https://${chef_server_hostname}/id/auth/chef/callback"
   local incorrect_password='incorrect-password'
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
             --header 'x-requested-with: XMLHttpRequest' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --data-urlencode 'utf8=✓' \
-            --data-urlencode "username=$username" \
+            --data-urlencode "username=$chef_server_test_admin_user_email" \
             --data-urlencode "password=$incorrect_password" \
             --data-urlencode 'commit=Sign+In')
 
