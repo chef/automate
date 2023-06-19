@@ -2,9 +2,7 @@ package main
 
 import (
 	"errors"
-	"io"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
@@ -32,11 +30,11 @@ func TestRunVerifyCmd(t *testing.T) {
 		{
 			description: "bastion with existing automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
-				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
-						Body:       io.NopCloser(strings.NewReader(`{"status":"success"}`)),
-					}, nil
+						Body:       nil,
+					}, []byte(`{"status":"success"}`), nil
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
@@ -75,14 +73,14 @@ func TestRunVerifyCmd(t *testing.T) {
 		{
 			description: "bastion without automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
-				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 					if requestMethod == http.MethodGet {
-						return nil, errors.New("some error occurred")
+						return nil, nil, errors.New("some error occurred")
 					}
 					return &http.Response{
 						StatusCode: http.StatusOK,
-						Body:       io.NopCloser(strings.NewReader(`{"status":"success"}`)),
-					}, nil
+						Body:       nil,
+					}, []byte(`{"status":"success"}`), nil
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{

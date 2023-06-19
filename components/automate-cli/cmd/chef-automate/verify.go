@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -265,9 +264,12 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 	v.Writer.Println("Checking automate-verify service on bastion")
 
 	//Call status API to check if automate-verify service is running on bastion
-	response, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
+	_, responseBody, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
 	if err != nil {
-		v.Writer.Println(fmt.Sprintf("error while checking automate-verify service on bastion: %v\n", err))
+		v.Writer.Printf("error while checking automate-verify service on bastion: %v\n", err)
+		if responseBody != nil {
+			v.Writer.Printf("Error response body: %s\n", string(responseBody))
+		}
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service")
 
 		// create systemd service with current CLI binary
@@ -278,8 +280,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 
 		v.Writer.Println("Added automate-verify service to systemd and started the the service")
 	} else {
-		defer response.Body.Close()
-		resultBytes, err := v.getResultFromResponseBody(response.Body)
+		resultBytes, err := v.getResultFromResponseBody(responseBody)
 		if err != nil {
 			return err
 		}
@@ -293,7 +294,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 		// Upgrade if current CLI is latest version than the existing CLI on bastion
 		latestCLIVersion := version.BuildTime
 		if latestCLIVersion > result.CliVersion {
-			v.Writer.Println(fmt.Sprintf("Upgrading from CLI %s to latest %s on bastion", result.CliVersion, latestCLIVersion))
+			v.Writer.Printf("Upgrading from CLI %s to latest %s on bastion\n", result.CliVersion, latestCLIVersion)
 			// create systemd service with current CLI binary
 			err = v.createSystemdOnBastion()
 			if err != nil {
@@ -340,7 +341,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		}
 
 		// Starting automate-verify service on remote nodes
-		err = v.StartServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
+		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
 		if err != nil {
 			return err
 		}
@@ -362,7 +363,7 @@ func (v *verifyCmdFlow) createSystemdOnBastion() error {
 	if err != nil {
 		return err
 	}
-	// Wait for given seconds for the service to start
+	// TODO: Added 2 seconds sleep to make sure service is started. Need to handle this in a better way.
 	time.Sleep(SLEEP_DURATION)
 	return nil
 }
@@ -370,12 +371,14 @@ func (v *verifyCmdFlow) createSystemdOnBastion() error {
 // Makes batch-check API call
 func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckRequest, nodeType string) error {
 	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
-	response, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
+	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
 	if err != nil {
+		if responseBody != nil {
+			v.Writer.Printf("Error response body: %s\n", string(responseBody))
+		}
 		return fmt.Errorf("error while doing batch-check API call for %s: %v", nodeType, err)
 	} else {
-		defer response.Body.Close()
-		resultBytes, err := v.getResultFromResponseBody(response.Body)
+		resultBytes, err := v.getResultFromResponseBody(responseBody)
 		if err != nil {
 			return err
 		}
@@ -408,7 +411,7 @@ func (v *verifyCmdFlow) copyCLIOnRemoteNodes(destFileName string, sshConfig sshu
 }
 
 // Starts automate-verify service on remote nodes
-func (v *verifyCmdFlow) StartServiceOnRemoteNodes(destFileName string, sshConfig sshutils.SSHConfig, hostIPs []string) error {
+func (v *verifyCmdFlow) startServiceOnRemoteNodes(destFileName string, sshConfig sshutils.SSHConfig, hostIPs []string) error {
 	v.Writer.Println("Creating automate-verify service on remote nodes")
 	cmd := fmt.Sprintf("sudo /tmp/%s verify systemd-service create", destFileName)
 	excuteResults := v.SSHUtil.ExecuteConcurrently(sshConfig, cmd, hostIPs)
@@ -422,25 +425,21 @@ func (v *verifyCmdFlow) StartServiceOnRemoteNodes(destFileName string, sshConfig
 	if isError {
 		return fmt.Errorf("remote execution failed")
 	}
-	// Wait for given seconds for the service to start
+	// TODO: Added 2 seconds sleep to make sure service is started. Need to handle this in a better way.
 	time.Sleep(SLEEP_DURATION)
-	v.Writer.Println("Creating automate-verify service on remote nodes completed")
+	v.Writer.Println("Created automate-verify service on remote nodes")
 	return nil
 }
 
 // Returns result field from response body
-func (v *verifyCmdFlow) getResultFromResponseBody(body io.ReadCloser) ([]byte, error) {
-	responseBody, err := io.ReadAll(body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %v", err)
-	}
-
+func (v *verifyCmdFlow) getResultFromResponseBody(responseBody []byte) ([]byte, error) {
 	var responseBodyStruct response.ResponseBody
 	if err := json.Unmarshal(responseBody, &responseBodyStruct); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response body: %v", err)
 	}
 
 	var resultBytes []byte
+	var err error
 	if v.prettyPrint {
 		resultBytes, err = json.MarshalIndent(responseBodyStruct.Result, "", "    ")
 	} else {
@@ -448,7 +447,7 @@ func (v *verifyCmdFlow) getResultFromResponseBody(body io.ReadCloser) ([]byte, e
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal Result field: %v", err)
+		return nil, fmt.Errorf("failed to marshal result field: %v", err)
 	}
 
 	return resultBytes, nil

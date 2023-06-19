@@ -46,14 +46,11 @@ func TestMakeRequestSuccessfulRequest(t *testing.T) {
 		"key1": "value1",
 		"key2": "42",
 	}
-	resp, err := client.MakeRequest(http.MethodPost, url, requestBody)
+	resp, responseBody, err := client.MakeRequest(http.MethodPost, url, requestBody)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	responseBody, err := io.ReadAll(resp.Body)
-	assert.NoError(t, err)
 
 	expectedResponseBody := "Success"
 	assert.Equal(t, expectedResponseBody, string(responseBody))
@@ -71,11 +68,13 @@ func TestMakeRequestErrorResponse(t *testing.T) {
 	client := httputils.NewClient(logger)
 
 	url := server.URL
-	resp, err := client.MakeRequest(http.MethodGet, url, nil)
+	resp, responseBody, err := client.MakeRequest(http.MethodGet, url, nil)
 
 	assert.Error(t, err)
 	assert.NotNil(t, resp)
 	assert.Contains(t, err.Error(), "unexpected response status")
+	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	assert.Equal(t, "Internal Server Error", string(responseBody))
 }
 
 func TestMakeRequestRequestBodyError(t *testing.T) {
@@ -83,10 +82,11 @@ func TestMakeRequestRequestBodyError(t *testing.T) {
 	assert.NoError(t, err)
 	client := httputils.NewClient(logger)
 
-	resp, err := client.MakeRequest(http.MethodPost, "https://example.com", make(chan int))
+	resp, responseBody, err := client.MakeRequest(http.MethodPost, "https://example.com", make(chan int))
 
 	assert.Error(t, err)
 	assert.Nil(t, resp)
+	assert.Nil(t, responseBody)
 	assert.Contains(t, err.Error(), "failed to marshal request body")
 }
 
@@ -95,10 +95,11 @@ func TestMakeRequestRequestError(t *testing.T) {
 	assert.NoError(t, err)
 	client := httputils.NewClient(logger)
 
-	resp, err := client.MakeRequest(http.MethodGet, "invalid-url", nil)
+	resp, responseBody, err := client.MakeRequest(http.MethodGet, "invalid-url", nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, resp)
+	assert.Nil(t, responseBody)
 	assert.Contains(t, err.Error(), "failed to make HTTP request")
 }
 
@@ -108,9 +109,10 @@ func TestMakeRequestConnectionError(t *testing.T) {
 
 	client := httputils.NewClientWithTimeout(1*time.Millisecond, logger)
 
-	resp, err := client.MakeRequest(http.MethodGet, "http://non-existent-server", nil)
+	resp, responseBody, err := client.MakeRequest(http.MethodGet, "http://non-existent-server", nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, resp)
+	assert.Nil(t, responseBody)
 	assert.Contains(t, err.Error(), "context deadline exceeded")
 }
