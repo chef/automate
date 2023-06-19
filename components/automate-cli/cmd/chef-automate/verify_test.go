@@ -150,6 +150,7 @@ func TestRunVerifyCmd(t *testing.T) {
 func TestVerifyCmdFunc(t *testing.T) {
 	flagsObj := &verifyCmdFlags{
 		config: CONFIG_TOML_PATH + CONFIG_FILE,
+		debug:  true,
 	}
 
 	vf := verifyCmdFunc(flagsObj)
