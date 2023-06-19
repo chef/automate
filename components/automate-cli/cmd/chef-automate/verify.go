@@ -224,10 +224,10 @@ func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []str
 
 func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj *verifyCmdFlags) error {
 	v.prettyPrint = flagsObj.prettyPrint
-	return v.runVerify(flagsObj.config)
+	return v.RunVerify(flagsObj.config)
 }
 
-func (v *verifyCmdFlow) runVerify(config string) error {
+func (v *verifyCmdFlow) RunVerify(config string) error {
 	var configPath string
 
 	// TODO : config flag is optional for now. Need to handle the default config path
