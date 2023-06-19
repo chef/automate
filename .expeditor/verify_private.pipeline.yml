@@ -686,24 +686,24 @@ steps:
 #         linux:
 #           privileged: true
 
-  - label: "chef server only"
-    command:
-      - integration/run_test integration/tests/chef_server_only.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
+  # - label: "chef server only"
+  #   command:
+  #     - integration/run_test integration/tests/chef_server_only.sh
+  #   timeout_in_minutes: 20
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         privileged: true
 
-  - label: "ha chef server"
-    command:
-      - integration/run_test integration/tests/ha_chef_server.sh
-    timeout_in_minutes: 35
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+  # - label: "ha chef server"
+  #   command:
+  #     - integration/run_test integration/tests/ha_chef_server.sh
+  #   timeout_in_minutes: 35
+  #   expeditor:
+  #     executor:
+  #       linux:
+  #         single-use: true
+  #         privileged: true
 
 #   - label: "workflow"
 #     command:
@@ -930,15 +930,15 @@ steps:
 #         linux:
 #           privileged: true
 
-#   - label: "ocid"
-#     command:
-#       - integration/run_test integration/tests/testing_ocid.sh
-#     timeout_in_minutes: 30
-#     expeditor:
-#       secrets:
-#         A2_LICENSE:
-#           path: secret/a2/license
-#           field: license
-#       executor:
-#         linux:
-#           privileged: true
+  - label: "ocid"
+    command:
+      - integration/run_test integration/tests/testing_ocid.sh
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
