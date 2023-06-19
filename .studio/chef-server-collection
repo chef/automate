@@ -392,47 +392,92 @@ function test_knife() {
   done
 }
 
-
-document "test_ocid" <<DOC
-  test OCID against the embedded Chef server
-DOC
-function test_ocid() {
-  check_if_deployinate_started || return 1
-  bootstrap_chef_user_data || return 1
-
-  test_if_webui_key_is_patched
-  test_if_env_vars_are_configured
+hab_curl() {
+  hab pkg exec core/curl curl "$@";
 }
 
-test_if_env_vars_are_configured() {
-  ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
+document "test_if_login_working_with_correct_credentials" <<DOC
+  login call returns 200 if creds are correct
+DOC
+test_if_login_working_with_correct_credentials() {
+  url='https://a2-dev.test/id/auth/chef/callback'
+  username='admin@test.com'
+  password='S3cur3!'
 
-  # Read settings/production.yml into an associative array
-  declare -A config_values
-  while IFS=":" read -r key value; do
-    config_values["$key"]="${value// /}"  # Remove spaces from the value
-  done < "$ocid_config_file_path"
+  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
+              --header 'x-requested-with: XMLHttpRequest' \
+              --header 'Content-Type: application/x-www-form-urlencoded' \
+              --data-urlencode 'utf8=✓' \
+              --data-urlencode "username=$username" \
+              --data-urlencode "password=$password" \
+              --data-urlencode 'commit=Sign+In')
 
-  errors=()
-
-  if [[ "${config_values[endpoint]}" != "https://127.0.0.1:443" ]]; then
-    errors+=("Endpoint not configured properly.")
-  fi
-
-  if [[ "${config_values[superuser]}" != "pivotal" ]]; then
-    errors+=("Superuser not configured properly.")
-  fi
-
-  if [[ "${config_values[ssl_verify_mode]}" != "verify_none" ]]; then
-    errors+=("Verify mode not configured properly.")
-  fi
-
-  if [[ ${#errors[@]} -gt 0 ]]; then
-    printf '%s\n' "${errors[@]}"
+  if [ $res_code == 200 ]; then
+    echo "User Logged In"
+  else
+    echo "Error Logging in with test admin user"
     return 1
   fi
 }
 
+document "test_if_login_failing_with_incorrect_credentials" <<DOC
+  login call returns 302 if creds are incorrect
+DOC
+test_if_login_failing_with_incorrect_credentials() {
+  url='https://a2-dev.test/id/auth/chef/callback'
+  username='admin@test.com'
+  incorrect_password='wrong-password'
+
+  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
+            --header 'x-requested-with: XMLHttpRequest' \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'utf8=✓' \
+            --data-urlencode "username=$username" \
+            --data-urlencode "password=$password" \
+            --data-urlencode 'commit=Sign+In')
+
+  if [ $res_code == 302 ]; then
+    echo "User redirected to different page"
+  else
+    echo "Admin user with wrong password did not return 302"
+    return 1
+  fi
+}
+
+document "test_if_env_vars_are_configured" <<DOC
+  test if ENVs are configured for OCID
+DOC
+test_if_env_vars_are_configured() {
+  ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
+
+  # Get values from in settings/production.yml
+  endpoint=$(awk '/endpoint:/ {print $2}' $ocid_config_file_path)
+  superuser=$(awk '/superuser:/ {print $2}' $ocid_config_file_path)
+  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' $ocid_config_file_path)
+
+  errors=()
+
+  if [ $endpoint != "https://127.0.0.1:443" ]; then
+    errors+=("Endpoint not configured properly.")
+  fi
+
+  if [ $superuser != "pivotal" ]; then
+    errors+=("Superuser not configured properly.")
+  fi
+
+  if [ $ssl_verify_mode != "verify_none" ]; then
+    errors+=("Verify mode not configured properly.")
+  fi
+
+  if [ ${#errors} -gt 0 ]; then
+    for (( i=0; i<${#errors[@]}; i++ )); do echo "${errors[$i]}" ; done
+    return 1
+  fi
+}
+
+document "test_if_webui_key_is_patched" <<DOC
+  test if WEB UI key is patched for OCID
+DOC
 test_if_webui_key_is_patched() {
   install_if_missing core/jq-static jq
 
@@ -447,19 +492,18 @@ test_if_webui_key_is_patched() {
   erchef_webui_key_path="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
 
   # Compare the temporary file with the erchef PEM file
-  output=$(diff "$erchef_webui_key_path" <(cat temp_ocid_webui_key.pem))
+  output=$(diff "$erchef_webui_key_path" temp_ocid_webui_key.pem)
+
+  # Remove the temporary file
+  rm temp_ocid_webui_key.pem
 
   # Check if the output is empty, indicating a match
   if [ -z "$output" ]; then
     echo "The content of the PEM file matches."
-    return 1
   else
     echo "The content of the PEM file does not match."
-    return 0
+    return 1
   fi
-
-  # Remove the temporary file
-  rm temp_ocid_webui_key.pem
 }
 
 document "ohai_time" <<DOC
