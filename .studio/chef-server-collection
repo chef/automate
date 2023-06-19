@@ -400,9 +400,9 @@ document "test_if_login_working_with_correct_credentials" <<DOC
   login call returns 200 if creds are correct
 DOC
 test_if_login_working_with_correct_credentials() {
-  url='https://a2-dev.test/id/auth/chef/callback'
-  username='admin@test.com'
-  password='S3cur3!'
+  local url='https://a2-dev.test/id/auth/chef/callback'
+  local username='admin@test.com'
+  local password='S3cur3!'
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
               --header 'x-requested-with: XMLHttpRequest' \
@@ -424,22 +424,22 @@ document "test_if_login_failing_with_incorrect_credentials" <<DOC
   login call returns 302 if creds are incorrect
 DOC
 test_if_login_failing_with_incorrect_credentials() {
-  url='https://a2-dev.test/id/auth/chef/callback'
-  username='admin@test.com'
-  incorrect_password='wrong-password'
+  local url='https://a2-dev.test/id/auth/chef/callback'
+  local username='admin@test.com'
+  local incorrect_password='incorrect-password'
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
             --header 'x-requested-with: XMLHttpRequest' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --data-urlencode 'utf8=✓' \
             --data-urlencode "username=$username" \
-            --data-urlencode "password=$password" \
+            --data-urlencode "password=$incorrect_password" \
             --data-urlencode 'commit=Sign+In')
 
   if [ $res_code == 302 ]; then
-    echo "User redirected to different page"
+    echo "Login Failed, User redirected"
   else
-    echo "Admin user with wrong password did not return 302"
+    echo "Admin user with wrong password didn't redirect"
     return 1
   fi
 }
@@ -472,6 +472,8 @@ test_if_env_vars_are_configured() {
   if [ ${#errors} -gt 0 ]; then
     for (( i=0; i<${#errors[@]}; i++ )); do echo "${errors[$i]}" ; done
     return 1
+  else
+    echo "ENV Vars configured correctly"
   fi
 }
 
