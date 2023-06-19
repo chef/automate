@@ -240,7 +240,10 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 
 	// Get config required for batch-check API call
 	batchCheckConfig := &models.Config{}
-	batchCheckConfig.PopulateWith(v.Config)
+	err = batchCheckConfig.PopulateWith(v.Config)
+	if err != nil {
+		return err
+	}
 
 	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
 
