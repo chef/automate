@@ -276,7 +276,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 			return err
 		}
 
-		v.Writer.Println("Adding automate-verify service to systemd and starting the service completed")
+		v.Writer.Println("Added automate-verify service to systemd and started the the service")
 	} else {
 		defer response.Body.Close()
 		resultBytes, err := v.getResultFromResponseBody(response.Body)
