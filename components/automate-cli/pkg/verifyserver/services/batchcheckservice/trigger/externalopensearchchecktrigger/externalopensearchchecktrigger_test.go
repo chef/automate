@@ -224,7 +224,7 @@ func getRequest() models.ExternalOS {
 		OSUsername:     osUsername,
 		OSUserPassword: osUserPassword,
 		OSCert:         osCert,
-		OSRoleArn:      oSRoleArn,
+		OSRoleArn:      "",
 	}
 
 }
@@ -533,11 +533,12 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 			json.Unmarshal(reader, &got)
 
 			wantReq := getRequest()
+
 			fmt.Printf("wantReq: %+v\n", wantReq)
 			fmt.Printf("got: %+v\n", got)
 
 			assert.NotNil(t, got)
-			// assert.Equal(t, got, wantReq)
+			assert.Equal(t, got, wantReq)
 			if r.URL.Path == constants.EXTERNAL_OPENSEARCH_API_PATH {
 				if isPassed {
 					w.WriteHeader(http.StatusOK)

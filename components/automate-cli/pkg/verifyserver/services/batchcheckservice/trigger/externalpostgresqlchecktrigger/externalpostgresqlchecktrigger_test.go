@@ -434,8 +434,8 @@ func TestForChefserverPostgres(t *testing.T) {
 
 		config := &models.Config{
 			Hardware: &models.Hardware{
-				ChefInfraServerNodeCount: 2,
-				AutomateNodeIps:          []string{"127.0.0.5"},
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{"127.0.0.5"},
 			},
 			ExternalPG: &models.ExternalPG{
 				PGInstanceURL:       postgresqlInstanceUrl,
