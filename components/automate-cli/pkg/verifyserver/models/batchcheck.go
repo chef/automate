@@ -55,13 +55,10 @@ type Backup struct {
 }
 
 type Certificate struct {
-	Fqdn           string      `json:"fqdn"`
-	FqdnRootCert   string      `json:"fqdn_root_ca"`
-	NodeType       string      `json:"node_type"`
-	AutomateFqdn   string      `json:"automate_fqdn"`
-	ChefServerFqdn string      `json:"cs_fqdn"`
-	RootCert       string      `json:"root_cert"`
-	Nodes          []*NodeCert `json:"nodes"`
+	Fqdn         string      `json:"fqdn"`
+	FqdnRootCert string      `json:"fqdn_root_ca"`
+	NodeType     string      `json:"node_type"`
+	Nodes        []*NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -191,10 +188,10 @@ func (c *Config) populateExistingInfraConfig(haConfig *config.HaDeployConfig) {
 }
 
 func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
-	err := errors.New("haConfig is nil")
+	var err error
 
 	if haConfig == nil {
-		return err
+		return errors.New("haConfig is nil")
 	}
 
 	c.Hardware.AutomateNodeCount, err = strconv.Atoi(haConfig.Automate.Config.InstanceCount)

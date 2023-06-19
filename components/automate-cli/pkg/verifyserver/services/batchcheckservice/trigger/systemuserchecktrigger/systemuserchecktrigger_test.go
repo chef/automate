@@ -38,24 +38,6 @@ const (
 	}`
 )
 
-var externalOS = &models.ExternalOS{
-	OSDomainName:   "example.com",
-	OSDomainURL:    "https://example.com",
-	OSUsername:     "username",
-	OSUserPassword: "password",
-	OSCert:         "certificate",
-	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
-}
-
-var externalPG = &models.ExternalPG{
-	PGInstanceURL:       "http://example.com",
-	PGSuperuserName:     "superuser",
-	PGSuperuserPassword: "superpassword",
-	PGDbUserName:        "dbuser",
-	PGDbUserPassword:    "dbpassword",
-	PGRootCert:          "rootcert",
-}
-
 func TestSystemUserCheck_Run(t *testing.T) {
 	t.Run("System User Check", func(t *testing.T) {
 		// Create a dummy server
@@ -68,8 +50,6 @@ func TestSystemUserCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
-			ExternalOS: externalOS,
-			ExternalPG: externalPG,
 		}
 
 		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
@@ -101,8 +81,6 @@ func TestSystemUserCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
-			ExternalOS: externalOS,
-			ExternalPG: externalPG,
 		}
 
 		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
@@ -121,16 +99,14 @@ func TestSystemUserCheck_Run(t *testing.T) {
 
 		// Test data
 		config := &models.Config{
-			Hardware:   nil,
-			ExternalOS: externalOS,
-			ExternalPG: &models.ExternalPG{},
+			Hardware: nil,
 		}
 
 		suc := NewSystemUserCheck(logger.NewLogrusStandardLogger(), port)
 		got := suc.Run(config)
 
 		require.Len(t, got, 5)
-		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
 		assert.Equal(t, constants.SYSTEM_USER, got[1].CheckType)
 		assert.True(t, got[0].Result.Skipped)

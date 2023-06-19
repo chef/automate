@@ -339,7 +339,7 @@ func TestRunS3BackupCheck(t *testing.T) {
 		got := svc.Run(config)
 
 		assert.Len(t, got, 1)
-		assert.Equal(t, "unknown-host", got[0].Host)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
 		assert.True(t, got[0].Result.Skipped)
@@ -367,6 +367,8 @@ func TestRunS3BackupCheck(t *testing.T) {
 		assert.Equal(t, constants.LOCALHOST, got[0].Host)
 		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+		assert.Equal(t, constants.S3_BACKUP_MISSING, got[0].Result.Error.Message)
 		assert.False(t, got[0].Result.Skipped)
 	})
 }

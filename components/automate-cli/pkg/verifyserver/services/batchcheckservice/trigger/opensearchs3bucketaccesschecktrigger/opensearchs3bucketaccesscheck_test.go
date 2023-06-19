@@ -226,7 +226,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			} else {
 				if tt.name == "Nil OS and Object storage" {
 					assert.Len(t, got, 1)
-					assert.Equal(t, "unknown-host", got[0].Host)
+					assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
 					assert.True(t, got[0].Result.Skipped)
@@ -237,7 +237,7 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
 					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].Result.Check)
 					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
-					assert.Equal(t, "Object storage detail or OS detail is missing", got[0].Result.Error.Message)
+					assert.Equal(t, constants.OBJECT_STORAGE_MISSING, got[0].Result.Error.Message)
 					assert.False(t, got[0].Result.Skipped)
 				} else {
 					assert.Equal(t, want, got)

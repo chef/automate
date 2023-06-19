@@ -504,7 +504,7 @@ func TestNilResp(t *testing.T) {
 				Skipped: true,
 				Check:   checkType,
 			},
-			Host: constants.UNKNONHOST,
+			Host: constants.UNKNOWN_HOST,
 		},
 		{
 			NodeType:  constants.CHEF_INFRA_SERVER,
@@ -514,11 +514,11 @@ func TestNilResp(t *testing.T) {
 				Skipped: true,
 				Check:   checkType,
 			},
-			Host: constants.UNKNONHOST,
+			Host: constants.UNKNOWN_HOST,
 		},
 	}
 
-	result1 := NilResp(checkType, false, false, false)
+	result1 := HardwareNil(checkType, false, false, false)
 	assert.Equal(t, expected1, result1)
 
 	// Test case 2: Include OPENSEARCH
@@ -530,10 +530,10 @@ func TestNilResp(t *testing.T) {
 			Skipped: true,
 			Check:   checkType,
 		},
-		Host: constants.UNKNONHOST,
+		Host: constants.UNKNOWN_HOST,
 	})
 
-	result2 := NilResp(checkType, true, false, false)
+	result2 := HardwareNil(checkType, true, false, false)
 	assert.Equal(t, expected2, result2)
 
 	// Test case 3: Include POSTGRESQL and BASTION
@@ -545,7 +545,7 @@ func TestNilResp(t *testing.T) {
 			Skipped: true,
 			Check:   checkType,
 		},
-		Host: constants.UNKNONHOST,
+		Host: constants.UNKNOWN_HOST,
 	}, models.CheckTriggerResponse{
 		NodeType:  constants.BASTION,
 		CheckType: checkType,
@@ -557,32 +557,8 @@ func TestNilResp(t *testing.T) {
 		Host: constants.LOCALHOST,
 	})
 
-	result3 := NilResp(checkType, true, true, true)
+	result3 := HardwareNil(checkType, true, true, true)
 	assert.Equal(t, expected3, result3)
-}
-
-func TestIfHardwareEmpty(t *testing.T) {
-	// Test case 1: Empty hardware configuration
-	config := models.Config{
-		Hardware: &models.Hardware{},
-	}
-	result := IfHardwareEmpty(config)
-	assert.True(t, result, "Expected hardware to be empty")
-	// Test case 2: Non-empty hardware configuration
-	config = models.Config{
-		Hardware: &models.Hardware{
-			AutomateNodeCount:        1,
-			AutomateNodeIps:          []string{"192.168.0.1"},
-			ChefInfraServerNodeCount: 2,
-			ChefInfraServerNodeIps:   []string{"192.168.0.2", "192.168.0.3"},
-			PostgresqlNodeCount:      3,
-			PostgresqlNodeIps:        []string{"192.168.0.4", "192.168.0.5", "192.168.0.6"},
-			OpenSearchNodeCount:      4,
-			OpenSearchNodeIps:        []string{"192.168.0.7", "192.168.0.8", "192.168.0.9", "192.168.0.10"},
-		},
-	}
-	result = IfHardwareEmpty(config)
-	assert.False(t, result, "Expected hardware not to be empty")
 }
 
 func TestGetErrTriggerCheckResp(t *testing.T) {
@@ -605,7 +581,7 @@ func TestGetErrTriggerCheckResp(t *testing.T) {
 		},
 	}
 
-	result := GetErrTriggerCheckResp(ip, checkType, nodeType, errorMsg)
+	result := ErrTriggerCheckResp(ip, checkType, nodeType, errorMsg)
 
 	assert.Equal(t, expected, result)
 }
@@ -626,7 +602,7 @@ func TestGetSkippedTriggerCheckResp(t *testing.T) {
 		Host: ip,
 	}
 
-	result := GetSkippedTriggerCheckResp(ip, checkType, nodeType)
+	result := SkippedTriggerCheckResp(ip, checkType, nodeType)
 
 	assert.Equal(t, expected, result)
 }
@@ -645,17 +621,17 @@ func TestGetNilResp(t *testing.T) {
 	checkType := "sampleCheckType"
 
 	expectedResponses := []models.CheckTriggerResponse{
-		GetSkippedTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE),
-		GetSkippedTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE),
-		GetSkippedTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER),
-		GetSkippedTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER),
-		GetSkippedTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL),
-		GetSkippedTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL),
-		GetSkippedTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH),
-		GetSkippedTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH),
+		SkippedTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE),
+		SkippedTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE),
+		SkippedTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER),
+		SkippedTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER),
+		SkippedTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL),
+		SkippedTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL),
+		SkippedTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH),
+		SkippedTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH),
 	}
 
-	responses := GetNilResp(config, checkType)
+	responses := ConstructNilResp(config, checkType)
 
 	assert.Equal(t, expectedResponses, responses)
 }
@@ -675,17 +651,17 @@ func TestEmptyResp(t *testing.T) {
 	message := "Sample message"
 
 	expectedResponses := []models.CheckTriggerResponse{
-		GetErrTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE, message),
-		GetErrTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE, message),
-		GetErrTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER, message),
-		GetErrTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER, message),
-		GetErrTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL, message),
-		GetErrTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL, message),
-		GetErrTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH, message),
-		GetErrTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH, message),
+		ErrTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE, message),
+		ErrTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE, message),
+		ErrTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER, message),
+		ErrTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER, message),
+		ErrTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL, message),
+		ErrTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL, message),
+		ErrTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH, message),
+		ErrTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH, message),
 	}
 
-	responses := EmptyResp(config, checkType, message)
+	responses := ConstructEmptyResp(config, checkType, message)
 
 	assert.Equal(t, expectedResponses, responses)
 }

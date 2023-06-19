@@ -30,13 +30,13 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 
 	// Check if certificate is empty or nil
 	if config.Hardware == nil {
-		return trigger.NilResp(constants.SSH_USER, true, true, false)
+		return trigger.HardwareNil(constants.SSH_USER, true, true, false)
 	}
 	if config.SSHUser == nil {
-		return trigger.GetNilResp(config, constants.SSH_USER)
+		return trigger.ConstructNilResp(config, constants.SSH_USER)
 	}
 	if IsSSHUserEmpty(config.SSHUser) {
-		return trigger.EmptyResp(config, constants.SSH_USER, "SSH credentials is missing")
+		return trigger.ConstructEmptyResp(config, constants.SSH_USER, "SSH credentials is missing")
 	}
 
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
@@ -79,5 +79,5 @@ func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]in
 }
 
 func IsSSHUserEmpty(sshUser *models.SSHUser) bool {
-	return (sshUser.Username == "" || sshUser.Port == "" || sshUser.PrivateKey == "" || sshUser.SudoPassword == "")
+	return (sshUser.Username == "" || sshUser.Port == "" || sshUser.PrivateKey == "")
 }

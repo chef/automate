@@ -25,7 +25,7 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	// Check for nil or empty req body
 	if config.Hardware == nil {
-		return trigger.NilResp(constants.EXTERNAL_OPENSEARCH, false, false, false)
+		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, false, false, false)
 	}
 	if config.ExternalOS == nil {
 		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH)
@@ -89,11 +89,11 @@ func externalOSNillResp(config *models.Config, checktype string) []models.CheckT
 	var triggerResps []models.CheckTriggerResponse
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
 	}
 
 	return triggerResps
@@ -113,12 +113,12 @@ func externalOSEmptyResp(config *models.Config, checkType string) []models.Check
 	count := 0
 
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		triggerResps = append(triggerResps, trigger.GetErrTriggerCheckResp(ip, checkType, constants.AUTOMATE, "OS configuration is missing"))
+		triggerResps = append(triggerResps, trigger.ErrTriggerCheckResp(ip, checkType, constants.AUTOMATE, constants.OS_DETAILS_MISSING))
 		count++
 	}
 
 	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		triggerResps = append(triggerResps, trigger.GetErrTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, "OS configuration is missing"))
+		triggerResps = append(triggerResps, trigger.ErrTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, constants.OS_DETAILS_MISSING))
 		count++
 	}
 

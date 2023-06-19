@@ -1,7 +1,6 @@
 package systemresourcechecktrigger
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -39,24 +38,6 @@ const (
 	}`
 )
 
-var externalOS = &models.ExternalOS{
-	OSDomainName:   "example.com",
-	OSDomainURL:    "https://example.com",
-	OSUsername:     "username",
-	OSUserPassword: "password",
-	OSCert:         "certificate",
-	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
-}
-
-var externalPG = &models.ExternalPG{
-	PGInstanceURL:       "http://example.com",
-	PGSuperuserName:     "superuser",
-	PGSuperuserPassword: "superpassword",
-	PGDbUserName:        "dbuser",
-	PGDbUserPassword:    "dbpassword",
-	PGRootCert:          "rootcert",
-}
-
 func TestSystemResourceCheck_Run(t *testing.T) {
 	t.Run("System Resource Check", func(t *testing.T) {
 		// Create a dummy server
@@ -70,8 +51,6 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 				AutomateNodeIps:   []string{host},
 			},
 			DeploymentState: "pre-release",
-			ExternalOS:      externalOS,
-			ExternalPG:      externalPG,
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
@@ -103,8 +82,6 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
-			ExternalOS: externalOS,
-			ExternalPG: externalPG,
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
@@ -124,16 +101,15 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		// Test data
 		config := &models.Config{
 			Hardware:   nil,
-			ExternalOS: externalOS,
+			ExternalOS: &models.ExternalOS{},
 			ExternalPG: &models.ExternalPG{},
 		}
 
 		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
 		got := suc.Run(config)
 
-		fmt.Printf("ctr: %+v\n", got)
 		require.Len(t, got, 5)
-		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
 		assert.Equal(t, constants.SYSTEM_RESOURCES, got[1].CheckType)
 		assert.True(t, got[0].Result.Skipped)

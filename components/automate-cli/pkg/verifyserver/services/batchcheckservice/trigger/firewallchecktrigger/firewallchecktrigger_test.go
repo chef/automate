@@ -25,7 +25,7 @@ var (
 	}
 
 	certificatelist = []*models.Certificate{
-		{RootCert: "test-cert",
+		{
 			Nodes: nodes,
 		},
 	}
@@ -368,24 +368,6 @@ const (
 	 `
 )
 
-var externalOS = &models.ExternalOS{
-	OSDomainName:   "example.com",
-	OSDomainURL:    "https://example.com",
-	OSUsername:     "username",
-	OSUserPassword: "password",
-	OSCert:         "certificate",
-	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
-}
-
-var externalPG = &models.ExternalPG{
-	PGInstanceURL:       "http://example.com",
-	PGSuperuserName:     "superuser",
-	PGSuperuserPassword: "superpassword",
-	PGDbUserName:        "dbuser",
-	PGDbUserPassword:    "dbpassword",
-	PGRootCert:          "rootcert",
-}
-
 func TestMakeRequests(t *testing.T) {
 	// Create a sample configuration
 	config := &models.Config{
@@ -593,7 +575,7 @@ func TestFirewallCheck_Run(t *testing.T) {
 				config: &models.Config{
 					Hardware: nil,
 					Certificate: []*models.Certificate{
-						{RootCert: "test-cert",
+						{
 							Nodes: nodes,
 						},
 					},

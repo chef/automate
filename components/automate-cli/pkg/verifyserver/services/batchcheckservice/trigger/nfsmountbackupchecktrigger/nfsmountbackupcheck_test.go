@@ -845,7 +845,7 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
-		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
 		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
 		assert.True(t, got[0].Result.Skipped)
@@ -896,13 +896,14 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
-		assert.Equal(t, "12.12.1.6", got[0].Host)
-		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
-		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
-		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].Result.Check)
-		assert.Equal(t, http.StatusBadRequest, got[3].Result.Error.Code)
-		assert.Equal(t, "MountLocation is missing", got[3].Result.Error.Message)
-		assert.False(t, got[0].Result.Skipped)
+		for _, v := range got {
+			assert.Equal(t, "12.12.1.6", got[0].Host)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
+			assert.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			assert.Equal(t, constants.MOUNT_LOCATION_MISSING, v.Result.Error.Message)
+			assert.False(t, v.Result.Skipped)
+		}
 	})
 
 }

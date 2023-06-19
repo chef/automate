@@ -328,24 +328,6 @@ func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error
 	return nil
 }
 
-var externalOS = &models.ExternalOS{
-	OSDomainName:   "example.com",
-	OSDomainURL:    "https://example.com",
-	OSUsername:     "username",
-	OSUserPassword: "password",
-	OSCert:         "certificate",
-	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
-}
-
-var externalPG = &models.ExternalPG{
-	PGInstanceURL:       "http://example.com",
-	PGSuperuserName:     "superuser",
-	PGSuperuserPassword: "superpassword",
-	PGDbUserName:        "dbuser",
-	PGDbUserPassword:    "dbpassword",
-	PGRootCert:          "rootcert",
-}
-
 func TestCertificateCheck_Run(t *testing.T) {
 
 	t.Run("Returns OK", func(t *testing.T) {
@@ -590,22 +572,6 @@ func TestCertificateCheck_Run(t *testing.T) {
 		require.True(t, ctr[0].Result.Skipped)
 	})
 
-	t.Run("Nil Hardware", func(t *testing.T) {
-		config := &models.Config{
-			Hardware:    nil,
-			Certificate: nil,
-		}
-
-		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
-		ctr := suc.Run(config)
-
-		require.Len(t, ctr, 4)
-
-		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
-		assert.Equal(t, constants.UNKNONHOST, ctr[0].Host)
-		require.True(t, ctr[0].Result.Skipped)
-	})
-
 	t.Run("Empty Cert", func(t *testing.T) {
 		config := &models.Config{
 			Hardware: &models.Hardware{
@@ -626,11 +592,14 @@ func TestCertificateCheck_Run(t *testing.T) {
 
 		require.Len(t, ctr, 4)
 
-		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
-		assert.Equal(t, "12.12.1.3", ctr[1].Host)
-		require.False(t, ctr[0].Result.Skipped)
-		require.Equal(t, http.StatusBadRequest, ctr[2].Result.Error.Code)
-		require.Equal(t, "Certificate is missing", ctr[3].Result.Error.Message)
+		for _, v := range ctr {
+			require.Equal(t, constants.CERTIFICATE, v.Result.Check)
+			assert.NotEmpty(t, v.Host)
+			require.False(t, v.Result.Skipped)
+			require.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			require.Equal(t, constants.MISSING_CERTIFICATE, v.Result.Error.Message)
+		}
+
 	})
 
 }

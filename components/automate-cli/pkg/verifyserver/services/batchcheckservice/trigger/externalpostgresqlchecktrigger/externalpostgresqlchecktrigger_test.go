@@ -397,6 +397,9 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
 					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
 					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+					assert.Equal(t, constants.PG_DETAILS_MISSING, got[0].Result.Error.Message)
+					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+
 					assert.Len(t, got, 3)
 				} else {
 					assert.NotNil(t, got[0].Result.Error)
@@ -582,7 +585,7 @@ func TestRunCheck(t *testing.T) {
 		newOS := NewExternalPostgresCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 2)
-		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
 		assert.Equal(t, constants.EXTERNAL_POSTGRESQL, got[1].CheckType)
 		assert.True(t, got[0].Result.Skipped)

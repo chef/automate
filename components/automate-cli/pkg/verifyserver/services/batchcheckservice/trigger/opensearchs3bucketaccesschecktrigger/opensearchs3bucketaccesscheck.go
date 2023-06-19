@@ -27,13 +27,13 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.ExternalOS == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
-			trigger.GetSkippedTriggerCheckResp(constants.UNKNONHOST, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
+			trigger.SkippedTriggerCheckResp(constants.UNKNOWN_HOST, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
 		}
 	}
 
 	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {
 		return []models.CheckTriggerResponse{
-			trigger.GetErrTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, "Object storage detail or OS detail is missing"),
+			trigger.ErrTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.OBJECT_STORAGE_MISSING),
 		}
 	}
 

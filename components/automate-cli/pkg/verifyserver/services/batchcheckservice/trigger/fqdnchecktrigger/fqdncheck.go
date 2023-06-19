@@ -26,17 +26,6 @@ func NewFqdnCheck(log logger.Logger, port string) *FqdnCheck {
 }
 
 func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
-	if config.Hardware == nil {
-		return trigger.NilResp(constants.FQDN, false, false, false)
-	}
-
-	// Check if certificate is empty or nil
-	if config.Certificate == nil {
-		return nilCertificateResp(config, constants.FQDN)
-	}
-	if IsCertificateEmpty(config.Certificate) {
-		return emptyCertificateResp(config, constants.FQDN)
-	}
 
 	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 
@@ -115,32 +104,4 @@ func (ss *FqdnCheck) GetPortsForMockServer() map[string]map[string][]int {
 		},
 	}
 	return nodeTypePortMap
-}
-
-func nilCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
-	}
-
-	return resps
-}
-
-func IsCertificateEmpty(certificate []*models.Certificate) bool {
-	return len(certificate) == 0
-}
-
-func emptyCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "Certificate is missing"))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "Certificate is missing"))
-	}
-
-	return resps
 }

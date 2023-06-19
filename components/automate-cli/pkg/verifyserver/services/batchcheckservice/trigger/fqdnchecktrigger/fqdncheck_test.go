@@ -449,62 +449,6 @@ func TestFqdnCheck_Run(t *testing.T) {
 			httpStatus: http.StatusOK,
 			isError:    false,
 		},
-
-		{
-			name: "Hardware Nil",
-			args: args{
-				config: &models.Config{
-					Hardware:        nil,
-					Certificate:     nil,
-					DeploymentState: "post-deploy",
-					APIToken:        token,
-				},
-			},
-			isPassed:   true,
-			response:   fqdnTriggerResponseAutomateSuccess,
-			httpStatus: http.StatusOK,
-			isError:    false,
-		},
-		{
-			name: "Certificate nil",
-			args: args{
-				config: &models.Config{
-					Hardware: &models.Hardware{
-						AutomateNodeCount:        1,
-						AutomateNodeIps:          []string{"1.2.3.4"},
-						ChefInfraServerNodeCount: 1,
-						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
-					},
-					Certificate:     nil,
-					DeploymentState: "post-deploy",
-					APIToken:        token,
-				},
-			},
-			isPassed:   true,
-			response:   fqdnTriggerResponseAutomateSuccess,
-			httpStatus: http.StatusOK,
-			isError:    false,
-		},
-		{
-			name: "Certificate Empty",
-			args: args{
-				config: &models.Config{
-					Hardware: &models.Hardware{
-						AutomateNodeCount:        1,
-						AutomateNodeIps:          []string{"1.2.3.4"},
-						ChefInfraServerNodeCount: 1,
-						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
-					},
-					Certificate:     []*models.Certificate{},
-					DeploymentState: "post-deploy",
-					APIToken:        token,
-				},
-			},
-			isPassed:   true,
-			response:   fqdnTriggerResponseAutomateSuccess,
-			httpStatus: http.StatusOK,
-			isError:    false,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -529,27 +473,9 @@ func TestFqdnCheck_Run(t *testing.T) {
 				assert.Equal(t, got[0].Result.Error.Code, tt.httpStatus)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
-				if tt.name == "Hardware Nil" {
-					assert.Len(t, got, 2)
-					assert.True(t, got[0].Result.Skipped)
-					assert.True(t, got[1].Result.Skipped)
-				} else if tt.name == "Certificate nil" {
-					assert.Len(t, got, 2)
-					assert.True(t, got[0].Result.Skipped)
-					assert.Equal(t, constants.FQDN, got[0].CheckType)
-					assert.True(t, got[1].Result.Skipped)
-					assert.Equal(t, constants.FQDN, got[1].CheckType)
-				} else if tt.name == "Certificate Empty" {
-					assert.Len(t, got, 2)
-					assert.False(t, got[0].Result.Skipped)
-					assert.Equal(t, constants.FQDN, got[0].Result.Check)
-					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
-					assert.Equal(t, "Certificate is missing", got[0].Result.Error.Message)
-				} else {
-					assert.Equal(t, got, want)
-					assert.NotNil(t, got)
-					assert.Nil(t, got[0].Result.Error)
-				}
+				assert.Equal(t, got, want)
+				assert.NotNil(t, got)
+				assert.Nil(t, got[0].Result.Error)
 			}
 
 		})

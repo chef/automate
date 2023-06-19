@@ -30,13 +30,13 @@ func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigChe
 
 func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil {
-		return trigger.NilResp(constants.NFS_BACKUP_CONFIG, true, true, false)
+		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, true, true, false)
 	}
 	if config.Backup.FileSystem == nil {
-		return trigger.GetNilResp(config, constants.NFS_BACKUP_CONFIG)
+		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG)
 	}
-	if isBackupEmpty(config.Backup) {
-		return trigger.EmptyResp(config, constants.NFS_BACKUP_CONFIG, "MountLocation is missing")
+	if isMountLocationEmpty(config.Backup) {
+		return trigger.ConstructEmptyResp(config, constants.NFS_BACKUP_CONFIG, constants.MOUNT_LOCATION_MISSING)
 	}
 
 	nfsMountReq := models.NFSMountRequest{
@@ -126,6 +126,6 @@ func (ss *NfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]
 	return nodeTypePortMap
 }
 
-func isBackupEmpty(backup *models.Backup) bool {
+func isMountLocationEmpty(backup *models.Backup) bool {
 	return (backup.FileSystem.MountLocation == "")
 }

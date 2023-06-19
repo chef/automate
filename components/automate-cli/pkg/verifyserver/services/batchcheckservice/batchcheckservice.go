@@ -347,7 +347,7 @@ func (ss *BatchCheckService) getPortsToOpenForCheck(check string) map[string]map
 
 func (ss *BatchCheckService) getDeploymentState(config *models.Config) (string, error) {
 	if config.Hardware == nil {
-		return "", errors.New("automate nodes not present")
+		return "", errors.New(constants.NODES_NOT_PRESENT)
 	}
 
 	if config.Hardware.AutomateNodeCount > 0 {
@@ -363,7 +363,7 @@ func (ss *BatchCheckService) getDeploymentState(config *models.Config) (string, 
 			}
 		}
 	}
-	return "", errors.New("automate nodes not present")
+	return "", errors.New(constants.NODES_NOT_PRESENT)
 }
 
 func (ss *BatchCheckService) getStatusFromNode(ip string) (string, error) {

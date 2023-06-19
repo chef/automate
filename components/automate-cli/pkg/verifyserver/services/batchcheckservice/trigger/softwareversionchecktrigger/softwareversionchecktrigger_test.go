@@ -128,18 +128,19 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		config := &models.Config{
 			Hardware: nil,
 		}
-
+		fmt.Printf("config: %+v\n", config)
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
 		ctr := suc.Run(config)
 
-		fmt.Printf("ctr: %+v\n", ctr)
 		require.Len(t, ctr, 5)
-		require.True(t, ctr[3].Result.Skipped)
-		assert.Equal(t, constants.UNKNONHOST, ctr[2].Host)
-		assert.Equal(t, constants.CHEF_INFRA_SERVER, ctr[1].NodeType)
-		assert.Equal(t, constants.SOFTWARE_VERSIONS, ctr[3].CheckType)
-		assert.Equal(t, constants.SOFTWARE_VERSIONS, ctr[3].Result.Check)
-		assert.True(t, ctr[0].Result.Skipped)
+		for _, v := range ctr {
+			if v.NodeType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SOFTWARE_VERSIONS, v.CheckType)
+			assert.Equal(t, constants.SOFTWARE_VERSIONS, v.Result.Check)
+		}
 	})
 
 }

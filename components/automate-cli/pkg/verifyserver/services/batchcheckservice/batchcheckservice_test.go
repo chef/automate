@@ -3,6 +3,7 @@ package batchcheckservice
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"errors"
 	"io"
@@ -1113,16 +1114,16 @@ func TestConstructResult(t *testing.T) {
 	assert.Len(t, result, 2, "Result should have two items")
 
 	for _, v := range result {
+		fmt.Printf("v: %+v\n", v)
+		fmt.Printf("v: %+v\n", v.NodeType)
 		// Check the nodeType1
-		if v.Ip == "host1" {
+		if v.NodeType == "nodeType1" {
 			assert.Equal(t, "host1", result[0].Ip, "IP should be 'host1'")
 			assert.Len(t, result[0].Tests, 1, "Tests should have one item")
 			assert.Equal(t, true, result[0].Tests[0].Passed, "Passed should be true")
 			assert.Equal(t, "Test message 1", result[0].Tests[0].Message, "Message should be 'Test message 1'")
 		}
-
-		// Check the nodeType2
-		if v.Ip == "host2" {
+		if v.NodeType == "nodeType2" {
 			assert.Equal(t, "host2", result[1].Ip, "IP should be 'host2'")
 			assert.Equal(t, "nodeType2", result[1].NodeType, "NodeType should be 'nodeType2'")
 			assert.Len(t, result[1].Tests, 1, "Tests should have one item")

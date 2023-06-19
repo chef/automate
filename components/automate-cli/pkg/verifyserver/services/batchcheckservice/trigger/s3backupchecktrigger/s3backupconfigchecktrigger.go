@@ -25,12 +25,12 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	if config.Hardware == nil || config.Backup.ObjectStorage == nil {
 		return []models.CheckTriggerResponse{
-			trigger.GetSkippedTriggerCheckResp(constants.UNKNONHOST, constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
+			trigger.SkippedTriggerCheckResp(constants.UNKNOWN_HOST, constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
 		}
 	}
 
 	if isObjectStorage(config.Backup) {
-		return emptyNFSMountBackupResp(config, constants.S3_BACKUP_CONFIG)
+		return emptyResp(config, constants.S3_BACKUP_CONFIG)
 	}
 
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
@@ -88,10 +88,10 @@ func isObjectStorage(backup *models.Backup) bool {
 		backup.ObjectStorage.AWSRegion == ""
 }
 
-func emptyNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+func emptyResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
 	resps := []models.CheckTriggerResponse{}
 	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "S3 backup detail is missing"))
+		resps = append(resps, trigger.ErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, constants.S3_BACKUP_MISSING))
 	}
 
 	return resps

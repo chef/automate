@@ -104,22 +104,6 @@ func GetRequestJson() *models.Config {
 				"14.15.16.17"
 			]
 		},
-		"external_opensearch": {
-			"opensearch_domain_name": "test-url",
-			"opensearch_domain_url": "url",
-			"opensearch_username": "username",
-			"opensearch_user_password": "opensearch_user_password",
-			"opensearch_cert": "cdrt",
-			"opensearch_role_arn": "opensearch_role_arn"
-		},
-		"external_postgresql": {
-			"postgresql_instance_url": "test-url",
-			"postgresql_superuser_username": "root",
-			"postgresql_superuser_password": "pass",
-			"postgresql_dbuser_username": "root",
-			"postgresql_dbuser_password": "pass",
-			"postgresql_root_cert": "cert"
-		},
 		"certificate": {
 			"fqdn": "my_fqdn",
 			"root_cert": "---- VALID ROOT CA ----",
@@ -304,7 +288,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
-		assert.Equal(t, constants.UNKNONHOST, got[0].Host)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
 		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
 		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
 		assert.True(t, got[0].Result.Skipped)
@@ -327,10 +311,12 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
-		assert.Equal(t, "12.12.1.6", got[0].Host)
-		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
-		assert.True(t, got[0].Result.Skipped)
+		for _, v := range got {
+			assert.Equal(t, constants.SSH_USER, v.CheckType)
+			assert.Equal(t, constants.SSH_USER, v.Result.Check)
+			assert.Nil(t, v.Result.Error)
+			assert.True(t, v.Result.Skipped)
+		}
 	})
 	t.Run("Empty SSHUser", func(t *testing.T) {
 		config := &models.Config{
@@ -350,13 +336,13 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
-		assert.Equal(t, "12.12.1.6", got[0].Host)
-		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
-		assert.False(t, got[0].Result.Skipped)
-		assert.Equal(t, http.StatusBadRequest, got[1].Result.Error.Code)
-		assert.Equal(t, "SSH credentials is missing", got[1].Result.Error.Message)
-		assert.Equal(t, constants.SSH_USER, got[1].Result.Check)
+		for _, v := range got {
+			assert.Equal(t, constants.SSH_USER, v.CheckType)
+			assert.False(t, v.Result.Skipped)
+			assert.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			assert.Equal(t, "SSH credentials is missing", v.Result.Error.Message)
+			assert.Equal(t, constants.SSH_USER, v.Result.Check)
+		}
 	})
 }
 
