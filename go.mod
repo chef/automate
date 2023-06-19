@@ -217,6 +217,7 @@ require (
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.0 // indirect
+	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/uber/jaeger-lib v1.3.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
