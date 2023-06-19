@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -25,9 +26,55 @@ func TestRunVerifyCmd(t *testing.T) {
 		wantErr                  error
 	}{
 		{
-			description: "success",
+			description: "bastion with existing automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       io.NopCloser(strings.NewReader(`{"status":"success"}`)),
+					}, nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_TOML_PATH + "/config_valid_config_parser.toml",
+			wantErr:    nil,
+		},
+		{
+			description: "bastion without automate-verify - success",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, error) {
+					if requestMethod == http.MethodGet {
+						return nil, errors.New("some error occurred")
+					}
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       io.NopCloser(strings.NewReader(`{"status":"success"}`)),
@@ -94,4 +141,17 @@ func TestRunVerifyCmd(t *testing.T) {
 		})
 	}
 
+}
+
+func TestVerifyCmdFunc(t *testing.T) {
+	flagsObj := &verifyCmdFlags{
+		config: CONFIG_TOML_PATH + "/config_valid_config_parser.toml",
+	}
+
+	vf := verifyCmdFunc(flagsObj)
+	assert.NotNil(t, vf)
+
+	err := vf(nil, nil)
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "Cannot create automate-verify service since systemd is not present on this machine")
 }
