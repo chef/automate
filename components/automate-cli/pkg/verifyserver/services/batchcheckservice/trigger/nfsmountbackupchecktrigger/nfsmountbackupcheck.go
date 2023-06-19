@@ -33,10 +33,10 @@ func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTrigge
 		return trigger.NilResp(constants.NFS_BACKUP_CONFIG, true, true, false)
 	}
 	if config.Backup.FileSystem == nil {
-		return nilNFSMountBackupResp(config, constants.NFS_BACKUP_CONFIG)
+		return trigger.GetNilResp(config, constants.NFS_BACKUP_CONFIG)
 	}
 	if isBackupEmpty(config.Backup) {
-		return emptyNFSMountBackupResp(config, constants.NFS_BACKUP_CONFIG)
+		return trigger.EmptyResp(config, constants.NFS_BACKUP_CONFIG, "MountLocation is missing")
 	}
 
 	nfsMountReq := models.NFSMountRequest{
@@ -128,40 +128,4 @@ func (ss *NfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]
 
 func isBackupEmpty(backup *models.Backup) bool {
 	return (backup.FileSystem.MountLocation == "")
-}
-
-func nilNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
-	}
-
-	return resps
-}
-
-func emptyNFSMountBackupResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "MountLocation is missing"))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "MountLocation is missing"))
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, "MountLocation is missing"))
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, "MountLocation is missing"))
-	}
-
-	return resps
 }

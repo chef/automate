@@ -33,10 +33,10 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 		return trigger.NilResp(constants.SSH_USER, true, true, false)
 	}
 	if config.SSHUser == nil {
-		return nilSSHUserResp(config, constants.SSH_USER)
+		return trigger.GetNilResp(config, constants.SSH_USER)
 	}
 	if IsSSHUserEmpty(config.SSHUser) {
-		return emptySSHUserResp(config, constants.SSH_USER)
+		return trigger.EmptyResp(config, constants.SSH_USER, "SSH credentials is missing")
 	}
 
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
@@ -78,43 +78,6 @@ func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]in
 	return nodeTypePortMap
 }
 
-func nilSSHUserResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
-	}
-
-	return resps
-}
-
 func IsSSHUserEmpty(sshUser *models.SSHUser) bool {
 	return (sshUser.Username == "" || sshUser.Port == "" || sshUser.PrivateKey == "" || sshUser.SudoPassword == "")
-}
-
-func emptySSHUserResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "SSH credentials is missing"))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "SSH credentials is missing"))
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, "SSH credentials is missing"))
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, "SSH credentials is missing"))
-	}
-
-	return resps
 }

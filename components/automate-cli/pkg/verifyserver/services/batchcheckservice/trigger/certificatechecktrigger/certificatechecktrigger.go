@@ -31,10 +31,10 @@ func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResp
 	}
 	// Check if certificate is empty or nil
 	if config.Certificate == nil {
-		return nilCertificateResp(config, constants.CERTIFICATE)
+		return trigger.GetNilResp(config, constants.CERTIFICATE)
 	}
 	if IsCertificateEmpty(config.Certificate) {
-		return emptyCertificateResp(config, constants.CERTIFICATE)
+		return trigger.EmptyResp(config, constants.CERTIFICATE, "Certificate is missing")
 	}
 
 	count := 0
@@ -76,42 +76,6 @@ func (ss *CertificateCheck) GetPortsForMockServer() map[string]map[string][]int 
 	return nodeTypePortMap
 }
 
-func nilCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, trigger.GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
-	}
-
-	return resps
-}
-
 func IsCertificateEmpty(certificate []*models.Certificate) bool {
 	return len(certificate) == 0
-}
-
-func emptyCertificateResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
-	resps := []models.CheckTriggerResponse{}
-	for _, ip := range config.Hardware.AutomateNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, "Certificate is missing"))
-	}
-	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, "Certificate is missing"))
-	}
-	for _, ip := range config.Hardware.PostgresqlNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, "Certificate is missing"))
-	}
-	for _, ip := range config.Hardware.OpenSearchNodeIps {
-		resps = append(resps, trigger.GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, "Certificate is missing"))
-	}
-
-	return resps
 }

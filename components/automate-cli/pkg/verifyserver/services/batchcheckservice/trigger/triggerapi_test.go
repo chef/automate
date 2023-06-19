@@ -630,3 +630,62 @@ func TestGetSkippedTriggerCheckResp(t *testing.T) {
 
 	assert.Equal(t, expected, result)
 }
+
+func TestGetNilResp(t *testing.T) {
+	// Mock Config
+	config := &models.Config{
+		Hardware: &models.Hardware{
+			AutomateNodeIps:        []string{"1.2.3.4", "5.6.7.8"},
+			ChefInfraServerNodeIps: []string{"10.20.30.40", "50.60.70.80"},
+			PostgresqlNodeIps:      []string{"100.200.300.400", "500.600.700.800"},
+			OpenSearchNodeIps:      []string{"192.168.1.1", "192.168.1.2"},
+		},
+	}
+
+	checkType := "sampleCheckType"
+
+	expectedResponses := []models.CheckTriggerResponse{
+		GetSkippedTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE),
+		GetSkippedTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE),
+		GetSkippedTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER),
+		GetSkippedTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER),
+		GetSkippedTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL),
+		GetSkippedTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL),
+		GetSkippedTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH),
+		GetSkippedTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH),
+	}
+
+	responses := GetNilResp(config, checkType)
+
+	assert.Equal(t, expectedResponses, responses)
+}
+
+func TestEmptyResp(t *testing.T) {
+	// Mock Config
+	config := &models.Config{
+		Hardware: &models.Hardware{
+			AutomateNodeIps:        []string{"1.2.3.4", "5.6.7.8"},
+			ChefInfraServerNodeIps: []string{"10.20.30.40", "50.60.70.80"},
+			PostgresqlNodeIps:      []string{"100.200.300.400", "500.600.700.800"},
+			OpenSearchNodeIps:      []string{"192.168.1.1", "192.168.1.2"},
+		},
+	}
+
+	checkType := "sampleCheckType"
+	message := "Sample message"
+
+	expectedResponses := []models.CheckTriggerResponse{
+		GetErrTriggerCheckResp("1.2.3.4", checkType, constants.AUTOMATE, message),
+		GetErrTriggerCheckResp("5.6.7.8", checkType, constants.AUTOMATE, message),
+		GetErrTriggerCheckResp("10.20.30.40", checkType, constants.CHEF_INFRA_SERVER, message),
+		GetErrTriggerCheckResp("50.60.70.80", checkType, constants.CHEF_INFRA_SERVER, message),
+		GetErrTriggerCheckResp("100.200.300.400", checkType, constants.POSTGRESQL, message),
+		GetErrTriggerCheckResp("500.600.700.800", checkType, constants.POSTGRESQL, message),
+		GetErrTriggerCheckResp("192.168.1.1", checkType, constants.OPENSEARCH, message),
+		GetErrTriggerCheckResp("192.168.1.2", checkType, constants.OPENSEARCH, message),
+	}
+
+	responses := EmptyResp(config, checkType, message)
+
+	assert.Equal(t, expectedResponses, responses)
+}

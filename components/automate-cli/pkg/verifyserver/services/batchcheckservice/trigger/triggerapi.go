@@ -288,3 +288,39 @@ func GetSkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTrig
 		Host: ip,
 	}
 }
+
+func EmptyResp(config *models.Config, checktype, msg string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, msg))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, msg))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, msg))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, msg))
+	}
+
+	return resps
+}
+
+func GetNilResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, GetSkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
+}
