@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source .studio/01_base.sh
+
 document "start_chef_server" <<DOC
   Reconfigures deployment service to enable the chef server collection. Deployment service must be running to use it.
 DOC
@@ -480,7 +482,7 @@ document "test_if_webui_key_is_patched" <<DOC
   test if WEB UI key is patched for OCID
 DOC
 test_if_webui_key_is_patched() {
-  # install_if_missing core/jq-static jq
+  install_if_missing core/jq-static jq
 
   # Extract webui_key from private-chef-secrets.json
   ocid_secrets_file_path="$(hab pkg path chef/oc_id)/oc_id/config/private-chef-secrets.json"
