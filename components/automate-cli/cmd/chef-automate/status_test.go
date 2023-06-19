@@ -73,7 +73,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		err := handleManagedServiceError(testCase.flags)
+		err := handleManagedServiceErrorForStatusCmd(testCase.flags)
 
 		if testCase.errorExepected != nil {
 			assert.EqualError(t, err, testCase.errorExepected.Error())

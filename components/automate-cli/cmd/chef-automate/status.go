@@ -63,6 +63,7 @@ type BeStatus []BeStatusValue
 
 const (
 	STATUS_ERROR_ON_SELF_MANAGED = "Showing the status for externally configured %s is not supported."
+	CMD_FAIL_MSG                 = "Command failed on %s node : %s with error:\n %s\n"
 	BACKEND_STATUS               = "sudo HAB_LICENSE=accept-no-persist hab svc status"
 	FRONTEND_STATUS              = "sudo chef-automate status"
 )
@@ -316,7 +317,7 @@ func runStatusFromBastion(flags *statusCmdFlags, nodeOpUtils NodeOpUtils, remote
 		if err != nil {
 			return err
 		}
-		return handleManagedServiceError(flags)
+		return handleManagedServiceErrorForStatusCmd(flags)
 	}
 
 	runStatusCmdForBackend(infra, flags, statusCmdResults, remoteExe)
@@ -381,27 +382,31 @@ func printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, 
 	for _, value := range cmdResult {
 		for _, cmdResult := range value {
 			if cmdResult.Error != nil {
-				isOutputError := false
-				if strings.Contains(cmdResult.Output, "UnhealthyStatusError") {
-					isOutputError = true
-					writer.Failf("Output for Host IP %s : \n%s", cmdResult.HostIP, cmdResult.Output+"\n")
-					writer.Success("Command is executed on " + remoteService + " node : " + cmdResult.HostIP + "\n")
-				}
-
-				if strings.Contains(cmdResult.Output, "DeploymentServiceUnreachableError") {
-					isOutputError = true
-					writer.Fail("Command failed on " + remoteService + " node : " + cmdResult.HostIP + " with error:\n" + cmdResult.Output + "\n")
-				}
-
-				if !isOutputError {
-					writer.Fail("Command failed on " + remoteService + " node : " + cmdResult.HostIP + " with error:\n" + cmdResult.Error.Error() + "\n")
-				}
+				printStatusErrorOutput(cmdResult, remoteService, writer)
 			} else {
 				writer.Printf("Output for Host IP %s : \n%s", cmdResult.HostIP, cmdResult.Output+"\n")
 				writer.Success("Command is executed on " + remoteService + " node : " + cmdResult.HostIP + "\n")
 			}
 			writer.BufferWriter().Flush()
 		}
+	}
+}
+
+func printStatusErrorOutput(cmdResult *CmdResult, remoteService string, writer *cli.Writer) {
+	isOutputError := false
+	if strings.Contains(cmdResult.Output, "UnhealthyStatusError") {
+		isOutputError = true
+		writer.Failf("Output for Host IP %s : \n%s", cmdResult.HostIP, cmdResult.Output+"\n")
+		writer.Success("Command is executed on " + remoteService + " node : " + cmdResult.HostIP + "\n")
+	}
+
+	if strings.Contains(cmdResult.Output, "DeploymentServiceUnreachableError") {
+		isOutputError = true
+		writer.Failf(CMD_FAIL_MSG, remoteService, cmdResult.HostIP, cmdResult.Output)
+	}
+
+	if !isOutputError {
+		writer.Failf(CMD_FAIL_MSG, remoteService, cmdResult.HostIP, cmdResult.Error.Error())
 	}
 }
 
@@ -419,7 +424,7 @@ func getValueFromChannel(statusCmdResults chan statusCmdResult, printStatusOutpu
 	return nil
 }
 
-func handleManagedServiceError(flags *statusCmdFlags) error {
+func handleManagedServiceErrorForStatusCmd(flags *statusCmdFlags) error {
 
 	if flags.postgresql && flags.opensearch {
 		return nil
