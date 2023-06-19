@@ -2,36 +2,12 @@ package main
 
 import (
 	"errors"
-	"sync"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/stretchr/testify/assert"
 )
-
-type MockStatusCmdFromBastionHelperImpl struct {
-	getAutomateHAInfraDetailsFunc func() (*AutomateHAInfraDetails, error)
-	isManagedServicesOnFunc       func() bool
-	executeRemoteExecutorFunc     func(*NodeTypeAndCmd, SSHUtil, *cli.Writer) (map[string][]*CmdResult, error)
-	printStatusOutputFunc         func(map[string][]*CmdResult, string, *sync.Mutex, *cli.Writer)
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) getAutomateHAInfraDetails() (*AutomateHAInfraDetails, error) {
-	return mst.getAutomateHAInfraDetailsFunc()
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) isManagedServicesOn() bool {
-	return mst.isManagedServicesOnFunc()
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) executeRemoteExecutor(nodemap *NodeTypeAndCmd, sshUtil SSHUtil, writer *cli.Writer) (map[string][]*CmdResult, error) {
-	return mst.executeRemoteExecutorFunc(nodemap, sshUtil, writer)
-}
-
-func (mst *MockStatusCmdFromBastionHelperImpl) printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, mutex *sync.Mutex, writer *cli.Writer) {
-	mst.printStatusOutputFunc(cmdResult, remoteService, mutex, writer)
-}
 
 func TestBuildFrontEndStatusCmd(t *testing.T) {
 	type testCase struct {
@@ -188,11 +164,14 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 
 func TestRunStatusFromBastion(t *testing.T) {
 	type testCase struct {
-		description         string
-		flags               *statusCmdFlags
-		mockStatusCmdHelper *MockStatusCmdFromBastionHelperImpl
-		errorWant           error
+		description       string
+		flags             *statusCmdFlags
+		mockNodeOpUtils   *MockNodeUtilsImpl
+		mockRemoteCmdExec *MockRemoteCmdExecutor
+		errorWant         error
 	}
+
+	printStatusOutput := func(m map[string][]*CmdResult, s string, w *cli.Writer) {}
 
 	testCases := []testCase{
 		{
@@ -200,9 +179,9 @@ func TestRunStatusFromBastion(t *testing.T) {
 			flags: &statusCmdFlags{
 				node: "1",
 			},
-			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
-				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
-					return &AutomateHAInfraDetails{}, nil
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
 				},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, "Please provide service flag"),
@@ -210,9 +189,9 @@ func TestRunStatusFromBastion(t *testing.T) {
 		{
 			description: "Error while reading infra details",
 			flags:       &statusCmdFlags{},
-			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
-				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
-					return nil, errors.New("Error occured while reading infra details")
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return nil, nil, errors.New("Error occured while reading infra details")
 				},
 			},
 			errorWant: errors.New("Error occured while reading infra details"),
@@ -220,54 +199,57 @@ func TestRunStatusFromBastion(t *testing.T) {
 		{
 			description: "Want status of all services",
 			flags:       &statusCmdFlags{},
-			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
-				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
-					return &AutomateHAInfraDetails{}, nil
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
 					return false
 				},
-				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
-				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: nil,
 		},
 		{
 			description: "Want status of all services but error occured while remote execution",
 			flags:       &statusCmdFlags{},
-			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
-				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
-					return &AutomateHAInfraDetails{}, nil
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
 					return false
 				},
-				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, errors.New("Some error occured while remote execution")
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
-				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: errors.New("Some error occured while remote execution"),
 		},
 		{
 			description: "Want status of all services with managed services",
 			flags:       &statusCmdFlags{},
-			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
-				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
-					return &AutomateHAInfraDetails{}, nil
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
-				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
-				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: nil,
 		},
@@ -276,18 +258,19 @@ func TestRunStatusFromBastion(t *testing.T) {
 			flags: &statusCmdFlags{
 				postgresql: true,
 			},
-			mockStatusCmdHelper: &MockStatusCmdFromBastionHelperImpl{
-				getAutomateHAInfraDetailsFunc: func() (*AutomateHAInfraDetails, error) {
-					return &AutomateHAInfraDetails{}, nil
+			mockNodeOpUtils: &MockNodeUtilsImpl{
+				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
 					return true
 				},
-				executeRemoteExecutorFunc: func(ntac *NodeTypeAndCmd, s SSHUtil, w *cli.Writer) (map[string][]*CmdResult, error) {
+			},
+			mockRemoteCmdExec: &MockRemoteCmdExecutor{
+				ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
-				printStatusOutputFunc: func(m1 map[string][]*CmdResult, s string, mtx *sync.Mutex, w *cli.Writer) {
-				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL),
 		},
@@ -295,7 +278,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			err := runStatusFromBastion(testCase.flags, testCase.mockStatusCmdHelper)
+			err := runStatusFromBastion(testCase.flags, testCase.mockNodeOpUtils, testCase.mockRemoteCmdExec, printStatusOutput)
 			if err != nil {
 				assert.EqualError(t, testCase.errorWant, err.Error())
 			} else {
