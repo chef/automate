@@ -614,8 +614,14 @@ func TestFirewallCheck_Run(t *testing.T) {
 
 				} else if tt.name == "Hardware Nil" {
 					assert.Len(t, got, 5)
-					require.True(t, got[0].Result.Skipped)
-					require.True(t, got[1].Result.Skipped)
+					for _, v := range got {
+						if v.CheckType == constants.BASTION {
+							assert.Equal(t, constants.LOCALHOST, v.Host)
+						}
+						assert.Equal(t, constants.FIREWALL, v.CheckType)
+						assert.Equal(t, constants.FIREWALL, v.Result.Check)
+						assert.True(t, v.Result.Skipped)
+					}
 				} else {
 					var want []models.CheckTriggerResponse
 					json.Unmarshal([]byte(tt.response), &want)

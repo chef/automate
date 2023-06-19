@@ -109,10 +109,14 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		got := suc.Run(config)
 
 		require.Len(t, got, 5)
-		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
-		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
-		assert.Equal(t, constants.SYSTEM_RESOURCES, got[1].CheckType)
-		assert.True(t, got[0].Result.Skipped)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.SYSTEM_RESOURCES, v.CheckType)
+			assert.Equal(t, constants.SYSTEM_RESOURCES, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+		}
 	})
 
 }

@@ -1,8 +1,6 @@
 package configutils
 
 import (
-	"fmt"
-
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
@@ -41,7 +39,6 @@ func GetCertificateMap(certificateList []*models.Certificate) map[string]*models
 
 	for _, certificate := range certificateList {
 		certificateMap[certificate.NodeType] = certificate
-		fmt.Printf("certificateMap[certificate.NewFileStore]: %v\n", certificate)
 	}
 
 	return certificateMap

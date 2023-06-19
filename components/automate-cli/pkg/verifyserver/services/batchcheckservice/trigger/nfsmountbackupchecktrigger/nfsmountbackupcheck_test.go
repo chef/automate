@@ -845,10 +845,14 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		newOS := NewNfsBackupConfigCheck(logger.NewLogrusStandardLogger(), "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
-		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
-		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
-		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
-		assert.True(t, got[0].Result.Skipped)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+		}
 	})
 
 	t.Run("Nil FileSystem", func(t *testing.T) {
@@ -872,9 +876,14 @@ func TestHardwareResourceCountCheck_TriggerHardwareResourceCountCheck(t *testing
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		assert.Equal(t, "12.12.1.6", got[0].Host)
-		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
-		assert.Equal(t, constants.NFS_BACKUP_CONFIG, got[3].CheckType)
-		assert.True(t, got[0].Result.Skipped)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.CheckType)
+			assert.Equal(t, constants.NFS_BACKUP_CONFIG, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+		}
 	})
 	t.Run("Empty FileSystem", func(t *testing.T) {
 		config := &models.Config{
