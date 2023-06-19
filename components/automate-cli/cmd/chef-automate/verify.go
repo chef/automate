@@ -466,8 +466,10 @@ func (v *verifyCmdFlow) getHostIPs(automatePrivateIps, chefServerPrivateIps, pos
 	var hostIPs []string
 	hostIPs = stringutils.ConcatSlice(hostIPs, automatePrivateIps)
 	hostIPs = stringutils.ConcatSlice(hostIPs, chefServerPrivateIps)
-	hostIPs = stringutils.ConcatSlice(hostIPs, postgresqlPrivateIps)
-	hostIPs = stringutils.ConcatSlice(hostIPs, opensearchPrivateIps)
+	if !v.Config.IsExternalDb() {
+		hostIPs = stringutils.ConcatSlice(hostIPs, postgresqlPrivateIps)
+		hostIPs = stringutils.ConcatSlice(hostIPs, opensearchPrivateIps)
+	}
 	return hostIPs
 }
 
