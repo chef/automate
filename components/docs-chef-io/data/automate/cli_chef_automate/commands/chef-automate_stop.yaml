@@ -3,10 +3,49 @@ synopsis: Stop deployment
 usage: chef-automate stop [flags]
 description: Stop a running deployment of Automate.
 options:
+- name: a2
+  default_value: "false"
+  usage: Stop chef automate services of automate nodes
+  compatible_with_options: AutomateHA
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Stop chef automate services of automate nodes
+  compatible_with_options: AutomateHA
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Stop chef automate services of chef_server nodes
+  compatible_with_options: AutomateHA
+- name: cs
+  default_value: "false"
+  usage: Stop chef automate services of chef_server nodes
+  compatible_with_options: AutomateHA
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for stop
+- name: node
+  usage: Node Ip address
+  compatible_with_options: AutomateHA
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: Stop hab-sup service of opensearch nodes
+  compatible_with_options: AutomateHA
+- name: os
+  default_value: "false"
+  usage: Stop hab-sup service of opensearch nodes
+  compatible_with_options: AutomateHA
+- name: pg
+  default_value: "false"
+  usage: Stop hab-sup service of postgresql nodes
+  compatible_with_options: AutomateHA
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: Stop hab-sup service of postgresql nodes
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: debug
   shorthand: d
@@ -19,4 +58,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-supported_on: FrontEnd
+supported_on: Bastion

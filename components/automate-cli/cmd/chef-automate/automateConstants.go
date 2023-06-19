@@ -75,6 +75,8 @@ const (
 	STOP_FE_SERVICES_CMD = `sudo systemctl stop chef-automate`
 	STOP_BE_SERVICES_CMD = `sudo systemctl stop hab-sup`
 
+	CHEF_AUTOMATE_STOP_FE_CMD = `sudo chef-automate stop`
+
 	EXCLUDE_OPENSEARCH_NODE_REQUEST = `
 	curl --location --request PUT 'http://localhost:10144/_cluster/settings' \
 	--header 'Content-Type: application/json' \
