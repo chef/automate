@@ -185,7 +185,6 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		defer mockServer.Close()
 
 		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1124")
-		fmt.Printf("request: %+v\n", request)
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(finalResp))

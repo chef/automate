@@ -1,7 +1,6 @@
 package softwareversionchecktrigger
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -128,7 +127,7 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		config := &models.Config{
 			Hardware: nil,
 		}
-		fmt.Printf("config: %+v\n", config)
+
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
 		ctr := suc.Run(config)
 

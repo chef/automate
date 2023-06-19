@@ -2,7 +2,6 @@ package externalopensearchchecktrigger
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -533,9 +532,6 @@ func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*ht
 			json.Unmarshal(reader, &got)
 
 			wantReq := getRequest()
-
-			fmt.Printf("wantReq: %+v\n", wantReq)
-			fmt.Printf("got: %+v\n", got)
 
 			assert.NotNil(t, got)
 			assert.Equal(t, got, wantReq)

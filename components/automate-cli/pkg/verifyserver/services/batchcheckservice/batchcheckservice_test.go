@@ -3,7 +3,6 @@ package batchcheckservice
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"errors"
 	"io"
@@ -1114,8 +1113,6 @@ func TestConstructResult(t *testing.T) {
 	assert.Len(t, result, 2, "Result should have two items")
 
 	for _, v := range result {
-		fmt.Printf("v: %+v\n", v)
-		fmt.Printf("v: %+v\n", v.NodeType)
 		// Check the nodeType1
 		if v.NodeType == "nodeType1" {
 			assert.Equal(t, "host1", result[0].Ip, "IP should be 'host1'")
