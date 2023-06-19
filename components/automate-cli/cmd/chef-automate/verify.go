@@ -265,7 +265,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 	v.Writer.Println("Checking automate-verify service on bastion")
 
 	//Call status API to check if automate-verify service is running on bastion
-	res, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
+	response, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
 	if err != nil {
 		v.Writer.Println(fmt.Sprintf("error while checking automate-verify service on bastion: %v\n", err))
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service")
@@ -278,7 +278,8 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 
 		v.Writer.Println("Adding automate-verify service to systemd and starting the service completed")
 	} else {
-		resultBytes, err := v.getResultFromResponseBody(res.Body)
+		defer response.Body.Close()
+		resultBytes, err := v.getResultFromResponseBody(response.Body)
 		if err != nil {
 			return err
 		}
@@ -367,13 +368,14 @@ func (v *verifyCmdFlow) createSystemdOnBastion() error {
 }
 
 // Makes batch-check API call
-func (v *verifyCmdFlow) makeBatchCheckAPICall(batchCheckReq models.BatchCheckRequest, nodeType string) error {
+func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckRequest, nodeType string) error {
 	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
-	batchCheckBastionRes, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, batchCheckReq)
+	response, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
 	if err != nil {
 		return fmt.Errorf("error while doing batch-check API call for %s: %v", nodeType, err)
 	} else {
-		resultBytes, err := v.getResultFromResponseBody(batchCheckBastionRes.Body)
+		defer response.Body.Close()
+		resultBytes, err := v.getResultFromResponseBody(response.Body)
 		if err != nil {
 			return err
 		}
