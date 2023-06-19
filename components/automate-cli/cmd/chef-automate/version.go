@@ -195,10 +195,15 @@ func runCommandOnBastion(args []string) error {
 		logrus.Errorf("Error while getting IP addresses :: %s", status.Wrap(getSingleErrorFromList(errList), status.InvalidCommandArgsError, ipAddressError))
 		return status.Wrap(getSingleErrorFromList(errList), status.InvalidCommandArgsError, ipAddressError)
 	}
+
+	sshUtil := NewSSHUtil(&SSHConfig{})
+	cmdExecutor := NewRemoteCmdExecutorWithoutNodeMap(sshUtil, writer)
+
 	writer.Println("-----------------------------------------")
 
 	if len(automateIps) != 0 {
-		versions, err := getChefAutomateVersion(automateIps, infra)
+
+		versions, err := getChefAutomateVersion(automateIps, infra, cmdExecutor)
 		if err != nil {
 			logrus.Errorf("Error while getting Automate Version :: %s", err)
 			return err
@@ -214,7 +219,7 @@ func runCommandOnBastion(args []string) error {
 	}
 
 	if len(chefServerIps) != 0 {
-		versions, err := getInfraServerVersion(chefServerIps, infra)
+		versions, err := getInfraServerVersion(chefServerIps, infra, cmdExecutor)
 		if err != nil {
 			logrus.Errorf("Error while getting Infra server Version :: %s", err)
 			return err
@@ -233,7 +238,7 @@ func runCommandOnBastion(args []string) error {
 	isManaged := isManagedServicesOn()
 
 	if len(opensearchIps) != 0 {
-		versions, err := getOpensearchVersion(opensearchIps, infra, isManaged)
+		versions, err := getOpensearchVersion(opensearchIps, infra, isManaged, cmdExecutor)
 		if err != nil {
 			logrus.Errorf("Error while getting Opensearch Version :: %s", err)
 			return err
@@ -251,7 +256,7 @@ func runCommandOnBastion(args []string) error {
 	}
 
 	if len(postgresqlIps) != 0 {
-		versions, err := getPostgresqlVersion(postgresqlIps, infra, isManaged)
+		versions, err := getPostgresqlVersion(postgresqlIps, infra, isManaged, cmdExecutor)
 		if err != nil {
 			logrus.Errorf("Error while getting Postgresql Version :: %s", err)
 			return err
@@ -273,7 +278,7 @@ func runCommandOnBastion(args []string) error {
 	return nil
 }
 
-func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails) (map[string]string, error) {
+func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
 	automateCmd := A2VERSIONCMD
 	if VersionCommandFlags.verbose {
 		automateCmd = A2VERSIONVERBOSE
@@ -292,10 +297,7 @@ func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails)
 		Infra:      infra,
 	}
 
-	sshUtil := NewSSHUtil(&SSHConfig{})
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-	cmdresult, err := cmdUtil.Execute()
+	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
 
 	if err != nil {
 		logrus.Error("ERROR", err)
@@ -308,7 +310,7 @@ func getChefAutomateVersion(automateIps []string, infra *AutomateHAInfraDetails)
 	return versionMap, nil
 }
 
-func getInfraServerVersion(chefServerIps []string, infra *AutomateHAInfraDetails) (map[string]string, error) {
+func getInfraServerVersion(chefServerIps []string, infra *AutomateHAInfraDetails, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
 
 	nodeMap := &NodeTypeAndCmd{
 		Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
@@ -324,10 +326,7 @@ func getInfraServerVersion(chefServerIps []string, infra *AutomateHAInfraDetails
 		Infra:      infra,
 	}
 
-	sshUtil := NewSSHUtil(&SSHConfig{})
-	cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-	cmdresult, err := cmdUtil.Execute()
+	cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
 
 	if err != nil {
 		logrus.Error("ERROR", err)
@@ -347,7 +346,7 @@ func getInfraServerVersion(chefServerIps []string, infra *AutomateHAInfraDetails
 	return versionMap, nil
 }
 
-func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool) (map[string]string, error) {
+func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
 	versionMap := make(map[string]string)
 	if isManagedServicesOn {
 		automateIps := infra.Outputs.AutomatePrivateIps.Value
@@ -365,10 +364,7 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails,
 			Infra:      infra,
 		}
 
-		sshUtil := NewSSHUtil(&SSHConfig{})
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-		cmdresult, err := cmdUtil.Execute()
+		cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
 
 		if err != nil {
 			logrus.Error("ERROR", err)
@@ -405,10 +401,7 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails,
 			Infra: infra,
 		}
 
-		sshUtil := NewSSHUtil(&SSHConfig{})
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-		cmdresult, err := cmdUtil.Execute()
+		cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
 
 		if err != nil {
 			logrus.Error("ERROR", err)
@@ -441,7 +434,7 @@ func getOpensearchVersion(opensearchIps []string, infra *AutomateHAInfraDetails,
 	}
 }
 
-func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool) (map[string]string, error) {
+func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails, isManagedServicesOn bool, cmdExecuter RemoteCmdExecutor) (map[string]string, error) {
 	versionMap := make(map[string]string)
 
 	if isManagedServicesOn {
@@ -465,10 +458,7 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 			Infra:      infra,
 		}
 
-		sshUtil := NewSSHUtil(&SSHConfig{})
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-		cmdresult, err := cmdUtil.Execute()
+		cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
 
 		if err != nil {
 			logrus.Error("ERROR", err)
@@ -505,10 +495,7 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 			Infra:      infra,
 		}
 
-		sshUtil := NewSSHUtil(&SSHConfig{})
-		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
-
-		cmdresult, err := cmdUtil.Execute()
+		cmdresult, err := cmdExecuter.ExecuteWithNodeMap(nodeMap)
 
 		if err != nil {
 			logrus.Error("ERROR", err)
