@@ -434,8 +434,6 @@ func TestForChefserverPostgres(t *testing.T) {
 
 		config := &models.Config{
 			Hardware: &models.Hardware{
-				AutomateNodeCount:        1,
-				AutomateNodeIps:          []string{"127.0.0.5"},
 				ChefInfraServerNodeCount: 2,
 			},
 			ExternalPG: &models.ExternalPG{
@@ -471,8 +469,8 @@ func TestForChefserverPostgres(t *testing.T) {
 			assert.Equal(t, externalPostgresqlResponseSuccessChefServerExpected, got[0].Result.Error.Error())
 		} else {
 			assert.Nil(t, got[0].Result.Error)
-			assert.Equal(t, config.Hardware.AutomateNodeIps[0], got[0].Host)
-			assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+			assert.Equal(t, host, got[0].Host)
+			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
 		}
 	})
 	t.Run("ChefServer Postgres check fail", func(t *testing.T) {
