@@ -96,6 +96,11 @@ func SliceReject(haystack []string, needle string) []string {
 	return res
 }
 
+func ConcatSlice(first, second []string) []string {
+	n := len(first)
+	return append(first[:n:n], second...)
+}
+
 func GetFullPlatformName(name, release string) string {
 	return fmt.Sprintf("%s %s", name, release)
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
@@ -25,16 +26,34 @@ type SSHConfig struct {
 type SSHUtilImpl struct {
 	SshClient ISshClient
 	logger    logger.Logger
+	Exec      command.Executor
 }
 
 type SSHUtil interface {
 	Execute(sshConfig SSHConfig, cmd string) (string, error)
+	ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostIPs []string) []Result
+	CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool) error
+	CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []Result
+}
+
+type Result struct {
+	HostIP string
+	Output string
+	Error  error
 }
 
 func NewSSHUtil(sshclient ISshClient, logger logger.Logger) *SSHUtilImpl {
 	return &SSHUtilImpl{
 		SshClient: sshclient,
 		logger:    logger,
+	}
+}
+
+func NewSSHUtilWithCommandExecutor(sshclient ISshClient, logger logger.Logger, exec command.Executor) *SSHUtilImpl {
+	return &SSHUtilImpl{
+		SshClient: sshclient,
+		logger:    logger,
+		Exec:      exec,
 	}
 }
 
@@ -169,6 +188,112 @@ func (s *SSHUtilImpl) Execute(sshConfig SSHConfig, cmd string) (string, error) {
 	}
 	defer s.SshClient.Close(session)
 	return output, nil
+}
+
+func (s *SSHUtilImpl) ExecuteConcurrently(sshConfig SSHConfig, cmd string, hostIPs []string) []Result {
+	resultChan := make(chan Result, len(hostIPs))
+
+	for _, hostIP := range hostIPs {
+		sshConfig.HostIP = hostIP
+		s.logger.Debugln("Connecting to the node : " + hostIP)
+
+		go func(sshConfig SSHConfig, cmd string, resultChan chan Result) {
+			rc := Result{sshConfig.HostIP, "", nil}
+
+			output, err := s.Execute(sshConfig, cmd)
+			if err != nil {
+				rc.Error = err
+				rc.Output = output
+				resultChan <- rc
+				return
+			}
+
+			if strings.Contains(strings.ToUpper(strings.TrimSpace(output)), "ERROR") {
+				rc.Error = errors.New(output)
+				rc.Output = output
+				resultChan <- rc
+				return
+			}
+
+			rc.Output = output
+			resultChan <- rc
+		}(sshConfig, cmd, resultChan)
+	}
+
+	var results []Result
+
+	for i := 0; i < len(hostIPs); i++ {
+		result := <-resultChan
+
+		if result.Error != nil {
+			s.logger.Errorf("Remote execution failed on node : %s with error: %v\n", result.HostIP, result.Error)
+		} else {
+			s.logger.Debugf("Remote execution is completed. Output for Host IP %s : \n%s\n", result.HostIP, result.Output)
+		}
+
+		results = append(results, result)
+	}
+	close(resultChan)
+	return results
+}
+
+func (s *SSHUtilImpl) CopyFileToRemote(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool) error {
+	cmd := "scp"
+	args := []string{"-P " + sshConfig.SshPort, "-o StrictHostKeyChecking=no", "-i", sshConfig.SshKeyFile, "-r", srcFilePath, sshConfig.SshUser + "@" + sshConfig.HostIP + ":/tmp/" + destFileName}
+	if err := s.Exec.Run(cmd, command.Args(args...)); err != nil {
+		s.logger.Errorf("Failed to copy file %s to remote with error: %v\n", srcFilePath, err)
+		if srcFilePath == "/usr/bin/chef-automate" {
+			s.logger.Errorln("Please copy your chef-automate binary to /usr/bin")
+		}
+		return err
+	}
+	if removeFile {
+		cmd := "rm"
+		args := []string{"-rf", srcFilePath}
+		if err := s.Exec.Run(cmd, command.Args(args...)); err != nil {
+			s.logger.Errorf("Failed to remove source file with error: %v\n", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *SSHUtilImpl) CopyFileToRemoteConcurrently(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []Result {
+	resultChan := make(chan Result, len(hostIPs))
+
+	for _, hostIP := range hostIPs {
+		sshConfig.HostIP = hostIP
+		s.logger.Debugln("Copying to the node : " + hostIP)
+
+		go func(sshConfig SSHConfig, srcFilePath string, destFileName string, removeFile bool, resultChan chan Result) {
+			rc := Result{sshConfig.HostIP, "", nil}
+
+			err := s.CopyFileToRemote(sshConfig, srcFilePath, destFileName, removeFile)
+			if err != nil {
+				rc.Error = err
+				resultChan <- rc
+				return
+			}
+
+			resultChan <- rc
+		}(sshConfig, srcFilePath, destFileName, removeFile, resultChan)
+	}
+
+	var results []Result
+
+	for i := 0; i < len(hostIPs); i++ {
+		result := <-resultChan
+
+		if result.Error != nil {
+			s.logger.Error("Remote copying failed on node : " + result.HostIP + " with error:\n" + result.Error.Error() + "\n")
+		} else {
+			s.logger.Debugf("Remote copying of file %s is completed on node at %s:/tmp/%s\n", srcFilePath, result.HostIP, destFileName)
+		}
+
+		results = append(results, result)
+	}
+	close(resultChan)
+	return results
 }
 
 func (s *SSHUtilImpl) CreateKnownHosts() error {

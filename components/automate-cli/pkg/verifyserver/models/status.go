@@ -7,9 +7,10 @@ type ServiceDetails struct {
 }
 
 type StatusDetails struct {
-	Status   string            `json:"status"`
-	Services *[]ServiceDetails `json:"services"`
-	Error    string            `json:"error"`
+	Status     string            `json:"status"`
+	Services   *[]ServiceDetails `json:"services"`
+	CliVersion string            `json:"cli_version"`
+	Error      string            `json:"error"`
 }
 
 type StatusApiResponse struct {

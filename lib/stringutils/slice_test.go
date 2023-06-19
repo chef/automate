@@ -110,3 +110,11 @@ func TestSliceIntersection(t *testing.T) {
 	diff := stringutils.SliceIntersection(a, b)
 	assert.Equal(t, []string{"hardware-check"}, diff)
 }
+
+func TestConcatSlice(t *testing.T) {
+	a := []string{"1", "2", "4"}
+	b := []string{"3", "5", "6"}
+	concat := stringutils.ConcatSlice(a, b)
+	assert.Equal(t, []string{"1", "2", "4", "3", "5", "6"}, concat)
+
+}

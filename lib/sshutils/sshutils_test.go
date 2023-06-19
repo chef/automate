@@ -9,26 +9,35 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/sshutils"
 	"golang.org/x/crypto/ssh"
 )
 
 const (
-	testfile        = `./testfiles/ssh`
-	sudoPassword    = "123456"
-	sudoPasswordCmd = `echo 123456 | sudo -S ls -l`
-	dialFailed      = `dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain`
-	nodeIp          = "1.1.1.1"
-	userName        = "ubuntu"
-	port            = "22"
-	timeout         = 150
+	testfile                   = `./testfiles/ssh`
+	sudoPassword               = "123456"
+	sudoPasswordCmd            = `echo 123456 | sudo -S ls -l`
+	dialFailed                 = `dial failed:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain`
+	nodeIp1                    = "1.1.1.1"
+	nodeIp2                    = "1.1.1.2"
+	nodeIp3                    = "1.1.1.3"
+	userName                   = "ubuntu"
+	port                       = "22"
+	timeout                    = 150
+	totalZero                  = "total 0"
+	sessionCreationFailedError = "Session creation failed"
+	srcFilePath                = "/some/file/path"
+	destFileName               = "abc.txt"
+	remoteCopyError            = "error while copying file to remote"
+	outputWithError            = "some error output"
 )
 
 var sshConfig = sshutils.SSHConfig{
 	SshUser:    "ubuntu",
 	SshPort:    "22",
 	SshKeyFile: testfile,
-	HostIP:     "1.1.1.1",
+	HostIP:     nodeIp1,
 	Timeout:    150,
 }
 
@@ -215,14 +224,14 @@ func TestExecute(t *testing.T) {
 						return nil, nil
 					},
 					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
-						return []byte("total 0"), nil
+						return []byte(totalZero), nil
 					},
 					Closefunc: func(s *ssh.Session) error {
 						return nil
 					},
 				},
 			},
-			want:    "total 0",
+			want:    totalZero,
 			wantErr: nil,
 		},
 		{
@@ -270,7 +279,7 @@ func TestExecute(t *testing.T) {
 						return nil
 					},
 					NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
-						return nil, errors.New("Session creation failed")
+						return nil, errors.New(sessionCreationFailedError)
 					},
 					CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
 						return nil, nil
@@ -280,8 +289,8 @@ func TestExecute(t *testing.T) {
 					},
 				},
 			},
-			want:    "Session creation failed",
-			wantErr: errors.New("Session creation failed"),
+			want:    sessionCreationFailedError,
+			wantErr: errors.New(sessionCreationFailedError),
 		},
 		{
 			description: "Combined Output not able to produce the desired output",
@@ -349,6 +358,256 @@ func TestExecute(t *testing.T) {
 			assert.Equal(t, got, tt.want)
 			if gotError != nil {
 				assert.EqualError(t, gotError, tt.wantErr.Error())
+			}
+		})
+	}
+}
+
+func TestExecuteConcurrently(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	sshUtil := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
+
+	tests := []struct {
+		description   string
+		sshConfig     sshutils.SSHConfig
+		cmd           string
+		hostIPs       []string
+		MockSshClient sshutils.ISshClient
+		want          string
+		wantErr       error
+	}{
+		{
+			description: "Execute command concurrently - success",
+			sshConfig:   sshConfig,
+			cmd:         "sudo whoami",
+			hostIPs:     []string{nodeIp1, nodeIp2, nodeIp3},
+			MockSshClient: &sshutils.MockSshClient{
+				Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+					return &ssh.Client{}, nil
+				},
+				ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+					return nil, nil
+				},
+				PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+					return nil
+				},
+				NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+					return nil, nil
+				},
+				CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+					return []byte("root"), nil
+				},
+				Closefunc: func(s *ssh.Session) error {
+					return nil
+				},
+			},
+			want:    "root",
+			wantErr: nil,
+		},
+		{
+			description: "Execute command concurrently - failure",
+			sshConfig:   sshConfig,
+			cmd:         "some command",
+			hostIPs:     []string{nodeIp1, nodeIp2, nodeIp3},
+			MockSshClient: &sshutils.MockSshClient{
+				Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+					return &ssh.Client{}, nil
+				},
+				ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+					return nil, nil
+				},
+				PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+					return nil
+				},
+				NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+					return nil, nil
+				},
+				CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+					return []byte(""), errors.New("error while executing command on the remote host:Process exited with status 1")
+				},
+				Closefunc: func(s *ssh.Session) error {
+					return nil
+				},
+			},
+			want:    "",
+			wantErr: errors.New("error while executing command on the remote host:Process exited with status 1"),
+		},
+		{
+			description: "Execute command concurrently - error in output",
+			sshConfig:   sshConfig,
+			cmd:         "sudo whoami",
+			hostIPs:     []string{nodeIp1, nodeIp2, nodeIp3},
+			MockSshClient: &sshutils.MockSshClient{
+				Dialfunc: func(network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+					return &ssh.Client{}, nil
+				},
+				ParsePrivateKeyfunc: func(pemBytes []byte) (ssh.Signer, error) {
+					return nil, nil
+				},
+				PublicKeyfunc: func(signers ssh.Signer) ssh.AuthMethod {
+					return nil
+				},
+				NewSessionfunc: func(c *ssh.Client) (*ssh.Session, error) {
+					return nil, nil
+				},
+				CombinedOutputfunc: func(cmd string, session *ssh.Session) ([]byte, error) {
+					return []byte(outputWithError), nil
+				},
+				Closefunc: func(s *ssh.Session) error {
+					return nil
+				},
+			},
+			want:    outputWithError,
+			wantErr: errors.New(outputWithError),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			sshUtil.SshClient = tt.MockSshClient
+			results := sshUtil.ExecuteConcurrently(tt.sshConfig, tt.cmd, tt.hostIPs)
+			for _, result := range results {
+				if tt.wantErr != nil {
+					assert.ErrorContains(t, result.Error, tt.wantErr.Error())
+				}
+				assert.Equal(t, result.Output, tt.want)
+			}
+		})
+	}
+
+}
+
+func TestCopyFileToRemote(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	sshUtil := sshutils.NewSSHUtil(&sshutils.SshClient{}, log)
+
+	tests := []struct {
+		description  string
+		sshConfig    sshutils.SSHConfig
+		exec         command.Executor
+		srcFilePath  string
+		destFileName string
+		removeFile   bool
+		wantErr      error
+	}{
+		{
+			description: "copy file to remote - success",
+			sshConfig:   sshConfig,
+			exec: &command.MockExecutorImpl{
+				RunFunc: func(cmd string, opts ...command.Opt) error {
+					return nil
+				},
+			},
+			srcFilePath:  srcFilePath,
+			destFileName: destFileName,
+			removeFile:   false,
+			wantErr:      nil,
+		},
+		{
+			description: "copy file to remote - failure",
+			sshConfig:   sshConfig,
+			exec: &command.MockExecutorImpl{
+				RunFunc: func(cmd string, opts ...command.Opt) error {
+					return errors.New(remoteCopyError)
+				},
+			},
+			srcFilePath:  "/usr/bin/chef-automate",
+			destFileName: destFileName,
+			removeFile:   false,
+			wantErr:      errors.New(remoteCopyError),
+		},
+		{
+			description: "copy file to remote and delete source file - success",
+			sshConfig:   sshConfig,
+			exec: &command.MockExecutorImpl{
+				RunFunc: func(cmd string, opts ...command.Opt) error {
+					return nil
+				},
+			},
+			srcFilePath:  srcFilePath,
+			destFileName: destFileName,
+			removeFile:   true,
+			wantErr:      nil,
+		},
+		{
+			description: "copy file to remote and delete source file - failure",
+			sshConfig:   sshConfig,
+			exec: &command.MockExecutorImpl{
+				RunFunc: func(cmd string, opts ...command.Opt) error {
+					if cmd == "rm" {
+						return errors.New(remoteCopyError)
+					}
+					return nil
+				},
+			},
+			srcFilePath:  srcFilePath,
+			destFileName: destFileName,
+			removeFile:   true,
+			wantErr:      errors.New(remoteCopyError),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			sshUtil.Exec = tt.exec
+			err := sshUtil.CopyFileToRemote(tt.sshConfig, tt.srcFilePath, tt.destFileName, tt.removeFile)
+			assert.Equal(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestCopyFileToRemoteConcurrently(t *testing.T) {
+	log, _ := logger.NewLogger("text", "debug")
+	sshUtil := sshutils.NewSSHUtilWithCommandExecutor(&sshutils.SshClient{}, log, command.NewMockExecutor(t))
+
+	tests := []struct {
+		description  string
+		sshConfig    sshutils.SSHConfig
+		exec         command.Executor
+		srcFilePath  string
+		destFileName string
+		removeFile   bool
+		hostIPs      []string
+		wantErr      error
+	}{
+		{
+			description: "copy file to remote concurrently - success",
+			sshConfig:   sshConfig,
+			exec: &command.MockExecutorImpl{
+				RunFunc: func(cmd string, opts ...command.Opt) error {
+					return nil
+				},
+			},
+			srcFilePath:  srcFilePath,
+			destFileName: destFileName,
+			removeFile:   false,
+			hostIPs:      []string{nodeIp1, nodeIp2, nodeIp3},
+			wantErr:      nil,
+		},
+		{
+			description: "copy file to remote concurrently - failure",
+			sshConfig:   sshConfig,
+			exec: &command.MockExecutorImpl{
+				RunFunc: func(cmd string, opts ...command.Opt) error {
+					return errors.New(remoteCopyError)
+				},
+			},
+			srcFilePath:  srcFilePath,
+			destFileName: destFileName,
+			removeFile:   false,
+			hostIPs:      []string{nodeIp1, nodeIp2, nodeIp3},
+			wantErr:      errors.New(remoteCopyError),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			sshUtil.Exec = tt.exec
+			results := sshUtil.CopyFileToRemoteConcurrently(tt.sshConfig, tt.srcFilePath, tt.destFileName, tt.removeFile, tt.hostIPs)
+			for _, result := range results {
+				if tt.wantErr != nil {
+					assert.ErrorContains(t, result.Error, tt.wantErr.Error())
+				}
 			}
 		})
 	}
@@ -436,9 +695,9 @@ func TestAddHostKey(t *testing.T) {
 		{
 			description: "If the Adding host key was successfully done",
 			args: args{
-				host: nodeIp,
+				host: nodeIp1,
 				remote: &netAddressTest{
-					Address: nodeIp,
+					Address: nodeIp1,
 				},
 				pubkey: &sshPublicKeyTest{
 					key:  "",
@@ -484,9 +743,9 @@ func TestHostCallKeyBack(t *testing.T) {
 		{
 			description: "Client Config creation is a success",
 			args: args{
-				host: nodeIp,
+				host: nodeIp1,
 				remote: &netAddressTest{
-					Address: nodeIp,
+					Address: nodeIp1,
 				},
 				pubkey: &sshPublicKeyTest{
 					key:  "",
@@ -523,7 +782,7 @@ func TestNewSshConfigWithTimeout(t *testing.T) {
 		timeout  int
 	}
 	var arg args = args{
-		ip:       nodeIp,
+		ip:       nodeIp1,
 		port:     port,
 		keyfile:  testfile,
 		userName: userName,
@@ -533,7 +792,7 @@ func TestNewSshConfigWithTimeout(t *testing.T) {
 		SshUser:    "ubuntu",
 		SshPort:    "22",
 		SshKeyFile: testfile,
-		HostIP:     "1.1.1.1",
+		HostIP:     nodeIp1,
 		Timeout:    150,
 	}
 	response := sshutils.NewSshConfigWithTimeout(arg.ip, arg.port, arg.keyfile, arg.userName, arg.timeout)
@@ -548,7 +807,7 @@ func TestNewSshConfig(t *testing.T) {
 		userName string
 	}
 	var arg args = args{
-		ip:       nodeIp,
+		ip:       nodeIp1,
 		port:     port,
 		keyfile:  testfile,
 		userName: userName,
@@ -557,7 +816,7 @@ func TestNewSshConfig(t *testing.T) {
 		SshUser:    "ubuntu",
 		SshPort:    "22",
 		SshKeyFile: testfile,
-		HostIP:     "1.1.1.1",
+		HostIP:     nodeIp1,
 	}
 	response := sshutils.NewSshConfig(arg.ip, arg.port, arg.keyfile, arg.userName)
 	assert.Equal(t, response, want)

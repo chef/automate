@@ -40,7 +40,7 @@ type systemdInput struct {
 	ServiceCommand     string
 }
 
-type CreateSystemdService struct {
+type CreateSystemdServiceImpl struct {
 	SystemdCreateUtils      SystemdCreateUtils
 	BinaryDestinationFolder string
 	SystemdLocation         string
@@ -49,12 +49,23 @@ type CreateSystemdService struct {
 	Writer                  *cli.Writer
 }
 
+type CreateSystemdService interface {
+	Create() error
+}
+type MockCreateSystemdService struct {
+	CreateFun func() error
+}
+
+func (m *MockCreateSystemdService) Create() error {
+	return m.CreateFun()
+}
+
 func NewCreateSystemdService(
 	systemdCreateUtils SystemdCreateUtils,
 	binaryDestinationFolder string,
 	systemdLocation string,
 	debug bool,
-	writer *cli.Writer) (*CreateSystemdService, error) {
+	writer *cli.Writer) (CreateSystemdService, error) {
 	level := INFO_LEVEL
 	if debug {
 		level = DEBUG_LEVEL
@@ -75,7 +86,7 @@ func NewCreateSystemdService(
 	if systemdLocation == "" {
 		return nil, errors.New("Systemd location cannot be empty")
 	}
-	return &CreateSystemdService{
+	return &CreateSystemdServiceImpl{
 		SystemdCreateUtils:      systemdCreateUtils,
 		BinaryDestinationFolder: binaryDestinationFolder,
 		SystemdLocation:         systemdLocation,
@@ -85,7 +96,7 @@ func NewCreateSystemdService(
 }
 
 // Create the systemd service file.
-func (css *CreateSystemdService) createSystemdServiceFile() error {
+func (css *CreateSystemdServiceImpl) createSystemdServiceFile() error {
 	// Create the template.
 	tmpl, err := template.New(TEMPLATE_NAME).Parse(TEMPLATE_TEXT)
 	if err != nil {
@@ -121,8 +132,24 @@ func (css *CreateSystemdService) createSystemdServiceFile() error {
 	return nil
 }
 
+// Check if status is active and then stop the service.
+func (css *CreateSystemdServiceImpl) stopIfSystemdServiceIsActive() error {
+	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
+	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"status", service})
+	if err == nil {
+		css.Logger.Debugln("Status of service is active")
+		err = css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"stop", service})
+		if err != nil {
+			return errors.Wrap(err, "Error stopping service")
+		}
+		css.Logger.Debugln("Stopped the service successfully")
+	}
+	css.Logger.Debugln("Checked status of service successfully")
+	return nil
+}
+
 // Enable and start the systemd service.
-func (css *CreateSystemdService) enableSystemdService() error {
+func (css *CreateSystemdServiceImpl) enableSystemdService() error {
 	service := fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)
 	err := css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"daemon-reload"})
 	if err != nil {
@@ -142,12 +169,13 @@ func (css *CreateSystemdService) enableSystemdService() error {
 	return nil
 }
 
-func (css *CreateSystemdService) isSystemdEnabled() error {
+func (css *CreateSystemdServiceImpl) isSystemdEnabled() error {
 	return css.SystemdCreateUtils.ExecuteShellCommand("systemctl", []string{"is-enabled", fmt.Sprintf(SYSTEMD_FILE, SERVICE_NAME)})
 }
 
-// Create and start the systemd service.
-func (css *CreateSystemdService) Create() error {
+// Create and start the systemd service for automate-verify if not exist.
+// Else replace the existing service and restart it.
+func (css *CreateSystemdServiceImpl) Create() error {
 
 	currentBinaryPath, err := css.SystemdCreateUtils.GetBinaryPath()
 	css.Logger.Debugf("Current binary path %s", currentBinaryPath)
@@ -160,9 +188,17 @@ func (css *CreateSystemdService) Create() error {
 	}
 	css.Logger.Debugln("Systemd is found on this system")
 
+	//If service is already running, stop it and then create it again.
 	err = css.isSystemdEnabled()
 	if err == nil {
-		return errors.New(fmt.Sprintf("Service %[1]v already exists on this node, use systemctl start/stop/status %[1]v", SERVICE_NAME))
+		err = css.stopIfSystemdServiceIsActive()
+		if err != nil {
+			return err
+		}
+		err = css.enableSystemdService()
+		if err != nil {
+			return err
+		}
 	}
 	css.Logger.Debugf("Service %s is not running on this system", SERVICE_NAME)
 
@@ -173,9 +209,14 @@ func (css *CreateSystemdService) Create() error {
 		return err
 	}
 
-	css.Writer.Printf("Binary copied to %s\n", fullBinaryDestination)
+	css.Logger.Debugf("Binary copied from %s to %s\n", currentBinaryPath, fullBinaryDestination)
 
 	err = css.createSystemdServiceFile()
+	if err != nil {
+		return err
+	}
+
+	err = css.stopIfSystemdServiceIsActive()
 	if err != nil {
 		return err
 	}
