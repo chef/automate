@@ -400,7 +400,9 @@ document "test_if_login_working_with_correct_credentials" <<DOC
   login call returns 200 if creds are correct
 DOC
 test_if_login_working_with_correct_credentials() {
-  local url='https://a2-dev.test/id/auth/chef/callback'
+  bootstrap_chef_user_data || return 1
+
+  local url="https://${chef_server_hostname}/id/auth/chef/callback"
   local username='admin@test.com'
   local password='S3cur3!'
 
