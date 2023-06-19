@@ -4,9 +4,11 @@ package main
 
 import (
 	"container/list"
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,6 +72,30 @@ func Test_getChefAutomateVersion(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
+	})
+	t.Run("Error", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{}, errors.Errorf("Error sample")
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		automateIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getChefAutomateVersion(automateIps, infra, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Empty(t, versionMap)
 	})
 }
 
@@ -163,14 +189,38 @@ func Test_getInfraServerVersion(t *testing.T) {
 				}
 			},
 		}
-		automateIps := []string{TEST_IP_1}
+		csIps := []string{TEST_IP_1}
 		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
 
-		versionMap, err := getInfraServerVersion(automateIps, infra, mockCmdExecutor)
+		versionMap, err := getInfraServerVersion(csIps, infra, mockCmdExecutor)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
 		assert.Equal(t, "15.4.0", versionMap[TEST_IP_1])
+	})
+	t.Run("Success", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{}, errors.Errorf("Error sample")
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		csIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getInfraServerVersion(csIps, infra, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Empty(t, versionMap)
 	})
 }
 
@@ -204,14 +254,98 @@ func Test_getOpensearchVersion(t *testing.T) {
 				}
 			},
 		}
-		automateIps := []string{TEST_IP_1}
+		osIps := []string{TEST_IP_1}
 		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
 
-		versionMap, err := getOpensearchVersion(automateIps, infra, false, mockCmdExecutor)
+		versionMap, err := getOpensearchVersion(osIps, infra, false, mockCmdExecutor)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
 		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1])
+	})
+	t.Run("Error Chef Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{}, errors.Errorf("Error sample")
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		osIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getOpensearchVersion(osIps, infra, false, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Empty(t, versionMap)
+	})
+	t.Run("Success Self Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{
+					TEST_IP_1: {
+						{
+							ScriptName:  "",
+							HostIP:      TEST_IP_1,
+							OutputFiles: []string{},
+							Output:      `% Total % Received % Xferd Average Speed Time Time Time Current Dload Upload Total Spent Left Speed 100 565 100 565 0 0 551k 0 --:--:-- --:--:-- --:--:-- 551k { "name" : "ip-10-0-0-76", "cluster_name" : "opensearch", "cluster_uuid" : "3t-WAhYoTVa5F6-vcGbRTw", "version" : { "distribution" : "opensearch", "number" : "1.3.7", "build_type" : "tar", "build_hash" : "db18a0d5a08b669fb900c00d81462e221f4438ee", "build_date" : "2022-12-07T22:59:20.186520Z", "build_snapshot" : false, "lucene_version" : "8.10.1", "minimum_wire_compatibility_version" : "6.8.0", "minimum_index_compatibility_version" : "6.0.0-beta1" }, "tagline" : "The OpenSearch Project: https://opensearch.org/" }`,
+							Error:       nil,
+						},
+					},
+				}, nil
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		osIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+		infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+		versionMap, err := getOpensearchVersion(osIps, infra, true, mockCmdExecutor)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, versionMap)
+		assert.Contains(t, versionMap, TEST_IP_1)
+		assert.Equal(t, "1.3.7", versionMap[TEST_IP_1])
+	})
+	t.Run("Error Self Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{}, errors.Errorf("Error sample")
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		osIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+		infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+		versionMap, err := getOpensearchVersion(osIps, infra, true, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Empty(t, versionMap)
 	})
 }
 
@@ -247,15 +381,78 @@ func Test_getPostgresqlVersion(t *testing.T) {
 				}
 			},
 		}
-		automateIps := []string{TEST_IP_1}
+		pgIps := []string{TEST_IP_1}
 		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
 
-		versionMap, err := getPostgresqlVersion(automateIps, infra, false, mockCmdExecutor)
+		versionMap, err := getPostgresqlVersion(pgIps, infra, false, mockCmdExecutor)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, versionMap)
 		assert.Contains(t, versionMap, TEST_IP_1)
 		assert.Equal(t, "13.5.0", versionMap[TEST_IP_1])
 	})
+	t.Run("Error Chef Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{}, errors.Errorf("Error sample")
+
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		pgIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		versionMap, err := getPostgresqlVersion(pgIps, infra, false, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Empty(t, versionMap)
+	})
+	t.Run("Error Self Managed", func(t *testing.T) {
+		mockCmdExecutor := &MockRemoteCmdExecutor{
+			ExecuteFunc: func() (map[string][]*CmdResult, error) {
+				return nil, nil
+			},
+			ExecuteWithNodeMapFunc: func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
+				//return dummy result
+				return map[string][]*CmdResult{
+					TEST_IP_1: {
+						{
+							ScriptName:  "",
+							HostIP:      TEST_IP_1,
+							OutputFiles: []string{},
+							Output:      `PostgreSQL 13.5 on x86_64-pc-linux-gnu, compiled by gcc.real (GCC) 9.4.0, 64-bit`,
+							Error:       nil,
+						},
+					},
+				}, nil
+			},
+			GetSshUtilFunc: func() SSHUtil {
+				return &MockSSHUtilsImpl{
+					connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+						return "", nil
+					},
+				}
+			},
+		}
+		pgIps := []string{TEST_IP_1}
+		infra := &AutomateHAInfraDetails{} // Replace with appropriate initialization
+
+		infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+
+		versionMap, err := getPostgresqlVersion(pgIps, infra, true, mockCmdExecutor)
+		assert.Error(t, err)
+		assert.Equal(t, "Couldn't get Super user password and name from config", err.Error())
+		assert.Empty(t, versionMap)
+	})
+
 }
 
 func Test_splitIP(t *testing.T) {
@@ -302,16 +499,52 @@ func Test_getIPAddressesFromFlagOrInfra(t *testing.T) {
 	assert.Equal(t, postgresqlIps, []string{ValidIP7, ValidIP8, ValidIP9})
 }
 
+func Test_getIPAddressesFromFlag(t *testing.T) {
+
+	infra := &AutomateHAInfraDetails{}
+	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+
+	VersionCommandFlags.isAutomate = true
+	VersionCommandFlags.isOpenSearch = true
+	VersionCommandFlags.isPostgresql = true
+	VersionCommandFlags.node = fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8)
+
+	automateIps, chefServerIps, opensearchIps, postgresqlIps, _ := getIPAddressesFromFlagOrInfra(infra)
+	assert.Equal(t, automateIps, []string{ValidIP})
+	assert.Equal(t, opensearchIps, []string{ValidIP5})
+	assert.Equal(t, postgresqlIps, []string{ValidIP8})
+	assert.Empty(t, chefServerIps)
+}
+
 func Test_getPgAuth(t *testing.T) {
+	t.Run("Valid config", func(t *testing.T) {
+		sshUtil := GetMockSSHUtil(&SSHConfig{}, nil, configShow, nil, "", nil)
 
-	sshUtil := GetMockSSHUtil(&SSHConfig{}, nil, configShow, nil, "", nil)
+		su, sp := getPgAuth(sshUtil)
 
-	su, sp := getPgAuth(sshUtil)
+		assert.NotEmpty(t, su)
+		assert.NotEmpty(t, sp)
+		assert.Equal(t, "admin", su)
+		assert.Equal(t, "admin", sp)
+	})
+	t.Run("InValid config", func(t *testing.T) {
+		sshUtil := GetMockSSHUtil(&SSHConfig{}, nil, "Invalid", nil, "", nil)
 
-	assert.NotEmpty(t, su)
-	assert.NotEmpty(t, sp)
-	assert.Equal(t, "admin", su)
-	assert.Equal(t, "admin", sp)
+		su, sp := getPgAuth(sshUtil)
+
+		assert.Empty(t, su)
+		assert.Empty(t, sp)
+	})
+	t.Run("Error config", func(t *testing.T) {
+		sshUtil := GetMockSSHUtil(&SSHConfig{}, nil, "", errors.Errorf("remote execution"), "", nil)
+
+		su, sp := getPgAuth(sshUtil)
+
+		assert.Empty(t, su)
+		assert.Empty(t, sp)
+	})
 
 }
 

@@ -539,13 +539,20 @@ func getPgAuth(sshUtil SSHUtil) (string, string) {
 		logrus.Error("Error in config show", err)
 		return "", ""
 	}
-	config, _ := toml.Load(output)
+	config, err := toml.Load(output)
+	if err != nil {
+		logrus.Error("Error in parsing config", err)
+		return "", ""
+	}
 	// retrieve data directly
 	superUser := config.Get("global.v1.external.postgresql.auth.password.superuser").(*toml.Tree)
-	userName := superUser.Get("username").(string)
-	password := superUser.Get("password").(string)
+	if superUser != nil {
+		userName := superUser.Get("username").(string)
+		password := superUser.Get("password").(string)
+		return userName, password
+	}
 
-	return userName, password
+	return "", ""
 }
 
 func filterPackage(services *[]models.ServiceDetails, packageName string) *models.ServiceDetails {
