@@ -249,13 +249,13 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 
 	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
 
-	resBastion, err := v.runVerifyServiceForBastion(*batchCheckConfig)
+	resBastion, err := v.runVerifyServiceForBastion(batchCheckConfig)
 	if err != nil {
 		return err
 	}
 	v.Writer.Printf("Response for batch-check API on bastion: \n%s\n", string(resBastion))
 
-	resRemote, err := v.runVerifyServiceForRemote(*batchCheckConfig)
+	resRemote, err := v.runVerifyServiceForRemote(batchCheckConfig)
 	if err != nil {
 		return err
 	}
@@ -265,7 +265,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 }
 
 // Runs automate-verify service on bastion
-func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Config) ([]byte, error) {
+func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig *models.Config) ([]byte, error) {
 	v.Writer.Println("Checking automate-verify service on bastion")
 
 	//Call status API to check if automate-verify service is running on bastion
@@ -320,7 +320,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 }
 
 // Runs automate-verify service on remote nodes
-func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config) ([]byte, error) {
+func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig *models.Config) ([]byte, error) {
 
 	// TODO: Need to check if automate-verify service is already running on remote nodes and upgrade if needed.
 	var port, keyFile, userName string
