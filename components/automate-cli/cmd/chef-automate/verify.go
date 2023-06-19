@@ -229,7 +229,6 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 
 func (v *verifyCmdFlow) RunVerify(config string) error {
 	var configPath string
-
 	// TODO : config flag is optional for now. Need to handle the default config path
 	if len(strings.TrimSpace(config)) > 0 {
 		configPath = config
@@ -241,7 +240,14 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	}
 
 	// Get config required for batch-check API call
-	batchCheckConfig := &models.Config{}
+	batchCheckConfig := &models.Config{
+		Hardware: &models.Hardware{},
+		SSHUser:  &models.SSHUser{},
+		Backup: &models.Backup{
+			FileSystem:    &models.FileSystem{},
+			ObjectStorage: &models.ObjectStorage{},
+		},
+	}
 	err = batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {
 		return err
@@ -249,13 +255,13 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 
 	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
 
-	resBastion, err := v.runVerifyServiceForBastion(batchCheckConfig)
+	resBastion, err := v.runVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
 	v.Writer.Printf("Response for batch-check API on bastion: \n%s\n", string(resBastion))
 
-	resRemote, err := v.runVerifyServiceForRemote(batchCheckConfig)
+	resRemote, err := v.runVerifyServiceForRemote(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
@@ -265,7 +271,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 }
 
 // Runs automate-verify service on bastion
-func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig *models.Config) ([]byte, error) {
+func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Config) ([]byte, error) {
 	v.Writer.Println("Checking automate-verify service on bastion")
 
 	//Call status API to check if automate-verify service is running on bastion
@@ -313,14 +319,14 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig *models.Conf
 	// Doing batch-check API call for bastion
 	batchCheckBastionReq := models.BatchCheckRequest{
 		Checks: constants.GetBastionChecks(),
-		Config: batchCheckConfig,
+		Config: &batchCheckConfig,
 	}
 
 	return v.makeBatchCheckAPICall(batchCheckBastionReq, BASTION)
 }
 
 // Runs automate-verify service on remote nodes
-func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig *models.Config) ([]byte, error) {
+func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config) ([]byte, error) {
 
 	// TODO: Need to check if automate-verify service is already running on remote nodes and upgrade if needed.
 	var port, keyFile, userName string
@@ -357,7 +363,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig *models.Confi
 	// Doing batch-check API call for remote nodes
 	batchCheckRemoteReq := models.BatchCheckRequest{
 		Checks: constants.GetRemoteChecks(),
-		Config: batchCheckConfig,
+		Config: &batchCheckConfig,
 	}
 	return v.makeBatchCheckAPICall(batchCheckRemoteReq, REMOTE_NODES)
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/chef/automate/lib/config"
@@ -135,11 +136,13 @@ func createMapforCertByIp(certsByIP *[]config.CertByIP) map[string]*config.CertB
 }
 
 func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
+	if haConfig == nil {
+		return nil
+	}
 	err := haConfig.Verify()
 	if err != nil {
 		return err
 	}
-
 	if err = c.populateCommonConfig(haConfig); err != nil {
 		return err
 	}
@@ -193,7 +196,7 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 	if haConfig == nil {
 		return errors.New("haConfig is nil")
 	}
-
+	fmt.Printf("haConfig.Automate.Config.InstanceCount: %v\n", haConfig.Automate.Config.InstanceCount)
 	c.Hardware.AutomateNodeCount, err = strconv.Atoi(haConfig.Automate.Config.InstanceCount)
 	if err != nil {
 		return err
