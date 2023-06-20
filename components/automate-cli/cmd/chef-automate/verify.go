@@ -449,9 +449,37 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		if err != nil {
 			return nil, err
 		}
-	}
+	} else {
+		if v.Config.IsAws() {
+			port, keyFile, userName = v.getSSHConfig(v.Config.Architecture.Aws)
+			configDetails, err := fetchAwsConfigFromTerraform()
+			if err != nil {
+				return nil, err
+			}
+			hostIPs = v.getHostIPs(
+				configDetails.AutomateIps,
+				configDetails.ChefServerIps,
+				configDetails.PostgresqlIps,
+				configDetails.OpensearchIps,
+			)
 
-	//TODO: Need to handle the case for AWS
+			sshConfig := sshutils.NewSshConfig("", port, keyFile, userName)
+
+			destFileName := "chef-automate"
+
+			// Copying CLI binary to remote nodes
+			err = v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPs)
+			if err != nil {
+				return nil, err
+			}
+
+			// Starting automate-verify service on remote nodes
+			err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	// Doing batch-check API call for remote nodes
 	batchCheckRemoteReq := models.BatchCheckRequest{
