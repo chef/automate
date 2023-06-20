@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -26,6 +27,11 @@ os_snapshot_user_access_key_id = " "
 os_snapshot_user_access_key_secret = " "`
 
 func Test_fetchAwsConfigFromTerraform(t *testing.T) {
+	// In mac we can't create directory at root level, but for this test we need directory at root level.
+	// So we are omitting the test in case of Mac OS.
+	if runtime.GOOS == "darwin" {
+		return
+	}
 	params := new(configDetails)
 	err := json.Unmarshal([]byte(AwsAutoTfvarsJsonString), &params)
 	assert.NoError(t, err)
