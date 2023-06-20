@@ -346,7 +346,7 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -412,7 +412,7 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -458,7 +458,7 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -526,7 +526,7 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -592,7 +592,7 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -656,7 +656,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -696,7 +696,7 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -785,7 +785,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			return &cfg, nil
 		},
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -863,7 +863,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -941,7 +941,7 @@ func TestRemovenodeExecuteWithProvisionError(t *testing.T) {
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {

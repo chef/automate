@@ -250,16 +250,16 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 
 func (nu *NodeUtilsImpl) saveConfigToBastion() error {
 	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
 }
 
 func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
 	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
-	return executeCmdInAllNodeAndCaptureOutput(nodeObjects, false, "", nu)
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu)
 }
 
 // Execute custom command in one node of all the each node-type
-func executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
+func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
 	for _, nodeObject := range nodeObjects {
 		outFiles := nodeObject.OutputFile
 		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)

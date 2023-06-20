@@ -512,7 +512,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
-			executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 				return nil
 			},
 			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -638,7 +638,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			calculateTotalInstanceCountFunc: func() (int, error) {
 				return 0, nil
 			},
-			executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 				return nil
 			},
 			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -723,7 +723,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -828,7 +828,6 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 			return nil
 		},
 		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
-			// filewritten = true
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -845,7 +844,6 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 			return nil
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
-			// ipAddres = true
 			return &AWSConfigIp{
 				configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
 				configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
@@ -854,18 +852,15 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 			}, nil
 		},
 		executeShellCommandFunc: func() error {
-			// executeCommands = true
 			return nil
 		},
 		moveAWSAutoTfvarsFileFunc: func(path string) error {
-			// autoFileMoved = true
 			return nil
 		},
 		modifyTfArchFileFunc: func(path string) error {
-			// tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {

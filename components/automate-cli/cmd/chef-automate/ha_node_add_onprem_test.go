@@ -394,7 +394,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -455,7 +455,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		isManagedServicesOnFunc: func() bool {
 			return false
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -535,7 +535,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 			cfg.Opensearch.Config.CertsByIP = []CertByIP{}
 			return &cfg, nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -603,7 +603,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 			return false
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -706,7 +706,6 @@ func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 			return nil
 		},
 		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
-			// filewritten = true
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -723,7 +722,6 @@ func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 			return nil
 		},
 		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
-			// ipAddres = true
 			return &AWSConfigIp{
 				configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
 				configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
@@ -732,18 +730,15 @@ func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 			}, nil
 		},
 		executeShellCommandFunc: func() error {
-			// executeCommands = true
 			return nil
 		},
 		moveAWSAutoTfvarsFileFunc: func(path string) error {
-			// autoFileMoved = true
 			return nil
 		},
 		modifyTfArchFileFunc: func(path string) error {
-			// tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {

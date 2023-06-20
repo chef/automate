@@ -185,7 +185,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -285,7 +285,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -361,7 +361,7 @@ func TestAddnodeWithSaveConfigToBasionErr(t *testing.T) {
 			tfArchModified = false
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -424,7 +424,7 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -492,7 +492,7 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -557,7 +557,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 			tfArchModified = true
 			return nil
 		},
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {

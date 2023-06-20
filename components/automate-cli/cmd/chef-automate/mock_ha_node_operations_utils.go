@@ -1,33 +1,33 @@
 package main
 
 type MockNodeUtilsImpl struct {
-	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
-	getHaInfraDetailsfunc                     func() (*AutomateHAInfraDetails, *SSHConfig, error)
-	writeHAConfigFilesFunc                    func(templateName string, data interface{}) error
-	taintTerraformFunc                        func(path string) error
-	isA2HARBFileExistFunc                     func() bool
-	getModeFromConfigFunc                     func(path string) (string, error)
-	checkIfFileExistFunc                      func(path string) bool
-	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAwsFunc                func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
-	isManagedServicesOnFunc                   func() bool
-	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
-	getModeOfDeploymentFunc                   func() string
-	executeShellCommandFunc                   func() error
-	moveAWSAutoTfvarsFileFunc                 func(path string) error
-	modifyTfArchFileFunc                      func(path string) error
-	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
-	stopServicesOnNodeFunc                    func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
-	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
-	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	calculateTotalInstanceCountFunc           func() (int, error)
-	parseAndMoveConfigFileToWorkspaceDirFunc  func(outputFiles []string, outputDirectory string) error
-	executeCmdInAllNodesAndCaptureOutputFunc  func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
-	executeCustomCmdOnEachNodeTypeFunc        func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
-	saveConfigToBastionFunc                   func() error
-	syncConfigToAllNodesFunc                  func() error
+	executeAutomateClusterCtlCommandAsyncfunc    func(command string, args []string, helpDocs string) error
+	getHaInfraDetailsfunc                        func() (*AutomateHAInfraDetails, *SSHConfig, error)
+	writeHAConfigFilesFunc                       func(templateName string, data interface{}) error
+	taintTerraformFunc                           func(path string) error
+	isA2HARBFileExistFunc                        func() bool
+	getModeFromConfigFunc                        func(path string) (string, error)
+	checkIfFileExistFunc                         func(path string) bool
+	pullAndUpdateConfigFunc                      func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
+	pullAndUpdateConfigAwsFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
+	isManagedServicesOnFunc                      func() bool
+	getConfigPullerFunc                          func(sshUtil *SSHUtil) (PullConfigs, error)
+	getInfraConfigFunc                           func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
+	getAWSConfigFunc                             func(sshUtil *SSHUtil) (*AwsConfigToml, error)
+	getModeOfDeploymentFunc                      func() string
+	executeShellCommandFunc                      func() error
+	moveAWSAutoTfvarsFileFunc                    func(path string) error
+	modifyTfArchFileFunc                         func(path string) error
+	getAWSConfigIpFunc                           func() (*AWSConfigIp, error)
+	stopServicesOnNodeFunc                       func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
+	excludeOpenSearchNodeFunc                    func(ipToDelete string, infra *AutomateHAInfraDetails) error
+	checkExistingExcludedOSNodesFunc             func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
+	calculateTotalInstanceCountFunc              func() (int, error)
+	parseAndMoveConfigFileToWorkspaceDirFunc     func(outputFiles []string, outputDirectory string) error
+	executeCmdInAllNodeTypesAndCaptureOutputFunc func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
+	executeCustomCmdOnEachNodeTypeFunc           func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	saveConfigToBastionFunc                      func() error
+	syncConfigToAllNodesFunc                     func() error
 }
 
 func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
@@ -103,8 +103,8 @@ func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outputFiles [
 	return mnu.parseAndMoveConfigFileToWorkspaceDirFunc(outputFiles, outputDirectory)
 }
 
-func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
-	return mnu.executeCmdInAllNodesAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
+func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+	return mnu.executeCmdInAllNodeTypesAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
 }
 
 func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {

@@ -270,7 +270,7 @@ func TestSaveConfigToBastion(t *testing.T) {
 			return &cfg, nil
 		},
 
-		executeCmdInAllNodesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
 		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
@@ -659,7 +659,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.NoError(t, err)
 	})
 
@@ -680,7 +680,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.Error(t, err, "error parsing output file")
 	})
 
@@ -707,7 +707,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -736,7 +736,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		}
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -765,7 +765,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		}
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.Error(t, err, "No ips found")
 	})
 
@@ -792,7 +792,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 		nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
 		singleNode := true
 		outputDirectory := ""
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.Error(t, err, "No ips found")
 	})
 }
@@ -816,7 +816,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutputToSaveConfigInBastionBeforeNodeModif
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.NoError(t, err)
 	})
 
@@ -837,7 +837,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutputToSaveConfigInBastionBeforeNodeModif
 		singleNode := true
 		outputDirectory := ""
 
-		err := executeCmdInAllNodeAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
+		err := executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, singleNode, outputDirectory, mnu)
 		assert.Error(t, err, "error parsing output file")
 	})
 }
