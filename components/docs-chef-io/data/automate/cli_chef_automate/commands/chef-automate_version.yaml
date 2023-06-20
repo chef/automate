@@ -14,7 +14,8 @@ options:
   default_value: "false"
   usage: help for version
 - name: node
-  usage: Node Ip address
+  usage: |
+    Node Ip address. While using this flag, pass the node type as well. Example : chef-automate version --node 192.0.0.1 --cs
   compatible_with_options: AutomateHA
 - name: os
   default_value: "false"
