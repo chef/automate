@@ -2,7 +2,6 @@ package v1_test
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http/httptest"
 	"strings"

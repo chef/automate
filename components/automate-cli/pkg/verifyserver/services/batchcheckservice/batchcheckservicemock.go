@@ -86,7 +86,7 @@ func SetupMockCertificateCheck() trigger.ICheck {
 					Host:     "1.2.3.4",
 					NodeType: "automate",
 					Result: models.ApiResult{
-						Passed:  false,
+						Passed:  true,
 						Check:   constants.CERTIFICATE,
 						Message: "certificate-check",
 						Checks: []models.Checks{
