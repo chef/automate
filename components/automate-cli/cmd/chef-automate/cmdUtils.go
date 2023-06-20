@@ -68,7 +68,7 @@ type MockRemoteCmdExecutor struct {
 	ExecuteFunc            func() (map[string][]*CmdResult, error)
 	ExecuteWithNodeMapFunc func(nodeMap *NodeTypeAndCmd) (map[string][]*CmdResult, error)
 	GetSshUtilFunc         func() SSHUtil
-	SetWriterFunc func(cli *cli.Writer)
+	SetWriterFunc          func(cli *cli.Writer)
 }
 
 func (m *MockRemoteCmdExecutor) Execute() (map[string][]*CmdResult, error) {

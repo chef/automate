@@ -19,7 +19,7 @@ const (
 	RESTART_FRONTEND_COMMAND    = `sudo chef-automate restart-services`
 	RESTART_BACKEND_COMMAND     = `sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup`
 	DEFAULT_TIMEOUT_FOR_RESTART = 1200
-	ERROR_ON_MANAGED_SERVICES   = "Restart for externally configured services are not supported."
+	ERROR_ON_MANAGED_SERVICES   = "Restart for externally configured %s is not supported."
 	CMD_FAILED_MSG              = "Command failed on %s node : %s with error:\n %s\n"
 )
 
@@ -123,73 +123,73 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu Node
 		}
 		flags.automate = true
 		flags.chefServer = true
-		if !isManagedServicesOn() {
+		if !nu.isManagedServicesOn() {
 			flags.opensearch = true
 			flags.postgresql = true
 		}
 	}
-	errChan := make(chan restartCmdResult, 4)
-	runRestartCmdForFrontEnd(infra, flags, rs, errChan)
+	restartCmdResults := make(chan restartCmdResult, 4)
+	runRestartCmdForFrontEnd(infra, flags, rs, restartCmdResults)
 
 	if nu.isManagedServicesOn() {
-		errChan <- restartCmdResult{}
-		errChan <- restartCmdResult{}
-		err = getChannelValue(errChan, printRestartOutput)
+		restartCmdResults <- restartCmdResult{}
+		restartCmdResults <- restartCmdResult{}
+		err = getChannelValue(restartCmdResults, printRestartOutput)
 		if err != nil {
 			return err
 		}
 		return handleManagedServices(flags)
 	}
 
-	runRestartCmdForBackend(infra, flags, rs, errChan)
+	runRestartCmdForBackend(infra, flags, rs, restartCmdResults)
 
-	return getChannelValue(errChan, printRestartOutput)
+	return getChannelValue(restartCmdResults, printRestartOutput)
 }
 
-func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, errChan chan restartCmdResult) {
+func runRestartCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {
 	if flags.automate {
-		restartOnGivenNode(flags, AUTOMATE, infra, rs, errChan)
+		restartOnGivenNode(flags, AUTOMATE, infra, rs, restartCmdResults)
 	} else {
-		errChan <- restartCmdResult{}
+		restartCmdResults <- restartCmdResult{}
 	}
 
 	if flags.chefServer {
 		flags.automate = false
-		restartOnGivenNode(flags, CHEF_SERVER, infra, rs, errChan)
+		restartOnGivenNode(flags, CHEF_SERVER, infra, rs, restartCmdResults)
 	} else {
-		errChan <- restartCmdResult{}
+		restartCmdResults <- restartCmdResult{}
 	}
 }
 
-func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, errChan chan restartCmdResult) {
+func runRestartCmdForBackend(infra *AutomateHAInfraDetails, flags *RestartCmdFlags, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {
 	flags.automate = false
 	flags.chefServer = false
 	if flags.postgresql {
-		restartOnGivenNode(flags, POSTGRESQL, infra, rs, errChan)
+		restartOnGivenNode(flags, POSTGRESQL, infra, rs, restartCmdResults)
 	} else {
-		errChan <- restartCmdResult{}
+		restartCmdResults <- restartCmdResult{}
 	}
 	if flags.opensearch {
 		flags.postgresql = false
-		restartOnGivenNode(flags, OPENSEARCH, infra, rs, errChan)
+		restartOnGivenNode(flags, OPENSEARCH, infra, rs, restartCmdResults)
 	} else {
-		errChan <- restartCmdResult{}
+		restartCmdResults <- restartCmdResult{}
 	}
 }
 
-func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs RemoteCmdExecutor, resultErrChan chan restartCmdResult) {
-	go func(flags RestartCmdFlags, resultErrChan chan<- restartCmdResult) {
+func restartOnGivenNode(flags *RestartCmdFlags, nodeType string, infra *AutomateHAInfraDetails, rs RemoteCmdExecutor, restartCmdResults chan restartCmdResult) {
+	go func(flags RestartCmdFlags, restartCmdResults chan<- restartCmdResult) {
 		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 		rs.SetWriter(writer)
 		nodeMap := constructNodeMapForAllNodeTypes(&flags, infra)
 		cmdResult, err := rs.ExecuteWithNodeMap(nodeMap)
-		resultErrChan <- restartCmdResult{
+		restartCmdResults <- restartCmdResult{
 			cmdResult: cmdResult,
 			writer:    writer,
 			nodeType:  nodeType,
 			err:       err,
 		}
-	}(*flags, resultErrChan)
+	}(*flags, restartCmdResults)
 }
 
 func printRestartOutput(cmdResult map[string][]*CmdResult, remoteService string, writer *cli.Writer) {
@@ -234,11 +234,14 @@ func getChannelValue(restartCmdResults chan restartCmdResult, printRestartOutput
 }
 
 func handleManagedServices(flags *RestartCmdFlags) error {
+	if flags.postgresql && flags.opensearch {
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, "postgresql and opensearch")
+	}
 	if flags.postgresql {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES)
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL)
 	}
 	if flags.opensearch {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES)
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH)
 	}
 	return nil
 }

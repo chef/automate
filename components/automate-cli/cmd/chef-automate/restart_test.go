@@ -34,6 +34,7 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						ErrorCheckEnableInOutput: true,
 						NodeIps:                  []string{""},
 						NodeType:                 true,
+						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -43,6 +44,7 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						ErrorCheckEnableInOutput: true,
 						NodeIps:                  []string{""},
 						NodeType:                 false,
+						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -52,6 +54,7 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
+						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -61,6 +64,7 @@ func TestConstructNodeMapForAllNodeTypes(t *testing.T) {
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
+						SkipPrintOutput:          true,
 						HideSSHConnectionMessage: true,
 					},
 				},
@@ -247,7 +251,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
-			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
+			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
 		},
 		{
 			description: "Restarting Postgresql with managed services",
@@ -270,7 +274,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				},
 				SetWriterFunc: func(cli *cli.Writer) {},
 			},
-			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
+			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
 		},
 	}
 
@@ -296,13 +300,13 @@ func TestHandleManagedServiceError(t *testing.T) {
 			flags: &RestartCmdFlags{
 				postgresql: true,
 			},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
 		},
 		{
 			flags: &RestartCmdFlags{
 				opensearch: true,
 			},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
 		},
 		{
 			flags:          &RestartCmdFlags{},
@@ -313,7 +317,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 				postgresql: true,
 				opensearch: true,
 			},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, "postgresql and opensearch"),
 		},
 	}
 
