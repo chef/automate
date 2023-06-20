@@ -302,8 +302,11 @@ func runStatusFromBastion(flags *statusCmdFlags, nodeOpUtils NodeOpUtils, remote
 
 		flags.automate = true
 		flags.chefServer = true
-		flags.opensearch = true
-		flags.postgresql = true
+
+		if !nodeOpUtils.isManagedServicesOn() {
+			flags.opensearch = true
+			flags.postgresql = true
+		}
 	}
 
 	statusCmdResults := make(chan statusCmdResult, 4)
@@ -427,7 +430,7 @@ func getValueFromChannel(statusCmdResults chan statusCmdResult, printStatusOutpu
 func handleManagedServiceErrorForStatusCmd(flags *statusCmdFlags) error {
 
 	if flags.postgresql && flags.opensearch {
-		return nil
+		return status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, "services")
 	}
 
 	if flags.postgresql {

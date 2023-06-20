@@ -68,7 +68,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 				postgresql: true,
 				opensearch: true,
 			},
-			errorExepected: nil,
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, "services"),
 		},
 	}
 
