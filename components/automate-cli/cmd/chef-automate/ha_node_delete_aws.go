@@ -81,6 +81,8 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 		return err
 	}
 
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
 	err = dna.nodeUtils.saveConfigToBastion()
 	if err != nil {
 		return err
@@ -222,6 +224,8 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 	}
 
 	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
 	syncErr := dna.nodeUtils.syncConfigToAllNodes()
 	if syncErr != nil {
 		if err != nil {

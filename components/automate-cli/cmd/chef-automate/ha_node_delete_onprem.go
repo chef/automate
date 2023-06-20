@@ -76,6 +76,8 @@ func (dni *DeleteNodeOnPremImpl) Execute(c *cobra.Command, args []string) error 
 		}
 	}
 
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
 	err = dni.nodeUtils.saveConfigToBastion()
 	if err != nil {
 		return err
@@ -245,6 +247,9 @@ func (dni *DeleteNodeOnPremImpl) runDeploy() error {
 	}
 	argsdeploy := []string{"-y"}
 	err = dni.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
 	syncErr := dni.nodeUtils.syncConfigToAllNodes()
 	if syncErr != nil {
 		if err != nil {
