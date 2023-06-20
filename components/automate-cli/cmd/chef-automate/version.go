@@ -33,7 +33,7 @@ var versionCmd = &cobra.Command{
 	RunE:  runVersionCmd,
 	Annotations: map[string]string{
 		NoRequireRootAnnotation: NoRequireRootAnnotation,
-		docs.Tag:                docs.FrontEnd,
+		docs.Tag:                docs.BastionHost,
 	},
 }
 
