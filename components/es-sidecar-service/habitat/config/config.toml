@@ -29,10 +29,14 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
     {{~/if}}
   {{~/eachAlive}}
 {{~else}}
-  {{~#if cfg.backups.s3.bucket}}  
-  backend = "s3"
-  {{~else}}
-  backend = "fs"
+  {{~#if cfg.backups.backend}}
+  backend = "{{cfg.backups.backend}}"
+  {{else}}
+    {{~#if cfg.backups.s3.bucket}}  
+    backend = "s3"
+    {{~else}}
+    backend = "fs"
+    {{~/if}}
   {{~/if}}
 {{~/if}}
 {{~#if cfg.backups.verify_repo}}
