@@ -64,8 +64,8 @@ type BeStatus []BeStatusValue
 const (
 	STATUS_ERROR_ON_SELF_MANAGED = "Showing the status for externally configured %s is not supported."
 	CMD_FAIL_MSG                 = "Command failed on %s node : %s with error:\n %s\n"
-	BACKEND_STATUS               = "sudo HAB_LICENSE=accept-no-persist hab svc status"
-	FRONTEND_STATUS              = "sudo chef-automate status"
+	BACKEND_STATUS_CMD           = "sudo HAB_LICENSE=accept-no-persist hab svc status"
+	FRONTEND_STATUS_CMD          = "sudo chef-automate status"
 )
 
 func newStatusCmd() *cobra.Command {
@@ -430,7 +430,7 @@ func getValueFromChannel(statusCmdResults chan StatusCmdResult, printStatusOutpu
 func handleManagedServiceErrorForStatusCmd(flags *StatusCmdFlags) error {
 
 	if flags.postgresql && flags.opensearch {
-		return status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, "services")
+		return status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL+" and "+OPENSEARCH)
 	}
 
 	if flags.postgresql {
@@ -479,7 +479,7 @@ func constructNodeMapForStatus(flags *StatusCmdFlags, infra *AutomateHAInfraDeta
 		},
 		Postgresql: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      BACKEND_STATUS,
+				Cmd:                      BACKEND_STATUS_CMD,
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.postgresql,
@@ -490,7 +490,7 @@ func constructNodeMapForStatus(flags *StatusCmdFlags, infra *AutomateHAInfraDeta
 		},
 		Opensearch: &Cmd{
 			CmdInputs: &CmdInputs{
-				Cmd:                      BACKEND_STATUS,
+				Cmd:                      BACKEND_STATUS_CMD,
 				NodeIps:                  []string{flags.node},
 				ErrorCheckEnableInOutput: true,
 				NodeType:                 flags.opensearch,
@@ -505,7 +505,7 @@ func constructNodeMapForStatus(flags *StatusCmdFlags, infra *AutomateHAInfraDeta
 }
 
 func buildFrontEndStatusCmd(flags *StatusCmdFlags) string {
-	command := FRONTEND_STATUS
+	command := FRONTEND_STATUS_CMD
 
 	if flags.waitForHealthy {
 		command += " -w"

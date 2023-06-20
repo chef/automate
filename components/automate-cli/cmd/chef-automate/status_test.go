@@ -41,7 +41,7 @@ func TestBuildFrontEndStatusCmd(t *testing.T) {
 	}
 }
 
-func TestHandleManagedServiceError(t *testing.T) {
+func TestHandleManagedServiceForStatusCmd(t *testing.T) {
 
 	testCases := []struct {
 		flags          *StatusCmdFlags
@@ -68,7 +68,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 				postgresql: true,
 				opensearch: true,
 			},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, "services"),
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL+" and "+OPENSEARCH),
 		},
 	}
 
@@ -131,7 +131,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 				},
 				Postgresql: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      BACKEND_STATUS,
+						Cmd:                      BACKEND_STATUS_CMD,
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
@@ -142,7 +142,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 				},
 				Opensearch: &Cmd{
 					CmdInputs: &CmdInputs{
-						Cmd:                      BACKEND_STATUS,
+						Cmd:                      BACKEND_STATUS_CMD,
 						NodeIps:                  []string{""},
 						ErrorCheckEnableInOutput: true,
 						NodeType:                 false,
