@@ -5,10 +5,6 @@ exec 2>&1
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 cd {{pkgPathFor "chef/oc_id"}}/oc_id
 
-pkg_svc_user=root
-pkg_svc_group=root
-pkg_svc_run="return 0"
-
 # moved logic from plan.sh
 source "{{pkg.svc_config_path}}/scripts/do_install.sh"
 
