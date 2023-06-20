@@ -3,7 +3,6 @@ package main
 import (
 	"container/list"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -785,7 +784,7 @@ func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *Automat
 // Remove TLS values used for frontend LB and product key in frontend nodes
 func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 
-	tomlbyt, _ := ioutil.ReadFile(srcString) // nosemgrep
+	tomlbyt, _ := fileutils.ReadFile(srcString) // nosemgrep
 	destString := string(tomlbyt)
 	var dest dc.AutomateConfig
 	if _, err := toml.Decode(destString, &dest); err != nil {
