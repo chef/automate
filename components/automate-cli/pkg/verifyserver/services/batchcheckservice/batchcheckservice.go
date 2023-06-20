@@ -252,7 +252,6 @@ func (ss *BatchCheckService) constructRequestAndStartMockServer(protocolMap map[
 }
 
 func getHostFromNodeTypeAndIpCombination(nodeTypeWithIp string) []string {
-	fmt.Println("NodeTypeWithIP", nodeTypeWithIp)
 	return strings.Split(nodeTypeWithIp, "_")
 }
 
@@ -522,9 +521,19 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 	// Constructing response which is needed by the handler
 	result := constructResult(ipMap)
 
+	isPassed := true
+	for _, v := range result {
+		for _, checksResult := range v.Tests {
+			if !checksResult.Passed {
+				isPassed = false
+				break
+			}
+		}
+	}
+
 	return models.BatchCheckResponse{
-		Status: "SUCCESS",
-		Result: result,
+		Passed:     isPassed,
+		NodeResult: result,
 	}
 }
 
