@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type statusCmdFlags struct {
+type StatusCmdFlags struct {
 	waitForHealthy      bool
 	waitTimeout         int64
 	waitRefreshInterval int64
@@ -29,7 +29,7 @@ type statusCmdFlags struct {
 	opensearch          bool
 	node                string
 }
-type statusCmdResult struct {
+type StatusCmdResult struct {
 	cmdResult map[string][]*CmdResult
 	writer    *cli.Writer
 	nodeType  string
@@ -70,7 +70,7 @@ const (
 
 func newStatusCmd() *cobra.Command {
 
-	statusCmdFlag := statusCmdFlags{}
+	statusCmdFlag := StatusCmdFlags{}
 
 	var statusCmd = &cobra.Command{
 		Use:   "status",
@@ -120,7 +120,7 @@ func newStatusCmd() *cobra.Command {
 	return statusCmd
 }
 
-func runStatusCmdGetter(flags *statusCmdFlags) func(cmd *cobra.Command, args []string) error {
+func runStatusCmdGetter(flags *StatusCmdFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		return runStatusCmdFlowExecutor(cmd, args, flags)
 	}
@@ -216,7 +216,7 @@ func executeStatusSummary(cmd *cobra.Command, args []string, statusSummaryCmdFla
 	return nil
 }
 
-func runStatusCmdFlowExecutor(cmd *cobra.Command, args []string, flags *statusCmdFlags) error {
+func runStatusCmdFlowExecutor(cmd *cobra.Command, args []string, flags *StatusCmdFlags) error {
 	if isA2HARBFileExist() {
 		nodeOpUtils := &NodeUtilsImpl{}
 		remoteExecutor := NewRemoteCmdExecutorWithoutNodeMap(&SSHUtilImpl{}, cli.NewWriter(os.Stdout, os.Stderr, os.Stdin))
@@ -288,7 +288,7 @@ func runStatusCmdFlowExecutor(cmd *cobra.Command, args []string, flags *statusCm
 	}
 }
 
-func runStatusFromBastion(flags *statusCmdFlags, nodeOpUtils NodeOpUtils, remoteExe RemoteCmdExecutor, printStatusOutput func(map[string][]*CmdResult, string, *cli.Writer)) error {
+func runStatusFromBastion(flags *StatusCmdFlags, nodeOpUtils NodeOpUtils, remoteExe RemoteCmdExecutor, printStatusOutput func(map[string][]*CmdResult, string, *cli.Writer)) error {
 
 	infra, _, err := nodeOpUtils.getHaInfraDetails()
 	if err != nil {
@@ -309,13 +309,13 @@ func runStatusFromBastion(flags *statusCmdFlags, nodeOpUtils NodeOpUtils, remote
 		}
 	}
 
-	statusCmdResults := make(chan statusCmdResult, 4)
+	statusCmdResults := make(chan StatusCmdResult, 4)
 
 	runStatusCmdForFrontEnd(infra, flags, statusCmdResults, remoteExe)
 
 	if nodeOpUtils.isManagedServicesOn() {
-		statusCmdResults <- statusCmdResult{}
-		statusCmdResults <- statusCmdResult{}
+		statusCmdResults <- StatusCmdResult{}
+		statusCmdResults <- StatusCmdResult{}
 		err = getValueFromChannel(statusCmdResults, printStatusOutput)
 		if err != nil {
 			return err
@@ -328,30 +328,30 @@ func runStatusFromBastion(flags *statusCmdFlags, nodeOpUtils NodeOpUtils, remote
 	return getValueFromChannel(statusCmdResults, printStatusOutput)
 }
 
-func runStatusCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *statusCmdFlags, statusCmdResults chan statusCmdResult, remoteExe RemoteCmdExecutor) {
+func runStatusCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *StatusCmdFlags, statusCmdResults chan StatusCmdResult, remoteExe RemoteCmdExecutor) {
 
 	if flags.automate {
 		nodeStatus(flags, AUTOMATE, infra, statusCmdResults, remoteExe)
 	} else {
-		statusCmdResults <- statusCmdResult{}
+		statusCmdResults <- StatusCmdResult{}
 	}
 
 	if flags.chefServer {
 		flags.automate = false
 		nodeStatus(flags, CHEF_SERVER, infra, statusCmdResults, remoteExe)
 	} else {
-		statusCmdResults <- statusCmdResult{}
+		statusCmdResults <- StatusCmdResult{}
 	}
 }
 
-func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *statusCmdFlags, statusCmdResults chan statusCmdResult, remoteExe RemoteCmdExecutor) {
+func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *StatusCmdFlags, statusCmdResults chan StatusCmdResult, remoteExe RemoteCmdExecutor) {
 
 	if flags.postgresql {
 		flags.automate = false
 		flags.chefServer = false
 		nodeStatus(flags, POSTGRESQL, infra, statusCmdResults, remoteExe)
 	} else {
-		statusCmdResults <- statusCmdResult{}
+		statusCmdResults <- StatusCmdResult{}
 	}
 
 	if flags.opensearch {
@@ -360,17 +360,17 @@ func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *statusCmdFlags
 		flags.postgresql = false
 		nodeStatus(flags, OPENSEARCH, infra, statusCmdResults, remoteExe)
 	} else {
-		statusCmdResults <- statusCmdResult{}
+		statusCmdResults <- StatusCmdResult{}
 	}
 }
 
-func nodeStatus(flags *statusCmdFlags, nodeType string, infra *AutomateHAInfraDetails, statusCmdResults chan statusCmdResult, remoteExe RemoteCmdExecutor) {
-	go func(nodeType string, flags statusCmdFlags, statusCmdResults chan<- statusCmdResult) {
+func nodeStatus(flags *StatusCmdFlags, nodeType string, infra *AutomateHAInfraDetails, statusCmdResults chan StatusCmdResult, remoteExe RemoteCmdExecutor) {
+	go func(nodeType string, flags StatusCmdFlags, statusCmdResults chan<- StatusCmdResult) {
 		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 		remoteExe.SetWriter(writer)
 		nodeMap := constructNodeMapForStatus(&flags, infra)
 		cmdResult, err := remoteExe.ExecuteWithNodeMap(nodeMap)
-		statusCmdResults <- statusCmdResult{
+		statusCmdResults <- StatusCmdResult{
 			cmdResult: cmdResult,
 			writer:    writer,
 			nodeType:  nodeType,
@@ -413,7 +413,7 @@ func printStatusErrorOutput(cmdResult *CmdResult, remoteService string, writer *
 	}
 }
 
-func getValueFromChannel(statusCmdResults chan statusCmdResult, printStatusOutput func(map[string][]*CmdResult, string, *cli.Writer)) error {
+func getValueFromChannel(statusCmdResults chan StatusCmdResult, printStatusOutput func(map[string][]*CmdResult, string, *cli.Writer)) error {
 	for i := 0; i < 4; i++ {
 		cmdResult := <-statusCmdResults
 		if cmdResult.err != nil {
@@ -427,7 +427,7 @@ func getValueFromChannel(statusCmdResults chan statusCmdResult, printStatusOutpu
 	return nil
 }
 
-func handleManagedServiceErrorForStatusCmd(flags *statusCmdFlags) error {
+func handleManagedServiceErrorForStatusCmd(flags *StatusCmdFlags) error {
 
 	if flags.postgresql && flags.opensearch {
 		return status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, "services")
@@ -444,7 +444,7 @@ func handleManagedServiceErrorForStatusCmd(flags *statusCmdFlags) error {
 	return nil
 }
 
-func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+func constructNodeMapForStatus(flags *StatusCmdFlags, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
 	commandFrontEnd := buildFrontEndStatusCmd(flags)
 	nodeMap := &NodeTypeAndCmd{
 		Frontend: &Cmd{
@@ -504,7 +504,7 @@ func constructNodeMapForStatus(flags *statusCmdFlags, infra *AutomateHAInfraDeta
 	return nodeMap
 }
 
-func buildFrontEndStatusCmd(flags *statusCmdFlags) string {
+func buildFrontEndStatusCmd(flags *StatusCmdFlags) string {
 	command := FRONTEND_STATUS
 
 	if flags.waitForHealthy {

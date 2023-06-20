@@ -11,20 +11,20 @@ import (
 
 func TestBuildFrontEndStatusCmd(t *testing.T) {
 	type testCase struct {
-		flags           *statusCmdFlags
+		flags           *StatusCmdFlags
 		expectedCommand string
 	}
 
 	testCases := []testCase{
 		{
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				waitRefreshInterval: 2,
 				waitTimeout:         600,
 			},
 			expectedCommand: "sudo chef-automate status -r 2",
 		},
 		{
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				waitRefreshInterval: 2,
 				waitTimeout:         600,
 				waitForHealthy:      true,
@@ -44,27 +44,27 @@ func TestBuildFrontEndStatusCmd(t *testing.T) {
 func TestHandleManagedServiceError(t *testing.T) {
 
 	testCases := []struct {
-		flags          *statusCmdFlags
+		flags          *StatusCmdFlags
 		errorExepected error
 	}{
 		{
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				postgresql: true,
 			},
 			errorExepected: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, POSTGRESQL),
 		},
 		{
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				opensearch: true,
 			},
 			errorExepected: status.Errorf(status.InvalidCommandArgsError, STATUS_ERROR_ON_SELF_MANAGED, OPENSEARCH),
 		},
 		{
-			flags:          &statusCmdFlags{},
+			flags:          &StatusCmdFlags{},
 			errorExepected: nil,
 		},
 		{
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				postgresql: true,
 				opensearch: true,
 			},
@@ -85,14 +85,14 @@ func TestHandleManagedServiceError(t *testing.T) {
 
 func TestConstructNodeMapForStatus(t *testing.T) {
 	type testCase struct {
-		flags           *statusCmdFlags
+		flags           *StatusCmdFlags
 		nodeMapExpected *NodeTypeAndCmd
 	}
 	infra := &AutomateHAInfraDetails{}
 
 	testCases := []testCase{
 		{
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				waitForHealthy:      false,
 				waitTimeout:         600,
 				waitRefreshInterval: 10,
@@ -165,7 +165,7 @@ func TestConstructNodeMapForStatus(t *testing.T) {
 func TestRunStatusFromBastion(t *testing.T) {
 	type testCase struct {
 		description       string
-		flags             *statusCmdFlags
+		flags             *StatusCmdFlags
 		mockNodeOpUtils   *MockNodeUtilsImpl
 		mockRemoteCmdExec *MockRemoteCmdExecutor
 		errorWant         error
@@ -176,7 +176,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 	testCases := []testCase{
 		{
 			description: "No service flag provided and node flag is provided",
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				node: "1",
 			},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
@@ -188,7 +188,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 		},
 		{
 			description: "Error while reading infra details",
-			flags:       &statusCmdFlags{},
+			flags:       &StatusCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 					return nil, nil, errors.New("Error occured while reading infra details")
@@ -198,7 +198,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 		},
 		{
 			description: "Want status of all services",
-			flags:       &statusCmdFlags{},
+			flags:       &StatusCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
@@ -217,7 +217,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 		},
 		{
 			description: "Want status of all services but error occured while remote execution",
-			flags:       &statusCmdFlags{},
+			flags:       &StatusCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
@@ -236,7 +236,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 		},
 		{
 			description: "Want status of all services with managed services",
-			flags:       &statusCmdFlags{},
+			flags:       &StatusCmdFlags{},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
 					return &AutomateHAInfraDetails{}, &SSHConfig{}, nil
@@ -255,7 +255,7 @@ func TestRunStatusFromBastion(t *testing.T) {
 		},
 		{
 			description: "Managed services and pg flag provided",
-			flags: &statusCmdFlags{
+			flags: &StatusCmdFlags{
 				postgresql: true,
 			},
 			mockNodeOpUtils: &MockNodeUtilsImpl{
