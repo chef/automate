@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,24 +28,16 @@ os_snapshot_user_access_key_secret = " "`
 func Test_fetchAwsConfigFromTerraform(t *testing.T) {
 	params := new(configDetails)
 	err := json.Unmarshal([]byte(AwsAutoTfvarsJsonString), &params)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	assert.NoError(t, err)
 
 	dirPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment")
 	filePath := dirPath + "/output.auto.tfvars"
+
 	err = os.MkdirAll(dirPath, os.ModePerm)
-	if err != nil {
-		fmt.Println("Error creating directories:", err)
-		return
-	}
+	assert.NoError(t, err, "Error creating directories")
 
 	file, err := os.Create(filePath)
-	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
-	}
+	assert.NoError(t, err, "Error creating file")
 	defer os.Remove(file.Name())
 
 	tests := []struct {
@@ -84,8 +75,5 @@ func Test_fetchAwsConfigFromTerraform(t *testing.T) {
 	}
 
 	err = file.Close()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	assert.NoError(t, err)
 }

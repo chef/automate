@@ -31,7 +31,6 @@ func getJsonFromTerraformOutputAutoTfVarsFile(jsonString string) (*configDetails
 	params := configDetails{}
 	err := json.Unmarshal([]byte(jsonString), &params)
 	if err != nil {
-		writer.Fail(err.Error())
 		return nil, err
 	}
 	return &params, nil
