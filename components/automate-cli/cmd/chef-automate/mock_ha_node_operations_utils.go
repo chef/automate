@@ -24,7 +24,7 @@ type MockNodeUtilsImpl struct {
 	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCountFunc           func() (int, error)
 	parseAndMoveConfigFileToWorkspaceDirFunc  func(outputFiles []string, outputDirectory string) error
-	executeCmdInAllNodeAndCaptureOutputFunc   func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
+	executeCmdInAllNodesAndCaptureOutputFunc  func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
 	executeCustomCmdOnEachNodeTypeFunc        func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
 	saveConfigToBastionFunc                   func() error
 	syncConfigToAllNodesFunc                  func() error
@@ -104,7 +104,7 @@ func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outputFiles [
 }
 
 func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
-	return mnu.executeCmdInAllNodeAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
+	return mnu.executeCmdInAllNodesAndCaptureOutputFunc(nodeObjects, singleNode, outputDirectory)
 }
 
 func (mnu *MockNodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
