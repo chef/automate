@@ -365,7 +365,7 @@ func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *statusCmdFlags
 }
 
 func nodeStatus(flags *statusCmdFlags, nodeType string, infra *AutomateHAInfraDetails, statusCmdResults chan statusCmdResult, remoteExe RemoteCmdExecutor) {
-	go func(flags statusCmdFlags, statusCmdResults chan<- statusCmdResult) {
+	go func(nodeType string, flags statusCmdFlags, statusCmdResults chan<- statusCmdResult) {
 		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 		remoteExe.SetWriter(writer)
 		nodeMap := constructNodeMapForStatus(&flags, infra)
@@ -376,7 +376,7 @@ func nodeStatus(flags *statusCmdFlags, nodeType string, infra *AutomateHAInfraDe
 			nodeType:  nodeType,
 			err:       err,
 		}
-	}(*flags, statusCmdResults)
+	}(nodeType, *flags, statusCmdResults)
 }
 
 func printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, writer *cli.Writer) {
