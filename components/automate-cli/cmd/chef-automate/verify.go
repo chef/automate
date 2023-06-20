@@ -34,12 +34,16 @@ const (
 	SYSTEMD_PATH              = "/etc/systemd/system"
 	REMOTE_NODES              = "remote nodes"
 	BASTION                   = "bastion"
+	LOCALHOST                 = "localhost"
 	SLEEP_DURATION            = 2 * time.Second
 )
 
 var (
-	statusAPIEndpoint     = fmt.Sprintf("http://localhost:%s/status", getPort())
-	batchCheckAPIEndpoint = fmt.Sprintf("http://localhost:%s/api/v1/checks/batch-checks", getPort())
+	statusAPIRoute     = "/status"
+	batchCheckAPIRoute = "/api/v1/checks/batch-checks"
+	getAPIEndpoint     = func(hostIp string, port string, route string) string {
+		return fmt.Sprintf("http://%s:%s%s", hostIp, port, route)
+	}
 )
 
 type verifyCmdFlags struct {
@@ -323,6 +327,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 	v.Writer.Println("Checking automate-verify service on bastion")
 
 	//Call status API to check if automate-verify service is running on bastion
+	statusAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), statusAPIRoute)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
 	if err != nil {
 		v.Writer.Printf("error while checking automate-verify service on bastion: %v\n", err)
@@ -389,16 +394,23 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 
 	destFileName := "chef-automate"
 
-	// Copying CLI binary to remote nodes
-	err := v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPs)
+	hostIPsToCopyLatestCLI, err := v.getHostIPsWithNoLatestCLI(hostIPs)
 	if err != nil {
 		return nil, err
 	}
 
-	// Starting automate-verify service on remote nodes
-	err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
-	if err != nil {
-		return nil, err
+	if len(hostIPsToCopyLatestCLI) > 0 {
+		// Copying Latest CLI binary to remote nodes
+		err = v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPsToCopyLatestCLI)
+		if err != nil {
+			return nil, err
+		}
+
+		// Starting automate-verify service on remote nodes
+		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	//TODO: Need to handle the case for AWS
@@ -410,6 +422,37 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 	}
 
 	return v.makeBatchCheckAPICall(batchCheckRemoteReq, REMOTE_NODES)
+}
+
+// Get Host IPs without chef-automate binary or without latest version chef-automate binary
+func (v *verifyCmdFlow) getHostIPsWithNoLatestCLI(hostIPs []string) ([]string, error) {
+	hostIPsWithoutLatestCLI := []string{}
+	for _, hostIP := range hostIPs {
+		statusAPIEndpoint := getAPIEndpoint(hostIP, getPort(), statusAPIRoute)
+		_, responseBody, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
+
+		// Incase of unreachable error (connection refused) , appending IP to the array
+		if err != nil {
+			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, hostIP)
+			continue
+		}
+
+		resultBytes, err := v.getResultFromResponseBody(responseBody)
+		if err != nil {
+			return nil, err
+		}
+
+		var result models.StatusDetails
+		if err := json.Unmarshal(resultBytes, &result); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal Result field: %v", err)
+		}
+
+		if result.CliVersion < version.BuildTime {
+			// fmt.Printf("Hosyt IP: %s, resultVersion: %s, buildVersion: %s\n", hostIPsWithoutLatestCLI, result.CliVersion, version.BuildTime)
+			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, hostIP)
+		}
+	}
+	return hostIPsWithoutLatestCLI, nil
 }
 
 // Creates systemd service with current CLI binary
@@ -426,6 +469,7 @@ func (v *verifyCmdFlow) createSystemdOnBastion() error {
 // Makes batch-check API call
 func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckRequest, nodeType string) ([]byte, error) {
 	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
+	batchCheckAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), batchCheckAPIRoute)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
 	if err != nil {
 		if responseBody != nil {
