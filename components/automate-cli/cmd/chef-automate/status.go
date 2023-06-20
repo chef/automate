@@ -331,14 +331,14 @@ func runStatusFromBastion(flags *StatusCmdFlags, nodeOpUtils NodeOpUtils, remote
 func runStatusCmdForFrontEnd(infra *AutomateHAInfraDetails, flags *StatusCmdFlags, statusCmdResults chan StatusCmdResult, remoteExe RemoteCmdExecutor) {
 
 	if flags.automate {
-		nodeStatus(flags, AUTOMATE, infra, statusCmdResults, remoteExe)
+		go nodeStatus(*flags, AUTOMATE, infra, statusCmdResults, remoteExe)
 	} else {
 		statusCmdResults <- StatusCmdResult{}
 	}
 
 	if flags.chefServer {
 		flags.automate = false
-		nodeStatus(flags, CHEF_SERVER, infra, statusCmdResults, remoteExe)
+		go nodeStatus(*flags, CHEF_SERVER, infra, statusCmdResults, remoteExe)
 	} else {
 		statusCmdResults <- StatusCmdResult{}
 	}
@@ -349,7 +349,7 @@ func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *StatusCmdFlags
 	if flags.postgresql {
 		flags.automate = false
 		flags.chefServer = false
-		nodeStatus(flags, POSTGRESQL, infra, statusCmdResults, remoteExe)
+		go nodeStatus(*flags, POSTGRESQL, infra, statusCmdResults, remoteExe)
 	} else {
 		statusCmdResults <- StatusCmdResult{}
 	}
@@ -358,25 +358,23 @@ func runStatusCmdForBackend(infra *AutomateHAInfraDetails, flags *StatusCmdFlags
 		flags.automate = false
 		flags.chefServer = false
 		flags.postgresql = false
-		nodeStatus(flags, OPENSEARCH, infra, statusCmdResults, remoteExe)
+		go nodeStatus(*flags, OPENSEARCH, infra, statusCmdResults, remoteExe)
 	} else {
 		statusCmdResults <- StatusCmdResult{}
 	}
 }
 
-func nodeStatus(flags *StatusCmdFlags, nodeType string, infra *AutomateHAInfraDetails, statusCmdResults chan StatusCmdResult, remoteExe RemoteCmdExecutor) {
-	go func(nodeType string, flags StatusCmdFlags, statusCmdResults chan<- StatusCmdResult) {
-		writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-		remoteExe.SetWriter(writer)
-		nodeMap := constructNodeMapForStatus(&flags, infra)
-		cmdResult, err := remoteExe.ExecuteWithNodeMap(nodeMap)
-		statusCmdResults <- StatusCmdResult{
-			cmdResult: cmdResult,
-			writer:    writer,
-			nodeType:  nodeType,
-			err:       err,
-		}
-	}(nodeType, *flags, statusCmdResults)
+func nodeStatus(flags StatusCmdFlags, nodeType string, infra *AutomateHAInfraDetails, statusCmdResults chan StatusCmdResult, remoteExe RemoteCmdExecutor) {
+	writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+	remoteExe.SetWriter(writer)
+	nodeMap := constructNodeMapForStatus(&flags, infra)
+	cmdResult, err := remoteExe.ExecuteWithNodeMap(nodeMap)
+	statusCmdResults <- StatusCmdResult{
+		cmdResult: cmdResult,
+		writer:    writer,
+		nodeType:  nodeType,
+		err:       err,
+	}
 }
 
 func printStatusOutput(cmdResult map[string][]*CmdResult, remoteService string, writer *cli.Writer) {
