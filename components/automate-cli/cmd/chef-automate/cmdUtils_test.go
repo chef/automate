@@ -267,6 +267,7 @@ func TestExecute(t *testing.T) {
 			c := &remoteCmdExecutor{
 				NodeMap: testCase.fields.NodeMap,
 				SshUtil: testCase.fields.SshUtil,
+				Output: cli.NewWriter(os.Stdout, os.Stderr, os.Stdin),
 			}
 			_, err := c.Execute()
 			if testCase.wantErr {

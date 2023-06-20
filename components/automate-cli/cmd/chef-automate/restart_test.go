@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -92,6 +93,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 		mockRemoteCmdExec    *MockRemoteCmdExecutor
 		errorWant            error
 	}
+	printRestartOutput := func(m map[string][]*CmdResult, s string, w *cli.Writer) {}
 	testCases := []testCase{
 		{
 			description: "Error when wait timeout is less than default timeout",
@@ -145,7 +147,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 			}(),
 			mockRestartCmdHelper: &MockNodeUtilsImpl{
 				getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
-					return nil, &SSHConfig{}, nil
+					return nil, &SSHConfig{}, errors.New("Error occured while reading infra details")
 				},
 				isManagedServicesOnFunc: func() bool {
 					return false
@@ -176,6 +178,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: nil,
 		},
@@ -197,6 +200,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: errors.New("Some error occured while remote execution"),
 		},
@@ -218,6 +222,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: nil,
 		},
@@ -240,6 +245,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
@@ -262,6 +268,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 				ExecuteWithNodeMapFunc: func(nodemap *NodeTypeAndCmd) (map[string][]*CmdResult, error) {
 					return map[string][]*CmdResult{}, nil
 				},
+				SetWriterFunc: func(cli *cli.Writer) {},
 			},
 			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
@@ -269,7 +276,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.description, func(t *testing.T) {
-			err := runRestartFromBastion(testCase.flags, testCase.mockRemoteCmdExec, testCase.mockRestartCmdHelper)
+			err := runRestartFromBastion(testCase.flags, testCase.mockRemoteCmdExec, testCase.mockRestartCmdHelper, printRestartOutput)
 			if err != nil {
 				assert.EqualError(t, testCase.errorWant, err.Error())
 			} else {
