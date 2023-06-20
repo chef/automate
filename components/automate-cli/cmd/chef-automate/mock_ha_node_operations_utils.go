@@ -23,7 +23,7 @@ type MockNodeUtilsImpl struct {
 	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCountFunc           func() (int, error)
-	parseAndMoveConfigFileToWorkspaceDirFunc  func(outFiles []string, outputDirectory string) error
+	parseAndMoveConfigFileToWorkspaceDirFunc  func(outputFiles []string, outputDirectory string) error
 	executeCmdInAllNodeAndCaptureOutputFunc   func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error
 	executeCustomCmdOnEachNodeTypeFunc        func(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
 	saveConfigToBastionFunc                   func() error
@@ -99,8 +99,8 @@ func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
 	return mnu.calculateTotalInstanceCountFunc()
 }
 
-func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error {
-	return mnu.parseAndMoveConfigFileToWorkspaceDirFunc(outFiles, outputDirectory)
+func (mnu *MockNodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outputFiles []string, outputDirectory string) error {
+	return mnu.parseAndMoveConfigFileToWorkspaceDirFunc(outputFiles, outputDirectory)
 }
 
 func (mnu *MockNodeUtilsImpl) executeCmdInAllNodeAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {

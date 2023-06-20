@@ -397,7 +397,7 @@ func TestAddnodeDeployWithNewOSNode(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		syncConfigToAllNodesFunc: func() error {
@@ -458,7 +458,7 @@ func TestAddnodeDeployWithNewOSNodeGenconfigError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		pullAndUpdateConfigFunc: PullConfFunc,
@@ -538,7 +538,7 @@ func TestAddnodeExecuteWithNewOSNodeNoCertByIP(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -606,7 +606,7 @@ func TestAddnodeExecuteWithNewOSNode(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -746,7 +746,7 @@ func newMockNodeUtilsImplForAddOnprem() *MockNodeUtilsImpl {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {

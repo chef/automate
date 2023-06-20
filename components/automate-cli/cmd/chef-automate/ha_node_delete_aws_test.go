@@ -515,7 +515,7 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 				return nil
 			},
-			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return nil
 			},
 			syncConfigToAllNodesFunc: func() error {
@@ -641,7 +641,7 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 				return nil
 			},
-			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return nil
 			},
 			saveConfigToBastionFunc: func() error {
@@ -726,7 +726,7 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -868,7 +868,7 @@ func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {

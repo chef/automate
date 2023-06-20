@@ -349,7 +349,7 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -461,7 +461,7 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -529,7 +529,7 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		syncConfigToAllNodesFunc: func() error {
@@ -595,7 +595,7 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		syncConfigToAllNodesFunc: func() error {
@@ -659,7 +659,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -699,7 +699,7 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 	}, CONFIG_TOML_PATH, &fileutils.MockFileSystemUtils{}, &MockSSHUtilsImpl{
@@ -788,7 +788,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -866,7 +866,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -944,7 +944,7 @@ func TestRemovenodeExecuteWithProvisionError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {

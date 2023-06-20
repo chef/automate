@@ -188,7 +188,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -288,7 +288,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -364,7 +364,7 @@ func TestAddnodeWithSaveConfigToBasionErr(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -427,7 +427,7 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -495,7 +495,7 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -563,7 +563,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 		executeCustomCmdOnEachNodeTypeFunc: func(outputFiles, inputFiles []string, inputFilesPrefix, service, cmdString string, singleNode bool) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		syncConfigToAllNodesFunc: func() error {

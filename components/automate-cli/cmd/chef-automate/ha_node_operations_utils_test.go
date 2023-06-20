@@ -273,7 +273,7 @@ func TestSaveConfigToBastion(t *testing.T) {
 		executeCmdInAllNodeAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
 			return nil
 		},
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return nil
 		},
 		saveConfigToBastionFunc: func() error {
@@ -645,7 +645,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 	t.Run("save config in bastion", func(t *testing.T) {
 
 		mnu := &MockNodeUtilsImpl{
-			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return nil
 			},
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -666,7 +666,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutput(t *testing.T) {
 	t.Run("save config in bastion with error in parsing", func(t *testing.T) {
 
 		mnu := &MockNodeUtilsImpl{
-			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return errors.New("error parsing output file")
 			},
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -802,7 +802,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutputToSaveConfigInBastionBeforeNodeModif
 	t.Run("save config in bastion", func(t *testing.T) {
 
 		mnu := &MockNodeUtilsImpl{
-			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return nil
 			},
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -823,7 +823,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutputToSaveConfigInBastionBeforeNodeModif
 	t.Run("save config in bastion with error in parsing", func(t *testing.T) {
 
 		mnu := &MockNodeUtilsImpl{
-			parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 				return errors.New("error parsing output file")
 			},
 			getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
@@ -844,7 +844,7 @@ func TestExecuteCmdInAllNodeAndCaptureOutputToSaveConfigInBastionBeforeNodeModif
 
 func TestCreateNodeMap(t *testing.T) {
 	mnu := &MockNodeUtilsImpl{
-		parseAndMoveConfigFileToWorkspaceDirFunc: func(outFiles []string, outputDirectory string) error {
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
 			return errors.New("error parsing output file")
 		},
 		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
