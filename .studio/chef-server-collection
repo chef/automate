@@ -400,7 +400,7 @@ document "test_if_login_working_with_correct_credentials" <<DOC
   login call returns 200 if creds are correct
 DOC
 test_if_login_working_with_correct_credentials() {
-  set_up_chef_server_test_environment || return 1
+  bootstrap_chef_user_data || return 1
   local url="https://${chef_server_hostname}/id/auth/chef/callback"
 
   res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
@@ -423,7 +423,7 @@ document "test_if_login_failing_with_incorrect_credentials" <<DOC
   login call returns 302 if creds are incorrect
 DOC
 test_if_login_failing_with_incorrect_credentials() {
-  set_up_chef_server_test_environment || return 1
+  bootstrap_chef_user_data || return 1
   local url="https://${chef_server_hostname}/id/auth/chef/callback"
   local incorrect_password='incorrect-password'
 
