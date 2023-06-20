@@ -2,6 +2,7 @@ package v1_test
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http/httptest"
 	"strings"
@@ -25,8 +26,8 @@ func SetupMockBatchCheckService(errorFromBatchCheck bool) batchcheckservice.IBat
 				return models.BatchCheckResponse{}, errors.New("error occurred in batch check service")
 			}
 			return models.BatchCheckResponse{
-				Status: "SUCCESS",
-				Result: []models.BatchCheckResult{
+				Passed: true,
+				NodeResult: []models.BatchCheckResult{
 					{
 						NodeType: "automate",
 						Ip:       "1.2.3.4",
@@ -117,7 +118,7 @@ func TestBatchCheckAPI(t *testing.T) {
 				}
 			}`,
 			expectedCode: 200,
-			expectedBody: "{\"status\":\"SUCCESS\",\"result\":[{\"node_type\":\"automate\",\"ip\":\"1.2.3.4\",\"tests\":[{\"passed\":true,\"msg\":\"success\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-count-1\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"hardware-resource-count-2\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}],\"skipped\":false},{\"passed\":true,\"msg\":\"success\",\"check\":\"ssh-user\",\"checks\":[{\"title\":\"ssh-user-1\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"ssh-user-2\",\"passed\":true,\"success_msg\":\"success\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}],\"skipped\":false}]}]}",
+			expectedBody: `{"status":"SUCCESS","result":{"passed":true,"node_result":[{"node_type":"automate","ip":"1.2.3.4","tests":[{"passed":true,"msg":"success","check":"hardware-resource-count","checks":[{"title":"hardware-resource-count-1","passed":true,"success_msg":"success","error_msg":"","resolution_msg":"","skipped":false},{"title":"hardware-resource-count-2","passed":true,"success_msg":"success","error_msg":"","resolution_msg":"","skipped":false}],"skipped":false},{"passed":true,"msg":"success","check":"ssh-user","checks":[{"title":"ssh-user-1","passed":true,"success_msg":"success","error_msg":"","resolution_msg":"","skipped":false},{"title":"ssh-user-2","passed":true,"success_msg":"success","error_msg":"","resolution_msg":"","skipped":false}],"skipped":false}]}]}}`,
 		},
 		{
 			description: "400:failure batch check route",

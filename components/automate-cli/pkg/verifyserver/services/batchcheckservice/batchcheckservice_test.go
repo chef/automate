@@ -764,14 +764,13 @@ func TestBatchCheckService(t *testing.T) {
 			}
 
 			if !test.avoidSuccessResponse {
-				assert.Equal(t, resp.Status, "SUCCESS")
-				assert.Equal(t, len(resp.Result), test.totalIpsCount)
-				assert.Equal(t, test.expectedResponseForAutomateIp, getResponseForIp(resp.Result, "1.2.3.4", "automate"))
-				assert.Equal(t, test.expectedResponseFromChefServerIp, getResponseForIp(resp.Result, test.chefServerIpArray[0], "chef-infra-server"))
-				assert.Equal(t, test.expectedResponseForPostgresIp1, getResponseForIp(resp.Result, "1.2.3.7", "postgresql"))
-				assert.Equal(t, test.expectedResponseForPostgresIp2, getResponseForIp(resp.Result, "1.2.3.8", "postgresql"))
-				assert.Equal(t, test.expectedResponseForOpenSearchIp1, getResponseForIp(resp.Result, "1.2.3.5", "opensearch"))
-				assert.Equal(t, test.expectedResponseForOpenSearchIp2, getResponseForIp(resp.Result, "1.2.3.6", "opensearch"))
+				assert.Equal(t, len(resp.NodeResult), test.totalIpsCount)
+				assert.Equal(t, test.expectedResponseForAutomateIp, getResponseForIp(resp.NodeResult, "1.2.3.4", "automate"))
+				assert.Equal(t, test.expectedResponseFromChefServerIp, getResponseForIp(resp.NodeResult, test.chefServerIpArray[0], "chef-infra-server"))
+				assert.Equal(t, test.expectedResponseForPostgresIp1, getResponseForIp(resp.NodeResult, "1.2.3.7", "postgresql"))
+				assert.Equal(t, test.expectedResponseForPostgresIp2, getResponseForIp(resp.NodeResult, "1.2.3.8", "postgresql"))
+				assert.Equal(t, test.expectedResponseForOpenSearchIp1, getResponseForIp(resp.NodeResult, "1.2.3.5", "opensearch"))
+				assert.Equal(t, test.expectedResponseForOpenSearchIp2, getResponseForIp(resp.NodeResult, "1.2.3.6", "opensearch"))
 			}
 		})
 	}

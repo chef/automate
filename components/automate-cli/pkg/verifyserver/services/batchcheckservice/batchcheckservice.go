@@ -522,9 +522,19 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 	// Constructing response which is needed by the handler
 	result := constructResult(ipMap)
 
+	isPassed := true
+	for _, v := range result {
+		testForNode := v.Tests
+		for _, checksResult := range testForNode {
+			if !checksResult.Passed {
+				isPassed = false
+			}
+		}
+	}
+
 	return models.BatchCheckResponse{
-		Status: "SUCCESS",
-		Result: result,
+		Passed:     isPassed,
+		NodeResult: result,
 	}
 }
 
