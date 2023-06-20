@@ -23,7 +23,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
-	"github.com/ttacon/chalk"
+	"github.com/fatih/color"
 )
 
 var versionCmd = &cobra.Command{
@@ -178,7 +178,7 @@ func init() {
 	versionCmd.PersistentFlags().BoolVar(&VersionCommandFlags.isPostgresql, "pg", false, "Get only postgresql Status")
 	versionCmd.PersistentFlags().SetAnnotation("postgresql", docs.Compatibility, []string{docs.CompatiblewithHA})
 
-	versionCmd.PersistentFlags().StringVar(&VersionCommandFlags.node, "node", "", "Node Ip address")
+	versionCmd.PersistentFlags().StringVar(&VersionCommandFlags.node, "node", "", "Node Ip address. While using this flag, pass the node type as well. Example : chef-automate version --node 192.0.0.1 --cs")
 	versionCmd.PersistentFlags().SetAnnotation("node", docs.Compatibility, []string{docs.CompatiblewithHA})
 	RootCmd.AddCommand(versionCmd)
 }
@@ -192,8 +192,8 @@ func runCommandOnBastion(args []string) error {
 	}
 	automateIps, chefServerIps, opensearchIps, postgresqlIps, errList := getIPAddressesFromFlagOrInfra(infra)
 	if errList != nil && errList.Len() > 0 {
-		logrus.Errorf("Error while getting IP addresses :: %s", status.Wrap(getSingleErrorFromList(errList), status.InvalidCommandArgsError, ipAddressError))
-		return status.Wrap(getSingleErrorFromList(errList), status.InvalidCommandArgsError, ipAddressError)
+		logrus.Errorf("Error while getting IP addresses :: %s", getSingleErrorFromList(errList))
+		return getSingleErrorFromList(errList)
 	}
 
 	sshUtil := NewSSHUtil(&SSHConfig{})
@@ -208,7 +208,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Automate Version :: %s", err)
 			return err
 		}
-		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Automate")))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Automate"))
 		writer.Println("\n")
 
 		for ip, version := range versions {
@@ -224,8 +224,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Infra server Version :: %s", err)
 			return err
 		}
-
-		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Chef Server")))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Chef Server"))
 		writer.Println("\n")
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
@@ -243,8 +242,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Opensearch Version :: %s", err)
 			return err
 		}
-
-		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Opensearch")))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Opensearch"))
 		writer.Println("\n")
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
@@ -261,8 +259,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Postgresql Version :: %s", err)
 			return err
 		}
-
-		writer.Println(chalk.Bold.TextStyle(chalk.Underline.TextStyle("Postgresql")))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Postgresql"))
 		writer.Println("\n")
 
 		for ip, version := range versions {
@@ -449,7 +446,7 @@ func getPostgresqlVersion(postgresqlIps []string, infra *AutomateHAInfraDetails,
 			return nil, errors.New("Couldn't get Super user password and name from config")
 		}
 		automateIps := infra.Outputs.AutomatePrivateIps.Value
-		pgCommand := fmt.Sprintf(PGGETVERSIONCURLCMD, sp, su)
+		pgCommand := fmt.Sprintf(PGGETVERSIONCURLCMD, sp, PGCOREPKG, su)
 		nodeMap := &NodeTypeAndCmd{
 			Frontend: &Cmd{CmdInputs: &CmdInputs{NodeType: false}},
 			Automate: &Cmd{CmdInputs: &CmdInputs{
@@ -663,7 +660,7 @@ func splitIP(node string) (nodes []string) {
 func validateIPAddresses(errorList *list.List, IpsFromcmd []string, nodeType, errorMessage string, infra *AutomateHAInfraDetails) ([]string, []string, *list.List) {
 	ips, err := getNodeIPs(false, "", infra, nodeType)
 	if err != nil {
-		errorList.PushBack("Error while getting node ips")
+		errorList.PushBack("Error while getting node ips" + err.Error())
 	}
 	var ipFound, ipNotFound []string
 

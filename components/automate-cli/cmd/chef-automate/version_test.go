@@ -500,22 +500,40 @@ func Test_getIPAddressesFromFlagOrInfra(t *testing.T) {
 }
 
 func Test_getIPAddressesFromFlag(t *testing.T) {
+	t.Run("Valid config", func(t *testing.T) {
+		infra := &AutomateHAInfraDetails{}
+		infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+		infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+		infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
 
-	infra := &AutomateHAInfraDetails{}
-	infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
-	infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
-	infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
+		VersionCommandFlags.isAutomate = true
+		VersionCommandFlags.isOpenSearch = true
+		VersionCommandFlags.isPostgresql = true
+		VersionCommandFlags.node = fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8)
 
-	VersionCommandFlags.isAutomate = true
-	VersionCommandFlags.isOpenSearch = true
-	VersionCommandFlags.isPostgresql = true
-	VersionCommandFlags.node = fmt.Sprintf("%s,%s,%s,%s", ValidIP, ValidIP3, ValidIP5, ValidIP8)
+		automateIps, chefServerIps, opensearchIps, postgresqlIps, _ := getIPAddressesFromFlagOrInfra(infra)
+		assert.Equal(t, automateIps, []string{ValidIP})
+		assert.Equal(t, opensearchIps, []string{ValidIP5})
+		assert.Equal(t, postgresqlIps, []string{ValidIP8})
+		assert.Empty(t, chefServerIps)
+	})
+	t.Run("Invalid config", func(t *testing.T) {
+		infra := &AutomateHAInfraDetails{}
+		infra.Outputs.AutomatePrivateIps.Value = []string{ValidIP, ValidIP1}
+		infra.Outputs.OpensearchPrivateIps.Value = []string{ValidIP4, ValidIP5, ValidIP6}
+		infra.Outputs.PostgresqlPrivateIps.Value = []string{ValidIP7, ValidIP8, ValidIP9}
 
-	automateIps, chefServerIps, opensearchIps, postgresqlIps, _ := getIPAddressesFromFlagOrInfra(infra)
-	assert.Equal(t, automateIps, []string{ValidIP})
-	assert.Equal(t, opensearchIps, []string{ValidIP5})
-	assert.Equal(t, postgresqlIps, []string{ValidIP8})
-	assert.Empty(t, chefServerIps)
+		VersionCommandFlags.isAutomate = true
+		VersionCommandFlags.node = fmt.Sprintf("%s,%s", TEST_IP, TEST_IP2)
+
+		automateIps, chefServerIps, opensearchIps, postgresqlIps, errorList := getIPAddressesFromFlagOrInfra(infra)
+		assert.Empty(t, automateIps)
+		assert.Empty(t, opensearchIps)
+		assert.Empty(t, postgresqlIps)
+		assert.Empty(t, chefServerIps)
+		assert.NotEmpty(t, errorList)
+	})
+
 }
 
 func Test_getPgAuth(t *testing.T) {

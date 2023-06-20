@@ -14,10 +14,11 @@ const (
 	A2VERSIONVERBOSE    = "sudo chef-automate version -v "
 	CSVERSIONCMD        = "sudo chef-server-ctl version"
 	OSGETINFOCURLCMD    = "curl -XGET http://localhost:10144"
-	PGGETVERSIONCURLCMD = "PGPASSWORD=%s  hab pkg exec core/postgresql13  psql -U %s -h localhost -p 10145 -d postgres --dbname postgres -tAc 'SELECT version()'"
+	PGGETVERSIONCURLCMD = "PGPASSWORD=%s  hab pkg exec %s  psql -U %s -h localhost -p 10145 -d postgres --dbname postgres -tAc 'SELECT version()'"
 	HABSVCSTATUS        = "echo yes |sudo hab svc status"
 	CONFIGSHOW          = "sudo chef-automate config show"
 	VERSIONREGEX        = `(\d+\.\d+\.\d+)`
 	PGVERSIONREGEX      = `PostgreSQL (\d+\.\d+)`
 	OSVERSIONREGEX      = `"number"\s*:\s*"([^"]+)"`
+	PGCOREPKG           = "core/postgresql13 "
 )
