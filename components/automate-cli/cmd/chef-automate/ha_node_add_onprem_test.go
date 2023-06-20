@@ -12,6 +12,7 @@ import (
 )
 
 const CONFIG_TOML_PATH = "../../pkg/testfiles/onprem"
+const CONFIG_AWS_TOML_PATH = "../../pkg/testfiles/aws"
 const TEST_IP_1 = "192.0.2.11"
 
 type MockSSHUtilsImpl struct {
