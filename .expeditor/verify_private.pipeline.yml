@@ -933,7 +933,7 @@ steps:
   - label: "ocid"
     command:
       - integration/run_test integration/tests/testing_ocid.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 15
     expeditor:
       secrets:
         A2_LICENSE:

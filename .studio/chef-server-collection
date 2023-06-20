@@ -457,15 +457,15 @@ test_if_env_vars_are_configured() {
   errors=()
 
   if [ $endpoint != "https://127.0.0.1:443" ]; then
-    errors+=("Endpoint not configured properly.")
+    errors+=("Chef-Server endpoint is not configured properly.")
   fi
 
   if [ $superuser != "pivotal" ]; then
-    errors+=("Superuser not configured properly.")
+    errors+=("Chef-Server superuser is not configured properly.")
   fi
 
   if [ $ssl_verify_mode != "verify_none" ]; then
-    errors+=("Verify mode not configured properly.")
+    errors+=("Chef-Server SSL certificate verification mode is not configured properly.")
   fi
 
   if [ ${#errors} -gt 0 ]; then
@@ -500,7 +500,7 @@ test_if_webui_key_is_patched() {
 
   # Extract webui_key from private-chef-secrets.json
   ocid_secrets_file_path="$(hab pkg path chef/oc_id)/oc_id/config/private-chef-secrets.json"
-  ocid_webui_key="$(jq --arg variable_name "chef-server" -r '.[$variable_name]."webui_key"' < $ocid_secrets_file_path)"
+  ocid_webui_key="$(jq --arg elem "chef-server" -r '.[$elem]."webui_key"' < $ocid_secrets_file_path)"
 
   # Create a temporary file with the ocid_webui_key content
   echo "$ocid_webui_key" > temp_ocid_webui_key.pem
