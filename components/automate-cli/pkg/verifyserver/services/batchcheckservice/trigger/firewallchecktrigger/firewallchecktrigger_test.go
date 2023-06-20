@@ -17,28 +17,25 @@ import (
 )
 
 var (
-	hardware = models.Hardware{
+	hardware = &models.Hardware{
 		AutomateNodeIps:        []string{"10.0.0.1", "10.0.0.2"},
 		PostgresqlNodeIps:      []string{"10.0.0.3", "10.0.0.6"},
 		OpenSearchNodeIps:      []string{"10.0.0.5", "10.0.0.10"},
 		ChefInfraServerNodeIps: []string{"10.0.0.7"},
 	}
 
-	certificatelist = []models.Certificate{
+	certificatelist = []*models.Certificate{
 		{
-			Fqdn:         "url",
-			FqdnRootCert: "",
-			NodeType:     constants.AUTOMATE,
-			Nodes:        nodes,
+			Nodes: nodes,
 		},
 	}
-	nodeCert = models.NodeCert{
-		IP:       "10.0.0.1",
-		RootCert: "test-cert",
-		Key:      "test-key",
+
+	nodeCert = &models.NodeCert{
+		IP:  "10.0.0.1",
+		Key: "test-key",
 	}
 
-	nodes = []models.NodeCert{nodeCert}
+	nodes = []*models.NodeCert{nodeCert}
 )
 
 const (
@@ -373,7 +370,7 @@ const (
 
 func TestMakeRequests(t *testing.T) {
 	// Create a sample configuration
-	config := models.Config{
+	config := &models.Config{
 		Hardware:    hardware,
 		Certificate: certificatelist,
 	}
@@ -485,7 +482,7 @@ func createDummyServer(t *testing.T, requiredStatusCode int, invalidParseRespons
 func TestFirewallCheck_Run(t *testing.T) {
 
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
 		name                 string
@@ -499,8 +496,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Automate Pg Passed",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -513,8 +510,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Automate Pg failure",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -528,8 +525,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Internal Server Error For automate and other nodes",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -544,8 +541,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		{
 			name: "Error in parsing the response",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -559,8 +556,8 @@ func TestFirewallCheck_Run(t *testing.T) {
 		}, {
 			name: "Status Bad Request",
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeIps:   []string{"10.0.0.1"},
 						PostgresqlNodeIps: []string{"10.0.0.3"},
 					},
@@ -572,10 +569,28 @@ func TestFirewallCheck_Run(t *testing.T) {
 			isError:              true,
 			invalidParseResponse: true,
 		},
+		{
+			name: "Hardware Nil",
+			args: args{
+				config: &models.Config{
+					Hardware: nil,
+					Certificate: []*models.Certificate{
+						{
+							Nodes: nodes,
+						},
+					},
+					ExternalOS: nil,
+					ExternalPG: nil,
+				},
+			},
+			response:       "",
+			httpStatusCode: http.StatusOK,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
+
 				// Create a dummy server
 				server, host, port := createDummyServer(t, tt.httpStatusCode, tt.invalidParseResponse, tt.isFailed)
 				defer server.Close()
@@ -597,6 +612,16 @@ func TestFirewallCheck_Run(t *testing.T) {
 						assert.NotNil(t, got[i].Host)
 					}
 
+				} else if tt.name == "Hardware Nil" {
+					assert.Len(t, got, 5)
+					for _, v := range got {
+						if v.CheckType == constants.BASTION {
+							assert.Equal(t, constants.LOCALHOST, v.Host)
+						}
+						assert.Equal(t, constants.FIREWALL, v.CheckType)
+						assert.Equal(t, constants.FIREWALL, v.Result.Check)
+						assert.True(t, v.Result.Skipped)
+					}
 				} else {
 					var want []models.CheckTriggerResponse
 					json.Unmarshal([]byte(tt.response), &want)

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/chef/automate/lib/config"
@@ -9,7 +10,7 @@ import (
 
 type BatchCheckRequest struct {
 	Checks []string `json:"checks"`
-	Config Config   `json:"config"`
+	Config *Config  `json:"config"`
 }
 
 type MockServerFromBatchServiceResponse struct {
@@ -49,15 +50,15 @@ type ObjectStorage struct {
 	AWSRegion  string `json:"aws_region"`
 }
 type Backup struct {
-	FileSystem    FileSystem    `json:"file_system"`
-	ObjectStorage ObjectStorage `json:"object_storage"`
+	FileSystem    *FileSystem    `json:"file_system"`
+	ObjectStorage *ObjectStorage `json:"object_storage"`
 }
 
 type Certificate struct {
-	Fqdn         string     `json:"fqdn"`
-	FqdnRootCert string     `json:"fqdn_root_ca"`
-	NodeType     string     `json:"node_type"`
-	Nodes        []NodeCert `json:"nodes"`
+	Fqdn         string      `json:"fqdn"`
+	FqdnRootCert string      `json:"fqdn_root_ca"`
+	NodeType     string      `json:"node_type"`
+	Nodes        []*NodeCert `json:"nodes"`
 }
 
 type ExternalOS struct {
@@ -79,25 +80,25 @@ type ExternalPG struct {
 }
 
 type Config struct {
-	SSHUser         SSHUser       `json:"ssh_user"`
-	Arch            string        `json:"arch"`
-	Backup          Backup        `json:"backup"`
-	Hardware        Hardware      `json:"hardware"`
-	Certificate     []Certificate `json:"certificate"`
-	ExternalOS      ExternalOS    `json:"external_opensearch"`
-	ExternalPG      ExternalPG    `json:"external_postgresql"`
-	DeploymentState string        `json:"deployment_state"`
-	APIToken        string        `json:"api_token"`
+	SSHUser         *SSHUser       `json:"ssh_user"`
+	Arch            string         `json:"arch"`
+	Backup          *Backup        `json:"backup"`
+	Hardware        *Hardware      `json:"hardware"`
+	Certificate     []*Certificate `json:"certificate"`
+	ExternalOS      *ExternalOS    `json:"external_opensearch"`
+	ExternalPG      *ExternalPG    `json:"external_postgresql"`
+	DeploymentState string         `json:"deployment_state"`
+	APIToken        string         `json:"api_token"`
 }
 
-func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []NodeCert {
-	nodeCertsList := make([]NodeCert, 0)
+func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
+	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
 	for _, ip := range ipList {
 		certByIP, ok := certByIpMap[ip]
-		var nodeCert NodeCert
+		var nodeCert *NodeCert
 		if ok {
-			nodeCert = NodeCert{
+			nodeCert = &NodeCert{
 				IP:        certByIP.IP,
 				Key:       certByIP.PrivateKey,
 				Cert:      certByIP.PublicKey,
@@ -106,7 +107,7 @@ func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, p
 				RootCert:  nodeRootCa,
 			}
 		} else {
-			nodeCert = NodeCert{
+			nodeCert = &NodeCert{
 				IP:        ip,
 				Key:       privateKey,
 				Cert:      publicKey,
@@ -134,11 +135,13 @@ func createMapforCertByIp(certsByIP *[]config.CertByIP) map[string]*config.CertB
 }
 
 func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
+	if haConfig == nil {
+		return nil
+	}
 	err := haConfig.Verify()
 	if err != nil {
 		return err
 	}
-
 	if err = c.populateCommonConfig(haConfig); err != nil {
 		return err
 	}
@@ -188,6 +191,10 @@ func (c *Config) populateExistingInfraConfig(haConfig *config.HaDeployConfig) {
 
 func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 	var err error
+
+	if haConfig == nil {
+		return errors.New("haConfig is nil")
+	}
 	c.Hardware.AutomateNodeCount, err = strconv.Atoi(haConfig.Automate.Config.InstanceCount)
 	if err != nil {
 		return err
@@ -311,8 +318,8 @@ func (c *Config) populateExistingInfraCommonConfig(haConfig *config.HaDeployConf
 	c.Certificate = append(c.Certificate, cert)
 }
 
-func addCertificatesInConfig(fqdn, rootCA, nodeType string) Certificate {
-	cert := Certificate{
+func addCertificatesInConfig(fqdn, rootCA, nodeType string) *Certificate {
+	cert := &Certificate{
 		Fqdn:         fqdn,
 		FqdnRootCert: rootCA,
 		NodeType:     nodeType,
@@ -390,6 +397,7 @@ type ApiResult struct {
 	Check   string       `json:"check"`
 	Checks  []Checks     `json:"checks"`
 	Error   *fiber.Error `json:"error,omitempty"`
+	Skipped bool         `json:"skipped"`
 }
 
 type Checks struct {
@@ -398,6 +406,7 @@ type Checks struct {
 	SuccessMsg    string `json:"success_msg"`
 	ErrorMsg      string `json:"error_msg"`
 	ResolutionMsg string `json:"resolution_msg"`
+	Skipped       bool   `json:"skipped"`
 }
 
 // is this supposed to be cert_by_ip? this struct needs modifiation

@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // mockTransport is a mock implementation of the http.RoundTripper interface
@@ -197,8 +198,8 @@ func GetRequestJsonWithSameFrontEnd() models.Config {
 	return ipConfig
 }
 
-func GetRequestJson() models.Config {
-	ipConfig := models.Config{}
+func GetRequestJson() *models.Config {
+	ipConfig := &models.Config{}
 
 	json.Unmarshal([]byte(`{
 		"ssh_user": {
@@ -544,6 +545,61 @@ func TestCertificateCheck_Run(t *testing.T) {
 			assert.Empty(t, resp.Result.Checks)
 			assert.Equal(t, resp.Result.Passed, false)
 		}
+	})
+
+	t.Run("Nil Cert", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			Certificate: nil,
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 4)
+		assert.Equal(t, "12.12.1.7", ctr[1].Host)
+		require.Equal(t, constants.CERTIFICATE, ctr[0].Result.Check)
+		assert.Nil(t, ctr[0].Result.Error)
+		require.True(t, ctr[0].Result.Skipped)
+	})
+
+	t.Run("Empty Cert", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.2"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.3"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.4"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.5"},
+			},
+			Certificate: []*models.Certificate{},
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 4)
+
+		for _, v := range ctr {
+			require.Equal(t, constants.CERTIFICATE, v.Result.Check)
+			assert.NotEmpty(t, v.Host)
+			require.False(t, v.Result.Skipped)
+			require.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			require.Equal(t, constants.MISSING_CERTIFICATE, v.Result.Error.Message)
+		}
+
 	})
 
 }

@@ -434,28 +434,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with backend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "automate type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -468,28 +472,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with backend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "automate type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -502,28 +510,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with backend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -536,28 +548,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with backend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -570,28 +586,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with frontend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "postgresql type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -604,28 +624,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with frontend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "postgresql type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -638,28 +662,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with frontend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "postgresql type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -672,28 +700,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with frontend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "opensearch type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -706,28 +738,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with frontend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "opensearch type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					},
@@ -740,28 +776,32 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 								"passed": true,
 								"success_msg": "IP address is unique",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "IP address is of valid format",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "Not shared with frontend nodes",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							},
 							{
 								"title": "IP address",
 								"passed": true,
 								"success_msg": "opensearch type has valid count as per Automate HA requirement",
 								"error_msg": "",
-								"resolution_msg": ""
+								"resolution_msg": "",
+								"skipped":false
 							}
 						]
 					}

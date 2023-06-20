@@ -70,75 +70,76 @@ const (
 	  }`
 )
 
-func GetRequestJson() models.Config {
+func GetRequestJson() *models.Config {
 	ipConfig := models.Config{}
 
 	json.Unmarshal([]byte(`{
-		  "ssh_user": {
+		"ssh_user": {
 			"user_name": "ubuntu",
-			"private_key": "test_key",
-			"sudo_password": "test@123"
-		  },
-		  "arch": "existing_nodes",
-		  "backup": {
+            "ssh_port": "1234",
+            "private_key": "test_key",
+            "sudo_password": "test@123"
+		},
+		"arch": "existing_nodes",
+		"backup": {
 			"file_system": {
-			  "mount_location": "/mnt/automate_backups"
+				"mount_location": "/mnt/automate_backups"
 			}
-		  },
-		  "hardware": {
+		},
+		"hardware": {
 			"automate_node_count": 1,
 			"automate_node_ips": [
-			  "1.2.3.4"
+				"1.2.3.4"
 			],
 			"chef_infra_server_node_count": 1,
 			"chef_infra_server_node_ips": [
-			  "5.6.7.8"
+				"5.6.7.8"
 			],
 			"postgresql_node_count": 1,
 			"postgresql_node_ips": [
-			  "9.10.11.12"
+				"9.10.11.12"
 			],
 			"opensearch_node_count": 1,
 			"opensearch_node_ips": [
-			  "14.15.16.17"
+				"14.15.16.17"
 			]
-		  },
-		  "certificate": {
-			"fqdn":"my_fqdn",
-			"root_cert":"---- VALID ROOT CA ----",
-			"nodes":[
+		},
+		"certificate": {
+			"fqdn": "my_fqdn",
+			"root_cert": "---- VALID ROOT CA ----",
+			"nodes": [
 				{
-					"ip":"1.2.3.4",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "1.2.3.4",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				},
 				{
-					"ip":"5.6.7.8",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "5.6.7.8",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				},
 				{
-					"ip":"9.10.11.12",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "9.10.11.12",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				},
 				{
-					"ip":"14.15.16.17",
-					"cert":"---- VALID NODE CERT ----",
-					"key":"---- VALID PRIVATE KEY ----",
-					"admin_key":"---- VALID ADMIN PRIVATE KEY ----",
-					"admin_cert":"---- VALID ADMIN CERT ----"
+					"ip": "14.15.16.17",
+					"cert": "---- VALID NODE CERT ----",
+					"key": "---- VALID PRIVATE KEY ----",
+					"admin_key": "---- VALID ADMIN PRIVATE KEY ----",
+					"admin_cert": "---- VALID ADMIN CERT ----"
 				}
 			]
-		  }
-		}`), &ipConfig)
-	return ipConfig
+		}
+	}`), &ipConfig)
+	return &ipConfig
 }
 
 func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error {
@@ -184,7 +185,6 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		defer mockServer.Close()
 
 		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1124")
-
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(finalResp))
@@ -278,6 +278,71 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		}
 	})
 
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: nil,
+		}
+
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.SSH_USER, got[1].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+	})
+	t.Run("Nil SSHUser", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			SSHUser: nil,
+		}
+
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		for _, v := range got {
+			assert.Equal(t, constants.SSH_USER, v.CheckType)
+			assert.Equal(t, constants.SSH_USER, v.Result.Check)
+			assert.Nil(t, v.Result.Error)
+			assert.True(t, v.Result.Skipped)
+		}
+	})
+	t.Run("Empty SSHUser", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.6"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.7"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.8"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.9"},
+			},
+			SSHUser: &models.SSHUser{},
+		}
+
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 4)
+		for _, v := range got {
+			assert.Equal(t, constants.SSH_USER, v.CheckType)
+			assert.False(t, v.Result.Skipped)
+			assert.Equal(t, http.StatusBadRequest, v.Result.Error.Code)
+			assert.Equal(t, "SSH credentials is missing", v.Result.Error.Message)
+			assert.Equal(t, constants.SSH_USER, v.Result.Check)
+		}
+	})
 }
 
 func TestGetSShUserAPIRquest(t *testing.T) {
@@ -297,6 +362,7 @@ func GetSshRequest() models.SShUserRequest {
 		Username:     "ubuntu",
 		PrivateKey:   "test_key",
 		SudoPassword: "test@123",
+		Port:         "1234",
 	}
 	return request
 }

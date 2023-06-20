@@ -25,11 +25,11 @@ func NewFqdnCheck(log logger.Logger, port string) *FqdnCheck {
 	}
 }
 
-func (fqc *FqdnCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (fqc *FqdnCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 
 	endPoint := checkutils.PrepareEndPoint(fqc.host, fqc.port, constants.FQDN_LOAD_BALANCER_CHECK)
 
-	return triggerFqdnCheck(&config, endPoint, fqc.log)
+	return triggerFqdnCheck(config, endPoint, fqc.log)
 
 }
 

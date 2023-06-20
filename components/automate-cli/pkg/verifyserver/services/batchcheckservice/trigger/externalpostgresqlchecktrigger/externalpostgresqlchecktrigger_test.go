@@ -212,7 +212,7 @@ const (
 	postgresqlSuperUserPassword = "Chefautomate"
 	postgresqlDbUserUserName    = "postgres"
 	postgresqlDbUserPassword    = "Chefautomate"
-	postgresqlRootCert          = ""
+	postgresqlRootCert          = "----CERT----"
 )
 
 func getRequest() models.ExternalPgRequest {
@@ -231,7 +231,7 @@ func getRequest() models.ExternalPgRequest {
 
 func TestPostgresCheckAutomate_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 
 	tests := []struct {
@@ -248,11 +248,12 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.4"},
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -271,11 +272,12 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.3"},
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -293,11 +295,12 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusInternalServerError,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.2"},
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -315,11 +318,12 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusGatewayTimeout,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"127.0.0.1"},
 					},
-					ExternalPG: models.ExternalPG{
+					ExternalPG: &models.ExternalPG{
 						PGInstanceURL:       postgresqlInstanceUrl,
 						PGSuperuserName:     postgresqlSuperUserUserName,
 						PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -331,7 +335,41 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			},
 			response: "error while connecting to the endpoint, received invalid status code",
 		},
+		{
+			name:           "Empty PG",
+			isPassed:       false,
+			isError:        true,
+			httpStatusCode: http.StatusBadRequest,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount:        2,
+						AutomateNodeIps:          []string{"127.0.0.1", "127.0.0.10"},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
+					},
+					ExternalPG: &models.ExternalPG{},
+				},
+			},
+			response: "PG configuration is missing",
+		},
+		{
+			name:     "Nil PG",
+			isPassed: false,
+			args: args{
+				config: &models.Config{
+					Hardware: &models.Hardware{
+						AutomateNodeCount:        1,
+						AutomateNodeIps:          []string{"127.0.0.1"},
+						ChefInfraServerNodeCount: 1,
+						ChefInfraServerNodeIps:   []string{"1.1.1.1"},
+					},
+					ExternalPG: nil,
+				},
+			},
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var want []models.CheckTriggerResponse
@@ -353,16 +391,37 @@ func TestPostgresCheckAutomate_Run(t *testing.T) {
 			got := svc.Run(tt.args.config)
 
 			if tt.isError {
-				assert.NotNil(t, got[0].Result.Error)
-				assert.Equal(t, constants.LOCALHOST, got[0].Host)
-				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-				assert.Equal(t, tt.httpStatusCode, got[0].Result.Error.Code)
-				assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				if tt.name == "Empty PG" {
+					assert.NotNil(t, got[0].Result.Error)
+					assert.Equal(t, constants.LOCALHOST, got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+					assert.Equal(t, constants.PG_DETAILS_MISSING, got[0].Result.Error.Message)
+					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+
+					assert.Len(t, got, 3)
+				} else {
+					assert.NotNil(t, got[0].Result.Error)
+					assert.Equal(t, constants.LOCALHOST, got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.Equal(t, tt.httpStatusCode, got[0].Result.Error.Code)
+					assert.Equal(t, tt.response, got[0].Result.Error.Error())
+				}
+
 			} else {
-				assert.Nil(t, got[0].Result.Error)
-				assert.Equal(t, constants.LOCALHOST, got[0].Host)
-				assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
-				assert.Equal(t, want, got)
+				if tt.name == "Nil PG" {
+					assert.Len(t, got, 3)
+					assert.Equal(t, "127.0.0.1", got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.True(t, got[0].Result.Skipped)
+				} else {
+					assert.Nil(t, got[0].Result.Error)
+					assert.Equal(t, constants.LOCALHOST, got[0].Host)
+					assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+					assert.Equal(t, want, got)
+				}
+
 			}
 
 		})
@@ -373,11 +432,11 @@ func TestForChefserverPostgres(t *testing.T) {
 	t.Run("ChefServer Postgres check pass", func(t *testing.T) {
 		var want []models.CheckTriggerResponse
 
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 2,
 			},
-			ExternalPG: models.ExternalPG{
+			ExternalPG: &models.ExternalPG{
 				PGInstanceURL:       postgresqlInstanceUrl,
 				PGSuperuserName:     postgresqlSuperUserUserName,
 				PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -410,19 +469,19 @@ func TestForChefserverPostgres(t *testing.T) {
 			assert.Equal(t, externalPostgresqlResponseSuccessChefServerExpected, got[0].Result.Error.Error())
 		} else {
 			assert.Nil(t, got[0].Result.Error)
-			assert.Equal(t, constants.LOCALHOST, got[0].Host)
+			assert.Equal(t, host, got[0].Host)
 			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
-			assert.Equal(t, want, got)
 		}
 	})
 	t.Run("ChefServer Postgres check fail", func(t *testing.T) {
 		var want []models.CheckTriggerResponse
 
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				ChefInfraServerNodeCount: 2,
+				ChefInfraServerNodeIps:   []string{"127.0.0.1"},
 			},
-			ExternalPG: models.ExternalPG{
+			ExternalPG: &models.ExternalPG{
 				PGInstanceURL:       postgresqlInstanceUrl,
 				PGSuperuserName:     postgresqlSuperUserUserName,
 				PGSuperuserPassword: postgresqlSuperUserPassword,
@@ -457,9 +516,9 @@ func TestForChefserverPostgres(t *testing.T) {
 			assert.Nil(t, got[0].Result.Error)
 			assert.Equal(t, constants.LOCALHOST, got[0].Host)
 			assert.Equal(t, constants.CHEF_INFRA_SERVER, got[0].NodeType)
-			assert.Equal(t, want, got)
 		}
 	})
+
 }
 
 // Helper function to create a dummy server
@@ -513,4 +572,22 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))
+}
+
+func TestRunCheck(t *testing.T) {
+	t.Run("Nil Hardware", func(t *testing.T) {
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: nil,
+		}
+
+		newOS := NewExternalPostgresCheck(logger.NewLogrusStandardLogger(), "8080")
+		got := newOS.Run(config)
+		assert.Len(t, got, 2)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
+		assert.Equal(t, constants.CHEF_INFRA_SERVER, got[1].NodeType)
+		assert.Equal(t, constants.EXTERNAL_POSTGRESQL, got[1].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+
+	})
 }

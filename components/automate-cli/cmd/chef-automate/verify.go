@@ -229,7 +229,6 @@ func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj
 
 func (v *verifyCmdFlow) RunVerify(config string) error {
 	var configPath string
-
 	// TODO : config flag is optional for now. Need to handle the default config path
 	if len(strings.TrimSpace(config)) > 0 {
 		configPath = config
@@ -241,7 +240,14 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	}
 
 	// Get config required for batch-check API call
-	batchCheckConfig := &models.Config{}
+	batchCheckConfig := &models.Config{
+		Hardware: &models.Hardware{},
+		SSHUser:  &models.SSHUser{},
+		Backup: &models.Backup{
+			FileSystem:    &models.FileSystem{},
+			ObjectStorage: &models.ObjectStorage{},
+		},
+	}
 	err = batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {
 		return err
@@ -313,7 +319,7 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 	// Doing batch-check API call for bastion
 	batchCheckBastionReq := models.BatchCheckRequest{
 		Checks: constants.GetBastionChecks(),
-		Config: batchCheckConfig,
+		Config: &batchCheckConfig,
 	}
 
 	return v.makeBatchCheckAPICall(batchCheckBastionReq, BASTION)
@@ -357,7 +363,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 	// Doing batch-check API call for remote nodes
 	batchCheckRemoteReq := models.BatchCheckRequest{
 		Checks: constants.GetRemoteChecks(),
-		Config: batchCheckConfig,
+		Config: &batchCheckConfig,
 	}
 	return v.makeBatchCheckAPICall(batchCheckRemoteReq, REMOTE_NODES)
 }

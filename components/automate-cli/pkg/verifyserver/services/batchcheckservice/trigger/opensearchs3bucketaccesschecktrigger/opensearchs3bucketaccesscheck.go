@@ -24,7 +24,19 @@ func NewOpensearchS3BucketAccessCheck(log logger.Logger, port string) *Opensearc
 	}
 }
 
-func (osb *OpensearchS3BucketAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.ExternalOS == nil || config.Backup.ObjectStorage == nil {
+		return []models.CheckTriggerResponse{
+			trigger.SkippedTriggerCheckResp(constants.UNKNOWN_HOST, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH),
+		}
+	}
+
+	if isEmptyExternalOS(config.ExternalOS) || isObjectStorage(config.Backup) {
+		return []models.CheckTriggerResponse{
+			trigger.ErrTriggerCheckResp(config.ExternalOS.OSDomainURL, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, constants.OPENSEARCH, constants.OBJECT_STORAGE_MISSING),
+		}
+	}
+
 	s3OpensearchBackupRequest := models.S3BackupDetails{
 		Endpoint:   config.ExternalOS.OSDomainURL,
 		Username:   config.ExternalOS.OSUsername,
@@ -74,4 +86,19 @@ func triggerCheckForOpensearchS3Backup(endPoint string, log logger.Logger, metho
 
 	return result
 
+}
+
+func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
+	return externalOS.OSDomainURL == "" ||
+		externalOS.OSUsername == "" ||
+		externalOS.OSUserPassword == "" ||
+		externalOS.OSRoleArn == ""
+}
+
+func isObjectStorage(backup *models.Backup) bool {
+	return backup.ObjectStorage.BucketName == "" ||
+		backup.ObjectStorage.BasePath == "" ||
+		backup.ObjectStorage.AccessKey == "" ||
+		backup.ObjectStorage.SecretKey == "" ||
+		backup.ObjectStorage.AWSRegion == ""
 }

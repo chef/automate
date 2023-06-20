@@ -41,6 +41,24 @@ const (
 	}`
 )
 
+var externalOS = &models.ExternalOS{
+	OSDomainName:   "example.com",
+	OSDomainURL:    "https://example.com",
+	OSUsername:     "username",
+	OSUserPassword: "password",
+	OSCert:         "certificate",
+	OSRoleArn:      "arn:aws:iam::123456789012:role/MyRole",
+}
+
+var externalPG = &models.ExternalPG{
+	PGInstanceURL:       "http://example.com",
+	PGSuperuserName:     "superuser",
+	PGSuperuserPassword: "superpassword",
+	PGDbUserName:        "dbuser",
+	PGDbUserPassword:    "dbpassword",
+	PGRootCert:          "rootcert",
+}
+
 func TestSoftwareVersionCheck_Run(t *testing.T) {
 	t.Run("Software Version Check", func(t *testing.T) {
 		// Create a dummy server
@@ -48,11 +66,13 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
@@ -80,11 +100,13 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
+			ExternalOS: externalOS,
+			ExternalPG: externalPG,
 		}
 
 		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
@@ -95,6 +117,31 @@ func TestSoftwareVersionCheck_Run(t *testing.T) {
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
 		assert.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
 	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		// Create a dummy server
+		server, _, port := createDummyServer(t, http.StatusInternalServerError)
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware: nil,
+		}
+
+		suc := NewSoftwareVersionCheck(logger.NewLogrusStandardLogger(), port)
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 5)
+		for _, v := range ctr {
+			if v.NodeType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.True(t, v.Result.Skipped)
+			assert.Equal(t, constants.SOFTWARE_VERSIONS, v.CheckType)
+			assert.Equal(t, constants.SOFTWARE_VERSIONS, v.Result.Check)
+		}
+	})
+
 }
 
 // Helper function to create a dummy server

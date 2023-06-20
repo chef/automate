@@ -45,8 +45,8 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -77,8 +77,8 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		defer server.Close()
 
 		// Test data
-		config := models.Config{
-			Hardware: models.Hardware{
+		config := &models.Config{
+			Hardware: &models.Hardware{
 				AutomateNodeCount: 1,
 				AutomateNodeIps:   []string{host},
 			},
@@ -92,6 +92,33 @@ func TestSystemResourceCheck_Run(t *testing.T) {
 		require.Equal(t, ctr[0].Result.Error.Code, http.StatusInternalServerError)
 		require.Equal(t, "error while connecting to the endpoint, received invalid status code", ctr[0].Result.Error.Error())
 	})
+
+	t.Run("Nil Hardware", func(t *testing.T) {
+		// Create a dummy server
+		server, _, port := createDummyServer(t, http.StatusInternalServerError)
+		defer server.Close()
+
+		// Test data
+		config := &models.Config{
+			Hardware:   nil,
+			ExternalOS: &models.ExternalOS{},
+			ExternalPG: &models.ExternalPG{},
+		}
+
+		suc := NewSystemResourceCheck(logger.NewLogrusStandardLogger(), port)
+		got := suc.Run(config)
+
+		require.Len(t, got, 5)
+		for _, v := range got {
+			if v.CheckType == constants.BASTION {
+				assert.Equal(t, constants.LOCALHOST, v.Host)
+			}
+			assert.Equal(t, constants.SYSTEM_RESOURCES, v.CheckType)
+			assert.Equal(t, constants.SYSTEM_RESOURCES, v.Result.Check)
+			assert.True(t, v.Result.Skipped)
+		}
+	})
+
 }
 
 // Helper function to create a dummy server

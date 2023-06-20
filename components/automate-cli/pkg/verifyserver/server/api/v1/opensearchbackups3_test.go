@@ -81,7 +81,7 @@ func TestOpensearchS3BackupAPI(t *testing.T) {
 				"aws_region": "eu-north-1",
 				"aws_role_arn": "arn:to:the:backend:role"
 			  }`,
-			expectedBody: "{\"passed\":true,\"checks\":[{\"title\":\"Create test backup\",\"passed\":true,\"success_msg\":\"OpenSearch is able to create backup to provided S3\",\"error_msg\":\"\",\"resolution_msg\":\"\"}]}",
+			expectedBody: "{\"status\":\"SUCCESS\",\"result\":{\"passed\":true,\"checks\":[{\"title\":\"Create test backup\",\"passed\":true,\"success_msg\":\"OpenSearch is able to create backup to provided S3\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}]}}",
 		}, {
 			description:  "400:Bad Request - Mandatory field set to empty",
 			expectedCode: 400,

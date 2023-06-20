@@ -101,21 +101,24 @@ func TestCheckFqdn(t *testing.T) {
 							"passed": true,
 							"success_msg": "FQDN is reachable",
 							"error_msg": "",
-							"resolution_msg": ""
+							"resolution_msg": "",
+							"skipped":false
 						},
 						{
 							"title": "Nodes are reachable",
 							"passed": true,
 							"success_msg": "All nodes are reachable",
 							"error_msg": "",
-							"resolution_msg": ""
+							"resolution_msg": "",
+							"skipped":false
 						},
 						{
 							"title": "Certificate validity for FQDN",
 							"passed": true,
 							"success_msg": "FQDN has with valid certificates",
 							"error_msg": "",
-							"resolution_msg": ""
+							"resolution_msg": "",
+							"skipped":false
 						}
 					]
 				}

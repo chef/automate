@@ -25,9 +25,20 @@ func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
 	}
 }
 
-func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerResponse {
-
+func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing SSH user access check from batch check ")
+
+	// Check if certificate is empty or nil
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.SSH_USER, true, true, false)
+	}
+	if config.SSHUser == nil {
+		return trigger.ConstructNilResp(config, constants.SSH_USER)
+	}
+	if IsSSHUserEmpty(config.SSHUser) {
+		return trigger.ConstructEmptyResp(config, constants.SSH_USER, "SSH credentials is missing")
+	}
+
 	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
 		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
 
@@ -51,7 +62,7 @@ func (ss *SshUserAccessCheck) Run(config models.Config) []models.CheckTriggerRes
 	return finalResult
 }
 
-func getSShUserAPIRquest(ip string, sshUser models.SSHUser) models.SShUserRequest {
+func getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
 
 	return models.SShUserRequest{
 		IP:           ip,
@@ -65,4 +76,8 @@ func getSShUserAPIRquest(ip string, sshUser models.SSHUser) models.SShUserReques
 func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
+}
+
+func IsSSHUserEmpty(sshUser *models.SSHUser) bool {
+	return (sshUser.Username == "" || sshUser.Port == "" || sshUser.PrivateKey == "")
 }

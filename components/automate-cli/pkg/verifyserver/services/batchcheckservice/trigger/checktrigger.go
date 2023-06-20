@@ -20,7 +20,7 @@ type CheckTrigger struct {
 	SystemUserCheck               ICheck
 }
 type ICheck interface {
-	Run(config models.Config) []models.CheckTriggerResponse
+	Run(config *models.Config) []models.CheckTriggerResponse
 	GetPortsForMockServer() map[string]map[string][]int
 }
 

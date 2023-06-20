@@ -15,8 +15,8 @@ const (
 	key     = "test_key"
 )
 
-func GetRequestJson() models.Hardware {
-	ipConfig := models.Hardware{}
+func GetRequestJson() *models.Hardware {
+	ipConfig := &models.Hardware{}
 
 	json.Unmarshal([]byte(` {
 			"automate_node_count": 1,
@@ -67,7 +67,7 @@ func TestGetNodeTypeMap(t *testing.T) {
 	assert.Equal(t, expected, GetNodeTypeMap(GetRequestJson()))
 
 	config := models.Config{
-		Hardware: models.Hardware{
+		Hardware: &models.Hardware{
 			AutomateNodeIps:        []string{"192.168.1.1"},
 			ChefInfraServerNodeIps: []string{"192.168.1.1"},
 			OpenSearchNodeIps:      []string{"192.168.1.3"},
@@ -87,17 +87,17 @@ func TestGetNodeTypeMap(t *testing.T) {
 func TestGetCertificateMap(t *testing.T) {
 	tests := []struct {
 		name            string
-		certificateList []models.Certificate
-		want            map[string]models.Certificate
+		certificateList []*models.Certificate
+		want            map[string]*models.Certificate
 	}{
 		{
 			name: "Adding Certificate Config with automate,chef-server,opensearch,postgresql",
-			certificateList: []models.Certificate{
+			certificateList: []*models.Certificate{
 				{
 					Fqdn:         "Automate_FQDN",
 					NodeType:     constants.AUTOMATE,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "1.2.3.4",
 							Cert: cert,
@@ -109,7 +109,7 @@ func TestGetCertificateMap(t *testing.T) {
 					Fqdn:         "Chef_server_fqdn",
 					NodeType:     constants.CHEF_INFRA_SERVER,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "5.6.7.8",
 							Cert: cert,
@@ -121,7 +121,7 @@ func TestGetCertificateMap(t *testing.T) {
 					Fqdn:         "",
 					NodeType:     constants.OPENSEARCH,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "10.12.13.14",
 							Cert: cert,
@@ -133,7 +133,7 @@ func TestGetCertificateMap(t *testing.T) {
 					Fqdn:         "",
 					NodeType:     constants.POSTGRESQL,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "10.12.13.14",
 							Cert: cert,
@@ -142,12 +142,12 @@ func TestGetCertificateMap(t *testing.T) {
 					},
 				},
 			},
-			want: map[string]models.Certificate{
+			want: map[string]*models.Certificate{
 				constants.AUTOMATE: {
 					Fqdn:         "Automate_FQDN",
 					NodeType:     constants.AUTOMATE,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "1.2.3.4",
 							Cert: cert,
@@ -160,7 +160,7 @@ func TestGetCertificateMap(t *testing.T) {
 					Fqdn:         "Chef_server_fqdn",
 					NodeType:     constants.CHEF_INFRA_SERVER,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "5.6.7.8",
 							Cert: cert,
@@ -173,7 +173,7 @@ func TestGetCertificateMap(t *testing.T) {
 					Fqdn:         "",
 					NodeType:     constants.OPENSEARCH,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "10.12.13.14",
 							Cert: cert,
@@ -186,7 +186,7 @@ func TestGetCertificateMap(t *testing.T) {
 					Fqdn:         "",
 					NodeType:     constants.POSTGRESQL,
 					FqdnRootCert: root_ca,
-					Nodes: []models.NodeCert{
+					Nodes: []*models.NodeCert{
 						{
 							IP:   "10.12.13.14",
 							Cert: cert,
@@ -198,8 +198,8 @@ func TestGetCertificateMap(t *testing.T) {
 		},
 		{
 			name:            "Having blank certificate list",
-			certificateList: []models.Certificate{},
-			want:            map[string]models.Certificate{},
+			certificateList: []*models.Certificate{},
+			want:            map[string]*models.Certificate{},
 		},
 	}
 	for _, tt := range tests {

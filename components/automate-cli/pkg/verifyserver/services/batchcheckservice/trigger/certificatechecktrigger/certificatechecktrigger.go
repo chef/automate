@@ -24,8 +24,16 @@ func NewCertificateCheck(log logger.Logger, port string) *CertificateCheck {
 	}
 }
 
-func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (ss *CertificateCheck) Run(config *models.Config) []models.CheckTriggerResponse {
 	ss.log.Info("Performing Certificate check from batch check ")
+
+	// Check if certificate is empty or nil
+	if isCertificateNil(config.Certificate) {
+		return trigger.ConstructNilResp(config, constants.CERTIFICATE)
+	}
+	if isCertificateEmpty(config.Certificate) {
+		return trigger.ConstructEmptyResp(config, constants.CERTIFICATE, constants.MISSING_CERTIFICATE)
+	}
 
 	count := 0
 
@@ -64,4 +72,12 @@ func (ss *CertificateCheck) Run(config models.Config) []models.CheckTriggerRespo
 func (ss *CertificateCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
+}
+
+func isCertificateEmpty(certificate []*models.Certificate) bool {
+	return len(certificate) == 0
+}
+
+func isCertificateNil(certificate []*models.Certificate) bool {
+	return certificate == nil
 }

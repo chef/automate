@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/checkutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/httputils"
@@ -27,7 +28,16 @@ func NewNfsBackupConfigCheck(log logger.Logger, port string) *NfsBackupConfigChe
 	}
 }
 
-func (nbc *NfsBackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (nbc *NfsBackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.NFS_BACKUP_CONFIG, true, true, false)
+	}
+	if config.Backup.FileSystem == nil {
+		return trigger.ConstructNilResp(config, constants.NFS_BACKUP_CONFIG)
+	}
+	if isMountLocationEmpty(config.Backup) {
+		return trigger.ConstructEmptyResp(config, constants.NFS_BACKUP_CONFIG, constants.MOUNT_LOCATION_MISSING)
+	}
 
 	nfsMountReq := models.NFSMountRequest{
 		AutomateNodeIPs:        config.Hardware.AutomateNodeIps,
@@ -73,7 +83,7 @@ func (ss *NfsBackupConfigCheck) triggerCheckForMountService(body models.NFSMount
 }
 
 // constructErrorResult constructs the error response when recived from the API
-func constructErrorResult(config models.Config, err error) []models.CheckTriggerResponse {
+func constructErrorResult(config *models.Config, err error) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
@@ -114,4 +124,8 @@ func constructSuccessResult(resp models.NFSMountCheckResponse) []models.CheckTri
 func (ss *NfsBackupConfigCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := make(map[string]map[string][]int)
 	return nodeTypePortMap
+}
+
+func isMountLocationEmpty(backup *models.Backup) bool {
+	return (backup.FileSystem.MountLocation == "")
 }

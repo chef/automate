@@ -22,7 +22,17 @@ func NewS3BackupConfigCheck(log logger.Logger, port string) *S3BackupConfigCheck
 	}
 }
 
-func (svc *S3BackupConfigCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (svc *S3BackupConfigCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	if config.Hardware == nil || config.Backup.ObjectStorage == nil {
+		return []models.CheckTriggerResponse{
+			trigger.SkippedTriggerCheckResp(constants.UNKNOWN_HOST, constants.S3_BACKUP_CONFIG, constants.AUTOMATE),
+		}
+	}
+
+	if isObjectStorage(config.Backup) {
+		return emptyResp(config, constants.S3_BACKUP_CONFIG)
+	}
+
 	req := getS3CheckRequest(config.Backup.ObjectStorage)
 	return runCheckForS3Config(config.Hardware.AutomateNodeIps, svc.log, svc.port, http.MethodPost, req)
 }
@@ -59,7 +69,7 @@ func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerRespo
 	return result
 }
 
-func getS3CheckRequest(object models.ObjectStorage) models.S3ConfigRequest {
+func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
 	return models.S3ConfigRequest{
 		Endpoint:   object.Endpoint,
 		BucketName: object.BucketName,
@@ -68,4 +78,21 @@ func getS3CheckRequest(object models.ObjectStorage) models.S3ConfigRequest {
 		SecretKey:  object.SecretKey,
 		Region:     object.AWSRegion,
 	}
+}
+
+func isObjectStorage(backup *models.Backup) bool {
+	return backup.ObjectStorage.BucketName == "" ||
+		backup.ObjectStorage.BasePath == "" ||
+		backup.ObjectStorage.AccessKey == "" ||
+		backup.ObjectStorage.SecretKey == "" ||
+		backup.ObjectStorage.AWSRegion == ""
+}
+
+func emptyResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, trigger.ErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, constants.S3_BACKUP_MISSING))
+	}
+
+	return resps
 }

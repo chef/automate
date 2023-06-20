@@ -183,7 +183,7 @@ func getRequest() models.S3ConfigRequest {
 
 func TestS3BackupConfigCheck_Run(t *testing.T) {
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 
 	tests := []struct {
@@ -200,12 +200,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -224,12 +224,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        false,
 			httpStatusCode: http.StatusOK,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 1,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -248,12 +248,12 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusInternalServerError,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
@@ -272,17 +272,19 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 			isError:        true,
 			httpStatusCode: http.StatusGatewayTimeout,
 			args: args{
-				config: models.Config{
-					Hardware: models.Hardware{
+				config: &models.Config{
+					Hardware: &models.Hardware{
 						AutomateNodeCount: 2,
+						AutomateNodeIps:   []string{"1.1.1.1", "2.2.2.2"},
 					},
-					Backup: models.Backup{
-						ObjectStorage: models.ObjectStorage{
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{
 							Endpoint:   endPoint,
 							BucketName: BucketName,
 							BasePath:   basePath,
 							AccessKey:  accessKey,
 							SecretKey:  secretKey,
+							AWSRegion:  "ap-south",
 						},
 					},
 				},
@@ -322,6 +324,53 @@ func TestS3BackupConfigCheck_Run(t *testing.T) {
 
 		})
 	}
+}
+
+func TestRunS3BackupCheck(t *testing.T) {
+	t.Run("NIl Hardware", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: nil,
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.True(t, got[0].Result.Skipped)
+
+	})
+
+	t.Run("Empty Object storage", func(t *testing.T) {
+		svc := NewS3BackupConfigCheck(
+			logger.NewLogrusStandardLogger(),
+			"8081",
+		)
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount: 1,
+				AutomateNodeIps:   []string{constants.LOCALHOST},
+			},
+			Backup: &models.Backup{
+				ObjectStorage: &models.ObjectStorage{},
+			},
+		}
+
+		got := svc.Run(config)
+
+		assert.Len(t, got, 1)
+		assert.Equal(t, constants.LOCALHOST, got[0].Host)
+		assert.Equal(t, constants.AUTOMATE, got[0].NodeType)
+		assert.Equal(t, constants.S3_BACKUP_CONFIG, got[0].CheckType)
+		assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+		assert.Equal(t, constants.S3_BACKUP_MISSING, got[0].Result.Error.Message)
+		assert.False(t, got[0].Result.Skipped)
+	})
 }
 
 // Helper function to create a dummy server

@@ -22,7 +22,19 @@ func NewExternalOpensearchCheck(log logger.Logger, port string) *ExternalOpensea
 	}
 }
 
-func (eoc *ExternalOpensearchCheck) Run(config models.Config) []models.CheckTriggerResponse {
+func (eoc *ExternalOpensearchCheck) Run(config *models.Config) []models.CheckTriggerResponse {
+	// Check for nil or empty req body
+	if config.Hardware == nil {
+		return trigger.HardwareNil(constants.EXTERNAL_OPENSEARCH, false, false, false)
+	}
+	if config.ExternalOS == nil {
+		return externalOSNillResp(config, constants.EXTERNAL_OPENSEARCH)
+	}
+
+	if isEmptyExternalOS(config.ExternalOS) {
+		return externalOSEmptyResp(config, constants.EXTERNAL_OPENSEARCH)
+	}
+
 	return runCheckForOpensearch(config, eoc.port, eoc.log)
 }
 
@@ -31,7 +43,7 @@ func (ss *ExternalOpensearchCheck) GetPortsForMockServer() map[string]map[string
 	return nodeTypePortMap
 }
 
-func runCheckForOpensearch(config models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
+func runCheckForOpensearch(config *models.Config, port string, log logger.Logger) []models.CheckTriggerResponse {
 	log.Debug("Trigger Opensearch check for automate and chef server nodes")
 	req := getOpensearchRequest(config.ExternalOS)
 	var resultChan []models.CheckTriggerResponse
@@ -62,7 +74,7 @@ func runCheckForOpensearch(config models.Config, port string, log logger.Logger)
 
 }
 
-func getOpensearchRequest(details models.ExternalOS) models.ExternalOS {
+func getOpensearchRequest(details *models.ExternalOS) models.ExternalOS {
 	return models.ExternalOS{
 		OSDomainName:   details.OSDomainName,
 		OSDomainURL:    details.OSDomainURL,
@@ -71,4 +83,44 @@ func getOpensearchRequest(details models.ExternalOS) models.ExternalOS {
 		OSCert:         details.OSCert,
 	}
 
+}
+
+func externalOSNillResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, trigger.SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+
+	return triggerResps
+}
+
+func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
+	return externalOS.OSDomainName == "" ||
+		externalOS.OSDomainURL == "" ||
+		externalOS.OSUsername == "" ||
+		externalOS.OSUserPassword == "" ||
+		externalOS.OSCert == "" ||
+		externalOS.OSRoleArn == ""
+}
+
+func externalOSEmptyResp(config *models.Config, checkType string) []models.CheckTriggerResponse {
+	var triggerResps []models.CheckTriggerResponse
+	count := 0
+
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		triggerResps = append(triggerResps, trigger.ErrTriggerCheckResp(ip, checkType, constants.AUTOMATE, constants.OS_DETAILS_MISSING))
+		count++
+	}
+
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		triggerResps = append(triggerResps, trigger.ErrTriggerCheckResp(ip, checkType, constants.CHEF_INFRA_SERVER, constants.OS_DETAILS_MISSING))
+		count++
+	}
+
+	return triggerResps
 }

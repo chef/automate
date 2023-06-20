@@ -15,20 +15,22 @@ import (
 )
 
 var (
-	externalOs = models.ExternalOS{
+	externalOs = &models.ExternalOS{
 		OSDomainName:   "Name of the domain",
 		OSDomainURL:    "open-search-url",
 		OSRoleArn:      "Role-ARN",
 		OSUsername:     "username",
 		OSUserPassword: "password",
+		OSCert:         "___CERT____",
 	}
 
-	s3Properties = models.ObjectStorage{
+	s3Properties = &models.ObjectStorage{
 		Endpoint:   "s3-url-com",
 		BucketName: "test",
 		BasePath:   "tt.com",
 		AccessKey:  "access-kkey",
 		SecretKey:  "secret-key",
+		AWSRegion:  "ap-east",
 	}
 )
 
@@ -44,7 +46,8 @@ const (
 			  "passed": true,
 			  "success_msg": "OpenSearch is able to create backup to provided S3",
 			  "error_msg": "",
-			  "resolution_msg": ""
+			  "resolution_msg": "",
+			  "Skipped":false
 			}
 		  ]
 		}
@@ -62,7 +65,8 @@ const (
 			  "passed": false,
 			  "success_msg": "",
 			  "error_msg": "OpenSearch is not able to create backup to provided S3",
-			  "resolution_msg": "Setup OpenSearch with valid configurations for S3 backup"
+			  "resolution_msg": "Setup OpenSearch with valid configurations for S3 backup",
+			  "Skipped":false
 			}
 		  ]
 		}
@@ -83,7 +87,8 @@ const (
 						"passed": true,
 						"success_msg": "OpenSearch is able to create backup to provided S3",
 						"error_msg": "",
-						"resolution_msg": ""
+						"resolution_msg": "",
+						"Skipped":false
 					}
 				]
 			}
@@ -104,7 +109,8 @@ const (
 					"passed": false,
 					"success_msg": "",
 					"error_msg": "OpenSearch is not able to create backup to provided S3",
-					"resolution_msg": "Setup OpenSearch with valid configurations for S3 backup"
+					"resolution_msg": "Setup OpenSearch with valid configurations for S3 backup",
+					"Skipped":false
 				}
 			]
 		}
@@ -116,7 +122,7 @@ const (
 func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 
 	type args struct {
-		config models.Config
+		config *models.Config
 	}
 	tests := []struct {
 		name             string
@@ -129,9 +135,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 		{
 			name: "Success Response",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					ExternalOS: externalOs,
-					Backup: models.Backup{
+					Backup: &models.Backup{
 						ObjectStorage: s3Properties,
 					},
 				},
@@ -144,9 +150,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 		{
 			name: "Failure Response",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					ExternalOS: externalOs,
-					Backup: models.Backup{
+					Backup: &models.Backup{
 						ObjectStorage: s3Properties,
 					},
 				},
@@ -159,9 +165,9 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 		{
 			name: "Internal Server Error",
 			args: args{
-				config: models.Config{
+				config: &models.Config{
 					ExternalOS: externalOs,
-					Backup: models.Backup{
+					Backup: &models.Backup{
 						ObjectStorage: s3Properties,
 					},
 				},
@@ -170,6 +176,33 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 			isPassed:         false,
 			response:         "error while connecting to the endpoint, received invalid status code",
 			isError:          true,
+		},
+		{
+			name: "Nil OS and Object storage",
+			args: args{
+				config: &models.Config{
+					ExternalOS: nil,
+					Backup: &models.Backup{
+						ObjectStorage: nil,
+					},
+				},
+			},
+			isError: false,
+		},
+		{
+			name: "Empty OS and Object storage",
+			args: args{
+				config: &models.Config{
+					ExternalOS: &models.ExternalOS{
+						OSDomainURL: "dave.com",
+					},
+					Backup: &models.Backup{
+						ObjectStorage: &models.ObjectStorage{},
+					},
+				},
+			},
+			httpResponseCode: http.StatusBadRequest,
+			isError:          false,
 		},
 	}
 	for _, tt := range tests {
@@ -191,10 +224,27 @@ func TestOpensearchS3BucketAccessCheck_Run(t *testing.T) {
 				assert.Equal(t, "open-search-url", got[0].Host)
 				assert.Equal(t, tt.response, got[0].Result.Error.Error())
 			} else {
-				assert.Equal(t, want, got)
-				assert.NotNil(t, got)
-				assert.Nil(t, got[0].Result.Error)
-				assert.Equal(t, "open-search-url", got[0].Host)
+				if tt.name == "Nil OS and Object storage" {
+					assert.Len(t, got, 1)
+					assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
+					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
+					assert.True(t, got[0].Result.Skipped)
+				} else if tt.name == "Empty OS and Object storage" {
+					assert.Len(t, got, 1)
+					assert.Equal(t, "dave.com", got[0].Host)
+					assert.Equal(t, constants.OPENSEARCH, got[0].NodeType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].CheckType)
+					assert.Equal(t, constants.AWS_OPENSEARCH_S3_BUCKET_ACCESS, got[0].Result.Check)
+					assert.Equal(t, http.StatusBadRequest, got[0].Result.Error.Code)
+					assert.Equal(t, constants.OBJECT_STORAGE_MISSING, got[0].Result.Error.Message)
+					assert.False(t, got[0].Result.Skipped)
+				} else {
+					assert.Equal(t, want, got)
+					assert.NotNil(t, got)
+					assert.Nil(t, got[0].Result.Error)
+					assert.Equal(t, "open-search-url", got[0].Host)
+				}
 			}
 
 		})

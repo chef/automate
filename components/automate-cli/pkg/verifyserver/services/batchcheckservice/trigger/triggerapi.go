@@ -15,7 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 )
 
-func RunCheck(config models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
+func RunCheck(config *models.Config, log logger.Logger, port string, path string, depState string) []models.CheckTriggerResponse {
 	var result []models.CheckTriggerResponse
 	count := config.Hardware.AutomateNodeCount +
 		config.Hardware.ChefInfraServerNodeCount +
@@ -182,4 +182,135 @@ func interfaceToIOReader(body interface{}) (io.Reader, error) {
 
 	}
 	return reader, nil
+}
+
+func HardwareNil(checkType string, includeOPENSEARCH bool, includePOSTGRESQL bool, includeBASTION bool) []models.CheckTriggerResponse {
+	responses := []models.CheckTriggerResponse{
+		{
+			NodeType:  constants.AUTOMATE,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		},
+		{
+			NodeType:  constants.CHEF_INFRA_SERVER,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		},
+	}
+
+	if includeOPENSEARCH {
+		responses = append(responses, models.CheckTriggerResponse{
+			NodeType:  constants.OPENSEARCH,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		})
+	}
+
+	if includePOSTGRESQL {
+		responses = append(responses, models.CheckTriggerResponse{
+			NodeType:  constants.POSTGRESQL,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.UNKNOWN_HOST,
+		})
+	}
+
+	if includeBASTION {
+		responses = append(responses, models.CheckTriggerResponse{
+			NodeType:  constants.BASTION,
+			CheckType: checkType,
+			Result: models.ApiResult{
+				Passed:  false,
+				Skipped: true,
+				Check:   checkType,
+			},
+			Host: constants.LOCALHOST,
+		})
+	}
+
+	return responses
+}
+
+func ErrTriggerCheckResp(ip, checkType, nodeType, msg string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		Host:      ip,
+		NodeType:  nodeType,
+		CheckType: checkType,
+		Result: models.ApiResult{
+			Passed: false,
+			Error: &fiber.Error{
+				Code:    http.StatusBadRequest,
+				Message: msg,
+			},
+			Check: checkType,
+		},
+	}
+}
+
+func SkippedTriggerCheckResp(ip, checktype, nodeType string) models.CheckTriggerResponse {
+	return models.CheckTriggerResponse{
+		NodeType:  nodeType,
+		CheckType: checktype,
+		Result: models.ApiResult{
+			Passed:  false,
+			Skipped: true,
+			Check:   checktype,
+		},
+		Host: ip,
+	}
+}
+
+func ConstructEmptyResp(config *models.Config, checktype, msg string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.AUTOMATE, msg))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER, msg))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.POSTGRESQL, msg))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, ErrTriggerCheckResp(ip, checktype, constants.OPENSEARCH, msg))
+	}
+
+	return resps
+}
+
+func ConstructNilResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
+	resps := []models.CheckTriggerResponse{}
+	for _, ip := range config.Hardware.AutomateNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.AUTOMATE))
+	}
+	for _, ip := range config.Hardware.ChefInfraServerNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.CHEF_INFRA_SERVER))
+	}
+	for _, ip := range config.Hardware.PostgresqlNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.POSTGRESQL))
+	}
+	for _, ip := range config.Hardware.OpenSearchNodeIps {
+		resps = append(resps, SkippedTriggerCheckResp(ip, checktype, constants.OPENSEARCH))
+	}
+
+	return resps
 }

@@ -23,4 +23,5 @@ const (
 	STATUS_API_PATH                          = "/status"
 	START_MOCK_SERVER                        = "/api/v1/start/mock-server"
 	STOP_MOCK_SERVER                         = "/api/v1/stop/mock-server"
+	UNKNOWN_HOST                             = "unknown-host"
 )
