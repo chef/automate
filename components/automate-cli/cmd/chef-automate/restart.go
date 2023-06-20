@@ -18,7 +18,7 @@ const (
 	RESTART_FRONTEND_COMMAND    = `sudo chef-automate restart-services`
 	RESTART_BACKEND_COMMAND     = `sudo HAB_LICENSE=accept-no-persist systemctl restart hab-sup`
 	DEFAULT_TIMEOUT_FOR_RESTART = 1200
-	ERROR_ON_MANAGED_SERVICES   = "Restarting services on managed %s is not supported."
+	ERROR_ON_MANAGED_SERVICES   = "Restart for externally configured services are not supported."
 )
 
 type RestartCmdFlags struct {
@@ -118,8 +118,10 @@ func runRestartFromBastion(flags *RestartCmdFlags, rs RemoteCmdExecutor, nu Node
 		}
 		flags.automate = true
 		flags.chefServer = true
-		flags.opensearch = true
-		flags.postgresql = true
+		if !isManagedServicesOn() {
+			flags.opensearch = true
+			flags.postgresql = true
+		}
 	}
 	errChan := make(chan *ResultWithError, 4)
 	runRestartCmdForFrontEnd(infra, flags, rs, errChan)
@@ -190,14 +192,11 @@ func getChannelValue(errChan chan *ResultWithError) error {
 }
 
 func handleManagedServices(flags *RestartCmdFlags) error {
-	if flags.postgresql && flags.opensearch {
-		return nil
-	}
 	if flags.postgresql {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL)
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES)
 	}
 	if flags.opensearch {
-		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH)
+		return status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES)
 	}
 	return nil
 }

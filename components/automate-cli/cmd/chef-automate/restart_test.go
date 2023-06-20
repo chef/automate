@@ -211,7 +211,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return nil, &SSHConfig{}, nil
 				},
 				isManagedServicesOnFunc: func() bool {
-					return true
+					return false
 				},
 			},
 			mockRemoteCmdExec: &MockRemoteCmdExecutor{
@@ -241,7 +241,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return map[string][]*CmdResult{}, nil
 				},
 			},
-			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
+			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
 		{
 			description: "Restarting Postgresql with managed services",
@@ -263,7 +263,7 @@ func TestRunRestartFromBastion(t *testing.T) {
 					return map[string][]*CmdResult{}, nil
 				},
 			},
-			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
+			errorWant: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
 	}
 
@@ -289,13 +289,13 @@ func TestHandleManagedServiceError(t *testing.T) {
 			flags: &RestartCmdFlags{
 				postgresql: true,
 			},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, POSTGRESQL),
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
 		{
 			flags: &RestartCmdFlags{
 				opensearch: true,
 			},
-			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES, OPENSEARCH),
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
 		{
 			flags:          &RestartCmdFlags{},
@@ -306,7 +306,7 @@ func TestHandleManagedServiceError(t *testing.T) {
 				postgresql: true,
 				opensearch: true,
 			},
-			errorExepected: nil,
+			errorExepected: status.Errorf(status.InvalidCommandArgsError, ERROR_ON_MANAGED_SERVICES),
 		},
 	}
 
