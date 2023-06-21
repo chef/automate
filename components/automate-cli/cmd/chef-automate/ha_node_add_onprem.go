@@ -208,8 +208,9 @@ func (ani *AddNodeOnPremImpl) runDeploy() error {
 		if err != nil {
 			return errors.Wrap(err, syncErr.Error())
 		}
+		return syncErr
 	}
-	return syncErr
+	return err
 }
 
 func (ani *AddNodeOnPremImpl) validateCmdArgs() *list.List {
