@@ -6,21 +6,21 @@ description: |
 options:
 - name: a2
   default_value: "false"
-  usage: Shows status from Automate node(HA)[DUPLICATE]
+  usage: Shows status from Automate nodes[DUPLICATE]
   compatible_with_options: AutomateHA
 - name: automate
   shorthand: a
   default_value: "false"
-  usage: Shows status from Automate node(HA)
+  usage: Shows status from Automate nodes
   compatible_with_options: AutomateHA
 - name: chef_server
   shorthand: c
   default_value: "false"
-  usage: Shows status from Chef-server node(HA)
+  usage: Shows status from Chef-server nodes
   compatible_with_options: AutomateHA
 - name: cs
   default_value: "false"
-  usage: Shows status from Chef-server node(HA)[DUPLICATE]
+  usage: Shows status from Chef-server nodes[DUPLICATE]
   compatible_with_options: AutomateHA
 - name: help
   shorthand: h
@@ -33,20 +33,20 @@ options:
 - name: opensearch
   shorthand: o
   default_value: "false"
-  usage: Shows status from OpenSearch node
+  usage: Shows status from OpenSearch nodes
   compatible_with_options: AutomateHA
 - name: os
   default_value: "false"
-  usage: Shows status from OpenSearch node[DUPLICATE]
+  usage: Shows status from OpenSearch nodes[DUPLICATE]
   compatible_with_options: AutomateHA
 - name: pg
   default_value: "false"
-  usage: Shows status from PostgresQL node[DUPLICATE]
+  usage: Shows status from PostgresQL nodes[DUPLICATE]
   compatible_with_options: AutomateHA
 - name: postgresql
   shorthand: p
   default_value: "false"
-  usage: Shows status from PostgresQL node
+  usage: Shows status from PostgresQL nodes
   compatible_with_options: AutomateHA
 - name: wait-for-healthy
   shorthand: w
