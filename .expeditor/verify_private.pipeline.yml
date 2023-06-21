@@ -932,7 +932,6 @@ steps:
 
   - label: "ocid"
     command:
-      - source scripts/verify_studio_init.sh
       - integration/run_test integration/tests/testing_ocid.sh
     timeout_in_minutes: 15
     expeditor:
