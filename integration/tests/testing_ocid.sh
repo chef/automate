@@ -5,8 +5,6 @@ test_name="ocid"
 
 #shellcheck source=.studio/chef-server-collection
 source .studio/chef-server-collection
-source scripts/verify_studio_init.sh
-
 
 do_deploy() {
     #shellcheck disable=SC2154

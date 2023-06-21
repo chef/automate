@@ -476,21 +476,22 @@ test_if_env_vars_are_configured() {
   fi
 }
 
-# install_if_missing() {
-#   if [ "$#" -ne 2 ]; then
-#     error "Wrong number of arguments to ${FUNCNAME[0]}"
-#     describe "${FUNCNAME[0]}"
-#     return 1
-#   fi
+# We are keeping a local copy of this method as the original from 01_base.sh is not accessible here
+install_if_missing() {
+  if [ "$#" -ne 2 ]; then
+    error "Wrong number of arguments to ${FUNCNAME[0]}"
+    describe "${FUNCNAME[0]}"
+    return 1
+  fi
 
-#   # Install the package if it is not installed
-#   if [[ ! -d "/hab/pkgs/$1" ]]; then
-#     hab pkg install "$1" > /dev/null
-#   fi
+  # Install the package if it is not installed
+  if [[ ! -d "/hab/pkgs/$1" ]]; then
+    hab pkg install "$1" > /dev/null
+  fi
 
-#   # Ensure we are binlinking to the same version `hab pkg exec` would run
-#   hab pkg binlink --force "$1" "$2" > /dev/null
-# }
+  # Ensure we are binlinking to the same version `hab pkg exec` would run
+  hab pkg binlink --force "$1" "$2" > /dev/null
+}
 
 document "test_if_webui_key_is_patched" <<DOC
   test if WEB UI key is patched for OCID
