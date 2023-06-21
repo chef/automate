@@ -137,6 +137,19 @@ func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, p
 
 }
 
+func NewConfig() *Config {
+	return &Config{
+		SSHUser: &SSHUser{},
+		Backup: &Backup{
+			FileSystem:    &FileSystem{},
+			ObjectStorage: &ObjectStorage{},
+		},
+		Hardware:   &Hardware{},
+		ExternalOS: &ExternalOS{},
+		ExternalPG: &ExternalPG{},
+	}
+}
+
 func createMapforCertByIp(certsByIP *[]config.CertByIP) map[string]*config.CertByIP {
 	certByIPMap := make(map[string]*config.CertByIP)
 	if certsByIP != nil {

@@ -566,3 +566,31 @@ func TestPopulateWith(t *testing.T) {
 		})
 	}
 }
+
+func TestNewConfig(t *testing.T) {
+	config := NewConfig()
+
+	// Verify SSHUser is initialized correctly
+	assert.NotNil(t, config.SSHUser)
+	assert.Equal(t, reflect.TypeOf(&SSHUser{}), reflect.TypeOf(config.SSHUser))
+
+	// Verify Backup is initialized correctly
+	assert.NotNil(t, config.Backup)
+	assert.Equal(t, reflect.TypeOf(&Backup{}), reflect.TypeOf(config.Backup))
+	assert.NotNil(t, config.Backup.FileSystem)
+	assert.Equal(t, reflect.TypeOf(&FileSystem{}), reflect.TypeOf(config.Backup.FileSystem))
+	assert.NotNil(t, config.Backup.ObjectStorage)
+	assert.Equal(t, reflect.TypeOf(&ObjectStorage{}), reflect.TypeOf(config.Backup.ObjectStorage))
+
+	// Verify Hardware is initialized correctly
+	assert.NotNil(t, config.Hardware)
+	assert.Equal(t, reflect.TypeOf(&Hardware{}), reflect.TypeOf(config.Hardware))
+
+	// Verify ExternalOS is initialized correctly
+	assert.NotNil(t, config.ExternalOS)
+	assert.Equal(t, reflect.TypeOf(&ExternalOS{}), reflect.TypeOf(config.ExternalOS))
+
+	// Verify ExternalPG is initialized correctly
+	assert.NotNil(t, config.ExternalPG)
+	assert.Equal(t, reflect.TypeOf(&ExternalPG{}), reflect.TypeOf(config.ExternalPG))
+}
