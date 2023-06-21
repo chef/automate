@@ -3,10 +3,51 @@ synopsis: restart deployment services
 usage: chef-automate restart-services [flags]
 description: Restart services for a deployment
 options:
+- name: a2
+  default_value: "false"
+  usage: restart chef automate service on automate nodes[DUPLICATE]
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: restart chef automate service on automate nodes
+  compatible_with_options: AutomateHA
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: restart chef automate service on chef-server nodes
+  compatible_with_options: AutomateHA
+- name: cs
+  default_value: "false"
+  usage: |
+    restart chef automate service on chef-server nodes[DUPLICATE]
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for restart-services
+- name: node
+  usage: Node Ip address
+  compatible_with_options: AutomateHA
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: restart hab-sup service on opensearch nodes
+  compatible_with_options: AutomateHA
+- name: os
+  default_value: "false"
+  usage: restart hab-sup service on opensearch nodes[DUPLICATE]
+- name: pg
+  default_value: "false"
+  usage: restart hab-sup service on postgresql nodes[DUPLICATE]
+  compatible_with_options: AutomateHA
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: restart hab-sup service on postgresql nodes
+- name: wait-timeout
+  default_value: "1200"
+  usage: |
+    This flag sets the operation timeout duration (in seconds) for each individual node during the restart services
+  compatible_with_options: AutomateHA
 inherited_options:
 - name: debug
   shorthand: d
@@ -19,4 +60,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-supported_on: FrontEnd
+supported_on: Bastion
