@@ -806,6 +806,7 @@ func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
 		dest.LoadBalancer.V1.Sys.FrontendTls = nil
 	}
 
+	// Ignoring product key
 	if dest.Deployment == nil ||
 		dest.Deployment.V1 == nil ||
 		dest.Deployment.V1.Svc == nil ||
