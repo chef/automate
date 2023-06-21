@@ -661,66 +661,66 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 func runOcIdShowAppCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		infra, err := getAutomateHAInfraDetails()
-    if err != nil {
-      return err
-    }
-    if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
-      return errors.Errorf("The operation timeout duration for each individual node during the config patch process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
-    }
+		if err != nil {
+		  return err
+		}
+		if configCmdFlags.waitTimeout < DEFAULT_TIMEOUT {
+		  return errors.Errorf("The operation timeout duration for each individual node during the config oc-id-show-app process should be set to a value greater than %v seconds.", DEFAULT_TIMEOUT)
+		}
 
-    frontendCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
-    frontend := &Cmd{
-      CmdInputs: &CmdInputs{
-        Cmd:                      frontendCmd,
-        WaitTimeout:              configCmdFlags.waitTimeout,
-        Single:                   false,
-        Args:                     args,
-        ErrorCheckEnableInOutput: true,
-        NodeType:                 configCmdFlags.frontend,
-      },
-    }
-    automateCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
-    automate := &Cmd{
-      CmdInputs: &CmdInputs{
-        Cmd:                      automateCmd,
-        WaitTimeout:              configCmdFlags.waitTimeout,
-        Single:                   false,
-        Args:                     args,
-        ErrorCheckEnableInOutput: true,
-        NodeType:                 configCmdFlags.automate,
-      },
-    }
+		frontendCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
+		frontend := &Cmd{
+		  CmdInputs: &CmdInputs{
+		    Cmd:                      frontendCmd,
+		    WaitTimeout:              configCmdFlags.waitTimeout,
+		    Single:                   false,
+		    Args:                     args,
+		    ErrorCheckEnableInOutput: true,
+		    NodeType:                 configCmdFlags.frontend,
+		  },
+		}
+		automateCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
+		automate := &Cmd{
+		  CmdInputs: &CmdInputs{
+		    Cmd:                      automateCmd,
+		    WaitTimeout:              configCmdFlags.waitTimeout,
+		    Single:                   false,
+		    Args:                     args,
+		    ErrorCheckEnableInOutput: true,
+		    NodeType:                 configCmdFlags.automate,
+		  },
+		}
 
-    chefServerCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
-    chefServer := &Cmd{
-      CmdInputs: &CmdInputs{
-        Cmd:                      chefServerCmd,
-        WaitTimeout:              configCmdFlags.waitTimeout,
-        Single:                   false,
-        Args:                     args,
-        ErrorCheckEnableInOutput: true,
-        NodeType:                 configCmdFlags.chef_server,
-      },
-    }
+		chefServerCmd := fmt.Sprintf(CONF_PREFIX_FOR_SHOW_APPS_CMD, OCID_SHOW_APP)
+		chefServer := &Cmd{
+		  CmdInputs: &CmdInputs{
+		    Cmd:                      chefServerCmd,
+		    WaitTimeout:              configCmdFlags.waitTimeout,
+		    Single:                   false,
+		    Args:                     args,
+		    ErrorCheckEnableInOutput: true,
+		    NodeType:                 configCmdFlags.chef_server,
+		  },
+		}
 
-    nodeMap := &NodeTypeAndCmd{
-      Frontend:   frontend,
-      Automate:   automate,
-      ChefServer: chefServer,
-      Infra:      infra,
-    }
-    sshUtil := NewSSHUtil(&SSHConfig{})
-    cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
+		nodeMap := &NodeTypeAndCmd{
+		  Frontend:   frontend,
+		  Automate:   automate,
+		  ChefServer: chefServer,
+		  Infra:      infra,
+		}
+		sshUtil := NewSSHUtil(&SSHConfig{})
+		cmdUtil := NewRemoteCmdExecutor(nodeMap, sshUtil, writer)
 
-    if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server {
-      _, err := cmdUtil.Execute()
+		if configCmdFlags.frontend || configCmdFlags.automate || configCmdFlags.chef_server {
+		  _, err := cmdUtil.Execute()
 
-      if err != nil {
-        return err
-      }
-    } else {
-      writer.Println(cmd.UsageString())
-    }
+		  if err != nil {
+		    return err
+		  }
+		} else {
+		  writer.Println(cmd.UsageString())
+		}
 	} else {
 		oauthAppDetailsFilePath := "/hab/svc/automate-cs-ocid/config/registered_oauth_applications.yaml"
 		content, err := os.ReadFile(oauthAppDetailsFilePath)
