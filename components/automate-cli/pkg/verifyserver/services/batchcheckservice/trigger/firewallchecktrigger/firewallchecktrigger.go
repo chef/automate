@@ -45,12 +45,10 @@ func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerRespons
 func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
-			constants.TCP:   []int{9631, 9638},
 			constants.HTTPS: []int{443},
 			constants.HTTP:  []int{80},
 		},
 		constants.CHEF_INFRA_SERVER: {
-			constants.TCP:   []int{9631, 9638},
 			constants.HTTP:  []int{80},
 			constants.HTTPS: []int{443},
 		},
@@ -68,10 +66,10 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
 func makeRequests(config *models.Config, reqMap map[string][]models.FirewallRequest) {
-	reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
-	reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
-	reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
-	reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
+	//reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
+	//reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
+	//reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
+	//reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
 	reqMap[constants.BASTION] = getRequestAsBastionSource(config)
 }
 
