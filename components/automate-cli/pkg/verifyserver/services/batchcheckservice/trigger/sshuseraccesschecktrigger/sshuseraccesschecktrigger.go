@@ -68,9 +68,10 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 }
 
 func (ss *SshUserAccessCheck) getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
-	ct, err := ss.FileUtils.ReadFile(filepath.Join(os.Getenv("HOME"), sshUser.PrivateKey))
+	filePath := filepath.Join(os.Getenv("HOME"), sshUser.PrivateKey)
+	ct, err := ss.FileUtils.ReadFile(filePath)
 	if err != nil {
-		ss.log.Error("Error while opeing the file private file present on the path", err)
+		ss.log.Errorf("Error while opening the private file on path %v: %v", filePath, err)
 		return models.SShUserRequest{}
 	}
 	keyContents := string(ct)
