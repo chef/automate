@@ -66,10 +66,10 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
 func makeRequests(config *models.Config, reqMap map[string][]models.FirewallRequest) {
-	//reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
-	//reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
-	//reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
-	//reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
+	reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
+	reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
+	reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
+	reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
 	reqMap[constants.BASTION] = getRequestAsBastionSource(config)
 }
 
