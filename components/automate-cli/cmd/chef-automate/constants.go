@@ -21,4 +21,8 @@ const (
 	PGVERSIONREGEX      = `PostgreSQL (\d+\.\d+)`
 	OSVERSIONREGEX      = `"number"\s*:\s*"([^"]+)"`
 	PGCOREPKG           = "core/postgresql13 "
+	AUTOMATE_NAME       = "Automate"
+	CHEF_SERVER_NAME    = "Chef Server"
+	OPENSEARCH_NAME     = "Opensearch"
+	POSTGRESQL_NAME     = "Postgresql"
 )

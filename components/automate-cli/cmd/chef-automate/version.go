@@ -208,7 +208,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Automate Version :: %s", err)
 			return err
 		}
-		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Automate"))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(AUTOMATE_NAME))
 		writer.Println("\n")
 
 		for ip, version := range versions {
@@ -224,7 +224,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Infra server Version :: %s", err)
 			return err
 		}
-		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Chef Server"))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(CHEF_SERVER_NAME))
 		writer.Println("\n")
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
@@ -242,7 +242,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Opensearch Version :: %s", err)
 			return err
 		}
-		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Opensearch"))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(OPENSEARCH_NAME))
 		writer.Println("\n")
 		for ip, version := range versions {
 			writer.Printf("Node IP : %s\n", ip)
@@ -259,7 +259,7 @@ func runCommandOnBastion(args []string) error {
 			logrus.Errorf("Error while getting Postgresql Version :: %s", err)
 			return err
 		}
-		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint("Postgresql"))
+		writer.Println(color.New(color.Bold).Add(color.Underline).Sprint(POSTGRESQL_NAME))
 		writer.Println("\n")
 
 		for ip, version := range versions {
@@ -599,16 +599,16 @@ func getIpAddressesFromFlag(errorList *list.List, infra *AutomateHAInfraDetails)
 					VersionCommandFlags.isPostgresql {
 					services := []string{}
 					if VersionCommandFlags.isAutomate {
-						services = append(services, "Automate")
+						services = append(services, AUTOMATE_NAME)
 					}
 					if VersionCommandFlags.isChefServer {
-						services = append(services, "Chef server")
+						services = append(services, CHEF_SERVER_NAME)
 					}
 					if VersionCommandFlags.isOpenSearch {
-						services = append(services, "Opensearch")
+						services = append(services, OPENSEARCH_NAME)
 					}
 					if VersionCommandFlags.isPostgresql {
-						services = append(services, "PostgreSQL")
+						services = append(services, POSTGRESQL_NAME)
 					}
 					errorList.PushBack(fmt.Sprintf("List of  ip address not found %s does not match any node for %s services", nodes, strings.Join(services[:], ", ")))
 				} else {
