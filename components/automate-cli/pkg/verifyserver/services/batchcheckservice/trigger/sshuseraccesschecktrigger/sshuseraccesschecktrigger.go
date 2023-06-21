@@ -3,8 +3,6 @@ package sshuseraccesschecktrigger
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
@@ -68,10 +66,10 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 }
 
 func (ss *SshUserAccessCheck) getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
-	filePath := filepath.Join(os.Getenv("HOME"), sshUser.PrivateKey)
-	ct, err := ss.FileUtils.ReadFile(filePath)
+	//Always give the absolute path in the config.toml
+	ct, err := ss.FileUtils.ReadFile(sshUser.PrivateKey)
 	if err != nil {
-		ss.log.Errorf("Error while opening the private file on path %v: %v", filePath, err)
+		ss.log.Errorf("Error while opening the private file path %s: %v\n", sshUser.PrivateKey, err)
 		return models.SShUserRequest{}
 	}
 	keyContents := string(ct)
