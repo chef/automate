@@ -19,7 +19,7 @@ do_deploy() {
 
 do_test_deploy() {
     test_if_env_vars_are_configured
+    test_if_webui_key_is_patched
     test_if_login_working_with_correct_credentials
     test_if_login_failing_with_incorrect_credentials
-    test_if_webui_key_is_patched
 }

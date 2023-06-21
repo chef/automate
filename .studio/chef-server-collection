@@ -457,15 +457,15 @@ test_if_env_vars_are_configured() {
   errors=()
 
   if [ $endpoint != "https://127.0.0.1:443" ]; then
-    errors+=("Endpoint not configured properly.")
+    errors+=("Chef-Server endpoint is not configured properly.")
   fi
 
   if [ $superuser != "pivotal" ]; then
-    errors+=("Superuser not configured properly.")
+    errors+=("Chef-Server superuser is not configured properly.")
   fi
 
   if [ $ssl_verify_mode != "verify_none" ]; then
-    errors+=("Verify mode not configured properly.")
+    errors+=("Chef-Server SSL certificate verification mode is not configured properly.")
   fi
 
   if [ ${#errors} -gt 0 ]; then
@@ -476,21 +476,21 @@ test_if_env_vars_are_configured() {
   fi
 }
 
-install_if_missing() {
-  if [ "$#" -ne 2 ]; then
-    error "Wrong number of arguments to ${FUNCNAME[0]}"
-    describe "${FUNCNAME[0]}"
-    return 1
-  fi
+# install_if_missing() {
+#   if [ "$#" -ne 2 ]; then
+#     error "Wrong number of arguments to ${FUNCNAME[0]}"
+#     describe "${FUNCNAME[0]}"
+#     return 1
+#   fi
 
-  # Install the package if it is not installed
-  if [[ ! -d "/hab/pkgs/$1" ]]; then
-    hab pkg install "$1" > /dev/null
-  fi
+#   # Install the package if it is not installed
+#   if [[ ! -d "/hab/pkgs/$1" ]]; then
+#     hab pkg install "$1" > /dev/null
+#   fi
 
-  # Ensure we are binlinking to the same version `hab pkg exec` would run
-  hab pkg binlink --force "$1" "$2" > /dev/null
-}
+#   # Ensure we are binlinking to the same version `hab pkg exec` would run
+#   hab pkg binlink --force "$1" "$2" > /dev/null
+# }
 
 document "test_if_webui_key_is_patched" <<DOC
   test if WEB UI key is patched for OCID
@@ -500,7 +500,10 @@ test_if_webui_key_is_patched() {
 
   # Extract webui_key from private-chef-secrets.json
   ocid_secrets_file_path="$(hab pkg path chef/oc_id)/oc_id/config/private-chef-secrets.json"
-  ocid_webui_key="$(jq --arg variable_name "chef-server" -r '.[$variable_name]."webui_key"' < $ocid_secrets_file_path)"
+
+  # elem variable hold the value 'chef-server', we opted for this syntax becz chef-server needs to be
+  # to be treated as string as it contains `-`, which is not a valid JSON character
+  ocid_webui_key="$(jq --arg elem "chef-server" -r '.[$elem]."webui_key"' < $ocid_secrets_file_path)"
 
   # Create a temporary file with the ocid_webui_key content
   echo "$ocid_webui_key" > temp_ocid_webui_key.pem
