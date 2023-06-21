@@ -39,13 +39,13 @@ func (s *MockServersServiceImp) Start(cfg *models.StartMockServerRequestBody) er
 	var err error
 	switch cfg.Protocol {
 	case constants.TCP:
-		err = s.StartTCPServer(cfg.Port)
+		err = s.StartTCPServer(cfg.Port, cfg.Protocol)
 	case constants.UDP:
-		err = s.StartUDPServer(cfg.Port)
+		err = s.StartUDPServer(cfg.Port, cfg.Protocol)
 	case constants.HTTP:
-		err = s.StartHTTPServer(cfg.Port)
+		err = s.StartHTTPServer(cfg.Port, cfg.Protocol)
 	case constants.HTTPS:
-		err = s.StartHTTPSServer(cfg.Port, cfg.Cert, cfg.Key)
+		err = s.StartHTTPSServer(cfg.Port, cfg.Protocol, cfg.Cert, cfg.Key)
 	default:
 		err = errors.New("unsupported protocol")
 	}
@@ -77,23 +77,12 @@ func (s *MockServersServiceImp) Stop(cfg *models.StopMockServerRequestBody) erro
 }
 
 // IsMockServerRunning returns true if on given port and protocol any server is running.
-func (s *MockServersServiceImp) IsMockServerRunningOnGivenPort(port int) bool {
-	servers := s.mockServers
-
-	for _, server := range servers {
-		if server.Port == port {
-			s.logger.Debug("Mock server is already running on port: ", port)
-			return true
-		}
-	}
-	return false
-}
-
 func (s *MockServersServiceImp) IsMockServerRunningOnGivenPortAndProctocol(port int, protocol string) bool {
 	servers := s.mockServers
 
 	for _, server := range servers {
 		if server.Port == port && server.Protocol == protocol {
+			s.logger.Debug("Mock server is already running on port: ", port)
 			return true
 		}
 	}
@@ -101,11 +90,11 @@ func (s *MockServersServiceImp) IsMockServerRunningOnGivenPortAndProctocol(port 
 	return false
 }
 
-func (s *MockServersServiceImp) StartTCPServer(port int) error {
+func (s *MockServersServiceImp) StartTCPServer(port int, protocol string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.IsMockServerRunningOnGivenPort(port) {
+	if s.IsMockServerRunningOnGivenPortAndProctocol(port, protocol) {
 		return errors.New("port unavailable")
 	}
 
@@ -153,11 +142,11 @@ func (s *MockServersServiceImp) StartTCPServer(port int) error {
 	return nil
 }
 
-func (s *MockServersServiceImp) StartUDPServer(port int) error {
+func (s *MockServersServiceImp) StartUDPServer(port int, protocol string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.IsMockServerRunningOnGivenPort(port) {
+	if s.IsMockServerRunningOnGivenPortAndProctocol(port, protocol) {
 		return errors.New("port unavailable")
 	}
 
@@ -204,11 +193,11 @@ func (s *MockServersServiceImp) StartUDPServer(port int) error {
 	return nil
 }
 
-func (s *MockServersServiceImp) StartHTTPServer(port int) error {
+func (s *MockServersServiceImp) StartHTTPServer(port int, protocol string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.IsMockServerRunningOnGivenPort(port) {
+	if s.IsMockServerRunningOnGivenPortAndProctocol(port, protocol) {
 		return errors.New("port unavailable")
 	}
 
@@ -266,11 +255,11 @@ func (s *MockServersServiceImp) StartHTTPServer(port int) error {
 	}
 }
 
-func (s *MockServersServiceImp) StartHTTPSServer(port int, cert string, key string) error {
+func (s *MockServersServiceImp) StartHTTPSServer(port int, protocol string, cert string, key string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.IsMockServerRunningOnGivenPort(port) {
+	if s.IsMockServerRunningOnGivenPortAndProctocol(port, protocol) {
 		return errors.New("port unavailable")
 	}
 
