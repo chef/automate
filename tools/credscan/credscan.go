@@ -168,6 +168,9 @@ var a2Config = config{
 
 		// Exclude test file for fqdnservice which uses RSA KEY for test cases
 		{regex: `components/automate-cli/pkg/verifyserver/services/fqdnservice/fqdnservice_test.go`},
+
+		// Exclude test file for verifyservice which uses RSA KEY for test cases
+		{regex: `components/automate-cli/pkg/testfiles/aws/valid_config.toml`},
 	},
 	contentInclude: []pattern{
 		{
