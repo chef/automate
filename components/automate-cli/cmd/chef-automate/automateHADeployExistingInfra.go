@@ -224,23 +224,29 @@ func (e *existingInfra) validateExternalDbFields() *list.List {
 		}
 	}
 	if e.config.ExternalDB.Database.Type == "self-managed" {
-		if len(strings.TrimSpace(e.config.ExternalDB.Database.Opensearch.OpensearchDomainName)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.Opensearch.OpensearchInstanceURL)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserName)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.Opensearch.OpensearchRootCert)) < 1 {
+		if isExternalOSConfigValid(e.config) {
 			errorList.PushBack("Opensearch Domain Name and/or Instance URL and/or SuperUser Name and/or SuperUser Password and/or Root Cert  are missing.")
 		}
-		if len(strings.TrimSpace(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)) < 1 ||
-			len(strings.TrimSpace(e.config.ExternalDB.Database.PostgreSQL.PostgreSQLRootCert)) < 1 {
+		if isExternalPGConfigValid(e.config) {
 			errorList.PushBack("PostgreQL Instance URL and/or SuperUser Name and/or SuperUser Password and/or DBUserName and/or DBUserPassword and/or Root Cert are missing ")
 		}
 	}
 	return errorList
+}
+
+func isExternalOSConfigValid(opensearchConfig ExistingInfraConfigToml) bool {
+	return len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.Opensearch.OpensearchDomainName)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.Opensearch.OpensearchInstanceURL)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.Opensearch.OpensearchSuperUserName)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.Opensearch.OpensearchSuperUserPassword)) < 1
+}
+
+func isExternalPGConfigValid(opensearchConfig ExistingInfraConfigToml) bool {
+	return (len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.PostgreSQL.PostgreSQLInstanceURL)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserName)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName)) < 1 ||
+		len(strings.TrimSpace(opensearchConfig.ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword)) < 1)
 }
 
 func extractIPsFromCertsByIP(certsByIp []CertByIP) []string {

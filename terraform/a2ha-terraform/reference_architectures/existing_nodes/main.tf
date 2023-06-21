@@ -192,7 +192,7 @@ module "postgresql" {
   postgresql_listen_port          = var.postgresql_listen_port
   postgresql_pkg_ident            = var.postgresql_pkg_ident
   postgresql_pg_dump_enabled      = var.postgresql_pg_dump_enabled
-  postgresql_ssl_enable           = var.postgresql_ssl_enable
+  postgresql_ssl_enable           = length(trimspace(var.postgresql_root_ca)) >= 1 
   postgresql_svc_load_args        = var.postgresql_svc_load_args
   postgresql_wal_archive_enabled  = var.postgresql_wal_archive_enabled
   proxy_listen_port               = var.proxy_listen_port
@@ -266,7 +266,7 @@ module "bootstrap_automate" {
   opensearch_private_ips             = var.existing_opensearch_private_ips
   proxy_listen_port                  = var.proxy_listen_port
   postgresql_private_ips             = var.existing_postgresql_private_ips
-  postgresql_ssl_enable              = var.postgresql_ssl_enable
+  postgresql_ssl_enable              = length(trimspace(var.postgresql_root_ca)) >= 1 
   private_ips                        = slice(var.existing_automate_private_ips, 0, 1)
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
@@ -338,7 +338,7 @@ module "automate" {
   opensearch_private_ips             = var.existing_opensearch_private_ips
   proxy_listen_port                  = var.proxy_listen_port
   postgresql_private_ips             = var.existing_postgresql_private_ips
-  postgresql_ssl_enable              = var.postgresql_ssl_enable
+  postgresql_ssl_enable              = length(trimspace(var.postgresql_root_ca)) >= 1 
   private_ips = slice(
     var.existing_automate_private_ips,
     1,
@@ -414,7 +414,7 @@ module "chef_server" {
   opensearch_private_ips             = var.existing_opensearch_private_ips
   proxy_listen_port                  = var.proxy_listen_port
   postgresql_private_ips             = var.existing_postgresql_private_ips
-  postgresql_ssl_enable              = var.postgresql_ssl_enable
+  postgresql_ssl_enable              = length(trimspace(var.postgresql_root_ca)) >= 1 
   private_ips                        = var.existing_chef_server_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
