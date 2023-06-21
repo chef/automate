@@ -4,77 +4,55 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/jedib0t/go-pretty/v5/table"
 )
 
 type VerificationReport struct {
-	TableKey     string
-	Report       Info
-	TotalReports int
+	TableKey string //NodeType
+	Report   Info
 }
 
 type Info struct {
-	Hostip        string         `json:"hostip,omitempty"`
-	Parameter     string         `json:"parameter,omitempty"`
-	Status        string         `json:"status,omitempty"`
+	Hostip        string         `json:"hostip,omitempty"`    //ip
+	Parameter     string         `json:"parameter,omitempty"` //overall Check
+	Status        string         `json:"status,omitempty"`    //overall Passed
 	StatusMessage *StatusMessage `json:"statusMessage,omitempty"`
 	SummaryInfo   *SummaryInfo   `json:"summaryInfo,omitempty"`
 }
 
 type StatusMessage struct {
-	MainMessage string   `json:"mainMessage,omitempty"`
-	SubMessage  []string `json:"subMessage,omitempty"`
+	MainMessage string   `json:"mainMessage,omitempty"` //overall Message with status
+	SubMessage  []string `json:"subMessage,omitempty"`  //ErrorMsg
 }
 
 type SummaryInfo struct {
-	SuccessfulCount int      `json:"successfulCount,omitempty"`
-	FailedCount     int      `json:"failedCount,omitempty"`
-	ToResolve       []string `json:"toResolve,omitempty"`
+	SuccessfulCount int      `json:"successfulCount,omitempty"` //calculate based on individual true check
+	FailedCount     int      `json:"failedCount,omitempty"`     //calculate based on individual false check
+	ToResolve       []string `json:"toResolve,omitempty"`       //ResolutionMsg
 }
 
-type progress struct {
-	currentCount int
-	totalCount   int
-}
-
-func VerificationReports(reportChan chan VerificationReport, reporting Reporting, nodeInfoMap map[string][]Info, done chan bool) {
-	tableProgress := make(map[string]progress)
+func VerificationReports(reports []VerificationReport, reporting Reporting, nodeInfoMap map[string][]Info) {
 	keyMap := make(map[string][]string)
 	tableKeys := reporting.GetAllTableKeys()
-	oldProgresslen := 0
-	for n := range reportChan {
-		time.Sleep(time.Second * 1)
-		report := n
+
+	for _, report := range reports {
 		info := report.Report
-		total := report.TotalReports
 		node := report.TableKey
 		var nodeinfo []Info
 		if _, ok := nodeInfoMap[node]; ok {
 			nodeinfo := nodeInfoMap[node]
 			nodeinfo = append(nodeinfo, info)
 			nodeInfoMap[node] = nodeinfo
-			oldCount := tableProgress[node].currentCount
-			tableProgress[node] = progress{
-				currentCount: oldCount + 1,
-				totalCount:   total,
-			}
 		} else {
 			nodeinfo = append(nodeinfo, info)
 			nodeInfoMap[node] = nodeinfo
 			keyMap[node] = matchNodeNameWithRespectiveTablesName(node, tableKeys)
-			tableProgress[node] = progress{
-				currentCount: 1,
-				totalCount:   total,
-			}
 		}
-		oldProgresslen = showProgress(tableProgress, oldProgresslen)
 	}
-	clearPrintedProgressMsg(len(tableProgress))
+
 	updateTablesWithData(reporting, nodeInfoMap, keyMap)
 	printTables(reporting, nodeInfoMap, keyMap)
-	done <- true
 }
 
 func printTables(reporting Reporting, nodeInfo map[string][]Info, keyMap map[string][]string) {
@@ -232,29 +210,6 @@ func createSingleParameterRows(parameter string, parameterSummary SummaryInfo, r
 		rows = append(rows, row)
 	}
 	return rows
-}
-
-func showProgress(tableProgess map[string]progress, lines int) int {
-	clearPrintedProgressMsg(lines)
-	keys := make([]string, len(tableProgess))
-	i := 0
-	for key := range tableProgess {
-		keys[i] = key
-		i++
-	}
-	sort.Strings(keys)
-	for _, key := range keys {
-		percent := float64(tableProgess[key].currentCount) / float64(tableProgess[key].totalCount) * 100
-		progressMsg := fmt.Sprintf("%-12s %.2f%%\n", key, percent)
-		fmt.Print(progressMsg)
-	}
-	return len(keys)
-}
-
-func clearPrintedProgressMsg(lines int) {
-	if lines > 0 {
-		fmt.Printf("\033[%dA\033[J", lines)
-	}
 }
 
 func updateTableTitle(reporting Reporting, nodeInfo map[string][]Info, keyMap map[string][]string) {

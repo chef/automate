@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/reporting"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
@@ -259,13 +260,38 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	if err != nil {
 		return err
 	}
-	v.Writer.Printf("Response for batch-check API on bastion: \n%s\n", string(resBastion))
+
+	var batchCheckResultBastion, batchCheckResultRemote models.BatchCheckResponse
+	var batchCheckResults []models.BatchCheckResult
+
+	if err := json.Unmarshal(resBastion, &batchCheckResultBastion); err != nil {
+		return fmt.Errorf("failed to unmarshal batch-check API result field for bastion: %v", err)
+	}
+	v.Writer.Printf("Response for batch-check API on bastion as struct: \n%v\n", batchCheckResultBastion)
+	if !batchCheckResultBastion.Passed {
+		return fmt.Errorf("batch-check API failed on bastion:\n%s", string(resBastion))
+	}
+
+	batchCheckResults = append(batchCheckResults, batchCheckResultBastion.NodeResult...)
 
 	resRemote, err := v.runVerifyServiceForRemote(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
-	v.Writer.Printf("Response for batch-check API on remote nodes: \n%s\n", string(resRemote))
+
+	if err := json.Unmarshal(resRemote, &batchCheckResultRemote); err != nil {
+		return fmt.Errorf("failed to unmarshal batch-check API result field for remote nodes: %v", err)
+	}
+	v.Writer.Printf("Response for batch-check API on remote nodes as struct: \n%v\n", batchCheckResultRemote)
+	if !batchCheckResultRemote.Passed {
+		return fmt.Errorf("batch-check API failed on remote nodes:\n%s", string(resRemote))
+	}
+
+	batchCheckResults = append(batchCheckResults, batchCheckResultRemote.NodeResult...)
+
+	v.Writer.Printf("Response for batch-check API as struct: \n%v\n", batchCheckResults)
+
+	v.printResponse(batchCheckResults)
 
 	return nil
 }
@@ -385,7 +411,7 @@ func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckReque
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
 	if err != nil {
 		if responseBody != nil {
-			v.Writer.Printf("Error response body: %s\n", string(responseBody))
+			return nil, fmt.Errorf("error while doing batch-check API call for %s:\n%s", nodeType, string(responseBody))
 		}
 		return nil, fmt.Errorf("error while doing batch-check API call for %s: %v", nodeType, err)
 	}
@@ -477,6 +503,10 @@ func (v *verifyCmdFlow) getHostIPs(automatePrivateIps, chefServerPrivateIps, pos
 		hostIPs = stringutils.ConcatSlice(hostIPs, opensearchPrivateIps)
 	}
 	return hostIPs
+}
+
+func (v *verifyCmdFlow) printResponse(batchCheckResults []models.BatchCheckResult) {
+	reporting.VerificationReports(nil, nil, nil)
 }
 
 // Returns port
