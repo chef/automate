@@ -586,6 +586,14 @@ func TestNewConfig(t *testing.T) {
 	assert.NotNil(t, config.Hardware)
 	assert.Equal(t, reflect.TypeOf(&Hardware{}), reflect.TypeOf(config.Hardware))
 
+	// Verify Certificate is initialized correctly
+	assert.NotNil(t, config.Certificate)
+	assert.Equal(t, reflect.TypeOf([]*Certificate{}), reflect.TypeOf(config.Certificate))
+	assert.NotNil(t, config.Certificate[0])
+	assert.Equal(t, reflect.TypeOf(&Certificate{}), reflect.TypeOf(config.Certificate[0]))
+	assert.NotNil(t, config.Certificate[0].Nodes)
+	assert.Equal(t, reflect.TypeOf([]*NodeCert{}), reflect.TypeOf(config.Certificate[0].Nodes))
+
 	// Verify ExternalOS is initialized correctly
 	assert.NotNil(t, config.ExternalOS)
 	assert.Equal(t, reflect.TypeOf(&ExternalOS{}), reflect.TypeOf(config.ExternalOS))
