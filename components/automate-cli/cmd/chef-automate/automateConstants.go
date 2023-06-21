@@ -71,5 +71,8 @@ const (
 	automate-backend-ctl applied --svc=automate-ha-%s
 	`
 
+	CONF_PREFIX_FOR_SHOW_APPS_CMD = `
+	sudo chef-automate config %s`
+
 	SUDO_PASSWORD_CMD = `echo "%s" | sudo -S bash -c "`
 )
