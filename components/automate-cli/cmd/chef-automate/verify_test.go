@@ -3,6 +3,9 @@ package main
 import (
 	"errors"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -23,6 +26,24 @@ const (
 )
 
 func TestRunVerifyCmd(t *testing.T) {
+	var file *os.File
+	// In mac we can't able to create folder at root level. that's why we are ignoring the testcases(aws testcases) which required
+	// to read the file from the root directory.
+	if runtime.GOOS != "darwin" {
+		dirPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment")
+		filePath := dirPath + "/output.auto.tfvars"
+
+		err := os.MkdirAll(dirPath, os.ModePerm)
+		assert.NoError(t, err, "Error creating directories")
+
+		file, err = os.Create(filePath)
+		assert.NoError(t, err, "Error creating file")
+		defer os.Remove(file.Name())
+
+		_, err = file.WriteString(OutputAutoTfvarsFileContent)
+		assert.NoError(t, err)
+	}
+
 	tests := []struct {
 		description              string
 		mockHttputils            *httputils.MockHTTPClient
@@ -32,6 +53,7 @@ func TestRunVerifyCmd(t *testing.T) {
 		mockVerifyCmdDeps        *verifyCmdDeps
 		configFile               string
 		wantErr                  error
+		IsAws                    bool
 	}{
 		{
 			description: "bastion with existing automate-verify - success",
@@ -92,6 +114,7 @@ func TestRunVerifyCmd(t *testing.T) {
 		},
 		{
 			description: "bastion with aws automate-verify - success",
+			IsAws:       true,
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 					return &http.Response{
@@ -189,6 +212,7 @@ func TestRunVerifyCmd(t *testing.T) {
 		},
 		{
 			description: "bastion aws without automate-verify - success",
+			IsAws:       true,
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
 					if requestMethod == http.MethodGet {
@@ -237,6 +261,9 @@ func TestRunVerifyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
+			if tt.IsAws && runtime.GOOS == "darwin" {
+				return
+			}
 			cw := majorupgrade_utils.NewCustomWriter()
 
 			vc := NewVerifyCmdFlow(tt.mockHttputils,
@@ -262,6 +289,10 @@ func TestRunVerifyCmd(t *testing.T) {
 		})
 	}
 
+	if runtime.GOOS != "darwin" {
+		err := file.Close()
+		assert.NoError(t, err)
+	}
 }
 
 func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
