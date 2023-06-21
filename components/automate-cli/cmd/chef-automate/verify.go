@@ -478,6 +478,14 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 			if err != nil {
 				return nil, err
 			}
+
+			// assign ip's to models.Hardware
+			batchCheckHardware := batchCheckConfig.Hardware
+			batchCheckHardware.AutomateNodeIps = configDetails.AutomateIps
+			batchCheckHardware.ChefInfraServerNodeIps = configDetails.ChefServerIps
+			batchCheckHardware.PostgresqlNodeIps = configDetails.PostgresqlIps
+			batchCheckHardware.OpenSearchNodeIps = configDetails.OpensearchIps
+
 		}
 	}
 
