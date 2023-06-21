@@ -436,15 +436,15 @@ test_if_login_failing_with_incorrect_credentials() {
             --data-urlencode 'commit=Sign+In')
 
   if [ $res_code == 302 ]; then
-    echo "Login Failed, User redirected"
+    echo "Login call returns HTTP STATUS 302 as expected for invalid credentials"
   else
-    echo "Admin user with wrong password didn't redirect"
+    echo "Login call did not return HTTP STATUS 302 for invalid credentials"
     return 1
   fi
 }
 
 document "test_if_env_vars_are_configured" <<DOC
-  test if ENVs are configured for OCID
+  test if default ENV variables are configured for OCID
 DOC
 test_if_env_vars_are_configured() {
   ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
