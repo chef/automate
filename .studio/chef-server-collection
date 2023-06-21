@@ -392,6 +392,141 @@ function test_knife() {
   done
 }
 
+hab_curl() {
+  hab pkg exec core/curl curl "$@";
+}
+
+document "test_if_login_working_with_correct_credentials" <<DOC
+  login call returns 200 if creds are correct
+DOC
+test_if_login_working_with_correct_credentials() {
+  bootstrap_chef_user_data || return 1
+  local url="https://${chef_server_hostname}/id/auth/chef/callback"
+
+  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
+              --header 'x-requested-with: XMLHttpRequest' \
+              --header 'Content-Type: application/x-www-form-urlencoded' \
+              --data-urlencode 'utf8=✓' \
+              --data-urlencode "username=$chef_server_test_admin_user_email" \
+              --data-urlencode "password=$chef_server_test_user_password" \
+              --data-urlencode 'commit=Sign+In')
+
+  if [ $res_code == 200 ]; then
+    echo "User Logged In"
+  else
+    echo "Error Logging in with test admin user"
+    return 1
+  fi
+}
+
+document "test_if_login_failing_with_incorrect_credentials" <<DOC
+  login call returns 302 if creds are incorrect
+DOC
+test_if_login_failing_with_incorrect_credentials() {
+  bootstrap_chef_user_data || return 1
+  local url="https://${chef_server_hostname}/id/auth/chef/callback"
+  local incorrect_password='incorrect-password'
+
+  res_code=$(hab_curl --insecure -H -s -o /dev/null -w "%{http_code}" $url \
+            --header 'x-requested-with: XMLHttpRequest' \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'utf8=✓' \
+            --data-urlencode "username=$chef_server_test_admin_user_email" \
+            --data-urlencode "password=$incorrect_password" \
+            --data-urlencode 'commit=Sign+In')
+
+  if [ $res_code == 302 ]; then
+    echo "Login call returns HTTP STATUS 302 as expected for invalid credentials"
+  else
+    echo "Login call did not return HTTP STATUS 302 for invalid credentials"
+    return 1
+  fi
+}
+
+document "test_if_env_vars_are_configured" <<DOC
+  test if default ENV variables are configured for OCID
+DOC
+test_if_env_vars_are_configured() {
+  ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
+
+  # Get values from in settings/production.yml
+  endpoint=$(awk '/endpoint:/ {print $2}' $ocid_config_file_path)
+  superuser=$(awk '/superuser:/ {print $2}' $ocid_config_file_path)
+  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' $ocid_config_file_path)
+
+  errors=()
+
+  if [ $endpoint != "https://127.0.0.1:443" ]; then
+    errors+=("Chef-Server endpoint is not configured properly.")
+  fi
+
+  if [ $superuser != "pivotal" ]; then
+    errors+=("Chef-Server superuser is not configured properly.")
+  fi
+
+  if [ $ssl_verify_mode != "verify_none" ]; then
+    errors+=("Chef-Server SSL certificate verification mode is not configured properly.")
+  fi
+
+  if [ ${#errors} -gt 0 ]; then
+    for (( i=0; i<${#errors[@]}; i++ )); do echo "${errors[$i]}" ; done
+    return 1
+  else
+    echo "ENV Vars configured correctly"
+  fi
+}
+
+# We are keeping a local copy of this method as the original from 01_base.sh is not accessible here
+install_if_missing() {
+  if [ "$#" -ne 2 ]; then
+    error "Wrong number of arguments to ${FUNCNAME[0]}"
+    describe "${FUNCNAME[0]}"
+    return 1
+  fi
+
+  # Install the package if it is not installed
+  if [[ ! -d "/hab/pkgs/$1" ]]; then
+    hab pkg install "$1" > /dev/null
+  fi
+
+  # Ensure we are binlinking to the same version `hab pkg exec` would run
+  hab pkg binlink --force "$1" "$2" > /dev/null
+}
+
+document "test_if_webui_key_is_patched" <<DOC
+  test if WEB UI key is patched for OCID
+DOC
+test_if_webui_key_is_patched() {
+  install_if_missing core/jq-static jq
+
+  # Extract webui_key from private-chef-secrets.json
+  ocid_secrets_file_path="$(hab pkg path chef/oc_id)/oc_id/config/private-chef-secrets.json"
+
+  # elem variable hold the value 'chef-server', we opted for this syntax becz chef-server needs to be
+  # to be treated as string as it contains `-`, which is not a valid JSON character
+  ocid_webui_key="$(jq --arg elem "chef-server" -r '.[$elem]."webui_key"' < $ocid_secrets_file_path)"
+
+  # Create a temporary file with the ocid_webui_key content
+  echo "$ocid_webui_key" > temp_ocid_webui_key.pem
+
+  # Path for erchef webui_priv.pem file
+  erchef_webui_key_path="/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
+
+  # Compare the temporary file with the erchef PEM file
+  output=$(diff "$erchef_webui_key_path" temp_ocid_webui_key.pem)
+
+  # Remove the temporary file
+  rm temp_ocid_webui_key.pem
+
+  # Check if the output is empty, indicating a match
+  if [ -z "$output" ]; then
+    echo "The content of the PEM file matches."
+  else
+    echo "The content of the PEM file does not match."
+    return 1
+  fi
+}
+
 document "ohai_time" <<DOC
   Gets ohai_time for a converged node. Assumes converge_chef_client has already run.
 DOC

@@ -4,7 +4,6 @@ fips_enabled = false
 ip_mode = "ipv4"
 rails_env="production"
 rack_env="production"
-DATABASE_URL="postgresql://automate@127.0.0.1:5432/automate-cs-ocid?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
 
 [network]
 port=9090
@@ -46,3 +45,5 @@ pool_queue_max=50
     # But if you have a valid certificate in your chef-server then you should
     # set it to: verify_peer
     ssl_verify_mode="verify_none"
+  [ocid.v1.sys.ocid.oauth_application_config]
+    [[ocid.v1.sys.ocid.oauth_application_config.oauth_applications]]

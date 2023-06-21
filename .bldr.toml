@@ -963,7 +963,6 @@ paths = [
   "lib/user/*"
 ]
 
-
 [automate-cs-ocid]
 plan_path = "components/automate-cs-ocid"
 paths = [
