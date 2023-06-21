@@ -39,7 +39,7 @@ func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerRespons
 
 	response := triggerMultipleRequests(config, fc.log, endPoint, http.MethodPost, requestMap)
 
-	return response
+	return constructResponseFromOutput(response)
 }
 
 func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
@@ -55,11 +55,12 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 			constants.HTTPS: []int{443},
 		},
 		constants.POSTGRESQL: {
-			constants.TCP: []int{7432, 9631, 5432, 6432, 9638},
+			constants.TCP: []int{7432, 9631, 5432, 6432},
 			constants.UDP: []int{9638},
 		},
 		constants.OPENSEARCH: {
-			constants.TCP: []int{9200, 9300, 9631, 9638},
+			constants.TCP: []int{9200, 9300, 9631},
+			constants.UDP: []int{9638},
 		},
 	}
 	return nodeTypePortMap
@@ -67,11 +68,11 @@ func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 
 // The request response is being constructed based on the https://docs.chef.io/automate/ha_on_premises_deployment_prerequisites/#firewall-checks (Firewall Checks)
 func makeRequests(config *models.Config, reqMap map[string][]models.FirewallRequest) {
-	reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
+	//reqMap[constants.AUTOMATE] = getRequestsForAutomateAsSource(config)
 	reqMap[constants.CHEF_INFRA_SERVER] = getRequestsForChefServerAsSource(config)
-	reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
-	reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
-	reqMap[constants.BASTION] = getRequestAsBastionSource(config)
+	//reqMap[constants.POSTGRESQL] = getRequestsForPostgresAsSource(config)
+	//reqMap[constants.OPENSEARCH] = getRequestsForOpensearchAsSource(config)
+	//reqMap[constants.BASTION] = getRequestAsBastionSource(config)
 }
 
 // getRequestsForAutomateAsSource gives the requests for all the ports and types automate as source
@@ -137,27 +138,27 @@ func getRequestsForChefServerAsSource(config *models.Config) []models.FirewallRe
 			reqBodies = append(reqBodies, reqBody)
 		}
 
-		// Dest postgres
-		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "7432",
-				DestinationServiceProtocol: "tcp",
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
+		// // Dest postgres
+		// for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
+		// 	reqBody := models.FirewallRequest{
+		// 		SourceNodeIP:               sourceNodeIP,
+		// 		DestinationNodeIP:          destNodeIP,
+		// 		DestinationServicePort:     "7432",
+		// 		DestinationServiceProtocol: "tcp",
+		// 	}
+		// 	reqBodies = append(reqBodies, reqBody)
+		// }
 
-		// Dest opensearch
-		for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "9200",
-				DestinationServiceProtocol: "tcp",
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
+		// // Dest opensearch
+		// for _, destNodeIP := range config.Hardware.OpenSearchNodeIps {
+		// 	reqBody := models.FirewallRequest{
+		// 		SourceNodeIP:               sourceNodeIP,
+		// 		DestinationNodeIP:          destNodeIP,
+		// 		DestinationServicePort:     "9200",
+		// 		DestinationServiceProtocol: "tcp",
+		// 	}
+		// 	reqBodies = append(reqBodies, reqBody)
+		// }
 
 	}
 
@@ -313,4 +314,37 @@ func triggerMultipleRequests(config *models.Config, log logger.Logger, endPoint,
 
 	close(outputCh)
 	return result
+}
+
+// constructResponseFromOutput constructing the final output from result in the format excepted by Batch Check service
+func constructResponseFromOutput(result []models.CheckTriggerResponse) []models.CheckTriggerResponse {
+
+	var response []models.CheckTriggerResponse
+	resultMap := make(map[string]models.CheckTriggerResponse)
+
+	for _, checkResponse := range result {
+		key := checkResponse.Host + "_" + checkResponse.NodeType
+		value, ok := resultMap[key]
+		if ok {
+			//Adding checks for the results
+			newChecks := value.Result.Checks
+			newChecks = append(newChecks, checkResponse.Result.Checks...)
+			//Adding the new checks to the result
+			value.Result.Checks = newChecks
+			if checkResponse.Result.Error != nil {
+				value.Result.Error = checkResponse.Result.Error
+			}
+			resultMap[key] = value
+		} else {
+			resultMap[key] = checkResponse
+		}
+
+	}
+
+	//Creating the check trigger response
+	for _, checkResponses := range resultMap {
+		response = append(response, checkResponses)
+	}
+
+	return response
 }
