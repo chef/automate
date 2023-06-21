@@ -1,4 +1,4 @@
 {
   "name": "chef/automate-cs-ocid",
-  "uses_platform_scaffolding": false
+  "uses_platform_scaffolding": true
 }

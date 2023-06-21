@@ -11,6 +11,11 @@ pkg_version="15.4.0"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
+
+pkg_svc_user=root
+pkg_svc_group=root
+pkg_svc_run="return 0"
+
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   chef/mlsa
@@ -51,27 +56,5 @@ do_build() {
 }
 
 do_install() {
-  # Copying this file into oc_id application directory so that this file
-  # can be executed as a rake task in the later stage of the application lifecycle.
-  cp "habitat/config/tasks/oauth_application.rake" $(hab pkg path "chef/oc_id")/oc_id/lib/tasks
-  
-  # This script is to set required permission on files and folders.
-  # If you have to set any specific permission for any file add that in the below script.
-  source habitat/config/scripts/set_file_permissions.sh
-
-  cd "$(hab pkg path 'chef/oc_id')/oc_id"
-
-  export BUNDLE_SILENCE_ROOT_WARNING=1 GEM_PATH
-  build_line "Setting BUNDLE_SILENCE_ROOT_WARNING=$BUNDLE_SILENCE_ROOT_WARNING"
-
-  bundle config path "vendor/bundle"
-
-  # TODO :: Remove following line once new ocid hab package is used
-  echo "gem 'tzinfo-data'" >> Gemfile
-  bundle install
-
-  # tmp directory is required for storage of sessions
-  mkdir -p tmp && chmod 777 -R tmp
-
   return 0
 }
