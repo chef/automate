@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -76,12 +77,12 @@ func GetRequestJson() *models.Config {
 	json.Unmarshal([]byte(`{
 		"ssh_user": {
 			"user_name": "ubuntu",
-            "ssh_port": "1234",
-            "private_key": "test_key",
-            "sudo_password": "test@123"
-		},
-		"arch": "existing_nodes",
-		"backup": {
+			"private_key": "test_key",
+			"ssh_port":"22",
+			"sudo_password": "test@123"
+		  },
+		  "arch": "existing_nodes",
+		  "backup": {
 			"file_system": {
 				"mount_location": "/mnt/automate_backups"
 			}
@@ -154,7 +155,7 @@ func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error
 
 func TestNewSshUserAccessCheck(t *testing.T) {
 	testPort := "1234"
-	cc := NewSshUserAccessCheck(logger.NewTestLogger(), testPort)
+	cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.FileSystemUtils{},testPort)
 	assert.NotNil(t, cc)
 	assert.NotNil(t, cc.log)
 	assert.Equal(t, constants.LOCAL_HOST_URL, cc.host)
@@ -184,7 +185,12 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1124")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+		},"1124")
+
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
 		assert.Equal(t, totalIps, len(finalResp))
@@ -229,7 +235,11 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1235")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+		},"1235")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -265,7 +275,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), "1236")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.FileSystemUtils{},"1236")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -284,7 +294,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ExternalOS: nil,
 		}
 
-		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
@@ -307,7 +317,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			SSHUser: nil,
 		}
 
-		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		for _, v := range got {
@@ -332,7 +342,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			SSHUser: &models.SSHUser{},
 		}
 
-		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "8080")
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		for _, v := range got {
@@ -346,11 +356,16 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 }
 
 func TestGetSShUserAPIRquest(t *testing.T) {
+	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+		ReadFileFunc: func(filepath string) ([]byte, error) {
+			return []byte("test_key"), nil
+		},
+	},"1234")
 	ip := "1.2.3.4"
 
 	expected := GetSshRequest()
 
-	actual := getSShUserAPIRquest(ip, GetRequestJson().SSHUser)
+	actual := fwc.getSShUserAPIRquest(ip, GetRequestJson().SSHUser)
 
 	assert.Equal(t, expected, actual)
 
@@ -360,15 +375,15 @@ func GetSshRequest() models.SShUserRequest {
 	request := models.SShUserRequest{
 		IP:           "1.2.3.4",
 		Username:     "ubuntu",
-		PrivateKey:   "test_key",
+		Port:         "22",
 		SudoPassword: "test@123",
-		Port:         "1234",
+		PrivateKey:   "test_key",
 	}
 	return request
 }
 
 func TestGetPortsForMockServer(t *testing.T) {
-	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), "1234")
+	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"1234")
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))

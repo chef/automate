@@ -96,7 +96,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddBatchCheckService(
 			batchcheckservice.NewBatchCheckService(trigger.NewCheckTrigger(
 				hardwareresourcechecktrigger.NewHardwareResourceCountCheck(l, port),
-				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, port),
+				sshuseraccesschecktrigger.NewSshUserAccessCheck(l, fileutils.NewFileSystemUtils(), port),
 				certificatechecktrigger.NewCertificateCheck(l, port),
 				externalopensearchchecktrigger.NewExternalOpensearchCheck(l, port),
 				externalpostgresqlchecktrigger.NewExternalPostgresCheck(l, port),
@@ -117,7 +117,7 @@ func NewVerifyServer(port string, debug bool) (*VerifyServer, error) {
 		AddS3ConfigService(s3configservice.NewS3ConfigService(l, awsutils.NewAwsUtils())).
 		AddOSS3BackupService(opensearchbackupservice.NewOSS3BackupService(l)).
 		AddPortReachableService(portreachableservice.NewPortReachableService(l, constants.TIMEOUT)).
-		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(),  fileutils.NewFileSystemUtils(),  l)).
+		AddExternalPostgresqlService(externalpostgresqlservice.NewExternalPostgresqlService(db.NewDBImpl(), fileutils.NewFileSystemUtils(), l)).
 		AddSystemUserService(systemuserservice.NewSystemUserService(l, executil.NewExecCmdServiceImp(), userutils.NewUserUtilImp())).
 		AddExternalOpensearchService(externalopensearchservice.NewExternalOpensearchService(l, constants.TIMEOUT)).
 		AddFqdnService(fqdnservice.NewFqdnService(l, constants.TIMEOUT)).

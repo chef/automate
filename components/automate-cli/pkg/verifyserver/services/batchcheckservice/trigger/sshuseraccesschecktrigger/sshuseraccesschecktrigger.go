@@ -3,25 +3,30 @@ package sshuseraccesschecktrigger
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 )
 
 type SshUserAccessCheck struct {
-	host string
-	port string
-	log  logger.Logger
+	host      string
+	port      string
+	log       logger.Logger
+	FileUtils fileutils.FileUtils
 }
 
-func NewSshUserAccessCheck(log logger.Logger, port string) *SshUserAccessCheck {
+func NewSshUserAccessCheck(log logger.Logger, fileutils fileutils.FileUtils, port string) *SshUserAccessCheck {
 	return &SshUserAccessCheck{
-		log:  log,
-		host: constants.LOCAL_HOST_URL,
-		port: port,
+		log:       log,
+		host:      constants.LOCAL_HOST_URL,
+		port:      port,
+		FileUtils: fileutils,
 	}
 }
 
@@ -49,7 +54,7 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
-			requestBody := getSShUserAPIRquest(ip, config.SSHUser)
+			requestBody := ss.getSShUserAPIRquest(ip, config.SSHUser)
 			go trigger.TriggerCheckAPI(url, ip, types[i], http.MethodPost, outputCh, requestBody)
 		}
 	}
@@ -62,14 +67,19 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 	return finalResult
 }
 
-func getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
-
+func (ss *SshUserAccessCheck) getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
+	ct, err := ss.FileUtils.ReadFile(filepath.Join(os.Getenv("HOME"), sshUser.PrivateKey))
+	if err != nil {
+		ss.log.Error("Error while opeing the file private file present on the path", err)
+		return models.SShUserRequest{}
+	}
+	keyContents := string(ct)
 	return models.SShUserRequest{
 		IP:           ip,
 		Username:     sshUser.Username,
 		Port:         sshUser.Port,
 		SudoPassword: sshUser.SudoPassword,
-		PrivateKey:   sshUser.PrivateKey,
+		PrivateKey:   keyContents,
 	}
 }
 

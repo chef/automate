@@ -5,6 +5,7 @@ type MockSystemdCreateUtils struct {
 	SystemdRunningFunc           func() error
 	CreateDestinationAndCopyFunc func(binarySrcPath, binaryDestPath string) error
 	ExecuteShellCommandFunc      func(name string, arg []string) error
+	GetEnvFunc                   func() string
 }
 
 func (msc *MockSystemdCreateUtils) GetBinaryPath() (string, error) {
@@ -18,4 +19,7 @@ func (msc *MockSystemdCreateUtils) CreateDestinationAndCopy(binarySrcPath, binar
 }
 func (msc *MockSystemdCreateUtils) ExecuteShellCommand(name string, arg []string) error {
 	return msc.ExecuteShellCommandFunc(name, arg)
+}
+func (msc *MockSystemdCreateUtils) GetEnv() string {
+	return msc.GetEnvFunc()
 }

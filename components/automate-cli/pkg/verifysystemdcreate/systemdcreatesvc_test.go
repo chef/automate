@@ -64,6 +64,7 @@ func TestSystemdServiceCreate(t *testing.T) {
 			SystemdRunningFunc:           func() error { return nil },
 			CreateDestinationAndCopyFunc: createDestinationAndCopy,
 			ExecuteShellCommandFunc:      executeShellCommand,
+			GetEnvFunc:                   func() string { return "/home/ubuntu" },
 		}
 	}
 
@@ -192,7 +193,7 @@ ExecStart=%s/chef-automate verify serve
 Restart=always
 StandardOutput=journal
 StandardError=journal
-
+Environment="HOME=/home/ubuntu"
 [Install]
 WantedBy=multi-user.target
 `
