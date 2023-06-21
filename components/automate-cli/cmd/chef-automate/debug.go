@@ -91,8 +91,8 @@ func newDebugCmd() *cobra.Command {
 	logLevelCmd.Flags().StringVar(&logLevelCmdFlags.endpoint, "endpoint", "", "The endpoint the service is listening on")
 	logLevelCmd.Flags().DurationVar(&logLevelCmdFlags.connectionTimeout, "connection-timeout", 0, "Most time to wait to connect to service")
 
-	versionCmd.Flags().StringVar(&versionCmdFlags.endpoint, "endpoint", "", "The endpoint the service is listening on")
-	versionCmd.Flags().DurationVar(&versionCmdFlags.connectionTimeout, "connection-timeout", 0, "Most time to wait to connect to service")
+	getVersionCmd.Flags().StringVar(&versionCmdFlags.endpoint, "endpoint", "", "The endpoint the service is listening on")
+	getVersionCmd.Flags().DurationVar(&versionCmdFlags.connectionTimeout, "connection-timeout", 0, "Most time to wait to connect to service")
 
 	debugCmd.AddCommand(profileCmd)
 	debugCmd.AddCommand(traceCmd)

@@ -3,15 +3,26 @@ synopsis: Show CLI version
 usage: chef-automate version [flags]
 description: Show the CLI version.
 options:
-- name: connection-timeout
-  default_value: 0s
-  usage: Most time to wait to connect to service
-- name: endpoint
-  usage: The endpoint the service is listening on
+- name: a2
+  default_value: "false"
+  usage: Get only automate Status
+- name: cs
+  default_value: "false"
+  usage: Get only chef server Status
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for version
+- name: node
+  usage: |
+    Node Ip address. While using this flag, pass the node type as well. Example : chef-automate version --node 192.0.0.1 --cs
+  compatible_with_options: AutomateHA
+- name: os
+  default_value: "false"
+  usage: Get only opensearch Status
+- name: pg
+  default_value: "false"
+  usage: Get only postgresql Status
 - name: verbose
   shorthand: v
   default_value: "false"
@@ -28,4 +39,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-supported_on: FrontEnd
+supported_on: Bastion
