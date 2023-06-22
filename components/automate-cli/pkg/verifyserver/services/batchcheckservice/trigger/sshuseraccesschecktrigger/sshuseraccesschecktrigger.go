@@ -43,40 +43,30 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 		return trigger.ConstructEmptyResp(config, constants.SSH_USER, "SSH credentials is missing")
 	}
 
-	count := config.Hardware.AutomateNodeCount + config.Hardware.ChefInfraServerNodeCount +
-		config.Hardware.PostgresqlNodeCount + config.Hardware.OpenSearchNodeCount
+	count := 0
 
-	outputCh := make(chan models.CheckTriggerResponse, count)
+	outputCh := make(chan models.CheckTriggerResponse)
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.SSH_USER_CHECK_API_PATH)
-	ct, err := ss.fileUtils.ReadFile(config.SSHUser.PrivateKey)
-	if err != nil {
-		ss.log.Errorf("Error while opening the private file path %s: %v\n", config.SSHUser.PrivateKey, err)
-		return []models.CheckTriggerResponse{
-			{
-				Status: "SUCCESS",
-				Result: models.ApiResult{
-					Passed:  false,
-					Message: "SSH User Access Check",
-					Check:   "ssh-user",
-					Checks:  []models.Checks{},
-					Error:   &fiber.Error{
-						Code: 400,
-						Message: err.Error(),
-					},
-					Skipped: false,
-				},
-				Host: constants.UNKNOWN_HOST,
-				NodeType: constants.UNKNOWN,
-			},
-		}
-	}
-	keyContents := string(ct)
-	config.SSHUser.PrivateKey = keyContents
 	var finalResult []models.CheckTriggerResponse
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
-			requestBody := ss.getSShUserAPIRequest(ip, config.SSHUser)
+			requestBody, err := ss.getSShUserAPIRequest(ip, config.SSHUser)
+			if err != nil {
+				finalResult = append(finalResult, models.CheckTriggerResponse{
+					Host: ip,
+					NodeType: types[i],
+					Result: models.ApiResult{
+						Passed: false,
+						Error: &fiber.Error{
+							Code: http.StatusBadRequest,
+							Message: err.Error(),
+						},
+					},
+				})
+				continue
+			}
+			count = count + 1
 			go trigger.TriggerCheckAPI(url, ip, types[i], http.MethodPost, outputCh, requestBody)
 		}
 	}
@@ -85,18 +75,23 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 		finalResult = append(finalResult, resp)
 	}
 	close(outputCh)
-
 	return finalResult
 }
 
-func (ss *SshUserAccessCheck) getSShUserAPIRequest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
+func (ss *SshUserAccessCheck) getSShUserAPIRequest(ip string, sshUser *models.SSHUser) (models.SShUserRequest, error) {
+	ct, err := ss.fileUtils.ReadFile(sshUser.PrivateKey)
+	if err != nil {
+		ss.log.Errorf("Error while opening the private file path %s: %v\n", sshUser.PrivateKey, err)
+		return models.SShUserRequest{}, err
+	}
+	keyContents := string(ct)
 	return models.SShUserRequest{
 		IP:           ip,
 		Username:     sshUser.Username,
 		Port:         sshUser.Port,
 		SudoPassword: sshUser.SudoPassword,
-		PrivateKey:   sshUser.PrivateKey,
-	}
+		PrivateKey:   keyContents,
+	}, nil
 }
 
 func (ss *SshUserAccessCheck) GetPortsForMockServer() map[string]map[string][]int {

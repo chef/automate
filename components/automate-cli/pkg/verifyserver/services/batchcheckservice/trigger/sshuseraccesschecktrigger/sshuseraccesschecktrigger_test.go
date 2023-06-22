@@ -156,7 +156,7 @@ func startMockServerOnCustomPort(mockServer *httptest.Server, port string) error
 
 func TestNewSshUserAccessCheck(t *testing.T) {
 	testPort := "1234"
-	cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.FileSystemUtils{},testPort)
+	cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.FileSystemUtils{}, testPort)
 	assert.NotNil(t, cc)
 	assert.NotNil(t, cc.log)
 	assert.Equal(t, constants.LOCAL_HOST_URL, cc.host)
@@ -190,7 +190,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
-		},"1124")
+		}, "1124")
 
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -215,7 +215,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		}
 	})
 
-	t.Run("File Reading Get fail", func(t *testing.T) {
+	t.Run("Returns Error if file reading fails", func(t *testing.T) {
 		request := GetRequestJson()
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -237,23 +237,25 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		models.NewConfig().SSHUser.PrivateKey = "test.pem"
 		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.MockFileSystemUtils{
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte(""), errors.New("open test.pem: no such file or directory")
 			},
-		},"1124")
-
+		}, "1124")
 		finalResp := cc.Run(request)
+		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
+		assert.Equal(t, totalIps, len(finalResp))
+
 		for _, resp := range finalResp {
-			assert.Equal(t, resp.Status, "SUCCESS")
-			assert.Equal(t, resp.Result.Skipped, false)
-			assert.Equal(t, resp.Result.Passed, false)
-			assert.Equal(t, resp.Result.Message, "SSH User Access Check")
-			assert.Equal(t, resp.Result.Error.Message, "open test.pem: no such file or directory")
+			if resp.Host == "14.15.16.17" {
+				triggerResp := resp
+				assert.Equal(t, triggerResp.Result.Skipped, false)
+				assert.Equal(t, triggerResp.Result.Passed, false)
+				assert.Equal(t, triggerResp.Result.Error.Code, 400)
+				assert.Equal(t, triggerResp.Result.Error.Message, "open test.pem: no such file or directory")
+			}
 		}
 	})
-
 	t.Run("Failure response", func(t *testing.T) {
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -279,7 +281,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
-		},"1235")
+		}, "1235")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -305,7 +307,6 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			}
 		}
 	})
-
 	t.Run("Returns error", func(t *testing.T) {
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -319,7 +320,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
-		},"1236")
+		}, "1236")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -342,7 +343,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
-		},"8080")
+		}, "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
@@ -365,7 +366,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			SSHUser: nil,
 		}
 
-		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"8080")
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{}, "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		for _, v := range got {
@@ -390,7 +391,7 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			SSHUser: &models.SSHUser{},
 		}
 
-		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"8080")
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{}, "8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		for _, v := range got {
@@ -404,19 +405,30 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 }
 
 func TestGetSShUserAPIRquest(t *testing.T) {
-	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
-		ReadFileFunc: func(filepath string) ([]byte, error) {
-			return []byte("test_key"), nil
-		},
-	},"1234")
-	ip := "1.2.3.4"
+	t.Run("Reading was successfull", func(t *testing.T) {
+		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+		}, "1234")
+		ip := "1.2.3.4"
+		expected := GetSshRequest()
+		actual, _ := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
+		assert.Equal(t, expected, actual)
+	})
 
-	expected := GetSshRequest()
-
-	actual := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
-
-	assert.Equal(t, expected, actual)
-
+	t.Run("Reading was unsuccessfull", func(t *testing.T) {
+		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte(""), errors.New("open test.pem: no such file or directory")
+			},
+		}, "1234")
+		ip := "1.2.3.4"
+		expected, err := models.SShUserRequest{}, errors.New("open test.pem: no such file or directory")
+		got, gotErr := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
+		assert.Equal(t, expected, got)
+		assert.Equal(t, err.Error(), gotErr.Error())
+	})
 }
 
 func GetSshRequest() models.SShUserRequest {
@@ -431,7 +443,7 @@ func GetSshRequest() models.SShUserRequest {
 }
 
 func TestGetPortsForMockServer(t *testing.T) {
-	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"1234")
+	fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{}, "1234")
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))
