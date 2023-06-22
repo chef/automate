@@ -47,10 +47,17 @@ func (ani *AddNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	err = ani.modifyConfig()
 	if err != nil {
 		return err
 	}
+
+	err = ani.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	if !ani.flags.autoAccept {
 		res, err := ani.promptUserConfirmation()
 		if err != nil {
@@ -149,5 +156,13 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	return ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	syncErr := ani.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }

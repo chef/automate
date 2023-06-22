@@ -1,15 +1,18 @@
 package fileutils
 
 import (
+	"bufio"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/chef/toml"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,6 +33,8 @@ type FileUtils interface {
 	WriteFile(filepath string, data []byte, perm os.FileMode) error
 	CreateTempFile(content string, filename string) (string, error)
 	DeleteFile(fileName string) error
+	Move(sourceFile string, destinationFile string) error
+	RemoveFirstLine(filePath string) error
 }
 
 type FileSystemUtils struct{}
@@ -70,6 +75,13 @@ func (fsu *FileSystemUtils) CreateTempFile(content string, filename string) (str
 }
 func (fsu *FileSystemUtils) DeleteFile(filePath string) error {
 	return DeleteFile(filePath)
+}
+
+func (fsu *FileSystemUtils) Move(sourceFile string, destinationFile string) error {
+	return Move(sourceFile, destinationFile)
+}
+func (fsu *FileSystemUtils) RemoveFirstLine(filePath string) error {
+	return RemoveFirstLine(filePath)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -174,4 +186,97 @@ func CreateTempFile(content string, filename string) (string, error) {
 
 func DeleteFile(filePath string) error {
 	return os.Remove(filePath)
+}
+
+// Moves file from current/source directory to destination directory.
+// Creates the directory, if not already exists
+//
+// Example usage:
+// err := fileutils.Move("file.txt", "/path/to/my/dir/", "");
+// Incase of retriving the old file name, leave renamedFileName as empty
+func Move(sourceFile string, destinationFile string) error {
+	destinationDir, fileName := filepath.Split(destinationFile)
+
+	if err := os.MkdirAll(destinationDir, os.ModePerm); err != nil {
+		return err
+	}
+	err := os.Rename(sourceFile, destinationFile)
+	if err != nil {
+		// Checks if the error is of type *os.LinkError
+		if linkErr, ok := err.(*os.LinkError); ok {
+			// Checks the underlying error code & Handles the "file exists" error
+			if linkErr.Err.Error() == "file exists" {
+				if err = os.Remove(destinationFile); err != nil {
+					return err
+				}
+				// Retrys the rename operation
+				if err = os.Rename(sourceFile, destinationDir+fileName); err != nil {
+					return err
+				}
+			}
+		}
+		return err
+	}
+	return nil
+}
+
+func RemoveFirstLine(filePath string) error {
+	// Open the file for reading
+	file, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Create a temporary file to write the updated content
+	tempFile, err := os.CreateTemp("", "temp")
+	if err != nil {
+		return err
+	}
+	defer tempFile.Close()
+
+	// Create a scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+
+	// Skip the first line
+	scanner.Scan()
+
+	// Write the remaining lines to the temporary file
+	for scanner.Scan() {
+		line := scanner.Text()
+		_, err := tempFile.WriteString(line + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
+	// Close the files
+	file.Close()
+	tempFile.Close()
+
+	// Replace the original file with the temporary file
+	if err = os.Rename(tempFile.Name(), filePath); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// createTomlFileFromConfig created a toml file where path and struct interface is provided
+func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, error) {
+	f, err := os.Create(tomlFile)
+
+	if err != nil {
+		// failed to create/open the file
+		return "", errors.Wrap(err, "Failed to create/open the file, \n%v")
+	}
+	if err := toml.NewEncoder(f).Encode(config); err != nil {
+		// failed to encode
+		return "", errors.Wrap(err, "Failed to encode\n%v")
+	}
+	if err := f.Close(); err != nil {
+		return "", errors.Wrap(err, "Failed to close the file\n%v")
+	}
+
+	return tomlFile, nil
 }

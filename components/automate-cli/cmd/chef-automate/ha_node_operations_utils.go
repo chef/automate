@@ -8,12 +8,15 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/chef/toml"
 	ptoml "github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -40,100 +43,6 @@ type HAModifyAndDeploy interface {
 	runDeploy() error
 }
 
-type MockNodeUtilsImpl struct {
-	executeAutomateClusterCtlCommandAsyncfunc func(command string, args []string, helpDocs string) error
-	getHaInfraDetailsfunc                     func() (*AutomateHAInfraDetails, *SSHConfig, error)
-	writeHAConfigFilesFunc                    func(templateName string, data interface{}) error
-	taintTerraformFunc                        func(path string) error
-	isA2HARBFileExistFunc                     func() bool
-	getModeFromConfigFunc                     func(path string) (string, error)
-	checkIfFileExistFunc                      func(path string) bool
-	pullAndUpdateConfigFunc                   func(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error)
-	pullAndUpdateConfigAwsFunc                func(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error)
-	isManagedServicesOnFunc                   func() bool
-	getConfigPullerFunc                       func(sshUtil *SSHUtil) (PullConfigs, error)
-	getInfraConfigFunc                        func(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error)
-	getAWSConfigFunc                          func(sshUtil *SSHUtil) (*AwsConfigToml, error)
-	getModeOfDeploymentFunc                   func() string
-	executeShellCommandFunc                   func() error
-	moveAWSAutoTfvarsFileFunc                 func(path string) error
-	modifyTfArchFileFunc                      func(path string) error
-	getAWSConfigIpFunc                        func() (*AWSConfigIp, error)
-	stopServicesOnNodeFunc                    func(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error
-	excludeOpenSearchNodeFunc                 func(ipToDelete string, infra *AutomateHAInfraDetails) error
-	checkExistingExcludedOSNodesFunc          func(automateIp string, infra *AutomateHAInfraDetails) (string, error)
-	calculateTotalInstanceCountFunc           func() (int, error)
-}
-
-func (mnu *MockNodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
-	return mnu.executeAutomateClusterCtlCommandAsyncfunc(command, args, helpDocs)
-}
-func (mnu *MockNodeUtilsImpl) getAWSConfigIp() (*AWSConfigIp, error) {
-	return mnu.getAWSConfigIpFunc()
-}
-func (mnu *MockNodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error) {
-	return mnu.getHaInfraDetailsfunc()
-}
-func (mnu *MockNodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
-	return mnu.writeHAConfigFilesFunc(templateName, data)
-}
-func (mnu *MockNodeUtilsImpl) taintTerraform(path string) error {
-	return mnu.taintTerraformFunc(path)
-}
-
-func (mnu *MockNodeUtilsImpl) isA2HARBFileExist() bool {
-	return mnu.isA2HARBFileExistFunc()
-}
-func (mnu *MockNodeUtilsImpl) getModeFromConfig(path string) (string, error) {
-	return mnu.getModeFromConfigFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) checkIfFileExist(path string) bool {
-	return mnu.checkIfFileExistFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfig(sshUtil *SSHUtil, exceptionIps []string) (*ExistingInfraConfigToml, error) {
-	return mnu.pullAndUpdateConfigFunc(sshUtil, exceptionIps)
-}
-func (mnu *MockNodeUtilsImpl) isManagedServicesOn() bool {
-	return mnu.isManagedServicesOnFunc()
-}
-func (mnu *MockNodeUtilsImpl) getConfigPuller(sshUtil *SSHUtil) (PullConfigs, error) {
-	return mnu.getConfigPullerFunc(sshUtil)
-}
-func (mnu *MockNodeUtilsImpl) getInfraConfig(sshUtil *SSHUtil) (*ExistingInfraConfigToml, error) {
-	return mnu.getInfraConfigFunc(sshUtil)
-}
-func (mnu *MockNodeUtilsImpl) getAWSConfig(sshUtil *SSHUtil) (*AwsConfigToml, error) {
-	return mnu.getAWSConfigFunc(sshUtil)
-}
-func (mnu *MockNodeUtilsImpl) getModeOfDeployment() string {
-	return mnu.getModeOfDeploymentFunc()
-}
-func (mnu *MockNodeUtilsImpl) executeShellCommand(command, path string) error {
-	return mnu.executeShellCommandFunc()
-}
-
-func (mnu *MockNodeUtilsImpl) moveAWSAutoTfvarsFile(path string) error {
-	return mnu.moveAWSAutoTfvarsFileFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) modifyTfArchFile(path string) error {
-	return mnu.modifyTfArchFileFunc(path)
-}
-func (mnu *MockNodeUtilsImpl) pullAndUpdateConfigAws(sshUtil *SSHUtil, exceptionIps []string) (*AwsConfigToml, error) {
-	return mnu.pullAndUpdateConfigAwsFunc(sshUtil, exceptionIps)
-}
-func (mnu *MockNodeUtilsImpl) stopServicesOnNode(ip, nodeType, deploymentType string, infra *AutomateHAInfraDetails) error {
-	return mnu.stopServicesOnNodeFunc(ip, nodeType, deploymentType, infra)
-}
-func (mnu *MockNodeUtilsImpl) excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error {
-	return mnu.excludeOpenSearchNodeFunc(ipToDelete, infra)
-}
-func (mnu *MockNodeUtilsImpl) checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error) {
-	return mnu.checkExistingExcludedOSNodesFunc(automateIp, infra)
-}
-func (mnu *MockNodeUtilsImpl) calculateTotalInstanceCount() (int, error) {
-	return mnu.calculateTotalInstanceCountFunc()
-}
-
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error)
@@ -157,6 +66,10 @@ type NodeOpUtils interface {
 	excludeOpenSearchNode(ipToDelete string, infra *AutomateHAInfraDetails) error
 	checkExistingExcludedOSNodes(automateIp string, infra *AutomateHAInfraDetails) (string, error)
 	calculateTotalInstanceCount() (int, error)
+	parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error
+	executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error
+	saveConfigToBastion() error
+	syncConfigToAllNodes() error
 }
 
 type NodeUtilsImpl struct {
@@ -332,6 +245,54 @@ func (nu *NodeUtilsImpl) getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfi
 		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
 	}
 	return infra, sshconfig, nil
+}
+
+func (nu *NodeUtilsImpl) saveConfigToBastion() error {
+	nodeObjects := getNodeObjectsToFetchConfigFromAllNodeTypes()
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, true, AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR, nu)
+}
+
+func (nu *NodeUtilsImpl) syncConfigToAllNodes() error {
+	nodeObjects := getNodeObjectsToPatchWorkspaceConfigToAllNodes()
+	return executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects, false, "", nu)
+}
+
+// Execute custom command in one node of all the each node-type
+func executeCmdInAllNodeTypesAndCaptureOutput(nodeObjects []*NodeObject, singleNode bool, outputDirectory string, nu NodeOpUtils) error {
+	for _, nodeObject := range nodeObjects {
+		outFiles := nodeObject.OutputFile
+		err := nu.executeCustomCmdOnEachNodeType(outFiles, nodeObject.InputFile, nodeObject.InputFilePrefix, nodeObject.NodeType, nodeObject.CmdString, singleNode)
+		if err != nil {
+			return err
+		}
+		if len(outFiles) > 0 {
+			if err = nu.parseAndMoveConfigFileToWorkspaceDir(outFiles, outputDirectory); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Execute 'config show' command in specific service and fetch the output file to bastion
+func (nu *NodeUtilsImpl) executeCustomCmdOnEachNodeType(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool) error {
+
+	infra, _, err := nu.getHaInfraDetails()
+	if err != nil {
+		return err
+	}
+	nodeMap := createNodeMap(outputFiles, inputFiles, inputFilesPrefix, service, cmdString, singleNode, infra)
+
+	sshUtil := nu.cmdUtil.GetSshUtil()
+
+	sshUtil.setSSHConfig(&SSHConfig{
+		sshUser:    infra.Outputs.SSHUser.Value,
+		sshPort:    infra.Outputs.SSHPort.Value,
+		sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+	})
+
+	_, err = nu.cmdUtil.ExecuteWithNodeMap(nodeMap)
+	return err
 }
 
 func (nu *NodeUtilsImpl) isManagedServicesOn() bool {
@@ -702,4 +663,163 @@ func readConfigAWS(path string) (AwsConfigToml, error) {
 		return AwsConfigToml{}, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}
 	return config, nil
+}
+
+type NodeObject struct {
+	CmdString       string
+	OutputFile      []string
+	InputFile       []string
+	InputFilePrefix string
+	NodeType        string
+}
+
+func NewNodeObjectWithOutputFile(cmdString string, outFile []string, inputFile []string, inputFilePrefix string, nodeType string) *NodeObject {
+	return &NodeObject{cmdString, outFile, inputFile, inputFilePrefix, nodeType}
+}
+
+func (nu *NodeUtilsImpl) parseAndMoveConfigFileToWorkspaceDir(outFiles []string, outputDirectory string) error {
+
+	err := removeOutputHeaderInConfigFile(outFiles[0])
+	if err != nil {
+		return errors.Wrap(err, "error on removing output header in fetched config")
+	}
+	if err = fileutils.Move(outFiles[0], outputDirectory+outFiles[0]); err != nil {
+		return err
+	}
+	return nil
+}
+
+func removeOutputHeaderInConfigFile(filePath string) error {
+	return fileutils.RemoveFirstLine(filePath)
+}
+
+func getNodeObjectsToFetchConfigFromAllNodeTypes() []*NodeObject {
+	nodeObjects := []*NodeObject{
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, AUTOMATE_TOML), []string{AUTOMATE_TOML}, nil, "", AUTOMATE),
+		NewNodeObjectWithOutputFile(fmt.Sprintf(GET_FRONTEND_CONFIG, CHEF_SERVER_TOML), []string{CHEF_SERVER_TOML}, nil, "", CHEF_SERVER),
+	}
+	if !isManagedServicesOn() {
+		backendNodeObjects := []*NodeObject{
+			NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, POSTGRESQL, " > "+POSTGRESQL_TOML), []string{POSTGRESQL_TOML}, nil, "", POSTGRESQL),
+			NewNodeObjectWithOutputFile(fmt.Sprintf(GET_BACKEND_CONFIG, OPENSEARCH, " > "+OPENSEARCH_TOML), []string{OPENSEARCH_TOML}, nil, "", OPENSEARCH),
+		}
+		nodeObjects = append(nodeObjects, backendNodeObjects...)
+	}
+	return nodeObjects
+}
+
+func getNodeObjectsToPatchWorkspaceConfigToAllNodes() []*NodeObject {
+	timestamp := time.Now().Format("20060102150405")
+	fmt.Println("====================================================================")
+	fmt.Println("sync Config to all frontend nodes")
+	frontendPrefix := "frontend" + "_" + timestamp + "_"
+	frontend := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+AUTOMATE_TOML, DATE_FORMAT)
+	chefserver := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+CHEF_SERVER_TOML, DATE_FORMAT)
+	nodeObjects := []*NodeObject{
+		NewNodeObjectWithOutputFile(frontend, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + AUTOMATE_TOML}, frontendPrefix, AUTOMATE),
+		NewNodeObjectWithOutputFile(chefserver, nil, []string{AUTOMATE_HA_AUTOMATE_NODE_CONFIG_DIR + CHEF_SERVER_TOML}, frontendPrefix, CHEF_SERVER),
+	}
+	return nodeObjects
+}
+
+func createNodeMap(outputFiles []string, inputFiles []string, inputFilesPrefix string, service string, cmdString string, singleNode bool, infra *AutomateHAInfraDetails) *NodeTypeAndCmd {
+
+	nodeMap := NewNodeTypeAndCmd()
+	cmd := newNodeTypeCmd(nodeMap, cmdString, outputFiles, singleNode)
+	if service == POSTGRESQL {
+		cmd.CmdInputs.Args = inputFiles
+	} else if service == OPENSEARCH {
+		cmd.CmdInputs.Args = inputFiles
+	} else {
+		cmd.CmdInputs.Args = inputFiles
+		// Patch only incase of frontends node
+		if len(inputFiles) > 0 {
+			cmd.PreExec = prePatchForFrontendNodes
+			cmd.CmdInputs.InputFilesPrefix = inputFilesPrefix
+			cmd.CmdInputs.WaitTimeout = 300
+		}
+	}
+	switch service {
+	case AUTOMATE:
+		nodeMap.Automate = cmd
+	case CHEF_SERVER:
+		nodeMap.ChefServer = cmd
+	case POSTGRESQL:
+		nodeMap.Postgresql = cmd
+	case OPENSEARCH:
+		nodeMap.Opensearch = cmd
+	}
+
+	nodeMap.Infra = infra
+
+	return nodeMap
+}
+
+// Create *Cmd struct instance with 'cmdString' and 'outputFiles' params
+func newNodeTypeCmd(nodeMap *NodeTypeAndCmd, cmdString string, outputFiles []string, singleNode bool) *Cmd {
+	return &Cmd{
+		CmdInputs: &CmdInputs{
+			Cmd:                      cmdString,
+			Single:                   singleNode,
+			InputFiles:               []string{},
+			Outputfiles:              outputFiles,
+			NodeType:                 true,
+			HideSSHConnectionMessage: true,
+		},
+	}
+}
+
+// prePatchForFrontendNodes parse frontend config before patch and remove cert related keys-values
+func prePatchForFrontendNodes(inputs *CmdInputs, sshUtil SSHUtil, infra *AutomateHAInfraDetails, remoteService string, writer *cli.Writer) error {
+	srcPath, err := removeRestrictedKeysFromSrcFile(inputs.Args[0])
+	if err != nil {
+		return err
+	}
+
+	inputs.InputFiles = []string{srcPath}
+
+	return nil
+}
+
+// Remove TLS values used for frontend LB and product key in frontend nodes
+func removeRestrictedKeysFromSrcFile(srcString string) (string, error) {
+
+	tomlbyt, _ := fileutils.ReadFile(srcString) // nosemgrep
+	destString := string(tomlbyt)
+	var dest dc.AutomateConfig
+	if _, err := toml.Decode(destString, &dest); err != nil {
+		return "", err
+	}
+
+	// Ignoring cert values for "global.v1.frontend_tls"
+	if dest.Global != nil &&
+		dest.Global.V1 != nil &&
+		len(dest.Global.V1.FrontendTls) != 0 {
+		dest.Global.V1.FrontendTls = nil
+	}
+
+	// Ignoring cert values for "load_balancer.v1.sys.frontend_tls"
+	if dest.LoadBalancer != nil &&
+		dest.LoadBalancer.V1 != nil &&
+		dest.LoadBalancer.V1.Sys != nil &&
+		len(dest.LoadBalancer.V1.Sys.FrontendTls) != 0 {
+		dest.LoadBalancer.V1.Sys.FrontendTls = nil
+	}
+
+	// Ignoring product key
+	if dest.Deployment == nil ||
+		dest.Deployment.V1 == nil ||
+		dest.Deployment.V1.Svc == nil ||
+		dest.Deployment.V1.Svc.Products == nil {
+		return srcString, nil
+	} else {
+		// Following are the unsupported or restricted key to patch via bastion
+		dest.Deployment.V1.Svc.Products = nil
+
+		srcString, err := fileutils.CreateTomlFileFromConfig(dest, srcString)
+		if err != nil {
+			return "", err
+		}
+		return srcString, nil
+	}
 }

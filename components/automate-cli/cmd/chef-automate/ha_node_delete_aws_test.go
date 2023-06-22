@@ -512,6 +512,15 @@ func TestDeletenodeDeployWithNewOSNodeInAws(t *testing.T) {
 				tfArchModified = true
 				return nil
 			},
+			executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+				return nil
+			},
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+				return nil
+			},
+			syncConfigToAllNodesFunc: func() error {
+				return nil
+			},
 		},
 		CONFIG_TOML_PATH_AWS,
 		&fileutils.MockFileSystemUtils{},
@@ -629,6 +638,18 @@ func TestDeletenodeAWSExecuteWithError(t *testing.T) {
 			calculateTotalInstanceCountFunc: func() (int, error) {
 				return 0, nil
 			},
+			executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+				return nil
+			},
+			parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+				return nil
+			},
+			saveConfigToBastionFunc: func() error {
+				return nil
+			},
+			syncConfigToAllNodesFunc: func() error {
+				return nil
+			},
 		},
 		CONFIG_TOML_PATH_AWS,
 		&fileutils.MockFileSystemUtils{},
@@ -702,6 +723,18 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 			count = count - 1
 			return count, nil
 		},
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
+		},
 	}
 	flagsArr := []AddDeleteNodeHACmdFlags{
 		{
@@ -740,4 +773,125 @@ func TestDeletenodeAWSExecuteNoError(t *testing.T) {
 		assert.True(t, autoFileMoved)
 	}
 
+}
+
+func TestDeletenodeDeploy(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	mockNodeUtil := newMockNodeUtilsImplForDeleteAWS()
+
+	t.Run("With save config error", func(t *testing.T) {
+
+		mockNodeUtil.saveConfigToBastionFunc = func() error {
+			return errors.New("error removing header from output file")
+		}
+		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
+
+		err := nodeDelete.Execute(nil, nil)
+		assert.Error(t, err, "error removing header from output file")
+	})
+
+	t.Run("With sync config error", func(t *testing.T) {
+
+		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+			return errors.New("sync error")
+		}
+		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
+
+		err := nodeDelete.runDeploy()
+		assert.Error(t, err, "sync error")
+	})
+	t.Run("With sync config error and deploy error", func(t *testing.T) {
+
+		mockNodeUtil.syncConfigToAllNodesFunc = func() error {
+			return errors.New("sync error")
+		}
+		mockNodeUtil.executeAutomateClusterCtlCommandAsyncfunc = func(command string, args []string, helpDocs string) error {
+			if command == "deploy" {
+				return errors.New("deploy error")
+			}
+			return nil
+		}
+		nodeDelete := createNewDeleteNodeAWS(mockNodeUtil, nil, w)
+
+		err := nodeDelete.runDeploy()
+		assert.Error(t, err, "sync error")
+		assert.Error(t, err, "deploy error")
+	})
+}
+
+func newMockNodeUtilsImplForDeleteAWS() *MockNodeUtilsImpl {
+	return &MockNodeUtilsImpl{
+		getHaInfraDetailsfunc: func() (*AutomateHAInfraDetails, *SSHConfig, error) {
+			return nil, &SSHConfig{}, nil
+		},
+		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
+			return nil
+		},
+		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+			return nil
+		},
+		getModeFromConfigFunc: func(path string) (string, error) {
+			return EXISTING_INFRA_MODE, nil
+		},
+		isManagedServicesOnFunc: func() bool {
+			return false
+		},
+		pullAndUpdateConfigAwsFunc: PullAwsConfFunc,
+		isA2HARBFileExistFunc: func() bool {
+			return true
+		},
+		taintTerraformFunc: func(path string) error {
+			return nil
+		},
+		getAWSConfigIpFunc: func() (*AWSConfigIp, error) {
+			return &AWSConfigIp{
+				configAutomateIpList:   []string{"192.0.0.1", "192.0.0.2", "192.0.0.3", "192.0.0.4"},
+				configChefServerIpList: []string{"192.0.1.1", "192.0.1.2", "192.0.1.3", "192.0.1.4"},
+				configOpensearchIpList: []string{"192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4"},
+				configPostgresqlIpList: []string{"192.0.3.1", "192.0.3.2", "192.0.3.3", "192.0.3.4"},
+			}, nil
+		},
+		executeShellCommandFunc: func() error {
+			return nil
+		},
+		moveAWSAutoTfvarsFileFunc: func(path string) error {
+			return nil
+		},
+		modifyTfArchFileFunc: func(path string) error {
+			return nil
+		},
+		executeCmdInAllNodeTypesAndCaptureOutputFunc: func(nodeObjects []*NodeObject, singleNode bool, outputDirectory string) error {
+			return nil
+		},
+		parseAndMoveConfigFileToWorkspaceDirFunc: func(outputFiles []string, outputDirectory string) error {
+			return nil
+		},
+		saveConfigToBastionFunc: func() error {
+			return nil
+		},
+		syncConfigToAllNodesFunc: func() error {
+			return nil
+		},
+		calculateTotalInstanceCountFunc: func() (int, error) {
+			return 0, nil
+		},
+	}
+}
+
+func createNewDeleteNodeAWS(mockNodeUtilsImpl *MockNodeUtilsImpl, mockSSHUtilsImpl *MockSSHUtilsImpl, w *majorupgrade_utils.CustomWriter) HAModifyAndDeploy {
+
+	flags := AddDeleteNodeHACmdFlags{
+		automateIp: "192.0.0.1",
+	}
+	return NewDeleteNodeAWS(
+		w.CliWriter,
+		flags,
+		mockNodeUtilsImpl,
+		CONFIG_TOML_PATH_AWS,
+		&fileutils.MockFileSystemUtils{},
+		&MockSSHUtilsImpl{
+			connectAndExecuteCommandOnRemoteFunc: func(remoteCommands string, spinner bool) (string, error) {
+				return "", nil
+			},
+		})
 }

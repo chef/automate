@@ -25,4 +25,8 @@ const (
 	CHEF_SERVER_NAME    = "Chef Server"
 	OPENSEARCH_NAME     = "Opensearch"
 	POSTGRESQL_NAME     = "Postgresql"
+	AUTOMATE_TOML       = "automate.config.toml"
+	CHEF_SERVER_TOML    = "chef_server.config.toml"
+	POSTGRESQL_TOML     = "postgresql.config.toml"
+	OPENSEARCH_TOML     = "opensearch.config.toml"
 )

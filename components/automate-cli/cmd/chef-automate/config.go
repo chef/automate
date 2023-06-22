@@ -40,7 +40,6 @@ var configCmdFlags = struct {
 }{}
 
 const (
-	dateFormat       = "%Y%m%d%H%M%S"
 	postgresql       = "postgresql"
 	opensearch_const = "opensearch"
 	PRODUCT_WARNING  = `Ignored 'products' from [deployment.v1.svc]`
@@ -360,7 +359,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		configFile := args[0]
 		configFileName := stringutils.GetFileName(configFile)
 		frontendPrefix := "frontend" + "_" + timestamp + "_"
-		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+configFileName, dateFormat)
+		frontendCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, frontendPrefix+configFileName, DATE_FORMAT)
 		frontend := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -375,7 +374,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		automatePrefix := "automate" + "_" + timestamp + "_"
-		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, automatePrefix+configFileName, dateFormat)
+		automateCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, automatePrefix+configFileName, DATE_FORMAT)
 		automate := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -390,7 +389,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		chefserverPrefix := "chef_server" + "_" + timestamp + "_"
-		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, chefserverPrefix+configFileName, dateFormat)
+		chefServerCmd := fmt.Sprintf(FRONTEND_COMMAND, PATCH, chefserverPrefix+configFileName, DATE_FORMAT)
 		chefServer := &Cmd{
 			PreExec: prePatchCheckForFrontendNodes,
 			CmdInputs: &CmdInputs{
@@ -405,7 +404,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		postgresqlPrefix := "postgresql" + "_" + timestamp + "_"
-		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "postgresql", "%s", postgresqlPrefix+configFileName)
+		postgresqlCmd := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, "postgresql", "%s", postgresqlPrefix+configFileName)
 		postgresql := &Cmd{
 			PreExec: prePatchCheckForPostgresqlNodes,
 			CmdInputs: &CmdInputs{
@@ -420,7 +419,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			},
 		}
 		opensearchPrefix := "opensearch" + "_" + timestamp + "_"
-		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, dateFormat, "opensearch", "%s", opensearchPrefix+configFileName)
+		opensearchCmd := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, "opensearch", "%s", opensearchPrefix+configFileName)
 		opensearch := &Cmd{
 			PreExec: prePatchCheckForOpensearch,
 			CmdInputs: &CmdInputs{
@@ -650,7 +649,7 @@ type ResultConfigSet struct {
 func setConfigForFrontEndNodes(args []string, sshUtil SSHUtil, frontendIps []string, remoteService string, timestamp string, cliWriter *cli.Writer) error {
 	resultChan := make(chan ResultConfigSet, len(frontendIps))
 	configFile := remoteService + timestamp
-	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, dateFormat)
+	scriptCommands := fmt.Sprintf(FRONTEND_COMMAND, SET, configFile, DATE_FORMAT)
 	originalSSHConfig := sshUtil.getSSHConfig()
 
 	for _, hostIP := range frontendIps {
@@ -787,7 +786,7 @@ func setConfigForOpensearch(args []string, remoteService string, sshUtil SSHUtil
 
 // setConfigForPostgresqlAndOpensearch set the configuration for postgresql and opensearch nodes in Automate HA
 func setConfigForPostgresqlAndOpensearch(remoteService string, timestamp string, sshUtil SSHUtil, hostIP string, tomlFilePath string, writer *cli.Writer) error {
-	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, dateFormat, remoteService, "%s", remoteService+timestamp)
+	scriptCommands := fmt.Sprintf(BACKEND_COMMAND, DATE_FORMAT, remoteService, "%s", remoteService+timestamp)
 
 	sshUtil.getSSHConfig().hostIP = hostIP
 	printConnectionMessage(remoteService, sshUtil.getSSHConfig().hostIP, writer)

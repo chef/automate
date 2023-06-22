@@ -18,6 +18,10 @@ type Cmd struct {
 	CmdInputs *CmdInputs
 }
 
+func NewCmd() *Cmd {
+	return &Cmd{CmdInputs: &CmdInputs{NodeType: false}}
+}
+
 type CmdInputs struct {
 	Cmd                      string
 	Args                     []string
@@ -41,6 +45,16 @@ type NodeTypeAndCmd struct {
 	Postgresql *Cmd
 	Opensearch *Cmd
 	Infra      *AutomateHAInfraDetails
+}
+
+func NewNodeTypeAndCmd() *NodeTypeAndCmd {
+	return &NodeTypeAndCmd{
+		Frontend:   NewCmd(),
+		Automate:   NewCmd(),
+		ChefServer: NewCmd(),
+		Opensearch: NewCmd(),
+		Postgresql: NewCmd(),
+	}
 }
 
 type CmdResult struct {
@@ -131,6 +145,7 @@ func (c *remoteCmdExecutor) execute(nodeMap *NodeTypeAndCmd) (map[string][]*CmdR
 		if err != nil {
 			return cmdResult, err
 		}
+
 		output := c.executeCmdOnGivenNodes(nodeMap.Frontend.CmdInputs, nodeIps, remoteService, nodeMap.Frontend.CmdInputs.InputFilesPrefix, writer)
 		return output, nil
 	case nodeMap.Automate.CmdInputs.NodeType:

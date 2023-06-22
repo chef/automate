@@ -80,6 +80,14 @@ func (dna *DeleteNodeAWSImpl) Execute(c *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
+	err = dna.nodeUtils.saveConfigToBastion()
+	if err != nil {
+		return err
+	}
+
 	if !dna.flags.autoAccept {
 		res, err := dna.promptUserConfirmation()
 		if err != nil {
@@ -215,7 +223,17 @@ func (dna *DeleteNodeAWSImpl) runDeploy() error {
 		return err
 	}
 
-	return dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	err = dna.nodeUtils.executeAutomateClusterCtlCommandAsync("deploy", argsdeploy, upgradeHaHelpDoc)
+	// TODO : Remove this after fixing the following ticket
+	// https://chefio.atlassian.net/browse/CHEF-3630
+	syncErr := dna.nodeUtils.syncConfigToAllNodes()
+	if syncErr != nil {
+		if err != nil {
+			return errors.Wrap(err, syncErr.Error())
+		}
+		return syncErr
+	}
+	return err
 }
 
 func (dna *DeleteNodeAWSImpl) runRemoveNodeFromAws() error {
