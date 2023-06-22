@@ -40,23 +40,6 @@ inherited_options:
   usage: Disable version check
 - name: result-json
   usage: Write command result as JSON to PATH
-- name: wait-for-healthy
-  shorthand: w
-  default_value: "false"
-  usage: |
-    Wait until the status response is healthy or the timeout is reached
-  compatible_with_options: Automate
-- name: wait-refresh-interval
-  shorthand: r
-  default_value: "2"
-  usage: How many seconds to wait between polling for status updates
-  compatible_with_options: Automate
-- name: wait-timeout
-  shorthand: t
-  default_value: "600"
-  usage: |
-    How many seconds to wait for the status to be healthy before returning an error
-  compatible_with_options: Automate
 see_also:
 - chef-automate status - Retrieve Chef Automate status
 supported_on: Bastion
