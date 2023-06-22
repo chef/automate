@@ -448,7 +448,6 @@ func (v *verifyCmdFlow) getHostIPsWithNoLatestCLI(hostIPs []string) ([]string, e
 		}
 
 		if result.CliVersion < version.BuildTime {
-			// fmt.Printf("Hosyt IP: %s, resultVersion: %s, buildVersion: %s\n", hostIPsWithoutLatestCLI, result.CliVersion, version.BuildTime)
 			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, hostIP)
 		}
 	}
