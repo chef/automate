@@ -4,27 +4,64 @@ usage: chef-automate status [flags]
 description: |
   Retrieve Chef Automate status. Includes status of Automate services.
 options:
+- name: a2
+  default_value: "false"
+  usage: Shows status from Automate nodes[DUPLICATE]
+  compatible_with_options: AutomateHA
+- name: automate
+  shorthand: a
+  default_value: "false"
+  usage: Shows status from Automate nodes
+  compatible_with_options: AutomateHA
+- name: chef_server
+  shorthand: c
+  default_value: "false"
+  usage: Shows status from Chef-server nodes
+  compatible_with_options: AutomateHA
+- name: cs
+  default_value: "false"
+  usage: Shows status from Chef-server nodes[DUPLICATE]
+  compatible_with_options: AutomateHA
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for status
+- name: node
+  usage: |
+    Pass this flag to check status of perticular node in the cluster
+  compatible_with_options: AutomateHA
+- name: opensearch
+  shorthand: o
+  default_value: "false"
+  usage: Shows status from OpenSearch nodes
+  compatible_with_options: AutomateHA
+- name: os
+  default_value: "false"
+  usage: Shows status from OpenSearch nodes[DUPLICATE]
+  compatible_with_options: AutomateHA
+- name: pg
+  default_value: "false"
+  usage: Shows status from PostgresQL nodes[DUPLICATE]
+  compatible_with_options: AutomateHA
+- name: postgresql
+  shorthand: p
+  default_value: "false"
+  usage: Shows status from PostgresQL nodes
+  compatible_with_options: AutomateHA
 - name: wait-for-healthy
   shorthand: w
   default_value: "false"
   usage: |
     Wait until the status response is healthy or the timeout is reached
-  compatible_with_options: Automate
 - name: wait-refresh-interval
   shorthand: r
   default_value: "2"
   usage: How many seconds to wait between polling for status updates
-  compatible_with_options: Automate
 - name: wait-timeout
   shorthand: t
   default_value: "600"
   usage: |
     How many seconds to wait for the status to be healthy before returning an error
-  compatible_with_options: Automate
 inherited_options:
 - name: debug
   shorthand: d
