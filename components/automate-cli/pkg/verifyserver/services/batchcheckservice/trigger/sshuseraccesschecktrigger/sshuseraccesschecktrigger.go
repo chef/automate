@@ -10,13 +10,14 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/gofiber/fiber/v2"
 )
 
 type SshUserAccessCheck struct {
 	host      string
 	port      string
 	log       logger.Logger
-	FileUtils fileutils.FileUtils
+	fileUtils fileutils.FileUtils
 }
 
 func NewSshUserAccessCheck(log logger.Logger, fileutils fileutils.FileUtils, port string) *SshUserAccessCheck {
@@ -24,7 +25,7 @@ func NewSshUserAccessCheck(log logger.Logger, fileutils fileutils.FileUtils, por
 		log:       log,
 		host:      constants.LOCAL_HOST_URL,
 		port:      port,
-		FileUtils: fileutils,
+		fileUtils: fileutils,
 	}
 }
 
@@ -47,12 +48,35 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 
 	outputCh := make(chan models.CheckTriggerResponse, count)
 	url := fmt.Sprintf("%s:%s%s", ss.host, ss.port, constants.SSH_USER_CHECK_API_PATH)
-
+	ct, err := ss.fileUtils.ReadFile(config.SSHUser.PrivateKey)
+	if err != nil {
+		ss.log.Errorf("Error while opening the private file path %s: %v\n", config.SSHUser.PrivateKey, err)
+		return []models.CheckTriggerResponse{
+			{
+				Status: "SUCCESS",
+				Result: models.ApiResult{
+					Passed:  false,
+					Message: "SSH User Access Check",
+					Check:   "ssh-user",
+					Checks:  []models.Checks{},
+					Error:   &fiber.Error{
+						Code: 400,
+						Message: err.Error(),
+					},
+					Skipped: false,
+				},
+				Host: constants.UNKNOWN_HOST,
+				NodeType: constants.UNKNOWN,
+			},
+		}
+	}
+	keyContents := string(ct)
+	config.SSHUser.PrivateKey = keyContents
 	var finalResult []models.CheckTriggerResponse
 	hostMap := configutils.GetNodeTypeMap(config.Hardware)
 	for ip, types := range hostMap {
 		for i := 0; i < len(types); i++ {
-			requestBody := ss.getSShUserAPIRquest(ip, config.SSHUser)
+			requestBody := ss.getSShUserAPIRequest(ip, config.SSHUser)
 			go trigger.TriggerCheckAPI(url, ip, types[i], http.MethodPost, outputCh, requestBody)
 		}
 	}
@@ -65,20 +89,13 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 	return finalResult
 }
 
-func (ss *SshUserAccessCheck) getSShUserAPIRquest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
-	//Always give the absolute path in the config.toml
-	ct, err := ss.FileUtils.ReadFile(sshUser.PrivateKey)
-	if err != nil {
-		ss.log.Errorf("Error while opening the private file path %s: %v\n", sshUser.PrivateKey, err)
-		return models.SShUserRequest{}
-	}
-	keyContents := string(ct)
+func (ss *SshUserAccessCheck) getSShUserAPIRequest(ip string, sshUser *models.SSHUser) models.SShUserRequest {
 	return models.SShUserRequest{
 		IP:           ip,
 		Username:     sshUser.Username,
 		Port:         sshUser.Port,
 		SudoPassword: sshUser.SudoPassword,
-		PrivateKey:   keyContents,
+		PrivateKey:   sshUser.PrivateKey,
 	}
 }
 

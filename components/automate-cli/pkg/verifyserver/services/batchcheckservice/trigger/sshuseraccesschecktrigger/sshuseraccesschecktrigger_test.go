@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -214,6 +215,45 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		}
 	})
 
+	t.Run("File Reading Get fail", func(t *testing.T) {
+		request := GetRequestJson()
+		//starting the mock server on custom port
+		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			req := r.Body
+			//not handling error because of test file
+			reader, _ := io.ReadAll(req)
+			var actualRequest models.SShUserRequest
+			json.Unmarshal([]byte(reader), &actualRequest)
+
+			sshRequest := GetSshRequest()
+			assert.NotNil(t, actualRequest)
+			assert.Equal(t, actualRequest.PrivateKey, sshRequest.PrivateKey)
+			assert.Equal(t, actualRequest.Username, sshRequest.Username)
+			assert.Equal(t, actualRequest.SudoPassword, sshRequest.SudoPassword)
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(sshCheckSuccessResp))
+		}))
+		err := startMockServerOnCustomPort(mockServer, "1124")
+		assert.NoError(t, err)
+		defer mockServer.Close()
+
+		models.NewConfig().SSHUser.PrivateKey = "test.pem"
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte(""), errors.New("open test.pem: no such file or directory")
+			},
+		},"1124")
+
+		finalResp := cc.Run(request)
+		for _, resp := range finalResp {
+			assert.Equal(t, resp.Status, "SUCCESS")
+			assert.Equal(t, resp.Result.Skipped, false)
+			assert.Equal(t, resp.Result.Passed, false)
+			assert.Equal(t, resp.Result.Message, "SSH User Access Check")
+			assert.Equal(t, resp.Result.Error.Message, "open test.pem: no such file or directory")
+		}
+	})
+
 	t.Run("Failure response", func(t *testing.T) {
 		//starting the mock server on custom port
 		mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -275,7 +315,11 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		assert.NoError(t, err)
 		defer mockServer.Close()
 
-		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.FileSystemUtils{},"1236")
+		cc := NewSshUserAccessCheck(logger.NewTestLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+		},"1236")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -294,7 +338,11 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ExternalOS: nil,
 		}
 
-		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.FileSystemUtils{},"8080")
+		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+		},"8080")
 		got := newOS.Run(config)
 		assert.Len(t, got, 4)
 		assert.Equal(t, constants.UNKNOWN_HOST, got[0].Host)
@@ -365,7 +413,7 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 
 	expected := GetSshRequest()
 
-	actual := fwc.getSShUserAPIRquest(ip, GetRequestJson().SSHUser)
+	actual := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
 
 	assert.Equal(t, expected, actual)
 
