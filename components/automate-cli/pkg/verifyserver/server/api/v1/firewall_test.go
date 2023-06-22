@@ -194,24 +194,6 @@ func TestFirewallCheck(t *testing.T) {
 			}`,
 		},
 		{
-			TestName: "Using HTTPS protocol but not giving root_ca",
-			RequestBody: `{
-				"source_node_ip": "15.237.128.20",
-				"destination_node_ip": "13.39.148.115",
-				"destination_service_port": "7432",
-				"destination_service_protocol": "https"
-			  }`,
-			ExpectedCode: 400,
-			ExpectedBody: `{
-				"status": "FAILED",
-				"result": null,
-				"error": {
-					"code": 400,
-					"message": "root_cert value is mandatory for protocol https"
-				}
-			}`,
-		},
-		{
 			TestName: "Giving Invalid Protocol",
 			RequestBody: `{
 				"source_node_ip": "15.237.128.20",

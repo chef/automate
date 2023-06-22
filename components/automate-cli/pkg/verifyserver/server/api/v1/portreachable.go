@@ -27,9 +27,6 @@ func (h *Handler) PortReachable(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "Invalid port number")
 	}
 
-	if reqBody.DestinationNodeServiceProtocol == constants.HTTPS && reqBody.RootCA == "" {
-		return fiber.NewError(http.StatusBadRequest, "RootCA value is mandatory for protocol HTTPS")
-	}
 	if reqBody.DestinationNodeServiceProtocol != constants.TCP && reqBody.DestinationNodeServiceProtocol != constants.UDP && reqBody.DestinationNodeServiceProtocol != constants.HTTPS {
 		return fiber.NewError(http.StatusBadRequest, "Please Give Valid Protocol i.e tcp, udp or https")
 	}

@@ -112,23 +112,6 @@ func TestPortReachable(t *testing.T) {
 			  }`,
 		},
 		{
-			TestName:     "Not Given the rootCA while using HTTPS Protocol",
-			ExpectedCode: 400,
-			ExpectedBody: `{
-				"status": "FAILED",
-				"result": null,
-				"error": {
-					"code": 400,
-					"message": "RootCA value is mandatory for protocol HTTPS"
-				}
-			}`,
-			RequestBody: `{
-				"destination_node_ip": "13.37.23.16",
-				"destination_node_port": 443,
-				"destination_node_service_protocol": "https"
-			  }`,
-		},
-		{
 			TestName:     "Giving Invalid Protocol Type",
 			ExpectedCode: 400,
 			ExpectedBody: `{

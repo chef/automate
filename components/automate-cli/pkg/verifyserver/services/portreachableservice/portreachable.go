@@ -2,8 +2,6 @@ package portreachableservice
 
 import (
 	"crypto/tls"
-	"crypto/x509"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -86,16 +84,12 @@ func (pr *PortReachableService) udpClient(protocolType, host, port string) error
 
 func (pr *PortReachableService) httpsClient(host, cert string, port int) error {
 	pr.log.Debug(fmt.Sprintf("Trying to connect https server on %s:%d", host, port))
-	caCertPool := x509.NewCertPool()
-	ok := caCertPool.AppendCertsFromPEM([]byte(cert))
-	if !ok {
-		return errors.New("certificate error: root_ca is not of correct format")
-	}
+	//Checking for insecure connection as root ca will not be available for https port
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs:    caCertPool,
-				MinVersion: tls.VersionTLS12,
+				InsecureSkipVerify: true,
+				MinVersion:         tls.VersionTLS12,
 			},
 		},
 		Timeout: time.Second * pr.timeout,
