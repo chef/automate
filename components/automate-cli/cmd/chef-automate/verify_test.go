@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
@@ -14,7 +17,8 @@ import (
 )
 
 const (
-	CONFIG_FILE = "/config_valid_config_parser.toml"
+	CONFIG_FILE         = "/config_valid_config_parser.toml"
+	STATUS_API_RESPONSE = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
 )
 
 func TestRunVerifyCmd(t *testing.T) {
@@ -31,10 +35,13 @@ func TestRunVerifyCmd(t *testing.T) {
 			description: "bastion with existing automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return makeRequestResponse(body)
+					}
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       nil,
-					}, []byte(`{"status":"success"}`), nil
+					}, []byte(STATUS_API_RESPONSE), nil
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
@@ -74,13 +81,10 @@ func TestRunVerifyCmd(t *testing.T) {
 			description: "bastion without automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
-					if requestMethod == http.MethodGet {
-						return nil, nil, errors.New("some error occurred")
+					if strings.Contains(url, "batch-check") {
+						return makeRequestResponse(body)
 					}
-					return &http.Response{
-						StatusCode: http.StatusOK,
-						Body:       nil,
-					}, []byte(`{"status":"success"}`), nil
+					return nil, nil, errors.New("some error occurred")
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
@@ -157,4 +161,40 @@ func TestVerifyCmdFunc(t *testing.T) {
 	err := vf(nil, nil)
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "Cannot create automate-verify service since systemd is not present on this machine")
+}
+
+func getBatchCheckJSONResponse(nodeType string) ([]byte, error) {
+	jsonFile := "../../pkg/verifyserver/models/testdata/"
+	if nodeType == "bastion" {
+		jsonFile = jsonFile + "batch-check-bastion-response.json"
+	} else {
+		jsonFile = jsonFile + "batch-check-remote-response.json"
+	}
+	return os.ReadFile(jsonFile)
+}
+
+func makeRequestResponse(body interface{}) (*http.Response, []byte, error) {
+	requestBody, err := json.Marshal(body)
+	if err != nil {
+		return nil, nil, err
+	}
+	// If the request body contains system-resources check, return remote batch-check API response
+	if strings.Contains(string(requestBody), "system-resources") {
+		res, err := getBatchCheckJSONResponse("remote")
+		if err != nil {
+			return nil, nil, err
+		}
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       nil,
+		}, res, nil
+	}
+	res, err := getBatchCheckJSONResponse("bastion")
+	if err != nil {
+		return nil, nil, err
+	}
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       nil,
+	}, res, nil
 }
