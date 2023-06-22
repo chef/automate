@@ -8,6 +8,7 @@ data "local_file" "readToken" {
   filename   = "${path.module}/metadata_token.txt"
   depends_on = [null_resource.generateMetadataToken]
 }
+
 data "http" "getEc2PrivateIP" {
   url = "http://169.254.169.254/latest/meta-data/local-ipv4"
   request_headers = {
