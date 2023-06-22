@@ -2,10 +2,8 @@ package verification
 
 import (
 	"fmt"
-	"os"
 	"sync"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/config_parser"
 	"github.com/chef/automate/lib/reporting"
 	"github.com/jedib0t/go-pretty/v5/table"
@@ -368,10 +366,10 @@ func getReport(testReport report, status string) reporting.Info {
 }
 
 func startReportModule(nodeNumbers *numberOfNodes) {
-	wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
-	tb := createTables(nodeNumbers)
-	rp := reporting.NewReportingModule(wr, tb)
-	go reporting.VerificationReports(reportChan, rp, nodeInfoMap, doneChan)
+	// wr := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+	// tb := createTables(nodeNumbers)
+	// rp := reporting.NewReportingModule(wr, tb)
+	// go reporting.VerificationReports(reportChan, rp, nodeInfoMap, doneChan)
 }
 
 func createTables(nodeNumbers *numberOfNodes) map[string]*reporting.Table {
@@ -408,18 +406,10 @@ func getSummaryTable(title string) *reporting.Table {
 }
 
 func chanWriter(reportChan chan reporting.VerificationReport, nodeType string, report reporting.Info, nodeNumbers *numberOfNodes) {
-	total := 3 * nodeNumbers.numberOfAutomateNodes
-	if nodeType == "ChefServer" {
-		total = 3 * nodeNumbers.numberOfChefServerNodes
-	} else if nodeType == "OpenSearch" {
-		total = 4 * nodeNumbers.numberOfOpenSearchNodes
-	} else if nodeType == "PostgresSQL" {
-		total = 4 * nodeNumbers.numberOfPostgresSQLNodes
-	}
+
 	msg := reporting.VerificationReport{
-		TableKey:     nodeType,
-		Report:       report,
-		TotalReports: total,
+		TableKey: nodeType,
+		Report:   report,
 	}
 	reportChan <- msg
 }

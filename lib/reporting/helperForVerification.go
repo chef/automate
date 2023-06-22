@@ -85,8 +85,15 @@ func updateTablesWithData(reporting Reporting, nodeInfo map[string][]Info, keyMa
 	for key, value := range nodeInfo {
 		summaryMap := make(map[string]SummaryInfo)
 		statusTableRows, summaryTableRows := createSingleNodeRowsForBothTables(key, value, reporting, summaryMap)
-		reporting.GetTable(keyMap[key][0]).Rows = statusTableRows
-		reporting.GetTable(keyMap[key][1]).Rows = summaryTableRows
+		if _, ok := keyMap[key]; !ok {
+			continue
+		}
+		matchingKeys := keyMap[key]
+		if len(matchingKeys) < 2 {
+			continue
+		}
+		reporting.GetTable(matchingKeys[0]).Rows = statusTableRows
+		reporting.GetTable(matchingKeys[1]).Rows = summaryTableRows
 	}
 }
 
@@ -215,6 +222,9 @@ func createSingleParameterRows(parameter string, parameterSummary SummaryInfo, r
 func updateTableTitle(reporting Reporting, nodeInfo map[string][]Info, keyMap map[string][]string) {
 	var failed bool
 	for key, value := range nodeInfo {
+		if _, ok := keyMap[key]; !ok {
+			continue
+		}
 		title := reporting.GetTable(keyMap[key][0]).Title
 		if checkStatusNotEmpty(value) {
 			return
@@ -251,7 +261,7 @@ func checkFailedStatus(info []Info) bool {
 func matchNodeNameWithRespectiveTablesName(substring string, keys []string) []string {
 	var matchingKeys []string
 	for _, key := range keys {
-		if strings.Contains(key, substring) {
+		if strings.Contains(strings.ToUpper(key), strings.ToUpper(substring)) {
 			matchingKeys = append(matchingKeys, key)
 		}
 	}
