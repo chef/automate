@@ -44,6 +44,7 @@ func NewBatchCheckService(trigger trigger.CheckTrigger, log logger.Logger, port 
 func (ss *BatchCheckService) BatchCheck(checks []string, config *models.Config) (models.BatchCheckResponse, error) {
 	var bastionChecks = stringutils.SliceIntersection(checks, constants.GetBastionChecks())
 	var remoteChecks = stringutils.SliceIntersection(checks, constants.GetRemoteChecks())
+	var err error
 	checkTriggerRespMap := make(map[string][]models.CheckTriggerResponse)
 
 	// Get bastion check trigger resp
@@ -51,11 +52,13 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config *models.Config) 
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
-	successfullyStartedMockServers, notStartedMockServers, err := ss.startMockServerIfNeeded(remoteChecks, config)
+	config.DeploymentState, err = ss.getDeploymentState(config)
 	if err != nil {
-		ss.log.Error("Error occurred while starting mock server")
+		ss.log.Error("Failed to get the Deployment state:", err)
 		return models.BatchCheckResponse{}, err
 	}
+
+	successfullyStartedMockServers, notStartedMockServers := ss.startMockServerIfNeeded(remoteChecks, config)
 
 	if len(notStartedMockServers) > 0 {
 		mockServersStoppedSuccessfully := ss.stopAllMockServers(successfullyStartedMockServers)
@@ -105,32 +108,24 @@ func (ss *BatchCheckService) stopAllMockServers(successfullyStartedMockServers [
 	return true
 }
 
-func (ss *BatchCheckService) startMockServerIfNeeded(remoteChecks []string, config *models.Config) ([]models.MockServerFromBatchServiceResponse, []models.MockServerFromBatchServiceResponse, error) {
+func (ss *BatchCheckService) startMockServerIfNeeded(remoteChecks []string, config *models.Config) ([]models.MockServerFromBatchServiceResponse, []models.MockServerFromBatchServiceResponse) {
 	successfullyStartedMockServers := []models.MockServerFromBatchServiceResponse{}
 	notStartedMockServers := []models.MockServerFromBatchServiceResponse{}
 
 	if len(remoteChecks) > 0 {
-		startMockServer, err := ss.shouldStartMockServer(remoteChecks, config)
-		if err != nil {
-			return successfullyStartedMockServers, notStartedMockServers, err
-		}
+		startMockServer := ss.shouldStartMockServer(remoteChecks, config)
 		if startMockServer {
 			successfullyStartedMockServers, notStartedMockServers = ss.startMockServer(remoteChecks, config)
 		}
 	}
-	return successfullyStartedMockServers, notStartedMockServers, nil
+	return successfullyStartedMockServers, notStartedMockServers
 }
 
-func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string, config *models.Config) (bool, error) {
+func (ss *BatchCheckService) shouldStartMockServer(remoteChecks []string, config *models.Config) bool {
 	if stringutils.SliceContains(remoteChecks, constants.FIREWALL) || stringutils.SliceContains(remoteChecks, constants.FQDN) {
-		deploymentState, err := ss.getDeploymentState(config)
-		if err != nil {
-			ss.log.Error("Error while calling status api from batch check service:", err)
-			return false, err
-		}
-		return deploymentState == constants.PRE_DEPLOY, nil
+		return config.DeploymentState == constants.PRE_DEPLOY
 	}
-	return false, nil
+	return false
 }
 
 func (ss *BatchCheckService) createNodeTypeMap(remoteChecks []string) map[string]map[string][]int {
