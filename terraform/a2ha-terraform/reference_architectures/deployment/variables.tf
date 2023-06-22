@@ -247,3 +247,23 @@ variable "ssh_user" {
 variable "sudo_cmd" {
   default = "sudo"
 }
+
+variable "automate_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
+variable "chef_server_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
+variable "opensearch_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}
+
+variable "postgresql_certs_by_ip" {
+  type = map(map(string))
+  default = {}
+}

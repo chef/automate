@@ -175,7 +175,7 @@ func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, a
 }
 
 func (nu *NodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
-	return writeHAConfigFiles(templateName, data)
+	return writeHAConfigFiles(templateName, data, "deploy")
 }
 
 func (nu *NodeUtilsImpl) moveAWSAutoTfvarsFile(terraformPath string) error {

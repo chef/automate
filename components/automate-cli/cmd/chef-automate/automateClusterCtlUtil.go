@@ -30,6 +30,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -219,7 +220,7 @@ func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
 	if err != nil {
 		return err
 	}
-	err = dm.generateConfig()
+	err = dm.generateConfig("provision")
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
 	}
@@ -575,8 +576,14 @@ func isManagedServicesOn() bool {
 	return false
 }
 
-func writeHAConfigFiles(templateName string, data interface{}) error {
-	finalTemplate := renderSettingsToA2HARBFile(templateName, data)
+func writeHAConfigFiles(templateName string, data interface{}, state string) error {
+	result := map[string]interface{}{}
+	err := mapstructure.Decode(data, &result)
+	if err != nil {
+		return err
+	}
+
+	finalTemplate := renderSettingsToA2HARBFile(templateName, result, state)
 	writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
 	config, err := toml.Marshal(data)
 	if err != nil {

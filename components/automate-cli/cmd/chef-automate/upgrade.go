@@ -27,6 +27,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/fatih/color"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -416,7 +417,13 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if err != nil {
 			return err
 		}
-		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, config)
+		result := map[string]interface{}{}
+		err = mapstructure.Decode(config, &result)
+		if err != nil {
+			return err
+		}
+
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, result, "deploy")
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	} else if modeOfDeployment == AWS_MODE {
@@ -436,7 +443,13 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if err != nil {
 			return err
 		}
-		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, config)
+		result := map[string]interface{}{}
+		err = mapstructure.Decode(config, &result)
+		if err != nil {
+			return err
+		}
+
+		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, result, "deploy")
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	}

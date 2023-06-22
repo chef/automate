@@ -197,6 +197,7 @@ automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
 opensearch_instance_count = <%= config.opensearch.instance_count %>
 
+<% if config.state == 'deploy' %>
 automate_root_ca = <<-EOT
 <%= config.automate.root_ca %>
 
@@ -273,6 +274,10 @@ automate_certs_by_ip = <%= config.automate.certs_by_ip %>
 chef_server_certs_by_ip = <%= config.chef_server.certs_by_ip %>
 postgresql_certs_by_ip = <%= config.postgresql.certs_by_ip %>
 opensearch_certs_by_ip = <%= config.opensearch.certs_by_ip %>
+
+<% end %>
+
+
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
