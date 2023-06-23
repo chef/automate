@@ -574,3 +574,33 @@ test_if_env_vars_are_configured_after_patch() {
     echo "ENV Vars configured correctly"
   fi
 }
+
+document "test_if_oauthapps_are_patched_correctly" <<DOC
+  test if OAuth App values are patched correctly
+DOC
+test_if_oauthapps_are_patched_correctly() {
+  chef-automate config oc-id-show-app > registered_oauth_apps.yml
+
+  yaml_file="registered_oauth_apps.yml"
+
+  # Extract values of attributes
+  name=$(grep -oP "(?<=name: ).*" "$yaml_file")
+  redirect_uri=$(grep -oP "(?<=redirect_uri: ).*" "$yaml_file")
+
+  errors=()
+
+  if [ $name != "test-supermarket" ]; then
+    errors+=("Registered OAuth application's name is not patched correctly.")
+  fi
+
+  if [ $redirect_uri != "https://sampleurl.com/auth/chef_oauth2/callback" ]; then
+    errors+=("Registered OAuth application's redirect URI is not configured correctly.")
+  fi
+
+  if [ ${#errors} -gt 0 ]; then
+    for (( i=0; i<${#errors[@]}; i++ )); do echo "${errors[$i]}" ; done
+    return 1
+  else
+    echo "OAuth App values are not patched correctly"
+  fi
+}
