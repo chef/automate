@@ -210,40 +210,6 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 			expectedIpsListLength: 1,
 			wantErr:               nil,
 		},
-		// {
-		// 	description: "remote with old cli version",
-		// 	mockHttputils: &httputils.MockHTTPClient{
-		// 		MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
-		// 			if strings.Contains(url, "10.0.0.2") {
-		// 				return &http.Response{
-		// 						StatusCode: http.StatusOK,
-		// 					}, []byte(`{
-		// 					"status": "SUCCESS",
-		// 					"result": {
-		// 							"status": "OK",
-		// 							"services": [],
-		// 							"cli_version": "w",
-		// 							"error": "error getting services from hab svc status"
-		// 					}
-		// 			}`), nil
-		// 			}
-		// 			return &http.Response{
-		// 					StatusCode: http.StatusOK,
-		// 				}, []byte(`{
-		// 					"status": "SUCCESS",
-		// 					"result": {
-		// 							"status": "OK",
-		// 							"services": [],
-		// 							"cli_version": "unknown",
-		// 							"error": "error getting services from hab svc status"
-		// 					}
-		// 			}`), nil
-		// 		},
-		// 	},
-		// 	mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
-		// 	expectedIpsListLength: 1,
-		// 	wantErr:               nil,
-		// },
 	}
 
 	for _, tt := range tests {
