@@ -44,8 +44,7 @@ func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerRespons
 func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
-			constants.HTTPS: []int{443},
-			constants.HTTP:  []int{80},
+			constants.HTTP: []int{80},
 		},
 		constants.CHEF_INFRA_SERVER: {
 			constants.HTTP:  []int{80},
@@ -108,17 +107,6 @@ func getRequestsForChefServerAsSource(config *models.Config) []models.FirewallRe
 
 	var reqBodies []models.FirewallRequest
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
-		//Dest Automate
-		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "443",
-				DestinationServiceProtocol: "https",
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-
 		// Dest postgres
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 			reqBody := models.FirewallRequest{

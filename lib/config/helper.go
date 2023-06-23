@@ -305,10 +305,13 @@ func validateCertsByIP(certsByIpList *[]CertByIP, nodeType string) error {
 		if checkIPAddress(element.IP) != nil {
 			errorList.PushBack(nodeType + " " + element.IP + " for certs is not valid")
 		}
-		errorList.PushBack(checkCertValid([]keydetails{
+		err := checkCertValid([]keydetails{
 			{key: element.PrivateKey, certtype: PRIVATE_KEY, svc: nodeType},
 			{key: element.PublicKey, certtype: PUBLIC_KEY, svc: nodeType},
-		}))
+		})
+		if err != nil {
+			errorList.PushBack(err)
+		}
 	}
 	return getSingleErrorFromList(errorList)
 }
