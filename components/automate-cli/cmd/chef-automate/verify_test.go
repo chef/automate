@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/sshutils"
+	"github.com/chef/automate/lib/version"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -160,6 +161,7 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 		mockHttputils         *httputils.MockHTTPClient
 		mockHostIPs           []string
 		expectedIpsListLength int
+		BuildVersion          string
 		wantErr               error
 	}{
 
@@ -175,7 +177,7 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 							"result": {
 									"status": "OK",
 									"services": [],
-									"cli_version": "unknown",
+									"cli_version": "2023",
 									"error": "error getting services from hab svc status"
 							}
 					}`), nil
@@ -183,6 +185,7 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 			},
 			mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
 			expectedIpsListLength: 0,
+			BuildVersion:          "2023",
 			wantErr:               nil,
 		},
 		{
@@ -200,7 +203,7 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 							"result": {
 									"status": "OK",
 									"services": [],
-									"cli_version": "unknown",
+									"cli_version": "2023",
 									"error": "error getting services from hab svc status"
 							}
 					}`), nil
@@ -208,12 +211,49 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 			},
 			mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
 			expectedIpsListLength: 1,
+			BuildVersion:          "2023",
+			wantErr:               nil,
+		},
+		{
+			description: "remote with some of the machines have old cli version",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "10.0.0.2") {
+						return &http.Response{
+								StatusCode: http.StatusOK,
+							}, []byte(`{
+							"status": "SUCCESS",
+							"result": {
+									"status": "OK",
+									"services": [],
+									"cli_version": "2022",
+									"error": "error getting services from hab svc status"
+							}
+					}`), nil
+					}
+					return &http.Response{
+							StatusCode: http.StatusOK,
+						}, []byte(`{
+							"status": "SUCCESS",
+							"result": {
+									"status": "OK",
+									"services": [],
+									"cli_version": "2023",
+									"error": "error getting services from hab svc status"
+							}
+					}`), nil
+				},
+			},
+			mockHostIPs:           []string{"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5"},
+			expectedIpsListLength: 1,
+			BuildVersion:          "2023",
 			wantErr:               nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
+			version.BuildTime = tt.BuildVersion
 			cw := majorupgrade_utils.NewCustomWriter()
 
 			vc := newMockVerifyCmdFlow(tt.mockHttputils, cw)
