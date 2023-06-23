@@ -49,6 +49,7 @@ const (
 // When an invocation of the chef-automate CLI results in a Failure it exits with
 // one of the following codes that identifies the error types.
 const (
+	IpAccessError                     = 123
 	InsufficientSpaceError            = 122
 	CalDestDirSizeError               = 121
 	CalESDirSizeError                 = 120

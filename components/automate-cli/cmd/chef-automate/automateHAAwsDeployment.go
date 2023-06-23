@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	TERRAFORM_APPLY = "cd /hab/a2_deploy_workspace/terraform; terraform apply; cd -"
+	DEPLOY    = "deploy"
+	PROVISION = "provision"
 )
 
 type awsDeployment struct {
@@ -36,7 +37,7 @@ func newAwsDeployemnt(configPath string) *awsDeployment {
 
 func (a *awsDeployment) doDeployWork(args []string) error {
 	if isA2HARBFileExist() {
-		err := a.generateConfig("deploy")
+		err := a.generateConfig(DEPLOY)
 		if err != nil {
 			return status.Annotate(err, status.DeployError)
 		}
@@ -48,7 +49,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 		}
-		archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
+		archBytes, err := os.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
 		if err != nil {
 			writer.Errorf("%s", err.Error())
 			return err
@@ -59,7 +60,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to marshal config to file")
 		}
-		err = ioutil.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
+		err = os.WriteFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "config.toml"), shardConfig, 0644) // nosemgrep
 		if err != nil {
 			return status.Wrap(err, status.ConfigError, "unable to write config toml to file")
 		}
@@ -71,7 +72,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 
 func (a *awsDeployment) doProvisionJob(args []string) error {
 	writer.Print("AWS Provision")
-	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas, "provision")
+	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas, PROVISION)
 	if err != nil {
 		return err
 	}
@@ -89,7 +90,7 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 }
 
 func (a *awsDeployment) generateConfig(state string) error {
-	templateBytes, err := ioutil.ReadFile(a.getConfigPath())
+	templateBytes, err := os.ReadFile(a.getConfigPath())
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
@@ -97,6 +98,19 @@ func (a *awsDeployment) generateConfig(state string) error {
 	err = ptoml.Unmarshal(templateBytes, &a.config)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+	}
+	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) {
+		archBytes, err := os.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
+		if err != nil {
+			writer.Errorf("%s", err.Error())
+			return err
+		}
+		var arch = strings.Trim(string(archBytes), "\n")
+		a.config.Architecture.ConfigInitials.Architecture = arch
+		err = a.getAwsHAIp()
+		if err != nil {
+			return status.Wrap(err, status.IpAccessError, "Error in fetching node IPs in aws mode")
+		}
 	}
 	errList := a.validateConfigFields()
 	if errList != nil && errList.Len() > 0 {
@@ -113,15 +127,6 @@ func (a *awsDeployment) generateConfig(state string) error {
 			return err
 		}
 		a.config.Opensearch.Config.NodesDn = nodes_dn
-	}
-	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) {
-		archBytes, err := ioutil.ReadFile(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) // nosemgrep
-		if err != nil {
-			writer.Errorf("%s", err.Error())
-			return err
-		}
-		var arch = strings.Trim(string(archBytes), "\n")
-		a.config.Architecture.ConfigInitials.Architecture = arch
 	}
 	return writeHAConfigFiles(awsA2harbTemplate, a.config, state)
 }
@@ -380,7 +385,7 @@ func (a *awsDeployment) validateCerts() *list.List {
 			if len(strings.TrimSpace(a.config.Postgresql.Config.RootCA)) < 1 ||
 				len(strings.TrimSpace(a.config.Postgresql.Config.PrivateKey)) < 1 ||
 				len(strings.TrimSpace(a.config.Postgresql.Config.PublicKey)) < 1 {
-				errorList.PushBack("Postgresql root_ca and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+				errorList.PushBack("PostgreSQL root_ca, public_key and private_key are mandatory fields, check if any of them are missing. Otherwise set enable_custom_certs to false.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
 				{key: a.config.Postgresql.Config.RootCA, certtype: "root_ca", svc: "postgresql"},
@@ -423,7 +428,7 @@ func (a *awsDeployment) validateCerts() *list.List {
 				len(strings.TrimSpace(a.config.Opensearch.Config.AdminCert)) < 1 ||
 				len(strings.TrimSpace(a.config.Opensearch.Config.PrivateKey)) < 1 ||
 				len(strings.TrimSpace(a.config.Opensearch.Config.PublicKey)) < 1 {
-				errorList.PushBack("Opensearch root_ca and/or admin_key and/or admin_cert and/or public_key and/or private_key are missing. Otherwise set enable_custom_certs to false.")
+				errorList.PushBack("Opensearch root_ca, admin_key, admin_cert, public_key and private_key are mandatory fields, check if any of them are missing. Otherwise set enable_custom_certs to false.")
 			}
 			errorList.PushBackList(checkCertValid([]keydetails{
 				{key: a.config.Opensearch.Config.RootCA, certtype: "root_ca", svc: "opensearch"},

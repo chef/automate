@@ -423,7 +423,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return err
 		}
 
-		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, result, "deploy")
+		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, result, DEPLOY)
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	} else if modeOfDeployment == AWS_MODE {
@@ -449,7 +449,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return err
 		}
 
-		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, result, "deploy")
+		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, result, DEPLOY)
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
 	}
