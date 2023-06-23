@@ -216,7 +216,7 @@ postgresql do
 end
 
 ###############################################################
-### Only applies when using AWSSarchitecture                ###
+### Only applies when using AWS architecture                ###
 ###############################################################
 aws do
   ### AWS Credentials profile to use when deploying AWS infrastructure

@@ -270,51 +270,51 @@ locals {
 
 
 variable "automate_root_ca" {
-    default = ""
+  default = ""
 }
 variable "automate_private_key" {
-    default = ""
+  default = ""
 }
 variable "automate_public_key" {
-    default = ""
+  default = ""
 }
 variable "chef_server_private_key" {
-    default = ""
+  default = ""
 }
 variable "chef_server_public_key" {
-    default = ""
+  default = ""
 }
 
 variable "postgresql_root_ca" {
-    default = ""
+  default = ""
 }
 variable "postgresql_private_key" {
-    default = ""
+  default = ""
 }
 variable "postgresql_public_key" {
-    default = ""
+  default = ""
 }
 
 variable "opensearch_root_ca" {
-    default = ""
+  default = ""
 }
 variable "opensearch_private_key" {
-    default = ""
+  default = ""
 }
 variable "opensearch_public_key" {
-    default = ""
+  default = ""
 }
 variable "opensearch_admin_dn" {
-    default = ""
+  default = ""
 }
 variable "opensearch_nodes_dn" {
-    default = ""
+  default = ""
 }
 variable "opensearch_admin_cert" {
-    default = ""
+  default = ""
 }
 variable "opensearch_admin_key" {
-    default = ""
+  default = ""
 }
 variable "automate_custom_certs_enabled" {
   default = false
