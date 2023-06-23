@@ -212,6 +212,11 @@ resource "aws_instance" "chef_automate_postgresql" {
       root_block_device
     ]
   }
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
@@ -246,6 +251,11 @@ resource "aws_instance" "chef_automate_opensearch" {
       tags,
       tags_all,
       root_block_device    ]
+  }
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
   }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
@@ -285,7 +295,11 @@ resource "aws_instance" "chef_automate" {
       root_block_device
     ]
   }
-
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
   
 }
@@ -325,7 +339,11 @@ resource "aws_instance" "chef_server" {
       root_block_device
     ]
   }
-  
+  metadata_options {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
