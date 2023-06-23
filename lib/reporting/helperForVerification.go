@@ -9,27 +9,27 @@ import (
 )
 
 type VerificationReport struct {
-	TableKey string //NodeType
+	TableKey string
 	Report   Info
 }
 
 type Info struct {
-	Hostip        string         `json:"hostip,omitempty"`    //ip
-	Parameter     string         `json:"parameter,omitempty"` //overall Check
-	Status        string         `json:"status,omitempty"`    //overall Passed
+	Hostip        string         `json:"hostip,omitempty"`
+	Parameter     string         `json:"parameter,omitempty"`
+	Status        string         `json:"status,omitempty"`
 	StatusMessage *StatusMessage `json:"statusMessage,omitempty"`
 	SummaryInfo   *SummaryInfo   `json:"summaryInfo,omitempty"`
 }
 
 type StatusMessage struct {
-	MainMessage string   `json:"mainMessage,omitempty"` //overall Message with status
-	SubMessage  []string `json:"subMessage,omitempty"`  //ErrorMsg
+	MainMessage string   `json:"mainMessage,omitempty"`
+	SubMessage  []string `json:"subMessage,omitempty"`
 }
 
 type SummaryInfo struct {
-	SuccessfulCount int      `json:"successfulCount,omitempty"` //calculate based on individual true check
-	FailedCount     int      `json:"failedCount,omitempty"`     //calculate based on individual false check
-	ToResolve       []string `json:"toResolve,omitempty"`       //ResolutionMsg
+	SuccessfulCount int      `json:"successfulCount,omitempty"`
+	FailedCount     int      `json:"failedCount,omitempty"`
+	ToResolve       []string `json:"toResolve,omitempty"`
 }
 
 func VerificationReports(reports []VerificationReport, reporting Reporting, nodeInfoMap map[string][]Info) {

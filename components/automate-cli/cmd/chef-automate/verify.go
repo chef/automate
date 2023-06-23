@@ -590,11 +590,11 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 	return reports
 }
 
-func createTables(numberOfAutomateNodes, numberOfChefServerNodes, numberOfPostgresSQLNodes, numberOfOpenSearchNodes int) map[string]*reporting.Table {
+func createTables(numberOfAutomateNodes, numberOfChefServerNodes, numberOfPostgreSQLNodes, numberOfOpenSearchNodes int) map[string]*reporting.Table {
 	bastionSummaryTableTitle := "Summary: Bastion <Node> - 1"
 	automateSummaryTableTitle := fmt.Sprintf("Summary: Automate <Nodes> - %d", numberOfAutomateNodes)
 	chefServerSummaryTableTitle := fmt.Sprintf("Summary: Chef Infra Server <Nodes> - %d", numberOfChefServerNodes)
-	postgresSQLSummaryTableTitle := fmt.Sprintf("Summary: PostgresSQL <Nodes> - %d", numberOfPostgresSQLNodes)
+	postgreSQLSummaryTableTitle := fmt.Sprintf("Summary: PostgreSQL <Nodes> - %d", numberOfPostgreSQLNodes)
 	openSearchSummaryTableTitle := fmt.Sprintf("Summary: Opensearch <Nodes> - %d", numberOfOpenSearchNodes)
 	tb := make(map[string]*reporting.Table)
 	tb["bastionStatusTable"] = getStatusTable("Bastion")
@@ -603,8 +603,8 @@ func createTables(numberOfAutomateNodes, numberOfChefServerNodes, numberOfPostgr
 	tb["automateSummaryTable"] = getSummaryTable(automateSummaryTableTitle)
 	tb["chef-infra-serverStatusTable"] = getStatusTable("Chef Infra Server")
 	tb["chef-infra-serverSummaryTable"] = getSummaryTable(chefServerSummaryTableTitle)
-	tb["postgresqlStatusTable"] = getStatusTable("PostgresSQL")
-	tb["postgresqlSummaryTable"] = getSummaryTable(postgresSQLSummaryTableTitle)
+	tb["postgresqlStatusTable"] = getStatusTable("PostgreSQL")
+	tb["postgresqlSummaryTable"] = getSummaryTable(postgreSQLSummaryTableTitle)
 	tb["opensearchStatusTable"] = getStatusTable("OpenSearch")
 	tb["opensearchSummaryTable"] = getSummaryTable(openSearchSummaryTableTitle)
 	return tb
