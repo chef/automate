@@ -190,6 +190,9 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400, nil
+			},
 		}, "1124")
 
 		finalResp := cc.Run(request)
@@ -241,6 +244,9 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte(""), errors.New("open test.pem: no such file or directory")
 			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400, nil
+			},
 		}, "1124")
 		finalResp := cc.Run(request)
 		totalIps := request.Hardware.AutomateNodeCount + request.Hardware.ChefInfraServerNodeCount + request.Hardware.PostgresqlNodeCount + request.Hardware.OpenSearchNodeCount
@@ -281,6 +287,9 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400, nil
+			},
 		}, "1235")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
@@ -320,6 +329,9 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400, nil
+			},
 		}, "1236")
 		request := GetRequestJson()
 		finalResp := cc.Run(request)
@@ -342,6 +354,9 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 		newOS := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
+			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400 , nil
 			},
 		}, "8080")
 		got := newOS.Run(config)
@@ -405,10 +420,45 @@ func TestSshUserAccessCheck_Run(t *testing.T) {
 }
 
 func TestGetSShUserAPIRquest(t *testing.T) {
+
+	t.Run("Fail to get FilePermission", func(t *testing.T) {
+		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 0, errors.New("Unable to get the file on the path provided")
+			},
+		}, "1234")
+		ip := "1.2.3.4"
+		expected, err := models.SShUserRequest{}, errors.New("Unable to get the file on the path provided")
+		actual, actualerr := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
+		assert.Equal(t, expected, actual)
+		assert.Equal(t, err.Error(), actualerr.Error())
+	})
+
+	t.Run("Permission is less the 400", func(t *testing.T) {
+		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
+			ReadFileFunc: func(filepath string) ([]byte, error) {
+				return []byte("test_key"), nil
+			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 300, nil
+			},
+		}, "1234")
+		ip := "1.2.3.4"
+		expected, err := models.SShUserRequest{}, errors.New("Permissions on the ssh key file do not satisfy the requirement")
+		actual, actualerr := fwc.getSShUserAPIRequest(ip, GetRequestJson().SSHUser)
+		assert.Equal(t, expected, actual)
+		assert.Equal(t, err.Error(), actualerr.Error())
+	})
 	t.Run("Reading was successfull", func(t *testing.T) {
 		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
+			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400, nil
 			},
 		}, "1234")
 		ip := "1.2.3.4"
@@ -421,6 +471,9 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte(""), errors.New("open test.pem: no such file or directory")
+			},
+			GetFilePermissionFunc: func(filePath string) (int64, error) {
+				return 400, nil
 			},
 		}, "1234")
 		ip := "1.2.3.4"

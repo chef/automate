@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pkg/errors"
 )
 
 type SshUserAccessCheck struct {
@@ -54,12 +55,12 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 			requestBody, err := ss.getSShUserAPIRequest(ip, config.SSHUser)
 			if err != nil {
 				finalResult = append(finalResult, models.CheckTriggerResponse{
-					Host: ip,
+					Host:     ip,
 					NodeType: types[i],
 					Result: models.ApiResult{
 						Passed: false,
 						Error: &fiber.Error{
-							Code: http.StatusBadRequest,
+							Code:    http.StatusBadRequest,
 							Message: err.Error(),
 						},
 					},
@@ -79,6 +80,13 @@ func (ss *SshUserAccessCheck) Run(config *models.Config) []models.CheckTriggerRe
 }
 
 func (ss *SshUserAccessCheck) getSShUserAPIRequest(ip string, sshUser *models.SSHUser) (models.SShUserRequest, error) {
+	permisssion, err := ss.fileUtils.GetFilePermission(sshUser.PrivateKey)
+	if err != nil {
+		return models.SShUserRequest{}, err
+	}
+	if permisssion < 400 {
+		return models.SShUserRequest{}, errors.New("Permissions on the ssh key file do not satisfy the requirement")
+	}
 	ct, err := ss.fileUtils.ReadFile(sshUser.PrivateKey)
 	if err != nil {
 		ss.log.Errorf("Error while opening the private file path %s: %v\n", sshUser.PrivateKey, err)
