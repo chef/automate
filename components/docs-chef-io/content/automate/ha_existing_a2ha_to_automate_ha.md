@@ -77,7 +77,7 @@ done
 
 1. Detach the File system from the old A2HA cluster.
 
-1. Configure the backup at Automate HA cluster. If you have not configured it, please refer to this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_file_system/#backup-and-restore-commands)
+1. Configure the backup at Automate HA cluster. If you have not configured it, please refer to this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_file_system/#setting-up-the-backup-configuration)
 
 1. From Step 3, you will get the backup mount path.
 
