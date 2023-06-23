@@ -35,5 +35,5 @@ EOF
 
 do_test_deploy() {
     test_if_env_vars_are_configured_after_patch
-    # test_if_oauthapps_are_patched_properly
+    test_if_oauthapps_are_patched_correctly
 }
