@@ -53,7 +53,8 @@ module "aws" {
   lb_access_logs                  = var.lb_access_logs
   tags                            = var.aws_tags
   aws_instance_profile_name       = var.backup_config_s3 == "true" ? module.s3[0].instance_profile_name : null
-  json_data                       = module.aws_metadata.private_ip
+  json_data                       = module.aws_metadata.json_data
+  depends_on = [module.aws_metadata]
 }
 
 module "efs" {
