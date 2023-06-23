@@ -20,9 +20,11 @@ import (
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/reporting"
 	"github.com/chef/automate/lib/sshutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
+	"github.com/jedib0t/go-pretty/v5/table"
 	"github.com/spf13/cobra"
 )
 
@@ -54,6 +56,13 @@ type verifyCmdFlow struct {
 	SSHUtil              sshutils.SSHUtil
 	Writer               *cli.Writer
 	prettyPrint          bool
+	automateIPs          []string
+	chefServerIPs        []string
+	postgresqlIPs        []string
+	opensearchIPs        []string
+	sshPort              string
+	sshKeyFile           string
+	sshUserName          string
 }
 
 func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService verifysystemdcreate.CreateSystemdService, systemdCreateUtils verifysystemdcreate.SystemdCreateUtils, config *config.HaDeployConfig, sshutil sshutils.SSHUtil, writer *cli.Writer) *verifyCmdFlow {
@@ -248,24 +257,63 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 			ObjectStorage: &models.ObjectStorage{},
 		},
 	}
+
 	err = batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {
 		return err
 	}
 
-	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
+	if v.Config.IsExistingInfra() {
+		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
 
+		v.automateIPs = v.Config.ExistingInfra.Config.AutomatePrivateIps
+		v.chefServerIPs = v.Config.ExistingInfra.Config.ChefServerPrivateIps
+		v.postgresqlIPs = v.Config.ExistingInfra.Config.PostgresqlPrivateIps
+		v.opensearchIPs = v.Config.ExistingInfra.Config.OpensearchPrivateIps
+	}
+
+	var batchCheckResultBastion, batchCheckResultRemote models.BatchCheckResponse
+	var batchCheckResults []models.BatchCheckResult
+
+	// Doing batch-check API call for bastion
 	resBastion, err := v.runVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
-	v.Writer.Printf("Response for batch-check API on bastion: \n%s\n", string(resBastion))
 
+	if err := json.Unmarshal(resBastion, &batchCheckResultBastion); err != nil {
+		return fmt.Errorf("failed to unmarshal batch-check API result field for bastion: %v", err)
+	}
+
+	batchCheckResults = append(batchCheckResults, batchCheckResultBastion.NodeResult...)
+
+	// If batch-check API failed on bastion
+	if !batchCheckResultBastion.Passed {
+		v.printResponse(batchCheckResults)
+		return fmt.Errorf("batch-check API failed on bastion")
+	}
+
+	// Doing batch-check API call for remote nodes
 	resRemote, err := v.runVerifyServiceForRemote(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
-	v.Writer.Printf("Response for batch-check API on remote nodes: \n%s\n", string(resRemote))
+
+	if err := json.Unmarshal(resRemote, &batchCheckResultRemote); err != nil {
+		return fmt.Errorf("failed to unmarshal batch-check API result field for remote nodes: %v", err)
+	}
+
+	// Appending batch-check API result for remote nodes to batch-check API result for bastion
+	batchCheckResults = append(batchCheckResults, batchCheckResultRemote.NodeResult...)
+
+	// If batch-check API failed on remote nodes
+	if !batchCheckResultRemote.Passed {
+		v.printResponse(batchCheckResults)
+		return fmt.Errorf("batch-check API failed on remote nodes")
+	}
+
+	// Printing response for success case
+	v.printResponse(batchCheckResults)
 
 	return nil
 }
@@ -329,33 +377,28 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config) ([]byte, error) {
 
 	// TODO: Need to check if automate-verify service is already running on remote nodes and upgrade if needed.
-	var port, keyFile, userName string
-	var hostIPs []string
 
-	if v.Config.IsExistingInfra() {
-		port, keyFile, userName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
-		hostIPs = v.getHostIPs(
-			v.Config.ExistingInfra.Config.AutomatePrivateIps,
-			v.Config.ExistingInfra.Config.ChefServerPrivateIps,
-			v.Config.ExistingInfra.Config.PostgresqlPrivateIps,
-			v.Config.ExistingInfra.Config.OpensearchPrivateIps,
-		)
+	hostIPs := v.getHostIPs(
+		v.automateIPs,
+		v.chefServerIPs,
+		v.postgresqlIPs,
+		v.opensearchIPs,
+	)
 
-		sshConfig := sshutils.NewSshConfig("", port, keyFile, userName)
+	sshConfig := sshutils.NewSshConfig("", v.sshPort, v.sshKeyFile, v.sshUserName)
 
-		destFileName := "chef-automate"
+	destFileName := "chef-automate"
 
-		// Copying CLI binary to remote nodes
-		err := v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPs)
-		if err != nil {
-			return nil, err
-		}
+	// Copying CLI binary to remote nodes
+	err := v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPs)
+	if err != nil {
+		return nil, err
+	}
 
-		// Starting automate-verify service on remote nodes
-		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
-		if err != nil {
-			return nil, err
-		}
+	// Starting automate-verify service on remote nodes
+	err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
+	if err != nil {
+		return nil, err
 	}
 
 	//TODO: Need to handle the case for AWS
@@ -365,6 +408,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		Checks: constants.GetRemoteChecks(),
 		Config: &batchCheckConfig,
 	}
+
 	return v.makeBatchCheckAPICall(batchCheckRemoteReq, REMOTE_NODES)
 }
 
@@ -385,7 +429,7 @@ func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckReque
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
 	if err != nil {
 		if responseBody != nil {
-			v.Writer.Printf("Error response body: %s\n", string(responseBody))
+			return nil, fmt.Errorf("error while doing batch-check API call for %s:\n%s", nodeType, string(responseBody))
 		}
 		return nil, fmt.Errorf("error while doing batch-check API call for %s: %v", nodeType, err)
 	}
@@ -477,6 +521,109 @@ func (v *verifyCmdFlow) getHostIPs(automatePrivateIps, chefServerPrivateIps, pos
 		hostIPs = stringutils.ConcatSlice(hostIPs, opensearchPrivateIps)
 	}
 	return hostIPs
+}
+
+func (v *verifyCmdFlow) printResponse(batchCheckResults []models.BatchCheckResult) {
+	reports := buildReports(batchCheckResults)
+	tables := createTables(len(v.automateIPs), len(v.chefServerIPs), len(v.postgresqlIPs), len(v.opensearchIPs))
+	reportingModule := reporting.NewReportingModule(v.Writer, tables)
+	nodeInfoMap := make(map[string][]reporting.Info)
+
+	reporting.VerificationReports(reports, reportingModule, nodeInfoMap)
+}
+
+func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.VerificationReport {
+	var reports []reporting.VerificationReport
+
+	for _, batchCheckResult := range batchCheckResults {
+
+		for _, test := range batchCheckResult.Tests {
+
+			if test.Skipped {
+				continue
+			}
+
+			report := reporting.VerificationReport{}
+			report.TableKey = batchCheckResult.NodeType
+
+			info := reporting.Info{}
+			info.Hostip = batchCheckResult.Ip
+
+			info.Parameter = test.Check
+
+			if test.Passed {
+				info.Status = "Success"
+			} else {
+				info.Status = "Failed"
+			}
+
+			var errorMsgs, resolutionMsgs []string
+			var successfulCount, failedCount int
+			for _, check := range test.Checks {
+				if check.Passed {
+					successfulCount++
+				} else {
+					failedCount++
+					errorMsgs = append(errorMsgs, check.ErrorMsg)
+					resolutionMsgs = append(resolutionMsgs, check.ResolutionMsg)
+				}
+			}
+
+			statusMessage := &reporting.StatusMessage{}
+			statusMessage.MainMessage = fmt.Sprintf("%s - %s", test.Message, info.Status)
+			statusMessage.SubMessage = errorMsgs
+			info.StatusMessage = statusMessage
+
+			summaryInfo := &reporting.SummaryInfo{}
+			summaryInfo.SuccessfulCount = successfulCount
+			summaryInfo.FailedCount = failedCount
+			summaryInfo.ToResolve = resolutionMsgs
+			info.SummaryInfo = summaryInfo
+
+			report.Report = info
+
+			reports = append(reports, report)
+		}
+
+	}
+
+	return reports
+}
+
+func createTables(numberOfAutomateNodes, numberOfChefServerNodes, numberOfPostgreSQLNodes, numberOfOpenSearchNodes int) map[string]*reporting.Table {
+	bastionSummaryTableTitle := "Summary: Bastion <Node> - 1"
+	automateSummaryTableTitle := fmt.Sprintf("Summary: Automate <Nodes> - %d", numberOfAutomateNodes)
+	chefServerSummaryTableTitle := fmt.Sprintf("Summary: Chef Infra Server <Nodes> - %d", numberOfChefServerNodes)
+	postgreSQLSummaryTableTitle := fmt.Sprintf("Summary: PostgreSQL <Nodes> - %d", numberOfPostgreSQLNodes)
+	openSearchSummaryTableTitle := fmt.Sprintf("Summary: Opensearch <Nodes> - %d", numberOfOpenSearchNodes)
+	tb := make(map[string]*reporting.Table)
+	tb["bastionStatusTable"] = getStatusTable("Bastion")
+	tb["bastionSummaryTable"] = getSummaryTable(bastionSummaryTableTitle)
+	tb["automateStatusTable"] = getStatusTable("Automate")
+	tb["automateSummaryTable"] = getSummaryTable(automateSummaryTableTitle)
+	tb["chef-infra-serverStatusTable"] = getStatusTable("Chef Infra Server")
+	tb["chef-infra-serverSummaryTable"] = getSummaryTable(chefServerSummaryTableTitle)
+	tb["postgresqlStatusTable"] = getStatusTable("PostgreSQL")
+	tb["postgresqlSummaryTable"] = getSummaryTable(postgreSQLSummaryTableTitle)
+	tb["opensearchStatusTable"] = getStatusTable("OpenSearch")
+	tb["opensearchSummaryTable"] = getSummaryTable(openSearchSummaryTableTitle)
+	return tb
+}
+
+func getStatusTable(title string) *reporting.Table {
+	return &reporting.Table{
+		Title:     title,
+		Header:    table.Row{"No.", "Identifier", "Parameter", "Status", "Message"},
+		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 5, WidthMin: 5}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 25, WidthMin: 25}, {Number: 4, WidthMax: 15, WidthMin: 15}, {Number: 5, WidthMax: 60, WidthMin: 60}},
+	}
+}
+
+func getSummaryTable(title string) *reporting.Table {
+	return &reporting.Table{
+		Title:     title,
+		Header:    table.Row{"Parameter", "Successful", "Failed", "How to resolve it"},
+		ColConfig: []table.ColumnConfig{{Number: 1, WidthMax: 30, WidthMin: 30}, {Number: 2, WidthMax: 15, WidthMin: 15}, {Number: 3, WidthMax: 15, WidthMin: 15}, {Number: 4, WidthMax: 60, WidthMin: 60}},
+	}
 }
 
 // Returns port

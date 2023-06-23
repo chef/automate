@@ -1,6 +1,7 @@
 package reporting
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -38,18 +39,16 @@ func getMockReportingModule(wr *cli.Writer) Reporting {
 	}
 }
 
-var reportChan = make(chan VerificationReport, 10)
 var nodeInfoMap = make(map[string][]Info)
-var done = make(chan bool, 1)
 
 func TestVerificationReports(t *testing.T) {
 	cw := getMockWriterImpl()
 	type args struct {
-		reportChan  chan VerificationReport
+		reports     []VerificationReport
 		reporting   Reporting
 		nodeInfoMap map[string][]Info
-		done        chan bool
 	}
+
 	test := struct {
 		name string
 		args args
@@ -58,35 +57,29 @@ func TestVerificationReports(t *testing.T) {
 
 		name: successStr,
 		args: args{
-			reportChan:  reportChan,
+			reports: []VerificationReport{
+				{
+					TableKey: "",
+					Report: Info{
+						Hostip:        "",
+						Parameter:     "",
+						Status:        "",
+						StatusMessage: &StatusMessage{},
+						SummaryInfo:   &SummaryInfo{},
+					},
+				},
+			},
 			reporting:   getMockReportingModule(cw.CliWriter),
 			nodeInfoMap: nodeInfoMap,
-			done:        done,
 		},
 		want: "Automate\n+-------+-----------------+---------------------------+-----------------+--------------------------------------------------------------+\n|   NO. |      IDENTIFIER |                 PARAMETER |          STATUS |                                                      MESSAGE |\n+-------+-----------------+---------------------------+-----------------+--------------------------------------------------------------+\n+-------+-----------------+---------------------------+-----------------+--------------------------------------------------------------+\nSUMMARY : Automate\n+--------------------------------+-----------------+-----------------+-------------------------------------------------------------------+\n|                      PARAMETER |      SUCCESSFUL |          FAILED |                                                 HOW TO RESOLVE IT |\n+--------------------------------+-----------------+-----------------+-------------------------------------------------------------------+\n+--------------------------------+-----------------+-----------------+-------------------------------------------------------------------+\n",
 	}
 
-	report := VerificationReport{
-		TableKey: "",
-		Report: Info{
-			Hostip:        "",
-			Parameter:     "",
-			Status:        "",
-			StatusMessage: &StatusMessage{},
-			SummaryInfo:   &SummaryInfo{},
-		},
-		TotalReports: 0,
-	}
+	VerificationReports(test.args.reports, test.args.reporting, test.args.nodeInfoMap)
 
-	reportChan <- report
-	reportChan <- report
-	close(reportChan)
+	fmt.Println("output: ", cw.Output())
+	assert.Equal(t, test.want, cw.Output())
 
-	VerificationReports(test.args.reportChan, test.args.reporting, test.args.nodeInfoMap, test.args.done)
-	if <-done {
-		assert.Equal(t, test.want, cw.Output())
-
-	}
 }
 
 func TestCreateStatusTableRows(t *testing.T) {
@@ -235,34 +228,6 @@ func TestCreateSummaryTableRows(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
-}
-
-func TestShowProgress(t *testing.T) {
-	type args struct {
-		tableProgess map[string]progress
-		lines        int
-	}
-	test := struct {
-		name string
-		args args
-		want int
-	}{
-		name: successStr,
-		args: args{
-			tableProgess: map[string]progress{
-				automate: {
-					currentCount: 2,
-					totalCount:   3,
-				},
-			},
-			lines: 1,
-		},
-		want: 1,
-	}
-
-	got := showProgress(test.args.tableProgess, test.args.lines)
-	assert.Equal(t, test.want, got)
-
 }
 
 func TestUpdateTableTitle(t *testing.T) {

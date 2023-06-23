@@ -59,7 +59,7 @@ func (c *Client) MakeRequest(requestMethod, url string, body interface{}) (*http
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to marshal request body: %w", err)
 		}
-		c.Logger.Debugf("Request body for MakeRequest: %s\n", string(requestBody))
+		c.Logger.Debugf("Request body for MakeRequest: \n%s\n", string(requestBody))
 		reader = bytes.NewReader(requestBody)
 	}
 
@@ -81,6 +81,8 @@ func (c *Client) MakeRequest(requestMethod, url string, body interface{}) (*http
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read response body: %w", err)
 	}
+
+	c.Logger.Debugf("Response body for MakeRequest: \n%s\n", string(responseBody))
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return resp, responseBody, fmt.Errorf("unexpected response status: %s", resp.Status)

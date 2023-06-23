@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/chef/automate/components/automate-cli/pkg/verifysystemdcreate"
@@ -14,7 +15,9 @@ import (
 )
 
 const (
-	CONFIG_FILE = "/config_valid_config_parser.toml"
+	CONFIG_FILE         = "/config_valid_config_parser.toml"
+	STATUS_API_RESPONSE = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
+	BATCH_CHECK_REQUEST = `{"status":"SUCCESS","result":{"passed":true,"node_result":[]}}`
 )
 
 func TestRunVerifyCmd(t *testing.T) {
@@ -31,10 +34,16 @@ func TestRunVerifyCmd(t *testing.T) {
 			description: "bastion with existing automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       nil,
-					}, []byte(`{"status":"success"}`), nil
+					}, []byte(STATUS_API_RESPONSE), nil
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
@@ -74,13 +83,13 @@ func TestRunVerifyCmd(t *testing.T) {
 			description: "bastion without automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
-					if requestMethod == http.MethodGet {
-						return nil, nil, errors.New("some error occurred")
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
 					}
-					return &http.Response{
-						StatusCode: http.StatusOK,
-						Body:       nil,
-					}, []byte(`{"status":"success"}`), nil
+					return nil, nil, errors.New("some error occurred")
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{

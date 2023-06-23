@@ -458,6 +458,7 @@ paths = [
   "lib/proc/*",
   "lib/product/*",
   "lib/proxy/*",
+  "lib/reporting/*",
   "lib/secrets/*",
   "lib/sshutils/*",
   "lib/stringutils/*",
