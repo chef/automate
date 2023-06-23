@@ -377,7 +377,7 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 			writer.Fail(err.Error())
 		}
 		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
-		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
+		sharedConfigToml.Opensearch.Config.EnableCustomCerts = false
 
 		// Build CertsByIP for Postgresql
 		var pgCerts []CertByIP
@@ -394,7 +394,7 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 		if pgRootCA := getOSORPGRootCA(pgConfigMap); len(pgRootCA) > 0 {
 			sharedConfigToml.Postgresql.Config.RootCA = pgRootCA
 		}
-		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+		sharedConfigToml.Postgresql.Config.EnableCustomCerts = false
 	}
 
 	// Build CertsByIP for Automate
@@ -409,7 +409,7 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	}
 	sharedConfigToml.Automate.Config.CertsByIP = a2Certs
 
-	sharedConfigToml.Automate.Config.EnableCustomCerts = true
+	sharedConfigToml.Automate.Config.EnableCustomCerts = false
 
 	// Build CertsByIP for ChefServer
 	var csCerts []CertByIP
@@ -428,7 +428,7 @@ func (p *PullConfigsImpl) fetchInfraConfig() (*ExistingInfraConfigToml, error) {
 	if csRootCA := getRootCAFromCS(csConfigMap); len(csRootCA) > 0 {
 		sharedConfigToml.Automate.Config.RootCA = csRootCA
 	}
-	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = false
 
 	objectStorageConfig := getS3BackConfig(a2ConfigMap)
 	if len(objectStorageConfig.accessKey) > 0 {
@@ -518,6 +518,7 @@ func (p *PullConfigsImpl) generateInfraConfig() (*ExistingInfraConfigToml, error
 
 func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	sharedConfigToml, err := getAwsHAConfig()
+	fmt.Println("sharedConfigToml", sharedConfigToml.Architecture.ConfigInitials.SSHUser)
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
@@ -582,7 +583,7 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		}
 		sharedConfigToml.Opensearch.Config.NodesDn = fmt.Sprintf("%v", nodeDn)
 		sharedConfigToml.Opensearch.Config.AdminDn = fmt.Sprintf("%v", adminDn)
-		sharedConfigToml.Opensearch.Config.EnableCustomCerts = true
+		sharedConfigToml.Opensearch.Config.EnableCustomCerts = false
 
 		// Build CertsByIP for Postgresql
 		var pgCerts []CertByIP
@@ -606,7 +607,7 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 		if len(pgPubKey) > 0 {
 			sharedConfigToml.Postgresql.Config.PublicKey = pgPubKey
 		}
-		sharedConfigToml.Postgresql.Config.EnableCustomCerts = true
+		sharedConfigToml.Postgresql.Config.EnableCustomCerts = false
 	}
 
 	// Build CertsByIP for Automate
@@ -631,7 +632,7 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if a2PubKey := getPublicKeyFromFE(a2ConfigMap); len(a2PubKey) > 0 {
 		sharedConfigToml.Automate.Config.PublicKey = a2PubKey
 	}
-	sharedConfigToml.Automate.Config.EnableCustomCerts = true
+	sharedConfigToml.Automate.Config.EnableCustomCerts = false
 
 	// Build CertsByIP for ChefServer
 	var csCerts []CertByIP
@@ -656,7 +657,7 @@ func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	if csPubKey := getPublicKeyFromFE(csConfigMap); len(csPubKey) > 0 {
 		sharedConfigToml.ChefServer.Config.PublicKey = csPubKey
 	}
-	sharedConfigToml.ChefServer.Config.EnableCustomCerts = true
+	sharedConfigToml.ChefServer.Config.EnableCustomCerts = false
 
 	objStorageConfig := getOpenSearchObjectStorageConfig(a2ConfigMap)
 	if len(objStorageConfig.bucketName) > 0 {
