@@ -55,7 +55,7 @@ module "aws" {
   aws_instance_profile_name       = var.backup_config_s3 == "true" ? module.s3[0].instance_profile_name : null
   json_data                       = module.aws_metadata.json_data
 
-  depends_on                      = [module.aws_metadata]
+  depends_on = [module.aws_metadata]
 }
 
 module "efs" {
