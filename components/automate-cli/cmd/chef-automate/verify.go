@@ -469,7 +469,10 @@ func (v *verifyCmdFlow) createSystemdOnBastion() error {
 func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckRequest, nodeType string) ([]byte, error) {
 	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
 	batchCheckAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), batchCheckAPIRoute)
+	v.Writer.Printf("batchCheckAPIEndpoint: %s\n", batchCheckAPIEndpoint)
+	v.Writer.Printf("requestBody: %v\n",requestBody)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
+	v.Writer.Printf("responseBody: %v\n",responseBody)
 	if err != nil {
 		if responseBody != nil {
 			return nil, fmt.Errorf("error while doing batch-check API call for %s:\n%s", nodeType, string(responseBody))
