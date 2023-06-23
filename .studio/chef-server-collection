@@ -541,3 +541,36 @@ function ohai_time() {
     -a           ohai_time \
       | grep ohai_time | cut -f2 -d":" | xargs
 }
+
+document "test_if_env_vars_are_configured_after_patch" <<DOC
+  test if OCID ENV variables are configured after patch
+DOC
+test_if_env_vars_are_configured_after_patch() {
+  ocid_config_file_path="$(hab pkg path chef/oc_id)/oc_id/config/settings/production.yml"
+
+  # Get values from in settings/production.yml
+  endpoint=$(awk '/endpoint:/ {print $2}' $ocid_config_file_path)
+  superuser=$(awk '/superuser:/ {print $2}' $ocid_config_file_path)
+  ssl_verify_mode=$(awk '/ssl_verify_mode:/ {print $2}' $ocid_config_file_path)
+
+  errors=()
+
+  if [ $endpoint != "https://test-url.com:443" ]; then
+    errors+=("Chef-Server endpoint is not configured properly.")
+  fi
+
+  if [ $superuser != "testuser" ]; then
+    errors+=("Chef-Server superuser is not configured properly.")
+  fi
+
+  if [ $ssl_verify_mode != "verify_peer" ]; then
+    errors+=("Chef-Server SSL certificate verification mode is not configured properly.")
+  fi
+
+  if [ ${#errors} -gt 0 ]; then
+    for (( i=0; i<${#errors[@]}; i++ )); do echo "${errors[$i]}" ; done
+    return 1
+  else
+    echo "ENV Vars configured correctly"
+  fi
+}
