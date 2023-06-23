@@ -1,9 +1,10 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
-
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -91,6 +92,24 @@ type Config struct {
 	APIToken        string         `json:"api_token"`
 }
 
+func NewConfig() *Config {
+    return &Config{
+        SSHUser: &SSHUser{},
+        Backup: &Backup{
+            FileSystem:    &FileSystem{},
+            ObjectStorage: &ObjectStorage{},
+        },
+        Hardware: &Hardware{},
+        Certificate: []*Certificate{
+            {
+                Nodes: []*NodeCert{},
+            },
+        },
+        ExternalOS: &ExternalOS{},
+        ExternalPG: &ExternalPG{},
+    }
+}
+
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
 	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
@@ -166,7 +185,10 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 
 	// not available in config
 	c.DeploymentState = ""
+	fmt.Printf("c: %+v\n", c)
+	bx, _ := json.MarshalIndent(c, "", "\t")
 
+    fmt.Printf("bx: %v\n", string(bx))
 	return nil
 }
 
