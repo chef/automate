@@ -912,7 +912,7 @@ func TestShouldStartMockServer(t *testing.T) {
 			"error": ""
 		}
 	}`, nil, false)
-	shouldStartMockServer, _ := ss.shouldStartMockServer([]string{"abc"}, &models.Config{
+	shouldStartMockServer := ss.shouldStartMockServer([]string{"abc"}, &models.Config{
 		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
@@ -970,7 +970,7 @@ func TestStartMockServerIfNeeded(t *testing.T) {
 	ss := getBatchCheckServiceInstance()
 
 	ss.httpRequestClient = SetupMockHttpRequestClient(`{}`, errors.New("error occurred"), false)
-	resp, _, err := ss.startMockServerIfNeeded([]string{"firewall"}, &models.Config{
+	resp, _ := ss.startMockServerIfNeeded([]string{"firewall"}, &models.Config{
 		Hardware: &models.Hardware{
 			AutomateNodeCount:        1,
 			AutomateNodeIps:          []string{"1.2.3.4"},
@@ -982,7 +982,6 @@ func TestStartMockServerIfNeeded(t *testing.T) {
 			OpenSearchNodeIps:        []string{"1.2.3.5", "1.2.3.6"},
 		},
 	})
-	assert.Equal(t, "received no response for status api from any automate nodes", err.Error())
 	assert.Equal(t, 0, len(resp))
 }
 
