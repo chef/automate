@@ -258,7 +258,7 @@ func (ss *BatchCheckService) generateRootCaAndPrivateKeyForHost(host, nodeType s
 
 	certificateNodes, ok := certMap[nodeType]
 	if ok && len(certificateNodes.Nodes) > 0 {
-		nodes := config.Certificate[0].Nodes
+		nodes := certificateNodes.Nodes
 		for _, nodeData := range nodes {
 			if host == nodeData.IP {
 				startMockServerRequestBody.Cert = nodeData.Cert

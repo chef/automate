@@ -94,6 +94,7 @@ type Config struct {
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
 	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
+	
 	for _, ip := range ipList {
 		certByIP, ok := certByIpMap[ip]
 		var nodeCert *NodeCert
@@ -127,7 +128,8 @@ func createMapforCertByIp(certsByIP *[]config.CertByIP) map[string]*config.CertB
 	certByIPMap := make(map[string]*config.CertByIP)
 	if certsByIP != nil {
 		for _, cert := range *certsByIP {
-			certByIPMap[cert.IP] = &cert
+			certificateIp := cert
+			certByIPMap[cert.IP] = &certificateIp
 		}
 
 	}

@@ -233,7 +233,7 @@ func TestMakeRequests(t *testing.T) {
 
 	requestsForchefServer, ok := mapRequests[constants.CHEF_INFRA_SERVER]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForchefServer), 6)
+	assert.Equal(t, 4, len(requestsForchefServer))
 
 	//As there are two postgress nodes which needs to interact with eachother
 	requestsForPostgres, ok := mapRequests[constants.POSTGRESQL]
@@ -468,8 +468,6 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 4, len(resp))
-	assert.Equal(t, 1, len(resp["automate"]["https"]))
-	assert.Equal(t, 1, len(resp["chef-infra-server"]["https"]))
 	assert.Equal(t, 4, len(resp["postgresql"]["tcp"]))
 	assert.Equal(t, 1, len(resp["postgresql"]["udp"]))
 	assert.Equal(t, 3, len(resp["opensearch"]["tcp"]))
