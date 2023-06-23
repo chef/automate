@@ -275,22 +275,15 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 			log.Println(err)
 			return err
 		}
-        v.Config = config
-        err = v.Config.Verify()
+		v.Config = config
+		err = v.Config.Verify()
 		if err != nil {
 			log.Println(err)
 			return err
 		}
 	}
 	// Get config required for batch-check API call
-	batchCheckConfig := &models.Config{
-		Hardware: &models.Hardware{},
-		SSHUser:  &models.SSHUser{},
-		Backup: &models.Backup{
-			FileSystem:    &models.FileSystem{},
-			ObjectStorage: &models.ObjectStorage{},
-		},
-	}
+	batchCheckConfig := models.NewConfig()
 	err := batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {
 		return err
@@ -480,6 +473,7 @@ func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckReque
 	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
 	batchCheckAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), batchCheckAPIRoute)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
+	v.Writer.Printf("responseBody: %v\n", responseBody)
 	if err != nil {
 		if responseBody != nil {
 			return nil, fmt.Errorf("error while doing batch-check API call for %s:\n%s", nodeType, string(responseBody))
