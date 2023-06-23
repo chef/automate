@@ -290,7 +290,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// If batch-check API failed on bastion
 	if !batchCheckResultBastion.Passed {
 		v.printResponse(batchCheckResults)
-		return fmt.Errorf("batch-check API failed on bastion:\n%v", batchCheckResults)
+		return fmt.Errorf("batch-check API failed on bastion")
 	}
 
 	// Doing batch-check API call for remote nodes
@@ -309,7 +309,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// If batch-check API failed on remote nodes
 	if !batchCheckResultRemote.Passed {
 		v.printResponse(batchCheckResults)
-		return fmt.Errorf("batch-check API failed on remote nodes:\n%v", batchCheckResults)
+		return fmt.Errorf("batch-check API failed on remote nodes")
 	}
 
 	// Printing response for success case
