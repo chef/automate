@@ -134,7 +134,7 @@
     [cs_nginx.v1.sys.ngx.http]
       ssl_verify_depth = 6
     [global.v1.external.automate.ssl]
-      server_name = "https://<%= overrides[:automate_fqdn] %>"
+      server_name = "<%= overrides[:automate_fqdn] %>"
       root_cert = """<%= overrides[:automate_root_ca] %>"""
   <% end %>
 <% else %>
