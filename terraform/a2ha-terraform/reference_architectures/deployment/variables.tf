@@ -135,7 +135,6 @@ variable "delete_on_termination" {
 }
 
 variable "managed_opensearch_certificate" {
-  default = ""
 }
 
 variable "managed_opensearch_certificate_deployment" {
@@ -172,6 +171,9 @@ variable "managed_opensearch_username_deployment" {
 
 variable "managed_rds_certificate_deployment" {
   default = ""
+}
+
+variable "managed_rds_certificate" {
 }
 
 variable "managed_rds_dbuser_password" {

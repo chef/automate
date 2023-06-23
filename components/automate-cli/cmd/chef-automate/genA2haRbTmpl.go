@@ -120,8 +120,8 @@ managed_aws do
   superuser_password "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLSuperUserPassword}}"
   dbuser_username "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLDBUserName}}"
   dbuser_password "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLDBUserPassword}}"
-  {{ if (eq .ExternalDB.Database.Type "self-managed") }}postgresql_root_cert "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLRootCert}}" {{ else }}#postgresql_root_cert "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLRootCert}}" {{ end }}
-  {{ if (eq .ExternalDB.Database.Type "self-managed") }}opensearch_root_cert "{{ .ExternalDB.Database.Opensearch.OpensearchRootCert}}" {{ else}}#opensearch_root_cert "{{ .ExternalDB.Database.Opensearch.OpensearchRootCert}}" {{ end}}
+  postgresql_root_cert "{{ .ExternalDB.Database.PostgreSQL.PostgreSQLRootCert}}"
+  opensearch_root_cert "{{ .ExternalDB.Database.Opensearch.OpensearchRootCert}}"
 end  
 `
 

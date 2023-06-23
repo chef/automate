@@ -159,7 +159,7 @@ module AutomateCluster
       default :managed_opensearch_domain_url, ' '
       default :managed_opensearch_username, ' '
       default :managed_opensearch_user_password, ' '
-      default :managed_opensearch_certificate, ' '
+      default :managed_opensearch_certificate
       default :aws_os_snapshot_role_arn, ' '
       default :os_snapshot_user_access_key_id, ' '
       default :os_snapshot_user_access_key_secret, ' '
@@ -168,7 +168,7 @@ module AutomateCluster
       default :managed_rds_superuser_password, ' '
       default :managed_rds_dbuser_username, ' '
       default :managed_rds_dbuser_password, ' '
-      default :managed_rds_certificate, ' '
+      default :managed_rds_certificate
       default :ami_filter_name
       default :ami_filter_virt_type
       default :ami_filter_owner
