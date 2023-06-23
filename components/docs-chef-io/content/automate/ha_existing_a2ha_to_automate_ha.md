@@ -35,24 +35,23 @@ In order to verify the migration is completed successfully we'll need to capture
 
 Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > pre_migration_infra_counts.log`
 
-    ```bash
-    #!/usr/bin/bash
+```bash
+#!/usr/bin/bash
 
-    for i in `chef-server-ctl org-list`; do
-        org=https://localhost/organizations/$i
-        echo "Orgination: ${i}"
-        echo -n "node count: "
-        knife node list -s $org | wc -l
-        echo -n "client count: "
-        knife client list -s $org | wc -l
-        echo -n "cookbook count: "
-        knife cookbook list -s $org | wc -l
-        echo -n "total objects: "
-        knife list / -R -s $org | wc -l
-        echo "----------------"
-    done
-    ```
-
+for i in `chef-server-ctl org-list`; do
+    org=https://localhost/organizations/$i
+    echo "Orgination: ${i}"
+    echo -n "node count: "
+    knife node list -s $org | wc -l
+    echo -n "client count: "
+    knife client list -s $org | wc -l
+    echo -n "cookbook count: "
+    knife cookbook list -s $org | wc -l
+    echo -n "total objects: "
+    knife list / -R -s $org | wc -l
+    echo "----------------"
+done
+```
 
 ## Migration
 
@@ -78,7 +77,7 @@ Create `capture_infra_counts.sh` and run it using `./capture_infra_counts.sh > p
 
 1. Detach the File system from the old A2HA cluster.
 
-1. Configure the backup at Automate HA cluster. If you have not configured it, please refer to this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup)
+1. Configure the backup at Automate HA cluster. If you have not configured it, please refer to this [Doc: Pre Backup Configuration for File System Backup](/automate/ha_backup_restore_file_system/#setting-up-the-backup-configuration)
 
 1. From Step 3, you will get the backup mount path.
 
