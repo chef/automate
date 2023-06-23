@@ -84,6 +84,12 @@ type verifyServeCmdFlow struct{}
 
 type verifySystemdCreateFlow struct{}
 
+type StatusResponse struct {
+	HostIp       string
+	ResponseBody []byte
+	Error        error
+}
+
 func init() {
 	flagsObj := verifyCmdFlags{}
 
@@ -400,6 +406,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 	}
 
 	if len(hostIPsToCopyLatestCLI) > 0 {
+		v.Writer.Printf("Copying CLI to the follwoing IPs: %v", hostIPsToCopyLatestCLI)
 		// Copying Latest CLI binary to remote nodes
 		err = v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPsToCopyLatestCLI)
 		if err != nil {
@@ -426,18 +433,36 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 
 // Get Host IPs without chef-automate binary or without latest version chef-automate binary
 func (v *verifyCmdFlow) getHostIPsWithNoLatestCLI(hostIPs []string) ([]string, error) {
-	hostIPsWithoutLatestCLI := []string{}
+
+	responseChan := make(chan StatusResponse, len(hostIPs))
 	for _, hostIP := range hostIPs {
 		statusAPIEndpoint := getAPIEndpoint(hostIP, getPort(), statusAPIRoute)
-		_, responseBody, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
+
+		go func(hostIP string) {
+			rc := StatusResponse{hostIP, nil, nil}
+			_, responseBody, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
+			if err != nil {
+				rc.Error = err
+				responseChan <- rc
+				return
+			}
+			rc.ResponseBody = responseBody
+			responseChan <- rc
+
+		}(hostIP)
+	}
+
+	hostIPsWithoutLatestCLI := []string{}
+	for i := 0; i < len(hostIPs); i++ {
+		response := <-responseChan
 
 		// Incase of unreachable error (connection refused) , appending IP to the array
-		if err != nil {
-			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, hostIP)
+		if response.Error != nil {
+			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, response.HostIp)
 			continue
 		}
 
-		resultBytes, err := v.getResultFromResponseBody(responseBody)
+		resultBytes, err := v.getResultFromResponseBody(response.ResponseBody)
 		if err != nil {
 			return nil, err
 		}
@@ -448,7 +473,7 @@ func (v *verifyCmdFlow) getHostIPsWithNoLatestCLI(hostIPs []string) ([]string, e
 		}
 
 		if result.CliVersion < version.BuildTime {
-			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, hostIP)
+			hostIPsWithoutLatestCLI = append(hostIPsWithoutLatestCLI, response.HostIp)
 		}
 	}
 	return hostIPsWithoutLatestCLI, nil
