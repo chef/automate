@@ -205,7 +205,7 @@ func doBootstrapEnv(airgapBundlePath string, saas bool, frontend bool, backend b
 	return nil
 }
 
-func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
+func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool, state string) error {
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -220,7 +220,7 @@ func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
 	if err != nil {
 		return err
 	}
-	err = dm.generateConfig("provision")
+	err = dm.generateConfig(state)
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
 	}

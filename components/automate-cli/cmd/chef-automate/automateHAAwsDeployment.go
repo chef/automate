@@ -71,7 +71,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 
 func (a *awsDeployment) doProvisionJob(args []string) error {
 	writer.Print("AWS Provision")
-	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas)
+	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas, "provision")
 	if err != nil {
 		return err
 	}
@@ -276,7 +276,8 @@ func (a *awsDeployment) validateCerts() *list.List {
 	if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", ".tf_arch")) {
 		err := a.getAwsHAIp()
 		if err != nil {
-			errorList.PushBack(fmt.Sprintf("error listing ips"))
+			errorList.PushBack("Error in fetching node IPs in aws mode")
+			return errorList
 		}
 	}
 	// If automate root_ca is provided, check that it is valid
