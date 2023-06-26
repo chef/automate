@@ -91,7 +91,7 @@ type Config struct {
 	APIToken        string         `json:"api_token"`
 }
 
-func NewConfig() *Config {
+func (c *Config) NewConfig() *Config {
 	return &Config{
 		Hardware:    &Hardware{},
 		Certificate: []*Certificate{},
@@ -158,8 +158,6 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 	if err != nil {
 		return err
 	}
-	// initialize config
-	c = NewConfig()
 
 	if err = c.populateCommonConfig(haConfig); err != nil {
 		return err
@@ -224,14 +222,22 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 		return err
 	}
 
-	c.Hardware.PostgresqlNodeCount, err = strconv.Atoi(haConfig.Postgresql.Config.InstanceCount)
-	if err != nil {
-		return err
+	if haConfig.Postgresql.Config.InstanceCount == "" && haConfig.Aws.Config.SetupManagedServices {
+		c.Hardware.PostgresqlNodeCount = 0
+	} else {
+		c.Hardware.PostgresqlNodeCount, err = strconv.Atoi(haConfig.Postgresql.Config.InstanceCount)
+		if err != nil {
+			return err
+		}
 	}
 
-	c.Hardware.OpenSearchNodeCount, err = strconv.Atoi(haConfig.Opensearch.Config.InstanceCount)
-	if err != nil {
-		return err
+	if haConfig.Opensearch.Config.InstanceCount == "" && haConfig.Aws.Config.SetupManagedServices {
+		c.Hardware.OpenSearchNodeCount = 0
+	} else {
+		c.Hardware.OpenSearchNodeCount, err = strconv.Atoi(haConfig.Opensearch.Config.InstanceCount)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

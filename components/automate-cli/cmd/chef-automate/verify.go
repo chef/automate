@@ -25,6 +25,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
 	"github.com/jedib0t/go-pretty/v5/table"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -297,6 +298,8 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 			FileSystem:    &models.FileSystem{},
 			ObjectStorage: &models.ObjectStorage{},
 		},
+		ExternalOS: &models.ExternalOS{},
+		ExternalPG: &models.ExternalPG{},
 	}
 
 	err := batchCheckConfig.PopulateWith(v.Config)
@@ -311,6 +314,28 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		v.chefServerIPs = v.Config.ExistingInfra.Config.ChefServerPrivateIps
 		v.postgresqlIPs = v.Config.ExistingInfra.Config.PostgresqlPrivateIps
 		v.opensearchIPs = v.Config.ExistingInfra.Config.OpensearchPrivateIps
+	} else if v.Config.IsAws() {
+		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.Aws)
+		configDetails, err := fetchAwsConfigFromTerraform()
+		if err != nil {
+			return err
+		}
+
+		v.automateIPs = configDetails.AutomateIps
+		v.chefServerIPs = configDetails.ChefServerIps
+		v.postgresqlIPs = configDetails.PostgresqlIps
+		v.opensearchIPs = configDetails.OpensearchIps
+
+		batchCheckConfig.ExternalOS.OSRoleArn = configDetails.OsSnapshotRoleArn
+
+		// assign ip's to models.Hardware
+		batchCheckHardware := batchCheckConfig.Hardware
+		batchCheckHardware.AutomateNodeIps = configDetails.AutomateIps
+		batchCheckHardware.ChefInfraServerNodeIps = configDetails.ChefServerIps
+		batchCheckHardware.PostgresqlNodeIps = configDetails.PostgresqlIps
+		batchCheckHardware.OpenSearchNodeIps = configDetails.OpensearchIps
+	} else {
+		return errors.New("Invalid config")
 	}
 
 	var batchCheckResultBastion, batchCheckResultRemote models.BatchCheckResponse
@@ -362,7 +387,6 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 // Runs automate-verify service on bastion
 func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Config) ([]byte, error) {
 	v.Writer.Println("Checking automate-verify service on bastion")
-
 	//Call status API to check if automate-verify service is running on bastion
 	statusAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), statusAPIRoute)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodGet, statusAPIEndpoint, nil)
@@ -417,7 +441,6 @@ func (v *verifyCmdFlow) runVerifyServiceForBastion(batchCheckConfig models.Confi
 
 // Runs automate-verify service on remote nodes
 func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config) ([]byte, error) {
-
 	// TODO: Need to check if automate-verify service is already running on remote nodes and upgrade if needed.
 
 	hostIPs := v.getHostIPs(
@@ -448,44 +471,6 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
 		if err != nil {
 			return nil, err
-		}
-	} else {
-		if v.Config.IsAws() {
-			port, keyFile, userName := v.getSSHConfig(v.Config.Architecture.Aws)
-			configDetails, err := fetchAwsConfigFromTerraform()
-			if err != nil {
-				return nil, err
-			}
-			hostIPs = v.getHostIPs(
-				configDetails.AutomateIps,
-				configDetails.ChefServerIps,
-				configDetails.PostgresqlIps,
-				configDetails.OpensearchIps,
-			)
-
-			sshConfig := sshutils.NewSshConfig("", port, keyFile, userName)
-
-			destFileName := "chef-automate"
-
-			// Copying CLI binary to remote nodes
-			err = v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPs)
-			if err != nil {
-				return nil, err
-			}
-
-			// Starting automate-verify service on remote nodes
-			err = v.startServiceOnRemoteNodes(destFileName, sshConfig, hostIPs)
-			if err != nil {
-				return nil, err
-			}
-
-			// assign ip's to models.Hardware
-			batchCheckHardware := batchCheckConfig.Hardware
-			batchCheckHardware.AutomateNodeIps = configDetails.AutomateIps
-			batchCheckHardware.ChefInfraServerNodeIps = configDetails.ChefServerIps
-			batchCheckHardware.PostgresqlNodeIps = configDetails.PostgresqlIps
-			batchCheckHardware.OpenSearchNodeIps = configDetails.OpensearchIps
-
 		}
 	}
 
