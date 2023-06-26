@@ -54,7 +54,7 @@ var cmdCheckArray = []string{"mkdir", "useradd", "usermod", "groupadd", "chown",
 	"grep", "which", "cp", "curl", "bash", "sh",
 	"sysctl", "cat", "sed", "mount", "mv", "systemctl",
 	"wget", "rsync", "tar", "find", "sort", "awk",
-	"xargs", "tail", "umask", "id"}
+	"xargs", "tail", "id"}
 
 func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*models.SoftwareVersionDetails, error) {
 	sv.logger.Debug("The query parameter entered: ", query)
