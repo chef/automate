@@ -406,7 +406,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		batchCheckConfig.Hardware.PostgresqlNodeIps,
 		batchCheckConfig.Hardware.OpenSearchNodeIps,
 	)
-	sshConfig := sshutils.NewSshConfig("", v.sshPort, v.sshKeyFile, v.sshUserName)
+	sshConfig := sshutils.NewSshConfig("", batchCheckConfig.SSHUser.Port, batchCheckConfig.SSHUser.PrivateKey, batchCheckConfig.SSHUser.Username)
 
 	destFileName := "chef-automate"
 
