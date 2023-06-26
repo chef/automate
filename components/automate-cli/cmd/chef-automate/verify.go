@@ -451,7 +451,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 		}
 	} else {
 		if v.Config.IsAws() {
-			port, keyFile, userName = v.getSSHConfig(v.Config.Architecture.Aws)
+			port, keyFile, userName := v.getSSHConfig(v.Config.Architecture.Aws)
 			configDetails, err := fetchAwsConfigFromTerraform()
 			if err != nil {
 				return nil, err
