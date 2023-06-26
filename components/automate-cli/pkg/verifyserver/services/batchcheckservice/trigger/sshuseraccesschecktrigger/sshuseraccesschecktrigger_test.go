@@ -437,13 +437,13 @@ func TestGetSShUserAPIRquest(t *testing.T) {
 		assert.Equal(t, err.Error(), actualerr.Error())
 	})
 
-	t.Run("Permission is less the 400", func(t *testing.T) {
+	t.Run("Permission is greater the 400", func(t *testing.T) {
 		fwc := NewSshUserAccessCheck(logger.NewLogrusStandardLogger(), &fileutils.MockFileSystemUtils{
 			ReadFileFunc: func(filepath string) ([]byte, error) {
 				return []byte("test_key"), nil
 			},
 			GetFilePermissionFunc: func(filePath string) (int64, error) {
-				return 300, nil
+				return 700, nil
 			},
 		}, "1234")
 		ip := "1.2.3.4"
