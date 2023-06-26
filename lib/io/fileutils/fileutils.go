@@ -2,11 +2,13 @@ package fileutils
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -35,6 +37,7 @@ type FileUtils interface {
 	DeleteFile(fileName string) error
 	Move(sourceFile string, destinationFile string) error
 	RemoveFirstLine(filePath string) error
+	GetFilePermission(filePath string) (int64, error)
 }
 
 type FileSystemUtils struct{}
@@ -82,6 +85,10 @@ func (fsu *FileSystemUtils) Move(sourceFile string, destinationFile string) erro
 }
 func (fsu *FileSystemUtils) RemoveFirstLine(filePath string) error {
 	return RemoveFirstLine(filePath)
+}
+
+func (fsu *FileSystemUtils) GetFilePermission(filePath string) (int64, error) {
+	return GetFilePermission(filePath)
 }
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -279,4 +286,18 @@ func CreateTomlFileFromConfig(config interface{}, tomlFile string) (string, erro
 	}
 
 	return tomlFile, nil
+}
+
+func GetFilePermission(filePath string) (int64, error) {
+	info, err := os.Stat(filePath)
+	if err != nil {
+		return 0, errors.New("Unable to get the file on the path provided")
+	}
+	permissions := info.Mode().Perm()
+	perms := fmt.Sprintf("%04o", permissions)
+	testint, err := strconv.ParseInt(perms, 10, 32)
+	if err != nil {
+		return 0, errors.New("Error while parsing the file permission")
+	}
+	return testint, nil
 }

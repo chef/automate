@@ -18,6 +18,7 @@ type MockFileSystemUtils struct {
 	DeleteTempFileFunc         func(tempFile string) error
 	MoveFunc                   func(sourceFile string, destinationFile string) error
 	RemoveFirstLineFunc        func(filePath string) error
+	GetFilePermissionFunc      func(filePath string) (int64, error)
 }
 
 func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
@@ -58,4 +59,7 @@ func (fsu *MockFileSystemUtils) Move(sourceFile string, destinationFile string) 
 }
 func (fsu *MockFileSystemUtils) RemoveFirstLine(filePath string) error {
 	return fsu.RemoveFirstLineFunc(filePath)
+}
+func (fsu *MockFileSystemUtils) GetFilePermission(filePath string) (int64, error) {
+	return fsu.GetFilePermissionFunc(filePath)
 }

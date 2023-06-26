@@ -28,7 +28,7 @@ ExecStart={{.ServiceCommand}}
 Restart=always
 StandardOutput=journal
 StandardError=journal
-
+Environment="HOME={{.HomeEnv}}"
 [Install]
 WantedBy=multi-user.target
 `
@@ -38,6 +38,7 @@ type systemdInput struct {
 	ServiceName        string
 	ServiceDescription string
 	ServiceCommand     string
+	HomeEnv            string  
 }
 
 type CreateSystemdServiceImpl struct {
@@ -102,12 +103,13 @@ func (css *CreateSystemdServiceImpl) createSystemdServiceFile() error {
 	if err != nil {
 		return errors.Wrap(err, "Error parsing template")
 	}
-
+	envVariable := css.SystemdCreateUtils.GetEnv()
 	// Prepare the template data.
 	data := systemdInput{
 		ServiceName:        SERVICE_NAME,
 		ServiceDescription: SERVICE_DESCRIPTION,
 		ServiceCommand:     css.BinaryDestinationFolder + "/" + SERVICE_COMMAND,
+		HomeEnv:            envVariable,
 	}
 
 	css.Logger.Debugf(

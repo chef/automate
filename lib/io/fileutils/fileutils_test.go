@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -199,5 +200,28 @@ Age = 30
 		var invalidConfig int
 		_, err := fileutils.CreateTomlFileFromConfig(invalidConfig, tomlFilePath)
 		require.Error(t, err, "Failed to encode")
+	})
+}
+
+func TestGetFilePermission(t *testing.T) {
+	t.Run("Permission Was Successfully Recevied", func(t *testing.T) {
+		tempdir := t.TempDir()
+
+		testData := []byte("test data")
+		filePath := path.Join(tempdir, "file")
+		ioutil.WriteFile(filePath, testData, 0400)
+		res, err := fileutils.GetFilePermission(filePath)
+		assert.NoError(t, err)
+		assert.Equal(t, res, int64(400))
+	})
+
+	t.Run("Unable to get the filepath", func(t *testing.T) {
+		testData := []byte("test data")
+		filePath := path.Join("ssh", "file")
+		ioutil.WriteFile(filePath, testData, 0400)
+		got, gotErr := fileutils.GetFilePermission(filePath)
+		want, wantErr := int64(0), errors.New("Unable to get the file on the path provided")
+		assert.Equal(t, want, got)
+		assert.Equal(t, wantErr.Error(), gotErr.Error())
 	})
 }
