@@ -26,6 +26,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					NodeType: "automate",
 					Checks: []models.Checks{
 						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
+						{
 							Title:         "IP address",
 							Passed:        true,
 							SuccessMsg:    "IP address is unique",
@@ -59,6 +66,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					IP:       "172.154.0.2",
 					NodeType: "automate",
 					Checks: []models.Checks{
+						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
 						{
 							Title:         "IP address",
 							Passed:        true,
@@ -94,6 +108,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					NodeType: "chef-infra-server",
 					Checks: []models.Checks{
 						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
+						{
 							Title:         "IP address",
 							Passed:        true,
 							SuccessMsg:    "IP address is unique",
@@ -127,6 +148,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					IP:       "172.154.0.4",
 					NodeType: "chef-infra-server",
 					Checks: []models.Checks{
+						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
 						{
 							Title:         "IP address",
 							Passed:        true,
@@ -162,6 +190,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					NodeType: "postgresql",
 					Checks: []models.Checks{
 						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
+						{
 							Title:         "IP address",
 							Passed:        true,
 							SuccessMsg:    "IP address is unique",
@@ -195,6 +230,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					IP:       "172.154.0.6",
 					NodeType: "postgresql",
 					Checks: []models.Checks{
+						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
 						{
 							Title:         "IP address",
 							Passed:        true,
@@ -230,6 +272,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					NodeType: "postgresql",
 					Checks: []models.Checks{
 						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
+						{
 							Title:         "IP address",
 							Passed:        true,
 							SuccessMsg:    "IP address is unique",
@@ -263,6 +312,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					IP:       "172.154.0.8",
 					NodeType: "opensearch",
 					Checks: []models.Checks{
+						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
 						{
 							Title:         "IP address",
 							Passed:        true,
@@ -298,6 +354,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					NodeType: "opensearch",
 					Checks: []models.Checks{
 						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
+						{
 							Title:         "IP address",
 							Passed:        true,
 							SuccessMsg:    "IP address is unique",
@@ -331,6 +394,13 @@ func SetupMockHardwareResourceCountService() hardwareresourcecount.IHardwareReso
 					IP:       "172.154.0.10",
 					NodeType: "opensearch",
 					Checks: []models.Checks{
+						{
+							Title:         "Instance count",
+							Passed:        true,
+							SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+							ErrorMsg:      "",
+							ResolutionMsg: "",
+						},
 						{
 							Title:         "IP address",
 							Passed:        true,
@@ -423,390 +493,470 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 			  }`,
 			ExpectedCode: 200,
 			ExpectedBody: `{
-				"status": "SUCCESS",
-				"result": [
-					{
-						"ip": "172.154.0.1",
-						"node_type": "automate",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with backend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "automate type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.2",
-						"node_type": "automate",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with backend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "automate type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.3",
-						"node_type": "chef-infra-server",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with backend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.4",
-						"node_type": "chef-infra-server",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with backend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.5",
-						"node_type": "postgresql",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with frontend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "postgresql type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.6",
-						"node_type": "postgresql",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with frontend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "postgresql type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.7",
-						"node_type": "postgresql",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with frontend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "postgresql type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.8",
-						"node_type": "opensearch",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with frontend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "opensearch type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.9",
-						"node_type": "opensearch",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with frontend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "opensearch type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					},
-					{
-						"ip": "172.154.0.10",
-						"node_type": "opensearch",
-						"checks": [
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is unique",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "IP address is of valid format",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "Not shared with frontend nodes",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							},
-							{
-								"title": "IP address",
-								"passed": true,
-								"success_msg": "opensearch type has valid count as per Automate HA requirement",
-								"error_msg": "",
-								"resolution_msg": "",
-								"skipped":false
-							}
-						]
-					}
-				]
-			}`,
+    "status": "SUCCESS",
+    "result": [
+        {
+            "ip": "172.154.0.1",
+            "node_type": "automate",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with backend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "automate type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.2",
+            "node_type": "automate",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with backend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "automate type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.3",
+            "node_type": "chef-infra-server",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with backend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.4",
+            "node_type": "chef-infra-server",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with backend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "chef-infra-server type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.5",
+            "node_type": "postgresql",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with frontend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "postgresql type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.6",
+            "node_type": "postgresql",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with frontend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "postgresql type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.7",
+            "node_type": "postgresql",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with frontend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "postgresql type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.8",
+            "node_type": "opensearch",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with frontend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "opensearch type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.9",
+            "node_type": "opensearch",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with frontend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "opensearch type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        },
+        {
+            "ip": "172.154.0.10",
+            "node_type": "opensearch",
+            "checks": [
+                {
+                    "title": "Instance count",
+                    "passed": true,
+                    "success_msg": "Number of IP Addresses are matched with the instance count",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is unique",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "IP address is of valid format",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "Not shared with frontend nodes",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                },
+                {
+                    "title": "IP address",
+                    "passed": true,
+                    "success_msg": "opensearch type has valid count as per Automate HA requirement",
+                    "error_msg": "",
+                    "resolution_msg": "",
+                    "skipped": false
+                }
+            ]
+        }
+    ]
+}`,
 		},
 		{
 			TestName:     "400:Failure Hardware Resource Count Check",
@@ -818,41 +968,6 @@ func TestHardwareResourceCountCheckAPI(t *testing.T) {
 				"error": {
 					"code": 400,
 					"message": "Invalid Body Request"
-				}
-			}`,
-		},
-		{
-			TestName: "400:Failure Node Count and length of Node Ips should be equal.",
-			RequestBody: `{
-				"automate_node_count": 2,
-				"automate_node_ips": [
-				  "172.154.0.1"
-				],
-				"chef_infra_server_node_count": 2,
-				"chef_infra_server_node_ips": [
-				  "172.154.0.3",
-				  "172.154.0.4"
-				],
-				"postgresql_node_count": 3,
-				"postgresql_node_ips": [
-				  "172.154.0.5",
-				  "172.154.0.6",
-				  "172.154.0.7"
-				],
-				"opensearch_node_count": 3,
-				"opensearch_node_ips": [
-				  "172.154.0.8",
-				  "172.154.0.9",
-				  "172.154.0.10"
-				]
-			  }`,
-			ExpectedCode: 400,
-			ExpectedBody: `{
-				"status": "FAILED",
-				"result": null,
-				"error": {
-					"code": 400,
-					"message": "Node Count and length of Node Ips should be equal."
 				}
 			}`,
 		},

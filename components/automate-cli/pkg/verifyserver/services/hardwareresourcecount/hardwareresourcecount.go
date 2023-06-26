@@ -42,7 +42,10 @@ func validateHardwareResources(minNodeCount, reqNodeCount int, nodeType string, 
 	res.NodeType = nodeType
 	res.IP = ip
 
-	checks := uniqueIP(nodeType, len(nodeSet), reqNodeCount)
+	checks := instanceCountAndIpsCheck(reqNodeCount, len(nodeSet))
+	res.Checks = append(res.Checks, checks)
+
+	checks = uniqueIP(nodeType, len(nodeSet), reqNodeCount)
 	res.Checks = append(res.Checks, checks)
 
 	checks = validFormat(ip)
@@ -55,6 +58,14 @@ func validateHardwareResources(minNodeCount, reqNodeCount int, nodeType string, 
 	res.Checks = append(res.Checks, checks)
 
 	return res
+}
+
+// instanceCountAndIpsCheck validates the count of IP Addresses matched with instance count
+func instanceCountAndIpsCheck(instanceCount, ipsCount int) models.Checks {
+	if instanceCount == ipsCount {
+		return createCheck(constants.INSTANCE_COUNT, true, constants.VALID_COUNT_IPS_SUCCESS_MESSAGE, "", "")
+	}
+	return createCheck(constants.INSTANCE_COUNT, false, "", constants.VALID_COUNT_IPS_ERROR_MESSAGE, constants.VALID_COUNT_IPS_RESOLUTION_MESSAGE)
 }
 
 // uniqueIP function will check that are we getting unique ips for each service.

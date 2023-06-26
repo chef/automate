@@ -40,6 +40,13 @@ var (
 			NodeType: "automate",
 			Checks: []models.Checks{
 				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
 					Title:         "IP address",
 					Passed:        true,
 					SuccessMsg:    "IP address is unique",
@@ -73,6 +80,13 @@ var (
 			IP:       "172.154.0.2",
 			NodeType: "automate",
 			Checks: []models.Checks{
+				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
 				{
 					Title:         "IP address",
 					Passed:        true,
@@ -108,6 +122,13 @@ var (
 			NodeType: "chef-infra-server",
 			Checks: []models.Checks{
 				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
 					Title:         "IP address",
 					Passed:        true,
 					SuccessMsg:    "IP address is unique",
@@ -141,6 +162,13 @@ var (
 			IP:       "172.154.0.4",
 			NodeType: "chef-infra-server",
 			Checks: []models.Checks{
+				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
 				{
 					Title:         "IP address",
 					Passed:        true,
@@ -176,6 +204,13 @@ var (
 			NodeType: "postgresql",
 			Checks: []models.Checks{
 				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
 					Title:         "IP address",
 					Passed:        true,
 					SuccessMsg:    "IP address is unique",
@@ -209,6 +244,13 @@ var (
 			IP:       "172.154.0.6",
 			NodeType: "postgresql",
 			Checks: []models.Checks{
+				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
 				{
 					Title:         "IP address",
 					Passed:        true,
@@ -244,6 +286,13 @@ var (
 			NodeType: "postgresql",
 			Checks: []models.Checks{
 				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
 					Title:         "IP address",
 					Passed:        true,
 					SuccessMsg:    "IP address is unique",
@@ -277,6 +326,13 @@ var (
 			IP:       "172.154.0.8",
 			NodeType: "opensearch",
 			Checks: []models.Checks{
+				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
 				{
 					Title:         "IP address",
 					Passed:        true,
@@ -312,6 +368,13 @@ var (
 			NodeType: "opensearch",
 			Checks: []models.Checks{
 				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
+				{
 					Title:         "IP address",
 					Passed:        true,
 					SuccessMsg:    "IP address is unique",
@@ -345,6 +408,13 @@ var (
 			IP:       "172.154.0.10",
 			NodeType: "opensearch",
 			Checks: []models.Checks{
+				{
+					Title:         "Instance count",
+					Passed:        true,
+					SuccessMsg:    "Number of IP Addresses are matched with the instance count",
+					ErrorMsg:      "",
+					ResolutionMsg: "",
+				},
 				{
 					Title:         "IP address",
 					Passed:        true,

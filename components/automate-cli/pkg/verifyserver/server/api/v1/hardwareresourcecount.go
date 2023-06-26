@@ -14,14 +14,6 @@ func (h *Handler) HardwareResourceCount(c *fiber.Ctx) error {
 		h.Logger.Error(err.Error())
 		return fiber.NewError(http.StatusBadRequest, "Invalid Body Request")
 	}
-
-	if req.AutomateNodeCount != len(req.AutomateNodeIps) ||
-		req.ChefInfraServerNodeCount != len(req.ChefInfraServerNodeIps) ||
-		req.PostgresqlNodeCount != len(req.PostgresqlNodeIps) ||
-		req.OpenSearchNodeCount != len(req.OpenSearchNodeIps) {
-		h.Logger.Error("Node Count and length of Node Ips should be equal.")
-		return fiber.NewError(http.StatusBadRequest, "Node Count and length of Node Ips should be equal.")
-	}
 	res := h.HardwareResourceCountService.GetHardwareResourceCount(*req)
 	return c.JSON(response.BuildSuccessResponse(res))
 }
