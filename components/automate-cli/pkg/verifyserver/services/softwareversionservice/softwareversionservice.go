@@ -49,7 +49,12 @@ const (
 	KERNAL_SUPPORTED_VERSION  = 3.2
 )
 
-var cmdCheckArray = []string{"mkdir", "useradd", "chown", "rm", "touch", "truncate", "echo", "sleep", "ls", "grep", "yum", "which", "cp", "curl", "bash", "sysctl", "cat", "sed", "mount", "mv", "systemd", "wget", "exec", "rsync"}
+var cmdCheckArray = []string{"mkdir", "useradd", "usermod", "groupadd", "chown", "chmod",
+	"rm", "touch", "truncate", "echo", "sleep", "ls", "ln",
+	"grep", "which", "cp", "curl", "bash", "sh",
+	"sysctl", "cat", "sed", "mount", "mv", "systemctl",
+	"wget", "rsync", "tar", "find", "sort", "awk",
+	"xargs", "tail", "umask", "eval", "id", "setenforce"}
 
 func (sv *SoftwareVersionService) GetSoftwareVersionDetails(query string) (*models.SoftwareVersionDetails, error) {
 	sv.logger.Debug("The query parameter entered: ", query)
