@@ -1,9 +1,7 @@
 package models
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
@@ -185,10 +183,6 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 
 	// not available in config
 	c.DeploymentState = ""
-	fmt.Printf("c: %+v\n", c)
-	bx, _ := json.MarshalIndent(c, "", "\t")
-
-    fmt.Printf("bx: %v\n", string(bx))
 	return nil
 }
 
