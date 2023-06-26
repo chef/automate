@@ -389,6 +389,53 @@ func TestGetPortReachableDetails(t *testing.T) {
 			},
 		},
 		{
+			"HTTPS Server connection without root ca",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        true,
+				SuccessMsg:    fmt.Sprintf(constants.PORT_REACHABLE_SUCCESS_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
+				ErrorMsg:      "",
+				ResolutionMsg: "",
+			},
+		},
+		{
+			"HTTPS Server running there but giving different server rootCA",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+				RootCA:                         DIFF_SERVER_ROOT_CA,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      fmt.Sprintf(constants.PORT_REACHABLE_ERROR_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
+				ResolutionMsg: fmt.Sprintf(constants.PORT_REACHABLE_RESOLUTION_MSG, httpsTestPort, LOCALHOST),
+			},
+		},
+		{
+			"HTTPS Server running there but giving wrong rootCA",
+			models.PortReachableRequest{
+				DestinationNodeIp:              LOCALHOST,
+				DestinationNodePort:            httpsTestPort,
+				DestinationNodeServiceProtocol: constants.HTTPS,
+				RootCA:                         WRONG_ROOT_CA,
+			},
+			models.Checks{
+				Title:         constants.PORT_REACHABLE,
+				Passed:        false,
+				SuccessMsg:    "",
+				ErrorMsg:      fmt.Sprintf(constants.PORT_REACHABLE_ERROR_MSG, constants.HTTPS, LOCALHOST, httpsTestPort),
+				ResolutionMsg: fmt.Sprintf(constants.PORT_REACHABLE_RESOLUTION_MSG, httpsTestPort, LOCALHOST),
+			},
+		},
+		{
 			"HTTPS Server running there but giving wrong response status code",
 			models.PortReachableRequest{
 				DestinationNodeIp:              LOCALHOST,
