@@ -52,12 +52,10 @@ func (ss *BatchCheckService) BatchCheck(checks []string, config *models.Config) 
 		checkTriggerRespMap = getBastionCheckResp(ss, bastionChecks, config)
 	}
 
-	if len(remoteChecks) > 0 {
-		config.DeploymentState, err = ss.getDeploymentState(config)
-		if err != nil {
-			ss.log.Error("Failed to get the Deployment state:", err)
-			return models.BatchCheckResponse{}, err
-		}
+	config.DeploymentState, err = ss.getDeploymentState(config)
+	if err != nil {
+		ss.log.Error("Failed to get the Deployment state:", err)
+		return models.BatchCheckResponse{}, err
 	}
 
 	successfullyStartedMockServers, notStartedMockServers := ss.startMockServerIfNeeded(remoteChecks, config)
