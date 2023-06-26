@@ -86,20 +86,36 @@ func (pr *PortReachableService) udpClient(protocolType, host, port string) error
 
 func (pr *PortReachableService) httpsClient(host, cert string, port int) error {
 	pr.log.Debug(fmt.Sprintf("Trying to connect https server on %s:%d", host, port))
-	caCertPool := x509.NewCertPool()
-	ok := caCertPool.AppendCertsFromPEM([]byte(cert))
-	if !ok {
-		return errors.New("certificate error: root_ca is not of correct format")
-	}
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:    caCertPool,
-				MinVersion: tls.VersionTLS12,
+	//Checking for insecure connection as root ca will not be available for https port
+	var client *http.Client
+	if cert != "" {
+		caCertPool := x509.NewCertPool()
+		ok := caCertPool.AppendCertsFromPEM([]byte(cert))
+		if !ok {
+			return errors.New("certificate error: root_ca is not of correct format")
+		}
+
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs:    caCertPool,
+					MinVersion: tls.VersionTLS12,
+				},
 			},
-		},
-		Timeout: time.Second * pr.timeout,
+			Timeout: time.Second * pr.timeout,
+		}
+	} else {
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+					MinVersion:         tls.VersionTLS12,
+				},
+			},
+			Timeout: time.Second * pr.timeout,
+		}
 	}
+
 	url := fmt.Sprintf("https://%s:%d", host, port)
 	pr.log.Debug("URL: ", url)
 	resp, err := client.Get(url)

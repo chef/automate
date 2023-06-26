@@ -103,18 +103,13 @@ const (
 						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
 						"error_msg": "",
 						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
+					},{
+						"title": "Check for reachability of service at destination port from the source node",
+						"passed": true,
+						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
+						"error_msg": "",
+						"resolution_msg": ""
+					},{
 						"title": "Check for reachability of service at destination port from the source node",
 						"passed": true,
 						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
@@ -123,92 +118,7 @@ const (
 					}
 				]
 			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": true,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port from the source node",
-						"passed": true,
-						"success_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is reachable fro <source_node_ip>",
-						"error_msg": "",
-						"resolution_msg": ""
-					}
-				]
-			}
-		}
+		}		
 	]
 	 `
 
@@ -243,103 +153,13 @@ const (
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
 						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
+					},{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
 						"success_msg": "",
 						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
 						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
-						"title": "Check for reachability of service at destination port",
-						"passed": false,
-						"success_msg": "",
-						"error_msg": "The <protocol> service running at <destination_node_ip>:<destination_node_port> is not reachable from <source_ip>",
-						"resolution_msg": "Check your firewall settings to provide access to <destination_node_port> port at <destination_node_ip> from <source_node_ip>"
-					}
-				]
-			}
-		},
-		{
-			"status": "SUCCESS",
-			"host": "127.0.0.1",
-			"node_type": "bastion",
-			"result": {
-				"passed": false,
-				"checks": [
-					{
+					},{
 						"title": "Check for reachability of service at destination port",
 						"passed": false,
 						"success_msg": "",
@@ -413,16 +233,20 @@ func TestMakeRequests(t *testing.T) {
 
 	requestsForchefServer, ok := mapRequests[constants.CHEF_INFRA_SERVER]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForchefServer), 6)
+	assert.Equal(t, 4, len(requestsForchefServer))
 
 	//As there are two postgress nodes which needs to interact with eachother
 	requestsForPostgres, ok := mapRequests[constants.POSTGRESQL]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForPostgres), 12)
+	assert.Equal(t, len(requestsForPostgres), 10)
 
 	requestsForOpensearch, ok := mapRequests[constants.OPENSEARCH]
 	assert.True(t, ok)
-	assert.Equal(t, len(requestsForOpensearch), 10)
+	assert.Equal(t, len(requestsForOpensearch), 8)
+
+	requestsForBastion, ok := mapRequests[constants.BASTION]
+	assert.True(t, ok)
+	assert.Equal(t, len(requestsForBastion), 11)
 
 	require.Equal(t, expected[0].SourceNodeIP, requestsForautomate[0].SourceNodeIP)
 	require.Equal(t, expected[0].DestinationNodeIP, requestsForautomate[0].DestinationNodeIP)
@@ -644,12 +468,8 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 4, len(resp))
-	assert.Equal(t, 2, len(resp["automate"]["tcp"]))
-	assert.Equal(t, 1, len(resp["automate"]["https"]))
-	assert.Equal(t, 2, len(resp["chef-infra-server"]["tcp"]))
-	assert.Equal(t, 1, len(resp["chef-infra-server"]["https"]))
-	assert.Equal(t, 5, len(resp["postgresql"]["tcp"]))
+	assert.Equal(t, 4, len(resp["postgresql"]["tcp"]))
 	assert.Equal(t, 1, len(resp["postgresql"]["udp"]))
-	assert.Equal(t, 4, len(resp["opensearch"]["tcp"]))
+	assert.Equal(t, 3, len(resp["opensearch"]["tcp"]))
 	assert.Equal(t, true, true)
 }

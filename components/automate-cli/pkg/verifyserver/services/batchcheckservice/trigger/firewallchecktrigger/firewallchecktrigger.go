@@ -7,7 +7,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/models"
 	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/services/batchcheckservice/trigger"
-	"github.com/chef/automate/components/automate-cli/pkg/verifyserver/utils/configutils"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -39,27 +38,24 @@ func (fc *FirewallCheck) Run(config *models.Config) []models.CheckTriggerRespons
 
 	response := triggerMultipleRequests(config, fc.log, endPoint, http.MethodPost, requestMap)
 
-	return response
+	return constructResponseFromOutput(response)
 }
 
 func (fc *FirewallCheck) GetPortsForMockServer() map[string]map[string][]int {
 	nodeTypePortMap := map[string]map[string][]int{
 		constants.AUTOMATE: {
-			constants.TCP:   []int{9631, 9638},
-			constants.HTTPS: []int{443},
-			constants.HTTP:  []int{80},
+			constants.HTTP: []int{80},
 		},
 		constants.CHEF_INFRA_SERVER: {
-			constants.TCP:   []int{9631, 9638},
-			constants.HTTP:  []int{80},
-			constants.HTTPS: []int{443},
+			constants.HTTP: []int{80},
 		},
 		constants.POSTGRESQL: {
-			constants.TCP: []int{7432, 9631, 5432, 6432, 9638},
+			constants.TCP: []int{7432, 9631, 5432, 6432},
 			constants.UDP: []int{9638},
 		},
 		constants.OPENSEARCH: {
-			constants.TCP: []int{9200, 9300, 9631, 9638},
+			constants.TCP: []int{9200, 9300, 9631},
+			constants.UDP: []int{9638},
 		},
 	}
 	return nodeTypePortMap
@@ -105,38 +101,11 @@ func getRequestsForAutomateAsSource(config *models.Config) []models.FirewallRequ
 
 }
 
-func getRootCertForNodeWithNodeTypeAndIP(certMap map[string]*models.Certificate, nodeType string, nodeIp string) string {
-
-	nodesCert, found := certMap[nodeType]
-	if found {
-		for _, cert := range nodesCert.Nodes {
-			if cert.IP == nodeIp {
-				return cert.RootCert
-			}
-		}
-	}
-
-	return ""
-}
-
 // getRequestsForChefServerAsSource gives the requests for all the ports where chefserver is the source
 func getRequestsForChefServerAsSource(config *models.Config) []models.FirewallRequest {
 
 	var reqBodies []models.FirewallRequest
-	certMap := configutils.GetCertificateMap(config.Certificate)
 	for _, sourceNodeIP := range config.Hardware.ChefInfraServerNodeIps {
-		//Dest Automate
-		for _, destNodeIP := range config.Hardware.AutomateNodeIps {
-			reqBody := models.FirewallRequest{
-				SourceNodeIP:               sourceNodeIP,
-				DestinationNodeIP:          destNodeIP,
-				DestinationServicePort:     "443",
-				DestinationServiceProtocol: "https",
-				RootCert:                   getRootCertForNodeWithNodeTypeAndIP(certMap, constants.AUTOMATE, destNodeIP),
-			}
-			reqBodies = append(reqBodies, reqBody)
-		}
-
 		// Dest postgres
 		for _, destNodeIP := range config.Hardware.PostgresqlNodeIps {
 			reqBody := models.FirewallRequest{
@@ -313,4 +282,37 @@ func triggerMultipleRequests(config *models.Config, log logger.Logger, endPoint,
 
 	close(outputCh)
 	return result
+}
+
+// constructResponseFromOutput constructing the final output from result in the format excepted by Batch Check service
+func constructResponseFromOutput(result []models.CheckTriggerResponse) []models.CheckTriggerResponse {
+
+	var response []models.CheckTriggerResponse
+	resultMap := make(map[string]models.CheckTriggerResponse)
+
+	for _, checkResponse := range result {
+		key := checkResponse.Host + "_" + checkResponse.NodeType
+		value, ok := resultMap[key]
+		if ok {
+			//Adding checks for the results
+			newChecks := value.Result.Checks
+			newChecks = append(newChecks, checkResponse.Result.Checks...)
+			//Adding the new checks to the result
+			value.Result.Checks = newChecks
+			if checkResponse.Result.Error != nil {
+				value.Result.Error = checkResponse.Result.Error
+			}
+			resultMap[key] = value
+		} else {
+			resultMap[key] = checkResponse
+		}
+
+	}
+
+	//Creating the check trigger response
+	for _, checkResponses := range resultMap {
+		response = append(response, checkResponses)
+	}
+
+	return response
 }

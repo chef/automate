@@ -602,6 +602,41 @@ func TestCertificateCheck_Run(t *testing.T) {
 
 	})
 
+	t.Run("Nodes Empty", func(t *testing.T) {
+		config := &models.Config{
+			Hardware: &models.Hardware{
+				AutomateNodeCount:        1,
+				AutomateNodeIps:          []string{"12.12.1.2"},
+				ChefInfraServerNodeCount: 1,
+				ChefInfraServerNodeIps:   []string{"12.12.1.3"},
+				PostgresqlNodeCount:      1,
+				PostgresqlNodeIps:        []string{"12.12.1.4"},
+				OpenSearchNodeCount:      1,
+				OpenSearchNodeIps:        []string{"12.12.1.5"},
+			},
+			Certificate: []*models.Certificate{
+				{
+					Fqdn:         "example.com",
+					FqdnRootCert: "root_ca",
+					NodeType:     constants.AUTOMATE,
+					Nodes:        []*models.NodeCert{},
+				},
+			},
+		}
+
+		suc := NewCertificateCheck(logger.NewLogrusStandardLogger(), "8080")
+		ctr := suc.Run(config)
+
+		require.Len(t, ctr, 1)
+
+		for _, v := range ctr {
+			require.Equal(t, constants.CERTIFICATE, v.Result.Check)
+			assert.NotEmpty(t, v.Host)
+			require.True(t, v.Result.Skipped)
+		}
+
+	})
+
 }
 
 func TestGetPortsForMockServer(t *testing.T) {
@@ -609,4 +644,57 @@ func TestGetPortsForMockServer(t *testing.T) {
 	resp := fwc.GetPortsForMockServer()
 
 	assert.Equal(t, 0, len(resp))
+}
+
+func Test_skipCertificateForAutomateAndChefServerNodes(t *testing.T) {
+	type args struct {
+		nodeType    string
+		hardwareMap map[string][]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []models.CheckTriggerResponse
+	}{{
+		name: "Check response for automate nodes",
+		args: args{
+			nodeType: constants.AUTOMATE,
+			hardwareMap: map[string][]string{
+				"test_ip":  {constants.AUTOMATE},
+				"test_ip2": {constants.AUTOMATE},
+			},
+		},
+		want: []models.CheckTriggerResponse{
+			{
+				Host:      "test_ip",
+				NodeType:  constants.AUTOMATE,
+				CheckType: constants.CERTIFICATE,
+				Result: models.ApiResult{
+					Skipped: true,
+					Passed:  false,
+					Check:   constants.CERTIFICATE,
+				},
+			}, {
+				Host:      "test_ip2",
+				NodeType:  constants.AUTOMATE,
+				CheckType: constants.CERTIFICATE,
+				Result: models.ApiResult{
+					Skipped: true,
+					Passed:  false,
+					Check:   constants.CERTIFICATE,
+				},
+			},
+		},
+	},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := skipCertificateForAutomateAndChefServerNodes(tt.args.nodeType, tt.args.hardwareMap)
+			assert.Equal(t, len(tt.want), len(got))
+			for _, w := range tt.want {
+				assert.Contains(t, got, w)
+			}
+
+		})
+	}
 }

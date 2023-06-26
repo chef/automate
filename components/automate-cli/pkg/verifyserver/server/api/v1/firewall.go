@@ -44,12 +44,6 @@ func (h *Handler) FirewallCheck(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "source_node_ip and destination_node_ip cannot be same")
 	}
 
-	// For https protocol root_ca is mandatory
-	if strings.TrimSpace(reqBody.DestinationServiceProtocol) == constants.HTTPS &&
-		strings.TrimSpace(reqBody.RootCert) == "" {
-		return fiber.NewError(http.StatusBadRequest, "root_cert value is mandatory for protocol https")
-	}
-
 	// Supported protocol check
 	if strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.TCP &&
 		strings.TrimSpace(reqBody.DestinationServiceProtocol) != constants.UDP &&

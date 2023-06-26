@@ -70,6 +70,10 @@ func getResultFromOutputChan(reqList int, outputCh chan models.CheckTriggerRespo
 }
 
 func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
+	//passing a default value if s3 bucket path not provided
+	if object.BasePath == "" {
+		object.BasePath = "automate"
+	}
 	return models.S3ConfigRequest{
 		Endpoint:   object.Endpoint,
 		BucketName: object.BucketName,
@@ -82,7 +86,6 @@ func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
 
 func isObjectStorage(backup *models.Backup) bool {
 	return backup.ObjectStorage.BucketName == "" ||
-		backup.ObjectStorage.BasePath == "" ||
 		backup.ObjectStorage.AccessKey == "" ||
 		backup.ObjectStorage.SecretKey == "" ||
 		backup.ObjectStorage.AWSRegion == ""

@@ -173,7 +173,7 @@ var (
 )
 
 func TestAppendCertsByIpToNodeCerts(t *testing.T) {
-	// // Test case 1: certsByIP is nil, ipList is not empty
+	// Test case 1: certsByIP is nil, ipList is not empty
 	ipList := []string{"192.168.0.3", "192.168.0.4"}
 	privateKey := "private_key"
 	publicKey := "public_key"
@@ -269,6 +269,54 @@ func TestAppendCertsByIpToNodeCerts(t *testing.T) {
 		found := containsElement(actual, expectedNode)
 		if !found {
 			t.Errorf("Test case 2 failed: Expected node %+v not found in the result.", expectedNode)
+		}
+	}
+
+	//Test case 3: certsByIP is not nil, ipList is not nil
+	certByIps = []config.CertByIP{
+		{
+			IP:         "1.1.1.1",
+			PrivateKey: "private1",
+			PublicKey:  "public1",
+		},
+		{
+			IP:         "1.1.1.2",
+			PrivateKey: "private1",
+			PublicKey:  "public1",
+		},
+	}
+	ipList = []string{"1.1.1.1", "1.1.1.2"}
+	privateKey = "private_key"
+	publicKey = "public_key"
+	adminKey = "admin_key"
+	adminCert = "admin_cert"
+
+	actual = appendCertsByIpToNodeCerts(&certByIps, ipList, privateKey, publicKey, adminKey, adminCert, "")
+
+	expected = []*NodeCert{
+		{
+			IP:        "1.1.1.1",
+			Key:       "private1",
+			Cert:      "public1",
+			AdminKey:  "admin_key",
+			AdminCert: "admin_cert",
+			RootCert:  "",
+		},
+		{
+			IP:        "1.1.1.2",
+			Key:       "private1",
+			Cert:      "public1",
+			AdminKey:  "admin_key",
+			AdminCert: "admin_cert",
+			RootCert:  "",
+		},
+	}
+
+	//Check if each expected element exists in the actual result
+	for _, expectedNode := range expected {
+		found := containsElement(actual, expectedNode)
+		if !found {
+			t.Errorf("Test case 4 failed: Expected node %+v not found in the result.", expectedNode)
 		}
 	}
 }

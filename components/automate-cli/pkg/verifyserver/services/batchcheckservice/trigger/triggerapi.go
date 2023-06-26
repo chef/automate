@@ -115,7 +115,7 @@ func TriggerCheckAPI(endPoint, host, nodeType, method string, output chan<- mode
 	}
 
 	client := http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: 35 * time.Second,
 	}
 	resp, err := client.Do(req)
 	if err != nil {

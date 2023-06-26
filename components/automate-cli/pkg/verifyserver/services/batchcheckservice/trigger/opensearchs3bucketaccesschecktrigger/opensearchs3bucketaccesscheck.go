@@ -37,6 +37,11 @@ func (osb *OpensearchS3BucketAccessCheck) Run(config *models.Config) []models.Ch
 		}
 	}
 
+	//Passing a default value if s3 bucket path not provided
+	if config.Backup.ObjectStorage.BasePath == "" {
+		config.Backup.ObjectStorage.BasePath = "automate"
+	}
+
 	s3OpensearchBackupRequest := models.S3BackupDetails{
 		Endpoint:   config.ExternalOS.OSDomainURL,
 		Username:   config.ExternalOS.OSUsername,
@@ -97,7 +102,6 @@ func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
 
 func isObjectStorage(backup *models.Backup) bool {
 	return backup.ObjectStorage.BucketName == "" ||
-		backup.ObjectStorage.BasePath == "" ||
 		backup.ObjectStorage.AccessKey == "" ||
 		backup.ObjectStorage.SecretKey == "" ||
 		backup.ObjectStorage.AWSRegion == ""
