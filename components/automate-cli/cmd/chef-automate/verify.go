@@ -240,7 +240,6 @@ func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []str
 		return c.runVerifyCmd(cmd, args, flagsObj)
 	}
 }
-
 func (v *verifyCmdFlow) runVerifyCmd(cmd *cobra.Command, args []string, flagsObj *verifyCmdFlags) error {
 	v.prettyPrint = flagsObj.prettyPrint
 	return v.RunVerify(flagsObj.config)
@@ -402,10 +401,10 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 
 	// TODO: Need to check if automate-verify service is already running on remote nodes and upgrade if needed.
 	hostIPs := v.getHostIPs(
-		v.automateIPs,
-		v.chefServerIPs,
-		v.postgresqlIPs,
-		v.opensearchIPs,
+		batchCheckConfig.Hardware.AutomateNodeIps,
+		batchCheckConfig.Hardware.ChefInfraServerNodeIps,
+		batchCheckConfig.Hardware.PostgresqlNodeIps,
+		batchCheckConfig.Hardware.OpenSearchNodeIps,
 	)
 	sshConfig := sshutils.NewSshConfig("", v.sshPort, v.sshKeyFile, v.sshUserName)
 
@@ -417,7 +416,7 @@ func (v *verifyCmdFlow) runVerifyServiceForRemote(batchCheckConfig models.Config
 	}
 
 	if len(hostIPsToCopyLatestCLI) > 0 {
-		v.Writer.Printf("Copying CLI to the follwoing IPs: %v", hostIPsToCopyLatestCLI)
+		v.Writer.Printf("Copying CLI to the following IPs: %v", hostIPsToCopyLatestCLI)
 		// Copying Latest CLI binary to remote nodes
 		err = v.copyCLIOnRemoteNodes(destFileName, sshConfig, hostIPsToCopyLatestCLI)
 		if err != nil {
@@ -505,10 +504,9 @@ func (v *verifyCmdFlow) createSystemdOnBastion() error {
 func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckRequest, nodeType string) ([]byte, error) {
 	v.Writer.Printf("Doing batch-check API call for %s\n", nodeType)
 	batchCheckAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), batchCheckAPIRoute)
-	v.Writer.Printf("batchCheckAPIEndpoint: %s\n", batchCheckAPIEndpoint)
-	v.Writer.Printf("requestBody: %v\n",requestBody)
+	fmt.Printf("batchCheckAPIEndpoint: %v\n", batchCheckAPIEndpoint)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
-	v.Writer.Printf("responseBody: %v\n",responseBody)
+	v.Writer.Printf("responseBody: %v\n", responseBody)
 	if err != nil {
 		if responseBody != nil {
 			return nil, fmt.Errorf("error while doing batch-check API call for %s:\n%s", nodeType, string(responseBody))
