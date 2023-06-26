@@ -74,8 +74,8 @@ func runCheckForOpensearch(config *models.Config, port string, log logger.Logger
 
 }
 
-func getOpensearchRequest(details *models.ExternalOS) models.ExternalOS {
-	return models.ExternalOS{
+func getOpensearchRequest(details *models.ExternalOS) models.ExternalOSRequest {
+	return models.ExternalOSRequest{
 		OSDomainName:   details.OSDomainName,
 		OSDomainURL:    details.OSDomainURL,
 		OSUsername:     details.OSUsername,
@@ -104,8 +104,7 @@ func isEmptyExternalOS(externalOS *models.ExternalOS) bool {
 		externalOS.OSDomainURL == "" ||
 		externalOS.OSUsername == "" ||
 		externalOS.OSUserPassword == "" ||
-		externalOS.OSCert == "" ||
-		externalOS.OSRoleArn == ""
+		externalOS.OSCert == ""
 }
 
 func externalOSEmptyResp(config *models.Config, checkType string) []models.CheckTriggerResponse {

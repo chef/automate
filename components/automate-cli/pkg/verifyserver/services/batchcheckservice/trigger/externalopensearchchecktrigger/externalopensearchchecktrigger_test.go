@@ -216,14 +216,13 @@ const (
 	oSRoleArn      = "arn:aws:iam::123456789012:role/MyRole"
 )
 
-func getRequest() models.ExternalOS {
-	return models.ExternalOS{
+func getRequest() models.ExternalOSRequest {
+	return models.ExternalOSRequest{
 		OSDomainName:   osDomainName,
 		OSDomainURL:    osDomainURL,
 		OSUsername:     osUsername,
 		OSUserPassword: osUserPassword,
 		OSCert:         osCert,
-		OSRoleArn:      "",
 	}
 
 }
@@ -351,8 +350,7 @@ func TestOpensearchCheck_Run(t *testing.T) {
 						OSDomainURL:    osDomainURL,
 						OSUsername:     osUsername,
 						OSUserPassword: osUserPassword,
-						OSCert:         osCert,
-						OSRoleArn:      "",
+						OSCert:         "",
 					},
 				},
 			},
@@ -526,7 +524,7 @@ func TestForChefserverOpensearch(t *testing.T) {
 func createDummyServer(t *testing.T, requiredStatusCode int, isPassed bool) (*httptest.Server, string, string) {
 	if requiredStatusCode == http.StatusOK {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var got models.ExternalOS
+			var got models.ExternalOSRequest
 			req := r.Body
 			reader, _ := io.ReadAll(req)
 			json.Unmarshal(reader, &got)
