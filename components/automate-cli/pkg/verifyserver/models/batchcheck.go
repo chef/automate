@@ -91,6 +91,20 @@ type Config struct {
 	APIToken        string         `json:"api_token"`
 }
 
+func NewConfig() *Config {
+	return &Config{
+		Hardware:    &Hardware{},
+		Certificate: []*Certificate{},
+		SSHUser:     &SSHUser{},
+		Backup: &Backup{
+			FileSystem:    &FileSystem{},
+			ObjectStorage: &ObjectStorage{},
+		},
+		ExternalOS: &ExternalOS{},
+		ExternalPG: &ExternalPG{},
+	}
+}
+
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
 	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
@@ -144,6 +158,9 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 	if err != nil {
 		return err
 	}
+	// initialize config
+	c = NewConfig()
+
 	if err = c.populateCommonConfig(haConfig); err != nil {
 		return err
 	}
