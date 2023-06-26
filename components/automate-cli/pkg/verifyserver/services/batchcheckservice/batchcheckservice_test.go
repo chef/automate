@@ -1143,3 +1143,50 @@ func TestConstructResult(t *testing.T) {
 	assert.Empty(t, result[0].Tests)
 	assert.Len(t, result, 1)
 }
+
+func TestBastionBatchChecks(t *testing.T) {
+	ss := NewBatchCheckService(trigger.NewCheckTrigger(SetupMockHardwareResourceCountCheck([]models.CheckTriggerResponse{
+		{
+			Status:   "Passed",
+			Host:     "1.2.3.4",
+			NodeType: "automate",
+			Result: models.ApiResult{
+				Passed: false,
+				Checks: []models.Checks{
+					{
+						Title: "hardware-resource-count-check-1",
+					},
+					{
+						Title: "hardware-resource-count-check-2",
+					},
+				},
+			},
+		},
+	}),
+		SetupMockSshUserAccessCheck(nil),
+		SetupMockCertificateCheck(),
+		SetupMockExternalOpenSearchCheck(nil),
+		SetupMockExternalPostgresCheck(nil),
+		SetupMockFirewallCheck(),
+		SetupMockFqdnCheck(),
+		SetupMockNfsBackupConfigCheck(),
+		SetupMockOpenSearchS3BucketAccessCheck(),
+		SetupMockS3BackupConfigCheck(),
+		SetupMockSoftwareVersionCheck(),
+		SetupMockSystemResourceCheck(),
+		SetupMockSystemUserCheck(),
+	), logger.NewTestLogger(), "1234")
+
+	checksToExecute := []string{
+		constants.HARDWARE_RESOURCE_COUNT,
+	}
+	resp, err := ss.BatchCheck(checksToExecute, &models.Config{
+		Hardware: &models.Hardware{
+			AutomateNodeCount:        1,
+			AutomateNodeIps:          []string{"1.2.3.4"},
+		},
+	})
+	assert.Equal(t, nil, err)
+	assert.Equal(t, false, resp.Passed)
+	assert.Equal(t, "{\"node_type\":\"automate\",\"ip\":\"1.2.3.4\",\"tests\":[{\"passed\":false,\"msg\":\"Hardware Resource Count Check\",\"check\":\"hardware-resource-count\",\"checks\":[{\"title\":\"hardware-resource-count-check-1\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false},{\"title\":\"hardware-resource-count-check-2\",\"passed\":false,\"success_msg\":\"\",\"error_msg\":\"\",\"resolution_msg\":\"\",\"skipped\":false}],\"skipped\":false}]}", getResponseForIp(resp.NodeResult, "1.2.3.4", "automate"))
+}
