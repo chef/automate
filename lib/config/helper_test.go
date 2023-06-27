@@ -363,7 +363,7 @@ func TestValidateS3Endpoint(t *testing.T) {
 		expectedError bool
 	}{
 		{
-			name:          "Valid Endpoint",
+			name:          "Empty Endpoint",
 			endpoint:      "",
 			expectedError: true,
 		},
