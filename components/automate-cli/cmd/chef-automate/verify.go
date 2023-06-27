@@ -319,7 +319,8 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		v.opensearchIPs = configDetails.OpensearchIps
 
 		batchCheckConfig.ExternalOS.OSRoleArn = configDetails.OsSnapshotRoleArn
-
+		batchCheckConfig.ExternalOS.OsSnapshotUserAccessKeyId = configDetails.OsSnapshotUserID
+		batchCheckConfig.ExternalOS.OsSnapshotUserAccessKeySecret = configDetails.OsSnapshotUserSecret
 		// assign ip's to models.Hardware
 		batchCheckHardware := batchCheckConfig.Hardware
 		batchCheckHardware.AutomateNodeIps = configDetails.AutomateIps

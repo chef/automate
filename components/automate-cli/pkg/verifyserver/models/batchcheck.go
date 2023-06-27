@@ -64,12 +64,14 @@ type Certificate struct {
 }
 
 type ExternalOS struct {
-	OSDomainName   string `json:"opensearch_domain_name"`
-	OSDomainURL    string `json:"opensearch_domain_url"`
-	OSUsername     string `json:"opensearch_username"`
-	OSUserPassword string `json:"opensearch_user_password"`
-	OSCert         string `json:"opensearch_cert"`
-	OSRoleArn      string `json:"opensearch_role_arn"`
+	OSDomainName                  string `json:"opensearch_domain_name"`
+	OSDomainURL                   string `json:"opensearch_domain_url"`
+	OSUsername                    string `json:"opensearch_username"`
+	OSUserPassword                string `json:"opensearch_user_password"`
+	OSCert                        string `json:"opensearch_cert"`
+	OSRoleArn                     string `json:"opensearch_role_arn"`
+	OsSnapshotUserAccessKeySecret string `json:"os_snapshot_user_access_key_secret"`
+	OsSnapshotUserAccessKeyId     string `json:"os_snapshot_user_access_key_id"`
 }
 
 type ExternalPG struct {

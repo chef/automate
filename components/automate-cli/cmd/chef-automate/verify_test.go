@@ -3,9 +3,6 @@ package main
 import (
 	"errors"
 	"net/http"
-	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -26,25 +23,9 @@ const (
 	DARWIN              = "darwin"
 )
 
+var AwsAutoTfvarsJsonStringEmpty = `{}`
+
 func TestRunVerifyCmd(t *testing.T) {
-	var file *os.File
-	// In mac we can't able to create folder at root level. that's why we are ignoring the testcases(aws testcases) which required
-	// to read the file from the root directory.
-	if runtime.GOOS != DARWIN {
-		dirPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment")
-		filePath := dirPath + "/output.auto.tfvars"
-
-		err := os.MkdirAll(dirPath, os.ModePerm)
-		assert.NoError(t, err, "Error creating directories")
-
-		file, err = os.Create(filePath)
-		assert.NoError(t, err, "Error creating file")
-		defer os.Remove(file.Name())
-
-		_, err = file.WriteString(OutputAutoTfvarsFileContent)
-		assert.NoError(t, err)
-	}
-
 	tests := []struct {
 		description              string
 		mockHttputils            *httputils.MockHTTPClient
@@ -55,6 +36,7 @@ func TestRunVerifyCmd(t *testing.T) {
 		configFile               string
 		wantErr                  error
 		IsAws                    bool
+		ConvTfvarToJsonFunc      func(string) string
 	}{
 		{
 			description: "bastion with existing automate-verify - success",
@@ -112,16 +94,25 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
 			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return ""
+			},
 		},
 		{
 			description: "bastion with aws automate-verify - success",
 			IsAws:       true,
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       nil,
-					}, []byte(`{"status":"success"}`), nil
+					}, []byte(STATUS_API_RESPONSE), nil
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
@@ -156,6 +147,9 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
 			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
 		},
 		{
 			description: "bastion on prem without automate-verify - success",
@@ -210,19 +204,25 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
 			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return ""
+			},
 		},
 		{
 			description: "bastion aws without automate-verify - success",
 			IsAws:       true,
 			mockHttputils: &httputils.MockHTTPClient{
 				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
-					if requestMethod == http.MethodGet {
-						return nil, nil, errors.New("some error occurred")
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
 					}
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       nil,
-					}, []byte(`{"status":"success"}`), nil
+					}, []byte(STATUS_API_RESPONSE), nil
 				},
 			},
 			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
@@ -257,14 +257,15 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
 			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			if tt.IsAws && runtime.GOOS == DARWIN {
-				return
-			}
+			ConvTfvarToJsonFunc = tt.ConvTfvarToJsonFunc
 			cw := majorupgrade_utils.NewCustomWriter()
 
 			vc := NewVerifyCmdFlow(tt.mockHttputils,
@@ -288,11 +289,6 @@ func TestRunVerifyCmd(t *testing.T) {
 				assert.NoError(t, err)
 			}
 		})
-	}
-
-	if runtime.GOOS != DARWIN {
-		err := file.Close()
-		assert.NoError(t, err)
 	}
 }
 

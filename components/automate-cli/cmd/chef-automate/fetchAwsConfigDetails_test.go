@@ -2,9 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -27,49 +24,40 @@ os_snapshot_user_access_key_id = " "
 os_snapshot_user_access_key_secret = " "`
 
 func Test_fetchAwsConfigFromTerraform(t *testing.T) {
-	// In mac we can't create directory at root level, but for this test we need directory at root level.
-	// So we are omitting the test in case of Mac OS.
-	if runtime.GOOS == "darwin" {
-		return
-	}
 	params := new(configDetails)
 	err := json.Unmarshal([]byte(AwsAutoTfvarsJsonString), &params)
 	assert.NoError(t, err)
 
-	dirPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment")
-	filePath := dirPath + "/output.auto.tfvars"
-
-	err = os.MkdirAll(dirPath, os.ModePerm)
-	assert.NoError(t, err, "Error creating directories")
-
-	file, err := os.Create(filePath)
-	assert.NoError(t, err, "Error creating file")
-	defer os.Remove(file.Name())
-
 	tests := []struct {
-		TestName       string
-		ExpectedOutput *configDetails
-		WriteString    string
-		ExpectedError  error
+		TestName            string
+		ExpectedOutput      *configDetails
+		WriteString         string
+		ExpectedError       error
+		ConvTfvarToJsonFunc func(string) string
 	}{
 		{
 			TestName:       "Valid Content",
 			ExpectedOutput: params,
 			WriteString:    OutputAutoTfvarsFileContent,
 			ExpectedError:  nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonString
+			},
 		},
 		{
 			TestName:       "Invalid Content",
 			ExpectedOutput: nil,
 			WriteString:    "test",
 			ExpectedError:  errors.New(""),
+			ConvTfvarToJsonFunc: func(string) string {
+				return ""
+			},
 		},
 	}
 
 	for _, e := range tests {
-		_, err = file.WriteString(e.WriteString)
-		assert.NoError(t, err)
 		t.Run(e.TestName, func(t *testing.T) {
+			ConvTfvarToJsonFunc = e.ConvTfvarToJsonFunc
 			res, err := fetchAwsConfigFromTerraform()
 			if e.ExpectedError != nil {
 				assert.Error(t, err)
@@ -79,7 +67,4 @@ func Test_fetchAwsConfigFromTerraform(t *testing.T) {
 			assert.Equal(t, e.ExpectedOutput, res)
 		})
 	}
-
-	err = file.Close()
-	assert.NoError(t, err)
 }
