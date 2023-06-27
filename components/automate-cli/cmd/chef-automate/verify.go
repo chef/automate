@@ -267,7 +267,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 			return err
 		}
 	} else {
-		infra, err := v.deps.getAutomateHAInfraDetails()
+		infra, err := getAutomateHAInfraDetails()
 		if err != nil {
 			return err
 		}
@@ -279,7 +279,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
 
-		config, err := v.deps.PopulateHaCommonConfig(configPuller)
+		config, err := PopulateHaCommonConfig(configPuller)
 		if err != nil {
 			return err
 		}
@@ -291,7 +291,20 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	}
 
 	// Get config required for batch-check API call
-	batchCheckConfig := models.NewConfig()
+	batchCheckConfig := &models.Config{
+		Hardware: &models.Hardware{},
+		SSHUser:  &models.SSHUser{},
+		Backup: &models.Backup{
+			FileSystem:    &models.FileSystem{},
+			ObjectStorage: &models.ObjectStorage{},
+		},
+	}
+
+	err := batchCheckConfig.PopulateWith(v.Config)
+	if err != nil {
+		return err
+	}
+
 	if v.Config.IsExistingInfra() {
 		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
 
