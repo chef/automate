@@ -23,13 +23,14 @@ const (
 	STATUS_API_RESPONSE = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
 	BATCH_CHECK_REQUEST = `{"status":"SUCCESS","result":{"passed":true,"node_result":[]}}`
 	AWS_CONFIG_FILE     = "/valid_config.toml"
+	DARWIN              = "darwin"
 )
 
 func TestRunVerifyCmd(t *testing.T) {
 	var file *os.File
 	// In mac we can't able to create folder at root level. that's why we are ignoring the testcases(aws testcases) which required
 	// to read the file from the root directory.
-	if runtime.GOOS != "darwin" {
+	if runtime.GOOS != DARWIN {
 		dirPath := filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment")
 		filePath := dirPath + "/output.auto.tfvars"
 
@@ -261,7 +262,7 @@ func TestRunVerifyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			if tt.IsAws && runtime.GOOS == "darwin" {
+			if tt.IsAws && runtime.GOOS == DARWIN {
 				return
 			}
 			cw := majorupgrade_utils.NewCustomWriter()
@@ -289,7 +290,7 @@ func TestRunVerifyCmd(t *testing.T) {
 		})
 	}
 
-	if runtime.GOOS != "darwin" {
+	if runtime.GOOS != DARWIN {
 		err := file.Close()
 		assert.NoError(t, err)
 	}
