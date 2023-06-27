@@ -12,6 +12,7 @@ const (
 	Red = iota
 	Green
 	Yellow
+	Grey
 )
 
 const (
@@ -19,6 +20,7 @@ const (
 	Success
 	Warning
 	SquareBracket
+	Skipped
 )
 
 type Reporting interface {
@@ -85,6 +87,7 @@ func (r *ReportingModule) AppendSpecialCharater(symbol int, str string) string {
 	failedSymbol := "✖ "
 	successSymbol := "✔ "
 	warningSymbol := "! "
+	skippedSymbol := "⊖ "
 
 	switch symbol {
 	case Failed:
@@ -98,6 +101,9 @@ func (r *ReportingModule) AppendSpecialCharater(symbol int, str string) string {
 		return msg
 	case SquareBracket:
 		msg := "[ " + str + " ] "
+		return msg
+	case Skipped:
+		msg := skippedSymbol + str
 		return msg
 	}
 
@@ -114,6 +120,8 @@ func (r *ReportingModule) ChangeColour(fgColor int, msg string) string {
 		return color.New(color.FgGreen).Sprint(msg)
 	case Yellow:
 		return color.New(color.FgYellow).Sprint(msg)
+	case Grey:
+		return color.New(90).Sprint(msg)
 	default:
 		return msg
 	}

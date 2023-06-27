@@ -606,20 +606,16 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 	for _, batchCheckResult := range batchCheckResults {
 
 		for _, test := range batchCheckResult.Tests {
-
-			if test.Skipped {
-				continue
-			}
-
 			report := reporting.VerificationReport{}
 			report.TableKey = batchCheckResult.NodeType
-
 			info := reporting.Info{}
 			info.Hostip = batchCheckResult.Ip
 
 			info.Parameter = test.Check
 
-			if test.Passed {
+			if test.Skipped {
+				info.Status = "Skipped"
+			} else if test.Passed {
 				info.Status = "Success"
 			} else {
 				info.Status = "Failed"
