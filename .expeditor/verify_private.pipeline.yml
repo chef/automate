@@ -932,8 +932,8 @@ steps:
 
   - label: "ocid"
     command:
-      - integration/run_test integration/tests/testing_ocid.sh
       - integration/run_test integration/tests/testing_ocid_config_patch.sh
+      - integration/run_test integration/tests/testing_ocid.sh
     timeout_in_minutes: 15
     expeditor:
       secrets:
