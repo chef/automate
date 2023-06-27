@@ -506,7 +506,6 @@ func (v *verifyCmdFlow) makeBatchCheckAPICall(requestBody models.BatchCheckReque
 	batchCheckAPIEndpoint := getAPIEndpoint(LOCALHOST, getPort(), batchCheckAPIRoute)
 	fmt.Printf("batchCheckAPIEndpoint: %v\n", batchCheckAPIEndpoint)
 	_, responseBody, err := v.Client.MakeRequest(http.MethodPost, batchCheckAPIEndpoint, requestBody)
-	v.Writer.Printf("responseBody: %v\n", responseBody)
 	if err != nil {
 		if responseBody != nil {
 			return nil, fmt.Errorf("error while doing batch-check API call for %s:\n%s", nodeType, string(responseBody))
