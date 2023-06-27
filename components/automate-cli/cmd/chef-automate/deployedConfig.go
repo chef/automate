@@ -7,25 +7,21 @@ import (
 )
 
 func PopulateHaCommonConfig(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
-	modeOfDeployment := getModeOfDeployment()
-	if modeOfDeployment == EXISTING_INFRA_MODE {
-		existingInfraConfig, err := configPuller.fetchInfraConfig()
-		if err != nil {
-			return nil, err
-		}
-		if existingInfraConfig != nil {
-			return CopyExistingInfra(existingInfraConfig), nil
-		}
+	existingInfraConfig, err := configPuller.fetchInfraConfig()
+	if err != nil {
+		return nil, err
 	}
-	if modeOfDeployment == AWS_MODE {
-		awsConfig, err := configPuller.fetchAwsConfig()
-		if err != nil {
-			return nil, err
-		}
+	if existingInfraConfig != nil {
+		return CopyExistingInfra(existingInfraConfig), nil
+	}
 
-		if awsConfig != nil {
-			return CopyAws(awsConfig), nil
-		}
+	awsConfig, err := configPuller.fetchAwsConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	if awsConfig != nil {
+		return CopyAws(awsConfig), nil
 	}
 
 	return nil, errors.New("deployed config was not found")
