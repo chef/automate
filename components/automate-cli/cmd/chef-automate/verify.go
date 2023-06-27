@@ -269,7 +269,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		}
 		sshUtil := NewSSHUtil(sshConfig)
 		configPuller := NewPullConfigs(infra, sshUtil)
-		fmt.Println("Populate HA common config calling")
+
 		config, err := PopulateHaCommonConfig(configPuller)
 		if err != nil {
 			log.Println(err)
@@ -283,25 +283,70 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		}
 	}
 	// Get config required for batch-check API call
-	batchCheckConfig := models.NewConfig()
+	batchCheckConfig := &models.Config{
+		Hardware: &models.Hardware{},
+		SSHUser:  &models.SSHUser{},
+		Backup: &models.Backup{
+			FileSystem:    &models.FileSystem{},
+			ObjectStorage: &models.ObjectStorage{},
+		},
+	}
 	err := batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {
 		return err
 	}
 
-	// TODO: For now just print the result as json. Need to merge the result with the response from batch-check API call for remote.
+	if v.Config.IsExistingInfra() {
+		v.sshPort, v.sshKeyFile, v.sshUserName = v.getSSHConfig(v.Config.Architecture.ExistingInfra)
 
+		v.automateIPs = v.Config.ExistingInfra.Config.AutomatePrivateIps
+		v.chefServerIPs = v.Config.ExistingInfra.Config.ChefServerPrivateIps
+		v.postgresqlIPs = v.Config.ExistingInfra.Config.PostgresqlPrivateIps
+		v.opensearchIPs = v.Config.ExistingInfra.Config.OpensearchPrivateIps
+	}
+
+	var batchCheckResultBastion, batchCheckResultRemote models.BatchCheckResponse
+	var batchCheckResults []models.BatchCheckResult
+
+	// Doing batch-check API call for bastion
 	resBastion, err := v.runVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
-	v.Writer.Printf("Response for batch-check API on bastion: \n%s\n", string(resBastion))
 
+	if err := json.Unmarshal(resBastion, &batchCheckResultBastion); err != nil {
+		return fmt.Errorf("failed to unmarshal batch-check API result field for bastion: %v", err)
+	}
+
+	batchCheckResults = append(batchCheckResults, batchCheckResultBastion.NodeResult...)
+
+	// If batch-check API failed on bastion
+	if !batchCheckResultBastion.Passed {
+		v.printResponse(batchCheckResults)
+		return fmt.Errorf("batch-check API failed on bastion")
+	}
+
+	// Doing batch-check API call for remote nodes
 	resRemote, err := v.runVerifyServiceForRemote(*batchCheckConfig)
 	if err != nil {
 		return err
 	}
-	v.Writer.Printf("Response for batch-check API on remote nodes: \n%s\n", string(resRemote))
+	
+	if err := json.Unmarshal(resRemote, &batchCheckResultRemote); err != nil {
+		return fmt.Errorf("failed to unmarshal batch-check API result field for remote nodes: %v", err)
+	}
+
+	// Appending batch-check API result for remote nodes to batch-check API result for bastion
+	batchCheckResults = append(batchCheckResults, batchCheckResultRemote.NodeResult...)
+
+	// If batch-check API failed on remote nodes
+	if !batchCheckResultRemote.Passed {
+		v.printResponse(batchCheckResults)
+		return fmt.Errorf("batch-check API failed on remote nodes")
+	}
+
+	// Printing response for success case
+	v.printResponse(batchCheckResults)
 
 	return nil
 }
