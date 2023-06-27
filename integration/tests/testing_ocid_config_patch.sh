@@ -18,7 +18,7 @@ source .studio/chef-server-collection
 # }
 
 do_create_config() {
-    do_create_config_default
+    # do_create_config_default
     
     #shellcheck disable=SC2154
     cat <<EOF >> "$test_config_path"
