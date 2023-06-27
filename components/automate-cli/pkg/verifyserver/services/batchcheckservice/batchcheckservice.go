@@ -521,7 +521,7 @@ func constructBatchCheckResponse(checkTriggerRespMap map[string][]models.CheckTr
 	isPassed := true
 	for _, v := range result {
 		for _, checksResult := range v.Tests {
-			if !checksResult.Passed {
+			if !checksResult.Passed && !checksResult.Skipped {
 				isPassed = false
 				break
 			}

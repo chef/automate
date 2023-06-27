@@ -28,21 +28,24 @@ func NewHardwareResourceCountService(log logger.Logger) *HardwareResourceCountSe
 // In this function, nodeSet parameter contains set of nodes of similar node type.
 // OppositeTypeSet parameter contains nodes of opposite type.
 // For eg: nodeSet contains automate nodes, then OppositeTypeSet will contains Postgresql and Opensearch Nodes.
-func runHardwareResourceCountCheck(reqNodeCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
+func runHardwareResourceCountCheck(reqNodeCount, reqIPCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
 	minNodeCount := getMinNodesHARequirement(nodeType)
-	response := validateHardwareResources(minNodeCount, reqNodeCount, nodeType, ip, nodeSet, oppositeTypeSet)
+	response := validateHardwareResources(minNodeCount, reqNodeCount, reqIPCount, nodeType, ip, nodeSet, oppositeTypeSet)
 	respMap := make(map[string]models.HardwareResourceResponse)
 	respMap[key] = response
 	ch <- respMap
 }
 
 // validateHardwareResources function is mainly used for calling the 4 main checks, and preparing the response.
-func validateHardwareResources(minNodeCount, reqNodeCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string) models.HardwareResourceResponse {
+func validateHardwareResources(minNodeCount, reqNodeCount, reqIPCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string) models.HardwareResourceResponse {
 	var res = models.HardwareResourceResponse{}
 	res.NodeType = nodeType
 	res.IP = ip
 
-	checks := uniqueIP(nodeType, len(nodeSet), reqNodeCount)
+	checks := instanceCountAndIpsCheck(reqNodeCount, len(nodeSet))
+	res.Checks = append(res.Checks, checks)
+
+	checks = uniqueIP(nodeType, len(nodeSet), reqIPCount)
 	res.Checks = append(res.Checks, checks)
 
 	checks = validFormat(ip)
@@ -55,6 +58,14 @@ func validateHardwareResources(minNodeCount, reqNodeCount int, nodeType string, 
 	res.Checks = append(res.Checks, checks)
 
 	return res
+}
+
+// instanceCountAndIpsCheck validates the count of IP Addresses matched with instance count
+func instanceCountAndIpsCheck(instanceCount, ipsCount int) models.Checks {
+	if instanceCount == ipsCount {
+		return createCheck(constants.INSTANCE_COUNT, true, constants.VALID_COUNT_IPS_SUCCESS_MESSAGE, "", "")
+	}
+	return createCheck(constants.INSTANCE_COUNT, false, "", constants.VALID_COUNT_IPS_ERROR_MESSAGE, constants.VALID_COUNT_IPS_RESOLUTION_MESSAGE)
 }
 
 // uniqueIP function will check that are we getting unique ips for each service.
@@ -173,14 +184,14 @@ func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Har
 	for index, ip := range req.AutomateNodeIps {
 		key := constants.AUTOMATE + ip + strconv.Itoa(index)
 		hrc.log.Debug("Call Initiated for Automate node having IP: ", ip)
-		go runHardwareResourceCountCheck(req.AutomateNodeCount, constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
+		go runHardwareResourceCountCheck(req.AutomateNodeCount, len(req.AutomateNodeIps), constants.AUTOMATE, ip, setAutomate, setBackend, ch, key)
 		hardwareResultOrderList = append(hardwareResultOrderList, key)
 	}
 
 	for index, ip := range req.ChefInfraServerNodeIps {
 		key := constants.CHEF_INFRA_SERVER + ip + strconv.Itoa(index)
 		hrc.log.Debug("Call Initiated for Chefserver node having IP: ", ip)
-		go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
+		go runHardwareResourceCountCheck(req.ChefInfraServerNodeCount, len(req.ChefInfraServerNodeIps), constants.CHEF_INFRA_SERVER, ip, setChefServer, setBackend, ch, key)
 		hardwareResultOrderList = append(hardwareResultOrderList, key)
 	}
 
@@ -188,14 +199,14 @@ func (hrc *HardwareResourceCountService) GetHardwareResourceCount(req models.Har
 		for index, ip := range req.PostgresqlNodeIps {
 			key := constants.POSTGRESQL + ip + strconv.Itoa(index)
 			hrc.log.Debug("Call Initiated for Postgresql node having IP: ", ip)
-			go runHardwareResourceCountCheck(req.PostgresqlNodeCount, constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
+			go runHardwareResourceCountCheck(req.PostgresqlNodeCount, len(req.PostgresqlNodeIps), constants.POSTGRESQL, ip, setPostgresql, setFrontend, ch, key)
 			hardwareResultOrderList = append(hardwareResultOrderList, key)
 		}
 
 		for index, ip := range req.OpenSearchNodeIps {
 			key := constants.OPENSEARCH + ip + strconv.Itoa(index)
 			hrc.log.Debug("Call Initiated for Opensearch node having IP: ", ip)
-			go runHardwareResourceCountCheck(req.OpenSearchNodeCount, constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
+			go runHardwareResourceCountCheck(req.OpenSearchNodeCount, len(req.OpenSearchNodeIps), constants.OPENSEARCH, ip, setOpensearch, setFrontend, ch, key)
 			hardwareResultOrderList = append(hardwareResultOrderList, key)
 		}
 	}
