@@ -431,10 +431,10 @@ region = "ca-central-1"
 
 # Provide vpcid and cidr block
 # Eg.: aws_vpc_id = "vpc12318h"
-aws_vpc_id  = "vpc-b2fad5db"
+aws_vpc_id  = "vpc12318h"
 
 # Eg.: aws_cidr_block_addr = "172.31.64.0"
-aws_cidr_block_addr  = "172.31.192.0"
+aws_cidr_block_addr  = "172.31.64.0"
 
 # Eg.: private_custom_subnets = ["subnet-e556d512", "subnet-e556d513", "subnet-e556d514"]
 private_custom_subnets = []
@@ -508,7 +508,7 @@ managed_rds_certificate = ""
 
 # This AMI should be from the Same Region which we selected above.
 # eg: ami_id = "ami-08d4ac5b634553e16" # This ami is of Ubuntu 20.04 in us-east-1
-ami_id = "ami-01c7ecac079939e18"
+ami_id = "ami-08d4ac5b634553e16"
 
 # eg: delete_on_termination = true or false
 delete_on_termination = true
@@ -526,10 +526,10 @@ opensearch_server_instance_type = "m5.large"
 postgresql_server_instance_type = "m5.large"
 
 # eg: automate_lb_certificate_arn = "arn:aws:acm...."
-automate_lb_certificate_arn = "arn:aws:acm:ca-central-1:112758395563:certificate/1754e15c-5834-44b0-82a7-0508c3155601"
+automate_lb_certificate_arn = "arn:aws:acm...."
 
 # eg: chef_server_lb_certificate_arn = "arn:aws:acm...."
-chef_server_lb_certificate_arn = "arn:aws:acm:ca-central-1:112758395563:certificate/1754e15c-5834-44b0-82a7-0508c3155601"
+chef_server_lb_certificate_arn = "arn:aws:acm...."
 
 # eg: automate_ebs_volume_iops = "100"
 automate_ebs_volume_iops = "100"
