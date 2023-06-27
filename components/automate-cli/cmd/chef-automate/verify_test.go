@@ -28,6 +28,7 @@ func TestRunVerifyCmd(t *testing.T) {
 		mockCreateSystemdService *verifysystemdcreate.MockCreateSystemdService
 		mockSystemdCreateUtils   *verifysystemdcreate.MockSystemdCreateUtils
 		mockSSHUtil              *sshutils.MockSSHUtilsImpl
+		mockVerifyCmdDeps        *verifyCmdDeps
 		configFile               string
 		wantErr                  error
 	}{
@@ -77,6 +78,14 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return &config.HaDeployConfig{}, nil
+				},
+			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
 			wantErr:    nil,
 		},
@@ -123,8 +132,130 @@ func TestRunVerifyCmd(t *testing.T) {
 					}
 				},
 			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return &config.HaDeployConfig{}, nil
+				},
+			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
 			wantErr:    nil,
+		},
+		{
+			description: "Failed to get automate HA infra details",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return nil, errors.New("Unable to get automate HA infra details")
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return &config.HaDeployConfig{}, nil
+				},
+			},
+			configFile: "",
+			wantErr:    errors.New("Unable to get automate HA infra details"),
+		},
+		{
+			description: "Failed to populate HA common config",
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			mockVerifyCmdDeps: &verifyCmdDeps{
+				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+					return &AutomateHAInfraDetails{}, nil
+				},
+				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+					return nil, errors.New("Failed to populate HA common config")
+				},
+			},
+			configFile: "",
+			wantErr:    errors.New("Failed to populate HA common config"),
 		},
 	}
 
@@ -137,7 +268,9 @@ func TestRunVerifyCmd(t *testing.T) {
 				tt.mockSystemdCreateUtils,
 				config.NewHaDeployConfig(),
 				tt.mockSSHUtil,
-				cw.CliWriter)
+				cw.CliWriter,
+				tt.mockVerifyCmdDeps,
+			)
 
 			flagsObj := &verifyCmdFlags{
 				config: tt.configFile,
@@ -316,10 +449,20 @@ func newMockVerifyCmdFlow(mockHttputils *httputils.MockHTTPClient, cw *majorupgr
 			}
 		},
 	}
+	mockVerifyCmdDeps := &verifyCmdDeps{
+		getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
+			return &AutomateHAInfraDetails{}, nil
+		},
+		PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
+			return &config.HaDeployConfig{}, nil
+		},
+	}
 	return NewVerifyCmdFlow(mockHttputils,
 		mockCreateSystemdService,
 		mockSystemdCreateUtils,
 		config.NewHaDeployConfig(),
 		mockSSHUtil,
-		cw.CliWriter)
+		cw.CliWriter,
+		mockVerifyCmdDeps,
+	)
 }

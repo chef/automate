@@ -67,9 +67,15 @@ type verifyCmdFlow struct {
 	sshPort              string
 	sshKeyFile           string
 	sshUserName          string
+	deps                 *verifyCmdDeps
 }
 
-func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService verifysystemdcreate.CreateSystemdService, systemdCreateUtils verifysystemdcreate.SystemdCreateUtils, config *config.HaDeployConfig, sshutil sshutils.SSHUtil, writer *cli.Writer) *verifyCmdFlow {
+type verifyCmdDeps struct {
+	getAutomateHAInfraDetails func() (*AutomateHAInfraDetails, error)
+	PopulateHaCommonConfig    func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error)
+}
+
+func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService verifysystemdcreate.CreateSystemdService, systemdCreateUtils verifysystemdcreate.SystemdCreateUtils, config *config.HaDeployConfig, sshutil sshutils.SSHUtil, writer *cli.Writer, deps *verifyCmdDeps) *verifyCmdFlow {
 	return &verifyCmdFlow{
 		Client:               client,
 		CreateSystemdService: createSystemdService,
@@ -77,6 +83,7 @@ func NewVerifyCmdFlow(client httputils.HTTPClient, createSystemdService verifysy
 		Config:               config,
 		SSHUtil:              sshutil,
 		Writer:               writer,
+		deps:                 deps,
 	}
 }
 
@@ -235,8 +242,11 @@ func verifyCmdFunc(flagsObj *verifyCmdFlags) func(cmd *cobra.Command, args []str
 		if err != nil {
 			return err
 		}
-
-		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, verifysystemdcreate.NewSystemdCreateUtilsImpl(), config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer)
+		deps := &verifyCmdDeps{
+			getAutomateHAInfraDetails: getAutomateHAInfraDetails,
+			PopulateHaCommonConfig:    PopulateHaCommonConfig,
+		}
+		c := NewVerifyCmdFlow(httputils.NewClient(log), createSystemdServiceWithBinary, verifysystemdcreate.NewSystemdCreateUtilsImpl(), config.NewHaDeployConfig(), sshutils.NewSSHUtilWithCommandExecutor(sshutils.NewSshClient(), log, command.NewExecExecutor()), writer, deps)
 		return c.runVerifyCmd(cmd, args, flagsObj)
 	}
 }
@@ -251,11 +261,32 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// TODO : config flag is optional for now. Need to handle the default config path
 	if len(strings.TrimSpace(config)) > 0 {
 		configPath = config
-	}
+		err := v.Config.ParseAndVerify(configPath)
+		if err != nil {
+			return err
+		}
+	} else {
+		infra, err := v.deps.getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
 
-	err := v.Config.ParseAndVerify(configPath)
-	if err != nil {
-		return err
+		config, err := v.deps.PopulateHaCommonConfig(configPuller)
+		if err != nil {
+			return err
+		}
+		v.Config = config
+		err = v.Config.Verify()
+		if err != nil {
+			return err
+		}
 	}
 
 	// Get config required for batch-check API call
@@ -268,7 +299,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 		},
 	}
 
-	err = batchCheckConfig.PopulateWith(v.Config)
+	err := batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {
 		return err
 	}
