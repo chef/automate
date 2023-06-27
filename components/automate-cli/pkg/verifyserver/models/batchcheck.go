@@ -471,6 +471,7 @@ type NodeCert struct {
 type HardwareResourceCheckResponse struct {
 	Status string                           `json:"status"`
 	Result []HardwareResourceCountApiResult `json:"result"`
+	Error  fiber.Error                      `json:"error"`
 }
 
 type HardwareResourceCountApiResult struct {
@@ -506,6 +507,7 @@ type FirewallRequest struct {
 type NFSMountCheckResponse struct {
 	Status string             `json:"status"`
 	Result []NFSMountResponse `json:"result"`
+	Error  fiber.Error        `json:"error"`
 }
 
 type FqdnRequest struct {

@@ -3,7 +3,6 @@ package httputils
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 
@@ -44,9 +43,6 @@ func MakeRequest(requestMethod string, url string, body interface{}) (*http.Resp
 	resp, err := client.Do(req)
 	if err != nil {
 		return resp, err
-	}
-	if err == nil && resp.StatusCode != 200 {
-		return resp, errors.New(resp.Status)
 	}
 	return resp, nil
 }

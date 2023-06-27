@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func PrepareTriggerResponse(resp *models.CheckTriggerResponse, host, nodeType, errorString, check, msg string, isError bool) models.CheckTriggerResponse {
+func PrepareTriggerResponse(resp *models.CheckTriggerResponse, host, nodeType, errorString, check, msg string, isError bool, statusCode int) models.CheckTriggerResponse {
 	if isError {
 		return models.CheckTriggerResponse{
 			Host:     host,
@@ -16,7 +16,7 @@ func PrepareTriggerResponse(resp *models.CheckTriggerResponse, host, nodeType, e
 				Passed:  false,
 				Check:   check,
 				Message: msg,
-				Error:   fiber.NewError(fiber.StatusServiceUnavailable, errorString),
+				Error:   fiber.NewError(statusCode, errorString),
 			},
 		}
 	}

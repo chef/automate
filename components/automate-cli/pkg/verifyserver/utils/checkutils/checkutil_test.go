@@ -44,9 +44,10 @@ func TestPrepareTriggerResponse_WithNoError(t *testing.T) {
 	check := "test check"
 	msg := "test message"
 	isError := false
+	statusCode := 200
 
 	// Act
-	result := PrepareTriggerResponse(resp, host, nodeType, errorString, check, msg, isError)
+	result := PrepareTriggerResponse(resp, host, nodeType, errorString, check, msg, isError, statusCode)
 
 	// Assert
 	assert.Equal(t, resp.Status, result.Status)
@@ -68,9 +69,9 @@ func TestPrepareTriggerResponse_WithError(t *testing.T) {
 	check := "test check"
 	msg := "test message"
 	isError := true
-
+	statusCode := 400
 	// Act
-	result := PrepareTriggerResponse(resp, host, nodeType, errorString, check, msg, isError)
+	result := PrepareTriggerResponse(resp, host, nodeType, errorString, check, msg, isError, statusCode)
 
 	// Assert
 	assert.Equal(t, resp.Status, result.Status)
