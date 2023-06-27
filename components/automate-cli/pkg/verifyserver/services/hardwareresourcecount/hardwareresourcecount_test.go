@@ -539,26 +539,27 @@ func TestValidateHardwareResources(t *testing.T) {
 		TestName     string
 		MinNodeCount int
 		ReqNodeCount int
+		ReqIPCount   int
 		NodeType     string
 		IP           string
 		Set          map[string]string
 		SetBackend   map[string]string
 		ExpectedRes  bool
 	}{
-		{"All Validations okay", 2, 2, "Automate", "174.2.3.4",
+		{"All Validations okay", 2, 2, 2, "Automate", "174.2.3.4",
 			map[string]string{
 				"172.2.3.4": "Automate",
 				"172.2.3.5": "Automate"},
 			map[string]string{"172.3.4.6": "Postgresql"}, true},
-		{"Unique IP Test Failed", 2, 2, "Automate", "174.2.3.4",
+		{"Unique IP Test Failed", 2, 2, 2, "Automate", "174.2.3.4",
 			map[string]string{
 				"172.2.3.4": "Automate"},
 			map[string]string{"172.3.4.6": "Postgresql"}, false},
 	}
 
 	for _, e := range tests {
-		res := validateHardwareResources(e.MinNodeCount, e.ReqNodeCount, e.NodeType, e.IP, e.Set, e.SetBackend)
-		assert.Equal(t, e.ExpectedRes, res.Checks[0].Passed)
+		res := validateHardwareResources(e.MinNodeCount, e.ReqNodeCount, e.ReqIPCount, e.NodeType, e.IP, e.Set, e.SetBackend)
+		assert.Equal(t, e.ExpectedRes, res.Checks[1].Passed)
 	}
 }
 
