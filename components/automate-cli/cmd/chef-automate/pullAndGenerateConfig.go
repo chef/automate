@@ -518,7 +518,6 @@ func (p *PullConfigsImpl) generateInfraConfig() (*ExistingInfraConfigToml, error
 
 func (p *PullConfigsImpl) fetchAwsConfig() (*AwsConfigToml, error) {
 	sharedConfigToml, err := getAwsHAConfig()
-	fmt.Println("sharedConfigToml", sharedConfigToml.Architecture.ConfigInitials.SSHUser)
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "unable to fetch HA config")
 	}
