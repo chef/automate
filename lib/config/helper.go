@@ -366,11 +366,5 @@ func validateS3Endpoint(endpoint string) error {
 	if endpoint == "" {
 		return errors.New("invalid or empty: endpoint")
 	}
-	if strings.HasPrefix(endpoint, "http://") || strings.HasPrefix(endpoint, "https://") {
-		return errors.New("s3 endpoint should not include the HTTP protocol")
-	}
-	if !strings.HasSuffix(endpoint, ".amazonaws.com") {
-		return errors.New("invalid S3 endpoint format. Endpoint should end with '.amazonaws.com'")
-	}
 	return nil
 }
