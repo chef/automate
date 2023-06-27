@@ -20,8 +20,8 @@ const (
 	SHARED_SUCCESS_MESSAGE             = "Not shared with %s nodes"
 	SHARED_ERROR_MESSAGE               = "IP address is common in %s type and %s type"
 	SHARED_RESOLUTION_MESSAGE          = "Unique IP address should be used for %s type and %s type"
-	MIN_AUTOMATE_REQ                   = 2
-	MIN_CHEF_INFRA_SERVER_REQ          = 2
+	MIN_AUTOMATE_REQ                   = 1
+	MIN_CHEF_INFRA_SERVER_REQ          = 1
 	MIN_POSTGRESQL_REQ                 = 3
 	MIN_OPENSEARCH_REQ                 = 3
 )
