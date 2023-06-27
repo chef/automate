@@ -205,6 +205,9 @@ func (c *HaDeployConfig) verifyAutomateSettings() error {
 	if err := validatePort(automateSettings.TeamsPort, "teams_port", false); err != nil {
 		errorList.PushBack(err)
 	}
+	if err := validateFqdnRootCA(automateSettings.FqdnRootCA, true); err != nil {
+		errorList.PushBack(err)
+	}
 	if automateSettings.EnableCustomCerts {
 		if err := validateAutomateCerts(c); err != nil {
 			errorList.PushBack(err)
