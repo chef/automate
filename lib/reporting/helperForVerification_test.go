@@ -129,6 +129,23 @@ func TestCreateStatusTableRows(t *testing.T) {
 			},
 			want: []table.Row{{1, color.New(color.FgRed).Sprint(ip), color.New(color.FgRed).Sprint(certificate), color.New(color.FgRed).Sprint("✖ Failed"), color.New(color.FgRed).Sprint("Certificate validation failed")}, {"", "", "", "", color.New(color.FgRed).Sprint("✖ [ Failed ] Certificate is not formatted properly")}},
 		},
+		{
+			name: "Status is Skipped",
+			args: args{
+				index: 1,
+				rowData: &Info{
+					Hostip:    ip,
+					Parameter: certificate,
+					Status:    skippedStr,
+					StatusMessage: &StatusMessage{
+						MainMessage: "Certificate validation skipped",
+					},
+					SummaryInfo: &SummaryInfo{},
+				},
+				reporting: getMockReportingModule(getMockWriterImpl().CliWriter),
+			},
+			want: []table.Row{{1, ip, certificate, color.New(90).Sprint("⊖ Skipped"), "Certificate validation skipped"}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

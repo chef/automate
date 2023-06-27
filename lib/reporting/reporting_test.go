@@ -13,6 +13,7 @@ import (
 
 const (
 	successStr = "Success"
+	skippedStr = "Skipped"
 	failedStr  = "Failed"
 	waringStr  = "Warning"
 	test1      = "test1"
@@ -257,10 +258,19 @@ func TestAppendSpecialCharater(t *testing.T) {
 			name:   "String returned as it is",
 			fields: module,
 			args: args{
-				symbol: 4,
+				symbol: 5,
 				str:    waringStr,
 			},
 			want: waringStr,
+		},
+		{
+			name:   "Skipped Returnd",
+			fields: module,
+			args: args{
+				symbol: 4,
+				str:    waringStr,
+			},
+			want: "⊖ Warning",
 		},
 	}
 	for _, tt := range tests {

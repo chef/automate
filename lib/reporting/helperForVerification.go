@@ -120,6 +120,10 @@ func createStatusTableRows(index int, rowData *Info, reporting Reporting) []tabl
 
 		row = failedRow(index, rowData, reporting)
 		rows = append(rows, row)
+	} else if rowData.Status == "Skipped" {
+
+		row = skippedRow(index, rowData, reporting)
+		rows = append(rows, row)
 	}
 	if len(rowData.StatusMessage.SubMessage) > 0 {
 		for _, value := range rowData.StatusMessage.SubMessage {
@@ -145,6 +149,15 @@ func failedRow(index int, rowData *Info, reporting Reporting) table.Row {
 	status := reporting.ChangeColour(Red, reporting.AppendSpecialCharater(Failed, rowData.Status))
 	message := reporting.ChangeColour(Red, rowData.StatusMessage.MainMessage)
 
+	row := table.Row{index, hostip, parameter, status, message}
+	return row
+}
+
+func skippedRow(index int, rowData *Info, reporting Reporting) table.Row {
+	hostip := rowData.Hostip
+	parameter := rowData.Parameter
+	status := reporting.ChangeColour(Grey, reporting.AppendSpecialCharater(Skipped, rowData.Status))
+	message := rowData.StatusMessage.MainMessage
 	row := table.Row{index, hostip, parameter, status, message}
 	return row
 }

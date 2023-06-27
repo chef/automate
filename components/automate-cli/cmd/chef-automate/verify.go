@@ -288,10 +288,12 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// Doing batch-check API call for bastion
 	resBastion, err := v.runVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
+		fmt.Println("Inside the resbastion on firs t block error", err)
 		return err
 	}
 
 	if err := json.Unmarshal(resBastion, &batchCheckResultBastion); err != nil {
+		fmt.Println("Inside the resbastion on second block error", err)
 		return fmt.Errorf("failed to unmarshal batch-check API result field for bastion: %v", err)
 	}
 
@@ -606,20 +608,16 @@ func buildReports(batchCheckResults []models.BatchCheckResult) []reporting.Verif
 	for _, batchCheckResult := range batchCheckResults {
 
 		for _, test := range batchCheckResult.Tests {
-
-			if test.Skipped {
-				continue
-			}
-
 			report := reporting.VerificationReport{}
 			report.TableKey = batchCheckResult.NodeType
-
 			info := reporting.Info{}
 			info.Hostip = batchCheckResult.Ip
 
 			info.Parameter = test.Check
 
-			if test.Passed {
+			if test.Skipped {
+				info.Status = "Skipped"
+			} else if test.Passed {
 				info.Status = "Success"
 			} else {
 				info.Status = "Failed"
