@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"strconv"
+
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -165,6 +166,7 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 
 	// not available in config
 	c.DeploymentState = ""
+
 	return nil
 }
 
