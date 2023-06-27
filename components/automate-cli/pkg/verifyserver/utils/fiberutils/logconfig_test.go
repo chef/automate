@@ -14,6 +14,8 @@ func TestLogUtils(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("It should create the debug format in case of debug level", func(t *testing.T) {
+		os.Setenv(fiberutils.LOG_REQ_BODY, "True")
+		defer os.Unsetenv(fiberutils.LOG_REQ_BODY)
 		lc := fiberutils.GetLogConfig(l)
 		assert.Contains(t, lc.Format, "| ${magenta}DEBUG${reset} | ${red}${time}${reset}  |  ${green}${pid}${reset}  |"+
 			"  ${yellow}${status}${reset}  |  ${blue}${method}${reset}  |  ${magenta}${path}${reset}  |"+
