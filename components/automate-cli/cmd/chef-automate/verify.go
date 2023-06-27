@@ -251,6 +251,32 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// TODO : config flag is optional for now. Need to handle the default config path
 	if len(strings.TrimSpace(config)) > 0 {
 		configPath = config
+		err := v.Config.ParseAndVerify(configPath)
+		if err != nil {
+			return err
+		}
+	} else {
+		infra, err := getAutomateHAInfraDetails()
+		if err != nil {
+			return err
+		}
+		sshConfig := &SSHConfig{
+			sshUser:    infra.Outputs.SSHUser.Value,
+			sshKeyFile: infra.Outputs.SSHKeyFile.Value,
+			sshPort:    infra.Outputs.SSHPort.Value,
+		}
+		sshUtil := NewSSHUtil(sshConfig)
+		configPuller := NewPullConfigs(infra, sshUtil)
+
+		config, err := PopulateHaCommonConfig(configPuller)
+		if err != nil {
+			return err
+		}
+		v.Config = config
+		err = v.Config.Verify()
+		if err != nil {
+			return err
+		}
 	}
 
 	err := v.Config.ParseAndVerify(configPath)
