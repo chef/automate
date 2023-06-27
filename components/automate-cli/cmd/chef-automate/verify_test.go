@@ -19,7 +19,11 @@ const (
 	CONFIG_FILE         = "/config_valid_config_parser.toml"
 	STATUS_API_RESPONSE = `{"status":"SUCCESS","result":{"status":"OK","services":[],"cli_version":"20230622174936","error":"error getting services from hab svc status"}}`
 	BATCH_CHECK_REQUEST = `{"status":"SUCCESS","result":{"passed":true,"node_result":[]}}`
+	AWS_CONFIG_FILE     = "/valid_config.toml"
+	DARWIN              = "darwin"
 )
+
+var AwsAutoTfvarsJsonStringEmpty = `{}`
 
 func TestRunVerifyCmd(t *testing.T) {
 	tests := []struct {
@@ -31,7 +35,115 @@ func TestRunVerifyCmd(t *testing.T) {
 		mockVerifyCmdDeps        *verifyCmdDeps
 		configFile               string
 		wantErr                  error
+		IsAws                    bool
+		ConvTfvarToJsonFunc      func(string) string
 	}{
+		{
+			description: "bastion with aws automate-verify - success",
+			IsAws:       true,
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		},
+		{
+			description: "bastion aws without automate-verify - success",
+			IsAws:       true,
+			mockHttputils: &httputils.MockHTTPClient{
+				MakeRequestFunc: func(requestMethod, url string, body interface{}) (*http.Response, []byte, error) {
+					if strings.Contains(url, "batch-check") {
+						return &http.Response{
+							StatusCode: http.StatusOK,
+							Body:       nil,
+						}, []byte(BATCH_CHECK_REQUEST), nil
+					}
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       nil,
+					}, []byte(STATUS_API_RESPONSE), nil
+				},
+			},
+			mockCreateSystemdService: &verifysystemdcreate.MockCreateSystemdService{
+				CreateFun: func() error {
+					return nil
+				},
+			},
+			mockSystemdCreateUtils: &verifysystemdcreate.MockSystemdCreateUtils{
+				GetBinaryPathFunc: func() (string, error) {
+					return "", nil
+				},
+			},
+			mockSSHUtil: &sshutils.MockSSHUtilsImpl{
+				ExecuteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, cmd string, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+				CopyFileToRemoteConcurrentlyFunc: func(sshConfig sshutils.SSHConfig, srcFilePath string, destFileName string, removeFile bool, hostIPs []string) []sshutils.Result {
+					return []sshutils.Result{
+						{
+							HostIP: "",
+							Error:  nil,
+							Output: "",
+						},
+					}
+				},
+			},
+			configFile: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+			wantErr:    nil,
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
+		},
 		{
 			description: "bastion with existing automate-verify - success",
 			mockHttputils: &httputils.MockHTTPClient{
@@ -261,6 +373,7 @@ func TestRunVerifyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
+			ConvTfvarToJsonFunc = tt.ConvTfvarToJsonFunc
 			cw := majorupgrade_utils.NewCustomWriter()
 
 			vc := NewVerifyCmdFlow(tt.mockHttputils,
@@ -285,7 +398,6 @@ func TestRunVerifyCmd(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
@@ -404,17 +516,34 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 }
 
 func TestVerifyCmdFunc(t *testing.T) {
-	flagsObj := &verifyCmdFlags{
-		config: CONFIG_TOML_PATH + CONFIG_FILE,
-		debug:  true,
+	tests := []struct {
+		test     string
+		flagsObj *verifyCmdFlags
+	}{
+		{
+			test: "Existing Infra",
+			flagsObj: &verifyCmdFlags{
+				config: CONFIG_TOML_PATH + CONFIG_FILE,
+				debug:  true,
+			},
+		}, {
+			test: "Aws Infra",
+			flagsObj: &verifyCmdFlags{
+				config: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
+				debug:  true,
+			},
+		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.test, func(t *testing.T) {
+			vf := verifyCmdFunc(tt.flagsObj)
+			assert.NotNil(t, vf, "verifyCmdFunc should not be nil")
 
-	vf := verifyCmdFunc(flagsObj)
-	assert.NotNil(t, vf)
-
-	err := vf(nil, nil)
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "Cannot create automate-verify service since systemd is not present on this machine")
+			err := vf(nil, nil)
+			assert.Error(t, err, "expected an error")
+			assert.Contains(t, err.Error(), "Cannot create automate-verify service", "unexpected error message")
+		})
+	}
 }
 
 func newMockVerifyCmdFlow(mockHttputils *httputils.MockHTTPClient, cw *majorupgrade_utils.CustomWriter) *verifyCmdFlow {

@@ -18,8 +18,10 @@ type configDetails struct {
 	OsSnapshotUserSecret string   `json:"os_snapshot_user_access_key_secret"`
 }
 
+var ConvTfvarToJsonFunc func(string) string = convTfvarToJson
+
 func fetchAwsConfigFromTerraform() (*configDetails, error) {
-	AwsConfigJsonString := convTfvarToJson(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment", "output.auto.tfvars"))
+	AwsConfigJsonString := ConvTfvarToJsonFunc(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "terraform", "reference_architectures", "deployment", "output.auto.tfvars"))
 	awsAutoTfvarConfig, err := getJsonFromTerraformOutputAutoTfVarsFile(AwsConfigJsonString)
 	if err != nil {
 		return nil, err

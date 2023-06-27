@@ -33,6 +33,12 @@ func (c *HaDeployConfig) Verify() error {
 	if err := c.verifyChefServerSettings(); err != nil {
 		errorList.PushBack(err)
 	}
+
+	// no need to verify os ans pg config for aws managed services
+	if c.IsAws() && c.Aws.Config.SetupManagedServices {
+		return getSingleErrorFromList(errorList)
+	}
+
 	if err := c.verifyOpensearchSettings(); err != nil {
 		errorList.PushBack(err)
 	}
@@ -490,6 +496,10 @@ func (c *HaDeployConfig) IsExternalDbSelfManaged() bool {
 func validateAwsOsPgConfig(aws *ConfigAwsSettings) error {
 	errorList := list.New()
 
+	if err := validateAwsDbInstanceType(aws); err != nil {
+		errorList.PushBack(err)
+	}
+
 	err := validateNumberField(aws.OpensearchEbsVolumeIops, "aws opensearch_ebs_volume_iops", true)
 	if err != nil {
 		errorList.PushBack(err)
@@ -593,10 +603,6 @@ func validateCommonAwsSettings(aws *ConfigAwsSettings) error {
 	}
 
 	if err := awsChefSettings(aws); err != nil {
-		errorList.PushBack(err)
-	}
-
-	if err := validateAwsDbInstanceType(aws); err != nil {
 		errorList.PushBack(err)
 	}
 

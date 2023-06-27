@@ -2,8 +2,10 @@ package models
 
 import (
 	"errors"
+	"log"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -62,12 +64,14 @@ type Certificate struct {
 }
 
 type ExternalOS struct {
-	OSDomainName   string `json:"opensearch_domain_name"`
-	OSDomainURL    string `json:"opensearch_domain_url"`
-	OSUsername     string `json:"opensearch_username"`
-	OSUserPassword string `json:"opensearch_user_password"`
-	OSCert         string `json:"opensearch_cert"`
-	OSRoleArn      string `json:"opensearch_role_arn"`
+	OSDomainName                  string `json:"opensearch_domain_name"`
+	OSDomainURL                   string `json:"opensearch_domain_url"`
+	OSUsername                    string `json:"opensearch_username"`
+	OSUserPassword                string `json:"opensearch_user_password"`
+	OSCert                        string `json:"opensearch_cert"`
+	OSRoleArn                     string `json:"opensearch_role_arn"`
+	OsSnapshotUserAccessKeySecret string `json:"os_snapshot_user_access_key_secret"`
+	OsSnapshotUserAccessKeyId     string `json:"os_snapshot_user_access_key_id"`
 }
 
 type ExternalPG struct {
@@ -91,10 +95,24 @@ type Config struct {
 	APIToken        string         `json:"api_token"`
 }
 
+func (c *Config) NewConfig() *Config {
+	return &Config{
+		Hardware:    &Hardware{},
+		Certificate: []*Certificate{},
+		SSHUser:     &SSHUser{},
+		Backup: &Backup{
+			FileSystem:    &FileSystem{},
+			ObjectStorage: &ObjectStorage{},
+		},
+		ExternalOS: &ExternalOS{},
+		ExternalPG: &ExternalPG{},
+	}
+}
+
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
 	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
-	
+
 	for _, ip := range ipList {
 		certByIP, ok := certByIpMap[ip]
 		var nodeCert *NodeCert
@@ -144,6 +162,7 @@ func (c *Config) PopulateWith(haConfig *config.HaDeployConfig) error {
 	if err != nil {
 		return err
 	}
+
 	if err = c.populateCommonConfig(haConfig); err != nil {
 		return err
 	}
@@ -207,14 +226,22 @@ func (c *Config) populateCommonConfig(haConfig *config.HaDeployConfig) error {
 		return err
 	}
 
-	c.Hardware.PostgresqlNodeCount, err = strconv.Atoi(haConfig.Postgresql.Config.InstanceCount)
-	if err != nil {
-		return err
+	if haConfig.Postgresql.Config.InstanceCount == "" && haConfig.Aws.Config.SetupManagedServices {
+		c.Hardware.PostgresqlNodeCount = 0
+	} else {
+		c.Hardware.PostgresqlNodeCount, err = strconv.Atoi(haConfig.Postgresql.Config.InstanceCount)
+		if err != nil {
+			return err
+		}
 	}
 
-	c.Hardware.OpenSearchNodeCount, err = strconv.Atoi(haConfig.Opensearch.Config.InstanceCount)
-	if err != nil {
-		return err
+	if haConfig.Opensearch.Config.InstanceCount == "" && haConfig.Aws.Config.SetupManagedServices {
+		c.Hardware.OpenSearchNodeCount = 0
+	} else {
+		c.Hardware.OpenSearchNodeCount, err = strconv.Atoi(haConfig.Opensearch.Config.InstanceCount)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -242,6 +269,15 @@ func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
 func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
 	if haConfig.Architecture.Aws.BackupConfig == "s3" {
 		c.Backup.ObjectStorage.BucketName = haConfig.Architecture.Aws.S3BucketName
+		c.Backup.ObjectStorage.Endpoint = "https://s3.amazonaws.com"
+		cred := credentials.NewSharedCredentials("", "")
+		creds, err := cred.Get()
+		if err != nil {
+			log.Println("populateAwsS3BucketName:", err)
+		}
+		c.Backup.ObjectStorage.AccessKey = creds.AccessKeyID
+		c.Backup.ObjectStorage.SecretKey = creds.SecretAccessKey
+		c.Backup.ObjectStorage.AWSRegion = haConfig.Aws.Config.Region
 	}
 }
 
