@@ -328,7 +328,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	if err := json.Unmarshal(resRemote, &batchCheckResultRemote); err != nil {
 		return fmt.Errorf("failed to unmarshal batch-check API result field for remote nodes: %v", err)
 	}
