@@ -80,10 +80,10 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			mockVerifyCmdDeps: &verifyCmdDeps{
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
-					return nil, nil
+					return &AutomateHAInfraDetails{}, nil
 				},
 				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
-					return nil, nil
+					return &config.HaDeployConfig{}, nil
 				},
 			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
@@ -134,10 +134,10 @@ func TestRunVerifyCmd(t *testing.T) {
 			},
 			mockVerifyCmdDeps: &verifyCmdDeps{
 				getAutomateHAInfraDetails: func() (*AutomateHAInfraDetails, error) {
-					return nil, nil
+					return &AutomateHAInfraDetails{}, nil
 				},
 				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
-					return nil, nil
+					return &config.HaDeployConfig{}, nil
 				},
 			},
 			configFile: CONFIG_TOML_PATH + CONFIG_FILE,
@@ -194,7 +194,7 @@ func TestRunVerifyCmd(t *testing.T) {
 					return nil, errors.New("Unable to get automate HA infra details")
 				},
 				PopulateHaCommonConfig: func(configPuller PullConfigs) (haDeployConfig *config.HaDeployConfig, err error) {
-					return nil, nil
+					return &config.HaDeployConfig{}, nil
 				},
 			},
 			configFile: "",
