@@ -933,7 +933,6 @@ steps:
   - label: "ocid"
     command:
       - integration/run_test integration/tests/testing_ocid.sh
-      - integration/run_test integration/tests/testing_ocid_config_patch.sh
     timeout_in_minutes: 15
     expeditor:
       secrets:
@@ -944,15 +943,15 @@ steps:
         linux:
           privileged: true
 
-  # - label: "ocid patch"
-  #   command:
-  #     - integration/run_test integration/tests/testing_ocid_config_patch.sh
-  #   timeout_in_minutes: 15
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "ocid config patch"
+    command:
+      - integration/run_test integration/tests/testing_ocid_config_patch.sh
+    timeout_in_minutes: 15
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
