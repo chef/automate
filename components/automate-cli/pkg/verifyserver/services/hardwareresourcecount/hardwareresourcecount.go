@@ -30,7 +30,7 @@ func NewHardwareResourceCountService(log logger.Logger) *HardwareResourceCountSe
 // For eg: nodeSet contains automate nodes, then OppositeTypeSet will contains Postgresql and Opensearch Nodes.
 func runHardwareResourceCountCheck(reqNodeCount, reqIPCount int, nodeType string, ip string, nodeSet, oppositeTypeSet map[string]string, ch chan map[string]models.HardwareResourceResponse, key string) {
 	minNodeCount := getMinNodesHARequirement(nodeType)
-	response := validateHardwareResources(minNodeCount, reqIPCount, reqNodeCount, nodeType, ip, nodeSet, oppositeTypeSet)
+	response := validateHardwareResources(minNodeCount, reqNodeCount, reqIPCount, nodeType, ip, nodeSet, oppositeTypeSet)
 	respMap := make(map[string]models.HardwareResourceResponse)
 	respMap[key] = response
 	ch <- respMap
