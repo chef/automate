@@ -2,8 +2,10 @@ package models
 
 import (
 	"errors"
+	"log"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/chef/automate/lib/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -108,7 +110,7 @@ func (c *Config) NewConfig() *Config {
 func appendCertsByIpToNodeCerts(certsByIP *[]config.CertByIP, ipList []string, privateKey, publicKey, adminKey, adminCert, nodeRootCa string) []*NodeCert {
 	nodeCertsList := make([]*NodeCert, 0)
 	certByIpMap := createMapforCertByIp(certsByIP)
-	
+
 	for _, ip := range ipList {
 		certByIP, ok := certByIpMap[ip]
 		var nodeCert *NodeCert
@@ -265,6 +267,15 @@ func (c *Config) populateConfigInitials(haConfig *config.HaDeployConfig) {
 func (c *Config) populateAwsS3BucketName(haConfig *config.HaDeployConfig) {
 	if haConfig.Architecture.Aws.BackupConfig == "s3" {
 		c.Backup.ObjectStorage.BucketName = haConfig.Architecture.Aws.S3BucketName
+		c.Backup.ObjectStorage.Endpoint = "https://s3.amazonaws.com"
+		cred := credentials.NewSharedCredentials("", "")
+		creds, err := cred.Get()
+		if err != nil {
+			log.Println("populateAwsS3BucketName:", err)
+		}
+		c.Backup.ObjectStorage.AccessKey = creds.AccessKeyID
+		c.Backup.ObjectStorage.SecretKey = creds.SecretAccessKey
+		c.Backup.ObjectStorage.AWSRegion = haConfig.Aws.Config.Region
 	}
 }
 

@@ -87,8 +87,7 @@ func getS3CheckRequest(object *models.ObjectStorage) models.S3ConfigRequest {
 func isObjectStorage(backup *models.Backup) bool {
 	return backup.ObjectStorage.BucketName == "" ||
 		backup.ObjectStorage.AccessKey == "" ||
-		backup.ObjectStorage.SecretKey == "" ||
-		backup.ObjectStorage.AWSRegion == ""
+		backup.ObjectStorage.SecretKey == ""
 }
 
 func emptyResp(config *models.Config, checktype string) []models.CheckTriggerResponse {
