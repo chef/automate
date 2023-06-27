@@ -291,8 +291,7 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	}
 
 	// Get config required for batch-check API call
-	batchCheckConfig := &models.Config{}
-	batchCheckConfig = batchCheckConfig.NewConfig()
+	batchCheckConfig := models.NewConfig()
 
 	err := batchCheckConfig.PopulateWith(v.Config)
 	if err != nil {

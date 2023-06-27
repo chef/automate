@@ -517,8 +517,9 @@ func TestGetHostIPsWithNoLatestCLI(t *testing.T) {
 
 func TestVerifyCmdFunc(t *testing.T) {
 	tests := []struct {
-		test     string
-		flagsObj *verifyCmdFlags
+		test                string
+		flagsObj            *verifyCmdFlags
+		ConvTfvarToJsonFunc func(string) string
 	}{
 		{
 			test: "Existing Infra",
@@ -526,16 +527,23 @@ func TestVerifyCmdFunc(t *testing.T) {
 				config: CONFIG_TOML_PATH + CONFIG_FILE,
 				debug:  true,
 			},
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
 		}, {
 			test: "Aws Infra",
 			flagsObj: &verifyCmdFlags{
 				config: CONFIG_AWS_TOML_PATH + AWS_CONFIG_FILE,
 				debug:  true,
 			},
+			ConvTfvarToJsonFunc: func(string) string {
+				return AwsAutoTfvarsJsonStringEmpty
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.test, func(t *testing.T) {
+			ConvTfvarToJsonFunc = tt.ConvTfvarToJsonFunc
 			vf := verifyCmdFunc(tt.flagsObj)
 			assert.NotNil(t, vf, "verifyCmdFunc should not be nil")
 
