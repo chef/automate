@@ -288,12 +288,10 @@ func (v *verifyCmdFlow) RunVerify(config string) error {
 	// Doing batch-check API call for bastion
 	resBastion, err := v.runVerifyServiceForBastion(*batchCheckConfig)
 	if err != nil {
-		fmt.Println("Inside the resbastion on firs t block error", err)
 		return err
 	}
 
 	if err := json.Unmarshal(resBastion, &batchCheckResultBastion); err != nil {
-		fmt.Println("Inside the resbastion on second block error", err)
 		return fmt.Errorf("failed to unmarshal batch-check API result field for bastion: %v", err)
 	}
 
