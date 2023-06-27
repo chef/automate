@@ -95,17 +95,13 @@ type Config struct {
 	APIToken        string         `json:"api_token"`
 }
 
-func (c *Config) NewConfig() *Config {
+func NewConfig() *Config {
 	return &Config{
 		Hardware:    &Hardware{},
 		Certificate: []*Certificate{},
 		SSHUser:     &SSHUser{},
-		Backup: &Backup{
-			FileSystem:    &FileSystem{},
-			ObjectStorage: &ObjectStorage{},
-		},
-		ExternalOS: &ExternalOS{},
-		ExternalPG: &ExternalPG{},
+		ExternalOS:  &ExternalOS{},
+		ExternalPG:  &ExternalPG{},
 	}
 }
 
