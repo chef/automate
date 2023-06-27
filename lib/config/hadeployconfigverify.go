@@ -99,7 +99,7 @@ func (c *HaDeployConfig) verifyConfigInitials(configInitials *ConfigInitials) er
 	if err := validateRequiredString(configInitials.SecretsStoreFile, "secrets_store_file"); err != nil {
 		errorList.PushBack(err)
 	}
-	if err := validateRequiredString(configInitials.Architecture, "architecture", "aws", "existing_nodes"); err != nil {
+	if err := validateRequiredString(configInitials.Architecture, "architecture", "aws", "existing_nodes", "deployment"); err != nil {
 		errorList.PushBack(err)
 	}
 	if err := validateRequiredString(configInitials.WorkspacePath, "workspace_path", "/hab/a2_deploy_workspace"); err != nil {
