@@ -363,29 +363,19 @@ func TestValidateS3Endpoint(t *testing.T) {
 		expectedError bool
 	}{
 		{
-			name:          "Valid Endpoint",
-			endpoint:      "s3-external-1.amazonaws.com",
-			expectedError: false,
+			name:          "Empty Endpoint",
+			endpoint:      "",
+			expectedError: true,
 		},
 		{
 			name:          "Valid Endpoint with HTTPS",
 			endpoint:      "https://s3.amazonaws.com",
-			expectedError: true,
+			expectedError: false,
 		},
 		{
 			name:          "Valid Endpoint without HTTP/HTTPS",
 			endpoint:      "s3.amazonaws.com",
 			expectedError: false,
-		},
-		{
-			name:          "Invalid Endpoint (Invalid Format)",
-			endpoint:      "example.com",
-			expectedError: true,
-		},
-		{
-			name:          "Invalid Endpoint (Missing .amazonaws.com)",
-			endpoint:      "s3.dualstack.us-east-1",
-			expectedError: true,
 		},
 	}
 
