@@ -146,6 +146,12 @@ type patchFnParameters struct {
 	skipIpsList   []string
 }
 
+type configPatchResponse struct {
+	hostIp       string
+	outputString string
+	err          error
+}
+
 func init() {
 	flagsObj := certRotateFlags{}
 
@@ -545,33 +551,61 @@ func (c *certRotateFlow) copyAndExecute(ips []string, sshUtil SSHUtil, timestamp
 
 	var err error
 	var tomlFilePath string
+	responseChan := make(chan configPatchResponse, len(ips))
 	for i := 0; i < len(ips); i++ {
-		sshUtil.getSSHConfig().hostIP = ips[i]
-		if (flagsObj.postgres || flagsObj.opensearch) && remoteService != "frontend" {
-			tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUtil)
-			if err != nil {
-				return err
-			}
-			// Copying the new toml file which includes both old and new configurations (for backend nodes).
-			err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
-		} else {
-			// Copying the new toml file which includes new configurations (for frontend nodes).
-			err = sshUtil.copyFileToRemote(fileName, remoteService+timestamp, false)
-		}
-		if err != nil {
-			writer.Errorf("%v", err)
-			return err
-		}
+		go func(hostIP string) {
+			rc := configPatchResponse{hostIP, "", nil}
 
-		fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, ips[i])
-		output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
-		if err != nil {
-			writer.Errorf("%v", err)
-			return err
-		}
-		writer.Printf(output + "\n")
+			sshUtil.getSSHConfig().hostIP = hostIP
+			if (flagsObj.postgres || flagsObj.opensearch) && remoteService != "frontend" {
+				tomlFilePath, err = c.getMerger(fileName, timestamp, remoteService, GET_USER_CONFIG, sshUtil)
+				if err != nil {
+					rc.err = err
+					responseChan <- rc
+					return
+				}
+				// Copying the new toml file which includes both old and new configurations (for backend nodes).
+				err = sshUtil.copyFileToRemote(tomlFilePath, remoteService+timestamp, false)
+			} else {
+				// Copying the new toml file which includes new configurations (for frontend nodes).
+				err = sshUtil.copyFileToRemote(fileName, remoteService+timestamp, false)
+			}
+			if err != nil {
+				writer.Errorf("%v", err)
+				rc.err = err
+				responseChan <- rc
+			}
+
+			fmt.Printf("Started Applying the Configurations in %s node: %s", remoteService, hostIP)
+
+			output, err := sshUtil.connectAndExecuteCommandOnRemote(scriptCommands, true)
+			if err != nil {
+				writer.Errorf("%v", err)
+
+				rc.err = err
+				responseChan <- rc
+				return
+			}
+			writer.Printf(output + "\n")
+			rc.outputString = output
+			responseChan <- rc
+
+		}(ips[i])
+
 	}
-	return nil
+
+	var errorStrings error = nil
+	for i := 0; i < len(ips); i++ {
+		response := <-responseChan
+		if response.err != nil {
+			if errorStrings != nil {
+				errors.Wrap(response.err, errorStrings.Error())
+			} else {
+				errorStrings = response.err
+			}
+		}
+	}
+	return errorStrings
 }
 
 // validateEachIp validate given ip with the remoteService cluster.
