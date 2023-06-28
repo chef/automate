@@ -197,7 +197,7 @@ func (ani *AddNodeOnPremImpl) promptUserConfirmation() (bool, error) {
 }
 
 func (ani *AddNodeOnPremImpl) runDeploy() error {
-	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config)
+	err := ani.nodeUtils.writeHAConfigFiles(existingNodesA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
 		return err
 	}

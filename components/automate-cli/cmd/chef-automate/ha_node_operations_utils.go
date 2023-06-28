@@ -46,7 +46,7 @@ type HAModifyAndDeploy interface {
 type NodeOpUtils interface {
 	executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error
 	getHaInfraDetails() (*AutomateHAInfraDetails, *SSHConfig, error)
-	writeHAConfigFiles(templateName string, data interface{}) error
+	writeHAConfigFiles(templateName string, data interface{}, state string) error
 	taintTerraform(path string) error
 	isA2HARBFileExist() bool
 	getModeFromConfig(path string) (string, error)
@@ -174,8 +174,8 @@ func (nu *NodeUtilsImpl) executeAutomateClusterCtlCommandAsync(command string, a
 	return executeAutomateClusterCtlCommandAsync(command, args, helpDocs, true)
 }
 
-func (nu *NodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}) error {
-	return writeHAConfigFiles(templateName, data, DEPLOY)
+func (nu *NodeUtilsImpl) writeHAConfigFiles(templateName string, data interface{}, state string) error {
+	return writeHAConfigFiles(templateName, data, state)
 }
 
 func (nu *NodeUtilsImpl) moveAWSAutoTfvarsFile(terraformPath string) error {

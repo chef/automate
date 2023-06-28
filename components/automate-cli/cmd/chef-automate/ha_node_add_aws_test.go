@@ -166,7 +166,7 @@ func TestAddnodeDeployWithNewOSNodeInAws(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -260,7 +260,7 @@ func TestAddnodeWithExecuteFuncGenConfigErr(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return errors.New("random")
 		},
@@ -336,7 +336,7 @@ func TestAddnodeWithSaveConfigToBasionErr(t *testing.T) {
 			deployed = false
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = false
 			return nil
 		},
@@ -399,7 +399,7 @@ func TestAddnodeWithSyncConfigToAllNodesErr(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -467,7 +467,7 @@ func TestAddnodeWithSyncConfigToAllNodesErrAndDeployError(t *testing.T) {
 			}
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -532,7 +532,7 @@ func TestAddnodeWithExecuteFunc(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},

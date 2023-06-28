@@ -147,12 +147,16 @@ func (ani *AddNodeAWSImpl) runDeploy() error {
 	if err != nil {
 		return err
 	}
-	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config)
+	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config, PROVISION)
 	if err != nil {
 		return err
 	}
 	argsdeploy := []string{"-y"}
 	err = ani.nodeUtils.executeAutomateClusterCtlCommandAsync("provision", argsdeploy, provisionInfraHelpDocs)
+	if err != nil {
+		return err
+	}
+	err = ani.nodeUtils.writeHAConfigFiles(awsA2harbTemplate, ani.config, DEPLOY)
 	if err != nil {
 		return err
 	}

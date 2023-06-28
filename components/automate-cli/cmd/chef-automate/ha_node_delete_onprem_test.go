@@ -334,7 +334,7 @@ func TestDeleteNodeDeployWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -401,7 +401,7 @@ func TestDeleteNodeDeployWithSaveConfigToBastionError(t *testing.T) {
 		getModeFromConfigFunc: func(path string) (string, error) {
 			return EXISTING_INFRA_MODE, nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return nil
 		},
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
@@ -449,7 +449,7 @@ func TestDeleteNodeDeployWithError(t *testing.T) {
 			deployed = false
 			return errors.New("Invalid or empty command")
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -517,7 +517,7 @@ func TestDeleteNodeDeployWithErrorSync(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -583,7 +583,7 @@ func TestDeleteNodeDeployWithErrorSyncAndDeployError(t *testing.T) {
 			deployed = false
 			return errors.New("Invalid or empty command")
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -645,7 +645,7 @@ func TestDeleteNodeDeployWithNewOSMinCountError(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return nil
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -685,7 +685,7 @@ func TestDeleteNodeDeployWithNewOSNodeError(t *testing.T) {
 		executeAutomateClusterCtlCommandAsyncfunc: func(command string, args []string, helpDocs string) error {
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			return errors.New("random")
 		},
 		getModeFromConfigFunc: func(path string) (string, error) {
@@ -747,7 +747,7 @@ func TestRemovenodeExecuteWithNewOSNodeNoCertsByIP(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -835,7 +835,7 @@ func TestRemovenodeExecuteWithNewOSNode(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
@@ -913,7 +913,7 @@ func TestRemovenodeExecuteWithProvisionError(t *testing.T) {
 			deployed = true
 			return nil
 		},
-		writeHAConfigFilesFunc: func(templateName string, data interface{}) error {
+		writeHAConfigFilesFunc: func(templateName string, data interface{}, state string) error {
 			filewritten = true
 			return nil
 		},
