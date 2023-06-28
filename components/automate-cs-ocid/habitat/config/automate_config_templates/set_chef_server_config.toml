@@ -1,4 +1,0 @@
-[ocid.v1.sys.ocid.chef_server_config]
-  endpoint = "https://127.0.0.1:443"
-  superuser = "pivotal"
-  ssl_verify_mode = "verify_none"

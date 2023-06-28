@@ -47,13 +47,8 @@ message ConfigRequest {
 			}
 
 			message Ocid {
-				google.protobuf.Int32Value sql_retry_count = 1;
-				google.protobuf.Int32Value sql_retry_delay = 2;
-				google.protobuf.Int32Value abandoned_upload_cleanup_interval = 3;
-				google.protobuf.Int32Value deleted_data_cleanup_interval = 4;
-				google.protobuf.BoolValue stream_download = 5;
-				ChefServerConfig chef_server_config = 6;
-				OauthApplicationConfig oauth_application_config = 7;
+				ChefServerConfig chef_server_config = 1;
+				OauthApplicationConfig oauth_application_config = 2;
 
 				message ChefServerConfig {
 					google.protobuf.StringValue endpoint = 1;
