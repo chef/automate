@@ -69,3 +69,9 @@ Target version: 4.2.59
 `
 	assert.Equal(t, expected, tw.Output())
 }
+
+func TestRemoveCommonContentFromAwsAutoTfvar(t *testing.T) {
+	err := removeCommonContentFromAwsAutoTfvar("../../pkg/testfiles/aws.auto.tfvars")
+	assert.NoError(t, err)
+	copyFileContents("../../pkg/testfiles/copy/aws.auto.tfvars", "../../pkg/testfiles/aws.auto.tfvars")
+}

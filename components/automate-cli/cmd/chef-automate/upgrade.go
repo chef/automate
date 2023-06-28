@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -452,6 +455,16 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, result, DEPLOY)
 		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
 		writer.Println("a2ha.rb has regenerated...")
+		AwsAutoTfvarsExist, err := dirExists(filepath.Join(terraformPath, AWS_AUTO_TFVARS))
+		if err != nil {
+			return err
+		}
+		if AwsAutoTfvarsExist {
+			err := removeCommonContentFromAwsAutoTfvar(filepath.Join(terraformPath, AWS_AUTO_TFVARS))
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	if offlineMode {
@@ -509,6 +522,51 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		} */
 	}
 	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc, true)
+}
+
+func removeCommonContentFromAwsAutoTfvar(filePath string) error {
+	var line1, line2 bool
+	file, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	buffer := strings.Builder{}
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "# Common" {
+			line1 = true
+		}
+		if line == "################################################################################" && line1 {
+			line2 = true
+			truncateAwsAutoTfvar(file, buffer)
+		}
+		if !line1 && !line2 {
+			buffer.WriteString(line)
+			buffer.WriteString("\n")
+		}
+	}
+	return nil
+}
+
+func truncateAwsAutoTfvar(file *os.File, buffer strings.Builder) error {
+	err := file.Truncate(int64(buffer.Len()))
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Seek(0, io.SeekStart)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(file, strings.NewReader(buffer.String()))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
