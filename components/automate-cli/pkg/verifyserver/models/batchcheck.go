@@ -322,13 +322,19 @@ func (c *Config) populateAwsCerts(haConfig *config.HaDeployConfig) {
 
 func (c *Config) populateAwsManagedServicesConfig(haConfig *config.HaDeployConfig) {
 	awsManagedServicesConfig := haConfig.Aws.Config
-	c.ExternalPG = &ExternalPG{
-		PGDbUserName:        awsManagedServicesConfig.ManagedRdsDbuserUsername,
-		PGDbUserPassword:    awsManagedServicesConfig.ManagedRdsDbuserPassword,
-		PGInstanceURL:       awsManagedServicesConfig.ManagedRdsInstanceURL,
-		PGRootCert:          awsManagedServicesConfig.ManagedRdsCertificate,
-		PGSuperuserName:     awsManagedServicesConfig.ManagedRdsSuperuserUsername,
-		PGSuperuserPassword: awsManagedServicesConfig.ManagedRdsSuperuserPassword,
+	if c.ExternalPG == nil {
+		c.ExternalPG = &ExternalPG{}
+	}
+
+	c.ExternalPG.PGDbUserName = awsManagedServicesConfig.ManagedRdsDbuserUsername
+	c.ExternalPG.PGDbUserPassword = awsManagedServicesConfig.ManagedRdsDbuserPassword
+	c.ExternalPG.PGInstanceURL = awsManagedServicesConfig.ManagedRdsInstanceURL
+	c.ExternalPG.PGRootCert = awsManagedServicesConfig.ManagedRdsCertificate
+	c.ExternalPG.PGSuperuserName = awsManagedServicesConfig.ManagedRdsSuperuserUsername
+	c.ExternalPG.PGSuperuserPassword = awsManagedServicesConfig.ManagedRdsSuperuserPassword
+
+	if c.ExternalOS == nil {
+		c.ExternalOS = &ExternalOS{}
 	}
 
 	c.ExternalOS.OSDomainName = awsManagedServicesConfig.ManagedOpensearchDomainName
@@ -373,24 +379,27 @@ func addCertificatesInConfig(fqdn, rootCA, nodeType string) *Certificate {
 
 func (c *Config) populateExternalDbConfig(haConfig *config.HaDeployConfig) {
 	externalPgConfig := haConfig.External.Database.PostgreSQL
-	c.ExternalPG = &ExternalPG{
-		PGDbUserName:        externalPgConfig.DbuserUsername,
-		PGDbUserPassword:    externalPgConfig.DbuserPassword,
-		PGInstanceURL:       externalPgConfig.InstanceURL,
-		PGRootCert:          externalPgConfig.PostgresqlRootCert,
-		PGSuperuserName:     externalPgConfig.SuperuserUsername,
-		PGSuperuserPassword: externalPgConfig.SuperuserPassword,
+	if c.ExternalPG == nil {
+		c.ExternalPG = &ExternalPG{}
 	}
+	c.ExternalPG.PGDbUserName = externalPgConfig.DbuserUsername
+	c.ExternalPG.PGDbUserPassword = externalPgConfig.DbuserPassword
+	c.ExternalPG.PGInstanceURL = externalPgConfig.InstanceURL
+	c.ExternalPG.PGRootCert = externalPgConfig.PostgresqlRootCert
+	c.ExternalPG.PGSuperuserName = externalPgConfig.SuperuserUsername
+	c.ExternalPG.PGSuperuserPassword = externalPgConfig.SuperuserPassword
 
 	externalOsConfig := haConfig.External.Database.OpenSearch
 
-	c.ExternalOS = &ExternalOS{
-		OSDomainName:   externalOsConfig.OpensearchDomainName,
-		OSDomainURL:    externalOsConfig.OpensearchDomainURL,
-		OSCert:         externalOsConfig.OpensearchRootCert,
-		OSUserPassword: externalOsConfig.OpensearchUserPassword,
-		OSUsername:     externalOsConfig.OpensearchUsername,
+	if c.ExternalOS == nil {
+		c.ExternalOS = &ExternalOS{}
 	}
+
+	c.ExternalOS.OSDomainName = externalOsConfig.OpensearchDomainName
+	c.ExternalOS.OSDomainURL = externalOsConfig.OpensearchDomainURL
+	c.ExternalOS.OSCert = externalOsConfig.OpensearchRootCert
+	c.ExternalOS.OSUserPassword = externalOsConfig.OpensearchUserPassword
+	c.ExternalOS.OSUsername = externalOsConfig.OpensearchUsername
 
 	if haConfig.IsAwsExternalOsConfigured() {
 		c.ExternalOS.OSRoleArn = externalOsConfig.Aws.AwsOsSnapshotRoleArn
