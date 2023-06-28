@@ -1,6 +1,6 @@
-# Automate-HA-Backend-ElasticSearch
+# Automate-HA-Backend-Elasticsearch
 
-This is a wrapper package of core/elasticsearch for Chef Automate that provides a backend HA ElasticSearch.
+This is a wrapper package of core/elasticsearch for Chef Automate that provides a backend HA Elasticsearch.
 
 ## Maintainers
 
@@ -12,5 +12,5 @@ This is a service package.
 
 ## Notes
 
-This package wraps the upstream ElasticSearch package. It installs and clusters
-ElasticSearch. It also loads in a basic dashboard based on the contents of `files/dashboard.tar.gz`. If you want to incorporate dashboard changes, simply deploy this app, make your changes in kibana, then run `files/exporter.rb`. This will export a new dashboard.tar.gz containing all local kibana dashboards that you can drop in this package.
+This package wraps the upstream Elasticsearch package. It installs and clusters
+Elasticsearch. It also loads in a basic dashboard based on the contents of `files/dashboard.tar.gz`. If you want to incorporate dashboard changes, simply deploy this app, make your changes in kibana, then run `files/exporter.rb`. This will export a new dashboard.tar.gz containing all local kibana dashboards that you can drop in this package.

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# ElasticSearch Health Check for Habitat
+# Elasticsearch Health Check for Habitat
 
 # For details on the elasticsearch health colors, see:
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
